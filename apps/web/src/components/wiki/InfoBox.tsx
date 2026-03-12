@@ -62,6 +62,16 @@ export interface InfoBoxProps {
   policyStatus?: string;
   policyAuthor?: string;
   scope?: string;
+  // AI Model fields
+  modelFamily?: string;
+  modelTier?: string;
+  releaseDate?: string;
+  developer?: string;
+  inputPrice?: number;
+  outputPrice?: number;
+  contextWindow?: number;
+  safetyLevel?: string;
+  benchmarks?: { name: string; score: number; unit?: string }[];
   // Summary/overview page this entity belongs to
   summaryPage?: { title: string; href: string };
   // Child pages (for overview entities)
@@ -178,6 +188,15 @@ export function InfoBox({
   policyStatus,
   policyAuthor,
   scope,
+  modelFamily,
+  modelTier,
+  releaseDate,
+  developer,
+  inputPrice,
+  outputPrice,
+  contextWindow,
+  safetyLevel,
+  benchmarks,
   summaryPage,
   childPages,
 }: InfoBoxProps) {
@@ -206,6 +225,17 @@ export function InfoBox({
   if (!isOverview && affiliation) fields.push({ label: "Affiliation", value: affiliation });
   if (!isOverview && role) fields.push({ label: "Role", value: role });
   if (!isOverview && knownFor) fields.push({ label: "Known For", value: knownFor });
+  // AI Model fields
+  if (!isOverview && releaseDate) fields.push({ label: "Released", value: releaseDate });
+  if (!isOverview && developer) fields.push({ label: "Developer", value: developer });
+  if (!isOverview && modelTier) fields.push({ label: "Tier", value: modelTier.charAt(0).toUpperCase() + modelTier.slice(1) });
+  if (!isOverview && safetyLevel) fields.push({ label: "Safety Level", value: safetyLevel });
+  if (!isOverview && inputPrice !== undefined && outputPrice !== undefined) {
+    fields.push({ label: "Pricing", value: `$${inputPrice} / $${outputPrice} per MTok` });
+  }
+  if (!isOverview && contextWindow) {
+    fields.push({ label: "Context", value: contextWindow >= 1000000 ? `${contextWindow / 1000000}M tokens` : `${contextWindow / 1000}K tokens` });
+  }
   if (website) fields.push({ label: "Website", value: website });
   if (customFields) fields.push(...customFields);
 
@@ -444,6 +474,23 @@ export function InfoBox({
         </div>
       )}
 
+
+      {/* Benchmarks */}
+      {benchmarks && benchmarks.length > 0 && (
+        <div className="px-4 py-3 border-t border-border">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Benchmarks</div>
+          <div className="flex flex-col gap-1">
+            {benchmarks.map((b, i) => (
+              <div key={i} className="flex justify-between items-baseline py-1 border-b border-border last:border-b-0">
+                <span className="text-xs text-muted-foreground pr-2">{b.name}</span>
+                <span className="text-xs font-semibold text-foreground whitespace-nowrap">
+                  {b.score}{b.unit === "%" ? "%" : b.unit ? ` ${b.unit}` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ITN Framework */}
       {hasITN && (

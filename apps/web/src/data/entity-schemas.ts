@@ -220,6 +220,28 @@ const IntelligenceParadigmEntitySchema = BaseEntity.extend({
   entityType: z.literal("intelligence-paradigm"),
 });
 
+const BenchmarkResult = z.object({
+  name: z.string(),
+  score: z.number(),
+  unit: z.string().optional(),
+  date: z.string().optional(),
+});
+
+const AiModelEntitySchema = BaseEntity.extend({
+  entityType: z.literal("ai-model"),
+  modelFamily: z.string().optional(),
+  modelTier: z.string().optional(),
+  generation: z.string().optional(),
+  releaseDate: z.string().optional(),
+  developer: z.string().optional(),
+  inputPrice: z.number().optional(),
+  outputPrice: z.number().optional(),
+  contextWindow: z.number().optional(),
+  safetyLevel: z.string().optional(),
+  benchmarks: z.array(BenchmarkResult).default([]),
+  capabilities: z.array(z.string()).default([]),
+});
+
 // Catch-all for entity types we haven't explicitly modeled
 const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
@@ -262,6 +284,7 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   TableEntitySchema,
   DiagramEntitySchema,
   IntelligenceParadigmEntitySchema,
+  AiModelEntitySchema,
 ]);
 
 // ============================================================================
@@ -274,6 +297,7 @@ export type PersonEntity = z.infer<typeof PersonEntitySchema>;
 export type OrganizationEntity = z.infer<typeof OrganizationEntitySchema>;
 export type PolicyEntity = z.infer<typeof PolicyEntitySchema>;
 export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
+export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -294,5 +318,9 @@ export function isOrganization(e: TypedEntity | GenericEntity): e is Organizatio
 
 export function isPolicy(e: TypedEntity | GenericEntity): e is PolicyEntity {
   return e.entityType === "policy";
+}
+
+export function isAiModel(e: TypedEntity | GenericEntity): e is AiModelEntity {
+  return e.entityType === "ai-model";
 }
 

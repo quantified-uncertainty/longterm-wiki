@@ -1,7 +1,7 @@
 thing:
   id: claude-sonnet-4-5
   stableId: fdp0LajPwQ
-  type: project
+  type: ai-model
   name: Claude Sonnet 4.5
   numericId: E1036
 facts:

@@ -1,7 +1,7 @@
 thing:
   id: claude
   stableId: cMKB5i2WZQ
-  type: project
+  type: ai-model
   name: Claude
   numericId: E1041
 facts:
