@@ -3,11 +3,11 @@ import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
 const CG_CSV_URL =
   "https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv";
 const CG_CSV_PATH = "/tmp/coefficient-giving-grants.csv";
-const FUNDER_ID = "ULjDXpSLCI";
 
 export const source: GrantSource = {
   id: "coefficient-giving",
@@ -58,7 +58,7 @@ export const source: GrantSource = {
 
       grants.push({
         source: "coefficient-giving",
-        funderId: FUNDER_ID,
+        funderId: FUNDER_IDS.OPEN_PHILANTHROPY,
         granteeName: orgName,
         granteeId,
         name: grantName.substring(0, 500),
