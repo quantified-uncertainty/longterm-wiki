@@ -27,6 +27,7 @@ import {
   SourceLink,
   DirectoryEntityLink,
 } from "@/components/directory";
+import { ResourceLink } from "@components/wiki/ResourceLink";
 import { formatKBDate } from "@/components/wiki/kb/format";
 
 export function generateStaticParams() {
@@ -305,12 +306,20 @@ export default async function PersonProfilePage({
                   const title = fieldStr(pub.fields, "title") ?? pub.key;
                   const year = pub.fields.year ? Number(pub.fields.year) : null;
                   const url = fieldStr(pub.fields, "url");
+                  const resourceId = fieldStr(pub.fields, "resource");
                   const notes = fieldStr(pub.fields, "notes");
 
                   return (
                     <div key={pub.key} className="px-5 py-3">
                       <div className="flex items-baseline gap-2">
-                        {url ? (
+                        {resourceId ? (
+                          <ResourceLink
+                            id={resourceId}
+                            className="font-semibold text-sm text-primary hover:underline"
+                          >
+                            {title}
+                          </ResourceLink>
+                        ) : url ? (
                           <a
                             href={url}
                             target="_blank"

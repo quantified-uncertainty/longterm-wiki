@@ -59,22 +59,26 @@ records:
       title: "The Sequences (Rationality: A-Z)"
       year: 2009
       url: https://www.readthesequences.com/
+      resource: jPGXEMnk5Q
       notes: "Series of blog posts on LessWrong covering epistemology, cognitive biases, and AI alignment; later compiled into 'Rationality: From AI to Zombies'"
 
     i_eY7jK8lM9n:
       title: "Harry Potter and the Methods of Rationality (HPMOR)"
       year: 2015
       url: https://hpmor.com/
+      resource: totiI8Dqjg
       notes: "Popular Harry Potter fanfiction exploring rationalist thinking; widely read (millions of readers); served as an entry point to rationalism for many"
 
     i_eYoP1qR2s:
       title: "Intelligence Explosion Microeconomics"
       year: 2013
       url: https://intelligence.org/files/IEM.pdf
+      resource: OGUwNmFkNG
       notes: "Technical analysis of recursive self-improvement and intelligence explosion dynamics"
 
     i_eYtU3vW4x:
       title: "AGI Ruin: A List of Lethalities"
       year: 2022
       url: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+      resource: YmRlOWY0ZD
       notes: "Influential post arguing that alignment is likely unsolvable in time and AI will likely kill everyone; catalyzed major debate in AI safety"

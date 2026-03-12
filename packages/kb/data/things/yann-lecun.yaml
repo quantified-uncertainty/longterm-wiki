@@ -95,16 +95,19 @@ records:
       title: "Backpropagation Applied to Handwritten Zip Code Recognition"
       year: 1989
       url: https://ieeexplore.ieee.org/document/6795724
+      resource: EmOPSeJHJQ
       notes: "Introduced convolutional neural networks (CNNs); one of the most cited papers in deep learning"
 
     i_yLyZ5aB6c:
       title: "Gradient-Based Learning Applied to Document Recognition (LeNet-5)"
       year: 1998
       url: http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
+      resource: 3TNJXsVwtw
       notes: "Definitive CNN architecture paper; LeNet deployed commercially for reading checks at banks"
 
     i_yLdE7fG8h:
       title: "A Path Towards Autonomous Machine Intelligence"
       year: 2022
       url: https://openreview.net/pdf?id=BZ5a1r-kVsf
+      resource: 3cH1vT52ow
       notes: "Position paper proposing Joint Embedding Predictive Architectures (JEPA) as path to human-level AI"

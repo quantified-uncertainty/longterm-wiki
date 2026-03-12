@@ -12,5 +12,6 @@ fields:
   title: { type: text, required: true, description: "Publication title" }
   year: { type: number, required: true, description: "Publication year" }
   url: { type: text, description: "URL to the publication" }
+  resource: { type: text, description: "Resource ID (10-char stable_id) for ResourceLink rendering" }
   source: { type: text, description: "URL to a citation or reference" }
   notes: { type: text, description: "Impact, significance, or citation count" }

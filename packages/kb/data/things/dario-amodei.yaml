@@ -104,16 +104,19 @@ records:
       title: "Concrete Problems in AI Safety"
       year: 2016
       url: https://arxiv.org/abs/1606.06565
+      resource: M2JlZDZhMj
       notes: "Co-authored influential paper outlining five practical safety problems for ML systems"
 
     i_dAeF5gH6i:
       title: "Language Models are Few-Shot Learners (GPT-3)"
       year: 2020
       url: https://arxiv.org/abs/2005.14165
+      resource: MGZkNjA2Mj
       notes: "Key contributor to GPT-3 paper demonstrating in-context learning at scale"
 
     i_dAjK7lM8n:
       title: "Machines of Loving Grace"
       year: 2024
       url: https://darioamodei.com/machines-of-loving-grace
+      resource: DMWUTByTQw
       notes: "Influential essay on how AI could transform biology, poverty, governance, and work"
