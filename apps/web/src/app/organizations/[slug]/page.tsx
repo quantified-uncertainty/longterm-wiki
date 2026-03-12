@@ -588,6 +588,428 @@ function FundingProgramsSection({
   );
 }
 
+// ── Personnel helpers ────────────────────────────────────────────────
+
+const ROLE_TYPE_LABELS: Record<string, string> = {
+  "key-person": "Key Person",
+  board: "Board",
+  career: "Career",
+};
+
+const ROLE_TYPE_COLORS: Record<string, string> = {
+  "key-person": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  board: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  career: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+};
+
+function parsePersonnelRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  const schema = record.schema;
+
+  // Extract person ID — key-person and board use different field names
+  const personId =
+    (f.person as string) ?? (f.member as string) ?? null;
+
+  // Extract role/title
+  const role = (f.title as string) ?? (f.role as string) ?? null;
+
+  // Extract dates — key-person uses start/end, board uses appointed/departed
+  const startDate =
+    (f.start as string) ?? (f.appointed as string) ?? null;
+  const endDate =
+    (f.end as string) ?? (f.departed as string) ?? null;
+
+  const isFounder = (f.is_founder as boolean) ?? false;
+
+  // Determine display role type from schema
+  const roleType =
+    schema === "key-person"
+      ? "key-person"
+      : schema === "board-seat"
+        ? "board"
+        : "career";
+
+  return {
+    key: record.key,
+    personId,
+    role,
+    roleType,
+    startDate,
+    endDate,
+    isFounder,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+/** Key Personnel section for org pages. */
+function KeyPersonnelSection({
+  personnel,
+}: {
+  personnel: (ReturnType<typeof parsePersonnelRecord> & {
+    personName: string;
+    personHref: string | null;
+  })[];
+}) {
+  if (personnel.length === 0) return null;
+
+  return (
+    <section>
+      <SectionHeader title="Key Personnel" count={personnel.length} />
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Name</th>
+              <th className="text-left py-2 px-3 font-medium">Role</th>
+              <th className="text-left py-2 px-3 font-medium">Type</th>
+              <th className="text-center py-2 px-3 font-medium">Period</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {personnel.map((p) => (
+              <tr key={p.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {p.personHref ? (
+                      <Link href={p.personHref} className="text-primary hover:underline">
+                        {p.personName}
+                      </Link>
+                    ) : (
+                      p.personName
+                    )}
+                  </span>
+                  {p.isFounder && (
+                    <span className="ml-1.5 inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                      Founder
+                    </span>
+                  )}
+                  {p.source && (
+                    <a
+                      href={p.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-xs text-muted-foreground">
+                  {p.role ?? ""}
+                </td>
+                <td className="py-2 px-3">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                      ROLE_TYPE_COLORS[p.roleType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    {ROLE_TYPE_LABELS[p.roleType] ?? p.roleType}
+                  </span>
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {p.startDate && (
+                    <span>
+                      {p.startDate}
+                      {p.endDate ? ` - ${p.endDate}` : " - present"}
+                    </span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+// ── Funding Round helpers ────────────────────────────────────────────
+
+function parseFundingRoundRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    date: (f.date as string) ?? null,
+    raised: typeof f.raised === "number" ? f.raised : null,
+    valuation: typeof f.valuation === "number" ? f.valuation : null,
+    instrument: (f.instrument as string) ?? null,
+    leadInvestor: (f.lead_investor as string) ?? null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+/** Funding Rounds section for org pages. */
+function FundingRoundsSection({
+  rounds,
+}: {
+  rounds: (ReturnType<typeof parseFundingRoundRecord> & {
+    leadInvestorName: string;
+    leadInvestorHref: string | null;
+  })[];
+}) {
+  if (rounds.length === 0) return null;
+
+  const totalRaised = rounds.reduce((sum, r) => sum + (r.raised ?? 0), 0);
+
+  return (
+    <section>
+      <SectionHeader title="Funding Rounds" count={rounds.length} />
+      {totalRaised > 0 && (
+        <div className="text-xs text-muted-foreground mb-3">
+          Total raised: {formatCompactCurrency(totalRaised)}
+        </div>
+      )}
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Round</th>
+              <th className="text-right py-2 px-3 font-medium">Raised</th>
+              <th className="text-right py-2 px-3 font-medium">Valuation</th>
+              <th className="text-left py-2 px-3 font-medium">Lead Investor</th>
+              <th className="text-center py-2 px-3 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {rounds.map((r) => (
+              <tr key={r.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">{r.name}</span>
+                  {r.instrument && (
+                    <span className="ml-1.5 text-[10px] text-muted-foreground/60">
+                      ({r.instrument})
+                    </span>
+                  )}
+                  {r.source && (
+                    <a
+                      href={r.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {r.raised != null && (
+                    <span className="font-semibold">{formatCompactCurrency(r.raised)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {r.valuation != null && (
+                    <span className="text-muted-foreground">{formatCompactCurrency(r.valuation)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-xs">
+                  {r.leadInvestorHref ? (
+                    <Link href={r.leadInvestorHref} className="text-primary hover:underline">
+                      {r.leadInvestorName}
+                    </Link>
+                  ) : r.leadInvestorName ? (
+                    <span className="text-muted-foreground">{r.leadInvestorName}</span>
+                  ) : null}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {r.date ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+// ── Investment helpers ───────────────────────────────────────────────
+
+function parseInvestmentRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    investorId: (f.investor as string) ?? null,
+    roundName: (f.round_name as string) ?? null,
+    date: (f.date as string) ?? null,
+    amount: typeof f.amount === "number" ? f.amount : null,
+    stakeAcquired: typeof f.stake_acquired === "number" ? f.stake_acquired : null,
+    instrument: (f.instrument as string) ?? null,
+    role: (f.role as string) ?? null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+/** Investments Received section for org pages. */
+function InvestmentsReceivedSection({
+  investments,
+}: {
+  investments: (ReturnType<typeof parseInvestmentRecord> & {
+    investorName: string;
+    investorHref: string | null;
+  })[];
+}) {
+  if (investments.length === 0) return null;
+
+  const totalAmount = investments.reduce((sum, inv) => sum + (inv.amount ?? 0), 0);
+
+  return (
+    <section>
+      <SectionHeader title="Investments Received" count={investments.length} />
+      {totalAmount > 0 && (
+        <div className="text-xs text-muted-foreground mb-3">
+          Total tracked: {formatCompactCurrency(totalAmount)}
+        </div>
+      )}
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Investor</th>
+              <th className="text-left py-2 px-3 font-medium">Round</th>
+              <th className="text-right py-2 px-3 font-medium">Amount</th>
+              <th className="text-center py-2 px-3 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {investments.map((inv) => (
+              <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {inv.investorHref ? (
+                      <Link href={inv.investorHref} className="text-primary hover:underline">
+                        {inv.investorName}
+                      </Link>
+                    ) : (
+                      inv.investorName
+                    )}
+                  </span>
+                  {inv.role && (
+                    <span className="ml-1.5 text-[10px] text-muted-foreground/60">
+                      ({inv.role})
+                    </span>
+                  )}
+                  {inv.source && (
+                    <a
+                      href={inv.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-xs text-muted-foreground">
+                  {inv.roundName ?? ""}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {inv.amount != null && (
+                    <span className="font-semibold">{formatCompactCurrency(inv.amount)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {inv.date ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+// ── Equity Position helpers ─────────────────────────────────────────
+
+function parseEquityPositionRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    holderId: (f.holder as string) ?? null,
+    stake: typeof f.stake === "number" ? f.stake : null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+    asOf: "asOf" in record ? (record as { asOf?: string }).asOf : undefined,
+  };
+}
+
+/** Format a stake percentage for display (e.g., 0.15 → "15%"). */
+function formatStake(stake: number): string {
+  if (stake <= 1) {
+    return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
+  }
+  // Already a percentage
+  return `${stake.toFixed(1).replace(/\.0$/, "")}%`;
+}
+
+/** Equity Positions section for org pages. */
+function EquityPositionsSection({
+  positions,
+}: {
+  positions: (ReturnType<typeof parseEquityPositionRecord> & {
+    holderName: string;
+    holderHref: string | null;
+  })[];
+}) {
+  if (positions.length === 0) return null;
+
+  return (
+    <section>
+      <SectionHeader title="Equity Positions" count={positions.length} />
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Holder</th>
+              <th className="text-right py-2 px-3 font-medium">Stake</th>
+              <th className="text-center py-2 px-3 font-medium">As Of</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {positions.map((pos) => (
+              <tr key={pos.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {pos.holderHref ? (
+                      <Link href={pos.holderHref} className="text-primary hover:underline">
+                        {pos.holderName}
+                      </Link>
+                    ) : (
+                      pos.holderName
+                    )}
+                  </span>
+                  {pos.source && (
+                    <a
+                      href={pos.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {pos.stake != null && (
+                    <span className="font-semibold">{formatStake(pos.stake)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {pos.asOf ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────
 
 export default async function OrgProfilePage({
@@ -672,6 +1094,84 @@ export default async function OrgProfilePage({
   const fundingPrograms = fundingProgramRecords
     .map(parseFundingProgramRecord)
     .sort((a, b) => (b.totalBudget ?? 0) - (a.totalBudget ?? 0));
+
+  // ── Key Personnel (key-person, board, career records owned by this org) ──
+  const personnelRecords = getKBRecords(entity.id, "personnel");
+  const personnel = personnelRecords
+    .map((r) => {
+      const parsed = parsePersonnelRecord(r);
+      const resolved = parsed.personId
+        ? resolveRecipient(parsed.personId)
+        : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
+      return {
+        ...parsed,
+        personName: resolved.name,
+        personHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      // Founders first, then key-person, then board, then career
+      if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
+      const typeOrder: Record<string, number> = { "key-person": 0, board: 1, career: 2 };
+      const aOrder = typeOrder[a.roleType] ?? 3;
+      const bOrder = typeOrder[b.roleType] ?? 3;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return a.personName.localeCompare(b.personName);
+    });
+
+  // ── Funding Rounds ──
+  const fundingRoundRecords = getKBRecords(entity.id, "funding-rounds");
+  const fundingRounds = fundingRoundRecords
+    .map((r) => {
+      const parsed = parseFundingRoundRecord(r);
+      const resolved = parsed.leadInvestor
+        ? resolveRecipient(parsed.leadInvestor)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        leadInvestorName: resolved.name,
+        leadInvestorHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      // Sort by date descending (most recent first)
+      if (a.date && b.date) return b.date.localeCompare(a.date);
+      if (a.date) return -1;
+      if (b.date) return 1;
+      return (b.raised ?? 0) - (a.raised ?? 0);
+    });
+
+  // ── Investments Received ──
+  const investmentRecords = getKBRecords(entity.id, "investments");
+  const investmentsReceived = investmentRecords
+    .map((r) => {
+      const parsed = parseInvestmentRecord(r);
+      const resolved = parsed.investorId
+        ? resolveRecipient(parsed.investorId)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        investorName: resolved.name,
+        investorHref: resolved.href,
+      };
+    })
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Equity Positions ──
+  const equityPositionRecords = getKBRecords(entity.id, "equity-positions");
+  const equityPositions = equityPositionRecords
+    .map((r) => {
+      const parsed = parseEquityPositionRecord(r);
+      const resolved = parsed.holderId
+        ? resolveRecipient(parsed.holderId)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        holderName: resolved.name,
+        holderHref: resolved.href,
+      };
+    })
+    .sort((a, b) => (b.stake ?? 0) - (a.stake ?? 0));
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
@@ -785,6 +1285,18 @@ export default async function OrgProfilePage({
 
           {/* Funding Programs (RFPs, grant rounds, fellowships, etc.) */}
           <FundingProgramsSection programs={fundingPrograms} />
+
+          {/* Key Personnel (key people, board members) */}
+          <KeyPersonnelSection personnel={personnel} />
+
+          {/* Funding Rounds (equity funding rounds) */}
+          <FundingRoundsSection rounds={fundingRounds} />
+
+          {/* Investments Received */}
+          <InvestmentsReceivedSection investments={investmentsReceived} />
+
+          {/* Equity Positions (ownership stakes) */}
+          <EquityPositionsSection positions={equityPositions} />
         </div>
 
         {/* Sidebar */}
