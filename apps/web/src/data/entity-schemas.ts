@@ -230,7 +230,7 @@ const BenchmarkResult = z.object({
 const AiModelEntitySchema = BaseEntity.extend({
   entityType: z.literal("ai-model"),
   modelFamily: z.string().optional(),
-  modelTier: z.string().optional(),
+  modelTier: z.enum(["haiku", "sonnet", "opus"]).optional(),
   generation: z.string().optional(),
   releaseDate: z.string().optional(),
   developer: z.string().optional(),

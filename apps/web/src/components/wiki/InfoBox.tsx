@@ -11,6 +11,7 @@ import type { AnyEntityTypeName } from "@/data/entity-type-names";
 import type { ExternalLinksData } from "@/data";
 import { InfoBoxDescription } from "./InfoBoxDescription";
 import { isSafeUrl } from "./resource-utils";
+import { formatCompactNumber } from "@lib/format-compact";
 
 type LucideIcon = React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
 
@@ -63,7 +64,6 @@ export interface InfoBoxProps {
   policyAuthor?: string;
   scope?: string;
   // AI Model fields
-  modelFamily?: string;
   modelTier?: string;
   releaseDate?: string;
   developer?: string;
@@ -188,7 +188,6 @@ export function InfoBox({
   policyStatus,
   policyAuthor,
   scope,
-  modelFamily,
   modelTier,
   releaseDate,
   developer,
@@ -234,7 +233,7 @@ export function InfoBox({
     fields.push({ label: "Pricing", value: `$${inputPrice} / $${outputPrice} per MTok` });
   }
   if (!isOverview && contextWindow) {
-    fields.push({ label: "Context", value: contextWindow >= 1000000 ? `${contextWindow / 1000000}M tokens` : `${contextWindow / 1000}K tokens` });
+    fields.push({ label: "Context", value: `${formatCompactNumber(contextWindow)} tokens` });
   }
   if (website) fields.push({ label: "Website", value: website });
   if (customFields) fields.push(...customFields);

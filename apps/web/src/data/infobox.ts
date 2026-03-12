@@ -219,7 +219,6 @@ export function getEntityInfoBoxData(entityId: string) {
     policyAuthor,
     scope,
     // AI Model
-    modelFamily,
     modelTier,
     releaseDate,
     developer,
