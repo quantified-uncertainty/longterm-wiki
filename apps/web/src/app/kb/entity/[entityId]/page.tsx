@@ -170,7 +170,7 @@ const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(CATEGORIES.ma
 const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   organization: ["revenue", "valuation", "headcount", "total-funding", "enterprise-market-share", "founded-date"],
   person: ["employed-by", "role", "net-worth", "born-year"],
-  "ai-model": ["developed-by", "parameter-count", "context-window", "model-release-date"],
+  "ai-model": ["context-window"],
 };
 
 /** Sort record entries by a date field, newest first. */
