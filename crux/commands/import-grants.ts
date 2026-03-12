@@ -4,11 +4,14 @@
  * Sources:
  *   1. Coefficient Giving (Open Philanthropy) grants archive CSV
  *   2. EA Funds public grants CSV
+ *   3. FTX Future Fund (historical, pre-collapse) — Vipul Naik donations repo SQL
  *
  * Usage:
  *   pnpm crux import-grants analyze          # Preview what would be imported
  *   pnpm crux import-grants sync             # Import to wiki-server Postgres
  *   pnpm crux import-grants sync --dry-run   # Show what would be synced without writing
+ *   pnpm crux import-grants ftx-analyze      # Preview FTX Future Fund grants
+ *   pnpm crux import-grants ftx-sync         # Import FTX Future Fund grants
  */
 
 import { createHash } from "crypto";
@@ -28,10 +31,29 @@ const EA_FUNDS_CSV_URL = "https://funds.effectivealtruism.org/api/grants";
 const CG_CSV_PATH = "/tmp/coefficient-giving-grants.csv";
 const EA_FUNDS_CSV_PATH = "/tmp/ea-funds-grants.csv";
 
+/** FTX Future Fund SQL data source (Vipul Naik donations repo) */
+const FTX_SQL_BASE_URL =
+  "https://raw.githubusercontent.com/vipulnaik/donations/master/sql/donations/private-foundations/ftx-future-fund/";
+const FTX_SQL_FILES = [
+  "ftx-future-fund-ai-safety-open-call-grants.sql",
+  "ftx-future-fund-ai-safety-regrants.sql",
+  "ftx-future-fund-biosecurity-open-call-grants.sql",
+  "ftx-future-fund-biosecurity-regrants.sql",
+  "ftx-future-fund-biosecurity-staff-led-grants.sql",
+  "ftx-future-fund-effective-altruism-open-call-grants.sql",
+  "ftx-future-fund-effective-altruism-staff-led-grants.sql",
+  "ftx-future-fund-epistemic-institutions-open-call-grants.sql",
+  "ftx-future-fund-epistemic-institutions-regrants.sql",
+  "ftx-future-fund-open-call-grants.sql",
+  "ftx-future-fund-staff-led-grants.sql",
+];
+const FTX_SQL_DIR = "/tmp/ftx-future-fund-sql";
+
 /** Funder entity stableIds */
 const FUNDER_IDS: Record<string, string> = {
   "coefficient-giving": "ULjDXpSLCI",
   ltff: "yA12C1KcjQ",
+  "ftx-future-fund": "JhIGCaI3Ng",
   // EA Funds sub-funds — we map to LTFF and other known entities
   "Long-Term Future Fund": "yA12C1KcjQ",
   "Animal Welfare Fund": "__AWF__", // placeholder — will be resolved
@@ -225,6 +247,16 @@ const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
   "GiveDirectly": "givedirectly",
   "Effective Ventures Foundation": "cea",
   "Against Malaria Foundation": "against-malaria-foundation",
+  // FTX Future Fund grantees
+  "Ought": "elicit",
+  "Manifold Markets": "manifold",
+  "Rethink Priorities": "rethink-priorities",
+  "Good Judgment Project": "good-judgment",
+  "Giving What We Can": "giving-what-we-can",
+  "Council on Strategic Risks": "council-on-strategic-risks",
+  "1Day Sooner": "1day-sooner",
+  "Quantified Uncertainty Research Institute": "quri",
+  "AI Impacts": "ai-impacts",
 };
 
 // ---------------------------------------------------------------------------
@@ -232,7 +264,7 @@ const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 interface RawGrant {
-  source: "coefficient-giving" | "ea-funds";
+  source: "coefficient-giving" | "ea-funds" | "ftx-future-fund";
   funderId: string; // stableId of funder entity
   granteeName: string;
   granteeId: string | null; // stableId if matched, else null
@@ -441,7 +473,9 @@ function toSyncGrant(raw: RawGrant): SyncGrant {
     source:
       raw.source === "coefficient-giving"
         ? "https://coefficientgiving.org/grants/"
-        : "https://funds.effectivealtruism.org/grants",
+        : raw.source === "ftx-future-fund"
+          ? "https://web.archive.org/web/20221101/https://ftxfuturefund.org/our-grants/"
+          : "https://funds.effectivealtruism.org/grants",
     notes,
   };
 }
@@ -651,6 +685,317 @@ async function cmdSync(dryRun: boolean) {
 }
 
 // ---------------------------------------------------------------------------
+// FTX Future Fund — SQL data from Vipul Naik donations repo
+// ---------------------------------------------------------------------------
+
+function downloadFTXSQL() {
+  execSync(`mkdir -p "${FTX_SQL_DIR}"`, { stdio: "pipe" });
+  for (const file of FTX_SQL_FILES) {
+    const url = `${FTX_SQL_BASE_URL}${file}`;
+    const path = `${FTX_SQL_DIR}/${file}`;
+    if (existsSync(path)) continue;
+    console.log(`  Downloading ${file}...`);
+    execSync(
+      `curl -fsSL --retry 3 --connect-timeout 10 -o "${path}" "${url}"`,
+      { stdio: "inherit" }
+    );
+  }
+}
+
+/**
+ * Parse Vipul Naik SQL INSERT statements to extract grant records.
+ *
+ * The SQL format is:
+ *   insert into donations(donor, donee, amount, donation_date, ...) values
+ *     ('FTX Future Fund','Donee Name',123456,'2022-05-01',...),
+ *     ...;
+ *
+ * Fields are positional within each row's value tuple. We extract:
+ *   - donee (field 2)
+ *   - amount (field 3)
+ *   - donation_date (field 4)
+ *   - cause_area (field 7)
+ *   - donation_earmark (field 10)
+ *   - intended_use_of_funds (field 18)
+ */
+interface FTXSQLGrant {
+  donee: string;
+  amount: number;
+  date: string;
+  causeArea: string | null;
+  earmark: string | null;
+  intendedUse: string | null;
+  grantType: string; // "open-call" | "regrant" | "staff-led"
+}
+
+function parseFTXSQLFile(
+  content: string,
+  grantType: string
+): FTXSQLGrant[] {
+  const grants: FTXSQLGrant[] = [];
+
+  // Strategy: find each row tuple. Each starts with ('FTX Future Fund','
+  // We look for value rows that start a grant record.
+  // The content has multi-line rows with /* comments */ interspersed.
+
+  // First, strip the INSERT INTO header and the trailing semicolon
+  // Then split on row boundaries: each new row starts with ('FTX Future Fund',
+
+  // Regex to find each value tuple: starts with ('FTX Future Fund'
+  const rowPattern = /\('FTX Future Fund','([^']*(?:''[^']*)*)'\s*,\s*(\d+)\s*,\s*'([^']*)'/g;
+  let match;
+
+  while ((match = rowPattern.exec(content)) !== null) {
+    const donee = match[1].replace(/''/g, "'");
+    const amount = parseInt(match[2], 10);
+    const date = match[3];
+
+    // Now extract additional fields from the text following this match.
+    // Find the text up to the next row start or end of content.
+    const startIdx = match.index;
+    const nextRowIdx = content.indexOf("('FTX Future Fund'", startIdx + 1);
+    const rowText =
+      nextRowIdx > -1
+        ? content.substring(startIdx, nextRowIdx)
+        : content.substring(startIdx);
+
+    // Extract cause_area (field 7): after date, skip precision, basis, then cause area
+    // Pattern: ,'cause_area_value', or ,NULL,
+    const causeAreaMatch = rowText.match(
+      /,'(?:month|day|year)','(?:donation log|website)'\s*,\s*(?:'([^']*(?:''[^']*)*)'|NULL)/
+    );
+    const causeArea = causeAreaMatch?.[1]?.replace(/''/g, "'") || null;
+
+    // Extract donation_earmark (field 10): look for the earmark pattern
+    // After the URL fields, there's the earmark field
+    const earmarkMatch = rowText.match(
+      /donation_earmark[^)]*?\),\s*(?:'([^']*(?:''[^']*)*)'|NULL)\s*,\s*(?:'[^']*'|NULL)\s*,\s*(?:'[^']*'|NULL)/
+    );
+    // Simpler approach: find the earmark value - it comes after the two URL fields
+    // Let's look for it by position. The 10th field is donation_earmark.
+    // We'll use a different strategy: extract from the /* comment */ annotations
+    let earmark: string | null = null;
+    // Some rows have the earmark as a non-NULL value right after the URLs
+    // Pattern: 'url1','url2','EarmarkName',NULL or 'url1','url2',NULL,NULL
+    const urlEarmarkPattern =
+      /https?:\/\/ftxfuturefund\.org\/[^']*'\s*,\s*(?:'(https?:\/\/[^']*)'\s*,\s*)?(?:'([^']+)'|NULL)\s*,\s*(?:'([^']*)'|NULL)\s*,/;
+    const ueMatch = rowText.match(urlEarmarkPattern);
+    if (ueMatch) {
+      // ueMatch[2] could be earmark or NULL marker
+      // The earmark is the name field after the URL fields
+      const possibleEarmark = ueMatch[2];
+      if (
+        possibleEarmark &&
+        possibleEarmark !== "NULL" &&
+        !possibleEarmark.startsWith("http")
+      ) {
+        earmark = possibleEarmark.replace(/''/g, "'");
+      }
+    }
+
+    // Extract intended_use_of_funds from /* intended_use_of_funds */ comment
+    const useMatch = rowText.match(
+      /\/\*\s*intended_use_of_funds\s*\*\/\s*'([^']*(?:''[^']*)*)'/
+    );
+    const intendedUse = useMatch?.[1]?.replace(/''/g, "'") || null;
+
+    grants.push({
+      donee,
+      amount,
+      date,
+      causeArea,
+      earmark,
+      intendedUse,
+      grantType,
+    });
+  }
+
+  return grants;
+}
+
+function classifyFTXFile(filename: string): string {
+  if (filename.includes("regrant")) return "regrant";
+  if (filename.includes("staff-led")) return "staff-led";
+  return "open-call";
+}
+
+function parseFTXFutureFundGrants(
+  matcher: ReturnType<typeof buildEntityMatcher>
+): RawGrant[] {
+  const grants: RawGrant[] = [];
+  const funderId = FUNDER_IDS["ftx-future-fund"];
+
+  for (const file of FTX_SQL_FILES) {
+    const path = `${FTX_SQL_DIR}/${file}`;
+    if (!existsSync(path)) {
+      console.warn(`  WARNING: Missing ${file}, skipping`);
+      continue;
+    }
+    const content = readFileSync(path, "utf8");
+    const grantType = classifyFTXFile(file);
+    const sqlGrants = parseFTXSQLFile(content, grantType);
+
+    for (const g of sqlGrants) {
+      // Match grantee entity
+      let granteeId: string | null = null;
+      const overrideSlug = MANUAL_GRANTEE_OVERRIDES[g.donee];
+      if (overrideSlug) {
+        const match = matcher.match(overrideSlug);
+        if (match) granteeId = match.stableId;
+      }
+      if (!granteeId) {
+        const match = matcher.match(g.donee);
+        if (match) granteeId = match.stableId;
+      }
+
+      // Build grant name from intended use or fallback
+      let name: string;
+      if (g.intendedUse) {
+        name = g.intendedUse.substring(0, 500);
+      } else if (g.earmark) {
+        name = `Grant to ${g.donee} (${g.earmark})`;
+      } else {
+        name = `Grant to ${g.donee}`;
+      }
+
+      // Parse date (already in ISO format from SQL: "2022-05-01")
+      // Convert to "2022-05" format to match existing pattern
+      const isoDate = g.date ? g.date.substring(0, 7) : null;
+
+      // Build focus area from cause area + grant type
+      const focusParts: string[] = [];
+      if (g.causeArea) focusParts.push(g.causeArea);
+      if (g.grantType !== "open-call")
+        focusParts.push(g.grantType);
+      const focusArea = focusParts.length > 0 ? focusParts.join("; ") : null;
+
+      grants.push({
+        source: "ftx-future-fund",
+        funderId,
+        granteeName: g.donee,
+        granteeId,
+        name,
+        amount: g.amount,
+        date: isoDate,
+        focusArea,
+        description: g.intendedUse,
+      });
+    }
+  }
+
+  return grants;
+}
+
+async function cmdFTXAnalyze() {
+  // Ensure SQL files exist
+  console.log("Downloading FTX Future Fund SQL files...");
+  downloadFTXSQL();
+
+  const matcher = buildEntityMatcher();
+  const grants = parseFTXFutureFundGrants(matcher);
+
+  // Stats
+  const matched = grants.filter((g) => g.granteeId !== null);
+  const unmatched = grants.filter((g) => g.granteeId === null);
+  const total = grants.reduce((s, g) => s + (g.amount || 0), 0);
+
+  console.log("\n=== FTX Future Fund Grant Analysis ===\n");
+  console.log(`Total grants: ${grants.length}`);
+  console.log(`Total amount: $${(total / 1e6).toFixed(1)}M\n`);
+
+  console.log(`Entity matching:`);
+  console.log(
+    `  Matched: ${matched.length} (${((matched.length / grants.length) * 100).toFixed(1)}%)`
+  );
+  console.log(`  Unmatched: ${unmatched.length} (stored as display names)\n`);
+
+  // By grant type
+  const byType = new Map<string, { count: number; total: number }>();
+  for (const g of grants) {
+    const type = g.focusArea || "unknown";
+    const entry = byType.get(type) || { count: 0, total: 0 };
+    entry.count++;
+    entry.total += g.amount || 0;
+    byType.set(type, entry);
+  }
+  console.log("By focus area:");
+  for (const [type, data] of [...byType.entries()].sort(
+    (a, b) => b[1].total - a[1].total
+  )) {
+    console.log(
+      `  ${type}: ${data.count} grants, $${(data.total / 1e6).toFixed(1)}M`
+    );
+  }
+
+  // Sample grants
+  console.log("\nSample grants (first 10):");
+  for (const g of grants.slice(0, 10)) {
+    const matchLabel = g.granteeId ? " [MATCHED]" : "";
+    console.log(
+      `  ${g.date || "????"} | $${((g.amount || 0) / 1e3).toFixed(0)}K | ${g.granteeName}${matchLabel}`
+    );
+    if (g.name && g.name !== `Grant to ${g.granteeName}`) {
+      console.log(`    ${g.name.substring(0, 100)}`);
+    }
+  }
+
+  // Top unmatched
+  const unmatchedByOrg = new Map<string, { total: number; count: number }>();
+  for (const g of unmatched) {
+    const entry = unmatchedByOrg.get(g.granteeName) || {
+      total: 0,
+      count: 0,
+    };
+    entry.total += g.amount || 0;
+    entry.count++;
+    unmatchedByOrg.set(g.granteeName, entry);
+  }
+  const sortedUnmatched = [...unmatchedByOrg.entries()]
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 20);
+  console.log(`\nTop unmatched grantees by amount:`);
+  for (const [name, data] of sortedUnmatched) {
+    console.log(
+      `  $${(data.total / 1e6).toFixed(2)}M (${data.count} grants) — ${name}`
+    );
+  }
+
+  // ID collision check
+  const syncGrants = grants.map(toSyncGrant);
+  const idSet = new Set<string>();
+  let collisions = 0;
+  for (const g of syncGrants) {
+    if (idSet.has(g.id)) collisions++;
+    idSet.add(g.id);
+  }
+  console.log(
+    `\nGenerated ${idSet.size} unique IDs (${collisions} collisions → would be deduped)`
+  );
+}
+
+async function cmdFTXSync(dryRun: boolean) {
+  // Ensure SQL files exist
+  console.log("Downloading FTX Future Fund SQL files...");
+  downloadFTXSQL();
+
+  const matcher = buildEntityMatcher();
+  const grants = parseFTXFutureFundGrants(matcher);
+
+  console.log(`Parsed ${grants.length} FTX Future Fund grants`);
+
+  // Convert and deduplicate by ID
+  const syncMap = new Map<string, SyncGrant>();
+  for (const raw of grants) {
+    const sync = toSyncGrant(raw);
+    syncMap.set(sync.id, sync);
+  }
+  const syncGrants = [...syncMap.values()];
+  console.log(`After dedup: ${syncGrants.length} unique grants`);
+
+  await syncToServer(syncGrants, dryRun);
+}
+
+// ---------------------------------------------------------------------------
 // Crux command exports
 // ---------------------------------------------------------------------------
 
@@ -672,10 +1017,23 @@ async function downloadCommand(_args: string[], _options: Record<string, unknown
   return { exitCode: 0 };
 }
 
+async function ftxAnalyzeCommand(_args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
+  await cmdFTXAnalyze();
+  return { exitCode: 0 };
+}
+
+async function ftxSyncCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options['dry-run'];
+  await cmdFTXSync(dryRun);
+  return { exitCode: 0 };
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   download: downloadCommand,
+  "ftx-analyze": ftxAnalyzeCommand,
+  "ftx-sync": ftxSyncCommand,
   default: analyzeCommand,
 };
 
@@ -684,13 +1042,17 @@ export function getHelp(): string {
 Import Grants — Import external grant databases into wiki-server Postgres
 
 Commands:
-  analyze              Preview import stats and entity matching
-  sync                 Import grants to wiki-server Postgres
+  analyze              Preview import stats and entity matching (CG + EA Funds)
+  sync                 Import CG + EA Funds grants to wiki-server Postgres
   sync --dry-run       Show what would be synced without writing
   download             Just download the CSV files
+  ftx-analyze          Preview FTX Future Fund grants (historical, pre-collapse)
+  ftx-sync             Import FTX Future Fund grants to wiki-server Postgres
+  ftx-sync --dry-run   Show what would be synced without writing
 
 Sources:
   - Coefficient Giving (Open Philanthropy) grants archive CSV
   - EA Funds public grants CSV
+  - FTX Future Fund (Vipul Naik donations repo SQL files)
 `;
 }
