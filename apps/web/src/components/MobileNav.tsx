@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/wiki", label: "Explore" },
   { href: "/organizations", label: "Organizations" },
   { href: "/people", label: "People" },
+  { href: "/risks", label: "Risks" },
   { href: "/grants", label: "Grants" },
   { href: "/sources", label: "Sources" },
   { href: "/kb", label: "Data" },
