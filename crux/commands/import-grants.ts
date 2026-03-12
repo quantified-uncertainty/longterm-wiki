@@ -101,13 +101,17 @@ async function cmdSync(dryRun: boolean, sourceFilter?: string) {
 
   // Convert and deduplicate by ID
   const syncMap = new Map<string, SyncGrant>();
+  let collisions = 0;
   for (const raw of allGrants) {
-    const src = sources.find(s => s.id === raw.source) || sources[0];
-    const sync = toSyncGrant(raw, src.sourceUrl);
+    const sync = toSyncGrant(raw, sourceUrlFor(raw.source));
+    if (syncMap.has(sync.id)) collisions++;
     syncMap.set(sync.id, sync);
   }
   const syncGrants = [...syncMap.values()];
   console.log(`After dedup: ${syncGrants.length} unique grants`);
+  if (collisions > 0) {
+    console.warn(`  (${collisions} ID collisions resolved by dedup)`);
+  }
 
   await syncToServer(syncGrants, dryRun);
 }

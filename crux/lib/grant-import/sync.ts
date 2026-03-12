@@ -23,7 +23,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
   if (raw.focusArea && raw.description) {
     notes = `[${raw.focusArea}] ${raw.description}`.substring(0, 5000);
   } else if (raw.focusArea) {
-    notes = raw.focusArea;
+    notes = raw.focusArea.substring(0, 5000);
   } else if (raw.description) {
     notes = raw.description.substring(0, 5000);
   }
@@ -48,10 +48,9 @@ export async function syncToServer(
 ): Promise<void> {
   const serverUrl = getServerUrl();
   if (!serverUrl) {
-    console.error(
-      "ERROR: wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+    throw new Error(
+      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
     );
-    process.exit(1);
   }
 
   console.log(`\nSyncing ${grants.length} grants to ${serverUrl}...`);

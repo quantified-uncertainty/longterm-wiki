@@ -86,7 +86,7 @@ async function fetchManifundProjects(): Promise<ManifundProject[]> {
 
   try {
     const result = execSync(
-      `NODE_PATH=/opt/homebrew/lib/node_modules node -e ${JSON.stringify(script)}`,
+      `node -e ${JSON.stringify(script)}`,
       { maxBuffer: 50 * 1024 * 1024, timeout: 120_000, encoding: "utf8", stdio: ["pipe", "pipe", "inherit"] }
     );
 
@@ -194,7 +194,7 @@ export const source: GrantSource = {
   sourceUrl: "https://manifund.org",
 
   async ensureData() {
-    // Data is fetched on-demand in parse()
+    await fetchManifundProjects();
   },
 
   async parse(matcher: EntityMatcher): Promise<RawGrant[]> {
