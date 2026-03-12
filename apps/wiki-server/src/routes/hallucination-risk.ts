@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, desc, sql } from "drizzle-orm";
-import { getDrizzleDb, getDb } from "../db.js";
+import { getDrizzleDb, getDb, type SqlQuery } from "../db.js";
 import { hallucinationRiskSnapshots } from "../schema.js";
 import {
   parseJsonBody,
@@ -96,15 +96,28 @@ export function clearMatViewCache(): void {
  * Uses CONCURRENTLY so reads are not blocked during refresh.
  * Falls back to non-concurrent refresh if the view has no unique index yet
  * (e.g., first run before migration fully applies).
+ *
+ * The refresh is wrapped in a transaction with an extended statement_timeout
+ * because materialized view refreshes are background operations that can
+ * legitimately take longer (30-60s+) than the default 30s query timeout.
+ * SET LOCAL scopes the override to this transaction only.
  */
 async function refreshMaterializedView(): Promise<void> {
   const rawDb = getDb();
   try {
-    await rawDb`REFRESH MATERIALIZED VIEW CONCURRENTLY hallucination_risk_latest`;
+    await rawDb.begin(async (txRaw) => {
+      const tx = txRaw as unknown as SqlQuery;
+      await tx`SET LOCAL statement_timeout = '300000'`; // 5 minutes
+      await tx`REFRESH MATERIALIZED VIEW CONCURRENTLY hallucination_risk_latest`;
+    });
   } catch (err) {
     // CONCURRENTLY requires a unique index; fall back if not available
     logger.warn({ err }, "Concurrent refresh failed, trying non-concurrent");
-    await rawDb`REFRESH MATERIALIZED VIEW hallucination_risk_latest`;
+    await rawDb.begin(async (txRaw) => {
+      const tx = txRaw as unknown as SqlQuery;
+      await tx`SET LOCAL statement_timeout = '300000'`; // 5 minutes
+      await tx`REFRESH MATERIALIZED VIEW hallucination_risk_latest`;
+    });
   }
 }
 

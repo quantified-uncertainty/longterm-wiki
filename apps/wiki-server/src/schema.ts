@@ -54,9 +54,8 @@ export const citationQuotes = pgTable(
     sourceTitle: text("source_title"),
     sourceType: text("source_type"),
     extractionModel: text("extraction_model"),
-    claimId: bigint("claim_id", { mode: "number" }).references(() => claims.id, {
-      onDelete: "set null",
-    }),
+    /** @deprecated FK to claims was dropped by migration 0065 (claims table archived). Column kept for data. */
+    claimId: bigint("claim_id", { mode: "number" }),
     accuracyVerdict: text("accuracy_verdict"),
     accuracyIssues: text("accuracy_issues"),
     accuracyScore: real("accuracy_score"),
@@ -389,8 +388,9 @@ export const summaries = pgTable(
  * new code should use section instead.
  * footnoteRefs is also legacy — new code should use claim_page_references table.
  */
+/** @archived Migration 0065 renamed this table to _archived_claims. Schema kept for citationQuotes.claimId FK reference. */
 export const claims = pgTable(
-  "claims",
+  "_archived_claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     entityId: text("entity_id") // primary entity (extraction source)
@@ -481,8 +481,9 @@ asOf: text("as_of"),                // temporal index: YYYY-MM or YYYY-MM-DD
  * claim_mode on the parent claim tells you whether the wiki endorses the claim
  * or is attributing it to another entity (e.g., "Anthropic claims that...").
  */
+/** @archived Migration 0065 renamed this table to _archived_claim_sources. */
 export const claimSources = pgTable(
-  "claim_sources",
+  "_archived_claim_sources",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     claimId: bigint("claim_id", { mode: "number" })
@@ -516,8 +517,9 @@ export const claimSources = pgTable(
 );
 
 /** Claim-to-page references — links a claim to every wiki page it appears on. */
+/** @archived Migration 0065 renamed this table to _archived_claim_page_references. */
 export const claimPageReferences = pgTable(
-  "claim_page_references",
+  "_archived_claim_page_references",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     claimId: bigint("claim_id", { mode: "number" })
@@ -1162,8 +1164,9 @@ export const properties = pgTable(
  * `valid_start` / `valid_end` are text (not date) to support partial dates
  * like "2025", "2025-07", "2026-02" from YAML facts.
  */
+/** @archived Migration 0065 renamed this table to _archived_statements. */
 export const statements = pgTable(
-  "statements",
+  "_archived_statements",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     variety: text("variety").notNull(), // "structured" | "attributed"
@@ -1236,8 +1239,9 @@ export const statements = pgTable(
  * Each row represents one resource backing a statement. Supports both
  * resource_id (linked to data/resources/) and raw URL fallback.
  */
+/** @archived Migration 0065 renamed this table to _archived_statement_citations. */
 export const statementCitations = pgTable(
-  "statement_citations",
+  "_archived_statement_citations",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     statementId: bigint("statement_id", { mode: "number" })
@@ -1262,8 +1266,9 @@ export const statementCitations = pgTable(
 );
 
 /** Statement-to-page references — links a statement to every wiki page it appears on. */
+/** @archived Migration 0065 renamed this table to _archived_statement_page_references. */
 export const statementPageReferences = pgTable(
-  "statement_page_references",
+  "_archived_statement_page_references",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     statementId: bigint("statement_id", { mode: "number" }).notNull().references(
@@ -1290,8 +1295,9 @@ export const statementPageReferences = pgTable(
  *
  * Each row is a snapshot of an entity's overall statement quality at a point in time.
  */
+/** @archived Migration 0065 renamed this table to _archived_entity_coverage_scores. */
 export const entityCoverageScores = pgTable(
-  "entity_coverage_scores",
+  "_archived_entity_coverage_scores",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     entityId: text("entity_id").notNull(),

@@ -72,7 +72,7 @@ const ALL_EXPECTED_TABLES = [
   "resources",
   "resource_citations",
   "summaries",
-  "claims",
+  "_archived_claims",
   "page_links",
 ];
 

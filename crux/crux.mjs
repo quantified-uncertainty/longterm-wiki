@@ -96,6 +96,7 @@ import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
 import * as kbCommands from './commands/kb.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
+import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 
 const domains = {
   validate: validateCommands,
@@ -137,6 +138,7 @@ const domains = {
   'pr-patrol': prPatrolCommands,
   kb: kbCommands,
   footnotes: footnotesCommands,
+  'agent-workspace': agentWorkspaceCommands,
 };
 
 /**
@@ -221,7 +223,8 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   release     Production release management (main → production)
   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
   kb          Knowledge base readability tools (show, list, lookup)
-  footnotes   Footnote migration tools (migrate-cr)
+  footnotes        Footnote migration tools (migrate-cr)
+  agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

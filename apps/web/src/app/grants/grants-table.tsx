@@ -1,0 +1,274 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { SortHeader } from "@/components/directory";
+import { formatCompactCurrency } from "@/lib/format-compact";
+
+export interface GrantRow {
+  /** Composite key: entityId-recordKey for uniqueness */
+  compositeKey: string;
+  name: string;
+  /** Grantor entity */
+  organizationId: string;
+  organizationName: string;
+  organizationSlug: string | null;
+  organizationWikiPageId: string | null;
+  amount: number | null;
+  period: string | null;
+  date: string | null;
+  status: string | null;
+  source: string | null;
+}
+
+type SortKey = "name" | "organization" | "amount" | "period" | "date" | "status";
+type SortDir = "asc" | "desc";
+
+const STATUS_COLORS: Record<string, string> = {
+  active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  completed: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
+  "winding-down": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+};
+
+export function GrantsTable({ rows }: { rows: GrantRow[] }) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortKey, setSortKey] = useState<SortKey>("amount");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const statuses = useMemo(() => {
+    const set = new Set<string>();
+    for (const r of rows) {
+      if (r.status) set.add(r.status);
+    }
+    return [...set].sort();
+  }, [rows]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: rows.length };
+    for (const r of rows) {
+      const s = r.status ?? "unknown";
+      counts[s] = (counts[s] ?? 0) + 1;
+    }
+    return counts;
+  }, [rows]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "name" || key === "organization" ? "asc" : "desc");
+    }
+  };
+
+  const filtered = useMemo(() => {
+    let result = rows;
+
+    if (statusFilter !== "all") {
+      result = result.filter((r) => r.status === statusFilter);
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          r.organizationName.toLowerCase().includes(q),
+      );
+    }
+
+    const dir = sortDir === "asc" ? 1 : -1;
+    result = [...result].sort((a, b) => {
+      const getValue = (row: GrantRow): string | number | null => {
+        switch (sortKey) {
+          case "name":
+            return row.name.toLowerCase();
+          case "organization":
+            return row.organizationName.toLowerCase();
+          case "amount":
+            return row.amount;
+          case "period":
+            return row.period;
+          case "date":
+            return row.date;
+          case "status":
+            return row.status;
+        }
+      };
+
+      const va = getValue(a);
+      const vb = getValue(b);
+
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+
+      if (typeof va === "string" && typeof vb === "string") {
+        return va.localeCompare(vb) * dir;
+      }
+      return ((va as number) - (vb as number)) * dir;
+    });
+
+    return result;
+  }, [rows, search, statusFilter, sortKey, sortDir]);
+
+  return (
+    <div>
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <input
+          type="text"
+          placeholder="Search grants or organizations..."
+          aria-label="Search grants"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+        />
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("all")}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+              statusFilter === "all"
+                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+            }`}
+          >
+            All
+            <span className="ml-1 text-[10px] opacity-60">
+              {statusCounts.all}
+            </span>
+          </button>
+          {statuses.map((s) => (
+            <button
+              type="button"
+              key={s}
+              onClick={() =>
+                setStatusFilter(statusFilter === s ? "all" : s)
+              }
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                statusFilter === s
+                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+              }`}
+            >
+              {s}
+              <span className="ml-1 text-[10px] opacity-60">
+                {statusCounts[s] ?? 0}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Results count */}
+      <div className="text-xs text-muted-foreground mb-3">
+        Showing {filtered.length} of {rows.length} grants
+      </div>
+
+      {/* Table */}
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <SortHeader label="Grant / Program" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Organization" sortKey="organization" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Amount" sortKey="amount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="Period" sortKey="period" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {filtered.map((row) => (
+              <tr
+                key={row.compositeKey}
+                className="hover:bg-muted/20 transition-colors"
+              >
+                {/* Name */}
+                <td className="py-2.5 px-3">
+                  <span className="font-medium text-foreground">
+                    {row.name}
+                  </span>
+                  {row.source && (
+                    <a
+                      href={row.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      title="Source"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+
+                {/* Organization */}
+                <td className="py-2.5 px-3">
+                  {row.organizationSlug ? (
+                    <Link
+                      href={`/organizations/${row.organizationSlug}`}
+                      className="text-foreground hover:text-primary transition-colors"
+                    >
+                      {row.organizationName}
+                    </Link>
+                  ) : (
+                    <span>{row.organizationName}</span>
+                  )}
+                  {row.organizationWikiPageId && (
+                    <Link
+                      href={`/wiki/${row.organizationWikiPageId}`}
+                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      title="Wiki page"
+                    >
+                      wiki
+                    </Link>
+                  )}
+                </td>
+
+                {/* Amount */}
+                <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                  {row.amount != null && (
+                    <span className="font-semibold">
+                      {formatCompactCurrency(row.amount)}
+                    </span>
+                  )}
+                </td>
+
+                {/* Period */}
+                <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
+                  {row.period ?? ""}
+                </td>
+
+                {/* Date */}
+                <td className="py-2.5 px-3 text-center text-muted-foreground">
+                  {row.date ?? ""}
+                </td>
+
+                {/* Status */}
+                <td className="py-2.5 px-3 text-center">
+                  {row.status && (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        STATUS_COLORS[row.status] ?? "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {row.status}
+                    </span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          No grants match your search.
+        </div>
+      )}
+    </div>
+  );
+}

@@ -63,6 +63,24 @@ export default function RootLayout({
                 Explore
               </Link>
               <Link
+                href="/organizations"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Organizations
+              </Link>
+              <Link
+                href="/people"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                People
+              </Link>
+              <Link
+                href="/grants"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Grants
+              </Link>
+              <Link
                 href="/kb"
                 className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
