@@ -78,21 +78,23 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const row: Record<string, unknown> = {
       id,
       url: params[1],
-      title: params[2],
-      type: params[3],
-      summary: params[4],
-      review: params[5],
-      abstract: params[6],
-      key_points: params[7],
-      publication_id: params[8],
-      authors: params[9],
-      published_date: params[10],
-      tags: params[11],
-      local_filename: params[12],
-      credibility_override: params[13],
-      fetched_at: params[14],
-      content_hash: params[15],
-      // COALESCE: preserve existing stable_id, only set if row didn't have one
+      // COALESCE(incoming, existing): non-null incoming overwrites; null preserves existing.
+      // Mirrors the server-side ON CONFLICT SET COALESCE() for enrichable fields.
+      title: params[2] ?? existing?.title ?? null,
+      type: params[3] ?? existing?.type ?? null,
+      summary: params[4] ?? existing?.summary ?? null,
+      review: params[5] ?? existing?.review ?? null,
+      abstract: params[6] ?? existing?.abstract ?? null,
+      key_points: params[7] ?? existing?.key_points ?? null,
+      publication_id: params[8] ?? existing?.publication_id ?? null,
+      authors: params[9] ?? existing?.authors ?? null,
+      published_date: params[10] ?? existing?.published_date ?? null,
+      tags: params[11] ?? existing?.tags ?? null,
+      local_filename: params[12] ?? existing?.local_filename ?? null,
+      credibility_override: params[13] ?? existing?.credibility_override ?? null,
+      fetched_at: params[14] ?? existing?.fetched_at ?? null,
+      content_hash: params[15] ?? existing?.content_hash ?? null,
+      // stableId is generate-once: preserve existing, only set if row didn't have one
       stable_id: existing?.stable_id ?? params[16] ?? null,
       created_at: existing?.created_at ?? now,
       updated_at: now,
@@ -347,6 +349,59 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
       expect(resourceStore.get("abc123def456")?.title).toBe("Updated Title");
+    });
+
+    it("preserves existing enriched fields when upserting bare resource (COALESCE)", async () => {
+      // First insert: a fully enriched resource
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        summary: "A comprehensive survey of AI alignment approaches.",
+        review: "Excellent overview of the field.",
+        abstract: "This paper surveys alignment techniques...",
+        keyPoints: ["Point 1", "Point 2"],
+        authors: ["Author A", "Author B"],
+        publishedDate: "2025-01-15",
+        tags: ["alignment", "survey"],
+      });
+      const enriched = resourceStore.get("abc123def456");
+      expect(enriched?.summary).toBe("A comprehensive survey of AI alignment approaches.");
+
+      // Upsert with bare resource (only id + url) — should NOT wipe enriched fields
+      const res = await postJson(app, "/api/resources", {
+        id: "abc123def456",
+        url: "https://arxiv.org/abs/2310.12345",
+      });
+      expect(res.status).toBe(201);
+
+      const afterBare = resourceStore.get("abc123def456");
+      // Enriched text fields should be preserved (COALESCE(null, existing) = existing)
+      expect(afterBare?.summary).toBe("A comprehensive survey of AI alignment approaches.");
+      expect(afterBare?.review).toBe("Excellent overview of the field.");
+      expect(afterBare?.abstract).toBe("This paper surveys alignment techniques...");
+      expect(afterBare?.published_date).toBe("2025-01-15");
+      // Array fields are serialized as JSON strings by Drizzle's PG driver;
+      // the important thing is they are preserved (not nulled out)
+      expect(afterBare?.authors).toBeTruthy();
+      expect(afterBare?.key_points).toBeTruthy();
+      expect(afterBare?.tags).toBeTruthy();
+    });
+
+    it("overwrites enriched fields when new non-null values are provided", async () => {
+      // First insert with summary
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        summary: "Original summary",
+      });
+
+      // Upsert with new summary — should overwrite
+      const res = await postJson(app, "/api/resources", {
+        ...sampleResource,
+        summary: "Updated summary",
+      });
+      expect(res.status).toBe(201);
+
+      const updated = resourceStore.get("abc123def456");
+      expect(updated?.summary).toBe("Updated summary");
     });
   });
 
