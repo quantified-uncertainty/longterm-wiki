@@ -97,7 +97,8 @@ export default async function RiskProfilePage({
   const entity = resolveRiskBySlug(slug);
   if (!entity) return notFound();
 
-  const typedEntity = getTypedEntityById(entity.id);
+  // Use the URL slug directly — typed entities are keyed by slug, not KB internal IDs
+  const typedEntity = getTypedEntityById(slug);
   const risk = typedEntity && isRisk(typedEntity) ? typedEntity : null;
 
   const riskCategory = risk?.riskCategory ?? null;
