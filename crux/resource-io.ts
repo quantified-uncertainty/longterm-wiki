@@ -25,6 +25,10 @@ import { generateSnapshot } from './wiki-server/snapshot-resources.ts';
 const SNAPSHOT_FILE = join(DATA_DIR, 'resources-snapshot.json');
 const PG_BATCH_SIZE = 200;
 
+// Concurrency guard: only one snapshot refresh at a time to prevent
+// race conditions when multiple saveResources() calls overlap.
+let snapshotRefreshInFlight: Promise<void> | null = null;
+
 /**
  * Load resources from the snapshot file (synchronous fallback).
  * Used when the wiki-server is unavailable.
@@ -229,9 +233,17 @@ export async function saveResources(resources: Resource[]): Promise<void> {
 
   // Fire-and-forget: refresh the snapshot file so it stays in sync with PG.
   // Failure doesn't block the write — snapshot is a best-effort fallback.
-  generateSnapshot({ quiet: true }).catch((e) =>
-    console.warn(`Snapshot refresh failed: ${e instanceof Error ? e.message : String(e)}`)
-  );
+  // Deduped: if a refresh is already running, skip this one to avoid race
+  // conditions on the file write (multiple concurrent saveResources calls).
+  if (!snapshotRefreshInFlight) {
+    snapshotRefreshInFlight = generateSnapshot({ quiet: true })
+      .catch((e) =>
+        console.warn(`Snapshot refresh failed: ${e instanceof Error ? e.message : String(e)}`)
+      )
+      .finally(() => {
+        snapshotRefreshInFlight = null;
+      });
+  }
 }
 
 export function loadPages(): PageEntry[] {
