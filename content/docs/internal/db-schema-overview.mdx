@@ -9,7 +9,7 @@ lastEdited: "2026-03-12"
 
 import { Mermaid } from '@components/wiki';
 
-The wiki-server PostgreSQL database has **39 active tables** (plus 7 archived) organized into six domains. This page documents every table, its purpose, key relationships, and the ongoing Phase 4a integer-PK migration.
+The wiki-server PostgreSQL database has **42 active tables** (plus 7 archived) organized into seven domains. This page documents every table, its purpose, key relationships, and the ongoing Phase 4a integer-PK migration.
 
 **Schema source of truth:** `apps/wiki-server/src/schema.ts` (Drizzle ORM)
 
@@ -34,7 +34,7 @@ flowchart TD
         Citations["Citation System\n(citation_quotes, citation_content,\npage_citations)"]
         Auto["Auto-Update\n(runs, results,\nnews_items)"]
         Agent["Agent Tracking\n(agent_sessions, active_agents,\nevents)"]
-        Financial["Financial Data\n(personnel, grants,\nfunding_rounds, investments,\nequity_positions)"]
+        Financial["Financial Data\n(personnel, grants,\nfunding_rounds, investments,\nequity, divisions,\nfunding_programs)"]
         Infra["Infrastructure\n(jobs, groundskeeper_runs,\nservice_health_incidents)"]
     end
     YAML -->|build-data sync| Core
@@ -95,7 +95,8 @@ erDiagram
         jsonb authors
         jsonb tags
         text search_vector "tsvector + GIN index"
-        timestamp last_fetched_at
+        text fetch_status "ok, dead, paywall, error"
+        timestamptz last_fetched_at
     }
     facts {
         bigserial id PK
@@ -137,7 +138,7 @@ erDiagram
 |-------|---------------|---------|
 | **wiki_pages** | ≈700 | Mirror of MDX pages. Full-text searchable via GIN index on `search_vector`. Dual-ID system: text `id` (legacy) + `integer_id` (Phase 4a). |
 | **entities** | ≈600 | Mirror of `data/entities/*.yaml`. Organizations, people, concepts, risks, etc. |
-| **resources** | ≈1,000 | Mirror of `data/resources/*.yaml`. Papers, blog posts, reports — the source library. |
+| **resources** | ≈1,000 | Mirror of `data/resources/*.yaml`. Papers, blog posts, reports — the source library. `fetch_status` tracks source availability (ok/dead/paywall/error). |
 | **facts** | ≈3,000 | Mirror of KB YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. Unique on `(entity_id, fact_id)`. |
 | **summaries** | ≈400 | LLM-generated entity summaries. One per entity. |
 | **page_links** | ≈10,000 | Directional knowledge graph. Link types: `yaml_related`, `entity_link`, `name_prefix`, `similarity`, `shared_tag`. |
@@ -434,6 +435,40 @@ erDiagram
         text as_of
         text valid_end
     }
+    divisions {
+        varchar id PK "10-char"
+        text slug UK
+        text parent_org_id
+        text name
+        text division_type
+        text lead
+        text status
+        text start_date
+        text end_date
+        text website
+    }
+    division_personnel {
+        varchar id PK "10-char"
+        text division_id FK
+        text person_id
+        text role
+        text start_date
+        text end_date
+    }
+    funding_programs {
+        varchar id PK "10-char"
+        text org_id
+        text division_id FK
+        text name
+        text program_type
+        numeric total_budget
+        text currency
+        text application_url
+        text deadline
+        text status
+    }
+    divisions ||--o{ division_personnel : "has staff"
+    divisions ||--o{ funding_programs : "runs"
 `} />
 
 ### Design notes
@@ -441,7 +476,8 @@ erDiagram
 - **NUMERIC type** for amounts (not FLOAT) — preserves exact financial values
 - **TEXT references** for person/org IDs — supports both entity IDs and display names for non-entity records (e.g., "D. E. Shaw Research")
 - **10-char VARCHAR primary keys** — stable IDs allocated from `entity_ids` sequence
-- **Temporal support**: `start_date`/`end_date` for personnel, `as_of`/`valid_end` for equity positions
+- **Temporal support**: `start_date`/`end_date` for personnel and division_personnel, `as_of`/`valid_end` for equity positions
+- **Divisions** model org sub-units (funds, teams, departments, labs, program areas) and link to personnel and funding programs
 
 ---
 
@@ -561,6 +597,9 @@ flowchart LR
         FR[funding_rounds]
         INV[investments]
         EP[equity_positions]
+        DIV[divisions]
+        DP[division_personnel]
+        FP[funding_programs]
     end
     subgraph Verification
         KBFRV[kb_fact_resource_verifications]
@@ -595,6 +634,8 @@ flowchart LR
     AA --> ASE
     AS --> ASP
     SESS --> SP
+    DIV --> DP
+    DIV --> FP
 `} />
 
 ---
@@ -609,7 +650,7 @@ Migration Pool:    max 1 connection, statement_timeout: unlimited, lock_timeout:
 - `DATABASE_URL` → application queries
 - `DATABASE_MIGRATION_URL` → DDL migrations (falls back to `DATABASE_URL`)
 - Drizzle ORM for schema management, migrations run on server startup
-- 77 migration files tracking schema evolution since project inception
+- 78 migration files tracking schema evolution since project inception
 
 ---
 
@@ -622,4 +663,4 @@ Migration Pool:    max 1 connection, statement_timeout: unlimited, lock_timeout:
 | Phase 2 | 0015–0020 | — | Entity data model, facts timeseries, jobs, agent sessions |
 | Phase 3 | 0021–0045 | — | Claims → statements unification, hallucination risk, health monitoring |
 | Phase 4a | 0046–0066 | — | Integer PK migration (dual-write strategy), table archival |
-| Phase 5 | 0067–0076 | Current | KB verification, personnel, grants, funding, equity, investments |
+| Phase 5 | 0067–0077 | Current | KB verification, personnel, grants, funding, equity, investments, divisions, funding programs |

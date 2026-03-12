@@ -30,16 +30,22 @@ import type { GrantSource, RawGrant, SyncGrant } from "../lib/grant-import/types
 const SOURCE_URL_MAP = new Map(ALL_SOURCES.map(s => [s.id, s.sourceUrl]));
 
 function sourceUrlFor(sourceId: string): string {
-  return SOURCE_URL_MAP.get(sourceId) ?? ALL_SOURCES[0].sourceUrl;
+  const url = SOURCE_URL_MAP.get(sourceId);
+  if (!url) {
+    throw new Error(
+      `No sourceUrl found for source ID "${sourceId}". Known sources: ${[...SOURCE_URL_MAP.keys()].join(", ")}`
+    );
+  }
+  return url;
 }
 
 function filterSources(sourceFilter?: string): GrantSource[] {
   if (!sourceFilter) return ALL_SOURCES;
   const src = ALL_SOURCES.find(s => s.id === sourceFilter);
   if (!src) {
-    console.error(`Unknown source: ${sourceFilter}`);
-    console.error(`Available: ${ALL_SOURCES.map(s => s.id).join(", ")}`);
-    process.exit(1);
+    throw new Error(
+      `Unknown source: ${sourceFilter}. Available: ${ALL_SOURCES.map(s => s.id).join(", ")}`
+    );
   }
   return [src];
 }
