@@ -7,7 +7,11 @@
  */
 
 export async function AnthropicStakeholdersTable() {
-  return null;
+  return (
+    <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+      Stakeholder data is temporarily unavailable while records migrate to PostgreSQL.
+    </div>
+  );
 }
 
 export default AnthropicStakeholdersTable;

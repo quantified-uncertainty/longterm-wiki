@@ -157,7 +157,7 @@ export default async function OrgFundingPage({
       )}
 
       {/* Empty state */}
-      {valuationFacts.length === 0 && (
+      {sortedValuations.length <= 1 && (
         <div className="text-center py-16 text-muted-foreground">
           <p className="mb-2">
             No funding data available for {entity.name} yet.

@@ -51,8 +51,6 @@ export default function PeoplePage() {
 
       bornYear: numericValue(bornYearFact),
       netWorthNum: numericValue(netWorthFact),
-
-      careerHistoryCount: 0, // Records removed
     };
   });
 
@@ -60,7 +58,6 @@ export default function PeoplePage() {
   const withEmployer = rows.filter((r) => r.employerName != null).length;
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
   const withNetWorth = rows.filter((r) => r.netWorthNum != null).length;
-  const totalCareerEntries = rows.reduce((s, r) => s + r.careerHistoryCount, 0);
 
   const stats = [
     { label: "People", value: String(rows.length) },
@@ -68,7 +65,6 @@ export default function PeoplePage() {
     { label: "With Employer", value: String(withEmployer) },
     { label: "With Birth Year", value: String(withBornYear) },
     { label: "With Net Worth", value: String(withNetWorth) },
-    { label: "Career Entries", value: String(totalCareerEntries) },
   ];
 
   return (
