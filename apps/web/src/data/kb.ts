@@ -317,9 +317,10 @@ export function getKBRecords(entityId: string, collection: string): KBRecordEntr
 
   const key = resolveEntityKey(entityId, kb);
   // records is added dynamically by build-data.mjs, not in SerializedKB type
-  const records = (kb as Record<string, unknown>).records as
-    | Record<string, Record<string, KBRecordEntry[]>>
-    | undefined;
+  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
+  const records = "records" in kb
+    ? (kb as { records?: RecordsMap }).records
+    : undefined;
   if (!records) return [];
 
   return records[key]?.[collection] ?? [];

@@ -101,6 +101,20 @@ const ORG_TYPE_COLORS: Record<string, string> = {
     "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
 
+function SectionHeader({ title, count }: { title: string; count?: number }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <h2 className="text-base font-bold tracking-tight">{title}</h2>
+      {count != null && (
+        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {count}
+        </span>
+      )}
+      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+    </div>
+  );
+}
+
 // ── Grant helpers ─────────────────────────────────────────────────────
 
 const MAX_GRANTS_SHOWN = 10;
