@@ -178,6 +178,15 @@ describe('ensureFrontmatterFields', () => {
     expect(ensureFrontmatterFields(original, improved)).toBe(improved);
   });
 
+  it('restores original frontmatter when LLM drops entire block', () => {
+    const original = '---\ntitle: "Page"\nentityType: capability\n---\nOriginal body';
+    const improved = 'Just body text without frontmatter';
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('---\ntitle: "Page"');
+    expect(result).toContain('entityType: capability');
+    expect(result).toContain('Just body text without frontmatter');
+  });
+
   it('keeps new fields added by LLM that were not in original', () => {
     const original = '---\ntitle: "A"\n---\nBody';
     const improved = '---\ntitle: "A"\ndraft: true\n---\nBody';

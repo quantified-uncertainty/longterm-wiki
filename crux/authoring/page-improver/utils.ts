@@ -219,7 +219,13 @@ export function repairFrontmatter(content: string): string {
 export function ensureFrontmatterFields(originalContent: string, improvedContent: string): string {
   const origMatch = originalContent.match(/^---\n([\s\S]*?)\n---/);
   const newMatch = improvedContent.match(/^---\n([\s\S]*?)\n---/);
-  if (!origMatch || !newMatch) return improvedContent;
+  if (!origMatch) return improvedContent;
+  if (!newMatch) {
+    // LLM dropped the entire frontmatter block — restore the original
+    log('frontmatter', 'Improved content missing frontmatter block; restoring original frontmatter');
+    const body = improvedContent.replace(/^\n+/, '');
+    return `---\n${origMatch[1]}\n---\n${body}`;
+  }
 
   // Parse top-level YAML keys and their full text (including continuation lines)
   const getKeys = (fm: string): Map<string, string> => {

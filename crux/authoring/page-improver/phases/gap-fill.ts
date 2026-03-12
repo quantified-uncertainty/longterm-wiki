@@ -48,6 +48,8 @@ Start your response with "---" (the frontmatter delimiter).`;
   }
 
   fixedContent = repairFrontmatter(fixedContent);
+  // Use pre-gap-fill content (not original file) as reference: the improve phase
+  // already restored fields from the original, so this is defense-in-depth.
   fixedContent = ensureFrontmatterFields(improvedContent, fixedContent);
 
   writeTemp(page.id, 'final.mdx', fixedContent);
