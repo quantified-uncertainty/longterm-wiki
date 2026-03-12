@@ -12,4 +12,6 @@ export const FUNDER_IDS = {
   MANIFUND: "fFVOuFZCRf",
   LTFF: "yA12C1KcjQ",
   CEA: "gNsqAes7Dw",
+  GIVEWELL: "OwXl35e7bg",
+  ACX_GRANTS: "LBr3ocKKyQ",
 } as const;

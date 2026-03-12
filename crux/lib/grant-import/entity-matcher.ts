@@ -153,6 +153,7 @@ export const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
   "Rethink Priorities": "rethink-priorities",
   "1Day Sooner": "1day-sooner",
   "1DaySooner": "1day-sooner",
+  "1DaySooner and Rethink Priorities": "1day-sooner",
   "EA Global": "ea-global",
 
   // --- Funders/Philanthropies ---
