@@ -319,6 +319,275 @@ function FundingReceivedSection({
   );
 }
 
+// ── Division helpers ──────────────────────────────────────────────────
+
+const DIVISION_TYPE_LABELS: Record<string, string> = {
+  fund: "Fund",
+  team: "Team",
+  department: "Department",
+  lab: "Lab",
+  "program-area": "Program Area",
+};
+
+const DIVISION_TYPE_COLORS: Record<string, string> = {
+  fund: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  team: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  department: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  lab: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+  "program-area": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+};
+
+function parseDivisionRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    divisionType: (f.divisionType as string) ?? "team",
+    lead: (f.lead as string) ?? null,
+    status: (f.status as string) ?? null,
+    startDate: (f.startDate as string) ?? null,
+    endDate: (f.endDate as string) ?? null,
+    website: (f.website as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+/** Divisions section for org pages. */
+function DivisionsSection({
+  divisions,
+}: {
+  divisions: ReturnType<typeof parseDivisionRecord>[];
+}) {
+  if (divisions.length === 0) return null;
+
+  return (
+    <section>
+      <SectionHeader title="Divisions" count={divisions.length} />
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Name</th>
+              <th className="text-left py-2 px-3 font-medium">Type</th>
+              <th className="text-left py-2 px-3 font-medium">Lead</th>
+              <th className="text-center py-2 px-3 font-medium">Status</th>
+              <th className="text-center py-2 px-3 font-medium">Dates</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {divisions.map((d) => (
+              <tr key={d.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {d.website ? (
+                      <a
+                        href={d.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {d.name}
+                      </a>
+                    ) : (
+                      d.name
+                    )}
+                  </span>
+                  {d.source && (
+                    <a
+                      href={d.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                      DIVISION_TYPE_COLORS[d.divisionType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
+                  </span>
+                </td>
+                <td className="py-2 px-3 text-xs text-muted-foreground">
+                  {d.lead ?? ""}
+                </td>
+                <td className="py-2 px-3 text-center text-xs">
+                  {d.status && (
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        d.status === "active"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                          : d.status === "inactive"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {titleCase(d.status)}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {d.startDate && (
+                    <span>
+                      {d.startDate}
+                      {d.endDate ? ` - ${d.endDate}` : " - present"}
+                    </span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+// ── Funding program helpers ──────────────────────────────────────────
+
+const PROGRAM_TYPE_LABELS: Record<string, string> = {
+  rfp: "RFP",
+  "grant-round": "Grant Round",
+  fellowship: "Fellowship",
+  prize: "Prize",
+  solicitation: "Solicitation",
+  call: "Call",
+};
+
+const PROGRAM_TYPE_COLORS: Record<string, string> = {
+  rfp: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+  "grant-round": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  fellowship: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  prize: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  solicitation: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+  call: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+};
+
+function parseFundingProgramRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    programType: (f.programType as string) ?? "grant-round",
+    description: (f.description as string) ?? null,
+    totalBudget: typeof f.totalBudget === "number" ? f.totalBudget : null,
+    currency: (f.currency as string) ?? "USD",
+    applicationUrl: (f.applicationUrl as string) ?? null,
+    openDate: (f.openDate as string) ?? null,
+    deadline: (f.deadline as string) ?? null,
+    status: (f.status as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+/** Funding Programs section for org pages. */
+function FundingProgramsSection({
+  programs,
+}: {
+  programs: ReturnType<typeof parseFundingProgramRecord>[];
+}) {
+  if (programs.length === 0) return null;
+
+  const totalBudget = programs.reduce((sum, p) => sum + (p.totalBudget ?? 0), 0);
+
+  return (
+    <section>
+      <SectionHeader title="Funding Programs" count={programs.length} />
+      {totalBudget > 0 && (
+        <div className="text-xs text-muted-foreground mb-3">
+          Total budget tracked: {formatCompactCurrency(totalBudget)}
+        </div>
+      )}
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Program</th>
+              <th className="text-left py-2 px-3 font-medium">Type</th>
+              <th className="text-right py-2 px-3 font-medium">Budget</th>
+              <th className="text-center py-2 px-3 font-medium">Status</th>
+              <th className="text-center py-2 px-3 font-medium">Deadline</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {programs.map((p) => (
+              <tr key={p.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {p.applicationUrl ? (
+                      <a
+                        href={p.applicationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {p.name}
+                      </a>
+                    ) : (
+                      p.name
+                    )}
+                  </span>
+                  {p.source && (
+                    <a
+                      href={p.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                  {p.description && (
+                    <div className="text-[10px] text-muted-foreground/60 mt-0.5 line-clamp-2">
+                      {p.description}
+                    </div>
+                  )}
+                </td>
+                <td className="py-2 px-3">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                      PROGRAM_TYPE_COLORS[p.programType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    }`}
+                  >
+                    {PROGRAM_TYPE_LABELS[p.programType] ?? p.programType}
+                  </span>
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {p.totalBudget != null && (
+                    <span className="font-semibold">{formatCompactCurrency(p.totalBudget)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-xs">
+                  {p.status && (
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        p.status === "open"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                          : p.status === "awarded"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {titleCase(p.status)}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {p.deadline ?? p.openDate ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────
 
 export default async function OrgProfilePage({
@@ -391,6 +660,18 @@ export default async function OrgProfilePage({
       };
     })
     .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Divisions (org subdivisions) ──
+  const divisionRecords = getKBRecords(entity.id, "divisions");
+  const divisions = divisionRecords
+    .map(parseDivisionRecord)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // ── Funding Programs (RFPs, grant rounds, fellowships, etc.) ──
+  const fundingProgramRecords = getKBRecords(entity.id, "funding-programs");
+  const fundingPrograms = fundingProgramRecords
+    .map(parseFundingProgramRecord)
+    .sort((a, b) => (b.totalBudget ?? 0) - (a.totalBudget ?? 0));
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
@@ -498,6 +779,12 @@ export default async function OrgProfilePage({
 
           {/* Funding Received (this org is a grant recipient) */}
           <FundingReceivedSection grants={grantsReceived} />
+
+          {/* Divisions (org subdivisions: funds, teams, labs, etc.) */}
+          <DivisionsSection divisions={divisions} />
+
+          {/* Funding Programs (RFPs, grant rounds, fellowships, etc.) */}
+          <FundingProgramsSection programs={fundingPrograms} />
         </div>
 
         {/* Sidebar */}
