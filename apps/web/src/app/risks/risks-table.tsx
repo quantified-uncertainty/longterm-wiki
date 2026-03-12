@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { SortHeader } from "@/components/directory";
+import { SortHeader } from "@/components/directory/SortHeader";
 
 export interface RiskRow {
   id: string;
