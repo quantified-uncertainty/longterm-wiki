@@ -4,8 +4,7 @@
  * To find or allocate new IDs: pnpm crux ids allocate <slug>
  */
 export const FUNDER_IDS = {
-  OPEN_PHILANTHROPY: "ULjDXpSLCI",
-  // Coefficient Giving is Open Philanthropy's grantmaking arm — same entity
+  // Rebranded from Open Philanthropy to Coefficient Giving (November 2025)
   COEFFICIENT_GIVING: "ULjDXpSLCI",
   SFF: "sIFjGbxVct",
   FTX_FUTURE_FUND: "JhIGCaI3Ng",

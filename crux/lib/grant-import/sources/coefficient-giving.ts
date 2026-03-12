@@ -45,7 +45,7 @@ export const source: GrantSource = {
 
       grants.push({
         source: "coefficient-giving",
-        funderId: FUNDER_IDS.OPEN_PHILANTHROPY,
+        funderId: FUNDER_IDS.COEFFICIENT_GIVING,
         granteeName: orgName,
         granteeId,
         name: grantName.substring(0, 500),
