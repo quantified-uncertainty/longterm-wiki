@@ -163,4 +163,5 @@ export const TOP_LEVEL_CONTENT_DIRS = [
   'dashboard',
   'project',
   'kb',
+  'sources',
 ];
