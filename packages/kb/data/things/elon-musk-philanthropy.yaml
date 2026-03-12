@@ -12,3 +12,40 @@ facts:
       philanthropic potential in history.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  grants:
+    fli-ai-safety-donation:
+      name: "Founding donation for FLI AI safety research program"
+      recipient: "fli"
+      amount: 10e6
+      date: "2015-01"
+      status: "completed"
+      source: https://futureoflife.org/recent-news/elon-musk-donates-10m-to-keep-ai-beneficial/
+      notes: "Funded FLI's 2015 AI Safety Research Program (37 grants to researchers worldwide)"
+
+    openai-founding-pledge:
+      name: "Co-founding pledge for OpenAI nonprofit"
+      recipient: "openai"
+      amount: 44e6
+      date: "2015-12"
+      status: "completed"
+      source: https://en.wikipedia.org/wiki/OpenAI
+      notes: "Part of $1B founding pledge; Musk reportedly contributed ~$44M before departing board in 2018"
+
+    xai-founding:
+      name: "Founding capital for xAI"
+      recipient: "xai"
+      amount: 6e9
+      date: "2024"
+      status: "active"
+      notes: "xAI Series B funding; Musk's personal contribution unclear but he is founder and primary backer. Total round was $6B from multiple investors"
+
+    neuralink-founding:
+      name: "Co-founding and early funding for Neuralink"
+      recipient: "neuralink"
+      amount: 100e6
+      date: "2017"
+      status: "active"
+      source: https://en.wikipedia.org/wiki/Neuralink
+      notes: "Personal investment in brain-computer interface company; exact amount is estimated"

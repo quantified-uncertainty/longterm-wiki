@@ -12,3 +12,61 @@ facts:
       signatories), and $665.8M Buterin donation (2021). Organization operates primarily"
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  funding-programs:
+    2015-ai-safety-research:
+      name: "AI Safety Research Program (2015)"
+      type: "round"
+      amount: 7e6
+      date: "2015"
+      status: "completed"
+      url: https://futureoflife.org/project/fli-grants-program/
+      notes: "37 grants to AI safety researchers worldwide; funded from Elon Musk's $10M donation. Recipients included Stuart Russell, MIRI, CSER"
+
+    2021-grants-program:
+      name: "Grants Program (2021)"
+      type: "program"
+      amount: 25e6
+      date: "2021"
+      status: "completed"
+      url: https://futureoflife.org/project/fli-grants-program/
+      notes: "Larger program funded from Vitalik Buterin's crypto donation ($665.8M total to FLI). Focus on AI governance, biosecurity, and nuclear risk"
+
+    worldbuilding-contest:
+      name: "Worldbuilding Contest"
+      type: "round"
+      date: "2022"
+      status: "completed"
+      url: https://worldbuild.ai/
+      notes: "Creative writing competition for positive AI futures; several thousand entries"
+
+  grants:
+    musk-founding-donation:
+      name: "Founding donation for AI safety research program"
+      recipient: "fli"
+      amount: 10e6
+      date: "2015-01"
+      status: "active"
+      source: https://futureoflife.org/recent-news/elon-musk-donates-10m-to-keep-ai-beneficial/
+      notes: "Elon Musk's donation that funded the 2015 AI Safety Research Program; announced at Puerto Rico conference"
+
+    stuart-russell-ai-safety:
+      name: "Research on provably beneficial AI"
+      recipient: "stuart-russell"
+      amount: 1.5e6
+      date: "2015"
+      status: "completed"
+      program: "2015-ai-safety-research"
+      source: https://futureoflife.org/project/fli-grants-program/
+      notes: "UC Berkeley CHAI foundational research on value alignment"
+
+    miri-2015-grant:
+      name: "AI safety research on agent foundations"
+      recipient: "miri"
+      amount: 383449
+      date: "2015"
+      status: "completed"
+      program: "2015-ai-safety-research"
+      source: https://futureoflife.org/project/fli-grants-program/
+      notes: "MIRI research on decision theory and logical uncertainty"
