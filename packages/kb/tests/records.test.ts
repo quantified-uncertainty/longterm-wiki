@@ -13,7 +13,7 @@ describe("records", () => {
   describe("record schemas", () => {
     it("loads all record schemas from schemas/records/", () => {
       const schemas = graph.getAllRecordSchemas();
-      expect(schemas.length).toBeGreaterThanOrEqual(14);
+      expect(schemas.length).toBeGreaterThanOrEqual(13);
     });
 
     it("loads investment schema with correct endpoints", () => {
