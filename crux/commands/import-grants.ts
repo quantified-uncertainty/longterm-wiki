@@ -12,7 +12,7 @@
  */
 
 import { createHash } from "crypto";
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import { execSync } from "child_process";
 import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
@@ -111,23 +111,24 @@ interface EntityMatch {
   name: string;
 }
 
-function buildEntityMatcher(dbPath: string): {
+function buildEntityMatcher(): {
   match: (name: string) => EntityMatch | null;
   allNames: Map<string, EntityMatch>;
 } {
-  const db = JSON.parse(readFileSync(dbPath, "utf8"));
   const nameMap = new Map<string, EntityMatch>();
 
-  // From KB entities
-  const slugToId = db.kb?.slugToEntityId || {};
+  // Load KB data from kb-data.json (database.json strips the kb field)
+  const kbDataPath = resolve("apps/web/src/data/kb-data.json");
+  const kbData = JSON.parse(readFileSync(kbDataPath, "utf8"));
+  const slugToId: Record<string, string> = kbData.slugToEntityId || {};
   const idToSlug = new Map<string, string>();
   for (const [slug, id] of Object.entries(slugToId)) {
     idToSlug.set(id as string, slug);
   }
 
-  if (db.kb?.entities) {
+  if (kbData.entities) {
     for (const [eid, entity] of Object.entries(
-      db.kb.entities as Record<string, { name?: string; aliases?: string[] }>
+      kbData.entities as Record<string, { name?: string; aliases?: string[] }>
     )) {
       const slug = idToSlug.get(eid) || "";
       const match: EntityMatch = {
@@ -146,9 +147,10 @@ function buildEntityMatcher(dbPath: string): {
     }
   }
 
-  // From typedEntities
+  // Also load typedEntities from database.json for non-KB entities
+  const dbPath = resolve("apps/web/src/data/database.json");
+  const db = JSON.parse(readFileSync(dbPath, "utf8"));
   for (const e of db.typedEntities || []) {
-    if (nameMap.has(e.title?.toLowerCase()?.trim())) continue;
     const slug = e.id;
     const stableId = slugToId[slug] || slug;
     const match: EntityMatch = {
@@ -156,7 +158,12 @@ function buildEntityMatcher(dbPath: string): {
       slug,
       name: e.title || slug,
     };
-    nameMap.set(e.title?.toLowerCase()?.trim(), match);
+    if (e.title && !nameMap.has(e.title.toLowerCase().trim())) {
+      nameMap.set(e.title.toLowerCase().trim(), match);
+    }
+    if (slug && !nameMap.has(slug.toLowerCase())) {
+      nameMap.set(slug.toLowerCase(), match);
+    }
   }
 
   return {
@@ -408,8 +415,10 @@ function toSyncGrant(raw: RawGrant): SyncGrant {
   const idInput = `${raw.source}|${raw.funderId}|${raw.granteeName}|${raw.date || ""}|${raw.amount || ""}|${raw.name.substring(0, 100)}`;
   const id = generateId(idInput);
 
-  // For granteeId: use stableId if matched, otherwise store display name (max 200 chars)
-  const granteeId = (raw.granteeId || raw.granteeName).substring(0, 200);
+  // granteeId: always store the human-readable name (max 200 chars).
+  // The entity stableId is useful for linking but the grants table renders
+  // this field directly, so it must always be a display name.
+  const granteeId = raw.granteeName.substring(0, 200);
 
   // Truncate notes
   let notes: string | null = null;
@@ -444,14 +453,14 @@ function toSyncGrant(raw: RawGrant): SyncGrant {
 
 function downloadCSVs() {
   console.log("Downloading Coefficient Giving CSV...");
-  execSync(`curl -sL -o "${CG_CSV_PATH}" "${CG_CSV_URL}"`, {
+  execSync(`curl -fsSL --retry 3 --connect-timeout 10 -o "${CG_CSV_PATH}" "${CG_CSV_URL}"`, {
     stdio: "inherit",
   });
   const cgSize = readFileSync(CG_CSV_PATH).length;
   console.log(`  → ${(cgSize / 1024).toFixed(0)} KB`);
 
   console.log("Downloading EA Funds CSV...");
-  execSync(`curl -sL -o "${EA_FUNDS_CSV_PATH}" "${EA_FUNDS_CSV_URL}"`, {
+  execSync(`curl -fsSL --retry 3 --connect-timeout 10 -o "${EA_FUNDS_CSV_PATH}" "${EA_FUNDS_CSV_URL}"`, {
     stdio: "inherit",
   });
   const eaSize = readFileSync(EA_FUNDS_CSV_PATH).length;
@@ -483,6 +492,7 @@ async function syncToServer(
   }
 
   let totalUpserted = 0;
+  let failedBatches = 0;
   for (let i = 0; i < grants.length; i += SYNC_BATCH_SIZE) {
     const batch = grants.slice(i, i + SYNC_BATCH_SIZE);
     const batchNum = Math.floor(i / SYNC_BATCH_SIZE) + 1;
@@ -502,12 +512,15 @@ async function syncToServer(
       totalUpserted += result.data.upserted;
       console.log(`    → ${result.data.upserted} upserted`);
     } else {
+      failedBatches++;
       console.error(`    ✗ Batch ${batchNum} failed:`, result.error);
-      // Continue with remaining batches
     }
   }
 
   console.log(`\nTotal upserted: ${totalUpserted}`);
+  if (failedBatches > 0) {
+    throw new Error(`${failedBatches} grant sync batch(es) failed`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -539,8 +552,7 @@ async function cmdAnalyze() {
     downloadCSVs();
   }
 
-  const dbPath = resolve("apps/web/src/data/database.json");
-  const matcher = buildEntityMatcher(dbPath);
+  const matcher = buildEntityMatcher();
   const eaFundIds = resolveEAFundEntityIds(matcher);
 
   const cgGrants = parseCoefficientGivingCSV(CG_CSV_PATH, matcher);
@@ -618,8 +630,7 @@ async function cmdSync(dryRun: boolean) {
     downloadCSVs();
   }
 
-  const dbPath = resolve("apps/web/src/data/database.json");
-  const matcher = buildEntityMatcher(dbPath);
+  const matcher = buildEntityMatcher();
   const eaFundIds = resolveEAFundEntityIds(matcher);
 
   const cgGrants = parseCoefficientGivingCSV(CG_CSV_PATH, matcher);

@@ -42,6 +42,7 @@
  *   ids         Entity ID allocation and lookup (allocate, check, list)
  *   audits      System-level behavioral verification (ongoing + post-merge)
  *   release     Production release management (create release PRs from main → production)
+ *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -227,6 +228,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   kb          Knowledge base readability tools (show, list, lookup)
   footnotes        Footnote migration tools (migrate-cr)
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
+  import-grants    Import external grant databases (Coefficient Giving, EA Funds)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
