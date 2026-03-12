@@ -326,9 +326,9 @@ export default async function PersonProfilePage({
               <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
                 {publications
                   .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-                  .map((pub) => (
+                  .map((pub, idx) => (
                     <div
-                      key={`${pub.title}-${pub.year ?? ""}`}
+                      key={`${idx}-${pub.title}`}
                       className="px-4 py-3"
                     >
                       <div className="flex items-start justify-between gap-2">

@@ -62,7 +62,7 @@ interface PersonResourceMatch {
 /**
  * Normalize a name for matching: lowercase, trim, remove accents.
  */
-function normalizeName(name: string): string {
+export function normalizeName(name: string): string {
   return name
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // strip diacritics
@@ -74,7 +74,7 @@ function normalizeName(name: string): string {
  * Build a lookup map from author name variants to person entity IDs.
  * Includes the full name and common variations.
  */
-function buildAuthorLookup(people: PersonEntity[]): Map<string, string> {
+export function buildAuthorLookup(people: PersonEntity[]): Map<string, string> {
   const lookup = new Map<string, string>();
 
   for (const person of people) {
@@ -83,10 +83,6 @@ function buildAuthorLookup(people: PersonEntity[]): Map<string, string> {
     const normalized = normalizeName(cleanName);
     lookup.set(normalized, person.id);
 
-    // Also index by "First Last" if the title had extra info
-    if (cleanName !== person.title) {
-      lookup.set(normalizeName(person.title), person.id);
-    }
   }
 
   // Manual aliases for known variations in literature.yaml
@@ -107,7 +103,7 @@ function buildAuthorLookup(people: PersonEntity[]): Map<string, string> {
  * Try to match an author string to a person entity.
  * Returns the entity ID if matched, null otherwise.
  */
-function matchAuthor(
+export function matchAuthor(
   authorName: string,
   lookup: Map<string, string>,
 ): string | null {
