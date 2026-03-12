@@ -1,11 +1,9 @@
 type: ai-model
 name: AI Model
 
-required:
+recommended:
   - developed-by
   - model-release-date
-
-recommended:
   - parameter-count
   - context-window
   - modality
