@@ -153,22 +153,36 @@ export function getEntityInfoBoxData(entityId: string) {
   let modelTier: string | undefined;
   let releaseDate: string | undefined;
   let developer: string | undefined;
+  let developerId: string | undefined;
   let inputPrice: number | undefined;
   let outputPrice: number | undefined;
   let contextWindow: number | undefined;
   let safetyLevel: string | undefined;
   let benchmarks: Array<{ name: string; score: number; unit?: string }> | undefined;
+  let modality: string[] | undefined;
+  let openWeight: boolean | undefined;
+  let parameterCount: string | undefined;
+  let trainingCutoff: string | undefined;
 
   if (isAiModel(entity)) {
     modelFamily = entity.modelFamily;
     modelTier = entity.modelTier;
     releaseDate = entity.releaseDate;
-    developer = entity.developer;
+    // Resolve developer to display name, keeping ID for linking
+    if (entity.developer) {
+      developerId = entity.developer;
+      const devEntity = getTypedEntityById(entity.developer);
+      developer = devEntity?.title ?? entity.developer;
+    }
     inputPrice = entity.inputPrice;
     outputPrice = entity.outputPrice;
     contextWindow = entity.contextWindow;
     safetyLevel = entity.safetyLevel;
     benchmarks = entity.benchmarks?.length ? entity.benchmarks : undefined;
+    modality = entity.modality?.length ? entity.modality : undefined;
+    openWeight = entity.openWeight;
+    parameterCount = entity.parameterCount;
+    trainingCutoff = entity.trainingCutoff;
   }
 
   // Resolve summaryPage to title + href
@@ -222,11 +236,16 @@ export function getEntityInfoBoxData(entityId: string) {
     modelTier,
     releaseDate,
     developer,
+    developerId,
     inputPrice,
     outputPrice,
     contextWindow,
     safetyLevel,
     benchmarks,
+    modality,
+    openWeight,
+    parameterCount,
+    trainingCutoff,
     // Overview
     childPages: entity.entityType === "overview"
       ? getChildPagesForOverview(entity.id)

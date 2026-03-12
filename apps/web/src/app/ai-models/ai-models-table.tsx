@@ -21,34 +21,29 @@ export interface AiModelRow {
   topBenchmark: { name: string; score: number; unit?: string } | null;
   capabilities: string[];
   isFamily: boolean;
+  openWeight: boolean | null;
+  parameterCount: string | null;
 }
 
-const TIER_LABELS: Record<string, string> = {
-  haiku: "Haiku",
-  sonnet: "Sonnet",
-  opus: "Opus",
-};
-
-const TIER_ORDER: Record<string, number> = {
-  haiku: 0,
-  sonnet: 1,
-  opus: 2,
-};
-
-const TIER_COLORS: Record<string, string> = {
-  haiku: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  sonnet: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  opus: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+const DEVELOPER_COLORS: Record<string, string> = {
+  anthropic: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  openai: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  deepmind: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  "meta-ai": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+  "mistral-ai": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+  xai: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
+  deepseek: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
 };
 
 type SortKey =
   | "name"
-  | "tier"
+  | "developer"
   | "releaseDate"
   | "inputPrice"
   | "outputPrice"
   | "contextWindow"
-  | "sweBench";
+  | "sweBench"
+  | "params";
 
 type SortDir = "asc" | "desc";
 
@@ -96,31 +91,30 @@ function SortHeader({
 
 export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   const [search, setSearch] = useState("");
-  const [tierFilter, setTierFilter] = useState<string>("all");
+  const [developerFilter, setDeveloperFilter] = useState<string>("all");
   const [showFamilies, setShowFamilies] = useState(false);
+  const [showOpenWeightOnly, setShowOpenWeightOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("releaseDate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const tiers = useMemo(() => {
-    const set = new Set<string>();
+  const developers = useMemo(() => {
+    const map = new Map<string, string>();
     for (const r of rows) {
-      if (r.modelTier) set.add(r.modelTier);
+      if (r.developer && r.developerName) {
+        map.set(r.developer, r.developerName);
+      }
     }
-    return [...set].sort(
-      (a, b) =>
-        (TIER_ORDER[a] ?? Number.MAX_SAFE_INTEGER) -
-        (TIER_ORDER[b] ?? Number.MAX_SAFE_INTEGER),
-    );
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
   }, [rows]);
 
-  const tierCounts = useMemo(() => {
+  const developerCounts = useMemo(() => {
     const counts: Record<string, number> = { all: 0 };
     for (const r of rows) {
       if (!showFamilies && r.isFamily) continue;
       counts.all += 1;
-      if (r.isFamily) continue;
-      const t = r.modelTier ?? "other";
-      counts[t] = (counts[t] ?? 0) + 1;
+      if (r.developer) {
+        counts[r.developer] = (counts[r.developer] ?? 0) + 1;
+      }
     }
     return counts;
   }, [rows, showFamilies]);
@@ -130,7 +124,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortDir(key === "name" ? "asc" : "desc");
+      setSortDir(key === "name" || key === "developer" ? "asc" : "desc");
     }
   };
 
@@ -141,8 +135,12 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       result = result.filter((r) => !r.isFamily);
     }
 
-    if (tierFilter !== "all") {
-      result = result.filter((r) => r.modelTier === tierFilter);
+    if (developerFilter !== "all") {
+      result = result.filter((r) => r.developer === developerFilter);
+    }
+
+    if (showOpenWeightOnly) {
+      result = result.filter((r) => r.openWeight === true);
     }
 
     if (search.trim()) {
@@ -150,7 +148,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       result = result.filter(
         (r) =>
           r.title.toLowerCase().includes(q) ||
-          r.developerName?.toLowerCase().includes(q),
+          r.developerName?.toLowerCase().includes(q) ||
+          r.modelFamily?.toLowerCase().includes(q),
       );
     }
 
@@ -160,8 +159,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
         switch (sortKey) {
           case "name":
             return row.title.toLowerCase();
-          case "tier":
-            return TIER_ORDER[row.modelTier ?? ""] ?? Number.MAX_SAFE_INTEGER;
+          case "developer":
+            return (row.developerName ?? "").toLowerCase();
           case "releaseDate":
             return row.releaseDate;
           case "inputPrice":
@@ -172,6 +171,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             return row.contextWindow;
           case "sweBench":
             return row.sweBenchScore;
+          case "params":
+            return row.parameterCount ? parseParamCount(row.parameterCount) : null;
         }
       };
 
@@ -189,48 +190,52 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
     });
 
     return result;
-  }, [rows, search, tierFilter, showFamilies, sortKey, sortDir]);
+  }, [rows, search, developerFilter, showFamilies, showOpenWeightOnly, sortKey, sortDir]);
 
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search models..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setTierFilter("all")}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              tierFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">{tierCounts.all}</span>
-          </button>
-          {tiers.map((t) => (
+      <div className="flex flex-col gap-3 mb-5">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Search models..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+          />
+          <div className="flex flex-wrap gap-1.5">
             <button
-              key={t}
-              onClick={() => setTierFilter(tierFilter === t ? "all" : t)}
+              onClick={() => setDeveloperFilter("all")}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                tierFilter === t
+                developerFilter === "all"
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
                   : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
               }`}
             >
-              {TIER_LABELS[t] ?? t}
-              <span className="ml-1 text-[10px] opacity-60">
-                {tierCounts[t] ?? 0}
-              </span>
+              All
+              <span className="ml-1 text-[10px] opacity-60">{developerCounts.all}</span>
             </button>
-          ))}
-          <label className="flex items-center gap-1.5 text-xs text-muted-foreground ml-2">
+            {developers.map(([devId, devName]) => (
+              <button
+                key={devId}
+                onClick={() => setDeveloperFilter(developerFilter === devId ? "all" : devId)}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  developerFilter === devId
+                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                }`}
+              >
+                {devName}
+                <span className="ml-1 text-[10px] opacity-60">
+                  {developerCounts[devId] ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
               checked={showFamilies}
@@ -238,6 +243,15 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               className="rounded"
             />
             Show families
+          </label>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={showOpenWeightOnly}
+              onChange={(e) => setShowOpenWeightOnly(e.target.checked)}
+              className="rounded"
+            />
+            Open weight only
           </label>
         </div>
       </div>
@@ -252,12 +266,12 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <SortHeader label="Model" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <SortHeader label="Tier" sortKey="tier" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Developer" sortKey="developer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Released" sortKey="releaseDate" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <SortHeader label="Params" sortKey="params" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Input $/MTok" sortKey="inputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Output $/MTok" sortKey="outputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Context" sortKey="contextWindow" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <th className="py-2.5 px-3 font-medium text-left">Safety</th>
               <SortHeader label="SWE-bench" sortKey="sweBench" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
             </tr>
           </thead>
@@ -269,32 +283,34 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  {row.numericId ? (
-                    <Link
-                      href={`/wiki/${row.numericId}`}
-                      className={`font-medium hover:text-primary transition-colors ${row.isFamily ? "text-foreground/80" : "text-foreground"}`}
-                    >
-                      {row.title}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{row.title}</span>
-                  )}
-                  {row.developerName && (
-                    <span className="ml-2 text-[10px] text-muted-foreground/60">
-                      {row.developerName}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {row.numericId ? (
+                      <Link
+                        href={`/wiki/${row.numericId}`}
+                        className={`font-medium hover:text-primary transition-colors ${row.isFamily ? "text-foreground/80" : "text-foreground"}`}
+                      >
+                        {row.title}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground">{row.title}</span>
+                    )}
+                    {row.openWeight && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
+                        Open
+                      </span>
+                    )}
+                  </div>
                 </td>
 
-                {/* Tier */}
+                {/* Developer */}
                 <td className="py-2.5 px-3">
-                  {row.modelTier && (
+                  {row.developer && row.developerName && (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        TIER_COLORS[row.modelTier] ?? "bg-gray-100 text-gray-600"
+                        DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                       }`}
                     >
-                      {TIER_LABELS[row.modelTier] ?? row.modelTier}
+                      {row.developerName}
                     </span>
                   )}
                 </td>
@@ -302,6 +318,11 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Release Date */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
                   {row.releaseDate ?? ""}
+                </td>
+
+                {/* Parameter Count */}
+                <td className="py-2.5 px-3 text-right tabular-nums text-muted-foreground">
+                  {row.parameterCount ?? ""}
                 </td>
 
                 {/* Input Price */}
@@ -317,15 +338,6 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Context Window */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.contextWindow != null ? formatContext(row.contextWindow) : ""}
-                </td>
-
-                {/* Safety Level */}
-                <td className="py-2.5 px-3 whitespace-nowrap">
-                  {row.safetyLevel && (
-                    <span className="text-xs text-muted-foreground">
-                      {row.safetyLevel}
-                    </span>
-                  )}
                 </td>
 
                 {/* SWE-bench */}
@@ -349,4 +361,14 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       )}
     </div>
   );
+}
+
+/** Parse a parameter count string like "70B" or "1.8T" to a numeric value for sorting. */
+function parseParamCount(s: string): number {
+  const match = s.match(/^([\d.]+)\s*([KMBT])?$/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1]);
+  const suffix = (match[2] ?? "").toUpperCase();
+  const multipliers: Record<string, number> = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 };
+  return num * (multipliers[suffix] ?? 1);
 }

@@ -11,7 +11,8 @@ import {
   getAllKBRecords,
 } from "@/data/kb";
 import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById, isOrganization } from "@/data";
+import { getTypedEntityById, getTypedEntities, isOrganization, isAiModel } from "@/data";
+import { getEntityHref } from "@/data/entity-nav";
 import {
   formatKBDate,
   titleCase,
@@ -1044,6 +1045,12 @@ export default async function OrgProfilePage({
   const descriptionText = orgData?.description ?? null;
   const websiteUrl = orgData?.website ?? null;
 
+  // AI models developed by this org
+  const orgModels = getTypedEntities()
+    .filter(isAiModel)
+    .filter((m) => m.developer === slug && m.releaseDate)
+    .sort((a, b) => (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""));
+
   // Headquarters text
   const hqText =
     hqFact?.value.type === "text" ? hqFact.value.value : null;
@@ -1297,6 +1304,64 @@ export default async function OrgProfilePage({
 
           {/* Equity Positions (ownership stakes) */}
           <EquityPositionsSection positions={equityPositions} />
+
+          {/* AI Models section */}
+          {orgModels.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold tracking-tight">
+                  AI Models ({orgModels.length})
+                </h2>
+                <Link
+                  href={`/ai-models`}
+                  className="text-xs text-primary hover:underline"
+                >
+                  View all models &rarr;
+                </Link>
+              </div>
+              <div className="border border-border rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                      <th className="py-2 px-3 text-left font-medium">Model</th>
+                      <th className="py-2 px-3 text-left font-medium">Released</th>
+                      <th className="py-2 px-3 text-right font-medium">Pricing (in/out)</th>
+                      <th className="py-2 px-3 text-right font-medium">Context</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50">
+                    {orgModels.map((model) => {
+                      const href = model.numericId ? `/wiki/${model.numericId}` : getEntityHref(model.id, model.entityType);
+                      return (
+                        <tr key={model.id} className="hover:bg-muted/20 transition-colors">
+                          <td className="py-2 px-3">
+                            <Link href={href} className="font-medium text-foreground hover:text-primary transition-colors">
+                              {model.title}
+                            </Link>
+                          </td>
+                          <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
+                            {model.releaseDate ?? ""}
+                          </td>
+                          <td className="py-2 px-3 text-right tabular-nums">
+                            {model.inputPrice != null && model.outputPrice != null
+                              ? `$${model.inputPrice} / $${model.outputPrice}`
+                              : ""}
+                          </td>
+                          <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
+                            {model.contextWindow != null
+                              ? model.contextWindow >= 1_000_000
+                                ? `${model.contextWindow / 1_000_000}M`
+                                : `${model.contextWindow / 1_000}K`
+                              : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
         </div>
 
         {/* Sidebar */}

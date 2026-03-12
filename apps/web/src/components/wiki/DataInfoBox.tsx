@@ -69,6 +69,11 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           contextWindow={data.contextWindow}
           safetyLevel={data.safetyLevel}
           benchmarks={data.benchmarks}
+          modality={data.modality}
+          openWeight={data.openWeight}
+          parameterCount={data.parameterCount}
+          trainingCutoff={data.trainingCutoff}
+          developerId={data.developerId}
           // Summary page
           summaryPage={data.summaryPage}
           // Overview child pages
