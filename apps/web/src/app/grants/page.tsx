@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@data/kb";
 import { getEntityHref } from "@data/entity-nav";
 import { getTypedEntityById } from "@data/database";
@@ -72,7 +73,7 @@ export default function GrantsPage() {
   // Build top funders summary (sorted by total amount desc)
   const funderTotals = new Map<
     string,
-    { name: string; count: number; total: number; href: string | null }
+    { id: string; name: string; count: number; total: number; href: string | null }
   >();
   for (const r of rows) {
     const existing = funderTotals.get(r.organizationId);
@@ -82,6 +83,7 @@ export default function GrantsPage() {
       existing.total += r.amount ?? 0;
     } else {
       funderTotals.set(r.organizationId, {
+        id: r.organizationId,
         name: r.organizationName,
         count: 1,
         total: r.amount ?? 0,
@@ -129,12 +131,18 @@ export default function GrantsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {topFunders.map((funder) => (
               <div
-                key={funder.name}
+                key={funder.id}
                 className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3"
               >
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    {funder.name}
+                    {funder.href ? (
+                      <Link href={funder.href} className="hover:underline">
+                        {funder.name}
+                      </Link>
+                    ) : (
+                      funder.name
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {funder.count} grant{funder.count !== 1 ? "s" : ""}
