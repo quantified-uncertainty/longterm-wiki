@@ -29,6 +29,21 @@ describe("parseCSVLine", () => {
   it("handles empty string", () => {
     expect(parseCSVLine("")).toEqual([""]);
   });
+
+  it("handles line with only commas", () => {
+    expect(parseCSVLine(",,,")).toEqual(["", "", "", ""]);
+  });
+
+  it("handles very long field (>10K chars)", () => {
+    const longField = "x".repeat(15000);
+    const result = parseCSVLine(`a,${longField},c`);
+    expect(result).toEqual(["a", longField, "c"]);
+    expect(result[1]).toHaveLength(15000);
+  });
+
+  it("handles field with only whitespace", () => {
+    expect(parseCSVLine("  ,\t,  \t  ")).toEqual(["  ", "\t", "  \t  "]);
+  });
 });
 
 describe("reassembleCSVRows", () => {
@@ -48,5 +63,11 @@ describe("reassembleCSVRows", () => {
     const text = "Header\nRow 1\n\nRow 2";
     const rows = reassembleCSVRows(text);
     expect(rows).toEqual(["Row 1", "Row 2"]);
+  });
+
+  it("returns empty array for header-only input", () => {
+    const text = "Name,Amount";
+    const rows = reassembleCSVRows(text);
+    expect(rows).toEqual([]);
   });
 });
