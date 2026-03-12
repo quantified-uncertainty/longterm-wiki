@@ -3,6 +3,10 @@
  *
  * Personnel data (key-persons, board-seats, career-history) is fetched
  * from PostgreSQL during build and merged into kb-data.json as KB records.
+ *
+ * Career data comes from the KB records layer (populated by build-data.mjs
+ * from the wiki-server personnel table). Career-history records are keyed
+ * by personId, with fields: organization, title, start, end, source, notes.
  */
 import {
   getKBRecords,
@@ -123,4 +127,50 @@ export function resolveOrgForCareer(
     name: orgEntity.name,
     slug: getKBEntitySlug(orgEntity.id),
   };
+}
+
+// -- Career history -------------------------------------------------------
+
+export interface CareerHistoryEntry {
+  key: string;
+  organization: string;
+  title: string;
+  startDate: string | null;
+  endDate: string | null;
+  source: string | null;
+  notes: string | null;
+}
+
+/**
+ * Get career history entries for a person.
+ * Reads from the KB records layer (career-history collection).
+ * Returns entries sorted by start date (most recent first).
+ */
+export function getCareerHistory(personEntityId: string): CareerHistoryEntry[] {
+  const records: KBRecordEntry[] = getKBRecords(
+    personEntityId,
+    "career-history",
+  );
+
+  const entries: CareerHistoryEntry[] = records.map((r) => ({
+    key: r.key,
+    organization: String(r.fields.organization ?? ""),
+    title: String(r.fields.title ?? ""),
+    startDate: r.fields.start ? String(r.fields.start) : null,
+    endDate: r.fields.end ? String(r.fields.end) : null,
+    source: r.fields.source ? String(r.fields.source) : null,
+    notes: r.fields.notes ? String(r.fields.notes) : null,
+  }));
+
+  // Sort: current roles first, then by start date descending
+  entries.sort((a, b) => {
+    const endA = a.endDate ? 1 : 0;
+    const endB = b.endDate ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const sa = a.startDate ?? "";
+    const sb = b.startDate ?? "";
+    return sb.localeCompare(sa);
+  });
+
+  return entries;
 }
