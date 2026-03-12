@@ -78,6 +78,7 @@ function enrichWithNames(
   return programs.map((p) => ({
     ...p,
     orgName: resolveEntityName(p.orgId),
+    currency: p.currency ?? "USD",
   }));
 }
 
