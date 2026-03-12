@@ -1,5 +1,5 @@
 import type { RawGrant, SyncGrant } from "./types.ts";
-import { convertToUSD, formatAmount } from "./currency.ts";
+import { convertToUSD, formatAmount, isSupportedCurrency } from "./currency.ts";
 
 // --- Data types ---
 
@@ -34,13 +34,9 @@ export interface FunderBreakdown {
 /** Convert a raw grant's amount to USD, using the grant's currency field. */
 function rawAmountToUSD(grant: RawGrant): number {
   if (grant.amount == null) return 0;
-  const currency = grant.currency || "USD";
-  try {
-    return convertToUSD(grant.amount, currency);
-  } catch {
-    // Unknown currency — treat as USD rather than crash aggregation
-    return grant.amount;
-  }
+  const currency = (grant.currency ?? "USD").trim().toUpperCase();
+  if (!isSupportedCurrency(currency)) return 0;
+  return convertToUSD(grant.amount, currency);
 }
 
 // --- Data functions ---
