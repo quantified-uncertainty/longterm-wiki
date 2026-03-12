@@ -13,10 +13,9 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
   const idInput = `${raw.source}|${raw.funderId}|${raw.granteeName}|${raw.date || ""}|${raw.amount || ""}|${raw.name.substring(0, 100)}`;
   const id = generateId(idInput);
 
-  // granteeId: always store the human-readable name (max 200 chars).
-  // The entity stableId is useful for linking but the grants table renders
-  // this field directly, so it must always be a display name.
-  const granteeId = raw.granteeName.substring(0, 200);
+  // Use the matched entity stableId when available; fall back to display name.
+  // This allows the grants table to link grantees to their entity pages.
+  const granteeId = (raw.granteeId ?? raw.granteeName).substring(0, 200);
 
   // Truncate notes
   let notes: string | null = null;

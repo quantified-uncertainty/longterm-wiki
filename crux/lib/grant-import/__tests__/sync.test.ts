@@ -23,7 +23,7 @@ describe("toSyncGrant", () => {
     expect(sync1.id).toHaveLength(10);
   });
 
-  it("uses granteeName as display granteeId", () => {
+  it("uses matched entity stableId as granteeId when available", () => {
     const raw: RawGrant = {
       source: "ea-funds",
       funderId: "yA12C1KcjQ",
@@ -36,7 +36,23 @@ describe("toSyncGrant", () => {
       description: null,
     };
     const sync = toSyncGrant(raw, defaultSourceUrl);
-    expect(sync.granteeId).toBe("Redwood Research");
+    expect(sync.granteeId).toBe("someEntityId");
+  });
+
+  it("falls back to granteeName when no entity match", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Unknown Org",
+      granteeId: null,
+      name: "Grant to Unknown",
+      amount: 500000,
+      date: "2024-01",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.granteeId).toBe("Unknown Org");
   });
 
   it("uses defaultSourceUrl when no sourceUrl on raw grant", () => {
