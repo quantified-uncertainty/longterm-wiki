@@ -89,29 +89,29 @@ records:
 
   grants:
     cz-biohub-sf-founding:
-      name: "CZ Biohub SF founding grant"
-      recipient: "CZ Biohub San Francisco"
+      name: "Founding grant for CZ Biohub SF"
+      recipient: "cz-biohub-san-francisco"
       amount: 600e6
       date: "2016-09"
       status: "active"
       program: "science-first-decade"
       source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
-      notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
+      notes: "Partnership with UCSF, Berkeley, Stanford"
 
     cz-biohub-chicago-founding:
-      name: "CZ Biohub Chicago founding grant"
-      recipient: "CZ Biohub Chicago"
+      name: "Founding grant for CZ Biohub Chicago"
+      recipient: "cz-biohub-chicago"
       amount: 250e6
       date: "2022-10"
       status: "active"
       program: "science-first-decade"
-      notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
+      notes: "Focused on biosensors and inflammation"
 
     cz-biohub-new-york-founding:
-      name: "CZ Biohub New York founding grant"
-      recipient: "CZ Biohub New York"
+      name: "Founding grant for CZ Biohub New York"
+      recipient: "cz-biohub-new-york"
       amount: 250e6
       date: "2023-06"
       status: "active"
       program: "science-first-decade"
-      notes: "Grant to establish Biohub New York focused on infectious disease"
+      notes: "Focused on infectious disease"

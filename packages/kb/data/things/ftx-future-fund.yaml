@@ -47,72 +47,70 @@ records:
       notes: "69 funded from 1,700+ applications (4% acceptance rate)"
 
   grants:
-    longview-philanthropy:
-      name: "Longview Philanthropy"
+    longview-philanthropy-general:
+      name: "General support for independent grantmaking"
       recipient: "longview-philanthropy"
       amount: 15e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
-      notes: "Independent grantmaking on global priorities research"
+      notes: "Global priorities research grantmaking"
 
-    centre-for-effective-altruism:
-      name: "Centre for Effective Altruism"
+    cea-general:
+      name: "General support"
       recipient: "cea"
       amount: 13.9e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/topics/future-fund
-      notes: "General support: conferences, student groups, online resources"
+      notes: "Conferences, student groups, online resources"
 
-    redwood-research:
-      name: "Redwood Research"
+    redwood-research-safety:
+      name: "AI safety research"
       recipient: "redwood-research"
       amount: 6.6e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/topics/future-fund
-      notes: "AI safety research; grant committed but reportedly never fully received"
+      notes: "Grant committed but reportedly never fully received due to FTX collapse"
 
-    ought-elicit:
-      name: "Ought (Elicit)"
+    elicit-research-tool:
+      name: "AI research assistant development"
       recipient: "elicit"
       amount: 5e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/topics/future-fund
-      notes: "LLM-based research assistant; alignment risk reduction"
+      notes: "LLM-based research assistant (formerly Ought); alignment risk reduction"
 
-    atlas-fellowship:
-      name: "Atlas Fellowship"
-      recipient: "Atlas Fellowship"
+    atlas-fellowship-scholarships:
+      name: "Scholarships for talented high school students"
+      recipient: "atlas-fellowship"
       amount: 5e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
-      notes: "Scholarships for talented high school students"
 
-    lightcone-infrastructure:
-      name: "Lightcone Infrastructure"
-      recipient: "Lightcone Infrastructure"
+    lightcone-operations:
+      name: "Forum operations, conferences, EA office space"
+      recipient: "lighthaven"
       amount: 2e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://forum.effectivealtruism.org/posts/paMYXYFYbbjpdjgbt/future-fund-june-2022-update
-      notes: "LessWrong forum operations, conferences, EA office space"
+      notes: "Lightcone Infrastructure (now Lighthaven); LessWrong operations"
 
-    securebio:
-      name: "SecureBio"
+    securebio-biosecurity:
+      name: "DNA synthesis screening and pathogen early-warning"
       recipient: "securebio"
       amount: 1.2e6
       date: "2022-06"
       status: "terminated"
       program: "staff-led-grants"
       source: https://donations.vipulnaik.com/donorDonee.php?donor=FTX+Future+Fund&donee=SecureBio
-      notes: "DNA synthesis screening, wastewater pathogen early-warning"

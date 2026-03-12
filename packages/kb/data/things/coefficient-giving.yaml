@@ -218,22 +218,22 @@ records:
       url: https://coefficientgiving.org/funds/air-quality
       notes: "40+ grants. Focus on South Asia and high-pollution areas"
 
-  grants:
     technical-ai-safety-rfp-2025:
       name: "Technical AI Safety RFP (2025)"
+      type: "round"
       amount: 40e6
       date: "2025"
       status: "active"
-      program: "navigating-transformative-ai"
-      source: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
-      notes: "RFP across 21 research areas; more available based on quality"
+      url: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
+      notes: "RFP across 21 research areas under Navigating Transformative AI; more funding available based on quality"
 
+  grants:
     anthropic-general-support:
-      name: "Anthropic general support"
+      name: "General support (early investment)"
       recipient: "anthropic"
       amount: 30e6
       date: "2021"
       status: "active"
       program: "navigating-transformative-ai"
       source: https://www.openphilanthropy.org/grants/anthropic-general-support/
-      notes: "Early mission-aligned investment via Good Ventures LP"
+      notes: "Mission-aligned investment via Good Ventures LP"

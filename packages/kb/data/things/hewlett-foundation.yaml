@@ -61,19 +61,49 @@ records:
       notes: "Multi-funder pool with Knight Foundation, Omidyar Network, Reid Hoffman. $7.6M first round to Harvard Berkman Klein + MIT Media Lab"
 
   grants:
-    cyber-policy-diverse-institutions:
-      name: "Cyber Policy at Diverse Institutions"
-      recipient: "FAMU, Spelman, FIU, Turtle Mountain CC"
-      amount: 20e6
+    cyber-policy-famu:
+      name: "Cyber policy at FAMU"
+      recipient: "famu"
+      amount: 5e6
       date: "2023"
       status: "active"
       program: "cyber-initiative"
       source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
-      notes: "Grants of $5-6M each to four institutions serving diverse student populations"
+      notes: "Part of $20M initiative across four diverse-serving institutions"
 
-    georgetown-cset-cyberai:
-      name: "Georgetown CSET CyberAI Project"
-      recipient: "Georgetown CSET"
+    cyber-policy-spelman:
+      name: "Cyber policy at Spelman College"
+      recipient: "spelman-college"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cyber-policy-fiu:
+      name: "Cyber policy at Florida International University"
+      recipient: "fiu"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cyber-policy-turtle-mountain:
+      name: "Cyber policy at Turtle Mountain Community College"
+      recipient: "turtle-mountain-cc"
+      amount: 5e6
+      date: "2023"
+      status: "active"
+      program: "cyber-initiative"
+      source: https://hewlett.org/newsroom/hewlett-foundation-announces-major-effort-funding-cyber-policy-studies-at-institutions-serving-diverse-student-populations/
+      notes: "Part of $20M initiative across four diverse-serving institutions"
+
+    cset-cyberai:
+      name: "CyberAI research project"
+      recipient: "cset"
       amount: 5e6
       period: "2020-2028"
       status: "active"

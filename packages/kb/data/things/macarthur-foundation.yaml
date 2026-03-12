@@ -68,21 +68,21 @@ records:
       notes: "Periodic $100M single-grant competition for transformative solutions. Three rounds completed (2017, 2020, 2025)"
 
   grants:
-    100-and-change-round-3:
-      name: "100&Change Round 3 — Broad Institute"
-      recipient: "Broad Institute"
+    100-and-change-round-3-broad:
+      name: "Sentinel pandemic prevention project"
+      recipient: "broad-institute"
       amount: 100e6
       date: "2025-11"
       status: "active"
       program: "100-and-change"
       source: https://www.100andchange.org/
-      notes: "Won by Broad Institute for Sentinel pandemic prevention project"
+      notes: "100&Change Round 3 winner; pandemic pathogen surveillance system"
 
-    humanity-ai-initiative:
-      name: "Humanity AI Initiative (coalition contribution)"
-      recipient: "Humanity AI"
+    humanity-ai-coalition:
+      name: "Humanity AI coalition contribution"
+      recipient: "humanity-ai"
       amount: 10e6
       date: "2025"
       status: "active"
       source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-      notes: "MacArthur's share of $500M coalition (Ford, Mellon, Mozilla, etc.). Includes grants to AI Now Institute, Brookings, Pulitzer Center"
+      notes: "MacArthur's share of $500M multi-foundation coalition (Ford, Mellon, Mozilla, etc.)"
