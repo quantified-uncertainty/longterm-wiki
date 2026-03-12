@@ -1620,7 +1620,7 @@ export const divisions = pgTable(
   },
   (table) => [
     index("idx_div_org").on(table.parentOrgId),
-    index("idx_div_slug").on(table.slug),
+    // slug UNIQUE constraint already creates an implicit index
     index("idx_div_type").on(table.divisionType),
     index("idx_div_status").on(table.status),
   ]

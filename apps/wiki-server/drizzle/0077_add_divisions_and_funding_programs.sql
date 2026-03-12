@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS divisions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_div_org ON divisions(parent_org_id);
-CREATE INDEX IF NOT EXISTS idx_div_slug ON divisions(slug);
+-- slug UNIQUE constraint already creates an implicit index; no explicit idx_div_slug needed
 CREATE INDEX IF NOT EXISTS idx_div_type ON divisions(division_type);
 CREATE INDEX IF NOT EXISTS idx_div_status ON divisions(status);
 

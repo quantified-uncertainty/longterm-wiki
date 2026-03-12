@@ -89,11 +89,19 @@ export async function seedDivisions() {
   // Track division IDs by slug for linking funding programs to divisions
   const divisionIdBySlug = new Map<string, string>();
 
+  // Two-pass approach: first pass builds division ID map, second pass creates rows.
+  // This ensures funding programs can always find their parent division regardless
+  // of YAML key ordering.
+  for (const [slug, record] of Object.entries(programs)) {
+    if (record.type === "fund") {
+      divisionIdBySlug.set(slug, deterministicId(`coeff-giving-division-${slug}`));
+    }
+  }
+
   for (const [slug, record] of Object.entries(programs)) {
     const id = deterministicId(`coeff-giving-division-${slug}`);
 
     if (record.type === "fund") {
-      divisionIdBySlug.set(slug, id);
       divisionRows.push({
         id,
         slug: `coefficient-giving-${slug}`,
@@ -194,8 +202,14 @@ export async function seedDivisions() {
   console.log("Done.");
 }
 
-// Run if invoked directly
-seedDivisions().catch((err) => {
-  console.error("Seed failed:", err);
-  process.exit(1);
-});
+// Run if invoked directly (not when imported as a module)
+const isMain =
+  import.meta.url === `file://${process.argv[1]}` ||
+  process.argv[1]?.endsWith("seed-divisions.ts");
+
+if (isMain) {
+  seedDivisions().catch((err) => {
+    console.error("Seed failed:", err);
+    process.exit(1);
+  });
+}
