@@ -149,6 +149,8 @@ import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
 import type { KbVerificationsRoute } from "@wiki-server/kb-verifications-route";
 import type { GrantsRoute } from "@wiki-server/grants-route";
+import type { DivisionsRoute } from "@wiki-server/divisions-route";
+import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -226,4 +228,34 @@ export type RpcGrantsOrgSummaryResult = InferResponseType<GrantsClient['by-org-s
 
 /** Inferred response type for GET /api/grants/by-grantee-summary */
 export type RpcGrantsGranteeSummaryResult = InferResponseType<GrantsClient['by-grantee-summary']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Divisions API
+// ============================================================================
+
+type DivisionsClient = ReturnType<typeof hc<DivisionsRoute>>;
+
+/** Inferred response type for GET /api/divisions/stats */
+export type RpcDivisionsStatsResult = InferResponseType<DivisionsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/divisions/all */
+export type RpcDivisionsAllResult = InferResponseType<DivisionsClient['all']['$get'], 200>;
+
+/** A single division row from the all-divisions list */
+export type RpcDivisionRow = RpcDivisionsAllResult['divisions'][number];
+
+// ============================================================================
+// Hono RPC client — Funding Programs API
+// ============================================================================
+
+type FundingProgramsClient = ReturnType<typeof hc<FundingProgramsRoute>>;
+
+/** Inferred response type for GET /api/funding-programs/stats */
+export type RpcFundingProgramsStatsResult = InferResponseType<FundingProgramsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/funding-programs/all */
+export type RpcFundingProgramsAllResult = InferResponseType<FundingProgramsClient['all']['$get'], 200>;
+
+/** A single funding program row from the all-programs list */
+export type RpcFundingProgramRow = RpcFundingProgramsAllResult['fundingPrograms'][number];
 
