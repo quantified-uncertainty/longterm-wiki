@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getTypedEntities, isAiModel } from "@/data";
-import { getTypedEntityById } from "@/data";
+import { getTypedEntities, getTypedEntityById, isAiModel } from "@/data";
 import { AiModelsTable, type AiModelRow } from "./ai-models-table";
 
 export const metadata: Metadata = {
@@ -55,10 +54,11 @@ export default function AiModelsPage() {
   });
 
   // Stats
-  const modelCount = rows.filter((r) => !r.isFamily).length;
-  const withPricing = rows.filter((r) => r.inputPrice != null).length;
-  const withBenchmarks = rows.filter((r) => r.sweBenchScore != null).length;
-  const withSafety = rows.filter((r) => r.safetyLevel != null).length;
+  const nonFamilyRows = rows.filter((r) => !r.isFamily);
+  const modelCount = nonFamilyRows.length;
+  const withPricing = nonFamilyRows.filter((r) => r.inputPrice != null).length;
+  const withBenchmarks = nonFamilyRows.filter((r) => r.sweBenchScore != null).length;
+  const withSafety = nonFamilyRows.filter((r) => r.safetyLevel != null).length;
 
   const stats = [
     { label: "Models", value: String(modelCount) },
