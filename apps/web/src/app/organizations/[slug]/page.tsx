@@ -8,7 +8,7 @@ import {
   getKBProperty,
   getKBEntitySlug,
 } from "@/data/kb";
-import { getEntityById } from "@/data";
+import { getTypedEntityById, isOrganization } from "@/data";
 import {
   formatKBFactValue,
   formatKBDate,
@@ -221,8 +221,10 @@ export default async function OrgProfilePage({
   const entity = resolveOrgBySlug(slug);
   if (!entity) return notFound();
 
-  const dbEntity = getEntityById(entity.id);
-  const orgType = (dbEntity as { orgType?: string } | undefined)?.orgType;
+  // Use URL slug directly — typed entities are keyed by slug, not KB internal IDs
+  const typedEntity = getTypedEntityById(slug);
+  const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
+  const orgType = orgData?.orgType ?? null;
 
   // Header facts
   const hqFact = getKBLatest(entity.id, "headquarters");
@@ -242,9 +244,9 @@ export default async function OrgProfilePage({
   const latestByProp = getLatestFactsByProperty(allFacts);
   const categoryGroups = groupByCategory([...latestByProp.keys()]);
 
-  // Description and website come from entity YAML
-  const descriptionText = (dbEntity as { description?: string } | undefined)?.description ?? null;
-  const websiteUrl = (dbEntity as { website?: string } | undefined)?.website ?? null;
+  // Description and website come from typed entity YAML data
+  const descriptionText = orgData?.description ?? null;
+  const websiteUrl = orgData?.website ?? null;
 
   // Headquarters text
   const hqText =

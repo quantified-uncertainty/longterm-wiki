@@ -9,6 +9,8 @@ import {
 import {
   getKBFacts,
   getKBLatest,
+  getKBProperty,
+  getKBEntity,
   getKBEntitySlug,
 } from "@/data/kb";
 import {
@@ -26,7 +28,12 @@ import {
   SourceLink,
   DirectoryEntityLink,
 } from "@/components/directory";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import {
+  formatKBDate,
+  formatKBFactValue,
+  titleCase,
+} from "@/components/wiki/kb/format";
+import type { Fact, Property } from "@longterm-wiki/kb";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -46,6 +53,102 @@ export async function generateMetadata({
       : undefined,
   };
 }
+
+// ── Fact display helpers ──────────────────────────────────────────────
+
+const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
+  { id: "financial", label: "Financial", order: 0 },
+  { id: "product", label: "Products & Usage", order: 1 },
+  { id: "organization", label: "Organization", order: 2 },
+  { id: "safety", label: "Safety & Research", order: 3 },
+  { id: "people", label: "People", order: 4 },
+  { id: "other", label: "Other", order: 99 },
+];
+
+function getLatestFactsByProperty(facts: Fact[]): Map<string, Fact> {
+  const latest = new Map<string, Fact>();
+  for (const fact of facts) {
+    if (fact.propertyId === "description") continue;
+    if (!latest.has(fact.propertyId)) {
+      latest.set(fact.propertyId, fact);
+    }
+  }
+  return latest;
+}
+
+function groupByCategory(
+  propertyIds: string[],
+): Array<{ category: string; label: string; props: string[] }> {
+  const groups = new Map<string, string[]>();
+  for (const propId of propertyIds) {
+    const prop = getKBProperty(propId);
+    const category = prop?.category ?? "other";
+    const list = groups.get(category) ?? [];
+    list.push(propId);
+    groups.set(category, list);
+  }
+
+  const catMap = new Map(FACT_CATEGORIES.map((c) => [c.id, c]));
+  return [...groups.entries()]
+    .map(([catId, props]) => ({
+      category: catId,
+      label: catMap.get(catId)?.label ?? titleCase(catId),
+      order: catMap.get(catId)?.order ?? 99,
+      props,
+    }))
+    .sort((a, b) => a.order - b.order);
+}
+
+function FactValueDisplay({ fact, property }: { fact: Fact; property?: Property }) {
+  const v = fact.value;
+  if (v.type === "ref") {
+    const refEntity = getKBEntity(v.value);
+    if (refEntity) {
+      const refSlug = getKBEntitySlug(v.value);
+      const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
+        : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
+        : `/kb/entity/${v.value}`;
+      return (
+        <Link href={href} className="text-primary hover:underline">
+          {refEntity.name}
+        </Link>
+      );
+    }
+    return <span>{v.value}</span>;
+  }
+  if (v.type === "refs") {
+    return (
+      <span>
+        {v.value.map((refId, i) => {
+          const refEntity = getKBEntity(refId);
+          if (refEntity) {
+            const refSlug = getKBEntitySlug(refId);
+            const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
+              : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
+              : `/kb/entity/${refId}`;
+            return (
+              <span key={refId}>
+                {i > 0 && ", "}
+                <Link href={href} className="text-primary hover:underline">
+                  {refEntity.name}
+                </Link>
+              </span>
+            );
+          }
+          return (
+            <span key={refId}>
+              {i > 0 && ", "}
+              {refId}
+            </span>
+          );
+        })}
+      </span>
+    );
+  }
+  return <span>{formatKBFactValue(fact, property?.unit, property?.display)}</span>;
+}
+
+// ── Main page ─────────────────────────────────────────────────────────
 
 export default async function PersonProfilePage({
   params,
@@ -391,23 +494,56 @@ export default async function PersonProfilePage({
             </section>
           )}
 
-          {/* Quick facts link */}
-          {allFacts.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Facts
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {allFacts.length}
-                </span>
-              </h2>
-              <Link
-                href={`/kb/entity/${entity.id}`}
-                className="text-xs text-primary hover:underline"
-              >
-                View all facts in KB explorer &rarr;
-              </Link>
-            </section>
-          )}
+          {/* Facts */}
+          {allFacts.length > 0 && (() => {
+            const latestByProp = getLatestFactsByProperty(allFacts);
+            const categoryGroups = groupByCategory([...latestByProp.keys()]);
+            return (
+              <section>
+                <h2 className="text-lg font-bold tracking-tight mb-4">
+                  Facts
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    {latestByProp.size}
+                  </span>
+                </h2>
+                <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+                  {categoryGroups.map(({ category, label, props }) => (
+                    <div key={category} className="px-4 py-3">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">
+                        {label}
+                      </div>
+                      <div className="space-y-1.5">
+                        {props.map((propId) => {
+                          const fact = latestByProp.get(propId);
+                          if (!fact) return null;
+                          const property = getKBProperty(propId);
+                          return (
+                            <div
+                              key={propId}
+                              className="flex items-baseline justify-between gap-2 text-sm"
+                            >
+                              <span className="text-muted-foreground text-xs truncate">
+                                {property?.name ?? titleCase(propId)}
+                              </span>
+                              <span className="font-medium text-xs tabular-nums text-right shrink-0 max-w-[55%] truncate">
+                                <FactValueDisplay fact={fact} property={property} />
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href={`/kb/entity/${entity.id}`}
+                  className="block mt-2 text-xs text-primary hover:underline text-center"
+                >
+                  View all facts in KB explorer &rarr;
+                </Link>
+              </section>
+            );
+          })()}
         </div>
       </div>
     </div>
