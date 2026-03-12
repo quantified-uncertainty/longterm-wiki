@@ -1,8 +1,21 @@
 import { generateId } from "./id.ts";
+import { isSupportedCurrency } from "./currency.ts";
 import type { RawGrant, SyncGrant } from "./types.ts";
 import { apiRequest, getServerUrl } from "../wiki-server/client.ts";
 
 export const SYNC_BATCH_SIZE = 500;
+
+/** Normalize and validate currency code, defaulting to USD. */
+function validateCurrency(currency: string | undefined): string {
+  const normalized = (currency ?? "USD").trim().toUpperCase();
+  if (!isSupportedCurrency(normalized)) {
+    if (currency) {
+      console.warn(`Unsupported currency "${currency}", defaulting to USD`);
+    }
+    return "USD";
+  }
+  return normalized;
+}
 
 /**
  * Convert a RawGrant to a SyncGrant.
@@ -34,7 +47,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     granteeId,
     name: raw.name,
     amount: raw.amount,
-    currency: "USD",
+    currency: validateCurrency(raw.currency),
     date: raw.date,
     status: null,
     source: raw.sourceUrl ?? defaultSourceUrl,

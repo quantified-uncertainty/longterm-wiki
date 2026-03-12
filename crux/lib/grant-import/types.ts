@@ -16,6 +16,8 @@ export interface RawGrant {
   granteeId: string | null;
   name: string;
   amount: number | null;
+  /** ISO 4217 currency code. Defaults to "USD" if omitted. */
+  currency?: string;
   date: string | null;
   focusArea: string | null;
   description: string | null;
