@@ -12,3 +12,77 @@ facts:
       work totals modest funding ($400K to IST for LLM risk; general support to P
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  funding-programs:
+    climate-solutions:
+      name: "Climate Solutions (Big Bet)"
+      type: "big-bet"
+      amount: 500e6
+      period: "2014-2026"
+      status: "winding-down"
+      url: https://www.macfound.org/programs/bigbets/climate-solutions/
+      notes: "Subnational decarbonization policy in US and India; winding down in 2026"
+
+    nuclear-challenges:
+      name: "Nuclear Challenges (Big Bet)"
+      type: "big-bet"
+      amount: 500e6
+      period: "2014-2024"
+      status: "completed"
+      url: https://www.macfound.org/programs/nuclear/strategy
+      notes: "Reducing weapons-usable nuclear material; fully exited nuclear field end of 2024. Final capstone $21.3M to 28 orgs"
+
+    criminal-justice:
+      name: "Criminal Justice Reform (Big Bet)"
+      type: "big-bet"
+      amount: 400e6
+      period: "2015-2025"
+      status: "winding-down"
+      url: https://www.macfound.org/programs/bigbets/
+      notes: "Addressed over-incarceration and racial/ethnic disparities in US criminal justice"
+
+    on-nigeria:
+      name: "On Nigeria (Big Bet)"
+      type: "big-bet"
+      amount: 200e6
+      period: "2015-2024"
+      status: "completed"
+      url: https://www.macfound.org/programs/bigbets/
+      notes: "Supported Nigerian-led anti-corruption efforts; concluded 2024"
+
+    ai-opportunity:
+      name: "AI Opportunity (Big Bet)"
+      type: "big-bet"
+      date: "2025"
+      status: "active"
+      url: https://www.macfound.org/programs/bigbets/ai-opportunity/
+      notes: "New Big Bet on AI, economy, and workforce; budget not yet publicly disclosed. Focus on young people in Chicago and community-centered AI"
+
+    100-and-change:
+      name: "100&Change Competition"
+      type: "round"
+      period: "2016-present"
+      status: "active"
+      url: https://www.100andchange.org/
+      notes: "Periodic $100M single-grant competition for transformative solutions. Three rounds completed (2017, 2020, 2025)"
+
+  grants:
+    100-and-change-round-3:
+      name: "100&Change Round 3 — Broad Institute"
+      recipient: "Broad Institute"
+      amount: 100e6
+      date: "2025-11"
+      status: "active"
+      program: "100-and-change"
+      source: https://www.100andchange.org/
+      notes: "Won by Broad Institute for Sentinel pandemic prevention project"
+
+    humanity-ai-initiative:
+      name: "Humanity AI Initiative (coalition contribution)"
+      recipient: "Humanity AI"
+      amount: 10e6
+      date: "2025"
+      status: "active"
+      source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+      notes: "MacArthur's share of $500M coalition (Ford, Mellon, Mozilla, etc.). Includes grants to AI Now Institute, Brookings, Pulitzer Center"

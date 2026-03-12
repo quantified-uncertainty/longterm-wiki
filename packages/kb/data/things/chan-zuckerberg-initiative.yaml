@@ -51,62 +51,67 @@ facts:
     notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
 
 records:
-  grants:
-    science-spending-first-decade:
-      name: "Science spending (first decade)"
+  funding-programs:
+    science-first-decade:
+      name: "Science (first decade)"
+      type: "program"
       amount: 4.25e9
       period: "2016-2025"
       status: "completed"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
       notes: "Total science spending first decade; estimated $4-4.5B"
 
-    social-causes-spending-first-decade:
-      name: "Social causes spending (first decade)"
+    social-causes-first-decade:
+      name: "Social causes (first decade)"
+      type: "program"
       amount: 3.5e9
       period: "2016-2025"
       status: "winding-down"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
       notes: "Total social causes spending 2016-2025; now winding down"
 
-    science-spending-commitment-second-decade:
-      name: "Science spending commitment (second decade)"
+    science-second-decade:
+      name: "Science (second decade commitment)"
+      type: "commitment"
       amount: 10e9
       period: "2026-2036"
       status: "active"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
       notes: "Minimum commitment for science over next decade ($10B+)"
 
-    cz-biohub-sf-founding-grant:
+    rare-as-one:
+      name: "Rare As One Project"
+      type: "program"
+      date: "2020-01"
+      status: "active"
+      url: https://chanzuckerberg.com/blog/2024-look-back/
+      notes: "Patient-led rare disease organizations; grown from 30 to 94 since 2020"
+
+  grants:
+    cz-biohub-sf-founding:
       name: "CZ Biohub SF founding grant"
+      recipient: "CZ Biohub San Francisco"
       amount: 600e6
       date: "2016-09"
       status: "active"
+      program: "science-first-decade"
       source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
       notes: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
 
-    cz-biohub-chicago-founding-grant:
+    cz-biohub-chicago-founding:
       name: "CZ Biohub Chicago founding grant"
+      recipient: "CZ Biohub Chicago"
       amount: 250e6
       date: "2022-10"
       status: "active"
+      program: "science-first-decade"
       notes: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
 
-    cz-biohub-new-york-founding-grant:
+    cz-biohub-new-york-founding:
       name: "CZ Biohub New York founding grant"
+      recipient: "CZ Biohub New York"
       amount: 250e6
       date: "2023-06"
       status: "active"
+      program: "science-first-decade"
       notes: "Grant to establish Biohub New York focused on infectious disease"
-
-    research-publications-supported:
-      name: "Research publications supported"
-      status: "active"
-      source: https://biohub.org/research/
-      notes: "More than 8,000 publications supported since founding"
-
-    rare-as-one-project:
-      name: "Rare As One Project"
-      date: "2020-01"
-      status: "active"
-      source: https://chanzuckerberg.com/blog/2024-look-back/
-      notes: "Patient-led rare disease organizations; grown from 30 to 94 since 2020"

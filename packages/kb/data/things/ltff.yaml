@@ -12,3 +12,22 @@ facts:
       Giving (median $257K). In 2023, LTFF granted $6.67M with a 19.3% acceptance rat
     asOf: 2026-03
     notes: Migrated from old entity system
+
+records:
+  funding-programs:
+    main-fund:
+      name: "LTFF Main Fund"
+      type: "fund"
+      amount: 20e6
+      period: "2017-present"
+      status: "active"
+      url: https://funds.effectivealtruism.org/funds/far-future
+      notes: "Core regranting program with quarterly rounds. ~$10M to AI safety, ~$3M to biosecurity, ~$4M to EA community building. Median grant $25K. 19.3% acceptance rate (2023). $6.67M granted in 2023"
+
+    individual-researcher-grants:
+      name: "Individual Researcher Grants"
+      type: "program"
+      period: "2017-present"
+      status: "active"
+      url: https://funds.effectivealtruism.org/funds/far-future
+      notes: "Distinctive niche funding individual researchers and small projects that larger funders miss. Typical grant $10K-$100K"

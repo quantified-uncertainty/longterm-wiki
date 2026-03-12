@@ -7,7 +7,7 @@ import { GrantsTable, type GrantRow } from "./grants-table";
 export const metadata: Metadata = {
   title: "Grants",
   description:
-    "Directory of major grants, programs, and spending initiatives tracked in the knowledge base.",
+    "Directory of individual grant disbursements tracked in the knowledge base.",
 };
 
 export default function GrantsPage() {
@@ -25,8 +25,17 @@ export default function GrantsPage() {
 
     const slug = getKBEntitySlug(entity.id) ?? null;
 
+    // Build program name lookup from funding-programs on the same entity
+    const programs = getKBRecords(entity.id, "funding-programs");
+    const programNames = new Map<string, string>();
+    for (const p of programs) {
+      const pFields = p.fields as Record<string, unknown>;
+      programNames.set(p.key, (pFields.name as string) ?? p.key);
+    }
+
     for (const grant of grants) {
       const fields = grant.fields as Record<string, unknown>;
+      const programKey = (fields.program as string) ?? null;
       rows.push({
         compositeKey: `${entity.id}-${grant.key}`,
         name: (fields.name as string) ?? grant.key,
@@ -34,6 +43,8 @@ export default function GrantsPage() {
         organizationName: entity.name,
         organizationSlug: slug,
         organizationWikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
+        recipient: (fields.recipient as string) ?? null,
+        program: programKey ? (programNames.get(programKey) ?? programKey) : null,
         amount: typeof fields.amount === "number" ? fields.amount : null,
         period: (fields.period as string) ?? null,
         date: (fields.date as string) ?? null,
@@ -64,8 +75,8 @@ export default function GrantsPage() {
           Grants
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
-          Directory of major grants, programs, and spending initiatives
-          tracked in the knowledge base.
+          Directory of individual grant disbursements tracked in the knowledge
+          base. Programs and initiatives are tracked separately.
         </p>
       </div>
 

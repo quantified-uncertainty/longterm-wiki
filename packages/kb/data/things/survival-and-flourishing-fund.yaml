@@ -42,3 +42,54 @@ facts:
     asOf: "2024"
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "Includes $0.85M Speculation Grants; above $5-15M estimate"
+
+records:
+  funding-programs:
+    s-process:
+      name: "S-Process"
+      type: "program"
+      amount: 125e6
+      period: "2019-present"
+      status: "active"
+      url: https://survivalandflourishing.fund/recommendations
+      notes: "Main grant mechanism using simulated marketplace. Annual rounds: $34.33M (2025), $19.86M (2024). Three tracks since 2025: Main, Freedom, Fairness. ~89 orgs funded in 2025"
+
+    speculation-grants:
+      name: "Speculation Grants"
+      type: "program"
+      amount: 16e6
+      period: "2021-present"
+      status: "active"
+      url: https://survivalandflourishing.fund/speculation-grants
+      notes: "Novel donor coordination mechanism with ~35 grantors. Budget grown from $4M to $16M. $0.59M in 2025, $0.85M in 2024"
+
+  grants:
+    miri:
+      name: "MIRI (cumulative)"
+      recipient: "miri"
+      amount: 10e6
+      period: "2019-2025"
+      status: "active"
+      program: "s-process"
+      source: https://survivalandflourishing.fund/recommendations
+      notes: "Machine Intelligence Research Institute; one of SFF's largest recurring recipients across multiple rounds"
+
+    cais:
+      name: "Center for AI Safety (cumulative)"
+      recipient: "center-for-ai-safety"
+      amount: 5e6
+      period: "2020-2025"
+      status: "active"
+      program: "s-process"
+      source: https://survivalandflourishing.fund/recommendations
+      notes: "Cumulative SFF grants across multiple rounds; lower bound estimate"
+
+    arc:
+      name: "Alignment Research Center (cumulative)"
+      recipient: "arc"
+      amount: 4e6
+      period: "2021-2025"
+      status: "active"
+      program: "s-process"
+      source: https://survivalandflourishing.fund/recommendations
+      notes: "Grants across multiple rounds for alignment research"

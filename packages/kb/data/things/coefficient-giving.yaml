@@ -77,6 +77,163 @@ facts:
   # ── Organizational ────────────────────────────────────────────
   - id: f_xnSsYFDnIw
     property: headcount
-    value: 100
+    value: 150
     asOf: "2025"
-    notes: "Approximate headcount after rebrand to Coefficient Giving"
+    source: https://coefficientgiving.org/about-us/team/
+    notes: "150+ staff after rebrand to Coefficient Giving (November 2025)"
+
+records:
+  funding-programs:
+    global-health-wellbeing:
+      name: "Global Health & Wellbeing Opportunities"
+      type: "fund"
+      amount: 1.3e9
+      period: "2014-present"
+      status: "active"
+      lead: "James Snowden"
+      url: https://coefficientgiving.org/funds/global-health-wellbeing-opportunities
+      notes: "360+ grants; largest fund. Primarily GiveWell-recommended charities; $175M committed for 2026 via GiveWell"
+
+    navigating-transformative-ai:
+      name: "Navigating Transformative AI"
+      type: "fund"
+      amount: 500e6
+      period: "2017-present"
+      status: "active"
+      lead: "Claire Zabel, Luke Muehlhauser, Peter Favaloro, Rossa O'Keeffe-O'Donovan"
+      url: https://coefficientgiving.org/funds/navigating-transformative-ai
+      notes: "480+ grants. Sub-areas: Technical Safety (Favaloro, O'Keeffe-O'Donovan), AI Governance (Muehlhauser), Short Timelines (Zabel). ~$63.6M in 2024 (~60% of all external AI safety funding)"
+
+    biosecurity-pandemic-preparedness:
+      name: "Biosecurity & Pandemic Preparedness"
+      type: "fund"
+      amount: 260e6
+      period: "2015-present"
+      status: "active"
+      lead: "Andrew Snyder-Beattie"
+      url: https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness
+      notes: "140+ grants. Work began ~2015 (five years before COVID-19). Johns Hopkins CHS, NTI Bio, pandemic preparedness"
+
+    gcr-opportunities:
+      name: "Global Catastrophic Risks Opportunities"
+      type: "fund"
+      amount: 400e6
+      period: "2015-present"
+      status: "active"
+      lead: "Eli Rose"
+      url: https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities
+      notes: "250+ grants across GCR cause areas and EA community capacity building"
+
+    farm-animal-welfare:
+      name: "Farm Animal Welfare"
+      type: "fund"
+      period: "2016-present"
+      status: "active"
+      lead: "Lewis Bollard"
+      url: https://coefficientgiving.org/funds/farm-animal-welfare
+      notes: "Corporate cage-free campaigns, alt-protein research, advocacy. Contributed to 3,000+ corporate cage-free commitments"
+
+    science-global-health-rd:
+      name: "Science and Global Health R&D"
+      type: "fund"
+      amount: 550e6
+      period: "2017-present"
+      status: "active"
+      lead: "Jacob Trefethen"
+      url: https://coefficientgiving.org/funds/science-and-global-health-rd
+      notes: "330+ grants + 30+ social investments ($90M+). Treatments, vaccines, diagnostics for low-income populations"
+
+    lead-exposure-action-fund:
+      name: "Lead Exposure Action Fund (LEAF)"
+      type: "fund"
+      amount: 125e6
+      date: "2024"
+      status: "active"
+      url: https://coefficientgiving.org/funds/lead-exposure-action-fund
+      notes: "$100-125M raised; 20+ grants. Multi-donor pooled fund with Gates Foundation, UNICEF, others"
+
+    criminal-justice-reform:
+      name: "Criminal Justice Reform"
+      type: "fund"
+      amount: 200e6
+      period: "2014-2022"
+      status: "completed"
+      notes: "Focused on reducing incarceration; wound down in 2022"
+
+    forecasting:
+      name: "Forecasting"
+      type: "fund"
+      amount: 50e6
+      period: "2018-present"
+      status: "active"
+      lead: "Benjamin Tereick"
+      url: https://coefficientgiving.org/funds/forecasting
+      notes: "30+ grants supporting forecasting infrastructure and research"
+
+    effective-giving-careers:
+      name: "Effective Giving & Careers"
+      type: "fund"
+      status: "active"
+      lead: "Melanie Basnak, Sam Donald"
+      url: https://coefficientgiving.org/funds/effective-giving-and-careers
+      notes: "Support for CEA, 80,000 Hours, EA Funds, and community infrastructure"
+
+    abundance-growth:
+      name: "Abundance & Growth"
+      type: "fund"
+      amount: 120e6
+      date: "2025-03"
+      status: "active"
+      lead: "Matt Clancy"
+      url: https://coefficientgiving.org/funds/abundance-and-growth
+      notes: "$120M committed over 3 years. Economic growth, scientific progress, US-focused. Launched March 2025"
+
+    global-aid-policy:
+      name: "Global Aid Policy"
+      type: "fund"
+      amount: 30e6
+      period: "2018-present"
+      status: "active"
+      lead: "Norma Altshuler"
+      url: https://coefficientgiving.org/funds/global-aid-policy
+      notes: "50+ grants. Encouraging generous and cost-effective international aid"
+
+    global-growth:
+      name: "Global Growth"
+      type: "fund"
+      amount: 40e6
+      date: "2024-10"
+      status: "active"
+      lead: "Justin Sandefur"
+      url: https://coefficientgiving.org/funds/global-growth
+      notes: "$40M+ committed over 3 years. Policy research for economic growth in low/middle-income countries. Launched October 2024"
+
+    air-quality:
+      name: "Air Quality"
+      type: "fund"
+      amount: 20e6
+      period: "2022-present"
+      status: "active"
+      lead: "Santosh Harish"
+      url: https://coefficientgiving.org/funds/air-quality
+      notes: "40+ grants. Focus on South Asia and high-pollution areas"
+
+  grants:
+    technical-ai-safety-rfp-2025:
+      name: "Technical AI Safety RFP (2025)"
+      amount: 40e6
+      date: "2025"
+      status: "active"
+      program: "navigating-transformative-ai"
+      source: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
+      notes: "RFP across 21 research areas; more available based on quality"
+
+    anthropic-general-support:
+      name: "Anthropic general support"
+      recipient: "anthropic"
+      amount: 30e6
+      date: "2021"
+      status: "active"
+      program: "navigating-transformative-ai"
+      source: https://www.openphilanthropy.org/grants/anthropic-general-support/
+      notes: "Early mission-aligned investment via Good Ventures LP"
