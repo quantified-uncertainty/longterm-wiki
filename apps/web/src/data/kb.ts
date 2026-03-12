@@ -1,22 +1,36 @@
 /**
  * KB data access layer.
  *
- * Reads the `kb` field from database.json (populated by build-data.mjs).
+ * Reads kb-data.json (populated by build-data.mjs) — a dedicated file
+ * split out from database.json for faster incremental builds and smaller
+ * main database bundle.
+ *
  * The KB data may not exist if build-data hasn't been wired up yet,
  * so all accessors return undefined/empty gracefully.
  */
 
+import fs from "fs";
+import path from "path";
 import { getDatabase } from "@data";
 import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
-function getKB(): SerializedKB | undefined {
+const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
+
+let _kbData: SerializedKB | undefined | null = null; // null = not yet loaded
+
+/** Get the full serialized KB data (or undefined if not available). */
+export function getKB(): SerializedKB | undefined {
+  if (_kbData !== null) return _kbData;
+
+  const kbPath = path.join(LOCAL_DATA_DIR, "kb-data.json");
   try {
-    const db = getDatabase();
-    return db.kb;
+    const raw = fs.readFileSync(kbPath, "utf-8");
+    _kbData = JSON.parse(raw) as SerializedKB;
   } catch {
-    return undefined;
+    _kbData = undefined;
   }
+  return _kbData;
 }
 
 /**
