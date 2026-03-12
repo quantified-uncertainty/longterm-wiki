@@ -7,12 +7,25 @@ thing:
 facts:
   - id: f_YjbqhAe0Lg
     property: description
-    value: Sam Bankman-Fried (SBF) was the founder of FTX cryptocurrency exchange and Alameda Research, and a prominent
-      funder of effective altruism and longtermist causes. Convicted on all seven counts of fraud and money laundering
-      in November 2023 and sentenced to 25 years in prison, he misappropriated an estimated $8–9 billion in customer
-      funds. His collapse severely damaged the EA community's reputation and disrupted AI safety funding pipelines.
+    value: Sam Bankman-Fried (SBF) was the founder of FTX cryptocurrency exchange
+      and Alameda Research, and a prominent funder of effective altruism and
+      longtermist causes. Convicted on all seven counts of fraud and money
+      laundering in November 2023 and sentenced to 25 years in prison, he
+      misappropriated an estimated $8–9 billion in customer funds. His collapse
+      severely damaged the EA community's reputation and disrupted AI safety
+      funding pipelines.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_fAmmQtDQCg
     property: website
     value: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
+  - id: belBhpgLPw
+    property: born-year
+    value: 1992
+    source: https://www.wikidata.org/wiki/Q106543540
+    notes: From Wikidata Q106543540
+  - id: Qc5dFLYseQ
+    property: education
+    value: Crystal Springs Uplands School; Massachusetts Institute of Technology
+    source: https://www.wikidata.org/wiki/Q106543540
+    notes: From Wikidata Q106543540

@@ -49,3 +49,14 @@ facts:
     value: !ref Zmw9nfUYWA:fhi
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: gCm5sBgiQA
+    property: born-year
+    value: 1979
+    source: https://www.wikidata.org/wiki/Q7811863
+    notes: From Wikidata Q7811863
+  - id: WT3OtsGD2Q
+    property: education
+    value: University of Melbourne
+    source: https://www.wikidata.org/wiki/Q7811863
+    notes: From Wikidata Q7811863

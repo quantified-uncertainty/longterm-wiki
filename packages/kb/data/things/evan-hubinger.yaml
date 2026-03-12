@@ -7,8 +7,14 @@ thing:
 facts:
   - id: f_ENQaaYa3Gw
     property: description
-    value: AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization
-      framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner
-      alignment and corrigibility.
+    value: AI safety researcher formerly at Anthropic and MIRI, known for the
+      influential risks from learned optimization framework and the concept of
+      deceptive alignment (mesa-optimization). Author of key foundational work
+      on inner alignment and corrigibility.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: BlHQ8kWvig
+    property: education
+    value: Harvey Mudd College
+    source: https://www.wikidata.org/wiki/Q126287406
+    notes: From Wikidata Q126287406

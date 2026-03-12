@@ -33,3 +33,10 @@ facts:
     value: "Deep learning pioneer; now AI safety advocate"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: gdYQwa9C2Q
+    property: education
+    value: McGill University; McGill University; McGill University; Massachusetts
+      Institute of Technology
+    source: https://www.wikidata.org/wiki/Q3572699
+    notes: From Wikidata Q3572699

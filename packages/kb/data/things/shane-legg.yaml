@@ -31,3 +31,9 @@ facts:
     value: !ref A4XoubikkQ:deepmind
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: CSAKC0XVnA
+    property: education
+    value: Dalle Molle Institute for Artificial Intelligence Research
+    source: https://www.wikidata.org/wiki/Q22278829
+    notes: From Wikidata Q22278829
