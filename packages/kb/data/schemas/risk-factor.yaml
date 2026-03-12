@@ -6,8 +6,3 @@ required: []
 
 recommended:
   - description
-  - severity-level
-  - time-horizon
-  - evidence-strength
-  - expert-consensus-level
-  - related-risks

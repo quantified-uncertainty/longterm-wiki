@@ -6,7 +6,3 @@ required: []
 
 recommended:
   - description
-  - evidence-strength
-  - publication-date
-  - related-entities
-  - related-risks

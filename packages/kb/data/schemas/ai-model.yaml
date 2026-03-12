@@ -1,12 +1,8 @@
 type: ai-model
 name: AI Model
 
+required: []
+# developed-by and model-release-date removed — no facts currently use them.
+
 recommended:
-  - developed-by
-  - model-release-date
-  - parameter-count
   - context-window
-  - modality
-  - model-family
-  - license-type
-  - training-compute

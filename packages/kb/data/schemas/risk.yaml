@@ -5,9 +5,4 @@ required: []
 # Risk entities often lack precise quantitative estimates; no hard requirements.
 
 recommended:
-  - severity-level
-  - likelihood-estimate
-  - time-horizon
-  - reversibility
-  - evidence-strength
-  - expert-consensus-level
+  - description
