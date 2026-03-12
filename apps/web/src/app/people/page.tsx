@@ -3,7 +3,7 @@ import { getKBEntities, getKBLatest, getKBEntity, getKBEntitySlug } from "@/data
 import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getExpertById } from "@/data";
+import { getExpertById, getPublicationsForPerson } from "@/data";
 
 export const metadata: Metadata = {
   title: "People",
@@ -41,6 +41,7 @@ export default function PeoplePage() {
     const slug = getKBEntitySlug(entity.id) ?? entity.id;
     const expert = getExpertById(slug);
     const positionCount = expert?.positions?.length ?? 0;
+    const publicationCount = getPublicationsForPerson(slug).length;
 
     return {
       id: entity.id,
@@ -58,6 +59,7 @@ export default function PeoplePage() {
       netWorthNum: numericValue(netWorthFact),
 
       positionCount,
+      publicationCount,
     };
   });
 
@@ -66,6 +68,7 @@ export default function PeoplePage() {
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
   const withNetWorth = rows.filter((r) => r.netWorthNum != null).length;
   const withPositions = rows.filter((r) => r.positionCount > 0).length;
+  const withPublications = rows.filter((r) => r.publicationCount > 0).length;
 
   const stats = [
     { label: "People", value: String(rows.length) },
@@ -74,6 +77,7 @@ export default function PeoplePage() {
     { label: "With Birth Year", value: String(withBornYear) },
     { label: "With Net Worth", value: String(withNetWorth) },
     { label: "With Expert Positions", value: String(withPositions) },
+    { label: "With Publications", value: String(withPublications) },
   ];
 
   return (
@@ -89,7 +93,7 @@ export default function PeoplePage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
         {stats.map((stat) => (
           <ProfileStatCard key={stat.label} label={stat.label} value={stat.value} />
         ))}
