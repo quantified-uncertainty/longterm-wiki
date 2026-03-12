@@ -219,7 +219,6 @@ const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
   "GovAI": "govai",
   "Centre for Governance of AI (GovAI)": "govai",
   "Centre for Governance of AI": "govai",
-  "Georgetown University": "cset", // Most Georgetown grants go to CSET
   "Founders Pledge": "founders-pledge",
   "Good Ventures": "good-ventures",
   "Open Philanthropy": "coefficient-giving",
@@ -539,10 +538,10 @@ function resolveEAFundEntityIds(
     "Long-Term Future Fund": ltff?.stableId || "yA12C1KcjQ",
     // AWF, EAIF, GH&D don't have their own entity files;
     // use CEA as the parent org (EA Funds is a CEA program)
-    "Animal Welfare Fund": cea?.stableId || "cea",
-    "EA Infrastructure Fund": cea?.stableId || "cea",
-    "Effective Altruism Infrastructure Fund": cea?.stableId || "cea",
-    "Global Health and Development Fund": cea?.stableId || "cea",
+    "Animal Welfare Fund": cea?.stableId || "gNsqAes7Dw",
+    "EA Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
+    "Effective Altruism Infrastructure Fund": cea?.stableId || "gNsqAes7Dw",
+    "Global Health and Development Fund": cea?.stableId || "gNsqAes7Dw",
   };
 }
 
