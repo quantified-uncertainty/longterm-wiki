@@ -148,6 +148,7 @@ export function dataSourceLabel(source: DataSource): string {
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
 import type { KbVerificationsRoute } from "@wiki-server/kb-verifications-route";
+import type { GrantsRoute } from "@wiki-server/grants-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -204,4 +205,25 @@ export type RpcKbVerdictRow = RpcKbVerdictsResult['verdicts'][number];
 
 /** Inferred response type for GET /api/kb-verifications/verdicts/:factId */
 export type RpcKbVerdictDetailResult = InferResponseType<KbVerificationsClient['verdicts'][':factId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Grants API
+// ============================================================================
+
+type GrantsClient = ReturnType<typeof hc<GrantsRoute>>;
+
+/** Inferred response type for GET /api/grants/stats */
+export type RpcGrantsStatsResult = InferResponseType<GrantsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/grants/all */
+export type RpcGrantsAllResult = InferResponseType<GrantsClient['all']['$get'], 200>;
+
+/** A single grant row from the all-grants list */
+export type RpcGrantRow = RpcGrantsAllResult['grants'][number];
+
+/** Inferred response type for GET /api/grants/by-org-summary */
+export type RpcGrantsOrgSummaryResult = InferResponseType<GrantsClient['by-org-summary']['$get'], 200>;
+
+/** Inferred response type for GET /api/grants/by-grantee-summary */
+export type RpcGrantsGranteeSummaryResult = InferResponseType<GrantsClient['by-grantee-summary']['$get'], 200>;
 

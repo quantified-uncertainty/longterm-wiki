@@ -212,6 +212,39 @@ describe("toSyncGrant", () => {
     expect(sync1.id).toBe(sync2.id);
   });
 
+  it("defaults currency to USD when not specified on raw grant", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test Org",
+      granteeId: null,
+      name: "Test",
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.currency).toBe("USD");
+  });
+
+  it("passes through currency from raw grant", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "UK Org",
+      granteeId: null,
+      name: "Grant in GBP",
+      amount: 50000,
+      currency: "GBP",
+      date: "2024-06",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.currency).toBe("GBP");
+  });
+
   // ID stability tests — these pin the exact ID for existing CG/EA Funds grants
   it("produces stable ID for CG grant (ID must not change)", () => {
     const raw: RawGrant = {

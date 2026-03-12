@@ -77,6 +77,7 @@ import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/grou
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 import { KbVerificationsContent } from "@/app/internal/kb-verifications/kb-verifications-content";
+import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -226,6 +227,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   SystemHealthContent,
   PRDashboardContent,
   KbVerificationsContent,
+  GrantsDashboardContent,
 
   // Table view components
   SafetyApproachesTableView,

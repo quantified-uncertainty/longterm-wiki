@@ -19,12 +19,10 @@ import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { sql } from "drizzle-orm";
 import * as schema from "../src/schema.js";
+import { FUNDER_IDS } from "../../../crux/lib/grant-import/constants.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Coefficient Giving's stableId
-const COEFF_GIVING_STABLE_ID = "ULjDXpSLCI";
 
 // Characters used for 10-char IDs (matching the wiki-server ID convention)
 const ID_CHARS =
@@ -107,7 +105,7 @@ export async function seedDivisions() {
       divisionRows.push({
         id,
         slug: `coefficient-giving-${slug}`,
-        parentOrgId: COEFF_GIVING_STABLE_ID,
+        parentOrgId: FUNDER_IDS.COEFFICIENT_GIVING,
         name: record.name,
         divisionType: "fund",
         lead: record.lead ?? null,
@@ -135,7 +133,7 @@ export async function seedDivisions() {
 
       fundingProgramRows.push({
         id: deterministicId(`coeff-giving-program-${slug}`),
-        orgId: COEFF_GIVING_STABLE_ID,
+        orgId: FUNDER_IDS.COEFFICIENT_GIVING,
         divisionId: parentDivisionId,
         name: record.name,
         programType: "rfp",

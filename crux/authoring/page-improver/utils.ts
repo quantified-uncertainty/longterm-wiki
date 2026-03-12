@@ -148,9 +148,10 @@ export function repairFrontmatter(content: string): string {
   // Fix 1: Lines where a YAML key:value is merged with another key on the same line.
   fm = fm.replace(/^([ \t]+\w+:[ \t]*\S+?)([a-zA-Z_][\w]*:[ \t])/gm, '$1\n$2');
 
-  // Fix 2: Remove backslash-escaping from YAML string values.
-  fm = fm.replace(/^(\w+:.*)\\\$/gm, '$1$');
-  fm = fm.replace(/^([ \t]+\w+:.*)\\\$/gm, '$1$');
+  // Fix 2 (removed): Dollar-sign escaping is now handled exclusively by the
+  // post-apply dollar-signs validation rule, which understands YAML quoting
+  // context. The old regexes here stripped \\$ to $ blindly, corrupting
+  // double-quoted YAML values like "GPT-4: \\$78M" → "GPT-4: 78M".
 
   // Fix 3: Top-level keys that got incorrectly indented under a block.
   const knownSubKeys = new Set([
@@ -204,6 +205,63 @@ export function repairFrontmatter(content: string): string {
   fm = fmLines.join('\n');
 
   return '---\n' + fm + '\n---' + rest;
+}
+
+/**
+ * Ensure that all frontmatter fields from the original content are preserved
+ * in the LLM-generated output. LLMs sometimes drop fields (especially `title`,
+ * `numericId`, `entityType`) when regenerating content. This function merges
+ * any missing fields back from the original.
+ *
+ * Fields present in both versions use the LLM's value (it may have legitimately
+ * updated `description`, `llmSummary`, etc.).
+ */
+export function ensureFrontmatterFields(originalContent: string, improvedContent: string): string {
+  const origMatch = originalContent.match(/^---\n([\s\S]*?)\n---/);
+  const newMatch = improvedContent.match(/^---\n([\s\S]*?)\n---/);
+  if (!origMatch) return improvedContent;
+  if (!newMatch) {
+    // LLM dropped the entire frontmatter block — restore the original
+    log('frontmatter', 'Improved content missing frontmatter block; restoring original frontmatter');
+    const body = improvedContent.replace(/^\n+/, '');
+    return `---\n${origMatch[1]}\n---\n${body}`;
+  }
+
+  // Parse top-level YAML keys and their full text (including continuation lines)
+  const getKeys = (fm: string): Map<string, string> => {
+    const keys = new Map<string, string>();
+    const lines = fm.split('\n');
+    let currentKey = '';
+    let currentLines: string[] = [];
+    for (const line of lines) {
+      const keyMatch = line.match(/^([\w][\w-]*):/);
+      if (keyMatch) {
+        if (currentKey) keys.set(currentKey, currentLines.join('\n'));
+        currentKey = keyMatch[1];
+        currentLines = [line];
+      } else {
+        currentLines.push(line);
+      }
+    }
+    if (currentKey) keys.set(currentKey, currentLines.join('\n'));
+    return keys;
+  };
+
+  const origKeys = getKeys(origMatch[1]);
+  const newKeys = getKeys(newMatch[1]);
+
+  const missing: string[] = [];
+  for (const [key, value] of origKeys) {
+    if (!newKeys.has(key)) {
+      missing.push(value);
+    }
+  }
+
+  if (missing.length === 0) return improvedContent;
+
+  log('frontmatter', `Restored ${missing.length} missing field(s): ${[...origKeys.keys()].filter(k => !newKeys.has(k)).join(', ')}`);
+  const newFm = newMatch[1] + '\n' + missing.join('\n');
+  return '---\n' + newFm + '\n---' + improvedContent.slice(newMatch[0].length);
 }
 
 const RELATED_SECTION_PATTERNS = [
