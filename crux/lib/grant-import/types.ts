@@ -41,6 +41,8 @@ export interface SyncGrant {
   status: string | null;
   source: string | null;
   notes: string | null;
+  /** Soft reference to funding_programs.id (nullable -- most grants won't have one) */
+  programId?: string | null;
 }
 
 export interface GrantSource {

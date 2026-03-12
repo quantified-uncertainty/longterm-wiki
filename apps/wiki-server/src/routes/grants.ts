@@ -40,6 +40,7 @@ const SyncGrantItemSchema = z.object({
   status: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  programId: z.string().max(200).nullable().optional(),
 });
 
 const SyncGrantsBatchSchema = z.object({
@@ -61,6 +62,7 @@ function formatRow(r: typeof grants.$inferSelect) {
     status: r.status,
     source: r.source,
     notes: r.notes,
+    programId: r.programId,
     syncedAt: r.syncedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -222,6 +224,7 @@ const grantsApp = new Hono()
         status: item.status ?? null,
         source: item.source ?? null,
         notes: item.notes ?? null,
+        programId: item.programId ?? null,
       }));
 
       await tx
@@ -240,6 +243,7 @@ const grantsApp = new Hono()
             status: sql`excluded.status`,
             source: sql`excluded.source`,
             notes: sql`excluded.notes`,
+            programId: sql`excluded.program_id`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },

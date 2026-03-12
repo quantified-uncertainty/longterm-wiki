@@ -1465,6 +1465,7 @@ export const grants = pgTable(
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
     notes: text("notes"),
+    programId: text("program_id"), // soft ref to funding_programs.id (nullable)
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1479,6 +1480,7 @@ export const grants = pgTable(
     index("idx_grants_org").on(table.organizationId),
     index("idx_grants_grantee").on(table.granteeId),
     index("idx_grants_status").on(table.status),
+    index("idx_grants_program").on(table.programId),
   ]
 );
 
@@ -1658,8 +1660,8 @@ export const divisionPersonnel = pgTable(
 
 /**
  * Funding programs — RFPs, grant rounds, fellowships, prizes, solicitations.
- * Complementary to `grants` (individual awards). A future `grants.programId` column
- * will link individual grants to their parent program.
+ * Complementary to `grants` (individual awards). Individual grants link to their
+ * parent program via `grants.programId`.
  */
 export const fundingPrograms = pgTable(
   "funding_programs",
