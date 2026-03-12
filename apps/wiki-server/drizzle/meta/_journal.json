@@ -533,6 +533,13 @@
       "when": 1775116800000,
       "tag": "0075_add_funding_rounds_investments_equity",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1775203200000,
+      "tag": "0076_add_fetch_status_to_resources",
+      "breakpoints": true
     }
   ]
 }

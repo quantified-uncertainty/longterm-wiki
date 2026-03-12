@@ -6,7 +6,7 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { UpsertResource } from '../../../apps/wiki-server/src/api-types.ts';
+import type { UpsertResource, UpdateResourceFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { ResourcesRoute } from '../../../apps/wiki-server/src/routes/resources.ts';
 
@@ -27,6 +27,7 @@ export type ResourceRow = InferResponseType<RpcClient['lookup']['$get'], 200>;
 export type ResourceStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 export type ResourceSearchResult = InferResponseType<RpcClient['search']['$get'], 200>;
 export type ResourceListResult = InferResponseType<RpcClient['all']['$get'], 200>;
+export type UpdateFetchStatusResult = InferResponseType<RpcClient[':id']['fetch-status']['$patch'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -87,4 +88,15 @@ export async function listResources(
   let url = `/api/resources/all?limit=${limit}&offset=${offset}`;
   if (type) url += `&type=${encodeURIComponent(type)}`;
   return apiRequest('GET', url);
+}
+
+export async function updateResourceFetchStatus(
+  id: string,
+  status: UpdateResourceFetchStatus,
+): Promise<ApiResult<UpdateFetchStatusResult>> {
+  return apiRequest<UpdateFetchStatusResult>(
+    'PATCH',
+    `/api/resources/${encodeURIComponent(id)}/fetch-status`,
+    status,
+  );
 }
