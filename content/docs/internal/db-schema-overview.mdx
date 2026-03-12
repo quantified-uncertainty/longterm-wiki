@@ -73,7 +73,7 @@ erDiagram
         integer word_count
         text content_plaintext
         real recommended_score
-        tsvector search_vector
+        text search_vector "tsvector + GIN index"
         timestamp synced_at
     }
     entities {
@@ -94,7 +94,7 @@ erDiagram
         text type
         jsonb authors
         jsonb tags
-        tsvector search_vector
+        text search_vector "tsvector + GIN index"
         timestamp last_fetched_at
     }
     facts {
@@ -109,7 +109,7 @@ erDiagram
         text subject FK
     }
     summaries {
-        text entity_id PK_FK
+        text entity_id PK "FK to entities"
         text entity_type
         text one_liner
         text summary
@@ -213,8 +213,8 @@ erDiagram
         timestamp computed_at
     }
     resource_citations {
-        text resource_id PK_FK
-        text page_id_old PK_FK
+        text resource_id PK "FK to resources"
+        text page_id_old PK "FK to wiki_pages"
     }
 `} />
 
@@ -353,8 +353,8 @@ erDiagram
         integer cost_cents
     }
     agent_session_pages {
-        bigint agent_session_id PK_FK
-        text page_id PK_FK
+        bigint agent_session_id PK "FK to agent_sessions"
+        text page_id PK "FK to wiki_pages"
     }
     sessions {
         bigserial id PK
@@ -366,8 +366,8 @@ erDiagram
         text pr_url
     }
     session_pages {
-        bigint session_id PK_FK
-        text page_id_old PK_FK
+        bigint session_id PK "FK to sessions"
+        text page_id_old PK "FK to wiki_pages"
     }
 `} />
 
@@ -389,7 +389,7 @@ Structured financial records for AI companies and organizations — funding, per
 <Mermaid chart={`
 erDiagram
     personnel {
-        varchar_10 id PK
+        varchar id PK "10-char"
         text person_id
         text organization_id
         text role
@@ -399,7 +399,7 @@ erDiagram
         boolean is_founder
     }
     grants {
-        varchar_10 id PK
+        varchar id PK "10-char"
         text organization_id
         text grantee_id
         text name
@@ -408,7 +408,7 @@ erDiagram
         text status
     }
     funding_rounds {
-        varchar_10 id PK
+        varchar id PK "10-char"
         text company_id
         text name
         text date
@@ -418,7 +418,7 @@ erDiagram
         text lead_investor
     }
     investments {
-        varchar_10 id PK
+        varchar id PK "10-char"
         text company_id
         text investor_id
         text round_name
@@ -427,7 +427,7 @@ erDiagram
         text role
     }
     equity_positions {
-        varchar_10 id PK
+        varchar id PK "10-char"
         text company_id
         text holder_id
         text stake
