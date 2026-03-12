@@ -161,7 +161,7 @@ const fundingProgramsApp = new Hono()
       .select()
       .from(fundingPrograms)
       .where(whereClause)
-      .orderBy(desc(fundingPrograms.syncedAt))
+      .orderBy(desc(fundingPrograms.syncedAt), desc(fundingPrograms.id))
       .limit(limit)
       .offset(offset);
 
@@ -195,7 +195,7 @@ const fundingProgramsApp = new Hono()
       .select()
       .from(fundingPrograms)
       .where(whereClause)
-      .orderBy(desc(fundingPrograms.syncedAt))
+      .orderBy(desc(fundingPrograms.syncedAt), desc(fundingPrograms.id))
       .limit(limit)
       .offset(offset);
 
@@ -233,7 +233,7 @@ const fundingProgramsApp = new Hono()
         .select()
         .from(fundingPrograms)
         .where(whereClause)
-        .orderBy(desc(fundingPrograms.syncedAt))
+        .orderBy(desc(fundingPrograms.syncedAt), desc(fundingPrograms.id))
         .limit(limit)
         .offset(offset);
 

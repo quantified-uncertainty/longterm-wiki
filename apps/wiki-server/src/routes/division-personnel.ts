@@ -91,7 +91,7 @@ const divisionPersonnelApp = new Hono()
     const rows = await db
       .select()
       .from(divisionPersonnel)
-      .orderBy(desc(divisionPersonnel.syncedAt))
+      .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
       .limit(limit)
       .offset(offset);
 
@@ -121,7 +121,7 @@ const divisionPersonnelApp = new Hono()
         .select()
         .from(divisionPersonnel)
         .where(eq(divisionPersonnel.divisionId, divisionId))
-        .orderBy(desc(divisionPersonnel.syncedAt))
+        .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
         .limit(limit)
         .offset(offset);
 
@@ -151,7 +151,7 @@ const divisionPersonnelApp = new Hono()
       .select()
       .from(divisionPersonnel)
       .where(eq(divisionPersonnel.personId, personId))
-      .orderBy(desc(divisionPersonnel.syncedAt))
+      .orderBy(desc(divisionPersonnel.syncedAt), desc(divisionPersonnel.id))
       .limit(limit)
       .offset(offset);
 

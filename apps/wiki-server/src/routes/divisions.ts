@@ -151,7 +151,7 @@ const divisionsApp = new Hono()
       .select()
       .from(divisions)
       .where(whereClause)
-      .orderBy(desc(divisions.syncedAt))
+      .orderBy(desc(divisions.syncedAt), desc(divisions.id))
       .limit(limit)
       .offset(offset);
 
@@ -184,7 +184,7 @@ const divisionsApp = new Hono()
       .select()
       .from(divisions)
       .where(whereClause)
-      .orderBy(desc(divisions.syncedAt))
+      .orderBy(desc(divisions.syncedAt), desc(divisions.id))
       .limit(limit)
       .offset(offset);
 
