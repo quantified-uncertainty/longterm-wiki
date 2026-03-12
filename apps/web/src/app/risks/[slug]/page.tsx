@@ -176,7 +176,7 @@ export default async function RiskProfilePage({
           {riskCategory && (
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                RISK_CATEGORY_COLORS[riskCategory] ?? "bg-gray-100 text-gray-600"
+                RISK_CATEGORY_COLORS[riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
               }`}
             >
               {RISK_CATEGORY_LABELS[riskCategory] ?? riskCategory}
@@ -185,7 +185,7 @@ export default async function RiskProfilePage({
           {risk?.severity && (
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                SEVERITY_COLORS[risk.severity] ?? "bg-gray-100 text-gray-600"
+                SEVERITY_COLORS[risk.severity] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
               }`}
             >
               {titleCase(risk.severity)}
