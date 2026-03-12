@@ -49,25 +49,6 @@ async function createMinimalKBDir(): Promise<string> {
 name: Organization
 required: []
 recommended: []
-records:
-  - funding-round
-`
-  );
-
-  await mkdir(join(dataDir, "schemas", "records"));
-  await writeFile(
-    join(dataDir, "schemas", "records", "funding-round.yaml"),
-    `name: Funding Round
-endpoints:
-  organization:
-    types: [organization]
-    implicit: true
-fields:
-  date:
-    type: date
-    required: true
-  raised:
-    type: number
 `
   );
 
@@ -168,19 +149,6 @@ facts:
 `
     );
 
-    // Another supplementary file with records
-    await writeFile(
-      join(dataDir, "things", "my-multi-org", "funding.yaml"),
-      `records:
-  funding-rounds:
-    series-a:
-      date: "2021-06"
-      raised: 50000000
-    series-b:
-      date: "2023-01"
-      raised: 200000000
-`
-    );
   });
 
   afterAll(async () => {
@@ -216,16 +184,6 @@ facts:
     }
   });
 
-  it("merges records from supplementary files", async () => {
-    const { graph } = await loadKB(dataDir);
-    const rounds = graph.getRecords("multiOrg001", "funding-rounds");
-    expect(rounds).toHaveLength(2);
-
-    const seriesA = rounds.find((r) => r.key === "series-a");
-    expect(seriesA).toBeDefined();
-    expect(seriesA!.fields.date).toBe("2021-06");
-    expect(seriesA!.fields.raised).toBe(50000000);
-  });
 });
 
 // ── Test: error when two files have thing: blocks ──────────────────────────────
@@ -447,53 +405,6 @@ thing:
   });
 });
 
-// ── Test: record key conflicts ────────────────────────────────────────────────
-
-describe("per-entity directories — record key conflict", () => {
-  let dataDir: string;
-
-  beforeAll(async () => {
-    dataDir = await createMinimalKBDir();
-
-    await mkdir(join(dataDir, "things", "rec-conflict"));
-
-    await writeFile(
-      join(dataDir, "things", "rec-conflict", "entity.yaml"),
-      `thing:
-  id: rec-conflict
-  stableId: recConfl001
-  type: organization
-  name: Record Conflict Org
-
-records:
-  funding-rounds:
-    series-a:
-      date: "2021-01"
-      raised: 50000000
-`
-    );
-
-    await writeFile(
-      join(dataDir, "things", "rec-conflict", "extra.yaml"),
-      `records:
-  funding-rounds:
-    series-a:
-      date: "2022-01"
-      raised: 100000000
-`
-    );
-  });
-
-  afterAll(async () => {
-    await rm(dataDir, { recursive: true, force: true });
-  });
-
-  it("throws on record key conflict in same collection", async () => {
-    await expect(loadKB(dataDir)).rejects.toThrow(
-      /record key conflict.*series-a/
-    );
-  });
-});
 
 // ── Test: mixed single files and directories ──────────────────────────────────
 

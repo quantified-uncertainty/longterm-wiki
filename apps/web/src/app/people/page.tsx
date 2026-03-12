@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getKBEntities, getKBLatest, getKBEntity, getKBEntitySlug } from "@/data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
@@ -35,7 +35,6 @@ export default function PeoplePage() {
     const bornYearFact = getKBLatest(entity.id, "born-year");
     const netWorthFact = getKBLatest(entity.id, "net-worth");
 
-    const careerHistory = getKBRecords(entity.id, "career-history");
     const employer = resolveRef(employedByFact);
 
     return {
@@ -53,7 +52,7 @@ export default function PeoplePage() {
       bornYear: numericValue(bornYearFact),
       netWorthNum: numericValue(netWorthFact),
 
-      careerHistoryCount: careerHistory.length,
+      careerHistoryCount: 0, // Records removed
     };
   });
 

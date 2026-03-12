@@ -14,11 +14,8 @@ import { loadGraphFull } from '../lib/kb-loader.ts';
 import {
   readEntityDocument,
   appendFact,
-  appendRecord,
   writeEntityDocument,
   findEntityFilePath,
-  generateRecordKey,
-  pluralizeRecordType,
 } from '../lib/kb-writer.ts';
 import type { RawFactInput } from '../lib/kb-writer.ts';
 
@@ -55,7 +52,7 @@ describe('crux kb list', () => {
 });
 
 describe('crux kb show', () => {
-  it('shows entity details with facts and items', async () => {
+  it('shows entity details with facts', async () => {
     const result = await commands.show(['anthropic'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
@@ -63,9 +60,6 @@ describe('crux kb show', () => {
     expect(result.output).toContain('organization');
     expect(result.output).toContain('Facts');
     expect(result.output).toContain('Revenue');
-    expect(result.output).toContain('Records');
-    expect(result.output).toContain('funding-rounds');
-    expect(result.output).toContain('key-persons');
   }, 30_000);
 
   it('formats financial values with proper units', async () => {
@@ -88,13 +82,6 @@ describe('crux kb show', () => {
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('1983');
     expect(result.output).not.toContain('1,983');
-  }, 30_000);
-
-  it('resolves refs in key-people items', async () => {
-    const result = await commands.show(['anthropic'], {});
-    expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('Dario Amodei');
-    expect(result.output).toContain('CEO');
   }, 30_000);
 
   it('returns error for non-existent entity', async () => {
@@ -168,26 +155,6 @@ describe('resolveEntityArg', () => {
   it('returns undefined for non-existent entity', () => {
     const entity = resolveEntityArg('nonexistent-xyz-123', kb);
     expect(entity).toBeUndefined();
-  });
-});
-
-// ── pluralizeRecordType tests ───────────────────────────────────────────
-
-describe('pluralizeRecordType', () => {
-  it('pluralizes regular names by appending s', () => {
-    expect(pluralizeRecordType('funding-round')).toBe('funding-rounds');
-    expect(pluralizeRecordType('investment')).toBe('investments');
-    expect(pluralizeRecordType('grant')).toBe('grants');
-    expect(pluralizeRecordType('product')).toBe('products');
-  });
-
-  it('handles consonant+y -> ies', () => {
-    expect(pluralizeRecordType('career-history')).toBe('career-histories');
-  });
-
-  it('does not convert vowel+y to ies', () => {
-    // "key" should become "keys", not "keies"
-    expect(pluralizeRecordType('key')).toBe('keys');
   });
 });
 
@@ -268,62 +235,6 @@ facts:
     expect(result).toContain('revenue');
   });
 
-  it('appends a record entry', () => {
-    const yamlContent = `thing:
-  id: test-entity
-  stableId: aB3cD4eF5g
-  type: organization
-  name: Test Org
-
-facts: []
-`;
-    const filePath = join(tmpDir, 'things', 'test-entity.yaml');
-    writeFileSync(filePath, yamlContent, 'utf-8');
-
-    const doc = readEntityDocument(filePath);
-    appendRecord(doc, 'funding-rounds', 'i_testKey123', {
-      amount: 2000000000,
-      round: 'Series E',
-    });
-    writeEntityDocument(filePath, doc);
-
-    const result = readFileSync(filePath, 'utf-8');
-    expect(result).toContain('records:');
-    expect(result).toContain('funding-rounds:');
-    expect(result).toContain('i_testKey123');
-    expect(result).toContain('2000000000');
-    expect(result).toContain('Series E');
-  });
-
-  it('appends to existing records section', () => {
-    const yamlContent = `thing:
-  id: test-entity
-  stableId: aB3cD4eF5g
-  type: organization
-  name: Test Org
-
-records:
-  funding-rounds:
-    i_existingKey:
-      amount: 1000000
-`;
-    const filePath = join(tmpDir, 'things', 'test-entity.yaml');
-    writeFileSync(filePath, yamlContent, 'utf-8');
-
-    const doc = readEntityDocument(filePath);
-    appendRecord(doc, 'funding-rounds', 'i_newKey12345', {
-      amount: 5000000,
-      round: 'Series B',
-    });
-    writeEntityDocument(filePath, doc);
-
-    const result = readFileSync(filePath, 'utf-8');
-    expect(result).toContain('i_existingKey');
-    expect(result).toContain('i_newKey12345');
-    expect(result).toContain('5000000');
-    expect(result).toContain('Series B');
-  });
-
   it('findEntityFilePath finds single-file entities', () => {
     const filePath = join(tmpDir, 'things', 'my-entity.yaml');
     writeFileSync(filePath, 'thing:\n  id: my-entity\n', 'utf-8');
@@ -374,10 +285,6 @@ facts:
     expect(result).toContain('!date 1983');
   });
 
-  it('generateRecordKey produces i_ prefix with 10-char ID', () => {
-    const key = generateRecordKey();
-    expect(key).toMatch(/^i_[a-zA-Z0-9]{10}$/);
-  });
 });
 
 // ── add-fact command tests (integration with real data) ──────────────────
@@ -431,48 +338,3 @@ describe('crux kb add-fact', () => {
   }, 30_000);
 });
 
-// ── add-record command tests (integration with real data) ────────────────
-
-describe('crux kb add-record', () => {
-  it('shows usage when insufficient args', async () => {
-    const result = await commands['add-record'](['anthropic'], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('Usage');
-  });
-
-  it('returns error for non-existent entity', async () => {
-    const result = await commands['add-record'](['nonexistent-xyz', 'funding-round'], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('Entity not found');
-  }, 30_000);
-
-  it('returns error for non-existent record schema', async () => {
-    const result = await commands['add-record'](['anthropic', 'fake-record-xyz'], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('Record schema not found');
-  }, 30_000);
-
-  it('returns error for invalid key=value pair', async () => {
-    const result = await commands['add-record'](['anthropic', 'funding-round', 'badformat'], {});
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('Invalid key=value');
-  }, 30_000);
-
-  it('returns error for unknown field names with list of valid fields', async () => {
-    const result = await commands['add-record']([
-      'anthropic', 'funding-round', 'amunt=2e9', 'naem=SeriesX'],
-      {},
-    );
-    expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('Unknown field');
-    expect(result.output).toContain('"amunt"');
-    expect(result.output).toContain('"naem"');
-    // Should list valid fields so the user can fix the typo
-    expect(result.output).toContain('Valid fields');
-    expect(result.output).toContain('raised');
-    expect(result.output).toContain('name');
-    // Should also mention convention fields
-    expect(result.output).toContain('Also allowed');
-    expect(result.output).toContain('asOf');
-  }, 30_000);
-});

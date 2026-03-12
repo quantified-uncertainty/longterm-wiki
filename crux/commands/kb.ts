@@ -15,10 +15,9 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
-import { run as migrateRecordsRun } from './kb-migrate-records.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
 import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/kb-loader.ts';
@@ -26,11 +25,8 @@ import type { LoadedKB } from '../lib/kb-loader.ts';
 import {
   readEntityDocument,
   appendFact,
-  appendRecord,
   writeEntityDocument,
   findEntityFilePath,
-  generateRecordKey,
-  pluralizeRecordType,
 } from '../lib/kb-writer.ts';
 import type { RawFactInput } from '../lib/kb-writer.ts';
 
@@ -158,56 +154,7 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
     lines.push('');
   }
 
-  // Record collections
-  const recordCollections = getEntityRecordCollections(entity.id, graph);
-  if (recordCollections.length > 0) {
-    lines.push(`\x1b[1mRecords:\x1b[0m`);
-    for (const { name, records } of recordCollections) {
-      lines.push(`  ${name} (${records.length} entries)`);
-      for (const record of records) {
-        const summary = formatRecordEntry(record, graph);
-        lines.push(`    ${summary}`);
-      }
-      lines.push('');
-    }
-  }
-
   return { exitCode: 0, output: lines.join('\n') };
-}
-
-/**
- * Get all record collections for an entity by querying the graph directly.
- */
-function getEntityRecordCollections(
-  entityId: string,
-  graph: Graph,
-): Array<{ name: string; records: RecordEntry[] }> {
-  const results: Array<{ name: string; records: RecordEntry[] }> = [];
-  for (const collName of graph.getRecordCollectionNames(entityId)) {
-    const records = graph.getRecords(entityId, collName);
-    if (records.length > 0) {
-      results.push({ name: collName, records });
-    }
-  }
-  return results;
-}
-
-/**
- * Format a record entry for display.
- */
-function formatRecordEntry(record: RecordEntry, graph: Graph): string {
-  const name = record.displayName || record.key;
-  const fields = Object.entries(record.fields)
-    .map(([k, v]) => {
-      // Resolve entity refs to names
-      if (typeof v === 'string') {
-        const entity = graph.getEntity(v);
-        if (entity) return `${k}: ${entity.name} (${v})`;
-      }
-      return `${k}: ${v}`;
-    })
-    .join(', ');
-  return `${name}: ${fields}`;
 }
 
 // ── list command ────────────────────────────────────────────────────────
@@ -243,27 +190,19 @@ async function listCommand(
       name: e.name,
       type: e.type,
       factCount: graph.getFacts(e.id).length,
-      recordCount: graph.getRecordCollectionNames(e.id).reduce(
-        (sum, col) => sum + graph.getRecords(e.id, col).length,
-        0,
-      ),
     }));
     return { exitCode: 0, output: JSON.stringify(data) };
   }
 
   // Table header
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'Facts'.padEnd(7)} Records`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} Facts`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const recordCount = graph.getRecordCollectionNames(entity.id).reduce(
-      (sum, col) => sum + graph.getRecords(entity.id, col).length,
-      0,
-    );
-    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${recordCount}`;
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${facts.length}`;
     lines.push(row);
   }
 
@@ -1154,106 +1093,6 @@ Examples:
   };
 }
 
-// ── add-record command ──────────────────────────────────────────────────
-
-async function addRecordCommand(
-  args: string[],
-  options: KBCommandOptions,
-): Promise<CommandResult> {
-  const positionalArgs = args.filter((a) => !a.startsWith('--'));
-
-  if (positionalArgs.length < 2) {
-    return {
-      exitCode: 1,
-      output: `Usage: crux kb add-record <entity> <record-type> [key=value ...] [--asOf=YYYY-MM]
-
-  Add a record entry to a KB entity's YAML file.
-
-Examples:
-  crux kb add-record anthropic funding-round amount=2e9 round=SeriesE lead=mK9pX3rQ7n --asOf=2024-03
-  crux kb add-record dario-amodei career-history organization=mK9pX3rQ7n role=CEO --asOf=2021-01`,
-    };
-  }
-
-  const entityArg = positionalArgs[0];
-  const recordTypeArg = positionalArgs[1];
-  const kvArgs = positionalArgs.slice(2);
-
-  const resolved = await resolveEntityFile(entityArg);
-  if (!resolved.ok) return resolved.result;
-  const { entity, graph, filePath } = resolved;
-
-  // Validate record type
-  const recordSchema = graph.getRecordSchema(recordTypeArg);
-  if (!recordSchema) {
-    return {
-      exitCode: 1,
-      output: `Record schema not found: "${recordTypeArg}"\n  Available: ${graph.getAllRecordSchemas().map((s) => s.id).join(', ')}`,
-    };
-  }
-
-  // Validate entity type allows this record schema
-  const typeSchema = graph.getSchema(entity.type);
-  if (typeSchema?.records && !typeSchema.records.includes(recordTypeArg)) {
-    return {
-      exitCode: 1,
-      output: `Entity type "${entity.type}" does not allow record schema "${recordTypeArg}"\n  Allowed: ${typeSchema.records.join(', ')}`,
-    };
-  }
-
-  // Parse key=value pairs
-  const entry: Record<string, unknown> = {};
-  for (const kv of kvArgs) {
-    const eqIdx = kv.indexOf('=');
-    if (eqIdx < 1) {
-      return { exitCode: 1, output: `Invalid key=value pair: "${kv}"` };
-    }
-    const key = kv.slice(0, eqIdx);
-    const val = kv.slice(eqIdx + 1);
-
-    // Try numeric coercion for values that look like numbers
-    const num = Number(val);
-    entry[key] = !isNaN(num) && val.trim() !== '' ? num : val;
-  }
-
-  // Validate field names against the record schema
-  const conventionFields = ['asOf', 'validEnd', 'display_name'];
-  const validFields = new Set([
-    ...Object.keys(recordSchema.fields),
-    ...Object.keys(recordSchema.endpoints),
-    // Convention fields not defined in schema but allowed on any record
-    ...conventionFields,
-  ]);
-  const unknownFields = Object.keys(entry).filter((k) => !validFields.has(k));
-  if (unknownFields.length > 0) {
-    const schemaFields = [...Object.keys(recordSchema.fields), ...Object.keys(recordSchema.endpoints)].sort();
-    return {
-      exitCode: 1,
-      output: `Unknown field${unknownFields.length > 1 ? 's' : ''}: ${unknownFields.map((f) => `"${f}"`).join(', ')}\n  Valid fields for "${recordTypeArg}": ${schemaFields.join(', ')}\n  Also allowed on any record: ${conventionFields.join(', ')}`,
-    };
-  }
-  // Add asOf if provided
-  const asOf = options.asOf ?? options['as-of'];
-  if (asOf) {
-    entry.asOf = asOf;
-  }
-
-  // Generate key and determine collection name
-  const recordKey = generateRecordKey();
-  const collectionName = pluralizeRecordType(recordTypeArg);
-
-  // Read, modify, write
-  const doc = readEntityDocument(filePath);
-  appendRecord(doc, collectionName, recordKey, entry);
-  writeEntityDocument(filePath, doc);
-
-  const fieldSummary = kvArgs.length > 0 ? ` (${kvArgs.join(', ')})` : '';
-  return {
-    exitCode: 0,
-    output: `Added record ${recordKey} to ${entity.name} / ${collectionName}${fieldSummary}`,
-  };
-}
-
 // ── Exports ─────────────────────────────────────────────────────────────
 
 export const commands = {
@@ -1268,11 +1107,9 @@ export const commands = {
   stale: staleCommand,
   'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
-  'migrate-records': migrateRecordsRun,
   'sync-sources': syncSourcesCommand,
   verify: verifyCommand,
   'add-fact': addFactCommand,
-  'add-record': addRecordCommand,
 };
 
 export function getHelp(): string {
@@ -1291,9 +1128,7 @@ Commands:
   stale [days]          List facts older than N days (default: 180)
   needs-update <id>     Show missing and stale data for an entity
   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
-  add-record <entity> <type> [k=v ...]   Add a record entry to an entity YAML file
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
-  migrate-records       Sync key-persons/board-seats/career-history/grants to PG
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   verify                Verify KB facts against source URLs using LLM
 
@@ -1306,7 +1141,7 @@ Options:
   --entity=X            (verify) Verify all facts for one entity
   --fact=X              (verify) Verify a single fact by ID
   --dry-run             (verify) Show what would be checked without calling LLM
-  --asOf=YYYY-MM        (add-fact, add-record) Temporal anchor date
+  --asOf=YYYY-MM        (add-fact) Temporal anchor date
   --source=URL          (add-fact) Source URL
   --notes=TEXT           (add-fact) Free-text annotation
   --currency=USD         (add-fact) ISO 4217 currency code
@@ -1320,7 +1155,6 @@ Examples:
   crux kb needs-update anthropic      What's missing for Anthropic
   crux kb coverage --type=organization Organizations property coverage
   crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
-  crux kb add-record anthropic funding-round amount=2e9 round=SeriesE --asOf=2024-03
   crux kb sync-sources                Sync source URLs to wiki-server resources
   crux kb verify --entity=anthropic   Verify Anthropic facts against sources
   crux kb verify --dry-run --limit=5  Preview 5 facts that would be checked

@@ -19,11 +19,3 @@ export {
 } from "./format";
 export { CURRENCIES, resolveCurrency, isCurrencyCode } from "./currencies";
 export type { CurrencyFormat } from "./currencies";
-
-// Re-export record-specific types for convenience
-export type {
-  RecordSchema,
-  RecordEntry,
-  EndpointDef,
-  RecordSchemaFile,
-} from "./types";
