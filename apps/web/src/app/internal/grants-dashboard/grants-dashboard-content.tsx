@@ -2,52 +2,26 @@ import {
   fetchDetailed,
   withApiFallback,
   type FetchResult,
+  type RpcGrantsStatsResult,
+  type RpcGrantsAllResult,
+  type RpcGrantsOrgSummaryResult,
+  type RpcGrantsGranteeSummaryResult,
+  type RpcGrantRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { getKBEntity } from "@data/kb";
 import { GrantsTable, type GrantRow } from "./grants-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
-interface StatsResponse {
-  total: number;
-  totalAmount: number;
-  uniqueOrganizations: number;
-}
-
-interface OrgSummaryRow {
-  organizationId: string;
-  grantCount: number;
-  totalAmount: number;
-  minDate: string | null;
-  maxDate: string | null;
-}
-
-interface OrgSummaryResponse {
-  organizations: OrgSummaryRow[];
-}
-
-interface GranteeSummaryRow {
-  granteeId: string | null;
-  grantCount: number;
-  totalAmount: number;
-}
-
-interface GranteeSummaryResponse {
-  grantees: GranteeSummaryRow[];
-}
-
-interface AllGrantsResponse {
-  grants: GrantRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+type OrgSummaryRow = RpcGrantsOrgSummaryResult["organizations"][number];
+type GranteeSummaryRow = RpcGrantsGranteeSummaryResult["grantees"][number];
 
 interface DashboardData {
-  stats: StatsResponse;
+  stats: RpcGrantsStatsResult;
   orgSummary: OrgSummaryRow[];
   granteeSummary: GranteeSummaryRow[];
-  recentGrants: GrantRow[];
+  recentGrants: RpcGrantRow[];
 }
 
 // ── Data Loading ──────────────────────────────────────────────────────────
@@ -55,14 +29,14 @@ interface DashboardData {
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const [statsResult, orgResult, granteeResult, grantsResult] =
     await Promise.all([
-      fetchDetailed<StatsResponse>("/api/grants/stats", { revalidate: 60 }),
-      fetchDetailed<OrgSummaryResponse>("/api/grants/by-org-summary", {
+      fetchDetailed<RpcGrantsStatsResult>("/api/grants/stats", { revalidate: 60 }),
+      fetchDetailed<RpcGrantsOrgSummaryResult>("/api/grants/by-org-summary", {
         revalidate: 60,
       }),
-      fetchDetailed<GranteeSummaryResponse>("/api/grants/by-grantee-summary", {
+      fetchDetailed<RpcGrantsGranteeSummaryResult>("/api/grants/by-grantee-summary", {
         revalidate: 60,
       }),
-      fetchDetailed<AllGrantsResponse>("/api/grants/all?limit=50", {
+      fetchDetailed<RpcGrantsAllResult>("/api/grants/all?limit=50", {
         revalidate: 60,
       }),
     ]);
@@ -92,14 +66,30 @@ function emptyFallback(): DashboardData {
   };
 }
 
+// ── Entity name resolution ────────────────────────────────────────────────
+
+/** Resolve an entity stableId to a display name via the KB data layer. */
+function resolveEntityName(stableId: string): string {
+  const entity = getKBEntity(stableId);
+  return entity?.name ?? stableId;
+}
+
+/** Enrich grant rows with resolved organization names for the client table. */
+function enrichWithNames(grants: RpcGrantRow[]): GrantRow[] {
+  return grants.map((g) => ({
+    ...g,
+    organizationName: resolveEntityName(g.organizationId),
+  }));
+}
+
 // ── Formatting ────────────────────────────────────────────────────────────
 
 function formatUSD(amount: number): string {
   if (amount >= 1_000_000_000)
-    return `$${(amount / 1_000_000_000).toFixed(2)}B`;
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-  return `$${amount.toLocaleString()}`;
+    return `\$${(amount / 1_000_000_000).toFixed(2)}B`;
+  if (amount >= 1_000_000) return `\$${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 1_000) return `\$${(amount / 1_000).toFixed(0)}K`;
+  return `\$${amount.toLocaleString()}`;
 }
 
 // ── Content Component ────────────────────────────────────────────────────
@@ -163,7 +153,7 @@ export async function GrantsDashboardContent() {
                     className="border-b border-border/50"
                   >
                     <td className="py-2 pr-4 text-foreground font-medium">
-                      {org.organizationId}
+                      {resolveEntityName(org.organizationId)}
                     </td>
                     <td className="py-2 px-4 text-right tabular-nums text-muted-foreground">
                       {org.grantCount.toLocaleString()}
@@ -237,7 +227,7 @@ export async function GrantsDashboardContent() {
       {recentGrants.length > 0 && (
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-3">Recent Grants</h2>
-          <GrantsTable data={recentGrants} />
+          <GrantsTable data={enrichWithNames(recentGrants)} />
         </div>
       )}
 

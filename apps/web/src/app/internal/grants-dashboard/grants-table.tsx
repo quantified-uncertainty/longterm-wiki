@@ -22,6 +22,8 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 export interface GrantRow {
   id: string;
   organizationId: string;
+  /** Resolved display name for the funder (set by server component) */
+  organizationName?: string;
   granteeId: string | null;
   name: string;
   amount: number | null;
@@ -92,7 +94,7 @@ const columns: ColumnDef<GrantRow>[] = [
     ),
     cell: ({ row }) => (
       <span className="text-xs text-muted-foreground">
-        {row.original.organizationId}
+        {row.original.organizationName ?? row.original.organizationId}
       </span>
     ),
     size: 140,
