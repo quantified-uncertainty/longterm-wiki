@@ -2,14 +2,17 @@
  * Resources Snapshot
  *
  * Fetches all resources from the wiki-server PG database and writes
- * a snapshot JSON file. This snapshot serves as a fallback for builds
- * when the wiki-server is unavailable.
+ * a snapshot JSON file. This snapshot serves as a fallback for local
+ * development builds when the wiki-server is unavailable.
  *
- * The snapshot is intentionally trimmed: large text fields (summary,
- * review, abstract, key_points) are excluded to keep the git-tracked
- * file small (~1MB vs ~2.7MB). These fields are available from PG in
- * normal builds; the snapshot only needs structural/metadata fields
- * for the build to succeed. See #2073 for full discussion.
+ * The snapshot is NOT git-tracked (gitignored) to avoid ~640MB/year
+ * of history bloat. CI and Vercel builds fetch resources directly
+ * from PG. The snapshot is generated daily by CI and uploaded as a
+ * GitHub Actions artifact with 30-day retention. See #2079.
+ *
+ * Large text fields (summary, review, abstract, key_points) are
+ * excluded to keep the file small (~1.8MB vs ~2.7MB). These fields
+ * are available from PG in normal builds. See #2073.
  *
  * Usage:
  *   pnpm crux wiki-server snapshot-resources
@@ -51,20 +54,32 @@ interface PGResource {
   updatedAt: string;
 }
 
-async function main() {
-  const args = parseCliArgs(process.argv.slice(2));
-  const dryRun = args["dry-run"] === true;
+/**
+ * Fetch all resources from PG and write the snapshot file.
+ *
+ * This is the reusable core of the snapshot-resources command. It can be
+ * called programmatically (e.g., fire-and-forget after saveResources())
+ * or from the CLI entry point below.
+ *
+ * @param options.dryRun  If true, logs what would be written but doesn't write.
+ * @param options.quiet   If true, suppresses progress logging (for background use).
+ * @returns The number of resources written to the snapshot.
+ */
+export async function generateSnapshot(options?: {
+  dryRun?: boolean;
+  quiet?: boolean;
+}): Promise<number> {
+  const { dryRun = false, quiet = false } = options ?? {};
+  const log = quiet ? () => {} : console.log.bind(console);
 
   const serverUrl = getServerUrl();
   const apiKey = getApiKey();
 
   if (!serverUrl) {
-    console.error("Error: LONGTERMWIKI_SERVER_URL is required");
-    process.exit(1);
+    throw new Error("LONGTERMWIKI_SERVER_URL is required for snapshot generation");
   }
   if (!apiKey) {
-    console.error("Error: LONGTERMWIKI_SERVER_API_KEY is required");
-    process.exit(1);
+    throw new Error("LONGTERMWIKI_SERVER_API_KEY is required for snapshot generation");
   }
 
   const headers: Record<string, string> = {
@@ -72,7 +87,7 @@ async function main() {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  console.log(`Fetching resources from ${serverUrl}...`);
+  log(`Fetching resources from ${serverUrl}...`);
 
   const allResources: PGResource[] = [];
   let offset = 0;
@@ -85,8 +100,7 @@ async function main() {
     );
 
     if (!resp.ok) {
-      console.error(`Error: API returned ${resp.status} ${resp.statusText}`);
-      process.exit(1);
+      throw new Error(`API returned ${resp.status} ${resp.statusText}`);
     }
 
     const data = await resp.json();
@@ -98,7 +112,7 @@ async function main() {
     if (rows.length < limit) break;
   }
 
-  console.log(`  Fetched ${allResources.length} resources`);
+  log(`  Fetched ${allResources.length} resources`);
 
   // Fetch citations
   let citationCount = 0;
@@ -120,8 +134,8 @@ async function main() {
   }
 
   // Transform to snake_case format, excluding large text fields to keep
-  // the git-tracked snapshot small. Omitted: summary, review, abstract,
-  // key_points (~45% of full size). These are available from PG at build time.
+  // the snapshot small. Omitted: summary, review, abstract, key_points
+  // (~45% of full size). These are available from PG at build time.
   const snapshot = allResources.map((r) => {
     const entry: Record<string, unknown> = {
       id: r.id,
@@ -143,16 +157,26 @@ async function main() {
   });
 
   if (dryRun) {
-    console.log(`\n[dry-run] Would write ${snapshot.length} resources to ${SNAPSHOT_FILE}`);
-    console.log(`  Citations: ${citationCount} total`);
-    console.log(`  Sample entry:`, JSON.stringify(snapshot[0], null, 2).slice(0, 200));
-    return;
+    log(`\n[dry-run] Would write ${snapshot.length} resources to ${SNAPSHOT_FILE}`);
+    log(`  Citations: ${citationCount} total`);
+    if (snapshot[0]) {
+      log(`  Sample entry:`, JSON.stringify(snapshot[0], null, 2).slice(0, 200));
+    }
+    return snapshot.length;
   }
 
   writeFileSync(SNAPSHOT_FILE, JSON.stringify(snapshot, null, 2));
-  console.log(`\nSnapshot written to ${SNAPSHOT_FILE}`);
-  console.log(`  Resources: ${snapshot.length}`);
-  console.log(`  Citations: ${citationCount}`);
+  log(`\nSnapshot written to ${SNAPSHOT_FILE}`);
+  log(`  Resources: ${snapshot.length}`);
+  log(`  Citations: ${citationCount}`);
+  return snapshot.length;
+}
+
+async function main() {
+  const args = parseCliArgs(process.argv.slice(2));
+  const dryRun = args["dry-run"] === true;
+
+  await generateSnapshot({ dryRun });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

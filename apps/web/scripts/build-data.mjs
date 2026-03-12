@@ -145,6 +145,28 @@ function countEntries(data) {
   return 0;
 }
 
+const SNAPSHOT_STALENESS_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
+ * Check if the snapshot file is stale (mtime > 24h old) and log a warning.
+ * Called when falling back to the snapshot for resource loading.
+ */
+function warnIfSnapshotStale(snapshotPath) {
+  try {
+    const stats = statSync(snapshotPath);
+    const ageMs = Date.now() - stats.mtimeMs;
+    if (ageMs > SNAPSHOT_STALENESS_THRESHOLD_MS) {
+      const ageHours = Math.round(ageMs / (60 * 60 * 1000));
+      console.warn(
+        `  WARNING: resources snapshot is ${ageHours}h old (last modified: ${stats.mtime.toISOString()}). ` +
+        `Run 'pnpm crux wiki-server snapshot-resources' to refresh.`
+      );
+    }
+  } catch {
+    // statSync failed — file may have just been read; don't block on this
+  }
+}
+
 /**
  * Compute backlinks for all entities
  * Returns a map: entityId -> array of entities that link to it
@@ -1688,6 +1710,7 @@ async function main() {
           if (Array.isArray(snapshotData)) {
             database.resources = snapshotData;
             console.log(`  resources: ${snapshotData.length} loaded from snapshot (PG unavailable)`);
+            warnIfSnapshotStale(snapshotPath);
             snapshotLoaded = true;
           }
         } catch (err) {
@@ -1708,6 +1731,7 @@ async function main() {
         if (Array.isArray(snapshotData)) {
           database.resources = snapshotData;
           console.log(`  resources: ${snapshotData.length} entries (snapshot, content-only mode)`);
+          warnIfSnapshotStale(snapshotPath);
         } else {
           database.resources = [];
           console.warn(`  resources: 0 (snapshot not an array, content-only mode)`);
