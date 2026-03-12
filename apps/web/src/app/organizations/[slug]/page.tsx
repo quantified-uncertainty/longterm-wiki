@@ -18,7 +18,7 @@ import {
   titleCase,
   shortDomain,
 } from "@/components/wiki/kb/format";
-import { formatCompactCurrency } from "@/lib/format-compact";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import Link from "next/link";
 import {
   Breadcrumbs,
@@ -1349,9 +1349,7 @@ export default async function OrgProfilePage({
                           </td>
                           <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
                             {model.contextWindow != null
-                              ? model.contextWindow >= 1_000_000
-                                ? `${model.contextWindow / 1_000_000}M`
-                                : `${model.contextWindow / 1_000}K`
+                              ? `${formatCompactNumber(model.contextWindow)} tokens`
                               : ""}
                           </td>
                         </tr>
