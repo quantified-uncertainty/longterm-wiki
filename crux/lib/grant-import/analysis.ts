@@ -1,4 +1,5 @@
 import type { RawGrant, SyncGrant } from "./types.ts";
+import { convertToUSD, formatAmount } from "./currency.ts";
 
 // --- Data types ---
 
@@ -13,7 +14,8 @@ export interface MatchStats {
 
 export interface UnmatchedGrantee {
   name: string;
-  totalAmount: number;
+  /** Total amount converted to USD for ranking. */
+  totalAmountUSD: number;
   count: number;
 }
 
@@ -25,6 +27,20 @@ export interface IdCollisions {
 export interface FunderBreakdown {
   organizationId: string;
   count: number;
+}
+
+// --- Helpers ---
+
+/** Convert a raw grant's amount to USD, using the grant's currency field. */
+function rawAmountToUSD(grant: RawGrant): number {
+  if (grant.amount == null) return 0;
+  const currency = grant.currency || "USD";
+  try {
+    return convertToUSD(grant.amount, currency);
+  } catch {
+    // Unknown currency — treat as USD rather than crash aggregation
+    return grant.amount;
+  }
 }
 
 // --- Data functions ---
@@ -47,20 +63,20 @@ export function getMatchStats(grants: RawGrant[]): MatchStats {
 
 export function getTopUnmatched(grants: RawGrant[], limit = 30): UnmatchedGrantee[] {
   const unmatched = grants.filter((g) => g.granteeId === null);
-  const unmatchedByOrg = new Map<string, { total: number; count: number }>();
+  const unmatchedByOrg = new Map<string, { totalUSD: number; count: number }>();
   for (const g of unmatched) {
-    const entry = unmatchedByOrg.get(g.granteeName) || { total: 0, count: 0 };
-    entry.total += g.amount || 0;
+    const entry = unmatchedByOrg.get(g.granteeName) || { totalUSD: 0, count: 0 };
+    entry.totalUSD += rawAmountToUSD(g);
     entry.count++;
     unmatchedByOrg.set(g.granteeName, entry);
   }
 
   return [...unmatchedByOrg.entries()]
-    .sort((a, b) => b[1].total - a[1].total)
+    .sort((a, b) => b[1].totalUSD - a[1].totalUSD)
     .slice(0, limit)
     .map(([name, data]) => ({
       name,
-      totalAmount: data.total,
+      totalAmountUSD: data.totalUSD,
       count: data.count,
     }));
 }
@@ -100,10 +116,10 @@ export function printMatchStats(grants: RawGrant[]): void {
 export function printTopUnmatched(grants: RawGrant[], limit = 30): void {
   const topUnmatched = getTopUnmatched(grants, limit);
 
-  console.log(`\nTop ${limit} unmatched grantees by amount:`);
+  console.log(`\nTop ${limit} unmatched grantees by amount (USD-equivalent):`);
   for (const entry of topUnmatched) {
     console.log(
-      `  $${(entry.totalAmount / 1e6).toFixed(1)}M (${entry.count} grants) — ${entry.name}`
+      `  ${formatAmount(entry.totalAmountUSD, "USD")} (${entry.count} grants) — ${entry.name}`
     );
   }
 }

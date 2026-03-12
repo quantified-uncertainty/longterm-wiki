@@ -109,9 +109,9 @@ describe("getTopUnmatched", () => {
 
     const result = getTopUnmatched(grants);
     expect(result).toHaveLength(3);
-    expect(result[0]).toEqual({ name: "Big Org", totalAmount: 800_000, count: 2 });
-    expect(result[1]).toEqual({ name: "Medium Org", totalAmount: 200_000, count: 1 });
-    expect(result[2]).toEqual({ name: "Small Org", totalAmount: 10_000, count: 1 });
+    expect(result[0]).toEqual({ name: "Big Org", totalAmountUSD: 800_000, count: 2 });
+    expect(result[1]).toEqual({ name: "Medium Org", totalAmountUSD: 200_000, count: 1 });
+    expect(result[2]).toEqual({ name: "Small Org", totalAmountUSD: 10_000, count: 1 });
   });
 
   it("respects the limit parameter", () => {
@@ -132,8 +132,33 @@ describe("getTopUnmatched", () => {
       makeRawGrant({ granteeName: "No Amount", granteeId: null, amount: null }),
     ];
     const result = getTopUnmatched(grants);
-    expect(result[0].totalAmount).toBe(0);
+    expect(result[0].totalAmountUSD).toBe(0);
     expect(result[0].count).toBe(1);
+  });
+
+  it("converts non-USD amounts to USD when aggregating", () => {
+    const grants = [
+      // GBP grant: 100,000 GBP = 127,000 USD
+      makeRawGrant({ granteeName: "UK Org", granteeId: null, amount: 100_000, currency: "GBP" }),
+      // USD grant: 100,000 USD
+      makeRawGrant({ granteeName: "US Org", granteeId: null, amount: 100_000, currency: "USD" }),
+    ];
+
+    const result = getTopUnmatched(grants);
+    expect(result).toHaveLength(2);
+    // GBP org should rank higher after conversion
+    expect(result[0].name).toBe("UK Org");
+    expect(result[0].totalAmountUSD).toBe(127_000);
+    expect(result[1].name).toBe("US Org");
+    expect(result[1].totalAmountUSD).toBe(100_000);
+  });
+
+  it("defaults to USD when currency is not specified", () => {
+    const grants = [
+      makeRawGrant({ granteeName: "Default Org", granteeId: null, amount: 50_000 }),
+    ];
+    const result = getTopUnmatched(grants);
+    expect(result[0].totalAmountUSD).toBe(50_000);
   });
 });
 

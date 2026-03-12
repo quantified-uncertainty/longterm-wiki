@@ -34,7 +34,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     granteeId,
     name: raw.name,
     amount: raw.amount,
-    currency: "USD",
+    currency: raw.currency || "USD",
     date: raw.date,
     status: null,
     source: raw.sourceUrl ?? defaultSourceUrl,
