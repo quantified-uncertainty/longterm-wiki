@@ -202,7 +202,11 @@ Respond with JSON:
     // Write updated file — reorder keys to canonical order before serialization
     const orderedFrontmatter = reorderFrontmatterObject(frontmatter);
     const { stringify: stringifyYaml } = await import('yaml');
-    let yamlStr = stringifyYaml(orderedFrontmatter);
+    let yamlStr = stringifyYaml(orderedFrontmatter, {
+      defaultStringType: 'PLAIN',
+      defaultKeyType: 'PLAIN',
+      lineWidth: 0,
+    });
     // Ensure \$ in plain YAML values are double-quoted for MDX safety.
     yamlStr = ensureMdxSafeYaml(yamlStr);
     const newContent = `---\n${yamlStr}---\n${body}`;
