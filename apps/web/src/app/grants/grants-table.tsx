@@ -26,6 +26,8 @@ export interface GrantRow {
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "period" | "date" | "status";
 type SortDir = "asc" | "desc";
 
+const PAGE_SIZE = 100;
+
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   completed: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
@@ -33,11 +35,56 @@ const STATUS_COLORS: Record<string, string> = {
   terminated: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
 
+function PaginationControls({
+  page,
+  totalPages,
+  totalFiltered,
+  onPrev,
+  onNext,
+}: {
+  page: number;
+  totalPages: number;
+  totalFiltered: number;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  if (totalPages <= 1) return null;
+  const start = page * PAGE_SIZE + 1;
+  const end = Math.min((page + 1) * PAGE_SIZE, totalFiltered);
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <span className="text-xs text-muted-foreground tabular-nums">
+        {start}&ndash;{end} of {totalFiltered}
+      </span>
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={page === 0}
+        className="text-xs px-2.5 py-1 rounded border border-border bg-card hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Prev
+      </button>
+      <span className="text-xs text-muted-foreground tabular-nums">
+        {page + 1} / {totalPages}
+      </span>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={page >= totalPages - 1}
+        className="text-xs px-2.5 py-1 rounded border border-border bg-card hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
 export function GrantsTable({ rows }: { rows: GrantRow[] }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("amount");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(0);
 
   const statuses = useMemo(() => {
     const set = new Set<string>();
@@ -63,6 +110,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       setSortKey(key);
       setSortDir(key === "name" || key === "organization" ? "asc" : "desc");
     }
+    setPage(0);
   };
 
   const filtered = useMemo(() => {
@@ -122,6 +170,9 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
     return result;
   }, [rows, search, statusFilter, sortKey, sortDir]);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div>
       {/* Filters */}
@@ -131,13 +182,19 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
           placeholder="Search grants, recipients, or funders..."
           aria-label="Search grants"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
         />
         <div className="flex flex-wrap gap-1.5">
           <button
             type="button"
-            onClick={() => setStatusFilter("all")}
+            onClick={() => {
+              setStatusFilter("all");
+              setPage(0);
+            }}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               statusFilter === "all"
                 ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -153,9 +210,10 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
             <button
               type="button"
               key={s}
-              onClick={() =>
-                setStatusFilter(statusFilter === s ? "all" : s)
-              }
+              onClick={() => {
+                setStatusFilter(statusFilter === s ? "all" : s);
+                setPage(0);
+              }}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 statusFilter === s
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -171,9 +229,18 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
         </div>
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">
-        Showing {filtered.length} of {rows.length} grants
+      {/* Results count + pagination */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-xs text-muted-foreground">
+          Showing {filtered.length} of {rows.length} grants
+        </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          totalFiltered={filtered.length}
+          onPrev={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        />
       </div>
 
       {/* Table */}
@@ -191,7 +258,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {filtered.map((row) => (
+            {pageRows.map((row) => (
               <tr
                 key={row.compositeKey}
                 className="hover:bg-muted/20 transition-colors"
@@ -284,6 +351,17 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
           No grants match your search.
         </div>
       )}
+
+      {/* Bottom pagination */}
+      <div className="mt-3">
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          totalFiltered={filtered.length}
+          onPrev={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        />
+      </div>
     </div>
   );
 }
