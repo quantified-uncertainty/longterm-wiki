@@ -208,8 +208,7 @@ function extractFromKBRecords(
       endDate: record.end ?? null,
       isFounder:
         record.is_founder ??
-        /founder/i.test(record.title ?? "") ??
-        false,
+        /founder/i.test(record.title ?? ""),
       source: record.source ?? null,
       notes: record.notes ?? null,
       origin: "kb-record",
@@ -334,7 +333,9 @@ function extractFromExperts(entityMap: Map<string, string>): CareerEntry[] {
 
 /**
  * Deduplicate career entries, preferring kb-record > kb-fact > experts-yaml.
- * Two entries are considered duplicates if they share the same person + org + role.
+ * Two entries are considered duplicates if they share the same person + org + role + start date.
+ * Including start date prevents silently dropping re-join entries (same person, org, and role
+ * but different time periods).
  */
 function deduplicateEntries(entries: CareerEntry[]): CareerEntry[] {
   const seen = new Map<string, CareerEntry>();
@@ -352,8 +353,8 @@ function deduplicateEntries(entries: CareerEntry[]): CareerEntry[] {
   );
 
   for (const entry of sorted) {
-    // Key: person + org + role (normalized)
-    const key = `${entry.personId}|${entry.organizationId}|${entry.role.toLowerCase().trim()}`;
+    // Key: person + org + role + start date (normalized)
+    const key = `${entry.personId}|${entry.organizationId}|${entry.role.toLowerCase().trim()}|${entry.startDate ?? ""}`;
     if (!seen.has(key)) {
       seen.set(key, entry);
     }
