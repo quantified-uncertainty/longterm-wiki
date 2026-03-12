@@ -1,9 +1,13 @@
 name: Refresh Resources Snapshot
 run-name: "Refresh Resources Snapshot${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
-# Fetches all resources from PG and commits an updated snapshot file.
-# The snapshot (data/resources-snapshot.json) serves as an offline/CI
+# Fetches all resources from PG and uploads the snapshot as an artifact.
+# The snapshot (data/resources-snapshot.json) is NOT tracked in git to
+# avoid ~640MB/year of history bloat. It serves as a local development
 # fallback when the wiki-server is unavailable during builds.
+#
+# To use locally: pnpm crux wiki-server snapshot-resources
+# See #2079 for rationale.
 
 on:
   schedule:
@@ -33,13 +37,9 @@ jobs:
   snapshot:
     needs: [preflight]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
 
@@ -57,15 +57,9 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/resources-snapshot.json
-          if git diff --cached --quiet; then
-            echo "No changes to snapshot"
-          else
-            RESOURCE_COUNT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('data/resources-snapshot.json','utf-8')).length)") || RESOURCE_COUNT="unknown"
-            git commit -m "chore: refresh resources snapshot (${RESOURCE_COUNT} resources)"
-            git push
-          fi
+      - name: Upload snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resources-snapshot
+          path: data/resources-snapshot.json
+          retention-days: 30
