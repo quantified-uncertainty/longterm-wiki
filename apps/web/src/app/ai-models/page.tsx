@@ -18,14 +18,14 @@ export default function AiModelsPage() {
       ? getTypedEntityById(entity.developer)
       : null;
 
-    // Find SWE-bench score
-    const sweBench = entity.benchmarks?.find(
-      (b) => b.name === "SWE-bench Verified",
-    );
+    // Find SWE-bench score (accept both "SWE-bench" and "SWE-bench Verified")
+    const isSweBench = (name: string) =>
+      name === "SWE-bench" || name === "SWE-bench Verified";
+    const sweBench = entity.benchmarks?.find((b) => isSweBench(b.name));
 
     // Find top non-SWE benchmark for display
     const topBenchmark =
-      entity.benchmarks?.find((b) => b.name !== "SWE-bench Verified") ?? null;
+      entity.benchmarks?.find((b) => !isSweBench(b.name)) ?? null;
 
     // Is this a family entry (no tier, no release date)?
     const isFamily = !entity.modelTier && !entity.releaseDate;

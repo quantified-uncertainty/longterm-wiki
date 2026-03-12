@@ -29,6 +29,12 @@ const TIER_LABELS: Record<string, string> = {
   opus: "Opus",
 };
 
+const TIER_ORDER: Record<string, number> = {
+  haiku: 0,
+  sonnet: 1,
+  opus: 2,
+};
+
 const TIER_COLORS: Record<string, string> = {
   haiku: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
   sonnet: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
@@ -100,18 +106,24 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
     for (const r of rows) {
       if (r.modelTier) set.add(r.modelTier);
     }
-    return [...set].sort();
+    return [...set].sort(
+      (a, b) =>
+        (TIER_ORDER[a] ?? Number.MAX_SAFE_INTEGER) -
+        (TIER_ORDER[b] ?? Number.MAX_SAFE_INTEGER),
+    );
   }, [rows]);
 
   const tierCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: rows.filter((r) => !r.isFamily).length };
+    const counts: Record<string, number> = { all: 0 };
     for (const r of rows) {
+      if (!showFamilies && r.isFamily) continue;
+      counts.all += 1;
       if (r.isFamily) continue;
       const t = r.modelTier ?? "other";
       counts[t] = (counts[t] ?? 0) + 1;
     }
     return counts;
-  }, [rows]);
+  }, [rows, showFamilies]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -149,7 +161,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           case "name":
             return row.title.toLowerCase();
           case "tier":
-            return row.modelTier ?? "";
+            return TIER_ORDER[row.modelTier ?? ""] ?? Number.MAX_SAFE_INTEGER;
           case "releaseDate":
             return row.releaseDate;
           case "inputPrice":
