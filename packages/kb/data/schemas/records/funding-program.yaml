@@ -1,0 +1,21 @@
+name: Funding Program
+description: "Named funding programs, initiatives, grant rounds, and Big Bets."
+collectionName: funding-programs
+temporal: false
+
+endpoints:
+  organization:
+    types: [organization, funder]
+    implicit: true
+
+fields:
+  name: { type: text, required: true, description: "Program name" }
+  type: { type: text, description: "Program type: fund, program, initiative, round, big-bet, commitment" }
+  amount: { type: number, unit: USD, description: "Total budget or cumulative spending in USD" }
+  period: { type: text, description: "Active period (e.g. 2014-2026)" }
+  date: { type: date, description: "Launch or announcement date (YYYY-MM)" }
+  status: { type: text, description: "Current status (active, completed, winding-down, terminated)" }
+  lead: { type: text, description: "Program officer or lead (name or entity slug)" }
+  url: { type: text, description: "Program page URL" }
+  source: { type: text, description: "URL to announcement or report" }
+  notes: { type: text, description: "Context, scope, impact, or important details" }

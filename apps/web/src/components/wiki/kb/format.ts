@@ -7,7 +7,7 @@
 
 import { formatValue as smartFormatValue } from "@lib/format-value";
 import { CURRENCIES } from "@longterm-wiki/kb/currencies";
-import type { Fact, FieldDef, PropertyDisplay } from "@longterm-wiki/kb";
+import type { Fact, FieldDef, RecordEntry, PropertyDisplay } from "@longterm-wiki/kb";
 
 // ── Date formatting ────────────────────────────────────────────────
 
@@ -165,6 +165,32 @@ export function formatKBCellValue(
   if (Array.isArray(value)) return value.join(", ");
   if (typeof value === "object") return JSON.stringify(value);
   return String(value);
+}
+
+// ── Record sorting ─────────────────────────────────────────────────
+
+/** Sort record collection entries by a field value, ascending or descending. */
+export function sortKBRecords(
+  items: RecordEntry[],
+  sortBy: string,
+  ascending: boolean,
+): RecordEntry[] {
+  return [...items].sort((a, b) => {
+    const va = a.fields[sortBy];
+    const vb = b.fields[sortBy];
+
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+
+    let cmp = 0;
+    if (typeof va === "number" && typeof vb === "number") {
+      cmp = va - vb;
+    } else {
+      cmp = String(va).localeCompare(String(vb));
+    }
+    return ascending ? cmp : -cmp;
+  });
 }
 
 // ── Helpers ────────────────────────────────────────────────────────

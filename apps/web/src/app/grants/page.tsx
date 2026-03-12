@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@data/kb";
-import { getEntityHref } from "@data/entity-nav";
-import { getTypedEntityById } from "@data/database";
+import { getAllKBRecordsByCollection, getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getEntityHref } from "@/data/entity-nav";
+import { getTypedEntityById } from "@/data/database";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow } from "./grants-table";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default function GrantsPage() {
-  const allGrants = getAllKBRecords("grants");
+  const allGrants = getAllKBRecordsByCollection("grants");
 
   // Build rows with resolved entity names and links
   const rows: GrantRow[] = allGrants.map((record) => {

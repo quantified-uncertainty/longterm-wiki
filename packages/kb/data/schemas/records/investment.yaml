@@ -1,0 +1,24 @@
+name: Investment Participation
+description: "An investor's participation in a company's funding round."
+collectionName: investments
+temporal: false
+
+endpoints:
+  investor:
+    types: [person, organization]
+    required: true
+    allow_display_name: true
+  company:
+    types: [organization]
+    implicit: true
+
+fields:
+  round_name: { type: text, description: "Name of the funding round" }
+  date: { type: date, description: "Investment date (YYYY-MM)" }
+  amount: { type: number, unit: USD, description: "Capital contributed" }
+  stake_acquired: { type: number, description: "Pre-dilution stake acquired. Single number or [min, max]." }
+  instrument: { type: text, description: "Investment instrument type" }
+  role: { type: text, description: "lead | participant | founder" }
+  conditions: { type: text, description: "Investment conditions: compute commitments, board seats, etc." }
+  source: { type: text, description: "URL to source" }
+  notes: { type: text, description: "Context about this investment" }

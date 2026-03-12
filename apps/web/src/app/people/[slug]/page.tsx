@@ -12,6 +12,7 @@ import {
 import {
   getKBFacts,
   getKBLatest,
+  getKBRecords,
   getKBEntitySlug,
 } from "@/data/kb";
 import {
@@ -72,6 +73,10 @@ export default async function PersonProfilePage({
   // Expert positions from experts.yaml
   const expert = getExpertById(slug);
   const positions = expert?.positions ?? [];
+
+  // Records
+  const careerHistory = getKBRecords(entity.id, "career-history");
+  const boardSeats = getKBRecords(entity.id, "board-seats");
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);

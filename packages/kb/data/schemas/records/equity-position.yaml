@@ -1,0 +1,18 @@
+name: Equity Position
+description: "Current or historical equity ownership stake."
+collectionName: equity-positions
+temporal: true
+
+endpoints:
+  holder:
+    types: [person, organization]
+    required: true
+    allow_display_name: true
+  company:
+    types: [organization]
+    implicit: true
+
+fields:
+  stake: { type: number, description: "Current post-dilution equity stake. Single number or [min, max]." }
+  source: { type: text, description: "URL to source" }
+  notes: { type: text, description: "Context about the stake estimate" }

@@ -12,7 +12,7 @@
 import fs from "fs";
 import path from "path";
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -35,7 +35,7 @@ export function getKB(): SerializedKB | undefined {
 
 
 /**
- * Resolve an entity identifier to the entity ID used as key in facts.
+ * Resolve an entity identifier to the entity ID used as key in facts/records.
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
  */
@@ -288,66 +288,153 @@ export function getKBAllFactsByProperty(
   return result;
 }
 
-// ── Records access ────────────────────────────────────────────────
+// ── Record access (unified records with schema-defined endpoints) ────
 
 /**
- * A single record entry from the KB records system.
- * Records are structured data items (grants, funding rounds, etc.)
- * stored per-entity, per-collection in kb-data.json.
- * Populated from PostgreSQL during build-data.
+ * Get record entries for a named collection on an entity (primary index).
  */
-export interface KBRecordEntry {
-  key: string;
-  schema: string;
-  ownerEntityId: string;
-  fields: Record<string, unknown>;
+export function getKBRecords(entity: string, collection: string): RecordEntry[] {
+  const kb = getKB();
+  if (!kb) return [];
+  const key = resolveEntityKey(entity, kb);
+  return kb.records?.[key]?.[collection] ?? [];
 }
 
 /**
- * Get all records for an entity in a specific collection.
- * Returns an empty array if no records exist.
+ * Get all record collections for an entity.
+ */
+export function getKBAllRecordCollections(entity: string): Record<string, RecordEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+  const key = resolveEntityKey(entity, kb);
+  return { ...(kb.records?.[key] ?? {}) };
+}
+
+/**
+ * Get a record schema by ID.
+ */
+export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+  return kb.recordSchemas?.find((s) => s.id === schemaId);
+}
+
+/**
+ * Get all record schemas.
+ */
+export function getKBRecordSchemas(): RecordSchema[] {
+  const kb = getKB();
+  if (!kb) return [];
+  return kb.recordSchemas ?? [];
+}
+
+/**
+ * Find all records across all entities that reference the given entityId
+ * via an explicit endpoint field. Optionally filter by collection name.
  *
- * The records field is added to kb-data.json by build-data.mjs (merged from PG).
- * It is NOT part of the SerializedKB TypeScript type (which only covers
- * entities/facts/properties/schemas), so we access it via type assertion.
+ * This is the serialized equivalent of Graph.getRecordsReferencing().
+ * Scans all records and checks explicit endpoint fields using record schemas.
  */
-export function getKBRecords(entityId: string, collection: string): KBRecordEntry[] {
+export function getKBRecordsReferencing(
+  entityId: string,
+  collectionName?: string,
+): RecordEntry[] {
   const kb = getKB();
-  if (!kb) return [];
+  if (!kb || !kb.records || !kb.recordSchemas) return [];
 
-  const key = resolveEntityKey(entityId, kb);
-  // records is added dynamically by build-data.mjs, not in SerializedKB type
-  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
-  const records = "records" in kb
-    ? (kb as { records?: RecordsMap }).records
-    : undefined;
-  if (!records) return [];
+  // Build schema Map for O(1) lookups instead of linear scan per entry
+  const schemaMap = new Map(kb.recordSchemas.map((s) => [s.id, s]));
 
-  return records[key]?.[collection] ?? [];
+  const results: RecordEntry[] = [];
+
+  for (const [, collections] of Object.entries(kb.records)) {
+    for (const [colName, entries] of Object.entries(collections)) {
+      if (collectionName && colName !== collectionName) continue;
+      for (const entry of entries) {
+        const schema = schemaMap.get(entry.schema);
+        if (!schema) continue;
+        for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+          if (endpointDef.implicit) continue;
+          if (entry.fields[endpointName] === entityId) {
+            results.push(entry);
+            break; // Don't add same entry twice
+          }
+        }
+      }
+    }
+  }
+
+  return results;
 }
 
 /**
- * Get all records across all entities for a specific collection.
- * Returns a flat array of all record entries.
+ * Get all record entries across all entities as a flat list.
  */
-export function getAllKBRecords(collection: string): KBRecordEntry[] {
+export function getAllKBRecords(): Array<{
+  entityId: string;
+  collection: string;
+  entry: RecordEntry;
+}> {
   const kb = getKB();
-  if (!kb) return [];
+  if (!kb || !kb.records) return [];
 
-  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
-  const records = "records" in kb
-    ? (kb as { records?: RecordsMap }).records
-    : undefined;
-  if (!records) return [];
+  const results: Array<{
+    entityId: string;
+    collection: string;
+    entry: RecordEntry;
+  }> = [];
 
-  const result: KBRecordEntry[] = [];
-  for (const entityRecords of Object.values(records)) {
-    const collectionRecords = entityRecords[collection];
-    if (collectionRecords) {
-      result.push(...collectionRecords);
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        results.push({ entityId, collection: collectionName, entry });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Get all records across all entities for a specific collection name.
+ * Returns a flat array of record entries (convenience for collection-level queries).
+ */
+export function getAllKBRecordsByCollection(collection: string): RecordEntry[] {
+  const kb = getKB();
+  if (!kb || !kb.records) return [];
+
+  const result: RecordEntry[] = [];
+  for (const collections of Object.values(kb.records)) {
+    const entries = collections[collection];
+    if (entries) {
+      result.push(...entries);
     }
   }
   return result;
+}
+
+/**
+ * Look up a single record entry by its key.
+ * Note: keys are only unique within a collection, not globally.
+ * Returns the first match found across the entire KB.
+ * For disambiguation, prefer filtering by collection.
+ */
+export function getKBRecordByKey(
+  recordKey: string,
+): { entityId: string; collection: string; entry: RecordEntry } | undefined {
+  const kb = getKB();
+  if (!kb || !kb.records) return undefined;
+
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        if (entry.key === recordKey) {
+          return { entityId, collection: collectionName, entry };
+        }
+      }
+    }
+  }
+  return undefined;
 }
 
 // ── Slug resolution (public) ─────────────────────────────────────
