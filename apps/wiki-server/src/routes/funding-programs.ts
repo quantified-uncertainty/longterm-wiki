@@ -296,7 +296,8 @@ const fundingProgramsApp = new Hono()
             name: sql`excluded.name`,
             programType: sql`excluded.program_type`,
             currency: sql`excluded.currency`,
-            // COALESCE: preserve existing values when sync payload sends null
+            // COALESCE: preserve existing values when sync payload sends null.
+            // To clear a protected field, use a dedicated endpoint (not sync).
             divisionId: sql`COALESCE(excluded.division_id, ${fundingPrograms.divisionId})`,
             description: sql`COALESCE(excluded.description, ${fundingPrograms.description})`,
             totalBudget: sql`COALESCE(excluded.total_budget, ${fundingPrograms.totalBudget})`,

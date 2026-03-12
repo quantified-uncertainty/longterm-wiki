@@ -192,7 +192,8 @@ const divisionPersonnelApp = new Hono()
             divisionId: sql`excluded.division_id`,
             personId: sql`excluded.person_id`,
             role: sql`excluded.role`,
-            // COALESCE: preserve existing values when sync payload sends null
+            // COALESCE: preserve existing values when sync payload sends null.
+            // To clear a protected field, use a dedicated endpoint (not sync).
             startDate: sql`COALESCE(excluded.start_date, ${divisionPersonnel.startDate})`,
             endDate: sql`COALESCE(excluded.end_date, ${divisionPersonnel.endDate})`,
             source: sql`COALESCE(excluded.source, ${divisionPersonnel.source})`,

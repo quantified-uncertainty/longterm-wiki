@@ -249,11 +249,12 @@ const divisionsApp = new Hono()
         .onConflictDoUpdate({
           target: divisions.id,
           set: {
-            slug: sql`excluded.slug`,
             parentOrgId: sql`excluded.parent_org_id`,
             name: sql`excluded.name`,
             divisionType: sql`excluded.division_type`,
-            // COALESCE: preserve existing values when sync payload sends null
+            // COALESCE: preserve existing values when sync payload sends null.
+            // To clear a protected field, use a dedicated endpoint (not sync).
+            slug: sql`COALESCE(excluded.slug, ${divisions.slug})`,
             lead: sql`COALESCE(excluded.lead, ${divisions.lead})`,
             status: sql`COALESCE(excluded.status, ${divisions.status})`,
             startDate: sql`COALESCE(excluded.start_date, ${divisions.startDate})`,
