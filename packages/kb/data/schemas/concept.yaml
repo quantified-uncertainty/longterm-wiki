@@ -6,11 +6,3 @@ required: []
 
 recommended:
   - description
-  - expert-consensus-level
-  - evidence-strength
-  - time-horizon
-  - research-consensus
-  - publication-date
-  - related-risks
-  - related-entities
-  - open-questions

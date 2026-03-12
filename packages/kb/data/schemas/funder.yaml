@@ -6,8 +6,6 @@ required: []
 
 recommended:
   - description
-  - total-granted
-  - focus-areas
   - website
   - founded-date
   - headquarters

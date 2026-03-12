@@ -67,7 +67,7 @@ const CATEGORY_ORDER: Record<string, number> = {
 const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   organization: ["revenue", "valuation", "headcount", "total-funding", "founded-date"],
   person: ["employed-by", "role", "born-year"],
-  project: ["developed-by", "parameter-count", "context-window", "model-release-date"],
+  "ai-model": ["context-window"],
 };
 
 

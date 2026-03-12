@@ -6,9 +6,4 @@ required: []
 
 recommended:
   - description
-  - intervention-type
-  - maturity-level
-  - time-horizon
-  - evidence-strength
-  - expert-consensus-level
   - website

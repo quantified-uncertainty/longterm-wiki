@@ -573,6 +573,8 @@ export const resources = pgTable(
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
     contentHash: text("content_hash"),
     stableId: text("stable_id").unique(),
+    fetchStatus: text("fetch_status"),
+    lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })

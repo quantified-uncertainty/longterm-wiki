@@ -8,6 +8,9 @@
  *  - Fact extraction via Haiku (mocked)
  *  - Budget cap enforcement
  *  - ResearchResult shape and metadata
+ *  - PG resource cache initialization (Phase 0)
+ *  - PG resource pre-seeding (Phase 0b)
+ *  - New resource registration (Phase 5)
  *
  * All network calls are mocked — tests run fully offline.
  */
@@ -58,6 +61,44 @@ vi.mock('../llm.ts', async (importOriginal) => {
 });
 
 // ---------------------------------------------------------------------------
+// Mock resource-lookup — avoid real PG/snapshot calls
+// ---------------------------------------------------------------------------
+
+const mockInitFromPG = vi.fn<() => Promise<void>>(async () => {});
+const mockGetResourceByUrl = vi.fn<(url: string) => unknown>((_url: string) => null);
+
+vi.mock('./resource-lookup.ts', () => ({
+  initFromPG: () => mockInitFromPG(),
+  getResourceByUrl: (url: string) => mockGetResourceByUrl(url),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock resource-io — avoid real PG writes
+// ---------------------------------------------------------------------------
+
+const mockSaveResources = vi.fn<(resources: unknown[]) => Promise<void>>(async () => {});
+
+vi.mock('../../resource-io.ts', () => ({
+  saveResources: (resources: unknown[]) => mockSaveResources(resources),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock wiki-server client — avoid real API calls for PG search
+// ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockApiRequest = vi.fn<(...args: any[]) => Promise<any>>(async () => ({
+  ok: false,
+  error: 'unavailable',
+  message: 'not configured',
+}));
+
+vi.mock('../wiki-server/client.ts', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  apiRequest: (...args: any[]) => mockApiRequest(...args),
+}));
+
+// ---------------------------------------------------------------------------
 // Mock fetch — control search API responses
 // ---------------------------------------------------------------------------
 
@@ -92,7 +133,7 @@ const mockScryResponse = {
 
 function makeFetchMock(scenario: 'all-success' | 'exa-only' | 'no-keys' | 'scry-fails') {
   return vi.fn(async (url: string, init?: RequestInit) => {
-    const body = typeof init?.body === 'string' ? init.body : '';
+    const _body = typeof init?.body === 'string' ? init.body : '';
 
     // Exa search
     if (url === 'https://api.exa.ai/search') {
@@ -142,6 +183,16 @@ describe('runResearch', () => {
     process.env.EXA_API_KEY = 'test-exa-key';
     process.env.OPENROUTER_API_KEY = 'test-openrouter-key';
     delete process.env.SCRY_API_KEY;
+
+    // Default: PG init succeeds, no resources in cache, no PG search results
+    mockInitFromPG.mockResolvedValue(undefined);
+    mockGetResourceByUrl.mockReturnValue(null);
+    mockSaveResources.mockResolvedValue(undefined);
+    mockApiRequest.mockResolvedValue({
+      ok: false,
+      error: 'unavailable',
+      message: 'not configured',
+    });
   });
 
   it('returns SourceCacheEntry[] with correct shape', async () => {
@@ -195,6 +246,9 @@ describe('runResearch', () => {
     expect(result.metadata).toHaveProperty('urlsFound');
     expect(result.metadata).toHaveProperty('urlsFetched');
     expect(result.metadata).toHaveProperty('urlsDeduplicated');
+    expect(result.metadata).toHaveProperty('urlsAlreadyInPG');
+    expect(result.metadata).toHaveProperty('newResourcesRegistered');
+    expect(result.metadata).toHaveProperty('pgCacheInitialized');
     expect(result.metadata).toHaveProperty('totalCost');
     expect(result.metadata).toHaveProperty('costBreakdown');
     expect(result.metadata).toHaveProperty('durationMs');
@@ -330,7 +384,6 @@ describe('runResearch', () => {
     });
 
     expect(result.sources).toHaveLength(0);
-    expect(result.metadata.sourcesSearched).toHaveLength(0);
     expect(result.metadata.urlsFound).toBe(0);
   });
 
@@ -384,5 +437,156 @@ describe('runResearch', () => {
     for (const src of result.sources) {
       expect(Array.isArray(src.facts)).toBe(true);
     }
+  });
+
+  // -------------------------------------------------------------------------
+  // PG integration tests
+  // -------------------------------------------------------------------------
+
+  it('calls initFromPG at startup and reports pgCacheInitialized=true', async () => {
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    expect(mockInitFromPG).toHaveBeenCalledTimes(1);
+    expect(result.metadata.pgCacheInitialized).toBe(true);
+  });
+
+  it('continues gracefully when initFromPG fails', async () => {
+    mockInitFromPG.mockRejectedValueOnce(new Error('PG unavailable'));
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // Should still return sources from web search
+    expect(result.sources.length).toBeGreaterThan(0);
+    expect(result.metadata.pgCacheInitialized).toBe(false);
+  });
+
+  it('pre-seeds from PG search results and includes "pg" in sourcesSearched', async () => {
+    // Mock PG search returning results
+    mockApiRequest.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        results: [
+          { id: 'abc123', url: 'https://pg-resource.example.com/article', title: 'PG Resource', type: 'web', summary: 'From PG' },
+        ],
+        count: 1,
+        query: 'AI safety',
+      },
+    });
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    expect(result.metadata.sourcesSearched).toContain('pg');
+    // PG resource should be included in fetched sources
+    const urls = result.sources.map(s => s.url);
+    expect(urls.some(u => u.includes('pg-resource.example.com'))).toBe(true);
+  });
+
+  it('counts urlsAlreadyInPG when PG and web search overlap', async () => {
+    // Mock PG search returning a URL that Exa also returns
+    mockApiRequest.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        results: [
+          { id: 'shared-id', url: 'https://aisafety.com/overview', title: 'AI Safety Overview (PG)', type: 'web', summary: null },
+        ],
+        count: 1,
+        query: 'AI safety',
+      },
+    });
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // The shared URL should be deduplicated and counted as already in PG
+    expect(result.metadata.urlsAlreadyInPG).toBeGreaterThanOrEqual(1);
+  });
+
+  it('continues when PG search fails', async () => {
+    mockApiRequest.mockRejectedValueOnce(new Error('PG search timeout'));
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // Should still work with web search
+    expect(result.sources.length).toBeGreaterThan(0);
+    expect(result.metadata.sourcesSearched).not.toContain('pg');
+  });
+
+  it('registers new resources in PG after fact extraction', async () => {
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // saveResources should have been called with the discovered URLs
+    expect(mockSaveResources).toHaveBeenCalledTimes(1);
+    const savedResources = mockSaveResources.mock.calls[0]?.[0] as unknown[];
+    expect(savedResources).toBeDefined();
+    expect(savedResources.length).toBeGreaterThan(0);
+    expect(result.metadata.newResourcesRegistered).toBeGreaterThan(0);
+
+    // Each saved resource should have required fields
+    for (const resource of savedResources) {
+      expect(resource).toHaveProperty('id');
+      expect(resource).toHaveProperty('url');
+      expect(resource).toHaveProperty('title');
+      expect(resource).toHaveProperty('type');
+    }
+  });
+
+  it('skips registering URLs already in resource cache', async () => {
+    // Mock: all URLs are already in cache
+    mockGetResourceByUrl.mockReturnValue({
+      id: 'existing-id',
+      url: 'https://example.com',
+      title: 'Existing',
+      type: 'web',
+    });
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // No new resources should be registered
+    expect(result.metadata.newResourcesRegistered).toBe(0);
+    // saveResources should not be called since all URLs are known
+    expect(mockSaveResources).not.toHaveBeenCalled();
+  });
+
+  it('continues when resource registration fails', async () => {
+    mockSaveResources.mockRejectedValueOnce(new Error('PG write failed'));
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false },
+    });
+
+    // Should still return valid results despite PG write failure
+    expect(result.sources.length).toBeGreaterThan(0);
+    expect(result.metadata.newResourcesRegistered).toBe(0);
   });
 });

@@ -613,6 +613,8 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  fetchStatus: "ok" | "dead" | "paywall" | "error" | null;
+  lastFetchedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -629,6 +631,15 @@ export interface ResourceStatsResult {
   /** Resources that have been fetched (fetchedAt is set). */
   fetched: number;
 }
+
+// -- Resources: Fetch status update ------------------------------------------
+
+export const UpdateResourceFetchStatusSchema = z.object({
+  fetchStatus: z.enum(["ok", "dead", "paywall", "error"]),
+  lastFetchedAt: z.string().datetime(),
+  fetchedTitle: z.string().max(1000).optional(),
+});
+export type UpdateResourceFetchStatus = z.infer<typeof UpdateResourceFetchStatusSchema>;
 
 export interface ResourceSearchResult {
   results: ResourceRow[];

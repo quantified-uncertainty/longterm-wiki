@@ -6,9 +6,3 @@ required: []
 
 recommended:
   - description
-  - policy-status
-  - policy-type
-  - jurisdiction
-  - enacted-date
-  - sponsoring-body
-  - related-risks

@@ -6,8 +6,3 @@ required: []
 
 recommended:
   - description
-  - event-date
-  - event-type
-  - event-location
-  - event-organizers
-  - related-entities

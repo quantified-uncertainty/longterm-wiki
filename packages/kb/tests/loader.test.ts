@@ -59,12 +59,9 @@ describe("loader", () => {
   });
 
   describe("properties", () => {
-    it("loads properties (68 from main + additional migration properties)", () => {
+    it("loads properties (48 after unused property removal)", () => {
       const properties = graph.getAllProperties();
-      // 68 from main + branch additions (revenue-guidance, retention-rate, customer-concentration,
-      // infrastructure-investment, equity-stake-percent, equity-value, safety-staffing-ratio,
-      // model-parameters, benchmark-score) = 77
-      expect(properties.length).toBeGreaterThanOrEqual(68);
+      expect(properties.length).toBeGreaterThanOrEqual(48);
     });
 
     it("loads property details correctly", () => {
@@ -129,17 +126,12 @@ describe("loader", () => {
     it("loads ai-model schema with recommended properties", () => {
       const modelSchema = graph.getSchema("ai-model");
       expect(modelSchema!.required).toEqual([]);
-      expect(modelSchema!.recommended).toContain("developed-by");
-      expect(modelSchema!.recommended).toContain("model-release-date");
-      expect(modelSchema!.recommended).toContain("parameter-count");
       expect(modelSchema!.recommended).toContain("context-window");
     });
 
     it("loads risk schema with recommended properties", () => {
       const riskSchema = graph.getSchema("risk");
-      expect(riskSchema!.recommended).toContain("severity-level");
-      expect(riskSchema!.recommended).toContain("likelihood-estimate");
-      expect(riskSchema!.recommended).toContain("evidence-strength");
+      expect(riskSchema!.recommended).toContain("description");
     });
 
     it("loads organization schema with required and recommended properties", () => {

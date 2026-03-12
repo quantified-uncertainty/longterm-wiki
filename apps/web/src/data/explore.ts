@@ -5,6 +5,7 @@
 import { getDatabase, getTypedEntities, isRisk } from "./database";
 import type { ContentFormat, RawEntity, AnyEntity } from "./database";
 import { getEntityHref } from "./entity-nav";
+import { getKB } from "./kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 export interface ExploreItem {
@@ -99,7 +100,7 @@ export function getExploreItems(): ExploreItem[] {
   const db = getDatabase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
-  const kb = db.kb;
+  const kb = getKB();
 
   // Build a set of page IDs claimed by entities (including aliased ones)
   const entityClaimedPageIds = new Set<string>();

@@ -5,9 +5,4 @@ required: []
 # Approaches vary widely; no properties are universally applicable.
 
 recommended:
-  - intervention-type
-  - maturity-level
-  - time-horizon
-  - tractability
-  - evidence-strength
-  - expert-consensus-level
+  - description

@@ -6,6 +6,3 @@ required: []
 
 recommended:
   - description
-  - start-date
-  - end-date
-  - related-entities

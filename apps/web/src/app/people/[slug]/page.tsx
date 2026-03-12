@@ -26,7 +26,6 @@ import {
   SourceLink,
   DirectoryEntityLink,
 } from "@/components/directory";
-import { ResourceLink } from "@components/wiki/ResourceLink";
 import { formatKBDate } from "@/components/wiki/kb/format";
 
 export function generateStaticParams() {
@@ -68,7 +67,6 @@ export default async function PersonProfilePage({
 
   // Records removed — these collections now return empty arrays
   const careerHistory: Array<{ key: string; fields: Record<string, unknown> }> = [];
-  const publications: Array<{ key: string; fields: Record<string, unknown> }> = [];
   const boardSeats: Array<{ key: string; fields: Record<string, unknown> }> = [];
 
   // Reverse lookup: org key-person records referencing this person
@@ -90,13 +88,6 @@ export default async function PersonProfilePage({
     const sa = a.fields.start ? String(a.fields.start) : "";
     const sb = b.fields.start ? String(b.fields.start) : "";
     return sb.localeCompare(sa);
-  });
-
-  // Sort publications by year (most recent first)
-  const sortedPubs = [...publications].sort((a, b) => {
-    const ya = a.fields.year ? Number(a.fields.year) : 0;
-    const yb = b.fields.year ? Number(b.fields.year) : 0;
-    return yb - ya;
   });
 
   // Sort org roles: current first, then by start date
@@ -284,63 +275,6 @@ export default async function PersonProfilePage({
                         )}
                         <SourceLink source={source} />
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Notable Publications */}
-          {sortedPubs.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Notable Publications
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedPubs.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {sortedPubs.map((pub) => {
-                  const title = fieldStr(pub.fields, "title") ?? pub.key;
-                  const year = pub.fields.year ? Number(pub.fields.year) : null;
-                  const url = fieldStr(pub.fields, "url");
-                  const resourceId = fieldStr(pub.fields, "resource");
-                  const notes = fieldStr(pub.fields, "notes");
-
-                  return (
-                    <div key={pub.key} className="px-5 py-3">
-                      <div className="flex items-baseline gap-2">
-                        {resourceId ? (
-                          <ResourceLink
-                            id={resourceId}
-                            className="font-semibold text-sm text-primary hover:underline"
-                          >
-                            {title}
-                          </ResourceLink>
-                        ) : url ? (
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-semibold text-sm text-primary hover:underline"
-                          >
-                            {title}
-                          </a>
-                        ) : (
-                          <span className="font-semibold text-sm">{title}</span>
-                        )}
-                        {year && (
-                          <span className="text-xs text-muted-foreground">
-                            {year}
-                          </span>
-                        )}
-                      </div>
-                      {notes && (
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                          {notes}
-                        </p>
-                      )}
                     </div>
                   );
                 })}
