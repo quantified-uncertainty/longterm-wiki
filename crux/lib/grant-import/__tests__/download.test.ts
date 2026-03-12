@@ -9,17 +9,17 @@ vi.mock("fs", () => ({
 }));
 
 vi.mock("child_process", () => ({
-  execSync: vi.fn(),
+  execFileSync: vi.fn(),
 }));
 
 import { existsSync, statSync, unlinkSync, readFileSync } from "fs";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const mockExistsSync = vi.mocked(existsSync);
 const mockStatSync = vi.mocked(statSync);
 const mockUnlinkSync = vi.mocked(unlinkSync);
 const mockReadFileSync = vi.mocked(readFileSync);
-const mockExecSync = vi.mocked(execSync);
+const mockExecFileSync = vi.mocked(execFileSync);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -33,9 +33,10 @@ describe("downloadIfMissing", () => {
 
     downloadIfMissing("https://example.com/data.csv", "/tmp/data.csv", "test data");
 
-    expect(mockExecSync).toHaveBeenCalledOnce();
-    expect(mockExecSync).toHaveBeenCalledWith(
-      expect.stringContaining("curl"),
+    expect(mockExecFileSync).toHaveBeenCalledOnce();
+    expect(mockExecFileSync).toHaveBeenCalledWith(
+      "curl",
+      expect.arrayContaining(["-o", "/tmp/data.csv", "https://example.com/data.csv"]),
       expect.any(Object),
     );
   });
@@ -46,7 +47,7 @@ describe("downloadIfMissing", () => {
 
     downloadIfMissing("https://example.com/data.csv", "/tmp/data.csv", "test data");
 
-    expect(mockExecSync).not.toHaveBeenCalled();
+    expect(mockExecFileSync).not.toHaveBeenCalled();
     expect(mockUnlinkSync).not.toHaveBeenCalled();
   });
 
@@ -57,15 +58,25 @@ describe("downloadIfMissing", () => {
     downloadIfMissing("https://example.com/data.csv", "/tmp/data.csv", "test data");
 
     expect(mockUnlinkSync).toHaveBeenCalledWith("/tmp/data.csv");
-    expect(mockExecSync).toHaveBeenCalledOnce();
+    expect(mockExecFileSync).toHaveBeenCalledOnce();
   });
 
-  it("includes --max-time 120 in curl command", () => {
+  it("includes --max-time 120 in curl arguments", () => {
     mockExistsSync.mockReturnValue(false);
 
     downloadIfMissing("https://example.com/data.csv", "/tmp/data.csv", "test data");
 
-    const curlCmd = mockExecSync.mock.calls[0][0] as string;
-    expect(curlCmd).toContain("--max-time 120");
+    const args = mockExecFileSync.mock.calls[0][1] as string[];
+    expect(args).toContain("--max-time");
+    expect(args).toContain("120");
+  });
+
+  it("re-downloads when statSync throws (broken symlink)", () => {
+    mockExistsSync.mockReturnValue(true);
+    mockStatSync.mockImplementation(() => { throw new Error("ENOENT"); });
+
+    downloadIfMissing("https://example.com/data.csv", "/tmp/data.csv", "test data");
+
+    expect(mockExecFileSync).toHaveBeenCalledOnce();
   });
 });

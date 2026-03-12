@@ -1,7 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { matchGrantee, MANUAL_GRANTEE_OVERRIDES, buildEntityMatcher } from "../entity-matcher.ts";
 import type { EntityMatcher } from "../types.ts";
 import * as fs from "fs";
+
+// Note: vi.mock("fs") is hoisted to the top of the file regardless of where
+// it appears in the source. If fs mocking is added for buildEntityMatcher tests,
+// it will affect ALL tests in this file. Use afterEach(vi.restoreAllMocks) to
+// prevent mock leaks between tests.
 
 function makeMockMatcher(map: Record<string, string>): EntityMatcher {
   const nameMap = new Map(
@@ -17,6 +22,8 @@ function makeMockMatcher(map: Record<string, string>): EntityMatcher {
 }
 
 describe("matchGrantee", () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
   const matcher = makeMockMatcher({
     miri: "abc123",
     anthropic: "def456",
@@ -70,9 +77,11 @@ vi.mock("fs", async () => {
 });
 
 describe("buildEntityMatcher — missing files", () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
   it("handles missing kb-data.json gracefully", () => {
     const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation((path: fs.PathOrFileDescriptor, ...args: unknown[]) => {
+    readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
       if (pathStr.includes("kb-data.json")) {
         const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
@@ -91,17 +100,13 @@ describe("buildEntityMatcher — missing files", () => {
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("kb-data.json not found")
     );
-    // Matcher still works, just empty
     expect(matcher.match("Nonexistent Org")).toBeNull();
     expect(matcher.allNames.size).toBe(0);
-
-    warnSpy.mockRestore();
-    readMock.mockRestore();
   });
 
   it("handles missing database.json gracefully", () => {
     const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation((path: fs.PathOrFileDescriptor, ...args: unknown[]) => {
+    readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
       if (pathStr.includes("kb-data.json")) {
         return JSON.stringify({ slugToEntityId: {}, entities: {} });
@@ -121,14 +126,11 @@ describe("buildEntityMatcher — missing files", () => {
       expect.stringContaining("database.json not found")
     );
     expect(matcher.match("Nonexistent Org")).toBeNull();
-
-    warnSpy.mockRestore();
-    readMock.mockRestore();
   });
 
   it("handles both files missing gracefully", () => {
     const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
+    readMock.mockImplementation(() => {
       const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
       err.code = "ENOENT";
       throw err;
@@ -140,19 +142,13 @@ describe("buildEntityMatcher — missing files", () => {
     expect(warnSpy).toHaveBeenCalledTimes(2);
     expect(matcher.allNames.size).toBe(0);
     expect(matcher.match("anything")).toBeNull();
-
-    warnSpy.mockRestore();
-    readMock.mockRestore();
   });
 
   it("re-throws non-ENOENT errors", () => {
-    const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation(() => {
+    vi.mocked(fs.readFileSync).mockImplementation(() => {
       throw new Error("EACCES: permission denied");
     });
 
     expect(() => buildEntityMatcher()).toThrow("EACCES: permission denied");
-
-    readMock.mockRestore();
   });
 });

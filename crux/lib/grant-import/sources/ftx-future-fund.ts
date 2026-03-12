@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from "fs";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
@@ -112,16 +112,15 @@ export const source: GrantSource = {
   sourceUrl: "https://web.archive.org/web/20221101/https://ftxfuturefund.org/our-grants/",
 
   ensureData() {
-    execSync(`mkdir -p "${FTX_SQL_DIR}"`, { stdio: "pipe" });
+    execFileSync("mkdir", ["-p", FTX_SQL_DIR], { stdio: "pipe" });
     for (const file of FTX_SQL_FILES) {
       const url = `${FTX_SQL_BASE_URL}${file}`;
       const path = `${FTX_SQL_DIR}/${file}`;
       if (existsSync(path)) continue;
       console.log(`  Downloading ${file}...`);
-      execSync(
-        `curl -fsSL --retry 3 --connect-timeout 10 -o "${path}" "${url}"`,
-        { stdio: "inherit" }
-      );
+      execFileSync("curl", ["-fsSL", "--retry", "3", "--connect-timeout", "10", "-o", path, url], {
+        stdio: "inherit",
+      });
     }
   },
 
