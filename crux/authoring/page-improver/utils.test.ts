@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { repairFrontmatter } from './utils.js';
+import { repairFrontmatter, ensureFrontmatterFields } from './utils.js';
 
 describe('repairFrontmatter', () => {
   describe('Fix 4: YAML-safe quoting', () => {
@@ -89,5 +89,109 @@ describe('repairFrontmatter', () => {
       expect(result).toContain('quality: 30');
       expect(result).toContain('sidebar:');
     });
+  });
+});
+
+describe('ensureFrontmatterFields', () => {
+  it('restores fields dropped by LLM', () => {
+    const original = [
+      '---',
+      'title: "My Page"',
+      'description: "A page"',
+      'entityType: capability',
+      'quality: 50',
+      '---',
+      'Body',
+    ].join('\n');
+
+    const improved = [
+      '---',
+      'description: "An improved page"',
+      'quality: 65',
+      '---',
+      'Better body',
+    ].join('\n');
+
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('title: "My Page"');
+    expect(result).toContain('entityType: capability');
+    expect(result).toContain('description: "An improved page"');
+    expect(result).toContain('quality: 65');
+    expect(result).toContain('Better body');
+  });
+
+  it('preserves LLM updates to existing fields', () => {
+    const original = [
+      '---',
+      'title: "Old Title"',
+      'description: "Old desc"',
+      '---',
+      'Body',
+    ].join('\n');
+
+    const improved = [
+      '---',
+      'title: "New Title"',
+      'description: "New desc"',
+      '---',
+      'Body',
+    ].join('\n');
+
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('title: "New Title"');
+    expect(result).toContain('description: "New desc"');
+  });
+
+  it('returns improved content unchanged when no fields are missing', () => {
+    const original = '---\ntitle: "A"\n---\nBody';
+    const improved = '---\ntitle: "B"\n---\nBody';
+    expect(ensureFrontmatterFields(original, improved)).toBe(improved);
+  });
+
+  it('handles multi-line frontmatter values (ratings block)', () => {
+    const original = [
+      '---',
+      'title: "Page"',
+      'ratings:',
+      '  novelty: 4.2',
+      '  rigor: 6.8',
+      '---',
+      'Body',
+    ].join('\n');
+
+    const improved = [
+      '---',
+      'title: "Page"',
+      '---',
+      'Body',
+    ].join('\n');
+
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('ratings:');
+    expect(result).toContain('  novelty: 4.2');
+    expect(result).toContain('  rigor: 6.8');
+  });
+
+  it('returns content unchanged when no frontmatter', () => {
+    const original = 'No frontmatter';
+    const improved = 'Also no frontmatter';
+    expect(ensureFrontmatterFields(original, improved)).toBe(improved);
+  });
+
+  it('restores original frontmatter when LLM drops entire block', () => {
+    const original = '---\ntitle: "Page"\nentityType: capability\n---\nOriginal body';
+    const improved = 'Just body text without frontmatter';
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('---\ntitle: "Page"');
+    expect(result).toContain('entityType: capability');
+    expect(result).toContain('Just body text without frontmatter');
+  });
+
+  it('keeps new fields added by LLM that were not in original', () => {
+    const original = '---\ntitle: "A"\n---\nBody';
+    const improved = '---\ntitle: "A"\ndraft: true\n---\nBody';
+    const result = ensureFrontmatterFields(original, improved);
+    expect(result).toContain('draft: true');
+    expect(result).toContain('title: "A"');
   });
 });

@@ -14,7 +14,7 @@ import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
   ROOT, log, getFilePath, getImportPath, writeTemp,
-  repairFrontmatter, stripRelatedPagesSections, buildObjectivityContext,
+  repairFrontmatter, ensureFrontmatterFields, stripRelatedPagesSections, buildObjectivityContext,
 } from '../utils.ts';
 import { runAgent } from '../api.ts';
 import { IMPROVE_PROMPT } from './prompts.ts';
@@ -150,6 +150,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   );
 
   improvedContent = repairFrontmatter(improvedContent);
+  improvedContent = ensureFrontmatterFields(currentContent, improvedContent);
   improvedContent = stripRelatedPagesSections(improvedContent);
 
   const { content: convertedContent, converted: slugsConverted } = convertSlugsToNumericIds(improvedContent, ROOT);
