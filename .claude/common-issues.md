@@ -123,4 +123,20 @@ Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citat
 
 ---
 
+---
+
+## Auto-Update Pipeline
+
+### Improve pipeline may strip `title` from frontmatter on complex pages
+When the LLM improve pipeline rewrites large, complex pages (e.g. `language-models.mdx`), it sometimes returns content without the `title` field in the frontmatter. This causes the frontmatter-schema gate check to fail with `title: Required (got: undefined)`, blocking the auto-update PR from merging.
+
+**Observed**: 5+ consecutive `auto-update.yml` failures (2026-03-09 to 2026-03-12). Issue #2117 tracks the fix.
+
+**Workaround**: If a page is repeatedly breaking auto-update, add it to the excluded list in the auto-update config, or ensure the improve pipeline prompt explicitly preserves all frontmatter fields.
+
+### Artifacts API `directions` field has 5000-char limit
+When auto-update generates directions for future runs, the LLM may produce more than 5000 characters. The artifact save call returns `400: String must contain at most 5000 character(s)` for the `directions` field. The directions are silently not saved, which is non-fatal. Truncation should be added upstream. (Also tracked in issue #2117.)
+
+---
+
 _Add new issues below as they're discovered. Group by category._
