@@ -60,24 +60,3 @@ records:
       source: https://humancompatible.ai/
       notes: "Founded CHAI at UC Berkeley with Open Philanthropy funding; research on value alignment and cooperative inverse reinforcement learning"
 
-  notable-publications:
-    i_sR7jK8lM9n:
-      title: "Artificial Intelligence: A Modern Approach"
-      year: 1995
-      url: https://aima.cs.berkeley.edu/
-      resource: 5Y3gTZIj7w
-      notes: "Co-authored with Peter Norvig; the most widely used AI textbook worldwide; used in 1,500+ universities across 135 countries; now in 4th edition (2020)"
-
-    i_sRoP1qR2s:
-      title: "Human Compatible: Artificial Intelligence and the Problem of Control"
-      year: 2019
-      url: https://en.wikipedia.org/wiki/Human_Compatible
-      resource: Nm9ElcWUcg
-      notes: "Book proposing 'provably beneficial AI' through cooperative inverse reinforcement learning; widely praised in AI safety circles"
-
-    i_sRtU3vW4x:
-      title: "Research Priorities for Robust and Beneficial Artificial Intelligence"
-      year: 2015
-      url: https://futureoflife.org/data/documents/research_priorities.pdf
-      resource: LLgTWO8Iww
-      notes: "Open letter co-authored with Max Tegmark and others; signed by thousands of AI researchers; helped mainstream AI safety concerns"

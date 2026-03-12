@@ -62,31 +62,3 @@ records:
       source: https://en.wikipedia.org/wiki/Nick_Bostrom
       notes: "Founded FHI in 2005; FHI closed in April 2024 due to administrative conflicts with the Faculty of Philosophy"
 
-  notable-publications:
-    i_nB7jK8lM9n:
-      title: "Are We Living in a Computer Simulation?"
-      year: 2003
-      url: https://www.simulation-argument.com/simulation.html
-      resource: XkcsA0OUXw
-      notes: "Proposed the simulation argument; one of the most discussed thought experiments in modern philosophy"
-
-    i_nBoP1qR2s:
-      title: "Superintelligence: Paths, Dangers, Strategies"
-      year: 2014
-      url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
-      resource: NWY3YWM3Mz
-      notes: "New York Times bestseller; catalyzed mainstream concern about AI existential risk; influenced Bill Gates, Elon Musk, and others"
-
-    i_nBtU3vW4x:
-      title: "The Vulnerable World Hypothesis"
-      year: 2019
-      url: https://onlinelibrary.wiley.com/doi/abs/10.1111/1758-5899.12718
-      resource: TRjom2SN7A
-      notes: "Argued that technological development may produce 'black ball' technologies enabling world destruction"
-
-    i_nByZ5aB6c:
-      title: "Deep Utopia: Life and Meaning in a Solved World"
-      year: 2024
-      url: https://en.wikipedia.org/wiki/Deep_Utopia
-      resource: ReRFWAEEjw
-      notes: "Book examining what a positive post-AI future might look like and the problem of meaning in a world of abundance"

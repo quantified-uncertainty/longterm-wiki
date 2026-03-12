@@ -88,24 +88,3 @@ records:
       source: https://www.nist.gov/people/paul-christiano
       notes: "Joined the U.S. AI Safety Institute (under NIST) to lead safety research"
 
-  notable-publications:
-    i_pCoP1qR2s:
-      title: "Deep Reinforcement Learning from Human Feedback"
-      year: 2017
-      url: https://arxiv.org/abs/1706.03741
-      resource: YjZhZWZlOD
-      notes: "Foundational RLHF paper; enabled alignment of language models to human preferences; one of the most impactful alignment papers"
-
-    i_pCtU3vW4x:
-      title: "AI Safety via Debate"
-      year: 2018
-      url: https://arxiv.org/abs/1805.00899
-      resource: OTU2YWU4MW
-      notes: "Proposed debate as a scalable oversight mechanism for aligning superhuman AI"
-
-    i_pCyZ5aB6c:
-      title: "Eliciting Latent Knowledge (ELK)"
-      year: 2021
-      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-      resource: YThjMzgxYT
-      notes: "ARC's central research problem; how to determine if an AI model's answers match its internal beliefs"

@@ -111,6 +111,26 @@ categories:
         link: "https://arxiv.org/abs/1805.00899"
         linkLabel: "arXiv:1805.00899"
 
+      - title: "Scalable agent alignment via reward modeling: a research direction"
+        authors: ["Jan Leike", "David Krueger", "Tom Everitt", "et al."]
+        organization: "DeepMind"
+        year: 2018
+        type: Paper
+        summary: "Influential research agenda laying out iterated amplification and reward modeling as a path to alignment. Proposes decomposing alignment into reward modeling, policy optimization, and safe exploration."
+        importance: "Shaped research agendas at DeepMind, OpenAI, and Anthropic. Provided a concrete roadmap connecting RLHF to scalable oversight."
+        link: "https://arxiv.org/abs/1811.07871"
+        linkLabel: "arXiv:1811.07871"
+
+      - title: "Eliciting Latent Knowledge (ELK)"
+        authors: ["Paul Christiano", "Mark Xu", "Ajeya Cotra"]
+        organization: "Alignment Research Center"
+        year: 2021
+        type: Technical Report
+        summary: "Defines the core problem of determining whether an AI model's answers match its internal beliefs. Proposes a framework for 'eliciting latent knowledge' from models that may have learned to be deceptive."
+        importance: "ARC's central research problem. Considered one of the key unsolved challenges in alignment. Influential in focusing research on model honesty and transparency."
+        link: "https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/"
+        linkLabel: "ARC Technical Report"
+
       - title: "Iterated Amplification and Distillation"
         authors: ["Paul Christiano", "Buck Shlegeris", "Dario Amodei"]
         year: 2018
@@ -243,6 +263,309 @@ categories:
         importance: "Influential in UK, EU, and US policy discussions. Provides detailed technical proposal for AI regulation. Written by leading governance researchers."
         link: "https://arxiv.org/abs/2307.03718"
         linkLabel: "arXiv:2307.03718"
+
+  - id: ml-foundations
+    name: ML Foundations
+    papers:
+      - title: "Learning representations by back-propagating errors"
+        authors: ["David Rumelhart", "Geoffrey Hinton", "Ronald Williams"]
+        year: 1986
+        type: Paper
+        summary: "Popularized the backpropagation algorithm for training multi-layer neural networks, enabling learning of internal representations."
+        importance: "Foundational technique that made deep learning possible. One of the most cited papers in all of computer science."
+        link: "https://www.nature.com/articles/323533a0"
+        linkLabel: "Nature"
+
+      - title: "Backpropagation Applied to Handwritten Zip Code Recognition"
+        authors: ["Yann LeCun", "Bernhard Boser", "John Denker", "et al."]
+        year: 1989
+        type: Paper
+        summary: "Introduced convolutional neural networks (CNNs) for handwritten digit recognition, combining backpropagation with weight sharing."
+        importance: "Introduced CNNs; one of the most cited papers in deep learning. Led to practical applications in document recognition."
+        link: "https://ieeexplore.ieee.org/document/6795724"
+        linkLabel: "IEEE"
+
+      - title: "Gradient-Based Learning Applied to Document Recognition (LeNet-5)"
+        authors: ["Yann LeCun", "Léon Bottou", "Yoshua Bengio", "Patrick Haffner"]
+        year: 1998
+        type: Paper
+        summary: "Definitive CNN architecture paper presenting LeNet-5. Demonstrated end-to-end learning for document recognition including segmentation."
+        importance: "LeNet was deployed commercially for reading checks at banks. Established CNNs as a practical architecture for visual recognition."
+        link: "http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf"
+        linkLabel: "Yann LeCun"
+
+      - title: "A fast learning algorithm for deep belief nets"
+        authors: ["Geoffrey Hinton", "Simon Osindero", "Yee-Whye Teh"]
+        year: 2006
+        type: Paper
+        summary: "Demonstrated greedy layer-wise pretraining for deep belief networks, showing deep architectures could be trained effectively."
+        importance: "Reignited interest in deep learning after the 'AI winter' for neural networks. Showed deep architectures were trainable."
+        link: "https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf"
+        linkLabel: "University of Toronto"
+
+      - title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
+        authors: ["Alex Krizhevsky", "Ilya Sutskever", "Geoffrey Hinton"]
+        year: 2012
+        type: Paper
+        summary: "Won ImageNet 2012 image classification challenge by a large margin using a deep CNN trained on GPUs, dramatically outperforming all prior methods."
+        importance: "Triggered the deep learning revolution. Demonstrated that deep CNNs with GPU training could achieve breakthrough results on large-scale vision tasks."
+        link: "https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html"
+        linkLabel: "NeurIPS 2012"
+
+      - title: "Sequence to Sequence Learning with Neural Networks"
+        authors: ["Ilya Sutskever", "Oriol Vinyals", "Quoc V. Le"]
+        organization: "Google"
+        year: 2014
+        type: Paper
+        summary: "Introduced the sequence-to-sequence architecture using encoder-decoder LSTMs for machine translation."
+        importance: "Foundational paper for neural machine translation and many NLP tasks. The seq2seq architecture became the basis for modern language models."
+        link: "https://arxiv.org/abs/1409.3215"
+        linkLabel: "arXiv:1409.3215"
+
+      - title: "Distilling the Knowledge in a Neural Network"
+        authors: ["Geoffrey Hinton", "Oriol Vinyals", "Jeff Dean"]
+        organization: "Google"
+        year: 2015
+        type: Paper
+        summary: "Introduced knowledge distillation: training a smaller 'student' model to mimic the outputs of a larger 'teacher' model."
+        importance: "Foundational technique for model compression. Widely used in practice to deploy efficient models while preserving performance."
+        link: "https://arxiv.org/abs/1503.02531"
+        linkLabel: "arXiv:1503.02531"
+
+  - id: ai-capabilities
+    name: AI Capabilities
+    papers:
+      - title: "Mastering the game of Go with deep neural networks and tree search (AlphaGo)"
+        authors: ["David Silver", "Aja Huang", "Chris J. Maddison", "et al."]
+        organization: "DeepMind"
+        year: 2016
+        type: Paper
+        summary: "Combined deep neural networks with Monte Carlo tree search to defeat professional Go players. AlphaGo later defeated world champion Lee Sedol 4-1."
+        importance: "Landmark achievement in AI. Go was considered decades away from being solved. Demonstrated that deep learning could master complex strategic reasoning."
+        link: "https://www.nature.com/articles/nature16961"
+        linkLabel: "Nature"
+
+      - title: "Mastering the game of Go without human knowledge (AlphaGo Zero)"
+        authors: ["David Silver", "Julian Schrittwieser", "Karen Simonyan", "et al."]
+        organization: "DeepMind"
+        year: 2017
+        type: Paper
+        summary: "Achieved superhuman Go play using only self-play reinforcement learning with zero human game data, surpassing all previous AlphaGo versions."
+        importance: "Showed that superhuman performance could be achieved from scratch through self-play, without any human knowledge or demonstrations."
+        link: "https://www.nature.com/articles/nature24270"
+        linkLabel: "Nature"
+
+      - title: "Language Models are Unsupervised Multitask Learners (GPT-2)"
+        authors: ["Alec Radford", "Jeffrey Wu", "Rewon Child", "David Luan", "Dario Amodei", "Ilya Sutskever"]
+        organization: "OpenAI"
+        year: 2019
+        type: Paper
+        summary: "Demonstrated that large language models trained on internet text could perform many tasks without task-specific training, through in-context learning."
+        importance: "Showed the power of unsupervised pre-training at scale. OpenAI initially withheld the full model over misuse concerns, sparking debate about responsible release."
+        link: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
+        linkLabel: "OpenAI"
+
+      - title: "Language Models are Few-Shot Learners (GPT-3)"
+        authors: ["Tom Brown", "Benjamin Mann", "Nick Ryder", "et al."]
+        organization: "OpenAI"
+        year: 2020
+        type: Paper
+        summary: "Scaled language models to 175B parameters, demonstrating that few-shot prompting could achieve strong performance across diverse tasks without fine-tuning."
+        importance: "Proved that scaling language models yields qualitatively new capabilities. Launched the era of large language models and in-context learning."
+        link: "https://arxiv.org/abs/2005.14165"
+        linkLabel: "arXiv:2005.14165"
+
+      - title: "Highly accurate protein structure prediction with AlphaFold"
+        authors: ["John Jumper", "Richard Evans", "Alexander Pritzel", "et al."]
+        organization: "DeepMind"
+        year: 2021
+        type: Paper
+        summary: "Solved the 50-year-old protein folding problem with unprecedented accuracy. Predicted structures for 200M+ proteins covering nearly all known proteins."
+        importance: "One of the most important scientific breakthroughs of the decade. Led to the 2024 Nobel Prize in Chemistry for Demis Hassabis and John Jumper."
+        link: "https://www.nature.com/articles/s41586-021-03819-2"
+        linkLabel: "Nature"
+
+      - title: "A Generalist Agent (Gato)"
+        authors: ["Scott Reed", "Konrad Zolna", "Emilio Parisotto", "et al."]
+        organization: "DeepMind"
+        year: 2022
+        type: Paper
+        summary: "Single transformer model performing 600+ tasks across robotics, games, language, and vision using a unified sequence format."
+        importance: "Demonstrated that a single model architecture could handle diverse modalities and tasks, advancing the case for general-purpose AI systems."
+        link: "https://arxiv.org/abs/2205.06175"
+        linkLabel: "arXiv:2205.06175"
+
+      - title: "GPT-NeoX-20B: An Open-Source Autoregressive Language Model"
+        authors: ["Sid Black", "Stella Biderman", "Eric Hallahan", "et al."]
+        organization: "EleutherAI"
+        year: 2022
+        type: Paper
+        summary: "One of the first large open-source language models at 20B parameters, demonstrating that large LMs could be trained outside major corporate labs."
+        importance: "Proved that open-source efforts could produce competitive large language models. Paved the way for the open-source LLM ecosystem."
+        link: "https://arxiv.org/abs/2204.06745"
+        linkLabel: "arXiv:2204.06745"
+
+      - title: "A Path Towards Autonomous Machine Intelligence"
+        authors: ["Yann LeCun"]
+        organization: "Meta AI"
+        year: 2022
+        type: Paper
+        summary: "Position paper proposing Joint Embedding Predictive Architectures (JEPA) as a path to human-level AI, arguing against autoregressive generation."
+        importance: "Influential alternative vision for achieving human-level AI. Challenges the dominant LLM paradigm with a world-model-based approach."
+        link: "https://openreview.net/pdf?id=BZ5a1r-kVsf"
+        linkLabel: "OpenReview"
+
+  - id: interpretability
+    name: Interpretability
+    papers:
+      - title: "Understanding LSTM Networks"
+        authors: ["Chris Olah"]
+        year: 2015
+        type: Blog Post
+        summary: "Clear visual explanation of LSTM architecture and how recurrent neural networks process sequential data."
+        importance: "One of the most influential ML explainers ever written. Established Chris Olah's reputation for making complex neural network concepts accessible."
+        link: "https://colah.github.io/posts/2015-08-Understanding-LSTMs/"
+        linkLabel: "colah.github.io"
+
+      - title: "Neural Networks, Types, and Functional Programming"
+        authors: ["Chris Olah"]
+        year: 2015
+        type: Blog Post
+        summary: "Influential essay connecting neural network design to type theory and functional programming, proposing deeper mathematical foundations."
+        importance: "Pioneered thinking about neural networks through the lens of programming language theory. Influenced research on neural network design."
+        link: "https://colah.github.io/posts/2015-09-NN-Types-FP/"
+        linkLabel: "colah.github.io"
+
+      - title: "Zoom In: An Introduction to Circuits"
+        authors: ["Chris Olah", "Nick Cammarata", "Ludwig Schubert", "et al."]
+        organization: "OpenAI"
+        year: 2020
+        type: Paper
+        summary: "First paper in the Circuits thread, showing that neural networks contain understandable features connected by interpretable circuits."
+        importance: "Foundational for mechanistic interpretability. Demonstrated that we can understand what individual neurons and circuits compute inside neural networks."
+        link: "https://distill.pub/2020/circuits/zoom-in/"
+        linkLabel: "Distill"
+
+  - id: ai-risk-essays
+    name: AI Risk Essays & Books
+    papers:
+      - title: "The Sequences (Rationality: A-Z)"
+        authors: ["Eliezer Yudkowsky"]
+        year: 2009
+        type: Blog Series
+        summary: "Extensive series of blog posts on LessWrong covering epistemology, cognitive biases, decision theory, and AI alignment. Later compiled into 'Rationality: From AI to Zombies.'"
+        importance: "Created the intellectual foundation for the rationalist community and much of the AI safety movement. Introduced key concepts used throughout the field."
+        link: "https://www.readthesequences.com/"
+        linkLabel: "Read the Sequences"
+
+      - title: "Harry Potter and the Methods of Rationality"
+        authors: ["Eliezer Yudkowsky"]
+        year: 2015
+        type: Fiction
+        summary: "Popular Harry Potter fanfiction exploring rationalist thinking and the scientific method. Read by millions."
+        importance: "Served as a major entry point to rationalism and effective altruism for many people. Demonstrated science communication through fiction."
+        link: "https://hpmor.com/"
+        linkLabel: "HPMOR"
+
+      - title: "AGI Ruin: A List of Lethalities"
+        authors: ["Eliezer Yudkowsky"]
+        year: 2022
+        type: Blog Post
+        summary: "Influential post arguing that alignment is likely unsolvable in time and that unaligned AGI would be catastrophic. Lists dozens of specific reasons for pessimism."
+        importance: "Catalyzed major debate in AI safety. Crystallized the pessimistic case and forced the community to engage with specific failure arguments."
+        link: "https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities"
+        linkLabel: "LessWrong"
+
+      - title: "Are We Living in a Computer Simulation?"
+        authors: ["Nick Bostrom"]
+        year: 2003
+        type: Paper
+        summary: "Proposed the simulation argument: at least one of three propositions must be true about civilizations and computer simulations."
+        importance: "One of the most discussed thought experiments in modern philosophy. Widely cited across philosophy, physics, and computer science."
+        link: "https://www.simulation-argument.com/simulation.html"
+        linkLabel: "simulation-argument.com"
+
+      - title: "The Vulnerable World Hypothesis"
+        authors: ["Nick Bostrom"]
+        year: 2019
+        type: Paper
+        summary: "Argues that technological development may produce 'black ball' technologies enabling civilizational destruction, and analyzes governance responses."
+        importance: "Influential framework for thinking about existential risk from technology. Extends risk analysis beyond AI to general technological development."
+        link: "https://onlinelibrary.wiley.com/doi/abs/10.1111/1758-5899.12718"
+        linkLabel: "Global Policy"
+
+      - title: "Deep Utopia: Life and Meaning in a Solved World"
+        authors: ["Nick Bostrom"]
+        year: 2024
+        type: Book
+        summary: "Examines what a positive post-AI future might look like, exploring the problem of meaning and purpose in a world where material scarcity is eliminated."
+        importance: "Rare exploration of the positive scenarios for advanced AI. Complements the risk-focused literature with thinking about flourishing."
+        link: "https://en.wikipedia.org/wiki/Deep_Utopia"
+        linkLabel: "Wikipedia"
+
+      - title: "Most Important Century (blog series)"
+        authors: ["Holden Karnofsky"]
+        year: 2021
+        type: Blog Series
+        summary: "Influential series arguing we may live in the most pivotal century in human history due to transformative AI."
+        importance: "Widely read in EA and AI safety communities. Made the case for urgency accessible to a broad audience beyond technical researchers."
+        link: "https://www.cold-takes.com/most-important-century/"
+        linkLabel: "Cold Takes"
+
+      - title: "AI Could Defeat All Of Us Combined"
+        authors: ["Holden Karnofsky"]
+        year: 2022
+        type: Blog Post
+        summary: "Essay examining AI takeover scenarios and arguing they deserve serious attention from a mainstream perspective."
+        importance: "Extended the Most Important Century series with concrete analysis of AI power dynamics and control failure scenarios."
+        link: "https://www.cold-takes.com/ai-could-defeat-all-of-us-combined/"
+        linkLabel: "Cold Takes"
+
+      - title: "Moore's Law for Everything"
+        authors: ["Sam Altman"]
+        year: 2021
+        type: Essay
+        summary: "Argues that AI-driven productivity gains will be so large that they should fund universal basic income via taxes on land and corporate equity."
+        importance: "Influential vision from OpenAI's CEO connecting AI progress to economic policy. Widely discussed in tech and policy circles."
+        link: "https://moores.samaltman.com/"
+        linkLabel: "samaltman.com"
+
+      - title: "The Intelligence Age"
+        authors: ["Sam Altman"]
+        year: 2024
+        type: Essay
+        summary: "Outlines a vision for AI's transformative impact on society and economics, arguing we are entering a new era of intelligence-driven progress."
+        importance: "Articulates OpenAI's long-term vision and the case for optimism about advanced AI."
+        link: "https://ia.samaltman.com/"
+        linkLabel: "samaltman.com"
+
+      - title: "Machines of Loving Grace"
+        authors: ["Dario Amodei"]
+        year: 2024
+        type: Essay
+        summary: "Influential essay on how AI could transform biology, poverty, governance, and work, exploring the positive potential of advanced AI."
+        importance: "Rare optimistic essay from a major AI lab CEO known for safety emphasis. Explores specific mechanisms by which AI could produce dramatic improvements."
+        link: "https://darioamodei.com/machines-of-loving-grace"
+        linkLabel: "darioamodei.com"
+
+      - title: "Artificial Intelligence: A Modern Approach"
+        authors: ["Stuart Russell", "Peter Norvig"]
+        year: 1995
+        type: Textbook
+        summary: "The most widely used AI textbook worldwide, covering search, knowledge representation, planning, learning, perception, and more. Now in 4th edition (2020)."
+        importance: "Used in 1,500+ universities across 135 countries. The standard reference for AI education."
+        link: "https://aima.cs.berkeley.edu/"
+        linkLabel: "AIMA"
+
+      - title: "Research Priorities for Robust and Beneficial Artificial Intelligence"
+        authors: ["Stuart Russell", "Max Tegmark", "et al."]
+        organization: "Future of Life Institute"
+        year: 2015
+        type: Open Letter
+        summary: "Open letter signed by thousands of AI researchers calling for expanded AI safety research alongside capability research."
+        importance: "Helped mainstream AI safety concerns. Demonstrated broad expert support for safety research. Catalyzed significant new funding for the field."
+        link: "https://futureoflife.org/data/documents/research_priorities.pdf"
+        linkLabel: "Future of Life Institute"
 
   - id: additional
     name: Additional Critical Papers

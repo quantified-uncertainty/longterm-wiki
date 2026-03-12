@@ -62,10 +62,3 @@ records:
       source: https://www.conjecture.dev/
       notes: "Founded Conjecture to work on AI alignment; shifted from capabilities to safety; prominent public advocate for AI risk"
 
-  notable-publications:
-    i_cL7jK8lM9n:
-      title: "GPT-NeoX-20B: An Open-Source Autoregressive Language Model"
-      year: 2022
-      url: https://arxiv.org/abs/2204.06745
-      resource: v7jCdXS8JQ
-      notes: "One of the first large open-source language models; demonstrated that large LMs could be trained outside major labs"
