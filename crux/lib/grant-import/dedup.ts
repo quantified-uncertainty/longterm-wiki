@@ -6,11 +6,16 @@ export interface DuplicateGroup {
   confidence: number;    // 0-1 confidence they're truly duplicates
 }
 
-// Common suffixes/words to strip from organization names for fuzzy matching
+// Common suffixes/words to strip from organization names for fuzzy matching.
+// Only strip truly generic words — keep Center/Centre/Institute/Foundation/Fund/Group
+// since they are meaningful differentiators (e.g., "Center for AI Safety" vs "Institute for AI Safety").
 const STRIP_SUFFIXES = [
-  /\b(inc\.?|incorporated|ltd\.?|limited|llc|l\.l\.c\.?|corp\.?|corporation|co\.?|company)\b/gi,
-  /\b(foundations?|funds?|trusts?|institutes?|associations?|society|societies|groups?|centers?|centres?)\b/gi,
-  /\b(the|a|an|of|for|and|&)\b/gi,
+  /\b(inc\.?|incorporated|ltd\.?|limited|llc|l\.l\.c\.?|corp\.?|corporation|company)\b/gi,
+  // Strip "co" only at end of name preceded by comma/space (avoids matching "Co-" prefix)
+  /[,\s]co\.?\s*$/gi,
+  /\b(the|a|an|of|for|and)\b/gi,
+  // Strip "&" separately since \b doesn't work around non-word characters
+  /&/g,
   /[.,\-'"()]/g,
 ];
 
@@ -27,6 +32,12 @@ export function normalizeGranteeName(name: string): string {
 
   // Collapse whitespace
   normalized = normalized.replace(/\s+/g, " ").trim();
+
+  // If normalization stripped everything, fall back to original name
+  // to avoid false-positive collisions in the empty-string bucket.
+  if (normalized === "" && name.trim() !== "") {
+    return name.toLowerCase().trim();
+  }
 
   return normalized;
 }
@@ -65,21 +76,37 @@ export function amountsMatch(a: number | null, b: number | null, tolerance = 0.0
 }
 
 /**
- * Generate a fuzzy dedup key from a grant.
- * Uses normalized grantee name + approximate amount bucket + year-month.
+ * Generate fuzzy dedup keys from a grant.
+ * Returns both floor and ceil bucket keys so that amounts near bucket
+ * boundaries (e.g., $104,999 and $105,001) are always compared.
  */
-export function dedupeKey(grant: RawGrant): string {
+export function dedupeKeys(grant: RawGrant): string[] {
   const name = normalizeGranteeName(grant.granteeName);
   const ym = extractYearMonth(grant.date);
 
-  // Bucket amount to nearest 10,000 to handle minor differences.
-  // The coarse bucket ensures near-boundary amounts end up in the same group.
-  // Fine-grained matching is done via amountsMatch in the validation step.
-  const amountBucket = grant.amount !== null
-    ? Math.round(grant.amount / 10000).toString()
-    : "null";
+  if (grant.amount === null) {
+    return [`${name}|null|${ym}`];
+  }
 
-  return `${name}|${amountBucket}|${ym}`;
+  const floorBucket = Math.floor(grant.amount / 10000);
+  const ceilBucket = Math.ceil(grant.amount / 10000);
+
+  if (floorBucket === ceilBucket) {
+    // Amount is an exact multiple of 10,000 — only one bucket needed
+    return [`${name}|${floorBucket}|${ym}`];
+  }
+
+  return [
+    `${name}|${floorBucket}|${ym}`,
+    `${name}|${ceilBucket}|${ym}`,
+  ];
+}
+
+/**
+ * @deprecated Use dedupeKeys() instead. Kept for backward compatibility in tests.
+ */
+export function dedupeKey(grant: RawGrant): string {
+  return dedupeKeys(grant)[0];
 }
 
 /**
@@ -140,18 +167,82 @@ function computeConfidence(grants: RawGrant[]): number {
  * Only returns groups with grants from multiple sources.
  */
 export function detectDuplicates(grants: RawGrant[]): DuplicateGroup[] {
-  // Group by fuzzy key
-  const groups = new Map<string, RawGrant[]>();
-  for (const grant of grants) {
-    const key = dedupeKey(grant);
-    const existing = groups.get(key) || [];
-    existing.push(grant);
-    groups.set(key, existing);
+  // Use union-find to merge groups across bucket boundaries.
+  // Each grant can produce multiple dedup keys (floor + ceil bucket),
+  // and grants sharing any key should be compared together.
+  const keyToGroupId = new Map<string, number>();
+  const grantGroupIds: number[] = new Array(grants.length);
+  let nextGroupId = 0;
+
+  // Parent map for union-find
+  const parent = new Map<number, number>();
+  function find(x: number): number {
+    let root = x;
+    while (parent.get(root) !== root) {
+      root = parent.get(root)!;
+    }
+    // Path compression
+    let cur = x;
+    while (cur !== root) {
+      const next = parent.get(cur)!;
+      parent.set(cur, root);
+      cur = next;
+    }
+    return root;
+  }
+  function union(a: number, b: number): void {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra !== rb) {
+      parent.set(ra, rb);
+    }
+  }
+
+  for (let i = 0; i < grants.length; i++) {
+    const keys = dedupeKeys(grants[i]);
+    let gid: number | undefined;
+
+    for (const key of keys) {
+      const existingGid = keyToGroupId.get(key);
+      if (existingGid !== undefined) {
+        if (gid === undefined) {
+          gid = existingGid;
+        } else {
+          // Merge groups
+          union(gid, existingGid);
+        }
+      }
+    }
+
+    if (gid === undefined) {
+      gid = nextGroupId++;
+      parent.set(gid, gid);
+    }
+
+    grantGroupIds[i] = gid;
+
+    // Map all keys to this grant's group
+    for (const key of keys) {
+      const existingGid = keyToGroupId.get(key);
+      if (existingGid !== undefined) {
+        union(existingGid, gid);
+      }
+      keyToGroupId.set(key, gid);
+    }
+  }
+
+  // Collect grants by their root group id
+  const mergedGroups = new Map<number, RawGrant[]>();
+  for (let i = 0; i < grants.length; i++) {
+    const root = find(grantGroupIds[i]);
+    const arr = mergedGroups.get(root) || [];
+    arr.push(grants[i]);
+    mergedGroups.set(root, arr);
   }
 
   const duplicateGroups: DuplicateGroup[] = [];
 
-  for (const [key, groupGrants] of groups) {
+  for (const [, groupGrants] of mergedGroups) {
     // Only consider groups with multiple grants
     if (groupGrants.length < 2) continue;
 
@@ -170,6 +261,7 @@ export function detectDuplicates(grants: RawGrant[]): DuplicateGroup[] {
 
       const confidence = computeConfidence(subGroup);
       if (confidence >= 0.3) {
+        const key = dedupeKeys(subGroup[0])[0];
         duplicateGroups.push({
           key,
           grants: subGroup,
@@ -199,10 +291,12 @@ function validateAmountGroups(grants: RawGrant[]): RawGrant[][] {
 
   for (let i = 1; i < sorted.length; i++) {
     const current = sorted[i];
-    // Check if this grant's amount matches any in the current group
-    const matchesGroup = currentGroup.some(g => amountsMatch(g.amount, current.amount));
+    // Compare against the group anchor (first element) only — not any element.
+    // This prevents transitive chaining where A~B and B~C causes A~C grouping
+    // even when A and C are outside tolerance of each other.
+    const matchesAnchor = amountsMatch(currentGroup[0].amount, current.amount);
 
-    if (matchesGroup) {
+    if (matchesAnchor) {
       currentGroup.push(current);
     } else {
       subGroups.push(currentGroup);

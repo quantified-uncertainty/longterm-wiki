@@ -4,6 +4,7 @@ import {
   extractYearMonth,
   amountsMatch,
   dedupeKey,
+  dedupeKeys,
   detectDuplicates,
   chooseBestGrant,
   deduplicateGrants,
@@ -31,10 +32,11 @@ function makeGrant(overrides: Partial<RawGrant> = {}): RawGrant {
 describe("normalizeGranteeName", () => {
   it("lowercases input", () => {
     expect(normalizeGranteeName("ACME Corporation")).not.toContain("ACME");
+    // "Corporation" is a legal suffix and gets stripped
     expect(normalizeGranteeName("ACME Corporation")).toBe("acme");
   });
 
-  it("strips Inc., Ltd., LLC, Corp., etc.", () => {
+  it("strips Inc., Ltd., LLC, Corp., Corporation, etc.", () => {
     expect(normalizeGranteeName("Acme Inc.")).toBe("acme");
     expect(normalizeGranteeName("Acme Inc")).toBe("acme");
     expect(normalizeGranteeName("Acme Ltd.")).toBe("acme");
@@ -43,14 +45,32 @@ describe("normalizeGranteeName", () => {
     expect(normalizeGranteeName("Acme Corporation")).toBe("acme");
   });
 
-  it("strips Foundation, Fund, Institute, etc.", () => {
-    expect(normalizeGranteeName("Open Philanthropy Foundation")).toBe("open philanthropy");
-    expect(normalizeGranteeName("EA Funds")).toBe("ea");
-    expect(normalizeGranteeName("Future of Life Institute")).toBe("future life");
+  it("keeps Foundation, Fund, Institute, Center, Group as meaningful differentiators", () => {
+    expect(normalizeGranteeName("Open Philanthropy Foundation")).toBe("open philanthropy foundation");
+    expect(normalizeGranteeName("EA Funds")).toBe("ea funds");
+    expect(normalizeGranteeName("Future of Life Institute")).toBe("future life institute");
+    expect(normalizeGranteeName("Center for AI Safety")).toBe("center ai safety");
+  });
+
+  it("distinguishes orgs with different type words", () => {
+    // These should NOT normalize to the same string
+    const centerForAI = normalizeGranteeName("Center for AI Safety");
+    const instituteForAI = normalizeGranteeName("Institute for AI Safety");
+    expect(centerForAI).not.toBe(instituteForAI);
+
+    // "EA Funds" vs "EA Foundation" should be distinct
+    const eaFunds = normalizeGranteeName("EA Funds");
+    const eaFoundation = normalizeGranteeName("EA Foundation");
+    expect(eaFunds).not.toBe(eaFoundation);
   });
 
   it("strips articles and prepositions", () => {
-    expect(normalizeGranteeName("The Center for AI Safety")).toBe("ai safety");
+    expect(normalizeGranteeName("The Center for AI Safety")).toBe("center ai safety");
+  });
+
+  it("strips & symbol", () => {
+    expect(normalizeGranteeName("Smith & Jones")).toBe("smith jones");
+    expect(normalizeGranteeName("R&D Foundation")).toBe("rd foundation");
   });
 
   it("strips punctuation", () => {
@@ -58,17 +78,39 @@ describe("normalizeGranteeName", () => {
     expect(normalizeGranteeName("Some-Org (International)")).toBe("someorg international");
   });
 
+  it("strips 'co' only at end after comma/space (not Co- prefix)", () => {
+    // "Co-operative Foundation" should keep "cooperative"
+    expect(normalizeGranteeName("Co-operative Foundation")).toBe("cooperative foundation");
+    // "Acme, Co." at end should strip "co"
+    expect(normalizeGranteeName("Acme, Co.")).toBe("acme");
+  });
+
   it("collapses whitespace", () => {
+    // "Corp" is a legal suffix and gets stripped, leaving just "acme"
     expect(normalizeGranteeName("  Acme   Corp  ")).toBe("acme");
+    // Test whitespace collapse with non-stripped words
+    expect(normalizeGranteeName("  Acme   Research  ")).toBe("acme research");
   });
 
   it("handles empty string", () => {
     expect(normalizeGranteeName("")).toBe("");
   });
 
-  it("handles names that are entirely stripped", () => {
-    // "The" + "Foundation" both get stripped
-    expect(normalizeGranteeName("The Foundation")).toBe("");
+  it("falls back to original name when normalization produces empty string", () => {
+    // "The" gets stripped but the result shouldn't be empty
+    // After removing "the", "a", "an", "of", "for", "and", "&" —
+    // if input is just "The" it becomes empty, falls back to original
+    expect(normalizeGranteeName("The")).toBe("the");
+  });
+
+  it("does not create universal collision bucket for all-stripped names", () => {
+    // These should NOT all normalize to the same string
+    const theFoundation = normalizeGranteeName("The Foundation");
+    const aFund = normalizeGranteeName("A Fund");
+    const theCenter = normalizeGranteeName("The Center");
+    // Each should fall back to something distinct since they contain org-type words now
+    expect(theFoundation).not.toBe(aFund);
+    expect(theFoundation).not.toBe(theCenter);
   });
 });
 
@@ -139,7 +181,42 @@ describe("amountsMatch", () => {
   });
 });
 
-describe("dedupeKey", () => {
+describe("dedupeKeys", () => {
+  it("returns both floor and ceil bucket keys for non-round amounts", () => {
+    const grant = makeGrant({ granteeName: "Acme", amount: 104999, date: "2024-06-15" });
+    const keys = dedupeKeys(grant);
+    expect(keys).toHaveLength(2);
+    // floor(104999/10000) = 10, ceil(104999/10000) = 11
+    expect(keys).toContain("acme|10|2024-06");
+    expect(keys).toContain("acme|11|2024-06");
+  });
+
+  it("returns single key for exact multiples of 10000", () => {
+    const grant = makeGrant({ granteeName: "Acme", amount: 100000, date: "2024-06-15" });
+    const keys = dedupeKeys(grant);
+    expect(keys).toHaveLength(1);
+  });
+
+  it("returns single key for null amount", () => {
+    const grant = makeGrant({ granteeName: "Acme", amount: null, date: "2024-06-15" });
+    const keys = dedupeKeys(grant);
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).toContain("null");
+  });
+
+  it("generates overlapping keys for amounts at bucket boundaries", () => {
+    // $104,999 and $105,001 should share at least one bucket key
+    const grant1 = makeGrant({ granteeName: "Acme", amount: 104999, date: "2024-06-15" });
+    const grant2 = makeGrant({ granteeName: "Acme", amount: 105001, date: "2024-06-15" });
+    const keys1 = dedupeKeys(grant1);
+    const keys2 = dedupeKeys(grant2);
+    // grant1: floor=10, ceil=11; grant2: floor=10, ceil=11
+    const overlap = keys1.filter(k => keys2.includes(k));
+    expect(overlap.length).toBeGreaterThan(0);
+  });
+});
+
+describe("dedupeKey (deprecated wrapper)", () => {
   it("generates consistent keys for similar grants", () => {
     const grant1 = makeGrant({
       granteeName: "Acme Inc.",
@@ -267,6 +344,30 @@ describe("detectDuplicates", () => {
     expect(groups.length).toBe(1);
   });
 
+  it("detects duplicates at bucket boundaries ($104,999 vs $105,001)", () => {
+    // These two amounts are within 0.002% of each other but land in
+    // different floor buckets (10 vs 10). With floor+ceil bucketing,
+    // they share the ceil bucket (11) and are compared.
+    const grants = [
+      makeGrant({
+        source: "sff",
+        granteeName: "Boundary Org",
+        amount: 104999,
+        date: "2024-06-15",
+      }),
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "Boundary Org",
+        amount: 105001,
+        date: "2024-06-20",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(1);
+    expect(groups[0].grants.length).toBe(2);
+  });
+
   it("handles grants with different name formats", () => {
     const grants = [
       makeGrant({
@@ -285,6 +386,47 @@ describe("detectDuplicates", () => {
 
     const groups = detectDuplicates(grants);
     expect(groups.length).toBe(1);
+  });
+
+  it("does NOT falsely match orgs with different type words (Center vs Institute)", () => {
+    const grants = [
+      makeGrant({
+        source: "sff",
+        granteeName: "Center for AI Safety",
+        amount: 200000,
+        date: "2024-01-10",
+      }),
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "Institute for AI Safety",
+        amount: 200000,
+        date: "2024-01-15",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(0);
+  });
+
+  it("does NOT falsely match empty-normalized names", () => {
+    // Orgs whose names used to normalize to "" should not match each other
+    const grants = [
+      makeGrant({
+        source: "sff",
+        granteeName: "The Foundation",
+        amount: 100000,
+        date: "2024-01-10",
+      }),
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "A Fund",
+        amount: 100000,
+        date: "2024-01-15",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(0);
   });
 
   it("does not flag grants with different months", () => {
