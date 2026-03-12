@@ -14,8 +14,6 @@ export interface RiskRow {
   severity: string | null;
   likelihood: string | null;
   timeHorizon: string | null;
-  evidenceStrength: string | null;
-  expertConsensus: string | null;
 }
 
 const RISK_CATEGORY_LABELS: Record<string, string> = {
@@ -181,8 +179,6 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
               <SortHeader label="Severity" sortKey="severity" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Likelihood" sortKey="likelihood" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Time Horizon" sortKey="timeHorizon" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <th className="py-2.5 px-3 font-medium text-left">Evidence</th>
-              <th className="py-2.5 px-3 font-medium text-left">Consensus</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -240,16 +236,6 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                 {/* Time Horizon */}
                 <td className="py-2.5 px-3 text-sm">
                   {row.timeHorizon ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-
-                {/* Evidence Strength */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.evidenceStrength ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-
-                {/* Expert Consensus */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.expertConsensus ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
               </tr>
             ))}
