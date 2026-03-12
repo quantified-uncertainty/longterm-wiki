@@ -1,5 +1,10 @@
 # AI Model Entities
 # Individual AI model versions with structured benchmark, pricing, and safety data.
+# Covers major frontier AI labs: Anthropic, OpenAI, Google DeepMind, Meta, Mistral, xAI, DeepSeek.
+
+# =============================================================================
+# ANTHROPIC — Claude Model Family
+# =============================================================================
 
 - id: claude
   numericId: E1041
@@ -7,6 +12,10 @@
   title: Claude
   modelFamily: Claude
   developer: anthropic
+  openWeight: false
+  modality:
+    - text
+    - image
   description: >-
     Claude is Anthropic's family of AI assistants, first released in March 2023. The product line spans
     three tiers — Haiku (fast/cheap), Sonnet (balanced), and Opus (most capable) — with major generations
@@ -86,6 +95,10 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: MMLU
       score: 86.8
@@ -97,7 +110,7 @@
     - tool-use
   description: >-
     Claude 3 Opus was Anthropic's most capable model at launch on March 4, 2024. It outperformed
-    GPT-4 on MMLU (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at $15/$75 per million
+    GPT-4 on MMLU (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at \$15/\$75 per million
     tokens (input/output) with a 200K token context window.
   relatedEntries:
     - id: claude
@@ -128,11 +141,15 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
   description: >-
     Claude 3 Sonnet was the mid-tier model in the Claude 3 family, released March 4, 2024. It offered
-    2x the speed of Claude 2 at higher intelligence levels. Priced at $3/$15 per million tokens with a
+    2x the speed of Claude 2 at higher intelligence levels. Priced at \$3/\$15 per million tokens with a
     200K token context window.
   relatedEntries:
     - id: claude
@@ -162,11 +179,15 @@
   outputPrice: 1.25
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
   description: >-
     Claude 3 Haiku was the fastest and most cost-effective model in the Claude 3 family, released
-    March 4, 2024. It could process a 10K-token research paper in under 3 seconds. Priced at $0.25/$1.25
+    March 4, 2024. It could process a 10K-token research paper in under 3 seconds. Priced at \$0.25/\$1.25
     per million tokens with a 200K token context window.
   relatedEntries:
     - id: claude
@@ -196,6 +217,10 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: MMLU
       score: 88.7
@@ -208,7 +233,7 @@
     - computer-use
   description: >-
     Claude 3.5 Sonnet was released June 20, 2024, and updated October 22, 2024. The initial release
-    outperformed Claude 3 Opus across the board at half the price ($3/$15 per MTok). The October update
+    outperformed Claude 3 Opus across the board at half the price (\$3/\$15 per MTok). The October update
     introduced computer use capability in public beta. Scored 92.0% on HumanEval and 88.7% on MMLU.
   relatedEntries:
     - id: claude
@@ -241,12 +266,16 @@
   outputPrice: 4
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
   description: >-
     Claude 3.5 Haiku was released November 4, 2024. It matched Claude 3 Opus performance on many
-    evaluations while maintaining Haiku-class speed. Priced at $0.80/$4 per million tokens (reduced
-    from initial $1/$5 in December 2024) with a 200K token context window.
+    evaluations while maintaining Haiku-class speed. Priced at \$0.80/\$4 per million tokens (reduced
+    from initial \$1/\$5 in December 2024) with a 200K token context window.
   relatedEntries:
     - id: claude
       type: ai-model
@@ -275,13 +304,17 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
     - extended-thinking
   description: >-
     Claude 3.7 Sonnet was released February 24, 2025 as the first hybrid reasoning model. Users could
     toggle extended thinking mode on or off, allowing the model to self-reflect before answering.
-    Priced at $3/$15 per million tokens with a 200K token context window.
+    Priced at \$3/\$15 per million tokens with a 200K token context window.
   relatedEntries:
     - id: claude
       type: ai-model
@@ -313,6 +346,10 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: SWE-bench Verified
       score: 72.7
@@ -322,7 +359,7 @@
     - extended-thinking
   description: >-
     Claude Sonnet 4 was released May 22, 2025, marking the transition to the Claude 4 generation with
-    a new naming convention. Scored 72.7% on SWE-bench Verified. Priced at $3/$15 per million tokens
+    a new naming convention. Scored 72.7% on SWE-bench Verified. Priced at \$3/\$15 per million tokens
     with a 200K token context window (1M beta added later).
   relatedEntries:
     - id: claude
@@ -352,6 +389,10 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: SWE-bench Verified
       score: 72.5
@@ -363,7 +404,7 @@
   description: >-
     Claude Opus 4 was released May 22, 2025 alongside Sonnet 4. Described as the world's best coding
     model at launch, capable of autonomous coding for up to 7 hours. Scored 72.5% on SWE-bench Verified.
-    Priced at $15/$75 per million tokens with a 200K token context window.
+    Priced at \$15/\$75 per million tokens with a 200K token context window.
   relatedEntries:
     - id: claude
       type: ai-model
@@ -393,13 +434,17 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
     - extended-thinking
     - agentic-coding
   description: >-
     Claude Opus 4.1 was released August 5, 2025 as an incremental improvement over Opus 4 with gains
-    in software engineering, agentic reasoning, and research-level tasks. Priced at $15/$75 per million
+    in software engineering, agentic reasoning, and research-level tasks. Priced at \$15/\$75 per million
     tokens with a 200K token context window.
   relatedEntries:
     - id: claude
@@ -429,6 +474,10 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: SWE-bench Verified
       score: 77.2
@@ -446,7 +495,7 @@
   description: >-
     Claude Sonnet 4.5 was released September 29, 2025. Scored 77.2% on SWE-bench Verified (82.0% with
     parallel compute) and 61.4% on OSWorld. Maintained focus for 30+ hours on multi-step tasks. Launched
-    alongside Claude Code 2.0. Priced at $3/$15 per million tokens with 200K context (1M beta).
+    alongside Claude Code 2.0. Priced at \$3/\$15 per million tokens with 200K context (1M beta).
   relatedEntries:
     - id: claude
       type: ai-model
@@ -476,13 +525,17 @@
   outputPrice: 5
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   capabilities:
     - tool-use
     - extended-thinking
   description: >-
     Claude Haiku 4.5 was released October 15, 2025. Delivered performance comparable to Sonnet 4 at a
     fraction of the cost, making near-frontier intelligence accessible for scaled deployments. Priced at
-    $1/$5 per million tokens with a 200K token context window.
+    \$1/\$5 per million tokens with a 200K token context window.
   relatedEntries:
     - id: claude
       type: ai-model
@@ -511,6 +564,10 @@
   outputPrice: 25
   contextWindow: 200000
   safetyLevel: ASL-2
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: SWE-bench Verified
       score: 80.9
@@ -527,7 +584,7 @@
     - agentic-coding
   description: >-
     Claude Opus 4.5 was released November 24, 2025. First model to break 80% on SWE-bench Verified
-    (80.9%). Featured a 67% price reduction from Opus 4 ($5/$25 vs $15/$75 per MTok). Scored 44% on
+    (80.9%). Featured a 67% price reduction from Opus 4 (\$5/\$25 vs \$15/\$75 per MTok). Scored 44% on
     Terminal-Bench Hard and 70 on Artificial Analysis Intelligence Index.
   relatedEntries:
     - id: claude
@@ -558,6 +615,10 @@
   outputPrice: 25
   contextWindow: 1000000
   safetyLevel: ASL-3
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: ARC-AGI-2
       score: 68.8
@@ -578,7 +639,7 @@
     Claude Opus 4.6 was released February 5, 2026. Introduced adaptive thinking with four effort levels,
     agent teams for splitting tasks, and 1M-token context window (beta). Scored 68.8% on ARC-AGI-2
     (83% improvement over Opus 4.5), 65.4% on Terminal-Bench 2.0, and 72.7% on OSWorld.
-    Priced at $5/$25 per million tokens.
+    Priced at \$5/\$25 per million tokens.
   relatedEntries:
     - id: claude
       type: ai-model
@@ -609,6 +670,10 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-3
+  openWeight: false
+  modality:
+    - text
+    - image
   benchmarks:
     - name: SWE-bench Verified
       score: 79.6
@@ -620,7 +685,7 @@
   description: >-
     Claude Sonnet 4.6 was released February 17, 2026. Scored 79.6% on SWE-bench Verified and ranked
     No. 1 on GDPval-AA leaderboard. Matches Opus-class performance on many benchmarks at one-fifth the
-    cost. Default model for free and Pro Claude users. Priced at $3/$15 per million tokens with
+    cost. Default model for free and Pro Claude users. Priced at \$3/\$15 per million tokens with
     200K context (1M beta).
   relatedEntries:
     - id: claude
@@ -636,3 +701,1698 @@
     - claude
     - claude-4
   lastUpdated: 2026-02
+
+# =============================================================================
+# OPENAI — GPT and o-series Model Families
+# =============================================================================
+
+- id: gpt
+  numericId: E1060
+  type: ai-model
+  title: GPT
+  modelFamily: GPT
+  developer: openai
+  openWeight: false
+  modality:
+    - text
+    - image
+  description: >-
+    GPT (Generative Pre-trained Transformer) is OpenAI's flagship line of large language models.
+    The series began with GPT-1 (2018) and has progressed through GPT-2 (2019), GPT-3 (2020),
+    GPT-3.5 (2022, powering the original ChatGPT), GPT-4 (2023), and GPT-4o (2024). The o-series
+    (o1, o3) extends GPT with chain-of-thought reasoning. GPT models are available via the OpenAI
+    API, ChatGPT, and Microsoft Copilot.
+  relatedEntries:
+    - id: openai
+      type: organization
+      relationship: created-by
+    - id: gpt-4
+      type: ai-model
+      relationship: composed-of
+    - id: gpt-4o
+      type: ai-model
+      relationship: composed-of
+    - id: gpt-4o-mini
+      type: ai-model
+      relationship: composed-of
+    - id: o1
+      type: ai-model
+      relationship: composed-of
+    - id: o3
+      type: ai-model
+      relationship: composed-of
+    - id: gpt-4-1
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: OpenAI Models Documentation
+      url: https://platform.openai.com/docs/models
+  tags:
+    - gpt
+    - openai
+    - frontier-ai
+  lastUpdated: 2025-04
+
+- id: gpt-4
+  numericId: E1066
+  type: ai-model
+  title: GPT-4
+  modelFamily: GPT
+  modelTier: flagship
+  generation: "4"
+  developer: openai
+  releaseDate: "2023-03-14"
+  inputPrice: 30
+  outputPrice: 60
+  contextWindow: 8192
+  openWeight: false
+  modality:
+    - text
+  trainingCutoff: "2023-04"
+  benchmarks:
+    - name: MMLU
+      score: 86.4
+      unit: "%"
+    - name: HumanEval
+      score: 67.0
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    GPT-4 was released March 14, 2023 as OpenAI's most capable model. It demonstrated human-level
+    performance on various professional and academic benchmarks, scoring 86.4% on MMLU and in the
+    90th percentile on the bar exam. Initially text-only with an 8K context window (32K variant
+    available). Priced at \$30/\$60 per million tokens.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "GPT-4 Technical Report"
+      url: https://arxiv.org/abs/2303.08774
+  tags:
+    - gpt
+    - gpt-4
+    - frontier-ai
+  lastUpdated: 2023-03
+
+- id: gpt-4-turbo
+  numericId: E1067
+  type: ai-model
+  title: GPT-4 Turbo
+  modelFamily: GPT
+  modelTier: flagship
+  generation: "4-turbo"
+  developer: openai
+  releaseDate: "2023-11-06"
+  inputPrice: 10
+  outputPrice: 30
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+    - image
+  trainingCutoff: "2023-12"
+  capabilities:
+    - tool-use
+    - vision
+  description: >-
+    GPT-4 Turbo was announced at OpenAI DevDay on November 6, 2023. It featured a 128K context window
+    (16x the original GPT-4), lower pricing (\$10/\$30 per MTok, 3x cheaper than GPT-4), multimodal
+    vision capabilities, and a knowledge cutoff of April 2023 (later updated to December 2023).
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: New models and developer products announced at DevDay
+      url: https://openai.com/blog/new-models-and-developer-products-announced-at-devday
+  tags:
+    - gpt
+    - gpt-4
+  lastUpdated: 2023-11
+
+- id: gpt-4o
+  numericId: E1068
+  type: ai-model
+  title: GPT-4o
+  modelFamily: GPT
+  modelTier: flagship
+  generation: "4o"
+  developer: openai
+  releaseDate: "2024-05-13"
+  inputPrice: 2.50
+  outputPrice: 10
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+  trainingCutoff: "2023-10"
+  benchmarks:
+    - name: MMLU
+      score: 88.7
+      unit: "%"
+    - name: HumanEval
+      score: 90.2
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - audio-input
+    - audio-output
+  description: >-
+    GPT-4o ("o" for "omni") was released May 13, 2024 as OpenAI's flagship multimodal model. It
+    natively processes text, image, and audio inputs and outputs. Matched GPT-4 Turbo intelligence
+    at 50% lower price (\$2.50/\$10 per MTok) and 2x faster speed. Scored 88.7% on MMLU. Available
+    free to all ChatGPT users with rate limits.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Hello GPT-4o
+      url: https://openai.com/index/hello-gpt-4o/
+  tags:
+    - gpt
+    - gpt-4o
+    - multimodal
+  lastUpdated: 2024-05
+
+- id: gpt-4o-mini
+  numericId: E1069
+  type: ai-model
+  title: GPT-4o mini
+  modelFamily: GPT
+  modelTier: mini
+  generation: "4o-mini"
+  developer: openai
+  releaseDate: "2024-07-18"
+  inputPrice: 0.15
+  outputPrice: 0.60
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+    - image
+  trainingCutoff: "2023-10"
+  benchmarks:
+    - name: MMLU
+      score: 82.0
+      unit: "%"
+    - name: HumanEval
+      score: 87.2
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+  description: >-
+    GPT-4o mini was released July 18, 2024 as the most cost-efficient small model from OpenAI.
+    Priced at \$0.15/\$0.60 per million tokens — over 60% cheaper than GPT-3.5 Turbo. Scored 82% on
+    MMLU and 87.2% on HumanEval. Replaced GPT-3.5 Turbo as the default free-tier model in ChatGPT.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: GPT-4o mini
+      url: https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/
+  tags:
+    - gpt
+    - gpt-4o
+    - cost-efficient
+  lastUpdated: 2024-07
+
+- id: o1-preview
+  numericId: E1070
+  type: ai-model
+  title: o1-preview
+  modelFamily: o-series
+  modelTier: preview
+  generation: "o1"
+  developer: openai
+  releaseDate: "2024-09-12"
+  inputPrice: 15
+  outputPrice: 60
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+  benchmarks:
+    - name: GPQA Diamond
+      score: 78.0
+      unit: "%"
+    - name: MATH
+      score: 94.8
+      unit: "%"
+  capabilities:
+    - reasoning
+  description: >-
+    o1-preview was released September 12, 2024 as OpenAI's first reasoning model. It uses internal
+    chain-of-thought to think through complex problems before responding. Scored 83.3% on the
+    International Mathematics Olympiad qualifying exam (vs 13.4% for GPT-4o) and 78% on GPQA Diamond.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+    - id: o1
+      type: ai-model
+      relationship: related
+  sources:
+    - title: Learning to Reason with LLMs
+      url: https://openai.com/index/learning-to-reason-with-llms/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+  lastUpdated: 2024-09
+
+- id: o1
+  numericId: E1071
+  type: ai-model
+  title: o1
+  modelFamily: o-series
+  modelTier: flagship
+  generation: "o1"
+  developer: openai
+  releaseDate: "2024-12-05"
+  inputPrice: 15
+  outputPrice: 60
+  contextWindow: 200000
+  openWeight: false
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: GPQA Diamond
+      score: 79.2
+      unit: "%"
+    - name: MATH
+      score: 96.4
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 48.9
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+  description: >-
+    o1 (full release) launched December 5, 2024 with significant improvements over o1-preview.
+    Added vision capabilities, tool use, and a 200K context window. Scored 96.4% on MATH and
+    79.2% on GPQA Diamond. Priced at \$15/\$60 per million tokens.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: OpenAI o1
+      url: https://openai.com/index/openai-o1/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+  lastUpdated: 2024-12
+
+- id: o1-mini
+  numericId: E1072
+  type: ai-model
+  title: o1-mini
+  modelFamily: o-series
+  modelTier: mini
+  generation: "o1"
+  developer: openai
+  releaseDate: "2024-09-12"
+  inputPrice: 3
+  outputPrice: 12
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+  benchmarks:
+    - name: MATH
+      score: 90.0
+      unit: "%"
+  capabilities:
+    - reasoning
+  description: >-
+    o1-mini was released alongside o1-preview on September 12, 2024. A smaller, faster, 80% cheaper
+    reasoning model optimized for STEM tasks. Scored 90% on MATH. Priced at \$3/\$12 per million tokens.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Learning to Reason with LLMs
+      url: https://openai.com/index/learning-to-reason-with-llms/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+    - cost-efficient
+  lastUpdated: 2024-09
+
+- id: o3-mini
+  numericId: E1073
+  type: ai-model
+  title: o3-mini
+  modelFamily: o-series
+  modelTier: mini
+  generation: "o3"
+  developer: openai
+  releaseDate: "2025-01-31"
+  inputPrice: 1.10
+  outputPrice: 4.40
+  contextWindow: 200000
+  openWeight: false
+  modality:
+    - text
+  benchmarks:
+    - name: GPQA Diamond
+      score: 79.7
+      unit: "%"
+    - name: MATH
+      score: 97.9
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 49.3
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+  description: >-
+    o3-mini was released January 31, 2025 with three reasoning effort levels (low, medium, high).
+    On high effort, scored 97.9% on MATH and 79.7% on GPQA Diamond. Priced at \$1.10/\$4.40 per
+    million tokens — significantly cheaper than o1. Available in the API and ChatGPT.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: OpenAI o3-mini
+      url: https://openai.com/index/openai-o3-mini/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+    - cost-efficient
+  lastUpdated: 2025-01
+
+- id: o3
+  numericId: E1074
+  type: ai-model
+  title: o3
+  modelFamily: o-series
+  modelTier: flagship
+  generation: "o3"
+  developer: openai
+  releaseDate: "2025-04-16"
+  inputPrice: 10
+  outputPrice: 40
+  contextWindow: 200000
+  openWeight: false
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 69.1
+      unit: "%"
+    - name: GPQA Diamond
+      score: 83.3
+      unit: "%"
+    - name: MATH
+      score: 99.2
+      unit: "%"
+    - name: ARC-AGI
+      score: 87.5
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+    - code-execution
+  description: >-
+    o3 was released April 16, 2025 as OpenAI's most powerful reasoning model. Scored 99.2% on MATH,
+    87.5% on ARC-AGI, and 83.3% on GPQA Diamond. Featured improved tool use, image understanding,
+    and code execution. Priced at \$10/\$40 per million tokens with a 200K context window.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing OpenAI o3 and o4-mini
+      url: https://openai.com/index/introducing-o3-and-o4-mini/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+    - frontier-ai
+  lastUpdated: 2025-04
+
+- id: gpt-4-1
+  numericId: E1075
+  type: ai-model
+  title: GPT-4.1
+  modelFamily: GPT
+  modelTier: flagship
+  generation: "4.1"
+  developer: openai
+  releaseDate: "2025-04-14"
+  inputPrice: 2
+  outputPrice: 8
+  contextWindow: 1048576
+  openWeight: false
+  modality:
+    - text
+    - image
+  trainingCutoff: "2025-03"
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 54.6
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - long-context
+  description: >-
+    GPT-4.1 was released April 14, 2025 as an API-focused model optimized for coding and instruction
+    following. Featured a 1M token context window, scored 54.6% on SWE-bench Verified, and priced at
+    \$2/\$8 per million tokens. Replaced GPT-4o as the recommended general-purpose API model.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing GPT-4.1 in the API
+      url: https://openai.com/index/gpt-4-1/
+  tags:
+    - gpt
+    - gpt-4-1
+    - long-context
+  lastUpdated: 2025-04
+
+- id: gpt-4-1-mini
+  numericId: E1076
+  type: ai-model
+  title: GPT-4.1 mini
+  modelFamily: GPT
+  modelTier: mini
+  generation: "4.1"
+  developer: openai
+  releaseDate: "2025-04-14"
+  inputPrice: 0.40
+  outputPrice: 1.60
+  contextWindow: 1048576
+  openWeight: false
+  modality:
+    - text
+    - image
+  trainingCutoff: "2025-03"
+  capabilities:
+    - tool-use
+    - vision
+    - long-context
+  description: >-
+    GPT-4.1 mini was released April 14, 2025 alongside GPT-4.1. A cost-efficient variant with the
+    same 1M token context window. Priced at \$0.40/\$1.60 per million tokens — nearly 3x cheaper than
+    GPT-4o mini with better performance.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing GPT-4.1 in the API
+      url: https://openai.com/index/gpt-4-1/
+  tags:
+    - gpt
+    - gpt-4-1
+    - cost-efficient
+  lastUpdated: 2025-04
+
+- id: gpt-4-1-nano
+  numericId: E1077
+  type: ai-model
+  title: GPT-4.1 nano
+  modelFamily: GPT
+  modelTier: nano
+  generation: "4.1"
+  developer: openai
+  releaseDate: "2025-04-14"
+  inputPrice: 0.10
+  outputPrice: 0.40
+  contextWindow: 1048576
+  openWeight: false
+  modality:
+    - text
+    - image
+  trainingCutoff: "2025-03"
+  capabilities:
+    - tool-use
+    - vision
+    - long-context
+  description: >-
+    GPT-4.1 nano was released April 14, 2025 as the fastest and cheapest model in the GPT-4.1 family.
+    Designed for high-throughput classification, routing, and structured output tasks. Priced at
+    \$0.10/\$0.40 per million tokens with a 1M token context window.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing GPT-4.1 in the API
+      url: https://openai.com/index/gpt-4-1/
+  tags:
+    - gpt
+    - gpt-4-1
+    - cost-efficient
+  lastUpdated: 2025-04
+
+- id: o4-mini
+  numericId: E1078
+  type: ai-model
+  title: o4-mini
+  modelFamily: o-series
+  modelTier: mini
+  generation: "o4"
+  developer: openai
+  releaseDate: "2025-04-16"
+  inputPrice: 1.10
+  outputPrice: 4.40
+  contextWindow: 200000
+  openWeight: false
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 68.1
+      unit: "%"
+    - name: GPQA Diamond
+      score: 81.4
+      unit: "%"
+    - name: MATH
+      score: 98.5
+      unit: "%"
+    - name: ARC-AGI
+      score: 82.6
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+    - code-execution
+  description: >-
+    o4-mini was released April 16, 2025 alongside o3. A cost-efficient reasoning model that
+    approaches o3 performance at a fraction of the cost. Scored 68.1% on SWE-bench Verified
+    and 81.4% on GPQA Diamond. Priced at \$1.10/\$4.40 per million tokens.
+  relatedEntries:
+    - id: gpt
+      type: ai-model
+      relationship: part-of
+    - id: openai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing OpenAI o3 and o4-mini
+      url: https://openai.com/index/introducing-o3-and-o4-mini/
+  tags:
+    - openai
+    - reasoning
+    - o-series
+    - cost-efficient
+  lastUpdated: 2025-04
+
+# =============================================================================
+# GOOGLE DEEPMIND — Gemini Model Family
+# =============================================================================
+
+- id: gemini
+  numericId: E1061
+  type: ai-model
+  title: Gemini
+  modelFamily: Gemini
+  developer: deepmind
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  description: >-
+    Gemini is Google DeepMind's family of multimodal AI models, first released in December 2023.
+    Built natively multimodal from the ground up, processing text, images, audio, and video.
+    The family spans three tiers: Ultra (most capable), Pro (balanced), and Flash (fast/efficient).
+    Gemini powers Google AI Studio, the Gemini API, and various Google products.
+  relatedEntries:
+    - id: deepmind
+      type: organization
+      relationship: created-by
+    - id: gemini-1-0-ultra
+      type: ai-model
+      relationship: composed-of
+    - id: gemini-1-5-pro
+      type: ai-model
+      relationship: composed-of
+    - id: gemini-1-5-flash
+      type: ai-model
+      relationship: composed-of
+    - id: gemini-2-0-flash
+      type: ai-model
+      relationship: composed-of
+    - id: gemini-2-5-pro
+      type: ai-model
+      relationship: composed-of
+    - id: gemini-2-5-flash
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: Google DeepMind Gemini
+      url: https://deepmind.google/technologies/gemini/
+  tags:
+    - gemini
+    - google
+    - multimodal
+    - frontier-ai
+  lastUpdated: 2025-03
+
+- id: gemini-1-0-ultra
+  numericId: E1079
+  type: ai-model
+  title: Gemini 1.0 Ultra
+  modelFamily: Gemini
+  modelTier: ultra
+  generation: "1.0"
+  developer: deepmind
+  releaseDate: "2024-02-08"
+  contextWindow: 128000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  benchmarks:
+    - name: MMLU
+      score: 90.0
+      unit: "%"
+    - name: HumanEval
+      score: 74.4
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - audio-input
+  description: >-
+    Gemini 1.0 Ultra launched February 8, 2024 via Gemini Advanced. First model to exceed human expert
+    performance on MMLU (90.0%). Built natively multimodal, processing text, images, audio, and video
+    in a single model. Powered the Gemini Advanced subscription tier.
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "Gemini: A Family of Highly Capable Multimodal Models"
+      url: https://arxiv.org/abs/2312.11805
+  tags:
+    - gemini
+    - google
+    - multimodal
+    - frontier-ai
+  lastUpdated: 2024-02
+
+- id: gemini-1-5-pro
+  numericId: E1080
+  type: ai-model
+  title: Gemini 1.5 Pro
+  modelFamily: Gemini
+  modelTier: pro
+  generation: "1.5"
+  developer: deepmind
+  releaseDate: "2024-02-15"
+  inputPrice: 1.25
+  outputPrice: 5
+  contextWindow: 2000000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  benchmarks:
+    - name: MMLU
+      score: 85.9
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - audio-input
+    - long-context
+  description: >-
+    Gemini 1.5 Pro was released February 15, 2024 with a breakthrough 1M token context window (later
+    extended to 2M). Used a Mixture-of-Experts architecture for efficiency. Could process up to 1 hour
+    of video, 11 hours of audio, or 30,000+ lines of code. Priced at \$1.25/\$5 per million tokens.
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context"
+      url: https://arxiv.org/abs/2403.05530
+  tags:
+    - gemini
+    - google
+    - long-context
+    - multimodal
+  lastUpdated: 2024-02
+
+- id: gemini-1-5-flash
+  numericId: E1081
+  type: ai-model
+  title: Gemini 1.5 Flash
+  modelFamily: Gemini
+  modelTier: flash
+  generation: "1.5"
+  developer: deepmind
+  releaseDate: "2024-05-24"
+  inputPrice: 0.075
+  outputPrice: 0.30
+  contextWindow: 1000000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  capabilities:
+    - tool-use
+    - vision
+    - audio-input
+    - long-context
+  description: >-
+    Gemini 1.5 Flash was released May 24, 2024. A lightweight, fast model distilled from 1.5 Pro.
+    Designed for high-volume, cost-sensitive tasks. Featured a 1M token context window at an
+    extremely low price point (\$0.075/\$0.30 per million tokens).
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Google I/O 2024 Gemini Announcements
+      url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
+  tags:
+    - gemini
+    - google
+    - cost-efficient
+  lastUpdated: 2024-05
+
+- id: gemini-2-0-flash
+  numericId: E1082
+  type: ai-model
+  title: Gemini 2.0 Flash
+  modelFamily: Gemini
+  modelTier: flash
+  generation: "2.0"
+  developer: deepmind
+  releaseDate: "2024-12-11"
+  inputPrice: 0.10
+  outputPrice: 0.40
+  contextWindow: 1000000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  benchmarks:
+    - name: MMLU
+      score: 89.7
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - audio-input
+    - audio-output
+    - image-generation
+  description: >-
+    Gemini 2.0 Flash was released December 11, 2024 as the first Gemini 2.0 model. Despite being
+    a Flash-tier model, it outperformed 1.5 Pro on most benchmarks (89.7% MMLU). Introduced native
+    tool use, multimodal generation (images and audio output), and agentic capabilities.
+    Priced at \$0.10/\$0.40 per million tokens.
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Gemini 2.0
+      url: https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024/
+  tags:
+    - gemini
+    - google
+    - multimodal
+  lastUpdated: 2024-12
+
+- id: gemini-2-5-pro
+  numericId: E1083
+  type: ai-model
+  title: Gemini 2.5 Pro
+  modelFamily: Gemini
+  modelTier: pro
+  generation: "2.5"
+  developer: deepmind
+  releaseDate: "2025-03-25"
+  inputPrice: 1.25
+  outputPrice: 10
+  contextWindow: 1000000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 63.8
+      unit: "%"
+    - name: GPQA Diamond
+      score: 84.0
+      unit: "%"
+    - name: MATH
+      score: 97.3
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+    - audio-input
+    - long-context
+  description: >-
+    Gemini 2.5 Pro was released March 25, 2025 as Google's most capable model with built-in
+    reasoning (thinking). It topped the LMSys Chatbot Arena leaderboard on release. Scored 63.8%
+    on SWE-bench Verified, 84% on GPQA Diamond, and 97.3% on MATH. Featured a 1M token context
+    window with reasoning capabilities. Priced at \$1.25/\$10 per million tokens.
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Gemini 2.5 Pro
+      url: https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/
+  tags:
+    - gemini
+    - google
+    - reasoning
+    - frontier-ai
+  lastUpdated: 2025-03
+
+- id: gemini-2-5-flash
+  numericId: E1084
+  type: ai-model
+  title: Gemini 2.5 Flash
+  modelFamily: Gemini
+  modelTier: flash
+  generation: "2.5"
+  developer: deepmind
+  releaseDate: "2025-05-20"
+  inputPrice: 0.15
+  outputPrice: 0.60
+  contextWindow: 1000000
+  openWeight: false
+  modality:
+    - text
+    - image
+    - audio
+    - video
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+    - audio-input
+    - long-context
+  description: >-
+    Gemini 2.5 Flash was previewed May 20, 2025 at Google I/O as a cost-efficient reasoning model.
+    Featured hybrid reasoning with a toggleable thinking budget, 1M token context window, and
+    multimodal capabilities. Priced at \$0.15/\$0.60 per million tokens. Designed to bring 2.5 Pro
+    reasoning quality to Flash-tier pricing.
+  relatedEntries:
+    - id: gemini
+      type: ai-model
+      relationship: part-of
+    - id: deepmind
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Google I/O 2025 Gemini Updates
+      url: https://blog.google/technology/ai/io-2025-keynote/
+  tags:
+    - gemini
+    - google
+    - reasoning
+    - cost-efficient
+  lastUpdated: 2025-05
+
+# =============================================================================
+# META — Llama Model Family
+# =============================================================================
+
+- id: llama
+  numericId: E1062
+  type: ai-model
+  title: Llama
+  modelFamily: Llama
+  developer: meta-ai
+  openWeight: true
+  modality:
+    - text
+  description: >-
+    Llama (Large Language Model Meta AI) is Meta's family of open-weight language models. First
+    released in February 2023, Llama has become the most widely adopted open-weight model family.
+    Llama 2 (July 2023) introduced commercial licensing, Llama 3 (April 2024) significantly closed
+    the gap to proprietary models, and Llama 4 (April 2025) introduced mixture-of-experts
+    architecture. Llama models are available for download and can be self-hosted.
+  relatedEntries:
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+    - id: llama-2
+      type: ai-model
+      relationship: composed-of
+    - id: llama-3
+      type: ai-model
+      relationship: composed-of
+    - id: llama-3-1
+      type: ai-model
+      relationship: composed-of
+    - id: llama-3-3
+      type: ai-model
+      relationship: composed-of
+    - id: llama-4-scout
+      type: ai-model
+      relationship: composed-of
+    - id: llama-4-maverick
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: Meta Llama
+      url: https://llama.meta.com/
+  tags:
+    - llama
+    - meta
+    - open-weight
+    - frontier-ai
+  lastUpdated: 2025-04
+
+- id: llama-2
+  numericId: E1085
+  type: ai-model
+  title: Llama 2
+  modelFamily: Llama
+  generation: "2"
+  developer: meta-ai
+  releaseDate: "2023-07-18"
+  contextWindow: 4096
+  openWeight: true
+  parameterCount: "70B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 68.9
+      unit: "%"
+  capabilities: []
+  description: >-
+    Llama 2 was released July 18, 2023 in partnership with Microsoft. Available in 7B, 13B, and 70B
+    parameter sizes with open commercial licensing (a first for Meta). The 70B model scored 68.9% on
+    MMLU. Trained on 2T tokens with a 4K context window. Llama 2 Chat variants were fine-tuned for
+    dialogue using RLHF.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
+      url: https://arxiv.org/abs/2307.09288
+  tags:
+    - llama
+    - meta
+    - open-weight
+  lastUpdated: 2023-07
+
+- id: llama-3
+  numericId: E1086
+  type: ai-model
+  title: Llama 3
+  modelFamily: Llama
+  generation: "3"
+  developer: meta-ai
+  releaseDate: "2024-04-18"
+  contextWindow: 8192
+  openWeight: true
+  parameterCount: "70B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 82.0
+      unit: "%"
+    - name: HumanEval
+      score: 81.7
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Llama 3 was released April 18, 2024 in 8B and 70B sizes. Trained on 15T tokens (7x Llama 2).
+    The 70B model scored 82% on MMLU and 81.7% on HumanEval, approaching GPT-4 performance.
+    Used a Grouped Query Attention (GQA) architecture and a 128K token vocabulary.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Meta Llama 3
+      url: https://ai.meta.com/blog/meta-llama-3/
+  tags:
+    - llama
+    - meta
+    - open-weight
+  lastUpdated: 2024-04
+
+- id: llama-3-1
+  numericId: E1087
+  type: ai-model
+  title: Llama 3.1
+  modelFamily: Llama
+  generation: "3.1"
+  developer: meta-ai
+  releaseDate: "2024-07-23"
+  contextWindow: 128000
+  openWeight: true
+  parameterCount: "405B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 88.6
+      unit: "%"
+    - name: HumanEval
+      score: 89.0
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Llama 3.1 was released July 23, 2024 in 8B, 70B, and a groundbreaking 405B size — the largest
+    openly available model at the time. The 405B scored 88.6% on MMLU, competitive with GPT-4o and
+    Claude 3.5 Sonnet. Extended context to 128K tokens. Released under the Llama 3.1 Community License.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Llama 3.1
+      url: https://ai.meta.com/blog/meta-llama-3-1/
+  tags:
+    - llama
+    - meta
+    - open-weight
+    - frontier-ai
+  lastUpdated: 2024-07
+
+- id: llama-3-3
+  numericId: E1088
+  type: ai-model
+  title: Llama 3.3
+  modelFamily: Llama
+  generation: "3.3"
+  developer: meta-ai
+  releaseDate: "2024-12-06"
+  contextWindow: 128000
+  openWeight: true
+  parameterCount: "70B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 86.0
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Llama 3.3 was released December 6, 2024 as a 70B model that matched Llama 3.1 405B performance
+    on many benchmarks. This represented a significant efficiency improvement — near-405B quality at
+    70B cost. Scored 86% on MMLU with 128K context window.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Llama 3.3 Release
+      url: https://ai.meta.com/blog/llama-3-3/
+  tags:
+    - llama
+    - meta
+    - open-weight
+  lastUpdated: 2024-12
+
+- id: llama-4-scout
+  numericId: E1089
+  type: ai-model
+  title: Llama 4 Scout
+  modelFamily: Llama
+  generation: "4"
+  developer: meta-ai
+  releaseDate: "2025-04-05"
+  contextWindow: 10000000
+  openWeight: true
+  parameterCount: "109B"
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: MMLU
+      score: 89.3
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - long-context
+  description: >-
+    Llama 4 Scout was released April 5, 2025 as a 17B active parameter mixture-of-experts model
+    (109B total, 16 experts). Featured a 10M token context window — the longest of any production
+    model at launch. Natively multimodal (text + image). Scored 89.3% on MMLU. Beat Gemini 2.0 Flash
+    and GPT-4o on multiple benchmarks while being deployable on a single H100 GPU.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Llama 4
+      url: https://ai.meta.com/blog/llama-4/
+  tags:
+    - llama
+    - meta
+    - open-weight
+    - mixture-of-experts
+    - long-context
+  lastUpdated: 2025-04
+
+- id: llama-4-maverick
+  numericId: E1090
+  type: ai-model
+  title: Llama 4 Maverick
+  modelFamily: Llama
+  generation: "4"
+  developer: meta-ai
+  releaseDate: "2025-04-05"
+  contextWindow: 1000000
+  openWeight: true
+  parameterCount: "400B"
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: MMLU
+      score: 92.2
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+  description: >-
+    Llama 4 Maverick was released April 5, 2025 as a 17B active parameter mixture-of-experts model
+    (400B total, 128 experts). Scored 92.2% on MMLU, outperforming GPT-4o and Gemini 2.0 Flash.
+    Featured a 1M token context window and native multimodal support. Could be deployed on a single
+    H100 DGX host.
+  relatedEntries:
+    - id: llama
+      type: ai-model
+      relationship: part-of
+    - id: meta-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Introducing Llama 4
+      url: https://ai.meta.com/blog/llama-4/
+  tags:
+    - llama
+    - meta
+    - open-weight
+    - mixture-of-experts
+    - frontier-ai
+  lastUpdated: 2025-04
+
+# =============================================================================
+# MISTRAL AI — Mistral Model Family
+# =============================================================================
+
+- id: mistral-ai-models
+  numericId: E1063
+  type: ai-model
+  title: Mistral
+  modelFamily: Mistral
+  developer: mistral-ai
+  openWeight: true
+  modality:
+    - text
+  description: >-
+    Mistral is Mistral AI's family of language models, combining open-weight releases with
+    commercial API offerings. Founded in 2023 by former DeepMind and Meta researchers, Mistral AI
+    quickly established itself as a leading European AI lab. Notable models include Mistral 7B
+    (the first competitive small open model), Mixtral (mixture-of-experts), and Mistral Large
+    (frontier-class). The company offers both open-weight and proprietary models.
+  relatedEntries:
+    - id: mistral-ai
+      type: organization
+      relationship: created-by
+    - id: mixtral-8x7b
+      type: ai-model
+      relationship: composed-of
+    - id: mistral-large-2
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: Mistral AI Models
+      url: https://docs.mistral.ai/getting-started/models/
+  tags:
+    - mistral
+    - european-ai
+    - open-weight
+  lastUpdated: 2024-07
+
+- id: mixtral-8x7b
+  numericId: E1091
+  type: ai-model
+  title: Mixtral 8x7B
+  modelFamily: Mistral
+  generation: "mixtral"
+  developer: mistral-ai
+  releaseDate: "2023-12-11"
+  contextWindow: 32000
+  openWeight: true
+  parameterCount: "46.7B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 70.6
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Mixtral 8x7B was released December 11, 2023 as an open-weight sparse mixture-of-experts model.
+    Used 8 expert networks with 7B parameters each (46.7B total, 12.9B active per token). Matched
+    or outperformed Llama 2 70B and GPT-3.5 on most benchmarks while being 6x faster at inference.
+    Scored 70.6% on MMLU. Released under Apache 2.0 license.
+  relatedEntries:
+    - id: mistral-ai-models
+      type: ai-model
+      relationship: part-of
+    - id: mistral-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "Mixtral of Experts"
+      url: https://arxiv.org/abs/2401.04088
+  tags:
+    - mistral
+    - mixture-of-experts
+    - open-weight
+  lastUpdated: 2023-12
+
+- id: mistral-large-2
+  numericId: E1092
+  type: ai-model
+  title: Mistral Large 2
+  modelFamily: Mistral
+  modelTier: large
+  generation: "2"
+  developer: mistral-ai
+  releaseDate: "2024-07-24"
+  inputPrice: 2
+  outputPrice: 6
+  contextWindow: 128000
+  openWeight: true
+  parameterCount: "123B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 84.0
+      unit: "%"
+    - name: HumanEval
+      score: 92.0
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Mistral Large 2 was released July 24, 2024 as a 123B parameter model. Scored 84% on MMLU and
+    92% on HumanEval. Competitive with GPT-4o and Claude 3.5 Sonnet at significantly lower cost.
+    Featured a 128K context window and was released under the Mistral Research License (later made
+    more permissive). Available via API and self-hosting.
+  relatedEntries:
+    - id: mistral-ai-models
+      type: ai-model
+      relationship: part-of
+    - id: mistral-ai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Mistral Large 2
+      url: https://mistral.ai/news/mistral-large-2407/
+  tags:
+    - mistral
+    - frontier-ai
+    - open-weight
+  lastUpdated: 2024-07
+
+# =============================================================================
+# XAI — Grok Model Family
+# =============================================================================
+
+- id: grok
+  numericId: E1064
+  type: ai-model
+  title: Grok
+  modelFamily: Grok
+  developer: xai
+  openWeight: false
+  modality:
+    - text
+    - image
+  description: >-
+    Grok is xAI's family of AI models, first released in November 2023. Founded by Elon Musk, xAI
+    positions Grok as a model focused on truth-seeking and reasoning, with access to real-time
+    information via the X (Twitter) platform. Grok-1 was partially open-sourced, but later versions
+    are proprietary. Available via the xAI API and the X platform.
+  relatedEntries:
+    - id: xai
+      type: organization
+      relationship: created-by
+    - id: grok-2
+      type: ai-model
+      relationship: composed-of
+    - id: grok-3
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: xAI
+      url: https://x.ai/
+  tags:
+    - grok
+    - xai
+    - frontier-ai
+  lastUpdated: 2025-02
+
+- id: grok-2
+  numericId: E1093
+  type: ai-model
+  title: Grok-2
+  modelFamily: Grok
+  generation: "2"
+  developer: xai
+  releaseDate: "2024-08-13"
+  inputPrice: 2
+  outputPrice: 10
+  contextWindow: 131072
+  openWeight: false
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: MMLU
+      score: 87.5
+      unit: "%"
+  capabilities:
+    - tool-use
+    - vision
+    - image-generation
+  description: >-
+    Grok-2 was released August 13, 2024. Scored 87.5% on MMLU, competitive with GPT-4o and Claude
+    3.5 Sonnet. Featured vision capabilities and integrated image generation via FLUX. Available
+    through the xAI API and X Premium+ subscribers. Priced at \$2/\$10 per million tokens.
+  relatedEntries:
+    - id: grok
+      type: ai-model
+      relationship: part-of
+    - id: xai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Grok-2 Beta Release
+      url: https://x.ai/blog/grok-2
+  tags:
+    - grok
+    - xai
+    - frontier-ai
+  lastUpdated: 2024-08
+
+- id: grok-3
+  numericId: E1094
+  type: ai-model
+  title: Grok-3
+  modelFamily: Grok
+  generation: "3"
+  developer: xai
+  releaseDate: "2025-02-17"
+  inputPrice: 3
+  outputPrice: 15
+  contextWindow: 131072
+  openWeight: false
+  modality:
+    - text
+    - image
+  benchmarks:
+    - name: GPQA Diamond
+      score: 80.0
+      unit: "%"
+    - name: MATH
+      score: 95.0
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+    - vision
+  description: >-
+    Grok-3 was released February 17, 2025. Trained on xAI's Colossus supercluster (100,000 Nvidia
+    H100 GPUs). Scored 80% on GPQA Diamond and 95% on MATH. Featured a "think" mode for chain-of-thought
+    reasoning. Available via the xAI API and X platform. Priced at \$3/\$15 per million tokens.
+  relatedEntries:
+    - id: grok
+      type: ai-model
+      relationship: part-of
+    - id: xai
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Grok 3
+      url: https://x.ai/blog/grok-3
+  tags:
+    - grok
+    - xai
+    - reasoning
+    - frontier-ai
+  lastUpdated: 2025-02
+
+# =============================================================================
+# DEEPSEEK — DeepSeek Model Family
+# =============================================================================
+
+- id: deepseek-models
+  numericId: E1065
+  type: ai-model
+  title: DeepSeek
+  modelFamily: DeepSeek
+  developer: deepseek
+  openWeight: true
+  modality:
+    - text
+  description: >-
+    DeepSeek is a Chinese AI lab's family of open-weight language models. Founded in 2023 as a
+    subsidiary of the quantitative trading firm High-Flyer. DeepSeek gained prominence with V2's
+    efficient mixture-of-experts architecture, V3's GPT-4o-level performance at dramatically lower
+    training cost, and R1's open-weight reasoning capabilities that rivaled o1. All models are
+    released under permissive MIT licenses.
+  relatedEntries:
+    - id: deepseek
+      type: organization
+      relationship: created-by
+    - id: deepseek-v3
+      type: ai-model
+      relationship: composed-of
+    - id: deepseek-r1
+      type: ai-model
+      relationship: composed-of
+  sources:
+    - title: DeepSeek
+      url: https://www.deepseek.com/
+  tags:
+    - deepseek
+    - chinese-ai
+    - open-weight
+  lastUpdated: 2025-01
+
+- id: deepseek-v3
+  numericId: E1095
+  type: ai-model
+  title: DeepSeek V3
+  modelFamily: DeepSeek
+  generation: "3"
+  developer: deepseek
+  releaseDate: "2024-12-26"
+  inputPrice: 0.27
+  outputPrice: 1.10
+  contextWindow: 128000
+  openWeight: true
+  parameterCount: "671B"
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 88.5
+      unit: "%"
+    - name: HumanEval
+      score: 82.6
+      unit: "%"
+    - name: MATH
+      score: 90.2
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    DeepSeek V3 was released December 26, 2024. A 671B parameter mixture-of-experts model (37B active
+    per token). Achieved GPT-4o-level performance at a fraction of the training cost — reportedly
+    trained for just \$5.6M using FP8 mixed precision on 2,048 H800 GPUs. Scored 88.5% on MMLU and
+    90.2% on MATH. Released under MIT license. API pricing at \$0.27/\$1.10 per million tokens — one
+    of the cheapest frontier-class models.
+  relatedEntries:
+    - id: deepseek-models
+      type: ai-model
+      relationship: part-of
+    - id: deepseek
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "DeepSeek-V3 Technical Report"
+      url: https://arxiv.org/abs/2412.19437
+  tags:
+    - deepseek
+    - mixture-of-experts
+    - open-weight
+    - cost-efficient
+  lastUpdated: 2024-12
+
+- id: deepseek-r1
+  numericId: E1096
+  type: ai-model
+  title: DeepSeek R1
+  modelFamily: DeepSeek
+  generation: "r1"
+  developer: deepseek
+  releaseDate: "2025-01-20"
+  inputPrice: 0.55
+  outputPrice: 2.19
+  contextWindow: 128000
+  openWeight: true
+  parameterCount: "671B"
+  modality:
+    - text
+  benchmarks:
+    - name: MATH
+      score: 97.3
+      unit: "%"
+    - name: GPQA Diamond
+      score: 71.5
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 49.2
+      unit: "%"
+  capabilities:
+    - reasoning
+    - tool-use
+  description: >-
+    DeepSeek R1 was released January 20, 2025 as an open-weight reasoning model that rivaled OpenAI's
+    o1. Built on DeepSeek V3 with reinforcement learning for chain-of-thought reasoning. Scored 97.3%
+    on MATH, 71.5% on GPQA Diamond, and 49.2% on SWE-bench Verified. Also released smaller distilled
+    versions (1.5B to 70B). Released under MIT license, making it the first open-weight model competitive
+    with proprietary reasoning models.
+  relatedEntries:
+    - id: deepseek-models
+      type: ai-model
+      relationship: part-of
+    - id: deepseek
+      type: organization
+      relationship: created-by
+  sources:
+    - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
+      url: https://arxiv.org/abs/2501.12948
+  tags:
+    - deepseek
+    - reasoning
+    - open-weight
+    - frontier-ai
+  lastUpdated: 2025-01

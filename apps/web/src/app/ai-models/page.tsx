@@ -50,6 +50,8 @@ export default function AiModelsPage() {
         : null,
       capabilities: entity.capabilities ?? [],
       isFamily,
+      openWeight: entity.openWeight ?? null,
+      parameterCount: entity.parameterCount ?? null,
     };
   });
 

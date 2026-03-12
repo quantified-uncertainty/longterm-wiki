@@ -230,7 +230,7 @@ const BenchmarkResult = z.object({
 const AiModelEntitySchema = BaseEntity.extend({
   entityType: z.literal("ai-model"),
   modelFamily: z.string().optional(),
-  modelTier: z.enum(["haiku", "sonnet", "opus"]).optional(),
+  modelTier: z.string().optional(),
   generation: z.string().optional(),
   releaseDate: z.string().optional(),
   developer: z.string().optional(),
@@ -240,6 +240,10 @@ const AiModelEntitySchema = BaseEntity.extend({
   safetyLevel: z.string().optional(),
   benchmarks: z.array(BenchmarkResult).default([]),
   capabilities: z.array(z.string()).default([]),
+  modality: z.array(z.string()).default([]),
+  openWeight: z.boolean().optional(),
+  parameterCount: z.string().optional(),
+  trainingCutoff: z.string().optional(),
 });
 
 // Catch-all for entity types we haven't explicitly modeled
