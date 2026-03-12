@@ -613,6 +613,8 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  fetchStatus: "ok" | "dead" | "paywall" | "error" | null;
+  lastFetchedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

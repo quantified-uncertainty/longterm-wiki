@@ -626,17 +626,6 @@ const resourcesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Check resource exists
-    const existing = await db
-      .select({ id: resources.id })
-      .from(resources)
-      .where(eq(resources.id, id))
-      .limit(1);
-
-    if (existing.length === 0) {
-      return notFoundError(c, `Resource not found: ${id}`);
-    }
-
     const { fetchStatus, lastFetchedAt, fetchedTitle } = parsed.data;
 
     const updateSet: Record<string, unknown> = {
@@ -650,10 +639,15 @@ const resourcesApp = new Hono()
       updateSet.title = sql`COALESCE(${resources.title}, ${fetchedTitle})`;
     }
 
-    await db
+    const updated = await db
       .update(resources)
       .set(updateSet)
-      .where(eq(resources.id, id));
+      .where(eq(resources.id, id))
+      .returning({ id: resources.id });
+
+    if (updated.length === 0) {
+      return notFoundError(c, `Resource not found: ${id}`);
+    }
 
     logger.info({ resourceId: id, fetchStatus, lastFetchedAt }, "Updated resource fetch status");
 
