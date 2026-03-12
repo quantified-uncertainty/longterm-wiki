@@ -4,6 +4,8 @@ import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { divisions } from "../schema.js";
 import {
+  paginationQuery,
+  noDuplicateIds,
   parseJsonBody,
   validationError,
   invalidJsonError,
@@ -12,8 +14,6 @@ import {
 } from "./utils.js";
 
 // ---- Constants ----
-
-const MAX_PAGE_SIZE = 200;
 
 const VALID_DIVISION_TYPES = [
   "fund",
@@ -27,17 +27,13 @@ const VALID_STATUSES = ["active", "inactive", "dissolved"] as const;
 
 // ---- Query schemas ----
 
-const AllQuery = z.object({
+const AllQuery = paginationQuery({ defaultLimit: 200 }).extend({
   division_type: z.enum(VALID_DIVISION_TYPES).optional(),
   status: z.enum(VALID_STATUSES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
-  offset: z.coerce.number().int().min(0).default(0),
 });
 
-const ByOrgQuery = z.object({
+const ByOrgQuery = paginationQuery({ defaultLimit: 100 }).extend({
   division_type: z.enum(VALID_DIVISION_TYPES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
 });
 
 // ---- Sync schema ----
@@ -62,10 +58,7 @@ const SyncDivisionsBatchSchema = z.object({
     .array(SyncDivisionItemSchema)
     .min(1)
     .max(500)
-    .refine(
-      (items) => new Set(items.map((i) => i.id)).size === items.length,
-      { message: "Duplicate id values in items array" }
-    )
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" })
     .refine(
       (items) => {
         const slugs = items.map((i) => i.slug).filter((s) => s != null);

@@ -4,6 +4,8 @@ import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { fundingPrograms } from "../schema.js";
 import {
+  paginationQuery,
+  noDuplicateIds,
   parseJsonBody,
   validationError,
   invalidJsonError,
@@ -12,8 +14,6 @@ import {
 } from "./utils.js";
 
 // ---- Constants ----
-
-const MAX_PAGE_SIZE = 200;
 
 const VALID_PROGRAM_TYPES = [
   "rfp",
@@ -28,26 +28,13 @@ const VALID_STATUSES = ["open", "closed", "awarded"] as const;
 
 // ---- Query schemas ----
 
-const AllQuery = z.object({
+const programFilters = {
   program_type: z.enum(VALID_PROGRAM_TYPES).optional(),
   status: z.enum(VALID_STATUSES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+};
 
-const ByOrgQuery = z.object({
-  program_type: z.enum(VALID_PROGRAM_TYPES).optional(),
-  status: z.enum(VALID_STATUSES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
-const ByDivisionQuery = z.object({
-  program_type: z.enum(VALID_PROGRAM_TYPES).optional(),
-  status: z.enum(VALID_STATUSES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const AllQuery = paginationQuery({ defaultLimit: 200 }).extend(programFilters);
+const ScopedQuery = paginationQuery({ defaultLimit: 100 }).extend(programFilters);
 
 // ---- Sync schema ----
 
@@ -73,10 +60,7 @@ const SyncFundingProgramsBatchSchema = z.object({
     .array(SyncFundingProgramItemSchema)
     .min(1)
     .max(500)
-    .refine(
-      (items) => new Set(items.map((i) => i.id)).size === items.length,
-      { message: "Duplicate id values in items array" }
-    ),
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Helpers ----
@@ -180,7 +164,7 @@ const fundingProgramsApp = new Hono()
   })
 
   // ---- GET /by-org/:orgId ----
-  .get("/by-org/:orgId", zv("query", ByOrgQuery), async (c) => {
+  .get("/by-org/:orgId", zv("query", ScopedQuery), async (c) => {
     const orgId = c.req.param("orgId");
     const { program_type, status, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -217,7 +201,7 @@ const fundingProgramsApp = new Hono()
   // ---- GET /by-division/:divisionId ----
   .get(
     "/by-division/:divisionId",
-    zv("query", ByDivisionQuery),
+    zv("query", ScopedQuery),
     async (c) => {
       const divisionId = c.req.param("divisionId");
       const { program_type, status, limit, offset } = c.req.valid("query");

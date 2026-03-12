@@ -4,27 +4,18 @@ import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { divisionPersonnel } from "../schema.js";
 import {
+  paginationQuery,
+  noDuplicateIds,
   parseJsonBody,
   validationError,
   invalidJsonError,
   zv,
 } from "./utils.js";
 
-// ---- Constants ----
-
-const MAX_PAGE_SIZE = 200;
-
 // ---- Query schemas ----
 
-const PaginationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
-const AllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const ScopedQuery = paginationQuery({ defaultLimit: 100 });
+const AllQuery = paginationQuery({ defaultLimit: 200 });
 
 // ---- Sync schema ----
 
@@ -44,10 +35,7 @@ const SyncDivisionPersonnelBatchSchema = z.object({
     .array(SyncDivisionPersonnelItemSchema)
     .min(1)
     .max(500)
-    .refine(
-      (items) => new Set(items.map((i) => i.id)).size === items.length,
-      { message: "Duplicate id values in items array" }
-    ),
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Helpers ----
@@ -111,7 +99,7 @@ const divisionPersonnelApp = new Hono()
   // ---- GET /by-division/:divisionId ----
   .get(
     "/by-division/:divisionId",
-    zv("query", PaginationQuery),
+    zv("query", ScopedQuery),
     async (c) => {
       const divisionId = c.req.param("divisionId");
       const { limit, offset } = c.req.valid("query");
@@ -142,7 +130,7 @@ const divisionPersonnelApp = new Hono()
   )
 
   // ---- GET /by-person/:personId ----
-  .get("/by-person/:personId", zv("query", PaginationQuery), async (c) => {
+  .get("/by-person/:personId", zv("query", ScopedQuery), async (c) => {
     const personId = c.req.param("personId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
