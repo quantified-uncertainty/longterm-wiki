@@ -64,18 +64,40 @@ export function isAutoUpdateAllowedFile(path: string): boolean {
 
 // ── Git helpers ──────────────────────────────────────────────────────────────
 
-function git(args: string[]): string {
+interface GitOptions {
+  /** Timeout in milliseconds. Default: 60_000 (60s). Use 0 for no timeout. */
+  timeout?: number;
+}
+
+function git(args: string[], opts?: GitOptions): string {
+  const timeout = opts?.timeout ?? 60_000;
   try {
     return execFileSync('git', args, {
       cwd: PROJECT_ROOT,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: timeout || undefined,
     }).trim();
   } catch (err: unknown) {
-    // execFileSync wraps the error but stderr is on err.stderr
-    const e = err as { stderr?: string; message?: string };
+    // execFileSync wraps the error; stderr, stdout, and status are on the error object
+    const e = err as {
+      stderr?: string;
+      stdout?: string;
+      message?: string;
+      status?: number | null;
+      signal?: string | null;
+    };
     const stderr = typeof e.stderr === 'string' ? e.stderr.trim() : '';
-    const detail = stderr || e.message || String(err);
+    const stdout = typeof e.stdout === 'string' ? e.stdout.trim() : '';
+
+    // Build a detailed error message with all available diagnostic info
+    const parts: string[] = [];
+    if (stderr) parts.push(`stderr: ${stderr}`);
+    if (stdout) parts.push(`stdout: ${stdout}`);
+    if (e.status != null) parts.push(`exit code: ${e.status}`);
+    if (e.signal) parts.push(`signal: ${e.signal}`);
+
+    const detail = parts.length > 0 ? parts.join(' | ') : (e.message || String(err));
     throw new Error(`git ${args[0]} failed: ${detail}`);
   }
 }
@@ -551,16 +573,34 @@ export async function orchestrateCiAutoUpdate(
   const commitMsg = `auto-update: ${date} daily wiki refresh\n\nAutomated news-driven wiki update.\nRun report: ${reportPath || 'N/A'}`;
   git(['commit', '-m', commitMsg]);
 
-  // For same-day re-runs the remote branch may already exist from a prior
-  // failed attempt. Use --force on retry because the shallow CI clone
-  // (fetch-depth: 1) lacks the reflog data that --force-with-lease needs.
-  // This is safe because auto-update branches are exclusively owned by CI.
+  // Pre-push diagnostics: log state that affects push behavior
   try {
-    git(['push', '-u', 'origin', branch]);
+    const remoteUrl = git(['remote', 'get-url', 'origin']);
+    console.log(`Remote URL: ${remoteUrl}`);
+    const isShallow = git(['rev-parse', '--is-shallow-repository']);
+    console.log(`Shallow clone: ${isShallow}`);
+    if (isShallow === 'true') {
+      console.log('Unshallowing repository for push compatibility...');
+      git(['fetch', '--unshallow', 'origin'], { timeout: 120_000 });
+      console.log('Repository unshallowed successfully');
+    }
+  } catch (diagErr) {
+    const msg = diagErr instanceof Error ? diagErr.message : String(diagErr);
+    console.warn(`Pre-push diagnostics warning: ${msg}`);
+  }
+
+  // For same-day re-runs the remote branch may already exist from a prior
+  // failed attempt. Use --force on retry because auto-update branches are
+  // exclusively owned by this CI pipeline.
+  // Use --verbose for detailed push diagnostics in CI logs.
+  const PUSH_TIMEOUT = 120_000; // 2 minutes
+  try {
+    git(['push', '--verbose', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
   } catch (pushErr: unknown) {
     const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
-    console.log(`Standard push failed (${msg}), retrying with --force`);
-    git(['push', '--force', '-u', 'origin', branch]);
+    console.warn(`Standard push failed:\n${msg}`);
+    console.log('Retrying with --force...');
+    git(['push', '--verbose', '--force', '-u', 'origin', branch], { timeout: PUSH_TIMEOUT });
   }
   console.log(`Pushed to origin/${branch}`);
 
