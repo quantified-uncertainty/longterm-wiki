@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
+import { ensureMdxSafeYaml } from '../../lib/yaml-mdx-safe.ts';
 import type { PageInfo, GradeResult, Metrics } from './types.ts';
 
 /**
@@ -30,7 +31,9 @@ function safeStringifyFm(obj: Record<string, unknown>): string {
     if (typeof obj.quality === 'number' && roundTripped?.quality !== obj.quality) {
       throw new Error('quality field lost in round-trip');
     }
-    return plainYaml;
+    // Ensure \$ in plain YAML values are double-quoted for MDX safety.
+    // Without this, remark-mdx-frontmatter converts \$ to invalid JS escapes.
+    return ensureMdxSafeYaml(plainYaml);
   } catch {
     // PLAIN serialization produced invalid YAML — fall back to quoted strings
     return stringifyYaml(obj, {

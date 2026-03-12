@@ -9,6 +9,7 @@ import path from 'path';
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { appendEditLog } from '../../lib/session/edit-log.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
+import { ensureMdxSafeYaml } from '../../lib/yaml-mdx-safe.ts';
 import { extractText } from '../../lib/llm.ts';
 import { READER_IMPORTANCE_GUIDELINES, TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';
 import type { TopicPhaseContext } from './types.ts';
@@ -201,7 +202,9 @@ Respond with JSON:
     // Write updated file — reorder keys to canonical order before serialization
     const orderedFrontmatter = reorderFrontmatterObject(frontmatter);
     const { stringify: stringifyYaml } = await import('yaml');
-    const yamlStr = stringifyYaml(orderedFrontmatter);
+    let yamlStr = stringifyYaml(orderedFrontmatter);
+    // Ensure \$ in plain YAML values are double-quoted for MDX safety.
+    yamlStr = ensureMdxSafeYaml(yamlStr);
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
 
