@@ -60,6 +60,15 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           policyStatus={data.policyStatus}
           policyAuthor={data.policyAuthor}
           scope={data.scope}
+          // AI Model fields
+          modelTier={data.modelTier}
+          releaseDate={data.releaseDate}
+          developer={data.developer}
+          inputPrice={data.inputPrice}
+          outputPrice={data.outputPrice}
+          contextWindow={data.contextWindow}
+          safetyLevel={data.safetyLevel}
+          benchmarks={data.benchmarks}
           // Summary page
           summaryPage={data.summaryPage}
           // Overview child pages

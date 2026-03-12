@@ -492,8 +492,8 @@ export function getTypedEntities(): AnyEntity[] {
 // TYPES (re-exported for consumers)
 // ============================================================================
 
-export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity } from "./entity-schemas";
-export { isRisk, isPerson, isOrganization, isPolicy } from "./entity-schemas";
+export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity } from "./entity-schemas";
+export { isRisk, isPerson, isOrganization, isPolicy, isAiModel } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
 interface Entity {
