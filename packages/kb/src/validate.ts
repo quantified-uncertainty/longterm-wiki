@@ -670,23 +670,22 @@ function checkRangeValues(
   return results;
 }
 
-/** Check 21: orphan entity — no facts and no records. */
+/** Check 21: orphan entity — no facts. */
 function checkOrphanEntity(
   graph: Graph,
   entityId: string
 ): ValidationResult[] {
   const facts = graph.getFacts(entityId);
-  const hasRecords = graph.getRecordCollectionNames(entityId).length > 0;
 
   // Only count non-derived facts.
   const nonDerivedFacts = facts.filter((f) => !f.derivedFrom);
 
-  if (nonDerivedFacts.length === 0 && !hasRecords) {
+  if (nonDerivedFacts.length === 0) {
     return [
       {
         severity: "info",
         entityId,
-        message: `Entity "${entityId}" is an orphan (no facts and no record collections).`,
+        message: `Entity "${entityId}" is an orphan (no facts).`,
         rule: "orphan-entity",
       },
     ];

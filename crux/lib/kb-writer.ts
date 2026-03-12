@@ -2,7 +2,7 @@
  * YAML read-modify-write utilities for KB entity files.
  *
  * Uses `parseDocument()` from the `yaml` package to preserve comments and
- * formatting when appending facts or records to entity YAML files.
+ * formatting when appending facts to entity YAML files.
  *
  * All writes are atomic: write to a `.tmp` file, then rename.
  */
@@ -95,53 +95,6 @@ export function appendFact(doc: Document, fact: RawFactInput): string {
 }
 
 /**
- * Append a record entry to an entity YAML document.
- * Creates the records/collection section if it doesn't exist.
- * Returns the generated record key.
- */
-export function appendRecord(
-  doc: Document,
-  collectionName: string,
-  key: string,
-  entry: Record<string, unknown>,
-): string {
-  const contents = doc.contents;
-  if (!isMap(contents)) {
-    throw new Error('Document root is not a mapping');
-  }
-
-  // Get or create the `records` mapping
-  let recordsNode = contents.get('records', true);
-  if (!recordsNode) {
-    const newMap = doc.createNode({});
-    contents.set('records', newMap);
-    recordsNode = contents.get('records', true);
-  }
-
-  if (!isMap(recordsNode)) {
-    throw new Error('`records` node is not a mapping');
-  }
-
-  // Get or create the collection mapping (e.g., "funding-rounds")
-  let collectionNode = recordsNode.get(collectionName, true);
-  if (!collectionNode) {
-    const newMap = doc.createNode({});
-    recordsNode.set(collectionName, newMap);
-    collectionNode = recordsNode.get(collectionName, true);
-  }
-
-  if (!isMap(collectionNode)) {
-    throw new Error(`\`records.${collectionName}\` node is not a mapping`);
-  }
-
-  // Add the record entry under the key
-  const entryNode = doc.createNode(entry);
-  collectionNode.set(key, entryNode);
-
-  return key;
-}
-
-/**
  * Write a YAML document back to file atomically (write to temp, rename).
  */
 export function writeEntityDocument(filepath: string, doc: Document): void {
@@ -177,24 +130,3 @@ export function findEntityFilePath(entitySlug: string, dataDir: string): string 
   return null;
 }
 
-/**
- * Generate a record entry key with `i_` prefix.
- */
-export function generateRecordKey(): string {
-  return `i_${generateId()}`;
-}
-
-/**
- * Pluralize a record schema ID to get the collection name.
- *
- * Rules:
- * - Ends in `-y` -> replace with `-ies` (e.g., `career-history` -> `career-histories`)
- * - Otherwise -> append `s`
- */
-export function pluralizeRecordType(schemaId: string): string {
-  if (schemaId.endsWith('y') && schemaId.length > 1 && schemaId[schemaId.length - 2] !== 'a' && schemaId[schemaId.length - 2] !== 'e' && schemaId[schemaId.length - 2] !== 'o') {
-    // Consonant + y -> ies (e.g., history -> histories, but not "key" -> "keies")
-    return schemaId.slice(0, -1) + 'ies';
-  }
-  return schemaId + 's';
-}

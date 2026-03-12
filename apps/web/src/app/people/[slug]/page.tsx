@@ -9,7 +9,6 @@ import {
 import {
   getKBFacts,
   getKBLatest,
-  getKBRecords,
   getKBEntitySlug,
 } from "@/data/kb";
 import {
@@ -66,9 +65,9 @@ export default async function PersonProfilePage({
   const notableForFact = getKBLatest(entity.id, "notable-for");
   const socialMediaFact = getKBLatest(entity.id, "social-media");
 
-  // Records
-  const careerHistory = getKBRecords(entity.id, "career-history");
-  const boardSeats = getKBRecords(entity.id, "board-seats");
+  // Records removed — these collections now return empty arrays
+  const careerHistory: Array<{ key: string; fields: Record<string, unknown> }> = [];
+  const boardSeats: Array<{ key: string; fields: Record<string, unknown> }> = [];
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBEntitySlug } from "@/data/kb";
+import { getKBEntities, getKBLatest, getKBEntitySlug } from "@/data/kb";
 import { getTypedEntityById, isOrganization } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -40,9 +40,6 @@ export default function OrganizationsPage() {
     const totalFundingFact = getKBLatest(entity.id, "total-funding");
     const foundedFact = getKBLatest(entity.id, "founded-date");
 
-    const fundingRounds = getKBRecords(entity.id, "funding-rounds");
-    const keyPersons = getKBRecords(entity.id, "key-persons");
-
     return {
       id: entity.id,
       slug: getKBEntitySlug(entity.id) ?? null,
@@ -73,8 +70,8 @@ export default function OrganizationsPage() {
             ? String(foundedFact.value.value)
             : null,
 
-      fundingRoundsCount: fundingRounds.length,
-      keyPeopleCount: keyPersons.length,
+      fundingRoundsCount: 0, // Records removed
+      keyPeopleCount: 0, // Records removed
     };
   });
 
