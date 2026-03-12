@@ -25,6 +25,7 @@ import {
   FounderBadge,
   SourceLink,
   DirectoryEntityLink,
+  FactsPanel,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
 
@@ -391,22 +392,9 @@ export default async function PersonProfilePage({
             </section>
           )}
 
-          {/* Quick facts link */}
+          {/* Facts */}
           {allFacts.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Facts
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {allFacts.length}
-                </span>
-              </h2>
-              <Link
-                href={`/kb/entity/${entity.id}`}
-                className="text-xs text-primary hover:underline"
-              >
-                View all facts in KB explorer &rarr;
-              </Link>
-            </section>
+            <FactsPanel facts={allFacts} entityId={entity.id} />
           )}
         </div>
       </div>

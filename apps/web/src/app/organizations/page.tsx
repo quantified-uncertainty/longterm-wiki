@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBEntitySlug } from "@/data/kb";
-import { getTypedEntityById, isOrganization } from "@/data";
+import { getKBLatest } from "@/data/kb";
+import { getTypedEntities, isOrganization } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
@@ -28,25 +28,24 @@ function formatFact(
 }
 
 export default function OrganizationsPage() {
-  const allEntities = getKBEntities();
-  const orgs = allEntities.filter((e) => e.type === "organization");
+  const allEntities = getTypedEntities();
+  const orgs = allEntities.filter(isOrganization);
 
-  const rows: OrgRow[] = orgs.map((entity) => {
-    const typedEntity = getTypedEntityById(entity.id);
-
-    const revenueFact = getKBLatest(entity.id, "revenue");
-    const valuationFact = getKBLatest(entity.id, "valuation");
-    const headcountFact = getKBLatest(entity.id, "headcount");
-    const totalFundingFact = getKBLatest(entity.id, "total-funding");
-    const foundedFact = getKBLatest(entity.id, "founded-date");
+  const rows: OrgRow[] = orgs.map((org) => {
+    // org.id is the slug — getKBLatest resolves slugs to KB entity IDs
+    const revenueFact = getKBLatest(org.id, "revenue");
+    const valuationFact = getKBLatest(org.id, "valuation");
+    const headcountFact = getKBLatest(org.id, "headcount");
+    const totalFundingFact = getKBLatest(org.id, "total-funding");
+    const foundedFact = getKBLatest(org.id, "founded-date");
 
     return {
-      id: entity.id,
-      slug: getKBEntitySlug(entity.id) ?? null,
-      name: entity.name,
-      numericId: entity.numericId ?? null,
-      orgType: (typedEntity && isOrganization(typedEntity) ? typedEntity.orgType : null) ?? null,
-      wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
+      id: org.id,
+      slug: org.id,
+      name: org.title,
+      numericId: org.numericId ?? null,
+      orgType: org.orgType ?? null,
+      wikiPageId: org.numericId ?? null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
       revenueNum: numericValue(revenueFact),
