@@ -6,7 +6,7 @@
 
 import { MODELS } from '../../../lib/anthropic.ts';
 import type { PageData, ReviewResult, PipelineOptions } from '../types.ts';
-import { log, writeTemp, repairFrontmatter } from '../utils.ts';
+import { log, writeTemp, repairFrontmatter, ensureFrontmatterFields } from '../utils.ts';
 import { runAgent } from '../api.ts';
 
 export async function gapFillPhase(page: PageData, improvedContent: string, review: ReviewResult, options: PipelineOptions): Promise<string> {
@@ -48,6 +48,7 @@ Start your response with "---" (the frontmatter delimiter).`;
   }
 
   fixedContent = repairFrontmatter(fixedContent);
+  fixedContent = ensureFrontmatterFields(improvedContent, fixedContent);
 
   writeTemp(page.id, 'final.mdx', fixedContent);
   log('gap-fill', 'Complete');

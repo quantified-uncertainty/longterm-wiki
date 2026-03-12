@@ -207,6 +207,7 @@ post_merge:
     merged: "2026-03-10"
     claim: "server-health-monitor jq fix, auto-update push --force fix, and scheduled-deploy removal from health checks all work correctly in CI"
     how_to_verify: "After next scheduled runs, check: (1) server-health-monitor succeeds, (2) auto-update push succeeds (if pages modified), (3) ci-pr-health no longer flags scheduled-deploy as missing"
-    status: partial
-    notes: "server-health-monitor passes (3/11). auto-update push still fails (tracked in #2093). ci-pr-health fetch returned GitHub 502 during verification."
+    status: verified
+    notes: "server-health-monitor passes. auto-update push fixed by #2102. ci-pr-health runs normally (fails only when detecting auto-update failures, which is correct behavior). Remaining auto-update failures are a content issue (#2117), not infrastructure."
+    checked_date: "2026-03-12"
     deadline: "2026-03-17"
