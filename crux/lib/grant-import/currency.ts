@@ -98,6 +98,10 @@ export function formatAmount(amount: number, currency: string): string {
     const formatted = thousands % 1 === 0
       ? thousands.toFixed(0)
       : thousands.toFixed(1);
+    // If rounding pushed us to 1000K, display as 1M instead
+    if (formatted === "1000" || formatted === "1000.0") {
+      return `${sign}${symbol}1M`;
+    }
     return `${sign}${symbol}${formatted}K`;
   }
 

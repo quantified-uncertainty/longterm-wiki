@@ -93,6 +93,11 @@ describe("formatAmount", () => {
     expect(formatAmount(100_000, "CHF")).toBe("CHF\u00a0100K");
   });
 
+  it("re-buckets to M when K rounds up to 1000", () => {
+    expect(formatAmount(999_950, "USD")).toBe("$1M");
+    expect(formatAmount(999_500, "USD")).toBe("$999.5K");
+  });
+
   it("handles negative amounts", () => {
     expect(formatAmount(-1_500_000, "USD")).toBe("-$1.5M");
     expect(formatAmount(-50_000, "USD")).toBe("-$50K");
