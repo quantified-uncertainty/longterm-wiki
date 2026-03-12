@@ -9,6 +9,7 @@
  *   crux agent-workspace sync-env        Regenerate .env for all agent slots from .env.base
  *   crux agent-workspace list            Show all agent slots with branch/PR/status info
  *   crux agent-workspace clean [N]       Remove idle agent slots (on main, no changes)
+ *   crux agent-workspace reset <N|all>   Reset merged-PR slots back to main
  */
 
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
@@ -228,7 +229,15 @@ async function syncEnv(_args: string[], _options: CommandOptions): Promise<Comma
   for (const { dir, slot } of slots) {
     const envContent = generateEnv(envBasePath, slot);
     writeFileSync(join(dir, '.env'), envContent);
-    lines.push(`  ✓ a${slot}/.env regenerated (ports ${3010 + slot}/${3110 + slot})`);
+
+    // Remove apps/web/.env.local if it exists — it overrides root .env values
+    const webEnvLocal = join(dir, 'apps', 'web', '.env.local');
+    if (existsSync(webEnvLocal)) {
+      execSync(`rm -f "${webEnvLocal}"`);
+      lines.push(`  ✓ a${slot}/.env regenerated (ports ${3010 + slot}/${3110 + slot}) — removed stale apps/web/.env.local`);
+    } else {
+      lines.push(`  ✓ a${slot}/.env regenerated (ports ${3010 + slot}/${3110 + slot})`);
+    }
   }
 
   return {
@@ -318,6 +327,12 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
     } else {
       output += `${c.dim}${line}${c.reset}\n`;
     }
+  }
+
+  // Merged-PR hint
+  const mergedSlots = infos.filter((i) => i.pr.includes('MERGED'));
+  if (mergedSlots.length > 0) {
+    output += `\n${c.yellow}${mergedSlots.length} slot(s) have merged PRs — run \`crux agent-workspace refresh\` to reset them${c.reset}\n`;
   }
 
   // Branch collision detection: warn if two slots share a non-main branch
@@ -425,14 +440,19 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
 
   const withClaude = args.includes('--claude');
   const windowName = `A${slot}`;
+  const devPort = 3010 + slot;
+  const serverPort = 3110 + slot;
+
+  // Build a shell command that sources .env (for env vars like API keys)
+  // and exports port vars (so pnpm dev / pnpm start use the right port)
+  const shellInit = `source "${slotDir}/.env" 2>/dev/null; export DEV_PORT=${devPort} PORT=${serverPort}`;
+  const cmd = withClaude
+    ? `${shellInit}; claude`
+    : `${shellInit}; exec $SHELL`;
 
   try {
-    if (withClaude) {
-      execSync(`tmux new-window -n "${windowName}" -c "${slotDir}" "claude"`, { stdio: 'inherit' });
-    } else {
-      execSync(`tmux new-window -n "${windowName}" -c "${slotDir}"`, { stdio: 'inherit' });
-    }
-    return { exitCode: 0, output: `Opened tmux window ${windowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
+    execSync(`tmux new-window -n "${windowName}" -c "${slotDir}" '${cmd}'`, { stdio: 'inherit' });
+    return { exitCode: 0, output: `Opened tmux window ${windowName} at ${slotDir} (ports ${devPort}/${serverPort})${withClaude ? ' with claude' : ''}` };
   } catch (e) {
     return { exitCode: 1, output: `Error opening tmux window: ${e instanceof Error ? e.message : String(e)}` };
   }
@@ -450,18 +470,54 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
     return { exitCode: 0, output: 'No agent slots found.' };
   }
 
+  const resetResults: string[] = [];
   const updated: string[] = [];
   const skipped: string[] = [];
 
   for (const { dir, slot } of slots) {
     const branch = git(dir, 'branch', '--show-current');
+
+    // Auto-reset slots whose PR has been merged
     if (branch !== 'main') {
+      let prState = '';
+      try {
+        prState = execSync(
+          `gh pr view "${branch}" --json state --jq .state 2>/dev/null`,
+          { cwd: dir, encoding: 'utf-8', timeout: 10000 },
+        ).trim();
+      } catch {
+        // gh not available or no PR
+      }
+
+      if (prState === 'MERGED') {
+        try {
+          execSync('git checkout -- .', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' }).toString();
+        } catch { /* no tracked changes */ }
+        try {
+          execSync('git clean -fd --exclude=.agent-slot', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+        } catch { /* ignore */ }
+        try {
+          execSync('git checkout main', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+          execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 60000, stdio: 'pipe' });
+          execSync(`git branch -D "${branch}"`, { cwd: dir, encoding: 'utf-8', timeout: 5000, stdio: 'pipe' });
+          resetResults.push(`  ✓ a${slot}: ${branch} → main (PR merged)`);
+          continue;
+        } catch {
+          skipped.push(`  a${slot}: reset failed after merged PR`);
+          continue;
+        }
+      }
+
       skipped.push(`  a${slot}: on branch ${branch}`);
       continue;
     }
 
     const porcelain = git(dir, 'status', '--porcelain');
-    if (porcelain) {
+    // Ignore untracked .agent-slot — it's expected in every slot
+    const significantChanges = porcelain
+      ? porcelain.split('\n').filter((l) => l && !l.endsWith('.agent-slot'))
+      : [];
+    if (significantChanges.length > 0) {
       skipped.push(`  a${slot}: has uncommitted changes`);
       continue;
     }
@@ -475,14 +531,142 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
   }
 
   let output = '';
+  if (resetResults.length > 0) {
+    output += `Reset ${resetResults.length} merged-PR slot(s):\n${resetResults.join('\n')}\n`;
+  }
   if (updated.length > 0) {
-    output += `Updated ${updated.length} slot(s):\n${updated.join('\n')}\n`;
+    output += `Pulled ${updated.length} slot(s):\n${updated.join('\n')}\n`;
   }
   if (skipped.length > 0) {
     output += `Skipped ${skipped.length} slot(s):\n${skipped.join('\n')}\n`;
   }
-  if (updated.length === 0 && skipped.length === 0) {
+  if (resetResults.length === 0 && updated.length === 0 && skipped.length === 0) {
     output = 'No slots to refresh.';
+  }
+
+  return { exitCode: 0, output };
+}
+
+// ---------------------------------------------------------------------------
+// reset
+// ---------------------------------------------------------------------------
+
+async function reset(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const lwDir = getLwDir();
+  const slots = findSlotDirs(lwDir);
+
+  const targetSlot = args.find((a) => !a.startsWith('--'));
+  if (!targetSlot) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux agent-workspace reset <N|all> [--force]
+
+Reset an agent slot back to main after its PR has been merged.
+
+Steps performed:
+  1. Verify the slot's branch has a merged PR (skip with --force)
+  2. Discard all local changes (git checkout + git clean)
+  3. Switch to main and pull latest
+  4. Delete the old local branch
+
+Use "all" to reset every slot whose PR is merged.`,
+    };
+  }
+
+  const resetAll = targetSlot === 'all';
+  let toReset: Array<{ dir: string; slot: number }>;
+
+  if (resetAll) {
+    toReset = slots;
+  } else {
+    if (!/^\d+$/.test(targetSlot)) {
+      return { exitCode: 1, output: 'Error: Slot number must be a positive integer (or "all")' };
+    }
+    const slotNum = parseInt(targetSlot, 10);
+    toReset = slots.filter((s) => s.slot === slotNum);
+    if (toReset.length === 0) {
+      return { exitCode: 1, output: `Error: Slot a${slotNum} not found.` };
+    }
+  }
+
+  const resetResults: string[] = [];
+  const skippedResults: string[] = [];
+
+  for (const { dir, slot } of toReset) {
+    const branch = git(dir, 'branch', '--show-current');
+
+    // Already on main — nothing to reset
+    if (branch === 'main') {
+      skippedResults.push(`  a${slot}: already on main`);
+      continue;
+    }
+
+    // Check if the branch's PR is merged (unless --force)
+    if (!options.force) {
+      let prState = '';
+      try {
+        prState = execSync(
+          `gh pr view "${branch}" --json state --jq .state 2>/dev/null`,
+          { cwd: dir, encoding: 'utf-8', timeout: 10000 },
+        ).trim();
+      } catch {
+        // gh not available or no PR exists
+      }
+
+      if (prState !== 'MERGED') {
+        const reason = prState ? `PR state is ${prState}` : 'no merged PR found';
+        skippedResults.push(`  a${slot}: ${reason} (use --force to override)`);
+        continue;
+      }
+    }
+
+    // Discard all local changes
+    try {
+      execSync('git checkout -- .', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+    } catch {
+      // May fail if there are no tracked changes — that's fine
+    }
+    // Remove untracked files but keep .agent-slot
+    try {
+      execSync('git clean -fd --exclude=.agent-slot', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+    } catch {
+      // Ignore
+    }
+
+    // Switch to main
+    try {
+      execSync('git checkout main', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+    } catch (e) {
+      skippedResults.push(`  a${slot}: failed to checkout main (${e instanceof Error ? e.message.split('\n')[0] : 'unknown'})`);
+      continue;
+    }
+
+    // Pull latest
+    try {
+      execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 60000, stdio: 'pipe' });
+    } catch {
+      // Pull failed but we're still on main — continue
+    }
+
+    // Delete old branch
+    try {
+      execSync(`git branch -D "${branch}"`, { cwd: dir, encoding: 'utf-8', timeout: 5000, stdio: 'pipe' });
+    } catch {
+      // Branch may already be gone
+    }
+
+    resetResults.push(`  ✓ a${slot}: ${branch} → main`);
+  }
+
+  let output = '';
+  if (resetResults.length > 0) {
+    output += `Reset ${resetResults.length} slot(s):\n${resetResults.join('\n')}\n`;
+  }
+  if (skippedResults.length > 0) {
+    output += `Skipped ${skippedResults.length} slot(s):\n${skippedResults.join('\n')}\n`;
+  }
+  if (resetResults.length === 0 && skippedResults.length === 0) {
+    output = 'No slots to reset.';
   }
 
   return { exitCode: 0, output };
@@ -498,6 +682,7 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
   'sync-env': syncEnv,
   list,
   clean,
+  reset,
   open,
   refresh,
 };
@@ -520,21 +705,24 @@ Commands:
   sync-env          Regenerate .env for all slots from .env.base
   list              Show all slots with branch, PR, and port info (default)
   clean [N]         Show idle slots; use --force to remove them
+  reset <N|all>     Reset merged-PR slots back to main (--force to skip PR check)
   open <N>          Open a tmux window at slot N (--claude to launch claude)
-  refresh           Pull latest main in idle slots (on main, clean)
+  refresh           Reset merged-PR slots + pull latest main in idle slots
 
 Port assignments (deterministic from slot number):
   Agent N → Next.js on port (3010+N), wiki-server on port (3110+N)
   e.g. slot 1 → 3011/3111, slot 10 → 3020/3120
 
 Options:
-  --force    Force re-init (setup) or actually delete (clean)
+  --force    Force re-init (setup), actually delete (clean), or skip PR check (reset)
   --json     JSON output (list)
 
 Examples:
   crux agent-workspace setup 3           Create agent slot a3
   crux agent-workspace sync-env          Regenerate .env for all slots
   crux agent-workspace list              Show all slots and their status
+  crux agent-workspace reset all         Reset all slots with merged PRs back to main
+  crux agent-workspace reset 2           Reset slot a2 back to main
   crux agent-workspace clean --force     Remove idle slots (on main, no changes)
 `;
 }

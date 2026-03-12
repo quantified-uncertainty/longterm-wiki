@@ -1,4 +1,6 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { resolve } from "path";
+loadEnv({ path: resolve(import.meta.dirname, "../../.env") });
 import { defineConfig } from "@playwright/test";
 
 const devPort = process.env.DEV_PORT || "3001";
