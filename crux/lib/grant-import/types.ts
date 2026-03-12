@@ -25,6 +25,12 @@ export interface RawGrant {
 export interface SyncGrant {
   id: string;
   organizationId: string;
+  /**
+   * Despite the name, this stores the human-readable display name (not an entity
+   * stableId). The wiki-server grants schema expects this field name, so it cannot
+   * be renamed without a coordinated server migration. Compare with RawGrant.granteeId,
+   * which IS an entity stableId (or null if unmatched).
+   */
   granteeId: string | null;
   name: string;
   amount: number | null;
