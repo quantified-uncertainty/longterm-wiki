@@ -36,6 +36,10 @@ export function parseSFFAmount(amountStr: string): number | null {
  * - "SFF-2019-Q3" -> "2019-07"
  * - "SFF-2024-FlexHEGs" -> "2024"
  * - "Initiative Committee 2024" -> "2024"
+ *
+ * Returns null for invalid quarter numbers (Q0, Q5-Q9).
+ * Note: previous inline code fell back to "01" for invalid quarters;
+ * returning null is more honest and lets callers handle the fallback.
  */
 export function sffRoundToDate(round: string): string | null {
   const hMatch = round.match(/SFF-(\d{4})-H(\d)/);
@@ -51,7 +55,9 @@ export function sffRoundToDate(round: string): string | null {
     const qMonth: Record<string, string> = {
       "1": "01", "2": "04", "3": "07", "4": "10",
     };
-    return `${year}-${qMonth[qMatch[2]] || "01"}`;
+    const month = qMonth[qMatch[2]];
+    if (!month) return null;
+    return `${year}-${month}`;
   }
 
   const yearMatch = round.match(/SFF-(\d{4})/);

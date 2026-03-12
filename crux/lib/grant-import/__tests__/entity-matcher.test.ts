@@ -1,6 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { matchGrantee, MANUAL_GRANTEE_OVERRIDES } from "../entity-matcher.ts";
 import type { EntityMatcher } from "../types.ts";
+
+// Note: vi.mock("fs") is hoisted to the top of the file regardless of where
+// it appears in the source. If fs mocking is added for buildEntityMatcher tests,
+// it will affect ALL tests in this file. Use afterEach(vi.restoreAllMocks) to
+// prevent mock leaks between tests.
 
 function makeMockMatcher(map: Record<string, string>): EntityMatcher {
   const nameMap = new Map(
@@ -16,6 +21,8 @@ function makeMockMatcher(map: Record<string, string>): EntityMatcher {
 }
 
 describe("matchGrantee", () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
   const matcher = makeMockMatcher({
     miri: "abc123",
     anthropic: "def456",
