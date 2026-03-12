@@ -145,6 +145,10 @@ async function upsertResource(
 ) {
   const vals = resourceValues(d);
 
+  // COALESCE(incoming, existing) for enrichable fields: a non-null incoming
+  // value overwrites, but null incoming preserves existing data. This prevents
+  // partial saves (bare resources, snapshot-loaded resources missing text fields)
+  // from wiping richer data already in PG. See #2069 review discussion.
   const rows = await db
     .insert(resources)
     .values(vals)
@@ -152,21 +156,21 @@ async function upsertResource(
       target: resources.id,
       set: {
         url: vals.url,
-        title: vals.title,
-        type: vals.type,
-        summary: vals.summary,
-        review: vals.review,
-        abstract: vals.abstract,
-        keyPoints: vals.keyPoints,
-        publicationId: vals.publicationId,
-        authors: vals.authors,
-        publishedDate: vals.publishedDate,
-        tags: vals.tags,
-        localFilename: vals.localFilename,
-        credibilityOverride: vals.credibilityOverride,
-        fetchedAt: vals.fetchedAt,
-        contentHash: vals.contentHash,
-        // Preserve existing stableId; only set if row didn't have one
+        title: sql`COALESCE(${vals.title}, ${resources.title})`,
+        type: sql`COALESCE(${vals.type}, ${resources.type})`,
+        summary: sql`COALESCE(${vals.summary}, ${resources.summary})`,
+        review: sql`COALESCE(${vals.review}, ${resources.review})`,
+        abstract: sql`COALESCE(${vals.abstract}, ${resources.abstract})`,
+        keyPoints: sql`COALESCE(${vals.keyPoints}, ${resources.keyPoints})`,
+        publicationId: sql`COALESCE(${vals.publicationId}, ${resources.publicationId})`,
+        authors: sql`COALESCE(${vals.authors}, ${resources.authors})`,
+        publishedDate: sql`COALESCE(${vals.publishedDate}, ${resources.publishedDate})`,
+        tags: sql`COALESCE(${vals.tags}, ${resources.tags})`,
+        localFilename: sql`COALESCE(${vals.localFilename}, ${resources.localFilename})`,
+        credibilityOverride: sql`COALESCE(${vals.credibilityOverride}, ${resources.credibilityOverride})`,
+        fetchedAt: sql`COALESCE(${vals.fetchedAt}, ${resources.fetchedAt})`,
+        contentHash: sql`COALESCE(${vals.contentHash}, ${resources.contentHash})`,
+        // stableId is generate-once: preserve existing, only set if row didn't have one
         stableId: sql`COALESCE(${resources.stableId}, ${vals.stableId})`,
         updatedAt: sql`now()`,
       },
