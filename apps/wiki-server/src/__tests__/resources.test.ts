@@ -79,6 +79,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- UPDATE resources SET fetch_status (PATCH /:id/fetch-status) ----
+  // Route uses .returning({ id }) for atomic exists-check, so return matched rows.
   if (q.startsWith("update") && q.includes("set") && q.includes('"fetch_status"')) {
     const id = params[params.length - 1] as string;
     const r = resourceStore.get(id);
@@ -86,6 +87,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       r.fetch_status = params[0];
       r.last_fetched_at = params[1];
       r.updated_at = new Date();
+      return [{ id }];
     }
     return [];
   }
