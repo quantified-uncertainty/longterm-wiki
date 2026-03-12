@@ -5,13 +5,19 @@ import {
   getKBLatest,
   getKBFacts,
   getKBProperty,
+  getKBEntity,
+  getKBEntitySlug,
+  getKBRecords,
+  getAllKBRecords,
 } from "@/data/kb";
+import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById, isOrganization } from "@/data";
 import {
   formatKBDate,
   titleCase,
   shortDomain,
 } from "@/components/wiki/kb/format";
+import { formatCompactCurrency } from "@/lib/format-compact";
 import Link from "next/link";
 import {
   Breadcrumbs,
@@ -95,6 +101,210 @@ const ORG_TYPE_COLORS: Record<string, string> = {
     "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
 
+// ── Grant helpers ─────────────────────────────────────────────────────
+
+const MAX_GRANTS_SHOWN = 10;
+
+/** Resolve a recipient slug/ID to a display name and optional href. */
+function resolveRecipient(recipientId: string): { name: string; href: string | null } {
+  const entity = getKBEntity(recipientId);
+  if (entity) {
+    const slug = getKBEntitySlug(recipientId);
+    const href = slug && entity.type === "organization" ? `/organizations/${slug}`
+      : slug && entity.type === "person" ? `/people/${slug}`
+      : `/kb/entity/${recipientId}`;
+    return { name: entity.name, href };
+  }
+  // Fall back: titleCase the slug
+  return { name: titleCase(recipientId.replace(/-/g, " ")), href: null };
+}
+
+/** Parse grant record fields into a structured object for display. */
+function parseGrantRecord(record: KBRecordEntry): {
+  key: string;
+  name: string;
+  recipient: string | null;
+  recipientName: string;
+  recipientHref: string | null;
+  amount: number | null;
+  date: string | null;
+  status: string | null;
+  source: string | null;
+} {
+  const f = record.fields;
+  const recipientId = (f.recipient as string) ?? null;
+  const resolved = recipientId ? resolveRecipient(recipientId) : { name: "", href: null };
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    recipient: recipientId,
+    recipientName: resolved.name,
+    recipientHref: resolved.href,
+    amount: typeof f.amount === "number" ? f.amount : null,
+    date: (f.date as string) ?? (f.period as string) ?? null,
+    status: (f.status as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+/** Grants Made section for funder org pages. */
+function GrantsMadeSection({
+  grants,
+  orgName,
+  totalCount,
+}: {
+  grants: ReturnType<typeof parseGrantRecord>[];
+  orgName: string;
+  totalCount: number;
+}) {
+  if (grants.length === 0) return null;
+
+  const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+
+  return (
+    <section>
+      <SectionHeader title="Grants Made" count={totalCount} />
+      {totalAmount > 0 && (
+        <div className="text-xs text-muted-foreground mb-3">
+          Total tracked: {formatCompactCurrency(totalAmount)}
+        </div>
+      )}
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Grant</th>
+              <th className="text-left py-2 px-3 font-medium">Recipient</th>
+              <th className="text-right py-2 px-3 font-medium">Amount</th>
+              <th className="text-center py-2 px-3 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {grants.slice(0, MAX_GRANTS_SHOWN).map((g) => (
+              <tr key={g.key} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">{g.name}</span>
+                  {g.source && (
+                    <a
+                      href={g.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-xs">
+                  {g.recipientHref ? (
+                    <Link href={g.recipientHref} className="text-primary hover:underline">
+                      {g.recipientName}
+                    </Link>
+                  ) : (
+                    <span className="text-muted-foreground">{g.recipientName}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {g.amount != null && (
+                    <span className="font-semibold">{formatCompactCurrency(g.amount)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {g.date ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {totalCount > MAX_GRANTS_SHOWN && (
+        <Link
+          href={`/grants?org=${encodeURIComponent(orgName)}`}
+          className="block mt-2 text-xs text-primary hover:underline text-center"
+        >
+          View all {totalCount} grants &rarr;
+        </Link>
+      )}
+    </section>
+  );
+}
+
+/** Enriched grant with funder info for received grants. */
+type ReceivedGrant = ReturnType<typeof parseGrantRecord> & {
+  funderName: string;
+  funderHref: string | null;
+};
+
+/** Funding Received section for org pages where org is a grant recipient. */
+function FundingReceivedSection({
+  grants,
+}: {
+  grants: ReceivedGrant[];
+}) {
+  if (grants.length === 0) return null;
+
+  const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+
+  return (
+    <section>
+      <SectionHeader title="Funding Received" count={grants.length} />
+      {totalAmount > 0 && (
+        <div className="text-xs text-muted-foreground mb-3">
+          Total tracked: {formatCompactCurrency(totalAmount)}
+        </div>
+      )}
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Grant</th>
+              <th className="text-left py-2 px-3 font-medium">Funder</th>
+              <th className="text-right py-2 px-3 font-medium">Amount</th>
+              <th className="text-center py-2 px-3 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {grants.map((g) => (
+              <tr key={`received-${g.key}`} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">{g.name}</span>
+                  {g.source && (
+                    <a
+                      href={g.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    >
+                      source
+                    </a>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-xs">
+                  {g.funderHref ? (
+                    <Link href={g.funderHref} className="text-primary hover:underline">
+                      {g.funderName}
+                    </Link>
+                  ) : (
+                    <span className="text-muted-foreground">{g.funderName}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {g.amount != null && (
+                    <span className="font-semibold">{formatCompactCurrency(g.amount)}</span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                  {g.date ?? ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────
 
 export default async function OrgProfilePage({
@@ -132,6 +342,41 @@ export default async function OrgProfilePage({
   // Headquarters text
   const hqText =
     hqFact?.value.type === "text" ? hqFact.value.value : null;
+
+  // ── Grants Made (this org is the funder) ──
+  const grantRecords = getKBRecords(entity.id, "grants");
+  const grantsMade = grantRecords
+    .map(parseGrantRecord)
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Funding Received (this org is a recipient in other orgs' grants) ──
+  // Recipients in PG grants are stored as display names (not entity IDs),
+  // so we match against entity name, aliases, and slug.
+  const allGrantRecords = getAllKBRecords("grants");
+  const recipientMatchNames = new Set<string>([
+    entity.name.toLowerCase(),
+    slug.toLowerCase(),
+    entity.id.toLowerCase(),
+    ...(entity.aliases?.map((a: string) => a.toLowerCase()) ?? []),
+  ]);
+  const grantsReceived = allGrantRecords
+    .filter((r) => {
+      const recipientRaw = r.fields.recipient as string | undefined;
+      if (!recipientRaw) return false;
+      return recipientMatchNames.has(recipientRaw.toLowerCase());
+    })
+    .map((r) => {
+      const parsed = parseGrantRecord(r);
+      // For received grants, show the funder instead of recipient
+      const funderEntity = getKBEntity(r.ownerEntityId);
+      const funderSlug = funderEntity ? getKBEntitySlug(r.ownerEntityId) : null;
+      return {
+        ...parsed,
+        funderName: funderEntity?.name ?? r.ownerEntityId,
+        funderHref: funderSlug ? `/organizations/${funderSlug}` : null,
+      };
+    })
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
@@ -229,6 +474,16 @@ export default async function OrgProfilePage({
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}
+
+          {/* Grants Made (this org is the funder) */}
+          <GrantsMadeSection
+            grants={grantsMade}
+            orgName={entity.name}
+            totalCount={grantsMade.length}
+          />
+
+          {/* Funding Received (this org is a grant recipient) */}
+          <FundingReceivedSection grants={grantsReceived} />
         </div>
 
         {/* Sidebar */}
