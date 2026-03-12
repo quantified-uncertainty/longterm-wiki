@@ -7,6 +7,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  notFoundError,
   zv,
 } from "./utils.js";
 
@@ -251,6 +252,24 @@ const fundingProgramsApp = new Hono()
       });
     }
   )
+
+  // ---- GET /:id ----
+  .get("/:id", async (c) => {
+    const id = c.req.param("id");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(fundingPrograms)
+      .where(eq(fundingPrograms.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `Funding program ${id} not found`);
+    }
+
+    return c.json(formatRow(rows[0]));
+  })
 
   // ---- POST /sync ----
   .post("/sync", async (c) => {

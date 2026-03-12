@@ -126,11 +126,17 @@ export async function seedDivisions() {
       // Try to find parent division (navigating-transformative-ai for the AI safety RFP)
       const parentDivisionSlug = "navigating-transformative-ai";
       const parentDivisionId = divisionIdBySlug.get(parentDivisionSlug);
+      if (!parentDivisionId) {
+        throw new Error(
+          `Parent division "${parentDivisionSlug}" not found for funding program "${slug}". ` +
+          `Ensure the parent fund is listed before this record in the YAML.`
+        );
+      }
 
       fundingProgramRows.push({
         id: deterministicId(`coeff-giving-program-${slug}`),
         orgId: COEFF_GIVING_STABLE_ID,
-        divisionId: parentDivisionId ?? null,
+        divisionId: parentDivisionId,
         name: record.name,
         programType: "rfp",
         totalBudget: record.amount != null ? String(record.amount) : null,

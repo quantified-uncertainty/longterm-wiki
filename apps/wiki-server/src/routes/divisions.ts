@@ -65,6 +65,13 @@ const SyncDivisionsBatchSchema = z.object({
     .refine(
       (items) => new Set(items.map((i) => i.id)).size === items.length,
       { message: "Duplicate id values in items array" }
+    )
+    .refine(
+      (items) => {
+        const slugs = items.map((i) => i.slug).filter((s) => s != null);
+        return new Set(slugs).size === slugs.length;
+      },
+      { message: "Duplicate slug values in items array" }
     ),
 });
 
