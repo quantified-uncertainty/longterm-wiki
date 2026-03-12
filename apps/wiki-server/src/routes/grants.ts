@@ -144,6 +144,57 @@ const grantsApp = new Hono()
     });
   })
 
+  // ---- GET /by-org-summary ----
+  .get("/by-org-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        organizationId: grants.organizationId,
+        grantCount: count(),
+        totalAmount: sql<number>`coalesce(sum(${grants.amount}), 0)`,
+        minDate: sql<string | null>`min(${grants.date})`,
+        maxDate: sql<string | null>`max(${grants.date})`,
+      })
+      .from(grants)
+      .groupBy(grants.organizationId)
+      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`);
+
+    return c.json({
+      organizations: rows.map((r) => ({
+        organizationId: r.organizationId,
+        grantCount: r.grantCount,
+        totalAmount: Number(r.totalAmount),
+        minDate: r.minDate,
+        maxDate: r.maxDate,
+      })),
+    });
+  })
+
+  // ---- GET /by-grantee-summary ----
+  .get("/by-grantee-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        granteeId: grants.granteeId,
+        grantCount: count(),
+        totalAmount: sql<number>`coalesce(sum(${grants.amount}), 0)`,
+      })
+      .from(grants)
+      .where(sql`${grants.granteeId} is not null`)
+      .groupBy(grants.granteeId)
+      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`);
+
+    return c.json({
+      grantees: rows.map((r) => ({
+        granteeId: r.granteeId,
+        grantCount: r.grantCount,
+        totalAmount: Number(r.totalAmount),
+      })),
+    });
+  })
+
   // ---- POST /sync ----
   .post("/sync", async (c) => {
     const body = await parseJsonBody(c);
