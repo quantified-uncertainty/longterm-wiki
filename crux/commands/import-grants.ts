@@ -4,11 +4,14 @@
  * Sources:
  *   1. Coefficient Giving (Open Philanthropy) grants archive CSV
  *   2. EA Funds public grants CSV
+ *   3. Survival and Flourishing Fund (SFF) HTML table
  *
  * Usage:
  *   pnpm crux import-grants analyze          # Preview what would be imported
  *   pnpm crux import-grants sync             # Import to wiki-server Postgres
  *   pnpm crux import-grants sync --dry-run   # Show what would be synced without writing
+ *   pnpm crux import-grants sff-analyze      # Preview SFF grants
+ *   pnpm crux import-grants sff-sync         # Import SFF grants to wiki-server
  */
 
 import { createHash } from "crypto";
@@ -24,14 +27,17 @@ import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
 const CG_CSV_URL =
   "https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv";
 const EA_FUNDS_CSV_URL = "https://funds.effectivealtruism.org/api/grants";
+const SFF_URL = "https://survivalandflourishing.fund/recommendations";
 
 const CG_CSV_PATH = "/tmp/coefficient-giving-grants.csv";
 const EA_FUNDS_CSV_PATH = "/tmp/ea-funds-grants.csv";
+const SFF_HTML_PATH = "/tmp/sff-recommendations.html";
 
 /** Funder entity stableIds */
 const FUNDER_IDS: Record<string, string> = {
   "coefficient-giving": "ULjDXpSLCI",
   ltff: "yA12C1KcjQ",
+  sff: "sIFjGbxVct",
   // EA Funds sub-funds — we map to LTFF and other known entities
   "Long-Term Future Fund": "yA12C1KcjQ",
   "Animal Welfare Fund": "__AWF__", // placeholder — will be resolved
@@ -232,7 +238,7 @@ const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 interface RawGrant {
-  source: "coefficient-giving" | "ea-funds";
+  source: "coefficient-giving" | "ea-funds" | "sff";
   funderId: string; // stableId of funder entity
   granteeName: string;
   granteeId: string | null; // stableId if matched, else null
@@ -406,6 +412,183 @@ function parseEAFundsCSV(
 }
 
 // ---------------------------------------------------------------------------
+// SFF HTML parsing
+// ---------------------------------------------------------------------------
+
+const SFF_HTML_CACHE_PATH = SFF_HTML_PATH;
+
+function downloadSFFHTML(): void {
+  console.log("Downloading SFF recommendations HTML...");
+  execSync(
+    `curl -fsSL --retry 3 --connect-timeout 10 -o "${SFF_HTML_CACHE_PATH}" "${SFF_URL}"`,
+    { stdio: "inherit" }
+  );
+  const size = readFileSync(SFF_HTML_CACHE_PATH).length;
+  console.log(`  → ${(size / 1024).toFixed(0)} KB`);
+}
+
+/**
+ * Parse the SFF amount field which can have several formats:
+ * - "$79,000"
+ * - "$1,535,000 +$500,000‡"   (matching pledge)
+ * - "$1,607,000‡"              (all matching)
+ * - "$1,094,000 and $135,000"  (FlexHEG dual-source)
+ * - "$21,000 and $1,000"
+ *
+ * We sum all dollar amounts in the field to get the total.
+ */
+function parseSFFAmount(amountStr: string): number | null {
+  // Extract all dollar amounts from the string
+  const matches = amountStr.match(/\$[\d,]+/g);
+  if (!matches || matches.length === 0) return null;
+
+  let total = 0;
+  for (const m of matches) {
+    const num = parseFloat(m.replace(/[$,]/g, ""));
+    if (!isNaN(num)) total += num;
+  }
+  return total > 0 ? total : null;
+}
+
+/**
+ * Convert SFF round name to an ISO date string.
+ * - "SFF-2025" → "2025"
+ * - "SFF-2024-FlexHEGs" → "2024"
+ * - "SFF-2023-H1" → "2023-01"
+ * - "SFF-2023-H2" → "2023-07"
+ * - "SFF-2019-Q3" → "2019-07"
+ * - "SFF-2019-Q4" → "2019-10"
+ * - "Initiative Committee 2024" → "2024"
+ */
+function sffRoundToDate(round: string): string | null {
+  // Match "SFF-YYYY-H1/H2" or "SFF-YYYY-Q3/Q4"
+  const hMatch = round.match(/SFF-(\d{4})-H(\d)/);
+  if (hMatch) {
+    const year = hMatch[1];
+    const half = hMatch[2];
+    return half === "1" ? `${year}-01` : `${year}-07`;
+  }
+
+  const qMatch = round.match(/SFF-(\d{4})-Q(\d)/);
+  if (qMatch) {
+    const year = qMatch[1];
+    const qMonth: Record<string, string> = {
+      "1": "01", "2": "04", "3": "07", "4": "10",
+    };
+    return `${year}-${qMonth[qMatch[2]] || "01"}`;
+  }
+
+  // "SFF-YYYY" or "SFF-YYYY-FlexHEGs"
+  const yearMatch = round.match(/SFF-(\d{4})/);
+  if (yearMatch) return yearMatch[1];
+
+  // "Initiative Committee YYYY"
+  const icMatch = round.match(/Initiative Committee (\d{4})/);
+  if (icMatch) return icMatch[1];
+
+  return null;
+}
+
+/**
+ * Parse the SFF recommendations HTML table into RawGrant records.
+ * The table has columns: Round, Source, Organization, Amount, Receiving Charity, Purpose
+ */
+function parseSFFHTML(
+  htmlPath: string,
+  matcher: ReturnType<typeof buildEntityMatcher>
+): RawGrant[] {
+  const html = readFileSync(htmlPath, "utf8");
+  const grants: RawGrant[] = [];
+
+  // Extract all table rows: <tr><td ...>...</td><td ...>...</td>...</tr>
+  // Match both inline <tr><td>...</td>...</tr> and multi-line <tr>\n<td>...\n</tr>
+  const trRegex = /<tr[^>]*>\s*<td[^>]*>([\s\S]*?)<\/tr>/g;
+  let trMatch;
+
+  while ((trMatch = trRegex.exec(html)) !== null) {
+    const rowHtml = trMatch[0];
+
+    // Extract all <td> contents
+    const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/g;
+    const cells: string[] = [];
+    let tdMatch;
+    while ((tdMatch = tdRegex.exec(rowHtml)) !== null) {
+      // Decode HTML entities and strip tags
+      cells.push(
+        tdMatch[1]
+          .replace(/<[^>]+>/g, "")
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/\s+/g, " ")
+          .trim()
+      );
+    }
+
+    if (cells.length < 6) continue;
+
+    const round = cells[0];
+    const source = cells[1];       // Funder name (e.g., "Jaan Tallinn")
+    const organization = cells[2]; // Recipient org
+    const amountStr = cells[3];
+    const receivingCharity = cells[4];
+    const purpose = cells[5];
+
+    if (!organization || !round) continue;
+
+    const amount = parseSFFAmount(amountStr);
+    const isoDate = sffRoundToDate(round);
+
+    // Match grantee to entity
+    let granteeId: string | null = null;
+    const overrideSlug = MANUAL_GRANTEE_OVERRIDES[organization];
+    if (overrideSlug) {
+      const match = matcher.match(overrideSlug);
+      if (match) granteeId = match.stableId;
+    }
+    if (!granteeId) {
+      const match = matcher.match(organization);
+      if (match) granteeId = match.stableId;
+    }
+
+    // Build grant name: purpose if meaningful, else "Grant to <org>"
+    const name = purpose && purpose !== "General support"
+      ? purpose.substring(0, 500)
+      : `Grant to ${organization}`.substring(0, 500);
+
+    // Notes: include round, source funder, receiving charity, and raw amount
+    const notesParts: string[] = [];
+    notesParts.push(`Round: ${round}`);
+    notesParts.push(`Source: ${source}`);
+    if (receivingCharity && receivingCharity !== organization) {
+      notesParts.push(`Receiving charity: ${receivingCharity}`);
+    }
+    if (amountStr.includes("+") || amountStr.includes("and")) {
+      notesParts.push(`Raw amount: ${amountStr}`);
+    }
+    if (amountStr.includes("\u2021")) {
+      notesParts.push("Includes matching pledge funding (‡)");
+    }
+
+    grants.push({
+      source: "sff",
+      funderId: FUNDER_IDS["sff"],
+      granteeName: organization,
+      granteeId,
+      name,
+      amount,
+      date: isoDate,
+      focusArea: null,
+      description: notesParts.join("; ").substring(0, 4000),
+    });
+  }
+
+  return grants;
+}
+
+// ---------------------------------------------------------------------------
 // Convert to sync format
 // ---------------------------------------------------------------------------
 
@@ -441,7 +624,9 @@ function toSyncGrant(raw: RawGrant): SyncGrant {
     source:
       raw.source === "coefficient-giving"
         ? "https://coefficientgiving.org/grants/"
-        : "https://funds.effectivealtruism.org/grants",
+        : raw.source === "sff"
+          ? "https://survivalandflourishing.fund/recommendations"
+          : "https://funds.effectivealtruism.org/grants",
     notes,
   };
 }
@@ -651,6 +836,100 @@ async function cmdSync(dryRun: boolean) {
 }
 
 // ---------------------------------------------------------------------------
+// SFF commands
+// ---------------------------------------------------------------------------
+
+async function cmdSFFAnalyze() {
+  if (!existsSync(SFF_HTML_CACHE_PATH)) {
+    downloadSFFHTML();
+  }
+
+  const matcher = buildEntityMatcher();
+  const grants = parseSFFHTML(SFF_HTML_CACHE_PATH, matcher);
+
+  const matched = grants.filter((g) => g.granteeId !== null);
+  const unmatched = grants.filter((g) => g.granteeId === null);
+  const totalAmount = grants.reduce((s, g) => s + (g.amount || 0), 0);
+
+  console.log("=== SFF Grant Import Analysis ===\n");
+  console.log(`Total grants: ${grants.length}`);
+  console.log(`Total amount: $${(totalAmount / 1e6).toFixed(1)}M\n`);
+
+  console.log(`Entity matching:`);
+  console.log(`  Matched: ${matched.length} (${((matched.length / grants.length) * 100).toFixed(1)}%)`);
+  console.log(`  Unmatched: ${unmatched.length} (stored as display names)\n`);
+
+  // By round
+  const byRound = new Map<string, { count: number; total: number }>();
+  for (const g of grants) {
+    const round = g.description?.match(/Round: ([^;]+)/)?.[1] || "unknown";
+    const entry = byRound.get(round) || { count: 0, total: 0 };
+    entry.count++;
+    entry.total += g.amount || 0;
+    byRound.set(round, entry);
+  }
+  console.log("By round:");
+  for (const [round, data] of [...byRound.entries()].sort()) {
+    console.log(`  ${round}: ${data.count} grants ($${(data.total / 1e6).toFixed(1)}M)`);
+  }
+
+  // Top unmatched
+  const unmatchedByOrg = new Map<string, { total: number; count: number }>();
+  for (const g of unmatched) {
+    const entry = unmatchedByOrg.get(g.granteeName) || { total: 0, count: 0 };
+    entry.total += g.amount || 0;
+    entry.count++;
+    unmatchedByOrg.set(g.granteeName, entry);
+  }
+
+  const sortedUnmatched = [...unmatchedByOrg.entries()]
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 30);
+
+  console.log(`\nTop 30 unmatched grantees by amount:`);
+  for (const [name, data] of sortedUnmatched) {
+    console.log(`  $${(data.total / 1e6).toFixed(1)}M (${data.count} grants) — ${name}`);
+  }
+
+  // Check for ID collisions
+  const syncGrants = grants.map(toSyncGrant);
+  const idSet = new Set<string>();
+  let collisions = 0;
+  for (const g of syncGrants) {
+    if (idSet.has(g.id)) collisions++;
+    idSet.add(g.id);
+  }
+  console.log(`\nGenerated ${idSet.size} unique IDs (${collisions} collisions → would be deduped)`);
+
+  // Sample grants
+  console.log("\nSample grants (first 5):");
+  for (const g of syncGrants.slice(0, 5)) {
+    console.log(`  ${g.id} | ${g.granteeId} | $${g.amount?.toLocaleString() || "?"} | ${g.date} | ${g.name.substring(0, 60)}`);
+  }
+}
+
+async function cmdSFFSync(dryRun: boolean) {
+  if (!existsSync(SFF_HTML_CACHE_PATH)) {
+    downloadSFFHTML();
+  }
+
+  const matcher = buildEntityMatcher();
+  const grants = parseSFFHTML(SFF_HTML_CACHE_PATH, matcher);
+  console.log(`Parsed ${grants.length} SFF grants`);
+
+  // Convert and deduplicate by ID
+  const syncMap = new Map<string, SyncGrant>();
+  for (const raw of grants) {
+    const sync = toSyncGrant(raw);
+    syncMap.set(sync.id, sync);
+  }
+  const syncGrants = [...syncMap.values()];
+  console.log(`After dedup: ${syncGrants.length} unique grants`);
+
+  await syncToServer(syncGrants, dryRun);
+}
+
+// ---------------------------------------------------------------------------
 // Crux command exports
 // ---------------------------------------------------------------------------
 
@@ -672,10 +951,29 @@ async function downloadCommand(_args: string[], _options: Record<string, unknown
   return { exitCode: 0 };
 }
 
+async function sffAnalyzeCommand(_args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
+  await cmdSFFAnalyze();
+  return { exitCode: 0 };
+}
+
+async function sffSyncCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options['dry-run'];
+  await cmdSFFSync(dryRun);
+  return { exitCode: 0 };
+}
+
+async function sffDownloadCommand(_args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
+  downloadSFFHTML();
+  return { exitCode: 0 };
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   download: downloadCommand,
+  "sff-analyze": sffAnalyzeCommand,
+  "sff-sync": sffSyncCommand,
+  "sff-download": sffDownloadCommand,
   default: analyzeCommand,
 };
 
@@ -684,13 +982,19 @@ export function getHelp(): string {
 Import Grants — Import external grant databases into wiki-server Postgres
 
 Commands:
-  analyze              Preview import stats and entity matching
-  sync                 Import grants to wiki-server Postgres
+  analyze              Preview import stats and entity matching (CG + EA Funds)
+  sync                 Import CG + EA Funds grants to wiki-server Postgres
   sync --dry-run       Show what would be synced without writing
   download             Just download the CSV files
+
+  sff-analyze          Preview SFF grant import stats and entity matching
+  sff-sync             Import SFF grants to wiki-server Postgres
+  sff-sync --dry-run   Show what would be synced without writing
+  sff-download         Just download the SFF HTML
 
 Sources:
   - Coefficient Giving (Open Philanthropy) grants archive CSV
   - EA Funds public grants CSV
+  - Survival and Flourishing Fund (SFF) HTML table
 `;
 }
