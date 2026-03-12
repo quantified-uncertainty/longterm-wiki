@@ -1,18 +1,22 @@
 /**
- * Import grants from external CSV sources into wiki-server Postgres.
+ * Import grants from external sources into wiki-server Postgres.
  *
  * Sources:
  *   1. Coefficient Giving (Open Philanthropy) grants archive CSV
  *   2. EA Funds public grants CSV
+ *   3. Manifund projects API (via Playwright for Vercel challenge bypass)
  *
  * Usage:
- *   pnpm crux import-grants analyze          # Preview what would be imported
- *   pnpm crux import-grants sync             # Import to wiki-server Postgres
- *   pnpm crux import-grants sync --dry-run   # Show what would be synced without writing
+ *   pnpm crux import-grants analyze                # Preview CG + EA Funds
+ *   pnpm crux import-grants sync                   # Import CG + EA Funds
+ *   pnpm crux import-grants sync --dry-run         # Show what would be synced
+ *   pnpm crux import-grants manifund-analyze       # Preview Manifund projects
+ *   pnpm crux import-grants manifund-sync          # Import Manifund to wiki-server
+ *   pnpm crux import-grants manifund-sync --dry-run
  */
 
 import { createHash } from "crypto";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, statSync } from "fs";
 import { resolve } from "path";
 import { execSync } from "child_process";
 import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
@@ -39,6 +43,11 @@ const FUNDER_IDS: Record<string, string> = {
   "Effective Altruism Infrastructure Fund": "__EAIF__",
   "Global Health and Development Fund": "__GHDF__",
 };
+
+/** Manifund entity stableId and config */
+const MANIFUND_FUNDER_ID = "fFVOuFZCRf";
+const MANIFUND_API_URL = "https://manifund.org/api/v0/projects";
+const MANIFUND_CACHE_PATH = "/tmp/manifund-projects.json";
 
 /** Batch size for sync API calls */
 const SYNC_BATCH_SIZE = 500;
@@ -232,7 +241,7 @@ const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 interface RawGrant {
-  source: "coefficient-giving" | "ea-funds";
+  source: "coefficient-giving" | "ea-funds" | "manifund";
   funderId: string; // stableId of funder entity
   granteeName: string;
   granteeId: string | null; // stableId if matched, else null
@@ -241,6 +250,8 @@ interface RawGrant {
   date: string | null;
   focusArea: string | null;
   description: string | null;
+  /** URL to the source page (used for Manifund project URLs) */
+  sourceUrl?: string | null;
 }
 
 interface SyncGrant {
@@ -439,9 +450,11 @@ function toSyncGrant(raw: RawGrant): SyncGrant {
     date: raw.date,
     status: null,
     source:
-      raw.source === "coefficient-giving"
-        ? "https://coefficientgiving.org/grants/"
-        : "https://funds.effectivealtruism.org/grants",
+      raw.sourceUrl
+        ? raw.sourceUrl
+        : raw.source === "coefficient-giving"
+          ? "https://coefficientgiving.org/grants/"
+          : "https://funds.effectivealtruism.org/grants",
     notes,
   };
 }
@@ -520,6 +533,222 @@ async function syncToServer(
   if (failedBatches > 0) {
     throw new Error(`${failedBatches} grant sync batch(es) failed`);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Manifund API types and fetching
+// ---------------------------------------------------------------------------
+
+interface ManifundProject {
+  title: string;
+  id: string;
+  created_at: string;
+  creator: string;
+  slug: string;
+  blurb: string;
+  description: string;
+  stage: string;
+  funding_goal: number | null;
+  min_funding: number | null;
+  type: string;
+  profiles: { username: string; full_name: string } | null;
+  txns: Array<{ amount: number; token: string }>;
+  bids: Array<{ amount: number; status: string }>;
+  causes: Array<{ title: string; slug: string }>;
+}
+
+/**
+ * Fetch all Manifund projects using Playwright to bypass Vercel security checkpoint.
+ * Results are cached to /tmp/manifund-projects.json for subsequent runs.
+ */
+async function fetchManifundProjects(): Promise<ManifundProject[]> {
+  // Try reading from cache first (less than 1 hour old)
+  if (existsSync(MANIFUND_CACHE_PATH)) {
+    const stat = statSync(MANIFUND_CACHE_PATH);
+    const ageMs = Date.now() - stat.mtimeMs;
+    if (ageMs < 3600_000) {
+      console.log(`  Using cached data (${(ageMs / 60_000).toFixed(0)}m old)`);
+      return JSON.parse(readFileSync(MANIFUND_CACHE_PATH, "utf8"));
+    }
+  }
+
+  console.log("  Fetching from Manifund API via Playwright...");
+  console.log("  (Manifund uses Vercel security checkpoint — requires headless browser)");
+
+  // Use a child process to run Playwright since it may not be in the project's
+  // node_modules but is available globally via npx
+  const script = `
+    const { chromium } = require('playwright');
+    (async () => {
+      const browser = await chromium.launch({ headless: true });
+      const context = await browser.newContext();
+      const page = await context.newPage();
+
+      // Navigate to homepage to pass Vercel security challenge
+      await page.goto('https://manifund.org/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await page.waitForTimeout(5000);
+
+      let allProjects = [];
+      let before = null;
+      let pageNum = 0;
+
+      while (true) {
+        pageNum++;
+        const url = before
+          ? '/api/v0/projects?before=' + encodeURIComponent(before)
+          : '/api/v0/projects';
+
+        const text = await page.evaluate(async (u) => {
+          const resp = await fetch(u);
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.text();
+        }, url);
+
+        const data = JSON.parse(text);
+        process.stderr.write('  Page ' + pageNum + ': ' + data.length + ' projects\\n');
+
+        if (data.length === 0) break;
+        allProjects = allProjects.concat(data);
+
+        before = data[data.length - 1].created_at;
+        if (data.length < 100) break;
+      }
+
+      // Write to stdout as JSON
+      process.stdout.write(JSON.stringify(allProjects));
+      await browser.close();
+    })().catch(e => { process.stderr.write('ERROR: ' + e.message + '\\n'); process.exit(1); });
+  `;
+
+  try {
+    const result = execSync(
+      `NODE_PATH=/opt/homebrew/lib/node_modules node -e ${JSON.stringify(script)}`,
+      { maxBuffer: 50 * 1024 * 1024, timeout: 120_000, encoding: "utf8", stdio: ["pipe", "pipe", "inherit"] }
+    );
+
+    const projects: ManifundProject[] = JSON.parse(result);
+    console.log(`  Downloaded ${projects.length} projects`);
+
+    // Cache the results
+    writeFileSync(MANIFUND_CACHE_PATH, JSON.stringify(projects));
+    return projects;
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+
+    // If Playwright fails, try direct fetch as fallback (works when Vercel isn't blocking)
+    console.warn(`  Playwright fetch failed: ${msg}`);
+    console.log("  Trying direct fetch as fallback...");
+    return await fetchManifundDirect();
+  }
+}
+
+/**
+ * Fallback: try to fetch Manifund API directly without Playwright.
+ * Works when Vercel isn't enforcing their security checkpoint.
+ */
+async function fetchManifundDirect(): Promise<ManifundProject[]> {
+  const allProjects: ManifundProject[] = [];
+  let before: string | null = null;
+  let pageNum = 0;
+
+  while (true) {
+    pageNum++;
+    const url = before
+      ? `${MANIFUND_API_URL}?before=${encodeURIComponent(before)}`
+      : MANIFUND_API_URL;
+
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Manifund API returned HTTP ${response.status}. Try again later or use cached data.`);
+    }
+
+    const data: ManifundProject[] = await response.json();
+    console.log(`  Page ${pageNum}: ${data.length} projects`);
+
+    if (data.length === 0) break;
+    allProjects.push(...data);
+
+    before = data[data.length - 1].created_at;
+    if (data.length < 100) break;
+  }
+
+  console.log(`  Downloaded ${allProjects.length} projects`);
+  writeFileSync(MANIFUND_CACHE_PATH, JSON.stringify(allProjects));
+  return allProjects;
+}
+
+/**
+ * Parse Manifund projects into RawGrant format.
+ * Only includes projects that received funding (have positive txns).
+ */
+function parseManifundProjects(
+  projects: ManifundProject[],
+  matcher: ReturnType<typeof buildEntityMatcher>
+): RawGrant[] {
+  const grants: RawGrant[] = [];
+
+  for (const project of projects) {
+    // Calculate total funding from USD txns
+    const totalFunding = project.txns
+      .filter(t => t.token === "USD" && t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Skip unfunded projects
+    if (totalFunding <= 0) continue;
+
+    // Creator name from profiles
+    const creatorName = project.profiles?.full_name
+      || project.profiles?.username
+      || "Unknown";
+
+    // Match grantee to entity
+    let granteeId: string | null = null;
+    const overrideSlug = MANUAL_GRANTEE_OVERRIDES[creatorName];
+    if (overrideSlug) {
+      const match = matcher.match(overrideSlug);
+      if (match) granteeId = match.stableId;
+    }
+    if (!granteeId) {
+      const match = matcher.match(creatorName);
+      if (match) granteeId = match.stableId;
+    }
+
+    // Parse date from created_at ISO string
+    let isoDate: string | null = null;
+    if (project.created_at) {
+      // "2024-03-15T12:00:00.000Z" → "2024-03-15"
+      const dateMatch = project.created_at.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        isoDate = dateMatch[1];
+      }
+    }
+
+    // Build cause area string from causes
+    const focusArea = project.causes.length > 0
+      ? project.causes.map(c => c.title).join(", ")
+      : null;
+
+    // Project page URL
+    const sourceUrl = `https://manifund.org/projects/${project.slug}`;
+
+    grants.push({
+      source: "manifund",
+      funderId: MANIFUND_FUNDER_ID,
+      granteeName: creatorName,
+      granteeId,
+      name: project.title.substring(0, 500),
+      amount: Math.round(totalFunding * 100) / 100, // round to cents
+      date: isoDate,
+      focusArea,
+      description: project.blurb || null,
+      sourceUrl,
+    });
+  }
+
+  return grants;
 }
 
 // ---------------------------------------------------------------------------
@@ -650,6 +879,112 @@ async function cmdSync(dryRun: boolean) {
   await syncToServer(syncGrants, dryRun);
 }
 
+async function cmdManifundAnalyze() {
+  console.log("=== Manifund Import Analysis ===\n");
+  console.log("Fetching Manifund projects...");
+
+  const projects = await fetchManifundProjects();
+  console.log(`\nTotal projects from API: ${projects.length}`);
+
+  // Stage breakdown
+  const stages: Record<string, number> = {};
+  for (const p of projects) {
+    stages[p.stage] = (stages[p.stage] || 0) + 1;
+  }
+  console.log(`\nProjects by stage:`);
+  for (const [stage, count] of Object.entries(stages).sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${stage}: ${count}`);
+  }
+
+  // Type breakdown
+  const types: Record<string, number> = {};
+  for (const p of projects) {
+    types[p.type] = (types[p.type] || 0) + 1;
+  }
+  console.log(`\nProjects by type:`);
+  for (const [type, count] of Object.entries(types).sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${type}: ${count}`);
+  }
+
+  const matcher = buildEntityMatcher();
+  const grants = parseManifundProjects(projects, matcher);
+
+  const totalFunding = grants.reduce((s, g) => s + (g.amount || 0), 0);
+  const matched = grants.filter(g => g.granteeId !== null);
+
+  console.log(`\nFunded projects: ${grants.length}`);
+  console.log(`Total funding: $${(totalFunding / 1e6).toFixed(2)}M`);
+  console.log(`\nEntity matching:`);
+  console.log(`  Matched: ${matched.length} (${grants.length > 0 ? ((matched.length / grants.length) * 100).toFixed(1) : 0}%)`);
+  console.log(`  Unmatched: ${grants.length - matched.length} (stored as display names)`);
+
+  // Top funded projects
+  const sorted = [...grants].sort((a, b) => (b.amount || 0) - (a.amount || 0));
+  console.log(`\nTop 20 funded projects:`);
+  for (const g of sorted.slice(0, 20)) {
+    const matchLabel = g.granteeId ? ` [${g.granteeId}]` : "";
+    console.log(`  $${((g.amount || 0) / 1000).toFixed(1)}k — ${g.name.slice(0, 60)} (${g.granteeName})${matchLabel}`);
+  }
+
+  // Top unmatched
+  const unmatchedByName = new Map<string, { total: number; count: number }>();
+  for (const g of grants.filter(g => !g.granteeId)) {
+    const entry = unmatchedByName.get(g.granteeName) || { total: 0, count: 0 };
+    entry.total += g.amount || 0;
+    entry.count++;
+    unmatchedByName.set(g.granteeName, entry);
+  }
+  const sortedUnmatched = [...unmatchedByName.entries()]
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 20);
+  console.log(`\nTop 20 unmatched grantees by amount:`);
+  for (const [name, data] of sortedUnmatched) {
+    console.log(`  $${(data.total / 1000).toFixed(1)}k (${data.count} projects) — ${name}`);
+  }
+
+  // ID collision check
+  const syncGrants = grants.map(toSyncGrant);
+  const idSet = new Set<string>();
+  let collisions = 0;
+  for (const g of syncGrants) {
+    if (idSet.has(g.id)) collisions++;
+    idSet.add(g.id);
+  }
+  console.log(`\nGenerated ${idSet.size} unique IDs (${collisions} collisions)`);
+
+  // Year breakdown
+  const byYear: Record<string, number> = {};
+  for (const g of grants) {
+    const year = g.date?.slice(0, 4) || "unknown";
+    byYear[year] = (byYear[year] || 0) + 1;
+  }
+  console.log(`\nFunded projects by year:`);
+  for (const [year, count] of Object.entries(byYear).sort()) {
+    console.log(`  ${year}: ${count}`);
+  }
+}
+
+async function cmdManifundSync(dryRun: boolean) {
+  console.log("Fetching Manifund projects...");
+  const projects = await fetchManifundProjects();
+
+  const matcher = buildEntityMatcher();
+  const grants = parseManifundProjects(projects, matcher);
+
+  console.log(`Parsed ${grants.length} funded Manifund projects from ${projects.length} total`);
+
+  // Convert and deduplicate by ID
+  const syncMap = new Map<string, SyncGrant>();
+  for (const raw of grants) {
+    const sync = toSyncGrant(raw);
+    syncMap.set(sync.id, sync);
+  }
+  const syncGrants = [...syncMap.values()];
+  console.log(`After dedup: ${syncGrants.length} unique grants`);
+
+  await syncToServer(syncGrants, dryRun);
+}
+
 // ---------------------------------------------------------------------------
 // Crux command exports
 // ---------------------------------------------------------------------------
@@ -672,10 +1007,23 @@ async function downloadCommand(_args: string[], _options: Record<string, unknown
   return { exitCode: 0 };
 }
 
+async function manifundAnalyzeCommand(_args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
+  await cmdManifundAnalyze();
+  return { exitCode: 0 };
+}
+
+async function manifundSyncCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options['dry-run'];
+  await cmdManifundSync(dryRun);
+  return { exitCode: 0 };
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   download: downloadCommand,
+  "manifund-analyze": manifundAnalyzeCommand,
+  "manifund-sync": manifundSyncCommand,
   default: analyzeCommand,
 };
 
@@ -684,13 +1032,17 @@ export function getHelp(): string {
 Import Grants — Import external grant databases into wiki-server Postgres
 
 Commands:
-  analyze              Preview import stats and entity matching
-  sync                 Import grants to wiki-server Postgres
+  analyze              Preview CG + EA Funds import stats
+  sync                 Import CG + EA Funds to wiki-server
   sync --dry-run       Show what would be synced without writing
   download             Just download the CSV files
+  manifund-analyze     Preview Manifund projects import stats
+  manifund-sync        Import Manifund projects to wiki-server
+  manifund-sync --dry-run
 
 Sources:
   - Coefficient Giving (Open Philanthropy) grants archive CSV
   - EA Funds public grants CSV
+  - Manifund projects API (https://manifund.org)
 `;
 }
