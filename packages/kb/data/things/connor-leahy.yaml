@@ -67,4 +67,5 @@ records:
       title: "GPT-NeoX-20B: An Open-Source Autoregressive Language Model"
       year: 2022
       url: https://arxiv.org/abs/2204.06745
+      resource: v7jCdXS8JQ
       notes: "One of the first large open-source language models; demonstrated that large LMs could be trained outside major labs"

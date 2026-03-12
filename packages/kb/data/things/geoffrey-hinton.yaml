@@ -111,22 +111,26 @@ records:
       title: "Learning representations by back-propagating errors"
       year: 1986
       url: https://www.nature.com/articles/323533a0
+      resource: NDQ0MmYxZj
       notes: "Co-authored with David Rumelhart and Ronald Williams; popularized backpropagation for training neural networks"
 
     i_gHdE7fG8h:
       title: "A fast learning algorithm for deep belief nets"
       year: 2006
       url: https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf
+      resource: GA1eS4dZlA
       notes: "Demonstrated greedy layer-wise pretraining; reignited interest in deep learning"
 
     i_gHiJ9kL1m:
       title: "ImageNet Classification with Deep Convolutional Neural Networks (AlexNet)"
       year: 2012
       url: https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+      resource: ZDBjMTBhOG
       notes: "Co-authored with Alex Krizhevsky and Ilya Sutskever; won ImageNet 2012 by a large margin, triggering the deep learning revolution"
 
     i_gHnO2pQ3r:
       title: "Distilling the Knowledge in a Neural Network"
       year: 2015
       url: https://arxiv.org/abs/1503.02531
+      resource: wDzP3RTg1g
       notes: "Introduced knowledge distillation; foundational technique for model compression"
