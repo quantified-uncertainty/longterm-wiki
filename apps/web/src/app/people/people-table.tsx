@@ -20,6 +20,8 @@ export interface PersonRow {
   bornYear: number | null;
 
   netWorthNum: number | null;
+
+  positionCount: number;
 }
 
 type SortKey =
@@ -27,7 +29,8 @@ type SortKey =
   | "role"
   | "employer"
   | "bornYear"
-  | "netWorth";
+  | "netWorth"
+  | "positions";
 
 type SortDir = "asc" | "desc";
 
@@ -91,6 +94,8 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             return row.bornYear;
           case "netWorth":
             return row.netWorthNum;
+          case "positions":
+            return row.positionCount || null;
         }
       };
 
@@ -168,6 +173,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
               <SortHeader label="Affiliation" sortKey="employer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Born" sortKey="bornYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Net Worth" sortKey="netWorth" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="Positions" sortKey="positions" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -223,6 +229,15 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.netWorthNum != null && (
                     <span className="font-semibold">{formatCompactCurrency(row.netWorthNum)}</span>
+                  )}
+                </td>
+
+                {/* Positions */}
+                <td className="py-2.5 px-3 text-center tabular-nums">
+                  {row.positionCount > 0 && (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {row.positionCount}
+                    </span>
                   )}
                 </td>
 

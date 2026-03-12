@@ -3,6 +3,7 @@ import { getKBEntities, getKBLatest, getKBEntity, getKBEntitySlug } from "@/data
 import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
+import { getExpertById } from "@/data";
 
 export const metadata: Metadata = {
   title: "People",
@@ -37,9 +38,13 @@ export default function PeoplePage() {
 
     const employer = resolveRef(employedByFact);
 
+    const slug = getKBEntitySlug(entity.id) ?? entity.id;
+    const expert = getExpertById(slug);
+    const positionCount = expert?.positions?.length ?? 0;
+
     return {
       id: entity.id,
-      slug: getKBEntitySlug(entity.id) ?? entity.id,
+      slug,
       name: entity.name,
       numericId: entity.numericId ?? null,
       wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
@@ -51,6 +56,8 @@ export default function PeoplePage() {
 
       bornYear: numericValue(bornYearFact),
       netWorthNum: numericValue(netWorthFact),
+
+      positionCount,
     };
   });
 
@@ -58,6 +65,7 @@ export default function PeoplePage() {
   const withEmployer = rows.filter((r) => r.employerName != null).length;
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
   const withNetWorth = rows.filter((r) => r.netWorthNum != null).length;
+  const withPositions = rows.filter((r) => r.positionCount > 0).length;
 
   const stats = [
     { label: "People", value: String(rows.length) },
@@ -65,6 +73,7 @@ export default function PeoplePage() {
     { label: "With Employer", value: String(withEmployer) },
     { label: "With Birth Year", value: String(withBornYear) },
     { label: "With Net Worth", value: String(withNetWorth) },
+    { label: "With Expert Positions", value: String(withPositions) },
   ];
 
   return (

@@ -202,6 +202,15 @@ export interface Publication {
   website?: string;
 }
 
+export interface ExpertPosition {
+  topic: string;
+  view: string;
+  estimate?: string;
+  confidence?: string;
+  source?: string;
+  sourceUrl?: string;
+}
+
 export interface Expert {
   id: string;
   name: string;
@@ -209,6 +218,7 @@ export interface Expert {
   role?: string;
   website?: string;
   knownFor?: string[];
+  positions?: ExpertPosition[];
 }
 
 export interface Organization {
@@ -709,6 +719,10 @@ export function getResourcesForPublication(publicationId: string): Resource[] {
 
 export function getExpertById(id: string): Expert | undefined {
   return expertIndex().get(id);
+}
+
+export function getAllExperts(): Expert[] {
+  return getDatabase().experts ?? [];
 }
 
 export function getOrganizationById(id: string): Organization | undefined {
