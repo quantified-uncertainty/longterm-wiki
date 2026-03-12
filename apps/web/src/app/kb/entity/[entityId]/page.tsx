@@ -8,6 +8,7 @@ import {
   getKBFacts,
   getKBProperty,
   getKBLatest,
+  getKBSlugMap,
 } from "@/data/kb";
 import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -94,7 +95,15 @@ function verdictSummary(verdicts: Map<string, VerdictRow>): Record<string, numbe
 // ─── Static params & metadata ────────────────────────────────────────
 
 export function generateStaticParams() {
-  return getKBEntities().map((entity) => ({ entityId: entity.id }));
+  const entities = getKBEntities();
+  const slugMap = getKBSlugMap();
+
+  // Generate params for both internal IDs and slugs so both URL patterns work
+  const params = entities.map((entity) => ({ entityId: entity.id }));
+  for (const slug of Object.keys(slugMap)) {
+    params.push({ entityId: slug });
+  }
+  return params;
 }
 
 export async function generateMetadata({
