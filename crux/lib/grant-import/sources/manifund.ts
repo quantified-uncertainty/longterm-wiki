@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from "fs";
 import { execSync } from "child_process";
+import { extractISODate } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
+import { FUNDER_IDS } from "../constants.ts";
 
-const MANIFUND_FUNDER_ID = "fFVOuFZCRf";
 const MANIFUND_API_URL = "https://manifund.org/api/v0/projects";
 const MANIFUND_CACHE_PATH = "/tmp/manifund-projects.json";
 
@@ -157,13 +158,9 @@ export function parseManifundProjects(
 
     const granteeId = matchGrantee(creatorName, matcher);
 
-    let isoDate: string | null = null;
-    if (project.created_at) {
-      const dateMatch = project.created_at.match(/^(\d{4}-\d{2}-\d{2})/);
-      if (dateMatch) {
-        isoDate = dateMatch[1];
-      }
-    }
+    const isoDate = project.created_at
+      ? extractISODate(project.created_at)
+      : null;
 
     const focusArea = project.causes.length > 0
       ? project.causes.map(c => c.title).join(", ")
@@ -173,7 +170,7 @@ export function parseManifundProjects(
 
     grants.push({
       source: "manifund",
-      funderId: MANIFUND_FUNDER_ID,
+      funderId: FUNDER_IDS.MANIFUND,
       granteeName: creatorName,
       granteeId,
       name: project.title.substring(0, 500),

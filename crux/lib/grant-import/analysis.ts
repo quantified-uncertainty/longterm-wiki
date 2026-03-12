@@ -1,20 +1,51 @@
 import type { RawGrant, SyncGrant } from "./types.ts";
 
-export function printMatchStats(grants: RawGrant[]): void {
-  const matched = grants.filter((g) => g.granteeId !== null);
-  const unmatched = grants.filter((g) => g.granteeId === null);
+// --- Data types ---
 
-  console.log(`Entity matching:`);
-  console.log(`  Matched: ${matched.length} (${grants.length > 0 ? ((matched.length / grants.length) * 100).toFixed(1) : 0}%)`);
-  console.log(`  Unmatched: ${unmatched.length} (stored as display names)\n`);
-
-  const granteeNames = new Set(grants.map((g) => g.granteeName));
-  const matchedNames = new Set(matched.map((g) => g.granteeName));
-  console.log(`Unique grantee names: ${granteeNames.size}`);
-  console.log(`Matched to entities: ${matchedNames.size}`);
+export interface MatchStats {
+  total: number;
+  matched: number;
+  unmatched: number;
+  matchRate: number; // 0-1
+  uniqueGranteeNames: number;
+  matchedGranteeNames: number;
 }
 
-export function printTopUnmatched(grants: RawGrant[], limit = 30): void {
+export interface UnmatchedGrantee {
+  name: string;
+  totalAmount: number;
+  count: number;
+}
+
+export interface IdCollisions {
+  uniqueIds: number;
+  collisions: number;
+}
+
+export interface FunderBreakdown {
+  organizationId: string;
+  count: number;
+}
+
+// --- Data functions ---
+
+export function getMatchStats(grants: RawGrant[]): MatchStats {
+  const matched = grants.filter((g) => g.granteeId !== null);
+  const unmatched = grants.filter((g) => g.granteeId === null);
+  const granteeNames = new Set(grants.map((g) => g.granteeName));
+  const matchedNames = new Set(matched.map((g) => g.granteeName));
+
+  return {
+    total: grants.length,
+    matched: matched.length,
+    unmatched: unmatched.length,
+    matchRate: grants.length > 0 ? matched.length / grants.length : 0,
+    uniqueGranteeNames: granteeNames.size,
+    matchedGranteeNames: matchedNames.size,
+  };
+}
+
+export function getTopUnmatched(grants: RawGrant[], limit = 30): UnmatchedGrantee[] {
   const unmatched = grants.filter((g) => g.granteeId === null);
   const unmatchedByOrg = new Map<string, { total: number; count: number }>();
   for (const g of unmatched) {
@@ -24,35 +55,69 @@ export function printTopUnmatched(grants: RawGrant[], limit = 30): void {
     unmatchedByOrg.set(g.granteeName, entry);
   }
 
-  const sorted = [...unmatchedByOrg.entries()]
+  return [...unmatchedByOrg.entries()]
     .sort((a, b) => b[1].total - a[1].total)
-    .slice(0, limit);
-
-  console.log(`\nTop ${limit} unmatched grantees by amount:`);
-  for (const [name, data] of sorted) {
-    console.log(
-      `  $${(data.total / 1e6).toFixed(1)}M (${data.count} grants) — ${name}`
-    );
-  }
+    .slice(0, limit)
+    .map(([name, data]) => ({
+      name,
+      totalAmount: data.total,
+      count: data.count,
+    }));
 }
 
-export function checkIdCollisions(syncGrants: SyncGrant[]): void {
+export function getIdCollisions(syncGrants: SyncGrant[]): IdCollisions {
   const idSet = new Set<string>();
   let collisions = 0;
   for (const g of syncGrants) {
     if (idSet.has(g.id)) collisions++;
     idSet.add(g.id);
   }
-  console.log(`\nGenerated ${idSet.size} unique IDs (${collisions} collisions → would be deduped)`);
+  return { uniqueIds: idSet.size, collisions };
 }
 
-export function printByFunder(syncGrants: SyncGrant[]): void {
+export function getByFunder(syncGrants: SyncGrant[]): FunderBreakdown[] {
   const byFunder = new Map<string, number>();
   for (const g of syncGrants) {
     byFunder.set(g.organizationId, (byFunder.get(g.organizationId) || 0) + 1);
   }
+  return [...byFunder.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([organizationId, count]) => ({ organizationId, count }));
+}
+
+// --- Print functions (thin wrappers) ---
+
+export function printMatchStats(grants: RawGrant[]): void {
+  const stats = getMatchStats(grants);
+
+  console.log(`Entity matching:`);
+  console.log(`  Matched: ${stats.matched} (${(stats.matchRate * 100).toFixed(1)}%)`);
+  console.log(`  Unmatched: ${stats.unmatched} (stored as display names)\n`);
+  console.log(`Unique grantee names: ${stats.uniqueGranteeNames}`);
+  console.log(`Matched to entities: ${stats.matchedGranteeNames}`);
+}
+
+export function printTopUnmatched(grants: RawGrant[], limit = 30): void {
+  const topUnmatched = getTopUnmatched(grants, limit);
+
+  console.log(`\nTop ${limit} unmatched grantees by amount:`);
+  for (const entry of topUnmatched) {
+    console.log(
+      `  $${(entry.totalAmount / 1e6).toFixed(1)}M (${entry.count} grants) — ${entry.name}`
+    );
+  }
+}
+
+export function checkIdCollisions(syncGrants: SyncGrant[]): void {
+  const { uniqueIds, collisions } = getIdCollisions(syncGrants);
+  console.log(`\nGenerated ${uniqueIds} unique IDs (${collisions} collisions → would be deduped)`);
+}
+
+export function printByFunder(syncGrants: SyncGrant[]): void {
+  const breakdown = getByFunder(syncGrants);
+
   console.log(`\nGrants by funder entity:`);
-  for (const [id, count] of [...byFunder.entries()].sort((a, b) => b[1] - a[1])) {
-    console.log(`  ${id}: ${count} grants`);
+  for (const entry of breakdown) {
+    console.log(`  ${entry.organizationId}: ${entry.count} grants`);
   }
 }

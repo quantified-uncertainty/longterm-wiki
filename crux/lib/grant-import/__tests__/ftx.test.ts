@@ -40,4 +40,29 @@ describe("parseFTXSQLFile", () => {
     const grants = parseFTXSQLFile(sql, "open-call");
     expect(grants).toEqual([]);
   });
+
+  it("handles escaped single quotes like O'Brien", () => {
+    const sql = `insert into donations(donor,donee,amount,donation_date) values
+('FTX Future Fund','O''Brien Foundation',750000,'2022-07-15','month','donation log',NULL);`;
+
+    const grants = parseFTXSQLFile(sql, "open-call");
+    expect(grants).toHaveLength(1);
+    expect(grants[0].donee).toBe("O'Brien Foundation");
+    expect(grants[0].amount).toBe(750000);
+  });
+
+  it("parses zero amount", () => {
+    const sql = `insert into donations(donor,donee,amount,donation_date) values
+('FTX Future Fund','Zero Grant Org',0,'2022-08-01','month','donation log',NULL);`;
+
+    const grants = parseFTXSQLFile(sql, "staff-led");
+    expect(grants).toHaveLength(1);
+    expect(grants[0].amount).toBe(0);
+    expect(grants[0].donee).toBe("Zero Grant Org");
+  });
+
+  it("returns empty array for empty SQL file", () => {
+    const grants = parseFTXSQLFile("", "open-call");
+    expect(grants).toEqual([]);
+  });
 });

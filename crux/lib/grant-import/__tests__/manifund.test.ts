@@ -133,4 +133,40 @@ describe("parseManifundProjects", () => {
     const total = grants.reduce((s, g) => s + (g.amount || 0), 0);
     expect(total).toBe(30000);
   });
+
+  it("uses 'Unknown' when profiles is null", () => {
+    const project = makeProject({
+      profiles: null,
+    });
+    const grants = parseManifundProjects([project], matcher);
+    expect(grants[0].granteeName).toBe("Unknown");
+  });
+
+  it("falls back to username when full_name is missing (null-like)", () => {
+    const project = makeProject({
+      profiles: { username: "jdoe", full_name: "" },
+    });
+    const grants = parseManifundProjects([project], matcher);
+    expect(grants[0].granteeName).toBe("jdoe");
+  });
+
+  it("sets focusArea to null when no causes", () => {
+    const project = makeProject({
+      causes: [],
+    });
+    const grants = parseManifundProjects([project], matcher);
+    expect(grants[0].focusArea).toBeNull();
+  });
+
+  it("joins multiple causes with comma separator", () => {
+    const project = makeProject({
+      causes: [
+        { title: "AI Safety", slug: "ai-safety" },
+        { title: "Biosecurity", slug: "biosecurity" },
+        { title: "Nuclear Risk", slug: "nuclear-risk" },
+      ],
+    });
+    const grants = parseManifundProjects([project], matcher);
+    expect(grants[0].focusArea).toBe("AI Safety, Biosecurity, Nuclear Risk");
+  });
 });

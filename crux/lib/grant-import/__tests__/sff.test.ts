@@ -25,6 +25,15 @@ describe("parseSFFAmount", () => {
   it("returns null for empty string", () => {
     expect(parseSFFAmount("")).toBeNull();
   });
+
+  it("sums matching pledge amount", () => {
+    // $1,535,000 + $500,000 with dagger
+    expect(parseSFFAmount("$1,535,000 +$500,000\u2021")).toBe(2035000);
+  });
+
+  it("handles amount string with only dagger (no plus)", () => {
+    expect(parseSFFAmount("$500,000\u2021")).toBe(500000);
+  });
 });
 
 describe("sffRoundToDate", () => {
@@ -58,5 +67,13 @@ describe("sffRoundToDate", () => {
 
   it("returns null for unrecognized format", () => {
     expect(sffRoundToDate("Something Else")).toBeNull();
+  });
+
+  it("parses SFF-YYYY-Q1", () => {
+    expect(sffRoundToDate("SFF-2020-Q1")).toBe("2020-01");
+  });
+
+  it("parses SFF-YYYY-Q2", () => {
+    expect(sffRoundToDate("SFF-2020-Q2")).toBe("2020-04");
   });
 });
