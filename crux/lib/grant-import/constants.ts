@@ -5,6 +5,8 @@
  */
 export const FUNDER_IDS = {
   OPEN_PHILANTHROPY: "ULjDXpSLCI",
+  // Coefficient Giving is Open Philanthropy's grantmaking arm — same entity
+  COEFFICIENT_GIVING: "ULjDXpSLCI",
   SFF: "sIFjGbxVct",
   FTX_FUTURE_FUND: "JhIGCaI3Ng",
   MANIFUND: "fFVOuFZCRf",
