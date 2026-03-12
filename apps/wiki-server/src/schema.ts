@@ -1589,3 +1589,109 @@ export const equityPositions = pgTable(
     index("idx_ep_holder").on(table.holderId),
   ]
 );
+
+/**
+ * Divisions — organizational sub-units (funds, teams, departments, labs, program areas).
+ */
+export const divisions = pgTable(
+  "divisions",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    slug: text("slug").unique(), // entity slug for entity system integration
+    parentOrgId: text("parent_org_id").notNull(), // parent org stableId (10-char)
+    name: text("name").notNull(),
+    divisionType: text("division_type").notNull(), // fund | team | department | lab | program-area
+    lead: text("lead"), // person stableId or display name
+    status: text("status"), // active | inactive | dissolved
+    startDate: text("start_date"), // YYYY or YYYY-MM
+    endDate: text("end_date"),
+    website: text("website"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_div_org").on(table.parentOrgId),
+    // slug UNIQUE constraint already creates an implicit index
+    index("idx_div_type").on(table.divisionType),
+    index("idx_div_status").on(table.status),
+  ]
+);
+
+/**
+ * Division personnel — people assigned to specific divisions.
+ */
+export const divisionPersonnel = pgTable(
+  "division_personnel",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    divisionId: text("division_id").notNull(), // divisions.id
+    personId: text("person_id").notNull(), // person stableId or display name
+    role: text("role").notNull(),
+    startDate: text("start_date"),
+    endDate: text("end_date"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_dp_division").on(table.divisionId),
+    index("idx_dp_person").on(table.personId),
+  ]
+);
+
+/**
+ * Funding programs — RFPs, grant rounds, fellowships, prizes, solicitations.
+ * Complementary to `grants` (individual awards). A future `grants.programId` column
+ * will link individual grants to their parent program.
+ */
+export const fundingPrograms = pgTable(
+  "funding_programs",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    orgId: text("org_id").notNull(), // org stableId (10-char)
+    divisionId: text("division_id"), // divisions.id (nullable)
+    name: text("name").notNull(),
+    description: text("description"),
+    programType: text("program_type").notNull(), // rfp | grant-round | fellowship | prize | solicitation | call
+    totalBudget: numeric("total_budget"), // USD amount (Drizzle returns string)
+    currency: text("currency").default("USD"),
+    applicationUrl: text("application_url"),
+    openDate: text("open_date"), // YYYY or YYYY-MM or ISO date
+    deadline: text("deadline"),
+    status: text("status"), // open | closed | awarded
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_fp_org").on(table.orgId),
+    index("idx_fp_division").on(table.divisionId),
+    index("idx_fp_status").on(table.status),
+    index("idx_fp_type").on(table.programType),
+  ]
+);
