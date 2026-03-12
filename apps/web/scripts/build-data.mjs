@@ -2287,10 +2287,19 @@ async function main() {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // Write combined JSON (strip raw entities — only typedEntities needed at runtime)
-  const { entities: _rawEntities, ...databaseForOutput } = database;
+  // Write combined JSON (strip raw entities and KB data — only typedEntities needed at runtime)
+  const { entities: _rawEntities, kb: _kbData, ...databaseForOutput } = database;
   writeFileSync(OUTPUT_FILE, JSON.stringify(databaseForOutput, null, 2));
-  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, typedEntities only)`);
+  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, KB split out, typedEntities only)`);
+
+  // Write KB data to a separate file (loaded independently by kb.ts)
+  const KB_OUTPUT_FILE = join(OUTPUT_DIR, 'kb-data.json');
+  if (_kbData) {
+    writeFileSync(KB_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
+    console.log(`✓ Written: ${KB_OUTPUT_FILE} (KB entities, facts, records, schemas)`);
+  } else {
+    console.warn('⚠ KB data not available — kb-data.json not written');
+  }
 
   // Also write individual JSON files for selective imports
   for (const { key, file, dir } of DATA_FILES) {
