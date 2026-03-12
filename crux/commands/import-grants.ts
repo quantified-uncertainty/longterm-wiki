@@ -23,6 +23,7 @@ import {
   checkIdCollisions,
   printByFunder,
 } from "../lib/grant-import/analysis.ts";
+import { printDuplicateAnalysis, deduplicateGrants } from "../lib/grant-import/dedup.ts";
 import { ALL_SOURCES } from "../lib/grant-import/sources/index.ts";
 import type { GrantSource, RawGrant, SyncGrant } from "../lib/grant-import/types.ts";
 
@@ -82,13 +83,18 @@ async function cmdAnalyze(sourceFilter?: string) {
   });
   checkIdCollisions(syncGrants);
   printByFunder(syncGrants);
+
+  // Cross-source duplicate analysis
+  if (sources.length > 1) {
+    printDuplicateAnalysis(allGrants);
+  }
 }
 
-async function cmdSync(dryRun: boolean, sourceFilter?: string) {
+async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = false) {
   const sources = filterSources(sourceFilter);
   const matcher = buildEntityMatcher();
 
-  const allGrants: RawGrant[] = [];
+  let allGrants: RawGrant[] = [];
 
   for (const src of sources) {
     await src.ensureData();
@@ -98,6 +104,15 @@ async function cmdSync(dryRun: boolean, sourceFilter?: string) {
   }
 
   console.log(`Total: ${allGrants.length} grants`);
+
+  // Cross-source deduplication (optional, behind --dedup flag)
+  if (dedup && sources.length > 1) {
+    const { deduplicated, removed } = deduplicateGrants(allGrants);
+    if (removed > 0) {
+      console.log(`Cross-source dedup: removed ${removed} likely duplicates`);
+    }
+    allGrants = deduplicated;
+  }
 
   // Convert and deduplicate by ID
   const syncMap = new Map<string, SyncGrant>();
@@ -131,7 +146,8 @@ async function analyzeCommand(_args: string[], options: Record<string, unknown>)
 async function syncCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const dryRun = !!options.dryRun || !!options["dry-run"];
   const sourceFilter = (options.source as string) || undefined;
-  await cmdSync(dryRun, sourceFilter);
+  const dedup = !!options.dedup;
+  await cmdSync(dryRun, sourceFilter, dedup);
   return { exitCode: 0 };
 }
 
@@ -163,6 +179,9 @@ Commands:
 
 Options:
   --source=<id>        Filter to a single source (default: all)
+  --dedup              Enable cross-source deduplication during sync
+                       (removes likely-duplicate grants across sources,
+                       keeping the most detailed version)
 
 Sources:
   ${ALL_SOURCES.map(s => `- ${s.id} (${s.name})`).join("\n  ")}
