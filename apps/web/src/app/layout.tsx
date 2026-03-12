@@ -81,6 +81,12 @@ export default function RootLayout({
                 Grants
               </Link>
               <Link
+                href="/sources"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                Sources
+              </Link>
+              <Link
                 href="/kb"
                 className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >

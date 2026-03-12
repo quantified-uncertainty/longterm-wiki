@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/organizations", label: "Organizations" },
   { href: "/people", label: "People" },
   { href: "/grants", label: "Grants" },
+  { href: "/sources", label: "Sources" },
   { href: "/kb", label: "Data" },
   { href: "/wiki/E755", label: "About" },
   { href: "/wiki/E779", label: "Internal" },

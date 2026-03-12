@@ -2,8 +2,38 @@
  * Entity navigation: URL resolution, backlinks, and related graph.
  */
 
-import { getDatabase, getIdRegistry, resolveId, type BacklinkEntry } from "./database";
+import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, type BacklinkEntry } from "./database";
 import type { WithSource } from "./database";
+import { getKBEntitySlug } from "./kb";
+
+// ============================================================================
+// DIRECTORY URL RESOLUTION
+// ============================================================================
+
+/** Entity types that have dedicated directory pages with slug-based URLs. */
+const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
+  person: "/people",
+  organization: "/organizations",
+  risk: "/risks",
+};
+
+/**
+ * Get the directory URL for an entity if it has a dedicated directory page.
+ * Returns null if the entity type doesn't have a directory or has no slug.
+ */
+export function getDirectoryHref(id: string): string | null {
+  const entity = getTypedEntityById(id);
+  if (!entity) return null;
+  const prefix = DIRECTORY_ENTITY_TYPES[entity.entityType];
+  if (!prefix) return null;
+  const slug = getKBEntitySlug(id) || getKBEntitySlug(resolveId(id));
+  if (!slug) return null;
+  return `${prefix}/${slug}`;
+}
+
+// ============================================================================
+// CORE URL RESOLUTION
+// ============================================================================
 
 export function getEntityPath(id: string): string | null {
   const slug = resolveId(id);
@@ -11,7 +41,16 @@ export function getEntityPath(id: string): string | null {
   return db.pathRegistry?.[slug] || db.pathRegistry?.[`__index__/${slug}`] || null;
 }
 
+/**
+ * Get the canonical wiki href for an entity (always /wiki/E<id>).
+ * For directory-backed entity types (people, organizations, risks),
+ * this returns the directory URL instead when a slug is available.
+ */
 export function getEntityHref(id: string, _type?: string): string {
+  // Try directory URL first for entity types with dedicated pages
+  const directoryHref = getDirectoryHref(id);
+  if (directoryHref) return directoryHref;
+
   const registry = getIdRegistry();
   // If already a numeric ID (E35), use it directly
   if (/^E\d+$/.test(id) && registry.byNumericId[id]) {
@@ -20,6 +59,20 @@ export function getEntityHref(id: string, _type?: string): string {
   // Otherwise look up slug → numeric ID
   const numericId = registry.bySlug[id];
   return numericId ? `/wiki/${numericId}` : `/wiki/${id}`;
+}
+
+/**
+ * Get the wiki page URL for an entity (always /wiki/E<id>, never a directory URL).
+ * Use this when you specifically need the wiki article, not the directory profile.
+ */
+export function getWikiHref(id: string): string {
+  const registry = getIdRegistry();
+  const slug = resolveId(id);
+  if (/^E\d+$/.test(id) && registry.byNumericId[id]) {
+    return `/wiki/${id}`;
+  }
+  const numericId = registry.bySlug[slug];
+  return numericId ? `/wiki/${numericId}` : `/wiki/${slug}`;
 }
 
 // ============================================================================
