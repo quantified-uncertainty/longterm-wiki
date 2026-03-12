@@ -104,6 +104,114 @@ describe("toSyncGrant", () => {
     expect(sync.notes).toBe("Global Health");
   });
 
+  it("uses description alone when no focusArea", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test",
+      granteeId: null,
+      name: "Test",
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: "Research on alignment techniques",
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.notes).toBe("Research on alignment techniques");
+  });
+
+  it("sets notes to null when neither focusArea nor description", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test",
+      granteeId: null,
+      name: "Test",
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.notes).toBeNull();
+  });
+
+  it("passes through null amount", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test Org",
+      granteeId: null,
+      name: "Undisclosed grant",
+      amount: null,
+      date: "2024-01",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.amount).toBeNull();
+  });
+
+  it("generates ID correctly with null date", () => {
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test Org",
+      granteeId: null,
+      name: "Grant with no date",
+      amount: 5000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.id).toHaveLength(10);
+    // Null date becomes empty string in ID input
+    expect(sync.date).toBeNull();
+  });
+
+  it("truncates very long granteeName in granteeId to 200 chars", () => {
+    const longName = "A".repeat(500);
+    const raw: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: longName,
+      granteeId: null,
+      name: "Test",
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, defaultSourceUrl);
+    expect(sync.granteeId).toHaveLength(200);
+  });
+
+  it("truncates name in ID input to 100 chars", () => {
+    const longName = "B".repeat(200);
+    const raw1: RawGrant = {
+      source: "ea-funds",
+      funderId: "yA12C1KcjQ",
+      granteeName: "Test",
+      granteeId: null,
+      name: longName,
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    // Same raw but with name extended beyond 100 chars in a different way
+    const raw2: RawGrant = {
+      ...raw1,
+      name: longName + "EXTRA",
+    };
+    const sync1 = toSyncGrant(raw1, defaultSourceUrl);
+    const sync2 = toSyncGrant(raw2, defaultSourceUrl);
+    // Both should produce the same ID since name is truncated to 100 chars
+    // and both share the same first 100 chars
+    expect(sync1.id).toBe(sync2.id);
+  });
+
   // ID stability tests — these pin the exact ID for existing CG/EA Funds grants
   it("produces stable ID for CG grant (ID must not change)", () => {
     const raw: RawGrant = {
