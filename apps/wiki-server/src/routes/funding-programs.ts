@@ -68,7 +68,14 @@ const SyncFundingProgramItemSchema = z.object({
 });
 
 const SyncFundingProgramsBatchSchema = z.object({
-  items: z.array(SyncFundingProgramItemSchema).min(1).max(500),
+  items: z
+    .array(SyncFundingProgramItemSchema)
+    .min(1)
+    .max(500)
+    .refine(
+      (items) => new Set(items.map((i) => i.id)).size === items.length,
+      { message: "Duplicate id values in items array" }
+    ),
 });
 
 // ---- Helpers ----

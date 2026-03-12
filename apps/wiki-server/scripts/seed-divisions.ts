@@ -71,8 +71,9 @@ export async function seedDivisions() {
 
   const programs = data?.records?.["funding-programs"];
   if (!programs) {
-    console.log("No funding-programs records found in coefficient-giving.yaml");
-    return;
+    throw new Error(
+      "packages/kb/data/things/coefficient-giving.yaml missing records.funding-programs section"
+    );
   }
 
   const databaseUrl = process.env.DATABASE_URL;

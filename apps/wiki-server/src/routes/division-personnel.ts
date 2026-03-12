@@ -40,7 +40,14 @@ const SyncDivisionPersonnelItemSchema = z.object({
 });
 
 const SyncDivisionPersonnelBatchSchema = z.object({
-  items: z.array(SyncDivisionPersonnelItemSchema).min(1).max(500),
+  items: z
+    .array(SyncDivisionPersonnelItemSchema)
+    .min(1)
+    .max(500)
+    .refine(
+      (items) => new Set(items.map((i) => i.id)).size === items.length,
+      { message: "Duplicate id values in items array" }
+    ),
 });
 
 // ---- Helpers ----

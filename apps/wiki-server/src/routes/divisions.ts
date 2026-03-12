@@ -58,7 +58,14 @@ const SyncDivisionItemSchema = z.object({
 });
 
 const SyncDivisionsBatchSchema = z.object({
-  items: z.array(SyncDivisionItemSchema).min(1).max(500),
+  items: z
+    .array(SyncDivisionItemSchema)
+    .min(1)
+    .max(500)
+    .refine(
+      (items) => new Set(items.map((i) => i.id)).size === items.length,
+      { message: "Duplicate id values in items array" }
+    ),
 });
 
 // ---- Helpers ----
