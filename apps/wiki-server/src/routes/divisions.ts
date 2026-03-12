@@ -7,6 +7,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  notFoundError,
   zv,
 } from "./utils.js";
 
@@ -200,7 +201,7 @@ const divisionsApp = new Hono()
       .limit(1);
 
     if (rows.length === 0) {
-      return c.json({ error: "not_found", message: `Division ${id} not found` }, 404);
+      return notFoundError(c, `Division ${id} not found`);
     }
 
     return c.json(formatRow(rows[0]));

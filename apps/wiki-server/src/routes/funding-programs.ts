@@ -35,11 +35,15 @@ const AllQuery = z.object({
 });
 
 const ByOrgQuery = z.object({
+  program_type: z.enum(VALID_PROGRAM_TYPES).optional(),
+  status: z.enum(VALID_STATUSES).optional(),
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const ByDivisionQuery = z.object({
+  program_type: z.enum(VALID_PROGRAM_TYPES).optional(),
+  status: z.enum(VALID_STATUSES).optional(),
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -170,13 +174,19 @@ const fundingProgramsApp = new Hono()
   // ---- GET /by-org/:orgId ----
   .get("/by-org/:orgId", zv("query", ByOrgQuery), async (c) => {
     const orgId = c.req.param("orgId");
-    const { limit, offset } = c.req.valid("query");
+    const { program_type, status, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    const conditions = [eq(fundingPrograms.orgId, orgId)];
+    if (program_type)
+      conditions.push(eq(fundingPrograms.programType, program_type));
+    if (status) conditions.push(eq(fundingPrograms.status, status));
+    const whereClause = and(...conditions);
 
     const rows = await db
       .select()
       .from(fundingPrograms)
-      .where(eq(fundingPrograms.orgId, orgId))
+      .where(whereClause)
       .orderBy(desc(fundingPrograms.syncedAt))
       .limit(limit)
       .offset(offset);
@@ -184,7 +194,7 @@ const fundingProgramsApp = new Hono()
     const countResult = await db
       .select({ count: count() })
       .from(fundingPrograms)
-      .where(eq(fundingPrograms.orgId, orgId));
+      .where(whereClause);
     const total = countResult[0].count;
 
     return c.json({
@@ -202,13 +212,19 @@ const fundingProgramsApp = new Hono()
     zv("query", ByDivisionQuery),
     async (c) => {
       const divisionId = c.req.param("divisionId");
-      const { limit, offset } = c.req.valid("query");
+      const { program_type, status, limit, offset } = c.req.valid("query");
       const db = getDrizzleDb();
+
+      const conditions = [eq(fundingPrograms.divisionId, divisionId)];
+      if (program_type)
+        conditions.push(eq(fundingPrograms.programType, program_type));
+      if (status) conditions.push(eq(fundingPrograms.status, status));
+      const whereClause = and(...conditions);
 
       const rows = await db
         .select()
         .from(fundingPrograms)
-        .where(eq(fundingPrograms.divisionId, divisionId))
+        .where(whereClause)
         .orderBy(desc(fundingPrograms.syncedAt))
         .limit(limit)
         .offset(offset);
@@ -216,7 +232,7 @@ const fundingProgramsApp = new Hono()
       const countResult = await db
         .select({ count: count() })
         .from(fundingPrograms)
-        .where(eq(fundingPrograms.divisionId, divisionId));
+        .where(whereClause);
       const total = countResult[0].count;
 
       return c.json({

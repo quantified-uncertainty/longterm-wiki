@@ -81,6 +81,7 @@ export async function seedDivisions() {
   }
 
   const client = postgres(databaseUrl, { max: 1 });
+  try {
   const db = drizzle(client, { schema });
 
   const divisionRows: (typeof schema.divisions.$inferInsert)[] = [];
@@ -198,8 +199,10 @@ export async function seedDivisions() {
     console.log(`  ✓ ${fundingProgramRows.length} funding programs upserted`);
   }
 
-  await client.end();
   console.log("Done.");
+  } finally {
+    await client.end();
+  }
 }
 
 // Run if invoked directly (not when imported as a module)
