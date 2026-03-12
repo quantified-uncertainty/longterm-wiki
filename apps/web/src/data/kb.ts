@@ -288,6 +288,68 @@ export function getKBAllFactsByProperty(
   return result;
 }
 
+// ── Records access ────────────────────────────────────────────────
+
+/**
+ * A single record entry from the KB records system.
+ * Records are structured data items (grants, funding rounds, etc.)
+ * stored per-entity, per-collection in kb-data.json.
+ * Populated from PostgreSQL during build-data.
+ */
+export interface KBRecordEntry {
+  key: string;
+  schema: string;
+  ownerEntityId: string;
+  fields: Record<string, unknown>;
+}
+
+/**
+ * Get all records for an entity in a specific collection.
+ * Returns an empty array if no records exist.
+ *
+ * The records field is added to kb-data.json by build-data.mjs (merged from PG).
+ * It is NOT part of the SerializedKB TypeScript type (which only covers
+ * entities/facts/properties/schemas), so we access it via type assertion.
+ */
+export function getKBRecords(entityId: string, collection: string): KBRecordEntry[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  const key = resolveEntityKey(entityId, kb);
+  // records is added dynamically by build-data.mjs, not in SerializedKB type
+  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
+  const records = "records" in kb
+    ? (kb as { records?: RecordsMap }).records
+    : undefined;
+  if (!records) return [];
+
+  return records[key]?.[collection] ?? [];
+}
+
+/**
+ * Get all records across all entities for a specific collection.
+ * Returns a flat array of all record entries.
+ */
+export function getAllKBRecords(collection: string): KBRecordEntry[] {
+  const kb = getKB();
+  if (!kb) return [];
+
+  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
+  const records = "records" in kb
+    ? (kb as { records?: RecordsMap }).records
+    : undefined;
+  if (!records) return [];
+
+  const result: KBRecordEntry[] = [];
+  for (const entityRecords of Object.values(records)) {
+    const collectionRecords = entityRecords[collection];
+    if (collectionRecords) {
+      result.push(...collectionRecords);
+    }
+  }
+  return result;
+}
+
 // ── Slug resolution (public) ─────────────────────────────────────
 
 /**
