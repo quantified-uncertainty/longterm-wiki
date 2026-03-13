@@ -129,6 +129,240 @@ export function resolveOrgForCareer(
   };
 }
 
+// ── Grant / funding connection types and helpers ──────────────────
+
+export interface PersonGrant {
+  key: string;
+  name: string;
+  amount: number | null;
+  date: string | null;
+  status: string | null;
+  source: string | null;
+  /** "direct" = person is the named recipient; "via-org" = through an affiliated org */
+  connectionType: "direct" | "via-org";
+  /** For "via-org" grants, the org through which the grant connects */
+  viaOrg: { id: string; name: string; slug: string | undefined } | null;
+  /** The funder organization (ownerEntityId of the grant record) */
+  funder: { id: string; name: string; slug: string | undefined };
+  /** Direction: "received" or "given" (when person leads a funder org) */
+  direction: "received" | "given";
+  /** Grant recipient display name (for "given" grants) */
+  recipientName: string | null;
+  recipientHref: string | null;
+}
+
+/**
+ * Collect all organization IDs affiliated with a person:
+ *  - key-person records (org roles)
+ *  - board seats
+ *  - career history (current positions only, i.e. no end date)
+ */
+export function getAffiliatedOrgIds(
+  personEntityId: string,
+): Set<string> {
+  const orgIds = new Set<string>();
+
+  // From key-person records
+  const orgRoles = getOrgRolesForPerson(personEntityId);
+  for (const { org } of orgRoles) {
+    orgIds.add(org.id);
+  }
+
+  // From board seats
+  const boardSeats = getBoardSeatsForPerson(personEntityId);
+  for (const { org } of boardSeats) {
+    orgIds.add(org.id);
+  }
+
+  // From career history (current only -- no end date)
+  const career = getCareerHistoryForPerson(personEntityId);
+  for (const rec of career) {
+    const orgId = rec.fields.organization as string | undefined;
+    if (orgId && !rec.fields.end) {
+      orgIds.add(orgId);
+    }
+  }
+
+  return orgIds;
+}
+
+/**
+ * Find grants where this person is the direct named recipient.
+ * Scans all grants across all orgs, matching the recipient field against
+ * the person's entity ID, slug, name, and aliases.
+ */
+export function getDirectGrantsForPerson(
+  personEntityId: string,
+  personName: string,
+  personSlug: string,
+  personAliases: string[],
+): PersonGrant[] {
+  const allGrants = getAllKBRecords("grants");
+
+  const matchNames = new Set<string>([
+    personEntityId.toLowerCase(),
+    personSlug.toLowerCase(),
+    personName.toLowerCase(),
+    ...personAliases.map((a) => a.toLowerCase()),
+  ]);
+
+  const results: PersonGrant[] = [];
+
+  for (const rec of allGrants) {
+    const recipientRaw = rec.fields.recipient as string | undefined;
+    if (!recipientRaw) continue;
+    if (!matchNames.has(recipientRaw.toLowerCase())) continue;
+
+    const funderEntity = getKBEntity(rec.ownerEntityId);
+    results.push({
+      key: `${rec.ownerEntityId}-${rec.key}`,
+      name: (rec.fields.name as string) ?? rec.key,
+      amount: typeof rec.fields.amount === "number" ? rec.fields.amount : null,
+      date:
+        (rec.fields.date as string) ??
+        (rec.fields.period as string) ??
+        null,
+      status: (rec.fields.status as string) ?? null,
+      source: (rec.fields.source as string) ?? null,
+      connectionType: "direct",
+      viaOrg: null,
+      funder: {
+        id: rec.ownerEntityId,
+        name: funderEntity?.name ?? rec.ownerEntityId,
+        slug: getKBEntitySlug(rec.ownerEntityId),
+      },
+      direction: "received",
+      recipientName: null,
+      recipientHref: null,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Find grants connected to this person through their affiliated organizations.
+ * For each affiliated org:
+ *  - "received": grants where the org is the named recipient
+ *  - "given": grants where the org is the funder (ownerEntityId)
+ */
+export function getOrgGrantsForPerson(
+  personEntityId: string,
+  affiliatedOrgIds: Set<string>,
+): PersonGrant[] {
+  const allGrants = getAllKBRecords("grants");
+  const results: PersonGrant[] = [];
+
+  // Build match sets for each org: name, slug, id, aliases
+  const orgMatchSets = new Map<string, Set<string>>();
+  for (const orgId of affiliatedOrgIds) {
+    const orgEntity = getKBEntity(orgId);
+    const matchNames = new Set<string>([orgId.toLowerCase()]);
+    if (orgEntity) {
+      matchNames.add(orgEntity.name.toLowerCase());
+      const slug = getKBEntitySlug(orgId);
+      if (slug) matchNames.add(slug.toLowerCase());
+    }
+    orgMatchSets.set(orgId, matchNames);
+  }
+
+  for (const rec of allGrants) {
+    // Check if this org is the funder (grants made by affiliated org)
+    if (affiliatedOrgIds.has(rec.ownerEntityId)) {
+      const funderEntity = getKBEntity(rec.ownerEntityId);
+      const recipientId = rec.fields.recipient as string | undefined;
+      let recipientName: string | null = null;
+      let recipientHref: string | null = null;
+      if (recipientId) {
+        const recipientEntity = getKBEntity(recipientId);
+        if (recipientEntity) {
+          recipientName = recipientEntity.name;
+          const recipientSlug = getKBEntitySlug(recipientId);
+          recipientHref = recipientSlug
+            ? (recipientEntity.type === "person"
+                ? `/people/${recipientSlug}`
+                : `/organizations/${recipientSlug}`)
+            : `/kb/entity/${recipientId}`;
+        } else {
+          // Humanize the slug
+          recipientName = recipientId
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+      }
+
+      results.push({
+        key: `via-${rec.ownerEntityId}-${rec.key}`,
+        name: (rec.fields.name as string) ?? rec.key,
+        amount:
+          typeof rec.fields.amount === "number" ? rec.fields.amount : null,
+        date:
+          (rec.fields.date as string) ??
+          (rec.fields.period as string) ??
+          null,
+        status: (rec.fields.status as string) ?? null,
+        source: (rec.fields.source as string) ?? null,
+        connectionType: "via-org",
+        viaOrg: {
+          id: rec.ownerEntityId,
+          name: funderEntity?.name ?? rec.ownerEntityId,
+          slug: getKBEntitySlug(rec.ownerEntityId),
+        },
+        funder: {
+          id: rec.ownerEntityId,
+          name: funderEntity?.name ?? rec.ownerEntityId,
+          slug: getKBEntitySlug(rec.ownerEntityId),
+        },
+        direction: "given",
+        recipientName,
+        recipientHref,
+      });
+      continue;
+    }
+
+    // Check if this org is the recipient (grants received by affiliated org)
+    const recipientRaw = rec.fields.recipient as string | undefined;
+    if (!recipientRaw) continue;
+
+    for (const [orgId, matchNames] of orgMatchSets) {
+      if (!matchNames.has(recipientRaw.toLowerCase())) continue;
+
+      const funderEntity = getKBEntity(rec.ownerEntityId);
+      const orgEntity = getKBEntity(orgId);
+
+      results.push({
+        key: `via-${orgId}-${rec.key}`,
+        name: (rec.fields.name as string) ?? rec.key,
+        amount:
+          typeof rec.fields.amount === "number" ? rec.fields.amount : null,
+        date:
+          (rec.fields.date as string) ??
+          (rec.fields.period as string) ??
+          null,
+        status: (rec.fields.status as string) ?? null,
+        source: (rec.fields.source as string) ?? null,
+        connectionType: "via-org",
+        viaOrg: {
+          id: orgId,
+          name: orgEntity?.name ?? orgId,
+          slug: getKBEntitySlug(orgId),
+        },
+        funder: {
+          id: rec.ownerEntityId,
+          name: funderEntity?.name ?? rec.ownerEntityId,
+          slug: getKBEntitySlug(rec.ownerEntityId),
+        },
+        direction: "received",
+        recipientName: null,
+        recipientHref: null,
+      });
+      break; // Avoid duplicate entries if multiple match names hit
+    }
+  }
+
+  return results;
+}
+
 // -- Career history -------------------------------------------------------
 
 export interface CareerHistoryEntry {

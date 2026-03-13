@@ -7,6 +7,9 @@ import {
   getOrgRolesForPerson,
   getBoardSeatsForPerson,
   getCareerHistory,
+  getAffiliatedOrgIds,
+  getDirectGrantsForPerson,
+  getOrgGrantsForPerson,
 } from "../people-utils";
 import {
   getKBFacts,
@@ -30,6 +33,7 @@ import {
 import { formatKBDate } from "@/components/wiki/kb/format";
 import { getExpertById, getPublicationsForPerson } from "@/data";
 import { ExpertPositions } from "./expert-positions";
+import { FundingConnections } from "./funding-connections";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -83,6 +87,25 @@ export default async function PersonProfilePage({
 
   // Career history from KB records (populated via personnel table)
   const careerHistory = getCareerHistory(entity.id);
+
+  // Funding connections
+  const affiliatedOrgIds = getAffiliatedOrgIds(entity.id);
+  // Also include employed-by org if it resolves
+  if (employedByFact?.value.type === "ref") {
+    affiliatedOrgIds.add(employedByFact.value.value);
+  }
+
+  const directGrants = getDirectGrantsForPerson(
+    entity.id,
+    entity.name,
+    slug,
+    entity.aliases ?? [],
+  );
+  const orgGrants = getOrgGrantsForPerson(entity.id, affiliatedOrgIds);
+
+  // Split org grants into received vs given
+  const orgGrantsReceived = orgGrants.filter((g) => g.direction === "received");
+  const orgGrantsGiven = orgGrants.filter((g) => g.direction === "given");
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
@@ -362,6 +385,13 @@ export default async function PersonProfilePage({
               </div>
             </section>
           )}
+
+          {/* Funding Connections */}
+          <FundingConnections
+            directGrants={directGrants}
+            orgGrantsReceived={orgGrantsReceived}
+            orgGrantsGiven={orgGrantsGiven}
+          />
         </div>
 
         {/* Sidebar */}
