@@ -12,3 +12,15 @@ facts:
       original research. His contributions are primarily utilitarian reference mater
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_iR3rK7mW5x
+    property: role
+    value: "Independent Researcher and Knowledge Infrastructure Developer"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_iR6tN2pQ8v
+    property: notable-for
+    value: "Created Timelines Wiki, AI Watch, and Org Watch for EA and AI safety communities; prolific knowledge infrastructure builder; contract researcher primarily funded by Vipul Naik"
+    asOf: 2026-03
+    notes: Enriched from wiki page

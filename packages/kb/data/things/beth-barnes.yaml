@@ -10,3 +10,26 @@ facts:
     value: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_bB3rK7mW9x
+    property: role
+    value: "Co-founder and CEO"
+    asOf: 2023-01
+    notes: Enriched from entity description and public information
+
+  - id: f_bB6tN2pQ4v
+    property: notable-for
+    value: "Founded METR (formerly ARC Evals), pioneering dangerous capability evaluations for frontier AI models; led pre-deployment evaluations of GPT-4 and Claude"
+    asOf: 2026-03
+    notes: Enriched from entity description
+
+  - id: f_bB9wS5jH1d
+    property: employed-by
+    value: !ref rQEkFJxS5w:metr
+    asOf: 2023-01
+    notes: Enriched from entity description; METR rebranded from ARC Evals
+
+  - id: f_bBcY8fL3kA
+    property: education
+    value: "Studied at University of Oxford"
+    notes: Enriched from public information

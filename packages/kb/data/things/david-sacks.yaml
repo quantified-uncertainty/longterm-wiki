@@ -12,3 +12,29 @@ facts:
       and cryptocurrency policy.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_dS4kM8nR2w
+    property: role
+    value: "White House AI and Crypto Czar"
+    asOf: 2024-12
+    source: https://en.wikipedia.org/wiki/David_Sacks
+    notes: Enriched from wiki page; appointed by President Trump
+
+  - id: f_dS7pQ3tV6x
+    property: notable-for
+    value: "White House AI and Crypto Czar under Trump administration; co-founder of Craft Ventures; PayPal Mafia member and former COO; founded Yammer (sold to Microsoft for $1.2B)"
+    asOf: 2026-03
+    source: https://en.wikipedia.org/wiki/David_Sacks
+    notes: Enriched from wiki page
+
+  - id: f_dSaU9wY1zA
+    property: born-year
+    value: 1972
+    source: https://en.wikipedia.org/wiki/David_Sacks
+    notes: Born May 25, 1972 in Cape Town, South Africa
+
+  - id: f_dSdX2bC5eD
+    property: education
+    value: "B.A. in Economics, Stanford University (1994); J.D., University of Chicago Law School (1998)"
+    source: https://en.wikipedia.org/wiki/David_Sacks
+    notes: Enriched from wiki page

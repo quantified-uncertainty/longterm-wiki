@@ -12,3 +12,26 @@ facts:
       2027 scenario forecast."
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_eL3rK9mW7x
+    property: role
+    value: "Co-founder and Researcher"
+    asOf: 2025-01
+    notes: Enriched from wiki page; co-founder at AI Futures Project
+
+  - id: f_eL6tN2pQ1v
+    property: notable-for
+    value: "Ranked #1 on RAND Forecasting Initiative all-time leaderboard; co-authored AI 2027 scenario forecast; co-leads Samotsvety forecasting team; co-founded AI Futures Project"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_eL9wS5jH4d
+    property: employed-by
+    value: !ref KDYvrwkgtw:ai-futures-project
+    asOf: 2025-01
+    notes: Enriched from wiki page; co-founded with Daniel Kokotajlo and Thomas Larsen
+
+  - id: f_eLcY8fL6kA
+    property: education
+    value: "Computer science and economics degrees, University of Virginia"
+    notes: Enriched from wiki page
