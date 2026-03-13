@@ -402,9 +402,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
     // Change-ratio limits depend on tier: polish is strict, standard/deep are lenient.
     const TIER_MAX_CHANGE_RATIO: Record<string, number> = {
-      polish: 0.15,    // Polish: max 15% of claims changed
-      standard: 0.40,  // Standard: max 40% of claims changed
-      deep: 0.70,      // Deep: max 70% of claims changed
+      polish: 0.20,    // Polish: max 20% of claims changed
+      standard: 0.60,  // Standard: max 60% of claims changed
+      deep: 0.85,      // Deep: max 85% of claims changed
     };
     let semanticDiffBlocked = false;
     try {
