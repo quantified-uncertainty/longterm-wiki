@@ -69,7 +69,7 @@ function parseFundingRound(record: KBRecordEntry): ParsedFundingRound {
   return {
     key: record.key,
     ownerEntityId: record.ownerEntityId,
-    name: (f.name as string) ?? record.key,
+    name: typeof f.name === "string" ? f.name : record.key,
     companyName: company.name,
     companyHref: company.href,
     date: typeof f.date === "string" ? f.date : null,
