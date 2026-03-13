@@ -13,12 +13,33 @@ import {
   getKBEntitySlug,
   getAllKBRecords,
   getKBEntity,
+  resolveKBSlug,
   type KBRecordEntry,
 } from "@/data/kb";
 import {
   resolveEntityBySlug,
   getEntitySlugs,
 } from "@/lib/directory-utils";
+
+/**
+ * Check whether a record's person/member field matches a given entity ID.
+ *
+ * Records from PG store canonical entity IDs (10-char hashes) in their
+ * endpoint fields, but records loaded from YAML store slugs (e.g.,
+ * "dario-amodei"). This helper handles both formats so that lookups
+ * work regardless of the data source.
+ */
+function matchesPersonField(
+  fieldValue: unknown,
+  personEntityId: string,
+): boolean {
+  if (typeof fieldValue !== "string") return false;
+  // Direct entity-ID match (PG data)
+  if (fieldValue === personEntityId) return true;
+  // Slug match (YAML data): resolve the slug to an entity ID
+  const resolvedId = resolveKBSlug(fieldValue);
+  return resolvedId === personEntityId;
+}
 
 // Re-export generic utilities with people-specific signatures
 export const resolvePersonBySlug = (slug: string) =>
@@ -44,7 +65,7 @@ export function getOrgRolesForPerson(
   }> = [];
 
   for (const rec of allKeyPersons) {
-    if (rec.fields.person !== personEntityId) continue;
+    if (!matchesPersonField(rec.fields.person, personEntityId)) continue;
 
     const orgEntity = getKBEntity(rec.ownerEntityId);
     if (!orgEntity) continue;
@@ -83,7 +104,7 @@ export function getBoardSeatsForPerson(
   }> = [];
 
   for (const rec of allBoardSeats) {
-    if (rec.fields.member !== personEntityId) continue;
+    if (!matchesPersonField(rec.fields.member, personEntityId)) continue;
 
     const orgEntity = getKBEntity(rec.ownerEntityId);
     if (!orgEntity) continue;

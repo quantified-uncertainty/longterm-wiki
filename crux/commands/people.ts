@@ -11,12 +11,18 @@
  *   crux people enrich --source=wikidata --apply                Write new facts to YAML
  *   crux people enrich --source=wikidata --entity=dario-amodei  Single entity
  *   crux people enrich --source=wikidata --dry-run --ci         JSON output
+ *   crux people import-key-persons [--sync] [--dry-run] [--verbose]   Sync key-persons from YAML to PG
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'yaml';
 import { CUSTOM_TAGS } from '../../packages/kb/src/loader.ts';
+import {
+  extractKeyPersons,
+  toSyncItems,
+  syncKeyPersons,
+} from '../lib/key-persons-import.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { loadGraphFull, resolveEntity, KB_DATA_DIR } from '../lib/kb-loader.ts';
 import {
@@ -1506,6 +1512,78 @@ async function enrichCommand(
   return { exitCode: 0, output: lines.join('\n') };
 }
 
+// ── import-key-persons command ────────────────────────────────────────
+
+async function importKeyPersonsCommand(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const verbose = !!options.verbose;
+  const sync = !!options.sync;
+  const dryRun = !!options['dry-run'];
+
+  const lines: string[] = [];
+  lines.push('\n  Key Persons Import');
+  lines.push(`  ${'='.repeat(40)}`);
+
+  // Extract from YAML
+  lines.push('  Extracting key-persons from KB YAML files...');
+  const { records, unresolved } = await extractKeyPersons();
+
+  lines.push(`  Found ${records.length} key-person entries across ${new Set(records.map(r => r.orgSlug)).size} organizations`);
+
+  if (unresolved.length > 0) {
+    lines.push(`\n  WARNING: ${unresolved.length} unresolved person slug(s):`);
+    for (const u of unresolved) {
+      lines.push(`    - ${u.orgSlug}/${u.yamlKey}: person="${u.personSlug}" not found`);
+    }
+  }
+
+  // Group by org for display
+  const byOrg = new Map<string, typeof records>();
+  for (const rec of records) {
+    const existing = byOrg.get(rec.orgSlug) ?? [];
+    existing.push(rec);
+    byOrg.set(rec.orgSlug, existing);
+  }
+
+  if (verbose) {
+    lines.push('\n  By organization:');
+    for (const [orgSlug, orgRecords] of [...byOrg.entries()].sort((a, b) => b[1].length - a[1].length)) {
+      lines.push(`    ${orgSlug}: ${orgRecords.length} key persons`);
+      for (const rec of orgRecords) {
+        const status = rec.personEntityId ? 'OK' : 'UNRESOLVED';
+        const founderTag = rec.isFounder ? ' [founder]' : '';
+        lines.push(`      - ${rec.personSlug}: ${rec.title}${founderTag} (${status})`);
+      }
+    }
+  }
+
+  // Convert to sync items
+  const syncItems = toSyncItems(records);
+  lines.push(`\n  Sync items: ${syncItems.length} (${records.length - syncItems.length} skipped due to unresolved persons)`);
+
+  // Sync to PG if requested
+  if (sync) {
+    try {
+      const result = await syncKeyPersons(syncItems, dryRun);
+      if (dryRun) {
+        lines.push(`\n  DRY RUN: would sync ${syncItems.length} records`);
+      } else {
+        lines.push(`\n  Sync complete: ${result.upserted} upserted, ${result.failed} batch(es) failed`);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      lines.push(`\n  Sync failed: ${message}`);
+      return { exitCode: 1, output: lines.join('\n') };
+    }
+  } else {
+    lines.push('\n  (preview only -- use --sync to write to PG, or --sync --dry-run to preview sync)');
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ---------------------------------------------------------------------------
 // Command dispatch
 // ---------------------------------------------------------------------------
@@ -1518,6 +1596,7 @@ export const commands: Record<
   create: createCommand,
   'link-resources': linkResourcesCommand,
   enrich: enrichCommand,
+  'import-key-persons': importKeyPersonsCommand,
   default: discoverCommand,
 };
 
@@ -1526,10 +1605,11 @@ export function getHelp(): string {
 \x1b[1mPeople\x1b[0m — Person entity discovery and data tools
 
 \x1b[1mCommands:\x1b[0m
-  discover         Find people across data sources who are not in people.yaml (default)
-  create           Generate YAML entity stubs for discovered candidates
-  link-resources   Match literature papers to person entities by author name
-  enrich           Enrich person KB entities with data from external sources
+  discover             Find people across data sources who are not in people.yaml (default)
+  create               Generate YAML entity stubs for discovered candidates
+  link-resources       Match literature papers to person entities by author name
+  enrich               Enrich person KB entities with data from external sources
+  import-key-persons   Extract key-persons from KB YAML and sync to PG
 
 \x1b[1mDiscover/Create Options:\x1b[0m
   --min-appearances=N   Only show people in N+ data sources (default: 1 for discover, 2 for create)
@@ -1564,6 +1644,11 @@ export function getHelp(): string {
   Requires high-confidence Wikidata matching (name + description relevance check).
   Currently extracts: born-year (P569), education (P69)
 
+\x1b[1mOptions (import-key-persons):\x1b[0m
+  --sync           Actually sync to wiki-server PG
+  --dry-run        Preview sync without writing
+  --verbose        Show per-org details
+
 \x1b[1mExamples:\x1b[0m
   crux people discover                     # List all candidates
   crux people discover --min-appearances=2 # Only people in 2+ sources
@@ -1576,5 +1661,9 @@ export function getHelp(): string {
   crux people enrich --source=wikidata --dry-run
   crux people enrich --source=wikidata --apply
   crux people enrich --source=wikidata --entity=dario-amodei --dry-run
+  crux people import-key-persons              # Preview extracted key-persons
+  crux people import-key-persons --verbose    # Show per-org details
+  crux people import-key-persons --sync       # Sync to wiki-server PG
+  crux people import-key-persons --sync --dry-run   # Preview sync (no writes)
 `;
 }
