@@ -20,3 +20,15 @@ facts:
   - id: f_zFKfTWKs8w
     property: website
     value: https://www.willmacaskill.com/
+
+  - id: f_wM1rKz8mXq
+    property: role
+    value: "Associate Professor of Philosophy at Oxford, co-founder of effective altruism movement"
+    asOf: "2026-03"
+    notes: "Migrated from entity customFields"
+
+  - id: f_wM2nLw9pYr
+    property: notable-for
+    value: "Effective altruism, longtermism, \"What We Owe the Future\", Giving What We Can"
+    asOf: "2026-03"
+    notes: "Migrated from entity customFields"
