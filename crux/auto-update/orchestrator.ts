@@ -155,6 +155,7 @@ function executePageImprove(
       '--', pageId,
       '--tier', tier,
       '--apply',
+      '--no-grade',  // Auto-update must not re-grade — grades are frozen fields
     ];
 
     if (directions) {
