@@ -52,15 +52,15 @@ facts:
     value: "@ch402"
     source: https://x.com/ch402
 
-  - id: f_cO_website
+  - id: f_pdsb5nkkx7
     property: website
     value: "https://colah.github.io"
 
-  - id: f_cO_github
+  - id: f_qzkd7k85wt
     property: github-profile
     value: "https://github.com/colah"
 
-  - id: f_cO_scholar
+  - id: f_s2rmoloko5
     property: google-scholar
     value: "https://scholar.google.com/citations?user=vKAKE1gAAAAJ"
 

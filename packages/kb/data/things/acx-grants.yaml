@@ -8,7 +8,7 @@ thing:
     - Astral Codex Ten Grants
 
 facts:
-  - id: f_acx_grants_desc
+  - id: f_grc0ej37ka
     property: description
     value: >-
       ACX Grants is a grant program run by Scott Alexander through his Astral Codex Ten blog.
@@ -16,6 +16,6 @@ facts:
       research, and other areas. Multiple rounds have been conducted since 2021, distributing
       grants typically ranging from a few thousand to several hundred thousand dollars.
     asOf: 2026-03
-  - id: f_acx_grants_web
+  - id: f_hkrt42xnt0
     property: website
     value: https://www.astralcodexten.com/p/acx-grants-results

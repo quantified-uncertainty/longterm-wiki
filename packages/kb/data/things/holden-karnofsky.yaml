@@ -73,11 +73,11 @@ facts:
     value: "@HoldenKarnofsky"
     source: https://x.com/HoldenKarnofsky
 
-  - id: f_hK_wiki_url
+  - id: f_ipz9p2zvf6
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Holden_Karnofsky"
 
-  - id: f_hK_website
+  - id: f_lagva40ag7
     property: website
     value: "https://www.cold-takes.com"
 

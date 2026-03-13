@@ -44,15 +44,15 @@ facts:
     value: "@NickBostrom"
     source: https://x.com/NickBostrom
 
-  - id: f_nB_wiki_url
+  - id: f_efk4yuk5lq
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Nick_Bostrom"
 
-  - id: f_nB_website
+  - id: f_hzwm2k1t58
     property: website
     value: "https://nickbostrom.com"
 
-  - id: f_nB_scholar
+  - id: f_ikrzfocsqt
     property: google-scholar
     value: "https://scholar.google.com/citations?user=gk5PjEkAAAAJ"
 
