@@ -212,7 +212,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki
@@ -222,7 +222,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
 
                 {/* Role */}
                 <td className="py-2.5 px-3 text-muted-foreground">
-                  {row.role ?? ""}
+                  {row.role ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Affiliation */}
@@ -241,20 +241,24 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                     >
                       {row.employerName}
                     </Link>
+                  ) : row.employerName ? (
+                    <span className="text-muted-foreground">{row.employerName}</span>
                   ) : (
-                    <span className="text-muted-foreground">{row.employerName ?? ""}</span>
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
                 {/* Born Year */}
                 <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
-                  {row.bornYear ?? ""}
+                  {row.bornYear ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Net Worth */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.netWorthNum != null && (
+                  {row.netWorthNum != null ? (
                     <span className="font-semibold">{formatCompactCurrency(row.netWorthNum)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
