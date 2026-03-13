@@ -51,7 +51,7 @@ function parseInvestment(record: KBRecordEntry): ParsedInvestment {
   const investorId = typeof f.investor === "string" ? f.investor : null;
   const investor = investorId
     ? resolveEntityLink(investorId)
-    : { name: "", href: null };
+    : { name: record.displayName ?? "", href: null };
 
   return {
     key: record.key,
@@ -238,7 +238,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
             )}
           </DetailSection>
 
-          {investment.investorId && (
+          {(investment.investorId || investment.investorName) && (
             <DetailSection title="Investor">
               <EntityLinkDisplay
                 name={investment.investorName}
