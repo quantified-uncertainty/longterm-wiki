@@ -334,7 +334,8 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       if (existingIds.has(wu.pageId)) {
         // Merge directions into the existing news-driven entry
         const existing = plan.pageUpdates.find(u => u.pageId === wu.pageId)!;
-        existing.directions = wu.directions + '\n\nAlso from news routing: ' + existing.directions;
+        const merged = wu.directions + '\n\nAlso from news routing: ' + existing.directions;
+        existing.directions = merged.length > 5000 ? merged.slice(0, 4997) + '...' : merged;
         const tierRank: Record<string, number> = { polish: 1, standard: 2, deep: 3 };
         if (tierRank[wu.suggestedTier] > tierRank[existing.suggestedTier]) {
           existing.suggestedTier = wu.suggestedTier;
