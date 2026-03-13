@@ -24,6 +24,7 @@
       estimate: 60%
       confidence: medium
       source: Anthropic Core Views (2023)
+      date: "2023"
 - id: sam-altman
   name: Sam Altman
   positions:
@@ -65,6 +66,7 @@
       estimate: 40%
       confidence: medium
       source: ARC Research (2023)
+      date: "2023"
     - topic: inner-alignment-solvability
       view: Hard but tractable
       estimate: Solvable with sufficient investment
@@ -86,6 +88,7 @@
       estimate: 10-20%
       confidence: medium
       source: Various posts (2022-2023)
+      date: "2023"
     - topic: how-fast-would-takeoff-be
       view: Slow
       estimate: 5-15 years
@@ -129,6 +132,7 @@
       confidence: high
       source: AGI Ruin (2022)
       sourceUrl: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
+      date: "2022-06"
     - topic: inner-alignment-solvability
       view: Very hard
       estimate: Requires major theoretical breakthrough
@@ -146,6 +150,7 @@
       estimate: ">90%"
       confidence: high
       source: AGI Ruin (2022)
+      date: "2022-06"
     - topic: how-fast-would-takeoff-be
       view: Very fast
       estimate: Weeks-months
@@ -172,15 +177,20 @@
       view: Moderate
       estimate: 10%
       confidence: medium
+      source: The Precipice (2020)
+      date: "2020-03"
     - topic: would-misalignment-be-catastrophic
       view: Significant risk
       estimate: 10% → existential
       confidence: medium
+      source: The Precipice (2020)
+      date: "2020-03"
     - topic: p-ai-catastrophe
       view: Moderate
       estimate: 10%
       confidence: medium
       source: The Precipice (2020)
+      date: "2020-03"
     - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Uncertain
       estimate: 50%
@@ -203,6 +213,7 @@
       estimate: 10-15%
       confidence: medium
       source: Public statements (2023)
+      date: "2023"
 - id: jan-leike
   name: Jan Leike
   affiliation: anthropic
@@ -219,6 +230,7 @@
       estimate: 45%
       confidence: medium
       source: OpenAI Superalignment (2023)
+      date: "2023-07"
     - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Concerned
       estimate: 40%
@@ -238,11 +250,13 @@
       estimate: 25%
       confidence: medium
       source: Human Compatible (2019)
+      date: "2019-10"
     - topic: p-ai-catastrophe
       view: Concerned
       estimate: 15-25%
       confidence: medium
       source: Interviews (2021-2023)
+      date: "2023"
 - id: nate-soares
   name: Nate Soares (MIRI)
   positions:
@@ -266,12 +280,14 @@
       confidence: medium
       source: 80,000 Hours Podcast #107 (2021)
       sourceUrl: https://80000hours.org/podcast/episodes/chris-olah-interpretability-research/
+      date: "2021"
     - topic: will-advanced-ai-systems-be-deceptive
       view: Detectable with interpretability
       estimate: Interpretability provides a "mulligan" to catch deception
       confidence: medium
       source: Chris Olah's views on AGI safety (LessWrong)
       sourceUrl: https://www.lesswrong.com/posts/X2i9dQQK3gETCyqh2/chris-olah-s-views-on-agi-safety
+      date: "2021-12"
 - id: connor-leahy
   name: Connor Leahy
   affiliation: conjecture
@@ -288,12 +304,14 @@
       confidence: high
       source: The Inside View podcast (2022)
       sourceUrl: https://theinsideview.ai/connor2
+      date: "2022"
     - topic: timelines
       view: Very short
       estimate: 50% by 2030-2035
       confidence: medium
       source: FLI Podcast (2023)
       sourceUrl: https://futureoflife.org/podcast/connor-leahy-on-ai-progress-chimps-memes-and-markets/
+      date: "2023"
     - topic: how-hard-is-alignment
       view: Extremely hard
       estimate: Requires mechanistic understanding
@@ -317,6 +335,7 @@
       confidence: high
       source: CAIS Statement on AI Risk (2023)
       sourceUrl: https://www.safe.ai/statement-on-ai-risk
+      date: "2023-05"
 - id: geoffrey-hinton
   name: Geoffrey Hinton
   affiliation: independent
@@ -333,12 +352,14 @@
       confidence: medium
       source: Public statements (2023)
       sourceUrl: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+      date: "2023-05"
     - topic: timelines
       view: Short
       estimate: 5-20 years
       confidence: medium
       source: Post-resignation interviews (2023)
       sourceUrl: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+      date: "2023-05"
 - id: holden-karnofsky
   name: Holden Karnofsky
   affiliation: coefficient-giving
@@ -369,18 +390,21 @@
       confidence: medium
       source: Dwarkesh Podcast (Nov 2025)
       sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
+      date: "2025-11"
     - topic: current-approaches-scale
       view: Insufficient — new paradigm needed
       estimate: Scaling alone won't reach AGI
       confidence: high
       source: Dwarkesh Podcast (Nov 2025)
       sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
+      date: "2025-11"
     - topic: how-hard-is-alignment
       view: Hard but solvable
       estimate: Alignment as a generalization problem
       confidence: medium
       source: Dwarkesh Podcast (Nov 2025)
       sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
+      date: "2025-11"
 - id: neel-nanda
   name: Neel Nanda
   affiliation: deepmind
@@ -415,18 +439,21 @@
       confidence: medium
       source: Superintelligence (2014)
       sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+      date: "2014"
     - topic: how-hard-is-alignment
       view: Very hard
       estimate: Core unsolved challenge
       confidence: high
       source: Superintelligence (2014)
       sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+      date: "2014"
     - topic: how-fast-would-takeoff-be
       view: Possibly fast
       estimate: Weeks to years depending on scenario
       confidence: low
       source: Superintelligence (2014)
       sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+      date: "2014"
 
 - id: yann-lecun
   name: Yann LeCun
@@ -445,24 +472,28 @@
       confidence: high
       source: TechCrunch interview (2024)
       sourceUrl: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+      date: "2024-10"
     - topic: timelines
       view: Very long (via current methods, never)
       estimate: 50+ years
       confidence: high
       source: TIME interview (2024)
       sourceUrl: https://time.com/6694432/yann-lecun-meta-ai-interview/
+      date: "2024"
     - topic: how-hard-is-alignment
       view: Solvable through design
       estimate: Engineering problem, not fundamental
       confidence: high
       source: Debate with Yudkowsky (2023)
       sourceUrl: https://www.lesswrong.com/posts/tcEFh3vPS6zEANTFZ/transcript-and-brief-response-to-twitter-conversation
+      date: "2023"
     - topic: how-fast-would-takeoff-be
       view: Impossible (hard takeoff)
       estimate: Incremental progress only
       confidence: high
       source: Public statements (2023-2024)
       sourceUrl: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+      date: "2024-10"
 
 - id: elon-musk
   name: Elon Musk
@@ -481,12 +512,14 @@
       confidence: medium
       source: Fortune Investment Initiative (2024)
       sourceUrl: https://fortune.com/2024/10/30/elon-musk-ai-could-go-bad-existential-threat-xai-fundraising/
+      date: "2024-10"
     - topic: timelines
       view: Very short
       estimate: AGI within 1-2 years (stated Oct 2024)
       confidence: low
       source: FII conference remarks (2024)
       sourceUrl: https://fortune.com/2024/10/30/elon-musk-ai-could-go-bad-existential-threat-xai-fundraising/
+      date: "2024-10"
 
 - id: leopold-aschenbrenner
   name: Leopold Aschenbrenner
@@ -504,6 +537,7 @@
       confidence: high
       source: Situational Awareness (2024)
       sourceUrl: https://situational-awareness.ai/
+      date: "2024-06"
     - topic: p-ai-catastrophe
       view: Moderate
       estimate: ~5% existential risk over 20 years
@@ -516,6 +550,7 @@
       confidence: medium
       source: Situational Awareness (2024)
       sourceUrl: https://situational-awareness.ai/
+      date: "2024-06"
 
 - id: max-tegmark
   name: Max Tegmark
@@ -534,12 +569,14 @@
       confidence: medium
       source: December 2023 discussion on prediction markets
       sourceUrl: https://en.wikipedia.org/wiki/Max_Tegmark
+      date: "2023-12"
     - topic: p-ai-catastrophe
       view: Significant
       estimate: High enough to warrant urgent action
       confidence: medium
       source: WebSummit 2024 remarks
       sourceUrl: https://en.wikipedia.org/wiki/Max_Tegmark
+      date: "2024-11"
 
 - id: ajeya-cotra
   name: Ajeya Cotra
@@ -557,12 +594,14 @@
       confidence: medium
       source: Bio Anchors report (2020)
       sourceUrl: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+      date: "2020"
     - topic: how-fast-would-takeoff-be
       view: Fast software loop, then hardware follows
       estimate: 6-12 month crunch time window
       confidence: medium
       source: 80,000 Hours Podcast #226 (2026)
       sourceUrl: https://80000hours.org/podcast/episodes/ajeya-cotra-transformative-ai-crunch-time/
+      date: "2026"
 
 # Additional experts referenced by organizations
 - id: daniela-amodei
@@ -580,6 +619,7 @@
       confidence: medium
       source: FLI Podcast — Daniela and Dario Amodei on Anthropic (2022)
       sourceUrl: https://futureoflife.org/podcast/daniela-and-dario-amodei-on-anthropic/
+      date: "2022"
 
 - id: shane-legg
   name: Shane Legg
@@ -597,18 +637,21 @@
       confidence: high
       source: Dwarkesh Podcast (Oct 2023)
       sourceUrl: https://www.dwarkesh.com/p/shane-legg
+      date: "2023-10"
     - topic: p-doom
       view: Wide range
       estimate: 5-50%
       confidence: low
       source: Q&A with Shane Legg on risks from AI (LessWrong)
       sourceUrl: https://www.lesswrong.com/posts/No5JpRCHzBrWA4jmS/q-and-a-with-shane-legg-on-risks-from-ai
+      date: "2011"
     - topic: how-hard-is-alignment
       view: Solvable via deliberation
       estimate: Function of model capability
       confidence: medium
       source: Dwarkesh Podcast (Oct 2023)
       sourceUrl: https://www.dwarkesh.com/p/shane-legg
+      date: "2023-10"
 
 - id: buck-shlegeris
   name: Buck Shlegeris
@@ -625,12 +668,14 @@
       confidence: high
       source: 80,000 Hours Podcast #214 (2025)
       sourceUrl: https://80000hours.org/podcast/episodes/buck-shlegeris-ai-control-scheming/
+      date: "2025"
     - topic: will-advanced-ai-systems-be-deceptive
       view: Significant risk
       estimate: ~30% probability of scheming before escape attempt
       confidence: medium
       source: AXRP Episode 27 — AI Control (2024)
       sourceUrl: https://axrp.net/episode/2024/04/11/episode-27-ai-control-buck-shlegeris-ryan-greenblatt.html
+      date: "2024-04"
 
 - id: ian-hogarth
   name: Ian Hogarth
@@ -646,6 +691,7 @@
       confidence: medium
       source: "We must slow down the race to God-like AI (Financial Times, Apr 2023)"
       sourceUrl: https://www.ft.com/content/03895dc4-a3b7-481e-95cc-336a524f2ac2
+      date: "2023-04"
 
 - id: elizabeth-kelly
   name: Elizabeth Kelly
@@ -663,6 +709,7 @@
       estimate: 40%
       confidence: medium
       source: Risks from Learned Optimization
+      date: "2019"
 - id: robin-hanson
   name: Robin Hanson
   positions:

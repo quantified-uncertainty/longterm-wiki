@@ -221,6 +221,7 @@ export interface ExpertPosition {
   view: string;
   estimate?: string;
   confidence?: string;
+  date?: string;
   source?: string;
   sourceUrl?: string;
 }
