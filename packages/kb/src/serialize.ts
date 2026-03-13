@@ -16,6 +16,8 @@ export interface SerializedKB {
   records: Record<string, Record<string, RecordEntry[]>>;
   /** Maps YAML filename/slug → entity ID, for resolving slug-based lookups */
   slugToEntityId?: Record<string, string>;
+  /** Maps previous slugs → current slug, for URL redirects when slugs change */
+  previousSlugToCurrentSlug?: Record<string, string>;
 }
 
 /**
@@ -65,5 +67,22 @@ export function serialize(
     slugToEntityId[filename] = entityId;
   }
 
-  return { entities, facts, properties, schemas, recordSchemas, records, slugToEntityId };
+  // Build previousSlug → currentSlug map for URL redirects
+  const previousSlugToCurrentSlug: Record<string, string> = {};
+  for (const entity of entities) {
+    if (entity.previousSlugs) {
+      const currentSlug = filenameMap.get(entity.id);
+      if (currentSlug) {
+        for (const prevSlug of entity.previousSlugs) {
+          previousSlugToCurrentSlug[prevSlug] = currentSlug;
+        }
+      }
+    }
+  }
+
+  return {
+    entities, facts, properties, schemas, recordSchemas, records,
+    slugToEntityId,
+    ...(Object.keys(previousSlugToCurrentSlug).length > 0 && { previousSlugToCurrentSlug }),
+  };
 }

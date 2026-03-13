@@ -198,7 +198,7 @@ function FootnoteCard({
           {resourceId && (
             <div className="mt-1.5">
               <a
-                href={`/source/${resourceId}`}
+                href={`/resources/${resourceId}`}
                 className="text-xs text-blue-600 dark:text-blue-400 hover:underline !no-underline hover:!underline"
               >
                 View source details

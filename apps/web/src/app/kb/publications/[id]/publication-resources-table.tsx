@@ -50,7 +50,7 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
       ),
       cell: ({ row }) => (
         <Link
-          href={`/source/${row.original.id}`}
+          href={`/resources/${row.original.id}`}
           className="text-primary hover:underline text-xs font-medium max-w-[350px] truncate block"
           title={row.original.title}
         >

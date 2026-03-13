@@ -45,34 +45,61 @@ const CONTENT_DIR = LONGTERM_CONTENT_DIR;  // Read MDX from longterm
 const OUTPUT_DIR = join(PROJECT_ROOT, 'public');
 
 /**
- * Load ID registry from database.json to map page slugs to numeric IDs (E1, E2, ...)
+ * Entity types that have dedicated directory pages with semantic URLs.
+ * Must be kept in sync with DIRECTORY_ENTITY_TYPES in apps/web/src/data/entity-nav.ts
  */
-function loadIdRegistry() {
+const DIRECTORY_ENTITY_TYPES = {
+  person: '/people',
+  organization: '/organizations',
+  risk: '/risks',
+  benchmark: '/benchmarks',
+  'ai-model': '/ai-models',
+};
+
+/**
+ * Load ID registry and entity data from database.json
+ */
+let _dbCache = null;
+
+function loadDatabase() {
+  if (_dbCache) return _dbCache;
   const dbPath = join(DATA_DIR, 'database.json');
   if (!existsSync(dbPath)) {
-    return {};
+    _dbCache = { slugToNumericId: {}, entities: {} };
+    return _dbCache;
   }
   const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
-  // database.json has idRegistry.bySlug (slug → E##)
-  return db.idRegistry?.bySlug || {};
-}
+  const slugToNumericId = db.idRegistry?.bySlug || {};
 
-// Loaded once and reused across all generators
-let _slugToNumericId = null;
-
-function getSlugToNumericId() {
-  if (!_slugToNumericId) {
-    _slugToNumericId = loadIdRegistry();
+  // Build entity type lookup: slug → entityType
+  const entities = {};
+  if (db.entities) {
+    for (const entity of db.entities) {
+      if (entity.id && entity.type) {
+        entities[entity.id] = entity.type;
+      }
+    }
   }
-  return _slugToNumericId;
+
+  _dbCache = { slugToNumericId, entities };
+  return _dbCache;
 }
 
 /**
- * Get the canonical URL for a page (using /wiki/E{n} numeric IDs)
+ * Get the canonical URL for a page, using semantic directory URLs when available.
  */
 function getPageUrl(page) {
-  const map = getSlugToNumericId();
-  const numericId = map[page.id];
+  const { slugToNumericId, entities } = loadDatabase();
+
+  // Check if entity has a dedicated directory page
+  const entityType = page.entityType || entities[page.id];
+  const prefix = entityType ? DIRECTORY_ENTITY_TYPES[entityType] : null;
+  if (prefix) {
+    return `${CONFIG.site.url}${prefix}/${page.id}`;
+  }
+
+  // Fall back to /wiki/E{N} numeric URL
+  const numericId = slugToNumericId[page.id];
   const wikiPath = numericId ? `/wiki/${numericId}` : `/wiki/${page.id}`;
   return `${CONFIG.site.url}${wikiPath}`;
 }
@@ -416,12 +443,12 @@ function generatePerPageTxt(pages) {
     mkdirSync(wikiDir, { recursive: true });
   }
 
-  const map = getSlugToNumericId();
+  const { slugToNumericId } = loadDatabase();
   let generated = 0;
   let skipped = 0;
 
   for (const page of pages) {
-    const numericId = map[page.id];
+    const numericId = slugToNumericId[page.id];
     if (!numericId) {
       skipped++;
       continue;

@@ -121,7 +121,7 @@ function ClaimContent({ entry }: { entry: RefMapEntry }) {
       {entry.resourceId && (
         <div className="mt-1.5">
           <a
-            href={`/source/${entry.resourceId}`}
+            href={`/resources/${entry.resourceId}`}
             className="text-xs text-blue-600 dark:text-blue-400 !no-underline hover:!underline"
           >
             View source details
