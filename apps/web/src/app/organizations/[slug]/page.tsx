@@ -85,6 +85,11 @@ function field(item: KBRecordEntry, key: string): string | undefined {
   return String(v);
 }
 
+/** Return href only if it is a safe HTTP(S) URL; otherwise "#". Prevents XSS via javascript: URIs. */
+function safeHref(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : "#";
+}
+
 // ── Subcomponents ─────────────────────────────────────────────────────
 
 function StatCard({
@@ -436,7 +441,7 @@ function GrantsMadeSection({
                   <span className="font-medium text-foreground text-xs">{g.name}</span>
                   {g.source && (
                     <a
-                      href={g.source}
+                      href={safeHref(g.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -520,7 +525,7 @@ function FundingReceivedSection({
                   <span className="font-medium text-foreground text-xs">{g.name}</span>
                   {g.source && (
                     <a
-                      href={g.source}
+                      href={safeHref(g.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -625,7 +630,7 @@ function DivisionsSection({
                   </span>
                   {d.source && (
                     <a
-                      href={d.source}
+                      href={safeHref(d.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -758,7 +763,7 @@ function FundingProgramsSection({
                   </span>
                   {p.source && (
                     <a
-                      href={p.source}
+                      href={safeHref(p.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -911,7 +916,7 @@ function KeyPersonnelSection({
                   )}
                   {p.source && (
                     <a
-                      href={p.source}
+                      href={safeHref(p.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -1010,7 +1015,7 @@ function FundingRoundsSection({
                   )}
                   {r.source && (
                     <a
-                      href={r.source}
+                      href={safeHref(r.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -1119,7 +1124,7 @@ function InvestmentsReceivedSection({
                   )}
                   {inv.source && (
                     <a
-                      href={inv.source}
+                      href={safeHref(inv.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -1162,13 +1167,9 @@ function parseEquityPositionRecord(record: KBRecordEntry) {
   };
 }
 
-/** Format a stake percentage for display (e.g., 0.15 → "15%"). */
+/** Format a stake fraction for display (e.g., 0.15 → "15%"). KB data stores stakes as decimal fractions. */
 function formatStake(stake: number): string {
-  if (stake <= 1) {
-    return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
-  }
-  // Already a percentage
-  return `${stake.toFixed(1).replace(/\.0$/, "")}%`;
+  return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
 }
 
 /** Equity Positions section for org pages. */
@@ -1209,7 +1210,7 @@ function EquityPositionsSection({
                   </span>
                   {pos.source && (
                     <a
-                      href={pos.source}
+                      href={safeHref(pos.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
@@ -1502,7 +1503,7 @@ export default async function OrgProfilePage({
     entity.name.toLowerCase(),
     slug.toLowerCase(),
     entity.id.toLowerCase(),
-    ...(entity.aliases?.map((a: string) => a.toLowerCase()) ?? []),
+    ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
   ]);
   const grantsReceived = allGrantRecords
     .filter((r) => {
@@ -1805,7 +1806,7 @@ export default async function OrgProfilePage({
             <div className="flex items-center gap-4 text-sm flex-wrap">
               {websiteUrl && (
                 <a
-                  href={websiteUrl}
+                  href={safeHref(websiteUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary/80 font-medium transition-colors"
