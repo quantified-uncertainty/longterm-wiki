@@ -16,7 +16,7 @@ import type {
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
   EnrichResult, AuditResult, PhaseContext,
 } from './types.ts';
-import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
+import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage, ensureFrontmatterFields } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
@@ -398,6 +398,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       process.exit(1);
     }
 
+    // Defense-in-depth: force-restore frozen frontmatter fields right before the
+    // final write. The improve phase already calls ensureFrontmatterFields, but
+    // later phases (enrich, validate auto-fixes, gap-fill) can re-modify content.
+    contentToApply = ensureFrontmatterFields(originalContent, contentToApply);
+
     // Semantic diff: analyze factual claim changes for safety audit.
     // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
     // Change-ratio limits depend on tier: polish is strict, standard/deep are lenient.
@@ -417,7 +422,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           tier,
           verbose: false,
           maxChangeRatio: TIER_MAX_CHANGE_RATIO[tier],
-          blockOnHighContradictions: tier === 'polish',
+          // Contradiction blocking disabled — produces too many false positives
+          // on numeric-heavy pages (cross-comparing unrelated metrics). Contradictions
+          // are still logged as warnings for human review.
+          blockOnHighContradictions: false,
         },
       );
       if (semanticDiff.assessment === 'block') {
