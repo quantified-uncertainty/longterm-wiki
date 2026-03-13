@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, asc } from "drizzle-orm";
+import { eq, and, count, sql, asc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { entityIds } from "../schema.js";
 import {
@@ -253,10 +253,11 @@ const idsApp = new Hono()
     if (items.length > 0) {
       await db.transaction(async (tx) => {
         for (const item of items) {
+          // Only set stableId if the row doesn't already have one
           const result = await tx
             .update(entityIds)
             .set({ stableId: item.stableId })
-            .where(eq(entityIds.slug, item.slug))
+            .where(and(eq(entityIds.slug, item.slug), sql`${entityIds.stableId} IS NULL`))
             .returning();
           if (result.length > 0) updated++;
         }
@@ -278,7 +279,7 @@ const idsApp = new Hono()
             await tx
               .update(entityIds)
               .set({ stableId: generateStableId() })
-              .where(eq(entityIds.slug, row.slug));
+              .where(and(eq(entityIds.slug, row.slug), sql`${entityIds.stableId} IS NULL`));
             generated++;
           }
         });

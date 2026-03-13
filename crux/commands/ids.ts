@@ -157,7 +157,7 @@ async function listCommand(
   ];
 
   for (const entry of ids) {
-    const stableId = (entry as { stableId?: string | null }).stableId ?? '—';
+    const stableId = entry.stableId ?? '—';
     lines.push(`  ${entry.numericId.padEnd(8)} ${stableId.padEnd(12)} ${entry.slug}`);
   }
 
