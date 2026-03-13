@@ -5,6 +5,7 @@ export const NAV_LINKS = [
   { href: "/people", label: "People" },
   { href: "/risks", label: "Risks" },
   { href: "/ai-models", label: "AI Models" },
+  { href: "/benchmarks", label: "Benchmarks" },
   { href: "/sources", label: "Sources" },
   { href: "/kb", label: "Data" },
   { href: "/wiki/E755", label: "About" },

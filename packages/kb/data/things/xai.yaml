@@ -19,7 +19,8 @@ facts:
     property: headquarters
     value: "Austin, TX"
     source: https://x.ai/about
-    notes: "Headquartered in Austin; operates a massive GPU cluster ('Colossus') in Memphis, TN"
+    notes: "Headquartered in Austin; operates a massive GPU cluster ('Colossus') in
+      Memphis, TN"
 
   - id: f_2O4rOQsrZg
     property: legal-structure
@@ -34,21 +35,21 @@ facts:
 
   - id: f_Uxbvs82r3w
     property: total-funding
-    value: 12e9
+    value: 1.2e+10
     asOf: 2024-12
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
     notes: "Approximately $12B raised across Series A and Series B rounds"
 
   - id: f_tEkfJ3yreg
     property: valuation
-    value: 50e9
+    value: 5e+10
     asOf: 2024-12
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
     notes: "Post-money valuation at Series B close"
 
   - id: f_CvDHaporPw
     property: valuation
-    value: 80e9
+    value: 8e+10
     asOf: 2025-11
     source: https://www.wsj.com/tech/ai/elon-musks-xai-is-in-talks-to-raise-funds-at-a-valuation-of-up-to-75-billion-a57a2e66
     notes: "Reported valuation range of $75-80B in late 2025 funding discussions"
@@ -57,26 +58,27 @@ facts:
     property: headcount
     value: 200
     asOf: 2024-12
-    notes: "Estimated 150-250 employees; relatively small team compared to other frontier labs; emphasizes efficiency"
+    notes: "Estimated 150-250 employees; relatively small team compared to other
+      frontier labs; emphasizes efficiency"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_YFcyndw4MQ
     property: valuation
-    value: 230e9
+    value: 2.3e+11
     asOf: 2026-01
     source: https://x.ai/news/series-e
     notes: "Post-money valuation at Series E round close"
 
   - id: f_SV0k98iOOw
     property: total-funding
-    value: 26e9
+    value: 2.6e+10
     asOf: 2026-01
     source: https://x.ai/news/series-e
     notes: "Over $26B total raised across all rounds"
 
   - id: f_xKzq35cBzQ
     property: revenue
-    value: 3.8e9
+    value: 3.8e+9
     asOf: "2025"
     source: https://sacra.com/c/xai/
     notes: "Annualized revenue run-rate at year-end 2025"
@@ -90,21 +92,21 @@ facts:
 
   - id: f_5bVJIucEHg
     property: user-count
-    value: 30e6
+    value: 3e+7
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Grok monthly active users; nearly doubled since Q1 2025"
 
   - id: f_XLWbsNoong
     property: user-count
-    value: 60e6
+    value: 6e+7
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Grok cumulative downloads since launch"
 
   - id: f_FSDfBi1tjw
     property: product-revenue
-    value: 88e6
+    value: 8.8e+7
     asOf: 2025-09
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Quarterly revenue from Grok app in Q3 2025"
@@ -125,52 +127,61 @@ facts:
 
   - id: f_Tub2PPCgcw
     property: model-parameters
-    value: 2.7e12
+    value: 2.7e+12
     asOf: "2025"
     source: https://x.ai/news/grok-3
     notes: "Grok 3: 2.7 trillion parameters"
 
   - id: f_ywABbaXqQg
     property: revenue
-    value: 200e6
+    value: 2e+8
     asOf: "2025"
     source: https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/
     notes: "$200M in Department of Defense contracts"
 
   - id: f_zlxDxDK2jA
     property: description
-    value: "Grok generated ~6,700 sexualized/undressing images per hour vs ~79/hr on other platforms (Dec 2025-Jan 2026)"
+    value: "Grok generated ~6,700 sexualized/undressing images per hour vs ~79/hr on
+      other platforms (Dec 2025-Jan 2026)"
     source: https://www.cnn.com/2026/01/08/tech/elon-musk-xai-digital-undressing
     notes: "During deepfake scandal period"
 
   - id: f_3HYN6TDpoA
     property: description
-    value: "~3M sexualized images generated in 10 days during deepfake scandal (Dec 2025-Jan 2026)"
+    value: "~3M sexualized images generated in 10 days during deepfake scandal (Dec
+      2025-Jan 2026)"
     source: https://www.nbcnews.com/tech/internet/x-paywall-ai-image-grok-app-bikini-allows-sexual-deepfakes-rcna252647
+  - id: jtTOlHKAYg
+    property: website
+    value: https://x.ai
+    source: https://www.wikidata.org/wiki/Q120599684
+    notes: From Wikidata Q120599684
 
 records:
   funding-rounds:
     series-b:
       name: "Series B"
       date: "2024-05"
-      raised: 6e9
-      valuation: 24e9
+      raised: 6e+9
+      valuation: 2.4e+10
       source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-raises-6-bln-series-b-round-2024-05-27/
-      notes: "Led by Andreessen Horowitz, Sequoia Capital, and others; valued at $24B pre-money"
+      notes: "Led by Andreessen Horowitz, Sequoia Capital, and others; valued at $24B
+        pre-money"
 
     series-c:
       name: "Series C"
       date: "2024-12"
-      raised: 6e9
-      valuation: 50e9
+      raised: 6e+9
+      valuation: 5e+10
       source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
-      notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock, Fidelity, Kingdom Holding, Sequoia, and others"
+      notes: "Closed December 2024; investors include Andreessen Horowitz, BlackRock,
+        Fidelity, Kingdom Holding, Sequoia, and others"
 
     series-e:
       name: "Series E"
       date: "2026-01"
-      raised: 20e9
-      valuation: 230e9
+      raised: 2e+10
+      valuation: 2.3e+11
       source: https://x.ai/news/series-e
       notes: "Series E round; brought total funding to over $26B"
 
@@ -181,7 +192,8 @@ records:
       start: "2023-03"
       is_founder: true
       source: https://x.ai/about
-      notes: "Also CEO of Tesla, SpaceX; owner of X (Twitter); former OpenAI co-founder and board member"
+      notes: "Also CEO of Tesla, SpaceX; owner of X (Twitter); former OpenAI
+        co-founder and board member"
 
     igor-babuschkin:
       person: igor-babuschkin
@@ -195,14 +207,16 @@ records:
       title: "Co-founder"
       start: "2023-03"
       is_founder: true
-      notes: "University of Toronto professor; co-inventor of Adam optimizer and Layer Normalization"
+      notes: "University of Toronto professor; co-inventor of Adam optimizer and Layer
+        Normalization"
 
     greg-yang:
       person: greg-yang
       title: "Co-founder"
       start: "2023-03"
       is_founder: true
-      notes: "Former Microsoft Research; developed Tensor Programs / muP theory for neural network scaling"
+      notes: "Former Microsoft Research; developed Tensor Programs / muP theory for
+        neural network scaling"
 
     toby-pohlen:
       person: toby-pohlen
@@ -215,21 +229,25 @@ records:
     grok-1:
       name: Grok-1
       released: "2023-11"
-      description: "First xAI model; 314B parameter mixture-of-experts; open-sourced March 2024"
+      description: "First xAI model; 314B parameter mixture-of-experts; open-sourced
+        March 2024"
       source: https://x.ai/blog/grok
-      notes: "Integrated into X (Twitter) platform; open-sourced weights under Apache 2.0 license"
+      notes: "Integrated into X (Twitter) platform; open-sourced weights under Apache
+        2.0 license"
 
     grok-2:
       name: Grok-2
       released: "2024-08"
-      description: "Major capability upgrade; competitive with GPT-4 and Claude 3.5 Sonnet on benchmarks"
+      description: "Major capability upgrade; competitive with GPT-4 and Claude 3.5
+        Sonnet on benchmarks"
       source: https://x.ai/blog/grok-2
       notes: "Available through X Premium+ subscription and xAI API"
 
     grok-3:
       name: Grok-3
       released: "2025-02"
-      description: "Trained on Colossus supercluster (200K H100 GPUs); significant reasoning improvements"
+      description: "Trained on Colossus supercluster (200K H100 GPUs); significant
+        reasoning improvements"
       source: https://x.ai/blog/grok-3
       notes: "Claimed top scores on several math and coding benchmarks at launch"
 
@@ -238,19 +256,23 @@ records:
       name: Large-Scale Training Infrastructure
       description: "Building and operating massive GPU clusters for frontier model training"
       started: "2023-07"
-      notes: "Colossus cluster in Memphis with 200K H100 GPUs; one of the largest single training clusters globally"
+      notes: "Colossus cluster in Memphis with 200K H100 GPUs; one of the largest
+        single training clusters globally"
 
     reasoning-and-problem-solving:
       name: Reasoning and Problem Solving
-      description: "Improving AI reasoning capabilities in mathematics, coding, and scientific domains"
+      description: "Improving AI reasoning capabilities in mathematics, coding, and
+        scientific domains"
       started: "2023-07"
-      notes: "Focus on chain-of-thought and multi-step reasoning; Grok-3 emphasized reasoning benchmarks"
+      notes: "Focus on chain-of-thought and multi-step reasoning; Grok-3 emphasized
+        reasoning benchmarks"
 
     real-time-information-integration:
       name: Real-Time Information Integration
       description: "Integrating live data from X platform and web into AI responses"
       started: "2023-11"
-      notes: "Unique advantage from X (Twitter) data access; real-time news and social media integration"
+      notes: "Unique advantage from X (Twitter) data access; real-time news and social
+        media integration"
 
   strategic-partnerships:
     i_QA3rV7Rf7w:
@@ -258,17 +280,20 @@ records:
       type: distribution + data
       date: "2023-11"
       source: https://x.ai/blog/grok
-      notes: "Grok integrated into X platform for Premium+ subscribers; access to X data for training"
+      notes: "Grok integrated into X platform for Premium+ subscribers; access to X
+        data for training"
 
     i_t8JrParM9w:
       partner: Oracle Cloud
       type: cloud
       date: "2024-06"
       source: https://www.oracle.com/news/announcement/oracle-xai-partnership-2024/
-      notes: "Oracle Cloud infrastructure partnership for additional compute capacity beyond Colossus"
+      notes: "Oracle Cloud infrastructure partnership for additional compute capacity
+        beyond Colossus"
 
     i_1LQjsDLebw:
       partner: Nvidia
       type: compute
       date: "2024-01"
-      notes: "Major Nvidia GPU customer; 200K H100 GPUs for Colossus cluster; among the largest single orders"
+      notes: "Major Nvidia GPU customer; 200K H100 GPUs for Colossus cluster; among
+        the largest single orders"

@@ -9,5 +9,5 @@ interface PageProps {
 
 export default async function LegacyPublicationPage({ params }: PageProps) {
   const { id } = await params;
-  redirect(`/sources/publications/${id}`);
+  redirect(`/publications/${id}`);
 }

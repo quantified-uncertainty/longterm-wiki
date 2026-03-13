@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc } from "drizzle-orm";
+import { eq, and, count, sql, desc, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
   kbFactVerdicts,
   kbFactResourceVerifications,
   facts,
+  entities,
 } from "../schema.js";
 import {
   zv,
@@ -109,9 +110,24 @@ const kbVerificationsApp = new Hono()
       conditions.push(eq(kbFactVerdicts.needsRecheck, needs_recheck));
     }
 
-    // Filter by entity_id via the joined facts table
+    // Filter by entity_id via the joined facts table.
+    // Resolve slug/numericId to stableId since facts.entity_id stores stableIds.
     if (entity_id) {
-      conditions.push(eq(facts.entityId, entity_id));
+      const resolved = await (async () => {
+        const rows = await db
+          .select({ stableId: entities.stableId })
+          .from(entities)
+          .where(
+            or(
+              eq(entities.stableId, entity_id),
+              eq(entities.id, entity_id),
+              eq(entities.numericId, entity_id),
+            )
+          )
+          .limit(1);
+        return rows[0]?.stableId ?? entity_id;
+      })();
+      conditions.push(eq(facts.entityId, resolved));
     }
 
     const whereClause =

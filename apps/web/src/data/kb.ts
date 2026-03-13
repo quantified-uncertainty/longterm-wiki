@@ -507,6 +507,17 @@ export function getKBSlugMap(): Record<string, string> {
   return kb?.slugToEntityId ?? {};
 }
 
+/**
+ * Resolve a previous slug to the current canonical slug.
+ * Returns the current slug if the input is a known previous slug, or undefined.
+ * Used for URL redirect support when entity slugs change.
+ */
+export function resolveSlugAlias(slug: string): string | undefined {
+  const kb = getKB();
+  if (!kb?.previousSlugToCurrentSlug) return undefined;
+  return kb.previousSlugToCurrentSlug[slug];
+}
+
 /** Lazy-initialized inverted index: entityId → slug. Built once on first call. */
 let entityIdToSlugIndex: Map<string, string> | undefined;
 

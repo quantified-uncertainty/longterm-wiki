@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import {
   renderMdxPage,
   getAllNumericIds,
@@ -7,7 +7,7 @@ import {
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
-import { getEntityById, getPageById, getEntityPath, getResourcesForPage } from "@/data";
+import { getEntityById, getPageById, getEntityPath, getResourcesForPage, getDirectoryHref } from "@/data";
 import type { Page, ContentFormat } from "@/data";
 import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
@@ -464,6 +464,10 @@ export default async function WikiPage({ params }: PageProps) {
     const slug = numericIdToSlug(id.toUpperCase());
     if (!slug) notFound();
 
+    // Redirect to semantic directory URL if entity has a dedicated page
+    const directoryHref = getDirectoryHref(slug);
+    if (directoryHref) permanentRedirect(directoryHref);
+
     const entityPath = getEntityPath(slug) || "";
 
     const result = await renderMdxPage(slug);
@@ -491,7 +495,11 @@ export default async function WikiPage({ params }: PageProps) {
     );
   } else {
     // String slug like "geoffrey-hinton"
-    // If it has a numeric ID, redirect to canonical URL
+    // Redirect to semantic directory URL if entity has a dedicated page
+    const directoryHref = getDirectoryHref(id);
+    if (directoryHref) permanentRedirect(directoryHref);
+
+    // If it has a numeric ID, redirect to canonical wiki URL
     const numericId = slugToNumericId(id);
     if (numericId) {
       redirect(`/wiki/${numericId}`);

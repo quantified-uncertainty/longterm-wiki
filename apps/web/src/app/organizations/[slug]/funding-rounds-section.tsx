@@ -1,6 +1,6 @@
 /**
  * Funding Rounds section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Round names link to /funding-rounds/[id] detail pages.
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -28,20 +28,25 @@ export function FundingRoundsSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Round</th>
-              <th className="text-right py-2 px-3 font-medium">Raised</th>
-              <th className="text-right py-2 px-3 font-medium">Valuation</th>
-              <th className="text-left py-2 px-3 font-medium">Lead Investor</th>
-              <th className="text-center py-2 px-3 font-medium">Date</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Round</th>
+              <th scope="col" className="text-right py-2 px-3 font-medium">Raised</th>
+              <th scope="col" className="text-right py-2 px-3 font-medium">Valuation</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Lead Investor</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {rounds.map((r) => (
               <tr key={r.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">{r.name}</span>
+                  <Link
+                    href={`/funding-rounds/${r.key}`}
+                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                  >
+                    {r.name}
+                  </Link>
                   {r.instrument && (
-                    <span className="ml-1.5 text-[10px] text-muted-foreground/60">
+                    <span className="ml-1.5 text-[11px] text-muted-foreground">
                       ({r.instrument})
                     </span>
                   )}
@@ -50,7 +55,7 @@ export function FundingRoundsSection({
                       href={safeHref(r.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>

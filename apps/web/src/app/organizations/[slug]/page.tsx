@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
+import { resolveSlugAlias } from "@/data/kb";
 import {
   getKBLatest,
   getKBProperty,
@@ -41,10 +42,7 @@ import {
 import { BoardOfDirectorsSection } from "./board-section";
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
-import { InvestmentsReceivedSection } from "./investments-section";
-import { FundingRoundsSection } from "./funding-rounds-section";
 import { GrantsMadeSection, FundingReceivedSection } from "./grants-section";
-import { KeyPersonnelSection } from "./key-people-section";
 import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
@@ -88,7 +86,11 @@ export default async function OrgProfilePage({
 }) {
   const { slug } = await params;
   const entity = resolveOrgBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/organizations/${canonical}`);
+    return notFound();
+  }
 
   const data = loadOrgPageData(entity, slug);
 
@@ -105,7 +107,7 @@ export default async function OrgProfilePage({
       <div className="mb-8">
         <div className="flex items-start gap-5">
           {/* Org avatar/icon */}
-          <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70">
+          <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70" aria-hidden="true">
             {entity.name
               .split(/\s+/)
               .map((w) => w[0])
@@ -141,7 +143,7 @@ export default async function OrgProfilePage({
                 {data.foundedDateStr && (
                   <span>
                     Founded {formatKBDate(data.foundedDateStr)}
-                    {data.orgAge && <span className="text-muted-foreground/60"> ({data.orgAge})</span>}
+                    {data.orgAge && <span className="text-muted-foreground"> ({data.orgAge})</span>}
                   </span>
                 )}
                 {data.founders.length > 0 && (
@@ -182,6 +184,7 @@ export default async function OrgProfilePage({
                 >
                   {shortDomain(data.websiteUrl)}{" "}
                   &#8599;
+                  <span className="sr-only">(opens in new tab)</span>
                 </a>
               )}
               {data.hqText && (
@@ -324,9 +327,6 @@ export default async function OrgProfilePage({
           <FundingReceivedSection grants={data.grantsReceived} />
           <DivisionsSection divisions={data.divisions} />
           <FundingProgramsSection programs={data.fundingPrograms} />
-          <KeyPersonnelSection personnel={data.personnel} />
-          <FundingRoundsSection rounds={data.fundingRounds} />
-          <InvestmentsReceivedSection investments={data.investmentsReceived} />
           <EquityPositionsSection positions={data.equityPositions} />
           <AiModelsSection models={data.orgModels} />
         </div>

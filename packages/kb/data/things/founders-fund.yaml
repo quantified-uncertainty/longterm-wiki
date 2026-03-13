@@ -7,8 +7,25 @@ thing:
 facts:
   - id: f_QJ9J38qA6Q
     property: description
-    value: Founders Fund is a $17B contrarian VC firm that has backed major AI companies like OpenAI and DeepMind but shows
-      no explicit focus on AI safety or alignment research, instead emphasizing rapid capability development and
-      transformative technologies. The firm has achieved exceptional returns through c
+    value: Founders Fund is a $17B contrarian VC firm that has backed major AI
+      companies like OpenAI and DeepMind but shows no explicit focus on AI
+      safety or alignment research, instead emphasizing rapid capability
+      development and transformative technologies. The firm has achieved
+      exceptional returns through c
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: JLyAJzGXGg
+    property: founded-date
+    value: "2005"
+    source: https://www.wikidata.org/wiki/Q1439864
+    notes: From Wikidata Q1439864
+  - id: RU49b6JAAA
+    property: headquarters
+    value: San Francisco
+    source: https://www.wikidata.org/wiki/Q1439864
+    notes: From Wikidata Q1439864
+  - id: NrKgge1b1Q
+    property: website
+    value: http://www.foundersfund.com
+    source: https://www.wikidata.org/wiki/Q1439864
+    notes: From Wikidata Q1439864

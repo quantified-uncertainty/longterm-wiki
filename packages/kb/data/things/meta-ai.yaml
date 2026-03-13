@@ -15,13 +15,15 @@ facts:
     property: founded-date
     value: 2013-12
     source: https://ai.meta.com/research/
-    notes: "Founded December 2013 as Facebook AI Research (FAIR) by Yann LeCun; rebranded to Meta AI after Meta rebrand in 2021"
+    notes: "Founded December 2013 as Facebook AI Research (FAIR) by Yann LeCun;
+      rebranded to Meta AI after Meta rebrand in 2021"
 
   - id: f_S0d9WF0E8g
     property: headquarters
     value: "Menlo Park, CA"
     source: https://ai.meta.com/
-    notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London, and Tel Aviv"
+    notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London,
+      and Tel Aviv"
 
   - id: f_lhQD26Idvw
     property: founded-by
@@ -33,53 +35,58 @@ facts:
     property: legal-structure
     value: "Division of Meta Platforms, Inc."
     source: https://ai.meta.com/
-    notes: "Not a separate legal entity; research division within Meta Platforms (formerly Facebook)"
+    notes: "Not a separate legal entity; research division within Meta Platforms
+      (formerly Facebook)"
 
   - id: f_adIN3DEEYw
     property: headcount
     value: 1500
     asOf: 2024-12
-    notes: "Estimated 1,000-2,000 AI researchers across FAIR and Meta GenAI teams; exact figure not publicly disclosed"
+    notes: "Estimated 1,000-2,000 AI researchers across FAIR and Meta GenAI teams;
+      exact figure not publicly disclosed"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_ynNWjLA9og
     property: user-count
-    value: 1e9
+    value: 1e+9
     asOf: 2025-03
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
     notes: "Over 1 billion monthly active users across Meta platforms"
 
   - id: f_Mb5ygFtjbA
     property: user-count
-    value: 630e6
+    value: 6.3e+8
     asOf: 2025-03
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
-    notes: "630M active AI users on WhatsApp, representing 63% of all Meta AI interactions"
+    notes: "630M active AI users on WhatsApp, representing 63% of all Meta AI
+      interactions"
 
   - id: f_4I3Dq2OGcQ
     property: infrastructure-investment
-    value: 69e9
+    value: 6.9e+10
     asOf: "2025"
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
     notes: "$66-72B capital expenditure for AI infrastructure in 2025 (midpoint used)"
 
   - id: f_Yc5dGApsJw
     property: infrastructure-investment
-    value: 125e9
+    value: 1.25e+11
     asOf: "2026"
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
-    notes: "Projected $115-135B CapEx for 2026 (midpoint used); includes Meta Superintelligence Labs and Prometheus supercluster"
+    notes: "Projected $115-135B CapEx for 2026 (midpoint used); includes Meta
+      Superintelligence Labs and Prometheus supercluster"
 
   - id: f_lCAFEOqqgQ
     property: cash-burn
-    value: 70e9
+    value: 7e+10
     asOf: 2026-01
     source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
-    notes: "Reality Labs cumulative losses since late 2020; cited at time of January 2026 layoffs"
+    notes: "Reality Labs cumulative losses since late 2020; cited at time of January
+      2026 layoffs"
 
   - id: f_TWxhXOjkvg
     property: revenue
-    value: 200.97e9
+    value: 2.0097e+11
     asOf: "2025"
     notes: "Meta Platforms parent company FY 2025 total revenue"
 
@@ -91,10 +98,11 @@ facts:
 
   - id: f_hpCI8c51YQ
     property: user-count
-    value: 1e9
+    value: 1e+9
     asOf: 2025-04
     source: https://medium.com/@tarifabeach/metas-llamacon-2025-redefining-the-future-of-open-source-ai-fa6551826e50
-    notes: "LLaMA model family 1 billion+ downloads; announced at LlamaCon April 29, 2025"
+    notes: "LLaMA model family 1 billion+ downloads; announced at LlamaCon April 29,
+      2025"
 
   - id: f_tbzBMB4UBA
     property: market-share
@@ -105,21 +113,28 @@ facts:
 
   - id: f_l8ZXhqm3Mw
     property: infrastructure-investment
-    value: 27e9
+    value: 2.7e+10
     asOf: 2025-10
     source: https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/
     notes: "$27B partnership with Blue Owl Capital for Hyperion data center project"
 
   - id: f_nju6MOGqNQ
     property: description
-    value: "AMI Labs (Yann LeCun) seeking ~$3.5B valuation in fundraising talks (2025)"
+    value: "AMI Labs (Yann LeCun) seeking ~$3.5B valuation in fundraising talks
+      (2025)"
     source: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
     notes: "Separate entity from Meta AI"
 
   - id: f_DXtu23aW3Q
     property: description
-    value: "MTIA v3 Iris: 40-44% cost reduction vs GPUs for total cost of ownership (2026)"
+    value: "MTIA v3 Iris: 40-44% cost reduction vs GPUs for total cost of ownership
+      (2026)"
     source: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap
+  - id: jHzNZtapXA
+    property: website
+    value: https://ai.meta.com/
+    source: https://www.wikidata.org/wiki/Q112114913
+    notes: From Wikidata Q112114913
 
 records:
   key-persons:
@@ -129,14 +144,16 @@ records:
       start: "2013-12"
       is_founder: true
       source: https://ai.meta.com/people/yann-lecun/
-      notes: "Founded FAIR in 2013; 2018 Turing Award laureate for deep learning; vocal critic of AI x-risk concerns"
+      notes: "Founded FAIR in 2013; 2018 Turing Award laureate for deep learning;
+        vocal critic of AI x-risk concerns"
 
     joelle-pineau:
       person: joelle-pineau
       title: "VP of AI Research"
       start: "2017-01"
       source: https://ai.meta.com/people/joelle-pineau/
-      notes: "Leads FAIR; McGill professor; advocates for reproducible research and open science"
+      notes: "Leads FAIR; McGill professor; advocates for reproducible research and
+        open science"
 
     ahmad-al-dahle:
       person: ahmad-al-dahle
@@ -149,13 +166,15 @@ records:
       person: mark-zuckerberg
       title: "CEO of Meta Platforms"
       start: "2004-02"
-      notes: "Drives overall AI strategy for Meta; committed to open-source AI approach"
+      notes: "Drives overall AI strategy for Meta; committed to open-source AI
+        approach"
 
   model-releases:
     llama:
       name: LLaMA
       released: "2023-02"
-      description: "First LLaMA model family (7B-65B params); initially restricted release, later leaked"
+      description: "First LLaMA model family (7B-65B params); initially restricted
+        release, later leaked"
       source: https://ai.meta.com/blog/large-language-model-llama-meta-ai/
       notes: "Catalyzed open-source LLM ecosystem; 65B model competitive with GPT-3.5"
 
@@ -178,47 +197,56 @@ records:
       released: "2025-04"
       description: "Next-generation open-weight models with mixture-of-experts architecture"
       source: https://ai.meta.com/blog/llama-4/
-      notes: "Scout (17B active/109B total) and Maverick (17B active/400B total) variants; 10M token context"
+      notes: "Scout (17B active/109B total) and Maverick (17B active/400B total)
+        variants; 10M token context"
 
   research-areas:
     self-supervised-learning:
       name: Self-Supervised Learning
-      description: "Learning representations from unlabeled data; foundation of modern LLM training"
+      description: "Learning representations from unlabeled data; foundation of modern
+        LLM training"
       started: "2014-01"
-      notes: "Core research philosophy under Yann LeCun; underpins Meta's approach to foundation models"
+      notes: "Core research philosophy under Yann LeCun; underpins Meta's approach to
+        foundation models"
 
     computer-vision:
       name: Computer Vision
       description: "Image recognition, object detection, and visual understanding"
       started: "2013-12"
       key-publication: https://arxiv.org/abs/2304.07193
-      notes: "Segment Anything Model (SAM) released 2023; DINOv2 self-supervised vision transformer"
+      notes: "Segment Anything Model (SAM) released 2023; DINOv2 self-supervised
+        vision transformer"
 
     open-source-ai:
       name: Open-Source AI
       description: "Developing and releasing AI models and tools under open licenses"
       started: "2015-01"
       key-publication: https://ai.meta.com/llama/
-      notes: "Meta's flagship open-source strategy; PyTorch (2016), Llama series, SAM, and numerous research tools"
+      notes: "Meta's flagship open-source strategy; PyTorch (2016), Llama series, SAM,
+        and numerous research tools"
 
     natural-language-processing:
       name: Natural Language Processing
       description: "Language understanding, generation, and translation"
       started: "2013-12"
-      notes: "NLLB (No Language Left Behind) translation for 200+ languages; contributed to multilingual AI research"
+      notes: "NLLB (No Language Left Behind) translation for 200+ languages;
+        contributed to multilingual AI research"
 
   products:
     pytorch:
       name: PyTorch
       launched: "2016-09"
-      description: "Open-source deep learning framework; became de facto standard for AI research"
+      description: "Open-source deep learning framework; became de facto standard for
+        AI research"
       source: https://pytorch.org/
-      notes: "Moved to Linux Foundation in 2022; used by majority of ML researchers globally"
+      notes: "Moved to Linux Foundation in 2022; used by majority of ML researchers
+        globally"
 
     meta-ai-assistant:
       name: Meta AI Assistant
       launched: "2023-09"
-      description: "AI assistant integrated across Meta apps (WhatsApp, Instagram, Messenger, Facebook)"
+      description: "AI assistant integrated across Meta apps (WhatsApp, Instagram,
+        Messenger, Facebook)"
       source: https://ai.meta.com/
       notes: "Powered by Llama models; available across Meta's 3B+ user platform"
 
@@ -243,6 +271,8 @@ records:
       name: Purple Llama
       date: "2023-12"
       type: safety-eval
-      description: "Open-source tools for evaluating and improving LLM safety including CyberSecEval"
+      description: "Open-source tools for evaluating and improving LLM safety
+        including CyberSecEval"
       source: https://ai.meta.com/blog/purple-llama-open-trust-safety-generative-ai/
-      notes: "Collaborative project for AI safety evaluations; includes Llama Guard and CyberSecEval benchmarks"
+      notes: "Collaborative project for AI safety evaluations; includes Llama Guard
+        and CyberSecEval benchmarks"

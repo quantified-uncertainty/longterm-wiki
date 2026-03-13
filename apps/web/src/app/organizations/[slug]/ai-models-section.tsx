@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
 import { formatCompactNumber } from "@/lib/format-compact";
+import { formatKBDate } from "@/components/wiki/kb/format";
 
 interface AiModelEntry {
   id: string;
@@ -37,14 +38,14 @@ export function AiModelsSection({
           View all models &rarr;
         </Link>
       </div>
-      <div className="border border-border rounded-xl overflow-hidden">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="py-2 px-3 text-left font-medium">Model</th>
-              <th className="py-2 px-3 text-left font-medium">Released</th>
-              <th className="py-2 px-3 text-right font-medium">Pricing (in/out)</th>
-              <th className="py-2 px-3 text-right font-medium">Context</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Model</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Released</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Pricing (in/out)</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Context</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -58,7 +59,7 @@ export function AiModelsSection({
                     </Link>
                   </td>
                   <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
-                    {model.releaseDate ?? ""}
+                    {model.releaseDate ? formatKBDate(model.releaseDate) : ""}
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums">
                     {model.inputPrice != null && model.outputPrice != null

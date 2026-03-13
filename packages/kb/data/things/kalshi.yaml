@@ -7,8 +7,25 @@ thing:
 facts:
   - id: f_QNucBwZfpw
     property: description
-    value: This is a comprehensive corporate profile of Kalshi, a US prediction market platform that offers some AI
-      safety-related contracts but is primarily focused on sports, politics, and economics. The AI safety relevance is
-      minimal, limited to a few markets on AI research pauses and regulation that show l
+    value: This is a comprehensive corporate profile of Kalshi, a US prediction
+      market platform that offers some AI safety-related contracts but is
+      primarily focused on sports, politics, and economics. The AI safety
+      relevance is minimal, limited to a few markets on AI research pauses and
+      regulation that show l
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: JVCVmdRuzA
+    property: founded-date
+    value: "2018"
+    source: https://www.wikidata.org/wiki/Q114586938
+    notes: From Wikidata Q114586938
+  - id: 2C9ndfFdRg
+    property: headquarters
+    value: New York City
+    source: https://www.wikidata.org/wiki/Q114586938
+    notes: From Wikidata Q114586938
+  - id: jYc4Oe5GJA
+    property: website
+    value: https://kalshi.com/
+    source: https://www.wikidata.org/wiki/Q114586938
+    notes: From Wikidata Q114586938

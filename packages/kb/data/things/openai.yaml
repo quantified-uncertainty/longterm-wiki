@@ -14,7 +14,8 @@ facts:
     property: founded-date
     value: 2015-12
     source: https://openai.com/blog/introducing-openai
-    notes: "Founded December 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon Musk, Wojciech Zaremski, and John Schulman"
+    notes: "Founded December 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon
+      Musk, Wojciech Zaremski, and John Schulman"
 
   - id: f_jyRF7MXyWw
     property: headquarters
@@ -57,40 +58,41 @@ facts:
 
   - id: f_HfB3WmNDFQ
     property: total-funding
-    value: 13e9
+    value: 1.3e+10
     asOf: 2024-01
     source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
     notes: "Microsoft cumulative investment across multiple rounds"
 
   - id: f_b56n3kcD2g
     property: valuation
-    value: 157e9
+    value: 1.57e+11
     asOf: 2024-12
     notes: "October 2024 funding round valuation"
 
   - id: f_YZ7zzKgBsA
     property: valuation
-    value: 500e9
+    value: 5e+11
     asOf: 2025-10
     notes: "Secondary share sale valuation, October 2025"
 
   - id: f_yvm9QNFjdA
     property: revenue
-    value: 3.4e9
+    value: 3.4e+9
     asOf: 2024-10
     notes: "Annualized run rate as of mid-2024"
 
   - id: f_w3pWgejwIA
     property: revenue
-    value: 20e9
+    value: 2e+10
     asOf: "2025"
     notes: "ARR per CFO Sarah Friar disclosure"
 
   - id: f_5VcbvP89LA
     property: user-count
-    value: 100e6
+    value: 1e+8
     asOf: 2023-02
-    notes: "ChatGPT reached 100M monthly active users within 2 months of launch; fastest-growing consumer application in history at that time"
+    notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
+      fastest-growing consumer application in history at that time"
 
   - id: f_o1tcwe2T0w
     property: headcount
@@ -102,24 +104,27 @@ facts:
     property: market-share
     value: 55
     asOf: 2025-12
-    notes: "Enterprise LLM API market share (estimated); dominant position from ChatGPT/GPT-4"
+    notes: "Enterprise LLM API market share (estimated); dominant position from
+      ChatGPT/GPT-4"
 
   - id: f_rK9bF2vL6s
     property: market-share
     value: 50
     asOf: 2026-02
-    notes: "Enterprise LLM API market share (estimated); declining slightly as competitors grow"
+    notes: "Enterprise LLM API market share (estimated); declining slightly as
+      competitors grow"
 
   - id: f_hJ5dQ8nT3w
     property: gross-margin
     value: 35
     asOf: 2025-12
-    notes: "Approximate gross margin; lower than Anthropic due to heavier compute usage"
+    notes: "Approximate gross margin; lower than Anthropic due to heavier compute
+      usage"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_ZencK2XFDA
     property: model-parameters
-    value: 175e9
+    value: 1.75e+11
     asOf: 2020-06
     source: https://arxiv.org/abs/2005.14165
     notes: "GPT-3 parameter count."
@@ -144,40 +149,49 @@ facts:
   - id: f_cOr3zkAB2Q
     property: description
     value: "75% of co-founders departed within 9 years of founding (by 2024)"
+  - id: EdV4qjV9fA
+    property: website
+    value: https://openai.com/
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
 
 records:
   funding-rounds:
     founding:
       name: "Founding"
       date: "2015-12"
-      raised: 1e9
-      notes: "Initial $1B commitment from founders and backers including Elon Musk, Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
+      raised: 1e+9
+      notes: "Initial $1B commitment from founders and backers including Elon Musk,
+        Sam Altman, Peter Thiel, Reid Hoffman, Jessica Livingston"
       source: https://openai.com/blog/introducing-openai
 
     microsoft-investment:
       name: "Microsoft Investment"
       date: "2019-07"
-      raised: 1e9
+      raised: 1e+9
       lead_investor: microsoft
       source: https://openai.com/blog/microsoft
-      notes: "Microsoft's initial $1B investment; coincided with creation of capped-profit entity OpenAI LP"
+      notes: "Microsoft's initial $1B investment; coincided with creation of
+        capped-profit entity OpenAI LP"
 
     microsoft-extension:
       name: "Microsoft Extension"
       date: "2023-01"
-      raised: 10e9
+      raised: 1e+10
       lead_investor: microsoft
       source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-      notes: "Microsoft's multi-year, multi-billion dollar investment reported at ~$10B; brought total Microsoft commitment to ~$13B"
+      notes: "Microsoft's multi-year, multi-billion dollar investment reported at
+        ~$10B; brought total Microsoft commitment to ~$13B"
 
     growth-round:
       name: "Growth Round"
       date: "2024-10"
-      raised: 6.6e9
-      valuation: 157e9
+      raised: 6.6e+9
+      valuation: 1.57e+11
       lead_investor: thrive-capital
       source: https://www.wsj.com/tech/ai/openai-completes-6-6-billion-funding-round-e16ffab4
-      notes: "Led by Thrive Capital; investors included Microsoft, NVIDIA, SoftBank, and others"
+      notes: "Led by Thrive Capital; investors included Microsoft, NVIDIA, SoftBank,
+        and others"
 
   key-persons:
     sam-altman:
@@ -186,7 +200,8 @@ records:
       start: "2019-03"
       is_founder: true
       source: https://openai.com/about
-      notes: "Co-chairman from founding (2015); became CEO when OpenAI LP was created in 2019. Briefly fired and reinstated in November 2023."
+      notes: "Co-chairman from founding (2015); became CEO when OpenAI LP was created
+        in 2019. Briefly fired and reinstated in November 2023."
 
     ilya-sutskever:
       person: ilya-sutskever
@@ -211,7 +226,8 @@ records:
       start: "2018"
       end: "2024-09"
       source: https://openai.com/about
-      notes: "Served as interim CEO during Sam Altman's brief ousting in November 2023; departed September 2024"
+      notes: "Served as interim CEO during Sam Altman's brief ousting in November
+        2023; departed September 2024"
 
     jan-leike:
       person: jan-leike
@@ -219,7 +235,8 @@ records:
       start: "2023-07"
       end: "2024-05"
       source: https://openai.com/blog/introducing-superalignment
-      notes: "Co-led Superalignment team from its founding in July 2023; resigned May 2024 citing safety concerns, joined Anthropic"
+      notes: "Co-led Superalignment team from its founding in July 2023; resigned May
+        2024 citing safety concerns, joined Anthropic"
 
     elon-musk:
       person: elon-musk
@@ -227,7 +244,8 @@ records:
       start: "2015-12"
       end: "2018-02"
       is_founder: true
-      notes: "Left the board in February 2018; later sued OpenAI alleging breach of founding agreement"
+      notes: "Left the board in February 2018; later sued OpenAI alleging breach of
+        founding agreement"
 
     john-schulman:
       person: john-schulman

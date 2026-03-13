@@ -675,7 +675,7 @@ export const facts = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     entityId: text("entity_id")
       .notNull()
-      .references(() => entities.id, { onDelete: "cascade" }),
+      .references(() => entities.stableId, { onDelete: "cascade" }),
     factId: text("fact_id").notNull(),
     label: text("label"),
     value: text("value"), // String representation of the value
@@ -684,7 +684,7 @@ export const facts = pgTable(
     high: real("high"), // Upper bound for range values
     asOf: text("as_of"), // Point-in-time (YYYY-MM, YYYY, or ISO date)
     measure: text("measure"), // Measure ID for timeseries grouping
-    subject: text("subject").references(() => entities.id, {
+    subject: text("subject").references(() => entities.stableId, {
       onDelete: "set null",
     }),
     note: text("note"),

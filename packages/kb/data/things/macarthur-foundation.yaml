@@ -7,45 +7,65 @@ thing:
 facts:
   - id: f_hzPewqzvnA
     property: description
-    value: Comprehensive profile of the $9 billion MacArthur Foundation documenting its evolution from 1978 to present, with
-      $8.27 billion in total grants across climate, criminal justice, nuclear threats, and journalism. AI governance
-      work totals modest funding ($400K to IST for LLM risk; general support to P
+    value: Comprehensive profile of the $9 billion MacArthur Foundation documenting
+      its evolution from 1978 to present, with $8.27 billion in total grants
+      across climate, criminal justice, nuclear threats, and journalism. AI
+      governance work totals modest funding ($400K to IST for LLM risk; general
+      support to P
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: iYQSExna2Q
+    property: founded-date
+    value: 1978-01
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: g3wZaAPTnA
+    property: headquarters
+    value: Marquette Building
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: ggXcLQLgkw
+    property: website
+    value: https://www.macfound.org/
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
 
 records:
   funding-programs:
     climate-solutions:
       name: "Climate Solutions (Big Bet)"
       type: "big-bet"
-      amount: 500e6
+      amount: 5e+8
       period: "2014-2026"
       status: "winding-down"
       url: https://www.macfound.org/programs/bigbets/climate-solutions/
-      notes: "Subnational decarbonization policy in US and India; winding down in 2026"
+      notes: "Subnational decarbonization policy in US and India; winding down in
+        2026"
 
     nuclear-challenges:
       name: "Nuclear Challenges (Big Bet)"
       type: "big-bet"
-      amount: 500e6
+      amount: 5e+8
       period: "2014-2024"
       status: "completed"
       url: https://www.macfound.org/programs/nuclear/strategy
-      notes: "Reducing weapons-usable nuclear material; fully exited nuclear field end of 2024. Final capstone $21.3M to 28 orgs"
+      notes: "Reducing weapons-usable nuclear material; fully exited nuclear field end
+        of 2024. Final capstone $21.3M to 28 orgs"
 
     criminal-justice:
       name: "Criminal Justice Reform (Big Bet)"
       type: "big-bet"
-      amount: 400e6
+      amount: 4e+8
       period: "2015-2025"
       status: "winding-down"
       url: https://www.macfound.org/programs/bigbets/
-      notes: "Addressed over-incarceration and racial/ethnic disparities in US criminal justice"
+      notes: "Addressed over-incarceration and racial/ethnic disparities in US
+        criminal justice"
 
     on-nigeria:
       name: "On Nigeria (Big Bet)"
       type: "big-bet"
-      amount: 200e6
+      amount: 2e+8
       period: "2015-2024"
       status: "completed"
       url: https://www.macfound.org/programs/bigbets/
@@ -57,7 +77,8 @@ records:
       date: "2025"
       status: "active"
       url: https://www.macfound.org/programs/bigbets/ai-opportunity/
-      notes: "New Big Bet on AI, economy, and workforce; budget not yet publicly disclosed. Focus on young people in Chicago and community-centered AI"
+      notes: "New Big Bet on AI, economy, and workforce; budget not yet publicly
+        disclosed. Focus on young people in Chicago and community-centered AI"
 
     100-and-change:
       name: "100&Change Competition"
@@ -65,13 +86,14 @@ records:
       period: "2016-present"
       status: "active"
       url: https://www.100andchange.org/
-      notes: "Periodic $100M single-grant competition for transformative solutions. Three rounds completed (2017, 2020, 2025)"
+      notes: "Periodic $100M single-grant competition for transformative solutions.
+        Three rounds completed (2017, 2020, 2025)"
 
   grants:
     100-and-change-round-3-broad:
       name: "Sentinel pandemic prevention project"
       recipient: "broad-institute"
-      amount: 100e6
+      amount: 1e+8
       date: "2025-11"
       status: "active"
       program: "100-and-change"
@@ -81,8 +103,9 @@ records:
     humanity-ai-coalition:
       name: "Humanity AI coalition contribution"
       recipient: "humanity-ai"
-      amount: 10e6
+      amount: 1e+7
       date: "2025"
       status: "active"
       source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-      notes: "MacArthur's share of $500M multi-foundation coalition (Ford, Mellon, Mozilla, etc.)"
+      notes: "MacArthur's share of $500M multi-foundation coalition (Ford, Mellon,
+        Mozilla, etc.)"

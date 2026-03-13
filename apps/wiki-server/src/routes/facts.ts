@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
+import { eq, and, count, asc, sql, isNotNull, lte, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { facts, entities, resources } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
@@ -36,6 +36,28 @@ const StalenessQuery = z.object({
 });
 
 // ---- Helpers ----
+
+/**
+ * Resolve an entity identifier (stableId, slug, or numericId) to a stableId.
+ * Returns null if the entity is not found.
+ */
+async function resolveEntityStableId(
+  db: ReturnType<typeof getDrizzleDb>,
+  identifier: string,
+): Promise<string | null> {
+  const rows = await db
+    .select({ stableId: entities.stableId })
+    .from(entities)
+    .where(
+      or(
+        eq(entities.stableId, identifier),
+        eq(entities.id, identifier),
+        eq(entities.numericId, identifier),
+      )
+    )
+    .limit(1);
+  return rows[0]?.stableId ?? null;
+}
 
 function formatFact(f: typeof facts.$inferSelect) {
   return {
@@ -132,10 +154,13 @@ const factsApp = new Hono()
 
   // ---- GET /timeseries/:entityId ----
   .get("/timeseries/:entityId", zv("query", TimeseriesQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+    const rawId = c.req.param("entityId");
 
     const { measure, limit } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    // Resolve slug/numericId/stableId to stableId (facts.entity_id stores stableIds)
+    const entityId = await resolveEntityStableId(db, rawId) ?? rawId;
 
     const rows = await db
       .select()
@@ -160,10 +185,13 @@ const factsApp = new Hono()
 
   // ---- GET /by-entity/:entityId ----
   .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+    const rawId = c.req.param("entityId");
 
     const { limit, offset, measure } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    // Resolve slug/numericId/stableId to stableId (facts.entity_id stores stableIds)
+    const entityId = await resolveEntityStableId(db, rawId) ?? rawId;
 
     const conditions = [eq(facts.entityId, entityId)];
     if (measure) conditions.push(eq(facts.measure, measure));
@@ -206,9 +234,9 @@ const factsApp = new Hono()
     const { facts: items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Validate entity references
+    // Validate entity references (facts now use stable IDs, not slugs)
     const entityIds = [...new Set(items.map((f) => f.entityId))];
-    const missingEntities = await checkRefsExist(db, entities, entities.id, entityIds);
+    const missingEntities = await checkRefsExist(db, entities, entities.stableId, entityIds);
     if (missingEntities.length > 0) {
       return validationError(
         c,
@@ -225,7 +253,7 @@ const factsApp = new Hono()
     ];
     let missingSubjects: string[] = [];
     if (subjectIds.length > 0) {
-      missingSubjects = await checkRefsExist(db, entities, entities.id, subjectIds);
+      missingSubjects = await checkRefsExist(db, entities, entities.stableId, subjectIds);
       if (missingSubjects.length > 0) {
         console.warn(
           `Facts sync: nulling out ${missingSubjects.length} unresolved subject(s): ${missingSubjects.join(", ")}`

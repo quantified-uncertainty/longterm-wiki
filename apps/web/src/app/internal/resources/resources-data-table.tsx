@@ -98,7 +98,7 @@ function makeColumns(): ColumnDef<ResourceDataRow>[] {
       ),
       cell: ({ row }) => (
         <Link
-          href={`/source/${row.original.id}`}
+          href={`/resources/${row.original.id}`}
           className="text-primary hover:underline text-xs font-medium max-w-[300px] truncate block"
           title={row.original.title}
         >

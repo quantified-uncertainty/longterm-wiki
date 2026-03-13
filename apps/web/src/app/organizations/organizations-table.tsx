@@ -2,7 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import { SortHeader } from "@/components/directory/SortHeader";
+import type { SortDir } from "@/lib/sort-utils";
+import { compareOrgRows } from "@/app/organizations/org-sort";
+import type { OrgSortKey } from "@/app/organizations/org-sort";
 
 export interface OrgRow {
   id: string;
@@ -27,6 +30,9 @@ export interface OrgRow {
   totalFundingNum: number | null;
 
   foundedDate: string | null;
+
+  /** Pre-computed lowercase text blob for full-text search across all fields */
+  searchText: string;
 }
 
 const ORG_TYPE_LABELS: Record<string, string> = {
@@ -50,14 +56,7 @@ const ORG_TYPE_COLORS: Record<string, string> = {
   government: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
 
-type SortKey =
-  | "name"
-  | "orgType"
-  | "revenue"
-  | "valuation"
-  | "headcount"
-  | "totalFunding"
-  | "founded";
+type SortKey = OrgSortKey;
 
 function formatCompactNumber(n: number | null): string {
   if (n == null) return "";
@@ -86,51 +85,6 @@ function DateHint({ date }: { date: string | null }) {
     <span className="text-[10px] text-muted-foreground/50 ml-1">
       {label}
     </span>
-  );
-}
-
-function SortHeader({
-  label,
-  sortKey,
-  currentSort,
-  currentDir,
-  onSort,
-  className,
-}: {
-  label: string;
-  sortKey: SortKey;
-  currentSort: SortKey;
-  currentDir: SortDir;
-  onSort: (key: SortKey) => void;
-  className?: string;
-}) {
-  const isActive = currentSort === sortKey;
-  const ariaSort = isActive
-    ? currentDir === "asc"
-      ? ("ascending" as const)
-      : ("descending" as const)
-    : ("none" as const);
-
-  return (
-    <th
-      className={`py-2.5 px-3 font-medium ${className ?? ""}`}
-      aria-sort={ariaSort}
-    >
-      <button
-        type="button"
-        className={`inline-flex items-center gap-1 cursor-pointer select-none hover:text-foreground transition-colors ${
-          isActive ? "text-foreground" : ""
-        }`}
-        onClick={() => onSort(sortKey)}
-      >
-        {label}
-        {isActive && (
-          <span className="text-[10px]">
-            {currentDir === "asc" ? "\u25B2" : "\u25BC"}
-          </span>
-        )}
-      </button>
-    </th>
   );
 }
 
@@ -177,22 +131,11 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter((r) => r.name.toLowerCase().includes(q));
+      result = result.filter((r) => r.searchText.includes(q));
     }
 
-    const getValue = (row: OrgRow): string | number | null => {
-      switch (sortKey) {
-        case "name": return row.name.toLowerCase();
-        case "orgType": return row.orgType ?? "";
-        case "revenue": return row.revenueNum;
-        case "valuation": return row.valuationNum;
-        case "headcount": return row.headcount;
-        case "totalFunding": return row.totalFundingNum;
-        case "founded": return row.foundedDate;
-      }
-    };
     result = [...result].sort((a, b) =>
-      compareByValue(a, b, getValue, sortDir),
+      compareOrgRows(a, b, sortKey, sortDir),
     );
 
     return result;
@@ -204,10 +147,10 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
-          placeholder="Search organizations..."
+          placeholder="Search name, type, people, funding programs, description..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
         />
         <div className="flex flex-wrap gap-1.5">
           <button

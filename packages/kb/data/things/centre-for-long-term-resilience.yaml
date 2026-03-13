@@ -7,7 +7,18 @@ thing:
 facts:
   - id: f_HDafGrfwfg
     property: description
-    value: UK-based think tank focused on extreme risks from AI, biosecurity, and improving government risk management
-      through policy research and direct advisory work.
+    value: UK-based think tank focused on extreme risks from AI, biosecurity, and
+      improving government risk management through policy research and direct
+      advisory work.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: HQxR57f4mw
+    property: founded-date
+    value: "2019"
+    source: https://www.wikidata.org/wiki/Q126286020
+    notes: From Wikidata Q126286020
+  - id: CHFmqwxbTA
+    property: website
+    value: https://www.longtermresilience.org/
+    source: https://www.wikidata.org/wiki/Q126286020
+    notes: From Wikidata Q126286020

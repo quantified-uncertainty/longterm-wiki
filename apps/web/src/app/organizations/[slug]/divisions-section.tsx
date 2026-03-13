@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 
@@ -38,11 +38,11 @@ export function DivisionsSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Name</th>
-              <th className="text-left py-2 px-3 font-medium">Type</th>
-              <th className="text-left py-2 px-3 font-medium">Lead</th>
-              <th className="text-center py-2 px-3 font-medium">Status</th>
-              <th className="text-center py-2 px-3 font-medium">Dates</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Name</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Lead</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Dates</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -50,19 +50,23 @@ export function DivisionsSection({
               <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
                   <span className="font-medium text-foreground text-xs">
-                    <Link
-                      href={`/divisions/${d.slug ?? d.key}`}
-                      className="text-primary hover:underline"
-                    >
-                      {d.name}
-                    </Link>
+                    {d.slug ? (
+                      <Link
+                        href={`/divisions/${d.slug}`}
+                        className="text-primary hover:underline"
+                      >
+                        {d.name}
+                      </Link>
+                    ) : (
+                      d.name
+                    )}
                   </span>
                   {d.source && (
                     <a
                       href={safeHref(d.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>
@@ -70,7 +74,7 @@ export function DivisionsSection({
                 </td>
                 <td className="py-2 px-3">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                    className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
                       DIVISION_TYPE_COLORS[d.divisionType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                     }`}
                   >
@@ -83,7 +87,7 @@ export function DivisionsSection({
                 <td className="py-2 px-3 text-center text-xs">
                   {d.status && (
                     <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                      className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
                         d.status === "active"
                           ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                           : d.status === "inactive"
@@ -98,8 +102,8 @@ export function DivisionsSection({
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs">
                   {d.startDate && (
                     <span>
-                      {d.startDate}
-                      {d.endDate ? ` - ${d.endDate}` : " - present"}
+                      {formatKBDate(d.startDate)}
+                      {d.endDate ? ` \u2013 ${formatKBDate(d.endDate)}` : " \u2013 present"}
                     </span>
                   )}
                 </td>

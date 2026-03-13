@@ -7,8 +7,8 @@ thing:
 facts:
   - id: f_MCKelTrhAw
     property: description
-    value: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of
-      AI alignment.
+    value: Executive Director of the Machine Intelligence Research Institute (MIRI),
+      focused on mathematical foundations of AI alignment.
     asOf: 2026-03
     notes: Migrated from old entity system
 
@@ -20,7 +20,9 @@ facts:
 
   - id: f_nS6tN2pQ5v
     property: notable-for
-    value: "Executive Director of MIRI; focuses on mathematical foundations of AI alignment including logical uncertainty, decision theory, and corrigibility; author of MIRI technical agenda papers"
+    value: "Executive Director of MIRI; focuses on mathematical foundations of AI
+      alignment including logical uncertainty, decision theory, and
+      corrigibility; author of MIRI technical agenda papers"
     asOf: 2026-03
     notes: Enriched from entity description
 
@@ -35,3 +37,8 @@ facts:
     value: "B.S. in Computer Science, University of California, Berkeley"
     source: https://intelligence.org/team/
     notes: Enriched from public information
+  - id: F7wEM1Rqcw
+    property: born-year
+    value: 1989
+    source: https://www.wikidata.org/wiki/Q136721135
+    notes: From Wikidata Q136721135

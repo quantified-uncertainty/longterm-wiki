@@ -13,3 +13,18 @@ facts:
     value: 6400000
     asOf: "2025"
     notes: "Cumulative SFF grants to CAIS across multiple rounds; lower bound"
+  - id: 1jdDcOMFYA
+    property: founded-date
+    value: "2022"
+    source: https://www.wikidata.org/wiki/Q119084607
+    notes: From Wikidata Q119084607
+  - id: 0ZlJqqX2HQ
+    property: headquarters
+    value: San Francisco
+    source: https://www.wikidata.org/wiki/Q119084607
+    notes: From Wikidata Q119084607
+  - id: t7r3olcDFw
+    property: website
+    value: https://www.safe.ai/
+    source: https://www.wikidata.org/wiki/Q119084607
+    notes: From Wikidata Q119084607

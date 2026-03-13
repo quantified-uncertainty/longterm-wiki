@@ -128,7 +128,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
       <span className="flex-1 min-w-0">
         {resource.id ? (
           <a
-            href={`/source/${resource.id}`}
+            href={`/resources/${resource.id}`}
             className="text-[13px] text-foreground/80 font-medium !no-underline hover:!underline leading-relaxed"
           >
             {resource.title}

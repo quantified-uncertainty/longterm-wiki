@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { resolveSlugAlias } from "@/data/kb";
 import {
   resolvePersonBySlug,
   getPersonSlugs,
@@ -60,7 +61,11 @@ export default async function PersonProfilePage({
 }) {
   const { slug } = await params;
   const entity = resolvePersonBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/people/${canonical}`);
+    return notFound();
+  }
 
   // Facts
   const roleFact = getKBLatest(entity.id, "role");

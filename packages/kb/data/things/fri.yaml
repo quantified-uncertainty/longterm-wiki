@@ -7,7 +7,12 @@ thing:
 facts:
   - id: f_ODgv72zg6w
     property: description
-    value: Research institute advancing forecasting methodology through large-scale tournaments and rigorous experiments,
-      led by Philip Tetlock.
+    value: Research institute advancing forecasting methodology through large-scale
+      tournaments and rigorous experiments, led by Philip Tetlock.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 4eRTUHLLtA
+    property: website
+    value: https://forecastingresearch.org
+    source: https://www.wikidata.org/wiki/Q122208275
+    notes: From Wikidata Q122208275

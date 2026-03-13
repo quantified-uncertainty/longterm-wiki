@@ -7,13 +7,25 @@ thing:
 facts:
   - id: f_kdFqCc8h7g
     property: description
-    value: FTX was a centralized cryptocurrency exchange founded by Sam Bankman-Fried in 2019 that collapsed in November
-      2022 after revelations that customer deposits had been misappropriated by its affiliated trading firm Alameda
-      Research. At its peak, FTX held a $32 billion valuation and was the third-largest crypto exchange globally.
-      Through the FTX Future Fund, it committed over $130 million to longtermist causes including AI safety before its
-      bankruptcy rendered those commitments void.
+    value: FTX was a centralized cryptocurrency exchange founded by Sam
+      Bankman-Fried in 2019 that collapsed in November 2022 after revelations
+      that customer deposits had been misappropriated by its affiliated trading
+      firm Alameda Research. At its peak, FTX held a $32 billion valuation and
+      was the third-largest crypto exchange globally. Through the FTX Future
+      Fund, it committed over $130 million to longtermist causes including AI
+      safety before its bankruptcy rendered those commitments void.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_DDhHhfcJXA
     property: website
     value: https://en.wikipedia.org/wiki/FTX
+  - id: r1e4D2WqSQ
+    property: founded-date
+    value: 2019-05
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780
+  - id: ZDZ5qywjxQ
+    property: headquarters
+    value: St. John's
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780

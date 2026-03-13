@@ -8,7 +8,8 @@ import {
   getKBEntity,
   getKBLatest,
 } from "@/data/kb";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate, isUrl, shortDomain } from "@/components/wiki/kb/format";
+import { formatAmount } from "@/app/organizations/[slug]/org-data";
 import type { Fact, RecordEntry } from "@longterm-wiki/kb";
 import { Breadcrumbs } from "@/components/directory";
 
@@ -30,28 +31,6 @@ export async function generateMetadata({
   };
 }
 
-function formatAmount(value: unknown): string | null {
-  if (value == null) return null;
-  const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
-  if (num >= 1e12) return `$${(num / 1e12).toFixed(1)}T`;
-  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
-  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`;
-  if (num >= 1e3) return `$${(num / 1e3).toFixed(0)}K`;
-  return `$${num.toLocaleString()}`;
-}
-
-function isUrl(s: string): boolean {
-  return s.startsWith("http://") || s.startsWith("https://");
-}
-
-function shortDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace("www.", "");
-  } catch {
-    return url;
-  }
-}
 
 export default async function OrgFundingPage({
   params,
@@ -88,11 +67,19 @@ export default async function OrgFundingPage({
   // Group investments by round key
   const investmentsByRound = new Map<string, RecordEntry[]>();
   for (const inv of investments) {
-    const roundKey = inv.fields.round ? String(inv.fields.round) : "__other__";
+    const roundKey = inv.fields.round_name ? String(inv.fields.round_name) : "__other__";
     const list = investmentsByRound.get(roundKey) ?? [];
     list.push(inv);
     investmentsByRound.set(roundKey, list);
   }
+
+  // Count unique investors (not investment records)
+  const uniqueInvestorCount = new Set(
+    investments
+      .map(inv => inv.fields.investor ?? inv.displayName ?? inv.key)
+      .filter((v): v is string | number => v != null)
+      .map(String)
+  ).size;
 
   // Sort valuation facts chronologically
   const sortedValuations = [...valuationFacts].sort((a, b) => {
@@ -129,10 +116,10 @@ export default async function OrgFundingPage({
             {fundingRounds.length} round
             {fundingRounds.length !== 1 ? "s" : ""}
           </span>
-          {investments.length > 0 && (
+          {uniqueInvestorCount > 0 && (
             <span>
-              {investments.length} known investor
-              {investments.length !== 1 ? "s" : ""}
+              {uniqueInvestorCount} known investor
+              {uniqueInvestorCount !== 1 ? "s" : ""}
             </span>
           )}
         </div>
@@ -144,15 +131,15 @@ export default async function OrgFundingPage({
           <h2 className="text-lg font-bold tracking-tight mb-4">
             Valuation History
           </h2>
-          <div className="border border-border/60 rounded-xl overflow-hidden">
+          <div className="border border-border/60 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                  <th className="text-left py-2.5 px-4 font-medium">Date</th>
-                  <th className="text-right py-2.5 px-4 font-medium">
+                  <th scope="col" className="text-left py-2.5 px-4 font-medium">Date</th>
+                  <th scope="col" className="text-right py-2.5 px-4 font-medium">
                     Valuation
                   </th>
-                  <th className="text-left py-2.5 px-4 font-medium">Source</th>
+                  <th scope="col" className="text-left py-2.5 px-4 font-medium">Source</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -235,7 +222,7 @@ export default async function OrgFundingPage({
                     <div className="flex items-baseline gap-3 flex-wrap">
                       <h3 className="text-base font-bold">{name}</h3>
                       {instrument && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
                           {instrument}
                         </span>
                       )}
@@ -353,7 +340,7 @@ export default async function OrgFundingPage({
                         href={source}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] text-primary/50 hover:text-primary hover:underline transition-colors"
+                        className="text-[11px] text-primary/70 hover:text-primary hover:underline transition-colors"
                       >
                         {shortDomain(source)}
                       </a>
