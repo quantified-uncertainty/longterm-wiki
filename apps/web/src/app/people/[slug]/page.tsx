@@ -10,6 +10,7 @@ import {
   getFundingConnectionsForPerson,
 } from "../people-utils";
 import {
+  getAllKBRecords,
   getKBFacts,
   getKBLatest,
   getKBEntitySlug,
@@ -91,17 +92,26 @@ export default async function PersonProfilePage({
   // Publications linked to this person (from literature.yaml via people-resources.yaml)
   const publications = getPublicationsForPerson(slug);
 
+  // Fetch key-persons and board-seats once; shared across org roles,
+  // board seats, and funding connections to avoid redundant KB scans.
+  const allKeyPersons = getAllKBRecords("key-persons");
+  const allBoardSeats = getAllKBRecords("board-seats");
+
   // Reverse lookup: org key-person records referencing this person
-  const orgRoles = getOrgRolesForPerson(entity.id);
+  const orgRoles = getOrgRolesForPerson(entity.id, allKeyPersons);
 
   // Board seats across all organizations referencing this person
-  const boardSeats = getBoardSeatsForPerson(entity.id);
+  const boardSeats = getBoardSeatsForPerson(entity.id, allBoardSeats);
 
   // Career history from KB records (populated via personnel table)
   const careerHistory = getCareerHistory(entity.id);
 
   // Funding connections (grants via org affiliations or personal grants)
-  const fundingConnections = getFundingConnectionsForPerson(entity.id);
+  const fundingConnections = getFundingConnectionsForPerson(
+    entity.id,
+    allKeyPersons,
+    allBoardSeats,
+  );
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
