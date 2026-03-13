@@ -117,7 +117,7 @@ const personnelApp = new Hono()
       .select()
       .from(personnel)
       .where(whereClause)
-      .orderBy(desc(personnel.syncedAt))
+      .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
       .offset(offset);
 
@@ -149,7 +149,7 @@ const personnelApp = new Hono()
       .select()
       .from(personnel)
       .where(whereClause)
-      .orderBy(desc(personnel.syncedAt))
+      .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
       .offset(offset);
 
@@ -178,7 +178,7 @@ const personnelApp = new Hono()
       .select()
       .from(personnel)
       .where(eq(personnel.personId, personId))
-      .orderBy(desc(personnel.syncedAt))
+      .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
       .offset(offset);
 
