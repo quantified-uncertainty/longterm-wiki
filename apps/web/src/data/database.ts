@@ -853,9 +853,7 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 
 // ============================================================================
 // RECORD VERDICTS
-// Note: These functions have no frontend consumer yet. The fetchRecordVerdicts()
-// call in build-data.mjs is commented out to save build time. Re-enable when
-// the record verification dashboard is built (see #2243).
+// Used by VerificationBadge on organization, grant, and funding-round detail pages.
 // ============================================================================
 
 export interface RecordVerdict {

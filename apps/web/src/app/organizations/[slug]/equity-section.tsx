@@ -3,6 +3,8 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord } from "./org-data";
 import { formatStake } from "./org-data";
@@ -27,39 +29,43 @@ export function EquityPositionsSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {positions.map((pos) => (
-              <tr key={pos.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">
-                    {pos.holderHref ? (
-                      <Link href={pos.holderHref} className="text-primary hover:underline">
-                        {pos.holderName}
-                      </Link>
-                    ) : (
-                      pos.holderName
+            {positions.map((pos) => {
+              const verdict = getRecordVerdict("equity-position", String(pos.key));
+              return (
+                <tr key={pos.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <span className="font-medium text-foreground text-xs">
+                      {pos.holderHref ? (
+                        <Link href={pos.holderHref} className="text-primary hover:underline">
+                          {pos.holderName}
+                        </Link>
+                      ) : (
+                        pos.holderName
+                      )}
+                    </span>
+                    {pos.source && (
+                      <a
+                        href={safeHref(pos.source)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        source
+                      </a>
                     )}
-                  </span>
-                  {pos.source && (
-                    <a
-                      href={safeHref(pos.source)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      source
-                    </a>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                  {pos.stake != null && (
-                    <span className="font-semibold">{formatStake(pos.stake)}</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                  {pos.asOf ?? ""}
-                </td>
-              </tr>
-            ))}
+                    <VerificationBadge verdict={verdict} />
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                    {pos.stake != null && (
+                      <span className="font-semibold">{formatStake(pos.stake)}</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                    {pos.asOf ?? ""}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

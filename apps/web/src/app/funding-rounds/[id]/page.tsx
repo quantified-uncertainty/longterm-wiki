@@ -7,9 +7,10 @@ import {
 } from "@/data/kb";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById } from "@/data/database";
+import { getTypedEntityById, getRecordVerdict } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -139,6 +140,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
   if (!record) notFound();
 
   const round = parseFundingRound(record);
+  const roundVerdict = getRecordVerdict("funding-round", String(round.key));
 
   // Company wiki page link
   const companyTypedEntity = getTypedEntityById(round.ownerEntityId);
@@ -192,6 +194,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
               {titleCase(round.instrument)}
             </span>
           )}
+          <VerificationBadge verdict={roundVerdict} />
         </div>
 
         {/* Amount hero */}

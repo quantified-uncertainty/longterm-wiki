@@ -4,6 +4,8 @@
  */
 import Link from "next/link";
 import { formatKBDate } from "@/components/wiki/kb/format";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader } from "./org-shared";
 import type { BoardMember } from "./org-data";
 
@@ -19,29 +21,33 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
       <div className="border border-border/60 rounded-xl bg-card">
         {current.length > 0 && (
           <div className="divide-y divide-border/40">
-            {current.map((m) => (
-              <div key={m.key} className="px-4 py-3">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {m.personHref ? (
-                    <Link href={m.personHref} className="font-semibold text-sm text-primary hover:underline">
-                      {m.personName}
-                    </Link>
-                  ) : (
-                    <span className="font-semibold text-sm">{m.personName}</span>
+            {current.map((m) => {
+              const verdict = getRecordVerdict("personnel", String(m.key));
+              return (
+                <div key={m.key} className="px-4 py-3">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {m.personHref ? (
+                      <Link href={m.personHref} className="font-semibold text-sm text-primary hover:underline">
+                        {m.personName}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-sm">{m.personName}</span>
+                    )}
+                    <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                      Current
+                    </span>
+                    <VerificationBadge verdict={verdict} />
+                  </div>
+                  {m.role && (
+                    <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
                   )}
-                  <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                    Current
-                  </span>
+                  <div className="text-[11px] text-muted-foreground mt-1">
+                    {m.appointed ? `Since ${formatKBDate(m.appointed)}` : ""}
+                    {m.appointedBy ? ` (${m.appointedBy})` : ""}
+                  </div>
                 </div>
-                {m.role && (
-                  <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
-                )}
-                <div className="text-[11px] text-muted-foreground mt-1">
-                  {m.appointed ? `Since ${formatKBDate(m.appointed)}` : ""}
-                  {m.appointedBy ? ` (${m.appointedBy})` : ""}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         {former.length > 0 && (
@@ -52,26 +58,30 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
               </div>
             )}
             <div className="divide-y divide-border/40">
-              {former.map((m) => (
-                <div key={m.key} className="px-4 py-2.5 opacity-70">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {m.personHref ? (
-                      <Link href={m.personHref} className="font-semibold text-sm hover:text-primary transition-colors">
-                        {m.personName}
-                      </Link>
-                    ) : (
-                      <span className="font-semibold text-sm">{m.personName}</span>
+              {former.map((m) => {
+                const verdict = getRecordVerdict("personnel", String(m.key));
+                return (
+                  <div key={m.key} className="px-4 py-2.5 opacity-70">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {m.personHref ? (
+                        <Link href={m.personHref} className="font-semibold text-sm hover:text-primary transition-colors">
+                          {m.personName}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold text-sm">{m.personName}</span>
+                      )}
+                      <VerificationBadge verdict={verdict} />
+                    </div>
+                    {m.role && (
+                      <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
                     )}
+                    <div className="text-[11px] text-muted-foreground mt-1">
+                      {m.appointed ? formatKBDate(m.appointed) : ""}
+                      {m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : ""}
+                    </div>
                   </div>
-                  {m.role && (
-                    <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
-                  )}
-                  <div className="text-[11px] text-muted-foreground mt-1">
-                    {m.appointed ? formatKBDate(m.appointed) : ""}
-                    {m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : ""}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
