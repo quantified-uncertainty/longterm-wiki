@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, isNotNull, lte, or } from "drizzle-orm";
+import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { facts, entities, resources } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
+import { resolveEntityStableId } from "./entity-resolution.js";
 import {
   parseJsonBody,
   validationError,
@@ -36,28 +37,6 @@ const StalenessQuery = z.object({
 });
 
 // ---- Helpers ----
-
-/**
- * Resolve an entity identifier (stableId, slug, or numericId) to a stableId.
- * Returns null if the entity is not found.
- */
-async function resolveEntityStableId(
-  db: ReturnType<typeof getDrizzleDb>,
-  identifier: string,
-): Promise<string | null> {
-  const rows = await db
-    .select({ stableId: entities.stableId })
-    .from(entities)
-    .where(
-      or(
-        eq(entities.stableId, identifier),
-        eq(entities.id, identifier),
-        eq(entities.numericId, identifier),
-      )
-    )
-    .limit(1);
-  return rows[0]?.stableId ?? null;
-}
 
 function formatFact(f: typeof facts.$inferSelect) {
   return {

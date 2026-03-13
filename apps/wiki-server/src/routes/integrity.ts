@@ -48,10 +48,10 @@ const integrityApp = new Hono()
         "entity_id",
         "entities"
       ),
-      // 2. summaries.entity_id → entities
+      // 2. summaries.entity_id → entities.stable_id
       checkDangling(
         db,
-        sql`SELECT DISTINCT entity_id AS ref FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities)`,
+        sql`SELECT DISTINCT entity_id AS ref FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL)`,
         "summaries",
         "entity_id",
         "entities"

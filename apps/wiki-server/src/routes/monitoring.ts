@@ -518,7 +518,7 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
   const result = await rawDb`
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_facts,
-      (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT id FROM entities))::int AS dangling_summaries,
+      (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_summaries,
       -- Only flag truly orphaned records where BOTH the legacy text page_id and the new integer
       -- page_id_int are NULL. Records with page_id_old populated but page_id_int NULL are
       -- pre-migration artifacts (Phase D / Phase 4a), not data corruption.
