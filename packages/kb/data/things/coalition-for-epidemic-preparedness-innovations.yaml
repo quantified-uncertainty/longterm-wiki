@@ -7,8 +7,25 @@ thing:
 facts:
   - id: f_miLYZKVFhg
     property: description
-    value: CEPI is an international vaccine development partnership founded in 2017 that addresses market failures in
-      pandemic preparedness by funding vaccines for diseases with limited commercial viability. While achieving notable
-      success during COVID-19, the organization faces ongoing criticism for weakening
+    value: CEPI is an international vaccine development partnership founded in 2017
+      that addresses market failures in pandemic preparedness by funding
+      vaccines for diseases with limited commercial viability. While achieving
+      notable success during COVID-19, the organization faces ongoing criticism
+      for weakening
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: Y2tpRyArBg
+    property: founded-date
+    value: 2016-08
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: rNpP4ZtDoA
+    property: headquarters
+    value: Oslo
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: HRR7Noz5zg
+    property: website
+    value: https://cepi.net
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033

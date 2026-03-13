@@ -7,22 +7,35 @@ thing:
 facts:
   - id: f_wP669aJGyw
     property: description
-    value: "Longview Philanthropy is a philanthropic advisory organization founded in 2018 that has directed $140M+ to
-      longtermist causes ($89M+ to AI risk), primarily through UHNW donor advising and managed funds (Frontier AI Fund:
-      $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient Givi"
+    value: "Longview Philanthropy is a philanthropic advisory organization founded
+      in 2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
+      primarily through UHNW donor advising and managed funds (Frontier AI Fund:
+      $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient
+      Givi"
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: KRsTLAVPnQ
+    property: founded-date
+    value: "2018"
+    source: https://www.wikidata.org/wiki/Q126277820
+    notes: From Wikidata Q126277820
+  - id: sEPBGRfOAA
+    property: website
+    value: https://www.longview.org/
+    source: https://www.wikidata.org/wiki/Q126277820
+    notes: From Wikidata Q126277820
 
 records:
   funding-programs:
     frontier-ai-fund:
       name: "Frontier AI Fund"
       type: "fund"
-      amount: 13e6
+      amount: 1.3e+7
       period: "2023-present"
       status: "active"
       url: https://www.longview.org/frontier-ai-fund
-      notes: "Pooled fund for AI safety and governance; $13M raised, $11.1M disbursed to 18 organizations. Managed fund accepting external donors"
+      notes: "Pooled fund for AI safety and governance; $13M raised, $11.1M disbursed
+        to 18 organizations. Managed fund accepting external donors"
 
     emerging-challenges-fund:
       name: "Emerging Challenges Fund (ECF)"
@@ -30,7 +43,8 @@ records:
       period: "2023-present"
       status: "active"
       url: https://www.longview.org/emerging-challenges-fund
-      notes: "Rapid-response fund for emerging catastrophic risks. Allows fast deployment of capital to time-sensitive opportunities"
+      notes: "Rapid-response fund for emerging catastrophic risks. Allows fast
+        deployment of capital to time-sensitive opportunities"
 
     nuclear-risk-fund:
       name: "Nuclear Risk Fund"
@@ -38,21 +52,24 @@ records:
       period: "2022-present"
       status: "active"
       url: https://www.longview.org/nuclear-risk-fund
-      notes: "Pooled fund focused on reducing nuclear risk; grants to policy and technical organizations"
+      notes: "Pooled fund focused on reducing nuclear risk; grants to policy and
+        technical organizations"
 
     donor-advising:
       name: "UHNW Donor Advising"
       type: "program"
-      amount: 140e6
+      amount: 1.4e+8
       period: "2018-present"
       status: "active"
-      notes: "Advisory services for ultra-high-net-worth donors; $140M+ directed to longtermist causes total ($89M+ to AI risk). Core organizational activity"
+      notes: "Advisory services for ultra-high-net-worth donors; $140M+ directed to
+        longtermist causes total ($89M+ to AI risk). Core organizational
+        activity"
 
   grants:
     miri-frontier-ai:
       name: "AI safety technical research"
       recipient: "miri"
-      amount: 2e6
+      amount: 2e+6
       date: "2023"
       status: "active"
       program: "frontier-ai-fund"
@@ -61,7 +78,7 @@ records:
     arc-frontier-ai:
       name: "Alignment research and evals"
       recipient: "arc"
-      amount: 1.5e6
+      amount: 1.5e+6
       date: "2023"
       status: "active"
       program: "frontier-ai-fund"

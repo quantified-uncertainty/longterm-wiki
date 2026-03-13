@@ -7,36 +7,55 @@ thing:
 facts:
   - id: f_lgHSlgia8Q
     property: description
-    value: The Hewlett Foundation is a $14.8 billion philanthropic organization that focuses primarily on AI cybersecurity
-      rather than AI alignment or existential risk, distinguishing it from AI safety-focused funders like Open
-      Philanthropy. While comprehensive in covering the foundation's history and controve
+    value: The Hewlett Foundation is a $14.8 billion philanthropic organization that
+      focuses primarily on AI cybersecurity rather than AI alignment or
+      existential risk, distinguishing it from AI safety-focused funders like
+      Open Philanthropy. While comprehensive in covering the foundation's
+      history and controve
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: GDDNkhfddw
+    property: founded-date
+    value: "1966"
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
+  - id: IIm6bu985w
+    property: headquarters
+    value: Menlo Park
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
+  - id: HKEBuHCnIQ
+    property: website
+    value: https://www.hewlett.org/
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
 
 records:
   funding-programs:
     environment:
       name: "Environment (Climate & Conservation)"
       type: "program"
-      amount: 241e6
+      amount: 2.41e+8
       date: "2024"
       status: "active"
       url: https://hewlett.org/programs/environment/
-      notes: "2024: 289 grants; largest program area. Includes climate mitigation and conservation"
+      notes: "2024: 289 grants; largest program area. Includes climate mitigation and
+        conservation"
 
     cyber-initiative:
       name: "Cyber Initiative"
       type: "program"
-      amount: 164e6
+      amount: 1.64e+8
       period: "2014-2023"
       status: "completed"
       url: https://hewlett.org/programs/cyber/
-      notes: "Built the cyber policy field from scratch over 10 years. Funded research institutions, workforce development, and policy centers"
+      notes: "Built the cyber policy field from scratch over 10 years. Funded research
+        institutions, workforce development, and policy centers"
 
     education:
       name: "Education Program"
       type: "program"
-      amount: 66e6
+      amount: 6.6e+7
       date: "2024"
       status: "active"
       url: https://hewlett.org/programs/education/
@@ -45,7 +64,7 @@ records:
     effective-philanthropy:
       name: "Effective Philanthropy Program"
       type: "program"
-      amount: 11e6
+      amount: 1.1e+7
       date: "2024"
       status: "active"
       url: https://hewlett.org/programs/effective-philanthropy/
@@ -54,17 +73,18 @@ records:
     ethics-governance-ai:
       name: "Ethics and Governance of AI Fund"
       type: "fund"
-      amount: 27e6
+      amount: 2.7e+7
       date: "2017"
       status: "completed"
       source: https://knightfoundation.org/press/releases/the-ethics-and-governance-of-artificial-intelligence-fund-commits-7-6-million-to-organizations-that-bolster-civil-society-efforts-around-the-world/
-      notes: "Multi-funder pool with Knight Foundation, Omidyar Network, Reid Hoffman. $7.6M first round to Harvard Berkman Klein + MIT Media Lab"
+      notes: "Multi-funder pool with Knight Foundation, Omidyar Network, Reid Hoffman.
+        $7.6M first round to Harvard Berkman Klein + MIT Media Lab"
 
   grants:
     cyber-policy-famu:
       name: "Cyber policy at FAMU"
       recipient: "famu"
-      amount: 5e6
+      amount: 5e+6
       date: "2023"
       status: "active"
       program: "cyber-initiative"
@@ -74,7 +94,7 @@ records:
     cyber-policy-spelman:
       name: "Cyber policy at Spelman College"
       recipient: "spelman-college"
-      amount: 5e6
+      amount: 5e+6
       date: "2023"
       status: "active"
       program: "cyber-initiative"
@@ -84,7 +104,7 @@ records:
     cyber-policy-fiu:
       name: "Cyber policy at Florida International University"
       recipient: "fiu"
-      amount: 5e6
+      amount: 5e+6
       date: "2023"
       status: "active"
       program: "cyber-initiative"
@@ -94,7 +114,7 @@ records:
     cyber-policy-turtle-mountain:
       name: "Cyber policy at Turtle Mountain Community College"
       recipient: "turtle-mountain-cc"
-      amount: 5e6
+      amount: 5e+6
       date: "2023"
       status: "active"
       program: "cyber-initiative"
@@ -104,9 +124,10 @@ records:
     cset-cyberai:
       name: "CyberAI research project"
       recipient: "cset"
-      amount: 5e6
+      amount: 5e+6
       period: "2020-2028"
       status: "active"
       program: "cyber-initiative"
       source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
-      notes: "Research on ML vulnerabilities, AI-cybersecurity intersection, policy primers"
+      notes: "Research on ML vulnerabilities, AI-cybersecurity intersection, policy
+        primers"

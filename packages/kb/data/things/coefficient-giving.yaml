@@ -12,21 +12,22 @@ facts:
   # ── Total Grants ──────────────────────────────────────────────
   - id: f_AGyevCSUAA
     property: total-funding
-    value: 4e9
+    value: 4e+9
     asOf: "2025-06"
     source: https://coefficientgiving.org/
-    notes: "Total grants disbursed since 2014 across all cause areas; lower bound ($4B+)"
+    notes: "Total grants disbursed since 2014 across all cause areas; lower bound
+      ($4B+)"
 
   - id: f_r91eebAciw
     property: total-funding
-    value: 2.8e9
+    value: 2.8e+9
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Total grants recommended 2017-2024 per annual reports"
 
   - id: f_d67GqRtcgA
     property: total-funding
-    value: 650e6
+    value: 6.5e+8
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Annual grantmaking figure for 2024"
@@ -36,7 +37,8 @@ facts:
     property: description
     value: "Cumulative AI safety grants (2017-2024): $336M (~12% of total giving)"
     source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
-    notes: "Per third-party LessWrong analysis; approximately 12% of $2.8B total giving"
+    notes: "Per third-party LessWrong analysis; approximately 12% of $2.8B total
+      giving"
 
   - id: f_krRH5KLlug
     property: description
@@ -81,43 +83,62 @@ facts:
     asOf: "2025"
     source: https://coefficientgiving.org/about-us/team/
     notes: "150+ staff after rebrand to Coefficient Giving (November 2025)"
+  - id: 6cG2oupsZg
+    property: founded-date
+    value: 2017-06
+    source: https://www.wikidata.org/wiki/Q25345685
+    notes: From Wikidata Q25345685
+  - id: Dyf2V67PFg
+    property: headquarters
+    value: San Francisco
+    source: https://www.wikidata.org/wiki/Q25345685
+    notes: From Wikidata Q25345685
+  - id: AZlMk0b5hg
+    property: website
+    value: http://www.openphilanthropy.org
+    source: https://www.wikidata.org/wiki/Q25345685
+    notes: From Wikidata Q25345685
 
 records:
   funding-programs:
     global-health-wellbeing:
       name: "Global Health & Wellbeing Opportunities"
       type: "fund"
-      amount: 1.3e9
+      amount: 1.3e+9
       period: "2014-present"
       status: "active"
       lead: "James Snowden"
       url: https://coefficientgiving.org/funds/global-health-wellbeing-opportunities
-      notes: "360+ grants; largest fund. Primarily GiveWell-recommended charities; $175M committed for 2026 via GiveWell"
+      notes: "360+ grants; largest fund. Primarily GiveWell-recommended charities;
+        $175M committed for 2026 via GiveWell"
 
     navigating-transformative-ai:
       name: "Navigating Transformative AI"
       type: "fund"
-      amount: 500e6
+      amount: 5e+8
       period: "2017-present"
       status: "active"
       lead: "Claire Zabel, Luke Muehlhauser, Peter Favaloro, Rossa O'Keeffe-O'Donovan"
       url: https://coefficientgiving.org/funds/navigating-transformative-ai
-      notes: "480+ grants. Sub-areas: Technical Safety (Favaloro, O'Keeffe-O'Donovan), AI Governance (Muehlhauser), Short Timelines (Zabel). ~$63.6M in 2024 (~60% of all external AI safety funding)"
+      notes: "480+ grants. Sub-areas: Technical Safety (Favaloro, O'Keeffe-O'Donovan),
+        AI Governance (Muehlhauser), Short Timelines (Zabel). ~$63.6M in 2024
+        (~60% of all external AI safety funding)"
 
     biosecurity-pandemic-preparedness:
       name: "Biosecurity & Pandemic Preparedness"
       type: "fund"
-      amount: 260e6
+      amount: 2.6e+8
       period: "2015-present"
       status: "active"
       lead: "Andrew Snyder-Beattie"
       url: https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness
-      notes: "140+ grants. Work began ~2015 (five years before COVID-19). Johns Hopkins CHS, NTI Bio, pandemic preparedness"
+      notes: "140+ grants. Work began ~2015 (five years before COVID-19). Johns
+        Hopkins CHS, NTI Bio, pandemic preparedness"
 
     gcr-opportunities:
       name: "Global Catastrophic Risks Opportunities"
       type: "fund"
-      amount: 400e6
+      amount: 4e+8
       period: "2015-present"
       status: "active"
       lead: "Eli Rose"
@@ -131,31 +152,34 @@ records:
       status: "active"
       lead: "Lewis Bollard"
       url: https://coefficientgiving.org/funds/farm-animal-welfare
-      notes: "Corporate cage-free campaigns, alt-protein research, advocacy. Contributed to 3,000+ corporate cage-free commitments"
+      notes: "Corporate cage-free campaigns, alt-protein research, advocacy.
+        Contributed to 3,000+ corporate cage-free commitments"
 
     science-global-health-rd:
       name: "Science and Global Health R&D"
       type: "fund"
-      amount: 550e6
+      amount: 5.5e+8
       period: "2017-present"
       status: "active"
       lead: "Jacob Trefethen"
       url: https://coefficientgiving.org/funds/science-and-global-health-rd
-      notes: "330+ grants + 30+ social investments ($90M+). Treatments, vaccines, diagnostics for low-income populations"
+      notes: "330+ grants + 30+ social investments ($90M+). Treatments, vaccines,
+        diagnostics for low-income populations"
 
     lead-exposure-action-fund:
       name: "Lead Exposure Action Fund (LEAF)"
       type: "fund"
-      amount: 125e6
+      amount: 1.25e+8
       date: "2024"
       status: "active"
       url: https://coefficientgiving.org/funds/lead-exposure-action-fund
-      notes: "$100-125M raised; 20+ grants. Multi-donor pooled fund with Gates Foundation, UNICEF, others"
+      notes: "$100-125M raised; 20+ grants. Multi-donor pooled fund with Gates
+        Foundation, UNICEF, others"
 
     criminal-justice-reform:
       name: "Criminal Justice Reform"
       type: "fund"
-      amount: 200e6
+      amount: 2e+8
       period: "2014-2022"
       status: "completed"
       notes: "Focused on reducing incarceration; wound down in 2022"
@@ -163,7 +187,7 @@ records:
     forecasting:
       name: "Forecasting"
       type: "fund"
-      amount: 50e6
+      amount: 5e+7
       period: "2018-present"
       status: "active"
       lead: "Benjamin Tereick"
@@ -181,17 +205,18 @@ records:
     abundance-growth:
       name: "Abundance & Growth"
       type: "fund"
-      amount: 120e6
+      amount: 1.2e+8
       date: "2025-03"
       status: "active"
       lead: "Matt Clancy"
       url: https://coefficientgiving.org/funds/abundance-and-growth
-      notes: "$120M committed over 3 years. Economic growth, scientific progress, US-focused. Launched March 2025"
+      notes: "$120M committed over 3 years. Economic growth, scientific progress,
+        US-focused. Launched March 2025"
 
     global-aid-policy:
       name: "Global Aid Policy"
       type: "fund"
-      amount: 30e6
+      amount: 3e+7
       period: "2018-present"
       status: "active"
       lead: "Norma Altshuler"
@@ -201,17 +226,18 @@ records:
     global-growth:
       name: "Global Growth"
       type: "fund"
-      amount: 40e6
+      amount: 4e+7
       date: "2024-10"
       status: "active"
       lead: "Justin Sandefur"
       url: https://coefficientgiving.org/funds/global-growth
-      notes: "$40M+ committed over 3 years. Policy research for economic growth in low/middle-income countries. Launched October 2024"
+      notes: "$40M+ committed over 3 years. Policy research for economic growth in
+        low/middle-income countries. Launched October 2024"
 
     air-quality:
       name: "Air Quality"
       type: "fund"
-      amount: 20e6
+      amount: 2e+7
       period: "2022-present"
       status: "active"
       lead: "Santosh Harish"
@@ -221,17 +247,18 @@ records:
     technical-ai-safety-rfp-2025:
       name: "Technical AI Safety RFP (2025)"
       type: "round"
-      amount: 40e6
+      amount: 4e+7
       date: "2025"
       status: "active"
       url: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
-      notes: "RFP across 21 research areas under Navigating Transformative AI; more funding available based on quality"
+      notes: "RFP across 21 research areas under Navigating Transformative AI; more
+        funding available based on quality"
 
   grants:
     anthropic-general-support:
       name: "General support (early investment)"
       recipient: "anthropic"
-      amount: 30e6
+      amount: 3e+7
       date: "2021"
       status: "active"
       program: "navigating-transformative-ai"

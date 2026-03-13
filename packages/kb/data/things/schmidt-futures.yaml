@@ -7,54 +7,75 @@ thing:
 facts:
   - id: f_gvxwABjqxA
     property: description
-    value: Schmidt Futures is a major philanthropic initiative founded by Eric Schmidt that has committed substantial
-      funding to AI safety research ($135M across AI2050 and AI Safety Science programs) while also supporting talent
-      development and scientific research across multiple domains. The organization has
+    value: Schmidt Futures is a major philanthropic initiative founded by Eric
+      Schmidt that has committed substantial funding to AI safety research
+      ($135M across AI2050 and AI Safety Science programs) while also supporting
+      talent development and scientific research across multiple domains. The
+      organization has
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: oHEcBbtJMQ
+    property: founded-date
+    value: "2017"
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691
+  - id: IdV39kECCA
+    property: headquarters
+    value: Chelsea
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691
+  - id: yhZ1j7uwBg
+    property: website
+    value: https://www.schmidtfutures.com/
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691
 
 records:
   funding-programs:
     ai-in-science-fellowships:
       name: "AI in Science Postdoctoral Fellowship"
       type: "program"
-      amount: 148e6
+      amount: 1.48e+8
       period: "2022-2028"
       status: "active"
       source: https://www.ox.ac.uk/news/2022-10-26-oxford-joins-schmidt-futures-148-million-global-initiative-accelerate-use-ai
-      notes: "Part of $400M broader commitment. 160 fellows across 9 universities (UChicago, Oxford, Cornell, Toronto, UCSD, etc.)"
+      notes: "Part of $400M broader commitment. 160 fellows across 9 universities
+        (UChicago, Oxford, Cornell, Toronto, UCSD, etc.)"
 
     rise-global-talent:
       name: "Rise Global Talent Program"
       type: "program"
-      amount: 1e9
+      amount: 1e+9
       date: "2020"
       status: "active"
       source: https://www.prnewswire.com/news-releases/schmidt-futures-and-rhodes-trust-launch-global-rise-program-to-find-the-next-generation-of-leaders-and-support-them-for-life-301173368.html
-      notes: "With Rhodes Trust. 100 winners/year ages 15-17 from 170+ countries. Lifetime scholarships, mentoring, funding"
+      notes: "With Rhodes Trust. 100 winners/year ages 15-17 from 170+ countries.
+        Lifetime scholarships, mentoring, funding"
 
     ai2050-fellowships:
       name: "AI2050 Fellowships"
       type: "program"
-      amount: 18e6
+      amount: 1.8e+7
       date: "2025"
       status: "active"
       source: https://www.schmidtsciences.org/2025-ai2050-fellows-announcement/
-      notes: "2025 cohort: 28 scholars (21 early-career, 7 senior). Co-chaired by Eric Schmidt and James Manyika"
+      notes: "2025 cohort: 28 scholars (21 early-career, 7 senior). Co-chaired by Eric
+        Schmidt and James Manyika"
 
     polymath-program:
       name: "Schmidt Science Polymaths Program"
       type: "program"
-      amount: 2.5e6
+      amount: 2.5e+6
       period: "2022-2025"
       status: "active"
       source: https://www.synbiobeta.com/read/schmidt-sciences-polymath-program-awards-2-5m-grants-to-six-pioneering-researchers
-      notes: "Up to $2.5M per researcher. 21 Polymaths across 6 countries as of 2025. For post-tenure disciplinary pivots"
+      notes: "Up to $2.5M per researcher. 21 Polymaths across 6 countries as of 2025.
+        For post-tenure disciplinary pivots"
 
     havi-humanities-ai:
       name: "Humanities and AI Virtual Institute (HAVI)"
       type: "program"
-      amount: 11e6
+      amount: 1.1e+7
       date: "2025"
       status: "active"
       source: https://www.schmidtsciences.org/havi-2025-announcement/
@@ -66,13 +87,15 @@ records:
       period: "2018-present"
       status: "active"
       source: https://schmidtsciencefellows.org/selection/who-can-apply/
-      notes: "With Rhodes Trust. 1-2 year postdoctoral placements; fellows must pivot disciplines from PhD. ~$100K/yr stipend"
+      notes: "With Rhodes Trust. 1-2 year postdoctoral placements; fellows must pivot
+        disciplines from PhD. ~$100K/yr stipend"
 
     strategic-innovation-fund:
       name: "Eric & Wendy Schmidt Fund for Strategic Innovation"
       type: "fund"
-      amount: 195e6
+      amount: 1.95e+8
       date: "2024"
       status: "active"
       source: https://projects.propublica.org/nonprofits/organizations/463460261
-      notes: "Primary funding vehicle with $1.59B in assets. Focus: education, human services, technology. $195M annual (2024)"
+      notes: "Primary funding vehicle with $1.59B in assets. Focus: education, human
+        services, technology. $195M annual (2024)"

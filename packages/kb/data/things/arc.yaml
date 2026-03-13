@@ -30,6 +30,11 @@ facts:
     value:
       - !ref vzxfzxBITd:paul-christiano
     source: https://alignment.org/
+  - id: xU3JVFJnrQ
+    property: website
+    value: http://alignment.org/
+    source: https://www.wikidata.org/wiki/Q117834778
+    notes: From Wikidata Q117834778
 
 records:
   key-persons:
@@ -39,14 +44,15 @@ records:
       start: "2021-10"
       is_founder: true
       source: https://alignment.org/
-      notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in 2023"
+      notes: "Founded ARC after leaving OpenAI; stepped back from day-to-day role in
+        2023"
 
   research-areas:
     eliciting-latent-knowledge-elk:
       name: Eliciting Latent Knowledge (ELK)
-      description: "Research on extracting truthful knowledge from AI models regardless of learned deceptive behaviors"
+      description: "Research on extracting truthful knowledge from AI models
+        regardless of learned deceptive behaviors"
       started: "2021-12"
       key-publication: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-      notes: "Seminal ELK report posed as a prize problem; attracted significant community engagement"
-
-
+      notes: "Seminal ELK report posed as a prize problem; attracted significant
+        community engagement"

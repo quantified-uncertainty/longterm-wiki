@@ -7,103 +7,127 @@ thing:
 facts:
   - id: f_5Tcn7xbvGQ
     property: description
-    value: "Comprehensive profile of FLI documenting $25M+ in grants distributed (2015: $7M to 37 projects, 2021: $25M
-      program), major public campaigns (Asilomar Principles with 5,700+ signatories, 2023 Pause Letter with 33,000+
-      signatories), and $665.8M Buterin donation (2021). Organization operates primarily"
+    value: "Comprehensive profile of FLI documenting $25M+ in grants distributed
+      (2015: $7M to 37 projects, 2021: $25M program), major public campaigns
+      (Asilomar Principles with 5,700+ signatories, 2023 Pause Letter with
+      33,000+ signatories), and $665.8M Buterin donation (2021). Organization
+      operates primarily"
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 9PdssVfDOg
+    property: founded-date
+    value: 2014-03
+    source: https://www.wikidata.org/wiki/Q18356657
+    notes: From Wikidata Q18356657
+  - id: jBsUkEukYQ
+    property: website
+    value: https://futureoflife.org/
+    source: https://www.wikidata.org/wiki/Q18356657
+    notes: From Wikidata Q18356657
 
 records:
   funding-programs:
     2015-ai-safety-research:
       name: "2015 AI Safety Research Grant Program"
       type: "round"
-      amount: 6.5e6
+      amount: 6.5e+6
       period: "2015-2017"
       status: "completed"
       url: https://futureoflife.org/grant-program/2015-grant-program/
-      notes: "First peer-reviewed AI safety grant program; 37 grants funded from Elon Musk's $10M donation. Largest grant $1.5M to FHI (Nick Bostrom). $6.5M distributed"
+      notes: "First peer-reviewed AI safety grant program; 37 grants funded from Elon
+        Musk's $10M donation. Largest grant $1.5M to FHI (Nick Bostrom). $6.5M
+        distributed"
 
     2018-agi-safety:
       name: "2018 AGI Safety Grant Program"
       type: "round"
-      amount: 1.78e6
+      amount: 1.78e+6
       period: "2018-2020"
       status: "completed"
       url: https://futureoflife.org/grant-program/2018-grant-program/
-      notes: "10 projects focused on AGI safety; recipients at Stanford, MIT, Oxford, Yale, ANU"
+      notes: "10 projects focused on AGI safety; recipients at Stanford, MIT, Oxford,
+        Yale, ANU"
 
     2021-grants:
       name: "2021 Grants"
       type: "round"
-      amount: 3.476e6
+      amount: 3.476e+6
       date: "2021"
       status: "completed"
       url: https://futureoflife.org/grant-program/2021-grants/
-      notes: "3 grants; largest was $3.25M to Improve the News Foundation. First grants from Vitalik Buterin donation era"
+      notes: "3 grants; largest was $3.25M to Improve the News Foundation. First
+        grants from Vitalik Buterin donation era"
 
     2022-grants:
       name: "2022 Grants"
       type: "round"
-      amount: 3.735e6
+      amount: 3.735e+6
       date: "2022"
       status: "completed"
       url: https://futureoflife.org/grant-program/2022-grants/
-      notes: "5 grants; $1M each to Foresight Institute and Cambridge CSER, $1.1M to Wise Ancestors"
+      notes: "5 grants; $1M each to Foresight Institute and Cambridge CSER, $1.1M to
+        Wise Ancestors"
 
     2023-grants:
       name: "2023 Grants"
       type: "round"
-      amount: 8.438e6
+      amount: 8.438e+6
       date: "2023"
       status: "completed"
       url: https://futureoflife.org/grant-program/2023-grants/
-      notes: "16 grants; largest to FAR AI ($1.86M) and ARC ($1.4M). AI safety research, policy, and governance"
+      notes: "16 grants; largest to FAR AI ($1.86M) and ARC ($1.4M). AI safety
+        research, policy, and governance"
 
     2024-grants:
       name: "2024 Grants"
       type: "round"
-      amount: 4.154e6
+      amount: 4.154e+6
       date: "2024"
       status: "completed"
       url: https://futureoflife.org/grant-program/2024-grants/
-      notes: "6 grants; largest $1.85M to IASEAI and $1.5M to FAS. Expanded to AI-nuclear nexus and journalism"
+      notes: "6 grants; largest $1.85M to IASEAI and $1.5M to FAS. Expanded to
+        AI-nuclear nexus and journalism"
 
     nuclear-war-research:
       name: "Nuclear War Research Grant Program"
       type: "program"
-      amount: 4.058e6
+      amount: 4.058e+6
       period: "2023-2025"
       status: "active"
       url: https://futureoflife.org/grant-program/nuclear-war-research/
-      notes: "10 grants studying nuclear war environmental impacts: climate, agriculture, ozone, fire modeling. Recipients at MIT, Rutgers, Exeter, Colorado, IIASA, PIK"
+      notes: "10 grants studying nuclear war environmental impacts: climate,
+        agriculture, ozone, fire modeling. Recipients at MIT, Rutgers, Exeter,
+        Colorado, IIASA, PIK"
 
     ai-power-concentration:
       name: "How to Mitigate AI-Driven Power Concentration"
       type: "program"
-      amount: 5.637e6
+      amount: 5.637e+6
       period: "2024-2025"
       status: "active"
       url: https://futureoflife.org/grant-program/mitigate-ai-driven-power-concentration/
-      notes: "13 projects; largest $1.66M to OpenMined Foundation. Two review rounds (July and October 2024)"
+      notes: "13 projects; largest $1.66M to OpenMined Foundation. Two review rounds
+        (July and October 2024)"
 
     global-institutions-governing-ai:
       name: "Global Institutions Governing AI"
       type: "program"
-      amount: 90e3
+      amount: 9e+4
       date: "2024"
       status: "completed"
       url: https://futureoflife.org/grant-program/global-institutions-governing-ai/
-      notes: "6 research papers at $15K each designing governance institutions for AGI"
+      notes: "6 research papers at $15K each designing governance institutions for
+        AGI"
 
     ai-sdgs:
       name: "Impact of AI on SDGs"
       type: "program"
-      amount: 150e3
+      amount: 1.5e+5
       date: "2024"
       status: "completed"
       url: https://futureoflife.org/grant-program/impact-of-ai-on-sdgs/
-      notes: "10 research grants at $15K each on AI impact on poverty, health, energy, climate. Primarily Global South recipients"
+      notes: "10 research grants at $15K each on AI impact on poverty, health, energy,
+        climate. Primarily Global South recipients"
 
     phd-fellowships:
       name: "Vitalik Buterin PhD Fellowship in AI Existential Safety"
@@ -112,7 +136,8 @@ records:
       status: "active"
       lead: "Andrea Berman"
       url: https://futureoflife.org/grant-program/phd-fellowships/
-      notes: "5-year tuition + $40K/year stipend + $10K research fund. Run with BAIF. 14 fellows as of 2025 at UC Berkeley, Stanford, MIT, Cambridge"
+      notes: "5-year tuition + $40K/year stipend + $10K research fund. Run with BAIF.
+        14 fellows as of 2025 at UC Berkeley, Stanford, MIT, Cambridge"
 
     postdoc-fellowships:
       name: "Vitalik Buterin Postdoctoral Fellowship in AI Existential Safety"
@@ -121,7 +146,9 @@ records:
       status: "active"
       lead: "Andrea Berman"
       url: https://futureoflife.org/grant-program/postdoctoral-fellowships/
-      notes: "$80K/year stipend + $10K research fund. Run with BAIF. Fellows: Nisan Stiennon (Berkeley/CHAI), Peter S. Park (MIT), Ekdeep Singh Lubana and Nandi Schoots (Oxford)"
+      notes: "$80K/year stipend + $10K research fund. Run with BAIF. Fellows: Nisan
+        Stiennon (Berkeley/CHAI), Peter S. Park (MIT), Ekdeep Singh Lubana and
+        Nandi Schoots (Oxford)"
 
     us-china-fellowships:
       name: "US-China AI Governance PhD Fellowship"
@@ -130,32 +157,35 @@ records:
       status: "active"
       lead: "Andrea Berman"
       url: https://futureoflife.org/grant-program/us-china-ai-governance-phd-fellowship/
-      notes: "Same structure as technical PhD fellowship. 2025 class: Ruofei Wang, John Ferguson, Kayla Blomquist"
+      notes: "Same structure as technical PhD fellowship. 2025 class: Ruofei Wang,
+        John Ferguson, Kayla Blomquist"
 
     multistakeholder-engagement:
       name: "Multistakeholder Engagement for Safe and Prosperous AI"
       type: "program"
-      amount: 5e6
+      amount: 5e+6
       date: "2025"
       status: "active"
       url: https://futureoflife.org/grant-program/multistakeholder-engagement-for-safe-and-prosperous-ai/
-      notes: "Up to $5M; individual grants $100K-$500K. Multi-year projects up to 3 years"
+      notes: "Up to $5M; individual grants $100K-$500K. Multi-year projects up to 3
+        years"
 
     religious-projects:
       name: "Request for Proposals on Religious Projects"
       type: "program"
-      amount: 1.5e6
+      amount: 1.5e+6
       date: "2026"
       status: "active"
       url: https://futureoflife.org/grant-program/rfp-on-religious-projects/
-      notes: "Up to $1.5M total; individual grants $30K-$300K. Faith community engagement with AI risks"
+      notes: "Up to $1.5M total; individual grants $30K-$300K. Faith community
+        engagement with AI risks"
 
   grants:
     # ── 2015 AI Safety Round (top grants) ─────────────────────────
     fhi-strategic-center:
       name: "Strategic Research Center for Artificial Intelligence"
       recipient: "fhi"
-      amount: 1.5e6
+      amount: 1.5e+6
       date: "2015-07"
       status: "completed"
       program: "2015-ai-safety-research"
@@ -175,7 +205,7 @@ records:
     miri-alignment:
       name: "Aligning superintelligence with human interests"
       recipient: "miri"
-      amount: 250e3
+      amount: 2.5e+5
       date: "2015-07"
       status: "completed"
       program: "2015-ai-safety-research"
@@ -185,7 +215,7 @@ records:
     christiano-oversight:
       name: "Counterfactual human oversight"
       recipient: "uc-berkeley"
-      amount: 50e3
+      amount: 5e+4
       date: "2015-07"
       status: "completed"
       program: "2015-ai-safety-research"
@@ -206,7 +236,7 @@ records:
     dafoe-governance:
       name: "Governance of AI programme"
       recipient: "yale-university"
-      amount: 276e3
+      amount: 2.76e+5
       date: "2018"
       status: "completed"
       program: "2018-agi-safety"
@@ -217,7 +247,7 @@ records:
     far-ai-2023:
       name: "Neglected AI safety research"
       recipient: "far-ai"
-      amount: 1.858e6
+      amount: 1.858e+6
       date: "2023"
       status: "completed"
       program: "2023-grants"
@@ -227,7 +257,7 @@ records:
     arc-2023:
       name: "Capability evaluations for advanced ML models"
       recipient: "arc"
-      amount: 1.401e6
+      amount: 1.401e+6
       date: "2023"
       status: "completed"
       program: "2023-grants"
@@ -236,7 +266,7 @@ records:
     redwood-2023:
       name: "AI alignment research"
       recipient: "redwood-research"
-      amount: 500e3
+      amount: 5e+5
       date: "2023"
       status: "completed"
       program: "2023-grants"
@@ -246,18 +276,19 @@ records:
     fas-2024:
       name: "AI implications for nuclear deterrence and biosecurity"
       recipient: "federation-of-american-scientists"
-      amount: 1.5e6
+      amount: 1.5e+6
       date: "2024"
       status: "active"
       program: "2024-grants"
       source: https://futureoflife.org/grant/federation-of-american-scientists-fas/
-      notes: "18-month project on AI implications for nuclear deterrence, bioengineering, autonomy, cybersecurity"
+      notes: "18-month project on AI implications for nuclear deterrence,
+        bioengineering, autonomy, cybersecurity"
 
     # ── AI Power Concentration (notable) ──────────────────────────
     openmined-power:
       name: "Privacy-preserving AI governance tools"
       recipient: "openmined-foundation"
-      amount: 1.662e6
+      amount: 1.662e+6
       date: "2024"
       status: "active"
       program: "ai-power-concentration"
@@ -267,7 +298,7 @@ records:
     cais-power:
       name: "Mitigating AI-driven power concentration"
       recipient: "center-for-ai-safety"
-      amount: 500e3
+      amount: 5e+5
       date: "2024"
       status: "active"
       program: "ai-power-concentration"

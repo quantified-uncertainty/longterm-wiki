@@ -48,6 +48,7 @@
  *   import-divisions Import curated organizational divisions
  *   import-funding-programs Import curated funding programs
  *   people       Person discovery and data tools (discover, create, link-resources, enrich)
+ *   orgs         Organization data tools (enrich from Wikidata)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -109,6 +110,7 @@ import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts'
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
+import * as orgsCommands from './commands/orgs.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 
@@ -159,6 +161,7 @@ const domains = {
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
+  orgs: orgsCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
   verify: recordsVerifyCommands,
 };
@@ -253,6 +256,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   import-divisions Import curated organizational divisions
   import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, create, link-resources, enrich)
+  orgs             Organization data tools (enrich from Wikidata)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}

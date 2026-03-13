@@ -7,15 +7,24 @@ thing:
 facts:
   - id: f_us5lFmzYgw
     property: description
-    value: Giving What We Can (GWWC) is an effective altruism organization co-founded by Toby Ord and Will MacAskill at
-      Oxford University in 2009. Its central initiative is the Pledge, where members commit to donate at least 10% of
-      their lifetime income to the most effective charities they can find. GWWC provides resources to help donors
-      identify high-impact charities, primarily through referrals to organizations like GiveWell's top charities. The
-      pledge community has grown to over 9,000 members who have collectively donated or pledged over $3 billion to
-      effective charities. GWWC is now part of the Centre for Effective Altruism (CEA) organizational family and played
-      a foundational role in establishing the effective altruism movement as an organized community.
+    value: Giving What We Can (GWWC) is an effective altruism organization
+      co-founded by Toby Ord and Will MacAskill at Oxford University in 2009.
+      Its central initiative is the Pledge, where members commit to donate at
+      least 10% of their lifetime income to the most effective charities they
+      can find. GWWC provides resources to help donors identify high-impact
+      charities, primarily through referrals to organizations like GiveWell's
+      top charities. The pledge community has grown to over 9,000 members who
+      have collectively donated or pledged over $3 billion to effective
+      charities. GWWC is now part of the Centre for Effective Altruism (CEA)
+      organizational family and played a foundational role in establishing the
+      effective altruism movement as an organized community.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_Dg8uYlL7aA
     property: website
     value: https://www.givingwhatwecan.org/
+  - id: WHc2eeyasw
+    property: founded-date
+    value: "2009"
+    source: https://www.wikidata.org/wiki/Q5565874
+    notes: From Wikidata Q5565874

@@ -7,8 +7,25 @@ thing:
 facts:
   - id: f_xxqgtpab8Q
     property: description
-    value: Berkeley nonprofit founded 2012 teaching applied rationality through workshops ($3,900 for 4.5 days), trained
-      1,300+ alumni reporting 9.2/10 satisfaction and 0.17σ life satisfaction increase at 1-year follow-up. Received
-      $3.5M+ from Open Philanthropy and $5M from FTX (later clawed back); faced major
+    value: Berkeley nonprofit founded 2012 teaching applied rationality through
+      workshops ($3,900 for 4.5 days), trained 1,300+ alumni reporting 9.2/10
+      satisfaction and 0.17σ life satisfaction increase at 1-year follow-up.
+      Received $3.5M+ from Open Philanthropy and $5M from FTX (later clawed
+      back); faced major
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: uQDW7Ye9ZQ
+    property: founded-date
+    value: "2012"
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499
+  - id: Mikuh0uzOA
+    property: headquarters
+    value: Berkeley
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499
+  - id: 9ToMXM39MA
+    property: website
+    value: http://rationality.org/
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499

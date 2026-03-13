@@ -7,6 +7,22 @@ thing:
 facts:
   - id: f_FsaYQdKRwQ
     property: description
-    value: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
+    value: Oxford University research center focused on existential risks, founded
+      by Nick Bostrom. Closed in 2024.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: FhW8eVfvQA
+    property: founded-date
+    value: "2005"
+    source: https://www.wikidata.org/wiki/Q5510826
+    notes: From Wikidata Q5510826
+  - id: ZaFx54GuIA
+    property: headquarters
+    value: Oxford
+    source: https://www.wikidata.org/wiki/Q5510826
+    notes: From Wikidata Q5510826
+  - id: wF7Rkbxkbg
+    property: website
+    value: http://www.fhi.ox.ac.uk/
+    source: https://www.wikidata.org/wiki/Q5510826
+    notes: From Wikidata Q5510826
