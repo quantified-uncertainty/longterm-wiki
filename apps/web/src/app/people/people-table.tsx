@@ -19,6 +19,7 @@ export interface PersonRow {
 
   employerId: string | null;
   employerName: string | null;
+  employerSlug: string | null;
 
   bornYear: number | null;
 
@@ -226,7 +227,14 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
 
                 {/* Affiliation */}
                 <td className="py-2.5 px-3">
-                  {row.employerId ? (
+                  {row.employerSlug ? (
+                    <Link
+                      href={`/organizations/${row.employerSlug}`}
+                      className="text-foreground hover:text-primary transition-colors"
+                    >
+                      {row.employerName}
+                    </Link>
+                  ) : row.employerId ? (
                     <Link
                       href={`/kb/entity/${row.employerId}`}
                       className="text-foreground hover:text-primary transition-colors"
