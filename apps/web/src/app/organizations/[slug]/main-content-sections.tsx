@@ -168,44 +168,57 @@ export function ProductsSection({
 }) {
   if (products.length === 0) return null;
 
+  const hasDescription = products.some((p) => field(p, "description"));
+  const hasSource = products.some((p) => {
+    const s = field(p, "source");
+    return s && isUrl(s);
+  });
+
   return (
     <section>
       <SectionHeader title="Products" count={products.length} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {products.map((prod) => {
-          const name = field(prod, "name") ?? titleCase(prod.key);
-          const launched = field(prod, "launched");
-          const description = field(prod, "description");
-          const source = field(prod, "source");
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Product</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Launched</th>
+              {hasDescription && (
+                <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Description</th>
+              )}
+              {hasSource && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
+              )}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {products.map((prod) => {
+              const name = field(prod, "name") ?? titleCase(prod.key);
+              const launched = field(prod, "launched");
+              const description = field(prod, "description");
+              const source = field(prod, "source");
 
-          return (
-            <div
-              key={prod.key}
-              className="group rounded-xl border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-border"
-            >
-              <div className="flex items-baseline gap-2">
-                <span className="font-semibold text-sm group-hover:text-primary transition-colors">
-                  {name}
-                </span>
-                {launched && (
-                  <span className="text-[11px] text-muted-foreground">
-                    {formatKBDate(launched)}
-                  </span>
-                )}
-              </div>
-              {description && (
-                <div className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
-                  {description}
-                </div>
-              )}
-              {source && isUrl(source) && (
-                <div className="mt-1.5">
-                  <SourceLink source={source} />
-                </div>
-              )}
-            </div>
-          );
-        })}
+              return (
+                <tr key={prod.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-1.5 px-3 font-medium">{name}</td>
+                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
+                    {launched ? formatKBDate(launched) : ""}
+                  </td>
+                  {hasDescription && (
+                    <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
+                      {description ?? ""}
+                    </td>
+                  )}
+                  {hasSource && (
+                    <td className="py-1.5 px-3">
+                      {source && isUrl(source) ? <SourceLink source={source} /> : ""}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );
