@@ -14,7 +14,7 @@ facts:
 
   - id: f_OxxVfxzLnw
     property: net-worth
-    value: 900e6
+    value: 9e+8
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Jaan_Tallinn
     notes: "Estimated net worth; primary funder of SFF and Lightspeed Grants"
@@ -24,3 +24,13 @@ facts:
     value: "Personal foundation giving (2024): $20M (excludes SFF amounts)"
     source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
     notes: "Allocated through personal foundation in 2024"
+  - id: Qhkqi9dJtA
+    property: born-year
+    value: 1972
+    source: https://www.wikidata.org/wiki/Q3156998
+    notes: From Wikidata Q3156998
+  - id: xGcPzg2OvQ
+    property: education
+    value: University of Tartu; Gustav Adolf Grammar School
+    source: https://www.wikidata.org/wiki/Q3156998
+    notes: From Wikidata Q3156998

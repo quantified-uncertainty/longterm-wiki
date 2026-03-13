@@ -7,8 +7,21 @@ thing:
 facts:
   - id: f_GupKup2iyw
     property: description
-    value: Vipul Naik is a mathematician and EA community member who has funded ~$255K in contract research (primarily to
-      Sebastian Sanchez and Issa Rice) and created the Donations List Website tracking $72.8B in philanthropic
-      donations. His main contribution is transparency infrastructure for EA funding patte
+    value: Vipul Naik is a mathematician and EA community member who has funded
+      ~$255K in contract research (primarily to Sebastian Sanchez and Issa Rice)
+      and created the Donations List Website tracking $72.8B in philanthropic
+      donations. His main contribution is transparency infrastructure for EA
+      funding patte
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: qQWbmtD8xA
+    property: born-year
+    value: 1986
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772
+  - id: 9qiKmgMPlQ
+    property: education
+    value: University of Chicago; University of Chicago; Chennai Mathematical
+      Institute
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772

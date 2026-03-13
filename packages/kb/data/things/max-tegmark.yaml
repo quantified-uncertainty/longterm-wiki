@@ -7,8 +7,20 @@ thing:
 facts:
   - id: f_oLpabpFPtg
     property: description
-    value: Swedish-American physicist at MIT, co-founder of the Future of Life Institute, and prominent AI safety advocate
-      known for his work on the Mathematical Universe Hypothesis and efforts to promote safe artificial intelligence
-      development.
+    value: Swedish-American physicist at MIT, co-founder of the Future of Life
+      Institute, and prominent AI safety advocate known for his work on the
+      Mathematical Universe Hypothesis and efforts to promote safe artificial
+      intelligence development.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: aCRxBQ1kHQ
+    property: born-year
+    value: 1967
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321
+  - id: HCqWZTSo4w
+    property: education
+    value: Royal Institute of Technology; Stockholm School of Economics; University
+      of California, Berkeley
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321

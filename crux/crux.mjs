@@ -46,7 +46,7 @@
  *   backfill-grantee-ids Backfill granteeId with matched entity stableIds
  *   import-divisions Import curated organizational divisions
  *   import-funding-programs Import curated funding programs
- *   people       Person discovery and data tools (discover, create, import-careers, link-resources)
+ *   people       Person discovery and data tools (discover, create, link-resources, enrich)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -246,7 +246,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   backfill-grantee-ids  Backfill granteeId with matched entity stableIds
   import-divisions Import curated organizational divisions
   import-funding-programs Import curated funding programs
-  people           Person discovery and data tools (discover, create, import-careers, link-resources)
+  people           Person discovery and data tools (discover, create, link-resources, enrich)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

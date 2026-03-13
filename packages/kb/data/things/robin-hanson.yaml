@@ -7,7 +7,20 @@ thing:
 facts:
   - id: f_Gtl0JxK7MQ
     property: description
-    value: Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics,
-      and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain.
+    value: Economist and futurist at George Mason University, known for work on
+      prediction markets, near-term AI economics, and the Em scenario (brain
+      emulation). Author of The Age of Em and co-author of The Elephant in the
+      Brain.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 381QlzCeFA
+    property: born-year
+    value: 1959
+    source: https://www.wikidata.org/wiki/Q2159779
+    notes: From Wikidata Q2159779
+  - id: AlBVArWcNg
+    property: education
+    value: University of California, Irvine; University of Chicago; California
+      Institute of Technology
+    source: https://www.wikidata.org/wiki/Q2159779
+    notes: From Wikidata Q2159779
