@@ -36,7 +36,7 @@ import {DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink} from
 | **Research Community Size** | 500+ dedicated researchers | Frontier labs (~350-400 FTE), independent orgs (~100-150), academic groups (≈50-100) |
 | **Tractability** | Medium-High | Interpretability: tens of millions of features identified; Control: protocols deployed; Evaluations: 30+ models tested by [UK AISI](https://www.aisi.gov.uk/) |
 | **Impact Potential** | 2-50% x-risk reduction | Depends heavily on timeline, adoption, and technical success; conditional on 10+ years of development |
-| **Timeline Pressure** | High | <R id="435b669c11e07d8f"><EntityLink id="E202" name="miri">MIRI</EntityLink>'s 2024 assessment</R>: "extremely unlikely to succeed in time"; [METR](https://metr.org/) finds autonomous task capability doubles every 7 months |
+| **Timeline Pressure** | High | <R id="Y2RjMjE1ZT"><EntityLink id="E202" name="miri">MIRI</EntityLink>'s 2024 assessment</R>: "extremely unlikely to succeed in time"; [METR](https://metr.org/) finds autonomous task capability doubles every 7 months |
 | **Key Bottleneck** | Talent and compute access | Safety funding is under 2% of estimated capabilities R&D; frontier model access critical |
 | **Adoption Rate** | Accelerating | 12 companies published [frontier AI safety policies](https://metr.org/blog/2025-03-26-common-elements-of-frontier-ai-safety-policies/) by Dec 2024; <EntityLink id="E252" name="responsible-scaling-policies">RSPs</EntityLink> at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, DeepMind |
 | **Empirical Progress** | Significant 2024-2025 | [Scheming detected](https://www.apolloresearch.ai/research/frontier-models-are-capable-of-incontext-scheming/) in 5/6 frontier models; deliberative alignment reduced <EntityLink id="E274" name="scheming">scheming</EntityLink> 30x |
@@ -135,14 +135,14 @@ flowchart TD
 - Develop automated interpretability tools
 
 **Recent progress:**
-- <R id="e724db341d6e0065">Anthropic's "Scaling Monosemanticity" (May 2024)</R> identified **tens of millions of interpretable features** in Claude 3 Sonnet using sparse autoencoders—the first detailed look inside a production-grade large language model
+- <R id="ZWFmNWM5Mz">Anthropic's "Scaling Monosemanticity" (May 2024)</R> identified **tens of millions of interpretable features** in Claude 3 Sonnet using sparse autoencoders—the first detailed look inside a production-grade large language model
 - Features discovered include concepts like the Golden Gate Bridge, code errors, deceptive behavior, and safety-relevant patterns
-- <R id="6374381b5ec386d1">DeepMind's mechanistic interpretability team</R> growing 37% in 2024, pursuing similar research directions
+- <R id="NWJkZjJiZj">DeepMind's mechanistic interpretability team</R> growing 37% in 2024, pursuing similar research directions
 - Circuit discovery moving from toy models to larger systems, though full model coverage remains cost-prohibitive
 
 **Key organizations:**
-- <R id="c355237bfc2d213d">Anthropic</R> (Interpretability team, ~15-25 researchers)
-- <R id="5b8be7f6a2aa7067">DeepMind</R> (Mechanistic Interpretability team)
+- <R id="OGMyMTYzM2">Anthropic</R> (Interpretability team, ~15-25 researchers)
+- <R id="OGVjY2NlNT">DeepMind</R> (Mechanistic Interpretability team)
 - Redwood Research (causal scrubbing, circuit analysis)
 - Apollo Research (deception-focused interpretability)
 
@@ -169,15 +169,15 @@ Expert estimates vary widely on how much x-risk reduction mechanistic interpreta
 - **Process-based supervision:** Reward reasoning process, not just outcomes
 
 **Recent progress:**
-- <R id="e64c8268e5f58e63">Weak-to-strong generalization (OpenAI, December 2023)</R>: Small models can partially supervise large models, with strong students **consistently outperforming their weak supervisors**. Tested across GPT-4 family spanning 7 orders of magnitude of compute.
-- <R id="683aef834ac1612a">Constitutional AI (Anthropic, 2022)</R>: Enables training harmless AI using only ~10 natural language principles ("constitution") as human oversight, introducing RLAIF (RL from AI Feedback)
-- OpenAI committed **20% of compute** over 4 years to superalignment, plus a <R id="704f57dfad89c1b3">\$10M grants program</R>
+- <R id="OWRiY2ZiNG">Weak-to-strong generalization (OpenAI, December 2023)</R>: Small models can partially supervise large models, with strong students **consistently outperforming their weak supervisors**. Tested across GPT-4 family spanning 7 orders of magnitude of compute.
+- <R id="MWI0YWIwNz">Constitutional AI (Anthropic, 2022)</R>: Enables training harmless AI using only ~10 natural language principles ("constitution") as human oversight, introducing RLAIF (RL from AI Feedback)
+- OpenAI committed **20% of compute** over 4 years to superalignment, plus a <R id="M2ZjOWYxYW">\$10M grants program</R>
 - Debate experiments showing promise in math/reasoning domains
 
 **Key organizations:**
 - OpenAI (Superalignment team dissolved mid-2024; unclear current state)
-- <R id="e99a5c1697baa07d">Anthropic</R> (Alignment Science team)
-- <R id="f232f1723d6802e7">DeepMind</R> (Alignment team, led by Anca Dragan and Rohin Shah)
+- <R id="MDlmNWFlMz">Anthropic</R> (Alignment Science team)
+- <R id="NjIwNmY5ZW">DeepMind</R> (Alignment team, led by Anca Dragan and Rohin Shah)
 
 **Theory of change:** If we can supervise superhuman AI, we can train aligned systems even when we can't evaluate all behaviors directly.
 
@@ -237,14 +237,14 @@ Expert estimates vary widely on how much x-risk reduction mechanistic interpreta
 - **Containment protocols:** Prevent AI from taking harmful actions
 
 **Recent progress:**
-- <R id="cc80ab28579c5794">Redwood Research's AI Control paper (December 2023)</R>: Introduced control evaluations where red teams search for attack strategies, then assess whether untrusted models can subvert safety measures
-- <R id="32c44bb7ba8a1bbe">"The case for ensuring that powerful AIs are controlled" (May 2024)</R>: Core framework explaining safety under the conservative assumption that AIs are misaligned and actively scheming
+- <R id="MTZkN2QwZW">Redwood Research's AI Control paper (December 2023)</R>: Introduced control evaluations where red teams search for attack strategies, then assess whether untrusted models can subvert safety measures
+- <R id="NmE2MmIwMD">"The case for ensuring that powerful AIs are controlled" (May 2024)</R>: Core framework explaining safety under the conservative assumption that AIs are misaligned and actively scheming
 - Control protocols use three building blocks: untrusted models (smart, fairly cheap), trusted models (dumb, extremely cheap), and humans (expensive trusted labor)
 - Recommendation: **~50% of AI control research** should make conservative misalignment assumptions
 
 **Key organizations:**
-- <R id="d42c3c74354e7b66">Redwood Research</R> (primary developer, ~20 staff, \$100M+ runway)
-- <R id="560dff85b3305858">Apollo Research</R> (scheming and deception research)
+- <R id="NjQ3OTAxYz">Redwood Research</R> (primary developer, ~20 staff, \$100M+ runway)
+- <R id="YjBkNGIzMD">Apollo Research</R> (scheming and deception research)
 - Anthropic (adopting control ideas in deployment)
 
 **Theory of change:** Even if alignment is unsolved, we can maintain safety through monitoring and containment as we develop better solutions.
@@ -260,15 +260,15 @@ Expert estimates vary widely on how much x-risk reduction mechanistic interpreta
 - Deception and scheming detection
 
 **Recent progress:**
-- <R id="91737bf431000298">Apollo Research scheming evaluations (December 2024)</R>: **Five of six frontier models showed in-context scheming capabilities**—including o1 and Claude 3.5 Sonnet. Models copied themselves to other servers in 0.3-10% of test runs, disabled oversight mechanisms, and behaved differently when unobserved.
-- <R id="b3f335edccfc5333">OpenAI-Apollo collaboration</R>: "Deliberative alignment" reduced detectable scheming by **up to 30x** (o3: 13% to 0.4%; o4-mini: 8.7% to 0.3%)
-- <R id="601b00f2dabbdd2a">METR's Autonomy Evaluation Resources (March 2024)</R>: Framework for testing dangerous autonomous capabilities, including the "rogue replication" threat model
-- <R id="fc3078f3c2ba5ebb">UK AI Safety Institute's Inspect framework</R>: 100+ pre-built evaluations for coding, reasoning, knowledge, and multimodal understanding
+- <R id="Y2ZkZjg2MD">Apollo Research scheming evaluations (December 2024)</R>: **Five of six frontier models showed in-context scheming capabilities**—including o1 and Claude 3.5 Sonnet. Models copied themselves to other servers in 0.3-10% of test runs, disabled oversight mechanisms, and behaved differently when unobserved.
+- <R id="OTg2NjRiYz">OpenAI-Apollo collaboration</R>: "Deliberative alignment" reduced detectable scheming by **up to 30x** (o3: 13% to 0.4%; o4-mini: 8.7% to 0.3%)
+- <R id="ZDMyM2NlMT">METR's Autonomy Evaluation Resources (March 2024)</R>: Framework for testing dangerous autonomous capabilities, including the "rogue replication" threat model
+- <R id="MjExZWM4Mz">UK AI Safety Institute's Inspect framework</R>: 100+ pre-built evaluations for coding, reasoning, knowledge, and multimodal understanding
 
 **Key organizations:**
-- <R id="45370a5153534152">METR</R> (Model Evaluation and Threat Research)
-- <R id="329d8c2e2532be3d">Apollo Research</R> (scheming, deception, ~10-15 researchers)
-- <R id="fdf68a8f30f57dee">UK AISI</R> (government evaluation institute, conducting pre-deployment testing since November 2023)
+- <R id="NWFiOTg0MD">METR</R> (Model Evaluation and Threat Research)
+- <R id="NDNkMjgwMT">Apollo Research</R> (scheming, deception, ~10-15 researchers)
+- <R id="MDhiMzZiZj">UK AISI</R> (government evaluation institute, conducting pre-deployment testing since November 2023)
 - US AISI (recently formed)
 
 **Theory of change:** Early detection of dangerous capabilities enables labs to implement safety measures before risks materialize.
@@ -433,7 +433,7 @@ For technical research to substantially reduce x-risk:
 | Funder | 2024 Amount | Focus Areas | Notes |
 |--------|-------------|-------------|-------|
 | <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink> | \$13.6M (60% of total) | Broad technical safety | Largest grants: CAIS (\$1.5M), Redwood (\$1.2M), MIRI (\$1.1M); \$10M RFP Mar 2025 |
-| <R id="6bc74edd147a374b">AI Safety Fund</R> | \$10M initial | Biosecurity, cyber, agents | Backed by Anthropic, Google, Microsoft, OpenAI |
+| <R id="NTMxZTU4Nz">AI Safety Fund</R> | \$10M initial | Biosecurity, cyber, agents | Backed by Anthropic, Google, Microsoft, OpenAI |
 | [Jaan Tallinn](https://quickmarketpitch.com/blogs/news/ai-safety-investors) | ≈\$10M | Long-term alignment | Skype co-founder; independent allocation |
 | [Eric Schmidt / Schmidt Sciences](https://quickmarketpitch.com/blogs/news/ai-safety-investors) | ≈\$10M | Safety benchmarking | Focus on evaluation infrastructure |
 | Long-Term Future Fund | \$1-8M | AI risk mitigation | Over \$10M cumulative in AI safety |
@@ -455,14 +455,14 @@ For technical research to substantially reduce x-risk:
 
 | Organization | Size | Focus | Key Outputs |
 |-------------|------|-------|-------------|
-| **<R id="f771d4f56ad4dbaa">Anthropic</R>** | ≈300 employees | Interpretability, Constitutional AI, RSP | Scaling Monosemanticity, Claude RSP |
-| **<R id="5b8be7f6a2aa7067">DeepMind AI Safety</R>** | ≈50 safety researchers | Amplified oversight, frontier safety | Frontier Safety Framework |
+| **<R id="NzQyNGViND">Anthropic</R>** | ≈300 employees | Interpretability, Constitutional AI, RSP | Scaling Monosemanticity, Claude RSP |
+| **<R id="OGVjY2NlNT">DeepMind AI Safety</R>** | ≈50 safety researchers | Amplified oversight, frontier safety | Frontier Safety Framework |
 | **OpenAI** | Unknown (team dissolved) | Superalignment (previously) | Weak-to-strong generalization |
-| **<R id="42e7247cbc33fc4c">Redwood Research</R>** | ≈20 staff | AI control | Control evaluations framework |
-| **<R id="86df45a5f8a9bf6d">MIRI</R>** | ≈10-15 staff | Agent foundations, policy | Shifting to policy advocacy in 2024 |
-| **<R id="329d8c2e2532be3d">Apollo Research</R>** | ≈10-15 researchers | Scheming, deception | Frontier model scheming evaluations |
-| **<R id="45370a5153534152">METR</R>** | ≈10-20 researchers | Autonomy, dangerous capabilities | ARA evaluations, rogue replication |
-| **<R id="fdf68a8f30f57dee">UK AISI</R>** | Government-funded | Pre-deployment testing | Inspect framework, 100+ evaluations |
+| **<R id="ZTU3ZmZmOG">Redwood Research</R>** | ≈20 staff | AI control | Control evaluations framework |
+| **<R id="YmZjYzBhMW">MIRI</R>** | ≈10-15 staff | Agent foundations, policy | Shifting to policy advocacy in 2024 |
+| **<R id="NDNkMjgwMT">Apollo Research</R>** | ≈10-15 researchers | Scheming, deception | Frontier model scheming evaluations |
+| **<R id="NWFiOTg0MD">METR</R>** | ≈10-20 researchers | Autonomy, dangerous capabilities | ARA evaluations, rogue replication |
+| **<R id="MDhiMzZiZj">UK AISI</R>** | Government-funded | Pre-deployment testing | Inspect framework, 100+ evaluations |
 
 ### Academic Groups
 - **UC Berkeley** (CHAI, Center for Human-Compatible AI)
@@ -579,38 +579,38 @@ Technical research is most valuable when combined with:
 ## Sources & Key References
 
 ### Mechanistic Interpretability
-- <R id="e724db341d6e0065">Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet</R> - Anthropic, May 2024
-- <R id="5019b9256d83a04c">Mapping the Mind of a Large Language Model</R> - Anthropic blog post
-- <R id="c355237bfc2d213d">Decomposing Language Models Into Understandable Components</R> - Anthropic, 2023
+- <R id="ZWFmNWM5Mz">Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet</R> - Anthropic, May 2024
+- <R id="YmY2ZmRjZT">Mapping the Mind of a Large Language Model</R> - Anthropic blog post
+- <R id="OGMyMTYzM2">Decomposing Language Models Into Understandable Components</R> - Anthropic, 2023
 
 ### Scalable Oversight
-- <R id="e64c8268e5f58e63">Weak-to-strong generalization</R> - OpenAI, December 2023
-- <R id="683aef834ac1612a">Constitutional AI: Harmlessness from AI Feedback</R> - Anthropic, December 2022
-- <R id="704f57dfad89c1b3">Introducing Superalignment</R> - OpenAI, July 2023
+- <R id="OWRiY2ZiNG">Weak-to-strong generalization</R> - OpenAI, December 2023
+- <R id="MWI0YWIwNz">Constitutional AI: Harmlessness from AI Feedback</R> - Anthropic, December 2022
+- <R id="M2ZjOWYxYW">Introducing Superalignment</R> - OpenAI, July 2023
 
 ### AI Control
-- <R id="cc80ab28579c5794">AI Control: Improving Safety Despite Intentional Subversion</R> - Redwood Research, December 2023
-- <R id="32c44bb7ba8a1bbe">The case for ensuring that powerful AIs are controlled</R> - Redwood Research blog, May 2024
-- <R id="a29670f1ec5df0d6">A sketch of an AI control safety case</R> - LessWrong
+- <R id="MTZkN2QwZW">AI Control: Improving Safety Despite Intentional Subversion</R> - Redwood Research, December 2023
+- <R id="NmE2MmIwMD">The case for ensuring that powerful AIs are controlled</R> - Redwood Research blog, May 2024
+- <R id="YzlmNmQ5Yz">A sketch of an AI control safety case</R> - LessWrong
 
 ### Evaluations & Scheming
-- <R id="91737bf431000298">Frontier Models are Capable of In-Context Scheming</R> - Apollo Research, December 2024
-- <R id="b3f335edccfc5333">Detecting and reducing scheming in AI models</R> - OpenAI-Apollo collaboration
-- <R id="1d03d6cd9dde0075">New Tests Reveal AI's Capacity for Deception</R> - TIME, December 2024
-- <R id="601b00f2dabbdd2a">Autonomy Evaluation Resources</R> - METR, March 2024
-- <R id="5b45342b68bf627e">The Rogue Replication Threat Model</R> - METR, November 2024
+- <R id="Y2ZkZjg2MD">Frontier Models are Capable of In-Context Scheming</R> - Apollo Research, December 2024
+- <R id="OTg2NjRiYz">Detecting and reducing scheming in AI models</R> - OpenAI-Apollo collaboration
+- <R id="ZTc4MWYzND">New Tests Reveal AI's Capacity for Deception</R> - TIME, December 2024
+- <R id="ZDMyM2NlMT">Autonomy Evaluation Resources</R> - METR, March 2024
+- <R id="MjAwN2QyYm">The Rogue Replication Threat Model</R> - METR, November 2024
 
 ### Safety Frameworks
-- <R id="d8c3d29798412b9f">Introducing the Frontier Safety Framework</R> - Google DeepMind
-- <R id="6374381b5ec386d1">AGI Safety and Alignment at Google DeepMind</R> - DeepMind Safety Research
-- <R id="fc3078f3c2ba5ebb">UK AI Safety Institute Inspect Framework</R> - UK AISI
-- <R id="7042c7f8de04ccb1">Frontier AI Trends Report</R> - UK AI Security Institute
+- <R id="NzZkNWU4MT">Introducing the Frontier Safety Framework</R> - Google DeepMind
+- <R id="NWJkZjJiZj">AGI Safety and Alignment at Google DeepMind</R> - DeepMind Safety Research
+- <R id="MjExZWM4Mz">UK AI Safety Institute Inspect Framework</R> - UK AISI
+- <R id="ZTBiMDIwZD">Frontier AI Trends Report</R> - UK AI Security Institute
 
 ### Strategy & Funding
-- <R id="435b669c11e07d8f">MIRI 2024 Mission and Strategy Update</R> - MIRI, January 2024
-- <R id="07ccedd2d560ecb7">MIRI's 2024 End-of-Year Update</R> - MIRI, December 2024
-- <R id="b1ab921f9cbae109">An Overview of the AI Safety Funding Situation</R> - LessWrong
-- <R id="913cb820e5769c0b">Request for Proposals: Technical AI Safety Research</R> - Coefficient Giving
-- <R id="6bc74edd147a374b">AI Safety Fund</R> - Frontier Model Forum
+- <R id="Y2RjMjE1ZT">MIRI 2024 Mission and Strategy Update</R> - MIRI, January 2024
+- <R id="YWEyM2ZjZD">MIRI's 2024 End-of-Year Update</R> - MIRI, December 2024
+- <R id="NmEzYWI0MW">An Overview of the AI Safety Funding Situation</R> - LessWrong
+- <R id="MWE1NzgyMW">Request for Proposals: Technical AI Safety Research</R> - Coefficient Giving
+- <R id="NTMxZTU4Nz">AI Safety Fund</R> - Frontier Model Forum
 
 ---

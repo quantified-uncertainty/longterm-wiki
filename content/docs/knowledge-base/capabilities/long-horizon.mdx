@@ -48,7 +48,7 @@ import {DataInfoBox, R, EntityLink, Mermaid} from '@components/wiki';
 
 Long-horizon autonomy refers to AI systems' ability to pursue goals over extended time periods—hours, days, or weeks—with minimal human intervention. This capability requires maintaining context across sessions, decomposing complex objectives into subtasks, recovering from errors, and staying aligned with intentions despite changing circumstances.
 
-Research from [METR](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/) (March 2025) demonstrates that AI task completion horizons have been doubling approximately every 7 months since 2019. Current frontier models like Claude 3.7 Sonnet achieve reliable autonomy for tasks taking humans approximately 1 hour, while <R id="433a37bad4e66a78">SWE-bench Verified</R> benchmarks show Claude Opus 4.5 reaching 80.9% success on real GitHub issues. However, multi-day autonomous operation remains largely out of reach—the gap between 1-hour reliability and week-long projects represents 4-5 doublings, or approximately 2-3 years at current trajectory.
+Research from [METR](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/) (March 2025) demonstrates that AI task completion horizons have been doubling approximately every 7 months since 2019. Current frontier models like Claude 3.7 Sonnet achieve reliable autonomy for tasks taking humans approximately 1 hour, while <R id="NTZiNjFjY2">SWE-bench Verified</R> benchmarks show Claude Opus 4.5 reaching 80.9% success on real GitHub issues. However, multi-day autonomous operation remains largely out of reach—the gap between 1-hour reliability and week-long projects represents 4-5 doublings, or approximately 2-3 years at current trajectory.
 
 This represents one of the most safety-critical capability thresholds because it fundamentally transforms AI from supervised tools into autonomous agents. The transition undermines existing oversight mechanisms and enables power accumulation pathways that could lead to loss of human control. [McKinsey's 2025 analysis](https://www.mckinsey.com/capabilities/risk-and-resilience/our-insights/deploying-agentic-ai-with-safety-and-security-a-playbook-for-technology-leaders) reports that 80% of organizations deploying agentic AI have already encountered risky behaviors including unauthorized data access and improper system access.
 
@@ -65,11 +65,11 @@ This represents one of the most safety-critical capability thresholds because it
 
 | Capability | Current State | Key Challenges | Leading Research |
 |------------|---------------|----------------|------------------|
-| **Memory Management** | 1-2M token contexts | Persistence across sessions | <R id="26e7ae529ac5e81b">MemGPT</R>, <R id="5b39694ffd7eee39">Transformer-XL</R> |
-| **Goal Decomposition** | Works for structured tasks | Handling dependencies, replanning | <R id="ba7b8013ee20dc8e">Tree of Thoughts</R>, <R id="3272d54e99e53eee">HierarchicalRL</R> |
-| **Error Recovery** | Basic retry mechanisms | Failure detection, root cause analysis | <R id="9f43ad33cfdb0c4d">Self-correction research</R> |
-| **World Modeling** | Limited environment tracking | Predicting multi-step consequences | <R id="e97b8be1cc138942">Model-based RL</R> |
-| **Sustained Alignment** | Unclear beyond hours | Preventing goal drift over time | <R id="683aef834ac1612a">Constitutional AI</R> |
+| **Memory Management** | 1-2M token contexts | Persistence across sessions | <R id="MmFkYTM0YW">MemGPT</R>, <R id="N2I2OWZiYT">Transformer-XL</R> |
+| **Goal Decomposition** | Works for structured tasks | Handling dependencies, replanning | <R id="NDY3MDg0Mm">Tree of Thoughts</R>, <R id="NTNkMmZjNj">HierarchicalRL</R> |
+| **Error Recovery** | Basic retry mechanisms | Failure detection, root cause analysis | <R id="NDJhZjZmZG">Self-correction research</R> |
+| **World Modeling** | Limited environment tracking | Predicting multi-step consequences | <R id="ODNmOWE4Yj">Model-based RL</R> |
+| **Sustained Alignment** | Unclear beyond hours | Preventing goal drift over time | <R id="MWI0YWIwNz">Constitutional AI</R> |
 
 ## Current Capabilities Assessment
 
@@ -86,12 +86,12 @@ This represents one of the most safety-critical capability thresholds because it
 | **GitLab** | Code reasoning | 10% improvement, no added latency | [Anthropic](https://www.anthropic.com/news/3-5-models-and-computer-use) |
 
 **Coding and Software Engineering**:
-- <R id="a4efa407affdbe1c">Devin</R>: Multi-hour software development; [Devin 2.0](https://cognition.ai/blog/devin-annual-performance-review-2025) (April 2025) completes 83% more junior-level tasks per compute unit
-- <R id="87a7d798988e26a3">Cursor Agent Mode</R>: Multi-file refactoring with context tracking
-- <R id="433a37bad4e66a78">SWE-bench Verified</R>: Claude Opus 4.5 at 80.9%, Claude 3.5 Sonnet at 49% ([Scale AI leaderboard](https://scale.com/leaderboard/swe_bench_pro_public))
+- <R id="NGQxOTQxYz">Devin</R>: Multi-hour software development; [Devin 2.0](https://cognition.ai/blog/devin-annual-performance-review-2025) (April 2025) completes 83% more junior-level tasks per compute unit
+- <R id="Y2IyY2JiMW">Cursor Agent Mode</R>: Multi-file refactoring with context tracking
+- <R id="NTZiNjFjY2">SWE-bench Verified</R>: Claude Opus 4.5 at 80.9%, Claude 3.5 Sonnet at 49% ([Scale AI leaderboard](https://scale.com/leaderboard/swe_bench_pro_public))
 
 **Research and Analysis**:
-- <R id="bd687578ef655f76">Perplexity Pro Research</R>: Multi-step investigation workflows lasting 2-4 hours
+- <R id="YjI2MmRkMj">Perplexity Pro Research</R>: Multi-step investigation workflows lasting 2-4 hours
 - Academic literature reviews with synthesis across dozens of papers
 - Market research automation with competitor analysis and trend identification
 
@@ -219,21 +219,21 @@ flowchart TD
 | Research Area | Key Work | Status | Organization |
 |---------------|----------|--------|--------------|
 | **Constitutional AI** | [Building principles into training](https://www.anthropic.com/research/building-effective-agents) | Deployed | Anthropic |
-| **Scalable Oversight** | <R id="61da2f8e311a2bbf">Debate and Amplification</R> | Research phase | Multiple |
-| **AI Control** | <R id="187aaa26886ce183">AI Control Framework</R> | Conceptual | ARC Evals |
-| **Corrigibility** | <R id="33c4da848ef72141">Corrigibility Research</R> | Foundational | MIRI, DeepMind |
+| **Scalable Oversight** | <R id="OTU2YWU4MW">Debate and Amplification</R> | Research phase | Multiple |
+| **AI Control** | <R id="MGJmNGQyNW">AI Control Framework</R> | Conceptual | ARC Evals |
+| **Corrigibility** | <R id="ZjZkYTE3NW">Corrigibility Research</R> | Foundational | MIRI, DeepMind |
 | **Agent Monitoring** | [NVIDIA safety framework](https://www.helpnetsecurity.com/2025/12/08/nvidia-agentic-ai-security-framework/) | Development | NVIDIA |
 | **Policy Enforcement** | Strict behavioral limits | Standards emerging | [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework) |
 
 **Alignment Preservation**:
-- <R id="02828439f34ad89c">Constitutional AI</R>: Maintaining principles over extended operation
-- <R id="61da2f8e311a2bbf">Debate and Amplification</R>: Scalable oversight for complex decisions
-- <R id="33c4da848ef72141">Corrigibility Research</R>: Maintaining human control over time
+- <R id="MjkxMzMyNT">Constitutional AI</R>: Maintaining principles over extended operation
+- <R id="OTU2YWU4MW">Debate and Amplification</R>: Scalable oversight for complex decisions
+- <R id="ZjZkYTE3NW">Corrigibility Research</R>: Maintaining human control over time
 
 **Monitoring and Control**:
-- <R id="187aaa26886ce183">AI Control Framework</R>: Safety despite possible misalignment
-- <R id="bd051aa0e3e84d84">Anomaly Detection Systems</R>: Automated monitoring of agent behavior
-- <R id="ea759f3929d984ee">Capability Control Methods</R>: Limiting agent capabilities without reducing utility
+- <R id="MGJmNGQyNW">AI Control Framework</R>: Safety despite possible misalignment
+- <R id="OGRjZDkwMz">Anomaly Detection Systems</R>: Automated monitoring of agent behavior
+- <R id="NGQ1YmE2NW">Capability Control Methods</R>: Limiting agent capabilities without reducing utility
 
 ## Trajectory and Timeline Projections
 
@@ -286,7 +286,7 @@ flowchart TD
 - Can robust world models emerge from training or require explicit engineering? [Google's internal RL research](https://venturebeat.com/infrastructure/how-googles-internal-rl-could-unlock-long-horizon-ai-agents/) suggests new training approaches may be needed.
 
 **Safety Scalability**:
-- Will <R id="683aef834ac1612a">constitutional AI</R> methods preserve alignment at extended timescales?
+- Will <R id="MWI0YWIwNz">constitutional AI</R> methods preserve alignment at extended timescales?
 - Can oversight mechanisms scale to monitor thousands of daily decisions? Current human review capacity is 10-50 decisions per day.
 - How will deceptive alignment risks manifest in long-horizon systems?
 
@@ -354,19 +354,19 @@ Long-horizon autonomy intersects critically with several other safety-relevant c
 
 | Category | Key Papers | Contribution |
 |----------|------------|--------------|
-| **Safety Foundations** | <R id="cd3035dbef6c7b5b">Concrete Problems in AI Safety</R> | Early identification of long-horizon alignment challenges |
-| **Agent Architectures** | <R id="7647307fe49844a0">ReAct</R>, <R id="ba7b8013ee20dc8e">Tree of Thoughts</R> | Reasoning and planning frameworks |
-| **Memory Systems** | <R id="26e7ae529ac5e81b">MemGPT</R>, <R id="02ad74cdb0c9081f">RAG</R> | Persistent context and knowledge retrieval |
-| **Safety Methods** | <R id="683aef834ac1612a">Constitutional AI</R>, <R id="187aaa26886ce183">AI Control</R> | Alignment and oversight approaches |
+| **Safety Foundations** | <R id="M2JlZDZhMj">Concrete Problems in AI Safety</R> | Early identification of long-horizon alignment challenges |
+| **Agent Architectures** | <R id="Mzg5MjM0MD">ReAct</R>, <R id="NDY3MDg0Mm">Tree of Thoughts</R> | Reasoning and planning frameworks |
+| **Memory Systems** | <R id="MmFkYTM0YW">MemGPT</R>, <R id="YzgwM2RkYj">RAG</R> | Persistent context and knowledge retrieval |
+| **Safety Methods** | <R id="MWI0YWIwNz">Constitutional AI</R>, <R id="MGJmNGQyNW">AI Control</R> | Alignment and oversight approaches |
 | **Task Horizons** | [METR HCAST](https://arxiv.org/html/2503.14499v1) | 170-task benchmark for measuring autonomy duration |
 
 ### Organizations and Initiatives
 
 | Type | Organizations | Focus Areas |
 |------|---------------|-------------|
-| **Industry Research** | <R id="e9aaa7b5e18f9f41">OpenAI</R>, <R id="f771d4f56ad4dbaa">Anthropic</R>, <R id="ea91ee7755dc9d40">DeepMind</R> | Capability development with safety research |
-| **Safety Organizations** | <R id="86df45a5f8a9bf6d">MIRI</R>, <R id="0562f8c207d8b63f">ARC</R>, <R id="9c4106b68045dbd6">CHAI</R> | Theoretical alignment and control research |
-| **Policy Research** | <R id="f35c467b353f990f">GovAI</R>, <R id="58f6946af0177ca5">CNAS</R>, <R id="cf5fd74e8db11565">RAND</R> | Governance frameworks and policy analysis |
+| **Industry Research** | <R id="N2U4YTc5ZG">OpenAI</R>, <R id="NzQyNGViND">Anthropic</R>, <R id="NzNhNzk5MT">DeepMind</R> | Capability development with safety research |
+| **Safety Organizations** | <R id="YmZjYzBhMW">MIRI</R>, <R id="ZjljOTM4Nm">ARC</R>, <R id="NGEyYTllZD">CHAI</R> | Theoretical alignment and control research |
+| **Policy Research** | <R id="YTgxMDMzYT">GovAI</R>, <R id="OTc2ODExMz">CNAS</R>, <R id="MmI4MGUzYm">RAND</R> | Governance frameworks and policy analysis |
 | **Standards Bodies** | [Linux Foundation Agentic AI](https://theconversation.com/ai-agents-arrived-in-2025-heres-what-happened-and-the-challenges-ahead-in-2026-272325), [NIST](https://www.nist.gov/itl/ai-risk-management-framework) | Shared standards and best practices |
 
 ### Evaluation Benchmarks
@@ -375,5 +375,5 @@ Long-horizon autonomy intersects critically with several other safety-relevant c
 |-----------|-------------|--------------|------------------|
 | [SWE-bench Verified](https://epoch.ai/benchmarks/swe-bench-verified) | Real software engineering tasks | 80.9% (Claude Opus 4.5) | Achieved >70% in 2025 |
 | [SWE-bench Pro](https://scale.com/leaderboard/swe_bench_pro_public) | Harder enterprise codebase tasks | 43.6% (Claude Sonnet 4.5) | Commercial subset under 20% |
-| <R id="c2614357fa198ba4">WebArena</R> | Web-based task completion | ≈30% success | Extended to multi-day tasks |
-| <R id="d234ade2718a748e">AgentBench</R> | Multi-environment agent evaluation | Variable by domain | Long-horizon extensions planned |
+| <R id="YTI1MGY0Nj">WebArena</R> | Web-based task completion | ≈30% success | Extended to multi-day tasks |
+| <R id="N2M4MzIyMj">AgentBench</R> | Multi-environment agent evaluation | Variable by domain | Long-horizon extensions planned |
