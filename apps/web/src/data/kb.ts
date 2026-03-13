@@ -377,6 +377,14 @@ export function getAllKBRecords(collection: string): KBRecordEntry[] {
 }
 
 /**
+ * Get all records across all entities for a specific collection name.
+ * Returns a flat array of record entries (convenience alias).
+ */
+export function getAllKBRecordsByCollection(collection: string): KBRecordEntry[] {
+  return getAllKBRecords(collection);
+}
+
+/**
  * Get a record schema by ID.
  */
 export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
