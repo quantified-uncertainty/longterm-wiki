@@ -44,11 +44,11 @@ export const PROGRAM_IDS = {
 
   // Manifund
   MANIFUND_REGRANTING: progId("prog|manifund|regranters"),
-  MANIFUND_IMPACT_CERTS: progId("prog|manifund|impact-certificates"),
 
   // ACX Grants
   ACX_2022: progId("prog|acx|grants-2022"),
   ACX_2023: progId("prog|acx|grants-2023"),
+  ACX_2025: progId("prog|acx|grants-2025"),
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -163,10 +163,10 @@ const RULES: ProgramRule[] = [
     descriptionPattern: /acx grants 2024/i,
     programId: PROGRAM_IDS.ACX_2023,
   },
-  // Fallback for other ACX rounds (e.g. 2025) — use the first program as a catch-all
   {
     source: "acx-grants",
-    programId: PROGRAM_IDS.ACX_2022,
+    descriptionPattern: /acx grants 2025/i,
+    programId: PROGRAM_IDS.ACX_2025,
   },
 ];
 

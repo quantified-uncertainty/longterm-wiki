@@ -258,21 +258,18 @@ const grantsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    let updated = 0;
+    // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
+    const valuesList = items
+      .map((item) => sql`(${item.id}, ${item.granteeId})`)
+      .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
 
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .update(grants)
-          .set({
-            granteeId: item.granteeId,
-            updatedAt: sql`now()`,
-          })
-          .where(eq(grants.id, item.id));
+    const result = await db.execute(sql`
+      UPDATE grants SET grantee_id = v.grantee_id, updated_at = now()
+      FROM (VALUES ${valuesList}) AS v(id, grantee_id)
+      WHERE grants.id = v.id
+    `);
 
-        updated++;
-      }
-    });
+    const updated = Number(result.rowCount ?? items.length);
 
     return c.json({ updated });
   })
@@ -309,7 +306,7 @@ const grantsApp = new Hono()
   })
 
   // ---- PATCH /batch-update-program ----
-  // Updates programId for multiple grants in a single transaction.
+  // Updates programId for multiple grants using bulk SQL.
   // Used by the backfill-program-ids command.
   .patch("/batch-update-program", async (c) => {
     const body = await parseJsonBody(c);
@@ -323,21 +320,18 @@ const grantsApp = new Hono()
 
     logger.info(`batch-update-program: updating ${items.length} grants`);
 
-    let updated = 0;
+    // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
+    const valuesList = items
+      .map((item) => sql`(${item.id}, ${item.programId})`)
+      .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
 
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .update(grants)
-          .set({
-            programId: item.programId,
-            updatedAt: sql`now()`,
-          })
-          .where(eq(grants.id, item.id));
+    const result = await db.execute(sql`
+      UPDATE grants SET program_id = v.program_id, updated_at = now()
+      FROM (VALUES ${valuesList}) AS v(id, program_id)
+      WHERE grants.id = v.id
+    `);
 
-        updated++;
-      }
-    });
+    const updated = Number(result.rowCount ?? items.length);
 
     return c.json({ updated });
   })

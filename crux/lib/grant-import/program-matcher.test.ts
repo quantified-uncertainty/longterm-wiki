@@ -194,7 +194,7 @@ describe("matchProgram", () => {
     expect(result).toBe(PROGRAM_IDS.ACX_2023);
   });
 
-  it("falls back for ACX 2025 round", () => {
+  it("matches ACX 2025 round", () => {
     const result = matchProgram({
       source: "acx-grants",
       funderId: "LBr3ocKKyQ",
@@ -202,8 +202,18 @@ describe("matchProgram", () => {
       name: "Some project",
       description: "ACX Grants 2025 round",
     });
-    // Falls back to ACX_2022 (the catch-all)
-    expect(result).toBe(PROGRAM_IDS.ACX_2022);
+    expect(result).toBe(PROGRAM_IDS.ACX_2025);
+  });
+
+  it("returns null for unrecognized ACX rounds", () => {
+    const result = matchProgram({
+      source: "acx-grants",
+      funderId: "LBr3ocKKyQ",
+      focusArea: null,
+      name: "Some project",
+      description: "ACX Grants 2030 round",
+    });
+    expect(result).toBeNull();
   });
 
   // ---- Unknown sources ----

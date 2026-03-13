@@ -12,7 +12,6 @@
 
 import {
   matchProgram,
-  getAllProgramIds,
   PROGRAM_IDS,
 } from "../lib/grant-import/program-matcher.ts";
 import {
@@ -60,7 +59,7 @@ function detectSource(sourceUrl: string | null): string | null {
     return "ea-funds";
   if (url.includes("survivalandflourishing"))
     return "sff";
-  if (url.includes("ftxfuturefund") || url.includes("web.archive.org") && url.includes("ftx"))
+  if (url.includes("ftxfuturefund") || (url.includes("web.archive.org") && url.includes("ftx")))
     return "ftx-future-fund";
   if (url.includes("manifund.org"))
     return "manifund";
