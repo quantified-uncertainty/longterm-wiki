@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
@@ -43,7 +43,54 @@ export default function PeoplePage() {
     const expert = getExpertById(slug);
     const positionCount = expert?.positions?.length ?? 0;
     const topics = expert?.positions?.map((p) => p.topic) ?? [];
-    const publicationCount = getPublicationsForPerson(slug).length;
+    const publications = getPublicationsForPerson(slug);
+
+    const roleText = roleFact?.value.type === "text" ? roleFact.value.value : null;
+
+    // Build searchable text from all available data sources
+    const searchParts: string[] = [entity.name];
+
+    // Entity aliases (alternative names)
+    if (entity.aliases) searchParts.push(...entity.aliases);
+
+    // Role and employer
+    if (roleText) searchParts.push(roleText);
+    if (employer?.name) searchParts.push(employer.name);
+
+    // Expert position views and topics
+    if (expert?.positions) {
+      for (const p of expert.positions) {
+        searchParts.push(p.topic, p.view);
+      }
+    }
+
+    // Expert knownFor
+    if (expert?.knownFor) searchParts.push(...expert.knownFor);
+
+    // Publication titles
+    for (const pub of publications) {
+      searchParts.push(pub.title);
+    }
+
+    // Career history role titles and org names from record fields
+    for (const entry of careerHistory) {
+      const fields = entry.fields;
+      if (typeof fields.role === "string") searchParts.push(fields.role);
+      if (typeof fields.title === "string") searchParts.push(fields.title);
+      if (typeof fields.organization === "string") {
+        // Resolve ref to org name
+        const org = getKBEntity(fields.organization);
+        if (org) searchParts.push(org.name);
+      }
+    }
+
+    // KB fact text values (notable-for, education, etc.)
+    const allFacts = getKBFacts(entity.id);
+    for (const fact of allFacts) {
+      if (fact.value.type === "text") {
+        searchParts.push(fact.value.value);
+      }
+    }
 
     return {
       id: entity.id,
@@ -52,7 +99,7 @@ export default function PeoplePage() {
       numericId: entity.numericId ?? null,
       wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
 
-      role: roleFact?.value.type === "text" ? roleFact.value.value : null,
+      role: roleText,
 
       employerId: employer?.id ?? null,
       employerName: employer?.name ?? null,
@@ -62,8 +109,10 @@ export default function PeoplePage() {
 
       positionCount,
       topics,
-      publicationCount,
+      publicationCount: publications.length,
       careerHistoryCount: careerHistory.length,
+
+      searchText: searchParts.join(" ").toLowerCase(),
     };
   });
 
