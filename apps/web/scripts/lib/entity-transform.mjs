@@ -19,7 +19,23 @@ import { extractDescriptionFromIntro } from './text-utils.mjs';
 // RISK CATEGORIES
 // ============================================================================
 
-const RISK_CATEGORIES = {
+/**
+ * Map from summaryPage value to risk category.
+ * This is the primary categorisation mechanism — entities with a summaryPage
+ * containing one of these overview slugs are assigned the corresponding category.
+ */
+const SUMMARY_PAGE_TO_CATEGORY = {
+  'accident-overview': 'accident',
+  'misuse-overview': 'misuse',
+  'structural-overview': 'structural',
+  'epistemic-overview': 'epistemic',
+};
+
+/**
+ * Legacy hardcoded fallback for entities that lack a summaryPage field.
+ * Kept for backward compatibility — new entities should always set summaryPage.
+ */
+const RISK_CATEGORIES_FALLBACK = {
   epistemic: [
     'authentication-collapse',
     'automation-bias',
@@ -49,10 +65,16 @@ const RISK_CATEGORIES = {
   ],
 };
 
-function getRiskCategory(riskId) {
-  if (RISK_CATEGORIES.epistemic.includes(riskId)) return 'epistemic';
-  if (RISK_CATEGORIES.misuse.includes(riskId)) return 'misuse';
-  if (RISK_CATEGORIES.structural.includes(riskId)) return 'structural';
+function getRiskCategory(riskId, summaryPage) {
+  // Primary: derive from summaryPage field
+  if (summaryPage && SUMMARY_PAGE_TO_CATEGORY[summaryPage]) {
+    return SUMMARY_PAGE_TO_CATEGORY[summaryPage];
+  }
+
+  // Fallback: hardcoded map for entities without summaryPage
+  if (RISK_CATEGORIES_FALLBACK.epistemic.includes(riskId)) return 'epistemic';
+  if (RISK_CATEGORIES_FALLBACK.misuse.includes(riskId)) return 'misuse';
+  if (RISK_CATEGORIES_FALLBACK.structural.includes(riskId)) return 'structural';
   return 'accident';
 }
 
@@ -168,7 +190,7 @@ function transformEntity(raw, expertMap, orgMap) {
         likelihood: raw.likelihood,
         timeframe: raw.timeframe,
         maturity: raw.maturity,
-        riskCategory: getRiskCategory(raw.id),
+        riskCategory: getRiskCategory(raw.id, raw.summaryPage),
       };
 
     case 'person': {

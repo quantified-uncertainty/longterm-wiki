@@ -4,6 +4,14 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import {
+  RISK_CATEGORY_LABELS,
+  RISK_CATEGORY_COLORS,
+  SEVERITY_ORDER,
+  SEVERITY_COLORS_DISPLAY,
+  LIKELIHOOD_ORDER,
+  LIKELIHOOD_COLORS_DISPLAY,
+} from "./risk-constants";
 
 export interface RiskRow {
   id: string;
@@ -17,30 +25,7 @@ export interface RiskRow {
   timeHorizon: string | null;
 }
 
-const RISK_CATEGORY_LABELS: Record<string, string> = {
-  accident: "Accident",
-  misuse: "Misuse",
-  structural: "Structural",
-  epistemic: "Epistemic",
-};
-
-const RISK_CATEGORY_COLORS: Record<string, string> = {
-  accident: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  misuse: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  structural: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  epistemic: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-};
-
 type SortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
-
-const SEVERITY_ORDER: Record<string, number> = {
-  low: 1,
-  medium: 2,
-  "medium-high": 3,
-  high: 4,
-  critical: 5,
-  catastrophic: 6,
-};
 
 export function RisksTable({ rows }: { rows: RiskRow[] }) {
   const [search, setSearch] = useState("");
@@ -97,7 +82,9 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         case "severity":
           return row.severity ? (SEVERITY_ORDER[row.severity] ?? 0) : null;
         case "likelihood":
-          return row.likelihood ?? null;
+          return row.likelihood
+            ? (LIKELIHOOD_ORDER[row.likelihood] ?? 0)
+            : null;
         case "timeHorizon":
           return row.timeHorizon ?? null;
       }
@@ -211,13 +198,33 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                 </td>
 
                 {/* Severity */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.severity ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                <td className="py-2.5 px-3">
+                  {row.severity ? (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        SEVERITY_COLORS_DISPLAY[row.severity] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {row.severity}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
                 </td>
 
                 {/* Likelihood */}
-                <td className="py-2.5 px-3 text-sm capitalize">
-                  {row.likelihood ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                <td className="py-2.5 px-3">
+                  {row.likelihood ? (
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        LIKELIHOOD_COLORS_DISPLAY[row.likelihood] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {row.likelihood}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
                 </td>
 
                 {/* Time Horizon */}
