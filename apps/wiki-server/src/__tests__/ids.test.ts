@@ -64,6 +64,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [row];
   }
 
+  // UPDATE entity_ids SET stable_id = ... WHERE slug = ... AND stable_id IS NULL
+  // Must come before SELECT-by-slug since both match "entity_ids" + "where" + "slug"
+  if (q.includes("update") && q.includes("entity_ids") && q.includes("stable_id")) {
+    const stableId = params[0] as string;
+    const slug = params[1] as string;
+    const row = store.get(slug);
+    if (row && !row.stable_id) {
+      row.stable_id = stableId;
+      return [row];
+    }
+    return [];
+  }
+
+  // SELECT ... WHERE stable_id IS NULL
+  // Must come before SELECT-by-slug since both match "entity_ids" + "where"
+  if (q.includes("entity_ids") && q.includes("is null") && !q.includes("update")) {
+    return Array.from(store.values()).filter(r => !r.stable_id);
+  }
+
   // SELECT ... WHERE ... slug = $1
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
     const slug = params[0] as string;
@@ -79,23 +98,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       (a, b) => a.numeric_id - b.numeric_id
     );
     return all.slice(offset, offset + limit);
-  }
-
-  // UPDATE entity_ids SET stable_id = ... WHERE slug = ...
-  if (q.includes("update") && q.includes("entity_ids") && q.includes("stable_id")) {
-    const stableId = params[0] as string;
-    const slug = params[1] as string;
-    const row = store.get(slug);
-    if (row) {
-      row.stable_id = stableId;
-      return [row];
-    }
-    return [];
-  }
-
-  // SELECT ... WHERE stable_id IS NULL
-  if (q.includes("entity_ids") && q.includes("is null")) {
-    return Array.from(store.values()).filter(r => !r.stable_id);
   }
 
   // setval
@@ -295,6 +297,82 @@ describe("ID Server API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.ids[0].stableId).toBeDefined();
+    });
+  });
+
+  describe("POST /api/ids/backfill-stable-ids", () => {
+    it("backfills stableIds for existing slugs", async () => {
+      // Pre-allocate entities (they get auto-generated stableIds)
+      await postJson(app, "/api/ids/allocate", { slug: "entity-a" });
+      await postJson(app, "/api/ids/allocate", { slug: "entity-b" });
+
+      // Clear the auto-generated stableIds to simulate pre-existing rows
+      store.get("entity-a")!.stable_id = null;
+      store.get("entity-b")!.stable_id = null;
+
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [
+          { slug: "entity-a", stableId: "aaaaaaaaaa" },
+          { slug: "entity-b", stableId: "bbbbbbbbbb" },
+        ],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.updated).toBe(2);
+      expect(store.get("entity-a")!.stable_id).toBe("aaaaaaaaaa");
+      expect(store.get("entity-b")!.stable_id).toBe("bbbbbbbbbb");
+    });
+
+    it("does not overwrite existing stableIds", async () => {
+      await postJson(app, "/api/ids/allocate", { slug: "has-id" });
+      const originalStableId = store.get("has-id")!.stable_id;
+      expect(originalStableId).toBeTruthy();
+
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [{ slug: "has-id", stableId: "zzzzzzzzzz" }],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.updated).toBe(0);
+      expect(store.get("has-id")!.stable_id).toBe(originalStableId);
+    });
+
+    it("generates stableIds for rows that still lack one when finalize=true", async () => {
+      await postJson(app, "/api/ids/allocate", { slug: "no-stable" });
+      store.get("no-stable")!.stable_id = null;
+
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [{ slug: "nonexistent-slug", stableId: "xxxxxxxxxx" }],
+        finalize: true,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.totalMissing).toBe(1);
+      expect(body.generated).toBe(1);
+      expect(store.get("no-stable")!.stable_id).toBeTruthy();
+    });
+
+    it("rejects invalid stableId format", async () => {
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [{ slug: "test", stableId: "too-short" }],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects non-alphanumeric stableId", async () => {
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [{ slug: "test", stableId: "abc!!def!!" }],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("returns updated=0 for non-existent slugs", async () => {
+      const res = await postJson(app, "/api/ids/backfill-stable-ids", {
+        items: [{ slug: "does-not-exist", stableId: "aaaaaaaaaa" }],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.updated).toBe(0);
     });
   });
 
