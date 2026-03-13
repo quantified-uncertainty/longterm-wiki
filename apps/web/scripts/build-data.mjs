@@ -1155,6 +1155,63 @@ async function mergePGRecordsIntoKB(kb) {
 }
 
 /**
+ * Fetch benchmark results from wiki-server PG tables.
+ * Returns a map of modelId → array of { benchmarkId, score, unit }.
+ * Falls back to empty object if wiki-server is unavailable.
+ */
+async function fetchBenchmarkResults() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  benchmark-results: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
+
+  try {
+    const pageSize = 200;
+    let allItems = [];
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/benchmark-results/all?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, fetchOpts);
+      if (!resp.ok) {
+        console.log(`  benchmark-results: skipped (HTTP ${resp.status})`);
+        return {};
+      }
+      const data = await resp.json();
+      const items = data.benchmarkResults || [];
+      allItems = allItems.concat(items);
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    // Group by modelId
+    const byModel = {};
+    for (const row of allItems) {
+      if (!byModel[row.modelId]) byModel[row.modelId] = [];
+      byModel[row.modelId].push({
+        benchmarkId: row.benchmarkId,
+        score: row.score,
+        unit: row.unit,
+        date: row.date,
+        sourceUrl: row.sourceUrl,
+      });
+    }
+
+    const modelCount = Object.keys(byModel).length;
+    if (allItems.length > 0) {
+      console.log(`  benchmark-results: ${allItems.length} results for ${modelCount} models fetched from PG`);
+    }
+    return byModel;
+  } catch (err) {
+    console.log(`  benchmark-results: skipped (${err instanceof Error ? err.message : err})`);
+    return {};
+  }
+}
+
+/**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
  * PG stores canonical entity IDs in personId/organizationId.
  */
@@ -1909,6 +1966,11 @@ async function main() {
     if (pgTotal > 0) {
       console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions, ${pgRecordCounts.divisions} divisions, ${pgRecordCounts.fundingPrograms} funding programs merged from PG`);
     }
+  }
+
+  // Fetch benchmark results from PG (separate from kb.records since these are model-keyed)
+  if (!CONTENT_ONLY) {
+    database.benchmarkResults = await fetchBenchmarkResults();
   }
 
   // Build URL → resource map for unconverted link detection
