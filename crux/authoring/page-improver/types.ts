@@ -181,6 +181,8 @@ export interface PipelineResults {
    */
   auditResult?: AuditResult;
   outputPath: string;
+  /** Set when semantic diff blocked the apply due to excessive changes. */
+  blocked?: boolean;
 }
 
 export interface TriageResult {

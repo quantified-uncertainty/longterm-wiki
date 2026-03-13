@@ -116,7 +116,8 @@ describe('ensureFrontmatterFields', () => {
     expect(result).toContain('title: "My Page"');
     expect(result).toContain('entityType: capability');
     expect(result).toContain('description: "An improved page"');
-    expect(result).toContain('quality: 65');
+    // quality is a frozen field — should be restored to original value (50), not LLM value (65)
+    expect(result).toContain('quality: 50');
     expect(result).toContain('Better body');
   });
 

@@ -79,7 +79,8 @@ async function persistRunToDb(
       newPagesCreated: report.newPagesCreated,
       results: report.execution.results.map(r => ({
         pageId: r.pageId,
-        status: r.status,
+        // Map 'blocked' → 'failed' for DB compatibility (DB schema only knows success/failed/skipped)
+        status: r.status === 'blocked' ? 'failed' as const : r.status,
         tier: r.tier,
         durationMs: r.durationMs,
         errorMessage: r.error,
@@ -154,6 +155,7 @@ function executePageImprove(
       '--', pageId,
       '--tier', tier,
       '--apply',
+      '--no-grade',  // Auto-update must not re-grade — grades are frozen fields
     ];
 
     if (directions) {
@@ -182,6 +184,19 @@ function executePageImprove(
     };
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
+    // Exit code 75 = semantic diff blocked the apply (changes too large for tier).
+    // Treat as 'blocked' rather than 'failed' so the run report distinguishes
+    // scope-check rejections from real errors.
+    const exitCode = (err as { status?: number }).status;
+    if (exitCode === 75) {
+      return {
+        pageId,
+        status: 'blocked',
+        tier,
+        error: 'Semantic diff blocked: changes exceeded scope limits for tier',
+        durationMs: Date.now() - start,
+      };
+    }
     return {
       pageId,
       status: 'failed',
@@ -417,13 +432,15 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       update.suggestedTier,
       update.directions,
       verbose,
-      update.sectionLevel ?? false,
+      update.sectionLevel ?? update.suggestedTier === 'polish',
     );
     results.push(result);
 
     if (result.status === 'success') {
       spent += cost;
       console.log(`    Done (${((result.durationMs || 0) / 1000).toFixed(0)}s)`);
+    } else if (result.status === 'blocked') {
+      console.log(`    BLOCKED: ${result.error?.slice(0, 100)}`);
     } else {
       console.log(`    FAILED: ${result.error?.slice(0, 100)}`);
     }
@@ -475,6 +492,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       pagesUpdated: results.filter(r => r.status === 'success').length,
       pagesFailed: results.filter(r => r.status === 'failed').length,
       pagesSkipped: results.filter(r => r.status === 'skipped').length,
+      pagesBlocked: results.filter(r => r.status === 'blocked').length,
       results,
     },
     newPagesCreated: [],
@@ -488,6 +506,9 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   console.log(`  Pages updated: ${report.execution.pagesUpdated}`);
   console.log(`  Pages failed: ${report.execution.pagesFailed}`);
   console.log(`  Pages skipped: ${report.execution.pagesSkipped}`);
+  if (report.execution.pagesBlocked) {
+    console.log(`  Pages blocked (scope): ${report.execution.pagesBlocked}`);
+  }
   console.log(`  Budget: $${spent.toFixed(0)} / $${budget}`);
   console.log(`  Report: ${reportPath}`);
 

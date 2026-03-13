@@ -93,7 +93,7 @@ export interface UpdatePlan {
 
 export interface RunResult {
   pageId: string;
-  status: 'success' | 'failed' | 'skipped';
+  status: 'success' | 'failed' | 'skipped' | 'blocked';
   tier: string;
   error?: string;
   durationMs?: number;
@@ -119,6 +119,7 @@ export interface RunReport {
     pagesUpdated: number;
     pagesFailed: number;
     pagesSkipped: number;
+    pagesBlocked?: number;
     results: RunResult[];
   };
   newPagesCreated: string[];
