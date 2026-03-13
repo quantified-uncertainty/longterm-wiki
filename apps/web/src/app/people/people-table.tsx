@@ -5,6 +5,8 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { topicLabel } from "@/data/topic-labels";
+import { comparePersonRows } from "./people-sort";
+import type { PeopleSortKey, SortDir } from "./people-sort";
 
 export interface PersonRow {
   id: string;
@@ -29,17 +31,7 @@ export interface PersonRow {
   careerHistoryCount: number;
 }
 
-type SortKey =
-  | "name"
-  | "role"
-  | "employer"
-  | "bornYear"
-  | "netWorth"
-  | "positions"
-  | "publications"
-  | "careerHistory";
-
-type SortDir = "asc" | "desc";
+type SortKey = PeopleSortKey;
 
 export function PeopleTable({ rows }: { rows: PersonRow[] }) {
   const [search, setSearch] = useState("");
@@ -104,42 +96,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
       );
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: PersonRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.name.toLowerCase();
-          case "role":
-            return row.role?.toLowerCase() ?? null;
-          case "employer":
-            return row.employerName?.toLowerCase() ?? null;
-          case "bornYear":
-            return row.bornYear;
-          case "netWorth":
-            return row.netWorthNum;
-          case "positions":
-            return row.positionCount || null;
-          case "publications":
-            return row.publicationCount || null;
-          case "careerHistory":
-            return row.careerHistoryCount;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      // Nulls sort last regardless of direction
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
-      }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    result = [...result].sort((a, b) => comparePersonRows(a, b, sortKey, sortDir));
 
     return result;
   }, [rows, search, affiliationFilter, topicFilter, sortKey, sortDir]);

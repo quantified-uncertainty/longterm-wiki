@@ -1,14 +1,13 @@
 /**
  * References API — wiki-server client module
  *
- * Unified API for both claim-backed and regular page citations.
+ * API for page citations (claim-backed references were removed with migration 0065).
  * Input types are derived from the canonical Zod schemas in api-types.ts.
  * Response types are inferred from the Hono route via InferResponseType<>.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type {
-  ClaimPageReferenceInsert,
   PageCitationInsert,
 } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
@@ -23,11 +22,6 @@ type RpcClient = ReturnType<typeof hc<ReferencesRoute>>;
 export type GetPageReferencesResult = InferResponseType<
   RpcClient['by-page'][':pageId']['$get'],
   200
->;
-
-export type ClaimPageReferenceRow = InferResponseType<
-  RpcClient['claim']['$post'],
-  201
 >;
 
 export type PageCitationRow = InferResponseType<
@@ -48,19 +42,6 @@ export async function getPageReferences(
   return apiRequest<GetPageReferencesResult>(
     'GET',
     `/api/references/by-page/${encodeURIComponent(pageId)}`,
-  );
-}
-
-/**
- * Create a claim page reference (claim-backed footnote).
- */
-export async function createClaimReference(
-  data: ClaimPageReferenceInsert,
-): Promise<ApiResult<ClaimPageReferenceRow>> {
-  return apiRequest<ClaimPageReferenceRow>(
-    'POST',
-    '/api/references/claim',
-    data
   );
 }
 

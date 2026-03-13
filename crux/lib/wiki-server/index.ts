@@ -128,13 +128,11 @@ export { upsertResource } from './resources.ts';
 // References
 export {
   getPageReferences,
-  createClaimReference,
   createCitation,
   createCitationsBatch,
 } from './references.ts';
 export type {
   GetPageReferencesResult,
-  ClaimPageReferenceRow,
   PageCitationRow,
 } from './references.ts';
 
