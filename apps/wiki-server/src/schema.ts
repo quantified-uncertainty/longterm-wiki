@@ -343,7 +343,7 @@ export const summaries = pgTable(
   {
     entityId: text("entity_id")
       .primaryKey()
-      .references(() => entities.id, { onDelete: "cascade" }),
+      .references(() => entities.stableId, { onDelete: "cascade" }),
     entityType: text("entity_type").notNull(),
     oneLiner: text("one_liner"),
     summary: text("summary"),
