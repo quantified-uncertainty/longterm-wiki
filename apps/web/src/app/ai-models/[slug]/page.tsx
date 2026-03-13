@@ -1,13 +1,18 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getTypedEntityById } from "@/data";
+import { getTypedEntityById, getPageById } from "@/data";
 import {
   resolveAiModelBySlug,
   getAiModelSlugs,
   getRelatedModels,
 } from "../ai-model-utils";
 import { resolveSlugAlias } from "@/data/kb";
+import {
+  DEVELOPER_COLORS,
+  SAFETY_LEVEL_COLORS,
+  formatContext,
+} from "../ai-model-constants";
 import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
 
@@ -26,39 +31,6 @@ export async function generateMetadata({
     title: entity ? `${entity.title} | AI Models` : "AI Model Not Found",
     description: entity?.description ?? undefined,
   };
-}
-
-const DEVELOPER_COLORS: Record<string, string> = {
-  anthropic:
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  openai:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  deepmind:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "meta-ai":
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "mistral-ai":
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  xai: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  deepseek:
-    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-};
-
-const SAFETY_LEVEL_COLORS: Record<string, string> = {
-  "ASL-1":
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  "ASL-2":
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "ASL-3":
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "ASL-4":
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-};
-
-function formatContext(tokens: number): string {
-  if (tokens >= 1_000_000) return `${tokens / 1_000_000}M tokens`;
-  if (tokens >= 1_000) return `${tokens / 1_000}K tokens`;
-  return `${tokens} tokens`;
 }
 
 function formatPrice(price: number): string {
@@ -120,7 +92,7 @@ export default async function AiModelDetailPage({
   if (entity.contextWindow != null) {
     stats.push({
       label: "Context Window",
-      value: formatContext(entity.contextWindow),
+      value: `${formatContext(entity.contextWindow)} tokens`,
     });
   }
 
@@ -177,7 +149,7 @@ export default async function AiModelDetailPage({
         )}
 
         <div className="flex items-center gap-4 mt-3 text-sm">
-          {entity.numericId && (
+          {entity.numericId && getPageById(entity.id) && (
             <Link
               href={`/wiki/${entity.numericId}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
@@ -423,7 +395,7 @@ export default async function AiModelDetailPage({
                 label="Context Window"
                 value={
                   entity.contextWindow != null
-                    ? formatContext(entity.contextWindow)
+                    ? `${formatContext(entity.contextWindow)} tokens`
                     : undefined
                 }
               />

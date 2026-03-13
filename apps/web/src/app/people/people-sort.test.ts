@@ -17,6 +17,7 @@ function makeRow(overrides: Partial<PersonRow> = {}): PersonRow {
     role: null,
     employerId: null,
     employerName: null,
+    employerSlug: null,
     bornYear: null,
     netWorthNum: null,
     positionCount: 0,
@@ -81,10 +82,10 @@ describe("getPersonSortValue", () => {
     ).toBe(null);
   });
 
-  it("returns careerHistoryCount directly (including zero)", () => {
+  it("returns careerHistoryCount or null when zero", () => {
     expect(
       getPersonSortValue(makeRow({ careerHistoryCount: 0 }), "careerHistory"),
-    ).toBe(0);
+    ).toBe(null);
     expect(
       getPersonSortValue(makeRow({ careerHistoryCount: 7 }), "careerHistory"),
     ).toBe(7);

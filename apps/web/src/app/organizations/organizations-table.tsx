@@ -6,6 +6,7 @@ import { SortHeader } from "@/components/directory/SortHeader";
 import type { SortDir } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
+import { ORG_TYPE_LABELS, ORG_TYPE_COLORS } from "@/app/organizations/org-constants";
 
 export interface OrgRow {
   id: string;
@@ -35,34 +36,15 @@ export interface OrgRow {
   searchText: string;
 }
 
-const ORG_TYPE_LABELS: Record<string, string> = {
-  "frontier-lab": "Frontier Lab",
-  "safety-org": "Safety Org",
-  academic: "Academic",
-  startup: "Startup",
-  generic: "Lab",
-  funder: "Funder",
-  government: "Government",
-  other: "Other",
-};
-
-const ORG_TYPE_COLORS: Record<string, string> = {
-  "frontier-lab": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "safety-org": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  academic: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  startup: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  generic: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  funder: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  government: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-};
-
 type SortKey = OrgSortKey;
 
 function formatCompactNumber(n: number | null): string {
   if (n == null) return "";
   if (n >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
+  if (n >= 1e10) return `$${(n / 1e9).toFixed(0)}B`;
   if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e7) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
   return `$${n.toLocaleString()}`;
 }
@@ -223,7 +205,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki
@@ -246,44 +228,52 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
 
                 {/* Revenue */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.revenueNum != null && (
+                  {row.revenueNum != null ? (
                     <>
                       <span className="font-semibold">{formatCompactNumber(row.revenueNum)}</span>
                       <DateHint date={row.revenueDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Valuation */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.valuationNum != null && (
+                  {row.valuationNum != null ? (
                     <>
                       <span className="font-semibold">{formatCompactNumber(row.valuationNum)}</span>
                       <DateHint date={row.valuationDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Headcount */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.headcount != null && (
+                  {row.headcount != null ? (
                     <>
                       <span>{formatHeadcount(row.headcount)}</span>
                       <DateHint date={row.headcountDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Total Funding */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.totalFundingNum != null && (
+                  {row.totalFundingNum != null ? (
                     <span className="font-semibold">{formatCompactNumber(row.totalFundingNum)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Founded */}
                 <td className="py-2.5 px-3 text-center text-muted-foreground">
-                  {row.foundedDate ?? ""}
+                  {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
 
               </tr>
