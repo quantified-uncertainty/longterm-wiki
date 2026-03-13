@@ -30,6 +30,11 @@ const SCRIPTS = {
     description: 'Sync all .claude/sessions/*.yaml to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
+  'sync-benchmarks': {
+    script: 'wiki-server/sync-benchmarks.ts',
+    description: 'Sync benchmark definitions + results to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-auto-update-runs': {
     script: 'wiki-server/sync-auto-update-runs.ts',
     description: 'Sync data/auto-update/runs/*.yaml to wiki-server',
@@ -71,6 +76,8 @@ Examples:
   crux wiki-server sync --batch-size=25      Use smaller batches
   crux wiki-server sync-entities             Sync all entities
   crux wiki-server sync-entities --dry-run   Preview entity sync
+  crux wiki-server sync-benchmarks             Sync benchmarks + results
+  crux wiki-server sync-benchmarks --dry-run   Preview benchmark sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
   crux wiki-server sync-sessions           Sync all session logs
   crux wiki-server sync-auto-update-runs   Sync all auto-update runs
