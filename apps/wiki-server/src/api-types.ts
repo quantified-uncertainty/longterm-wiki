@@ -661,7 +661,7 @@ export interface ResourceListResult {
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   numericId: z.string().max(20).nullable().optional(),
-  stableId: z.string().max(20).nullable().optional(),
+  stableId: z.string().regex(/^[A-Za-z0-9]{10}$/).nullable().optional(),
   entityType: z.string().min(1).max(100),
   title: z.string().min(1).max(500),
   description: z.string().max(50000).nullable().optional(),
