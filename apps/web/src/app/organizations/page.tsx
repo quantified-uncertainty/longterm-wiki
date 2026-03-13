@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/kb";
-import { getTypedEntities, isOrganization } from "@/data";
+import { getTypedEntities, isOrganization, type OrganizationEntity } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
@@ -29,7 +29,7 @@ function formatFact(
 
 /** Build a pre-computed lowercase text blob for full-text search across all org fields. */
 function buildOrgSearchText(
-  org: ReturnType<typeof getTypedEntities>[number] & { entityType: "organization" },
+  org: OrganizationEntity,
   orgToEmployeeNames: Map<string, string[]>,
 ): string {
   const parts: string[] = [org.title];
