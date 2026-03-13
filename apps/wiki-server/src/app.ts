@@ -44,6 +44,7 @@ import { fundingProgramsRoute } from "./routes/funding-programs.js";
 import { benchmarksRoute } from "./routes/benchmarks.js";
 import { benchmarkResultsRoute } from "./routes/benchmark-results.js";
 import { recordVerificationsRoute } from "./routes/record-verifications.js";
+import { thingsRoute } from "./routes/things.js";
 
 let requestCounter = 0;
 
@@ -163,6 +164,7 @@ export function createApp() {
   app.route("/api/benchmarks", benchmarksRoute);
   app.route("/api/benchmark-results", benchmarkResultsRoute);
   app.route("/api/record-verifications", recordVerificationsRoute);
+  app.route("/api/things", thingsRoute);
 
   return app;
 }

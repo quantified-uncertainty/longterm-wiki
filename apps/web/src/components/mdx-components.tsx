@@ -81,6 +81,7 @@ import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-d
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
+import { ThingsContent } from "@/app/internal/things/things-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -234,6 +235,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,
   PeopleCoverageContent,
+  ThingsContent,
 
   // Table view components
   SafetyApproachesTableView,
