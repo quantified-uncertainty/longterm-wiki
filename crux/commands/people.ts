@@ -4,22 +4,93 @@
  * CLI tools for managing person entity data.
  *
  * Usage:
+ *   crux people discover [--min-appearances=N] [--json]
+ *   crux people create [--min-appearances=N]
  *   crux people link-resources [--apply] [--verbose]   Match resources/literature to person entities
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as yaml from 'yaml';
+import { CUSTOM_TAGS } from '../../packages/kb/src/loader.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-const DATA_DIR = join(import.meta.dirname, '../../data');
+// Re-export yaml helpers used by link-resources under their expected names
+const { parse: parseYaml, stringify: stringifyYaml } = yaml;
 
-interface PeopleCommandOptions extends BaseOptions {
+const ROOT = path.resolve(import.meta.dirname, '../..');
+const DATA_DIR = path.join(ROOT, 'data');
+
+// ---------------------------------------------------------------------------
+// Shared option types
+// ---------------------------------------------------------------------------
+
+interface DiscoverCommandOptions extends BaseOptions {
+  minAppearances?: string;
+  json?: boolean;
+  ci?: boolean;
+}
+
+interface LinkResourcesCommandOptions extends BaseOptions {
   apply?: boolean;
   verbose?: boolean;
 }
 
-// ── Types ────────────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Types — discovery
+// ---------------------------------------------------------------------------
+
+interface PersonCandidate {
+  /** Slug-style ID (e.g. "sam-altman") */
+  id: string;
+  /** Human-readable name */
+  name: string;
+  /** Total number of distinct data sources that mention this person */
+  appearances: number;
+  /** Which data sources reference this person */
+  sources: DataSource[];
+  /** Relevance score — higher means more prominent */
+  score: number;
+}
+
+interface DataSource {
+  type:
+    | 'expert'
+    | 'org-keyPeople'
+    | 'entity-relatedEntries'
+    | 'kb-thing'
+    | 'literature-author';
+  /** Which file or entity references this person */
+  context: string;
+}
+
+interface EntityEntry {
+  id: string;
+  numericId?: string;
+  type: string;
+  title?: string;
+  relatedEntries?: Array<{ id: string; type: string; relationship?: string }>;
+  [key: string]: unknown;
+}
+
+interface ExpertEntry {
+  id: string;
+  name: string;
+  affiliation?: string;
+  role?: string;
+  [key: string]: unknown;
+}
+
+interface OrgEntry {
+  id: string;
+  name: string;
+  keyPeople?: string[];
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Types — link-resources
+// ---------------------------------------------------------------------------
 
 interface LiteraturePaper {
   title: string;
@@ -33,10 +104,14 @@ interface LiteraturePaper {
   importance?: string;
 }
 
-interface LiteratureCategory {
+interface LiteratureCategoryFull {
   id: string;
   name: string;
   papers: LiteraturePaper[];
+}
+
+interface LiteratureCategory {
+  papers?: Array<{ authors?: string[]; title?: string }>;
 }
 
 interface PersonEntity {
@@ -57,7 +132,92 @@ interface PersonResourceMatch {
   }>;
 }
 
-// ── Name matching ────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Data loading helpers
+// ---------------------------------------------------------------------------
+
+function loadYaml<T>(relativePath: string): T | null {
+  const fullPath = path.join(ROOT, relativePath);
+  if (!fs.existsSync(fullPath)) return null;
+  const raw = fs.readFileSync(fullPath, 'utf-8');
+  return yaml.parse(raw) as T;
+}
+
+function loadAllEntityFiles(): EntityEntry[] {
+  const dir = path.join(ROOT, 'data/entities');
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml'));
+  const entities: EntityEntry[] = [];
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
+    const parsed = yaml.parse(raw);
+    if (Array.isArray(parsed)) {
+      entities.push(...(parsed as EntityEntry[]));
+    }
+  }
+  return entities;
+}
+
+function loadAllKbThings(): Array<{
+  thing: { id: string; type: string; name?: string };
+}> {
+  const dir = path.join(ROOT, 'packages/kb/data/things');
+  if (!fs.existsSync(dir)) return [];
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml'));
+  const things: Array<{ thing: { id: string; type: string; name?: string } }> =
+    [];
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
+    // KB YAML uses custom !ref, !date, and !src tags
+    const parsed = yaml.parse(raw, {
+      customTags: CUSTOM_TAGS,
+    });
+    if (parsed?.thing) {
+      things.push(parsed);
+    }
+  }
+  return things;
+}
+
+// ---------------------------------------------------------------------------
+// Name matching helpers (shared)
+// ---------------------------------------------------------------------------
+
+/** Names/patterns to exclude from literature author discovery */
+const AUTHOR_BLOCKLIST = new Set(['et al.', 'et al', 'others']);
+
+/** Patterns that indicate a team/org name rather than a person */
+const TEAM_PATTERNS = [/\bteam\b/i, /\bgroup\b/i, /\bcollaboration\b/i];
+
+/** Check if a name looks like a real person (not a team or noise entry) */
+function isPersonName(name: string): boolean {
+  if (AUTHOR_BLOCKLIST.has(name)) return false;
+  if (TEAM_PATTERNS.some((p) => p.test(name))) return false;
+  // Must have at least a first and last name (2+ words)
+  const words = name.trim().split(/\s+/);
+  if (words.length < 2) return false;
+  return true;
+}
+
+/** Normalize a person name to a slug id (e.g. "Dario Amodei" -> "dario-amodei") */
+function nameToSlug(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks
+    .toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/** Convert a slug to a title-case name (e.g. "dario-amodei" -> "Dario Amodei") */
+function slugToName(slug: string): string {
+  return slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+// ── Name matching (link-resources) ───────────────────────────────────
 
 /**
  * Normalize a name for matching: lowercase, trim, remove accents.
@@ -115,29 +275,356 @@ export function matchAuthor(
   return lookup.get(normalized) ?? null;
 }
 
+// ---------------------------------------------------------------------------
+// Discovery logic
+// ---------------------------------------------------------------------------
+
+function discoverCandidates(): Map<string, PersonCandidate> {
+  const candidates = new Map<string, PersonCandidate>();
+
+  function addCandidate(id: string, name: string, source: DataSource): void {
+    const existing = candidates.get(id);
+    if (existing) {
+      // Don't count the same source type + context twice
+      const isDuplicate = existing.sources.some(
+        (s) => s.type === source.type && s.context === source.context,
+      );
+      if (!isDuplicate) {
+        existing.sources.push(source);
+        existing.appearances++;
+      }
+      // Prefer a proper name over a slug-derived name
+      if (name !== slugToName(id) && existing.name === slugToName(id)) {
+        existing.name = name;
+      }
+    } else {
+      candidates.set(id, {
+        id,
+        name,
+        appearances: 1,
+        sources: [source],
+        score: 0,
+      });
+    }
+  }
+
+  // Load existing person entity IDs to exclude
+  const allEntities = loadAllEntityFiles();
+  const existingPersonIds = new Set(
+    allEntities.filter((e) => e.type === 'person').map((e) => e.id),
+  );
+
+  // Source 1: experts.yaml — people listed as experts but not in people.yaml
+  const experts = loadYaml<ExpertEntry[]>('data/experts.yaml');
+  if (experts && Array.isArray(experts)) {
+    for (const expert of experts) {
+      if (!existingPersonIds.has(expert.id)) {
+        addCandidate(expert.id, expert.name, {
+          type: 'expert',
+          context: `experts.yaml (${expert.role || 'no role'}${expert.affiliation ? ' @ ' + expert.affiliation : ''})`,
+        });
+      }
+    }
+  }
+
+  // Source 2: data/organizations.yaml keyPeople
+  const orgs = loadYaml<OrgEntry[]>('data/organizations.yaml');
+  if (orgs && Array.isArray(orgs)) {
+    for (const org of orgs) {
+      if (org.keyPeople) {
+        for (const personId of org.keyPeople) {
+          if (!existingPersonIds.has(personId)) {
+            addCandidate(personId, slugToName(personId), {
+              type: 'org-keyPeople',
+              context: `${org.name} (${org.id})`,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // Source 3: entity YAML relatedEntries with type: person
+  for (const entity of allEntities) {
+    if (entity.relatedEntries) {
+      for (const rel of entity.relatedEntries) {
+        if (rel.type === 'person' && !existingPersonIds.has(rel.id)) {
+          addCandidate(rel.id, slugToName(rel.id), {
+            type: 'entity-relatedEntries',
+            context: `${entity.title || entity.id} (${entity.type})`,
+          });
+        }
+      }
+    }
+  }
+
+  // Source 4: KB things of type person that are not in people.yaml
+  const kbThings = loadAllKbThings();
+  for (const kb of kbThings) {
+    if (kb.thing.type === 'person' && !existingPersonIds.has(kb.thing.id)) {
+      addCandidate(
+        kb.thing.id,
+        kb.thing.name || slugToName(kb.thing.id),
+        {
+          type: 'kb-thing',
+          context: `packages/kb/data/things/${kb.thing.id}.yaml`,
+        },
+      );
+    }
+  }
+
+  // Source 5: literature.yaml authors
+  const literature = loadYaml<{ categories: LiteratureCategory[] }>(
+    'data/literature.yaml',
+  );
+  if (literature?.categories) {
+    for (const category of literature.categories) {
+      if (category.papers) {
+        for (const paper of category.papers) {
+          if (paper.authors) {
+            for (let authorName of paper.authors) {
+              // Strip trailing "et al." from combined names like "Long Ouyang et al."
+              authorName = authorName
+                .replace(/\s+et\s+al\.?\s*$/i, '')
+                .trim();
+              if (!isPersonName(authorName)) continue;
+              const authorSlug = nameToSlug(authorName);
+              if (!existingPersonIds.has(authorSlug)) {
+                addCandidate(authorSlug, authorName, {
+                  type: 'literature-author',
+                  context: `literature.yaml: "${paper.title}"`,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Compute scores based on source type weights
+  const sourceWeights: Record<DataSource['type'], number> = {
+    expert: 5,
+    'org-keyPeople': 4,
+    'entity-relatedEntries': 3,
+    'kb-thing': 4,
+    'literature-author': 2,
+  };
+
+  for (const candidate of candidates.values()) {
+    candidate.score = candidate.sources.reduce(
+      (sum, s) => sum + sourceWeights[s.type],
+      0,
+    );
+  }
+
+  return candidates;
+}
+
+// ---------------------------------------------------------------------------
+// discover command
+// ---------------------------------------------------------------------------
+
+async function discoverCommand(
+  _args: string[],
+  options: DiscoverCommandOptions,
+): Promise<CommandResult> {
+  const minAppearances = options.minAppearances
+    ? parseInt(options.minAppearances, 10)
+    : 1;
+
+  const candidates = discoverCandidates();
+
+  // Filter by min appearances
+  const filtered = Array.from(candidates.values())
+    .filter((c) => c.appearances >= minAppearances)
+    .sort((a, b) => b.score - a.score || b.appearances - a.appearances);
+
+  if (options.json || options.ci) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify(
+        {
+          totalCandidates: candidates.size,
+          filteredCount: filtered.length,
+          minAppearances,
+          candidates: filtered,
+        },
+        null,
+        2,
+      ),
+    };
+  }
+
+  if (filtered.length === 0) {
+    return {
+      exitCode: 0,
+      output:
+        minAppearances > 1
+          ? `No candidates found with ${minAppearances}+ appearances. Try lowering --min-appearances.`
+          : 'No new person candidates found in the data.',
+    };
+  }
+
+  const lines: string[] = [];
+  lines.push('\x1b[1mPeople Discovery Report\x1b[0m');
+  lines.push(
+    `Found ${filtered.length} candidate(s) not in people.yaml (of ${candidates.size} total, min appearances: ${minAppearances})`,
+  );
+  lines.push('');
+
+  // Group by score tier
+  const highScore = filtered.filter((c) => c.score >= 8);
+  const medScore = filtered.filter((c) => c.score >= 4 && c.score < 8);
+  const lowScore = filtered.filter((c) => c.score < 4);
+
+  if (highScore.length > 0) {
+    lines.push('\x1b[32m--- High Priority (score >= 8) ---\x1b[0m');
+    for (const c of highScore) {
+      lines.push(formatCandidate(c));
+    }
+    lines.push('');
+  }
+
+  if (medScore.length > 0) {
+    lines.push('\x1b[33m--- Medium Priority (score 4-7) ---\x1b[0m');
+    for (const c of medScore) {
+      lines.push(formatCandidate(c));
+    }
+    lines.push('');
+  }
+
+  if (lowScore.length > 0) {
+    lines.push('\x1b[2m--- Lower Priority (score < 4) ---\x1b[0m');
+    for (const c of lowScore) {
+      lines.push(formatCandidate(c));
+    }
+    lines.push('');
+  }
+
+  lines.push(
+    '\x1b[2mRun `crux people create` to generate YAML stubs for top candidates.\x1b[0m',
+  );
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+function formatCandidate(c: PersonCandidate): string {
+  const details = c.sources
+    .map((s) => `    - [${s.type}] ${s.context}`)
+    .join('\n');
+  return `  \x1b[1m${c.name}\x1b[0m (${c.id})  score: ${c.score}, appearances: ${c.appearances}\n${details}`;
+}
+
+// ---------------------------------------------------------------------------
+// create command (generate YAML for candidates)
+// ---------------------------------------------------------------------------
+
+async function createCommand(
+  _args: string[],
+  options: DiscoverCommandOptions,
+): Promise<CommandResult> {
+  const minAppearances = options.minAppearances
+    ? parseInt(options.minAppearances, 10)
+    : 2;
+
+  const candidates = discoverCandidates();
+
+  const filtered = Array.from(candidates.values())
+    .filter((c) => c.appearances >= minAppearances)
+    .sort((a, b) => b.score - a.score || b.appearances - a.appearances);
+
+  if (filtered.length === 0) {
+    return {
+      exitCode: 0,
+      output: `No candidates with ${minAppearances}+ appearances to create.`,
+    };
+  }
+
+  const lines: string[] = [];
+  lines.push('# Candidate person entity YAML entries');
+  lines.push('# Generated by `crux people create`');
+  lines.push('# Review each entry before adding to data/entities/people.yaml');
+  lines.push(
+    '# Entity IDs must be allocated via: pnpm crux ids allocate <slug>',
+  );
+  lines.push('');
+
+  for (const c of filtered) {
+    // Collect related org IDs from sources
+    const relatedOrgs = new Set<string>();
+    for (const s of c.sources) {
+      if (s.type === 'org-keyPeople') {
+        const match = s.context.match(/\(([a-z0-9-]+)\)$/);
+        if (match) relatedOrgs.add(match[1]);
+      }
+    }
+
+    // Find role from experts.yaml source
+    let role = '';
+    const expertSource = c.sources.find((s) => s.type === 'expert');
+    if (expertSource) {
+      const roleMatch = expertSource.context.match(
+        /\(([^)]+?)(?:\s+@\s+[^)]+)?\)/,
+      );
+      if (roleMatch && roleMatch[1] !== 'no role') {
+        role = roleMatch[1];
+      }
+    }
+
+    lines.push(`- id: ${c.id}`);
+    lines.push(`  numericId: # Run: pnpm crux ids allocate ${c.id}`);
+    lines.push('  type: person');
+    lines.push(`  title: ${c.name}`);
+
+    if (role) {
+      lines.push('  customFields:');
+      lines.push('    - label: Role');
+      lines.push(`      value: "${role}"`);
+    }
+
+    if (relatedOrgs.size > 0) {
+      lines.push('  relatedEntries:');
+      for (const orgId of relatedOrgs) {
+        lines.push(`    - id: ${orgId}`);
+        lines.push('      type: organization');
+      }
+    }
+
+    const sourceTypes = [...new Set(c.sources.map((s) => s.type))].join(', ');
+    lines.push('  description: >-');
+    lines.push(
+      `    TODO: Add description for ${c.name}. Discovered from: ${sourceTypes}.`,
+    );
+    lines.push('');
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ── link-resources command ───────────────────────────────────────────
 
 async function linkResourcesCommand(
   _args: string[],
-  options: PeopleCommandOptions,
+  options: LinkResourcesCommandOptions,
 ): Promise<CommandResult> {
   const verbose = !!options.verbose;
   const apply = !!options.apply;
 
   // Load people entities
-  const peoplePath = join(DATA_DIR, 'entities/people.yaml');
-  if (!existsSync(peoplePath)) {
+  const peoplePath = path.join(DATA_DIR, 'entities/people.yaml');
+  if (!fs.existsSync(peoplePath)) {
     return { exitCode: 1, output: 'Error: data/entities/people.yaml not found' };
   }
-  const people: PersonEntity[] = parseYaml(readFileSync(peoplePath, 'utf8'));
+  const people: PersonEntity[] = parseYaml(fs.readFileSync(peoplePath, 'utf8'));
 
   // Load literature
-  const litPath = join(DATA_DIR, 'literature.yaml');
-  if (!existsSync(litPath)) {
+  const litPath = path.join(DATA_DIR, 'literature.yaml');
+  if (!fs.existsSync(litPath)) {
     return { exitCode: 1, output: 'Error: data/literature.yaml not found' };
   }
-  const litData = parseYaml(readFileSync(litPath, 'utf8'));
-  const categories: LiteratureCategory[] = litData.categories || [];
+  const litData = parseYaml(fs.readFileSync(litPath, 'utf8'));
+  const categories: LiteratureCategoryFull[] = litData.categories || [];
 
   // Build name lookup
   const authorLookup = buildAuthorLookup(people);
@@ -240,9 +727,9 @@ async function linkResourcesCommand(
       })),
     }));
 
-    const outputPath = join(DATA_DIR, 'people-resources.yaml');
+    const outputPath = path.join(DATA_DIR, 'people-resources.yaml');
     const yamlOutput = stringifyYaml(outputData, { lineWidth: 120 });
-    writeFileSync(outputPath, `# Auto-generated by: pnpm crux people link-resources --apply\n# Maps person entities to their publications from literature.yaml\n# Last generated: ${new Date().toISOString().split('T')[0]}\n\n${yamlOutput}`);
+    fs.writeFileSync(outputPath, `# Auto-generated by: pnpm crux people link-resources --apply\n# Maps person entities to their publications from literature.yaml\n# Last generated: ${new Date().toISOString().split('T')[0]}\n\n${yamlOutput}`);
     lines.push(`\n  Wrote ${outputPath}`);
   } else {
     lines.push(`\n  (dry run — use --apply to write data/people-resources.yaml)`);
@@ -251,27 +738,57 @@ async function linkResourcesCommand(
   return { exitCode: 0, output: lines.join('\n') };
 }
 
-// ── Command dispatch ─────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Command dispatch
+// ---------------------------------------------------------------------------
 
-export const commands = {
+export const commands: Record<
+  string,
+  (args: string[], options: BaseOptions) => Promise<CommandResult>
+> = {
+  discover: discoverCommand,
+  create: createCommand,
   'link-resources': linkResourcesCommand,
-  default: linkResourcesCommand,
+  default: discoverCommand,
 };
 
 export function getHelp(): string {
   return `
-\x1b[1mPeople\x1b[0m — Person entity management tools
+\x1b[1mPeople\x1b[0m — Person entity discovery and data tools
 
 \x1b[1mCommands:\x1b[0m
+  discover         Find people across data sources who are not in people.yaml (default)
+  create           Generate YAML entity stubs for discovered candidates
   link-resources   Match literature papers to person entities by author name
 
-\x1b[1mOptions:\x1b[0m
+\x1b[1mDiscover/Create Options:\x1b[0m
+  --min-appearances=N   Only show people in N+ data sources (default: 1 for discover, 2 for create)
+  --json                JSON output
+  --ci                  JSON output (alias for --json)
+
+\x1b[1mLink-Resources Options:\x1b[0m
   --apply          Write results to data/people-resources.yaml
   --verbose        Show detailed output including unmatched authors
 
+\x1b[1mData Sources Scanned (discover):\x1b[0m
+  1. data/experts.yaml — expert entries not in people.yaml
+  2. data/organizations.yaml — keyPeople references
+  3. data/entities/*.yaml — relatedEntries with type: person
+  4. packages/kb/data/things/ — KB things with type: person
+  5. data/literature.yaml — paper authors
+
+\x1b[1mScoring:\x1b[0m
+  expert = 5pts, kb-thing = 4pts, org-keyPeople = 4pts,
+  entity-relatedEntries = 3pts, literature-author = 2pts
+
 \x1b[1mExamples:\x1b[0m
-  crux people link-resources                  Preview matches (dry run)
-  crux people link-resources --apply          Generate people-resources.yaml
-  crux people link-resources --verbose        Show all match details
+  crux people discover                     # List all candidates
+  crux people discover --min-appearances=2 # Only people in 2+ sources
+  crux people discover --json              # JSON output
+  crux people create                       # Generate YAML stubs (min 2 appearances)
+  crux people create --min-appearances=1   # Include single-mention candidates
+  crux people link-resources               # Preview matches (dry run)
+  crux people link-resources --apply       # Generate people-resources.yaml
+  crux people link-resources --verbose     # Show all match details
 `;
 }
