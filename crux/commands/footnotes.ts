@@ -26,6 +26,7 @@ interface FootnotesCommandOptions extends BaseOptions {
   ci?: boolean;
   dryRun?: boolean;
   'dry-run'?: boolean;
+  offline?: boolean;
 }
 
 interface ClaimReference {
@@ -176,31 +177,36 @@ async function migrateCrCommand(
 ): Promise<CommandResult> {
   const apply = options.apply === true;
   const pageFilter = options.page as string | undefined;
+  const offline = options.offline === true;
 
-  // 1. Check wiki-server availability
-  const available = await isServerAvailable();
-  if (!available) {
-    return {
-      exitCode: 1,
-      output: 'Error: Wiki server is not reachable. Cannot fetch claim reference data.\n' +
-        '  Set LONGTERMWIKI_SERVER_URL in your .env file.',
-    };
-  }
+  // 1. Check wiki-server availability (skip in offline mode)
+  let allRefs: ReferencesAllResponse | null = null;
+  if (!offline) {
+    const available = await isServerAvailable();
+    if (!available) {
+      return {
+        exitCode: 1,
+        output: 'Error: Wiki server is not reachable. Cannot fetch claim reference data.\n' +
+          '  Set LONGTERMWIKI_SERVER_URL in your .env file.\n' +
+          '  Or use --offline to convert all [^cr-] to [^rc-] without KB matching.',
+      };
+    }
 
-  // 2. Fetch all claim references from the wiki-server
-  const refResult = await batchedRequest<ReferencesAllResponse>(
-    'GET',
-    '/api/references/all',
-    undefined,
-    30_000,
-  );
-  if (!refResult.ok) {
-    return {
-      exitCode: 1,
-      output: `Error fetching references: ${refResult.message}`,
-    };
+    // 2. Fetch all claim references from the wiki-server
+    const refResult = await batchedRequest<ReferencesAllResponse>(
+      'GET',
+      '/api/references/all',
+      undefined,
+      30_000,
+    );
+    if (!refResult.ok) {
+      return {
+        exitCode: 1,
+        output: `Error fetching references: ${refResult.message}`,
+      };
+    }
+    allRefs = refResult.data;
   }
-  const allRefs = refResult.data;
 
   // 3. Find all MDX files with [^cr-XXXX] markers
   const allMdxFiles = findMdxFiles(CONTENT_DIR_ABS);
@@ -246,8 +252,8 @@ async function migrateCrCommand(
     // Load KB fact source map for this entity (reuses shared kb-fact-lookup.ts)
     const kbSourceMap = await buildKBFactSourceMap(entityId);
 
-    // Get claim references from the API for this page
-    const pageData = allRefs.pages[slug];
+    // Get claim references from the API for this page (empty if offline)
+    const pageData = allRefs?.pages[slug];
     const claimRefs = pageData?.claimReferences ?? [];
     const citations = pageData?.citations ?? [];
 
@@ -381,6 +387,11 @@ async function migrateCrCommand(
   lines.push(`  \x1b[32m\u2192 ${totalKbMatches} can migrate to [^kb-factId]\x1b[0m`);
   lines.push(`  \x1b[33m\u2192 ${totalRcConversions} will become [^rc-XXXX]\x1b[0m`);
 
+  if (offline) {
+    lines.push('');
+    lines.push('\x1b[2mOffline mode — KB matching skipped. All cr- refs converted to rc-.\x1b[0m');
+  }
+
   if (!apply) {
     lines.push('');
     lines.push('\x1b[2mDry run — no files modified. Use --apply to write changes.\x1b[0m');
@@ -407,10 +418,12 @@ Options:
   --apply         Write changes to MDX files (default: dry-run)
   --page=<id>     Only process a specific page (by slug)
   --ci            JSON output
+  --offline       Skip wiki-server; convert all [^cr-] to [^rc-] (no KB matching)
 
 How it works:
   1. Scans all MDX files for [^cr-XXXX] inline references
   2. Fetches claim reference data from the wiki-server (/api/references/all)
+     (skipped in --offline mode)
   3. For each page, loads KB facts from packages/kb/data/things/{entityId}.yaml
   4. Tries to match claims to KB facts by source URL
   5. If KB match found: converts [^cr-XXXX] to [^kb-{factId}]
@@ -422,6 +435,7 @@ Examples:
   crux footnotes migrate-cr                  Preview all changes (dry run)
   crux footnotes migrate-cr --page=anthropic Preview changes for one page
   crux footnotes migrate-cr --apply          Apply changes to all files
+  crux footnotes migrate-cr --apply --offline Apply without wiki-server
   crux footnotes migrate-cr --ci             JSON output for scripting
 `;
 }
