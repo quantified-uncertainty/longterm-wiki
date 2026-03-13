@@ -128,11 +128,10 @@ function computeAssessment(
   const substantiveRatio = substantiveChanges / totalClaims;
 
   if (assessmentOptions.maxChangeRatio != null && totalClaims > 5) {
-    // Block if EITHER the substantive ratio exceeds the limit OR the full ratio
-    // exceeds 3x the limit (even rephrasing at extreme levels indicates a rewrite)
-    const substantiveExceeded = substantiveRatio > assessmentOptions.maxChangeRatio;
-    const fullExceeded = fullRatio > assessmentOptions.maxChangeRatio * 3;
-    if (substantiveExceeded || fullExceeded) {
+    // Block only on substantive changes (removed + keyValue-changed claims).
+    // Rephrasing (text-only changes without keyValue differences) is not counted
+    // toward blocking because it doesn't represent factual changes.
+    if (substantiveRatio > assessmentOptions.maxChangeRatio) {
       issues.push(
         `${Math.round(substantiveRatio * 100)}% substantive changes (${Math.round(fullRatio * 100)}% total) — ` +
         `exceeds max ${Math.round(assessmentOptions.maxChangeRatio * 100)}% ` +
