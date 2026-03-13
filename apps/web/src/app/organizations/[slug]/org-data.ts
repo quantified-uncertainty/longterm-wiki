@@ -466,7 +466,19 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const orgModels = getTypedEntities()
     .filter(isAiModel)
     .filter((m) => m.developer === slug && m.releaseDate)
-    .sort((a, b) => (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""));
+    .sort((a, b) => (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""))
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      entityType: m.entityType,
+      numericId: m.numericId,
+      releaseDate: m.releaseDate ?? null,
+      inputPrice: m.inputPrice ?? null,
+      outputPrice: m.outputPrice ?? null,
+      contextWindow: m.contextWindow ?? null,
+      safetyLevel: m.safetyLevel ?? null,
+      benchmarks: m.benchmarks?.length ? m.benchmarks : null,
+    }));
 
   // Headquarters text
   const hqText =

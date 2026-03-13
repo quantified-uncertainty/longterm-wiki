@@ -1,6 +1,6 @@
 /**
  * Board of Directors section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Compact table layout matching the Key People table.
  */
 import Link from "next/link";
 import { formatKBDate } from "@/components/wiki/kb/format";
@@ -14,77 +14,64 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
 
   const current = members.filter((m) => !m.departed);
   const former = members.filter((m) => !!m.departed);
+  const sorted = [...current, ...former];
 
   return (
     <section>
       <SectionHeader title="Board of Directors" count={members.length} />
-      <div className="border border-border/60 rounded-xl bg-card">
-        {current.length > 0 && (
-          <div className="divide-y divide-border/40">
-            {current.map((m) => {
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Name</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Role</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Status</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Tenure</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {sorted.map((m) => {
+              const isCurrent = !m.departed;
               const verdict = getRecordVerdict("personnel", String(m.key));
+              const tenure = m.appointed
+                ? `${formatKBDate(m.appointed)}${m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : " \u2013 present"}`
+                : m.departed
+                  ? `\u2013 ${formatKBDate(m.departed)}`
+                  : "";
+
               return (
-                <div key={m.key} className="px-4 py-3">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {m.personHref ? (
-                      <Link href={m.personHref} className="font-semibold text-sm text-primary hover:underline">
-                        {m.personName}
-                      </Link>
-                    ) : (
-                      <span className="font-semibold text-sm">{m.personName}</span>
-                    )}
-                    <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                      Current
-                    </span>
-                    <VerificationBadge verdict={verdict} />
-                  </div>
-                  {m.role && (
-                    <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
-                  )}
-                  <div className="text-[11px] text-muted-foreground mt-1">
-                    {m.appointed ? `Since ${formatKBDate(m.appointed)}` : ""}
-                    {m.appointedBy ? ` (${m.appointedBy})` : ""}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {former.length > 0 && (
-          <>
-            {current.length > 0 && (
-              <div className="px-4 py-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground bg-muted/30 border-t border-border/40">
-                Former
-              </div>
-            )}
-            <div className="divide-y divide-border/40">
-              {former.map((m) => {
-                const verdict = getRecordVerdict("personnel", String(m.key));
-                return (
-                  <div key={m.key} className="px-4 py-2.5 opacity-70">
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                <tr
+                  key={m.key}
+                  className={`hover:bg-muted/20 transition-colors${!isCurrent ? " opacity-60" : ""}`}
+                >
+                  <td className="py-1.5 px-3">
+                    <span className="flex items-center gap-1.5">
                       {m.personHref ? (
-                        <Link href={m.personHref} className="font-semibold text-sm hover:text-primary transition-colors">
+                        <Link href={m.personHref} className="font-medium text-foreground hover:text-primary transition-colors">
                           {m.personName}
                         </Link>
                       ) : (
-                        <span className="font-semibold text-sm">{m.personName}</span>
+                        <span className="font-medium">{m.personName}</span>
                       )}
                       <VerificationBadge verdict={verdict} />
-                    </div>
-                    {m.role && (
-                      <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
+                    </span>
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground">{m.role ?? ""}</td>
+                  <td className="py-1.5 px-3">
+                    {isCurrent ? (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                        Current
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Former</span>
                     )}
-                    <div className="text-[11px] text-muted-foreground mt-1">
-                      {m.appointed ? formatKBDate(m.appointed) : ""}
-                      {m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : ""}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">{tenure}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );

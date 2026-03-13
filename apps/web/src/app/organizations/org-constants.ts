@@ -1,7 +1,7 @@
 /** Human-readable labels for org types used in badges and filters. */
 export const ORG_TYPE_LABELS: Record<string, string> = {
-  "frontier-lab": "Frontier Lab",
-  "safety-org": "Safety Org",
+  "frontier-lab": "Frontier AI Lab",
+  "safety-org": "Safety Organization",
   academic: "Academic",
   startup: "Startup",
   generic: "Organization",

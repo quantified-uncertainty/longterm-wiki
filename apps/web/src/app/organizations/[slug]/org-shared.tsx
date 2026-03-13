@@ -198,6 +198,87 @@ export function PersonRow({
   );
 }
 
+/** Compact unified people table with columns: Name, Title, Tags, Tenure. */
+export function PeopleTable({
+  people,
+}: {
+  people: Array<{
+    name: string;
+    title?: string;
+    slug?: string;
+    entityType?: string;
+    isFounder?: boolean;
+    isBoard?: boolean;
+    isCurrent?: boolean;
+    start?: string;
+    end?: string;
+  }>;
+}) {
+  if (people.length === 0) return null;
+
+  const hasBoard = people.some((p) => p.isBoard);
+
+  return (
+    <div className="border border-border rounded-xl overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <th scope="col" className="py-2 px-3 text-left font-medium">Name</th>
+            <th scope="col" className="py-2 px-3 text-left font-medium">Role</th>
+            <th scope="col" className="py-2 px-3 text-left font-medium">Tags</th>
+            <th scope="col" className="py-2 px-3 text-left font-medium">Tenure</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border/50">
+          {people.map((person, i) => {
+            const href = person.slug && person.entityType
+              ? person.entityType === "organization"
+                ? `/organizations/${person.slug}`
+                : `/people/${person.slug}`
+              : undefined;
+
+            const tenure = person.start
+              ? `${formatKBDate(person.start)}${person.end ? ` \u2013 ${formatKBDate(person.end)}` : " \u2013 present"}`
+              : "";
+
+            const isFormer = person.isCurrent === false;
+
+            return (
+              <tr key={`${person.name}-${i}`} className={`hover:bg-muted/20 transition-colors${isFormer ? " opacity-60" : ""}`}>
+                <td className="py-1.5 px-3">
+                  {href ? (
+                    <Link href={href} className="font-medium text-foreground hover:text-primary transition-colors">
+                      {person.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium">{person.name}</span>
+                  )}
+                </td>
+                <td className="py-1.5 px-3 text-muted-foreground">{person.title ?? ""}</td>
+                <td className="py-1.5 px-3">
+                  <span className="flex items-center gap-1">
+                    {person.isFounder && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                        Founder
+                      </span>
+                    )}
+                    {person.isBoard && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                        Board
+                      </span>
+                    )}
+                  </span>
+                </td>
+                <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">{tenure}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function Badge({ children, color }: { children: React.ReactNode; color?: string }) {
   const colorClass =
     color ?? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
