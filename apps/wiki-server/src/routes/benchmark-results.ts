@@ -108,13 +108,15 @@ const benchmarkResultsApp = new Hono()
       .where(eq(benchmarks.id, benchmarkId))
       .limit(1);
 
-    const sortDirection = benchmark?.higherIsBetter !== false ? desc : (col: typeof benchmarkResults.score) => col;
+    const scoreOrder = benchmark?.higherIsBetter === false
+      ? benchmarkResults.score          // ascending for lower-is-better
+      : desc(benchmarkResults.score);   // descending for higher-is-better
 
     const rows = await db
       .select()
       .from(benchmarkResults)
       .where(eq(benchmarkResults.benchmarkId, benchmarkId))
-      .orderBy(desc(benchmarkResults.score))
+      .orderBy(scoreOrder)
       .limit(limit)
       .offset(offset);
 
