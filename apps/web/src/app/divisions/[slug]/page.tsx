@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  getAllKBRecordsByCollection,
+  getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
   getKBRecords,
@@ -126,7 +126,7 @@ function parseDivisionPersonnel(record: KBRecordEntry): ParsedDivisionPersonnel 
 // ── Lookup helpers ────────────────────────────────────────────────────
 
 function findDivisionBySlug(slug: string): KBRecordEntry | undefined {
-  const allDivisions = getAllKBRecordsByCollection("divisions");
+  const allDivisions = getAllKBRecords("divisions");
   return allDivisions.find((d) => {
     const divSlug = d.fields.slug as string | undefined;
     return divSlug === slug || d.key === slug;
@@ -134,7 +134,7 @@ function findDivisionBySlug(slug: string): KBRecordEntry | undefined {
 }
 
 function getAllDivisionSlugs(): string[] {
-  const allDivisions = getAllKBRecordsByCollection("divisions");
+  const allDivisions = getAllKBRecords("divisions");
   const slugs: string[] = [];
   for (const d of allDivisions) {
     const slug = d.fields.slug as string | undefined;
@@ -249,7 +249,7 @@ export default async function DivisionDetailPage({ params }: PageProps) {
   }
 
   // Find funding programs linked to this division
-  const allPrograms = getAllKBRecordsByCollection("funding-programs");
+  const allPrograms = getAllKBRecords("funding-programs");
   const divisionPrograms = allPrograms
     .filter((p) => {
       const divId = p.fields.divisionId;
