@@ -73,10 +73,10 @@ function loadDatabase() {
 
   // Build entity type lookup: slug → entityType
   const entities = {};
-  if (db.entities) {
-    for (const entity of db.entities) {
-      if (entity.id && entity.type) {
-        entities[entity.id] = entity.type;
+  if (db.typedEntities) {
+    for (const entity of db.typedEntities) {
+      if (entity.id && entity.entityType) {
+        entities[entity.id] = entity.entityType;
       }
     }
   }

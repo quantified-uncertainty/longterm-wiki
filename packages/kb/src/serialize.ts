@@ -74,6 +74,9 @@ export function serialize(
       const currentSlug = filenameMap.get(entity.id);
       if (currentSlug) {
         for (const prevSlug of entity.previousSlugs) {
+          if (previousSlugToCurrentSlug[prevSlug] && previousSlugToCurrentSlug[prevSlug] !== currentSlug) {
+            console.warn(`[kb] duplicate previousSlug "${prevSlug}": claimed by both "${previousSlugToCurrentSlug[prevSlug]}" and "${currentSlug}"`);
+          }
           previousSlugToCurrentSlug[prevSlug] = currentSlug;
         }
       }
