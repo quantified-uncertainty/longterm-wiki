@@ -31,7 +31,7 @@ import {
   Shield,
 } from "lucide-react";
 import { cn } from "@lib/utils";
-import { safeHref } from "@/lib/directory-utils";
+import { safeHref, CREDIBILITY_DESCRIPTIONS, getPageTitle } from "@/lib/directory-utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -61,26 +61,6 @@ function formatDate(iso: string): string {
   }
 }
 
-/** Resolve a page slug to its display title */
-function getPageTitle(pageId: string): string {
-  const entity = getEntityById(pageId);
-  if (entity?.title) return entity.title;
-  const page = getPageById(pageId);
-  if (page?.title) return page.title;
-  // Fall back to formatting the slug
-  return pageId
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
-
-const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
-  5: "Gold standard. Rigorous peer review, high editorial standards, and strong institutional reputation.",
-  4: "High quality. Established institution or organization with editorial oversight and accountability.",
-  3: "Good quality. Reputable source with community review or editorial standards, but less rigorous than peer-reviewed venues.",
-  2: "Mixed quality. Some useful content but inconsistent editorial standards. Claims should be verified.",
-  1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
-};
 
 /** Resolve an author name to a linked element or plain text */
 function AuthorName({ name }: { name: string }) {

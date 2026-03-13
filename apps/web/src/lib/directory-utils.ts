@@ -124,3 +124,28 @@ export function fieldStr(
   const v = fields[key];
   return v != null ? String(v) : null;
 }
+
+// ── Source / publication shared utilities ─────────────────────────
+
+import { getEntityById, getPageById } from "@/data";
+
+/** Human-readable descriptions for credibility levels 1–5. */
+export const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
+  5: "Gold standard. Rigorous peer review, high editorial standards, and strong institutional reputation.",
+  4: "High quality. Established institution or organization with editorial oversight and accountability.",
+  3: "Good quality. Reputable source with community review or editorial standards, but less rigorous than peer-reviewed venues.",
+  2: "Mixed quality. Some useful content but inconsistent editorial standards. Claims should be verified.",
+  1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
+};
+
+/** Resolve a page slug to its display title (entity title → page title → slug). */
+export function getPageTitle(pageId: string): string {
+  const entity = getEntityById(pageId);
+  if (entity?.title) return entity.title;
+  const page = getPageById(pageId);
+  if (page?.title) return page.title;
+  return pageId
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}

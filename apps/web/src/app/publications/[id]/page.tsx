@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  getAllPublications,
   getPublicationById,
   getResourcesForPublication,
   getPagesForResource,
-  getEntityById,
-  getPageById,
   getEntityHref,
 } from "@/data";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
@@ -23,6 +20,7 @@ import {
   CheckCircle2,
   ArrowLeft,
 } from "lucide-react";
+import { CREDIBILITY_DESCRIPTIONS, getPageTitle } from "@/lib/directory-utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -44,29 +42,10 @@ export async function generateMetadata({
   };
 }
 
-const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
-  5: "Gold standard. Rigorous peer review, high editorial standards, and strong institutional reputation.",
-  4: "High quality. Established institution or organization with editorial oversight and accountability.",
-  3: "Good quality. Reputable source with community review or editorial standards, but less rigorous than peer-reviewed venues.",
-  2: "Mixed quality. Some useful content but inconsistent editorial standards. Claims should be verified.",
-  1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
-};
-
 function formatType(type: string): string {
   return type
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function getPageTitle(pageId: string): string {
-  const entity = getEntityById(pageId);
-  if (entity?.title) return entity.title;
-  const page = getPageById(pageId);
-  if (page?.title) return page.title;
-  return pageId
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 }
 
 export default async function PublicationDetailPage({ params }: PageProps) {
