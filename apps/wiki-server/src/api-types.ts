@@ -435,20 +435,6 @@ export interface PageCitationRow {
   createdAt: string;
 }
 
-// -- Citation linking types --------------------------------------------------
-
-export const LinkCitationClaimSchema = z.object({
-  claimId: z.number().int().positive(),
-});
-export type LinkCitationClaim = z.infer<typeof LinkCitationClaimSchema>;
-
-export const LinkCitationsClaimsBatchSchema = z.object({
-  items: z.array(z.object({
-    quoteId: z.number().int().positive(),
-    claimId: z.number().int().positive(),
-  })).min(1).max(200),
-});
-
 // ---------------------------------------------------------------------------
 // Page Links
 // ---------------------------------------------------------------------------
