@@ -28,8 +28,9 @@ import {
   FactsPanel,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import { getExpertById, getPublicationsForPerson } from "@/data";
+import { getEntityById, getExpertById, getPublicationsForPerson } from "@/data";
 import { ExpertPositions } from "./expert-positions";
+import { SocialLinks } from "./social-links";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -71,6 +72,9 @@ export default async function PersonProfilePage({
   // Expert positions from experts.yaml
   const expert = getExpertById(slug);
   const positions = expert?.positions ?? [];
+
+  // Entity data for website/sources (from entities YAML, keyed by slug)
+  const yamlEntity = getEntityById(slug);
 
   // Publications linked to this person (from literature.yaml via people-resources.yaml)
   const publications = getPublicationsForPerson(slug);
@@ -211,11 +215,14 @@ export default async function PersonProfilePage({
             >
               KB data &rarr;
             </Link>
-            {socialMediaFact?.value.type === "text" && (
-              <span className="text-muted-foreground">
-                {socialMediaFact.value.value}
-              </span>
-            )}
+          </div>
+          <div className="mt-2.5">
+            <SocialLinks
+              entityWebsite={yamlEntity?.website}
+              expertWebsite={expert?.website}
+              socialMediaFact={socialMediaFact}
+              entitySources={yamlEntity?.sources}
+            />
           </div>
         </div>
       </div>
