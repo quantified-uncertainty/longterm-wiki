@@ -1661,6 +1661,71 @@ export const divisionPersonnel = pgTable(
 );
 
 /**
+ * Benchmarks — AI evaluation benchmark definitions.
+ */
+export const benchmarks = pgTable(
+  "benchmarks",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    category: text("category"), // coding | reasoning | math | knowledge | multimodal | safety | agentic | general
+    description: text("description"),
+    website: text("website"),
+    scoringMethod: text("scoring_method"),
+    higherIsBetter: boolean("higher_is_better").notNull().default(true),
+    introducedDate: text("introduced_date"),
+    maintainer: text("maintainer"),
+    source: text("source"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_benchmarks_category").on(table.category),
+  ]
+);
+
+/**
+ * Benchmark results — individual model scores on benchmarks.
+ */
+export const benchmarkResults = pgTable(
+  "benchmark_results",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    benchmarkId: varchar("benchmark_id", { length: 10 })
+      .notNull()
+      .references(() => benchmarks.id),
+    modelId: text("model_id").notNull(), // entity slug of the ai-model
+    score: doublePrecision("score").notNull(),
+    unit: text("unit"),
+    date: text("date"),
+    sourceUrl: text("source_url"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_br_benchmark").on(table.benchmarkId),
+    index("idx_br_model").on(table.modelId),
+    uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
+  ]
+);
+
+/**
  * Funding programs — RFPs, grant rounds, fellowships, prizes, solicitations.
  * Complementary to `grants` (individual awards). Individual grants link to their
  * parent program via `grants.programId`.

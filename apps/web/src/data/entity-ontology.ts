@@ -249,6 +249,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     badgeColor: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
     headerColor: "#9333ea",
   },
+  benchmark: {
+    label: "Benchmark",
+    icon: BarChart3,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+    headerColor: "#059669",
+  },
 };
 
 /**
@@ -294,6 +301,7 @@ export const ENTITY_GROUPS: { label: string; types: string[] }[] = [
   { label: "Risks", types: ["risk", "risk-factor"] },
   { label: "Responses", types: ["approach", "safety-agenda", "policy"] },
   { label: "AI Models", types: ["ai-model"] },
+  { label: "Benchmarks", types: ["benchmark"] },
   { label: "Projects", types: ["project"] },
   { label: "Organizations", types: ["organization"] },
   { label: "People", types: ["person"] },

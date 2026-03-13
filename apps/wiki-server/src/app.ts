@@ -41,6 +41,8 @@ import { equityPositionsRoute } from "./routes/equity-positions.js";
 import { divisionsRoute } from "./routes/divisions.js";
 import { divisionPersonnelRoute } from "./routes/division-personnel.js";
 import { fundingProgramsRoute } from "./routes/funding-programs.js";
+import { benchmarksRoute } from "./routes/benchmarks.js";
+import { benchmarkResultsRoute } from "./routes/benchmark-results.js";
 
 let requestCounter = 0;
 
@@ -157,6 +159,8 @@ export function createApp() {
   app.route("/api/divisions", divisionsRoute);
   app.route("/api/division-personnel", divisionPersonnelRoute);
   app.route("/api/funding-programs", fundingProgramsRoute);
+  app.route("/api/benchmarks", benchmarksRoute);
+  app.route("/api/benchmark-results", benchmarkResultsRoute);
 
   return app;
 }

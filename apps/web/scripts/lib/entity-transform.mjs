@@ -240,6 +240,17 @@ function transformEntity(raw, expertMap, orgMap) {
         capabilities: raw.capabilities || [],
       };
 
+    case 'benchmark':
+      return {
+        ...base,
+        entityType: 'benchmark',
+        category: raw.category,
+        scoringMethod: raw.scoringMethod,
+        higherIsBetter: raw.higherIsBetter ?? true,
+        introducedDate: raw.introducedDate,
+        maintainer: raw.maintainer,
+      };
+
     case 'approach':
     case 'concept':
     case 'crux':
