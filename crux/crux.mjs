@@ -43,6 +43,7 @@
  *   audits      System-level behavioral verification (ongoing + post-merge)
  *   release     Production release management (create release PRs from main → production)
  *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
+ *   backfill-grantee-ids Backfill granteeId with matched entity stableIds
  *   import-divisions Import curated organizational divisions
  *   import-funding-programs Import curated funding programs
  *   people       Person discovery and data tools (discover, enrich)
@@ -102,6 +103,7 @@ import * as kbCommands from './commands/kb.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
+import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
@@ -148,6 +150,7 @@ const domains = {
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
+  'backfill-grantee-ids': backfillGranteeIdsCommands,
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
@@ -238,6 +241,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   footnotes        Footnote migration tools (migrate-cr)
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
   import-grants    Import external grant databases (Coefficient Giving, EA Funds)
+  backfill-grantee-ids  Backfill granteeId with matched entity stableIds
   import-divisions Import curated organizational divisions
   import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, enrich)
