@@ -25,23 +25,17 @@ import {
   type SourceFetchErrorType,
 } from '../lib/search/paywall-detection.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import {
+  VALID_RECORD_TYPES,
+  VALID_VERIFICATION_VERDICTS,
+  type RecordType,
+  type VerificationVerdict,
+} from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
 const MAX_CONTENT_LENGTH = 8000;
 const FETCH_TIMEOUT_MS = 15_000;
-
-const VALID_RECORD_TYPES = [
-  'grant',
-  'personnel',
-  'division',
-  'funding-program',
-  'funding-round',
-  'investment',
-  'equity-position',
-] as const;
-
-type RecordType = (typeof VALID_RECORD_TYPES)[number];
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -53,8 +47,6 @@ interface VerifyCommandOptions extends BaseOptions {
   limit?: string;
   ci?: boolean;
 }
-
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial';
 
 interface RecordToVerify {
   recordType: RecordType;
@@ -427,8 +419,7 @@ async function verifySingleRecord(
       reasoning: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
+    const verdict = (VALID_VERIFICATION_VERDICTS as readonly string[]).includes(parsed.verdict)
       ? (parsed.verdict as VerificationVerdict)
       : 'unverifiable';
 

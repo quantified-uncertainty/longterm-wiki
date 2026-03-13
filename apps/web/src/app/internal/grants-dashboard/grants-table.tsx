@@ -14,6 +14,7 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { safeHref } from "@/lib/format-compact";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,7 +68,7 @@ const columns: ColumnDef<GrantRow>[] = [
       const source = row.original.source;
       return source ? (
         <a
-          href={source.startsWith("http") ? source : "#"}
+          href={safeHref(source)}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[300px] truncate block"

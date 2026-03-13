@@ -30,6 +30,32 @@ export const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 export const PageIdSchema = z.string().min(1).max(200);
 
 // ---------------------------------------------------------------------------
+// Record Verifications
+// ---------------------------------------------------------------------------
+
+export const VALID_RECORD_TYPES = [
+  "grant",
+  "personnel",
+  "division",
+  "funding-program",
+  "funding-round",
+  "investment",
+  "equity-position",
+] as const;
+
+export type RecordType = (typeof VALID_RECORD_TYPES)[number];
+
+export const VALID_VERIFICATION_VERDICTS = [
+  "confirmed",
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+] as const;
+
+export type VerificationVerdict = (typeof VALID_VERIFICATION_VERDICTS)[number];
+
+// ---------------------------------------------------------------------------
 // Edit Logs
 // ---------------------------------------------------------------------------
 

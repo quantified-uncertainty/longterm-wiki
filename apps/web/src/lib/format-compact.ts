@@ -22,3 +22,8 @@ export function formatCompactNumber(n: number | null | undefined): string {
   if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
   return n.toLocaleString();
 }
+
+/** Return href only if it is a safe HTTP(S) URL; otherwise "#". Prevents XSS via javascript: URIs. */
+export function safeHref(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : "#";
+}

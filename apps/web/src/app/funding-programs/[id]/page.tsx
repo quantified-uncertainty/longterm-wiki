@@ -10,6 +10,7 @@ import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
   titleCase,
@@ -346,7 +347,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
           {program.applicationUrl && (
             <DetailSection title="Application">
               <a
-                href={program.applicationUrl}
+                href={safeHref(program.applicationUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-primary hover:underline break-all"
@@ -361,7 +362,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
             <DetailSection title="Source">
               {isUrl(program.source) ? (
                 <a
-                  href={program.source}
+                  href={safeHref(program.source)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline break-all"

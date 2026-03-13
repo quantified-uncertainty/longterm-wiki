@@ -8,6 +8,7 @@ import {
   getRelatedModels,
 } from "../ai-model-utils";
 import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
+import { safeHref } from "@/lib/directory-utils";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));
@@ -181,7 +182,7 @@ export default async function AiModelDetailPage({
           )}
           {entity.sources?.length > 0 && entity.sources[0].url && (
             <a
-              href={entity.sources[0].url}
+              href={safeHref(entity.sources[0].url)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:text-primary/80 font-medium transition-colors"
@@ -481,7 +482,7 @@ export default async function AiModelDetailPage({
                   <div key={`${i}-${source.title}`} className="px-4 py-3">
                     {source.url ? (
                       <a
-                        href={source.url}
+                        href={safeHref(source.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm font-medium hover:text-primary transition-colors"

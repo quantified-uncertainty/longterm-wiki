@@ -12,22 +12,7 @@
 
 import { generateId } from "../lib/grant-import/id.ts";
 import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
-import { FUNDER_IDS } from "../lib/grant-import/constants.ts";
-
-// ---------------------------------------------------------------------------
-// Org entity stableIds (from kb-data.json slugToEntityId mapping)
-// ---------------------------------------------------------------------------
-
-const ORG_IDS = {
-  ...FUNDER_IDS,
-  OPEN_PHILANTHROPY: "ULjDXpSLCI", // Coefficient Giving / Open Philanthropy
-  ANTHROPIC: "mK9pX3rQ7n",
-  OPENAI: "1LcLlMGLbw",
-  DEEPMIND: "A4XoubikkQ",
-  MIRI: "puAffUjWSS",
-  FLI: "d9sWZtyVwg",
-  SCHMIDT_FUTURES: "h6ntSGk8fg",
-} as const;
+import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
 // Division ID helper — must match the seeds used in import-divisions.ts

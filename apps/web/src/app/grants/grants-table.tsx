@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { formatCompactCurrency } from "@/lib/format-compact";
+import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 import { compareGrantRows, type SortDir } from "./grants-sort";
 
 export interface GrantRow {
@@ -241,7 +241,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   </Link>
                   {row.source && (
                     <a
-                      href={row.source}
+                      href={safeHref(row.source)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
