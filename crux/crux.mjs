@@ -44,6 +44,7 @@
  *   release     Production release management (create release PRs from main → production)
  *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
  *   backfill-grantee-ids Backfill granteeId with matched entity stableIds
+ *   backfill-program-ids Backfill programId linking grants to funding programs
  *   import-divisions Import curated organizational divisions
  *   import-funding-programs Import curated funding programs
  *   people       Person discovery and data tools (discover, create, link-resources, enrich)
@@ -104,6 +105,7 @@ import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
 import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
+import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
@@ -152,6 +154,7 @@ const domains = {
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
   'backfill-grantee-ids': backfillGranteeIdsCommands,
+  'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
@@ -244,6 +247,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
   import-grants    Import external grant databases (Coefficient Giving, EA Funds)
   backfill-grantee-ids  Backfill granteeId with matched entity stableIds
+  backfill-program-ids  Backfill programId linking grants to funding programs
   import-divisions Import curated organizational divisions
   import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, create, link-resources, enrich)

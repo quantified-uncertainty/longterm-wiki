@@ -133,3 +133,25 @@ export function printByFunder(syncGrants: SyncGrant[]): void {
     console.log(`  ${entry.organizationId}: ${entry.count} grants`);
   }
 }
+
+export function printProgramMatchStats(grants: RawGrant[]): void {
+  const withProgram = grants.filter((g) => g.programId != null);
+  const withoutProgram = grants.filter((g) => g.programId == null);
+  const rate = grants.length > 0 ? withProgram.length / grants.length : 0;
+
+  console.log(`\nProgram matching:`);
+  console.log(`  Matched: ${withProgram.length} (${(rate * 100).toFixed(1)}%)`);
+  console.log(`  Unmatched: ${withoutProgram.length}`);
+
+  // Breakdown by program ID
+  if (withProgram.length > 0) {
+    const byProgram = new Map<string, number>();
+    for (const g of withProgram) {
+      byProgram.set(g.programId!, (byProgram.get(g.programId!) || 0) + 1);
+    }
+    console.log(`  Programs used: ${byProgram.size}`);
+    for (const [progId, count] of [...byProgram.entries()].sort((a, b) => b[1] - a[1])) {
+      console.log(`    ${progId}: ${count} grants`);
+    }
+  }
+}

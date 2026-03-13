@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
+import { logger } from "../logger.js";
 import { grants } from "../schema.js";
 import {
   parseJsonBody,
@@ -56,6 +57,17 @@ const BatchUpdateGranteeItemSchema = z.object({
 
 const BatchUpdateGranteeSchema = z.object({
   items: z.array(BatchUpdateGranteeItemSchema).min(1).max(500),
+});
+
+// ---- Batch program update schema ----
+
+const BatchUpdateProgramItemSchema = z.object({
+  id: z.string().length(10),
+  programId: z.string().max(200),
+});
+
+const BatchUpdateProgramSchema = z.object({
+  items: z.array(BatchUpdateProgramItemSchema).min(1).max(500),
 });
 
 // ---- Helpers ----
@@ -246,21 +258,80 @@ const grantsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    let updated = 0;
+    // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
+    const valuesList = items
+      .map((item) => sql`(${item.id}, ${item.granteeId})`)
+      .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
 
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .update(grants)
-          .set({
-            granteeId: item.granteeId,
-            updatedAt: sql`now()`,
-          })
-          .where(eq(grants.id, item.id));
+    const result = await db.execute(sql`
+      UPDATE grants SET grantee_id = v.grantee_id, updated_at = now()
+      FROM (VALUES ${valuesList}) AS v(id, grantee_id)
+      WHERE grants.id = v.id
+    `);
 
-        updated++;
-      }
+    const updated = Number(result.rowCount ?? items.length);
+
+    return c.json({ updated });
+  })
+
+  // ---- GET /all-program-ids ----
+  // Returns all grant IDs with their current programId, organizationId,
+  // source, name, and notes. Used by backfill-program-ids to match grants
+  // to funding programs.
+  .get("/all-program-ids", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        id: grants.id,
+        programId: grants.programId,
+        organizationId: grants.organizationId,
+        source: grants.source,
+        name: grants.name,
+        notes: grants.notes,
+      })
+      .from(grants);
+
+    return c.json({
+      grants: rows.map((r) => ({
+        id: r.id,
+        programId: r.programId,
+        organizationId: r.organizationId,
+        source: r.source,
+        name: r.name,
+        notes: r.notes,
+      })),
+      total: rows.length,
     });
+  })
+
+  // ---- PATCH /batch-update-program ----
+  // Updates programId for multiple grants using bulk SQL.
+  // Used by the backfill-program-ids command.
+  .patch("/batch-update-program", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchUpdateProgramSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    logger.info(`batch-update-program: updating ${items.length} grants`);
+
+    // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
+    const valuesList = items
+      .map((item) => sql`(${item.id}, ${item.programId})`)
+      .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
+
+    const result = await db.execute(sql`
+      UPDATE grants SET program_id = v.program_id, updated_at = now()
+      FROM (VALUES ${valuesList}) AS v(id, program_id)
+      WHERE grants.id = v.id
+    `);
+
+    const updated = Number(result.rowCount ?? items.length);
 
     return c.json({ updated });
   })

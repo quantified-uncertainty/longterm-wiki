@@ -1,4 +1,5 @@
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -144,6 +145,15 @@ export function parseACXGrants(
         ? "https://www.astralcodexten.com/p/acx-grants-results-2024"
         : "https://www.astralcodexten.com/p/acx-grants-results-2025";
 
+    const description = `ACX Grants ${entry.round} round`;
+    const programId = matchProgram({
+      source: "acx-grants",
+      funderId: FUNDER_IDS.ACX_GRANTS,
+      focusArea: null,
+      name: entry.description.substring(0, 500),
+      description,
+    });
+
     return {
       source: "acx-grants",
       funderId: FUNDER_IDS.ACX_GRANTS,
@@ -153,8 +163,9 @@ export function parseACXGrants(
       amount: entry.amount,
       date: entry.round,
       focusArea: null,
-      description: `ACX Grants ${entry.round} round`,
+      description,
       sourceUrl,
+      programId,
     };
   });
 }

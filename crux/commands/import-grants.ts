@@ -22,6 +22,7 @@ import {
   printTopUnmatched,
   checkIdCollisions,
   printByFunder,
+  printProgramMatchStats,
 } from "../lib/grant-import/analysis.ts";
 import { printDuplicateAnalysis, deduplicateGrants } from "../lib/grant-import/dedup.ts";
 import { ALL_SOURCES } from "../lib/grant-import/sources/index.ts";
@@ -82,6 +83,7 @@ async function cmdAnalyze(sourceFilter?: string) {
   }
 
   printMatchStats(allGrants);
+  printProgramMatchStats(allGrants);
   printTopUnmatched(allGrants);
 
   const syncGrants = allGrants.map(g => {

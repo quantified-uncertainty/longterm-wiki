@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -135,6 +136,14 @@ export const source: GrantSource = {
         ? grantName.substring(0, 500)
         : `Grant to ${orgName}`.substring(0, 500);
 
+      const programId = matchProgram({
+        source: "givewell",
+        funderId: FUNDER_IDS.GIVEWELL,
+        focusArea: topic,
+        name,
+        description: null,
+      });
+
       grants.push({
         source: "givewell",
         funderId: FUNDER_IDS.GIVEWELL,
@@ -145,6 +154,7 @@ export const source: GrantSource = {
         date: isoDate,
         focusArea: topic,
         description: null,
+        programId,
       });
     }
 

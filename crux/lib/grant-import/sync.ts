@@ -51,6 +51,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     status: null,
     source: raw.sourceUrl ?? defaultSourceUrl,
     notes,
+    programId: raw.programId ?? null,
   };
 }
 

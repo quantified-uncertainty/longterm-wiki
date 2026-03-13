@@ -245,6 +245,16 @@ const PROGRAMS: FundingProgramDef[] = [
     status: "awarded",
     source: "https://www.astralcodexten.com/p/announcing-acx-grants-2",
   },
+  {
+    idSeed: "prog|acx|grants-2025",
+    orgId: ORG_IDS.ACX_GRANTS,
+    name: "ACX Grants 2025",
+    description:
+      "Third round of ACX Grants, funding projects in rationality, EA, and scientific research",
+    programType: "grant-round",
+    status: "awarded",
+    source: "https://www.astralcodexten.com/",
+  },
 ];
 
 // ---------------------------------------------------------------------------
