@@ -4,8 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import type { SortDir } from "@/lib/sort-utils";
-import { compareOrgRows } from "./org-sort";
-import type { OrgSortKey } from "./org-sort";
+import { compareOrgRows } from "@/app/organizations/org-sort";
+import type { OrgSortKey } from "@/app/organizations/org-sort";
 
 export interface OrgRow {
   id: string;
