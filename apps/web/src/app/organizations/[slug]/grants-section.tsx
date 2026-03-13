@@ -2,7 +2,9 @@
  * Grants Given / Grants Received sections for organization profile pages.
  *
  * Placed in the main content column with summary stats, expandable tables,
- * and full-width layout. Shows first 10 grants with a "Show all" toggle.
+ * and progressive loading. Only the first MAX_RENDERED_ROWS rows are
+ * serialized to the client to keep the RSC payload manageable for orgs
+ * with thousands of grants (e.g. Coefficient Giving: 2,627).
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -12,6 +14,9 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
 import { formatAmount, numericValue } from "./org-data";
 import { ExpandableGrantsTable } from "./expandable-grants-table";
+
+/** Cap server-rendered rows to keep RSC payload reasonable. */
+const MAX_RENDERED_ROWS = 200;
 
 /** Grants Given section — for orgs that are funders. */
 export function GrantsGivenSection({
@@ -28,7 +33,8 @@ export function GrantsGivenSection({
     0,
   );
 
-  const rows = grants.map((g) => {
+  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
+  const rows = renderedGrants.map((g) => {
     const verdict = getRecordVerdict("grant", String(g.key));
     return (
       <tr key={g.key} className="hover:bg-muted/20 transition-colors">
@@ -98,7 +104,10 @@ export function GrantsGivenSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable totalCount={grants.length}>
+            <ExpandableGrantsTable
+              totalCount={grants.length}
+              renderedCount={renderedGrants.length}
+            >
               {rows}
             </ExpandableGrantsTable>
           </tbody>
@@ -121,7 +130,8 @@ export function GrantsReceivedSection({
     0,
   );
 
-  const rows = grants.map((g) => {
+  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
+  const rows = renderedGrants.map((g) => {
     const verdict = getRecordVerdict("grant", String(g.key));
     return (
       <tr
@@ -191,7 +201,10 @@ export function GrantsReceivedSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable totalCount={grants.length}>
+            <ExpandableGrantsTable
+              totalCount={grants.length}
+              renderedCount={renderedGrants.length}
+            >
               {rows}
             </ExpandableGrantsTable>
           </tbody>
