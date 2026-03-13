@@ -51,6 +51,18 @@ facts:
     value: "@sama"
     source: https://x.com/sama
 
+  - id: f_sA_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Sam_Altman"
+
+  - id: f_sA_website
+    property: website
+    value: "https://blog.samaltman.com"
+
+  - id: f_sA_github
+    property: github-profile
+    value: "https://github.com/sama"
+
   - id: f_dL5uH8tF2n
     property: role
     value: "CEO & Co-founder, Loopt"

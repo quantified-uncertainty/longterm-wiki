@@ -45,6 +45,14 @@ facts:
     value: "@ESYudkowsky"
     source: https://x.com/ESYudkowsky
 
+  - id: f_eY_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Eliezer_Yudkowsky"
+
+  - id: f_eY_website
+    property: website
+    value: "https://www.yudkowsky.net"
+
 records:
   career-history:
     i_eY1zA2bC3d:

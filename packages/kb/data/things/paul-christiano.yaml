@@ -50,6 +50,18 @@ facts:
     value: "@paulfchristiano"
     source: https://x.com/paulfchristiano
 
+  - id: f_pC_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Paul_Christiano"
+
+  - id: f_pC_website
+    property: website
+    value: "https://paulfchristiano.com"
+
+  - id: f_pC_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=6gHkYDgAAAAJ"
+
   - id: f_DRwx53YvWw
     property: role
     value: "Head of AI Safety, US AI Safety Institute"

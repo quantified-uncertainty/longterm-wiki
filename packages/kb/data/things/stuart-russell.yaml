@@ -44,6 +44,18 @@ facts:
     value: "@StuartJRussell"
     source: https://x.com/StuartJRussell
 
+  - id: f_sR_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Stuart_J._Russell"
+
+  - id: f_sR_website
+    property: website
+    value: "https://people.eecs.berkeley.edu/~russell/"
+
+  - id: f_sR_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=2oy3OXYAAAAJ"
+
 records:
   career-history:
     i_sR1zA2bC3d:
