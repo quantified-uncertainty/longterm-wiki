@@ -42,10 +42,15 @@ import {
 import { BoardOfDirectorsSection } from "./board-section";
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
-import { GrantsMadeSection, FundingReceivedSection } from "./grants-section";
 import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
+
+// Section components — grants (main content column)
+import {
+  GrantsGivenSection,
+  GrantsReceivedSection,
+} from "./grants-section";
 
 // Section components — main content column
 import {
@@ -267,6 +272,11 @@ export default async function OrgProfilePage({
         <div className="lg:col-span-2 space-y-8">
           <FundingHistorySection rounds={data.sortedRounds} slug={slug} />
           <InvestorParticipationSection investments={data.investments} />
+          <GrantsGivenSection
+            grants={data.grantsMade}
+            orgName={entity.name}
+          />
+          <GrantsReceivedSection grants={data.grantsReceived} />
           <ModelReleasesSection models={data.sortedModels} />
           <ProductsSection products={data.products} />
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
@@ -319,12 +329,6 @@ export default async function OrgProfilePage({
             <FactsPanel facts={data.allFacts} entityId={entity.id} />
           )}
 
-          <GrantsMadeSection
-            grants={data.grantsMade}
-            orgName={entity.name}
-            totalCount={data.grantsMade.length}
-          />
-          <FundingReceivedSection grants={data.grantsReceived} />
           <DivisionsSection divisions={data.divisions} />
           <FundingProgramsSection programs={data.fundingPrograms} />
           <EquityPositionsSection positions={data.equityPositions} />
