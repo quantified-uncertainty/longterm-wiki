@@ -571,6 +571,7 @@ function parseDivisionRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
+    slug: (f.slug as string) ?? null,
     name: (f.name as string) ?? record.key,
     divisionType: (f.divisionType as string) ?? "team",
     lead: (f.lead as string) ?? null,
@@ -609,18 +610,12 @@ function DivisionsSection({
               <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
                   <span className="font-medium text-foreground text-xs">
-                    {d.website ? (
-                      <a
-                        href={d.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {d.name}
-                      </a>
-                    ) : (
-                      d.name
-                    )}
+                    <Link
+                      href={`/divisions/${d.slug ?? d.key}`}
+                      className="text-primary hover:underline"
+                    >
+                      {d.name}
+                    </Link>
                   </span>
                   {d.source && (
                     <a
@@ -748,18 +743,12 @@ function FundingProgramsSection({
               <tr key={p.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
                   <span className="font-medium text-foreground text-xs">
-                    {p.applicationUrl ? (
-                      <a
-                        href={p.applicationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {p.name}
-                      </a>
-                    ) : (
-                      p.name
-                    )}
+                    <Link
+                      href={`/funding-programs/${p.key}`}
+                      className="text-primary hover:underline"
+                    >
+                      {p.name}
+                    </Link>
                   </span>
                   {p.source && (
                     <a
