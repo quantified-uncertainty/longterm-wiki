@@ -13,7 +13,7 @@ export function SourcesOverviewContent() {
 
   const stats = [
     { label: "Resources", value: resources.length, href: "/resources" },
-    { label: "Publications", value: publications.length, href: "/wiki/E1044" },
+    { label: "Publications", value: publications.length, href: "/publications" },
     { label: "Peer-Reviewed Venues", value: peerReviewed },
     { label: "With Summaries", value: withSummary },
     { label: "Cited by Pages", value: citedResources },
@@ -68,7 +68,7 @@ export function SourcesOverviewContent() {
         </Link>
 
         <Link
-          href="/wiki/E1044"
+          href="/publications"
           className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
         >
           <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">

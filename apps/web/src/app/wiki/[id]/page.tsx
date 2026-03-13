@@ -42,6 +42,14 @@ import { KBAutoFacts } from "@/components/wiki/kb/KBAutoFacts";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
+ * Numeric entity IDs that should redirect to standalone listing pages
+ * instead of rendering the MDX wiki page shell.
+ */
+const STANDALONE_PAGE_REDIRECTS: Record<string, string> = {
+  E1044: "/publications",
+};
+
+/**
  * Build a reference map from citation quotes and footnote index data.
  * Maps footnote numbers to rich reference data for the FootnoteTooltip component.
  */
@@ -467,6 +475,10 @@ export default async function WikiPage({ params }: PageProps) {
     // Redirect to semantic directory URL if entity has a dedicated page
     const directoryHref = getDirectoryHref(slug);
     if (directoryHref) permanentRedirect(directoryHref);
+
+    // Redirect to standalone listing pages that replaced MDX stubs
+    const standaloneRedirect = STANDALONE_PAGE_REDIRECTS[id.toUpperCase()];
+    if (standaloneRedirect) permanentRedirect(standaloneRedirect);
 
     const entityPath = getEntityPath(slug) || "";
 
