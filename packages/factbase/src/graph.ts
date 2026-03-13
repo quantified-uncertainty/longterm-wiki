@@ -84,9 +84,10 @@ export class Graph {
     collectionName: string,
     entry: RecordEntry,
   ): void {
-    // Validate collectionName matches the schema's expected collection
+    // Validate collectionName matches the schema's expected collection.
+    // Skip if schema has no explicit collectionName (relies on plural fallback).
     const schema = this.recordSchemas.get(entry.schema);
-    if (schema && schema.collectionName !== collectionName) {
+    if (schema && schema.collectionName && schema.collectionName !== collectionName) {
       throw new Error(
         `Record collection mismatch: schema "${entry.schema}" expects "${schema.collectionName}" but got "${collectionName}"`,
       );

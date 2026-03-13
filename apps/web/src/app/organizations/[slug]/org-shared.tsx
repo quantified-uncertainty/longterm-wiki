@@ -32,24 +32,26 @@ export function field(item: KBRecordEntry, key: string): string | undefined {
 // ── Entity ref resolver helper ────────────────────────────────────────
 
 export function resolveRefName(
-  slug: string | undefined,
+  slugOrId: string | undefined,
   displayName: string | undefined,
 ): { name: string; href: string | null } {
-  if (!slug && !displayName) return { name: "Unknown", href: null };
+  if (!slugOrId && !displayName) return { name: "Unknown", href: null };
 
-  if (slug) {
-    const entityId = resolveKBSlug(slug);
-    const entity = entityId ? getKBEntity(entityId) : null;
-    if (entity) {
-      const prefix = entity.type === "organization" ? "/organizations"
-        : entity.type === "person" ? "/people"
+  if (slugOrId) {
+    // Try direct entity lookup first (handles both entity IDs and slugs
+    // since getKBEntity resolves both), then fall back to slug resolution.
+    const directEntity = getKBEntity(slugOrId);
+    if (directEntity) {
+      const resolvedSlug = getKBEntitySlug(directEntity.id) ?? slugOrId;
+      const prefix = directEntity.type === "organization" ? "/organizations"
+        : directEntity.type === "person" ? "/people"
         : null;
-      return { name: entity.name, href: prefix ? `${prefix}/${slug}` : `/factbase/entity/${entityId}` };
+      return { name: directEntity.name, href: prefix ? `${prefix}/${resolvedSlug}` : `/factbase/entity/${directEntity.id}` };
     }
   }
 
   // Fall back to display name or humanized slug
-  const fallbackName = displayName ?? (slug ? titleCase(slug) : "Unknown");
+  const fallbackName = displayName ?? (slugOrId ? titleCase(slugOrId) : "Unknown");
   return { name: fallbackName, href: null };
 }
 
