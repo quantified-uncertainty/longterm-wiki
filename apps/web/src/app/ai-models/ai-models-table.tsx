@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import { SortHeader } from "@/components/directory/SortHeader";
+import { DEVELOPER_COLORS, formatContext } from "./ai-model-constants";
 
 export interface AiModelRow {
   id: string;
@@ -28,16 +30,6 @@ export interface AiModelRow {
   parameterCount: string | null;
 }
 
-const DEVELOPER_COLORS: Record<string, string> = {
-  anthropic: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  openai: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  deepmind: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "meta-ai": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "mistral-ai": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  xai: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  deepseek: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-};
-
 type SortKey =
   | "name"
   | "developer"
@@ -45,52 +37,11 @@ type SortKey =
   | "inputPrice"
   | "outputPrice"
   | "contextWindow"
+  | "safetyLevel"
   | "sweBench"
   | "mmlu"
   | "gpqa"
   | "params";
-
-function formatContext(tokens: number): string {
-  if (tokens >= 1_000_000) return `${tokens / 1_000_000}M`;
-  if (tokens >= 1_000) return `${tokens / 1_000}K`;
-  return String(tokens);
-}
-
-function SortHeader({
-  label,
-  sortKey,
-  currentSort,
-  currentDir,
-  onSort,
-  className,
-}: {
-  label: string;
-  sortKey: SortKey;
-  currentSort: SortKey;
-  currentDir: SortDir;
-  onSort: (key: SortKey) => void;
-  className?: string;
-}) {
-  const isActive = currentSort === sortKey;
-  return (
-    <th className={`py-2.5 px-3 font-medium ${className ?? ""}`}>
-      <button
-        type="button"
-        className={`inline-flex items-center gap-1 cursor-pointer select-none hover:text-foreground transition-colors ${
-          isActive ? "text-foreground" : ""
-        }`}
-        onClick={() => onSort(sortKey)}
-      >
-        {label}
-        {isActive && (
-          <span className="text-[10px]">
-            {currentDir === "asc" ? "\u25B2" : "\u25BC"}
-          </span>
-        )}
-      </button>
-    </th>
-  );
-}
 
 export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   const [search, setSearch] = useState("");
@@ -170,6 +121,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           return row.outputPrice;
         case "contextWindow":
           return row.contextWindow;
+        case "safetyLevel":
+          return row.safetyLevel;
         case "sweBench":
           return row.sweBenchScore;
         case "mmlu":
@@ -267,6 +220,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <SortHeader label="Input $/MTok" sortKey="inputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Output $/MTok" sortKey="outputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Context" sortKey="contextWindow" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="Safety" sortKey="safetyLevel" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="MMLU" sortKey="mmlu" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="GPQA" sortKey="gpqa" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="SWE-bench" sortKey="sweBench" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -297,7 +251,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
 
                 {/* Developer */}
                 <td className="py-2.5 px-3">
-                  {row.developer && row.developerName && (
+                  {row.developer && row.developerName ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                         DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
@@ -305,32 +259,57 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                     >
                       {row.developerName}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
                 {/* Release Date */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
-                  {row.releaseDate ?? ""}
+                  {row.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Parameter Count */}
                 <td className="py-2.5 px-3 text-right tabular-nums text-muted-foreground">
-                  {row.parameterCount ?? ""}
+                  {row.parameterCount ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Input Price */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
-                  {row.inputPrice != null ? `$${row.inputPrice}` : ""}
+                  {row.inputPrice != null ? (
+                    `$${row.inputPrice}`
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
                 </td>
 
                 {/* Output Price */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
-                  {row.outputPrice != null ? `$${row.outputPrice}` : ""}
+                  {row.outputPrice != null ? (
+                    `$${row.outputPrice}`
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
                 </td>
 
                 {/* Context Window */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.contextWindow != null ? formatContext(row.contextWindow) : ""}
+                  {row.contextWindow != null ? (
+                    formatContext(row.contextWindow)
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
+                </td>
+
+                {/* Safety Level */}
+                <td className="py-2.5 px-3">
+                  {row.safetyLevel ? (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                      {row.safetyLevel}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
+                  )}
                 </td>
 
                 {/* MMLU */}
@@ -338,7 +317,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                   {row.mmluScore != null ? (
                     <Link href="/benchmarks/mmlu" className="font-semibold hover:text-primary transition-colors">{row.mmluScore}%</Link>
                   ) : (
-                    ""
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
@@ -347,7 +326,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                   {row.gpqaScore != null ? (
                     <Link href="/benchmarks/gpqa-diamond" className="font-semibold hover:text-primary transition-colors">{row.gpqaScore}%</Link>
                   ) : (
-                    ""
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
@@ -356,7 +335,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                   {row.sweBenchScore != null ? (
                     <Link href="/benchmarks/swe-bench-verified" className="font-semibold hover:text-primary transition-colors">{row.sweBenchScore}%</Link>
                   ) : (
-                    ""
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
               </tr>
