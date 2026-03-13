@@ -2,10 +2,10 @@
  * Rule: KBF Cross-Reference Integrity
  *
  * Checks that all <KBF entity="..." property="..."> and <Calc expr="{entity.property}">
- * components reference valid KB entity slugs and property IDs.
+ * components reference valid KB entity identifiers (slugs or stableIds) and property IDs.
  *
- * Entity slugs come from packages/kb/data/things/ directory listing (each .yaml
- * file basename minus extension = entity slug).
+ * Entity identifiers come from packages/kb/data/things/ — both the YAML filename
+ * (slug) and the thing.stableId field inside each file are accepted.
  *
  * Property IDs come from packages/kb/data/properties.yaml (all keys under the
  * top-level `properties:` mapping).
@@ -23,23 +23,64 @@ const KB_PROPERTIES_FILE = join(PROJECT_ROOT, 'packages/kb/data/properties.yaml'
 // ── Caches (populated on first use, like resource-ref-integrity) ─────────────
 // undefined = not yet attempted; null = load failed; Set = loaded successfully
 
-let entitySlugCache: Set<string> | null | undefined = undefined;
+let entityIdCache: Set<string> | null | undefined = undefined;
 let propertyIdCache: Set<string> | null | undefined = undefined;
 
+/**
+ * Load all valid entity identifiers: both slugs (from filenames) and stableIds
+ * (from thing.stableId inside each YAML file).
+ */
 export function loadEntitySlugs(): Set<string> | null {
-  if (entitySlugCache !== undefined) return entitySlugCache;
+  if (entityIdCache !== undefined) return entityIdCache;
   const loaded = new Set<string>();
   try {
-    const files = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith('.yaml'));
-    for (const file of files) {
-      loaded.add(file.replace(/\.yaml$/, ''));
+    const entries = readdirSync(KB_THINGS_DIR, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith('.yaml')) {
+        const slug = entry.name.replace(/\.yaml$/, '');
+        loaded.add(slug);
+        // Also extract stableId from the YAML file so that both slugs and
+        // stableIds are accepted as valid entity identifiers in MDX components.
+        try {
+          const raw = readFileSync(join(KB_THINGS_DIR, entry.name), 'utf-8');
+          const parsed = parseYaml(raw);
+          const stableId = parsed?.thing?.stableId;
+          if (typeof stableId === 'string' && stableId) {
+            loaded.add(stableId);
+          }
+        } catch {
+          // Individual file parse failure — slug is still valid, skip stableId
+        }
+      } else if (entry.isDirectory()) {
+        // Per-entity directory: look for entity.yaml or any file with a thing: block
+        const slug = entry.name;
+        loaded.add(slug);
+        try {
+          const dirFiles = readdirSync(join(KB_THINGS_DIR, entry.name)).filter(f => f.endsWith('.yaml'));
+          for (const f of dirFiles) {
+            try {
+              const raw = readFileSync(join(KB_THINGS_DIR, entry.name, f), 'utf-8');
+              const parsed = parseYaml(raw);
+              const stableId = parsed?.thing?.stableId;
+              if (typeof stableId === 'string' && stableId) {
+                loaded.add(stableId);
+                break; // Found the entity file, no need to check more
+              }
+            } catch {
+              // Skip unparseable files
+            }
+          }
+        } catch {
+          // Directory read failed — slug is still valid
+        }
+      }
     }
-    entitySlugCache = loaded;
+    entityIdCache = loaded;
   } catch {
     // KB things dir doesn't exist or is unreadable — signal to callers to skip validation
-    entitySlugCache = null;
+    entityIdCache = null;
   }
-  return entitySlugCache;
+  return entityIdCache;
 }
 
 export function loadPropertyIds(): Set<string> | null {
@@ -88,7 +129,7 @@ const CALC_REF_RE = /\{([^.}]+)\.([^}]+)\}/g;
 
 /** Reset caches for testing purposes. */
 export function _resetCache(): void {
-  entitySlugCache = undefined;
+  entityIdCache = undefined;
   propertyIdCache = undefined;
 }
 
@@ -108,11 +149,11 @@ export const kbfRefsRule = createRule({
       return issues;
     }
 
-    const entitySlugs = loadEntitySlugs();
+    const entityIds = loadEntitySlugs();
     const propertyIds = loadPropertyIds();
 
     // Skip validation if KB metadata could not be loaded (avoids false violations)
-    if (entitySlugs === null || propertyIds === null) {
+    if (entityIds === null || propertyIds === null) {
       return issues;
     }
 
@@ -160,12 +201,12 @@ export const kbfRefsRule = createRule({
 
       if (entityMatch) {
         const entity = entityMatch[1];
-        if (!entitySlugs.has(entity)) {
+        if (!entityIds.has(entity)) {
           issues.push(new Issue({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<KBF entity="${entity}"> does not match any KB entity in packages/kb/data/things/`,
+            message: `<KBF entity="${entity}"> does not match any KB entity slug or stableId in packages/kb/data/things/`,
             severity: Severity.ERROR,
           }));
         }
@@ -199,12 +240,12 @@ export const kbfRefsRule = createRule({
         const entity = refMatch[1];
         const property = refMatch[2];
 
-        if (!entitySlugs.has(entity)) {
+        if (!entityIds.has(entity)) {
           issues.push(new Issue({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<Calc> references entity "${entity}" which does not match any KB entity in packages/kb/data/things/`,
+            message: `<Calc> references entity "${entity}" which does not match any KB entity slug or stableId in packages/kb/data/things/`,
             severity: Severity.ERROR,
           }));
         }
