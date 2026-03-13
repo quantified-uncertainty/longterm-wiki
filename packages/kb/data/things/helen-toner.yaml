@@ -39,7 +39,7 @@ facts:
 
   - id: f_hT9wS5jH7d
     property: employed-by
-    value: !ref lvsDuyzPcg:cset
+    value: !ref lvsDuyzPcg
     asOf: 2019-01
     notes: Enriched from wiki page; joined CSET in January 2019, became Interim Executive Director September 2025
 

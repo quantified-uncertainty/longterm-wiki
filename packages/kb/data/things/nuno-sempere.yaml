@@ -27,7 +27,7 @@ facts:
 
   - id: f_nP9wS5jH3d
     property: employed-by
-    value: !ref JzhBAecjaA:sentinel
+    value: !ref JzhBAecjaA
     asOf: 2023-01
     notes: Enriched from wiki page; leads Sentinel early detection and response for global catastrophes
 

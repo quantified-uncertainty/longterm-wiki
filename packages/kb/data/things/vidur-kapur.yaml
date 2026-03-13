@@ -27,7 +27,7 @@ facts:
 
   - id: f_vK9wS5jH7d
     property: employed-by
-    value: !ref uhTh3ndt0Q:controlai
+    value: !ref uhTh3ndt0Q
     asOf: 2026-03
     notes: Enriched from wiki page; AI Policy Researcher at ControlAI
 

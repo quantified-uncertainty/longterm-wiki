@@ -27,7 +27,7 @@ facts:
 
   - id: f_lA9wS5jH5d
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: 2023-01
     validEnd: 2024-04
     notes: Enriched from wiki page; fired in April 2024 from Superalignment team

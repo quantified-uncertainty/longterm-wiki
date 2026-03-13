@@ -163,10 +163,10 @@ facts:
   - id: f_tAtOfKqDjg
     property: founded-by
     value:
-      - !ref zR4nW8xB2f:dario-amodei
-      - !ref tKMznr07QA:daniela-amodei
+      - !ref zR4nW8xB2f
+      - !ref tKMznr07QA
       - tom-brown
-      - !ref Tz48rTriBg:chris-olah
+      - !ref Tz48rTriBg
       - jared-kaplan
       - sam-mccandlish
       - jack-clark

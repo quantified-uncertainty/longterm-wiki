@@ -28,6 +28,6 @@ facts:
 
   - id: f_bS3oMx0qZs
     property: employed-by
-    value: !ref dwMzc9WzPa:redwood-research
+    value: !ref dwMzc9WzPa
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
