@@ -99,12 +99,41 @@ export default async function OrgProfilePage({
 
   const tabs: OrgTab[] = [];
 
-  // Overview tab: always present — key stats, people, facts, related orgs
+  // ── Overview tab: key metrics, related orgs, other data ──
   const overviewContent = (
     <div className="space-y-8">
-      {/* Key People + Board side by side */}
-      {(data.sortedPersons.length > 0 || data.boardMembers.length > 0) && (
+      {/* Facts + Other Data */}
+      {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {data.allFacts.length > 0 && (
+            <FactsPanel facts={data.allFacts} entityId={entity.id} />
+          )}
+          {data.otherCollections.length > 0 && (
+            <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
+          )}
+        </div>
+      )}
+
+      {/* Related Orgs */}
+      {data.relatedOrgs.length > 0 && (
+        <RelatedOrganizationsSection orgs={data.relatedOrgs} />
+      )}
+    </div>
+  );
+
+  tabs.push({ id: "overview", label: "Overview", content: overviewContent });
+
+  // ── People tab: key personnel + board of directors ──
+  const hasPeopleData =
+    data.sortedPersons.length > 0 || data.boardMembers.length > 0;
+
+  if (hasPeopleData) {
+    tabs.push({
+      id: "people",
+      label: "People",
+      count: data.sortedPersons.length + data.boardMembers.length,
+      content: (
+        <div className="space-y-8">
           {data.sortedPersons.length > 0 && (
             <section>
               <SectionHeader title="Key People" count={data.sortedPersons.length} />
@@ -141,36 +170,18 @@ export default async function OrgProfilePage({
           )}
           <BoardOfDirectorsSection members={data.boardMembers} />
         </div>
-      )}
+      ),
+    });
+  }
 
-      {/* Related Orgs */}
-      {data.relatedOrgs.length > 0 && (
-        <RelatedOrganizationsSection orgs={data.relatedOrgs} />
-      )}
-
-      {/* Facts + Other Data */}
-      {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {data.allFacts.length > 0 && (
-            <FactsPanel facts={data.allFacts} entityId={entity.id} />
-          )}
-          {data.otherCollections.length > 0 && (
-            <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  tabs.push({ id: "overview", label: "Overview", content: overviewContent });
-
-  // Funding tab
+  // ── Funding tab: rounds, investments, equity, grants, programs ──
   const hasFundingData =
     data.sortedRounds.length > 0 ||
     data.investments.length > 0 ||
     data.equityPositions.length > 0 ||
     data.grantsReceived.length > 0 ||
-    data.grantsMade.length > 0;
+    data.grantsMade.length > 0 ||
+    data.fundingPrograms.length > 0;
 
   if (hasFundingData) {
     const fundingCount =
@@ -208,12 +219,16 @@ export default async function OrgProfilePage({
               <FundingReceivedSection grants={data.grantsReceived} />
             </div>
           )}
+
+          {data.fundingPrograms.length > 0 && (
+            <FundingProgramsSection programs={data.fundingPrograms} />
+          )}
         </div>
       ),
     });
   }
 
-  // Products & Models tab
+  // ── Products & Models tab ──
   const hasProductData =
     data.sortedModels.length > 0 ||
     data.products.length > 0 ||
@@ -237,14 +252,14 @@ export default async function OrgProfilePage({
     });
   }
 
-  // Safety & Research tab
+  // ── Research & Safety tab ──
   const hasSafetyData =
     data.sortedMilestones.length > 0 || data.sortedPartnerships.length > 0;
 
   if (hasSafetyData) {
     tabs.push({
       id: "safety",
-      label: "Safety & Research",
+      label: "Research & Safety",
       count: data.sortedMilestones.length + data.sortedPartnerships.length,
       content: (
         <div className="space-y-8">
@@ -255,19 +270,15 @@ export default async function OrgProfilePage({
     });
   }
 
-  // Structure tab (divisions, programs)
-  const hasStructureData =
-    data.divisions.length > 0 || data.fundingPrograms.length > 0;
-
-  if (hasStructureData) {
+  // ── Structure tab (divisions only — funding programs are in Funding) ──
+  if (data.divisions.length > 0) {
     tabs.push({
       id: "structure",
       label: "Structure",
-      count: data.divisions.length + data.fundingPrograms.length,
+      count: data.divisions.length,
       content: (
         <div className="space-y-8">
           <DivisionsSection divisions={data.divisions} />
-          <FundingProgramsSection programs={data.fundingPrograms} />
         </div>
       ),
     });
