@@ -1,11 +1,9 @@
 /**
  * Divisions section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Shows org subdivisions with optional team lead resolution to person links.
  */
 import Link from "next/link";
 import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
-import { getRecordVerdict } from "@data/database";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 
@@ -28,8 +26,10 @@ const DIVISION_TYPE_COLORS: Record<string, string> = {
 /** Divisions section for org pages. */
 export function DivisionsSection({
   divisions,
+  leadResolved,
 }: {
   divisions: ParsedDivisionRecord[];
+  leadResolved?: Map<string, { name: string; href: string | null }>;
 }) {
   if (divisions.length === 0) return null;
 
@@ -49,7 +49,7 @@ export function DivisionsSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {divisions.map((d) => {
-              const verdict = getRecordVerdict("division", String(d.key));
+              const resolvedLead = leadResolved?.get(d.key);
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3">
@@ -75,7 +75,6 @@ export function DivisionsSection({
                         source
                       </a>
                     )}
-                    <VerificationBadge verdict={verdict} />
                   </td>
                   <td className="py-2 px-3">
                     <span
@@ -87,7 +86,20 @@ export function DivisionsSection({
                     </span>
                   </td>
                   <td className="py-2 px-3 text-xs text-muted-foreground">
-                    {d.lead ?? ""}
+                    {resolvedLead ? (
+                      resolvedLead.href ? (
+                        <Link
+                          href={resolvedLead.href}
+                          className="text-primary hover:underline"
+                        >
+                          {resolvedLead.name}
+                        </Link>
+                      ) : (
+                        resolvedLead.name
+                      )
+                    ) : (
+                      d.lead ?? ""
+                    )}
                   </td>
                   <td className="py-2 px-3 text-center text-xs">
                     {d.status && (

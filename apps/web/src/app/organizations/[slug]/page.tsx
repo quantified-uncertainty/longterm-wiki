@@ -46,6 +46,9 @@ import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
 
+// Section components — publications
+import { KeyPublicationsSection } from "./publications-section";
+
 // Section components — grants (main content column)
 import {
   GrantsGivenSection,
@@ -281,6 +284,7 @@ export default async function OrgProfilePage({
           <ProductsSection products={data.products} />
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
           <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
+          <KeyPublicationsSection publications={data.keyPublications} />
           <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
         </div>
 
@@ -329,10 +333,10 @@ export default async function OrgProfilePage({
             <FactsPanel facts={data.allFacts} entityId={entity.id} />
           )}
 
-          <DivisionsSection divisions={data.divisions} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
           <FundingProgramsSection programs={data.fundingPrograms} />
           <EquityPositionsSection positions={data.equityPositions} />
-          <AiModelsSection models={data.orgModels} />
+          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
         </div>
       </div>
     </div>
