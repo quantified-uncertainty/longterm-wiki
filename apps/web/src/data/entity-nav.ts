@@ -15,17 +15,27 @@ const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
   person: "/people",
   organization: "/organizations",
   risk: "/risks",
+  benchmark: "/benchmarks",
 };
 
 /**
  * Get the directory URL for an entity if it has a dedicated directory page.
  * Returns null if the entity type doesn't have a directory or has no slug.
  */
+/** Entity types that use entity ID as slug instead of KB slug resolution. */
+const NON_KB_DIRECTORY_TYPES = new Set(["benchmark"]);
+
 export function getDirectoryHref(id: string): string | null {
   const entity = getTypedEntityById(id);
   if (!entity) return null;
   const prefix = DIRECTORY_ENTITY_TYPES[entity.entityType];
   if (!prefix) return null;
+
+  // Non-KB entity types use entity ID directly as the slug
+  if (NON_KB_DIRECTORY_TYPES.has(entity.entityType)) {
+    return `${prefix}/${entity.id}`;
+  }
+
   const slug = getKBEntitySlug(id) || getKBEntitySlug(resolveId(id));
   if (!slug) return null;
   return `${prefix}/${slug}`;

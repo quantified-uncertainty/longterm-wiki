@@ -455,6 +455,7 @@ export const EntityType = z.enum([
   'intelligence-paradigm',
   'internal',
   'ai-model',
+  'benchmark',
   // --- Aliases (legacy/plural forms kept for backward compat) ---
   'researcher',        // → person
   'lab',               // → organization
