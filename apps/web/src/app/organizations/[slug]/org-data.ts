@@ -722,7 +722,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
       const leadEntityId = resolveKBSlug(d.lead);
       const leadEntity = leadEntityId ? getKBEntity(leadEntityId) : null;
       if (leadEntity) {
-        const leadSlug = getKBEntitySlug(leadEntityId);
+        const leadSlug = getKBEntitySlug(leadEntityId!);
         divisionLeadResolved.set(d.key, {
           name: leadEntity.name,
           href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/kb/entity/${leadEntityId}`,
