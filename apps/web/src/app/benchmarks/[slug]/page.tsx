@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -6,6 +6,7 @@ import {
   getBenchmarkSlugs,
   getBenchmarkResultsFromModels,
 } from "../benchmark-utils";
+import { resolveSlugAlias } from "@/data/kb";
 
 export function generateStaticParams() {
   return getBenchmarkSlugs().map((slug) => ({ slug }));
@@ -52,7 +53,11 @@ export default async function BenchmarkDetailPage({
 }) {
   const { slug } = await params;
   const entity = resolveBenchmarkBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/benchmarks/${canonical}`);
+    return notFound();
+  }
 
   const allResults = getBenchmarkResultsFromModels();
   const results = allResults.get(entity.id) ?? [];

@@ -409,6 +409,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
         ...(raw.parent !== undefined && { parent: raw.parent }),
         ...(raw.aliases !== undefined && { aliases: raw.aliases }),
         ...(raw.previousIds !== undefined && { previousIds: raw.previousIds }),
+        ...(raw.previousSlugs !== undefined && { previousSlugs: raw.previousSlugs }),
         ...(wikiPageId !== undefined && { wikiPageId }),
         // Deprecated aliases for backward compat
         stableId: raw.stableId!,
@@ -437,6 +438,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
       ...(raw.parent !== undefined && { parent: raw.parent }),
       ...(raw.aliases !== undefined && { aliases: raw.aliases }),
       ...(raw.previousIds !== undefined && { previousIds: raw.previousIds }),
+      ...(raw.previousSlugs !== undefined && { previousSlugs: raw.previousSlugs }),
       ...(wikiPageId !== undefined && { wikiPageId }),
       // Deprecated aliases
       stableId: raw.id,

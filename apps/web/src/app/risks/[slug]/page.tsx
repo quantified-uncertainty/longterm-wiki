@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { resolveRiskBySlug, getRiskSlugs } from "@/app/risks/risk-utils";
+import { resolveSlugAlias } from "@/data/kb";
 import { getKBEntity, getKBEntitySlug } from "@/data/kb";
 import { getTypedEntityById, isRisk } from "@/data";
 import { getEntityWikiHref, safeHref } from "@/lib/directory-utils";
@@ -95,7 +96,11 @@ export default async function RiskProfilePage({
 }) {
   const { slug } = await params;
   const entity = resolveRiskBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/risks/${canonical}`);
+    return notFound();
+  }
 
   // Use the URL slug directly — typed entities are keyed by slug, not KB internal IDs
   const typedEntity = getTypedEntityById(slug);

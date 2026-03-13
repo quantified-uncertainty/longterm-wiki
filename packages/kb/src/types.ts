@@ -31,6 +31,8 @@ export interface Entity {
   aliases?: string[];
   /** Former IDs for redirects */
   previousIds?: string[];
+  /** Former slugs for URL redirects (when a YAML file is renamed) */
+  previousSlugs?: string[];
   /** Wiki page URL ID with E prefix, e.g. "E22" (formerly numericId) */
   wikiPageId?: string;
   /** @deprecated Use `id` instead. Alias kept for backward compat during migration. */
@@ -195,6 +197,8 @@ export interface EntityFile {
     parent?: string;
     aliases?: string[];
     previousIds?: string[];
+    /** Former slugs for URL redirects (when a YAML file is renamed). */
+    previousSlugs?: string[];
     /** Old format: wiki page ID. */
     numericId?: string;
     /** New format: wiki page ID. */

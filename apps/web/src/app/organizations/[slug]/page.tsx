@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
+import { resolveSlugAlias } from "@/data/kb";
 import {
   getKBLatest,
   getKBProperty,
@@ -88,7 +89,11 @@ export default async function OrgProfilePage({
 }) {
   const { slug } = await params;
   const entity = resolveOrgBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/organizations/${canonical}`);
+    return notFound();
+  }
 
   const data = loadOrgPageData(entity, slug);
 

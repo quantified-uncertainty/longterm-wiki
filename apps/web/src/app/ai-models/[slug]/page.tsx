@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTypedEntityById } from "@/data";
@@ -7,6 +7,7 @@ import {
   getAiModelSlugs,
   getRelatedModels,
 } from "../ai-model-utils";
+import { resolveSlugAlias } from "@/data/kb";
 import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
 
@@ -71,7 +72,11 @@ export default async function AiModelDetailPage({
 }) {
   const { slug } = await params;
   const entity = resolveAiModelBySlug(slug);
-  if (!entity) return notFound();
+  if (!entity) {
+    const canonical = resolveSlugAlias(slug);
+    if (canonical) permanentRedirect(`/ai-models/${canonical}`);
+    return notFound();
+  }
 
   // Resolve developer
   const developerEntity = entity.developer
