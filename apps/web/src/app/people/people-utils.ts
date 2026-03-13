@@ -5,16 +5,16 @@
  * from PostgreSQL during build and merged into kb-data.json as KB records.
  */
 import {
+  getKBRecords,
+  getKBEntitySlug,
+  getAllKBRecords,
+  getKBEntity,
+  type KBRecordEntry,
+} from "@/data/kb";
+import {
   resolveEntityBySlug,
   getEntitySlugs,
 } from "@/lib/directory-utils";
-import {
-  getAllKBRecords,
-  getKBRecords,
-  getKBEntity,
-  getKBEntitySlug,
-  type KBRecordEntry,
-} from "@/data/kb";
 
 // Re-export generic utilities with people-specific signatures
 export const resolvePersonBySlug = (slug: string) =>

@@ -67,9 +67,11 @@ function getKBCounts(entityId: string, kb: SerializedKB | undefined): { factCoun
   const facts = kb.facts[entityId] ?? [];
   const factCount = facts.filter((f) => f.propertyId !== "description").length;
 
-  // Records were removed from KB and moved to PostgreSQL (wiki-server).
-  // kbItemCount is always 0 now; record counts come from PG at runtime.
-  const itemCount = 0;
+  const collections = kb.records?.[entityId] ?? {};
+  const itemCount = Object.values(collections).reduce(
+    (sum, entries) => sum + entries.length,
+    0,
+  );
 
   return { factCount, itemCount };
 }

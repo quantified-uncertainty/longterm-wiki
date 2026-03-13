@@ -15,7 +15,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { formatFactValue } from '../../packages/kb/src/format.ts';
 import { validate } from '../../packages/kb/src/validate.ts';
 import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, ValidationResult } from '../../packages/kb/src/types.ts';
+import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
@@ -154,7 +154,56 @@ function showEntity(entity: Entity, graph: Graph, options: KBCommandOptions): Co
     lines.push('');
   }
 
+  // Record collections
+  const recordCollections = getEntityRecordCollections(entity.id, graph);
+  if (recordCollections.length > 0) {
+    lines.push(`\x1b[1mRecords:\x1b[0m`);
+    for (const { name, records } of recordCollections) {
+      lines.push(`  ${name} (${records.length} entries)`);
+      for (const record of records) {
+        const summary = formatRecordEntry(record, graph);
+        lines.push(`    ${summary}`);
+      }
+      lines.push('');
+    }
+  }
+
   return { exitCode: 0, output: lines.join('\n') };
+}
+
+/**
+ * Get all record collections for an entity by querying the graph directly.
+ */
+function getEntityRecordCollections(
+  entityId: string,
+  graph: Graph,
+): Array<{ name: string; records: RecordEntry[] }> {
+  const results: Array<{ name: string; records: RecordEntry[] }> = [];
+  for (const collName of graph.getRecordCollectionNames(entityId)) {
+    const records = graph.getRecords(entityId, collName);
+    if (records.length > 0) {
+      results.push({ name: collName, records });
+    }
+  }
+  return results;
+}
+
+/**
+ * Format a record entry for display.
+ */
+function formatRecordEntry(record: RecordEntry, graph: Graph): string {
+  const name = record.displayName || record.key;
+  const fields = Object.entries(record.fields)
+    .map(([k, v]) => {
+      // Resolve entity refs to names
+      if (typeof v === 'string') {
+        const entity = graph.getEntity(v);
+        if (entity) return `${k}: ${entity.name} (${v})`;
+      }
+      return `${k}: ${v}`;
+    })
+    .join(', ');
+  return `${name}: ${fields}`;
 }
 
 // ── list command ────────────────────────────────────────────────────────
@@ -190,19 +239,27 @@ async function listCommand(
       name: e.name,
       type: e.type,
       factCount: graph.getFacts(e.id).length,
+      recordCount: graph.getRecordCollectionNames(e.id).reduce(
+        (sum, col) => sum + graph.getRecords(e.id, col).length,
+        0,
+      ),
     }));
     return { exitCode: 0, output: JSON.stringify(data) };
   }
 
   // Table header
   const lines: string[] = [];
-  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} Facts`;
+  const header = `${'ID'.padEnd(14)} ${'Name'.padEnd(28)} ${'Type'.padEnd(16)} ${'Facts'.padEnd(7)} Records`;
   lines.push(`\x1b[1m${header}\x1b[0m`);
   lines.push('-'.repeat(header.length));
 
   for (const entity of entities) {
     const facts = graph.getFacts(entity.id);
-    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${facts.length}`;
+    const recordCount = graph.getRecordCollectionNames(entity.id).reduce(
+      (sum, col) => sum + graph.getRecords(entity.id, col).length,
+      0,
+    );
+    const row = `${entity.id.padEnd(14)} ${entity.name.padEnd(28)} ${entity.type.padEnd(16)} ${String(facts.length).padEnd(7)} ${recordCount}`;
     lines.push(row);
   }
 

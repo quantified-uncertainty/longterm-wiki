@@ -52,7 +52,7 @@ describe('crux kb list', () => {
 });
 
 describe('crux kb show', () => {
-  it('shows entity details with facts', async () => {
+  it('shows entity details with facts and items', async () => {
     const result = await commands.show(['anthropic'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
@@ -60,6 +60,9 @@ describe('crux kb show', () => {
     expect(result.output).toContain('organization');
     expect(result.output).toContain('Facts');
     expect(result.output).toContain('Revenue');
+    expect(result.output).toContain('Records');
+    expect(result.output).toContain('funding-rounds');
+    expect(result.output).toContain('key-persons');
   }, 30_000);
 
   it('formats financial values with proper units', async () => {
@@ -82,6 +85,13 @@ describe('crux kb show', () => {
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('1983');
     expect(result.output).not.toContain('1,983');
+  }, 30_000);
+
+  it('resolves refs in key-people items', async () => {
+    const result = await commands.show(['anthropic'], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Dario Amodei');
+    expect(result.output).toContain('CEO');
   }, 30_000);
 
   it('returns error for non-existent entity', async () => {

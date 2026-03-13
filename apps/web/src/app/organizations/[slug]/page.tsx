@@ -6,19 +6,26 @@ import {
   getKBFacts,
   getKBProperty,
   getKBEntity,
+  getKBAllRecordCollections,
+  resolveKBSlug,
   getKBEntitySlug,
   getKBRecords,
-  getAllKBRecords,
+  getAllKBRecordsByCollection,
 } from "@/data/kb";
 import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById, getTypedEntities, isOrganization, isAiModel } from "@/data";
 import { getEntityHref } from "@/data/entity-nav";
 import {
   formatKBDate,
+  formatKBNumber,
   titleCase,
+  sortKBRecords,
   shortDomain,
+  isUrl,
 } from "@/components/wiki/kb/format";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
+import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
+import type { Fact, Property } from "@longterm-wiki/kb";
 import Link from "next/link";
 import {
   Breadcrumbs,
@@ -43,6 +50,33 @@ export async function generateMetadata({
       ? `Profile and key metrics for ${entity.name}.`
       : undefined,
   };
+}
+
+// ── Curated collection names ──────────────────────────────────────────
+const CURATED_COLLECTIONS = new Set([
+  "funding-rounds",
+  "investments",
+  "key-persons",
+  "products",
+  "model-releases",
+  "safety-milestones",
+  "strategic-partnerships",
+]);
+
+// ── Formatting helpers ────────────────────────────────────────────────
+
+function formatAmount(value: unknown): string | null {
+  if (value == null) return null;
+  const num = typeof value === "number" ? value : Number(value);
+  if (isNaN(num)) return String(value);
+  return formatKBNumber(num, "USD");
+}
+
+/** Safely get a string field from a record, or undefined. */
+function field(item: KBRecordEntry, key: string): string | undefined {
+  const v = item.fields[key];
+  if (v == null) return undefined;
+  return String(v);
 }
 
 // ── Subcomponents ─────────────────────────────────────────────────────
@@ -70,6 +104,215 @@ function StatCard({
     </div>
   );
 }
+
+/** Section header with optional count badge and divider. */
+function SectionHeader({ title, count }: { title: string; count?: number }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <h2 className="text-base font-bold tracking-tight">{title}</h2>
+      {count != null && (
+        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {count}
+        </span>
+      )}
+      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+    </div>
+  );
+}
+
+/** Source link for a record entry. */
+function SourceLink({ source }: { source: string | undefined }) {
+  if (!source) return null;
+  if (isUrl(source)) {
+    return (
+      <a
+        href={source}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[10px] text-primary/50 hover:text-primary hover:underline transition-colors"
+      >
+        {shortDomain(source)}
+      </a>
+    );
+  }
+  return <span className="text-[10px] text-muted-foreground">{source}</span>;
+}
+
+function PersonRow({
+  name,
+  title,
+  slug,
+  entityType,
+  isFounder,
+  start,
+  end,
+  notes,
+}: {
+  name: string;
+  title?: string;
+  slug?: string;
+  entityType?: string;
+  isFounder?: boolean;
+  start?: string;
+  end?: string;
+  notes?: string;
+}) {
+  const href = slug
+    ? entityType === "organization"
+      ? `/organizations/${slug}`
+      : `/people/${slug}`
+    : undefined;
+
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-border/40 last:border-b-0">
+      <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary/70 mt-0.5">
+        {name
+          .split(/\s+/)
+          .map((w) => w[0])
+          .filter(Boolean)
+          .slice(0, 2)
+          .join("")
+          .toUpperCase()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {href ? (
+            <Link
+              href={href}
+              className="font-semibold text-sm hover:text-primary transition-colors"
+            >
+              {name}
+            </Link>
+          ) : (
+            <span className="font-semibold text-sm">{name}</span>
+          )}
+          {isFounder && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              Founder
+            </span>
+          )}
+        </div>
+        {title && (
+          <div className="text-xs text-muted-foreground">{title}</div>
+        )}
+        <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+          {start && formatKBDate(start)}
+          {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
+        </div>
+        {notes && (
+          <div className="text-[10px] text-muted-foreground/50 mt-0.5 line-clamp-2">
+            {notes}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Badge helper ──────────────────────────────────────────────────────
+
+function Badge({ children, color }: { children: React.ReactNode; color?: string }) {
+  const colorClass =
+    color ?? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+  return (
+    <span
+      className={`inline-block px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${colorClass}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+const SAFETY_LEVEL_COLORS: Record<string, string> = {
+  "ASL-2": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  "ASL-3": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  "ASL-4": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+};
+
+const MILESTONE_TYPE_COLORS: Record<string, string> = {
+  "research-paper":
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  "policy-update":
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  "safety-eval":
+    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+  "red-team":
+    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+};
+
+// ── Entity ref resolver helper ────────────────────────────────────────
+
+function resolveRefName(
+  slug: string | undefined,
+  displayName: string | undefined,
+): { name: string; href: string | null } {
+  if (!slug && !displayName) return { name: "Unknown", href: null };
+
+  if (slug) {
+    const entityId = resolveKBSlug(slug);
+    const entity = entityId ? getKBEntity(entityId) : null;
+    if (entity) {
+      const prefix = entity.type === "organization" ? "/organizations"
+        : entity.type === "person" ? "/people"
+        : null;
+      return { name: entity.name, href: prefix ? `${prefix}/${slug}` : `/kb/entity/${entityId}` };
+    }
+  }
+
+  // Fall back to display name or humanized slug
+  const fallbackName = displayName ?? (slug ? titleCase(slug) : "Unknown");
+  return { name: fallbackName, href: null };
+}
+
+// ── Fact sidebar helpers ──────────────────────────────────────────────
+
+const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
+  { id: "financial", label: "Financial", order: 0 },
+  { id: "product", label: "Products & Usage", order: 1 },
+  { id: "organization", label: "Organization", order: 2 },
+  { id: "safety", label: "Safety & Research", order: 3 },
+  { id: "people", label: "People", order: 4 },
+  { id: "other", label: "Other", order: 99 },
+];
+
+/** Group facts by property, taking only the latest per property. */
+function getLatestFactsByProperty(
+  facts: Fact[],
+): Map<string, Fact> {
+  const latest = new Map<string, Fact>();
+  for (const fact of facts) {
+    if (fact.propertyId === "description") continue;
+    if (!latest.has(fact.propertyId)) {
+      latest.set(fact.propertyId, fact);
+    }
+  }
+  return latest;
+}
+
+/** Group property IDs by category, returning sorted categories. */
+function groupByCategory(
+  propertyIds: string[],
+): Array<{ category: string; label: string; props: string[] }> {
+  const groups = new Map<string, string[]>();
+  for (const propId of propertyIds) {
+    const prop = getKBProperty(propId);
+    const category = prop?.category ?? "other";
+    const list = groups.get(category) ?? [];
+    list.push(propId);
+    groups.set(category, list);
+  }
+
+  const catMap = new Map(FACT_CATEGORIES.map((c) => [c.id, c]));
+  return [...groups.entries()]
+    .map(([catId, props]) => ({
+      category: catId,
+      label: catMap.get(catId)?.label ?? titleCase(catId),
+      order: catMap.get(catId)?.order ?? 99,
+      props,
+    }))
+    .sort((a, b) => a.order - b.order);
+}
+
 
 // ── Hero stat properties for org pages ────────────────────────────────
 const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding", "founded-date"];
@@ -101,20 +344,6 @@ const ORG_TYPE_COLORS: Record<string, string> = {
   government:
     "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
-
-function SectionHeader({ title, count }: { title: string; count?: number }) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <h2 className="text-base font-bold tracking-tight">{title}</h2>
-      {count != null && (
-        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-          {count}
-        </span>
-      )}
-      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-    </div>
-  );
-}
 
 // ── Grant helpers ─────────────────────────────────────────────────────
 
@@ -1027,19 +1256,56 @@ export default async function OrgProfilePage({
   const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
   const orgType = orgData?.orgType ?? null;
 
-  // Header facts
+  // Header facts (description/website come from entity YAML, not KB facts)
   const hqFact = getKBLatest(entity.id, "headquarters");
+
+  // All record collections
+  const allCollections = getKBAllRecordCollections(entity.id);
+
+  // Curated collections
+  const rawFundingRounds = allCollections["funding-rounds"] ?? [];
+  const keyPersons = allCollections["key-persons"] ?? [];
+  const investments = allCollections["investments"] ?? [];
+  const products = allCollections["products"] ?? [];
+  const modelReleases = allCollections["model-releases"] ?? [];
+  const safetyMilestones = allCollections["safety-milestones"] ?? [];
+  const strategicPartnerships = allCollections["strategic-partnerships"] ?? [];
+
+  // Other (non-curated) collections with entries
+  const otherCollections = Object.entries(allCollections)
+    .filter(([name, entries]) => !CURATED_COLLECTIONS.has(name) && entries.length > 0)
+    .sort(([a], [b]) => a.localeCompare(b));
 
   // All facts for the panel
   const allFacts = getKBFacts(entity.id).filter(
     (f) => f.propertyId !== "description",
   );
 
+  // Sort collections by date (most recent first)
+  const sortedRounds = sortKBRecords(rawFundingRounds, "date", false);
+  const sortedModels = sortKBRecords(modelReleases, "released", false);
+  const sortedMilestones = sortKBRecords(safetyMilestones, "date", false);
+  const sortedPartnerships = sortKBRecords(strategicPartnerships, "date", false);
+
+  // Sort key persons: current first, then by start date descending
+  const sortedPersons = [...keyPersons].sort((a, b) => {
+    const endA = a.fields.end ? 1 : 0;
+    const endB = b.fields.end ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const startA = a.fields.start ? String(a.fields.start) : "";
+    const startB = b.fields.start ? String(b.fields.start) : "";
+    return startB.localeCompare(startA);
+  });
+
   const wikiHref = entity.numericId
     ? `/wiki/${entity.numericId}`
     : entity.wikiPageId
       ? `/wiki/${entity.wikiPageId}`
       : null;
+
+  // Fact sidebar data
+  const latestByProp = getLatestFactsByProperty(allFacts);
+  const categoryGroups = groupByCategory([...latestByProp.keys()]);
 
   // Description and website come from typed entity YAML data
   const descriptionText = orgData?.description ?? null;
@@ -1064,7 +1330,7 @@ export default async function OrgProfilePage({
   // ── Funding Received (this org is a recipient in other orgs' grants) ──
   // Recipients in PG grants are stored as display names (not entity IDs),
   // so we match against entity name, aliases, and slug.
-  const allGrantRecords = getAllKBRecords("grants");
+  const allGrantRecords = getAllKBRecordsByCollection("grants");
   const recipientMatchNames = new Set<string>([
     entity.name.toLowerCase(),
     slug.toLowerCase(),
@@ -1218,7 +1484,7 @@ export default async function OrgProfilePage({
           </p>
         )}
 
-        {/* Metadata row */}
+        {/* Metadata row: website, headquarters, links */}
         <div className="flex items-center gap-4 text-sm flex-wrap">
           {websiteUrl && (
             <a
@@ -1273,6 +1539,424 @@ export default async function OrgProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
+          {/* Funding rounds (timeline style like KB page) */}
+          {sortedRounds.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <SectionHeader title="Funding History" count={sortedRounds.length} />
+                <Link
+                  href={`/organizations/${slug}/funding`}
+                  className="text-xs text-primary hover:underline shrink-0"
+                >
+                  View all &rarr;
+                </Link>
+              </div>
+              <div className="border border-border/60 rounded-xl bg-card px-4">
+                {sortedRounds.slice(0, 8).map((round) => {
+                  const name = field(round, "name") ?? titleCase(round.key);
+                  const date = field(round, "date");
+                  const raised = round.fields.raised;
+                  const valuation = round.fields.valuation;
+                  const leadInvestor = field(round, "lead_investor");
+                  const { name: leadInvestorName, href: leadInvestorHref } =
+                    resolveRefName(leadInvestor, undefined);
+                  const instrument = field(round, "instrument");
+                  const notes = field(round, "notes");
+                  const source = field(round, "source");
+
+                  return (
+                    <div
+                      key={round.key}
+                      className="flex gap-4 py-4 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors"
+                    >
+                      {/* Timeline dot */}
+                      <div className="flex flex-col items-center pt-1">
+                        <div className="w-3 h-3 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
+                        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="font-semibold text-sm">{name}</span>
+                          {instrument && (
+                            <Badge>{instrument}</Badge>
+                          )}
+                          {date && (
+                            <span className="text-xs text-muted-foreground/70">
+                              {formatKBDate(date)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-4 mt-1.5 flex-wrap">
+                          {raised != null && (
+                            <span className="text-base font-bold tabular-nums tracking-tight">
+                              {formatAmount(raised)}
+                            </span>
+                          )}
+                          {valuation != null && (
+                            <span className="text-xs text-muted-foreground">
+                              at {formatAmount(valuation)} valuation
+                            </span>
+                          )}
+                          {leadInvestor && (
+                            <span className="text-xs text-muted-foreground">
+                              Led by{" "}
+                              {leadInvestorHref ? (
+                                <Link
+                                  href={leadInvestorHref}
+                                  className="text-primary hover:underline"
+                                >
+                                  {leadInvestorName}
+                                </Link>
+                              ) : (
+                                leadInvestorName
+                              )}
+                            </span>
+                          )}
+                        </div>
+                        {notes && (
+                          <div className="text-[10px] text-muted-foreground/50 mt-1.5 line-clamp-2">
+                            {notes}
+                          </div>
+                        )}
+                        <SourceLink source={source} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {sortedRounds.length > 8 && (
+                <Link
+                  href={`/organizations/${slug}/funding`}
+                  className="block mt-2 text-xs text-primary hover:underline text-center"
+                >
+                  +{sortedRounds.length - 8} more rounds
+                </Link>
+              )}
+            </section>
+          )}
+
+          {/* Investments (investor participation) */}
+          {investments.length > 0 && (
+            <section>
+              <SectionHeader title="Investor Participation" count={investments.length} />
+              <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
+                {investments.map((inv) => {
+                  const investorRef = field(inv, "investor");
+                  const { name: investorName, href: investorHref } =
+                    resolveRefName(
+                      investorRef,
+                      inv.displayName ?? field(inv, "display_name"),
+                    );
+                  const roundName = field(inv, "round_name");
+                  const amount = inv.fields.amount;
+                  const date = field(inv, "date");
+                  const notes = field(inv, "notes");
+
+                  return (
+                    <div
+                      key={inv.key}
+                      className="px-4 py-3"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 min-w-0">
+                          {investorHref ? (
+                            <Link
+                              href={investorHref}
+                              className="font-semibold text-sm text-primary hover:underline"
+                            >
+                              {investorName}
+                            </Link>
+                          ) : (
+                            <span className="font-semibold text-sm">
+                              {investorName}
+                            </span>
+                          )}
+                          {roundName && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              {roundName}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-sm tabular-nums">
+                          {amount != null && (
+                            <span className="font-bold">
+                              {formatAmount(amount)}
+                            </span>
+                          )}
+                          {date && (
+                            <span className="text-xs text-muted-foreground">
+                              {formatKBDate(date)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {notes && (
+                        <div className="text-[10px] text-muted-foreground/50 mt-1 line-clamp-2">
+                          {notes}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Model releases */}
+          {sortedModels.length > 0 && (
+            <section>
+              <SectionHeader title="Model Releases" count={sortedModels.length} />
+              <div className="border border-border/60 rounded-xl bg-card px-4">
+                {sortedModels.map((model) => {
+                  const name = field(model, "name") ?? titleCase(model.key);
+                  const released = field(model, "released");
+                  const safetyLevel = field(model, "safety_level");
+                  const description = field(model, "description");
+                  const source = field(model, "source");
+
+                  return (
+                    <div
+                      key={model.key}
+                      className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-b-0"
+                    >
+                      <div className="min-w-[70px] text-xs text-muted-foreground pt-0.5">
+                        {released ? formatKBDate(released) : "\u2014"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="font-medium text-sm">{name}</span>
+                          {safetyLevel && (
+                            <Badge
+                              color={
+                                SAFETY_LEVEL_COLORS[safetyLevel] ??
+                                "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              }
+                            >
+                              {safetyLevel}
+                            </Badge>
+                          )}
+                        </div>
+                        {description && (
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                            {description}
+                          </p>
+                        )}
+                        <SourceLink source={source} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Products (card grid like KB page) */}
+          {products.length > 0 && (
+            <section>
+              <SectionHeader title="Products" count={products.length} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {products.map((prod) => {
+                  const name = field(prod, "name") ?? titleCase(prod.key);
+                  const launched = field(prod, "launched");
+                  const description = field(prod, "description");
+                  const source = field(prod, "source");
+
+                  return (
+                    <div
+                      key={prod.key}
+                      className="group rounded-xl border border-border/60 bg-card p-4 transition-all hover:shadow-md hover:border-border"
+                    >
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-semibold text-sm group-hover:text-primary transition-colors">
+                          {name}
+                        </span>
+                        {launched && (
+                          <span className="text-[10px] text-muted-foreground/60">
+                            {formatKBDate(launched)}
+                          </span>
+                        )}
+                      </div>
+                      {description && (
+                        <div className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                          {description}
+                        </div>
+                      )}
+                      {source && isUrl(source) && (
+                        <div className="mt-1.5">
+                          <SourceLink source={source} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Safety milestones */}
+          {sortedMilestones.length > 0 && (
+            <section>
+              <SectionHeader title="Safety Milestones" count={sortedMilestones.length} />
+              <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
+                {sortedMilestones.map((ms) => {
+                  const name = field(ms, "name") ?? titleCase(ms.key);
+                  const date = field(ms, "date");
+                  const msType = field(ms, "type");
+                  const description = field(ms, "description");
+                  const source = field(ms, "source");
+
+                  return (
+                    <div key={ms.key} className="px-4 py-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-sm">{name}</span>
+                        {msType && (
+                          <Badge
+                            color={
+                              MILESTONE_TYPE_COLORS[msType] ??
+                              "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                            }
+                          >
+                            {titleCase(msType)}
+                          </Badge>
+                        )}
+                        {date && (
+                          <span className="text-xs text-muted-foreground ml-auto">
+                            {formatKBDate(date)}
+                          </span>
+                        )}
+                      </div>
+                      {description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {description}
+                        </p>
+                      )}
+                      <SourceLink source={source} />
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Strategic partnerships */}
+          {sortedPartnerships.length > 0 && (
+            <section>
+              <SectionHeader title="Strategic Partnerships" count={sortedPartnerships.length} />
+              <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
+                {sortedPartnerships.map((sp) => {
+                  const partnerRef = field(sp, "partner");
+                  const { name: partnerName, href: partnerHref } =
+                    resolveRefName(partnerRef, sp.displayName);
+                  const date = field(sp, "date");
+                  const spType = field(sp, "type");
+                  const investmentAmount = sp.fields.investment_amount;
+                  const computeCommitment = sp.fields.compute_commitment;
+                  const notes = field(sp, "notes");
+                  const source = field(sp, "source");
+
+                  return (
+                    <div key={sp.key} className="px-4 py-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        {partnerHref ? (
+                          <Link
+                            href={partnerHref}
+                            className="font-semibold text-sm text-primary hover:underline"
+                          >
+                            {partnerName}
+                          </Link>
+                        ) : (
+                          <span className="font-semibold text-sm">
+                            {partnerName}
+                          </span>
+                        )}
+                        {spType && (
+                          <Badge>{spType}</Badge>
+                        )}
+                        {date && (
+                          <span className="text-xs text-muted-foreground ml-auto">
+                            {formatKBDate(date)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        {investmentAmount != null && (
+                          <span>
+                            Investment: <span className="font-semibold text-foreground">{formatAmount(investmentAmount)}</span>
+                          </span>
+                        )}
+                        {computeCommitment != null && (
+                          <span>
+                            Compute: <span className="font-semibold text-foreground">{formatAmount(computeCommitment)}</span>
+                          </span>
+                        )}
+                      </div>
+                      {notes && (
+                        <div className="text-[10px] text-muted-foreground/50 mt-1 line-clamp-2">
+                          {notes}
+                        </div>
+                      )}
+                      <SourceLink source={source} />
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Other data (dynamic rendering for non-curated collections) */}
+          {otherCollections.length > 0 && (
+            <section>
+              <SectionHeader title="Other Data" />
+              {otherCollections.map(([name]) => (
+                <KBRecordCollection
+                  key={name}
+                  entity={entity.id}
+                  collection={name}
+                />
+              ))}
+            </section>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-8">
+          {/* Key People */}
+          {sortedPersons.length > 0 && (
+            <section>
+              <SectionHeader title="Key People" count={sortedPersons.length} />
+              <div className="border border-border/60 rounded-xl bg-card px-4">
+                {sortedPersons.map((person) => {
+                  const personRef = field(person, "person");
+                  const personEntityId = personRef
+                    ? resolveKBSlug(personRef)
+                    : undefined;
+                  const personEntity = personEntityId
+                    ? getKBEntity(personEntityId)
+                    : undefined;
+                  const name =
+                    field(person, "display_name") ??
+                    personEntity?.name ??
+                    titleCase(personRef ?? person.key);
+
+                  return (
+                    <PersonRow
+                      key={person.key}
+                      name={name}
+                      title={field(person, "title")}
+                      slug={personRef}
+                      entityType={personEntity?.type}
+                      isFounder={!!person.fields.is_founder}
+                      start={field(person, "start")}
+                      end={field(person, "end")}
+                      notes={field(person, "notes")}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Facts sidebar */}
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}
@@ -1357,34 +2041,6 @@ export default async function OrgProfilePage({
                     })}
                   </tbody>
                 </table>
-              </div>
-            </section>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Quick links */}
-          {allFacts.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Quick Links
-              </h2>
-              <div className="flex flex-col gap-2">
-                <Link
-                  href={`/kb/entity/${entity.id}`}
-                  className="text-xs text-primary hover:underline"
-                >
-                  View all facts in KB explorer &rarr;
-                </Link>
-                {wikiHref && (
-                  <Link
-                    href={wikiHref}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    Wiki page &rarr;
-                  </Link>
-                )}
               </div>
             </section>
           )}

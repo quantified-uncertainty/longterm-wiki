@@ -21,7 +21,7 @@
  *
  * Supports per-entity directories: a directory in things/ with an entity.yaml
  * (or any file containing a `thing:` block) plus additional YAML files that
- * contribute facts and _sources.
+ * contribute facts, records, items, and _sources.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -32,6 +32,7 @@ import { Graph } from "./graph";
 import type {
   PropertiesFile,
   SchemaFile,
+  RecordSchemaFile,
   EntityFile,
   RawFact,
   Property,
@@ -39,6 +40,9 @@ import type {
   Entity,
   Fact,
   FactValue,
+  RecordSchema,
+  RecordEntry,
+  EndpointDef,
 } from "./types";
 
 // ── !ref YAML tag ──────────────────────────────────────────────────
@@ -154,8 +158,9 @@ function resolveRefs(
   context: string
 ): unknown {
   // DateMarker in facts: pass through as-is so normalizeValue() can handle it.
+  // DateMarker in records: convert to the plain date string.
   if (value instanceof DateMarker) {
-    return value;
+    return context.endsWith("/facts") ? value : value.value;
   }
 
   if (value instanceof RefMarker) {
@@ -347,6 +352,29 @@ function parseSchema(raw: unknown): TypeSchema {
     name: file.name,
     required: file.required ?? [],
     recommended: file.recommended ?? [],
+    ...(file.records && { records: file.records }),
+  };
+}
+
+function parseRecordSchema(id: string, raw: unknown): RecordSchema {
+  const file = raw as RecordSchemaFile;
+  const endpoints: Record<string, EndpointDef> = {};
+  for (const [name, def] of Object.entries(file.endpoints ?? {})) {
+    endpoints[name] = {
+      types: def.types,
+      ...(def.implicit && { implicit: true }),
+      ...(def.required && { required: true }),
+      ...(def.allow_display_name && { allowDisplayName: true }),
+    };
+  }
+  return {
+    id,
+    name: file.name,
+    ...(file.description && { description: file.description }),
+    ...(file.collectionName && { collectionName: file.collectionName }),
+    endpoints,
+    fields: file.fields ?? {},
+    ...(file.temporal && { temporal: true }),
   };
 }
 
@@ -496,7 +524,7 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
  * - A .yaml file yields a single EntityFile (existing behavior).
  * - A subdirectory yields a merged EntityFile from all .yaml files inside it.
  *   Exactly one file must contain a `thing:` block (the main file); others
- *   contribute additional facts and _sources.
+ *   contribute additional facts, records, items, and _sources.
  */
 async function discoverEntityFiles(
   thingsDir: string
@@ -559,6 +587,8 @@ async function discoverEntityFiles(
  * Rules:
  * - Exactly one file must have a `thing:` block (the main file). Error if 0 or 2+.
  * - `facts:` arrays are concatenated.
+ * - `records:` maps are deep-merged (collection → key → entry). Error on key conflicts.
+ * - `items:` maps are merged similarly. Error on key conflicts.
  * - `_sources:` maps are merged. Error on key conflicts with different values.
  */
 function mergeEntityFiles(
@@ -567,6 +597,7 @@ function mergeEntityFiles(
 ): Record<string, unknown> {
   let mainFile: { name: string; thing: unknown } | undefined;
   const allFacts: unknown[] = [];
+  const mergedRecords: Record<string, Record<string, unknown>> = {};
   const mergedItems: Record<string, unknown> = {};
   const mergedSources: Record<string, string> = {};
 
@@ -587,6 +618,26 @@ function mergeEntityFiles(
     // Collect facts
     if (Array.isArray(file.facts)) {
       allFacts.push(...file.facts);
+    }
+
+    // Merge records (collection → key → entry)
+    if (file.records && typeof file.records === "object") {
+      for (const [collection, entries] of Object.entries(
+        file.records as Record<string, Record<string, unknown>>
+      )) {
+        if (!mergedRecords[collection]) {
+          mergedRecords[collection] = {};
+        }
+        for (const [key, entry] of Object.entries(entries)) {
+          if (mergedRecords[collection][key] !== undefined) {
+            throw new Error(
+              `[kb/loader] Per-entity directory "${dirName}": record key conflict ` +
+                `in collection "${collection}" — key "${key}" appears in multiple files.`
+            );
+          }
+          mergedRecords[collection][key] = entry;
+        }
+      }
     }
 
     // Merge items
@@ -631,10 +682,112 @@ function mergeEntityFiles(
 
   const result: Record<string, unknown> = { thing: mainFile.thing };
   if (allFacts.length > 0) result.facts = allFacts;
+  if (Object.keys(mergedRecords).length > 0) result.records = mergedRecords;
   if (Object.keys(mergedItems).length > 0) result.items = mergedItems;
   if (Object.keys(mergedSources).length > 0) result._sources = mergedSources;
 
   return result;
+}
+
+// ── Record helpers ─────────────────────────────────────────────────────
+
+/**
+ * Maps a collection name (e.g., "funding-rounds") to a record schema ID
+ * (e.g., "funding-round"). Uses explicit collectionName from schemas first,
+ * then falls back to naive depluralization.
+ */
+function findRecordSchemaId(
+  collectionName: string,
+  allowedIds: string[],
+  graph: Graph,
+): string | undefined {
+  // Exact match (e.g., collection "career-history" → schema "career-history")
+  if (allowedIds.includes(collectionName) && graph.getRecordSchema(collectionName)) {
+    return collectionName;
+  }
+
+  // Primary path: check if any allowed schema has this as its explicit collectionName
+  for (const id of allowedIds) {
+    const schema = graph.getRecordSchema(id);
+    if (schema?.collectionName === collectionName) {
+      return id;
+    }
+  }
+
+  // Fallback: naive depluralization for schemas without explicit collectionName
+  const candidates: string[] = [];
+  if (collectionName.endsWith("ies")) {
+    candidates.push(collectionName.slice(0, -3) + "y"); // histories → history
+  }
+  if (collectionName.endsWith("s")) {
+    candidates.push(collectionName.slice(0, -1)); // rounds → round
+  }
+  for (const singular of candidates) {
+    if (allowedIds.includes(singular) && graph.getRecordSchema(singular)) {
+      return singular;
+    }
+  }
+
+  // Check all allowed IDs for plural match: schema "grant" → collection "grants"
+  for (const id of allowedIds) {
+    if (id + "s" === collectionName && graph.getRecordSchema(id)) {
+      return id;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Parses a raw YAML record entry into a RecordEntry.
+ * Separates temporal fields (asOf, validEnd), display_name, and data fields.
+ * Warns if required explicit endpoints are missing.
+ */
+function parseRecordEntry(
+  key: string,
+  raw: Record<string, unknown>,
+  schemaId: string,
+  ownerEntityId: string,
+  schema: RecordSchema,
+): RecordEntry {
+  const fields: Record<string, unknown> = {};
+  let displayName: string | undefined;
+  let asOf: string | undefined;
+  let validEnd: string | undefined;
+
+  // resolveRefs() already converts DateMarker to plain strings for non-facts
+  // contexts, so asOf/validEnd arrive as strings here.
+  for (const [fieldName, fieldValue] of Object.entries(raw)) {
+    if (fieldName === "display_name") {
+      displayName = String(fieldValue);
+    } else if (fieldName === "asOf") {
+      asOf = String(fieldValue);
+    } else if (fieldName === "validEnd") {
+      validEnd = String(fieldValue);
+    } else {
+      fields[fieldName] = fieldValue;
+    }
+  }
+
+  // Warn about missing required explicit endpoints
+  for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+    if (endpointDef.implicit) continue;
+    if (endpointDef.required && !fields[endpointName] && !displayName) {
+      console.warn(
+        `[kb/loader] Record "${ownerEntityId}/${schemaId}/${key}" is missing ` +
+        `required endpoint "${endpointName}" (and no display_name fallback)`
+      );
+    }
+  }
+
+  return {
+    key,
+    schema: schemaId,
+    ownerEntityId,
+    fields,
+    ...(displayName && { displayName }),
+    ...(asOf && { asOf }),
+    ...(validEnd && { validEnd }),
+  };
 }
 
 // ── Main loader ────────────────────────────────────────────────────────
@@ -656,7 +809,7 @@ export interface LoadResult {
  *
  * Uses a two-pass approach for entities:
  *   Pass 1: Load all entity headers (builds entity ID index)
- *   Pass 2: Load facts (resolves !ref tags using the index)
+ *   Pass 2: Load facts and records (resolves !ref tags using the index)
  */
 export async function loadKB(dataDir: string): Promise<LoadResult> {
   const graph = new Graph();
@@ -688,6 +841,14 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
     graph.addSchema(schema);
   }
 
+  // 2b. Load record schemas (schemas/records/*.yaml)
+  const recordSchemaFiles = await readYamlFiles(join(dataDir, "schemas", "records"));
+  for (const { name, parsed } of recordSchemaFiles) {
+    const id = name.replace(/\.(yaml|yml)$/, "");
+    const recordSchema = parseRecordSchema(id, parsed);
+    graph.addRecordSchema(recordSchema);
+  }
+
   // 3. Load entities (two passes)
   // discoverEntityFiles handles both single .yaml files and per-entity directories
   const entityFiles = await discoverEntityFiles(join(dataDir, "things"));
@@ -715,6 +876,7 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
     const file: EntityFile = {
       thing: rawFile.thing,
       ...(rawFile.facts && { facts: rawFile.facts }),
+      ...(rawFile.records && { records: rawFile.records }),
     };
     const { entity, filename } = parseEntity(file.thing);
     graph.addEntity(entity);
@@ -722,7 +884,7 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
     parsedEntityFiles.push({ entity, filename, file, sources });
   }
 
-  // Pass 2: Load facts with !src and !ref resolution
+  // Pass 2: Load facts and records with !src and !ref resolution
   for (const { entity, filename, file, sources } of parsedEntityFiles) {
     // Resolve !src aliases in facts BEFORE !ref resolution (source aliases are file-scoped)
     for (const rawFact of file.facts ?? []) {
@@ -733,6 +895,57 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
       const resolvedFact = { ...(srcResolved as RawFact), value: resolvedValue };
       const fact = parseFact(resolvedFact as RawFact, entity.id, properties);
       if (fact) graph.addFact(fact);
+    }
+
+    // Parse records
+    if (file.records) {
+      // Resolve !src aliases first
+      const srcResolvedRecords = resolveSrcAliases(
+        file.records, sources, `${filename}/records`
+      );
+      const resolvedRecords = resolveRefs(
+        srcResolvedRecords,
+        graph,
+        filenameMap,
+        `${filename}/records`
+      ) as Record<string, Record<string, Record<string, unknown>>>;
+
+      // Look up which record schemas this entity type can host
+      const typeSchema = graph.getSchema(entity.type);
+      const allowedRecordIds = typeSchema?.records ?? [];
+
+      for (const [collectionName, rawEntries] of Object.entries(resolvedRecords)) {
+        // Map collection name to schema ID. Collection names use pluralized
+        // form (e.g., "funding-rounds") while schema IDs are singular
+        // (e.g., "funding-round"). Try both.
+        const schemaId = findRecordSchemaId(collectionName, allowedRecordIds, graph);
+        if (!schemaId) {
+          console.warn(
+            `[kb/loader] Unknown record collection "${collectionName}" on entity "${entity.name}" ` +
+            `(allowed: ${allowedRecordIds.join(", ")})`
+          );
+          continue;
+        }
+
+        const recordSchema = graph.getRecordSchema(schemaId);
+        if (!recordSchema) {
+          console.warn(
+            `[kb/loader] Record schema "${schemaId}" not found for collection "${collectionName}" on "${entity.name}"`
+          );
+          continue;
+        }
+
+        for (const [key, rawEntry] of Object.entries(rawEntries)) {
+          const entry = parseRecordEntry(
+            key,
+            rawEntry,
+            schemaId,
+            entity.id,
+            recordSchema,
+          );
+          graph.addRecord(collectionName, entry);
+        }
+      }
     }
   }
 

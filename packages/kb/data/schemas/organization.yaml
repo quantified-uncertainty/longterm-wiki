@@ -12,3 +12,17 @@ recommended:
   - legal-structure
   - total-funding
 
+records:
+  - funding-round
+  - funding-program
+  - investment
+  - equity-position
+  - board-seat
+  - key-person
+  - model-release
+  - product
+  - research-area
+  - strategic-partnership
+  - safety-milestone
+  - grant
+  - charitable-pledge

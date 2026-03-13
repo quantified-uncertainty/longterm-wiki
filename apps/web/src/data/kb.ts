@@ -12,7 +12,7 @@
 import fs from "fs";
 import path from "path";
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
 import type { SerializedKB } from "@longterm-wiki/kb";
 
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -35,7 +35,7 @@ export function getKB(): SerializedKB | undefined {
 
 
 /**
- * Resolve an entity identifier to the entity ID used as key in facts.
+ * Resolve an entity identifier to the entity ID used as key in facts/records.
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
  */
@@ -301,6 +301,8 @@ export interface KBRecordEntry {
   schema: string;
   ownerEntityId: string;
   fields: Record<string, unknown>;
+  /** Display name for non-entity participants (when allow_display_name is true) */
+  displayName?: string;
 }
 
 /**
@@ -327,6 +329,23 @@ export function getKBRecords(entityId: string, collection: string): KBRecordEntr
 }
 
 /**
+ * Get all record collections for an entity.
+ */
+export function getKBAllRecordCollections(entity: string): Record<string, KBRecordEntry[]> {
+  const kb = getKB();
+  if (!kb) return {};
+
+  const key = resolveEntityKey(entity, kb);
+  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
+  const records = "records" in kb
+    ? (kb as { records?: RecordsMap }).records
+    : undefined;
+  if (!records) return {};
+
+  return { ...(records[key] ?? {}) };
+}
+
+/**
  * Get all records across all entities for a specific collection.
  * Returns a flat array of all record entries.
  */
@@ -348,6 +367,116 @@ export function getAllKBRecords(collection: string): KBRecordEntry[] {
     }
   }
   return result;
+}
+
+/**
+ * Get all records across all entities for a specific collection name.
+ * Returns a flat array of record entries (convenience alias).
+ */
+export function getAllKBRecordsByCollection(collection: string): KBRecordEntry[] {
+  return getAllKBRecords(collection);
+}
+
+/**
+ * Get a record schema by ID.
+ */
+export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
+  const kb = getKB();
+  if (!kb) return undefined;
+  return kb.recordSchemas?.find((s: RecordSchema) => s.id === schemaId);
+}
+
+/**
+ * Get all record schemas.
+ */
+export function getKBRecordSchemas(): RecordSchema[] {
+  const kb = getKB();
+  if (!kb) return [];
+  return kb.recordSchemas ?? [];
+}
+
+/**
+ * Find all records across all entities that reference the given entityId
+ * via an explicit endpoint field. Optionally filter by collection name.
+ */
+export function getKBRecordsReferencing(
+  entityId: string,
+  collectionName?: string,
+): RecordEntry[] {
+  const kb = getKB();
+  if (!kb || !kb.records || !kb.recordSchemas) return [];
+
+  const schemaMap = new Map(kb.recordSchemas.map((s: RecordSchema) => [s.id, s]));
+  const results: RecordEntry[] = [];
+
+  for (const [, collections] of Object.entries(kb.records)) {
+    for (const [colName, entries] of Object.entries(collections)) {
+      if (collectionName && colName !== collectionName) continue;
+      for (const entry of entries) {
+        const schema = schemaMap.get(entry.schema);
+        if (!schema) continue;
+        for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
+          if (endpointDef.implicit) continue;
+          if (entry.fields[endpointName] === entityId) {
+            results.push(entry);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Look up a single record entry by its key.
+ */
+export function getKBRecordByKey(
+  recordKey: string,
+): { entityId: string; collection: string; entry: RecordEntry } | undefined {
+  const kb = getKB();
+  if (!kb || !kb.records) return undefined;
+
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        if (entry.key === recordKey) {
+          return { entityId, collection: collectionName, entry };
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Get all record entries across all entities as a flat list.
+ * Returns entries wrapped with their entityId and collection name.
+ */
+export function getAllKBRecordEntries(): Array<{
+  entityId: string;
+  collection: string;
+  entry: RecordEntry;
+}> {
+  const kb = getKB();
+  if (!kb || !kb.records) return [];
+
+  const results: Array<{
+    entityId: string;
+    collection: string;
+    entry: RecordEntry;
+  }> = [];
+
+  for (const [entityId, collections] of Object.entries(kb.records)) {
+    for (const [collectionName, entries] of Object.entries(collections)) {
+      for (const entry of entries) {
+        results.push({ entityId, collection: collectionName, entry });
+      }
+    }
+  }
+
+  return results;
 }
 
 // ── Slug resolution (public) ─────────────────────────────────────

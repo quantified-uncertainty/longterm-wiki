@@ -1,0 +1,16 @@
+name: Product
+description: "Major products and services launched by an organization."
+collectionName: products
+temporal: false
+
+endpoints:
+  developer:
+    types: [organization]
+    implicit: true
+
+fields:
+  name: { type: text, required: true, description: "Product name" }
+  launched: { type: date, required: true, description: "Launch date (YYYY-MM)" }
+  description: { type: text, description: "Brief description of the product" }
+  source: { type: text, description: "URL to announcement" }
+  notes: { type: text, description: "Context or current status" }
