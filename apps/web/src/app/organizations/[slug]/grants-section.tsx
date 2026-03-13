@@ -6,6 +6,8 @@
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
 import { formatAmount, numericValue } from "./org-data";
@@ -26,43 +28,47 @@ export function GrantsGivenSection({
     0,
   );
 
-  const rows = grants.map((g) => (
-    <tr key={g.key} className="hover:bg-muted/20 transition-colors">
-      <td className="py-2.5 px-4">
-        <span className="font-medium text-foreground text-sm">{g.name}</span>
-        {g.source && (
-          <a
-            href={safeHref(g.source)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-          >
-            source
-          </a>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-sm">
-        {g.recipientHref ? (
-          <Link
-            href={g.recipientHref}
-            className="text-primary hover:underline"
-          >
-            {g.recipientName}
-          </Link>
-        ) : (
-          <span className="text-muted-foreground">{g.recipientName}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-        {g.amount != null && (
-          <span className="font-semibold">{formatAmount(g.amount)}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-        {g.date ?? ""}
-      </td>
-    </tr>
-  ));
+  const rows = grants.map((g) => {
+    const verdict = getRecordVerdict("grant", String(g.key));
+    return (
+      <tr key={g.key} className="hover:bg-muted/20 transition-colors">
+        <td className="py-2.5 px-4">
+          <span className="font-medium text-foreground text-sm">{g.name}</span>
+          {g.source && (
+            <a
+              href={safeHref(g.source)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+            >
+              source
+            </a>
+          )}
+          <VerificationBadge verdict={verdict} />
+        </td>
+        <td className="py-2.5 px-4 text-sm">
+          {g.recipientHref ? (
+            <Link
+              href={g.recipientHref}
+              className="text-primary hover:underline"
+            >
+              {g.recipientName}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">{g.recipientName}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
+          {g.amount != null && (
+            <span className="font-semibold">{formatAmount(g.amount)}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
+          {g.date ?? ""}
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <section>
@@ -115,43 +121,47 @@ export function GrantsReceivedSection({
     0,
   );
 
-  const rows = grants.map((g) => (
-    <tr
-      key={`received-${g.key}`}
-      className="hover:bg-muted/20 transition-colors"
-    >
-      <td className="py-2.5 px-4">
-        <span className="font-medium text-foreground text-sm">{g.name}</span>
-        {g.source && (
-          <a
-            href={safeHref(g.source)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-          >
-            source
-          </a>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-sm">
-        {g.funderHref ? (
-          <Link href={g.funderHref} className="text-primary hover:underline">
-            {g.funderName}
-          </Link>
-        ) : (
-          <span className="text-muted-foreground">{g.funderName}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-        {g.amount != null && (
-          <span className="font-semibold">{formatAmount(g.amount)}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-        {g.date ?? ""}
-      </td>
-    </tr>
-  ));
+  const rows = grants.map((g) => {
+    const verdict = getRecordVerdict("grant", String(g.key));
+    return (
+      <tr
+        key={`received-${g.key}`}
+        className="hover:bg-muted/20 transition-colors"
+      >
+        <td className="py-2.5 px-4">
+          <span className="font-medium text-foreground text-sm">{g.name}</span>
+          {g.source && (
+            <a
+              href={safeHref(g.source)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+            >
+              source
+            </a>
+          )}
+          <VerificationBadge verdict={verdict} />
+        </td>
+        <td className="py-2.5 px-4 text-sm">
+          {g.funderHref ? (
+            <Link href={g.funderHref} className="text-primary hover:underline">
+              {g.funderName}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">{g.funderName}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
+          {g.amount != null && (
+            <span className="font-semibold">{formatAmount(g.amount)}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
+          {g.date ?? ""}
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <section>

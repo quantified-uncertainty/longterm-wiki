@@ -4,6 +4,8 @@
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedInvestmentRecord } from "@/app/organizations/[slug]/org-data";
 import { formatAmount, numericValue } from "@/app/organizations/[slug]/org-data";
@@ -36,54 +38,58 @@ export function InvestmentsReceivedSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {investments.map((inv) => (
-              <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">
-                    {inv.investorHref ? (
-                      <Link href={inv.investorHref} className="text-primary hover:underline">
-                        {inv.investorName}
-                      </Link>
-                    ) : (
-                      inv.investorName
-                    )}
-                  </span>
-                  <Link
-                    href={`/investments/${inv.key}`}
-                    className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
-                    title="Investment details"
-                  >
-                    details
-                  </Link>
-                  {inv.role && (
-                    <span className="ml-1.5 text-[11px] text-muted-foreground">
-                      ({inv.role})
+            {investments.map((inv) => {
+              const verdict = getRecordVerdict("investment", String(inv.key));
+              return (
+                <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <span className="font-medium text-foreground text-xs">
+                      {inv.investorHref ? (
+                        <Link href={inv.investorHref} className="text-primary hover:underline">
+                          {inv.investorName}
+                        </Link>
+                      ) : (
+                        inv.investorName
+                      )}
                     </span>
-                  )}
-                  {inv.source && (
-                    <a
-                      href={safeHref(inv.source)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                    <Link
+                      href={`/investments/${inv.key}`}
+                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      title="Investment details"
                     >
-                      source
-                    </a>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-xs text-muted-foreground">
-                  {inv.roundName ?? ""}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                  {inv.amount != null && (
-                    <span className="font-semibold">{formatAmount(inv.amount)}</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                  {inv.date ?? ""}
-                </td>
-              </tr>
-            ))}
+                      details
+                    </Link>
+                    {inv.role && (
+                      <span className="ml-1.5 text-[11px] text-muted-foreground">
+                        ({inv.role})
+                      </span>
+                    )}
+                    {inv.source && (
+                      <a
+                        href={safeHref(inv.source)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        source
+                      </a>
+                    )}
+                    <VerificationBadge verdict={verdict} />
+                  </td>
+                  <td className="py-2 px-3 text-xs text-muted-foreground">
+                    {inv.roundName ?? ""}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                    {inv.amount != null && (
+                      <span className="font-semibold">{formatAmount(inv.amount)}</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                    {inv.date ?? ""}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

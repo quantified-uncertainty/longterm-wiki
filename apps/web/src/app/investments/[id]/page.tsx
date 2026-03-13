@@ -7,9 +7,10 @@ import {
 } from "@/data/kb";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById } from "@/data/database";
+import { getTypedEntityById, getRecordVerdict } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -117,6 +118,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
   if (!record) notFound();
 
   const investment = parseInvestment(record);
+  const investmentVerdict = getRecordVerdict("investment", String(investment.key));
 
   // Company wiki page link
   const companyTypedEntity = getTypedEntityById(investment.ownerEntityId);
@@ -195,6 +197,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
                 {titleCase(investment.instrument)}
               </span>
             )}
+            <VerificationBadge verdict={investmentVerdict} />
           </div>
         </div>
 
