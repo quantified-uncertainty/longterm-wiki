@@ -8,6 +8,8 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 export interface GrantRow {
   /** Composite key: entityId-recordKey for uniqueness */
   compositeKey: string;
+  /** The KB record key, used for linking to /grants/[id] */
+  recordKey: string;
   name: string;
   /** Grantor entity */
   organizationId: string;
@@ -265,9 +267,12 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  <span className="font-medium text-foreground">
+                  <Link
+                    href={`/grants/${row.recordKey}`}
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
                     {row.name}
-                  </span>
+                  </Link>
                   {row.source && (
                     <a
                       href={row.source}

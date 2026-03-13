@@ -31,6 +31,7 @@ export default function GrantsPage() {
 
     return {
       compositeKey: `${record.ownerEntityId}-${record.key}`,
+      recordKey: record.key,
       name: (record.fields.name as string) ?? record.key,
       organizationId: record.ownerEntityId,
       organizationName: orgName,
