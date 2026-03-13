@@ -83,6 +83,7 @@ const DATA_FILES = [
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
+  { key: 'peopleResources', file: 'people-resources.yaml' },
 ];
 
 function loadYaml(filename) {

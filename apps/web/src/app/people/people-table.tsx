@@ -22,6 +22,8 @@ export interface PersonRow {
   netWorthNum: number | null;
 
   positionCount: number;
+
+  publicationCount: number;
   careerHistoryCount: number;
 }
 
@@ -32,6 +34,7 @@ type SortKey =
   | "bornYear"
   | "netWorth"
   | "positions"
+  | "publications"
   | "careerHistory";
 
 type SortDir = "asc" | "desc";
@@ -98,6 +101,8 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             return row.netWorthNum;
           case "positions":
             return row.positionCount || null;
+          case "publications":
+            return row.publicationCount || null;
           case "careerHistory":
             return row.careerHistoryCount;
         }
@@ -178,6 +183,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
               <SortHeader label="Born" sortKey="bornYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Net Worth" sortKey="netWorth" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Positions" sortKey="positions" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <SortHeader label="Pubs" sortKey="publications" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Career Entries" sortKey="careerHistory" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
           </thead>
@@ -242,6 +248,15 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                   {row.positionCount > 0 && (
                     <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                       {row.positionCount}
+                    </span>
+                  )}
+                </td>
+
+                {/* Publications */}
+                <td className="py-2.5 px-3 text-center tabular-nums">
+                  {row.publicationCount > 0 && (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      {row.publicationCount}
                     </span>
                   )}
                 </td>
