@@ -4,6 +4,7 @@ import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 import { getExpertById, getPublicationsForPerson } from "@/data";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "People",
@@ -153,6 +154,29 @@ export default function PeoplePage() {
           Directory of key people in AI safety, frontier AI research, policy,
           and effective altruism tracked in the knowledge base.
         </p>
+        <Link
+          href="/people/network"
+          className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-primary hover:underline"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          View Network Graph
+        </Link>
       </div>
 
       {/* Summary stats */}
