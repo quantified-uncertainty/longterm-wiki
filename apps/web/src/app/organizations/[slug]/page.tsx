@@ -61,6 +61,12 @@ const CURATED_COLLECTIONS = new Set([
   "model-releases",
   "safety-milestones",
   "strategic-partnerships",
+  "board-seats",
+  "divisions",
+  "funding-programs",
+  "personnel",
+  "grants",
+  "equity-positions",
 ]);
 
 // ── Formatting helpers ────────────────────────────────────────────────
@@ -1229,6 +1235,167 @@ function EquityPositionsSection({
   );
 }
 
+// ── Board of Directors section ────────────────────────────────────────
+
+interface BoardMember {
+  key: string;
+  personId: string | null;
+  personName: string;
+  personHref: string | null;
+  role: string | null;
+  appointed: string | null;
+  departed: string | null;
+  appointedBy: string | null;
+  source: string | null;
+}
+
+function parseBoardSeatRecord(record: KBRecordEntry): Omit<BoardMember, "personName" | "personHref"> {
+  const f = record.fields;
+  return {
+    key: record.key,
+    personId: (f.member as string) ?? null,
+    role: (f.role as string) ?? null,
+    appointed: (f.appointed as string) ?? null,
+    departed: (f.departed as string) ?? null,
+    appointedBy: (f.appointed_by as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+function BoardOfDirectorsSection({ members }: { members: BoardMember[] }) {
+  if (members.length === 0) return null;
+
+  const current = members.filter((m) => !m.departed);
+  const former = members.filter((m) => !!m.departed);
+
+  return (
+    <section>
+      <SectionHeader title="Board of Directors" count={members.length} />
+      <div className="border border-border/60 rounded-xl bg-card">
+        {current.length > 0 && (
+          <div className="divide-y divide-border/40">
+            {current.map((m) => (
+              <div key={m.key} className="px-4 py-3">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {m.personHref ? (
+                    <Link href={m.personHref} className="font-semibold text-sm text-primary hover:underline">
+                      {m.personName}
+                    </Link>
+                  ) : (
+                    <span className="font-semibold text-sm">{m.personName}</span>
+                  )}
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    Current
+                  </span>
+                </div>
+                {m.role && (
+                  <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
+                )}
+                <div className="text-[10px] text-muted-foreground/50 mt-1">
+                  {m.appointed ? `Since ${formatKBDate(m.appointed)}` : ""}
+                  {m.appointedBy ? ` (${m.appointedBy})` : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {former.length > 0 && (
+          <>
+            {current.length > 0 && (
+              <div className="px-4 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50 bg-muted/30 border-t border-border/40">
+                Former
+              </div>
+            )}
+            <div className="divide-y divide-border/40">
+              {former.map((m) => (
+                <div key={m.key} className="px-4 py-2.5 opacity-70">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {m.personHref ? (
+                      <Link href={m.personHref} className="font-semibold text-sm hover:text-primary transition-colors">
+                        {m.personName}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-sm">{m.personName}</span>
+                    )}
+                  </div>
+                  {m.role && (
+                    <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
+                  )}
+                  <div className="text-[10px] text-muted-foreground/50 mt-1">
+                    {m.appointed ? formatKBDate(m.appointed) : ""}
+                    {m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : ""}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ── Related Organizations section ────────────────────────────────────
+
+interface RelatedOrg {
+  id: string;
+  name: string;
+  slug: string | null;
+  relationship: string;
+  date: string | null;
+}
+
+function RelatedOrganizationsSection({ orgs }: { orgs: RelatedOrg[] }) {
+  if (orgs.length === 0) return null;
+
+  return (
+    <section>
+      <SectionHeader title="Related Organizations" count={orgs.length} />
+      <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+        {orgs.map((org, idx) => (
+          <div key={`${org.id}-${idx}`} className="px-4 py-3">
+            <div className="flex items-center gap-2">
+              {org.slug ? (
+                <Link
+                  href={`/organizations/${org.slug}`}
+                  className="font-semibold text-sm text-primary hover:underline"
+                >
+                  {org.name}
+                </Link>
+              ) : (
+                <span className="font-semibold text-sm">{org.name}</span>
+              )}
+              <span className="text-[10px] text-muted-foreground/70 px-1.5 py-0.5 rounded-full bg-muted">
+                {org.relationship}
+              </span>
+            </div>
+            {org.date && (
+              <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+                {formatKBDate(org.date)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Org age helper ───────────────────────────────────────────────────
+
+function computeOrgAge(foundedDateStr: string | undefined): string | null {
+  if (!foundedDateStr) return null;
+  const founded = new Date(foundedDateStr);
+  if (isNaN(founded.getTime())) return null;
+  const now = new Date();
+  const years = now.getFullYear() - founded.getFullYear();
+  const months = now.getMonth() - founded.getMonth();
+  const totalMonths = years * 12 + months;
+  if (totalMonths < 12) return `${totalMonths} months`;
+  const fullYears = Math.floor(totalMonths / 12);
+  return `${fullYears} year${fullYears !== 1 ? "s" : ""} old`;
+}
+
 // ── Main page ─────────────────────────────────────────────────────────
 
 export default async function OrgProfilePage({
@@ -1435,6 +1602,121 @@ export default async function OrgProfilePage({
     })
     .sort((a, b) => (b.stake ?? 0) - (a.stake ?? 0));
 
+  // ── Board of Directors ──
+  const boardSeatRecords = allCollections["board-seats"] ?? [];
+  const boardMembers: BoardMember[] = boardSeatRecords
+    .map((r) => {
+      const parsed = parseBoardSeatRecord(r);
+      const resolved = parsed.personId
+        ? resolveRecipient(parsed.personId)
+        : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
+      return {
+        ...parsed,
+        personName: resolved.name,
+        personHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      // Current first, then by appointment date descending
+      const endA = a.departed ? 1 : 0;
+      const endB = b.departed ? 1 : 0;
+      if (endA !== endB) return endA - endB;
+      const sa = a.appointed ?? "";
+      const sb = b.appointed ?? "";
+      return sb.localeCompare(sa);
+    });
+
+  // ── Related Organizations ──
+  // Mine strategic partnerships for org-to-org connections
+  const relatedOrgs: RelatedOrg[] = [];
+  const seenOrgIds = new Set<string>();
+
+  // From strategic partnerships
+  for (const sp of strategicPartnerships) {
+    const partnerRef = field(sp, "partner");
+    if (!partnerRef) continue;
+    const partnerEntityId = resolveKBSlug(partnerRef);
+    const partnerEntity = partnerEntityId ? getKBEntity(partnerEntityId) : null;
+    if (partnerEntity && partnerEntity.type === "organization" && !seenOrgIds.has(partnerEntity.id)) {
+      seenOrgIds.add(partnerEntity.id);
+      relatedOrgs.push({
+        id: partnerEntity.id,
+        name: partnerEntity.name,
+        slug: getKBEntitySlug(partnerEntity.id) ?? null,
+        relationship: field(sp, "type") ?? "Partner",
+        date: field(sp, "date") ?? null,
+      });
+    }
+  }
+
+  // From grants made — unique recipient orgs
+  for (const g of grantsMade) {
+    if (!g.recipient) continue;
+    const recipEntity = getKBEntity(g.recipient);
+    if (recipEntity && recipEntity.type === "organization" && !seenOrgIds.has(recipEntity.id)) {
+      seenOrgIds.add(recipEntity.id);
+      relatedOrgs.push({
+        id: recipEntity.id,
+        name: recipEntity.name,
+        slug: getKBEntitySlug(recipEntity.id) ?? null,
+        relationship: "Grantee",
+        date: g.date,
+      });
+    }
+  }
+
+  // From grants received — unique funder orgs
+  for (const g of grantsReceived) {
+    const funderEntity = getKBEntity(g.funderName);
+    // funderName is the display name, not entity ID. Use funderHref to derive org.
+    // But we also stored funderName from funderEntity above, so check by href.
+    if (g.funderHref && !seenOrgIds.has(g.funderName)) {
+      // We already have the funder info from the grantsReceived mapping
+      // Try to find the entity from the ownerEntityId
+      const funderOrgSlug = g.funderHref.replace("/organizations/", "");
+      const funderOrgEntityId = resolveKBSlug(funderOrgSlug);
+      if (funderOrgEntityId && !seenOrgIds.has(funderOrgEntityId)) {
+        seenOrgIds.add(funderOrgEntityId);
+        relatedOrgs.push({
+          id: funderOrgEntityId,
+          name: g.funderName,
+          slug: funderOrgSlug,
+          relationship: "Funder",
+          date: g.date,
+        });
+      }
+    }
+  }
+
+  // ── Founded date + org age ──
+  const foundedDateFact = getKBLatest(entity.id, "founded-date");
+  const foundedDateStr = foundedDateFact?.value.type === "text" || foundedDateFact?.value.type === "date"
+    ? foundedDateFact.value.value
+    : foundedDateFact?.value.type === "number"
+      ? String(foundedDateFact.value.value)
+      : undefined;
+  const orgAge = computeOrgAge(foundedDateStr);
+
+  // ── Founded by ──
+  const foundedByFact = getKBLatest(entity.id, "founded-by");
+  const founders: Array<{ name: string; href: string | null }> = [];
+  if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
+    for (const ref of foundedByFact.value.value) {
+      const refStr = typeof ref === "string" ? ref : (ref as { id?: string }).id ?? String(ref);
+      const resolved = resolveRecipient(refStr);
+      founders.push(resolved);
+    }
+  } else if (foundedByFact?.value.type === "ref") {
+    const resolved = resolveRecipient(foundedByFact.value.value);
+    founders.push(resolved);
+  }
+
+  // ── Computed stat cards ──
+  const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
+  const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
+  const totalGrantsMade = grantsMade.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+  const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
       <Breadcrumbs
@@ -1446,69 +1728,112 @@ export default async function OrgProfilePage({
 
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {entity.name}
-          </h1>
-          {orgType && (
-            <span
-              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                ORG_TYPE_COLORS[orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-              }`}
-            >
-              {ORG_TYPE_LABELS[orgType] ?? orgType}
-            </span>
-          )}
-        </div>
-        {entity.aliases && entity.aliases.length > 0 && (
-          <p className="text-sm text-muted-foreground/70 mb-2">
-            Also known as: {entity.aliases.join(", ")}
-          </p>
-        )}
+        <div className="flex items-start gap-5">
+          {/* Org avatar/icon */}
+          <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70">
+            {entity.name
+              .split(/\s+/)
+              .map((w) => w[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join("")
+              .toUpperCase()}
+          </div>
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-3xl font-extrabold tracking-tight">
+                {entity.name}
+              </h1>
+              {orgType && (
+                <span
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                    ORG_TYPE_COLORS[orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                  }`}
+                >
+                  {ORG_TYPE_LABELS[orgType] ?? orgType}
+                </span>
+              )}
+            </div>
+            {entity.aliases && entity.aliases.length > 0 && (
+              <p className="text-sm text-muted-foreground/70 mb-1">
+                Also known as: {entity.aliases.join(", ")}
+              </p>
+            )}
 
-        {/* Description */}
-        {descriptionText && (
-          <p className="text-sm text-muted-foreground leading-relaxed mb-3 max-w-prose">
-            {descriptionText}
-          </p>
-        )}
+            {/* Founded info */}
+            {(foundedDateStr || founders.length > 0) && (
+              <p className="text-sm text-muted-foreground mb-1">
+                {foundedDateStr && (
+                  <span>
+                    Founded {formatKBDate(foundedDateStr)}
+                    {orgAge && <span className="text-muted-foreground/60"> ({orgAge})</span>}
+                  </span>
+                )}
+                {founders.length > 0 && (
+                  <span>
+                    {foundedDateStr ? " by " : "Founded by "}
+                    {founders.map((f, i) => (
+                      <span key={i}>
+                        {i > 0 && (i === founders.length - 1 ? ", and " : ", ")}
+                        {f.href ? (
+                          <Link href={f.href} className="text-primary hover:underline">
+                            {f.name}
+                          </Link>
+                        ) : (
+                          f.name
+                        )}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </p>
+            )}
 
-        {/* Metadata row: website, headquarters, links */}
-        <div className="flex items-center gap-4 text-sm flex-wrap">
-          {websiteUrl && (
-            <a
-              href={websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              {shortDomain(websiteUrl)}{" "}
-              &#8599;
-            </a>
-          )}
-          {hqText && (
-            <span className="text-muted-foreground">
-              HQ: {hqText}
-            </span>
-          )}
-          {wikiHref && (
-            <Link
-              href={wikiHref}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Wiki page &rarr;
-            </Link>
-          )}
-          <Link
-            href={`/kb/entity/${entity.id}`}
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            KB data &rarr;
-          </Link>
+            {/* Description */}
+            {descriptionText && (
+              <p className="text-sm text-muted-foreground leading-relaxed mb-2 max-w-prose">
+                {descriptionText}
+              </p>
+            )}
+
+            {/* Metadata row: website, headquarters, links */}
+            <div className="flex items-center gap-4 text-sm flex-wrap">
+              {websiteUrl && (
+                <a
+                  href={websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  {shortDomain(websiteUrl)}{" "}
+                  &#8599;
+                </a>
+              )}
+              {hqText && (
+                <span className="text-muted-foreground">
+                  HQ: {hqText}
+                </span>
+              )}
+              {wikiHref && (
+                <Link
+                  href={wikiHref}
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  Wiki page &rarr;
+                </Link>
+              )}
+              <Link
+                href={`/kb/entity/${entity.id}`}
+                className="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                KB data &rarr;
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stat cards */}
+      {/* Stat cards — KB hero stats + computed counts */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
         {HERO_STATS.map((propId) => {
           const fact = getKBLatest(entity.id, propId);
@@ -1523,6 +1848,40 @@ export default async function OrgProfilePage({
             />
           );
         })}
+        {currentKeyPeople > 0 && (
+          <StatCard
+            label="Key People"
+            value={<span>{currentKeyPeople}</span>}
+            sub={`${sortedPersons.length} total tracked`}
+          />
+        )}
+        {currentBoardMembers > 0 && (
+          <StatCard
+            label="Board Members"
+            value={<span>{currentBoardMembers}</span>}
+            sub={`${boardMembers.length} total`}
+          />
+        )}
+        {totalGrantsMade > 0 && (
+          <StatCard
+            label="Grants Made"
+            value={<span>{formatCompactCurrency(totalGrantsMade)}</span>}
+            sub={`${grantsMade.length} grants`}
+          />
+        )}
+        {totalGrantsReceived > 0 && (
+          <StatCard
+            label="Funding Received"
+            value={<span>{formatCompactCurrency(totalGrantsReceived)}</span>}
+            sub={`${grantsReceived.length} grants`}
+          />
+        )}
+        {orgModels.length > 0 && (
+          <StatCard
+            label="AI Models"
+            value={<span>{orgModels.length}</span>}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1944,6 +2303,12 @@ export default async function OrgProfilePage({
               </div>
             </section>
           )}
+
+          {/* Board of Directors */}
+          <BoardOfDirectorsSection members={boardMembers} />
+
+          {/* Related Organizations */}
+          <RelatedOrganizationsSection orgs={relatedOrgs} />
 
           {/* Facts sidebar */}
           {allFacts.length > 0 && (
