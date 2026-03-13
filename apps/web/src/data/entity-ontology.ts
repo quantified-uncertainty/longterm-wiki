@@ -151,6 +151,9 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     badgeColor: "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",
     headerColor: "#65a30d",
   },
+  // "funder" is deprecated as a standalone entity type — it's now an alias
+  // for "organization" with orgType: "funder". Kept here for backward compat
+  // with relatedGraph entries that may still reference type "funder".
   funder: {
     label: "Funder",
     icon: Banknote,

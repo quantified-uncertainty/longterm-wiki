@@ -32,7 +32,6 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "case-study",
   "person",
   "resource",
-  "funder",
   "historical",
   "analysis",
   "parameter",
@@ -68,6 +67,9 @@ export const ENTITY_TYPE_ALIASES: Record<string, CanonicalEntityTypeName> = {
   "lab-research": "organization",
   "lab-startup": "organization",
   "lab-academic": "organization",
+  // Funder → organization (orgType: "funder" carries the detail)
+  // Deprecated: use type: organization with orgType: funder instead
+  funder: "organization",
   // Plural-form aliases found in YAML data
   "safety-approaches": "safety-agenda",
   policies: "policy",
@@ -118,6 +120,8 @@ export const OLD_TYPE_MAP: Record<string, string> = {
   "lab-startup": "organization",
   // Researcher → person
   researcher: "person",
+  // Funder → organization (deprecated; use orgType: "funder" instead)
+  funder: "organization",
 };
 
 /**

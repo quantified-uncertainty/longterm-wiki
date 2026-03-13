@@ -26,6 +26,7 @@ interface RawEntity {
   title?: string;
   entityType?: string;
   relatedEntries?: { id: string; type: string; relationship?: string }[];
+  parentOrg?: string;
 }
 
 const entities: RawEntity[] = fs.existsSync(ENTITIES_PATH)
@@ -220,6 +221,33 @@ describe("Entity data validation", () => {
           `Frontmatter entities with invalid types:\n  ${invalid.join("\n  ")}`,
         ).toHaveLength(0);
       }
+    });
+  });
+
+  describe("parentOrg references resolve", () => {
+    it("every parentOrg value is a known entity ID or org ID", () => {
+      const entityIds = new Set(entities.map((e) => e.id));
+      const invalid: string[] = [];
+      for (const entity of entities) {
+        const parentOrg = entity.parentOrg;
+        if (typeof parentOrg === "string" && !entityIds.has(parentOrg)) {
+          invalid.push(
+            `${entity.id} has parentOrg="${parentOrg}" which is not a known entity`,
+          );
+        }
+      }
+      // Warn but don't fail hard — parent orgs like uk-dsit and nist may not
+      // have entity entries yet. This test documents the gaps.
+      if (invalid.length > 0) {
+        console.warn(
+          `[warn] ${invalid.length} parentOrg references to non-entities:\n  ${invalid.join("\n  ")}`,
+        );
+      }
+      // Soft threshold: allow a few unresolved parentOrg refs
+      expect(
+        invalid.length,
+        `${invalid.length} unresolved parentOrg references — consider creating entity entries for them`,
+      ).toBeLessThan(10);
     });
   });
 

@@ -57,6 +57,8 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           headcount={data.headcount}
           funding={data.funding}
           orgType={data.orgType}
+          parentOrg={data.parentOrg}
+          childOrgs={data.childOrgs}
           // Policy fields
           introduced={data.introduced}
           policyStatus={data.policyStatus}

@@ -117,6 +117,11 @@ const OrganizationEntitySchema = BaseEntity.extend({
   headquarters: z.string().optional(),
   employees: z.string().optional(),
   funding: z.string().optional(),
+  // parentOrg = entity ID of a parent organization.
+  // Use for legally separate entities that are part of a larger org
+  // (e.g., CHAI → UC Berkeley, UK AISI → DSIT).
+  // Distinct from "divisions" which are internal sub-units.
+  parentOrg: z.string().optional(),
 });
 
 const PolicyEntitySchema = BaseEntity.extend({
@@ -176,9 +181,8 @@ const CaseStudyEntitySchema = BaseEntity.extend({
   entityType: z.literal("case-study"),
 });
 
-const FunderEntitySchema = BaseEntity.extend({
-  entityType: z.literal("funder"),
-});
+// FunderEntitySchema removed — "funder" is now an alias for "organization"
+// with orgType: "funder". See entity-type-names.ts ENTITY_TYPE_ALIASES.
 
 const ResourceEntitySchema = BaseEntity.extend({
   entityType: z.literal("resource"),
@@ -299,7 +303,6 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   ArgumentEntitySchema,
   ScenarioEntitySchema,
   CaseStudyEntitySchema,
-  FunderEntitySchema,
   ResourceEntitySchema,
   ParameterEntitySchema,
   MetricEntitySchema,
