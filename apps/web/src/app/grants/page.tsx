@@ -13,15 +13,49 @@ export const metadata: Metadata = {
     "Directory of grant disbursements tracked in the knowledge base, including funding from major AI safety and EA organizations.",
 };
 
+/**
+ * Canonical entity ID for Centre for Effective Altruism.
+ * The slug "cea" maps to stableId "gNsqAes7Dw". Some imported grants may use
+ * the slug as organizationId, causing duplicate funder entries. Normalize here.
+ */
+const CEA_CANONICAL_ID = "gNsqAes7Dw";
+const CEA_SLUG_ALIAS = "cea";
+
+/**
+ * Resolve an entity identifier to a display name, slug, and wiki page ID.
+ * Handles both entity IDs (stableIds) and plain-text names gracefully.
+ */
+function resolveRecipient(recipientId: string): {
+  name: string;
+  slug: string | null;
+  wikiPageId: string | null;
+} {
+  const entity = getKBEntity(recipientId);
+  if (entity) {
+    const slug = getKBEntitySlug(recipientId) ?? null;
+    const typedEntity = getTypedEntityById(recipientId);
+    const wikiPageId = typedEntity?.numericId ?? null;
+    return { name: entity.name, slug, wikiPageId };
+  }
+  // Not a known entity — return the raw ID as the display name
+  return { name: recipientId, slug: null, wikiPageId: null };
+}
+
 export default function GrantsPage() {
   const allGrants = getAllKBRecords("grants");
 
   // Build rows with resolved entity names and links
   const rows: GrantRow[] = allGrants.map((record) => {
-    const orgEntity = getKBEntity(record.ownerEntityId);
-    const orgName = orgEntity?.name ?? record.ownerEntityId;
-    const orgSlug = getKBEntitySlug(record.ownerEntityId) ?? null;
-    const orgTypedEntity = getTypedEntityById(record.ownerEntityId);
+    // Normalize CEA duplicate: map slug alias to canonical entity ID
+    const orgId =
+      record.ownerEntityId === CEA_SLUG_ALIAS
+        ? CEA_CANONICAL_ID
+        : record.ownerEntityId;
+
+    const orgEntity = getKBEntity(orgId);
+    const orgName = orgEntity?.name ?? orgId;
+    const orgSlug = getKBEntitySlug(orgId) ?? null;
+    const orgTypedEntity = getTypedEntityById(orgId);
     const orgWikiPageId = orgTypedEntity?.numericId ?? null;
 
     const recipientId =
@@ -29,15 +63,21 @@ export default function GrantsPage() {
         ? record.fields.recipient
         : null;
 
+    // Resolve recipient to display name and link info
+    const resolved = recipientId ? resolveRecipient(recipientId) : null;
+
     return {
-      compositeKey: `${record.ownerEntityId}-${record.key}`,
+      compositeKey: `${orgId}-${record.key}`,
       recordKey: record.key,
       name: (record.fields.name as string) ?? record.key,
-      organizationId: record.ownerEntityId,
+      organizationId: orgId,
       organizationName: orgName,
       organizationSlug: orgSlug,
       organizationWikiPageId: orgWikiPageId,
       recipient: recipientId,
+      recipientName: resolved?.name ?? null,
+      recipientSlug: resolved?.slug ?? null,
+      recipientWikiPageId: resolved?.wikiPageId ?? null,
       program:
         typeof record.fields.program === "string"
           ? record.fields.program

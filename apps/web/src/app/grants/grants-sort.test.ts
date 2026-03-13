@@ -13,6 +13,9 @@ function makeRow(overrides: Partial<GrantRow> = {}): GrantRow {
     organizationSlug: null,
     organizationWikiPageId: null,
     recipient: null,
+    recipientName: null,
+    recipientSlug: null,
+    recipientWikiPageId: null,
     program: null,
     amount: null,
     period: null,
@@ -46,6 +49,15 @@ describe("getGrantSortValue", () => {
     expect(
       getGrantSortValue(makeRow({ recipient: null }), "recipient"),
     ).toBe(null);
+  });
+
+  it("prefers recipientName over recipient for sorting", () => {
+    expect(
+      getGrantSortValue(
+        makeRow({ recipient: "some-id", recipientName: "University of Oxford" }),
+        "recipient",
+      ),
+    ).toBe("university of oxford");
   });
 
   it("returns lowercase program or null", () => {

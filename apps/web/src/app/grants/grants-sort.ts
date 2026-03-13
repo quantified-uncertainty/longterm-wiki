@@ -23,7 +23,7 @@ export function getGrantSortValue(
     case "organization":
       return row.organizationName.toLowerCase();
     case "recipient":
-      return row.recipient?.toLowerCase() ?? null;
+      return (row.recipientName ?? row.recipient)?.toLowerCase() ?? null;
     case "program":
       return row.program?.toLowerCase() ?? null;
     case "amount":
