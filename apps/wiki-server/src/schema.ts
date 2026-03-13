@@ -1764,3 +1764,79 @@ export const fundingPrograms = pgTable(
     index("idx_fp_type").on(table.programType),
   ]
 );
+
+// ── Record Verification ────────────────────────────────────────────────
+//
+// Unified verification for structured data records (grants, personnel,
+// divisions, funding programs, etc.). Mirrors the two-tier KB fact
+// verification model: evidence (per-source checks) → verdicts (aggregate).
+
+/**
+ * Per-source verification checks for structured data records.
+ *
+ * Each row records a single check of one record against one source URL.
+ * Multiple checks can exist per record (different sources, rechecks over time).
+ */
+export const recordVerifications = pgTable(
+  "record_verifications",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    recordType: text("record_type").notNull(), // 'grant' | 'personnel' | 'division' | 'funding-program' | 'funding-round' | 'investment' | 'equity-position'
+    recordId: varchar("record_id", { length: 10 }).notNull(), // ID from the source table
+    fieldName: text("field_name"), // optional: specific field checked (e.g., 'amount', 'startDate')
+    expectedValue: text("expected_value"), // what the record says
+    sourceUrl: text("source_url"), // URL that was checked
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
+    confidence: real("confidence"), // 0.0 to 1.0
+    extractedValue: text("extracted_value"), // what the source actually says
+    checkerModel: text("checker_model"), // e.g., "claude-3-haiku"
+    notes: text("notes"),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_rv_record").on(table.recordType, table.recordId),
+    index("idx_rv_verdict").on(table.verdict),
+    index("idx_rv_type").on(table.recordType),
+  ]
+);
+
+/**
+ * Aggregate per-record verdicts — one row per record, derived from
+ * record_verifications. Separates evidence (per-source checks) from
+ * conclusions (all-things-considered verdict).
+ */
+export const recordVerdicts = pgTable(
+  "record_verdicts",
+  {
+    recordType: text("record_type").notNull(),
+    recordId: varchar("record_id", { length: 10 }).notNull(),
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | unchecked
+    confidence: real("confidence"),
+    reasoning: text("reasoning"),
+    sourcesChecked: integer("sources_checked").notNull().default(0),
+    needsRecheck: boolean("needs_recheck").notNull().default(false),
+    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.recordType, table.recordId] }),
+    index("idx_rvd_verdict").on(table.verdict),
+    index("idx_rvd_recheck").on(table.needsRecheck),
+    index("idx_rvd_type").on(table.recordType),
+  ]
+);

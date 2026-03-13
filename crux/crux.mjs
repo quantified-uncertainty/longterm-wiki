@@ -110,6 +110,7 @@ import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
+import * as recordsVerifyCommands from './commands/records-verify.ts';
 
 const domains = {
   validate: validateCommands,
@@ -159,6 +160,7 @@ const domains = {
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
+  verify: recordsVerifyCommands,
 };
 
 /**
@@ -251,6 +253,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   import-divisions Import curated organizational divisions
   import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, create, link-resources, enrich)
+  verify           Verify structured data records against source URLs (grants, personnel, etc.)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
@@ -270,7 +273,7 @@ ${'\x1b[1m'}Domain Help:${'\x1b[0m'}
  * Main entry point
  */
 async function main() {
-  const { domain, command, args, options } = parseArgs();
+  let { domain, command, args, options } = parseArgs();
   const log = createLogger(options.ci);
 
   // Show help if requested or no domain specified
@@ -309,6 +312,12 @@ async function main() {
 
   if (commandName) {
     commandHandler = domainHandler.commands?.[commandName];
+    if (!commandHandler && domainHandler.commands?.default) {
+      // Unrecognized command name — treat it as a positional arg for 'default'
+      commandHandler = domainHandler.commands.default;
+      args = [commandName, ...args];
+      commandName = 'default';
+    }
   } else {
     // No command specified - try 'default', then 'check'
     commandHandler = domainHandler.commands?.default || domainHandler.commands?.check;

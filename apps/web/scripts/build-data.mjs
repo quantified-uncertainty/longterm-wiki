@@ -1227,6 +1227,58 @@ async function fetchBenchmarkResults() {
 }
 
 /**
+ * Fetch record verification verdicts from wiki-server.
+ * Returns a map keyed by "recordType:recordId" → verdict info.
+ */
+async function fetchRecordVerdicts() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  record-verdicts: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const pageSize = 200;
+    const verdicts = {};
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/record-verifications/verdicts?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+      if (!resp.ok) {
+        console.log(`  record-verdicts: skipped (HTTP ${resp.status})`);
+        return {};
+      }
+      const data = await resp.json();
+      const items = data.verdicts || [];
+      for (const v of items) {
+        verdicts[`${v.recordType}:${v.recordId}`] = {
+          verdict: v.verdict,
+          confidence: v.confidence,
+          sourcesChecked: v.sourcesChecked,
+          needsRecheck: v.needsRecheck,
+          lastComputedAt: v.lastComputedAt,
+        };
+      }
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    const count = Object.keys(verdicts).length;
+    if (count > 0) {
+      console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
+    } else {
+      console.log('  record-verdicts: 0 verdicts (none computed yet)');
+    }
+    return verdicts;
+  } catch (err) {
+    console.log(`  record-verdicts: skipped (${err instanceof Error ? err.message : err})`);
+    return {};
+  }
+}
+
+/**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
  * PG stores canonical entity IDs in personId/organizationId.
  */
@@ -2008,6 +2060,11 @@ async function main() {
   // Fetch benchmark results from PG (separate from kb.records since these are model-keyed)
   if (!CONTENT_ONLY) {
     database.benchmarkResults = await fetchBenchmarkResults();
+  }
+
+  // Fetch record verification verdicts from PG
+  if (!CONTENT_ONLY) {
+    database.recordVerdicts = await fetchRecordVerdicts();
   }
 
   // Build URL → resource map for unconverted link detection
