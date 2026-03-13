@@ -2762,7 +2762,7 @@
     - id: interpretability
       type: approach
     - id: open-philanthropy
-      type: funder
+      type: organization
   lastUpdated: 2026-02
 
 - id: debate

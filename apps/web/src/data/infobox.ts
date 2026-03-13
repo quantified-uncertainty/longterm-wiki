@@ -144,6 +144,8 @@ export function getEntityInfoBoxData(entityId: string) {
   let headcount: string | undefined;
   let funding: string | undefined;
   let orgType: string | undefined;
+  let parentOrg: { id: string; title: string; href: string } | undefined;
+  let childOrgs: { id: string; title: string; href: string }[] | undefined;
 
   if (isOrganization(entity)) {
     founded = entity.founded;
@@ -151,6 +153,27 @@ export function getEntityInfoBoxData(entityId: string) {
     headcount = entity.employees;
     funding = entity.funding;
     orgType = entity.orgType;
+    // Resolve parentOrg to display name + href
+    if (entity.parentOrg) {
+      const parentEntity = getTypedEntityById(entity.parentOrg);
+      parentOrg = {
+        id: entity.parentOrg,
+        title: parentEntity?.title ?? entity.parentOrg,
+        href: getEntityHref(entity.parentOrg),
+      };
+    }
+    // Find child orgs — entities that reference this entity as their parentOrg
+    const allEntities = getTypedEntities();
+    const children = allEntities.filter(
+      (e) => isOrganization(e) && e.parentOrg === entity.id,
+    );
+    if (children.length > 0) {
+      childOrgs = children.map((c) => ({
+        id: c.id,
+        title: c.title,
+        href: getEntityHref(c.id, c.entityType),
+      }));
+    }
   }
 
   // Policy-specific fields
@@ -247,6 +270,8 @@ export function getEntityInfoBoxData(entityId: string) {
     headcount,
     funding,
     orgType,
+    parentOrg,
+    childOrgs,
     // Policy
     introduced,
     policyStatus,

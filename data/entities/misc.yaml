@@ -93,7 +93,7 @@
     - governance
   relatedEntries:
     - id: openai-foundation
-      type: funder
+      type: organization
     - id: musk-openai-lawsuit
       type: analysis
     - id: long-term-benefit-trust
@@ -253,7 +253,7 @@
     - id: openai-foundation-governance
       type: analysis
     - id: openai-foundation
-      type: funder
+      type: organization
     - id: elon-musk
       type: person
     - id: openai
@@ -622,7 +622,7 @@
     - community
   relatedEntries:
     - id: open-philanthropy
-      type: funder
+      type: organization
     - id: securebio
       type: organization
     - id: securedna
