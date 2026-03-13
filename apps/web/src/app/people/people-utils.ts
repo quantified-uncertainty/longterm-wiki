@@ -12,7 +12,6 @@ import {
   getKBRecords,
   getKBEntitySlug,
   getAllKBRecords,
-  getAllKBRecordsByCollection,
   getKBEntity,
   resolveKBSlug,
   type KBRecordEntry,
@@ -126,31 +125,6 @@ export function getBoardSeatsForPerson(
   }
 
   return results;
-}
-
-/**
- * Get career history records for a person.
- * Career records have ownerEntityId === personEntityId, so we can look up directly.
- */
-export function getCareerHistoryForPerson(
-  personEntityId: string,
-): KBRecordEntry[] {
-  return getKBRecords(personEntityId, "career-history");
-}
-
-/**
- * Resolve an organization entity ID to a display-friendly object.
- */
-export function resolveOrgForCareer(
-  orgId: string,
-): { id: string; name: string; slug: string | undefined } | null {
-  const orgEntity = getKBEntity(orgId);
-  if (!orgEntity) return null;
-  return {
-    id: orgEntity.id,
-    name: orgEntity.name,
-    slug: getKBEntitySlug(orgEntity.id),
-  };
 }
 
 // -- Career history -------------------------------------------------------
@@ -318,7 +292,7 @@ export function getFundingConnectionsForPerson(
     return { name, href: null };
   }
 
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const seen = new Set<string>();
   const connections: FundingConnection[] = [];
 

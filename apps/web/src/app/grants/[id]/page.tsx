@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  getAllKBRecordsByCollection,
+  getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
 } from "@/data/kb";
@@ -84,7 +84,7 @@ function parseGrant(record: KBRecordEntry): ParsedGrant {
 // ── Static params ──────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   return allGrants.map((record) => ({ id: record.key }));
 }
 
@@ -96,7 +96,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const record = allGrants.find((r) => r.key === id);
   if (!record) {
     return { title: "Grant Not Found" };
@@ -126,7 +126,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default async function GrantDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const record = allGrants.find((r) => r.key === id);
 
   if (!record) notFound();

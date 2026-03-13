@@ -10,7 +10,7 @@ import {
   resolveKBSlug,
   getKBEntitySlug,
   getKBRecords,
-  getAllKBRecordsByCollection,
+  getAllKBRecords,
 } from "@/data/kb";
 import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById, getTypedEntities, isOrganization, isAiModel } from "@/data";
@@ -1330,7 +1330,7 @@ export default async function OrgProfilePage({
   // ── Funding Received (this org is a recipient in other orgs' grants) ──
   // Recipients in PG grants are stored as display names (not entity IDs),
   // so we match against entity name, aliases, and slug.
-  const allGrantRecords = getAllKBRecordsByCollection("grants");
+  const allGrantRecords = getAllKBRecords("grants");
   const recipientMatchNames = new Set<string>([
     entity.name.toLowerCase(),
     slug.toLowerCase(),

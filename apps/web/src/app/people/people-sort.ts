@@ -1,3 +1,7 @@
+import { compareByValue } from "@/lib/sort-utils";
+export type { SortDir } from "@/lib/sort-utils";
+import type { SortDir } from "@/lib/sort-utils";
+
 import type { PersonRow } from "./people-table";
 
 export type PeopleSortKey =
@@ -9,8 +13,6 @@ export type PeopleSortKey =
   | "positions"
   | "publications"
   | "careerHistory";
-
-export type SortDir = "asc" | "desc";
 
 export function getPersonSortValue(
   row: PersonRow,
@@ -42,17 +44,5 @@ export function comparePersonRows(
   sortKey: PeopleSortKey,
   sortDir: SortDir,
 ): number {
-  const dir = sortDir === "asc" ? 1 : -1;
-  const va = getPersonSortValue(a, sortKey);
-  const vb = getPersonSortValue(b, sortKey);
-
-  // Nulls sort last regardless of direction
-  if (va == null && vb == null) return 0;
-  if (va == null) return 1;
-  if (vb == null) return -1;
-
-  if (typeof va === "string" && typeof vb === "string") {
-    return va.localeCompare(vb) * dir;
-  }
-  return ((va as number) - (vb as number)) * dir;
+  return compareByValue(a, b, (row) => getPersonSortValue(row, sortKey), sortDir);
 }

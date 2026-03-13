@@ -240,16 +240,6 @@ export default async function PersonProfilePage({
             >
               KB data &rarr;
             </Link>
-            {socialMediaFact?.value.type === "text" && (
-              <a
-                href={`https://x.com/${socialMediaFact.value.value.replace(/^@/, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                {socialMediaFact.value.value}
-              </a>
-            )}
           </div>
         </div>
       </div>

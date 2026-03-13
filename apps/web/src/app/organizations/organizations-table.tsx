@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { compareByValue, type SortDir } from "@/lib/sort-utils";
 
 export interface OrgRow {
   id: string;
@@ -57,8 +58,6 @@ type SortKey =
   | "headcount"
   | "totalFunding"
   | "founded";
-
-type SortDir = "asc" | "desc";
 
 function formatCompactNumber(n: number | null): string {
   if (n == null) return "";
@@ -181,33 +180,20 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       result = result.filter((r) => r.name.toLowerCase().includes(q));
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: OrgRow): string | number | null => {
-        switch (sortKey) {
-          case "name": return row.name.toLowerCase();
-          case "orgType": return row.orgType ?? "";
-          case "revenue": return row.revenueNum;
-          case "valuation": return row.valuationNum;
-          case "headcount": return row.headcount;
-          case "totalFunding": return row.totalFundingNum;
-          case "founded": return row.foundedDate;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      // Nulls sort last regardless of direction
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
+    const getValue = (row: OrgRow): string | number | null => {
+      switch (sortKey) {
+        case "name": return row.name.toLowerCase();
+        case "orgType": return row.orgType ?? "";
+        case "revenue": return row.revenueNum;
+        case "valuation": return row.valuationNum;
+        case "headcount": return row.headcount;
+        case "totalFunding": return row.totalFundingNum;
+        case "founded": return row.foundedDate;
       }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    };
+    result = [...result].sort((a, b) =>
+      compareByValue(a, b, getValue, sortDir),
+    );
 
     return result;
   }, [rows, search, typeFilter, sortKey, sortDir]);
