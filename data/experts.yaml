@@ -56,7 +56,7 @@
       view: Significant
       estimate: 10-20%
       confidence: medium
-    - topic: how-hard-is-alignment-
+    - topic: how-hard-is-alignment
       view: Hard but tractable
       estimate: 50%
       confidence: medium
@@ -73,28 +73,28 @@
       view: Significant concern
       estimate: 50%
       confidence: medium
-    - topic: p-ai-x-risk-this-century-
+    - topic: p-ai-x-risk-this-century
       view: Moderate
       estimate: ~20-50%
       confidence: medium
-    - topic: would-misalignment-be-catastrophic-
+    - topic: would-misalignment-be-catastrophic
       view: Uncertain, depends on scenario
       estimate: 20-40% → catastrophic
       confidence: low
-    - topic: p-ai-catastrophe-
+    - topic: p-ai-catastrophe
       view: Significant
       estimate: 10-20%
       confidence: medium
       source: Various posts (2022-2023)
-    - topic: how-fast-would-takeoff-be-
+    - topic: how-fast-would-takeoff-be
       view: Slow
       estimate: 5-15 years
       confidence: medium
-    - topic: will-advanced-ai-systems-be-deceptive-
+    - topic: will-advanced-ai-systems-be-deceptive
       view: Possibly detectable
       estimate: 40%
       confidence: medium
-    - topic: will-we-get-adequate-warning-before-catastrophic-ai-
+    - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Likely
       estimate: 70%
       confidence: medium
@@ -119,7 +119,7 @@
       view: Very high
       estimate: ">90%"
       confidence: high
-    - topic: how-hard-is-alignment-
+    - topic: how-hard-is-alignment
       view: Extremely hard
       estimate: 5%
       confidence: high
@@ -137,24 +137,24 @@
       view: Very likely
       estimate: 85%
       confidence: high
-    - topic: would-misalignment-be-catastrophic-
+    - topic: would-misalignment-be-catastrophic
       view: Near-certainly catastrophic
       estimate: 95%+ → extinction
       confidence: high
-    - topic: p-ai-catastrophe-
+    - topic: p-ai-catastrophe
       view: Very high
       estimate: ">90%"
       confidence: high
       source: AGI Ruin (2022)
-    - topic: how-fast-would-takeoff-be-
+    - topic: how-fast-would-takeoff-be
       view: Very fast
       estimate: Weeks-months
       confidence: high
-    - topic: will-advanced-ai-systems-be-deceptive-
+    - topic: will-advanced-ai-systems-be-deceptive
       view: Likely deceptive
       estimate: 85%
       confidence: high
-    - topic: will-we-get-adequate-warning-before-catastrophic-ai-
+    - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Unlikely
       estimate: 10%
       confidence: high
@@ -172,16 +172,16 @@
       view: Moderate
       estimate: 10%
       confidence: medium
-    - topic: would-misalignment-be-catastrophic-
+    - topic: would-misalignment-be-catastrophic
       view: Significant risk
       estimate: 10% → existential
       confidence: medium
-    - topic: p-ai-catastrophe-
+    - topic: p-ai-catastrophe
       view: Moderate
       estimate: 10%
       confidence: medium
       source: The Precipice (2020)
-    - topic: will-we-get-adequate-warning-before-catastrophic-ai-
+    - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Uncertain
       estimate: 50%
       confidence: low
@@ -198,7 +198,7 @@
       view: Concerned
       estimate: 10-15%
       confidence: low
-    - topic: p-ai-catastrophe-
+    - topic: p-ai-catastrophe
       view: Concerned
       estimate: 10-15%
       confidence: medium
@@ -219,7 +219,7 @@
       estimate: 45%
       confidence: medium
       source: OpenAI Superalignment (2023)
-    - topic: will-we-get-adequate-warning-before-catastrophic-ai-
+    - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Concerned
       estimate: 40%
       confidence: medium
@@ -238,7 +238,7 @@
       estimate: 25%
       confidence: medium
       source: Human Compatible (2019)
-    - topic: p-ai-catastrophe-
+    - topic: p-ai-catastrophe
       view: Concerned
       estimate: 15-25%
       confidence: medium
@@ -268,6 +268,25 @@
     - Founding Conjecture
     - AI safety advocacy
     - interpretability research
+  positions:
+    - topic: p-doom
+      view: Very high
+      estimate: ~90%
+      confidence: high
+      source: The Inside View podcast (2022)
+      sourceUrl: https://theinsideview.ai/connor2
+    - topic: timelines
+      view: Very short
+      estimate: 50% by 2030-2035
+      confidence: medium
+      source: FLI Podcast (2023)
+      sourceUrl: https://futureoflife.org/podcast/connor-leahy-on-ai-progress-chimps-memes-and-markets/
+    - topic: how-hard-is-alignment
+      view: Extremely hard
+      estimate: Requires mechanistic understanding
+      confidence: high
+      source: Machine Learning Street Talk podcast
+      sourceUrl: https://www.youtube.com/watch?v=9Nkb1hw4E00
 - id: dan-hendrycks
   name: Dan Hendrycks
   affiliation: cais
@@ -278,6 +297,13 @@
     - benchmark creation
     - CAIS leadership
     - catastrophic risk focus
+  positions:
+    - topic: p-ai-catastrophe
+      view: Significant
+      estimate: Comparable to pandemics and nuclear war
+      confidence: high
+      source: CAIS Statement on AI Risk (2023)
+      sourceUrl: https://www.safe.ai/statement-on-ai-risk
 - id: geoffrey-hinton
   name: Geoffrey Hinton
   affiliation: independent
@@ -287,6 +313,19 @@
     - Deep learning pioneer
     - backpropagation
     - now AI risk vocal advocate
+  positions:
+    - topic: p-doom
+      view: Moderate-high
+      estimate: 10-20%
+      confidence: medium
+      source: Public statements (2023)
+      sourceUrl: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
+    - topic: timelines
+      view: Short
+      estimate: 5-20 years
+      confidence: medium
+      source: Post-resignation interviews (2023)
+      sourceUrl: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
 - id: holden-karnofsky
   name: Holden Karnofsky
   affiliation: coefficient-giving
@@ -297,7 +336,7 @@
     - effective altruism leadership
     - AI timelines work
   positions:
-    - topic: will-we-get-adequate-warning-before-catastrophic-ai-
+    - topic: will-we-get-adequate-warning-before-catastrophic-ai
       view: Probably
       estimate: 65%
       confidence: medium
@@ -324,7 +363,7 @@
       view: Less likely
       estimate: 15%
       confidence: medium
-    - topic: will-advanced-ai-systems-be-deceptive-
+    - topic: will-advanced-ai-systems-be-deceptive
       view: Less likely
       estimate: 20%
       confidence: medium
@@ -337,6 +376,161 @@
     - Superintelligence
     - existential risk research
     - simulation hypothesis
+  positions:
+    - topic: p-ai-catastrophe
+      view: Significant
+      estimate: Substantial but unquantified
+      confidence: medium
+      source: Superintelligence (2014)
+      sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+    - topic: how-hard-is-alignment
+      view: Very hard
+      estimate: Core unsolved challenge
+      confidence: high
+      source: Superintelligence (2014)
+      sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+    - topic: how-fast-would-takeoff-be
+      view: Possibly fast
+      estimate: Weeks to years depending on scenario
+      confidence: low
+      source: Superintelligence (2014)
+      sourceUrl: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+
+- id: yann-lecun
+  name: Yann LeCun
+  affiliation: ami-labs
+  role: Founder (formerly Chief AI Scientist at Meta)
+  website: https://yann.lecun.com
+  knownFor:
+    - Convolutional neural networks
+    - Turing Award winner
+    - AI risk skeptic
+    - JEPA architecture
+  positions:
+    - topic: p-doom
+      view: Effectively zero
+      estimate: ~0%
+      confidence: high
+      source: TechCrunch interview (2024)
+      sourceUrl: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+    - topic: timelines
+      view: Very long (via current methods, never)
+      estimate: 50+ years
+      confidence: high
+      source: TIME interview (2024)
+      sourceUrl: https://time.com/6694432/yann-lecun-meta-ai-interview/
+    - topic: how-hard-is-alignment
+      view: Solvable through design
+      estimate: Engineering problem, not fundamental
+      confidence: high
+      source: Debate with Yudkowsky (2023)
+      sourceUrl: https://www.lesswrong.com/posts/tcEFh3vPS6zEANTFZ/transcript-and-brief-response-to-twitter-conversation
+    - topic: how-fast-would-takeoff-be
+      view: Impossible (hard takeoff)
+      estimate: Incremental progress only
+      confidence: high
+      source: Public statements (2023-2024)
+      sourceUrl: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+
+- id: elon-musk
+  name: Elon Musk
+  affiliation: xai
+  role: Founder & CEO
+  website: https://x.ai
+  knownFor:
+    - Co-founding OpenAI
+    - Founded xAI
+    - Early AI safety warnings
+    - Tesla FSD
+  positions:
+    - topic: p-doom
+      view: Moderate
+      estimate: 10-20%
+      confidence: medium
+      source: Fortune Investment Initiative (2024)
+      sourceUrl: https://fortune.com/2024/10/30/elon-musk-ai-could-go-bad-existential-threat-xai-fundraising/
+    - topic: timelines
+      view: Very short
+      estimate: AGI within 1-2 years (stated Oct 2024)
+      confidence: low
+      source: FII conference remarks (2024)
+      sourceUrl: https://fortune.com/2024/10/30/elon-musk-ai-could-go-bad-existential-threat-xai-fundraising/
+
+- id: leopold-aschenbrenner
+  name: Leopold Aschenbrenner
+  affiliation: situational-awareness-lp
+  role: Founder
+  website: https://www.forourposterity.com
+  knownFor:
+    - Situational Awareness essay
+    - AGI-by-2027 prediction
+    - Former OpenAI Superalignment team
+  positions:
+    - topic: timelines
+      view: Very short
+      estimate: AGI by 2027
+      confidence: high
+      source: Situational Awareness (2024)
+      sourceUrl: https://situational-awareness.ai/
+    - topic: p-ai-catastrophe
+      view: Moderate
+      estimate: ~5% existential risk over 20 years
+      confidence: medium
+      source: "Nobody's On the Ball on AGI Alignment (blog post)"
+      sourceUrl: https://www.forourposterity.com
+    - topic: how-hard-is-alignment
+      view: Hard but solvable
+      estimate: Solvable with massive resources
+      confidence: medium
+      source: Situational Awareness (2024)
+      sourceUrl: https://situational-awareness.ai/
+
+- id: max-tegmark
+  name: Max Tegmark
+  affiliation: fli
+  role: President & MIT Professor
+  website: https://physics.mit.edu/faculty/max-tegmark/
+  knownFor:
+    - Future of Life Institute
+    - Life 3.0
+    - AI pause letter organizer
+    - Mathematical Universe Hypothesis
+  positions:
+    - topic: timelines
+      view: Very short
+      estimate: Within 3 years (stated Dec 2023)
+      confidence: medium
+      source: December 2023 discussion on prediction markets
+      sourceUrl: https://en.wikipedia.org/wiki/Max_Tegmark
+    - topic: p-ai-catastrophe
+      view: Significant
+      estimate: High enough to warrant urgent action
+      confidence: medium
+      source: WebSummit 2024 remarks
+      sourceUrl: https://en.wikipedia.org/wiki/Max_Tegmark
+
+- id: ajeya-cotra
+  name: Ajeya Cotra
+  affiliation: metr
+  role: Member of Technical Staff
+  website: https://www.lesswrong.com/users/ajeya-cotra
+  knownFor:
+    - Bio Anchors AI timelines report
+    - Crunch time framework
+    - AI safety grantmaking at Coefficient Giving
+  positions:
+    - topic: timelines
+      view: Medium-short
+      estimate: 15% by 2036, 50% by 2060 (Bio Anchors); early 2030s top-expert-dominating AI
+      confidence: medium
+      source: Bio Anchors report (2020)
+      sourceUrl: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+    - topic: how-fast-would-takeoff-be
+      view: Fast software loop, then hardware follows
+      estimate: 6-12 month crunch time window
+      confidence: medium
+      source: 80,000 Hours Podcast #226 (2026)
+      sourceUrl: https://80000hours.org/podcast/episodes/ajeya-cotra-transformative-ai-crunch-time/
 
 # Additional experts referenced by organizations
 - id: daniela-amodei
@@ -394,7 +588,7 @@
 - id: robin-hanson
   name: Robin Hanson
   positions:
-    - topic: how-fast-would-takeoff-be-
+    - topic: how-fast-would-takeoff-be
       view: Gradual
       estimate: Decades to centuries
       confidence: medium

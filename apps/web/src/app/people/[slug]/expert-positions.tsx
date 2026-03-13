@@ -5,16 +5,16 @@ const TOPIC_LABELS: Record<string, string> = {
   "p-doom": "P(doom)",
   timelines: "AGI Timelines",
   "current-approaches-scale": "Current Approaches Scale",
-  "how-hard-is-alignment-": "How Hard Is Alignment?",
+  "how-hard-is-alignment": "How Hard Is Alignment?",
   "inner-alignment-solvability": "Inner Alignment Solvability",
   "likelihood-of-deceptive-alignment": "Likelihood of Deceptive Alignment",
-  "would-misalignment-be-catastrophic-": "Would Misalignment Be Catastrophic?",
-  "p-ai-catastrophe-": "P(AI Catastrophe)",
-  "p-ai-x-risk-this-century-": "P(AI X-Risk This Century)",
-  "how-fast-would-takeoff-be-": "Takeoff Speed",
-  "will-advanced-ai-systems-be-deceptive-":
+  "would-misalignment-be-catastrophic": "Would Misalignment Be Catastrophic?",
+  "p-ai-catastrophe": "P(AI Catastrophe)",
+  "p-ai-x-risk-this-century": "P(AI X-Risk This Century)",
+  "how-fast-would-takeoff-be": "Takeoff Speed",
+  "will-advanced-ai-systems-be-deceptive":
     "Will Advanced AI Be Deceptive?",
-  "will-we-get-adequate-warning-before-catastrophic-ai-":
+  "will-we-get-adequate-warning-before-catastrophic-ai":
     "Will We Get Adequate Warning?",
 };
 
