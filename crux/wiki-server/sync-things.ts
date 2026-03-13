@@ -82,27 +82,6 @@ function loadEntities(): ThingRecord[] {
   return records;
 }
 
-function loadKbThings(): ThingRecord[] {
-  const dir = join(PROJECT_ROOT, "packages/kb/data/things");
-  const records: ThingRecord[] = [];
-
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith(".yaml")) continue;
-    const slug = entry.name.replace(".yaml", "");
-    const content = readFileSync(join(dir, entry.name), "utf-8");
-    const parsed = parseYaml(content) as Record<string, unknown>;
-
-    // KB things create entity-type things, keyed by stableId
-    const stableId = parsed.stableId as string | undefined;
-    if (!stableId) continue;
-
-    // Skip — these are already covered by loadEntities with the stableId
-    // But we can use KB data to enrich the thing with better descriptions
-  }
-
-  return records;
-}
-
 function loadResources(): ThingRecord[] {
   const dir = join(PROJECT_ROOT, "data/resources");
   const records: ThingRecord[] = [];
@@ -126,45 +105,6 @@ function loadResources(): ThingRecord[] {
         sourceUrl: r.url,
       });
     }
-  }
-
-  return records;
-}
-
-function loadStructuredRecords(
-  yamlDir: string,
-  thingType: string,
-  sourceTable: string,
-  titleFn: (r: Record<string, unknown>) => string,
-  parentFn?: (r: Record<string, unknown>) => string | undefined,
-): ThingRecord[] {
-  const dir = join(PROJECT_ROOT, yamlDir);
-  const records: ThingRecord[] = [];
-
-  try {
-    for (const file of readdirSync(dir).sort()) {
-      if (!file.endsWith(".yaml")) continue;
-      const content = readFileSync(join(dir, file), "utf-8");
-      const parsed = parseYaml(content);
-
-      // Could be a single object or array
-      const entries = Array.isArray(parsed) ? parsed : parsed?.records || [parsed];
-
-      for (const r of entries) {
-        if (!r?.id) continue;
-        records.push({
-          id: r.id,
-          thingType,
-          title: titleFn(r),
-          parentThingId: parentFn?.(r),
-          sourceTable,
-          sourceId: r.id,
-          sourceUrl: r.source || r.website,
-        });
-      }
-    }
-  } catch {
-    // Directory might not exist for some types
   }
 
   return records;
@@ -201,23 +141,6 @@ async function main() {
     console.log(`  Resources: ${resources.length}`);
     allRecords.push(...resources);
   }
-
-  // Structured data types from packages/kb/data/
-  const kbDataTypes = [
-    {
-      type: "grant",
-      dir: "packages/kb/data/things",
-      table: "grants",
-      titleFn: (r: Record<string, unknown>) => String(r.name || r.id),
-    },
-    {
-      type: "personnel",
-      dir: "packages/kb/data/things",
-      table: "personnel",
-      titleFn: (r: Record<string, unknown>) =>
-        `${r.personId || r.person_id || ""} — ${r.role || ""} at ${r.organizationId || r.organization_id || ""}`,
-    },
-  ];
 
   // Note: structured records (grants, personnel, divisions, etc.) are
   // populated from the DB by the migration, not from YAML files directly.

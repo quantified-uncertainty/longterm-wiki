@@ -14,11 +14,18 @@ import {
 } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { things, VALID_THING_TYPES } from "../schema.js";
-import { zv, validationError, escapeIlike } from "./utils.js";
+import {
+  zv,
+  validationError,
+  parseJsonBody,
+  invalidJsonError,
+  escapeIlike,
+} from "./utils.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+const MAX_SYNC_BATCH = 200;
 
 // ---- Query schemas ----
 
@@ -350,26 +357,30 @@ const thingsApp = new Hono()
 
   // ---- POST /sync ----
   .post("/sync", async (c) => {
-    const raw = await c.req.json().catch(() => null);
-    if (!raw || !Array.isArray(raw.things)) {
-      return c.json(
-        { error: "validation_error", message: "Expected { things: [...] }" },
-        400
-      );
-    }
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
 
-    const items = raw.things as Array<{
-      id: string;
-      thingType: string;
-      title: string;
-      parentThingId?: string;
-      sourceTable: string;
-      sourceId: string;
-      entityType?: string;
-      description?: string;
-      sourceUrl?: string;
-      numericId?: string;
-    }>;
+    const SyncThingSchema = z.object({
+      id: z.string().min(1).max(200),
+      thingType: z.enum(VALID_THING_TYPES as unknown as [string, ...string[]]),
+      title: z.string().min(1).max(2000),
+      parentThingId: z.string().max(200).optional(),
+      sourceTable: z.string().min(1).max(100),
+      sourceId: z.string().min(1).max(200),
+      entityType: z.string().max(100).optional(),
+      description: z.string().max(10000).optional(),
+      sourceUrl: z.string().max(2048).optional(),
+      numericId: z.string().max(20).optional(),
+    });
+
+    const SyncBatchSchema = z.object({
+      things: z.array(SyncThingSchema).min(1).max(MAX_SYNC_BATCH),
+    });
+
+    const parsed = SyncBatchSchema.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const items = parsed.data.things;
 
     const db = getDrizzleDb();
     let upserted = 0;

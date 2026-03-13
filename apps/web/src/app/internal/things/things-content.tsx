@@ -110,7 +110,7 @@ export async function ThingsContent() {
   const rows: ThingRow[] = items.map((item) => {
     let href: string | undefined;
     if (item.thingType === "entity" && item.numericId) {
-      href = `/wiki/E${item.numericId}`;
+      href = `/wiki/${item.numericId}`;
     } else if (item.thingType === "entity") {
       href = getEntityHref(item.sourceId);
     }
