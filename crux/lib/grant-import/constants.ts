@@ -14,4 +14,6 @@ export const FUNDER_IDS = {
   CEA: "gNsqAes7Dw",
   GIVEWELL: "OwXl35e7bg",
   ACX_GRANTS: "LBr3ocKKyQ",
+  FLI: "d9sWZtyVwg",
+  SCHMIDT_FUTURES: "h6ntSGk8fg",
 } as const;
