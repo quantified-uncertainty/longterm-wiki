@@ -4048,3 +4048,110 @@
     - development
     - research
   lastUpdated: 2026-03
+
+# =============================================================================
+# Top Grantee Organizations (by total grant funding received)
+# =============================================================================
+
+- id: malaria-consortium
+  numericId: E1228
+  type: organization
+  orgType: generic
+  title: Malaria Consortium
+  website: https://www.malariaconsortium.org
+  description: >-
+    International nonprofit specializing in the prevention, control, and
+    treatment of malaria and other communicable diseases, operating primarily in
+    Africa and Asia. One of the largest recipients of effective altruism-aligned
+    funding.
+  tags:
+    - global-health
+    - development
+  lastUpdated: 2026-03
+
+- id: evidence-action
+  numericId: E1229
+  type: organization
+  orgType: generic
+  title: Evidence Action
+  website: https://www.evidenceaction.org
+  description: >-
+    Global health nonprofit that scales evidence-based interventions to reduce
+    the burden of poverty. Known for its Deworm the World Initiative and
+    Dispensers for Safe Water programs.
+  tags:
+    - global-health
+    - development
+  lastUpdated: 2026-03
+
+- id: helen-keller-international
+  numericId: E1230
+  type: organization
+  orgType: generic
+  title: Helen Keller International
+  website: https://www.hki.org
+  description: >-
+    International health organization combating the causes and consequences of
+    blindness, poor health, and malnutrition. Programs include vitamin A
+    supplementation and neglected tropical disease treatment.
+  tags:
+    - global-health
+    - development
+  lastUpdated: 2026-03
+
+- id: gates-philanthropy-partners
+  numericId: E1231
+  type: organization
+  orgType: funder
+  title: Gates Philanthropy Partners
+  website: https://www.gatesphilanthropypartners.org
+  description: >-
+    Charitable organization affiliated with the Gates family that manages
+    grantmaking for the personal philanthropy of Bill Gates and Melinda French
+    Gates outside the Gates Foundation.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: the-humane-league
+  numericId: E1232
+  type: organization
+  orgType: generic
+  title: The Humane League
+  website: https://thehumaneleague.org
+  description: >-
+    Animal welfare nonprofit working to end the abuse of animals raised for
+    food through institutional and individual change campaigns, corporate
+    outreach, and public engagement.
+  tags:
+    - animal-welfare
+  lastUpdated: 2026-03
+
+- id: anima-international
+  numericId: E1233
+  type: organization
+  orgType: generic
+  title: Anima International
+  website: https://animainternational.org
+  description: >-
+    International animal advocacy organization operating in multiple European
+    countries, working to reduce animal suffering through corporate campaigns,
+    investigations, and legal advocacy.
+  tags:
+    - animal-welfare
+  lastUpdated: 2026-03
+
+- id: compassion-in-world-farming
+  numericId: E1234
+  type: organization
+  orgType: generic
+  title: Compassion in World Farming
+  website: https://www.ciwf.org
+  description: >-
+    International farm animal welfare organization founded in 1967, campaigning
+    to end factory farming and promote humane and sustainable food practices
+    through corporate engagement, policy advocacy, and public awareness.
+  tags:
+    - animal-welfare
+  lastUpdated: 2026-03
