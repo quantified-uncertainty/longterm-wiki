@@ -78,15 +78,20 @@ export default function PeoplePage() {
       if (typeof fields.role === "string") searchParts.push(fields.role);
       if (typeof fields.title === "string") searchParts.push(fields.title);
       if (typeof fields.organization === "string") {
-        // Resolve ref to org name
+        searchParts.push(fields.organization); // always include raw value
         const org = getKBEntity(fields.organization);
-        if (org) searchParts.push(org.name);
+        if (org && org.name !== fields.organization) {
+          searchParts.push(org.name);
+        }
       }
     }
 
     // KB fact text values (notable-for, education, etc.)
+    // Skip properties already added explicitly above, and non-useful URL/handle properties
+    const SKIP_PROPERTIES = new Set(['role', 'employed-by', 'social-media', 'google-scholar', 'github-profile', 'wikipedia-url']);
     const allFacts = getKBFacts(entity.id);
     for (const fact of allFacts) {
+      if (SKIP_PROPERTIES.has(fact.propertyId)) continue;
       if (fact.value.type === "text") {
         searchParts.push(fact.value.value);
       }
