@@ -11,7 +11,7 @@
  * - Handles diacritics (e.g. "Nuno Sempere" matches entity "Nuño Sempere")
  */
 
-import { normalizeName } from '../commands/people.ts';
+import { normalizeName } from './name-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Types

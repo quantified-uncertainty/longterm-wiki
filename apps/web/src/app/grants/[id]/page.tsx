@@ -10,6 +10,7 @@ import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
   titleCase,
@@ -252,7 +253,7 @@ export default async function GrantDetailPage({ params }: PageProps) {
             <DetailSection title="Source">
               {isUrl(grant.source) ? (
                 <a
-                  href={grant.source}
+                  href={safeHref(grant.source)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline break-all"

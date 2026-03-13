@@ -2062,10 +2062,11 @@ async function main() {
     database.benchmarkResults = await fetchBenchmarkResults();
   }
 
-  // Fetch record verification verdicts from PG
-  if (!CONTENT_ONLY) {
-    database.recordVerdicts = await fetchRecordVerdicts();
-  }
+  // TODO: Enable when record verification dashboard is built (see #2243)
+  // Fetch record verification verdicts from PG — currently no frontend consumer
+  // if (!CONTENT_ONLY) {
+  //   database.recordVerdicts = await fetchRecordVerdicts();
+  // }
 
   // Build URL → resource map for unconverted link detection
   const resources = database.resources || [];

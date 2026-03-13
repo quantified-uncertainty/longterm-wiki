@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  getAllKBRecordsByCollection,
+  getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
 } from "@/data/kb";
@@ -10,6 +10,7 @@ import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
   titleCase,
@@ -112,7 +113,7 @@ function parseGrant(record: KBRecordEntry): ParsedGrant {
 // ── Static params ──────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  const allPrograms = getAllKBRecordsByCollection("funding-programs");
+  const allPrograms = getAllKBRecords("funding-programs");
   return allPrograms.map((record) => ({ id: record.key }));
 }
 
@@ -124,7 +125,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allPrograms = getAllKBRecordsByCollection("funding-programs");
+  const allPrograms = getAllKBRecords("funding-programs");
   const record = allPrograms.find((r) => r.key === id);
   if (!record) {
     return { title: "Funding Program Not Found" };
@@ -187,7 +188,7 @@ const PROGRAM_TYPE_COLORS: Record<string, string> = {
 
 export default async function FundingProgramDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const allPrograms = getAllKBRecordsByCollection("funding-programs");
+  const allPrograms = getAllKBRecords("funding-programs");
   const record = allPrograms.find((r) => r.key === id);
 
   if (!record) notFound();
@@ -200,7 +201,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
   let divisionHref: string | null = null;
   if (program.divisionId) {
     // Look up division in KB records
-    const allDivisions = getAllKBRecordsByCollection("divisions");
+    const allDivisions = getAllKBRecords("divisions");
     const divRecord = allDivisions.find((d) => d.key === program.divisionId);
     if (divRecord) {
       divisionName = (divRecord.fields.name as string) ?? program.divisionId;
@@ -212,7 +213,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
   }
 
   // Find grants linked to this program (by programId)
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const programGrants = allGrants
     .filter((g) => {
       const grantProgramId = g.fields.programId;
@@ -346,7 +347,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
           {program.applicationUrl && (
             <DetailSection title="Application">
               <a
-                href={program.applicationUrl}
+                href={safeHref(program.applicationUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-primary hover:underline break-all"
@@ -361,7 +362,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
             <DetailSection title="Source">
               {isUrl(program.source) ? (
                 <a
-                  href={program.source}
+                  href={safeHref(program.source)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline break-all"

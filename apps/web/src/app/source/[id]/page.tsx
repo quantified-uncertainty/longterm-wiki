@@ -32,6 +32,7 @@ import {
   Shield,
 } from "lucide-react";
 import { cn } from "@lib/utils";
+import { safeHref } from "@/lib/directory-utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -200,7 +201,7 @@ export default async function SourcePage({ params }: PageProps) {
                   <span className="text-muted-foreground/30">&middot;</span>
                 )}
                 <a
-                  href={resource.url}
+                  href={safeHref(resource.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"

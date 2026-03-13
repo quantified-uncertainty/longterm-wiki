@@ -1,0 +1,726 @@
+/**
+ * Data-fetching and parsing logic for organization profile pages.
+ * Extracted from page.tsx as a pure refactor — no behavioral changes.
+ */
+import type { KBRecordEntry } from "@/data/kb";
+import {
+  getKBLatest,
+  getKBFacts,
+  getKBProperty,
+  getKBEntity,
+  getKBAllRecordCollections,
+  resolveKBSlug,
+  getKBEntitySlug,
+  getKBRecords,
+  getAllKBRecords,
+} from "@/data/kb";
+import type { Fact } from "@longterm-wiki/kb";
+import { getTypedEntityById, getTypedEntities, isOrganization, isAiModel } from "@/data";
+import {
+  formatKBNumber,
+  titleCase,
+  sortKBRecords,
+} from "@/components/wiki/kb/format";
+import { resolveRecipient } from "./org-shared";
+
+// ── Types ─────────────────────────────────────────────────────────────
+
+export interface BoardMember {
+  key: string;
+  personId: string | null;
+  personName: string;
+  personHref: string | null;
+  role: string | null;
+  appointed: string | null;
+  departed: string | null;
+  appointedBy: string | null;
+  source: string | null;
+}
+
+export interface RelatedOrg {
+  id: string;
+  name: string;
+  slug: string | null;
+  relationship: string;
+  date: string | null;
+}
+
+export type ParsedGrantRecord = {
+  key: string;
+  name: string;
+  recipient: string | null;
+  recipientName: string;
+  recipientHref: string | null;
+  amount: number | null;
+  date: string | null;
+  status: string | null;
+  source: string | null;
+};
+
+export type ReceivedGrant = ParsedGrantRecord & {
+  funderName: string;
+  funderHref: string | null;
+};
+
+export type ParsedDivisionRecord = ReturnType<typeof parseDivisionRecord>;
+export type ParsedFundingProgramRecord = ReturnType<typeof parseFundingProgramRecord>;
+export type ParsedPersonnelRecord = ReturnType<typeof parsePersonnelRecord> & {
+  personName: string;
+  personHref: string | null;
+};
+export type ParsedFundingRoundRecord = ReturnType<typeof parseFundingRoundRecord> & {
+  leadInvestorName: string;
+  leadInvestorHref: string | null;
+};
+export type ParsedInvestmentRecord = ReturnType<typeof parseInvestmentRecord> & {
+  investorName: string;
+  investorHref: string | null;
+};
+export type ParsedEquityPositionRecord = ReturnType<typeof parseEquityPositionRecord> & {
+  holderName: string;
+  holderHref: string | null;
+};
+
+// ── Curated collection names ──────────────────────────────────────────
+export const CURATED_COLLECTIONS = new Set([
+  "funding-rounds",
+  "investments",
+  "key-persons",
+  "products",
+  "model-releases",
+  "safety-milestones",
+  "strategic-partnerships",
+  "board-seats",
+  "divisions",
+  "funding-programs",
+  "personnel",
+  "grants",
+  "equity-positions",
+]);
+
+// ── Constants ─────────────────────────────────────────────────────────
+
+export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
+
+export const ORG_TYPE_LABELS: Record<string, string> = {
+  "frontier-lab": "Frontier Lab",
+  "safety-org": "Safety Org",
+  academic: "Academic",
+  startup: "Startup",
+  generic: "Lab",
+  funder: "Funder",
+  government: "Government",
+};
+
+export const ORG_TYPE_COLORS: Record<string, string> = {
+  "frontier-lab": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  "safety-org":
+    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+  academic:
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+  startup:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  generic:
+    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+  funder:
+    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  government:
+    "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
+};
+
+export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
+  { id: "financial", label: "Financial", order: 0 },
+  { id: "product", label: "Products & Usage", order: 1 },
+  { id: "organization", label: "Organization", order: 2 },
+  { id: "safety", label: "Safety & Research", order: 3 },
+  { id: "people", label: "People", order: 4 },
+  { id: "other", label: "Other", order: 99 },
+];
+
+export const SAFETY_LEVEL_COLORS: Record<string, string> = {
+  "ASL-2": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  "ASL-3": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  "ASL-4": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+};
+
+export const MILESTONE_TYPE_COLORS: Record<string, string> = {
+  "research-paper":
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  "policy-update":
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  "safety-eval":
+    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+  "red-team":
+    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+};
+
+export const MAX_GRANTS_SHOWN = 10;
+
+// ── Formatting helpers ────────────────────────────────────────────────
+
+export function formatAmount(value: unknown): string | null {
+  if (value == null) return null;
+  const num = typeof value === "number" ? value : Number(value);
+  if (isNaN(num)) return String(value);
+  return formatKBNumber(num, "USD");
+}
+
+// ── Fact sidebar helpers ──────────────────────────────────────────────
+
+/** Group facts by property, taking only the latest per property. */
+export function getLatestFactsByProperty(
+  facts: Fact[],
+): Map<string, Fact> {
+  const latest = new Map<string, Fact>();
+  for (const fact of facts) {
+    if (fact.propertyId === "description") continue;
+    if (!latest.has(fact.propertyId)) {
+      latest.set(fact.propertyId, fact);
+    }
+  }
+  return latest;
+}
+
+/** Group property IDs by category, returning sorted categories. */
+export function groupByCategory(
+  propertyIds: string[],
+): Array<{ category: string; label: string; props: string[] }> {
+  const groups = new Map<string, string[]>();
+  for (const propId of propertyIds) {
+    const prop = getKBProperty(propId);
+    const category = prop?.category ?? "other";
+    const list = groups.get(category) ?? [];
+    list.push(propId);
+    groups.set(category, list);
+  }
+
+  const catMap = new Map(FACT_CATEGORIES.map((c) => [c.id, c]));
+  return [...groups.entries()]
+    .map(([catId, props]) => ({
+      category: catId,
+      label: catMap.get(catId)?.label ?? titleCase(catId),
+      order: catMap.get(catId)?.order ?? 99,
+      props,
+    }))
+    .sort((a, b) => a.order - b.order);
+}
+
+// ── Org age helper ───────────────────────────────────────────────────
+
+export function computeOrgAge(foundedDateStr: string | undefined): string | null {
+  if (!foundedDateStr) return null;
+  const founded = new Date(foundedDateStr);
+  if (isNaN(founded.getTime())) return null;
+  const now = new Date();
+  const years = now.getFullYear() - founded.getFullYear();
+  const months = now.getMonth() - founded.getMonth();
+  const totalMonths = years * 12 + months;
+  if (totalMonths <= 0) return null;
+  if (totalMonths < 12) return `${totalMonths} months`;
+  const fullYears = Math.floor(totalMonths / 12);
+  return `${fullYears} year${fullYears !== 1 ? "s" : ""} old`;
+}
+
+// ── Format a stake fraction for display (e.g., 0.15 -> "15%") ────────
+export function formatStake(stake: number): string {
+  return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
+}
+
+// ── Record parsers ───────────────────────────────────────────────────
+
+export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
+  const f = record.fields;
+  const recipientId = (f.recipient as string) ?? null;
+  const resolved = recipientId ? resolveRecipient(recipientId) : { name: "", href: null };
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    recipient: recipientId,
+    recipientName: resolved.name,
+    recipientHref: resolved.href,
+    amount: typeof f.amount === "number" ? f.amount : null,
+    date: (f.date as string) ?? (f.period as string) ?? null,
+    status: (f.status as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+export function parseDivisionRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    slug: (f.slug as string) ?? null,
+    name: (f.name as string) ?? record.key,
+    divisionType: (f.divisionType as string) ?? "team",
+    lead: (f.lead as string) ?? null,
+    status: (f.status as string) ?? null,
+    startDate: (f.startDate as string) ?? null,
+    endDate: (f.endDate as string) ?? null,
+    website: (f.website as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+export function parseFundingProgramRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    programType: (f.programType as string) ?? "grant-round",
+    description: (f.description as string) ?? null,
+    totalBudget: typeof f.totalBudget === "number" ? f.totalBudget : null,
+    currency: (f.currency as string) ?? "USD",
+    applicationUrl: (f.applicationUrl as string) ?? null,
+    openDate: (f.openDate as string) ?? null,
+    deadline: (f.deadline as string) ?? null,
+    status: (f.status as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+export function parsePersonnelRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  const schema = record.schema;
+
+  // Extract person ID — key-person and board use different field names
+  const personId =
+    (f.person as string) ?? (f.member as string) ?? null;
+
+  // Extract role/title
+  const role = (f.title as string) ?? (f.role as string) ?? null;
+
+  // Extract dates — key-person uses start/end, board uses appointed/departed
+  const startDate =
+    (f.start as string) ?? (f.appointed as string) ?? null;
+  const endDate =
+    (f.end as string) ?? (f.departed as string) ?? null;
+
+  const isFounder = (f.is_founder as boolean) ?? false;
+
+  // Determine display role type from schema
+  const roleType =
+    schema === "key-person"
+      ? "key-person"
+      : schema === "board-seat"
+        ? "board"
+        : "career";
+
+  return {
+    key: record.key,
+    personId,
+    role,
+    roleType,
+    startDate,
+    endDate,
+    isFounder,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export function parseFundingRoundRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    name: (f.name as string) ?? record.key,
+    date: (f.date as string) ?? null,
+    raised: typeof f.raised === "number" ? f.raised : null,
+    valuation: typeof f.valuation === "number" ? f.valuation : null,
+    instrument: (f.instrument as string) ?? null,
+    leadInvestor: (f.lead_investor as string) ?? null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export function parseInvestmentRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    investorId: (f.investor as string) ?? null,
+    roundName: (f.round_name as string) ?? null,
+    date: (f.date as string) ?? null,
+    amount: typeof f.amount === "number" ? f.amount : null,
+    stakeAcquired: typeof f.stake_acquired === "number" ? f.stake_acquired : null,
+    instrument: (f.instrument as string) ?? null,
+    role: (f.role as string) ?? null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export function parseEquityPositionRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    holderId: (f.holder as string) ?? null,
+    stake: typeof f.stake === "number" ? f.stake : null,
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+    asOf: "asOf" in record ? (record as { asOf?: string }).asOf : undefined,
+  };
+}
+
+export function parseBoardSeatRecord(record: KBRecordEntry): Omit<BoardMember, "personName" | "personHref"> {
+  const f = record.fields;
+  return {
+    key: record.key,
+    personId: (f.member as string) ?? null,
+    role: (f.role as string) ?? null,
+    appointed: (f.appointed as string) ?? null,
+    departed: (f.departed as string) ?? null,
+    appointedBy: (f.appointed_by as string) ?? null,
+    source: (f.source as string) ?? null,
+  };
+}
+
+// ── Main data loader ─────────────────────────────────────────────────
+
+export interface OrgEntity {
+  id: string;
+  name: string;
+  numericId?: string;
+  wikiPageId?: string;
+  aliases?: string[];
+}
+
+/**
+ * Load all data needed for an organization profile page.
+ * This is a pure data function — no JSX rendering.
+ */
+export function loadOrgPageData(entity: OrgEntity, slug: string) {
+  // Use URL slug directly — typed entities are keyed by slug, not KB internal IDs
+  const typedEntity = getTypedEntityById(slug);
+  const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
+  const orgType = orgData?.orgType ?? null;
+
+  // Header facts (description/website come from entity YAML, not KB facts)
+  const hqFact = getKBLatest(entity.id, "headquarters");
+
+  // All record collections
+  const allCollections = getKBAllRecordCollections(entity.id);
+
+  // Curated collections
+  const rawFundingRounds = allCollections["funding-rounds"] ?? [];
+  const keyPersons = allCollections["key-persons"] ?? [];
+  const investments = allCollections["investments"] ?? [];
+  const products = allCollections["products"] ?? [];
+  const modelReleases = allCollections["model-releases"] ?? [];
+  const safetyMilestones = allCollections["safety-milestones"] ?? [];
+  const strategicPartnerships = allCollections["strategic-partnerships"] ?? [];
+
+  // Other (non-curated) collections with entries
+  const otherCollections = Object.entries(allCollections)
+    .filter(([name, entries]) => !CURATED_COLLECTIONS.has(name) && entries.length > 0)
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  // All facts for the panel
+  const allFacts = getKBFacts(entity.id).filter(
+    (f) => f.propertyId !== "description",
+  );
+
+  // Sort collections by date (most recent first)
+  const sortedRounds = sortKBRecords(rawFundingRounds, "date", false);
+  const sortedModels = sortKBRecords(modelReleases, "released", false);
+  const sortedMilestones = sortKBRecords(safetyMilestones, "date", false);
+  const sortedPartnerships = sortKBRecords(strategicPartnerships, "date", false);
+
+  // Sort key persons: current first, then by start date descending
+  const sortedPersons = [...keyPersons].sort((a, b) => {
+    const endA = a.fields.end ? 1 : 0;
+    const endB = b.fields.end ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const startA = a.fields.start ? String(a.fields.start) : "";
+    const startB = b.fields.start ? String(b.fields.start) : "";
+    return startB.localeCompare(startA);
+  });
+
+  const wikiHref = entity.numericId
+    ? `/wiki/${entity.numericId}`
+    : entity.wikiPageId
+      ? `/wiki/${entity.wikiPageId}`
+      : null;
+
+  // Fact sidebar data
+  const latestByProp = getLatestFactsByProperty(allFacts);
+  const categoryGroups = groupByCategory([...latestByProp.keys()]);
+
+  // Description and website come from typed entity YAML data
+  const descriptionText = orgData?.description ?? null;
+  const websiteUrl = orgData?.website ?? null;
+
+  // AI models developed by this org
+  const orgModels = getTypedEntities()
+    .filter(isAiModel)
+    .filter((m) => m.developer === slug && m.releaseDate)
+    .sort((a, b) => (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""));
+
+  // Headquarters text
+  const hqText =
+    hqFact?.value.type === "text" ? hqFact.value.value : null;
+
+  // ── Grants Made (this org is the funder) ──
+  const grantRecords = getKBRecords(entity.id, "grants");
+  const grantsMade = grantRecords
+    .map(parseGrantRecord)
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Funding Received (this org is a recipient in other orgs' grants) ──
+  const allGrantRecords = getAllKBRecords("grants");
+  const recipientMatchNames = new Set<string>([
+    entity.name.toLowerCase(),
+    slug.toLowerCase(),
+    entity.id.toLowerCase(),
+    ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
+  ]);
+  const grantsReceived: ReceivedGrant[] = allGrantRecords
+    .filter((r) => {
+      const recipientRaw = r.fields.recipient as string | undefined;
+      if (!recipientRaw) return false;
+      return recipientMatchNames.has(recipientRaw.toLowerCase());
+    })
+    .map((r) => {
+      const parsed = parseGrantRecord(r);
+      const funderEntity = getKBEntity(r.ownerEntityId);
+      const funderSlug = funderEntity ? getKBEntitySlug(r.ownerEntityId) : null;
+      return {
+        ...parsed,
+        funderName: funderEntity?.name ?? r.ownerEntityId,
+        funderHref: funderSlug ? `/organizations/${funderSlug}` : null,
+      };
+    })
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Divisions (org subdivisions) ──
+  const divisionRecords = getKBRecords(entity.id, "divisions");
+  const divisions = divisionRecords
+    .map(parseDivisionRecord)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // ── Funding Programs (RFPs, grant rounds, fellowships, etc.) ──
+  const fundingProgramRecords = getKBRecords(entity.id, "funding-programs");
+  const fundingPrograms = fundingProgramRecords
+    .map(parseFundingProgramRecord)
+    .sort((a, b) => (b.totalBudget ?? 0) - (a.totalBudget ?? 0));
+
+  // ── Key Personnel (key-person, board, career records owned by this org) ──
+  const personnelRecords = getKBRecords(entity.id, "personnel");
+  const personnel: ParsedPersonnelRecord[] = personnelRecords
+    .map((r) => {
+      const parsed = parsePersonnelRecord(r);
+      const resolved = parsed.personId
+        ? resolveRecipient(parsed.personId)
+        : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
+      return {
+        ...parsed,
+        personName: resolved.name,
+        personHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
+      const typeOrder: Record<string, number> = { "key-person": 0, board: 1, career: 2 };
+      const aOrder = typeOrder[a.roleType] ?? 3;
+      const bOrder = typeOrder[b.roleType] ?? 3;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return a.personName.localeCompare(b.personName);
+    });
+
+  // ── Funding Rounds ──
+  const fundingRoundRecords = getKBRecords(entity.id, "funding-rounds");
+  const fundingRounds: ParsedFundingRoundRecord[] = fundingRoundRecords
+    .map((r) => {
+      const parsed = parseFundingRoundRecord(r);
+      const resolved = parsed.leadInvestor
+        ? resolveRecipient(parsed.leadInvestor)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        leadInvestorName: resolved.name,
+        leadInvestorHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      if (a.date && b.date) return b.date.localeCompare(a.date);
+      if (a.date) return -1;
+      if (b.date) return 1;
+      return (b.raised ?? 0) - (a.raised ?? 0);
+    });
+
+  // ── Investments Received ──
+  const investmentRecords = getKBRecords(entity.id, "investments");
+  const investmentsReceived: ParsedInvestmentRecord[] = investmentRecords
+    .map((r) => {
+      const parsed = parseInvestmentRecord(r);
+      const resolved = parsed.investorId
+        ? resolveRecipient(parsed.investorId)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        investorName: resolved.name,
+        investorHref: resolved.href,
+      };
+    })
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
+  // ── Equity Positions ──
+  const equityPositionRecords = getKBRecords(entity.id, "equity-positions");
+  const equityPositions: ParsedEquityPositionRecord[] = equityPositionRecords
+    .map((r) => {
+      const parsed = parseEquityPositionRecord(r);
+      const resolved = parsed.holderId
+        ? resolveRecipient(parsed.holderId)
+        : { name: "", href: null };
+      return {
+        ...parsed,
+        holderName: resolved.name,
+        holderHref: resolved.href,
+      };
+    })
+    .sort((a, b) => (b.stake ?? 0) - (a.stake ?? 0));
+
+  // ── Board of Directors ──
+  const boardSeatRecords = allCollections["board-seats"] ?? [];
+  const boardMembers: BoardMember[] = boardSeatRecords
+    .map((r) => {
+      const parsed = parseBoardSeatRecord(r);
+      const resolved = parsed.personId
+        ? resolveRecipient(parsed.personId)
+        : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
+      return {
+        ...parsed,
+        personName: resolved.name,
+        personHref: resolved.href,
+      };
+    })
+    .sort((a, b) => {
+      const endA = a.departed ? 1 : 0;
+      const endB = b.departed ? 1 : 0;
+      if (endA !== endB) return endA - endB;
+      const sa = a.appointed ?? "";
+      const sb = b.appointed ?? "";
+      return sb.localeCompare(sa);
+    });
+
+  // ── Related Organizations ──
+  const relatedOrgs: RelatedOrg[] = [];
+  const seenOrgIds = new Set<string>();
+
+  // From strategic partnerships
+  for (const sp of strategicPartnerships) {
+    const partnerRef = sp.fields.partner != null ? String(sp.fields.partner) : undefined;
+    if (!partnerRef) continue;
+    const partnerEntityId = resolveKBSlug(partnerRef);
+    const partnerEntity = partnerEntityId ? getKBEntity(partnerEntityId) : null;
+    if (partnerEntity && partnerEntity.type === "organization" && partnerEntity.id !== entity.id && !seenOrgIds.has(partnerEntity.id)) {
+      seenOrgIds.add(partnerEntity.id);
+      relatedOrgs.push({
+        id: partnerEntity.id,
+        name: partnerEntity.name,
+        slug: getKBEntitySlug(partnerEntity.id) ?? null,
+        relationship: sp.fields.type != null ? String(sp.fields.type) : "Partner",
+        date: sp.fields.date != null ? String(sp.fields.date) : null,
+      });
+    }
+  }
+
+  // From grants made — unique recipient orgs (excluding self)
+  for (const g of grantsMade) {
+    if (!g.recipient) continue;
+    const recipEntity = getKBEntity(g.recipient);
+    if (recipEntity && recipEntity.type === "organization" && recipEntity.id !== entity.id && !seenOrgIds.has(recipEntity.id)) {
+      seenOrgIds.add(recipEntity.id);
+      relatedOrgs.push({
+        id: recipEntity.id,
+        name: recipEntity.name,
+        slug: getKBEntitySlug(recipEntity.id) ?? null,
+        relationship: "Grantee",
+        date: g.date,
+      });
+    }
+  }
+
+  // From grants received — unique funder orgs (excluding self)
+  for (const g of grantsReceived) {
+    if (!g.funderHref) continue;
+    const funderOrgSlug = g.funderHref.replace("/organizations/", "");
+    const funderOrgEntityId = resolveKBSlug(funderOrgSlug);
+    if (funderOrgEntityId && funderOrgEntityId !== entity.id && !seenOrgIds.has(funderOrgEntityId)) {
+      seenOrgIds.add(funderOrgEntityId);
+      relatedOrgs.push({
+        id: funderOrgEntityId,
+        name: g.funderName,
+        slug: funderOrgSlug,
+        relationship: "Funder",
+        date: g.date,
+      });
+    }
+  }
+
+  // ── Founded date + org age ──
+  const foundedDateFact = getKBLatest(entity.id, "founded-date");
+  const foundedDateStr = foundedDateFact?.value.type === "text" || foundedDateFact?.value.type === "date"
+    ? foundedDateFact.value.value
+    : foundedDateFact?.value.type === "number"
+      ? String(foundedDateFact.value.value)
+      : undefined;
+  const orgAge = computeOrgAge(foundedDateStr);
+
+  // ── Founded by ──
+  const foundedByFact = getKBLatest(entity.id, "founded-by");
+  const founders: Array<{ name: string; href: string | null }> = [];
+  if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
+    for (const ref of foundedByFact.value.value) {
+      const refStr = String(ref);
+      const resolved = resolveRecipient(refStr);
+      founders.push(resolved);
+    }
+  } else if (foundedByFact?.value.type === "ref") {
+    const resolved = resolveRecipient(foundedByFact.value.value);
+    founders.push(resolved);
+  }
+
+  // ── Computed stat cards ──
+  const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
+  const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
+  const totalGrantsMade = grantsMade.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+  const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+
+  return {
+    orgType,
+    hqText,
+    allCollections,
+    otherCollections,
+    allFacts,
+    sortedRounds,
+    sortedModels,
+    sortedMilestones,
+    sortedPartnerships,
+    sortedPersons,
+    wikiHref,
+    latestByProp,
+    categoryGroups,
+    descriptionText,
+    websiteUrl,
+    orgModels,
+    grantsMade,
+    grantsReceived,
+    divisions,
+    fundingPrograms,
+    personnel,
+    fundingRounds,
+    investmentsReceived,
+    equityPositions,
+    boardMembers,
+    relatedOrgs,
+    foundedDateStr,
+    orgAge,
+    founders,
+    currentKeyPeople,
+    currentBoardMembers,
+    totalGrantsMade,
+    totalGrantsReceived,
+    investments,
+    products,
+  };
+}

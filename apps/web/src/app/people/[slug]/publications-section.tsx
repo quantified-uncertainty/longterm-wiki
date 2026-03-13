@@ -1,4 +1,5 @@
 import type { PersonPublicationEntry } from "@/data/database";
+import { safeHref } from "@/lib/directory-utils";
 
 export function PublicationsSection({
   publications,
@@ -26,7 +27,7 @@ export function PublicationsSection({
               <div className="min-w-0">
                 {pub.link ? (
                   <a
-                    href={pub.link}
+                    href={safeHref(pub.link)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-sm text-foreground hover:text-primary transition-colors"

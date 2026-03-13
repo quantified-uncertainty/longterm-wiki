@@ -10,32 +10,16 @@ import {
   validationError,
   invalidJsonError,
 } from "./utils.js";
+import {
+  VALID_RECORD_TYPES,
+  VALID_VERIFICATION_VERDICTS,
+} from "../api-types.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 const MAX_ID_LENGTH = 10;
 const MAX_URL_LENGTH = 2048;
-
-// ---- Valid values ----
-
-const VALID_RECORD_TYPES = [
-  "grant",
-  "personnel",
-  "division",
-  "funding-program",
-  "funding-round",
-  "investment",
-  "equity-position",
-] as const;
-
-const VALID_VERDICTS = [
-  "confirmed",
-  "contradicted",
-  "unverifiable",
-  "outdated",
-  "partial",
-] as const;
 
 // ---- Query schemas ----
 
@@ -45,7 +29,7 @@ const VerificationBody = z.object({
   fieldName: z.string().max(100).optional(),
   expectedValue: z.string().max(2000).optional(),
   sourceUrl: z.string().url().max(MAX_URL_LENGTH).optional(),
-  verdict: z.enum(VALID_VERDICTS),
+  verdict: z.enum(VALID_VERIFICATION_VERDICTS),
   confidence: z.number().min(0).max(1).optional(),
   extractedValue: z.string().max(2000).optional(),
   checkerModel: z.string().max(100).optional(),
@@ -55,7 +39,7 @@ const VerificationBody = z.object({
 const VerdictUpsertBody = z.object({
   recordType: z.enum(VALID_RECORD_TYPES),
   recordId: z.string().min(1).max(MAX_ID_LENGTH),
-  verdict: z.enum([...VALID_VERDICTS, "unchecked"]),
+  verdict: z.enum([...VALID_VERIFICATION_VERDICTS, "unchecked"]),
   confidence: z.number().min(0).max(1).optional(),
   reasoning: z.string().max(5000).optional(),
   sourcesChecked: z.number().int().min(0).optional(),
