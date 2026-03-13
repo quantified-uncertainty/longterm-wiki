@@ -1,26 +1,5 @@
 import type { ExpertPosition } from "@/data/database";
-
-/** Human-readable labels for position topic slugs */
-const TOPIC_LABELS: Record<string, string> = {
-  "p-doom": "P(doom)",
-  timelines: "AGI Timelines",
-  "current-approaches-scale": "Current Approaches Scale",
-  "how-hard-is-alignment": "How Hard Is Alignment?",
-  "inner-alignment-solvability": "Inner Alignment Solvability",
-  "likelihood-of-deceptive-alignment": "Likelihood of Deceptive Alignment",
-  "would-misalignment-be-catastrophic": "Would Misalignment Be Catastrophic?",
-  "p-ai-catastrophe": "P(AI Catastrophe)",
-  "p-ai-x-risk-this-century": "P(AI X-Risk This Century)",
-  "how-fast-would-takeoff-be": "Takeoff Speed",
-  "will-advanced-ai-systems-be-deceptive":
-    "Will Advanced AI Be Deceptive?",
-  "will-we-get-adequate-warning-before-catastrophic-ai":
-    "Will We Get Adequate Warning?",
-};
-
-function topicLabel(topic: string): string {
-  return TOPIC_LABELS[topic] ?? topic.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import { topicLabel } from "@/data/topic-labels";
 
 const CONFIDENCE_STYLES: Record<string, string> = {
   high: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
