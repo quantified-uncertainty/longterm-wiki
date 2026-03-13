@@ -235,7 +235,7 @@ const idsApp = new Hono()
     const schema = z.object({
       items: z.array(z.object({
         slug: z.string().min(1).max(500),
-        stableId: z.string().length(10),
+        stableId: z.string().length(10).regex(/^[A-Za-z0-9]+$/, "stableId must be alphanumeric"),
       })).min(1).max(200),
     });
     const parsed = schema.safeParse(body);
