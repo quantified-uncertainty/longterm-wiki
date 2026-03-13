@@ -23,6 +23,7 @@ function makeRow(overrides: Partial<PersonRow> = {}): PersonRow {
     topics: [],
     publicationCount: 0,
     careerHistoryCount: 0,
+    searchText: "",
     ...overrides,
   };
 }
