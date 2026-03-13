@@ -9,7 +9,6 @@ import {
   getKBRecords,
   getKBRecordByKey,
   getKBRecordSchema,
-  getAllKBRecordEntries,
 } from "@/data/kb";
 import {
   formatKBCellValue,
@@ -19,28 +18,9 @@ import {
 } from "@/components/wiki/kb/format";
 import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 
-// ── Static params ────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  const allRecords = getAllKBRecordEntries();
-
-  // Assert global uniqueness of record keys at build time
-  const seen = new Map<string, string>();
-  for (const { entityId, collection, entry } of allRecords) {
-    const prev = seen.get(entry.key);
-    if (prev) {
-      console.warn(
-        `[KB] Duplicate record key "${entry.key}": found in ${prev} and ${entityId}/${collection}. ` +
-        `Only the first match will be used for /kb/record/${entry.key}.`,
-      );
-    } else {
-      seen.set(entry.key, `${entityId}/${collection}`);
-    }
-  }
-
-  // Deduplicate: only generate one page per key
-  return [...seen.keys()].map((key) => ({ recordId: key }));
-}
+// ── Rendering mode ───────────────────────────────────────────────────
+// Render on-demand to reduce build output size (~351 pages saved).
+// These are internal KB record detail pages with low traffic.
 
 // ── Metadata ─────────────────────────────────────────────────────────
 

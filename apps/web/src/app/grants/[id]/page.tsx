@@ -83,12 +83,9 @@ function parseGrant(record: KBRecordEntry): ParsedGrant {
   };
 }
 
-// ── Static params ──────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  const allGrants = getAllKBRecords("grants");
-  return allGrants.map((record) => ({ id: record.key }));
-}
+// ── Rendering mode ─────────────────────────────────────────────────────
+// Render on-demand to reduce build output size.
+// Grant detail pages are new and low-traffic.
 
 // ── Metadata ───────────────────────────────────────────────────────────
 
