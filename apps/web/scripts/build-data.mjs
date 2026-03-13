@@ -2238,7 +2238,7 @@ async function main() {
       }
     }
     // urlToId already built in outer scope
-    const validIds = new Set(resources.map(r => r.id));
+    const validIds = new Set(resources.flatMap(r => r.stable_id ? [r.id, r.stable_id] : [r.id]));
     const pageResources = {};
     let pagesWithRefs = 0;
     let totalRefs = 0;
@@ -2249,7 +2249,7 @@ async function main() {
       const seen = new Set();
 
       // Source 1: Inline <R id="..."> citations
-      const inlineRe = /<R\s+[^>]*id="([a-f0-9]+)"[^>]*>/g;
+      const inlineRe = /<R\s+[^>]*id="([a-zA-Z0-9]+)"[^>]*>/g;
       let m;
       while ((m = inlineRe.exec(page.rawContent)) !== null) {
         const id = m[1];

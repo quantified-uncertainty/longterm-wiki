@@ -75,7 +75,7 @@ function getCitedByIndex(): Map<string, Set<string>> {
 
 function getValidIds(): Set<string> {
   if (_validIdCache) return _validIdCache;
-  _validIdCache = new Set(getResources().map(r => r.id));
+  _validIdCache = new Set(getResources().flatMap(r => r.stable_id ? [r.id, r.stable_id] : [r.id]));
   return _validIdCache;
 }
 
@@ -86,7 +86,7 @@ function getValidIds(): Set<string> {
 /** Extract all <R id="..."> resource IDs from MDX content. */
 function extractInlineResourceIds(content: string): string[] {
   const ids: string[] = [];
-  const re = /<R\s+[^>]*id="([a-f0-9]+)"[^>]*>/g;
+  const re = /<R\s+[^>]*id="([a-zA-Z0-9]+)"[^>]*>/g;
   let m;
   while ((m = re.exec(content)) !== null) {
     ids.push(m[1]);
@@ -106,13 +106,16 @@ function parseExistingReferences(content: string): { exists: boolean; ids: strin
   const m = re.exec(content);
   if (!m) return { exists: false, ids: [], blockStart: -1, blockEnd: -1 };
 
-  // Extract IDs from the block
+  // Extract IDs from the ids={[...]} array inside the block
   const block = m[0];
-  const idRe = /"([a-f0-9]{16})"/g;
+  const idsArrayMatch = /ids=\{?\[([^\]]*)\]/s.exec(block);
   const ids: string[] = [];
-  let idMatch;
-  while ((idMatch = idRe.exec(block)) !== null) {
-    ids.push(idMatch[1]);
+  if (idsArrayMatch) {
+    const idRe = /"([a-zA-Z0-9]+)"/g;
+    let idMatch;
+    while ((idMatch = idRe.exec(idsArrayMatch[1])) !== null) {
+      ids.push(idMatch[1]);
+    }
   }
 
   return { exists: true, ids, blockStart: m.index, blockEnd: m.index + m[0].length };

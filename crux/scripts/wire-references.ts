@@ -30,6 +30,7 @@ interface ResourceEntry {
   url?: string;
   title?: string;
   cited_by?: string[];
+  stable_id?: string;
 }
 
 function loadAllResources(): ResourceEntry[] {
@@ -54,8 +55,8 @@ function buildCitedByIndex(resources: ResourceEntry[]): Map<string, Set<string>>
 /** Extract all <R id="..."> resource IDs from MDX content */
 function extractInlineResourceIds(content: string): string[] {
   const ids: string[] = [];
-  // Match <R id="hexid">, <R id="hexid" n={N}>, etc.
-  const re = /<R\s+[^>]*id="([a-f0-9]+)"[^>]*>/g;
+  // Match <R id="stableId">, <R id="stableId" n={N}>, etc. (alphanumeric stableIds or legacy hex)
+  const re = /<R\s+[^>]*id="([a-zA-Z0-9]+)"[^>]*>/g;
   let match;
   while ((match = re.exec(content)) !== null) {
     ids.push(match[1]);
@@ -127,8 +128,8 @@ function main() {
   const citedByIndex = buildCitedByIndex(resources);
   console.log(`cited_by index: ${citedByIndex.size} pages have tagged resources`);
 
-  // Build resource ID set for validation
-  const validResourceIds = new Set(resources.map(r => r.id));
+  // Build resource ID set for validation (include both hex primary keys and stableIds)
+  const validResourceIds = new Set(resources.flatMap(r => r.stable_id ? [r.id, r.stable_id] : [r.id]));
 
   // Scan all MDX files
   const mdxFiles = getAllMdxFiles(CONTENT_DIR);
