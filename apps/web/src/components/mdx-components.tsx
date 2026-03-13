@@ -80,6 +80,7 @@ import { KbVerificationsContent } from "@/app/internal/kb-verifications/kb-verif
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
+import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -232,6 +233,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   GrantsDashboardContent,
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,
+  PeopleCoverageContent,
 
   // Table view components
   SafetyApproachesTableView,
