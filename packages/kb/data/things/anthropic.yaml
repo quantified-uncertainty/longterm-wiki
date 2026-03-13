@@ -79,7 +79,7 @@ facts:
     property: valuation
     value: 1.8e+10
     asOf: 2024-02
-    source: https://fortune.com/2024/02/20/anthropic-750-million-funding/
+    source: https://www.reuters.com/technology/anthropic-valued-184-bln-latest-funding-round-sources-say-2024-02-20/
     notes: "Series D post-money valuation"
 
   - id: f_Vs2y6JyGAA
@@ -123,9 +123,9 @@ facts:
     value: 6.7e+10
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Total funding raised including $30B Series G. Exceeds equity round sum
-      because it includes Amazon cloud credit commitments and multi-tranche
-      strategic investments not listed as individual rounds."
+    notes: "Total funding raised including $30B Series G. Lower than individual round
+      sum ($75.2B) because some amounts overlap (FTX investment was part of Series B)
+      and strategic partnership amounts are 'up to' commitments not fully deployed."
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_zBoko30S4g
@@ -791,9 +791,9 @@ records:
       instrument: equity
       lead_investor: ftx
       source: https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html
-      notes: "Part of $580M Series B led by SBF. FTX held ~8% stake; sold in
-        bankruptcy for ~$884M in March 2024 to 24 institutional investors (Jane
-        Street, Fidelity, etc.). FTX estate's most profitable asset."
+      notes: "FTX/SBF's portion of the $580M Series B. Listed separately because FTX
+        held the shares directly (~8% stake) and they were later sold in bankruptcy
+        for ~$884M to 24 institutional investors (Jane Street, Fidelity, etc.)."
 
     google-initial:
       name: Google Initial
@@ -1019,8 +1019,7 @@ records:
       start: "2023-01"
       end: "2026-02"
       source: https://americanbazaaronline.com/2026/02/10/anthropic-ai-safety-researcher-mrinank-sharma-resigns-474827/
-      notes: "Resigned citing ethical concerns; wrote 'the world is in peril'; plans
-        to study poetry"
+      notes: "Resigned Feb 2026 citing ethical concerns about AI safety practices"
 
   # ── Products ────────────────────────────────────────────────────
   products:

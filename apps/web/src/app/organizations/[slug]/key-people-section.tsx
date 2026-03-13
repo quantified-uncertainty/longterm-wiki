@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedPersonnelRecord } from "./org-data";
 
@@ -34,10 +34,10 @@ export function KeyPersonnelSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Name</th>
-              <th className="text-left py-2 px-3 font-medium">Role</th>
-              <th className="text-left py-2 px-3 font-medium">Type</th>
-              <th className="text-center py-2 px-3 font-medium">Period</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Name</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Role</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Period</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -54,7 +54,7 @@ export function KeyPersonnelSection({
                     )}
                   </span>
                   {p.isFounder && (
-                    <span className="ml-1.5 inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                    <span className="ml-1.5 inline-block px-1.5 py-0.5 rounded text-[11px] font-semibold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
                       Founder
                     </span>
                   )}
@@ -63,7 +63,7 @@ export function KeyPersonnelSection({
                       href={safeHref(p.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>
@@ -74,7 +74,7 @@ export function KeyPersonnelSection({
                 </td>
                 <td className="py-2 px-3">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                    className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
                       ROLE_TYPE_COLORS[p.roleType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                     }`}
                   >
@@ -84,8 +84,8 @@ export function KeyPersonnelSection({
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs">
                   {p.startDate && (
                     <span>
-                      {p.startDate}
-                      {p.endDate ? ` - ${p.endDate}` : " - present"}
+                      {formatKBDate(p.startDate)}
+                      {p.endDate ? ` \u2013 ${formatKBDate(p.endDate)}` : " \u2013 present"}
                     </span>
                   )}
                 </td>

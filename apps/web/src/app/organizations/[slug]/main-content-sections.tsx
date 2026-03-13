@@ -68,7 +68,7 @@ export function FundingHistorySection({
               className="flex gap-4 py-4 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors"
             >
               {/* Timeline dot */}
-              <div className="flex flex-col items-center pt-1">
+              <div className="flex flex-col items-center pt-1" aria-hidden="true">
                 <div className="w-3 h-3 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
                 <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
               </div>
@@ -112,7 +112,7 @@ export function FundingHistorySection({
                   )}
                 </div>
                 {notes && (
-                  <div className="text-[10px] text-muted-foreground/50 mt-1.5 line-clamp-2">
+                  <div className="text-[11px] text-muted-foreground mt-1.5 line-clamp-2">
                     {notes}
                   </div>
                 )}
@@ -198,7 +198,7 @@ export function InvestorParticipationSection({
                 </div>
               </div>
               {notes && (
-                <div className="text-[10px] text-muted-foreground/50 mt-1 line-clamp-2">
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
                   {notes}
                 </div>
               )}
@@ -296,7 +296,7 @@ export function ProductsSection({
                   {name}
                 </span>
                 {launched && (
-                  <span className="text-[10px] text-muted-foreground/60">
+                  <span className="text-[11px] text-muted-foreground">
                     {formatKBDate(launched)}
                   </span>
                 )}
@@ -434,7 +434,7 @@ export function StrategicPartnershipsSection({
                 )}
               </div>
               {notes && (
-                <div className="text-[10px] text-muted-foreground/50 mt-1 line-clamp-2">
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
                   {notes}
                 </div>
               )}

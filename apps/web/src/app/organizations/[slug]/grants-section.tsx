@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
-import { MAX_GRANTS_SHOWN } from "./org-data";
+import { MAX_GRANTS_SHOWN, formatAmount, numericValue } from "./org-data";
 
 /** Grants Made section for funder org pages. */
 export function GrantsMadeSection({
@@ -20,7 +20,7 @@ export function GrantsMadeSection({
 }) {
   if (grants.length === 0) return null;
 
-  const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+  const totalAmount = grants.reduce((sum, g) => sum + numericValue(g.amount), 0);
 
   return (
     <section>
@@ -34,10 +34,10 @@ export function GrantsMadeSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Grant</th>
-              <th className="text-left py-2 px-3 font-medium">Recipient</th>
-              <th className="text-right py-2 px-3 font-medium">Amount</th>
-              <th className="text-center py-2 px-3 font-medium">Date</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Grant</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Recipient</th>
+              <th scope="col" className="text-right py-2 px-3 font-medium">Amount</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -50,7 +50,7 @@ export function GrantsMadeSection({
                       href={safeHref(g.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>
@@ -67,7 +67,7 @@ export function GrantsMadeSection({
                 </td>
                 <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
                   {g.amount != null && (
-                    <span className="font-semibold">{formatCompactCurrency(g.amount)}</span>
+                    <span className="font-semibold">{formatAmount(g.amount)}</span>
                   )}
                 </td>
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs">
@@ -98,7 +98,7 @@ export function FundingReceivedSection({
 }) {
   if (grants.length === 0) return null;
 
-  const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+  const totalAmount = grants.reduce((sum, g) => sum + numericValue(g.amount), 0);
 
   return (
     <section>
@@ -112,10 +112,10 @@ export function FundingReceivedSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Grant</th>
-              <th className="text-left py-2 px-3 font-medium">Funder</th>
-              <th className="text-right py-2 px-3 font-medium">Amount</th>
-              <th className="text-center py-2 px-3 font-medium">Date</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Grant</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Funder</th>
+              <th scope="col" className="text-right py-2 px-3 font-medium">Amount</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -128,7 +128,7 @@ export function FundingReceivedSection({
                       href={safeHref(g.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>
@@ -145,7 +145,7 @@ export function FundingReceivedSection({
                 </td>
                 <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
                   {g.amount != null && (
-                    <span className="font-semibold">{formatCompactCurrency(g.amount)}</span>
+                    <span className="font-semibold">{formatAmount(g.amount)}</span>
                   )}
                 </td>
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs">

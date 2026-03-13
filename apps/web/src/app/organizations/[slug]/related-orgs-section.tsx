@@ -32,12 +32,12 @@ export function RelatedOrganizationsSection({ orgs }: { orgs: RelatedOrg[] }) {
               ) : (
                 <span className="font-semibold text-sm">{org.name}</span>
               )}
-              <span className="text-[10px] text-muted-foreground/70 px-1.5 py-0.5 rounded-full bg-muted">
+              <span className="text-[11px] text-muted-foreground/70 px-1.5 py-0.5 rounded-full bg-muted">
                 {org.relationship}
               </span>
             </div>
             {org.date && (
-              <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+              <div className="text-[11px] text-muted-foreground mt-0.5">
                 {formatKBDate(org.date)}
               </div>
             )}
