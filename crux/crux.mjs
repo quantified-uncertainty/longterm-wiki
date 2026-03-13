@@ -269,7 +269,7 @@ ${'\x1b[1m'}Domain Help:${'\x1b[0m'}
  * Main entry point
  */
 async function main() {
-  const { domain, command, args, options } = parseArgs();
+  let { domain, command, args, options } = parseArgs();
   const log = createLogger(options.ci);
 
   // Show help if requested or no domain specified
@@ -308,6 +308,12 @@ async function main() {
 
   if (commandName) {
     commandHandler = domainHandler.commands?.[commandName];
+    if (!commandHandler && domainHandler.commands?.default) {
+      // Unrecognized command name — treat it as a positional arg for 'default'
+      commandHandler = domainHandler.commands.default;
+      args = [commandName, ...args];
+      commandName = 'default';
+    }
   } else {
     // No command specified - try 'default', then 'check'
     commandHandler = domainHandler.commands?.default || domainHandler.commands?.check;

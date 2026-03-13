@@ -565,7 +565,7 @@ export async function recordsVerifyCommand(
   args: string[],
   options: VerifyCommandOptions,
 ): Promise<CommandResult> {
-  const subcommand = args[0];
+  const subcommand = args.find(a => !a.startsWith('--'));
 
   // Stats subcommand
   if (subcommand === 'stats') {
