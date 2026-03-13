@@ -67,16 +67,18 @@ async function runCommand(
     return { exitCode: 0, output: lines.join('\n') };
   }
 
-  // Send to server in batches of 200
+  // Send to server in batches of 200, finalize on the last batch
   let totalUpdated = 0;
   let totalGenerated = 0;
 
-  for (let i = 0; i < slugToStableId.length; i += 200) {
-    const batch = slugToStableId.slice(i, i + 200);
+  const batchSize = 200;
+  for (let i = 0; i < slugToStableId.length; i += batchSize) {
+    const batch = slugToStableId.slice(i, i + batchSize);
+    const isLastBatch = i + batchSize >= slugToStableId.length;
     const result = await apiRequest<BackfillResult>(
       'POST',
       '/api/ids/backfill-stable-ids',
-      { items: batch },
+      { items: batch, finalize: isLastBatch },
     );
 
     if (!result.ok) {
@@ -85,6 +87,22 @@ async function runCommand(
     }
 
     totalUpdated += result.data.updated;
+    totalGenerated += result.data.generated;
+  }
+
+  // Handle edge case: no KB entities found, but still need to finalize
+  if (slugToStableId.length === 0) {
+    const result = await apiRequest<BackfillResult>(
+      'POST',
+      '/api/ids/backfill-stable-ids',
+      { items: [], finalize: true },
+    );
+
+    if (!result.ok) {
+      lines.push(`Error during finalization: ${result.message}`);
+      return { exitCode: 1, output: lines.join('\n') };
+    }
+
     totalGenerated += result.data.generated;
   }
 

@@ -235,46 +235,57 @@ const idsApp = new Hono()
     const schema = z.object({
       items: z.array(z.object({
         slug: z.string().min(1).max(500),
-        stableId: z.string().length(10).regex(/^[A-Za-z0-9]+$/, "stableId must be alphanumeric"),
-      })).min(1).max(200),
+        stableId: z.string().regex(/^[A-Za-z0-9]{10}$/, "stableId must be 10 alphanumeric characters"),
+      })).max(200).default([]),
+      finalize: z.boolean().default(false),
+    }).refine((v) => v.items.length > 0 || v.finalize, {
+      message: "items must be non-empty unless finalize=true",
     });
     const parsed = schema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
+    const { items, finalize } = parsed.data;
     const db = getDrizzleDb();
     let updated = 0;
     let generated = 0;
+    let totalMissing = 0;
 
-    await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        const result = await tx
-          .update(entityIds)
-          .set({ stableId: item.stableId })
-          .where(eq(entityIds.slug, item.slug))
-          .returning();
-        if (result.length > 0) updated++;
-      }
-    });
-
-    // Generate stableIds for any rows that still lack one
-    const missing = await db
-      .select({ slug: entityIds.slug })
-      .from(entityIds)
-      .where(sql`${entityIds.stableId} IS NULL`);
-
-    if (missing.length > 0) {
+    if (items.length > 0) {
       await db.transaction(async (tx) => {
-        for (const row of missing) {
-          await tx
+        for (const item of items) {
+          const result = await tx
             .update(entityIds)
-            .set({ stableId: generateStableId() })
-            .where(eq(entityIds.slug, row.slug));
-          generated++;
+            .set({ stableId: item.stableId })
+            .where(eq(entityIds.slug, item.slug))
+            .returning();
+          if (result.length > 0) updated++;
         }
       });
     }
 
-    return c.json({ updated, generated, totalMissing: missing.length });
+    // Only generate stableIds for remaining rows when finalize=true,
+    // so multi-batch imports can set known IDs before generating the rest.
+    if (finalize) {
+      const missing = await db
+        .select({ slug: entityIds.slug })
+        .from(entityIds)
+        .where(sql`${entityIds.stableId} IS NULL`);
+      totalMissing = missing.length;
+
+      if (missing.length > 0) {
+        await db.transaction(async (tx) => {
+          for (const row of missing) {
+            await tx
+              .update(entityIds)
+              .set({ stableId: generateStableId() })
+              .where(eq(entityIds.slug, row.slug));
+            generated++;
+          }
+        });
+      }
+    }
+
+    return c.json({ updated, generated, totalMissing });
   })
 
   // ---- GET /by-slug?slug=... ----
