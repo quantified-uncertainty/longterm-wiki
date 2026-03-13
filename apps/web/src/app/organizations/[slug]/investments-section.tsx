@@ -38,15 +38,12 @@ export function InvestmentsReceivedSection({
             {investments.map((inv) => (
               <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">
-                    {inv.investorHref ? (
-                      <Link href={inv.investorHref} className="text-primary hover:underline">
-                        {inv.investorName}
-                      </Link>
-                    ) : (
-                      inv.investorName
-                    )}
-                  </span>
+                  <Link
+                    href={`/investments/${inv.key}`}
+                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                  >
+                    {inv.investorHref ? inv.investorName : inv.investorName}
+                  </Link>
                   {inv.role && (
                     <span className="ml-1.5 text-[10px] text-muted-foreground/60">
                       ({inv.role})
