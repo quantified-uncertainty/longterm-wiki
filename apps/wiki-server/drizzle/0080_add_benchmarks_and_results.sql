@@ -1,6 +1,6 @@
 -- Benchmarks: definitions of AI evaluation benchmarks.
 CREATE TABLE IF NOT EXISTS benchmarks (
-  id         TEXT PRIMARY KEY,
+  id         VARCHAR(10) PRIMARY KEY,
   slug       TEXT NOT NULL UNIQUE,
   name       TEXT NOT NULL,
   category   TEXT, -- coding | reasoning | math | knowledge | multimodal | safety | agentic | general
@@ -21,7 +21,7 @@ CREATE INDEX IF NOT EXISTS idx_benchmarks_category ON benchmarks (category);
 -- Benchmark results: individual model scores on benchmarks.
 CREATE TABLE IF NOT EXISTS benchmark_results (
   id           VARCHAR(10) PRIMARY KEY,
-  benchmark_id TEXT NOT NULL REFERENCES benchmarks(id),
+  benchmark_id VARCHAR(10) NOT NULL REFERENCES benchmarks(id),
   model_id     TEXT NOT NULL, -- entity slug of the ai-model
   score        DOUBLE PRECISION NOT NULL,
   unit         TEXT, -- % | elo | etc.
