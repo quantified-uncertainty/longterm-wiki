@@ -40,10 +40,10 @@ const integrityApp = new Hono()
     const issues: IntegrityIssue[] = [];
 
     const checks = [
-      // 1. facts.entity_id → entities
+      // 1. facts.entity_id → entities.stable_id
       checkDangling(
         db,
-        sql`SELECT DISTINCT entity_id AS ref FROM facts WHERE entity_id NOT IN (SELECT id FROM entities)`,
+        sql`SELECT DISTINCT entity_id AS ref FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL)`,
         "facts",
         "entity_id",
         "entities"
