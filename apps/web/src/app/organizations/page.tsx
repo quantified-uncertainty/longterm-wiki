@@ -4,6 +4,7 @@ import { getTypedEntities, isOrganization, type OrganizationEntity } from "@/dat
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
+import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -179,17 +180,11 @@ export default function OrganizationsPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {stats.map((stat) => (
-          <div
+          <ProfileStatCard
             key={stat.label}
-            className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
-          >
-            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-              {stat.label}
-            </div>
-            <div className="text-2xl font-bold tabular-nums tracking-tight">
-              {stat.value}
-            </div>
-          </div>
+            label={stat.label}
+            value={stat.value}
+          />
         ))}
       </div>
 
