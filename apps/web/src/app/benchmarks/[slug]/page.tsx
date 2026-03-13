@@ -228,16 +228,12 @@ export default async function BenchmarkDetailPage({
                       )}
                     </td>
                     <td className="py-2.5 px-3">
-                      {row.numericId ? (
-                        <Link
-                          href={`/wiki/${row.numericId}`}
-                          className="hover:text-primary transition-colors"
-                        >
-                          {row.modelTitle}
-                        </Link>
-                      ) : (
-                        <span>{row.modelTitle}</span>
-                      )}
+                      <Link
+                        href={`/ai-models/${row.modelId}`}
+                        className="hover:text-primary transition-colors"
+                      >
+                        {row.modelTitle}
+                      </Link>
                     </td>
                     <td className="py-2.5 px-3">
                       {row.developer && row.developerName && (

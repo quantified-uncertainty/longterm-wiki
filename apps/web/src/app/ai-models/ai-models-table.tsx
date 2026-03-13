@@ -294,16 +294,12 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <div className="flex items-center gap-2">
-                    {row.numericId ? (
-                      <Link
-                        href={`/wiki/${row.numericId}`}
-                        className={`font-medium hover:text-primary transition-colors ${row.isFamily ? "text-foreground/80" : "text-foreground"}`}
-                      >
-                        {row.title}
-                      </Link>
-                    ) : (
-                      <span className="font-medium text-foreground">{row.title}</span>
-                    )}
+                    <Link
+                      href={`/ai-models/${row.id}`}
+                      className={`font-medium hover:text-primary transition-colors ${row.isFamily ? "text-foreground/80" : "text-foreground"}`}
+                    >
+                      {row.title}
+                    </Link>
                     {row.openWeight && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
                         Open
