@@ -17,7 +17,14 @@ export interface GrantRow {
   organizationName: string;
   organizationSlug: string | null;
   organizationWikiPageId: string | null;
+  /** Raw recipient identifier (entity ID or plain text) */
   recipient: string | null;
+  /** Resolved display name for the recipient */
+  recipientName: string | null;
+  /** Slug for linking to /organizations/ or /people/ */
+  recipientSlug: string | null;
+  /** Numeric wiki page ID for the recipient entity */
+  recipientWikiPageId: string | null;
   program: string | null;
   amount: number | null;
   period: string | null;
@@ -110,7 +117,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortDir(key === "name" || key === "organization" ? "asc" : "desc");
+      setSortDir(key === "name" || key === "organization" || key === "recipient" || key === "program" ? "asc" : "desc");
     }
     setPage(0);
   };
@@ -128,6 +135,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
         (r) =>
           r.name.toLowerCase().includes(q) ||
           r.organizationName.toLowerCase().includes(q) ||
+          (r.recipientName && r.recipientName.toLowerCase().includes(q)) ||
           (r.recipient && r.recipient.toLowerCase().includes(q)) ||
           (r.program && r.program.toLowerCase().includes(q)),
       );
@@ -277,7 +285,29 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
 
                 {/* Recipient */}
                 <td className="py-2.5 px-3 text-muted-foreground">
-                  {row.recipient ?? ""}
+                  {row.recipientName ? (
+                    row.recipientSlug ? (
+                      <Link
+                        href={`/organizations/${row.recipientSlug}`}
+                        className="text-foreground hover:text-primary transition-colors"
+                      >
+                        {row.recipientName}
+                      </Link>
+                    ) : (
+                      <span>{row.recipientName}</span>
+                    )
+                  ) : (
+                    row.recipient ?? ""
+                  )}
+                  {row.recipientWikiPageId && (
+                    <Link
+                      href={`/wiki/${row.recipientWikiPageId}`}
+                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      title="Wiki page"
+                    >
+                      wiki
+                    </Link>
+                  )}
                 </td>
 
                 {/* Program */}
