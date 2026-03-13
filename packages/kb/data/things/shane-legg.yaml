@@ -28,7 +28,7 @@ facts:
 
   - id: f_sL3oMx0qZs
     property: employed-by
-    value: !ref A4XoubikkQ:deepmind
+    value: !ref A4XoubikkQ
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
 

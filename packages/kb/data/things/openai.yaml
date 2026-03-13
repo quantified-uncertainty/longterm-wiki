@@ -48,10 +48,10 @@ facts:
   - id: f_A4ImW0y2sw
     property: founded-by
     value:
-      - !ref JKsVHQ5stQ:sam-altman
-      - !ref eYrBgMLJDw:ilya-sutskever
-      - !ref Yq4s2cI7ng:greg-brockman
-      - !ref 69vftmr1jg:elon-musk
+      - !ref JKsVHQ5stQ
+      - !ref eYrBgMLJDw
+      - !ref Yq4s2cI7ng
+      - !ref 69vftmr1jg
       - wojciech-zaremba
       - john-schulman
     source: https://openai.com/blog/introducing-openai

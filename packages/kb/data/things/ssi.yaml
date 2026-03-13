@@ -30,7 +30,7 @@ facts:
   - id: f_TUP4Wxpwqg
     property: founded-by
     value:
-      - !ref eYrBgMLJDw:ilya-sutskever
+      - !ref eYrBgMLJDw
       - daniel-gross
       - daniel-levy
     source: https://ssi.inc

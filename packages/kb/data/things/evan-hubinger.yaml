@@ -33,13 +33,13 @@ facts:
 
   - id: f_eH9wS5jH8d
     property: employed-by
-    value: !ref mK9pX3rQ7n:anthropic
+    value: !ref mK9pX3rQ7n
     asOf: 2023-01
     notes: Enriched from wiki page; Head of Alignment Stress-Testing
 
   - id: f_eHcY8fL1kA
     property: employed-by
-    value: !ref puAffUjWSS:miri
+    value: !ref puAffUjWSS
     asOf: 2019-01
     validEnd: 2023-01
     notes: Enriched from wiki page; Research Fellow at MIRI 2019-2023

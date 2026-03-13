@@ -27,7 +27,7 @@ facts:
 
   - id: f_eL9wS5jH4d
     property: employed-by
-    value: !ref KDYvrwkgtw:ai-futures-project
+    value: !ref KDYvrwkgtw
     asOf: 2025-01
     notes: Enriched from wiki page; co-founded with Daniel Kokotajlo and Thomas Larsen
 

@@ -42,9 +42,9 @@ facts:
   - id: f_O44njDhfpA
     property: organizations-involved
     value:
-      - !ref mK9pX3rQ7n:anthropic
-      - !ref 1LcLlMGLbw:openai
-      - !ref GLXKjYAEKw:xai
+      - !ref mK9pX3rQ7n
+      - !ref 1LcLlMGLbw
+      - !ref GLXKjYAEKw
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "Pentagon awarded AI contracts to Anthropic, OpenAI, Google, and xAI"
 

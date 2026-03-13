@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_StIAxD850A
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: 2015-12
     source: https://openai.com/about
     notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in 2019 when capped-profit entity was created"

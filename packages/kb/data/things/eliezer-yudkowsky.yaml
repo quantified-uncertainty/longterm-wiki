@@ -11,7 +11,7 @@ thing:
 facts:
   - id: f_pMYY3GyUXY
     property: employed-by
-    value: !ref puAffUjWSS:miri
+    value: !ref puAffUjWSS
     asOf: 2000-01
     source: https://intelligence.org/about/
     notes: "Founded MIRI (originally Singularity Institute) in 2000; has been its primary researcher and intellectual leader"

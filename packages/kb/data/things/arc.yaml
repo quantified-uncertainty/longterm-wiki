@@ -28,7 +28,7 @@ facts:
   - id: f_tC3M5pbZUg
     property: founded-by
     value:
-      - !ref vzxfzxBITd:paul-christiano
+      - !ref vzxfzxBITd
     source: https://alignment.org/
   - id: xU3JVFJnrQ
     property: website

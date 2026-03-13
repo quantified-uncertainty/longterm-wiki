@@ -25,6 +25,6 @@ facts:
 
   - id: f_eK3oMx0qZs
     property: employed-by
-    value: !ref fYyAxYlHDQ:us-aisi
+    value: !ref fYyAxYlHDQ
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"

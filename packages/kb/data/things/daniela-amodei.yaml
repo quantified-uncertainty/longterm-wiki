@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_R5GtlfjvmA
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: "2018"
     validEnd: 2021-01
     source: https://anthropic.com/company
@@ -24,7 +24,7 @@ facts:
 
   - id: f_9N4b6WjtiA
     property: employed-by
-    value: !ref mK9pX3rQ7n:anthropic
+    value: !ref mK9pX3rQ7n
     asOf: 2021-01
     source: https://anthropic.com/company
     notes: "Co-founded Anthropic in January 2021 with Dario Amodei and others; serves as President"

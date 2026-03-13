@@ -32,6 +32,6 @@ facts:
 
   - id: f_aC3oMx0qZs
     property: employed-by
-    value: !ref rQEkFJxS5w:metr
+    value: !ref rQEkFJxS5w
     asOf: "2026-03"
     notes: "Migrated from entity customFields"
