@@ -32,20 +32,14 @@ facts:
     property: website
     value: https://www.tobyord.com
 
-  - id: f_tO1rKz8mXq
+  - id: f_dxElTc1yeC
     property: role
-    value: "Senior Research Fellow in Philosophy"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Senior Research Fellow in Philosophy
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_tO2nLw9pYr
+  - id: f_TsTqk4xJS3
     property: notable-for
-    value: "The Precipice; existential risk quantification; effective altruism"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
-
-  - id: f_tO3oMx0qZs
-    property: employed-by
-    value: !ref Zmw9nfUYWA:fhi
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: The Precipice; existential risk quantification; effective altruism
+    asOf: 2026-03
+    notes: Migrated from experts.yaml

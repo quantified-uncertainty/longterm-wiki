@@ -28,8 +28,8 @@ facts:
     source: https://en.wikipedia.org/wiki/Yoshua_Bengio
     notes: "Born March 5, 1964 in Paris, France"
 
-  - id: f_yB2nLw9pYr
+  - id: f_9Mbg8zG9bk
     property: notable-for
-    value: "Deep learning pioneer; now AI safety advocate"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Deep learning pioneer; now AI safety advocate
+    asOf: 2026-03
+    notes: Migrated from experts.yaml

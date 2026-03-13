@@ -18,20 +18,20 @@ facts:
     property: website
     value: https://metr.org
 
-  - id: f_aC1rKz8mXq
+  - id: f_Ef4x2MPZSG
     property: role
-    value: "Member of Technical Staff at METR (formerly Senior Advisor at Coefficient Giving)"
-    asOf: "2026-03"
-    notes: "Migrated from entity customFields"
+    value: Member of Technical Staff at METR (formerly Senior Advisor at Coefficient Giving)
+    asOf: 2026-03
+    notes: Migrated from entity customFields
 
-  - id: f_aC2nLw9pYr
+  - id: f_7m0BMct16a
     property: notable-for
-    value: "Bio Anchors AI timelines report, AI safety grantmaking, intelligence explosion analysis, crunch time framework"
-    asOf: "2026-03"
-    notes: "Migrated from entity customFields"
+    value: Bio Anchors AI timelines report, AI safety grantmaking, intelligence explosion analysis, crunch time framework
+    asOf: 2026-03
+    notes: Migrated from entity customFields
 
-  - id: f_aC3oMx0qZs
+  - id: f_cl50l30yMS
     property: employed-by
     value: !ref rQEkFJxS5w:metr
-    asOf: "2026-03"
-    notes: "Migrated from entity customFields"
+    asOf: 2026-03
+    notes: Migrated from entity customFields

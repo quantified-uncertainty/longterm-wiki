@@ -11,20 +11,20 @@ facts:
     asOf: 2026-03
     notes: Migrated from old entity system
 
-  - id: f_iH1rKz8mXq
+  - id: f_StXd0lGEwK
     property: role
-    value: "Chair"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Chair
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_iH2nLw9pYr
+  - id: f_u57aVo3SgX
     property: notable-for
-    value: "Leading UK AI Safety Institute; AI investor and writer"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Leading UK AI Safety Institute; AI investor and writer
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_iH3oMx0qZs
+  - id: f_ytSLUPlyya
     property: employed-by
     value: !ref aX0jkoaekQ:uk-aisi
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    asOf: 2026-03
+    notes: Migrated from experts.yaml

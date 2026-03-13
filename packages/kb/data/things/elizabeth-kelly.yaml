@@ -11,20 +11,22 @@ facts:
     asOf: 2026-03
     notes: Migrated from old entity system
 
-  - id: f_eK1rKz8mXq
+  - id: f_Mse2OzXkDM
     property: role
-    value: "Director"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Director
+    asOf: 2026-03
+    validEnd: "2025-01"
+    notes: Migrated from experts.yaml
 
-  - id: f_eK2nLw9pYr
+  - id: f_YKitIOCVCm
     property: notable-for
-    value: "Leading US AI Safety Institute; AI policy"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Leading US AI Safety Institute; AI policy
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_eK3oMx0qZs
+  - id: f_9ZI3bqspRe
     property: employed-by
     value: !ref fYyAxYlHDQ:us-aisi
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    asOf: 2026-03
+    validEnd: "2025-01"
+    notes: Migrated from experts.yaml

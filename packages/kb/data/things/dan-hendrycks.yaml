@@ -30,20 +30,20 @@ facts:
     property: website
     value: https://hendrycks.com
 
-  - id: f_dH1rKz8mXq
+  - id: f_HfmY1ift7o
     property: role
-    value: "Director"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: Director
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_dH2nLw9pYr
+  - id: f_xn2UZoF55E
     property: notable-for
-    value: "AI safety research; benchmark creation; CAIS leadership; catastrophic risk focus"
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    value: AI safety research; benchmark creation; CAIS leadership; catastrophic risk focus
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
 
-  - id: f_dH3oMx0qZs
+  - id: f_qQbmxCtFd5
     property: employed-by
     value: !ref oa9A0OV0RX:center-for-ai-safety
-    asOf: "2026-03"
-    notes: "Migrated from experts.yaml"
+    asOf: 2026-03
+    notes: Migrated from experts.yaml
