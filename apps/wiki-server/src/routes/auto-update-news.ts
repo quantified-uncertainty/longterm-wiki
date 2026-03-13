@@ -122,7 +122,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(eq(autoUpdateNewsItems.runId, runId))
-      .orderBy(desc(autoUpdateNewsItems.relevanceScore));
+      .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
     return c.json({ items: rows.map((r) => mapNewsRow(r.item, r.routedToPageSlug)) });
   })
@@ -145,7 +145,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
-      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore))
+      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
       .limit(limit)
       .offset(offset);
 
@@ -182,7 +182,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
       .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
-      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore));
+      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
     // All results are routed to pageId (the URL param) — pass it directly as the slug override
     return c.json({
@@ -224,7 +224,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(inArray(autoUpdateNewsItems.runId, runIds))
-      .orderBy(desc(autoUpdateNewsItems.relevanceScore))
+      .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
       .limit(maxItems);
 
     return c.json({
