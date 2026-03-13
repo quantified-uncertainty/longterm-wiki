@@ -78,8 +78,8 @@ export async function extractKeyPersons(): Promise<{
 
       // Resolve slug to entity ID via filename map
       let personEntityId: string | null = null;
-      // If the value is already a 10-char entity ID, use it directly
-      if (personSlug.length === 10 && graph.getEntity(personSlug)) {
+      // If the value is already a valid entity ID, use it directly
+      if (graph.getEntity(personSlug)) {
         personEntityId = personSlug;
       } else {
         // Resolve as a slug/filename

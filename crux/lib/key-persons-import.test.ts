@@ -4,11 +4,13 @@
  * Tests extraction from real KB YAML data and conversion to sync items.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   extractKeyPersons,
   toSyncItems,
+  syncKeyPersons,
   type ExtractedKeyPerson,
+  type KeyPersonSyncItem,
 } from './key-persons-import.ts';
 
 describe('extractKeyPersons', () => {
@@ -119,5 +121,45 @@ describe('toSyncItems', () => {
     const items1 = toSyncItems(records);
     const items2 = toSyncItems(records);
     expect(items1[0].id).toBe(items2[0].id);
+  });
+});
+
+describe('syncKeyPersons', () => {
+  it('returns { upserted: 0, failed: 0 } in dry-run mode without making API calls', async () => {
+    // Spy on console.log to suppress output during test
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const items: KeyPersonSyncItem[] = [
+      {
+        id: 'test123456',
+        personId: 'per1234567',
+        organizationId: 'org1234567',
+        role: 'CEO',
+        roleType: 'key-person',
+        startDate: '2021-01',
+        endDate: null,
+        isFounder: true,
+        source: null,
+        notes: null,
+      },
+    ];
+
+    // Set a fake server URL so syncKeyPersons doesn't throw
+    const envKey = 'LONGTERMWIKI_SERVER_URL';
+    const originalUrl = process.env[envKey];
+    process.env[envKey] = 'http://fake-server-for-test:9999';
+
+    try {
+      const result = await syncKeyPersons(items, true);
+      expect(result).toEqual({ upserted: 0, failed: 0 });
+    } finally {
+      // Restore original env
+      if (originalUrl === undefined) {
+        delete process.env[envKey];
+      } else {
+        process.env[envKey] = originalUrl;
+      }
+      logSpy.mockRestore();
+    }
   });
 });
