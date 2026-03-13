@@ -7,7 +7,13 @@ thing:
 facts:
   - id: f_35Bt5h7alQ
     property: description
-    value: Independent nonprofit research organization focused on preventing and preparing for epidemics, pandemics, and
-      biological threats, with significant work on biosecurity and AI-biotechnology convergence.
+    value: Independent nonprofit research organization focused on preventing and
+      preparing for epidemics, pandemics, and biological threats, with
+      significant work on biosecurity and AI-biotechnology convergence.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: etlhaGMWzg
+    property: website
+    value: http://www.centerforhealthsecurity.org/
+    source: https://www.wikidata.org/wiki/Q5059526
+    notes: From Wikidata Q5059526

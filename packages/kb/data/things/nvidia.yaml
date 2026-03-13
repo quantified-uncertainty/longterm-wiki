@@ -7,11 +7,29 @@ thing:
 facts:
   - id: f_V7wquvAqSQ
     property: description
-    value: NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200, and B200 GPUs powering virtually all
-      frontier AI training. Revenue reached $130.5B in FY2025 (114% YoY growth), driven almost entirely by data center
-      GPU sales. Its proprietary CUDA software ecosystem creates deep lock-in across the AI training stack.
+    value: NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200,
+      and B200 GPUs powering virtually all frontier AI training. Revenue reached
+      $130.5B in FY2025 (114% YoY growth), driven almost entirely by data center
+      GPU sales. Its proprietary CUDA software ecosystem creates deep lock-in
+      across the AI training stack.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_qNGX8xU6kA
     property: website
     value: https://www.nvidia.com
+  - id: Z79rDWOcNw
+    property: founded-date
+    value: 1993-04
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: 0JYpe04Ctg
+    property: headquarters
+    value: Santa Clara
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: h0QiGVulng
+    property: headcount
+    value: 36000
+    asOf: 2025-02
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477 (as of 2025-02)

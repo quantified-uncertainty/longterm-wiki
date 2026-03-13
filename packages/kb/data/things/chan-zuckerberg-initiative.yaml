@@ -10,21 +10,21 @@ thing:
 facts:
   - id: f_AXsBEkGCvg
     property: total-funding
-    value: 45e9
+    value: 4.5e+10
     asOf: "2015-12"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     notes: "Initial value of 99% Facebook share pledge at founding"
 
   - id: f_xL0PjvPDlQ
     property: total-funding
-    value: 200e9
+    value: 2e+11
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     notes: "Current value of 99% Facebook share pledge, exceeds $200B"
 
   - id: f_bQVfcGecvg
     property: revenue
-    value: 1e9
+    value: 1e+9
     asOf: "2025"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
     notes: "Approximate annual operating budget as of 2025"
@@ -48,14 +48,30 @@ facts:
     value: 70
     asOf: "2026"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
+    notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical
+      research"
+  - id: m7Lq9YLiqw
+    property: founded-date
+    value: "2015"
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
+  - id: H4p8icjZnw
+    property: headquarters
+    value: Redwood City
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
+  - id: euDjDvv50g
+    property: website
+    value: https://chanzuckerberg.com/
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
 
 records:
   funding-programs:
     science-first-decade:
       name: "Science (first decade)"
       type: "program"
-      amount: 4.25e9
+      amount: 4.25e+9
       period: "2016-2025"
       status: "completed"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
@@ -64,7 +80,7 @@ records:
     social-causes-first-decade:
       name: "Social causes (first decade)"
       type: "program"
-      amount: 3.5e9
+      amount: 3.5e+9
       period: "2016-2025"
       status: "winding-down"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
@@ -73,7 +89,7 @@ records:
     science-second-decade:
       name: "Science (second decade commitment)"
       type: "commitment"
-      amount: 10e9
+      amount: 1e+10
       period: "2026-2036"
       status: "active"
       source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
@@ -91,7 +107,7 @@ records:
     cz-biohub-sf-founding:
       name: "Founding grant for CZ Biohub SF"
       recipient: "cz-biohub-san-francisco"
-      amount: 600e6
+      amount: 6e+8
       date: "2016-09"
       status: "active"
       program: "science-first-decade"
@@ -101,7 +117,7 @@ records:
     cz-biohub-chicago-founding:
       name: "Founding grant for CZ Biohub Chicago"
       recipient: "cz-biohub-chicago"
-      amount: 250e6
+      amount: 2.5e+8
       date: "2022-10"
       status: "active"
       program: "science-first-decade"
@@ -110,7 +126,7 @@ records:
     cz-biohub-new-york-founding:
       name: "Founding grant for CZ Biohub New York"
       recipient: "cz-biohub-new-york"
-      amount: 250e6
+      amount: 2.5e+8
       date: "2023-06"
       status: "active"
       program: "science-first-decade"

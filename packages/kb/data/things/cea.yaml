@@ -7,7 +7,19 @@ thing:
 facts:
   - id: f_GyKcbuIHcA
     property: description
-    value: Oxford-based organization that coordinates the effective altruism movement, running EA Global conferences,
-      supporting local groups, and maintaining the EA Forum.
+    value: Oxford-based organization that coordinates the effective altruism
+      movement, running EA Global conferences, supporting local groups, and
+      maintaining the EA Forum.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 3SeNHyi3JA
+    property: headcount
+    value: 109
+    asOf: 2024-00
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186 (as of 2024-00)
+  - id: vrQK8e7bPQ
+    property: website
+    value: https://www.centreforeffectivealtruism.org
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186

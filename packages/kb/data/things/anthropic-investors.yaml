@@ -7,7 +7,30 @@ thing:
 facts:
   - id: f_6EOi4oOMBQ
     property: description
-    value: "Analysis of EA-aligned philanthropic capital at Anthropic. At $350B valuation: $25-70B risk-adjusted EA capital
-      from founder pledges, investor stakes (Tallinn, Moskovitz), and employee matching programs ($20-40B in DAFs)."
+    value: "Analysis of EA-aligned philanthropic capital at Anthropic. At $350B
+      valuation: $25-70B risk-adjusted EA capital from founder pledges, investor
+      stakes (Tallinn, Moskovitz), and employee matching programs ($20-40B in
+      DAFs)."
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: p171WWceKg
+    property: founded-date
+    value: "2021"
+    source: https://www.wikidata.org/wiki/Q116758847
+    notes: From Wikidata Q116758847
+  - id: gOdoLxHbJw
+    property: headquarters
+    value: San Francisco
+    source: https://www.wikidata.org/wiki/Q116758847
+    notes: From Wikidata Q116758847
+  - id: iGoAcq36Rg
+    property: headcount
+    value: 500
+    asOf: 2024-00
+    source: https://www.wikidata.org/wiki/Q116758847
+    notes: From Wikidata Q116758847 (as of 2024-00)
+  - id: dcLEbK812Q
+    property: website
+    value: https://www.anthropic.com/
+    source: https://www.wikidata.org/wiki/Q116758847
+    notes: From Wikidata Q116758847

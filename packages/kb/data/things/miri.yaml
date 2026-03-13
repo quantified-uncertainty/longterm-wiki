@@ -15,7 +15,8 @@ facts:
     property: founded-date
     value: 2000-01
     source: https://intelligence.org/about/
-    notes: "Founded in 2000 as the Singularity Institute for Artificial Intelligence; renamed to MIRI in 2013"
+    notes: "Founded in 2000 as the Singularity Institute for Artificial
+      Intelligence; renamed to MIRI in 2013"
 
   - id: f_fiWGIkqBqf
     property: headquarters
@@ -39,12 +40,13 @@ facts:
     value: 18
     asOf: 2023-12
     source: https://intelligence.org/2024/04/02/2023-review/
-    notes: "Approximate staff count in 2023; MIRI significantly reduced staff in 2023-2024 as it shifted focus"
+    notes: "Approximate staff count in 2023; MIRI significantly reduced staff in
+      2023-2024 as it shifted focus"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_L3HohIdUBA
     property: total-funding
-    value: 15e6
+    value: 1.5e+7
     asOf: "2025"
     notes: "Estimated cumulative SFF grants to MIRI; lower bound"
 
@@ -66,7 +68,8 @@ facts:
     property: description
     value: "Net assets (2024): $15,242,215"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Net assets per ProPublica filing, not total funding raised; implies ~2 years operational runway"
+    notes: "Net assets per ProPublica filing, not total funding raised; implies ~2
+      years operational runway"
 
   - id: f_61BEuj13Jg
     property: headcount
@@ -81,6 +84,11 @@ facts:
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
+  - id: naKZe9gv3A
+    property: website
+    value: http://intelligence.org/
+    source: https://www.wikidata.org/wiki/Q2040269
+    notes: From Wikidata Q2040269
 
 records:
   key-persons:
@@ -90,14 +98,16 @@ records:
       start: "2000-01"
       is_founder: true
       source: https://intelligence.org/about/
-      notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow role"
+      notes: "Founded MIRI (as SIAI) in 2000; transitioned to Senior Research Fellow
+        role"
 
     nate-soares:
       person: nate-soares
       title: "President"
       start: "2015-05"
       source: https://intelligence.org/about/
-      notes: "Initially Executive Director (2015-2023); transitioned to President role"
+      notes: "Initially Executive Director (2015-2023); transitioned to President
+        role"
 
     malo-bourgon:
       person: malo-bourgon
@@ -111,10 +121,13 @@ records:
       name: Agent Foundations
       description: "Mathematical foundations of goal-directed AI systems"
       started: "2014-01"
-      notes: "Core research program focused on logical uncertainty, decision theory, and Vingean reflection"
+      notes: "Core research program focused on logical uncertainty, decision theory,
+        and Vingean reflection"
 
     alignment-theory:
       name: Alignment Theory
-      description: "Theoretical approaches to ensuring advanced AI systems are aligned with human values"
+      description: "Theoretical approaches to ensuring advanced AI systems are aligned
+        with human values"
       started: "2000-01"
-      notes: "MIRI's founding research focus; published extensively on corrigibility and value alignment"
+      notes: "MIRI's founding research focus; published extensively on corrigibility
+        and value alignment"
