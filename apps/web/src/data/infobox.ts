@@ -7,6 +7,7 @@ import {
   getTypedEntities,
   getTypedEntityById,
   getPageById,
+  getExpertById,
   isRisk,
   isPerson,
   isOrganization,
@@ -14,6 +15,7 @@ import {
   isAiModel,
 } from "./database";
 import { getEntityHref } from "./entity-nav";
+import { resolveKBSlug } from "./kb";
 
 export interface ChildPageEntry {
   id: string;
@@ -111,13 +113,29 @@ export function getEntityInfoBoxData(entityId: string) {
 
   // Person-specific fields
   let affiliation: string | undefined;
+  let affiliationId: string | undefined;
   let role: string | undefined;
   let knownFor: string | undefined;
+  let profileHref: string | undefined;
 
   if (isPerson(entity)) {
     affiliation = entity.affiliation;
     role = entity.role;
     knownFor = entity.knownFor?.join(", ");
+
+    // Resolve affiliation to org slug for linking
+    const expert = getExpertById(entity.id);
+    if (expert?.affiliation) {
+      const orgEntity = getTypedEntityById(expert.affiliation);
+      if (orgEntity && orgEntity.entityType === "organization") {
+        affiliationId = expert.affiliation;
+      }
+    }
+
+    // Profile page link — only if this person has a KB entry (which generates a profile page)
+    if (resolveKBSlug(entity.id)) {
+      profileHref = `/people/${entity.id}`;
+    }
   }
 
   // Organization-specific fields
@@ -219,8 +237,10 @@ export function getEntityInfoBoxData(entityId: string) {
     summaryPage,
     // Person
     affiliation,
+    affiliationId,
     role,
     knownFor,
+    profileHref,
     // Organization
     founded,
     location,

@@ -47,8 +47,10 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           backlinkCount={backlinkCount}
           // Person fields
           affiliation={data.affiliation}
+          affiliationId={data.affiliationId}
           role={data.role}
           knownFor={data.knownFor}
+          profileHref={data.profileHref}
           // Organization fields
           founded={data.founded}
           location={data.location}
