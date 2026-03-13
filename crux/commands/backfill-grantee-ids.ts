@@ -14,6 +14,7 @@ import {
   buildEntityMatcher,
   matchGrantee,
 } from "../lib/grant-import/entity-matcher.ts";
+import { isNumericGranteeId } from "../lib/grant-import/sync.ts";
 import {
   batchedRequest,
   getServerUrl,
@@ -48,15 +49,6 @@ interface BatchUpdateResult {
  */
 function looksLikeStableId(value: string): boolean {
   return /^[A-Za-z0-9]{10}$/.test(value);
-}
-
-/**
- * Purely numeric granteeIds are internal IDs from external systems
- * (e.g., Open Philanthropy's grant database) that were stored as granteeId
- * when the entity matcher couldn't resolve them. These should be cleared.
- */
-function isNumericOnlyId(value: string): boolean {
-  return /^\d+$/.test(value.trim());
 }
 
 const BATCH_SIZE = 200;
@@ -103,7 +95,7 @@ async function runBackfill(dryRun: boolean): Promise<void> {
       noGranteeId.push(grant);
     } else if (looksLikeStableId(grant.granteeId)) {
       alreadyLinked.push(grant);
-    } else if (isNumericOnlyId(grant.granteeId)) {
+    } else if (isNumericGranteeId(grant.granteeId)) {
       numericIds.push(grant);
     } else {
       needsMatching.push(grant);
