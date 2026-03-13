@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: buck-shlegeris
+  stableId: Z62bQynY4g
   numericId: E46
   type: person
   title: Buck Shlegeris
@@ -13,6 +14,7 @@
     - label: Known For
       value: AI safety research, Redwood Research leadership
 - id: chris-olah
+  stableId: Tz48rTriBg
   numericId: E59
   type: person
   title: Chris Olah
@@ -67,6 +69,7 @@
     - monosemanticity
   lastUpdated: 2025-12
 - id: connor-leahy
+  stableId: CrXoCsIucX
   numericId: E71
   type: person
   title: Connor Leahy
@@ -118,6 +121,7 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: dan-hendrycks
+  stableId: VoNqoBJkyg
   numericId: E89
   type: person
   title: Dan Hendrycks
@@ -168,6 +172,7 @@
     - compute-governance
   lastUpdated: 2025-12
 - id: daniela-amodei
+  stableId: tKMznr07QA
   numericId: E90
   type: person
   title: Daniela Amodei
@@ -179,6 +184,7 @@
       value: Co-founding Anthropic, Operations and business leadership
   description: "Co-founder and President of Anthropic, previously VP of Operations at OpenAI. Leads the business and operational strategy of Anthropic alongside her brother Dario Amodei as CEO."
 - id: dario-amodei
+  stableId: zR4nW8xB2f
   numericId: E91
   type: person
   title: Dario Amodei
@@ -236,11 +242,13 @@
     - empirical-alignment
   lastUpdated: 2025-12
 - id: demis-hassabis
+  stableId: Aqcyu3onCA
   numericId: E101
   type: person
   title: Demis Hassabis
   description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
+  stableId: fS1tEGKuNq
   numericId: E114
   type: person
   title: Eliezer Yudkowsky
@@ -299,6 +307,7 @@
     - deception
   lastUpdated: 2025-12
 - id: elizabeth-kelly
+  stableId: 1CHfDs0vsg
   numericId: E115
   type: person
   title: Elizabeth Kelly (US AISI Director)
@@ -309,16 +318,19 @@
     - label: Known For
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
+  stableId: XnqqKHiNmw
   numericId: E129
   type: person
   title: Evan Hubinger
   description: "AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner alignment and corrigibility."
 - id: gary-marcus
+  stableId: ILx7EzDqXQ
   numericId: E148
   type: person
   title: Gary Marcus
   description: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI approaches.
 - id: geoffrey-hinton
+  stableId: 5N5UqXNkkg
   numericId: E149
   type: person
   title: Geoffrey Hinton
@@ -370,6 +382,7 @@
     - autonomous-weapons
   lastUpdated: 2025-12
 - id: ajeya-cotra
+  stableId: dPzCwzIxiQ
   numericId: E864
   type: person
   title: Ajeya Cotra
@@ -402,6 +415,7 @@
     dynamics, and the strategic use of early transformative AI for safety work during what she terms "crunch time."
 
 - id: holden-karnofsky
+  stableId: eQh3ZhWv8D
   numericId: E156
   type: person
   title: Holden Karnofsky
@@ -452,6 +466,7 @@
     - grantmaking
   lastUpdated: 2025-12
 - id: ian-hogarth
+  stableId: DX4NK1gGtg
   numericId: E162
   type: person
   title: Ian Hogarth
@@ -462,6 +477,7 @@
     - label: Known For
       value: Leading UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
+  stableId: eYrBgMLJDw
   numericId: E163
   type: person
   title: Ilya Sutskever
@@ -513,6 +529,7 @@
     - gpt
   lastUpdated: 2025-12
 - id: jan-leike
+  stableId: hQ7mR2kN5p
   numericId: E182
   type: person
   title: Jan Leike
@@ -567,11 +584,13 @@
     - deception
   lastUpdated: 2025-12
 - id: nate-soares
+  stableId: 5MVd90lzCg
   numericId: E212
   type: person
   title: Nate Soares (MIRI)
   description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
+  stableId: zaRXTCXPPk
   numericId: E214
   type: person
   title: Neel Nanda
@@ -625,6 +644,7 @@
     - science-communication
   lastUpdated: 2025-12
 - id: nick-bostrom
+  stableId: IQvWHA3OiF
   numericId: E215
   type: person
   title: Nick Bostrom
@@ -678,6 +698,7 @@
     - control-problem
   lastUpdated: 2025-12
 - id: paul-christiano
+  stableId: vzxfzxBITd
   numericId: E220
   type: person
   title: Paul Christiano
@@ -735,16 +756,19 @@
     - deception
   lastUpdated: 2025-12
 - id: robin-hanson
+  stableId: DmGXPl1h2g
   numericId: E260
   type: person
   title: Robin Hanson
   description: "Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics, and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain."
 - id: sam-altman
+  stableId: JKsVHQ5stQ
   numericId: E269
   type: person
   title: Sam Altman
   description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
+  stableId: muueuPOHfg
   numericId: E280
   type: person
   title: Shane Legg
@@ -756,6 +780,7 @@
     - label: Known For
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
 - id: stuart-russell
+  stableId: ZxUirlzHke
   numericId: E290
   type: person
   title: Stuart Russell
@@ -810,6 +835,7 @@
     - governance
   lastUpdated: 2025-12
 - id: toby-ord
+  stableId: 8nmqy7vFiA
   numericId: E355
   type: person
   title: Toby Ord
@@ -862,6 +888,7 @@
     - future-generations
   lastUpdated: 2025-12
 - id: yoshua-bengio
+  stableId: nGFBXZeM3d
   numericId: E380
   type: person
   title: Yoshua Bengio
@@ -914,6 +941,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: elon-musk
+  stableId: 69vftmr1jg
   numericId: E116
   type: person
   title: Elon Musk (AI Industry)
@@ -929,6 +957,7 @@
     - ai-labs
   lastUpdated: 2025-12
 - id: beth-barnes
+  stableId: ZvfLhIm7pw
   numericId: E39
   type: person
   title: Beth Barnes
@@ -947,6 +976,7 @@
 # Generated 2026-02-08
 
 - id: david-sacks
+  stableId: JjyNWsA91A
   numericId: E431
   type: person
   title: David Sacks (White House AI Czar)
@@ -977,6 +1007,7 @@
   lastUpdated: 2026-02
 
 - id: marc-andreessen
+  stableId: qspeazccPg
   numericId: E432
   type: person
   title: Marc Andreessen (AI Investor)
@@ -1004,6 +1035,7 @@
   lastUpdated: 2026-02
 
 - id: max-tegmark
+  stableId: 3KjUCZCV8w
   numericId: E433
   type: person
   title: Max Tegmark
@@ -1035,6 +1067,7 @@
   lastUpdated: 2026-02
 
 - id: philip-tetlock
+  stableId: BCisPStEdQ
   numericId: E434
   type: person
   title: Philip Tetlock (Forecasting Pioneer)
@@ -1061,6 +1094,7 @@
   lastUpdated: 2026-02
 
 - id: eli-lifland
+  stableId: wjtZjN8acQ
   numericId: E435
   type: person
   title: Eli Lifland
@@ -1092,6 +1126,7 @@
   lastUpdated: 2026-02
 
 - id: dustin-moskovitz
+  stableId: Jtj6jHbuQ7
   numericId: E436
   type: person
   title: Dustin Moskovitz (AI Safety Funder)
@@ -1125,6 +1160,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: gwern
+  stableId: 25eyvY39Bw
   numericId: E574
   type: person
   title: Gwern Branwen
@@ -1138,6 +1174,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: helen-toner
+  stableId: oTieHq0pRA
   numericId: E575
   type: person
   title: Helen Toner
@@ -1151,6 +1188,7 @@
     - governance
   lastUpdated: 2026-02
 - id: issa-rice
+  stableId: nuR3te3Rkw
   numericId: E576
   type: person
   title: Issa Rice
@@ -1164,6 +1202,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: jaan-tallinn
+  stableId: 6gjF5d3geg
   numericId: E577
   type: person
   title: Jaan Tallinn
@@ -1177,6 +1216,7 @@
     - governance
   lastUpdated: 2026-02
 - id: leopold-aschenbrenner
+  stableId: izkduIMBDg
   numericId: E578
   type: person
   title: Leopold Aschenbrenner
@@ -1190,6 +1230,7 @@
     - governance
   lastUpdated: 2026-02
 - id: nuno-sempere
+  stableId: AnFfbQlIog
   numericId: E579
   type: person
   title: Nuño Sempere
@@ -1203,6 +1244,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: vidur-kapur
+  stableId: XqvdX3YisQ
   numericId: E580
   type: person
   title: Vidur Kapur
@@ -1217,6 +1259,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: vipul-naik
+  stableId: OdDfkoWwQg
   numericId: E581
   type: person
   title: Vipul Naik
@@ -1230,6 +1273,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: yann-lecun
+  stableId: cMbVUVK29Q
   numericId: E582
   type: person
   title: Yann LeCun
@@ -1243,6 +1287,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sam-bankman-fried
+  stableId: sace2bALew
   numericId: E857
   type: person
   title: Sam Bankman-Fried
@@ -1267,6 +1312,7 @@
   lastUpdated: 2026-02
 
 - id: nick-beckstead
+  stableId: licWPlOJMg
   numericId: E861
   type: person
   title: Nick Beckstead
@@ -1303,6 +1349,7 @@
   lastUpdated: 2026-02
 
 - id: will-macaskill
+  stableId: p1P9oQwB6w
   numericId: E862
   type: person
   title: Will MacAskill

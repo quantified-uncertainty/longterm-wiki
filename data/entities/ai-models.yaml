@@ -7,6 +7,7 @@
 # =============================================================================
 
 - id: claude
+  stableId: cMKB5i2WZQ
   numericId: E1041
   type: ai-model
   title: Claude
@@ -83,6 +84,7 @@
   lastUpdated: 2026-02
 
 - id: claude-3-opus
+  stableId: Ko9DCNV87A
   numericId: E1027
   type: ai-model
   title: Claude 3 Opus
@@ -129,6 +131,7 @@
   lastUpdated: 2024-03
 
 - id: claude-3-sonnet
+  stableId: ReFcBG3rJQ
   numericId: E1028
   type: ai-model
   title: Claude 3 Sonnet
@@ -292,6 +295,7 @@
   lastUpdated: 2024-11
 
 - id: claude-3-7-sonnet
+  stableId: ePVee3jidQ
   numericId: E1032
   type: ai-model
   title: Claude 3.7 Sonnet
@@ -334,6 +338,7 @@
   lastUpdated: 2025-02
 
 - id: claude-sonnet-4
+  stableId: 3cgL7jNlgw
   numericId: E1033
   type: ai-model
   title: Claude Sonnet 4
@@ -377,6 +382,7 @@
   lastUpdated: 2025-05
 
 - id: claude-opus-4
+  stableId: bmxLNyfK3A
   numericId: E1034
   type: ai-model
   title: Claude Opus 4
@@ -422,6 +428,7 @@
   lastUpdated: 2025-05
 
 - id: claude-opus-4-1
+  stableId: dHgSM46fMw
   numericId: E1035
   type: ai-model
   title: Claude Opus 4.1
@@ -462,6 +469,7 @@
   lastUpdated: 2025-08
 
 - id: claude-sonnet-4-5
+  stableId: fdp0LajPwQ
   numericId: E1036
   type: ai-model
   title: Claude Sonnet 4.5
@@ -513,6 +521,7 @@
   lastUpdated: 2025-09
 
 - id: claude-haiku-4-5
+  stableId: y87VxEBBIA
   numericId: E1037
   type: ai-model
   title: Claude Haiku 4.5
@@ -552,6 +561,7 @@
   lastUpdated: 2025-10
 
 - id: claude-opus-4-5
+  stableId: tppPAkJqjQ
   numericId: E1038
   type: ai-model
   title: Claude Opus 4.5
@@ -603,6 +613,7 @@
   lastUpdated: 2025-11
 
 - id: claude-opus-4-6
+  stableId: Ac7c55KtVw
   numericId: E1039
   type: ai-model
   title: Claude Opus 4.6
@@ -658,6 +669,7 @@
   lastUpdated: 2026-02
 
 - id: claude-sonnet-4-6
+  stableId: Au1yMEZYWQ
   numericId: E1040
   type: ai-model
   title: Claude Sonnet 4.6

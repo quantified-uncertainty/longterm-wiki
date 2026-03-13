@@ -141,6 +141,7 @@
     - training-dynamics
   lastUpdated: 2025-12
 - id: carlsmith-six-premises
+  stableId: Z3twlLAzJg
   numericId: E54
   type: analysis
   title: Carlsmith's Six-Premise Argument
@@ -2253,6 +2254,7 @@
     - governance
   lastUpdated: 2026-02
 - id: frontier-lab-cost-structure
+  stableId: gS4YxcslRg
   numericId: E703
   type: analysis
   title: "Frontier Lab Cost Structure"
