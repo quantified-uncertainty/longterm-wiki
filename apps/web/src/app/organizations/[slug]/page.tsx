@@ -321,7 +321,7 @@ function groupByCategory(
 
 
 // ── Hero stat properties for org pages ────────────────────────────────
-const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding", "founded-date"];
+const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
 // ── Org type labels / colors ──────────────────────────────────────────
 
@@ -1345,14 +1345,19 @@ interface RelatedOrg {
   date: string | null;
 }
 
+const MAX_RELATED = 15;
+
 function RelatedOrganizationsSection({ orgs }: { orgs: RelatedOrg[] }) {
   if (orgs.length === 0) return null;
+
+  const displayed = orgs.slice(0, MAX_RELATED);
+  const overflow = orgs.length - displayed.length;
 
   return (
     <section>
       <SectionHeader title="Related Organizations" count={orgs.length} />
       <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-        {orgs.map((org, idx) => (
+        {displayed.map((org, idx) => (
           <div key={`${org.id}-${idx}`} className="px-4 py-3">
             <div className="flex items-center gap-2">
               {org.slug ? (
@@ -1376,6 +1381,11 @@ function RelatedOrganizationsSection({ orgs }: { orgs: RelatedOrg[] }) {
             )}
           </div>
         ))}
+        {overflow > 0 && (
+          <div className="px-4 py-2.5 text-center text-xs text-muted-foreground">
+            +{overflow} more
+          </div>
+        )}
       </div>
     </section>
   );
@@ -1391,6 +1401,7 @@ function computeOrgAge(foundedDateStr: string | undefined): string | null {
   const years = now.getFullYear() - founded.getFullYear();
   const months = now.getMonth() - founded.getMonth();
   const totalMonths = years * 12 + months;
+  if (totalMonths <= 0) return null;
   if (totalMonths < 12) return `${totalMonths} months`;
   const fullYears = Math.floor(totalMonths / 12);
   return `${fullYears} year${fullYears !== 1 ? "s" : ""} old`;
@@ -1637,7 +1648,7 @@ export default async function OrgProfilePage({
     if (!partnerRef) continue;
     const partnerEntityId = resolveKBSlug(partnerRef);
     const partnerEntity = partnerEntityId ? getKBEntity(partnerEntityId) : null;
-    if (partnerEntity && partnerEntity.type === "organization" && !seenOrgIds.has(partnerEntity.id)) {
+    if (partnerEntity && partnerEntity.type === "organization" && partnerEntity.id !== entity.id && !seenOrgIds.has(partnerEntity.id)) {
       seenOrgIds.add(partnerEntity.id);
       relatedOrgs.push({
         id: partnerEntity.id,
@@ -1649,11 +1660,11 @@ export default async function OrgProfilePage({
     }
   }
 
-  // From grants made — unique recipient orgs
+  // From grants made — unique recipient orgs (excluding self)
   for (const g of grantsMade) {
     if (!g.recipient) continue;
     const recipEntity = getKBEntity(g.recipient);
-    if (recipEntity && recipEntity.type === "organization" && !seenOrgIds.has(recipEntity.id)) {
+    if (recipEntity && recipEntity.type === "organization" && recipEntity.id !== entity.id && !seenOrgIds.has(recipEntity.id)) {
       seenOrgIds.add(recipEntity.id);
       relatedOrgs.push({
         id: recipEntity.id,
@@ -1665,26 +1676,20 @@ export default async function OrgProfilePage({
     }
   }
 
-  // From grants received — unique funder orgs
+  // From grants received — unique funder orgs (excluding self)
   for (const g of grantsReceived) {
-    const funderEntity = getKBEntity(g.funderName);
-    // funderName is the display name, not entity ID. Use funderHref to derive org.
-    // But we also stored funderName from funderEntity above, so check by href.
-    if (g.funderHref && !seenOrgIds.has(g.funderName)) {
-      // We already have the funder info from the grantsReceived mapping
-      // Try to find the entity from the ownerEntityId
-      const funderOrgSlug = g.funderHref.replace("/organizations/", "");
-      const funderOrgEntityId = resolveKBSlug(funderOrgSlug);
-      if (funderOrgEntityId && !seenOrgIds.has(funderOrgEntityId)) {
-        seenOrgIds.add(funderOrgEntityId);
-        relatedOrgs.push({
-          id: funderOrgEntityId,
-          name: g.funderName,
-          slug: funderOrgSlug,
-          relationship: "Funder",
-          date: g.date,
-        });
-      }
+    if (!g.funderHref) continue;
+    const funderOrgSlug = g.funderHref.replace("/organizations/", "");
+    const funderOrgEntityId = resolveKBSlug(funderOrgSlug);
+    if (funderOrgEntityId && funderOrgEntityId !== entity.id && !seenOrgIds.has(funderOrgEntityId)) {
+      seenOrgIds.add(funderOrgEntityId);
+      relatedOrgs.push({
+        id: funderOrgEntityId,
+        name: g.funderName,
+        slug: funderOrgSlug,
+        relationship: "Funder",
+        date: g.date,
+      });
     }
   }
 
@@ -1702,7 +1707,7 @@ export default async function OrgProfilePage({
   const founders: Array<{ name: string; href: string | null }> = [];
   if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
     for (const ref of foundedByFact.value.value) {
-      const refStr = typeof ref === "string" ? ref : (ref as { id?: string }).id ?? String(ref);
+      const refStr = String(ref);
       const resolved = resolveRecipient(refStr);
       founders.push(resolved);
     }
