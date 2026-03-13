@@ -43,15 +43,15 @@ facts:
     value: "@ylecun"
     source: https://x.com/ylecun
 
-  - id: f_yL_wiki_url
+  - id: f_38uo2p1lbe
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Yann_LeCun"
 
-  - id: f_yL_scholar
+  - id: f_4bmkyq2hx6
     property: google-scholar
     value: "https://scholar.google.com/citations?user=WLN3QrAAAAAJ"
 
-  - id: f_yL_website
+  - id: f_4eqnc2klts
     property: website
     value: "http://yann.lecun.com"
 

@@ -44,15 +44,15 @@ facts:
     value: "@StuartJRussell"
     source: https://x.com/StuartJRussell
 
-  - id: f_sR_wiki_url
+  - id: f_w7yt58axq6
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Stuart_J._Russell"
 
-  - id: f_sR_website
+  - id: f_ws3y2ichnm
     property: website
     value: "https://people.eecs.berkeley.edu/~russell/"
 
-  - id: f_sR_scholar
+  - id: f_ytjh35xr0n
     property: google-scholar
     value: "https://scholar.google.com/citations?user=2oy3OXYAAAAJ"
 

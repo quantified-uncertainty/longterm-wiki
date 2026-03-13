@@ -51,15 +51,15 @@ facts:
     value: "@geoffreyhinton"
     source: https://x.com/geoffreyhinton
 
-  - id: f_gH_wiki_url
+  - id: f_diekhjz5ad
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Geoffrey_Hinton"
 
-  - id: f_gH_scholar
+  - id: f_dmbr3kfcpp
     property: google-scholar
     value: "https://scholar.google.com/citations?user=JicYPdAAAAAJ"
 
-  - id: f_gH_website
+  - id: f_dx6qemfhow
     property: website
     value: "https://www.cs.toronto.edu/~hinton/"
 

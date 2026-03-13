@@ -42,11 +42,11 @@ facts:
     value: "@demaborns"
     source: https://x.com/demishassabis
 
-  - id: f_dH_wiki_url
+  - id: f_lpkq3z8f0a
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Demis_Hassabis"
 
-  - id: f_dH_scholar
+  - id: f_o8sy73d82s
     property: google-scholar
     value: "https://scholar.google.com/citations?user=tdb0t88AAAAJ"
 
