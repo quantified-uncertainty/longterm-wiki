@@ -430,7 +430,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       update.suggestedTier,
       update.directions,
       verbose,
-      update.sectionLevel ?? false,
+      update.sectionLevel ?? update.suggestedTier === 'polish',
     );
     results.push(result);
 

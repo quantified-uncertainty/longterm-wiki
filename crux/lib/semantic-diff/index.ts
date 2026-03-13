@@ -113,23 +113,38 @@ function computeAssessment(
     );
   }
 
-  // Change ratio check
+  // Change ratio check — uses "substantive" changes only.
+  // Rephrased claims (matched but text differs without keyValue change) are not
+  // counted toward the blocking threshold, since they don't represent factual changes.
   const totalClaims = Math.max(diff.claimsBefore, diff.claimsAfter, 1);
-  const changedRatio = (diff.summary.added + diff.summary.removed + diff.summary.changed) / totalClaims;
+  const fullChangeCount = diff.summary.added + diff.summary.removed + diff.summary.changed;
+  const fullRatio = fullChangeCount / totalClaims;
+
+  // Count only substantive changes: removed + keyValue-changed (not "Claim text updated")
+  const keyValueChanges = diff.entries.filter(
+    e => e.status === 'changed' && e.changeDescription && e.changeDescription.startsWith('Key value')
+  ).length;
+  const substantiveChanges = diff.summary.removed + keyValueChanges;
+  const substantiveRatio = substantiveChanges / totalClaims;
 
   if (assessmentOptions.maxChangeRatio != null && totalClaims > 5) {
-    if (changedRatio > assessmentOptions.maxChangeRatio) {
+    // Block if EITHER the substantive ratio exceeds the limit OR the full ratio
+    // exceeds 3x the limit (even rephrasing at extreme levels indicates a rewrite)
+    const substantiveExceeded = substantiveRatio > assessmentOptions.maxChangeRatio;
+    const fullExceeded = fullRatio > assessmentOptions.maxChangeRatio * 3;
+    if (substantiveExceeded || fullExceeded) {
       issues.push(
-        `${Math.round(changedRatio * 100)}% of claims changed — exceeds max ${Math.round(assessmentOptions.maxChangeRatio * 100)}% ` +
-        `(${diff.summary.added} added, ${diff.summary.removed} removed, ${diff.summary.changed} modified). ` +
-        `Changes blocked.`
+        `${Math.round(substantiveRatio * 100)}% substantive changes (${Math.round(fullRatio * 100)}% total) — ` +
+        `exceeds max ${Math.round(assessmentOptions.maxChangeRatio * 100)}% ` +
+        `(${diff.summary.added} added, ${diff.summary.removed} removed, ${diff.summary.changed} modified, ` +
+        `${keyValueChanges} key-value changes). Changes blocked.`
       );
       shouldBlock = true;
     }
-  } else if (changedRatio > 0.5 && totalClaims > 5) {
+  } else if (fullRatio > 0.5 && totalClaims > 5) {
     // Default warn-only behavior for backwards compatibility
     issues.push(
-      `${Math.round(changedRatio * 100)}% of claims changed ` +
+      `${Math.round(fullRatio * 100)}% of claims changed ` +
       `(${diff.summary.added} added, ${diff.summary.removed} removed, ${diff.summary.changed} modified). ` +
       `Consider reviewing scope of changes.`
     );
