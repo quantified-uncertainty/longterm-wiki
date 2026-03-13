@@ -404,7 +404,7 @@ export function getSourcesNav(): NavSection[] {
       defaultOpen: true,
       items: [
         { label: "Overview", href: "/wiki/E1049" },
-        { label: "Resources", href: "/wiki/E1043" },
+        { label: "Resources", href: "/resources" },
         { label: "Publications", href: "/wiki/E1044" },
       ],
     },

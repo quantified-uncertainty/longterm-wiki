@@ -27,6 +27,16 @@ const nextConfig: NextConfig = {
   // wiki-server API calls that compete with hundreds of other pages for
   // server resources during concurrent static generation.
   staticPageGenerationTimeout: 300,
+
+  async redirects() {
+    return [
+      {
+        source: "/wiki/E1043",
+        destination: "/resources",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
