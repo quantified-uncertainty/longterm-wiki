@@ -52,6 +52,9 @@ import {
   GrantsReceivedSection,
 } from "./grants-section";
 
+// Section components — resources
+import { OrgResourcesSection } from "./resources-section";
+
 // Section components — main content column
 import {
   FundingHistorySection,
@@ -361,6 +364,38 @@ export default async function OrgProfilePage({
         <div className="space-y-8">
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
         </div>
+      ),
+    });
+  }
+
+  // ── Their Content tab (resources authored by the org) ──
+  if (data.resourcesByOrg.length > 0) {
+    tabs.push({
+      id: "their-content",
+      label: "Their Content",
+      count: data.resourcesByOrg.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourcesByOrg}
+          title="Content by This Organization"
+          emptyMessage="No resources from this organization found."
+        />
+      ),
+    });
+  }
+
+  // ── Coverage tab (resources about the org) ──
+  if (data.resourcesAboutOrg.length > 0) {
+    tabs.push({
+      id: "coverage",
+      label: "Coverage",
+      count: data.resourcesAboutOrg.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourcesAboutOrg}
+          title="Coverage & References"
+          emptyMessage="No external coverage found."
+        />
       ),
     });
   }

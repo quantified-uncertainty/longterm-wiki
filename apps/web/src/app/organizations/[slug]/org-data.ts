@@ -15,7 +15,19 @@ import {
   getAllKBRecords,
 } from "@/data/kb";
 import type { Fact } from "@longterm-wiki/kb";
-import { getTypedEntityById, getTypedEntities, isOrganization, isAiModel } from "@/data";
+import {
+  getTypedEntityById,
+  getTypedEntities,
+  isOrganization,
+  isAiModel,
+  getAllResources,
+  getResourcesForPage,
+  getResourceById,
+  getResourceCredibility,
+  getResourcePublication,
+  getPagesForResource,
+  type Resource,
+} from "@/data";
 import {
   formatKBNumber,
   titleCase,
@@ -387,6 +399,100 @@ export function parseBoardSeatRecord(record: KBRecordEntry): Omit<BoardMember, "
   };
 }
 
+// ── Resource helpers ─────────────────────────────────────────────────
+
+export interface OrgResourceRow {
+  id: string;
+  title: string;
+  url: string;
+  type: string;
+  publicationName: string | null;
+  credibility: number | null;
+  citingPageCount: number;
+  publishedDate: string | null;
+  authors: string[];
+}
+
+/** Extract the bare domain (no www) from a URL. Returns null on parse failure. */
+function extractDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+/** Convert a Resource to an OrgResourceRow. */
+function toOrgResourceRow(r: Resource): OrgResourceRow {
+  const publication = getResourcePublication(r);
+  const credibility = getResourceCredibility(r);
+  const citingPages = getPagesForResource(r.id);
+  return {
+    id: r.id,
+    title: r.title,
+    url: r.url,
+    type: r.type,
+    publicationName: publication?.name ?? null,
+    credibility: credibility ?? null,
+    citingPageCount: citingPages.length,
+    publishedDate: r.published_date ?? null,
+    authors: r.authors ?? [],
+  };
+}
+
+/**
+ * Get resources split by relationship to the org:
+ *  - byOrg: authored by the org (URL domain matches org website)
+ *  - aboutOrg: cited on the org's wiki page but not authored by them
+ */
+function getOrgResources(
+  orgSlug: string,
+  websiteUrl: string | null,
+): { byOrg: OrgResourceRow[]; aboutOrg: OrgResourceRow[] } {
+  const allResources = getAllResources();
+
+  // Determine the org's domain(s) for matching
+  const orgDomains = new Set<string>();
+  if (websiteUrl) {
+    const d = extractDomain(websiteUrl);
+    if (d) orgDomains.add(d);
+  }
+
+  // Resources authored BY the org (URL domain matches)
+  const byOrgMap = new Map<string, OrgResourceRow>();
+  if (orgDomains.size > 0) {
+    for (const r of allResources) {
+      const rDomain = extractDomain(r.url);
+      if (rDomain && orgDomains.has(rDomain)) {
+        byOrgMap.set(r.id, toOrgResourceRow(r));
+      }
+    }
+  }
+
+  // Resources cited on the org's wiki page (ABOUT the org)
+  const pageResourceIds = getResourcesForPage(orgSlug);
+  const aboutOrgMap = new Map<string, OrgResourceRow>();
+  for (const rid of pageResourceIds) {
+    if (byOrgMap.has(rid)) continue; // Already in "by org"
+    const r = getResourceById(rid);
+    if (!r) continue;
+    aboutOrgMap.set(rid, toOrgResourceRow(r));
+  }
+
+  // Sort both by date (newest first), then by title
+  const sortByDate = (a: OrgResourceRow, b: OrgResourceRow) => {
+    const da = a.publishedDate ?? "";
+    const db = b.publishedDate ?? "";
+    if (da !== db) return db.localeCompare(da);
+    return a.title.localeCompare(b.title);
+  };
+
+  return {
+    byOrg: [...byOrgMap.values()].sort(sortByDate),
+    aboutOrg: [...aboutOrgMap.values()].sort(sortByDate),
+  };
+}
+
 // ── Main data loader ─────────────────────────────────────────────────
 
 export interface OrgEntity {
@@ -705,6 +811,10 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     founders.push(resolved);
   }
 
+  // ── Resources ──
+  const { byOrg: resourcesByOrg, aboutOrg: resourcesAboutOrg } =
+    getOrgResources(slug, websiteUrl);
+
   // ── Computed stat cards ──
   const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
   const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
@@ -747,5 +857,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     totalGrantsReceived,
     investments,
     products,
+    resourcesByOrg,
+    resourcesAboutOrg,
   };
 }
