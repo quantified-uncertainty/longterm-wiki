@@ -12,3 +12,34 @@ facts:
       Awareness" essay predicting AGI by 2027, his disputed firing from OpenAI ov
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_lA3rK7mW8x
+    property: role
+    value: "Founder and Managing Partner"
+    asOf: 2024-06
+    notes: Enriched from wiki page; founder of Situational Awareness LP hedge fund
+
+  - id: f_lA6tN2pQ2v
+    property: notable-for
+    value: "Author of Situational Awareness: The Decade Ahead predicting AGI by 2027; Columbia University valedictorian at age 19; former OpenAI Superalignment team researcher; founder of $1.5B+ AI-focused hedge fund"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_lA9wS5jH5d
+    property: employed-by
+    value: !ref 1LcLlMGLbw:openai
+    asOf: 2023-01
+    validEnd: 2024-04
+    notes: Enriched from wiki page; fired in April 2024 from Superalignment team
+
+  - id: f_lAcY8fL8kA
+    property: born-year
+    value: 2001
+    source: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    notes: Born 2001 or 2002 in Germany; graduated Columbia as valedictorian at 19 in 2021
+
+  - id: f_lAfB4gN1mD
+    property: education
+    value: "B.A. Economics and Mathematics-Statistics, Columbia University (valedictorian, 2021); attended John F. Kennedy School in Berlin"
+    source: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    notes: Enriched from wiki page; enrolled at age 15, graduated at 19

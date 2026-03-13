@@ -24,3 +24,31 @@ facts:
     value: Georgetown University; University of Melbourne
     source: https://www.wikidata.org/wiki/Q123475976
     notes: From Wikidata Q123475976
+
+  - id: f_hT3rK7mW1x
+    property: role
+    value: "Interim Executive Director"
+    asOf: 2025-09
+    notes: Enriched from wiki page; Interim Executive Director of Georgetown CSET
+
+  - id: f_hT6tN2pQ4v
+    property: notable-for
+    value: "Former OpenAI board member who voted to remove Sam Altman in November 2023; Interim Executive Director of Georgetown CSET; TIME 100 Most Influential People in AI 2024; expertise in US-China AI competition and AI governance"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_hT9wS5jH7d
+    property: employed-by
+    value: !ref lvsDuyzPcg:cset
+    asOf: 2019-01
+    notes: Enriched from wiki page; joined CSET in January 2019, became Interim Executive Director September 2025
+
+  - id: f_hTcY8fL0kA
+    property: born-year
+    value: 1992
+    notes: Enriched from wiki page; born in Melbourne, Australia
+
+  - id: f_hTfB4gN2mD
+    property: education
+    value: "BSc Chemical Engineering, University of Melbourne (2014); MA Security Studies, Georgetown University (2021)"
+    notes: Enriched from wiki page
