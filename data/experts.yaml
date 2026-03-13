@@ -271,7 +271,7 @@
   positions:
     - topic: p-doom
       view: Very high
-      estimate: ~90%
+      estimate: ~99% (with 5-10% error bars)
       confidence: high
       source: The Inside View podcast (2022)
       sourceUrl: https://theinsideview.ai/connor2
@@ -398,7 +398,7 @@
 
 - id: yann-lecun
   name: Yann LeCun
-  affiliation: ami-labs
+  affiliation: meta-ai
   role: Founder (formerly Chief AI Scientist at Meta)
   website: https://yann.lecun.com
   knownFor:
