@@ -7,7 +7,6 @@ import { getKBDataNav } from "@/lib/wiki-nav";
 import {
   getKBEntities,
   getKBEntity,
-  getKBProperties,
   getKBProperty,
   getKBAllFactsByProperty,
 } from "@/data/kb";
@@ -20,11 +19,9 @@ import {
 } from "@/components/wiki/kb/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
 
-// ── Static params ────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  return getKBProperties().map((p) => ({ propertyId: p.id }));
-}
+// ── Rendering mode ───────────────────────────────────────────────────
+// Render on-demand to reduce build output size.
+// These are internal KB property pages with low traffic.
 
 // ── Metadata ─────────────────────────────────────────────────────────
 

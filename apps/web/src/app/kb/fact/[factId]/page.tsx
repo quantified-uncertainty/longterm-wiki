@@ -5,7 +5,6 @@ import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getKBDataNav } from "@/lib/wiki-nav";
 import {
-  getKBEntities,
   getKBEntity,
   getKBFacts,
   getKBFactById,
@@ -17,22 +16,9 @@ import type { Fact, Property } from "@longterm-wiki/kb";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/kb/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
 
-// ── Static params ────────────────────────────────────────────────────
-
-export function generateStaticParams(): { factId: string }[] {
-  const entities = getKBEntities();
-  const params: { factId: string }[] = [];
-
-  for (const entity of entities) {
-    const facts = getKBFacts(entity.id);
-    for (const fact of facts) {
-      if (fact.propertyId === "description") continue;
-      params.push({ factId: fact.id });
-    }
-  }
-
-  return params;
-}
+// ── Rendering mode ───────────────────────────────────────────────────
+// Render on-demand to reduce build output size (~492 pages saved).
+// These are internal KB fact detail pages with low traffic.
 
 // ── Metadata ─────────────────────────────────────────────────────────
 
