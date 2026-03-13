@@ -27,6 +27,8 @@ export interface RawGrant {
   focusArea: string | null;
   description: string | null;
   sourceUrl?: string | null;
+  /** Matched funding program ID (10-char), or null if no program matched */
+  programId?: string | null;
 }
 
 export interface SyncGrant {

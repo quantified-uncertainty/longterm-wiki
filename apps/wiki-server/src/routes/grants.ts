@@ -58,6 +58,17 @@ const BatchUpdateGranteeSchema = z.object({
   items: z.array(BatchUpdateGranteeItemSchema).min(1).max(500),
 });
 
+// ---- Batch program update schema ----
+
+const BatchUpdateProgramItemSchema = z.object({
+  id: z.string().length(10),
+  programId: z.string().max(200),
+});
+
+const BatchUpdateProgramSchema = z.object({
+  items: z.array(BatchUpdateProgramItemSchema).min(1).max(500),
+});
+
 // ---- Helpers ----
 
 function formatRow(r: typeof grants.$inferSelect) {
@@ -254,6 +265,71 @@ const grantsApp = new Hono()
           .update(grants)
           .set({
             granteeId: item.granteeId,
+            updatedAt: sql`now()`,
+          })
+          .where(eq(grants.id, item.id));
+
+        updated++;
+      }
+    });
+
+    return c.json({ updated });
+  })
+
+  // ---- GET /all-program-ids ----
+  // Returns all grant IDs with their current programId, organizationId,
+  // source, name, and notes. Used by backfill-program-ids to match grants
+  // to funding programs.
+  .get("/all-program-ids", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        id: grants.id,
+        programId: grants.programId,
+        organizationId: grants.organizationId,
+        source: grants.source,
+        name: grants.name,
+        notes: grants.notes,
+      })
+      .from(grants);
+
+    return c.json({
+      grants: rows.map((r) => ({
+        id: r.id,
+        programId: r.programId,
+        organizationId: r.organizationId,
+        source: r.source,
+        name: r.name,
+        notes: r.notes,
+      })),
+      total: rows.length,
+    });
+  })
+
+  // ---- PATCH /batch-update-program ----
+  // Updates programId for multiple grants in a single transaction.
+  // Used by the backfill-program-ids command.
+  .patch("/batch-update-program", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchUpdateProgramSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    console.log(`batch-update-program: updating ${items.length} grants`);
+
+    let updated = 0;
+
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        await tx
+          .update(grants)
+          .set({
+            programId: item.programId,
             updatedAt: sql`now()`,
           })
           .where(eq(grants.id, item.id));

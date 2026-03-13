@@ -3,6 +3,7 @@ import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
 import { parseMonthYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -43,6 +44,14 @@ export const source: GrantSource = {
       // Parse date: "February 2016" → "2016-02"
       const isoDate = date ? parseMonthYear(date) : null;
 
+      const programId = matchProgram({
+        source: "coefficient-giving",
+        funderId: FUNDER_IDS.OPEN_PHILANTHROPY,
+        focusArea: focusArea || null,
+        name: grantName.substring(0, 500),
+        description: details ? details.substring(0, 4000) : null,
+      });
+
       grants.push({
         source: "coefficient-giving",
         funderId: FUNDER_IDS.OPEN_PHILANTHROPY,
@@ -53,6 +62,7 @@ export const source: GrantSource = {
         date: isoDate,
         focusArea: focusArea || null,
         description: details ? details.substring(0, 4000) : null,
+        programId,
       });
     }
 

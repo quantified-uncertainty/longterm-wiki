@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, existsSync, statSync } from "fs";
 import { execSync } from "child_process";
 import { extractISODate } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -168,6 +169,14 @@ export function parseManifundProjects(
 
     const sourceUrl = `https://manifund.org/projects/${project.slug}`;
 
+    const programId = matchProgram({
+      source: "manifund",
+      funderId: FUNDER_IDS.MANIFUND,
+      focusArea,
+      name: project.title.substring(0, 500),
+      description: project.blurb || null,
+    });
+
     grants.push({
       source: "manifund",
       funderId: FUNDER_IDS.MANIFUND,
@@ -179,6 +188,7 @@ export function parseManifundProjects(
       focusArea,
       description: project.blurb || null,
       sourceUrl,
+      programId,
     });
   }
 
