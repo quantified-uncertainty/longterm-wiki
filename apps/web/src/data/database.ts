@@ -798,6 +798,36 @@ export function getResourcePublication(
 }
 
 // ============================================================================
+// PERSON NAME LOOKUP
+// ============================================================================
+
+let _personNameIndex: Map<string, string> | null = null;
+
+/**
+ * Build a lazily-cached index of person name → entity ID.
+ * Normalizes to lowercase for case-insensitive matching.
+ */
+function personNameIndex(): Map<string, string> {
+  if (!_personNameIndex) {
+    _personNameIndex = new Map();
+    for (const entity of getTypedEntities()) {
+      if (isPerson(entity)) {
+        _personNameIndex.set(entity.title.toLowerCase(), entity.id);
+      }
+    }
+  }
+  return _personNameIndex;
+}
+
+/**
+ * Find a person entity by name (case-insensitive).
+ * Returns the entity ID if a matching person is found, undefined otherwise.
+ */
+export function findPersonByName(name: string): string | undefined {
+  return personNameIndex().get(name.toLowerCase());
+}
+
+// ============================================================================
 // BENCHMARK RESULTS
 // ============================================================================
 
