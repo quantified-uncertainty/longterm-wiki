@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: anthropic-government-standoff
+  stableId: 27ay7L0VtY
   numericId: E924
   type: event
   title: Anthropic-Pentagon Standoff (2026)
@@ -105,6 +106,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-valuation
+  stableId: HrokCBSmBA
   numericId: E405
   type: analysis
   title: Anthropic Valuation Analysis
@@ -171,6 +173,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-investors
+  stableId: sKOD0uMVGg
   numericId: E406
   type: analysis
   title: Anthropic (Funder)
@@ -233,6 +236,7 @@
   lastUpdated: 2026-02
 
 - id: musk-openai-lawsuit
+  stableId: RQsF3N9BQA
   numericId: E408
   type: analysis
   title: Musk v. OpenAI Lawsuit
@@ -263,6 +267,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-ipo
+  stableId: hPZbflFceQ
   numericId: E409
   type: analysis
   title: Anthropic IPO
@@ -293,6 +298,7 @@
   lastUpdated: 2026-02
 
 - id: elon-musk-philanthropy
+  stableId: aw8anZDbCg
   numericId: E410
   type: analysis
   title: Elon Musk (Funder)
@@ -324,6 +330,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-pledge-enforcement
+  stableId: 3ljdV7I37g
   numericId: E411
   type: analysis
   title: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
@@ -357,6 +364,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-pre-ipo-daf-transfers
+  stableId: 1DjpqfXwjA
   numericId: E412
   type: analysis
   title: Anthropic Pre-IPO DAF Transfers
@@ -569,6 +577,7 @@
   lastUpdated: 2026-02
 
 - id: model-organisms-of-misalignment
+  stableId: OCU2M1tUnA
   numericId: E419
   type: analysis
   title: Model Organisms of Misalignment

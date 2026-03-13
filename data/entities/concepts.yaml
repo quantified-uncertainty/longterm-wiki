@@ -288,6 +288,7 @@
     - ai-risk
   lastUpdated: 2025-12
 - id: dual-use
+  stableId: CwBPBQAmxA
   numericId: E106
   type: concept
   title: Dual-Use AI Technology
@@ -299,6 +300,7 @@
     - governance
   lastUpdated: 2025-12
 - id: fast-takeoff
+  stableId: fRYu1EXclA
   numericId: E139
   type: concept
   title: Fast Takeoff
@@ -317,6 +319,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: superintelligence
+  stableId: 3fyHbDnHIQ
   numericId: E291
   type: concept
   title: Superintelligence
@@ -333,6 +336,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: content-moderation
+  stableId: s8PQomHkvA
   numericId: E75
   type: concept
   title: AI Content Moderation
@@ -344,6 +348,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: agi-race
+  stableId: QVsRgOaeUw
   numericId: E3
   type: concept
   title: AGI Race
@@ -360,6 +365,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: capability-evaluations
+  stableId: CD9w0PDxvg
   numericId: E52
   type: concept
   title: Capability Evaluations
@@ -378,6 +384,7 @@
     - capabilities
   lastUpdated: 2025-12
 - id: existential-risk
+  stableId: bQ9a5lwwlg
   numericId: E131
   type: concept
   title: Existential Risk from AI
@@ -392,6 +399,7 @@
     - longtermism
   lastUpdated: 2025-12
 - id: adversarial-robustness
+  stableId: gWxL0U06oQ
   numericId: E1
   type: concept
   title: Adversarial Robustness
@@ -418,6 +426,7 @@
     - theory
   lastUpdated: 2025-12
 - id: benchmarking
+  stableId: bfK5RgQBcQ
   numericId: E38
   type: concept
   title: AI Benchmarking
@@ -429,6 +438,7 @@
     - capabilities
   lastUpdated: 2025-12
 - id: transformative-ai
+  stableId: bmVIhwpQww
   numericId: E357
   type: concept
   title: Transformative AI
@@ -442,6 +452,7 @@
     - societal-impact
   lastUpdated: 2025-12
 - id: scaling-laws
+  stableId: eZJ1oAKS6A
   numericId: E273
   type: concept
   title: AI Scaling Laws
@@ -456,6 +467,7 @@
     - forecasting
   lastUpdated: 2025-12
 - id: ai-timelines
+  stableId: URCXiRsX0w
   numericId: E16
   type: concept
   title: AI Timelines
@@ -470,6 +482,7 @@
     - ai-development
   lastUpdated: 2025-12
 - id: data-constraints
+  stableId: HLakK5zplg
   numericId: E92
   type: concept
   title: AI Training Data Constraints
@@ -678,6 +691,7 @@
   lastUpdated: 2025-01
 
 - id: ai-welfare
+  stableId: TK450w7sTw
   numericId: E391
   type: concept
   title: AI Welfare and Digital Minds
@@ -914,6 +928,7 @@
   lastUpdated: 2026-02
 
 - id: agi-timeline
+  stableId: zkYFTnzRLA
   numericId: E399
   type: concept
   title: AGI Timeline
@@ -946,6 +961,7 @@
   lastUpdated: 2026-02
 
 - id: large-language-models
+  stableId: KwyMqBNvOQ
   numericId: E400
   type: concept
   title: Large Language Models
@@ -1008,6 +1024,7 @@
   lastUpdated: 2026-02
 
 - id: provable-safe
+  stableId: gmRaYb1fgg
   numericId: E402
   type: concept
   title: Provable / Guaranteed Safe AI
@@ -1039,6 +1056,7 @@
   lastUpdated: 2026-02
 
 - id: dense-transformers
+  stableId: RScckMUC2g
   numericId: E403
   type: concept
   title: Dense Transformers

@@ -125,6 +125,7 @@
     - science-fiction
   lastUpdated: 2025-12
 - id: mainstream-era
+  stableId: G1XyCr76gw
   numericId: E195
   type: historical
   title: Mainstream Era
@@ -187,6 +188,7 @@
     - government-regulation
   lastUpdated: 2025-12
 - id: miri-era
+  stableId: 7kMHUDshhw
   numericId: E203
   type: historical
   title: The MIRI Era
@@ -245,6 +247,7 @@
     - effective-altruism
   lastUpdated: 2025-12
 - id: ai-safety-summit
+  stableId: mnhBgvNfXA
   numericId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
