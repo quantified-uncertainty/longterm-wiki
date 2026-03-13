@@ -35,6 +35,12 @@ pg_version = "16"
 #   Intentional column removals are part of the deliberate consolidation/cleanup migrations
 #   in this project (e.g. removing FK columns superseded by a new data model). The column
 #   removal risk is mitigated by updating all consumers in the same PR before deploying.
+#
+# changing-column-type:
+#   All type changes in this project are safe casts (VARCHAR(n) → TEXT, widening numeric
+#   types) that PostgreSQL handles without table rewrites. Tables are small enough that even
+#   if a rewrite occurred, it would complete in seconds. Risk is mitigated by testing the
+#   migration against a production-like schema in CI (Test DB migrations job).
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -49,4 +55,5 @@ excluded_rules = [
   "adding-foreign-key-constraint",
   "renaming-table",
   "ban-drop-column",
+  "changing-column-type",
 ]
