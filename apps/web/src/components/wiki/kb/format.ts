@@ -65,9 +65,19 @@ export function formatKBNumber(
     if (display.divisor && display.divisor !== 0) {
       num = num / display.divisor;
     }
-    const formatted = Number.isInteger(num)
-      ? num.toLocaleString()
-      : num.toLocaleString("en-US", { maximumFractionDigits: 2 });
+    // Detect year-like values: 4-digit integers with no prefix/suffix/divisor
+    const isYearLike =
+      Number.isInteger(num) &&
+      num >= 1800 &&
+      num <= 2100 &&
+      !display.prefix &&
+      !display.suffix &&
+      !display.divisor;
+    const formatted = isYearLike
+      ? String(num)
+      : Number.isInteger(num)
+        ? num.toLocaleString()
+        : num.toLocaleString("en-US", { maximumFractionDigits: 2 });
     // If currency override provided and display has a currency-like prefix, use currency symbol
     let prefix = display.prefix ?? "";
     if (currency && Object.hasOwn(CURRENCIES, currency)) {
@@ -78,6 +88,10 @@ export function formatKBNumber(
   }
 
   // No unit, no display config — plain locale string
+  // Detect year-like values (4-digit integers 1800–2100) and skip thousands separator
+  if (Number.isInteger(value) && value >= 1800 && value <= 2100) {
+    return String(value);
+  }
   return value.toLocaleString();
 }
 

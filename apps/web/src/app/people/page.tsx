@@ -108,6 +108,7 @@ export default function PeoplePage() {
 
       employerId: employer?.id ?? null,
       employerName: employer?.name ?? null,
+      employerSlug: employer?.id ? getKBEntitySlug(employer.id) ?? null : null,
 
       bornYear: numericValue(bornYearFact),
       netWorthNum: numericValue(netWorthFact),
