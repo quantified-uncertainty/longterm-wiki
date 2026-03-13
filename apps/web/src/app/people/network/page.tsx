@@ -54,6 +54,7 @@ export default function PeopleNetworkPage() {
       type: "person",
       slug,
       numericId: person.numericId ?? undefined,
+      wikiPageId: person.wikiPageId ?? person.numericId ?? undefined,
       role,
       employer: employerName,
       topicCount: expert?.positions?.length ?? 0,
@@ -68,6 +69,7 @@ export default function PeopleNetworkPage() {
       type: "organization",
       slug,
       numericId: org.numericId ?? undefined,
+      wikiPageId: org.wikiPageId ?? org.numericId ?? undefined,
     });
   }
 

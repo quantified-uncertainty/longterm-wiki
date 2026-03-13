@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   Controls,
@@ -25,7 +25,9 @@ export interface NetworkNode {
   label: string;
   type: "person" | "organization";
   slug: string;
+  /** @deprecated Use wikiPageId instead. */
   numericId?: string;
+  wikiPageId?: string;
   role?: string;
   employer?: string;
   topicCount?: number;
@@ -146,8 +148,9 @@ function NodeDetail({
     (e) => e.source === node.id || e.target === node.id,
   );
 
-  const href = node.numericId
-    ? `/wiki/${node.numericId}`
+  const pageId = node.wikiPageId ?? node.numericId ?? undefined;
+  const href = pageId
+    ? `/wiki/${pageId}`
     : node.type === "person"
       ? `/people/${node.slug}`
       : `/organizations/${node.slug}`;
@@ -224,6 +227,18 @@ function NetworkGraphInner({
   const [orgFilter, setOrgFilter] = useState<string>("all");
   const [showPastRoles, setShowPastRoles] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search input to avoid re-layout on every keystroke
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [searchQuery]);
 
   // Filter edges and nodes
   const { filteredNodes, filteredEdges } = useMemo(() => {
@@ -254,9 +269,9 @@ function NetworkGraphInner({
 
     let nodesFiltered = networkNodes.filter((n) => connectedIds.has(n.id));
 
-    // Apply text search
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    // Apply text search (uses debounced value)
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       const matchingIds = new Set(
         nodesFiltered
           .filter(
@@ -279,7 +294,17 @@ function NetworkGraphInner({
     }
 
     return { filteredNodes: nodesFiltered, filteredEdges: edgesFiltered };
-  }, [networkNodes, networkEdges, orgFilter, showPastRoles, searchQuery]);
+  }, [networkNodes, networkEdges, orgFilter, showPastRoles, debouncedSearch]);
+
+  // Clear selectedNode when it's no longer in filteredNodes
+  useEffect(() => {
+    if (
+      selectedNode &&
+      !filteredNodes.some((n) => n.id === selectedNode.id)
+    ) {
+      setSelectedNode(null);
+    }
+  }, [filteredNodes, selectedNode]);
 
   // Layout
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(
@@ -311,6 +336,7 @@ function NetworkGraphInner({
         <input
           type="text"
           placeholder="Search people or orgs..."
+          aria-label="Search people or organizations"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring w-56"
@@ -318,6 +344,7 @@ function NetworkGraphInner({
         <select
           value={orgFilter}
           onChange={(e) => setOrgFilter(e.target.value)}
+          aria-label="Filter by organization"
           className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="all">All organizations</option>
@@ -409,8 +436,8 @@ function NetworkGraphInner({
           {selectedNode ? (
             <NodeDetail
               node={selectedNode}
-              edges={networkEdges}
-              allNodes={networkNodes}
+              edges={filteredEdges}
+              allNodes={filteredNodes}
             />
           ) : (
             <div className="border rounded-lg bg-card p-4 text-sm text-muted-foreground">
