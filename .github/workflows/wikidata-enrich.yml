@@ -1,0 +1,171 @@
+name: Wikidata Enrichment
+run-name: "Wikidata Enrichment${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Monthly Wikidata enrichment for people entities.
+# Fetches structured facts (birth year, education) from Wikidata and updates
+# KB YAML files. Only adds facts that don't already exist — never overwrites.
+#
+# Uses `pnpm crux people enrich --source=wikidata --apply` (merged in PR #2179).
+
+on:
+  schedule:
+    - cron: "0 8 1 * *" # 1st of each month at 08:00 UTC
+  workflow_dispatch:
+    inputs:
+      entity:
+        description: "Enrich a specific entity slug (empty = all)"
+        required: false
+        default: ""
+        type: string
+      dry_run:
+        description: "Dry run (preview changes without applying)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Only one enrichment run at a time
+concurrency:
+  group: wikidata-enrich
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  preflight:
+    # Global circuit breaker — skip when automation is paused.
+    # Set the AUTOMATION_PAUSED repository variable to 'true' to pause all automated workflows.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automation is active"
+
+  enrich:
+    needs: [preflight]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full clone needed for reliable git push. Shallow clones cause push
+          # failures — see issue #2093.
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Wikidata enrichment
+        id: enrich
+        run: |
+          ARGS="--source=wikidata"
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          else
+            ARGS="$ARGS --apply"
+          fi
+
+          if [ -n "${{ inputs.entity }}" ]; then
+            ARGS="$ARGS --entity=${{ inputs.entity }}"
+          fi
+
+          echo "Running: pnpm crux people enrich $ARGS"
+          pnpm crux people enrich $ARGS
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected — KB data is already up to date."
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected:"
+            git diff --stat
+          fi
+
+      - name: Create branch and commit
+        if: steps.changes.outputs.has_changes == 'true'
+        id: branch
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="auto/wikidata-enrich-${DATE}"
+          git checkout -b "$BRANCH"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage only KB YAML files that the enrichment command modifies
+          git diff --name-only | while IFS= read -r file; do
+            if echo "$file" | grep -qE '^packages/kb/data/things/.*\.yaml$'; then
+              git add -- "$file"
+            else
+              echo "::warning::Skipping unexpected modified file: $file"
+            fi
+          done
+
+          if git diff --cached --quiet; then
+            echo "No expected enrichment changes to commit."
+            echo "committed=false" >> $GITHUB_OUTPUT
+          else
+            CHANGED_COUNT=$(git diff --cached --numstat | wc -l | tr -d ' ')
+            git commit -m "data: enrich people from Wikidata (${DATE})" \
+              -m "Monthly automated Wikidata enrichment. Added structured facts (birth year, education) to ${CHANGED_COUNT} KB file(s)."
+
+            git push -u origin "$BRANCH"
+            echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+            echo "committed=true" >> $GITHUB_OUTPUT
+            echo "changed_count=$CHANGED_COUNT" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create pull request
+        if: steps.branch.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="${{ steps.branch.outputs.branch }}"
+          COUNT="${{ steps.branch.outputs.changed_count }}"
+          REPO="${{ github.repository }}"
+
+          cat <<EOF > /tmp/wikidata-pr-body.md
+          ## Summary
+
+          - Monthly automated Wikidata enrichment run
+          - Updated ${COUNT} KB file(s) with structured facts (birth year, education)
+          - Only adds facts that don't already exist -- never overwrites
+
+          ## Details
+
+          Source: [Wikidata](https://www.wikidata.org/)
+          Command: \`pnpm crux people enrich --source=wikidata --apply\`
+
+          ## Test plan
+
+          - [ ] CI passes (schema validation, frontmatter checks)
+          - [ ] Spot-check a few updated KB files for accuracy
+
+          Generated by the [Wikidata Enrichment](https://github.com/${REPO}/actions/workflows/wikidata-enrich.yml) workflow.
+          EOF
+
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' /tmp/wikidata-pr-body.md
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "data: Wikidata enrichment ${DATE}" \
+            --body-file /tmp/wikidata-pr-body.md
