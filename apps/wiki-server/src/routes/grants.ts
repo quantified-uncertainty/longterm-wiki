@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
+import { logger } from "../logger.js";
 import { grants } from "../schema.js";
 import {
   parseJsonBody,
@@ -320,7 +321,7 @@ const grantsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    console.log(`batch-update-program: updating ${items.length} grants`);
+    logger.info(`batch-update-program: updating ${items.length} grants`);
 
     let updated = 0;
 
