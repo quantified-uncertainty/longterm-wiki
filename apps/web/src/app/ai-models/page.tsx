@@ -23,6 +23,14 @@ export default function AiModelsPage() {
       name === "SWE-bench" || name === "SWE-bench Verified";
     const sweBench = entity.benchmarks?.find((b) => isSweBench(b.name));
 
+    // Find MMLU score
+    const mmlu = entity.benchmarks?.find((b) => b.name === "MMLU");
+
+    // Find GPQA Diamond score
+    const gpqa = entity.benchmarks?.find(
+      (b) => b.name === "GPQA Diamond" || b.name === "GPQA",
+    );
+
     // Find top non-SWE benchmark for display
     const topBenchmark =
       entity.benchmarks?.find((b) => !isSweBench(b.name)) ?? null;
@@ -45,11 +53,15 @@ export default function AiModelsPage() {
       contextWindow: entity.contextWindow ?? null,
       safetyLevel: entity.safetyLevel ?? null,
       sweBenchScore: sweBench?.score ?? null,
+      mmluScore: mmlu?.score ?? null,
+      gpqaScore: gpqa?.score ?? null,
       topBenchmark: topBenchmark
         ? { name: topBenchmark.name, score: topBenchmark.score, unit: topBenchmark.unit }
         : null,
       capabilities: entity.capabilities ?? [],
       isFamily,
+      openWeight: entity.openWeight ?? null,
+      parameterCount: entity.parameterCount ?? null,
     };
   });
 

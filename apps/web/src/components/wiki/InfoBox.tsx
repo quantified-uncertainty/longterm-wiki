@@ -72,6 +72,11 @@ export interface InfoBoxProps {
   contextWindow?: number;
   safetyLevel?: string;
   benchmarks?: { name: string; score: number; unit?: string }[];
+  modality?: string[];
+  openWeight?: boolean;
+  parameterCount?: string;
+  trainingCutoff?: string;
+  developerId?: string;
   // Summary/overview page this entity belongs to
   summaryPage?: { title: string; href: string };
   // Child pages (for overview entities)
@@ -196,6 +201,11 @@ export function InfoBox({
   contextWindow,
   safetyLevel,
   benchmarks,
+  modality,
+  openWeight,
+  parameterCount,
+  trainingCutoff,
+  developerId,
   summaryPage,
   childPages,
 }: InfoBoxProps) {
@@ -226,7 +236,7 @@ export function InfoBox({
   if (!isOverview && knownFor) fields.push({ label: "Known For", value: knownFor });
   // AI Model fields
   if (!isOverview && releaseDate) fields.push({ label: "Released", value: releaseDate });
-  if (!isOverview && developer) fields.push({ label: "Developer", value: developer });
+  if (!isOverview && developer) fields.push({ label: "Developer", value: developer, link: developerId ? `/organizations/${developerId}` : undefined });
   if (!isOverview && modelTier) fields.push({ label: "Tier", value: modelTier.charAt(0).toUpperCase() + modelTier.slice(1) });
   if (!isOverview && safetyLevel) fields.push({ label: "Safety Level", value: safetyLevel });
   if (!isOverview && inputPrice !== undefined && outputPrice !== undefined) {
@@ -235,6 +245,14 @@ export function InfoBox({
   if (!isOverview && contextWindow) {
     fields.push({ label: "Context", value: `${formatCompactNumber(contextWindow)} tokens` });
   }
+  if (!isOverview && parameterCount) fields.push({ label: "Parameters", value: parameterCount });
+  if (!isOverview && modality && modality.length > 0) {
+    fields.push({ label: "Modality", value: modality.join(", ") });
+  }
+  if (!isOverview && openWeight !== undefined) {
+    fields.push({ label: "Open Weight", value: openWeight ? "Yes" : "No" });
+  }
+  if (!isOverview && trainingCutoff) fields.push({ label: "Training Cutoff", value: trainingCutoff });
   if (website) fields.push({ label: "Website", value: website });
   if (customFields) fields.push(...customFields);
 

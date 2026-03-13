@@ -40,10 +40,22 @@ const SyncGrantItemSchema = z.object({
   status: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  programId: z.string().max(200).nullable().optional(),
 });
 
 const SyncGrantsBatchSchema = z.object({
   items: z.array(SyncGrantItemSchema).min(1).max(500),
+});
+
+// ---- Batch grantee update schema ----
+
+const BatchUpdateGranteeItemSchema = z.object({
+  id: z.string().length(10),
+  granteeId: z.string().max(200),
+});
+
+const BatchUpdateGranteeSchema = z.object({
+  items: z.array(BatchUpdateGranteeItemSchema).min(1).max(500),
 });
 
 // ---- Helpers ----
@@ -61,6 +73,7 @@ function formatRow(r: typeof grants.$inferSelect) {
     status: r.status,
     source: r.source,
     notes: r.notes,
+    programId: r.programId,
     syncedAt: r.syncedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -196,6 +209,62 @@ const grantsApp = new Hono()
     });
   })
 
+  // ---- GET /all-grantee-ids ----
+  // Returns all grant IDs and their current granteeId values.
+  // Used by the backfill command to identify grants needing entity linking.
+  .get("/all-grantee-ids", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        id: grants.id,
+        granteeId: grants.granteeId,
+        name: grants.name,
+      })
+      .from(grants);
+
+    return c.json({
+      grants: rows.map((r) => ({
+        id: r.id,
+        granteeId: r.granteeId,
+        name: r.name,
+      })),
+      total: rows.length,
+    });
+  })
+
+  // ---- PATCH /batch-update-grantee ----
+  // Updates granteeId for multiple grants in a single transaction.
+  // Used by the backfill command to link grantees to entity stableIds.
+  .patch("/batch-update-grantee", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = BatchUpdateGranteeSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    let updated = 0;
+
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        await tx
+          .update(grants)
+          .set({
+            granteeId: item.granteeId,
+            updatedAt: sql`now()`,
+          })
+          .where(eq(grants.id, item.id));
+
+        updated++;
+      }
+    });
+
+    return c.json({ updated });
+  })
+
   // ---- POST /sync ----
   .post("/sync", async (c) => {
     const body = await parseJsonBody(c);
@@ -222,6 +291,7 @@ const grantsApp = new Hono()
         status: item.status ?? null,
         source: item.source ?? null,
         notes: item.notes ?? null,
+        programId: item.programId ?? null,
       }));
 
       await tx
@@ -240,6 +310,7 @@ const grantsApp = new Hono()
             status: sql`excluded.status`,
             source: sql`excluded.source`,
             notes: sql`excluded.notes`,
+            programId: sql`excluded.program_id`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },

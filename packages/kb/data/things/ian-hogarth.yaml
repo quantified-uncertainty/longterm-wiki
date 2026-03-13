@@ -10,3 +10,21 @@ facts:
     value: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_iH1rKz8mXq
+    property: role
+    value: "Chair"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_iH2nLw9pYr
+    property: notable-for
+    value: "Leading UK AI Safety Institute; AI investor and writer"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_iH3oMx0qZs
+    property: employed-by
+    value: !ref aX0jkoaekQ:uk-aisi
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"

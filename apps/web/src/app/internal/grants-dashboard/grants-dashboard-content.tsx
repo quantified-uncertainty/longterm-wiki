@@ -74,11 +74,12 @@ function resolveEntityName(stableId: string): string {
   return entity?.name ?? stableId;
 }
 
-/** Enrich grant rows with resolved organization names for the client table. */
+/** Enrich grant rows with resolved organization and grantee names for the client table. */
 function enrichWithNames(grants: RpcGrantRow[]): GrantRow[] {
   return grants.map((g) => ({
     ...g,
     organizationName: resolveEntityName(g.organizationId),
+    granteeName: g.granteeId ? resolveEntityName(g.granteeId) : undefined,
   }));
 }
 
@@ -202,7 +203,7 @@ export async function GrantsDashboardContent() {
                     className="border-b border-border/50"
                   >
                     <td className="py-2 pr-4 text-foreground font-medium">
-                      {g.granteeId ?? "(unknown)"}
+                      {g.granteeId ? resolveEntityName(g.granteeId) : "(unknown)"}
                     </td>
                     <td className="py-2 px-4 text-right tabular-nums text-muted-foreground">
                       {g.grantCount.toLocaleString()}

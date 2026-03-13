@@ -20,6 +20,11 @@ export interface PersonRow {
   bornYear: number | null;
 
   netWorthNum: number | null;
+
+  positionCount: number;
+
+  publicationCount: number;
+  careerHistoryCount: number;
 }
 
 type SortKey =
@@ -27,7 +32,10 @@ type SortKey =
   | "role"
   | "employer"
   | "bornYear"
-  | "netWorth";
+  | "netWorth"
+  | "positions"
+  | "publications"
+  | "careerHistory";
 
 type SortDir = "asc" | "desc";
 
@@ -91,6 +99,12 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             return row.bornYear;
           case "netWorth":
             return row.netWorthNum;
+          case "positions":
+            return row.positionCount || null;
+          case "publications":
+            return row.publicationCount || null;
+          case "careerHistory":
+            return row.careerHistoryCount;
         }
       };
 
@@ -168,6 +182,9 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
               <SortHeader label="Affiliation" sortKey="employer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Born" sortKey="bornYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <SortHeader label="Net Worth" sortKey="netWorth" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="Positions" sortKey="positions" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <SortHeader label="Pubs" sortKey="publications" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <SortHeader label="Career Entries" sortKey="careerHistory" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -226,6 +243,30 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                   )}
                 </td>
 
+                {/* Positions */}
+                <td className="py-2.5 px-3 text-center tabular-nums">
+                  {row.positionCount > 0 && (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {row.positionCount}
+                    </span>
+                  )}
+                </td>
+
+                {/* Publications */}
+                <td className="py-2.5 px-3 text-center tabular-nums">
+                  {row.publicationCount > 0 && (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      {row.publicationCount}
+                    </span>
+                  )}
+                </td>
+
+                {/* Career History */}
+                <td className="py-2.5 px-3 text-center">
+                  {row.careerHistoryCount > 0 && (
+                    <span className="tabular-nums">{row.careerHistoryCount}</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

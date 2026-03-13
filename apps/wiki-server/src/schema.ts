@@ -24,6 +24,7 @@ export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
 export const entityIds = pgTable("entity_ids", {
   numericId: integer("numeric_id").primaryKey(),
   slug: text("slug").notNull().unique(),
+  stableId: text("stable_id").unique(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -626,6 +627,7 @@ export const entities = pgTable(
   {
     id: text("id").primaryKey(),
     numericId: text("numeric_id"),
+    stableId: text("stable_id").unique(),
     entityType: text("entity_type").notNull(),
     title: text("title").notNull(),
     description: text("description"),
@@ -1465,6 +1467,7 @@ export const grants = pgTable(
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
     notes: text("notes"),
+    programId: text("program_id"), // soft ref to funding_programs.id (nullable)
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1479,6 +1482,7 @@ export const grants = pgTable(
     index("idx_grants_org").on(table.organizationId),
     index("idx_grants_grantee").on(table.granteeId),
     index("idx_grants_status").on(table.status),
+    index("idx_grants_program").on(table.programId),
   ]
 );
 
@@ -1657,9 +1661,74 @@ export const divisionPersonnel = pgTable(
 );
 
 /**
+ * Benchmarks — AI evaluation benchmark definitions.
+ */
+export const benchmarks = pgTable(
+  "benchmarks",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    category: text("category"), // coding | reasoning | math | knowledge | multimodal | safety | agentic | general
+    description: text("description"),
+    website: text("website"),
+    scoringMethod: text("scoring_method"),
+    higherIsBetter: boolean("higher_is_better").notNull().default(true),
+    introducedDate: text("introduced_date"),
+    maintainer: text("maintainer"),
+    source: text("source"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_benchmarks_category").on(table.category),
+  ]
+);
+
+/**
+ * Benchmark results — individual model scores on benchmarks.
+ */
+export const benchmarkResults = pgTable(
+  "benchmark_results",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    benchmarkId: varchar("benchmark_id", { length: 10 })
+      .notNull()
+      .references(() => benchmarks.id),
+    modelId: text("model_id").notNull(), // entity slug of the ai-model
+    score: doublePrecision("score").notNull(),
+    unit: text("unit"),
+    date: text("date"),
+    sourceUrl: text("source_url"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_br_benchmark").on(table.benchmarkId),
+    index("idx_br_model").on(table.modelId),
+    uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
+  ]
+);
+
+/**
  * Funding programs — RFPs, grant rounds, fellowships, prizes, solicitations.
- * Complementary to `grants` (individual awards). A future `grants.programId` column
- * will link individual grants to their parent program.
+ * Complementary to `grants` (individual awards). Individual grants link to their
+ * parent program via `grants.programId`.
  */
 export const fundingPrograms = pgTable(
   "funding_programs",

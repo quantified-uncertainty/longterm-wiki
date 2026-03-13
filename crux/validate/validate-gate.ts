@@ -355,6 +355,17 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-kb-schema.ts'],
     cwd: PROJECT_ROOT,
   },
+  {
+    id: 'entity-refs',
+    name: 'Entity reference integrity (KB records)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-entity-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: many record endpoint fields intentionally use display names
+    // or slug strings that aren't modeled as KB entities yet. As entity
+    // coverage improves, this can be promoted to blocking.
+    advisory: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass

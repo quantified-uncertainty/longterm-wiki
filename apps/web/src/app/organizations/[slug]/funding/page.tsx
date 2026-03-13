@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import {
+  getKBRecords,
   getKBFacts,
+  getKBEntity,
   getKBLatest,
 } from "@/data/kb";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import type { Fact } from "@longterm-wiki/kb";
+import type { Fact, RecordEntry } from "@longterm-wiki/kb";
 import { Breadcrumbs } from "@/components/directory";
 
 export function generateStaticParams() {
@@ -60,11 +62,37 @@ export default async function OrgFundingPage({
   const entity = resolveOrgBySlug(slug);
   if (!entity) return notFound();
 
-  // Records removed — funding round records no longer available
+  const fundingRounds = getKBRecords(entity.id, "funding-rounds");
+  const investments = getKBRecords(entity.id, "investments");
   const valuationFacts = getKBFacts(entity.id).filter(
     (f) => f.propertyId === "valuation",
   );
   const totalFundingFact = getKBLatest(entity.id, "total-funding");
+
+  // Sort rounds chronologically (oldest first for timeline)
+  const sortedRounds = [...fundingRounds].sort((a, b) => {
+    const da = a.fields.date ? String(a.fields.date) : "";
+    const db = b.fields.date ? String(b.fields.date) : "";
+    return da.localeCompare(db);
+  });
+
+  // Cumulative funding
+  let cumulative = 0;
+  const roundsWithCumulative = sortedRounds.map((round) => {
+    const raised =
+      round.fields.raised != null ? Number(round.fields.raised) : 0;
+    cumulative += raised;
+    return { round, cumulativeRaised: cumulative };
+  });
+
+  // Group investments by round key
+  const investmentsByRound = new Map<string, RecordEntry[]>();
+  for (const inv of investments) {
+    const roundKey = inv.fields.round ? String(inv.fields.round) : "__other__";
+    const list = investmentsByRound.get(roundKey) ?? [];
+    list.push(inv);
+    investmentsByRound.set(roundKey, list);
+  }
 
   // Sort valuation facts chronologically
   const sortedValuations = [...valuationFacts].sort((a, b) => {
@@ -95,6 +123,16 @@ export default async function OrgFundingPage({
               <span className="font-bold text-foreground">
                 {formatAmount(totalFundingFact.value.value)}
               </span>
+            </span>
+          )}
+          <span>
+            {fundingRounds.length} round
+            {fundingRounds.length !== 1 ? "s" : ""}
+          </span>
+          {investments.length > 0 && (
+            <span>
+              {investments.length} known investor
+              {investments.length !== 1 ? "s" : ""}
             </span>
           )}
         </div>
@@ -152,23 +190,198 @@ export default async function OrgFundingPage({
         </section>
       )}
 
-      {/* Empty state */}
-      {sortedValuations.length <= 1 && (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="mb-2">
-            No funding data available for {entity.name} yet.
-          </p>
-          <p className="text-sm mb-4">
-            Funding round records are being migrated to PostgreSQL.
-          </p>
-          <Link
-            href={`/organizations/${slug}`}
-            className="text-primary hover:underline text-sm"
-          >
-            &larr; Back to profile
-          </Link>
-        </div>
+      {/* Funding rounds detail */}
+      {roundsWithCumulative.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Funding Rounds
+          </h2>
+          <div className="space-y-4">
+            {[...roundsWithCumulative].reverse().map(({ round, cumulativeRaised }) => {
+              const name = (round.fields.name as string) ?? round.key;
+              const date = round.fields.date
+                ? String(round.fields.date)
+                : null;
+              const raised = round.fields.raised;
+              const valuation = round.fields.valuation;
+              const leadInvestor = round.fields.lead_investor
+                ? String(round.fields.lead_investor)
+                : null;
+              const instrument = round.fields.instrument
+                ? String(round.fields.instrument)
+                : null;
+              const notes = round.fields.notes
+                ? String(round.fields.notes)
+                : null;
+              const source = round.fields.source
+                ? String(round.fields.source)
+                : null;
+
+              const leadEntity = leadInvestor
+                ? getKBEntity(leadInvestor)
+                : null;
+
+              // Investors for this round
+              const roundInvestors =
+                investmentsByRound.get(round.key) ?? [];
+
+              return (
+                <div
+                  key={round.key}
+                  className="border border-border/60 rounded-xl bg-card overflow-hidden"
+                >
+                  {/* Round header */}
+                  <div className="px-5 py-4 border-b border-border/40 bg-muted/20">
+                    <div className="flex items-baseline gap-3 flex-wrap">
+                      <h3 className="text-base font-bold">{name}</h3>
+                      {instrument && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                          {instrument}
+                        </span>
+                      )}
+                      {date && (
+                        <span className="text-sm text-muted-foreground">
+                          {formatKBDate(date)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-baseline gap-6 mt-2 flex-wrap">
+                      {raised != null && (
+                        <div>
+                          <span className="text-xs text-muted-foreground/70 mr-1">
+                            Raised
+                          </span>
+                          <span className="text-lg font-bold tabular-nums">
+                            {formatAmount(raised)}
+                          </span>
+                        </div>
+                      )}
+                      {valuation != null && (
+                        <div>
+                          <span className="text-xs text-muted-foreground/70 mr-1">
+                            Valuation
+                          </span>
+                          <span className="text-lg font-bold tabular-nums">
+                            {formatAmount(valuation)}
+                          </span>
+                        </div>
+                      )}
+                      {cumulativeRaised > 0 && raised != null && (
+                        <div>
+                          <span className="text-xs text-muted-foreground/70 mr-1">
+                            Cumulative
+                          </span>
+                          <span className="text-sm font-semibold tabular-nums text-muted-foreground">
+                            {formatAmount(cumulativeRaised)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Round details */}
+                  <div className="px-5 py-3 space-y-2">
+                    {leadInvestor && (
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">
+                          Lead investor:{" "}
+                        </span>
+                        {leadEntity ? (
+                          <Link
+                            href={`/kb/entity/${leadInvestor}`}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            {leadEntity.name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{leadInvestor}</span>
+                        )}
+                      </div>
+                    )}
+
+                    {roundInvestors.length > 0 && (
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">
+                          Investors:{" "}
+                        </span>
+                        {roundInvestors.map((inv, i) => {
+                          const investorId = inv.fields.investor
+                            ? String(inv.fields.investor)
+                            : null;
+                          const investorEntity = investorId
+                            ? getKBEntity(investorId)
+                            : null;
+                          const displayName =
+                            investorEntity?.name ??
+                            inv.displayName ??
+                            investorId ??
+                            inv.key;
+                          const amount = inv.fields.amount;
+
+                          return (
+                            <span key={inv.key}>
+                              {i > 0 && ", "}
+                              {investorEntity && investorId ? (
+                                <Link
+                                  href={`/kb/entity/${investorId}`}
+                                  className="text-primary hover:underline"
+                                >
+                                  {displayName}
+                                </Link>
+                              ) : (
+                                <span>{displayName}</span>
+                              )}
+                              {amount != null && (
+                                <span className="text-muted-foreground text-xs ml-1">
+                                  ({formatAmount(amount)})
+                                </span>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {notes && (
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {notes}
+                      </p>
+                    )}
+
+                    {source && isUrl(source) && (
+                      <a
+                        href={source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-primary/50 hover:text-primary hover:underline transition-colors"
+                      >
+                        {shortDomain(source)}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
+
+      {/* Empty state */}
+      {fundingRounds.length === 0 &&
+        investments.length === 0 &&
+        valuationFacts.length === 0 && (
+          <div className="text-center py-16 text-muted-foreground">
+            <p className="mb-2">
+              No funding data available for {entity.name} yet.
+            </p>
+            <Link
+              href={`/organizations/${slug}`}
+              className="text-primary hover:underline text-sm"
+            >
+              &larr; Back to profile
+            </Link>
+          </div>
+        )}
     </div>
   );
 }

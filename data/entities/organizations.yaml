@@ -2488,3 +2488,54 @@
     - community
     - ai-safety
   lastUpdated: 2026-02
+
+- id: mistral-ai
+  numericId: E1097
+  type: organization
+  orgType: frontier-lab
+  summaryPage: labs-overview
+  title: Mistral AI
+  website: https://mistral.ai
+  relatedEntries:
+    - id: mistral-ai-models
+      type: ai-model
+      relationship: created-by
+  description: >-
+    Mistral AI is a French AI company founded in April 2023 by Arthur Mensch, Guillaume Lample, and
+    Timothée Lacroix — former researchers at Google DeepMind and Meta AI. The company combines open-weight
+    model releases with commercial API offerings. Headquartered in Paris, Mistral raised over €1 billion
+    by early 2025 and has become the leading European AI lab. Notable models include Mistral 7B, Mixtral
+    8x7B (mixture-of-experts), and Mistral Large.
+  clusters:
+    - ai-safety
+  tags:
+    - frontier-lab
+    - european-ai
+    - open-weight
+  lastUpdated: 2025-04
+
+- id: deepseek
+  numericId: E1098
+  type: organization
+  orgType: frontier-lab
+  summaryPage: labs-overview
+  title: DeepSeek
+  website: https://www.deepseek.com
+  relatedEntries:
+    - id: deepseek-models
+      type: ai-model
+      relationship: created-by
+  description: >-
+    DeepSeek is a Chinese AI research lab founded in 2023 as a subsidiary of High-Flyer, a quantitative
+    trading firm based in Hangzhou. The company gained international attention in January 2025 with
+    DeepSeek R1, an open-weight reasoning model that rivaled OpenAI's o1, and DeepSeek V3, which
+    achieved GPT-4o-level performance at a reported training cost of just $5.6 million. DeepSeek
+    releases all models under MIT license and has been influential in demonstrating that frontier-level
+    AI can be developed at dramatically lower cost than previously assumed.
+  clusters:
+    - ai-safety
+  tags:
+    - frontier-lab
+    - chinese-ai
+    - open-weight
+  lastUpdated: 2025-01

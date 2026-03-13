@@ -7,6 +7,7 @@
  * - Checks that relatedEntries reference existing entity IDs
  * - Checks that entity IDs map to actual MDX files
  * - Validates expert/organization references
+ * - Cross-references expert IDs against people entities and KB things
  * - Reports orphaned entities
  *
  * Usage: node scripts/validate-data.ts
@@ -18,7 +19,7 @@ import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR, loadIdRegistry } from '../lib/content-types.ts';
+import { CONTENT_DIR, DATA_DIR, PROJECT_ROOT, loadIdRegistry } from '../lib/content-types.ts';
 import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
@@ -309,6 +310,45 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
         missingEntityRefs++;
       }
     }
+  }
+
+  // ==========================================================================
+  // 8. Cross-reference expert IDs against people entities and KB things
+  // ==========================================================================
+  if (!ciMode) console.log(`\n${colors.blue}Checking expert ID cross-references...${colors.reset}`);
+
+  // Build set of people entity IDs (type: person)
+  const peopleEntityIds = new Set<string>(
+    entities.filter((e: EntityData) => e.type === 'person').map((e: EntityData) => e.id)
+  );
+
+  // Build set of KB thing slugs from packages/kb/data/things/
+  const kbThingsDir = join(PROJECT_ROOT, 'packages/kb/data/things');
+  const kbThingSlugs = new Set<string>();
+  if (existsSync(kbThingsDir)) {
+    for (const file of readdirSync(kbThingsDir)) {
+      if (file.endsWith('.yaml')) {
+        kbThingSlugs.add(basename(file, '.yaml'));
+      }
+    }
+  }
+
+  let expertMismatches = 0;
+  for (const expert of experts) {
+    if (!peopleEntityIds.has(expert.id)) {
+      console.log(`${colors.yellow}⚠️  Expert "${expert.id}" has no matching entity in data/entities/people.yaml${colors.reset}`);
+      warnings++;
+      expertMismatches++;
+    }
+    if (!kbThingSlugs.has(expert.id)) {
+      console.log(`${colors.yellow}⚠️  Expert "${expert.id}" has no matching KB thing file at packages/kb/data/things/${expert.id}.yaml${colors.reset}`);
+      warnings++;
+      expertMismatches++;
+    }
+  }
+
+  if (expertMismatches === 0 && !ciMode) {
+    console.log(`${colors.green}  All ${experts.length} expert IDs match people entities and KB things${colors.reset}`);
   }
 
   // ==========================================================================

@@ -83,6 +83,7 @@ const DATA_FILES = [
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
+  { key: 'peopleResources', file: 'people-resources.yaml' },
 ];
 
 function loadYaml(filename) {
@@ -962,7 +963,7 @@ async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0 };
+    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0 };
   }
 
   const headers = buildHeaders();
@@ -972,6 +973,8 @@ async function mergePGRecordsIntoKB(kb) {
   let fundingRoundsCount = 0;
   let investmentsCount = 0;
   let equityPositionsCount = 0;
+  let divisionsCount = 0;
+  let fundingProgramsCount = 0;
 
   if (!kb.records) kb.records = {};
 
@@ -1004,12 +1007,16 @@ async function mergePGRecordsIntoKB(kb) {
     fundingRoundsResult,
     investmentsResult,
     equityPositionsResult,
+    divisionsResult,
+    fundingProgramsResult,
   ] = await Promise.allSettled([
     fetchAllPages('/api/personnel/all', 'personnel'),
     fetchAllPages('/api/grants/all', 'grants'),
     fetchAllPages('/api/funding-rounds/all', 'fundingRounds'),
     fetchAllPages('/api/investments/all', 'investments'),
     fetchAllPages('/api/equity-positions/all', 'equityPositions'),
+    fetchAllPages('/api/divisions/all', 'divisions'),
+    fetchAllPages('/api/funding-programs/all', 'fundingPrograms'),
   ]);
 
   /**
@@ -1116,12 +1123,34 @@ async function mergePGRecordsIntoKB(kb) {
     equityPositionRowToRecordEntry,
   );
 
+  // --- Process divisions ---
+  divisionsCount = mergeCollection(
+    'divisions',
+    divisionsResult,
+    ['divisions'],
+    (row) => row.parentOrgId,
+    () => 'divisions',
+    divisionRowToRecordEntry,
+  );
+
+  // --- Process funding programs ---
+  fundingProgramsCount = mergeCollection(
+    'funding-programs',
+    fundingProgramsResult,
+    ['funding-programs'],
+    (row) => row.orgId,
+    () => 'funding-programs',
+    fundingProgramRowToRecordEntry,
+  );
+
   return {
     personnel: personnelCount,
     grants: grantsCount,
     fundingRounds: fundingRoundsCount,
     investments: investmentsCount,
     equityPositions: equityPositionsCount,
+    divisions: divisionsCount,
+    fundingPrograms: fundingProgramsCount,
   };
 }
 
@@ -1284,6 +1313,58 @@ function equityPositionRowToRecordEntry(row) {
   if (row.asOf) entry.asOf = row.asOf;
   if (row.validEnd) entry.validEnd = row.validEnd;
   return entry;
+}
+
+/**
+ * Convert a PG division row to the RecordEntry format used by frontend components.
+ */
+function divisionRowToRecordEntry(row) {
+  const fields = {
+    name: row.name,
+    divisionType: row.divisionType,
+  };
+  if (row.slug) fields.slug = row.slug;
+  if (row.lead) fields.lead = row.lead;
+  if (row.status) fields.status = row.status;
+  if (row.startDate) fields.startDate = row.startDate;
+  if (row.endDate) fields.endDate = row.endDate;
+  if (row.website) fields.website = row.website;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'division',
+    ownerEntityId: row.parentOrgId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG funding program row to the RecordEntry format used by frontend components.
+ */
+function fundingProgramRowToRecordEntry(row) {
+  const fields = {
+    name: row.name,
+    programType: row.programType,
+  };
+  if (row.description) fields.description = row.description;
+  if (row.divisionId) fields.divisionId = row.divisionId;
+  if (row.totalBudget != null) fields.totalBudget = row.totalBudget;
+  if (row.currency) fields.currency = row.currency;
+  if (row.applicationUrl) fields.applicationUrl = row.applicationUrl;
+  if (row.openDate) fields.openDate = row.openDate;
+  if (row.deadline) fields.deadline = row.deadline;
+  if (row.status) fields.status = row.status;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'funding-program',
+    ownerEntityId: row.orgId,
+    fields,
+  };
 }
 
 /**
@@ -1824,9 +1905,9 @@ async function main() {
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
   if (database.kb && !CONTENT_ONLY) {
     const pgRecordCounts = await mergePGRecordsIntoKB(database.kb);
-    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions;
+    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms;
     if (pgTotal > 0) {
-      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions merged from PG`);
+      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions, ${pgRecordCounts.divisions} divisions, ${pgRecordCounts.fundingPrograms} funding programs merged from PG`);
     }
   }
 

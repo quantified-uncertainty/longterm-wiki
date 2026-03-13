@@ -25,6 +25,8 @@ export interface GrantRow {
   /** Resolved display name for the funder (set by server component) */
   organizationName?: string;
   granteeId: string | null;
+  /** Resolved display name for the grantee (set by server component) */
+  granteeName?: string;
   name: string;
   amount: number | null;
   currency: string;
@@ -107,7 +109,7 @@ const columns: ColumnDef<GrantRow>[] = [
       </SortableHeader>
     ),
     cell: ({ row }) => {
-      const v = row.original.granteeId;
+      const v = row.original.granteeName ?? row.original.granteeId;
       return v ? (
         <span className="text-xs text-muted-foreground">{v}</span>
       ) : (

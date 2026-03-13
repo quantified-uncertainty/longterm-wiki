@@ -5,6 +5,8 @@ import {
   resolvePersonBySlug,
   getPersonSlugs,
   getOrgRolesForPerson,
+  getBoardSeatsForPerson,
+  getCareerHistory,
 } from "../people-utils";
 import {
   getKBFacts,
@@ -23,11 +25,11 @@ import {
   Breadcrumbs,
   CurrentBadge,
   FounderBadge,
-  SourceLink,
-  DirectoryEntityLink,
   FactsPanel,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
+import { getExpertById, getPublicationsForPerson } from "@/data";
+import { ExpertPositions } from "./expert-positions";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -66,12 +68,21 @@ export default async function PersonProfilePage({
   const notableForFact = getKBLatest(entity.id, "notable-for");
   const socialMediaFact = getKBLatest(entity.id, "social-media");
 
-  // Records removed — these collections now return empty arrays
-  const careerHistory: Array<{ key: string; fields: Record<string, unknown> }> = [];
-  const boardSeats: Array<{ key: string; fields: Record<string, unknown> }> = [];
+  // Expert positions from experts.yaml
+  const expert = getExpertById(slug);
+  const positions = expert?.positions ?? [];
+
+  // Publications linked to this person (from literature.yaml via people-resources.yaml)
+  const publications = getPublicationsForPerson(slug);
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);
+
+  // Board seats across all organizations referencing this person
+  const boardSeats = getBoardSeatsForPerson(entity.id);
+
+  // Career history from KB records (populated via personnel table)
+  const careerHistory = getCareerHistory(entity.id);
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
@@ -84,13 +95,6 @@ export default async function PersonProfilePage({
       ? resolveEntityRef(employedByFact.value.value)
       : null;
 
-  // Sort career history by start date (most recent first)
-  const sortedCareer = [...careerHistory].sort((a, b) => {
-    const sa = a.fields.start ? String(a.fields.start) : "";
-    const sb = b.fields.start ? String(b.fields.start) : "";
-    return sb.localeCompare(sa);
-  });
-
   // Sort org roles: current first, then by start date
   const sortedOrgRoles = [...orgRoles].sort((a, b) => {
     const endA = a.record.fields.end ? 1 : 0;
@@ -98,6 +102,20 @@ export default async function PersonProfilePage({
     if (endA !== endB) return endA - endB;
     const sa = a.record.fields.start ? String(a.record.fields.start) : "";
     const sb = b.record.fields.start ? String(b.record.fields.start) : "";
+    return sb.localeCompare(sa);
+  });
+
+  // Sort board seats: current first, then by appointment date
+  const sortedBoardSeats = [...boardSeats].sort((a, b) => {
+    const endA = a.record.fields.departed ? 1 : 0;
+    const endB = b.record.fields.departed ? 1 : 0;
+    if (endA !== endB) return endA - endB;
+    const sa = a.record.fields.appointed
+      ? String(a.record.fields.appointed)
+      : "";
+    const sb = b.record.fields.appointed
+      ? String(b.record.fields.appointed)
+      : "";
     return sb.localeCompare(sa);
   });
 
@@ -214,67 +232,50 @@ export default async function PersonProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Career History Timeline */}
-          {sortedCareer.length > 0 && (
+          {/* Expert Positions */}
+          <ExpertPositions positions={positions} />
+
+          {/* Career Timeline */}
+          {careerHistory.length > 0 && (
             <section>
               <h2 className="text-lg font-bold tracking-tight mb-4">
                 Career History
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedCareer.length} positions
+                  {careerHistory.length}
                 </span>
               </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                {sortedCareer.map((entry) => {
-                  const org = resolveEntityRef(entry.fields.organization);
-                  const title = fieldStr(entry.fields, "title");
-                  const start = fieldStr(entry.fields, "start");
-                  const end = fieldStr(entry.fields, "end");
-                  const notes = fieldStr(entry.fields, "notes");
-                  const source = fieldStr(entry.fields, "source");
+              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+                {careerHistory.map((entry) => {
+                  const orgRef = resolveEntityRef(entry.organization);
+                  const orgSlug = orgRef
+                    ? getKBEntitySlug(orgRef.id)
+                    : undefined;
+                  const isCurrent = !entry.endDate;
+                  const isFounder = /founder/i.test(entry.title);
 
                   return (
-                    <div
-                      key={entry.key}
-                      className="flex gap-4 px-5 py-4 border-b border-border/40 last:border-b-0 group hover:bg-muted/20 transition-colors"
-                    >
-                      {/* Timeline dot */}
-                      <div className="flex flex-col items-center pt-1.5">
-                        <div
-                          className={`w-3 h-3 rounded-full border-2 shrink-0 transition-colors ${
-                            !end
-                              ? "border-primary bg-primary/20 group-hover:bg-primary/30"
-                              : "border-border bg-card group-hover:border-primary/50"
-                          }`}
-                        />
-                        <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
+                    <div key={entry.key} className="px-5 py-3.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm">
+                          {entry.title}
+                        </span>
+                        {isFounder && <FounderBadge />}
+                        {isCurrent && <CurrentBadge />}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2 flex-wrap">
-                          {title && (
-                            <span className="font-semibold text-sm">
-                              {title}
-                            </span>
-                          )}
-                          {!end && <CurrentBadge />}
-                        </div>
-                        {org && (
-                          <div className="text-sm mt-0.5">
-                            <DirectoryEntityLink
-                              entity={org}
-                              basePath="/organizations"
-                              className="text-primary hover:underline font-medium"
-                            />
-                          </div>
+                      <div className="text-sm text-muted-foreground mt-0.5">
+                        {orgSlug ? (
+                          <Link
+                            href={`/organizations/${orgSlug}`}
+                            className="hover:text-primary transition-colors"
+                          >
+                            {orgRef?.name ?? entry.organization}
+                          </Link>
+                        ) : (
+                          <span>{orgRef?.name ?? entry.organization}</span>
                         )}
-                        <div className="text-[10px] text-muted-foreground/60 mt-1">
-                          {formatDateRange(start, end)}
-                        </div>
-                        {notes && (
-                          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                            {notes}
-                          </p>
-                        )}
-                        <SourceLink source={source} />
+                      </div>
+                      <div className="text-xs text-muted-foreground/60 mt-1">
+                        {formatDateRange(entry.startDate, entry.endDate)}
                       </div>
                     </div>
                   );
@@ -291,6 +292,73 @@ export default async function PersonProfilePage({
               </h2>
               <div className="border border-border/60 rounded-xl bg-card px-5 py-3">
                 <p className="text-sm">{educationFact.value.value}</p>
+              </div>
+            </section>
+          )}
+
+          {/* Publications & Resources */}
+          {publications.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold tracking-tight mb-4">
+                Publications & Resources
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  {publications.length}
+                </span>
+              </h2>
+              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+                {publications
+                  .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+                  .map((pub, idx) => (
+                    <div
+                      key={`${idx}-${pub.title}`}
+                      className="px-4 py-3"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          {pub.link ? (
+                            <a
+                              href={pub.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-sm text-foreground hover:text-primary transition-colors"
+                            >
+                              {pub.title}
+                            </a>
+                          ) : (
+                            <span className="font-medium text-sm">
+                              {pub.title}
+                            </span>
+                          )}
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {pub.year && (
+                              <span className="text-xs text-muted-foreground tabular-nums">
+                                {pub.year}
+                              </span>
+                            )}
+                            {pub.type && (
+                              <span className="text-xs text-muted-foreground/60">
+                                {pub.type}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground/40">
+                              {pub.category}
+                            </span>
+                          </div>
+                        </div>
+                        {pub.link && (
+                          <a
+                            href={pub.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-xs text-muted-foreground/50 hover:text-primary transition-colors"
+                            title="Open link"
+                          >
+                            &rarr;
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </section>
           )}
@@ -352,38 +420,48 @@ export default async function PersonProfilePage({
           )}
 
           {/* Board Seats */}
-          {boardSeats.length > 0 && (
+          {sortedBoardSeats.length > 0 && (
             <section>
               <h2 className="text-lg font-bold tracking-tight mb-4">
                 Board Seats
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {boardSeats.length}
+                  {sortedBoardSeats.length}
                 </span>
               </h2>
               <div className="border border-border/60 rounded-xl bg-card">
-                {boardSeats.map((seat) => {
-                  const org = resolveEntityRef(seat.fields.organization);
-                  const role = fieldStr(seat.fields, "role") ?? "Board Member";
-                  const start = fieldStr(seat.fields, "start");
-                  const end = fieldStr(seat.fields, "end");
+                {sortedBoardSeats.map(({ org, record }) => {
+                  const role = fieldStr(record.fields, "role");
+                  const appointed = fieldStr(record.fields, "appointed");
+                  const departed = fieldStr(record.fields, "departed");
+                  const orgSlug = getKBEntitySlug(org.id);
 
                   return (
                     <div
-                      key={seat.key}
+                      key={`${org.id}-${record.key}`}
                       className="px-4 py-3 border-b border-border/40 last:border-b-0"
                     >
-                      <div className="flex items-baseline gap-2">
-                        <DirectoryEntityLink
-                          entity={org}
-                          basePath="/organizations"
-                          className="font-semibold text-sm hover:text-primary transition-colors"
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {role}
-                        </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {orgSlug ? (
+                          <Link
+                            href={`/organizations/${orgSlug}`}
+                            className="font-semibold text-sm hover:text-primary transition-colors"
+                          >
+                            {org.name}
+                          </Link>
+                        ) : (
+                          <span className="font-semibold text-sm">
+                            {org.name}
+                          </span>
+                        )}
+                        {!departed && <CurrentBadge />}
                       </div>
+                      {role && (
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {role}
+                        </div>
+                      )}
                       <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {formatDateRange(start, end)}
+                        {formatDateRange(appointed, departed)}
                       </div>
                     </div>
                   );

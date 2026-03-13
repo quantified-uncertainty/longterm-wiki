@@ -547,6 +547,27 @@
       "when": 1775289600000,
       "tag": "0077_add_divisions_and_funding_programs",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1775376000000,
+      "tag": "0078_add_grants_program_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1775462400000,
+      "tag": "0079_add_stable_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1775548800000,
+      "tag": "0080_add_benchmarks_and_results",
+      "breakpoints": true
     }
   ]
 }

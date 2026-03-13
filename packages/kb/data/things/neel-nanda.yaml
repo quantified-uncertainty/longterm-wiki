@@ -26,3 +26,9 @@ facts:
     property: born-year
     value: 1999
     notes: "Born approximately 1999"
+
+  - id: f_nN2nLw9pYr
+    property: notable-for
+    value: "Mechanistic interpretability; TransformerLens library; educational content"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"

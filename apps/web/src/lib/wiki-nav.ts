@@ -264,6 +264,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Auto-Update News", href: internalHref("auto-update-news-dashboard") },
         { label: "Groundskeeper Runs", href: internalHref("groundskeeper-runs-dashboard") },
         { label: "Grants", href: internalHref("grants-dashboard") },
+        { label: "Divisions", href: internalHref("divisions-dashboard") },
+        { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
       ],
     },
     {
