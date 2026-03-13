@@ -85,7 +85,7 @@ export function GrantsGivenSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border/60 rounded-xl overflow-x-auto bg-card">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
@@ -182,7 +182,7 @@ export function GrantsReceivedSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border/60 rounded-xl overflow-x-auto bg-card">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">

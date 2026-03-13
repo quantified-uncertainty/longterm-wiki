@@ -473,7 +473,7 @@ export default async function OrgProfilePage({
             )}
 
             {data.descriptionText && (
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose">
+              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose line-clamp-3">
                 {data.descriptionText}
               </p>
             )}
