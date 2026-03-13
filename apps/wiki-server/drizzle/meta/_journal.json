@@ -582,6 +582,13 @@
       "when": 1775721600000,
       "tag": "0082_alter_benchmark_id_to_text",
       "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1775808000000,
+      "tag": "0083_facts_entity_id_to_stable_id",
+      "breakpoints": true
     }
   ]
 }

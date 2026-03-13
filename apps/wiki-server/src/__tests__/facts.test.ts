@@ -20,10 +20,16 @@ function factKey(entityId: string, factId: string) {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // --- ref-check: SELECT id FROM entities/resources WHERE id IN (...) ---
+  // --- ref-check: SELECT id/stable_id FROM entities/resources WHERE column IN (...) ---
   if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
     // Return all queried IDs as existing (ref check passes)
     return params.map((p) => ({ id: p }));
+  }
+
+  // --- entity resolution: SELECT stable_id FROM entities WHERE stable_id/id/numeric_id = ... ---
+  if (q.includes("stable_id") && q.includes('"entities"') && q.includes("limit")) {
+    // Return the first param as both the entity stableId (pass-through for tests)
+    return params.length > 0 ? [{ stable_id: params[0] }] : [];
   }
 
   // --- facts: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
