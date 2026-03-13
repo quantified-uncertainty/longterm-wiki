@@ -4,7 +4,7 @@ import Link from "next/link";
 import { resolveRiskBySlug, getRiskSlugs } from "@/app/risks/risk-utils";
 import { getKBEntity, getKBEntitySlug } from "@/data/kb";
 import { getTypedEntityById, isRisk } from "@/data";
-import { getEntityWikiHref } from "@/lib/directory-utils";
+import { getEntityWikiHref, safeHref } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
   Breadcrumbs,
@@ -307,7 +307,7 @@ export default async function RiskProfilePage({
                     <div className="text-sm font-medium">
                       {src.url ? (
                         <a
-                          href={src.url}
+                          href={safeHref(src.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"
@@ -391,7 +391,7 @@ export default async function RiskProfilePage({
                     <span className="font-medium text-xs text-right shrink-0 max-w-[60%]">
                       {cf.link ? (
                         <a
-                          href={cf.link}
+                          href={safeHref(cf.link)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline"

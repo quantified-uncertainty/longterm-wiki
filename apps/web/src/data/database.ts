@@ -453,6 +453,8 @@ interface DatabaseShape {
     date: string | null;
     sourceUrl: string | null;
   }>>;
+  /** Record verification verdicts, keyed by "recordType:recordId" */
+  recordVerdicts?: Record<string, RecordVerdict>;
 }
 
 // ============================================================================
@@ -798,6 +800,36 @@ export function getResourcePublication(
 }
 
 // ============================================================================
+// PERSON NAME LOOKUP
+// ============================================================================
+
+let _personNameIndex: Map<string, string> | null = null;
+
+/**
+ * Build a lazily-cached index of person name → entity ID.
+ * Normalizes to lowercase for case-insensitive matching.
+ */
+function personNameIndex(): Map<string, string> {
+  if (!_personNameIndex) {
+    _personNameIndex = new Map();
+    for (const entity of getTypedEntities()) {
+      if (isPerson(entity)) {
+        _personNameIndex.set(entity.title.toLowerCase(), entity.id);
+      }
+    }
+  }
+  return _personNameIndex;
+}
+
+/**
+ * Find a person entity by name (case-insensitive).
+ * Returns the entity ID if a matching person is found, undefined otherwise.
+ */
+export function findPersonByName(name: string): string | undefined {
+  return personNameIndex().get(name.toLowerCase());
+}
+
+// ============================================================================
 // BENCHMARK RESULTS
 // ============================================================================
 
@@ -817,6 +849,54 @@ export function getBenchmarkResults(): Record<string, PGBenchmarkResult[]> {
 /** Get PG benchmark results for a specific model. Returns empty array if none. */
 export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[] {
   return getBenchmarkResults()[modelId] ?? [];
+}
+
+// ============================================================================
+// RECORD VERDICTS
+// Note: These functions have no frontend consumer yet. The fetchRecordVerdicts()
+// call in build-data.mjs is commented out to save build time. Re-enable when
+// the record verification dashboard is built (see #2243).
+// ============================================================================
+
+export interface RecordVerdict {
+  verdict: string;
+  confidence: number | null;
+  sourcesChecked: number;
+  needsRecheck: boolean;
+  lastComputedAt: string | null;
+}
+
+/** Get all record verdicts (keyed by "recordType:recordId") */
+export function getRecordVerdicts(): Record<string, RecordVerdict> {
+  return getDatabase().recordVerdicts ?? {};
+}
+
+/** Get the verification verdict for a specific record */
+export function getRecordVerdict(recordType: string, recordId: string): RecordVerdict | null {
+  return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
+}
+
+/** Get verification stats for a specific record type */
+export function getRecordVerdictStats(recordType: string): {
+  total: number;
+  confirmed: number;
+  contradicted: number;
+  unverifiable: number;
+  outdated: number;
+  partial: number;
+  unchecked: number;
+} {
+  const verdicts = getRecordVerdicts();
+  const stats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+  const validVerdicts = new Set(['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked']);
+  for (const [key, v] of Object.entries(verdicts)) {
+    if (!key.startsWith(`${recordType}:`)) continue;
+    stats.total++;
+    if (validVerdicts.has(v.verdict)) {
+      stats[v.verdict as 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial' | 'unchecked']++;
+    }
+  }
+  return stats;
 }
 
 // Re-export loadYaml for use in domain modules

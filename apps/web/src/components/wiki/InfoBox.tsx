@@ -60,6 +60,10 @@ export interface InfoBoxProps {
   backlinkCount?: number;
   // Organization subtype
   orgType?: string;
+  // Parent organization (legally separate entity that is part of a larger org)
+  parentOrg?: { id: string; title: string; href: string };
+  // Child organizations (entities that have this entity as parentOrg)
+  childOrgs?: { id: string; title: string; href: string }[];
   // Policy fields
   introduced?: string;
   policyStatus?: string;
@@ -193,6 +197,8 @@ export function InfoBox({
   wordCount,
   backlinkCount,
   orgType,
+  parentOrg,
+  childOrgs,
   introduced,
   policyStatus,
   policyAuthor,
@@ -226,6 +232,10 @@ export function InfoBox({
   if (!isOverview && location) fields.push({ label: "Location", value: location });
   if (!isOverview && headcount) fields.push({ label: "Employees", value: headcount });
   if (!isOverview && funding) fields.push({ label: "Funding", value: funding });
+  if (!isOverview && parentOrg) fields.push({ label: "Parent Org", value: parentOrg.title, link: parentOrg.href });
+  if (!isOverview && childOrgs?.length) {
+    fields.push({ label: "Sub-orgs", value: childOrgs.map((c) => c.title).join(", ") });
+  }
   if (!isOverview && introduced) fields.push({ label: "Introduced", value: introduced });
   if (!isOverview && policyStatus) fields.push({ label: "Status", value: policyStatus });
   if (!isOverview && policyAuthor) fields.push({ label: "Author", value: policyAuthor });

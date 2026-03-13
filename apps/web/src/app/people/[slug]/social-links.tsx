@@ -1,4 +1,5 @@
 import type { Fact } from "@longterm-wiki/kb";
+import { safeHref } from "@/lib/directory-utils";
 
 /**
  * Social link definition — maps a KB property to display config.
@@ -89,7 +90,7 @@ export function SocialLinks({ facts }: SocialLinksProps) {
         {links.map((link) => (
           <a
             key={link.label}
-            href={link.url}
+            href={safeHref(link.url)}
             target="_blank"
             rel="noopener noreferrer"
             title={link.label}

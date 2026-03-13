@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  getAllKBRecordsByCollection,
+  getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
 } from "@/data/kb";
@@ -10,6 +10,7 @@ import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
   titleCase,
@@ -35,6 +36,7 @@ interface ParsedGrant {
   status: string | null;
   source: string | null;
   program: string | null;
+  programId: string | null;
   notes: string | null;
 }
 
@@ -77,16 +79,14 @@ function parseGrant(record: KBRecordEntry): ParsedGrant {
     status: typeof f.status === "string" ? f.status : null,
     source: typeof f.source === "string" ? f.source : null,
     program: typeof f.program === "string" ? f.program : null,
+    programId: typeof f.programId === "string" ? f.programId : null,
     notes: typeof f.notes === "string" ? f.notes : null,
   };
 }
 
-// ── Static params ──────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  const allGrants = getAllKBRecordsByCollection("grants");
-  return allGrants.map((record) => ({ id: record.key }));
-}
+// ── Rendering mode ─────────────────────────────────────────────────────
+// Render on-demand to reduce build output size.
+// Grant detail pages are new and low-traffic.
 
 // ── Metadata ───────────────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const record = allGrants.find((r) => r.key === id);
   if (!record) {
     return { title: "Grant Not Found" };
@@ -126,7 +126,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default async function GrantDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const record = allGrants.find((r) => r.key === id);
 
   if (!record) notFound();
@@ -223,9 +223,18 @@ export default async function GrantDetailPage({ params }: PageProps) {
             </DetailSection>
           )}
 
-          {grant.program && (
+          {(grant.program || grant.programId) && (
             <DetailSection title="Program">
-              <span className="text-sm text-foreground">{grant.program}</span>
+              {grant.programId ? (
+                <Link
+                  href={`/funding-programs/${grant.programId}`}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  {grant.program ?? grant.programId}
+                </Link>
+              ) : (
+                <span className="text-sm text-foreground">{grant.program}</span>
+              )}
             </DetailSection>
           )}
 
@@ -244,7 +253,7 @@ export default async function GrantDetailPage({ params }: PageProps) {
             <DetailSection title="Source">
               {isUrl(grant.source) ? (
                 <a
-                  href={grant.source}
+                  href={safeHref(grant.source)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline break-all"

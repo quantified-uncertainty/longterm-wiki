@@ -12,27 +12,27 @@ import {
 import {
   getKBFacts,
   getKBLatest,
-  getKBEntitySlug,
 } from "@/data/kb";
 import {
   resolveEntityRef,
   formatAmount,
-  formatDateRange,
   getEntityWikiHref,
-  fieldStr,
-  formatCompactCurrency,
 } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
   Breadcrumbs,
-  CurrentBadge,
-  FounderBadge,
   FactsPanel,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import { getExpertById, getPublicationsForPerson } from "@/data";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
+import { CareerHistory } from "./career-history";
+import { EducationSection } from "./education-section";
+import { PublicationsSection } from "./publications-section";
+import { FundingConnections } from "./funding-connections";
+import { OrgRoles } from "./org-roles";
+import { BoardSeats } from "./board-seats";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -88,7 +88,7 @@ export default async function PersonProfilePage({
   const expert = getExpertById(slug);
   const positions = expert?.positions ?? [];
 
-  // Publications linked to this person (from literature.yaml via people-resources.yaml)
+  // Publications linked to this person
   const publications = getPublicationsForPerson(slug);
 
   // Reverse lookup: org key-person records referencing this person
@@ -97,10 +97,10 @@ export default async function PersonProfilePage({
   // Board seats across all organizations referencing this person
   const boardSeats = getBoardSeatsForPerson(entity.id);
 
-  // Career history from KB records (populated via personnel table)
+  // Career history from KB records
   const careerHistory = getCareerHistory(entity.id);
 
-  // Funding connections (grants via org affiliations or personal grants)
+  // Funding connections
   const fundingConnections = getFundingConnectionsForPerson(entity.id);
 
   // All facts for count
@@ -187,6 +187,10 @@ export default async function PersonProfilePage({
     .join("")
     .toUpperCase();
 
+  // Education text (if available)
+  const educationText =
+    educationFact?.value.type === "text" ? educationFact.value.value : null;
+
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
       <Breadcrumbs
@@ -230,16 +234,6 @@ export default async function PersonProfilePage({
             >
               KB data &rarr;
             </Link>
-            {socialMediaFact?.value.type === "text" && (
-              <a
-                href={`https://x.com/${socialMediaFact.value.value.replace(/^@/, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                {socialMediaFact.value.value}
-              </a>
-            )}
           </div>
         </div>
       </div>
@@ -256,408 +250,18 @@ export default async function PersonProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Expert Positions */}
           <ExpertPositions positions={positions} />
-
-          {/* Career Timeline */}
-          {careerHistory.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Career History
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {careerHistory.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {careerHistory.map((entry) => {
-                  const orgRef = resolveEntityRef(entry.organization);
-                  const orgSlug = orgRef
-                    ? getKBEntitySlug(orgRef.id)
-                    : undefined;
-                  const isCurrent = !entry.endDate;
-                  const isFounder = /founder/i.test(entry.title);
-
-                  return (
-                    <div key={entry.key} className="px-5 py-3.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-sm">
-                          {entry.title}
-                        </span>
-                        {isFounder && <FounderBadge />}
-                        {isCurrent && <CurrentBadge />}
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-0.5">
-                        {orgSlug ? (
-                          <Link
-                            href={`/organizations/${orgSlug}`}
-                            className="hover:text-primary transition-colors"
-                          >
-                            {orgRef?.name ?? entry.organization}
-                          </Link>
-                        ) : (
-                          <span>{orgRef?.name ?? entry.organization}</span>
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground/60 mt-1">
-                        {formatDateRange(entry.startDate, entry.endDate)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Education */}
-          {educationFact?.value.type === "text" && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Education
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card px-5 py-3">
-                <p className="text-sm">{educationFact.value.value}</p>
-              </div>
-            </section>
-          )}
-
-          {/* Publications & Resources */}
-          {publications.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Publications & Resources
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {publications.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {publications
-                  .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-                  .map((pub, idx) => (
-                    <div
-                      key={`${idx}-${pub.title}`}
-                      className="px-4 py-3"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          {pub.link ? (
-                            <a
-                              href={pub.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-sm text-foreground hover:text-primary transition-colors"
-                            >
-                              {pub.title}
-                            </a>
-                          ) : (
-                            <span className="font-medium text-sm">
-                              {pub.title}
-                            </span>
-                          )}
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {pub.year && (
-                              <span className="text-xs text-muted-foreground tabular-nums">
-                                {pub.year}
-                              </span>
-                            )}
-                            {pub.type && (
-                              <span className="text-xs text-muted-foreground/60">
-                                {pub.type}
-                              </span>
-                            )}
-                            <span className="text-xs text-muted-foreground/40">
-                              {pub.category}
-                            </span>
-                          </div>
-                        </div>
-                        {pub.link && (
-                          <a
-                            href={pub.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-xs text-muted-foreground/50 hover:text-primary transition-colors"
-                            title="Open link"
-                          >
-                            &rarr;
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </section>
-          )}
-
-          {/* Funding Connections */}
-          {fundingConnections.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Funding Connections
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {fundingConnections.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                {/* Summary stats */}
-                {(() => {
-                  const totalAmount = fundingConnections.reduce(
-                    (sum, c) => sum + (c.amount ?? 0),
-                    0,
-                  );
-                  const gaveCount = fundingConnections.filter(
-                    (c) => c.direction === "gave",
-                  ).length;
-                  const receivedCount = fundingConnections.filter(
-                    (c) =>
-                      c.direction === "received" || c.direction === "personal",
-                  ).length;
-                  return (
-                    <div className="px-5 py-3 bg-muted/30 border-b border-border/40 flex items-center gap-4 text-xs text-muted-foreground">
-                      {totalAmount > 0 && (
-                        <span>
-                          Total:{" "}
-                          <span className="font-semibold text-foreground">
-                            {formatCompactCurrency(totalAmount)}
-                          </span>
-                        </span>
-                      )}
-                      {gaveCount > 0 && (
-                        <span>
-                          Gave:{" "}
-                          <span className="font-medium">{gaveCount}</span>
-                        </span>
-                      )}
-                      {receivedCount > 0 && (
-                        <span>
-                          Received:{" "}
-                          <span className="font-medium">{receivedCount}</span>
-                        </span>
-                      )}
-                    </div>
-                  );
-                })()}
-                <div className="divide-y divide-border/40">
-                  {fundingConnections.slice(0, 20).map((conn) => (
-                    <div key={conn.key} className="px-5 py-3.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                            conn.direction === "gave"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                              : conn.direction === "personal"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                                : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                          }`}
-                        >
-                          {conn.direction === "gave"
-                            ? "Funded"
-                            : conn.direction === "personal"
-                              ? "Received"
-                              : "Org received"}
-                        </span>
-                        <span className="font-semibold text-sm">
-                          {conn.name}
-                        </span>
-                        {conn.amount != null && (
-                          <span className="text-sm font-semibold tabular-nums text-foreground">
-                            {formatCompactCurrency(conn.amount)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
-                        {conn.direction === "gave" && conn.counterparty && (
-                          <span>
-                            to{" "}
-                            {conn.counterparty.href ? (
-                              <Link
-                                href={conn.counterparty.href}
-                                className="hover:text-primary transition-colors"
-                              >
-                                {conn.counterparty.name}
-                              </Link>
-                            ) : (
-                              conn.counterparty.name
-                            )}
-                          </span>
-                        )}
-                        {(conn.direction === "received" ||
-                          conn.direction === "personal") &&
-                          conn.counterparty && (
-                            <span>
-                              from{" "}
-                              {conn.counterparty.href ? (
-                                <Link
-                                  href={conn.counterparty.href}
-                                  className="hover:text-primary transition-colors"
-                                >
-                                  {conn.counterparty.name}
-                                </Link>
-                              ) : (
-                                conn.counterparty.name
-                              )}
-                            </span>
-                          )}
-                        {conn.viaOrg && (
-                          <span className="text-muted-foreground/60">
-                            via{" "}
-                            {conn.viaOrg.slug ? (
-                              <Link
-                                href={`/organizations/${conn.viaOrg.slug}`}
-                                className="hover:text-primary transition-colors"
-                              >
-                                {conn.viaOrg.name}
-                              </Link>
-                            ) : (
-                              conn.viaOrg.name
-                            )}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground/60">
-                        {conn.date && <span>{conn.date}</span>}
-                        {conn.program && (
-                          <span className="text-muted-foreground/40">
-                            {conn.program}
-                          </span>
-                        )}
-                        {conn.status && (
-                          <span
-                            className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                              conn.status === "active"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                                : conn.status === "completed"
-                                  ? "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300"
-                                  : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {conn.status}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {fundingConnections.length > 20 && (
-                  <div className="px-5 py-3 border-t border-border/40 text-center">
-                    <span className="text-xs text-muted-foreground">
-                      Showing 20 of {fundingConnections.length} connections
-                    </span>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
+          <CareerHistory careerHistory={careerHistory} />
+          {educationText && <EducationSection education={educationText} />}
+          <PublicationsSection publications={publications} />
+          <FundingConnections fundingConnections={fundingConnections} />
         </div>
 
         {/* Sidebar */}
         <div className="space-y-8">
-          {/* Social Links */}
           <SocialLinks facts={socialLinkFacts} />
-
-          {/* Organization Roles (from org key-person records) */}
-          {sortedOrgRoles.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Organization Roles
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedOrgRoles.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card">
-                {sortedOrgRoles.map(({ org, record }) => {
-                  const title = fieldStr(record.fields, "title");
-                  const start = fieldStr(record.fields, "start");
-                  const end = fieldStr(record.fields, "end");
-                  const isFounder = !!record.fields.is_founder;
-                  const orgSlug = getKBEntitySlug(org.id);
-
-                  return (
-                    <div
-                      key={`${org.id}-${record.key}`}
-                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
-                    >
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {orgSlug ? (
-                          <Link
-                            href={`/organizations/${orgSlug}`}
-                            className="font-semibold text-sm hover:text-primary transition-colors"
-                          >
-                            {org.name}
-                          </Link>
-                        ) : (
-                          <span className="font-semibold text-sm">
-                            {org.name}
-                          </span>
-                        )}
-                        {isFounder && <FounderBadge />}
-                        {!end && <CurrentBadge />}
-                      </div>
-                      {title && (
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {title}
-                        </div>
-                      )}
-                      <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {formatDateRange(start, end)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Board Seats */}
-          {sortedBoardSeats.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Board Seats
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedBoardSeats.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card">
-                {sortedBoardSeats.map(({ org, record }) => {
-                  const role = fieldStr(record.fields, "role");
-                  const appointed = fieldStr(record.fields, "appointed");
-                  const departed = fieldStr(record.fields, "departed");
-                  const orgSlug = getKBEntitySlug(org.id);
-
-                  return (
-                    <div
-                      key={`${org.id}-${record.key}`}
-                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
-                    >
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {orgSlug ? (
-                          <Link
-                            href={`/organizations/${orgSlug}`}
-                            className="font-semibold text-sm hover:text-primary transition-colors"
-                          >
-                            {org.name}
-                          </Link>
-                        ) : (
-                          <span className="font-semibold text-sm">
-                            {org.name}
-                          </span>
-                        )}
-                        {!departed && <CurrentBadge />}
-                      </div>
-                      {role && (
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {role}
-                        </div>
-                      )}
-                      <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {formatDateRange(appointed, departed)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* Facts */}
+          <OrgRoles orgRoles={sortedOrgRoles} />
+          <BoardSeats boardSeats={sortedBoardSeats} />
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}

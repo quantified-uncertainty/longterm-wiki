@@ -35,7 +35,7 @@ const AllQuery = z.object({
 
 const SyncBenchmarkResultItemSchema = z.object({
   id: z.string().length(10),
-  benchmarkId: z.string().length(10),
+  benchmarkId: z.string().min(1).max(200),
   modelId: z.string().min(1).max(200),
   score: z.number(),
   unit: z.string().max(50).nullable().optional(),

@@ -28,9 +28,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
-  return getAllPublications().map((p) => ({ id: p.id }));
-}
+// Render on-demand to reduce build output size (~79 pages saved).
 
 export async function generateMetadata({
   params,

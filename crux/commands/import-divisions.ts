@@ -13,20 +13,7 @@
 
 import { generateId } from "../lib/grant-import/id.ts";
 import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
-import { FUNDER_IDS } from "../lib/grant-import/constants.ts";
-
-// ---------------------------------------------------------------------------
-// Org entity stableIds (from kb-data.json slugToEntityId mapping)
-// ---------------------------------------------------------------------------
-
-const ORG_IDS = {
-  ...FUNDER_IDS,
-  OPEN_PHILANTHROPY: "ULjDXpSLCI", // Coefficient Giving / Open Philanthropy
-  ANTHROPIC: "mK9pX3rQ7n",
-  OPENAI: "1LcLlMGLbw",
-  DEEPMIND: "A4XoubikkQ",
-  MIRI: "puAffUjWSS",
-} as const;
+import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
 // Division type (matches wiki-server SyncDivisionItemSchema)
@@ -50,15 +37,15 @@ interface DivisionDef {
 // ---------------------------------------------------------------------------
 
 const DIVISIONS: DivisionDef[] = [
-  // ---- Open Philanthropy program areas ----
+  // ---- Coefficient Giving / Open Philanthropy program areas ----
   {
     idSeed: "div|open-philanthropy|global-health-and-wellbeing",
     parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
     name: "Global Health and Wellbeing",
     divisionType: "program-area",
     status: "active",
-    source: "https://www.openphilanthropy.org/focus/global-health-and-wellbeing/",
-    notes: "Covers global health, farm animal welfare, and scientific research",
+    source: "https://coefficientgiving.org/funds/global-health-wellbeing-opportunities",
+    notes: "Covers global health, farm animal welfare, and scientific research. 360+ grants; largest program area.",
   },
   {
     idSeed: "div|open-philanthropy|global-catastrophic-risks",
@@ -66,8 +53,83 @@ const DIVISIONS: DivisionDef[] = [
     name: "Global Catastrophic Risks",
     divisionType: "program-area",
     status: "active",
-    source: "https://www.openphilanthropy.org/focus/global-catastrophic-risks/",
-    notes: "Covers AI safety, biosecurity, and other GCR-related grantmaking",
+    source: "https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities",
+    notes: "Covers AI safety, biosecurity, and other GCR-related grantmaking. 250+ grants across cause areas.",
+  },
+  {
+    idSeed: "div|coefficient-giving|navigating-transformative-ai",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Navigating Transformative AI",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/navigating-transformative-ai",
+    notes:
+      "480+ grants totaling ~$500M. Sub-areas: Technical Safety (Favaloro, O'Keeffe-O'Donovan), AI Governance (Muehlhauser), Short Timelines (Zabel). ~$63.6M in 2024 (~60% of all external AI safety funding).",
+  },
+  {
+    idSeed: "div|coefficient-giving|biosecurity",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Biosecurity & Pandemic Preparedness",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness",
+    notes: "140+ grants totaling ~$260M. Led by Andrew Snyder-Beattie. Work began ~2015, five years before COVID-19.",
+  },
+  {
+    idSeed: "div|coefficient-giving|farm-animal-welfare",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Farm Animal Welfare",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/farm-animal-welfare",
+    notes: "Led by Lewis Bollard. Corporate cage-free campaigns, alt-protein research, advocacy.",
+  },
+  {
+    idSeed: "div|coefficient-giving|science-rd",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Science and Global Health R&D",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/science-and-global-health-rd",
+    notes: "330+ grants + 30+ social investments ($90M+). Led by Jacob Trefethen. Treatments, vaccines, diagnostics.",
+  },
+  {
+    idSeed: "div|coefficient-giving|forecasting",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Forecasting",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/forecasting",
+    notes: "30+ grants totaling ~$50M. Led by Benjamin Tereick. Forecasting infrastructure and research.",
+  },
+  {
+    idSeed: "div|coefficient-giving|effective-giving-careers",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Effective Giving & Careers",
+    divisionType: "fund",
+    status: "active",
+    source: "https://coefficientgiving.org/funds/effective-giving-and-careers",
+    notes: "Led by Melanie Basnak and Sam Donald. Support for CEA, 80,000 Hours, EA Funds, and community infrastructure.",
+  },
+  {
+    idSeed: "div|coefficient-giving|abundance-growth",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Abundance & Growth",
+    divisionType: "fund",
+    status: "active",
+    startDate: "2025-03",
+    source: "https://coefficientgiving.org/funds/abundance-and-growth",
+    notes: "$120M committed over 3 years. Led by Matt Clancy. Economic growth, scientific progress, US-focused.",
+  },
+  {
+    idSeed: "div|coefficient-giving|criminal-justice",
+    parentOrgId: ORG_IDS.OPEN_PHILANTHROPY,
+    name: "Criminal Justice Reform",
+    divisionType: "fund",
+    status: "dissolved",
+    startDate: "2014",
+    endDate: "2022",
+    notes: "Focused on reducing incarceration; wound down in 2022. ~$200M total grants.",
   },
 
   // ---- EA Funds ----
@@ -115,12 +177,109 @@ const DIVISIONS: DivisionDef[] = [
   {
     idSeed: "div|sff|sff-main",
     parentOrgId: ORG_IDS.SFF,
-    name: "Survival and Flourishing Fund",
+    name: "Survival and Flourishing Fund (Main)",
     divisionType: "fund",
     status: "active",
     source: "https://survivalandflourishing.fund/",
     notes:
-      "SFF uses a simulation-based allocation process (S-Process) to distribute grants to organizations working on existential risk reduction",
+      "SFF's primary fund distributing grants via the S-Process simulation-based allocation. ~$152M cumulative since 2019. Three tracks since 2025: Main, Freedom, Fairness.",
+  },
+  {
+    idSeed: "div|sff|initiative-committee",
+    parentOrgId: ORG_IDS.SFF,
+    name: "Initiative Committee",
+    divisionType: "team",
+    status: "active",
+    startDate: "2024",
+    source: "https://survivalandflourishing.fund/",
+    notes:
+      "Small group (Jaan Tallinn, SFF Advisors, 2-5 anonymous voters) that makes proactive grants outside the S-Process rounds.",
+  },
+
+  // ---- Future of Life Institute ----
+  {
+    idSeed: "div|fli|grants-program",
+    parentOrgId: ORG_IDS.FLI,
+    name: "FLI Grants Program",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://futureoflife.org/grant-program/",
+    notes:
+      "FLI's grantmaking arm. $25M+ distributed since 2015 across AI safety, nuclear risk, governance, and existential risk reduction.",
+  },
+  {
+    idSeed: "div|fli|policy-advocacy",
+    parentOrgId: ORG_IDS.FLI,
+    name: "Policy & Advocacy",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://futureoflife.org/",
+    notes:
+      "Campaigns include Asilomar Principles (5,700+ signatories), 2023 Pause Letter (33,000+ signatories), AI Act advocacy. EU and UN engagement.",
+  },
+  {
+    idSeed: "div|fli|fellowships",
+    parentOrgId: ORG_IDS.FLI,
+    name: "Fellowship Programs",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2022",
+    source: "https://futureoflife.org/grant-program/phd-fellowships/",
+    notes:
+      "Vitalik Buterin PhD and Postdoctoral Fellowships in AI Existential Safety. Run with BAIF. 14+ PhD fellows and 4+ postdocs at top universities.",
+  },
+
+  // ---- Schmidt Futures / Schmidt Sciences ----
+  {
+    idSeed: "div|schmidt|ai-advanced-computing",
+    parentOrgId: ORG_IDS.SCHMIDT_FUTURES,
+    name: "AI & Advanced Computing",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.schmidtsciences.org/",
+    notes:
+      "One of five Schmidt Sciences centers. Includes AI2050, AI in Science, and Science of Trustworthy AI programs. $125M+ AI commitment.",
+  },
+  {
+    idSeed: "div|schmidt|climate",
+    parentOrgId: ORG_IDS.SCHMIDT_FUTURES,
+    name: "Climate",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.schmidtsciences.org/",
+    notes: "One of five Schmidt Sciences centers. $45M for carbon cycle research. Focuses on bending the carbon curve.",
+  },
+  {
+    idSeed: "div|schmidt|science-systems",
+    parentOrgId: ORG_IDS.SCHMIDT_FUTURES,
+    name: "Science Systems",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.schmidtsciences.org/",
+    notes:
+      "One of five Schmidt Sciences centers. Breaking down barriers to scientific discovery by supporting people, tools, and communities.",
+  },
+
+  // ---- Manifund ----
+  {
+    idSeed: "div|manifund|regranting",
+    parentOrgId: ORG_IDS.MANIFUND,
+    name: "Regranting Platform",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://manifund.org/about/regranting",
+    notes:
+      "Platform enabling individuals to receive tax-deductible donations for regranting. Provides fiscal sponsorship for individual regranters.",
+  },
+  {
+    idSeed: "div|manifund|impact-certs",
+    parentOrgId: ORG_IDS.MANIFUND,
+    name: "Impact Certificates",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://manifund.org",
+    notes:
+      "Experimental impact certificate marketplace where project creators sell shares of their impact to retroactive funders.",
   },
 
   // ---- DeepMind ----
@@ -212,6 +371,18 @@ const DIVISIONS: DivisionDef[] = [
     source: "https://intelligence.org/research/",
     notes:
       "Core technical research on mathematical foundations of AI alignment, including agent foundations and decision theory",
+  },
+
+  // ---- GiveWell ----
+  {
+    idSeed: "div|givewell|research",
+    parentOrgId: ORG_IDS.GIVEWELL,
+    name: "GiveWell Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.givewell.org/research",
+    notes:
+      "Cost-effectiveness research team evaluating global health and development interventions. Recommends ~$500M+ annually in grants.",
   },
 ];
 

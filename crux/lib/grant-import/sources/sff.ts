@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { QUARTER_TO_MONTH } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -135,6 +136,15 @@ export const source: GrantSource = {
         notesParts.push("Includes matching pledge funding (\u2021)");
       }
 
+      const description = notesParts.join("; ").substring(0, 4000);
+      const programId = matchProgram({
+        source: "sff",
+        funderId: FUNDER_IDS.SFF,
+        focusArea: null,
+        name,
+        description,
+      });
+
       grants.push({
         source: "sff",
         funderId: FUNDER_IDS.SFF,
@@ -144,7 +154,8 @@ export const source: GrantSource = {
         amount,
         date: isoDate,
         focusArea: null,
-        description: notesParts.join("; ").substring(0, 4000),
+        description,
+        programId,
       });
     }
 

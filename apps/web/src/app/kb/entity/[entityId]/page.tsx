@@ -3,14 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-  getKBEntities,
   getKBEntity,
   getKBFacts,
   getKBAllRecordCollections,
   getKBProperty,
   getKBRecordSchema,
   getKBLatest,
-  getKBSlugMap,
 } from "@/data/kb";
 import { getEntityHref } from "@/data";
 import type { Fact, Property, RecordEntry } from "@longterm-wiki/kb";
@@ -96,19 +94,9 @@ function verdictSummary(verdicts: Map<string, VerdictRow>): Record<string, numbe
   return counts;
 }
 
-// ─── Static params & metadata ────────────────────────────────────────
-
-export function generateStaticParams() {
-  const entities = getKBEntities();
-  const slugMap = getKBSlugMap();
-
-  // Generate params for both internal IDs and slugs so both URL patterns work
-  const params = entities.map((entity) => ({ entityId: entity.id }));
-  for (const slug of Object.keys(slugMap)) {
-    params.push({ entityId: slug });
-  }
-  return params;
-}
+// ─── Rendering mode ──────────────────────────────────────────────────
+// Render on-demand to reduce build output size (~724 pages × ~80KB each = ~56MB saved).
+// These are internal KB data pages with low traffic; SSG is unnecessary.
 
 export async function generateMetadata({
   params,

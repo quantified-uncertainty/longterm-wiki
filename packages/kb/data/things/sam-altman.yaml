@@ -51,15 +51,15 @@ facts:
     value: "@sama"
     source: https://x.com/sama
 
-  - id: f_sA_wiki_url
+  - id: f_4wv2f7drz7
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Sam_Altman"
 
-  - id: f_sA_website
+  - id: f_68fi4nulwx
     property: website
     value: "https://blog.samaltman.com"
 
-  - id: f_sA_github
+  - id: f_a0agpci09z
     property: github-profile
     value: "https://github.com/sama"
 

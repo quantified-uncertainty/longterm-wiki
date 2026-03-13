@@ -311,6 +311,8 @@
   numericId: E57
   type: organization
   orgType: academic
+  # parentOrg = legally separate part of another org (not an internal division)
+  parentOrg: uc-berkeley
   summaryPage: safety-orgs-overview
   title: CHAI
   website: https://humancompatible.ai
@@ -781,6 +783,8 @@
   numericId: E364
   type: organization
   orgType: government
+  # parentOrg = legally separate part of another org (not an internal division)
+  parentOrg: uk-dsit
   summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -835,6 +839,8 @@
   numericId: E365
   type: organization
   orgType: government
+  # parentOrg = legally separate part of another org (not an internal division)
+  parentOrg: nist
   summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi

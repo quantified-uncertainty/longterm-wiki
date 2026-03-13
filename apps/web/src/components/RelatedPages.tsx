@@ -27,6 +27,8 @@ const TYPE_TO_GROUP: Record<string, string> = {
   historical: "Historical",
   event: "Historical",
   parameter: "Parameters",
+  // "funder" is a deprecated entity type (alias for organization with orgType: funder).
+  // Kept here for backward compat with relatedGraph entries that may still reference it.
   funder: "Funders",
 };
 

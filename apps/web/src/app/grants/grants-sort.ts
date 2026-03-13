@@ -1,3 +1,6 @@
+import { compareByValue } from "@/lib/sort-utils";
+export type { SortDir } from "@/lib/sort-utils";
+import type { SortDir } from "@/lib/sort-utils";
 import type { GrantRow } from "./grants-table";
 
 export type GrantSortKey =
@@ -9,8 +12,6 @@ export type GrantSortKey =
   | "period"
   | "date"
   | "status";
-
-export type SortDir = "asc" | "desc";
 
 export function getGrantSortValue(
   row: GrantRow,
@@ -42,17 +43,5 @@ export function compareGrantRows(
   sortKey: GrantSortKey,
   sortDir: SortDir,
 ): number {
-  const dir = sortDir === "asc" ? 1 : -1;
-  const va = getGrantSortValue(a, sortKey);
-  const vb = getGrantSortValue(b, sortKey);
-
-  // Nulls sort last regardless of direction
-  if (va == null && vb == null) return 0;
-  if (va == null) return 1;
-  if (vb == null) return -1;
-
-  if (typeof va === "string" && typeof vb === "string") {
-    return va.localeCompare(vb) * dir;
-  }
-  return ((va as number) - (vb as number)) * dir;
+  return compareByValue(a, b, (row) => getGrantSortValue(row, sortKey), sortDir);
 }

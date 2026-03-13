@@ -5,9 +5,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export function generateStaticParams() {
-  return getAllPublications().map((p) => ({ id: p.id }));
-}
+// Render on-demand — this is just a redirect page.
 
 export default async function LegacyPublicationPage({ params }: PageProps) {
   const { id } = await params;

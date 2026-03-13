@@ -963,7 +963,7 @@ async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0 };
+    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0, divisionPersonnel: 0 };
   }
 
   const headers = buildHeaders();
@@ -975,6 +975,7 @@ async function mergePGRecordsIntoKB(kb) {
   let equityPositionsCount = 0;
   let divisionsCount = 0;
   let fundingProgramsCount = 0;
+  let divisionPersonnelCount = 0;
 
   if (!kb.records) kb.records = {};
 
@@ -1009,6 +1010,7 @@ async function mergePGRecordsIntoKB(kb) {
     equityPositionsResult,
     divisionsResult,
     fundingProgramsResult,
+    divisionPersonnelResult,
   ] = await Promise.allSettled([
     fetchAllPages('/api/personnel/all', 'personnel'),
     fetchAllPages('/api/grants/all', 'grants'),
@@ -1017,6 +1019,7 @@ async function mergePGRecordsIntoKB(kb) {
     fetchAllPages('/api/equity-positions/all', 'equityPositions'),
     fetchAllPages('/api/divisions/all', 'divisions'),
     fetchAllPages('/api/funding-programs/all', 'fundingPrograms'),
+    fetchAllPages('/api/division-personnel/all', 'divisionPersonnel'),
   ]);
 
   /**
@@ -1143,6 +1146,17 @@ async function mergePGRecordsIntoKB(kb) {
     fundingProgramRowToRecordEntry,
   );
 
+  // --- Process division personnel ---
+  // Division personnel are keyed by divisionId (stored in a synthetic entity key)
+  divisionPersonnelCount = mergeCollection(
+    'division-personnel',
+    divisionPersonnelResult,
+    ['division-personnel'],
+    (row) => `__division__${row.divisionId}`,
+    () => 'division-personnel',
+    divisionPersonnelRowToRecordEntry,
+  );
+
   return {
     personnel: personnelCount,
     grants: grantsCount,
@@ -1151,6 +1165,7 @@ async function mergePGRecordsIntoKB(kb) {
     equityPositions: equityPositionsCount,
     divisions: divisionsCount,
     fundingPrograms: fundingProgramsCount,
+    divisionPersonnel: divisionPersonnelCount,
   };
 }
 
@@ -1207,6 +1222,58 @@ async function fetchBenchmarkResults() {
     return byModel;
   } catch (err) {
     console.log(`  benchmark-results: skipped (${err instanceof Error ? err.message : err})`);
+    return {};
+  }
+}
+
+/**
+ * Fetch record verification verdicts from wiki-server.
+ * Returns a map keyed by "recordType:recordId" → verdict info.
+ */
+async function fetchRecordVerdicts() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  record-verdicts: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const pageSize = 200;
+    const verdicts = {};
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/record-verifications/verdicts?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+      if (!resp.ok) {
+        console.log(`  record-verdicts: skipped (HTTP ${resp.status})`);
+        return {};
+      }
+      const data = await resp.json();
+      const items = data.verdicts || [];
+      for (const v of items) {
+        verdicts[`${v.recordType}:${v.recordId}`] = {
+          verdict: v.verdict,
+          confidence: v.confidence,
+          sourcesChecked: v.sourcesChecked,
+          needsRecheck: v.needsRecheck,
+          lastComputedAt: v.lastComputedAt,
+        };
+      }
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    const count = Object.keys(verdicts).length;
+    if (count > 0) {
+      console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
+    } else {
+      console.log('  record-verdicts: 0 verdicts (none computed yet)');
+    }
+    return verdicts;
+  } catch (err) {
+    console.log(`  record-verdicts: skipped (${err instanceof Error ? err.message : err})`);
     return {};
   }
 }
@@ -1269,6 +1336,7 @@ function grantRowToRecordEntry(row) {
   if (row.status) fields.status = row.status;
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
+  if (row.programId) fields.programId = row.programId;
 
   return {
     key: row.id,
@@ -1420,6 +1488,27 @@ function fundingProgramRowToRecordEntry(row) {
     key: row.id,
     schema: 'funding-program',
     ownerEntityId: row.orgId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG division personnel row to the RecordEntry format used by frontend components.
+ */
+function divisionPersonnelRowToRecordEntry(row) {
+  const fields = {
+    personId: row.personId,
+    role: row.role,
+  };
+  if (row.startDate) fields.startDate = row.startDate;
+  if (row.endDate) fields.endDate = row.endDate;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'division-personnel',
+    ownerEntityId: `__division__${row.divisionId}`,
     fields,
   };
 }
@@ -1962,9 +2051,9 @@ async function main() {
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
   if (database.kb && !CONTENT_ONLY) {
     const pgRecordCounts = await mergePGRecordsIntoKB(database.kb);
-    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms;
+    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms + pgRecordCounts.divisionPersonnel;
     if (pgTotal > 0) {
-      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions, ${pgRecordCounts.divisions} divisions, ${pgRecordCounts.fundingPrograms} funding programs merged from PG`);
+      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions, ${pgRecordCounts.divisions} divisions, ${pgRecordCounts.fundingPrograms} funding programs, ${pgRecordCounts.divisionPersonnel} division personnel merged from PG`);
     }
   }
 
@@ -1972,6 +2061,12 @@ async function main() {
   if (!CONTENT_ONLY) {
     database.benchmarkResults = await fetchBenchmarkResults();
   }
+
+  // TODO: Enable when record verification dashboard is built (see #2243)
+  // Fetch record verification verdicts from PG — currently no frontend consumer
+  // if (!CONTENT_ONLY) {
+  //   database.recordVerdicts = await fetchRecordVerdicts();
+  // }
 
   // Build URL → resource map for unconverted link detection
   const resources = database.resources || [];

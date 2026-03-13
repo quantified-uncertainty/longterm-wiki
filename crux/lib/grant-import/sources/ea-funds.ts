@@ -3,6 +3,7 @@ import { parseCSVLine } from "../csv.ts";
 import { parseQuarterYear } from "../dates.ts";
 import { downloadIfMissing } from "../download.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -70,6 +71,14 @@ export const source: GrantSource = {
         ? description.substring(0, 500)
         : `Grant to ${grantee}`;
 
+      const programId = matchProgram({
+        source: "ea-funds",
+        funderId,
+        focusArea: fund,
+        name,
+        description: description || null,
+      });
+
       grants.push({
         source: "ea-funds",
         funderId,
@@ -80,6 +89,7 @@ export const source: GrantSource = {
         date: isoDate,
         focusArea: fund,
         description: description || null,
+        programId,
       });
     }
 

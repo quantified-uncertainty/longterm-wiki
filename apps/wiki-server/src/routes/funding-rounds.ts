@@ -96,7 +96,7 @@ const fundingRoundsApp = new Hono()
     const rows = await db
       .select()
       .from(fundingRounds)
-      .orderBy(desc(fundingRounds.syncedAt))
+      .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id)
       .limit(limit)
       .offset(offset);
 
@@ -123,7 +123,7 @@ const fundingRoundsApp = new Hono()
       .select()
       .from(fundingRounds)
       .where(eq(fundingRounds.companyId, entityId))
-      .orderBy(desc(fundingRounds.syncedAt))
+      .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id)
       .limit(limit)
       .offset(offset);
 

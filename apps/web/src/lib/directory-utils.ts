@@ -17,7 +17,7 @@ import type { Entity } from "@longterm-wiki/kb";
 import { formatCompactCurrency } from "@/lib/format-compact";
 
 // Re-export client-safe formatting for convenience in server components
-export { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
+export { formatCompactCurrency, formatCompactNumber, safeHref } from "@/lib/format-compact";
 
 // Re-export from format.ts so server consumers don't need two imports
 export { isUrl, shortDomain, formatKBDate } from "@/components/wiki/kb/format";

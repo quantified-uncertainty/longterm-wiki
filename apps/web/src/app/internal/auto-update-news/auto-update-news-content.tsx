@@ -102,7 +102,7 @@ async function loadNewsItemsFromApi(): Promise<FetchResult<NewsData>> {
   const result = await fetchDetailed<{
     items: AutoUpdateNewsRow[];
     runDates: string[];
-  }>("/api/auto-update-news/dashboard?runs=10", { revalidate: 60 });
+  }>("/api/auto-update-news/dashboard?runs=10&limit=200", { revalidate: 60 });
 
   if (!result.ok) return result;
 

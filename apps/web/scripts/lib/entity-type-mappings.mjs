@@ -16,6 +16,8 @@ export const OLD_TYPE_MAP = {
   'lab-academic': 'organization',
   'lab-startup': 'organization',
   researcher: 'person',
+  // Funder → organization (deprecated; use orgType: "funder" instead)
+  funder: 'organization',
 };
 
 /** Maps old lab-* types to organization orgType values. */

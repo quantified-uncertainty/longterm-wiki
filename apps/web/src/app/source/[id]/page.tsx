@@ -9,7 +9,10 @@ import {
   getEntityById,
   getPageById,
   getEntityHref,
+  getTypedEntityById,
+  findPersonByName,
 } from "@data";
+import { getEntityTypeLabel } from "@data/entity-ontology";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { CitationContentResult } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
@@ -24,8 +27,12 @@ import {
   Database,
   FileQuestion,
   ArrowLeft,
+  User,
+  BookOpen,
+  Shield,
 } from "lucide-react";
 import { cn } from "@lib/utils";
+import { safeHref } from "@/lib/directory-utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -68,6 +75,32 @@ function getPageTitle(pageId: string): string {
     .join(" ");
 }
 
+const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
+  5: "Gold standard. Rigorous peer review, high editorial standards, and strong institutional reputation.",
+  4: "High quality. Established institution or organization with editorial oversight and accountability.",
+  3: "Good quality. Reputable source with community review or editorial standards, but less rigorous than peer-reviewed venues.",
+  2: "Mixed quality. Some useful content but inconsistent editorial standards. Claims should be verified.",
+  1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
+};
+
+/** Resolve an author name to a linked element or plain text */
+function AuthorName({ name }: { name: string }) {
+  const personEntityId = findPersonByName(name);
+  if (personEntityId) {
+    const href = getEntityHref(personEntityId);
+    return (
+      <Link
+        href={href}
+        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        <User className="w-3 h-3" />
+        {name}
+      </Link>
+    );
+  }
+  return <span>{name}</span>;
+}
+
 export default async function SourcePage({ params }: PageProps) {
   const { id } = await params;
   const resource = resolveResource(id);
@@ -93,26 +126,19 @@ export default async function SourcePage({ params }: PageProps) {
   const hasKeyPoints = resource.key_points && resource.key_points.length > 0;
   const hasReview = !!resource.review;
   const hasContentSections = hasAbstract || hasSummary || hasKeyPoints || hasReview;
+  const hasAuthors = resource.authors && resource.authors.length > 0;
 
-  // Build metadata items for a single line
-  const metadataItems: string[] = [];
-  if (resource.authors && resource.authors.length > 0) {
-    metadataItems.push(
-      resource.authors.length <= 3
-        ? resource.authors.join(", ")
-        : `${resource.authors[0]} et al.`
-    );
-  }
-  if (resource.published_date) {
-    metadataItems.push(resource.published_date.slice(0, 4));
-  }
-  if (publication) {
-    metadataItems.push(
-      publication.name + (publication.peer_reviewed ? " (peer-reviewed)" : "")
-    );
-  } else if (domain) {
-    metadataItems.push(domain);
-  }
+  // Build citing page info for the table
+  const citingPageInfo = citingPages.map((pageId) => {
+    const entity = getEntityById(pageId);
+    const typedEntity = getTypedEntityById(pageId);
+    const page = getPageById(pageId);
+    const href = getEntityHref(pageId, entity?.type);
+    const title = getPageTitle(pageId);
+    const entityType = typedEntity?.entityType ?? entity?.type ?? null;
+    const quality = page?.quality ?? null;
+    return { pageId, href, title, entityType, quality };
+  });
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
@@ -126,38 +152,44 @@ export default async function SourcePage({ params }: PageProps) {
       </Link>
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-1.5">
+      <div className="mb-6">
+        <div className="flex items-start gap-3 mb-1.5">
           <h1 className="text-2xl font-bold">{resource.title}</h1>
           {resource.type && (
-            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
+            <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
               <FileText className="w-3 h-3" />
               {resource.type}
             </span>
           )}
         </div>
 
-        {/* Metadata row — authors, year, publication, credibility, and URL on one line */}
+        {/* Metadata row — year, publication, URL */}
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground">
-          {metadataItems.map((item, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5">
-              {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
-              <span>{item}</span>
-            </span>
-          ))}
-          {credibility != null && (
+          {resource.published_date && (
+            <span>{resource.published_date.slice(0, 4)}</span>
+          )}
+          {publication && (
             <span className="inline-flex items-center gap-1.5">
-              {metadataItems.length > 0 && (
+              {resource.published_date && (
                 <span className="text-muted-foreground/30">&middot;</span>
               )}
-              <CredibilityBadge
-                level={credibility}
-                size="sm"
-                showLabel
-              />
-              <span className="text-xs text-muted-foreground/60">
-                {publication ? "(publisher rating)" : "(source rating)"}
-              </span>
+              <Link
+                href={`/sources/publications/${publication.id}`}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {publication.name}
+              </Link>
+              {publication.peer_reviewed && (
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs">(peer-reviewed)</span>
+              )}
+            </span>
+          )}
+          {!publication && domain && (
+            <span className="inline-flex items-center gap-1.5">
+              {resource.published_date && (
+                <span className="text-muted-foreground/30">&middot;</span>
+              )}
+              <span>{domain}</span>
             </span>
           )}
           {resource.url && (() => {
@@ -165,11 +197,11 @@ export default async function SourcePage({ params }: PageProps) {
             const displayUrl = shortUrl.length > 60 ? shortUrl.slice(0, 57) + "..." : shortUrl;
             return (
               <span className="inline-flex items-center gap-1.5">
-                {(metadataItems.length > 0 || credibility != null) && (
+                {(resource.published_date || publication || domain) && (
                   <span className="text-muted-foreground/30">&middot;</span>
                 )}
                 <a
-                  href={resource.url}
+                  href={safeHref(resource.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
@@ -183,8 +215,71 @@ export default async function SourcePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Data Status Banner — simplified, no content-availability pills */}
-      <section className="mb-8 p-4 rounded-lg border border-border bg-card">
+      {/* Authors section */}
+      {hasAuthors && (
+        <section className="mb-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+            <User className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />
+            {resource.authors!.length === 1 ? "Author" : "Authors"}
+          </h2>
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-sm">
+            {resource.authors!.map((author, i) => (
+              <span key={i} className="inline-flex items-center gap-1.5">
+                {i > 0 && <span className="text-muted-foreground/30">&middot;</span>}
+                <AuthorName name={author} />
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Credibility section — prominent display */}
+      {credibility != null && (
+        <section className="mb-6 p-4 rounded-lg border border-border bg-card">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <Shield className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            Credibility Rating
+          </h2>
+          <div className="flex items-start gap-4">
+            <div className="shrink-0 text-center">
+              <div className="text-3xl font-bold tabular-nums">
+                {credibility}/5
+              </div>
+              <CredibilityBadge
+                level={credibility}
+                size="md"
+                showLabel
+                className="mt-1"
+              />
+            </div>
+            <div className="text-sm text-muted-foreground leading-relaxed">
+              <p>
+                {CREDIBILITY_DESCRIPTIONS[Math.max(1, Math.min(5, Math.round(credibility)))] ??
+                  CREDIBILITY_DESCRIPTIONS[3]}
+              </p>
+              {publication && (
+                <p className="mt-1.5 text-xs text-muted-foreground/70">
+                  Rating inherited from publication venue:{" "}
+                  <Link
+                    href={`/sources/publications/${publication.id}`}
+                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {publication.name}
+                  </Link>
+                </p>
+              )}
+              {resource.credibility_override !== undefined && (
+                <p className="mt-1.5 text-xs text-muted-foreground/70">
+                  This resource has a direct credibility override.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Data Status Banner */}
+      <section className="mb-6 p-4 rounded-lg border border-border bg-card">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
           Data Status
         </h2>
@@ -218,7 +313,7 @@ export default async function SourcePage({ params }: PageProps) {
 
       {/* Content sections — consolidated in a bordered container */}
       {hasContentSections && (
-        <section className="mb-8 rounded-lg border border-border overflow-hidden">
+        <section className="mb-6 rounded-lg border border-border overflow-hidden">
           {/* Abstract */}
           {hasAbstract && (
             <div className="px-5 py-4 border-b border-border last:border-b-0">
@@ -279,36 +374,70 @@ export default async function SourcePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Citing pages — uses EntityLink-style pill links */}
-      {citingPages.length > 0 && (
-        <section className="mb-8">
+      {/* Cited By table */}
+      {citingPageInfo.length > 0 && (
+        <section className="mb-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            <Link2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
-            Referenced by {citingPages.length} page
-            {citingPages.length !== 1 ? "s" : ""}
+            <BookOpen className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            Cited by {citingPageInfo.length} page
+            {citingPageInfo.length !== 1 ? "s" : ""}
           </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {citingPages.map((pageId) => {
-              const entity = getEntityById(pageId);
-              const href = getEntityHref(pageId, entity?.type);
-              const title = getPageTitle(pageId);
-              return (
-                <Link
-                  key={pageId}
-                  href={href}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted rounded text-sm text-accent-foreground no-underline transition-colors hover:bg-muted/80"
-                >
-                  {title}
-                </Link>
-              );
-            })}
+          <div className="rounded-lg border border-border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50">
+                  <th className="text-left px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Page
+                  </th>
+                  <th className="text-left px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Type
+                  </th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Quality
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {citingPageInfo.map(({ pageId, href, title, entityType, quality }) => (
+                  <tr
+                    key={pageId}
+                    className="border-t border-border hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="px-4 py-2">
+                      <Link
+                        href={href}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      >
+                        {title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {entityType ? (
+                        <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-muted capitalize">
+                          {getEntityTypeLabel(entityType)}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground/50">--</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                      {quality != null ? (
+                        <span>{quality.toFixed(1)}</span>
+                      ) : (
+                        <span className="text-muted-foreground/50">--</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       )}
 
       {/* Cached content preview */}
       {contentData?.fullTextPreview && (
-        <section className="mb-8">
+        <section className="mb-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
             Cached Content Preview
           </h2>

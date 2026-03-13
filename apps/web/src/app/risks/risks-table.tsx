@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { compareByValue, type SortDir } from "@/lib/sort-utils";
 
 export interface RiskRow {
   id: string;
@@ -31,7 +32,6 @@ const RISK_CATEGORY_COLORS: Record<string, string> = {
 };
 
 type SortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
-type SortDir = "asc" | "desc";
 
 const SEVERITY_ORDER: Record<string, number> = {
   low: 1,
@@ -88,36 +88,23 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       result = result.filter((r) => r.name.toLowerCase().includes(q));
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: RiskRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.name.toLowerCase();
-          case "category":
-            return row.riskCategory ?? "";
-          case "severity":
-            return row.severity ? (SEVERITY_ORDER[row.severity] ?? 0) : null;
-          case "likelihood":
-            return row.likelihood ?? null;
-          case "timeHorizon":
-            return row.timeHorizon ?? null;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      // Nulls sort last regardless of direction
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
+    const getValue = (row: RiskRow): string | number | null => {
+      switch (sortKey) {
+        case "name":
+          return row.name.toLowerCase();
+        case "category":
+          return row.riskCategory ?? "";
+        case "severity":
+          return row.severity ? (SEVERITY_ORDER[row.severity] ?? 0) : null;
+        case "likelihood":
+          return row.likelihood ?? null;
+        case "timeHorizon":
+          return row.timeHorizon ?? null;
       }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    };
+    result = [...result].sort((a, b) =>
+      compareByValue(a, b, getValue, sortDir),
+    );
 
     return result;
   }, [rows, search, categoryFilter, sortKey, sortDir]);

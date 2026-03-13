@@ -8,13 +8,13 @@ thing:
     - GiveWell.org
 
 facts:
-  - id: f_givewell_desc
+  - id: f_afp7cku2dp
     property: description
     value: >-
       GiveWell is a nonprofit charity evaluator founded in 2007 by Holden Karnofsky and Elie Hassenfeld.
       It conducts in-depth research to identify the most cost-effective charities in global health and
       development, and directs hundreds of millions of dollars annually to its top-recommended organizations.
     asOf: 2026-03
-  - id: f_givewell_web
+  - id: f_b3f24fq272
     property: website
     value: https://www.givewell.org

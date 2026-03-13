@@ -198,13 +198,16 @@ function transformEntity(raw, expertMap, orgMap) {
       return {
         ...base,
         entityType: 'organization',
-        orgType: orgType || orgData?.type || undefined,
+        orgType: orgType || orgData?.type || raw.orgType || undefined,
         founded: orgData?.founded || cf('Founded') || cf('Established'),
         headquarters: orgData?.headquarters || cf('Location') || cf('Headquarters'),
         employees: orgData?.employees || cf('Employees'),
         funding: orgData?.funding || cf('Funding'),
         website: orgData?.website || raw.website,
         title: orgData?.name || raw.title,
+        // parentOrg: legally separate entity that is part of a larger org.
+        // Distinct from "divisions" (internal sub-units stored in wiki-server).
+        parentOrg: raw.parentOrg || orgData?.parentOrg || undefined,
         customFields: filterCustomFields('Founded', 'Established', 'Location', 'Headquarters', 'Employees', 'Funding'),
       };
     }
@@ -262,7 +265,6 @@ function transformEntity(raw, expertMap, orgMap) {
     case 'argument':
     case 'scenario':
     case 'case-study':
-    case 'funder':
     case 'resource':
     case 'parameter':
     case 'metric':

@@ -78,7 +78,7 @@ flowchart TD
 
 The cornerstone of Anthropic's Core Views is the argument that effective AI safety research requires access to the most capable AI systems available. This claim rests on several empirical observations about how AI capabilities and risks emerge at scale. Anthropic argues that many safety-relevant phenomena only become apparent in sufficiently large and capable models, making toy problems and smaller-scale research insufficient for developing robust safety techniques. The Core Views document estimates that over the next 5 years, they "expect around a 1000x increase in the computation used to train the largest models, which could result in a capability jump significantly larger than the jump from GPT-2 to GPT-3."
 
-The evidence supporting this thesis has accumulated through Anthropic's own research programs. Their work on <R id="e724db341d6e0065">mechanistic interpretability</R>, led by Chris Olah and published in "<R id="e724db341d6e0065">Scaling Monosemanticity</R>" (May 2024), demonstrates that sparse autoencoders can extract interpretable features from Claude 3 Sonnet—identifying millions of concepts including safety-relevant features related to deception, sycophancy, and dangerous content. This required access to production-scale models with billions of parameters, providing evidence that certain interpretability techniques only become feasible at frontier scale.
+The evidence supporting this thesis has accumulated through Anthropic's own research programs. Their work on <R id="e724db341d6e0065">mechanistic interpretability</R>, led by <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> and published in "<R id="e724db341d6e0065">Scaling Monosemanticity</R>" (May 2024), demonstrates that sparse autoencoders can extract interpretable features from Claude 3 Sonnet—identifying millions of concepts including safety-relevant features related to deception, sycophancy, and dangerous content. This required access to production-scale models with billions of parameters, providing evidence that certain interpretability techniques only become feasible at frontier scale.
 
 ### Evidence Assessment
 
@@ -103,7 +103,7 @@ Anthropic's commitment to safety research is reflected in substantial financial 
 | Safety-focused staff | 200-330 (20-30%) | Includes interpretability, alignment, red team, policy |
 | Interpretability team | 40-60 researchers | Largest dedicated team globally |
 | Annual safety publications | 15-25 papers | Constitutional AI, interpretability, deception research |
-| Key safety hires (2024) | Jan Leike, John Schulman | Former OpenAI safety leads joined Anthropic |
+| Key safety hires (2024) | <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>, John Schulman | Former OpenAI safety leads joined Anthropic |
 
 The company's organizational structure reflects this dual focus, with an estimated 20-30% of technical staff working primarily on safety-focused research rather than capability development. This includes the world's largest dedicated interpretability team, comprising 40-60 researchers working on understanding the internal mechanisms of neural networks. The interpretability program, led by figures like Chris Olah from the former OpenAI safety team, represents a distinctive bet that reverse-engineering AI systems can provide crucial insights for ensuring their safe deployment.
 

@@ -12,7 +12,6 @@ import {
   getKBRecords,
   getKBEntitySlug,
   getAllKBRecords,
-  getAllKBRecordsByCollection,
   getKBEntity,
   resolveKBSlug,
   type KBRecordEntry,
@@ -50,22 +49,23 @@ export const getPersonSlugs = () => getEntitySlugs("person");
 
 /**
  * Find all key-person records across all organizations that reference this person.
- * Uses getAllKBRecords to scan all orgs' key-persons collections,
- * filtering by fields.person === personEntityId.
+ * Accepts pre-fetched key-person records to avoid redundant KB scans when the
+ * caller also needs the data for other lookups (e.g., funding connections).
  */
 export function getOrgRolesForPerson(
   personEntityId: string,
+  allKeyPersons?: KBRecordEntry[],
 ): Array<{
   org: { id: string; name: string; type: string };
   record: { key: string; fields: Record<string, unknown> };
 }> {
-  const allKeyPersons = getAllKBRecords("key-persons");
+  const records = allKeyPersons ?? getAllKBRecords("key-persons");
   const results: Array<{
     org: { id: string; name: string; type: string };
     record: { key: string; fields: Record<string, unknown> };
   }> = [];
 
-  for (const rec of allKeyPersons) {
+  for (const rec of records) {
     if (!matchesPersonField(rec.fields.person, personEntityId)) continue;
 
     const orgEntity = getKBEntity(rec.ownerEntityId);
@@ -89,22 +89,23 @@ export function getOrgRolesForPerson(
 
 /**
  * Find all board-seat records across all organizations that reference this person.
- * Uses getAllKBRecords to scan all orgs' board-seats collections,
- * filtering by fields.member === personEntityId.
+ * Accepts pre-fetched board-seat records to avoid redundant KB scans when the
+ * caller also needs the data for other lookups (e.g., funding connections).
  */
 export function getBoardSeatsForPerson(
   personEntityId: string,
+  allBoardSeats?: KBRecordEntry[],
 ): Array<{
   org: { id: string; name: string; type: string };
   record: { key: string; fields: Record<string, unknown> };
 }> {
-  const allBoardSeats = getAllKBRecords("board-seats");
+  const records = allBoardSeats ?? getAllKBRecords("board-seats");
   const results: Array<{
     org: { id: string; name: string; type: string };
     record: { key: string; fields: Record<string, unknown> };
   }> = [];
 
-  for (const rec of allBoardSeats) {
+  for (const rec of records) {
     if (!matchesPersonField(rec.fields.member, personEntityId)) continue;
 
     const orgEntity = getKBEntity(rec.ownerEntityId);
@@ -124,31 +125,6 @@ export function getBoardSeatsForPerson(
   }
 
   return results;
-}
-
-/**
- * Get career history records for a person.
- * Career records have ownerEntityId === personEntityId, so we can look up directly.
- */
-export function getCareerHistoryForPerson(
-  personEntityId: string,
-): KBRecordEntry[] {
-  return getKBRecords(personEntityId, "career-history");
-}
-
-/**
- * Resolve an organization entity ID to a display-friendly object.
- */
-export function resolveOrgForCareer(
-  orgId: string,
-): { id: string; name: string; slug: string | undefined } | null {
-  const orgEntity = getKBEntity(orgId);
-  if (!orgEntity) return null;
-  return {
-    id: orgEntity.id,
-    name: orgEntity.name,
-    slug: getKBEntitySlug(orgEntity.id),
-  };
 }
 
 // -- Career history -------------------------------------------------------
@@ -231,11 +207,16 @@ export interface FundingConnection {
  * 3. Find grants where those orgs are the recipient → "received"
  * 4. Find grants where the person themselves is the recipient → "personal"
  *
- * Deduplicates by grant record key to avoid showing the same grant multiple times
- * when a person has multiple affiliations with the same org.
+ * Deduplicates by composite key (ownerEntityId + record key) to avoid showing
+ * the same grant multiple times when a person has multiple affiliations with the same org.
+ *
+ * Accepts pre-fetched key-person and board-seat records to avoid redundant KB scans
+ * when the caller has already loaded them for other purposes.
  */
 export function getFundingConnectionsForPerson(
   personEntityId: string,
+  prefetchedKeyPersons?: KBRecordEntry[],
+  prefetchedBoardSeats?: KBRecordEntry[],
 ): FundingConnection[] {
   const entity = getKBEntity(personEntityId);
   if (!entity) return [];
@@ -255,17 +236,17 @@ export function getFundingConnectionsForPerson(
   }
 
   // From key-person records (org → person references)
-  const allKeyPersons = getAllKBRecords("key-persons");
-  for (const rec of allKeyPersons) {
-    if (rec.fields.person === personEntityId) {
+  const keyPersonRecords = prefetchedKeyPersons ?? getAllKBRecords("key-persons");
+  for (const rec of keyPersonRecords) {
+    if (matchesPersonField(rec.fields.person, personEntityId)) {
       affiliatedOrgIds.add(rec.ownerEntityId);
     }
   }
 
   // From board seats
-  const allBoardSeats = getAllKBRecords("board-seats");
-  for (const rec of allBoardSeats) {
-    if (rec.fields.member === personEntityId) {
+  const boardSeatRecords = prefetchedBoardSeats ?? getAllKBRecords("board-seats");
+  for (const rec of boardSeatRecords) {
+    if (matchesPersonField(rec.fields.member, personEntityId)) {
       affiliatedOrgIds.add(rec.ownerEntityId);
     }
   }
@@ -311,7 +292,7 @@ export function getFundingConnectionsForPerson(
     return { name, href: null };
   }
 
-  const allGrants = getAllKBRecordsByCollection("grants");
+  const allGrants = getAllKBRecords("grants");
   const seen = new Set<string>();
   const connections: FundingConnection[] = [];
 

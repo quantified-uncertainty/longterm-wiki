@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from "fs";
 import { execFileSync } from "child_process";
 import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
+import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
@@ -156,6 +157,14 @@ export const source: GrantSource = {
         if (g.grantType !== "open-call") focusParts.push(g.grantType);
         const focusArea = focusParts.length > 0 ? focusParts.join("; ") : null;
 
+        const programId = matchProgram({
+          source: "ftx-future-fund",
+          funderId: FUNDER_IDS.FTX_FUTURE_FUND,
+          focusArea,
+          name,
+          description: g.intendedUse,
+        });
+
         grants.push({
           source: "ftx-future-fund",
           funderId: FUNDER_IDS.FTX_FUTURE_FUND,
@@ -166,6 +175,7 @@ export const source: GrantSource = {
           date: isoDate,
           focusArea,
           description: g.intendedUse,
+          programId,
         });
       }
     }

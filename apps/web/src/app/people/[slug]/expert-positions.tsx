@@ -1,5 +1,6 @@
 import type { ExpertPosition } from "@/data/database";
 import { topicLabel } from "@/data/topic-labels";
+import { safeHref } from "@/lib/directory-utils";
 
 const CONFIDENCE_STYLES: Record<string, string> = {
   high: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
@@ -107,7 +108,7 @@ export function ExpertPositions({
                     {i > 0 && " · "}
                     {p.sourceUrl ? (
                       <a
-                        href={p.sourceUrl}
+                        href={safeHref(p.sourceUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"

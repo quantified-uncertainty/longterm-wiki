@@ -29,6 +29,9 @@ export interface PersonRow {
 
   publicationCount: number;
   careerHistoryCount: number;
+
+  /** Pre-computed lowercase text blob for full-text search across all fields */
+  searchText: string;
 }
 
 type SortKey = PeopleSortKey;
@@ -88,12 +91,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(
-        (r) =>
-          r.name.toLowerCase().includes(q) ||
-          (r.role && r.role.toLowerCase().includes(q)) ||
-          (r.employerName && r.employerName.toLowerCase().includes(q)),
-      );
+      result = result.filter((r) => r.searchText.includes(q));
     }
 
     result = [...result].sort((a, b) => comparePersonRows(a, b, sortKey, sortDir));
@@ -108,10 +106,10 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="Search people..."
+            placeholder="Search name, role, affiliation, publications, positions..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
           />
           {affiliations.length > 0 && (
             <div className="flex flex-wrap gap-1.5">

@@ -102,7 +102,7 @@ const investmentsApp = new Hono()
     const rows = await db
       .select()
       .from(investments)
-      .orderBy(desc(investments.syncedAt))
+      .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
       .offset(offset);
 
@@ -129,7 +129,7 @@ const investmentsApp = new Hono()
       .select()
       .from(investments)
       .where(eq(investments.companyId, entityId))
-      .orderBy(desc(investments.syncedAt))
+      .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
       .offset(offset);
 
@@ -158,7 +158,7 @@ const investmentsApp = new Hono()
       .select()
       .from(investments)
       .where(eq(investments.investorId, investorId))
-      .orderBy(desc(investments.syncedAt))
+      .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
       .offset(offset);
 

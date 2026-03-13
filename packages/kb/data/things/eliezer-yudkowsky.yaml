@@ -45,11 +45,11 @@ facts:
     value: "@ESYudkowsky"
     source: https://x.com/ESYudkowsky
 
-  - id: f_eY_wiki_url
+  - id: f_sjaxkelbxa
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Eliezer_Yudkowsky"
 
-  - id: f_eY_website
+  - id: f_tcr35bkwp1
     property: website
     value: "https://www.yudkowsky.net"
 
