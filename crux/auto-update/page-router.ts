@@ -158,7 +158,11 @@ async function llmRoute(
 Rules:
 - Only route items that contain genuinely new, substantive information
 - A page should only be updated if the news materially changes or adds to its content
-- Suggest "polish" tier for minor additions, "standard" for notable updates, "deep" for major developments
+- **Topical fit is critical**: the news item must be ABOUT the page's core topic, not merely tangentially related. A paper mentioning "alignment" in passing should NOT be routed to the "Why Alignment Might Be Hard" page unless it directly addresses alignment difficulty arguments. A news item about a company's product launch should go to that company's page, not to a general concept page that the product relates to.
+- Prefer routing to specific entity pages (organizations, people, products) over broad concept/debate pages
+- Do NOT route items to high-importance conceptual pages unless the item directly advances the page's core thesis
+- Suggest "polish" tier for minor additions (a sentence or two), "standard" for notable updates (a paragraph), "deep" for major developments
+- For "polish" tier: directions should be sentence-level edits ONLY — never suggest adding new sections
 - If news covers a topic not in the wiki, suggest a new page (only for clearly important topics)
 - Include specific "directions" — what exactly should be updated on each page
 - Skip items that are trivial, redundant, or not actionable for wiki updates
@@ -306,22 +310,26 @@ export async function routeDigest(
   // Merge results
   const pageUpdateMap = new Map<string, PageUpdate>();
 
-  // From entity matching
+  // From entity matching — only route items with relevance >= 30
   for (const [pageId, items] of matched) {
     const page = pages.find(p => p.id === pageId);
     if (!page) continue;
 
+    // Filter out low-relevance items that happen to mention the entity
+    const relevantItems = items.filter(i => i.relevanceScore >= 30);
+    if (relevantItems.length === 0) continue;
+
     pageUpdateMap.set(pageId, {
       pageId,
       pageTitle: page.title,
-      reason: `${items.length} news item(s) mention this entity directly`,
-      suggestedTier: items.some(i => i.relevanceScore >= 70) ? 'standard' : 'polish',
-      relevantNews: items.map(i => ({
+      reason: `${relevantItems.length} news item(s) mention this entity directly`,
+      suggestedTier: relevantItems.some(i => i.relevanceScore >= 70) ? 'standard' : 'polish',
+      relevantNews: relevantItems.map(i => ({
         title: i.title,
         url: i.url,
         summary: i.summary.slice(0, 200),
       })),
-      directions: `Review and incorporate recent developments: ${items.map(i => i.title).join('; ')}`,
+      directions: `Review and incorporate recent developments: ${relevantItems.map(i => i.title).join('; ')}`,
     });
   }
 

@@ -398,19 +398,35 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       process.exit(1);
     }
 
-    fs.writeFileSync(filePath, contentToApply);
-    console.log(`\nChanges applied to ${filePath}`);
-
-    // Semantic diff: analyze factual claim changes for safety audit
-    // Non-blocking: runs after write, warns but never blocks on analysis failure
+    // Semantic diff: analyze factual claim changes for safety audit.
+    // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
+    // Change-ratio limits depend on tier: polish is strict, standard/deep are lenient.
+    const TIER_MAX_CHANGE_RATIO: Record<string, number> = {
+      polish: 0.15,    // Polish: max 15% of claims changed
+      standard: 0.40,  // Standard: max 40% of claims changed
+      deep: 0.70,      // Deep: max 70% of claims changed
+    };
+    let semanticDiffBlocked = false;
     try {
       const semanticDiff = await runSemanticDiff(
         page.id,
         originalContent,
         contentToApply,
-        { agent: 'crux-improve', tier, verbose: false },
+        {
+          agent: 'crux-improve',
+          tier,
+          verbose: false,
+          maxChangeRatio: TIER_MAX_CHANGE_RATIO[tier],
+          blockOnHighContradictions: tier === 'polish',
+        },
       );
-      if (semanticDiff.assessment !== 'safe') {
+      if (semanticDiff.assessment === 'block') {
+        log('semantic-diff', `BLOCKED: changes exceed scope limits for ${tier} tier`);
+        for (const issue of semanticDiff.issues) {
+          log('semantic-diff', `  ${issue}`);
+        }
+        semanticDiffBlocked = true;
+      } else if (semanticDiff.assessment !== 'safe') {
         log('semantic-diff', `Assessment: ${semanticDiff.assessment.toUpperCase()}`);
         for (const issue of semanticDiff.issues) {
           log('semantic-diff', `  ${issue}`);
@@ -422,6 +438,19 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       const error = err instanceof Error ? err : new Error(String(err));
       log('semantic-diff', `Warning: semantic diff failed (non-blocking): ${error.message}`);
     }
+
+    if (semanticDiffBlocked) {
+      console.error(`\n❌ Semantic diff blocked apply — changes too large for ${tier} tier.`);
+      console.error(`   Original content preserved at: ${filePath}`);
+      console.error(`   Pipeline output preserved at: ${finalPath}`);
+      // Exit with code 75 (EX_TEMPFAIL) so the auto-update orchestrator can
+      // distinguish "blocked by scope check" from real errors (exit 1) and
+      // success (exit 0). The orchestrator treats 75 as 'blocked'.
+      process.exit(75);
+    }
+
+    fs.writeFileSync(filePath, contentToApply);
+    console.log(`\nChanges applied to ${filePath}`);
 
     // Post-apply cleanup: run auto-fixers on the written file
     const cleanupResult = await runPostApplyCleanup(filePath);

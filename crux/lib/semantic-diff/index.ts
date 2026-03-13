@@ -58,6 +58,10 @@ export interface SemanticDiffOptions {
   storeSnapshot?: boolean;
   /** Whether to output progress logs. Default: false. */
   verbose?: boolean;
+  /** Max ratio of changed claims before assessment becomes 'block'. Default: no limit. */
+  maxChangeRatio?: number;
+  /** Block on high-severity contradictions? Default: false. */
+  blockOnHighContradictions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -67,26 +71,39 @@ export interface SemanticDiffOptions {
 /**
  * Determine the overall assessment level based on diff and contradiction results.
  *
- * Currently:
- * - 'safe': No high-severity contradictions, reasonable claim changes
- * - 'warn': Medium-severity contradictions or unusual claim change ratio
+ * Levels:
+ * - 'safe': No issues detected
+ * - 'warn': Medium-severity contradictions or unusual claim changes
+ * - 'block': Exceeds max change ratio or has high-severity contradictions
+ *            when blocking mode is enabled
  *
- * A 'block' level may be added in the future when confidence in the
- * system is established. For now, callers should treat 'warn' as
- * informational.
+ * Callers can enable blocking via `maxChangeRatio` and `blockOnHighContradictions`
+ * options. When not set, behavior matches the original warn-only mode.
  */
+export interface AssessmentOptions {
+  /** Max ratio of changed claims (0-1). Exceeding triggers 'block'. Default: no limit. */
+  maxChangeRatio?: number;
+  /** Block on high-severity contradictions? Default: false (warn only). */
+  blockOnHighContradictions?: boolean;
+}
+
 function computeAssessment(
   diff: SemanticDiffResult['diff'],
   contradictions: SemanticDiffResult['contradictions'],
-): { assessment: 'safe' | 'warn'; issues: string[] } {
+  assessmentOptions: AssessmentOptions = {},
+): { assessment: 'safe' | 'warn' | 'block'; issues: string[] } {
   const issues: string[] = [];
+  let shouldBlock = false;
 
-  // High-severity contradictions = warn (not block yet, non-blocking mode)
+  // High-severity contradictions
   if (contradictions.hasHighSeverity) {
     issues.push(
       `${contradictions.summary.high} high-severity contradiction(s) detected. ` +
       `Review before publishing.`
     );
+    if (assessmentOptions.blockOnHighContradictions) {
+      shouldBlock = true;
+    }
   }
 
   // Medium-severity contradictions = warn
@@ -96,10 +113,21 @@ function computeAssessment(
     );
   }
 
-  // Unusual change ratio: more than 50% of claims changed
+  // Change ratio check
   const totalClaims = Math.max(diff.claimsBefore, diff.claimsAfter, 1);
   const changedRatio = (diff.summary.added + diff.summary.removed + diff.summary.changed) / totalClaims;
-  if (changedRatio > 0.5 && totalClaims > 5) {
+
+  if (assessmentOptions.maxChangeRatio != null && totalClaims > 5) {
+    if (changedRatio > assessmentOptions.maxChangeRatio) {
+      issues.push(
+        `${Math.round(changedRatio * 100)}% of claims changed — exceeds max ${Math.round(assessmentOptions.maxChangeRatio * 100)}% ` +
+        `(${diff.summary.added} added, ${diff.summary.removed} removed, ${diff.summary.changed} modified). ` +
+        `Changes blocked.`
+      );
+      shouldBlock = true;
+    }
+  } else if (changedRatio > 0.5 && totalClaims > 5) {
+    // Default warn-only behavior for backwards compatibility
     issues.push(
       `${Math.round(changedRatio * 100)}% of claims changed ` +
       `(${diff.summary.added} added, ${diff.summary.removed} removed, ${diff.summary.changed} modified). ` +
@@ -112,7 +140,7 @@ function computeAssessment(
     issues.push(`${diff.summary.removed} claims removed. Verify important information was not lost.`);
   }
 
-  const assessment = issues.length === 0 ? 'safe' : 'warn';
+  const assessment = shouldBlock ? 'block' : issues.length === 0 ? 'safe' : 'warn';
 
   return { assessment, issues };
 }
@@ -149,6 +177,8 @@ export async function runSemanticDiff(
     useLlmContradictions = true,
     storeSnapshot: doStoreSnapshot = true,
     verbose = false,
+    maxChangeRatio,
+    blockOnHighContradictions,
   } = options;
 
   const timestamp = new Date().toISOString();
@@ -229,7 +259,10 @@ export async function runSemanticDiff(
   }
 
   // Step 4: Compute assessment
-  const { assessment, issues } = computeAssessment(diff, contradictionResult);
+  const { assessment, issues } = computeAssessment(diff, contradictionResult, {
+    maxChangeRatio,
+    blockOnHighContradictions,
+  });
 
   // Step 5: Store snapshot
   let snapshotPath: string | undefined;
