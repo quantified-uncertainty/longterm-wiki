@@ -216,6 +216,31 @@ export interface PersonPublication {
   publications: PersonPublicationEntry[];
 }
 
+/** A paper from literature.yaml */
+export interface LiteraturePaper {
+  title: string;
+  authors: string[];
+  organization?: string;
+  year: number;
+  type: string;
+  summary: string;
+  importance: string;
+  link?: string;
+  linkLabel?: string;
+}
+
+/** A category from literature.yaml */
+export interface LiteratureCategory {
+  id: string;
+  name: string;
+  papers: LiteraturePaper[];
+}
+
+/** Top-level structure of literature.yaml */
+export interface LiteratureData {
+  categories: LiteratureCategory[];
+}
+
 export interface ExpertPosition {
   topic: string;
   view: string;
@@ -364,6 +389,7 @@ interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
+  literature?: LiteratureData;
   experts: Expert[];
   organizations: Organization[];
   cruxes: CruxData[];
@@ -717,6 +743,13 @@ export function getPublicationById(id: string): Publication | undefined {
 export function getAllPublications(): Publication[] {
   const db = getDatabase();
   return db.publications ?? [];
+}
+
+/** Get all literature papers (from literature.yaml loaded at build time). */
+export function getLiteraturePapers(): LiteraturePaper[] {
+  const db = getDatabase();
+  if (!db.literature?.categories) return [];
+  return db.literature.categories.flatMap((c) => c.papers ?? []);
 }
 
 /** Get resources that belong to a publication */

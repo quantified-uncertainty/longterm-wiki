@@ -1,6 +1,6 @@
 /**
  * AI Models table section for organization profile pages.
- * Combines typed entity data (pricing, context) with KB model-release data (ASL level, notes).
+ * Shows models with optional benchmark scores and safety levels.
  */
 import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
@@ -22,30 +22,73 @@ interface AiModelEntry {
   benchmarks?: Array<{ name: string; score: number; unit?: string }> | null;
 }
 
-/** Pick the most recognizable benchmark score to show in the table. */
-function pickKeyBenchmark(
-  benchmarks?: Array<{ name: string; score: number; unit?: string }> | null,
-): string | null {
-  if (!benchmarks || benchmarks.length === 0) return null;
-  // Prefer SWE-bench, then MMLU, then GPQA, then first available
-  const preferred = ["SWE-bench Verified", "SWE-bench", "MMLU", "GPQA Diamond"];
-  for (const name of preferred) {
-    const b = benchmarks.find((bm) => bm.name === name);
-    if (b) return `${b.score}${b.unit === "%" || b.score <= 100 ? "%" : ""} ${b.name}`;
+interface BenchmarkScore {
+  name: string;
+  score: number;
+  unit?: string;
+}
+
+/** Benchmarks we prefer to show, in priority order. */
+const FEATURED_BENCHMARKS = [
+  "MMLU",
+  "HumanEval",
+  "GPQA Diamond",
+  "SWE-bench",
+  "MATH",
+  "HellaSwag",
+  "ARC-Challenge",
+  "TruthfulQA",
+  "GSM8K",
+];
+
+/** Pick top N benchmark scores, preferring featured benchmarks. */
+function pickTopBenchmarks(
+  benchmarks: BenchmarkScore[],
+  maxCount = 3,
+): BenchmarkScore[] {
+  if (benchmarks.length === 0) return [];
+
+  const picked: BenchmarkScore[] = [];
+  const used = new Set<string>();
+
+  // First pass: pick featured benchmarks in priority order
+  for (const name of FEATURED_BENCHMARKS) {
+    if (picked.length >= maxCount) break;
+    const match = benchmarks.find(
+      (b) => b.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (match) {
+      picked.push(match);
+      used.add(match.name);
+    }
   }
-  const first = benchmarks[0];
-  return `${first.score}${first.unit === "%" || first.score <= 100 ? "%" : ""} ${first.name}`;
+
+  // Second pass: fill remaining slots with highest-scoring non-featured benchmarks
+  if (picked.length < maxCount) {
+    const remaining = benchmarks
+      .filter((b) => !used.has(b.name))
+      .sort((a, b) => b.score - a.score);
+    for (const b of remaining) {
+      if (picked.length >= maxCount) break;
+      picked.push(b);
+    }
+  }
+
+  return picked;
 }
 
 export function AiModelsSection({
   models,
+  benchmarksByModel,
 }: {
   models: AiModelEntry[];
+  benchmarksByModel?: Map<string, BenchmarkScore[]>;
 }) {
   if (models.length === 0) return null;
 
   const hasSafetyLevel = models.some((m) => m.safetyLevel);
-  const hasBenchmarks = models.some((m) => m.benchmarks && m.benchmarks.length > 0);
+  const hasBenchmarks =
+    benchmarksByModel && benchmarksByModel.size > 0;
 
   return (
     <section>
@@ -72,14 +115,17 @@ export function AiModelsSection({
               <th scope="col" className="py-2 px-3 text-right font-medium">Pricing (in/out)</th>
               <th scope="col" className="py-2 px-3 text-right font-medium">Context</th>
               {hasBenchmarks && (
-                <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Benchmark</th>
+                <th scope="col" className="py-2 px-3 text-left font-medium">Benchmarks</th>
               )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {models.map((model) => {
               const href = model.numericId ? `/wiki/${model.numericId}` : getEntityHref(model.id, model.entityType);
-              const benchmark = pickKeyBenchmark(model.benchmarks);
+              const benchmarks = benchmarksByModel?.get(model.id);
+              const topBenchmarks = benchmarks
+                ? pickTopBenchmarks(benchmarks)
+                : [];
               return (
                 <tr key={model.id} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3">
@@ -115,8 +161,21 @@ export function AiModelsSection({
                       : ""}
                   </td>
                   {hasBenchmarks && (
-                    <td className="py-2 px-3 text-muted-foreground text-xs hidden lg:table-cell">
-                      {benchmark}
+                    <td className="py-2 px-3">
+                      {topBenchmarks.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {topBenchmarks.map((b) => (
+                            <span
+                              key={b.name}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/50 text-[10px] text-muted-foreground"
+                              title={`${b.name}: ${b.score}${b.unit ? ` ${b.unit}` : ""}`}
+                            >
+                              <span className="font-medium text-foreground/80">{b.name}</span>
+                              <span className="tabular-nums">{b.score}{b.unit === "%" ? "%" : ""}</span>
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </td>
                   )}
                 </tr>

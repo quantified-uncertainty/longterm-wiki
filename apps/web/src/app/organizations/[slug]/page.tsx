@@ -46,6 +46,9 @@ import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
 
+// Section components — publications
+import { KeyPublicationsSection } from "./publications-section";
+
 // Section components — grants (main content column)
 import {
   GrantsGivenSection,
@@ -345,7 +348,7 @@ export default async function OrgProfilePage({
       count: productCount,
       content: (
         <div className="space-y-8">
-          <AiModelsSection models={data.orgModels} />
+          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
           <ProductsSection products={data.products} />
         </div>
       ),
@@ -368,18 +371,27 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Their Content tab (resources authored by the org) ──
-  if (data.resourcesByOrg.length > 0) {
+  // ── Their Content tab (resources authored by the org + key publications) ──
+  const hasTheirContent = data.resourcesByOrg.length > 0 || data.keyPublications.length > 0;
+  if (hasTheirContent) {
+    const theirContentCount = data.resourcesByOrg.length + data.keyPublications.length;
     tabs.push({
       id: "their-content",
       label: "Their Content",
-      count: data.resourcesByOrg.length,
+      count: theirContentCount,
       content: (
-        <OrgResourcesSection
-          resources={data.resourcesByOrg}
-          title="Content by This Organization"
-          emptyMessage="No resources from this organization found."
-        />
+        <div className="space-y-8">
+          {data.resourcesByOrg.length > 0 && (
+            <OrgResourcesSection
+              resources={data.resourcesByOrg}
+              title="Resources"
+              emptyMessage="No resources from this organization found."
+            />
+          )}
+          {data.keyPublications.length > 0 && (
+            <KeyPublicationsSection publications={data.keyPublications} />
+          )}
+        </div>
       ),
     });
   }
@@ -408,7 +420,7 @@ export default async function OrgProfilePage({
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
-          <DivisionsSection divisions={data.divisions} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
         </div>
       ),
     });

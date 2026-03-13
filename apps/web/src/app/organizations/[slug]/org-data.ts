@@ -26,7 +26,9 @@ import {
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
+  getLiteraturePapers,
   type Resource,
+  type LiteraturePaper,
 } from "@/data";
 import {
   formatKBNumber,
@@ -815,6 +817,46 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const { byOrg: resourcesByOrg, aboutOrg: resourcesAboutOrg } =
     getOrgResources(slug, websiteUrl);
 
+  // ── Key Publications (from literature.yaml) ──
+  const orgMatchNames = new Set<string>([
+    entity.name.toLowerCase(),
+    slug.toLowerCase(),
+    entity.id.toLowerCase(),
+    ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
+  ]);
+  const keyPublications: LiteraturePaper[] = getLiteraturePapers()
+    .filter((p) => {
+      if (!p.organization) return false;
+      return orgMatchNames.has(p.organization.toLowerCase());
+    })
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+
+  // ── Model benchmark data ──
+  const modelBenchmarks = new Map<string, Array<{ name: string; score: number; unit?: string }>>();
+  for (const model of orgModels) {
+    if (model.benchmarks && model.benchmarks.length > 0) {
+      modelBenchmarks.set(model.id, model.benchmarks);
+    }
+  }
+
+  // ── Division lead resolution ──
+  const divisionLeadResolved = new Map<string, { name: string; href: string | null }>();
+  for (const d of divisions) {
+    if (d.lead) {
+      const leadEntityId = resolveKBSlug(d.lead);
+      const leadEntity = leadEntityId ? getKBEntity(leadEntityId) : null;
+      if (leadEntity) {
+        const leadSlug = getKBEntitySlug(leadEntityId!);
+        divisionLeadResolved.set(d.key, {
+          name: leadEntity.name,
+          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/kb/entity/${leadEntityId}`,
+        });
+      } else {
+        divisionLeadResolved.set(d.key, { name: d.lead, href: null });
+      }
+    }
+  }
+
   // ── Computed stat cards ──
   const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
   const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
@@ -859,5 +901,8 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     products,
     resourcesByOrg,
     resourcesAboutOrg,
+    keyPublications,
+    modelBenchmarks,
+    divisionLeadResolved,
   };
 }
