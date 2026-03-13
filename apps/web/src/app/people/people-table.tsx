@@ -184,7 +184,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Name" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Role" sortKey="role" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Affiliation" sortKey="employer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
