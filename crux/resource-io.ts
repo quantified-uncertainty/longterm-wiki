@@ -18,9 +18,29 @@ import { PUBLICATIONS_FILE } from './resource-types.ts';
 import type { Resource, Publication } from './resource-types.ts';
 import { apiRequest } from './lib/wiki-server/client.ts';
 import { generateId } from '../packages/kb/src/ids.ts';
-import { normalizeDate, normalizeTimestamp } from './wiki-server/sync-resources.ts';
-import type { SyncResource } from './wiki-server/sync-resources.ts';
+import { normalizeDate, normalizeTimestamp } from './lib/date-utils.ts';
 import { generateSnapshot } from './wiki-server/snapshot-resources.ts';
+
+interface SyncResource {
+  id: string;
+  url: string;
+  title: string | null;
+  type: string | null;
+  summary: string | null;
+  review: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
+  publicationId: string | null;
+  authors: string[] | null;
+  publishedDate: string | null;
+  tags: string[] | null;
+  localFilename: string | null;
+  credibilityOverride: number | null;
+  fetchedAt: string | null;
+  contentHash: string | null;
+  stableId: string | null;
+  citedBy: string[] | null;
+}
 
 const SNAPSHOT_FILE = join(DATA_DIR, 'resources-snapshot.json');
 const PG_BATCH_SIZE = 200;

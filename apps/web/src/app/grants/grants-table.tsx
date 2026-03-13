@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { compareGrantRows, type SortDir } from "./grants-sort";
 
 export interface GrantRow {
   /** Composite key: entityId-recordKey for uniqueness */
@@ -26,7 +27,6 @@ export interface GrantRow {
 }
 
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "period" | "date" | "status";
-type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 100;
 
@@ -133,41 +133,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       );
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: GrantRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.name.toLowerCase();
-          case "organization":
-            return row.organizationName.toLowerCase();
-          case "recipient":
-            return row.recipient?.toLowerCase() ?? null;
-          case "program":
-            return row.program?.toLowerCase() ?? null;
-          case "amount":
-            return row.amount;
-          case "period":
-            return row.period;
-          case "date":
-            return row.date;
-          case "status":
-            return row.status;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
-      }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    result = [...result].sort((a, b) => compareGrantRows(a, b, sortKey, sortDir));
 
     return result;
   }, [rows, search, statusFilter, sortKey, sortDir]);

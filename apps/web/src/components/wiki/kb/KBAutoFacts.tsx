@@ -29,6 +29,7 @@ import {
   ExternalLink,
   Database,
 } from "lucide-react";
+import { formatAmount } from "@/lib/directory-utils";
 
 interface KBAutoFactsProps {
   /** Page slug / KB entity ID (e.g., "anthropic") */
@@ -164,16 +165,6 @@ function field(item: RecordEntry, key: string): string | undefined {
   if (typeof v === "string") return v;
   if (typeof v === "number" || typeof v === "boolean") return String(v);
   return undefined; // Don't coerce arrays/objects
-}
-
-/** Format a currency amount compactly. */
-function formatAmount(value: unknown): string | null {
-  if (value == null) return null;
-  const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
-  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
-  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`;
-  return `$${num.toLocaleString()}`;
 }
 
 /** Resolve which columns to show for a collection, including explicit endpoints. */

@@ -12,8 +12,11 @@ const SCRIPTS = {
     description: 'Sync wiki page content and metadata to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size', 'ci'],
   },
-  // sync-resources removed: YAML resource files deleted in R6 (PG is sole source of truth).
-  // The sync-resources.ts file is kept for its normalizeDate/normalizeTimestamp exports.
+  'sync-facts': {
+    script: 'wiki-server/sync-facts.ts',
+    description: 'Sync KB facts from packages/kb/data/ to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-entities': {
     script: 'wiki-server/sync-entities.ts',
     description: 'Sync data/entities/*.yaml to wiki-server',
