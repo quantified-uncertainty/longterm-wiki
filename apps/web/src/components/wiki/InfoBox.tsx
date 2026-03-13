@@ -45,8 +45,10 @@ export interface InfoBoxProps {
   maturity?: string;
   relatedSolutions?: { id: string; title: string; type: string; href: string }[];
   affiliation?: string;
+  affiliationId?: string;
   role?: string;
   knownFor?: string;
+  profileHref?: string;
   customFields?: { label: string; value: string; link?: string }[];
   relatedTopics?: string[];
   relatedEntries?: { id?: string; type: string; title: string; href: string }[];
@@ -177,8 +179,10 @@ export function InfoBox({
   maturity,
   relatedSolutions,
   affiliation,
+  affiliationId,
   role,
   knownFor,
+  profileHref,
   customFields,
   relatedTopics,
   relatedEntries,
@@ -231,9 +235,10 @@ export function InfoBox({
   if (!isOverview && likelihood) fields.push({ label: "Likelihood", value: likelihood });
   if (!isOverview && timeframe) fields.push({ label: "Timeframe", value: timeframe });
   if (!isOverview && maturity) fields.push({ label: "Maturity", value: maturityLabels[maturity.toLowerCase()] || maturity });
-  if (!isOverview && affiliation) fields.push({ label: "Affiliation", value: affiliation });
+  if (!isOverview && affiliation) fields.push({ label: "Affiliation", value: affiliation, link: affiliationId ? `/organizations/${affiliationId}` : undefined });
   if (!isOverview && role) fields.push({ label: "Role", value: role });
   if (!isOverview && knownFor) fields.push({ label: "Known For", value: knownFor });
+  if (!isOverview && profileHref) fields.push({ label: "Profile", value: "View profile page", link: profileHref });
   // AI Model fields
   if (!isOverview && releaseDate) fields.push({ label: "Released", value: releaseDate });
   if (!isOverview && developer) fields.push({ label: "Developer", value: developer, link: developerId ? `/organizations/${developerId}` : undefined });
