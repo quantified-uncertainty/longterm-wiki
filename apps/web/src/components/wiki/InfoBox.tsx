@@ -12,6 +12,7 @@ import type { ExternalLinksData } from "@/data";
 import { InfoBoxDescription } from "./InfoBoxDescription";
 import { isSafeUrl } from "./resource-utils";
 import { formatCompactNumber } from "@lib/format-compact";
+import { getBenchmarkSlugByName } from "@/app/benchmarks/benchmark-utils";
 
 type LucideIcon = React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement> & { size?: number | string }>;
 
@@ -512,14 +513,25 @@ export function InfoBox({
         <div className="px-4 py-3 border-t border-border">
           <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Benchmarks</div>
           <div className="flex flex-col gap-1">
-            {benchmarks.map((b, i) => (
+            {benchmarks.map((b, i) => {
+              const benchmarkSlug = getBenchmarkSlugByName(b.name);
+              return (
               <div key={i} className="flex justify-between items-baseline py-1 border-b border-border last:border-b-0">
-                <span className="text-xs text-muted-foreground pr-2">{b.name}</span>
+                <span className="text-xs text-muted-foreground pr-2">
+                  {benchmarkSlug ? (
+                    <Link href={`/benchmarks/${benchmarkSlug}`} className="hover:text-foreground hover:underline transition-colors">
+                      {b.name}
+                    </Link>
+                  ) : (
+                    b.name
+                  )}
+                </span>
                 <span className="text-xs font-semibold text-foreground whitespace-nowrap">
                   {b.score}{b.unit === "%" ? "%" : b.unit ? ` ${b.unit}` : ""}
                 </span>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

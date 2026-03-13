@@ -336,7 +336,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* MMLU */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
                   {row.mmluScore != null ? (
-                    <span className="font-semibold">{row.mmluScore}%</span>
+                    <Link href="/benchmarks/mmlu" className="font-semibold hover:text-primary transition-colors">{row.mmluScore}%</Link>
                   ) : (
                     ""
                   )}
@@ -345,7 +345,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* GPQA Diamond */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
                   {row.gpqaScore != null ? (
-                    <span className="font-semibold">{row.gpqaScore}%</span>
+                    <Link href="/benchmarks/gpqa-diamond" className="font-semibold hover:text-primary transition-colors">{row.gpqaScore}%</Link>
                   ) : (
                     ""
                   )}
@@ -354,7 +354,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* SWE-bench */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
                   {row.sweBenchScore != null ? (
-                    <span className="font-semibold">{row.sweBenchScore}%</span>
+                    <Link href="/benchmarks/swe-bench-verified" className="font-semibold hover:text-primary transition-colors">{row.sweBenchScore}%</Link>
                   ) : (
                     ""
                   )}

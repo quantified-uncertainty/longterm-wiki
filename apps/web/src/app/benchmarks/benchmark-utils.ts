@@ -55,6 +55,21 @@ const BENCHMARK_NAME_ALIASES: Record<string, string> = {
 };
 
 /**
+ * Resolve a benchmark display name to its slug for linking.
+ * Returns undefined if no matching benchmark is found.
+ */
+export function getBenchmarkSlugByName(name: string): string | undefined {
+  const lower = name.toLowerCase();
+  const fromAlias = BENCHMARK_NAME_ALIASES[lower];
+  if (fromAlias) return fromAlias;
+  for (const e of getBenchmarkEntities()) {
+    if (e.title.toLowerCase() === lower) return e.id;
+  }
+  return undefined;
+}
+
+
+/**
  * Build a map of benchmarkId -> model results.
  *
  * Uses PG-sourced benchmark results from database.json when available,
@@ -129,6 +144,8 @@ function buildFromInlineData(
       nameToSlug.set(e.title.toLowerCase(), e.id);
     }
   }
+
+
   for (const [alias, slug] of Object.entries(BENCHMARK_NAME_ALIASES)) {
     nameToSlug.set(alias, slug);
   }
