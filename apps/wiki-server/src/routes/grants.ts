@@ -269,7 +269,8 @@ const grantsApp = new Hono()
       WHERE grants.id = v.id
     `);
 
-    const updated = Number(result.rowCount ?? items.length);
+    // db.execute returns rowCount at runtime (postgres.js) but it's not in Drizzle's type
+    const updated = "rowCount" in result ? Number(result.rowCount) : items.length;
 
     return c.json({ updated });
   })
@@ -331,7 +332,8 @@ const grantsApp = new Hono()
       WHERE grants.id = v.id
     `);
 
-    const updated = Number(result.rowCount ?? items.length);
+    // db.execute returns rowCount at runtime (postgres.js) but it's not in Drizzle's type
+    const updated = "rowCount" in result ? Number(result.rowCount) : items.length;
 
     return c.json({ updated });
   })
