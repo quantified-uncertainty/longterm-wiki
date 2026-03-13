@@ -100,7 +100,7 @@ Empirical results from debate experiments show promise but remain limited to rel
 
 ### Recursive Reward Modeling
 
-Recursive reward modeling, developed primarily by <R id="50127ce5fac4e84b">Paul Christiano's research group</R>, addresses complex evaluation tasks through hierarchical decomposition. The approach involves training AI systems to break difficult questions into simpler sub-questions that humans can more reliably evaluate. Answers to sub-questions are then composed to address the original complex question, creating a scalable evaluation hierarchy that can handle arbitrarily complex tasks while maintaining human oversight at each level.
+Recursive reward modeling, developed primarily by <R id="50127ce5fac4e84b"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>'s research group</R>, addresses complex evaluation tasks through hierarchical decomposition. The approach involves training AI systems to break difficult questions into simpler sub-questions that humans can more reliably evaluate. Answers to sub-questions are then composed to address the original complex question, creating a scalable evaluation hierarchy that can handle arbitrarily complex tasks while maintaining human oversight at each level.
 
 The central insight is the recursive use of already trained agents to provide feedback for training successive agents on more complex tasks. In the framework, agent A1 attempts to achieve an objective, while agent A2 assists humans in evaluating A1's behavior. For example, A1 might propose a plan x and A2 identifies the largest weakness y in the plan. The human then evaluates whether y is indeed a weakness and how strong it is, making the evaluation task much simpler than assessing the entire plan directly. <R id="ca07d6bcd57e7027">OpenAI's iterated amplification work</R> demonstrated this approach by fine-tuning GPT-3 to do recursive summarization—first summarizing small sections of books, then recursively summarizing these summaries to produce summaries of entire books.
 
@@ -329,7 +329,7 @@ Constitutional AI and other value-learning approaches offer alternative perspect
 
 ### Foundational Research
 
-- **Irving et al. (2018):** <R id="61da2f8e311a2bbf">AI safety via debate</R> - Original debate proposal by Geoffrey Irving, Paul Christiano, and Dario Amodei
+- **Irving et al. (2018):** <R id="61da2f8e311a2bbf">AI safety via debate</R> - Original debate proposal by Geoffrey Irving, Paul Christiano, and <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>
 - **Christiano et al. (2018):** <R id="50127ce5fac4e84b">New safety research agenda: scalable agent alignment via reward modeling</R> - Paul Christiano's framework for recursive reward modeling
 - **OpenAI (2018):** <R id="ca07d6bcd57e7027">Learning complex goals with iterated amplification</R> - Practical implementation of recursive decomposition
 
@@ -363,6 +363,6 @@ Constitutional AI and other value-learning approaches offer alternative perspect
 ### Related Frameworks
 
 - **Alignment Survey:** <R id="14d1c8e3a3ef284b">Scalable Oversight | AI Alignment</R> - Educational resource
-- **Jan Leike:** <R id="2a84eb0982d4de6a">Personal website</R> - Key researcher in scalable oversight
+- **<EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>:** <R id="2a84eb0982d4de6a">Personal website</R> - Key researcher in scalable oversight
 
 ---

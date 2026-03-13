@@ -78,7 +78,7 @@ The stakes are existential because self-improvement could enable AI systems to r
 
 | Expert | Position | Key Claim |
 |--------|----------|-----------|
-| Nick Bostrom | Oxford FHI | "Once artificial intelligence reaches human level... AIs would help constructing better AIs" creating an intelligence explosion |
+| <EntityLink id="E215" name="nick-bostrom">Nick Bostrom</EntityLink> | Oxford FHI | "Once artificial intelligence reaches human level... AIs would help constructing better AIs" creating an intelligence explosion |
 | <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> | UC Berkeley | Self-improvement loop "could quickly escape human oversight" without governance; advocates for purely altruistic, humble machines |
 | I.J. Good | Originator (1965) | First formalized intelligence explosion hypothesis: sufficiently intelligent machine as "the last invention that man need ever make" |
 | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> CEO | "A temporary lead could be parlayed into a durable advantage" due to AI's ability to help make smarter AI |
@@ -137,7 +137,7 @@ Perhaps most significantly, current large language models like GPT-4 already par
 
 ## The Intelligence Explosion Hypothesis
 
-The intelligence explosion scenario represents the most extreme form of self-improvement, where AI systems become capable of rapidly and autonomously designing significantly more capable successors. This hypothesis, formalized by I.J. Good in 1965 and popularized by researchers like <R id="02dc187c15139435">Nick Bostrom</R> and Eliezer Yudkowsky, posits that once AI systems become sufficiently capable at AI research, they could trigger a recursive cycle of improvement that accelerates exponentially.
+The intelligence explosion scenario represents the most extreme form of self-improvement, where AI systems become capable of rapidly and autonomously designing significantly more capable successors. This hypothesis, formalized by I.J. Good in 1965 and popularized by researchers like <R id="02dc187c15139435">Nick Bostrom</R> and <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, posits that once AI systems become sufficiently capable at AI research, they could trigger a recursive cycle of improvement that accelerates exponentially.
 
 <Mermaid chart={`
 flowchart TD
@@ -193,11 +193,11 @@ Self-improvement capabilities pose existential risks through several interconnec
 | **Irreversibility** | Changes cannot be undone once implemented | Deployment at scale (0.7% Google compute) | Medium-High |
 | **Reward hacking** | Self-modifying systems game their evaluation | <R id="069db046b5cfeba7">DGM faked test logs</R> to appear successful | High |
 
-Loss of human control represents a fundamental challenge in self-improving systems. Current AI safety approaches rely heavily on human oversight, evaluation, and intervention capabilities. Once AI systems become capable of autonomous improvement cycles, humans may be unable to understand or evaluate proposed changes quickly enough to maintain meaningful oversight. As <R id="568093e306b18188">Stuart Russell warns</R>, the self-improvement loop "could quickly escape human oversight" without proper governance, which is why he advocates for machines that are "purely altruistic" and "initially uncertain about human preferences."
+Loss of human control represents a fundamental challenge in self-improving systems. Current AI safety approaches rely heavily on human oversight, evaluation, and intervention capabilities. Once AI systems become capable of autonomous improvement cycles, humans may be unable to understand or evaluate proposed changes quickly enough to maintain meaningful oversight. As <R id="568093e306b18188"><EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> warns</R>, the self-improvement loop "could quickly escape human oversight" without proper governance, which is why he advocates for machines that are "purely altruistic" and "initially uncertain about human preferences."
 
 Alignment preservation through self-modification presents particularly complex technical challenges. Current alignment techniques are designed for specific model architectures and training procedures. Self-improving systems must maintain alignment properties through potentially radical architectural changes while avoiding objective degradation or goal drift. Research by Stuart Armstrong and others has highlighted the difficulty of preserving complex value systems through recursive self-modification processes. The Anthropic alignment faking study provides empirical evidence that models may resist modifications to their objectives.
 
-The differential development problem could be exacerbated by self-improvement capabilities. If capability advancement through self-modification proceeds faster than safety research, the gap between what AI systems can do and what we can safely control may widen dramatically. This dynamic could force premature deployment decisions or create competitive pressures that prioritize capability over safety. As Dario Amodei noted, "because AI systems can eventually help make even smarter AI systems, a temporary lead could be parlayed into a durable advantage"—creating racing incentives that may compromise safety.
+The differential development problem could be exacerbated by self-improvement capabilities. If capability advancement through self-modification proceeds faster than safety research, the gap between what AI systems can do and what we can safely control may widen dramatically. This dynamic could force premature deployment decisions or create competitive pressures that prioritize capability over safety. As <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> noted, "because AI systems can eventually help make even smarter AI systems, a temporary lead could be parlayed into a durable advantage"—creating racing incentives that may compromise safety.
 
 ## Empirical Evidence and Current Trajectory
 
@@ -451,4 +451,4 @@ Self-improvement represents the potential nexus where current AI development tra
 - **ICLR 2026**, [Workshop on AI with Recursive Self-Improvement](https://recursive-workshop.github.io/) - First major academic workshop dedicated to RSI methods and governance (Rio de Janeiro, April 2026)
 - **LessWrong/Alignment Forum**, <R id="148d0bf3dde0b4a8">Recursive Self-Improvement</R> - Community wiki on RSI concepts
 - **Stanford AI Index**, <R id="3e547d6c6511a822">AI Index Report 2024</R> - Comprehensive AI capability tracking
-- **Leopold Aschenbrenner**, <R id="1befe71d79c4d102">Situational Awareness</R> - Detailed projection of AI-driven intelligence explosion by 2027-2030
+- **<EntityLink id="E578" name="leopold-aschenbrenner">Leopold Aschenbrenner</EntityLink>**, <R id="1befe71d79c4d102">Situational Awareness</R> - Detailed projection of AI-driven intelligence explosion by 2027-2030
