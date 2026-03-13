@@ -99,12 +99,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(
-        (r) =>
-          r.title.toLowerCase().includes(q) ||
-          r.developerName?.toLowerCase().includes(q) ||
-          r.modelFamily?.toLowerCase().includes(q),
-      );
+      result = result.filter((r) => {
+        const searchable = `${r.title} ${r.developerName ?? ""} ${r.modelFamily ?? ""} ${r.safetyLevel ?? ""} ${r.capabilities.join(" ")}`.toLowerCase();
+        return searchable.includes(q);
+      });
     }
 
     const getValue = (row: AiModelRow): string | number | null => {

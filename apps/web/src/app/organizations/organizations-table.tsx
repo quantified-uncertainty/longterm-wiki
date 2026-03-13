@@ -205,7 +205,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki

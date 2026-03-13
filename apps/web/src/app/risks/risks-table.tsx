@@ -70,7 +70,10 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter((r) => r.name.toLowerCase().includes(q));
+      result = result.filter((r) => {
+        const searchable = `${r.name} ${r.riskCategory ?? ""} ${r.severity ?? ""} ${r.likelihood ?? ""} ${r.timeHorizon ?? ""}`.toLowerCase();
+        return searchable.includes(q);
+      });
     }
 
     const getValue = (row: RiskRow): string | number | null => {
@@ -176,7 +179,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki
@@ -186,7 +189,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
 
                 {/* Category */}
                 <td className="py-2.5 px-3">
-                  {row.riskCategory && (
+                  {row.riskCategory ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                         RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
@@ -194,6 +197,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                     >
                       {RISK_CATEGORY_LABELS[row.riskCategory] ?? row.riskCategory}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
