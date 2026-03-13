@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getKBLatest } from "@/data/kb";
+import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/kb";
 import { getTypedEntities, isOrganization } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
@@ -27,9 +27,89 @@ function formatFact(
   return formatKBFactValue(fact, property?.unit, property?.display);
 }
 
+/** Build a pre-computed lowercase text blob for full-text search across all org fields. */
+function buildOrgSearchText(
+  org: ReturnType<typeof getTypedEntities>[number] & { entityType: "organization" },
+  orgToEmployeeNames: Map<string, string[]>,
+): string {
+  const parts: string[] = [org.title];
+
+  // Entity description, tags, clusters
+  if (org.description) parts.push(org.description);
+  parts.push(...org.tags);
+  parts.push(...org.clusters);
+
+  // Org-specific typed fields
+  if (org.orgType) parts.push(org.orgType);
+  if (org.headquarters) parts.push(org.headquarters);
+  if (org.parentOrg) {
+    const parent = getKBEntity(org.parentOrg);
+    if (parent) parts.push(parent.name);
+  }
+
+  // KB entity aliases (alternative names)
+  const kbEntity = getKBEntity(org.id);
+  if (kbEntity?.aliases) parts.push(...kbEntity.aliases);
+
+  // KB fact text values (description, headquarters, notable-for, etc.)
+  const SKIP_PROPERTIES = new Set([
+    "social-media", "wikipedia-url", "github-profile", "website",
+    "revenue", "valuation", "headcount", "total-funding", "founded-date",
+  ]);
+  if (kbEntity) {
+    const allFacts = getKBFacts(kbEntity.id);
+    for (const fact of allFacts) {
+      if (SKIP_PROPERTIES.has(fact.propertyId)) continue;
+      if (fact.value.type === "text") {
+        parts.push(fact.value.value);
+      } else if (fact.value.type === "ref") {
+        const refEntity = getKBEntity(fact.value.value);
+        if (refEntity) parts.push(refEntity.name);
+      }
+    }
+  }
+
+  // Funding program names from KB records
+  if (kbEntity) {
+    const fundingPrograms = getKBRecords(kbEntity.id, "funding-programs");
+    for (const fp of fundingPrograms) {
+      if (typeof fp.fields.name === "string") parts.push(fp.fields.name);
+      if (typeof fp.fields.description === "string") parts.push(fp.fields.description);
+    }
+  }
+
+  // Key people names (people employed by this org)
+  if (kbEntity) {
+    const employeeNames = orgToEmployeeNames.get(kbEntity.id) ?? [];
+    parts.push(...employeeNames);
+  }
+
+  // Related entries names
+  for (const rel of org.relatedEntries) {
+    const relEntity = getKBEntity(rel.id);
+    if (relEntity) parts.push(relEntity.name);
+  }
+
+  return parts.join(" ").toLowerCase();
+}
+
 export default function OrganizationsPage() {
   const allEntities = getTypedEntities();
   const orgs = allEntities.filter(isOrganization);
+
+  // Build reverse index: org slug → names of people employed there
+  // People have "employed-by" facts referencing the org's KB entity ID
+  const orgToEmployeeNames = new Map<string, string[]>();
+  const kbPeople = getKBEntities().filter((e) => e.type === "person");
+  for (const person of kbPeople) {
+    const employedByFact = getKBLatest(person.id, "employed-by");
+    if (employedByFact?.value.type === "ref") {
+      const orgId = employedByFact.value.value;
+      const existing = orgToEmployeeNames.get(orgId) ?? [];
+      existing.push(person.name);
+      orgToEmployeeNames.set(orgId, existing);
+    }
+  }
 
   const rows: OrgRow[] = orgs.map((org) => {
     // org.id is the slug — getKBLatest resolves slugs to KB entity IDs
@@ -69,6 +149,7 @@ export default function OrganizationsPage() {
             ? String(foundedFact.value.value)
             : null,
 
+      searchText: buildOrgSearchText(org, orgToEmployeeNames),
     };
   });
 
