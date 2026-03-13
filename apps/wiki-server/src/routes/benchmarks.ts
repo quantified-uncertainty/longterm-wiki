@@ -36,7 +36,7 @@ const AllQuery = z.object({
 // ---- Sync schema ----
 
 const SyncBenchmarkItemSchema = z.object({
-  id: z.string().length(10),
+  id: z.string().min(1).max(200),
   slug: z.string().min(1).max(200),
   name: z.string().min(1).max(500),
   category: z.enum(VALID_CATEGORIES).nullable().optional(),

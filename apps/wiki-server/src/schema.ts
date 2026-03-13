@@ -1666,7 +1666,7 @@ export const divisionPersonnel = pgTable(
 export const benchmarks = pgTable(
   "benchmarks",
   {
-    id: varchar("id", { length: 10 }).primaryKey(),
+    id: text("id").primaryKey(),
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     category: text("category"), // coding | reasoning | math | knowledge | multimodal | safety | agentic | general
@@ -1699,7 +1699,7 @@ export const benchmarkResults = pgTable(
   "benchmark_results",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    benchmarkId: varchar("benchmark_id", { length: 10 })
+    benchmarkId: text("benchmark_id")
       .notNull()
       .references(() => benchmarks.id),
     modelId: text("model_id").notNull(), // entity slug of the ai-model

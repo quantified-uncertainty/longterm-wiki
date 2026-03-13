@@ -35,6 +35,7 @@ interface ParsedGrant {
   status: string | null;
   source: string | null;
   program: string | null;
+  programId: string | null;
   notes: string | null;
 }
 
@@ -77,6 +78,7 @@ function parseGrant(record: KBRecordEntry): ParsedGrant {
     status: typeof f.status === "string" ? f.status : null,
     source: typeof f.source === "string" ? f.source : null,
     program: typeof f.program === "string" ? f.program : null,
+    programId: typeof f.programId === "string" ? f.programId : null,
     notes: typeof f.notes === "string" ? f.notes : null,
   };
 }
@@ -223,9 +225,18 @@ export default async function GrantDetailPage({ params }: PageProps) {
             </DetailSection>
           )}
 
-          {grant.program && (
+          {(grant.program || grant.programId) && (
             <DetailSection title="Program">
-              <span className="text-sm text-foreground">{grant.program}</span>
+              {grant.programId ? (
+                <Link
+                  href={`/funding-programs/${grant.programId}`}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  {grant.program ?? grant.programId}
+                </Link>
+              ) : (
+                <span className="text-sm text-foreground">{grant.program}</span>
+              )}
             </DetailSection>
           )}
 

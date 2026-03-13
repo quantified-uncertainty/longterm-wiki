@@ -1516,7 +1516,7 @@ async function enrichCommand(
 
 async function importKeyPersonsCommand(
   _args: string[],
-  options: CommandOptions,
+  options: BaseOptions,
 ): Promise<CommandResult> {
   const verbose = !!options.verbose;
   const sync = !!options.sync;
