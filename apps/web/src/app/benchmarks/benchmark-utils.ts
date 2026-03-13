@@ -1,4 +1,4 @@
-import { getTypedEntities, isBenchmark, type BenchmarkEntity, type AnyEntity } from "@/data";
+import { getTypedEntities, isBenchmark, isAiModel, type BenchmarkEntity } from "@/data";
 
 /**
  * Get all benchmark entities.
@@ -74,25 +74,27 @@ export function getBenchmarkResultsFromModels(): Map<string, BenchmarkResultRow[
     nameToSlug.set(alias, slug);
   }
 
-  for (const entity of allEntities) {
-    if (entity.entityType !== "ai-model") continue;
-    const model = entity as AnyEntity & { benchmarks?: Array<{ name: string; score: number; unit?: string }>; developer?: string; numericId?: string };
-    if (!model.benchmarks) continue;
+  // Build entity lookup map for developer resolution
+  const entityById = new Map(allEntities.map((e) => [e.id, e]));
 
-    for (const b of model.benchmarks) {
+  for (const entity of allEntities) {
+    if (!isAiModel(entity)) continue;
+    if (!entity.benchmarks?.length) continue;
+
+    // Resolve developer name once per model
+    const developerEntity = entity.developer
+      ? entityById.get(entity.developer)
+      : null;
+
+    for (const b of entity.benchmarks) {
       const slug = nameToSlug.get(b.name.toLowerCase());
       if (!slug) continue;
 
-      // Resolve developer name
-      const developerEntity = model.developer
-        ? allEntities.find((e) => e.id === model.developer)
-        : null;
-
       const row: BenchmarkResultRow = {
-        modelId: model.id,
-        modelTitle: model.title,
-        numericId: model.numericId ?? null,
-        developer: (model.developer as string) ?? null,
+        modelId: entity.id,
+        modelTitle: entity.title,
+        numericId: entity.numericId ?? null,
+        developer: entity.developer ?? null,
         developerName: developerEntity?.title ?? null,
         score: b.score,
         unit: b.unit,

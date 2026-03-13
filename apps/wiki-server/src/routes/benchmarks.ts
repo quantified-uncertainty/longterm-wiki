@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { benchmarks } from "../schema.js";
 import {
@@ -109,19 +109,10 @@ const benchmarksApp = new Hono()
     const { category, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const conditions = [];
-    if (category) conditions.push(eq(benchmarks.category, category));
-    const whereClause =
-      conditions.length > 0
-        ? conditions.length === 1
-          ? conditions[0]
-          : sql`${conditions[0]}`
-        : undefined;
-
     const rows = await db
       .select()
       .from(benchmarks)
-      .where(whereClause)
+      .where(category ? eq(benchmarks.category, category) : undefined)
       .orderBy(desc(benchmarks.syncedAt))
       .limit(limit)
       .offset(offset);
