@@ -227,6 +227,28 @@ const BenchmarkResult = z.object({
   date: z.string().optional(),
 });
 
+const BenchmarkEntitySchema = BaseEntity.extend({
+  entityType: z.literal("benchmark"),
+  category: z
+    .enum([
+      "coding",
+      "reasoning",
+      "math",
+      "knowledge",
+      "multimodal",
+      "safety",
+      "agentic",
+      "general",
+    ])
+    .optional(),
+  scoringMethod: z
+    .enum(["percentage", "elo", "accuracy", "pass_at_1", "points"])
+    .optional(),
+  higherIsBetter: z.boolean().default(true),
+  introducedDate: z.string().optional(),
+  maintainer: z.string().optional(),
+});
+
 const AiModelEntitySchema = BaseEntity.extend({
   entityType: z.literal("ai-model"),
   modelFamily: z.string().optional(),
@@ -289,6 +311,7 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   DiagramEntitySchema,
   IntelligenceParadigmEntitySchema,
   AiModelEntitySchema,
+  BenchmarkEntitySchema,
 ]);
 
 // ============================================================================
@@ -302,6 +325,7 @@ export type OrganizationEntity = z.infer<typeof OrganizationEntitySchema>;
 export type PolicyEntity = z.infer<typeof PolicyEntitySchema>;
 export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
 export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
+export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -326,5 +350,9 @@ export function isPolicy(e: TypedEntity | GenericEntity): e is PolicyEntity {
 
 export function isAiModel(e: TypedEntity | GenericEntity): e is AiModelEntity {
   return e.entityType === "ai-model";
+}
+
+export function isBenchmark(e: TypedEntity | GenericEntity): e is BenchmarkEntity {
+  return e.entityType === "benchmark";
 }
 

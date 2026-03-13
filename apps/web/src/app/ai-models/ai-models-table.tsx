@@ -18,6 +18,8 @@ export interface AiModelRow {
   contextWindow: number | null;
   safetyLevel: string | null;
   sweBenchScore: number | null;
+  mmluScore: number | null;
+  gpqaScore: number | null;
   topBenchmark: { name: string; score: number; unit?: string } | null;
   capabilities: string[];
   isFamily: boolean;
@@ -43,6 +45,8 @@ type SortKey =
   | "outputPrice"
   | "contextWindow"
   | "sweBench"
+  | "mmlu"
+  | "gpqa"
   | "params";
 
 type SortDir = "asc" | "desc";
@@ -171,6 +175,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             return row.contextWindow;
           case "sweBench":
             return row.sweBenchScore;
+          case "mmlu":
+            return row.mmluScore;
+          case "gpqa":
+            return row.gpqaScore;
           case "params":
             return row.parameterCount ? parseParamCount(row.parameterCount) : null;
         }
@@ -272,6 +280,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <SortHeader label="Input $/MTok" sortKey="inputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Output $/MTok" sortKey="outputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Context" sortKey="contextWindow" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="MMLU" sortKey="mmlu" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="GPQA" sortKey="gpqa" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="SWE-bench" sortKey="sweBench" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
             </tr>
           </thead>
@@ -338,6 +348,24 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Context Window */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.contextWindow != null ? formatContext(row.contextWindow) : ""}
+                </td>
+
+                {/* MMLU */}
+                <td className="py-2.5 px-3 text-right tabular-nums">
+                  {row.mmluScore != null ? (
+                    <span className="font-semibold">{row.mmluScore}%</span>
+                  ) : (
+                    ""
+                  )}
+                </td>
+
+                {/* GPQA Diamond */}
+                <td className="py-2.5 px-3 text-right tabular-nums">
+                  {row.gpqaScore != null ? (
+                    <span className="font-semibold">{row.gpqaScore}%</span>
+                  ) : (
+                    ""
+                  )}
                 </td>
 
                 {/* SWE-bench */}

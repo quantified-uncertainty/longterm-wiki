@@ -1,0 +1,161 @@
+# AI Benchmarks — entity definitions for the benchmark entity type.
+# Each entry represents a distinct evaluation benchmark for AI models.
+# Benchmark results (model scores) are stored in the wiki-server PG database.
+
+- id: mmlu
+  numericId: E1100
+  type: benchmark
+  title: MMLU
+  description: "Massive Multitask Language Understanding — a multiple-choice benchmark covering 57 academic subjects from STEM to humanities."
+  category: knowledge
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2021-01"
+  maintainer: "Dan Hendrycks et al."
+  website: "https://github.com/hendrycks/test"
+  sources:
+    - title: "Measuring Massive Multitask Language Understanding"
+      url: "https://arxiv.org/abs/2009.03300"
+
+- id: swe-bench-verified
+  numericId: E1101
+  type: benchmark
+  title: SWE-bench Verified
+  description: "A curated subset of SWE-bench with human-verified task instances for evaluating AI systems on real-world software engineering tasks from GitHub issues."
+  category: coding
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-08"
+  maintainer: "OpenAI / Princeton NLP"
+  website: "https://www.swebench.com"
+  sources:
+    - title: "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"
+      url: "https://arxiv.org/abs/2310.06770"
+
+- id: math-benchmark
+  numericId: E1102
+  type: benchmark
+  title: MATH
+  description: "A dataset of 12,500 competition mathematics problems testing mathematical reasoning across difficulty levels 1-5."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2021-03"
+  maintainer: "Dan Hendrycks et al."
+  sources:
+    - title: "Measuring Mathematical Problem Solving With the MATH Dataset"
+      url: "https://arxiv.org/abs/2103.03874"
+
+- id: humaneval
+  numericId: E1103
+  type: benchmark
+  title: HumanEval
+  description: "A benchmark of 164 hand-written Python programming problems with unit tests, evaluating code generation from docstrings."
+  category: coding
+  scoringMethod: pass_at_1
+  higherIsBetter: true
+  introducedDate: "2021-07"
+  maintainer: OpenAI
+  sources:
+    - title: "Evaluating Large Language Models Trained on Code"
+      url: "https://arxiv.org/abs/2107.03374"
+
+- id: gpqa-diamond
+  numericId: E1104
+  type: benchmark
+  title: GPQA Diamond
+  description: "Graduate-level Google-Proof Q&A Diamond subset — extremely difficult questions in physics, chemistry, and biology that even domain experts struggle with."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2023-11"
+  maintainer: "David Rein et al."
+  sources:
+    - title: "GPQA: A Graduate-Level Google-Proof Q&A Benchmark"
+      url: "https://arxiv.org/abs/2311.12022"
+
+- id: arc-agi
+  numericId: E1105
+  type: benchmark
+  title: ARC-AGI
+  description: "Abstraction and Reasoning Corpus — a benchmark of visual pattern recognition tasks designed to test fluid intelligence and novel reasoning."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2019-11"
+  maintainer: "Francois Chollet"
+  website: "https://arcprize.org"
+  sources:
+    - title: "On the Measure of Intelligence"
+      url: "https://arxiv.org/abs/1911.01547"
+
+- id: arc-agi-2
+  numericId: E1106
+  type: benchmark
+  title: ARC-AGI-2
+  description: "Second iteration of the ARC benchmark with harder tasks, designed to remain challenging as AI capabilities improve."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2025-01"
+  maintainer: "Francois Chollet / ARC Prize Foundation"
+  website: "https://arcprize.org"
+
+- id: terminal-bench-hard
+  numericId: E1107
+  type: benchmark
+  title: Terminal-Bench Hard
+  description: "A benchmark evaluating AI agents on complex terminal-based tasks requiring multi-step reasoning and system administration skills."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2025-01"
+  sources:
+    - title: "Terminal-Bench"
+      url: "https://github.com/terminal-bench/terminal-bench"
+
+- id: terminal-bench-2
+  numericId: E1108
+  type: benchmark
+  title: Terminal-Bench 2
+  description: "Second version of the Terminal-Bench benchmark with expanded task coverage and difficulty."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2025-06"
+
+- id: artificial-analysis-intelligence-index
+  numericId: E1109
+  type: benchmark
+  title: Artificial Analysis Intelligence Index
+  description: "A composite intelligence index from Artificial Analysis that aggregates performance across multiple benchmarks to provide a single capability score."
+  category: general
+  scoringMethod: points
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  maintainer: "Artificial Analysis"
+  website: "https://artificialanalysis.ai"
+
+- id: osworld
+  numericId: E1110
+  type: benchmark
+  title: OSWorld
+  description: "A benchmark for multimodal agents on real-world computer tasks across operating systems, testing GUI interaction and task completion."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-04"
+  sources:
+    - title: "OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments"
+      url: "https://arxiv.org/abs/2404.07972"
+
+- id: aime-2025
+  numericId: E1111
+  type: benchmark
+  title: AIME 2025
+  description: "American Invitational Mathematics Examination 2025 — a prestigious math competition used as a benchmark for advanced mathematical reasoning."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2025-02"
+  maintainer: "Mathematical Association of America"
