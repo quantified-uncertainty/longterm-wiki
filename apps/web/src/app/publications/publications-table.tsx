@@ -213,6 +213,7 @@ export function PublicationsTable({
             placeholder="Search publications..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
+            aria-label="Search publications"
             className="h-9 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           />
         </div>
@@ -220,6 +221,7 @@ export function PublicationsTable({
         {/* Type filter */}
         <select
           value={typeFilter}
+          aria-label="Filter by type"
           onChange={(e) => setTypeFilter(e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm"
         >
@@ -234,6 +236,7 @@ export function PublicationsTable({
         {/* Credibility filter */}
         <select
           value={credFilter}
+          aria-label="Filter by year"
           onChange={(e) => setCredFilter(e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm"
         >

@@ -468,6 +468,11 @@ export default async function WikiPage({ params }: PageProps) {
   const { id } = await params;
 
   if (isNumericId(id)) {
+    // Redirect to standalone listing pages that replaced MDX stubs (before slug
+    // canonicalization to avoid an extra redirect hop)
+    const standaloneRedirect = STANDALONE_PAGE_REDIRECTS[id.toUpperCase()];
+    if (standaloneRedirect) permanentRedirect(standaloneRedirect);
+
     // Numeric ID like E42 — look up slug and render
     const slug = numericIdToSlug(id.toUpperCase());
     if (!slug) notFound();
@@ -475,10 +480,6 @@ export default async function WikiPage({ params }: PageProps) {
     // Redirect to semantic directory URL if entity has a dedicated page
     const directoryHref = getDirectoryHref(slug);
     if (directoryHref) permanentRedirect(directoryHref);
-
-    // Redirect to standalone listing pages that replaced MDX stubs
-    const standaloneRedirect = STANDALONE_PAGE_REDIRECTS[id.toUpperCase()];
-    if (standaloneRedirect) permanentRedirect(standaloneRedirect);
 
     const entityPath = getEntityPath(slug) || "";
 
