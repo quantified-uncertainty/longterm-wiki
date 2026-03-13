@@ -19,3 +19,15 @@ facts:
   - id: f_9EOQ53N4Gg
     property: website
     value: https://www.nickbeckstead.com/
+
+  - id: f_nB1rKz8mXq
+    property: role
+    value: "Philosopher, longtermist philanthropist, former Open Philanthropy program officer"
+    asOf: "2026-03"
+    notes: "Migrated from entity customFields"
+
+  - id: f_nB2nLw9pYr
+    property: notable-for
+    value: "Longtermism, existential risk, FTX Future Fund leadership, Secure AI Project"
+    asOf: "2026-03"
+    notes: "Migrated from entity customFields"

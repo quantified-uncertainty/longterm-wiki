@@ -13,3 +13,21 @@ facts:
   - id: f_fixd9Ra6uA
     property: website
     value: https://redwoodresearch.org
+
+  - id: f_bS1rKz8mXq
+    property: role
+    value: "CEO"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_bS2nLw9pYr
+    property: notable-for
+    value: "AI safety research; Redwood Research leadership"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_bS3oMx0qZs
+    property: employed-by
+    value: !ref dwMzc9WzPa:redwood-research
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"

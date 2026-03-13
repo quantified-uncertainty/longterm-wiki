@@ -34,3 +34,9 @@ facts:
     value: "President"
     asOf: 2021-01
     source: https://anthropic.com/company
+
+  - id: f_dAm2nLw9pY
+    property: notable-for
+    value: "Co-founding Anthropic; Operations and business leadership"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"

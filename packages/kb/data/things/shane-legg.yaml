@@ -13,3 +13,21 @@ facts:
   - id: f_BbpmsSq6zg
     property: website
     value: https://deepmind.google
+
+  - id: f_sL1rKz8mXq
+    property: role
+    value: "Co-founder & Chief AGI Scientist"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_sL2nLw9pYr
+    property: notable-for
+    value: "Co-founding DeepMind; Early work on AGI; Machine super intelligence thesis"
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
+
+  - id: f_sL3oMx0qZs
+    property: employed-by
+    value: !ref A4XoubikkQ:deepmind
+    asOf: "2026-03"
+    notes: "Migrated from experts.yaml"
