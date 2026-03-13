@@ -116,6 +116,27 @@ properties:
     category: biographical
     appliesTo: [person]
 
+  google-scholar:
+    name: Google Scholar
+    description: "Google Scholar profile URL"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  github-profile:
+    name: GitHub
+    description: "GitHub profile URL"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
+  wikipedia-url:
+    name: Wikipedia
+    description: "Wikipedia article URL"
+    dataType: text
+    category: biographical
+    appliesTo: [person]
+
   founded-by:
     name: Founded By
     description: "Person(s) who founded this organization"

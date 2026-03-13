@@ -7,7 +7,43 @@ thing:
 facts:
   - id: f_TthTvMe4kQ
     property: description
-    value: American software engineer, entrepreneur, and venture capitalist who co-created Mosaic, founded Netscape, and
-      co-founded Andreessen Horowitz. Known for techno-optimist views on AI development.
+    value: American software engineer, entrepreneur, and venture capitalist who
+      co-created Mosaic, founded Netscape, and co-founded Andreessen Horowitz.
+      Known for techno-optimist views on AI development.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: XbC1xDUtjw
+    property: born-year
+    value: 1971
+    source: https://www.wikidata.org/wiki/Q62882
+    notes: From Wikidata Q62882
+  - id: Pbeg0qonzw
+    property: education
+    value: University of Illinois Urbana–Champaign; New Lisbon High School
+    source: https://www.wikidata.org/wiki/Q62882
+    notes: From Wikidata Q62882
+
+  - id: f_mA3rK7mW4x
+    property: role
+    value: "Co-founder and General Partner"
+    asOf: 2009-01
+    notes: Enriched from wiki page; co-founded Andreessen Horowitz (a16z) with Ben Horowitz
+
+  - id: f_mA6tN2pQ7v
+    property: notable-for
+    value: "Co-created Mosaic web browser (1993); founded Netscape (sold to AOL for $4.2B); co-founded Andreessen Horowitz managing $90B+ in venture capital; techno-optimist AI advocate opposing safety regulation"
+    asOf: 2026-03
+    source: https://en.wikipedia.org/wiki/Marc_Andreessen
+    notes: Enriched from wiki page
+
+  - id: f_mA9wS5jH1d
+    property: born-year
+    value: 1971
+    source: https://en.wikipedia.org/wiki/Marc_Andreessen
+    notes: Born July 9, 1971 in Cedar Falls, Iowa
+
+  - id: f_mAcY8fL4kA
+    property: education
+    value: "B.S. in Computer Science, University of Illinois at Urbana-Champaign"
+    source: https://en.wikipedia.org/wiki/Marc_Andreessen
+    notes: Enriched from wiki page; co-developed Mosaic while at NCSA

@@ -7,8 +7,43 @@ thing:
 facts:
   - id: f_GupKup2iyw
     property: description
-    value: Vipul Naik is a mathematician and EA community member who has funded ~$255K in contract research (primarily to
-      Sebastian Sanchez and Issa Rice) and created the Donations List Website tracking $72.8B in philanthropic
-      donations. His main contribution is transparency infrastructure for EA funding patte
+    value: Vipul Naik is a mathematician and EA community member who has funded
+      ~$255K in contract research (primarily to Sebastian Sanchez and Issa Rice)
+      and created the Donations List Website tracking $72.8B in philanthropic
+      donations. His main contribution is transparency infrastructure for EA
+      funding patte
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: qQWbmtD8xA
+    property: born-year
+    value: 1986
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772
+  - id: 9qiKmgMPlQ
+    property: education
+    value: University of Chicago; University of Chicago; Chennai Mathematical
+      Institute
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772
+
+  - id: f_vN3rK7mW3x
+    property: role
+    value: "Mathematician, Data Scientist, and Independent Researcher"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_vN6tN2pQ6v
+    property: notable-for
+    value: "Created Donations List Website tracking $72.8B in philanthropic donations; funded ~$255K in contract research for EA knowledge infrastructure; two-time International Mathematical Olympiad silver medalist; former MIRI researcher"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_vN9wS5jH9d
+    property: born-year
+    value: 1986
+    notes: Born 1986 in Delhi, India; enriched from wiki page
+
+  - id: f_vNcY8fL2kA
+    property: education
+    value: "Ph.D. Mathematics, University of Chicago (2013); B.Sc. Mathematics and Computer Science, Chennai Mathematical Institute; two-time IMO silver medalist (2003, 2004)"
+    notes: Enriched from wiki page

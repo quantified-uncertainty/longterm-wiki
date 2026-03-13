@@ -378,37 +378,8 @@ export const UpsertSummaryBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Page References & Citation Links (used by references.ts and citations.ts routes)
+// Page Citations (used by references.ts and citations.ts routes)
 // ---------------------------------------------------------------------------
-
-// -- Page References types ---------------------------------------------------
-
-export interface ClaimPageReferenceRow {
-  id: number;
-  claimId: number;
-  pageId: string;
-  footnote: number | null;
-  section: string | null;
-  quoteText: string | null;
-  referenceId: string | null;
-  createdAt: string;
-}
-
-export const ClaimPageReferenceInsertSchema = z.object({
-  claimId: z.number().int().positive(),
-  pageId: PageIdSchema,
-  footnote: z.number().int().min(0).nullable().optional(),
-  section: z.string().max(1000).nullable().optional(),
-  quoteText: z.string().max(10000).nullable().optional(),
-  referenceId: z.string().max(500).nullable().optional(),
-});
-export type ClaimPageReferenceInsert = z.infer<typeof ClaimPageReferenceInsertSchema>;
-
-export const ClaimPageReferenceBatchSchema = z.object({
-  items: z.array(ClaimPageReferenceInsertSchema.omit({ claimId: true })).min(1).max(200),
-});
-
-// -- Page Citations types (non-claim footnotes) -------------------------------
 
 export const PageCitationInsertSchema = z.object({
   referenceId: z.string().min(1).max(500),
@@ -434,20 +405,6 @@ export interface PageCitationRow {
   resourceId: string | null;
   createdAt: string;
 }
-
-// -- Citation linking types --------------------------------------------------
-
-export const LinkCitationClaimSchema = z.object({
-  claimId: z.number().int().positive(),
-});
-export type LinkCitationClaim = z.infer<typeof LinkCitationClaimSchema>;
-
-export const LinkCitationsClaimsBatchSchema = z.object({
-  items: z.array(z.object({
-    quoteId: z.number().int().positive(),
-    claimId: z.number().int().positive(),
-  })).min(1).max(200),
-});
 
 // ---------------------------------------------------------------------------
 // Page Links
@@ -661,7 +618,7 @@ export interface ResourceListResult {
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   numericId: z.string().max(20).nullable().optional(),
-  stableId: z.string().regex(/^[A-Za-z0-9]{10}$/).nullable().optional(),
+  stableId: z.string().max(20).nullable().optional(),
   entityType: z.string().min(1).max(100),
   title: z.string().min(1).max(500),
   description: z.string().max(50000).nullable().optional(),

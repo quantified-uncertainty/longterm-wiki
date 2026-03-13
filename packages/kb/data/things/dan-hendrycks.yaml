@@ -47,3 +47,9 @@ facts:
     value: !ref oa9A0OV0RX:center-for-ai-safety
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: G6NX3xbaYw
+    property: education
+    value: University of California, Berkeley
+    source: https://www.wikidata.org/wiki/Q107261221
+    notes: From Wikidata Q107261221

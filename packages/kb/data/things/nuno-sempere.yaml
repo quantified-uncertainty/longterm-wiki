@@ -12,3 +12,31 @@ facts:
       existential risk estimates and critical perspectives on EA institutions. The articl
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_nP3rK7mW6x
+    property: role
+    value: "Founder and Director"
+    asOf: 2023-01
+    notes: Enriched from wiki page; founder of Sentinel
+
+  - id: f_nP6tN2pQ9v
+    property: notable-for
+    value: "Co-founded Samotsvety forecasting group (won CSET-Foretell by ~2x margin); founded Sentinel for global catastrophe early warning; built Metaforecast.org; ranked 2nd all-time on INFER platform"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_nP9wS5jH3d
+    property: employed-by
+    value: !ref JzhBAecjaA:sentinel
+    asOf: 2023-01
+    notes: Enriched from wiki page; leads Sentinel early detection and response for global catastrophes
+
+  - id: f_nPcY8fL6kA
+    property: born-year
+    value: 1998
+    notes: Born October 10, 1998; enriched from wiki page
+
+  - id: f_nPfB4gN9mD
+    property: education
+    value: "Studied Mathematics and Philosophy (dropped out); subsequently studied development economics"
+    notes: Enriched from wiki page

@@ -7,8 +7,44 @@ thing:
 facts:
   - id: f_ENQaaYa3Gw
     property: description
-    value: AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization
-      framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner
-      alignment and corrigibility.
+    value: AI safety researcher formerly at Anthropic and MIRI, known for the
+      influential risks from learned optimization framework and the concept of
+      deceptive alignment (mesa-optimization). Author of key foundational work
+      on inner alignment and corrigibility.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: BlHQ8kWvig
+    property: education
+    value: Harvey Mudd College
+    source: https://www.wikidata.org/wiki/Q126287406
+    notes: From Wikidata Q126287406
+
+  - id: f_eH3rK7mW2x
+    property: role
+    value: "Head of Alignment Stress-Testing"
+    asOf: 2023-01
+    notes: Enriched from wiki page
+
+  - id: f_eH6tN2pQ5v
+    property: notable-for
+    value: "Co-authored Risks from Learned Optimization (2019) introducing mesa-optimization and deceptive alignment; led Sleeper Agents and Alignment Faking research at Anthropic; 3,400+ citations"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_eH9wS5jH8d
+    property: employed-by
+    value: !ref mK9pX3rQ7n:anthropic
+    asOf: 2023-01
+    notes: Enriched from wiki page; Head of Alignment Stress-Testing
+
+  - id: f_eHcY8fL1kA
+    property: employed-by
+    value: !ref puAffUjWSS:miri
+    asOf: 2019-01
+    validEnd: 2023-01
+    notes: Enriched from wiki page; Research Fellow at MIRI 2019-2023
+
+  - id: f_eHfB4gN3mD
+    property: education
+    value: "B.S. Mathematics and Computer Science, Harvey Mudd College (2019), High Distinction, GPA 3.912"
+    notes: Enriched from wiki page

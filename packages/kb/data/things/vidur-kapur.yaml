@@ -12,3 +12,26 @@ facts:
       a competent practitioner in forecasting and risk assessment, his individ
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_vK3rK7mW1x
+    property: role
+    value: "AI Policy Researcher"
+    asOf: 2026-03
+    notes: Enriched from wiki page; works at ControlAI
+
+  - id: f_vK6tN2pQ4v
+    property: notable-for
+    value: "Superforecaster affiliated with Good Judgment, Swift Centre, Samotsvety, and RAND; AI policy researcher at ControlAI; key member of Sentinel early warning system for global catastrophes"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_vK9wS5jH7d
+    property: employed-by
+    value: !ref uhTh3ndt0Q:controlai
+    asOf: 2026-03
+    notes: Enriched from wiki page; AI Policy Researcher at ControlAI
+
+  - id: f_vKcY8fL0kA
+    property: education
+    value: "London School of Economics (LSE); University of Chicago"
+    notes: Enriched from wiki page

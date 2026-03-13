@@ -4,6 +4,9 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { topicLabel } from "@/data/topic-labels";
+import { comparePersonRows } from "./people-sort";
+import type { PeopleSortKey, SortDir } from "./people-sort";
 
 export interface PersonRow {
   id: string;
@@ -22,26 +25,18 @@ export interface PersonRow {
   netWorthNum: number | null;
 
   positionCount: number;
+  topics: string[];
 
   publicationCount: number;
   careerHistoryCount: number;
 }
 
-type SortKey =
-  | "name"
-  | "role"
-  | "employer"
-  | "bornYear"
-  | "netWorth"
-  | "positions"
-  | "publications"
-  | "careerHistory";
-
-type SortDir = "asc" | "desc";
+type SortKey = PeopleSortKey;
 
 export function PeopleTable({ rows }: { rows: PersonRow[] }) {
   const [search, setSearch] = useState("");
   const [affiliationFilter, setAffiliationFilter] = useState<string>("all");
+  const [topicFilter, setTopicFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -57,6 +52,18 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
       .filter(([, count]) => count >= 2)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
+  }, [rows]);
+
+  // Collect all topics with person counts, sorted by count descending
+  const topicOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of rows) {
+      for (const t of r.topics) {
+        counts.set(t, (counts.get(t) ?? 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1]);
   }, [rows]);
 
   const handleSort = (key: SortKey) => {
@@ -75,6 +82,10 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
       result = result.filter((r) => r.employerName === affiliationFilter);
     }
 
+    if (topicFilter !== "all") {
+      result = result.filter((r) => r.topics.includes(topicFilter));
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -85,81 +96,79 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
       );
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: PersonRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.name.toLowerCase();
-          case "role":
-            return row.role?.toLowerCase() ?? null;
-          case "employer":
-            return row.employerName?.toLowerCase() ?? null;
-          case "bornYear":
-            return row.bornYear;
-          case "netWorth":
-            return row.netWorthNum;
-          case "positions":
-            return row.positionCount || null;
-          case "publications":
-            return row.publicationCount || null;
-          case "careerHistory":
-            return row.careerHistoryCount;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      // Nulls sort last regardless of direction
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
-      }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    result = [...result].sort((a, b) => comparePersonRows(a, b, sortKey, sortDir));
 
     return result;
-  }, [rows, search, affiliationFilter, sortKey, sortDir]);
+  }, [rows, search, affiliationFilter, topicFilter, sortKey, sortDir]);
 
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search people..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
-        />
-        {affiliations.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setAffiliationFilter("all")}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                affiliationFilter === "all"
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All
-              <span className="ml-1 text-[10px] opacity-60">{rows.length}</span>
-            </button>
-            {affiliations.map(([name, count]) => (
+      <div className="flex flex-col gap-3 mb-5">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Search people..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+          />
+          {affiliations.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
               <button
-                key={name}
-                onClick={() => setAffiliationFilter(affiliationFilter === name ? "all" : name)}
+                onClick={() => setAffiliationFilter("all")}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  affiliationFilter === name
+                  affiliationFilter === "all"
                     ? "bg-primary/10 border-primary/30 text-primary font-semibold"
                     : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
                 }`}
               >
-                {name}
+                All
+                <span className="ml-1 text-[10px] opacity-60">{rows.length}</span>
+              </button>
+              {affiliations.map(([name, count]) => (
+                <button
+                  key={name}
+                  onClick={() => setAffiliationFilter(affiliationFilter === name ? "all" : name)}
+                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                    affiliationFilter === name
+                      ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                      : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                  }`}
+                >
+                  {name}
+                  <span className="ml-1 text-[10px] opacity-60">{count}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Topic filter */}
+        {topicOptions.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground font-medium mr-1">Topics:</span>
+            <button
+              onClick={() => setTopicFilter("all")}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                topicFilter === "all"
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"
+                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+              }`}
+            >
+              All Topics
+            </button>
+            {topicOptions.map(([slug, count]) => (
+              <button
+                key={slug}
+                onClick={() => setTopicFilter(topicFilter === slug ? "all" : slug)}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  topicFilter === slug
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"
+                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                }`}
+              >
+                {topicLabel(slug)}
                 <span className="ml-1 text-[10px] opacity-60">{count}</span>
               </button>
             ))}

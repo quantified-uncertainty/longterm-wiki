@@ -11,3 +11,27 @@ facts:
       AI alignment.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_nS3rK7mW2x
+    property: role
+    value: "Executive Director"
+    asOf: 2015-01
+    notes: Enriched from entity description and public information
+
+  - id: f_nS6tN2pQ5v
+    property: notable-for
+    value: "Executive Director of MIRI; focuses on mathematical foundations of AI alignment including logical uncertainty, decision theory, and corrigibility; author of MIRI technical agenda papers"
+    asOf: 2026-03
+    notes: Enriched from entity description
+
+  - id: f_nS9wS5jH8d
+    property: employed-by
+    value: !ref puAffUjWSS:miri
+    asOf: 2015-01
+    notes: Enriched from entity description; became Executive Director around 2015
+
+  - id: f_nScY8fL1kA
+    property: education
+    value: "B.S. in Computer Science, University of California, Berkeley"
+    source: https://intelligence.org/team/
+    notes: Enriched from public information

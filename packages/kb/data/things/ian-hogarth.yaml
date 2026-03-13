@@ -28,3 +28,9 @@ facts:
     value: !ref aX0jkoaekQ:uk-aisi
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: hrtg6bcLOA
+    property: education
+    value: University of Cambridge; Beijing Language and Culture University
+    source: https://www.wikidata.org/wiki/Q14946860
+    notes: From Wikidata Q14946860

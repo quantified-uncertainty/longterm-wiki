@@ -30,6 +30,7 @@ import {
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getKBDataNav } from "@/lib/wiki-nav";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
+import { formatAmount } from "@/lib/directory-utils";
 
 // ─── Verification types & helpers ────────────────────────────────────
 
@@ -325,16 +326,6 @@ function PersonCard({ item }: { item: RecordEntry }) {
       </div>
     </div>
   );
-}
-
-/** Format a currency amount for display. */
-function formatAmount(value: unknown): string | null {
-  if (value == null) return null;
-  const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
-  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
-  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`;
-  return `$${num.toLocaleString()}`;
 }
 
 /** Funding round row for timeline display. */

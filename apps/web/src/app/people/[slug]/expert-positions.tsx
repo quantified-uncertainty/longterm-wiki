@@ -1,26 +1,5 @@
 import type { ExpertPosition } from "@/data/database";
-
-/** Human-readable labels for position topic slugs */
-const TOPIC_LABELS: Record<string, string> = {
-  "p-doom": "P(doom)",
-  timelines: "AGI Timelines",
-  "current-approaches-scale": "Current Approaches Scale",
-  "how-hard-is-alignment": "How Hard Is Alignment?",
-  "inner-alignment-solvability": "Inner Alignment Solvability",
-  "likelihood-of-deceptive-alignment": "Likelihood of Deceptive Alignment",
-  "would-misalignment-be-catastrophic": "Would Misalignment Be Catastrophic?",
-  "p-ai-catastrophe": "P(AI Catastrophe)",
-  "p-ai-x-risk-this-century": "P(AI X-Risk This Century)",
-  "how-fast-would-takeoff-be": "Takeoff Speed",
-  "will-advanced-ai-systems-be-deceptive":
-    "Will Advanced AI Be Deceptive?",
-  "will-we-get-adequate-warning-before-catastrophic-ai":
-    "Will We Get Adequate Warning?",
-};
-
-function topicLabel(topic: string): string {
-  return TOPIC_LABELS[topic] ?? topic.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import { topicLabel } from "@/data/topic-labels";
 
 const CONFIDENCE_STYLES: Record<string, string> = {
   high: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
@@ -29,12 +8,27 @@ const CONFIDENCE_STYLES: Record<string, string> = {
   low: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
 
+/** Format a date string like "2023", "2023-05", or "2023-05-01" for display */
+function formatPositionDate(date: string): string {
+  if (/^\d{4}-\d{2}$/.test(date)) {
+    const [year, month] = date.split("-");
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+  }
+  return date;
+}
+
 export function ExpertPositions({
   positions,
 }: {
   positions: ExpertPosition[];
 }) {
   if (positions.length === 0) return null;
+
+  const hasAnyDates = positions.some((p) => p.date);
 
   return (
     <section>
@@ -61,6 +55,11 @@ export function ExpertPositions({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Confidence
                 </th>
+                {hasAnyDates && (
+                  <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Date
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -87,6 +86,11 @@ export function ExpertPositions({
                       </span>
                     )}
                   </td>
+                  {hasAnyDates && (
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      {pos.date ? formatPositionDate(pos.date) : "—"}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

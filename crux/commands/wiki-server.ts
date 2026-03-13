@@ -12,8 +12,11 @@ const SCRIPTS = {
     description: 'Sync wiki page content and metadata to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size', 'ci'],
   },
-  // sync-resources removed: YAML resource files deleted in R6 (PG is sole source of truth).
-  // The sync-resources.ts file is kept for its normalizeDate/normalizeTimestamp exports.
+  'sync-facts': {
+    script: 'wiki-server/sync-facts.ts',
+    description: 'Sync KB facts from packages/kb/data/ to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-entities': {
     script: 'wiki-server/sync-entities.ts',
     description: 'Sync data/entities/*.yaml to wiki-server',
@@ -28,6 +31,11 @@ const SCRIPTS = {
   'sync-sessions': {
     script: 'wiki-server/sync-sessions.ts',
     description: 'Sync all .claude/sessions/*.yaml to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
+  'sync-benchmarks': {
+    script: 'wiki-server/sync-benchmarks.ts',
+    description: 'Sync benchmark definitions + results to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
   'sync-auto-update-runs': {
@@ -71,6 +79,8 @@ Examples:
   crux wiki-server sync --batch-size=25      Use smaller batches
   crux wiki-server sync-entities             Sync all entities
   crux wiki-server sync-entities --dry-run   Preview entity sync
+  crux wiki-server sync-benchmarks             Sync benchmarks + results
+  crux wiki-server sync-benchmarks --dry-run   Preview benchmark sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
   crux wiki-server sync-sessions           Sync all session logs
   crux wiki-server sync-auto-update-runs   Sync all auto-update runs

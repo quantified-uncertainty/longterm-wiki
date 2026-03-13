@@ -168,7 +168,7 @@ describe("MANUAL_GRANTEE_OVERRIDES coverage", () => {
     expect(MANUAL_GRANTEE_OVERRIDES["MIRI"]).toBe("miri");
     expect(MANUAL_GRANTEE_OVERRIDES["ARC"]).toBe("arc");
     expect(MANUAL_GRANTEE_OVERRIDES["METR"]).toBe("metr");
-    expect(MANUAL_GRANTEE_OVERRIDES["CAIS"]).toBe("center-for-ai-safety");
+    expect(MANUAL_GRANTEE_OVERRIDES["CAIS"]).toBe("cais");
     expect(MANUAL_GRANTEE_OVERRIDES["Apollo Research"]).toBe("apollo-research");
     expect(MANUAL_GRANTEE_OVERRIDES["Conjecture"]).toBe("conjecture");
     expect(MANUAL_GRANTEE_OVERRIDES["Goodfire"]).toBe("goodfire");
@@ -192,7 +192,7 @@ describe("MANUAL_GRANTEE_OVERRIDES coverage", () => {
 
   it("maps funders", () => {
     expect(MANUAL_GRANTEE_OVERRIDES["Open Phil"]).toBe("coefficient-giving");
-    expect(MANUAL_GRANTEE_OVERRIDES["SFF"]).toBe("survival-and-flourishing-fund");
+    expect(MANUAL_GRANTEE_OVERRIDES["SFF"]).toBe("sff");
     expect(MANUAL_GRANTEE_OVERRIDES["LTFF"]).toBe("ltff");
     expect(MANUAL_GRANTEE_OVERRIDES["CZI"]).toBe("chan-zuckerberg-initiative");
     expect(MANUAL_GRANTEE_OVERRIDES["Schmidt Futures"]).toBe("schmidt-futures");

@@ -40,3 +40,14 @@ facts:
     value: "Co-founding Anthropic; Operations and business leadership"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
+
+  - id: Mu44VStB8w
+    property: born-year
+    value: 1987
+    source: https://www.wikidata.org/wiki/Q119721378
+    notes: From Wikidata Q119721378
+  - id: lXJBrUMv9A
+    property: education
+    value: University of California, Santa Cruz
+    source: https://www.wikidata.org/wiki/Q119721378
+    notes: From Wikidata Q119721378

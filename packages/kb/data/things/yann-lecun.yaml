@@ -43,6 +43,18 @@ facts:
     value: "@ylecun"
     source: https://x.com/ylecun
 
+  - id: f_yL_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Yann_LeCun"
+
+  - id: f_yL_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=WLN3QrAAAAAJ"
+
+  - id: f_yL_website
+    property: website
+    value: "http://yann.lecun.com"
+
   - id: f_4vHT9Lh28Q
     property: role
     value: "Research Scientist"

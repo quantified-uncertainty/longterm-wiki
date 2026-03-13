@@ -7,8 +7,50 @@ thing:
 facts:
   - id: f_oLpabpFPtg
     property: description
-    value: Swedish-American physicist at MIT, co-founder of the Future of Life Institute, and prominent AI safety advocate
-      known for his work on the Mathematical Universe Hypothesis and efforts to promote safe artificial intelligence
-      development.
+    value: Swedish-American physicist at MIT, co-founder of the Future of Life
+      Institute, and prominent AI safety advocate known for his work on the
+      Mathematical Universe Hypothesis and efforts to promote safe artificial
+      intelligence development.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: aCRxBQ1kHQ
+    property: born-year
+    value: 1967
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321
+  - id: HCqWZTSo4w
+    property: education
+    value: Royal Institute of Technology; Stockholm School of Economics; University
+      of California, Berkeley
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321
+
+  - id: f_mT3rK7mW9x
+    property: role
+    value: "Professor of Physics, MIT; President, Future of Life Institute"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_mT6tN2pQ3v
+    property: notable-for
+    value: "Co-founded Future of Life Institute; developed 23 Asilomar AI Principles; organized 2023 AI pause letter with 30,000+ signatories; author of Life 3.0 (NYT bestseller); TIME 100 Most Influential in AI 2023"
+    asOf: 2026-03
+    notes: Enriched from wiki page
+
+  - id: f_mT9wS5jH6d
+    property: employed-by
+    value: !ref d9sWZtyVwg:fli
+    asOf: 2014-01
+    notes: Enriched from wiki page; co-founded FLI in 2014 and serves as president
+
+  - id: f_mTcY8fL9kA
+    property: born-year
+    value: 1967
+    source: https://en.wikipedia.org/wiki/Max_Tegmark
+    notes: Born May 5, 1967 in Stockholm, Sweden
+
+  - id: f_mTfB4gN5mD
+    property: education
+    value: "B.A. Economics, Stockholm School of Economics; B.Sc. Physics, Royal Institute of Technology; M.A. Physics, UC Berkeley (1992); Ph.D. Physics, UC Berkeley (1994)"
+    source: https://en.wikipedia.org/wiki/Max_Tegmark
+    notes: Enriched from wiki page

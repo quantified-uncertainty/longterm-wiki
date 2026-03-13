@@ -199,6 +199,9 @@ const COST_MAP: Record<string, number> = {
 
 const TIER_RANK = { polish: 1, standard: 2, deep: 3 } as const;
 
+/** Max length for directions field (must match wiki-server artifacts schema). */
+const MAX_DIRECTIONS_LENGTH = 5000;
+
 /**
  * Deduplicate page updates by pageId.
  * For duplicates: merge relevantNews arrays and take the highest tier.
@@ -218,6 +221,13 @@ export function deduplicatePageUpdates(updates: PageUpdate[]): PageUpdate[] {
       }
     } else {
       seen.set(update.pageId, { ...update, relevantNews: [...update.relevantNews] });
+    }
+  }
+
+  // Truncate directions that exceed the artifacts API limit
+  for (const update of seen.values()) {
+    if (update.directions.length > MAX_DIRECTIONS_LENGTH) {
+      update.directions = update.directions.slice(0, MAX_DIRECTIONS_LENGTH - 3) + '...';
     }
   }
 

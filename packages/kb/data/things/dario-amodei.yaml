@@ -42,6 +42,14 @@ facts:
     value: "@DarioAmodei"
     source: https://x.com/DarioAmodei
 
+  - id: f_dA_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Dario_Amodei"
+
+  - id: f_dA_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=0tSbNNgAAAAJ"
+
   - id: f_9Rz2EK1pYA
     property: role
     value: "VP of Research"

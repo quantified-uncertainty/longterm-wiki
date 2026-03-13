@@ -509,7 +509,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       pageId: page.id,
       engine: 'v1' as const,
       tier: tier as 'polish' | 'standard' | 'deep',
-      directions: directions || null,
+      directions: directions ? directions.slice(0, 5000) : null,
       startedAt: new Date(startTime).toISOString(),
       completedAt,
       durationS: parseFloat(totalDuration),
