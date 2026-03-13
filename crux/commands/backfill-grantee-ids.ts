@@ -50,6 +50,15 @@ function looksLikeStableId(value: string): boolean {
   return /^[A-Za-z0-9]{10}$/.test(value);
 }
 
+/**
+ * Purely numeric granteeIds are internal IDs from external systems
+ * (e.g., Open Philanthropy's grant database) that were stored as granteeId
+ * when the entity matcher couldn't resolve them. These should be cleared.
+ */
+function isNumericOnlyId(value: string): boolean {
+  return /^\d+$/.test(value.trim());
+}
+
 const BATCH_SIZE = 200;
 
 // ---------------------------------------------------------------------------
@@ -86,6 +95,7 @@ async function runBackfill(dryRun: boolean): Promise<void> {
   // 3. Categorize grants
   const alreadyLinked: GrantIdRow[] = [];
   const noGranteeId: GrantIdRow[] = [];
+  const numericIds: GrantIdRow[] = [];
   const needsMatching: GrantIdRow[] = [];
 
   for (const grant of allGrants) {
@@ -93,6 +103,8 @@ async function runBackfill(dryRun: boolean): Promise<void> {
       noGranteeId.push(grant);
     } else if (looksLikeStableId(grant.granteeId)) {
       alreadyLinked.push(grant);
+    } else if (isNumericOnlyId(grant.granteeId)) {
+      numericIds.push(grant);
     } else {
       needsMatching.push(grant);
     }
@@ -101,7 +113,21 @@ async function runBackfill(dryRun: boolean): Promise<void> {
   console.log("=== Grant Categorization ===");
   console.log(`  Already linked (stableId):  ${alreadyLinked.length}`);
   console.log(`  No granteeId (null):        ${noGranteeId.length}`);
+  console.log(`  Numeric IDs (to clear):     ${numericIds.length}`);
   console.log(`  Display names (to match):   ${needsMatching.length}\n`);
+
+  // Show numeric IDs that will be cleared
+  if (numericIds.length > 0) {
+    const uniqueIds = new Map<string, number>();
+    for (const g of numericIds) {
+      uniqueIds.set(g.granteeId!, (uniqueIds.get(g.granteeId!) || 0) + 1);
+    }
+    console.log(`Numeric grantee IDs (${uniqueIds.size} unique, will be set to null):`);
+    for (const [id, count] of [...uniqueIds.entries()].sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${count.toString().padStart(4)}x  "${id}"`);
+    }
+    console.log("");
+  }
 
   // 4. Match display names to entity stableIds
   const matched: Array<{ id: string; granteeId: string; oldValue: string }> = [];
@@ -150,26 +176,34 @@ async function runBackfill(dryRun: boolean): Promise<void> {
     }
   }
 
-  // 7. Apply updates
-  if (matched.length === 0) {
+  // 7. Build combined update list: matched display names + numeric IDs to clear
+  const toClear: Array<{ id: string; granteeId: string | null; oldValue: string }> =
+    numericIds.map((g) => ({ id: g.id, granteeId: null, oldValue: g.granteeId! }));
+  const allUpdates = [...matched, ...toClear];
+
+  if (allUpdates.length === 0) {
     console.log("No grants to update.");
     return;
   }
 
+  if (toClear.length > 0) {
+    console.log(`Will clear ${toClear.length} numeric grantee IDs (set to null)`);
+  }
+
   if (dryRun) {
-    console.log(`Dry run — would update ${matched.length} grants. Use without --dry-run to apply.`);
+    console.log(`Dry run — would update ${allUpdates.length} grants (${matched.length} matched + ${toClear.length} cleared). Use without --dry-run to apply.`);
     return;
   }
 
-  console.log(`Updating ${matched.length} grants...`);
+  console.log(`Updating ${allUpdates.length} grants...`);
 
   let totalUpdated = 0;
   let failedBatches = 0;
 
-  for (let i = 0; i < matched.length; i += BATCH_SIZE) {
-    const batch = matched.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < allUpdates.length; i += BATCH_SIZE) {
+    const batch = allUpdates.slice(i, i + BATCH_SIZE);
     const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(matched.length / BATCH_SIZE);
+    const totalBatches = Math.ceil(allUpdates.length / BATCH_SIZE);
 
     console.log(`  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`);
 
@@ -229,8 +263,9 @@ Commands:
 This command:
   1. Fetches all grants from the wiki-server
   2. Identifies grants where granteeId is a display name (not a 10-char stableId)
-  3. Runs the entity matcher (manual overrides + name normalization)
-  4. Updates matched grants with the entity stableId
-  5. Reports unmatched names (can be added as manual overrides)
+  3. Clears purely numeric grantee IDs (internal IDs from external systems)
+  4. Runs the entity matcher (manual overrides + name normalization)
+  5. Updates matched grants with the entity stableId
+  6. Reports unmatched names (can be added as manual overrides)
 `;
 }

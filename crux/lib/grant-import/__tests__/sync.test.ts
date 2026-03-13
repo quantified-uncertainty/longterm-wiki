@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toSyncGrant } from "../sync.ts";
+import { toSyncGrant, isNumericGranteeId } from "../sync.ts";
 import type { RawGrant } from "../types.ts";
 
 describe("toSyncGrant", () => {
@@ -261,6 +261,54 @@ describe("toSyncGrant", () => {
     expect(sync.currency).toBe("GBP");
   });
 
+  it("sets granteeId to null for numeric-only grantee names", () => {
+    const raw: RawGrant = {
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      granteeName: "252",
+      granteeId: null,
+      name: "Grant to organization 252",
+      amount: 100000,
+      date: "2022-01",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    expect(sync.granteeId).toBeNull();
+  });
+
+  it("keeps non-numeric grantee names when no entity match", () => {
+    const raw: RawGrant = {
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      granteeName: "Some Real Organization",
+      granteeId: null,
+      name: "Grant to Some Real Organization",
+      amount: 100000,
+      date: "2022-01",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    expect(sync.granteeId).toBe("Some Real Organization");
+  });
+
+  it("keeps matched entity stableId even when granteeName is numeric", () => {
+    const raw: RawGrant = {
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      granteeName: "252",
+      granteeId: "aBcDeFgHiJ",
+      name: "Grant to organization 252",
+      amount: 100000,
+      date: "2022-01",
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    expect(sync.granteeId).toBe("aBcDeFgHiJ");
+  });
+
   // ID stability tests — these pin the exact ID for existing CG/EA Funds grants
   it("produces stable ID for CG grant (ID must not change)", () => {
     const raw: RawGrant = {
@@ -292,5 +340,41 @@ describe("toSyncGrant", () => {
     };
     const sync = toSyncGrant(raw, "https://funds.effectivealtruism.org/grants");
     expect(sync.id).toBe("kPQNkZFIDW");
+  });
+});
+
+describe("isNumericGranteeId", () => {
+  it("returns true for purely numeric strings", () => {
+    expect(isNumericGranteeId("252")).toBe(true);
+    expect(isNumericGranteeId("278")).toBe(true);
+    expect(isNumericGranteeId("165")).toBe(true);
+    expect(isNumericGranteeId("0")).toBe(true);
+    expect(isNumericGranteeId("123456789")).toBe(true);
+  });
+
+  it("returns true for numeric strings with whitespace", () => {
+    expect(isNumericGranteeId(" 252 ")).toBe(true);
+    expect(isNumericGranteeId("  100  ")).toBe(true);
+  });
+
+  it("returns false for organization names", () => {
+    expect(isNumericGranteeId("MIRI")).toBe(false);
+    expect(isNumericGranteeId("OpenAI")).toBe(false);
+    expect(isNumericGranteeId("80,000 Hours")).toBe(false);
+    expect(isNumericGranteeId("1DaySooner")).toBe(false);
+  });
+
+  it("returns false for stableId-like strings", () => {
+    expect(isNumericGranteeId("aBcDeFgHiJ")).toBe(false);
+    expect(isNumericGranteeId("ULjDXpSLCI")).toBe(false);
+  });
+
+  it("returns false for mixed alphanumeric strings", () => {
+    expect(isNumericGranteeId("Center4AI")).toBe(false);
+    expect(isNumericGranteeId("Lab42")).toBe(false);
+  });
+
+  it("returns false for empty strings", () => {
+    expect(isNumericGranteeId("")).toBe(false);
   });
 });

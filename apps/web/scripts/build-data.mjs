@@ -1330,7 +1330,10 @@ function grantRowToRecordEntry(row) {
     name: row.name,
   };
   if (row.amount != null) fields.amount = row.amount;
-  if (row.granteeId) fields.recipient = row.granteeId;
+  // Skip purely numeric granteeIds — these are unresolved internal IDs from
+  // external systems (e.g., Open Philanthropy) that aren't meaningful as
+  // entity references or display names.
+  if (row.granteeId && !/^\d+$/.test(row.granteeId)) fields.recipient = row.granteeId;
   if (row.period) fields.period = row.period;
   if (row.date) fields.date = row.date;
   if (row.status) fields.status = row.status;
