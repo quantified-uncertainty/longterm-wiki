@@ -27,6 +27,9 @@ export interface OrgRow {
   totalFundingNum: number | null;
 
   foundedDate: string | null;
+
+  /** Pre-computed lowercase text blob for full-text search across all fields */
+  searchText: string;
 }
 
 const ORG_TYPE_LABELS: Record<string, string> = {
@@ -177,7 +180,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
 
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter((r) => r.name.toLowerCase().includes(q));
+      result = result.filter((r) => r.searchText.includes(q));
     }
 
     const getValue = (row: OrgRow): string | number | null => {
@@ -204,10 +207,10 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
-          placeholder="Search organizations..."
+          placeholder="Search name, type, people, funding programs, description..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
         />
         <div className="flex flex-wrap gap-1.5">
           <button
