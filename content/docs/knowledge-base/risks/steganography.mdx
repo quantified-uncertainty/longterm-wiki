@@ -106,11 +106,11 @@ Research has identified multiple techniques AI systems can use for information h
 
 | Method | Description | Capacity | Detection Rate | Source |
 |--------|-------------|----------|----------------|---------|
-| Character substitution | Using visually similar Unicode characters | 0.5-2 bits/word | 15% human detection | <R id="0fb23e1ab28041fd">Ziegler et al. (2022)</R> |
-| Synonym patterns | Encoding in word choice patterns | 1-3 bits/word | 25% human detection | <R id="a3a265ae188d4727">Aaronson & Shi (2024)</R> |
+| Character substitution | Using visually similar Unicode characters | 0.5-2 bits/word | 15% human detection | <R id="MDJmNzE0NW">Ziegler et al. (2022)</R> |
+| Synonym patterns | Encoding in word choice patterns | 1-3 bits/word | 25% human detection | <R id="Yzg3OGQyMD">Aaronson & Shi (2024)</R> |
 | Cycle-shifting watermarks | Rotating token probabilities | Up to 3 bits/KB | 70% neural detection | [Redwood Research (2024)](https://arxiv.org/abs/2310.18512) |
 | Balance-marking | Even/odd token frequency patterns | Up to 2 bits/KB | 65% neural detection | [Redwood Research (2024)](https://arxiv.org/abs/2310.18512) |
-| Image embedding | Information in pixel modifications | 1-4 bits/pixel | 5% human detection | <R id="ad7e3c9c8562b183">Carlini et al. (2023)</R> |
+| Image embedding | Information in pixel modifications | 1-4 bits/pixel | 5% human detection | <R id="ZGU5NmYzOG">Carlini et al. (2023)</R> |
 | Encoded reasoning | Hidden information in CoT steps | 3+ bits/KB | Under 30% human | [LASR Labs (2024)](https://arxiv.org/abs/2410.03768) |
 
 ### Steganographic Capacity vs. Security Tradeoff
@@ -220,9 +220,9 @@ Recent studies reveal concerning trends:
 
 | Organization | Approach | Effectiveness | Status |
 |--------------|----------|---------------|---------|
-| <R id="085feee8a2702182">Anthropic</R> | Constitutional AI + paraphrasing | Medium (reduces capacity) | Active research |
-| <R id="838d7a59a02e11a7">OpenAI</R> | [SynthID watermarking](https://ai.google.dev/responsible/docs/safeguards/synthid) | High for detection, N/A for prevention | Production |
-| <R id="a77b1b1f530bacea">DeepMind</R> | Interpretability + SynthID | Medium | Ongoing |
+| <R id="YWQ5NzdiZD">Anthropic</R> | Constitutional AI + paraphrasing | Medium (reduces capacity) | Active research |
+| <R id="NjQzNmMyMz">OpenAI</R> | [SynthID watermarking](https://ai.google.dev/responsible/docs/safeguards/synthid) | High for detection, N/A for prevention | Production |
+| <R id="OThlZmQxZD">DeepMind</R> | Interpretability + SynthID | Medium | Ongoing |
 | Redwood Research | Paraphrasing defenses | High (3 bits/KB limit) | Published 2024 |
 | Oxford AI Safety | CASE evaluation framework | N/A (diagnostic tool) | Released 2024 |
 
@@ -295,13 +295,13 @@ Organizations are implementing multiple defensive layers:
 
 Leading researchers express varying levels of concern:
 
-**High Concern** (<R id="2ccf0b6518e285d6"><EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink></R>):
+**High Concern** (<R id="NWVlZDRlOD"><EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink></R>):
 > "Steganographic capabilities represent a fundamental challenge to AI oversight, potentially enabling coordinated deception at scale."
 
-**Moderate Concern** (<R id="afe2508ac4caf5ee">Anthropic Research</R>):
+**Moderate Concern** (<R id="MWRkOTFhMm">Anthropic Research</R>):
 > "While concerning, steganographic risks can likely be managed through careful monitoring and detection systems."
 
-**Research Priority** (<R id="86df45a5f8a9bf6d">MIRI</R>):
+**Research Priority** (<R id="YmZjYzBhMW">MIRI</R>):
 > "Understanding steganographic capabilities is crucial for developing robust AI alignment verification methods."
 
 ## Mitigation Strategies
@@ -373,8 +373,8 @@ Steganography intersects with several other AI safety concerns:
 | [The Steganographic Potentials of LMs](https://arxiv.org/abs/2505.03439) | Multiple institutions | RL improves covert communication by approximately 20% | 2025 |
 | [Mitigating Deceptive Alignment](https://arxiv.org/abs/2505.18807) | AI safety researchers | CoT Monitor+ reduces deception by 43.8% | 2025 |
 | [LLMs as Carriers of Hidden Messages](https://arxiv.org/abs/2406.02481) | Multiple authors | Fine-tuning embeds extractable hidden text | 2024 |
-| <R id="0fb23e1ab28041fd">Ziegler et al.</R> | OpenAI/academic | Unicode steganography in GPT models | 2022 |
-| <R id="a3a265ae188d4727">Aaronson & Shi</R> | Academic | Mathematical foundations of AI steganography | 2024 |
+| <R id="MDJmNzE0NW">Ziegler et al.</R> | OpenAI/academic | Unicode steganography in GPT models | 2022 |
+| <R id="Yzg3OGQyMD">Aaronson & Shi</R> | Academic | Mathematical foundations of AI steganography | 2024 |
 
 ### Detection Research
 
@@ -389,9 +389,9 @@ Steganography intersects with several other AI safety concerns:
 - [SynthID-Text](https://ai.google.dev/responsible/docs/safeguards/synthid) - Google DeepMind's production watermarking ([Nature 2024](https://www.nature.com/articles/s41586-024-08025-4))
 - [MarkLLM Toolkit](https://github.com/THU-BPM/MarkLLM) - Open-source LLM watermarking (EMNLP 2024)
 - [Redwood Research](https://www.redwoodresearch.org/research) - AI alignment and control research
-- <R id="2111dc0026710661">Anthropic Constitutional AI</R>
-- <R id="838d7a59a02e11a7">OpenAI Safety Research</R>
-- <R id="ee872736d7fbfcd5">MIRI Agent Foundations</R>
+- <R id="MDQ4YzY4MW">Anthropic Constitutional AI</R>
+- <R id="NjQzNmMyMz">OpenAI Safety Research</R>
+- <R id="NzQxOWIyMT">MIRI Agent Foundations</R>
 
 ### AI Safety Analysis
 

@@ -27,7 +27,7 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 Responsible Scaling Policies (<EntityLink id="E252" name="responsible-scaling-policies">RSPs</EntityLink>) are self-imposed commitments by AI labs to tie AI development to safety progress. The core idea is simple: before scaling to more capable systems, labs commit to demonstrating that their safety measures are adequate for the risks those systems would pose. If evaluations reveal dangerous capabilities without adequate safeguards, development should pause until safety catches up.
 
-<R id="394ea6d17701b621"><EntityLink id="E22" name="anthropic">Anthropic</EntityLink> introduced the first RSP</R> in September 2023, establishing "AI Safety Levels" (ASL-1 through ASL-4+) analogous to biosafety levels. <EntityLink id="E218" name="openai">OpenAI</EntityLink> followed with its <R id="ded0b05862511312">Preparedness Framework</R> in December 2023, and <R id="8c8edfbc52769d52"><EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> published its Frontier Safety Framework</R> in May 2024. By late 2024, <R id="c8782940b880d00f">twelve major AI companies</R> had published some form of frontier AI safety policy, and the <R id="944fc2ac301f8980">Seoul Summit</R> secured voluntary commitments from sixteen companies.
+<R id="NGU0MjEyN2"><EntityLink id="E22" name="anthropic">Anthropic</EntityLink> introduced the first RSP</R> in September 2023, establishing "AI Safety Levels" (ASL-1 through ASL-4+) analogous to biosafety levels. <EntityLink id="E218" name="openai">OpenAI</EntityLink> followed with its <R id="OTU2ZjU2MD">Preparedness Framework</R> in December 2023, and <R id="MWQzOTZiZW"><EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> published its Frontier Safety Framework</R> in May 2024. By late 2024, <R id="OTE0ZWY2Nm">twelve major AI companies</R> had published some form of frontier AI safety policy, and the <R id="YmVmM2UwNW">Seoul Summit</R> secured voluntary commitments from sixteen companies.
 
 RSPs represent a significant governance innovation because they create a mechanism for safety-capability coupling without requiring external regulation. As of December 2025, [20 companies](https://metr.org/common-elements) have published frontier AI safety policies, up from 12 at the May 2024 Seoul Summit. Third-party evaluators like [METR](https://metr.org/) have conducted pre-deployment assessments of 5+ major models. However, RSPs face fundamental challenges: they are 100% voluntary with no legal enforcement, labs set their own thresholds (leading to [SaferAI grades](https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards) of only 1.9-2.2 out of 5), competitive pressure among 3+ frontier labs creates incentives to interpret policies permissively, and capability doubling times of approximately 7 months may outpace evaluation science.
 
@@ -76,11 +76,11 @@ The three leading frontier AI labs have published distinct but conceptually simi
 | Aspect | Anthropic RSP | OpenAI Preparedness | DeepMind FSF |
 |--------|---------------|---------------------|--------------|
 | **First Published** | September 2023 | December 2023 | May 2024 |
-| **Current Version** | <R id="d0ba81cc7a8fdb2b">v2.2 (May 2025)</R> | <R id="ec5d8e7d6a1b2c7c">v2.0 (April 2025)</R> | <R id="3c56c8c2a799e4ef">v3.0 (October 2025)</R> |
+| **Current Version** | <R id="NzJkZWFhMW">v2.2 (May 2025)</R> | <R id="YTFkNjM1Mz">v2.0 (April 2025)</R> | <R id="ZDk3MjIyZT">v3.0 (October 2025)</R> |
 | **Level Structure** | ASL-1 through ASL-4+ | High / Critical | CCL-1 through CCL-4+ |
 | **Risk Domains** | CBRN, AI R&D, Autonomy | Bio/Chem, Cyber, Self-improvement | Autonomy, Bio, Cyber, ML R&D, Manipulation |
 | **Governance Body** | Responsible Scaling Officer | Safety Advisory Group (SAG) | Frontier Safety Team |
-| **Third-Party Evals** | <R id="45370a5153534152">METR</R>, UK AISI | <R id="45370a5153534152">METR</R>, UK AISI | Internal primarily |
+| **Third-Party Evals** | <R id="NWFiOTg0MD">METR</R>, UK AISI | <R id="NWFiOTg0MD">METR</R>, UK AISI | Internal primarily |
 | **Pause Commitment** | Explicit if safeguards insufficient | Implicit (must have safeguards) | Explicit for CCL thresholds |
 | **Board Override** | Board can override RSO | SAG advises; leadership decides | Not specified |
 
@@ -93,7 +93,7 @@ The three leading frontier AI labs have published distinct but conceptually simi
 | **OpenAI Critical** | "Unprecedented new pathways to severe harm" | Novel attack vectors at scale | Recursive self-improvement; 5x speed improvement |
 | **DeepMind CCL** | "Heightened risk of severe harm" from bio capabilities | "Sophisticated cyber capabilities" | "Exceptional agency" and ML research capabilities |
 
-*Sources: <R id="afe1e125f3ba3f14">Anthropic RSP</R>, <R id="ec5d8e7d6a1b2c7c">OpenAI Preparedness Framework v2</R>, <R id="3c56c8c2a799e4ef">DeepMind FSF v3</R>*
+*Sources: <R id="NDA5OTUyY2">Anthropic RSP</R>, <R id="YTFkNjM1Mz">OpenAI Preparedness Framework v2</R>, <R id="ZDk3MjIyZT">DeepMind FSF v3</R>*
 
 ### Safeguard Requirements by Level
 
@@ -213,7 +213,7 @@ flowchart TD
 
 ### Anthropic's AI Safety Levels (ASL)
 
-Anthropic's <R id="afe1e125f3ba3f14">ASL system</R> is modeled after Biosafety Levels (BSL-1 through BSL-4) used for handling dangerous pathogens. Each level specifies both capability thresholds and required safeguards.
+Anthropic's <R id="NDA5OTUyY2">ASL system</R> is modeled after Biosafety Levels (BSL-1 through BSL-4) used for handling dangerous pathogens. Each level specifies both capability thresholds and required safeguards.
 
 | Level | Capability Definition | Deployment Safeguards | Security Standard |
 |-------|----------------------|----------------------|-------------------|
@@ -224,11 +224,11 @@ Anthropic's <R id="afe1e125f3ba3f14">ASL system</R> is modeled after Biosafety L
 
 **Current Status (January 2026):** All Claude models currently operate at ASL-2. Anthropic activated ASL-3 safeguard development in May 2025 following evaluations of Claude Opus 4.
 
-**RSP v2.2 Changes:** The <R id="d0ba81cc7a8fdb2b">October 2024 update</R> separated "ASL" to refer to safeguard standards rather than model categories, introducing distinct "Capability Thresholds" and "Required Safeguards." <R id="c12e001e2e41c05a">Critics argue</R> this reduced specificity compared to v1.
+**RSP v2.2 Changes:** The <R id="NzJkZWFhMW">October 2024 update</R> separated "ASL" to refer to safeguard standards rather than model categories, introducing distinct "Capability Thresholds" and "Required Safeguards." <R id="YWM3MWUxOD">Critics argue</R> this reduced specificity compared to v1.
 
 ### OpenAI's Preparedness Framework
 
-OpenAI's <R id="ded0b05862511312">Preparedness Framework</R> underwent a major revision in April 2025 (v2.0), simplifying from four risk levels to two actionable thresholds.
+OpenAI's <R id="OTU2ZjU2MD">Preparedness Framework</R> underwent a major revision in April 2025 (v2.0), simplifying from four risk levels to two actionable thresholds.
 
 | Risk Domain | High Threshold | Critical Threshold |
 |-------------|----------------|-------------------|
@@ -242,7 +242,7 @@ OpenAI's <R id="ded0b05862511312">Preparedness Framework</R> underwent a major r
 - Added explicit threshold for recursive self-improvement: achieving generational improvement (e.g., o1 to o3) in 1/5th the 2024 development time
 - Safety Advisory Group (SAG) now oversees all threshold determinations
 
-**Recent Evaluations:** OpenAI's <R id="a86b4f04559de6da">January 2026 o3/o4-mini system card</R> reported neither model reached High threshold in any tracked category, though biological and cyber capabilities continue trending upward.
+**Recent Evaluations:** OpenAI's <R id="NDc0NDczYj">January 2026 o3/o4-mini system card</R> reported neither model reached High threshold in any tracked category, though biological and cyber capabilities continue trending upward.
 
 ## Current Implementations
 
@@ -250,9 +250,9 @@ OpenAI's <R id="ded0b05862511312">Preparedness Framework</R> underwent a major r
 
 | Lab | Policy Name | Initial | Latest Version | Key Features |
 |-----|-------------|---------|----------------|--------------|
-| **Anthropic** | <R id="afe1e125f3ba3f14">Responsible Scaling Policy</R> | Sep 2023 | v2.2 (May 2025) | ASL levels, deployment/security standards, external evals |
-| **OpenAI** | <R id="ded0b05862511312">Preparedness Framework</R> | Dec 2023 | v2.0 (Apr 2025) | High/Critical thresholds, SAG governance, tracked categories |
-| **Google DeepMind** | <R id="8c8edfbc52769d52">Frontier Safety Framework</R> | May 2024 | v3.0 (Oct 2025) | CCL levels, manipulation risk domain added |
+| **Anthropic** | <R id="NDA5OTUyY2">Responsible Scaling Policy</R> | Sep 2023 | v2.2 (May 2025) | ASL levels, deployment/security standards, external evals |
+| **OpenAI** | <R id="OTU2ZjU2MD">Preparedness Framework</R> | Dec 2023 | v2.0 (Apr 2025) | High/Critical thresholds, SAG governance, tracked categories |
+| **Google DeepMind** | <R id="MWQzOTZiZW">Frontier Safety Framework</R> | May 2024 | v3.0 (Oct 2025) | CCL levels, manipulation risk domain added |
 | **xAI** | Safety Framework | 2024 | v1.0 | Evaluation and deployment procedures |
 | **Meta** | Frontier Model Safety | 2024 | v1.0 | Purple-team evaluations, staged deployment |
 
@@ -272,7 +272,7 @@ OpenAI's <R id="ded0b05862511312">Preparedness Framework</R> underwent a major r
 
 ### Seoul Summit Commitments (May 2024)
 
-The <R id="944fc2ac301f8980">Seoul AI Safety Summit</R> achieved a historic first: 16 frontier AI companies from the US, Europe, Middle East, and Asia signed binding-intent commitments. Signatories included Amazon, Anthropic, Cohere, G42, Google, IBM, Inflection AI, Meta, Microsoft, Mistral AI, Naver, OpenAI, Samsung, Technology Innovation Institute, xAI, and Zhipu.ai.
+The <R id="YmVmM2UwNW">Seoul AI Safety Summit</R> achieved a historic first: 16 frontier AI companies from the US, Europe, Middle East, and Asia signed binding-intent commitments. Signatories included Amazon, Anthropic, Cohere, G42, Google, IBM, Inflection AI, Meta, Microsoft, Mistral AI, Naver, OpenAI, Samsung, Technology Innovation Institute, xAI, and Zhipu.ai.
 
 | Commitment | Description | Compliance Verification |
 |------------|-------------|------------------------|
@@ -283,22 +283,22 @@ The <R id="944fc2ac301f8980">Seoul AI Safety Summit</R> achieved a historic firs
 | **Red-teaming** | Internal and external adversarial testing | Third-party verification emerging |
 | **Cybersecurity** | Protect model weights from theft | Industry standards |
 
-**Follow-up:** An additional 4 companies have joined since May 2024. The <R id="9f2ffd2569e88909">France AI Action Summit</R> (February 2025) reviewed compliance and expanded commitments.
+**Follow-up:** An additional 4 companies have joined since May 2024. The <R id="MmE4N2ZhY2">France AI Action Summit</R> (February 2025) reviewed compliance and expanded commitments.
 
 ### Third-Party Evaluation Ecosystem
 
-<R id="45370a5153534152">METR</R> (Model Evaluation and Threat Research) has emerged as the leading independent evaluator, having conducted pre-deployment assessments for both Anthropic and OpenAI. Founded by <EntityLink id="E39" name="beth-barnes">Beth Barnes</EntityLink> (former OpenAI alignment researcher) in December 2023, METR does not accept compensation for evaluations to maintain independence.
+<R id="NWFiOTg0MD">METR</R> (Model Evaluation and Threat Research) has emerged as the leading independent evaluator, having conducted pre-deployment assessments for both Anthropic and OpenAI. Founded by <EntityLink id="E39" name="beth-barnes">Beth Barnes</EntityLink> (former OpenAI alignment researcher) in December 2023, METR does not accept compensation for evaluations to maintain independence.
 
 | Organization | Role | Labs Evaluated | Key Focus Areas |
 |--------------|------|----------------|-----------------|
-| **<R id="45370a5153534152">METR</R>** | Third-party capability evals | Anthropic, OpenAI | <R id="dfeaf87817e20677">Dangerous capability evaluations</R>, autonomous agent tasks |
+| **<R id="NWFiOTg0MD">METR</R>** | Third-party capability evals | Anthropic, OpenAI | <R id="YWRkZDdlNW">Dangerous capability evaluations</R>, autonomous agent tasks |
 | **Apollo Research** | Alignment and scheming evals | Anthropic, Google | In-context scheming, deceptive alignment detection |
 | **UK AI Safety Institute** | Government evaluation body | Multiple labs | Independent testing, joint evaluation protocols |
 | **US AI Safety Institute (NIST)** | US government coordination | Multiple labs | AISIC consortium, standards development |
 
-**METR's Role:** METR's <R id="a86b4f04559de6da">GPT-4.5 pre-deployment evaluation</R> piloted a new form of third-party oversight: verifying developers' internal evaluation results rather than conducting fully independent assessments. This approach may scale better while maintaining accountability.
+**METR's Role:** METR's <R id="NDc0NDczYj">GPT-4.5 pre-deployment evaluation</R> piloted a new form of third-party oversight: verifying developers' internal evaluation results rather than conducting fully independent assessments. This approach may scale better while maintaining accountability.
 
-**Coverage Gap:** As of late 2025, <R id="c8782940b880d00f">METR's analysis</R> found that while 12 companies have published frontier safety policies, third-party evaluation coverage remains inconsistent, with most evaluations occurring only for the largest US labs.
+**Coverage Gap:** As of late 2025, <R id="OTE0ZWY2Nm">METR's analysis</R> found that while 12 companies have published frontier safety policies, third-party evaluation coverage remains inconsistent, with most evaluations occurring only for the largest US labs.
 
 ## Limitations and Challenges
 
@@ -448,26 +448,26 @@ RSPs are only as good as the evaluations that trigger them:
 
 | Document | Organization | Latest Version | URL |
 |----------|--------------|----------------|-----|
-| Responsible Scaling Policy | Anthropic | v2.2 (May 2025) | <R id="afe1e125f3ba3f14">anthropic.com/responsible-scaling-policy</R> |
-| RSP Announcement & Updates | Anthropic | Ongoing | <R id="d0ba81cc7a8fdb2b">anthropic.com/news/rsp-updates</R> |
-| Preparedness Framework | OpenAI | v2.0 (Apr 2025) | <R id="ec5d8e7d6a1b2c7c">cdn.openai.com/preparedness-framework-v2.pdf</R> |
-| Frontier Safety Framework | Google DeepMind | v3.0 (Oct 2025) | <R id="3c56c8c2a799e4ef">deepmind.google/frontier-safety-framework</R> |
-| Seoul Summit Commitments | UK Government | May 2024 | <R id="944fc2ac301f8980">gov.uk/frontier-ai-safety-commitments</R> |
+| Responsible Scaling Policy | Anthropic | v2.2 (May 2025) | <R id="NDA5OTUyY2">anthropic.com/responsible-scaling-policy</R> |
+| RSP Announcement & Updates | Anthropic | Ongoing | <R id="NzJkZWFhMW">anthropic.com/news/rsp-updates</R> |
+| Preparedness Framework | OpenAI | v2.0 (Apr 2025) | <R id="YTFkNjM1Mz">cdn.openai.com/preparedness-framework-v2.pdf</R> |
+| Frontier Safety Framework | Google DeepMind | v3.0 (Oct 2025) | <R id="ZDk3MjIyZT">deepmind.google/frontier-safety-framework</R> |
+| Seoul Summit Commitments | UK Government | May 2024 | <R id="YmVmM2UwNW">gov.uk/frontier-ai-safety-commitments</R> |
 
 ### Analysis & Commentary
 
 | Source | Focus | Key Finding |
 |--------|-------|-------------|
-| <R id="c8782940b880d00f">METR: Common Elements Analysis</R> | Cross-lab comparison | 12 companies published policies; significant variation in specificity |
-| <R id="c12e001e2e41c05a">SaferAI: RSP Update Critique</R> | Anthropic v2.0 | Reduced specificity from quantitative to qualitative thresholds |
-| <R id="bf534eeba9c14113">FAS: Can Preparedness Frameworks Pull Their Weight?</R> | Framework effectiveness | Questions whether voluntary commitments can constrain behavior |
-| <R id="73bedb360b0de6ae">METR: RSP Analysis (2023)</R> | Original RSP assessment | Early evaluation of the RSP concept and implementation |
+| <R id="OTE0ZWY2Nm">METR: Common Elements Analysis</R> | Cross-lab comparison | 12 companies published policies; significant variation in specificity |
+| <R id="YWM3MWUxOD">SaferAI: RSP Update Critique</R> | Anthropic v2.0 | Reduced specificity from quantitative to qualitative thresholds |
+| <R id="ZDc1NmRhZj">FAS: Can Preparedness Frameworks Pull Their Weight?</R> | Framework effectiveness | Questions whether voluntary commitments can constrain behavior |
+| <R id="NTI2OGFjZG">METR: RSP Analysis (2023)</R> | Original RSP assessment | Early evaluation of the RSP concept and implementation |
 
 ### Third-Party Evaluation Resources
 
-- <R id="45370a5153534152">METR</R>: Primary third-party evaluator for frontier models
-- <R id="dfeaf87817e20677">METR Dangerous Capability Evaluations</R>: Methodology for capability assessment
-- <R id="a86b4f04559de6da">METR GPT-4.5 Pre-deployment Evals</R>: Example of third-party verification process
+- <R id="NWFiOTg0MD">METR</R>: Primary third-party evaluator for frontier models
+- <R id="YWRkZDdlNW">METR Dangerous Capability Evaluations</R>: Methodology for capability assessment
+- <R id="NDc0NDczYj">METR GPT-4.5 Pre-deployment Evals</R>: Example of third-party verification process
 
 ### Key Critiques
 
@@ -492,7 +492,7 @@ RSP effectiveness depends on the quality of evaluations that trigger safeguard r
 | **Benchmark suites** | Standardized tests (MMLU, HumanEval, etc.) | Reproducible, comparable | May not capture dangerous capabilities |
 | **Red-teaming** | Adversarial testing by experts | Finds real-world attack vectors | Expensive, not comprehensive |
 | **Uplift studies** | Compare AI-assisted vs. unassisted task completion | Directly measures counterfactual risk | Hard to simulate real adversaries |
-| **Autonomous agent tasks** | <R id="271fc5f73a8304b2">Long-horizon task completion</R> | Tests agentic capabilities | Scaffolding matters; hard to standardize |
+| **Autonomous agent tasks** | <R id="NzE4Y2Q4ZT">Long-horizon task completion</R> | Tests agentic capabilities | Scaffolding matters; hard to standardize |
 | **Expert knowledge tests** | Domain-specific Q&A (e.g., virology) | Measures depth in dangerous domains | Experts may not know all dangerous knowledge |
 
 ### Key Metrics and Thresholds
@@ -501,7 +501,7 @@ RSP effectiveness depends on the quality of evaluations that trigger safeguard r
 |--------|-------------------|---------------------------|------------------------|
 | Bio knowledge | Expert-level Q&A | Exceeds 95th percentile virologist | Meaningful uplift for novices |
 | Cyber capability | CTF performance | Autonomous exploitation of hardened targets | Scaled attack assistance |
-| AI R&D automation | <R id="056e0ff33675b825">RE-Bench performance</R> | Substantially accelerates timeline | 5x speedup threshold |
+| AI R&D automation | <R id="OGExZTMwN2">RE-Bench performance</R> | Substantially accelerates timeline | 5x speedup threshold |
 | Autonomous task length | 1-hour tasks | Multi-day autonomous operation | Extended resource acquisition |
 
 ### Evaluation Limitations

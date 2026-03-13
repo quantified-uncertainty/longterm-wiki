@@ -80,9 +80,9 @@ flowchart TD
 
 ## Cloud KYC Implementation
 
-Cloud KYC leverages the natural chokepoint created by the concentration of AI training compute in major cloud providers. According to <R id="64895d06816dddf0">Synergy Research</R> data, the three major hyperscalers—AWS (30%), <EntityLink id="E550" name="microsoft">Microsoft</EntityLink> Azure (21%), and <EntityLink id="E98" name="deepmind">Google</EntityLink> Cloud (12%)—control approximately 63% of the global cloud infrastructure market as of Q4 2024. This concentration makes cloud-based monitoring particularly effective for frontier AI development, as training runs exceeding \$10-100 million in compute costs are economically impractical for most organizations to conduct on-premise. The implementation framework focuses on customer verification, usage reporting, and access controls that can be deployed relatively quickly given existing regulatory infrastructure.
+Cloud KYC leverages the natural chokepoint created by the concentration of AI training compute in major cloud providers. According to <R id="MDY4MjQ0MW">Synergy Research</R> data, the three major hyperscalers—AWS (30%), <EntityLink id="E550" name="microsoft">Microsoft</EntityLink> Azure (21%), and <EntityLink id="E98" name="deepmind">Google</EntityLink> Cloud (12%)—control approximately 63% of the global cloud infrastructure market as of Q4 2024. This concentration makes cloud-based monitoring particularly effective for frontier AI development, as training runs exceeding \$10-100 million in compute costs are economically impractical for most organizations to conduct on-premise. The implementation framework focuses on customer verification, usage reporting, and access controls that can be deployed relatively quickly given existing regulatory infrastructure.
 
-The customer verification component requires cloud providers to implement robust identity verification for customers requesting large amounts of compute resources. This goes beyond basic account creation to include verification of beneficial ownership, purpose-of-use declarations, and ongoing monitoring of usage patterns. As detailed in <R id="166215ac6c1d1698">GovAI's research on KYC schemes for compute providers</R>, organizations training models above specified compute thresholds would need to undergo enhanced due diligence similar to financial KYC processes. The <R id="dc9c71640f5c01b3">Department of Commerce's proposed rule</R> from February 2024 requires U.S. IaaS providers to develop Customer Identification Programs (CIPs) that verify beneficial ownership and collect identifying information about foreign customers.
+The customer verification component requires cloud providers to implement robust identity verification for customers requesting large amounts of compute resources. This goes beyond basic account creation to include verification of beneficial ownership, purpose-of-use declarations, and ongoing monitoring of usage patterns. As detailed in <R id="YTg3NzI1Mm">GovAI's research on KYC schemes for compute providers</R>, organizations training models above specified compute thresholds would need to undergo enhanced due diligence similar to financial KYC processes. The <R id="N2JkZTE4ZD">Department of Commerce's proposed rule</R> from February 2024 requires U.S. IaaS providers to develop Customer Identification Programs (CIPs) that verify beneficial ownership and collect identifying information about foreign customers.
 
 | Jurisdiction | Compute Threshold | Requirements Triggered | Estimated Training Cost |
 |--------------|-------------------|----------------------|------------------------|
@@ -91,7 +91,7 @@ The customer verification component requires cloud providers to implement robust
 | EU AI Act | 10^25 FLOP | Systemic risk designation, model evaluation | \$1-10M |
 | UK (Proposed) | 10^25 FLOP | Voluntary reporting framework | \$1-10M |
 
-*Training cost estimates from <R id="555d817916b2a488">Jack Clark, Anthropic</R>. According to <R id="080da6a9f43ad376">Epoch AI projections</R>, over 10 models will exceed the 10^26 FLOP threshold by 2026, rising to 200+ by 2030.*
+*Training cost estimates from <R id="OGFhNmNiYm">Jack Clark, Anthropic</R>. According to <R id="ZmVmYmE5Nm">Epoch AI projections</R>, over 10 models will exceed the 10^26 FLOP threshold by 2026, rising to 200+ by 2030.*
 
 Reporting obligations constitute the monitoring core, requiring cloud providers to report large training runs to government authorities in near real-time. This includes not just the scale of compute usage but contextual information about the customer, the apparent purpose of the training run, and any indicators of concerning capabilities being developed. The reporting framework must balance comprehensive oversight with protection of legitimate proprietary information and competitive intelligence.
 
@@ -101,7 +101,7 @@ Current implementation under Executive Order 14110 has begun with major US cloud
 
 ## Hardware-Level Governance Research
 
-Hardware-level governance represents a more fundamental but technically challenging approach that would embed monitoring capabilities directly into AI chips. As detailed in <R id="ab7f0c2b472816cf">RAND's research on Hardware-Enabled Governance Mechanisms</R> and <R id="44a63fa0e7875bb8">CNAS's "Secure, Governable Chips" report</R>, this approach addresses the primary limitation of cloud KYC—the inability to monitor on-premise compute infrastructure that organizations might use to evade cloud-based monitoring. The technical vision involves chip registration systems, on-chip monitoring capabilities, and cryptographic attestation mechanisms that would create end-to-end visibility into AI compute usage regardless of where it occurs.
+Hardware-level governance represents a more fundamental but technically challenging approach that would embed monitoring capabilities directly into AI chips. As detailed in <R id="MTBkNWQ4YT">RAND's research on Hardware-Enabled Governance Mechanisms</R> and <R id="MDNlZmYwZT">CNAS's "Secure, Governable Chips" report</R>, this approach addresses the primary limitation of cloud KYC—the inability to monitor on-premise compute infrastructure that organizations might use to evade cloud-based monitoring. The technical vision involves chip registration systems, on-chip monitoring capabilities, and cryptographic attestation mechanisms that would create end-to-end visibility into AI compute usage regardless of where it occurs.
 
 | HEM Component | Technical Maturity | Key Challenges | Policy Status |
 |---------------|-------------------|----------------|---------------|
@@ -111,13 +111,13 @@ Hardware-level governance represents a more fundamental but technically challeng
 | Compute Caps | Low | Technical complexity | Conceptual stage |
 | Kill Switches | Low | Security vulnerabilities | Controversial |
 
-*Based on <R id="6d999627fe0848e6">CNAS analysis</R> (December 2024). In July 2024, the Senate Appropriations Committee directed Commerce to report on the feasibility of on-chip mechanisms for export control.*
+*Based on <R id="MDc1MjkyMD">CNAS analysis</R> (December 2024). In July 2024, the Senate Appropriations Committee directed Commerce to report on the feasibility of on-chip mechanisms for export control.*
 
 Chip registration would assign unique identifiers to each advanced AI chip, creating a supply chain tracking system similar to those used for controlled technologies in other sectors. Manufacturers would register chips with government authorities during production, enabling tracking through distribution channels and end-user deployment. This system could identify unusual accumulations of compute power and provide early warning of potential large-scale training activities by previously unknown actors.
 
 On-chip monitoring represents the most technically ambitious component, requiring AI chips to include dedicated hardware for logging training activities, measuring computational workloads, and reporting usage data through secure channels. This data would need to be encrypted and authenticated to prevent tampering, while also being designed to protect legitimate proprietary information. The monitoring system would need to distinguish between different types of computational workloads, identifying AI training runs while avoiding false positives from other compute-intensive applications.
 
-Remote attestation would enable chips to cryptographically prove what software they are running and what computational work they are performing. This technology, based on existing trusted execution environments like Intel SGX and ARM TrustZone, could provide verification that organizations are complying with training restrictions or safety requirements. Modern AI hardware like Nvidia H100s already includes confidential computing capabilities that could support governance verification. The <R id="b52975eb93ce5be5">Future of Life Institute's research with Mithril Security</R> demonstrates how cryptographic proofs can attest that a model was trained with specific code on specific datasets, potentially verifying compliance with compute thresholds. The attestation system could also enable verification of safety measures, ensuring that organizations claiming to implement certain safeguards are actually doing so.
+Remote attestation would enable chips to cryptographically prove what software they are running and what computational work they are performing. This technology, based on existing trusted execution environments like Intel SGX and ARM TrustZone, could provide verification that organizations are complying with training restrictions or safety requirements. Modern AI hardware like Nvidia H100s already includes confidential computing capabilities that could support governance verification. The <R id="ZTk1ZmM5OD">Future of Life Institute's research with Mithril Security</R> demonstrates how cryptographic proofs can attest that a model was trained with specific code on specific datasets, potentially verifying compliance with compute thresholds. The attestation system could also enable verification of safety measures, ensuring that organizations claiming to implement certain safeguards are actually doing so.
 
 The technical challenges are substantial and largely unsolved. Adding monitoring capabilities to chips increases manufacturing complexity and cost while potentially degrading performance due to overhead from monitoring operations. Security concerns are paramount—the monitoring infrastructure itself becomes a high-value target for attackers, and compromise could enable either evasion of legitimate oversight or unauthorized surveillance. The need for backward compatibility with existing hardware creates additional complexity, as governance features would only be available in new chip generations while existing hardware remains in use for years.
 
@@ -163,7 +163,7 @@ Data processing and analysis capabilities must handle enormous volumes of monito
 
 ## Evasion Strategies and Countermeasures
 
-Sophisticated actors seeking to evade compute monitoring will likely develop various strategies to avoid detection while maintaining the ability to train large AI models. Understanding these evasion strategies is crucial for designing effective monitoring systems and developing appropriate countermeasures. <R id="1e392ce476b43c8f">RAND's game-theoretic analysis of compute governance</R> models the strategic interactions between evaders and monitors, finding that detection gaps persist under most policy configurations.
+Sophisticated actors seeking to evade compute monitoring will likely develop various strategies to avoid detection while maintaining the ability to train large AI models. Understanding these evasion strategies is crucial for designing effective monitoring systems and developing appropriate countermeasures. <R id="ODYxYzU5Yj">RAND's game-theoretic analysis of compute governance</R> models the strategic interactions between evaders and monitors, finding that detection gaps persist under most policy configurations.
 
 | Evasion Strategy | Resource Requirements | Effectiveness vs. Cloud KYC | Effectiveness vs. Hardware Gov | Primary Countermeasure |
 |------------------|----------------------|------------------------------|-------------------------------|----------------------|
@@ -188,7 +188,7 @@ Legal and economic countermeasures can increase the costs and risks of evasion a
 
 ## Current Implementation Status and Early Results
 
-Executive Order 14110, signed by President Biden on October 30, 2023, represented the most significant implementation of compute monitoring requirements to date before being <R id="6ffbbc7f418b8330">rescinded by President Trump</R> in January 2025. According to <R id="adc7475b9d9e8300">Stanford HAI's implementation tracker</R>, agencies completed 90% of the 21 requirements due within the first 90 days. The order required cloud providers to report training runs above 10^26 FLOP (or 10^23 FLOP for biological sequence models), along with customer information and red-teaming results.
+Executive Order 14110, signed by President Biden on October 30, 2023, represented the most significant implementation of compute monitoring requirements to date before being <R id="OGU2MzJlNm">rescinded by President Trump</R> in January 2025. According to <R id="NDU1Nzk5NW">Stanford HAI's implementation tracker</R>, agencies completed 90% of the 21 requirements due within the first 90 days. The order required cloud providers to report training runs above 10^26 FLOP (or 10^23 FLOP for biological sequence models), along with customer information and red-teaming results.
 
 | Implementation Milestone | Date | Status | Notes |
 |-------------------------|------|--------|-------|
@@ -200,7 +200,7 @@ Executive Order 14110, signed by President Biden on October 30, 2023, represente
 
 Early implementation experiences have revealed both the potential and limitations of cloud-based monitoring approaches. Major US cloud providers—Amazon Web Services, Microsoft Azure, and Google Cloud Platform—have generally treated the requirements as manageable compliance obligations similar to existing financial reporting requirements. These providers already had sophisticated logging and billing systems that could be adapted for AI monitoring purposes with relatively modest modifications.
 
-The primary reporting threshold of 10^26 FLOP was calibrated based on estimates of the compute required to train frontier AI models as of 2023—a level just above GPT-4's training compute. According to the <R id="510c42bfa643b8de">Institute for Law & AI's analysis</R>, this threshold was designed to capture only the most capable systems while avoiding regulatory burden on smaller research projects. The lower 10^23 FLOP threshold applies specifically to models trained primarily on biological sequence data, reflecting heightened biosecurity concerns. However, the rapid pace of AI advancement means that these thresholds may need periodic adjustment as training efficiency improves and model capabilities increase.
+The primary reporting threshold of 10^26 FLOP was calibrated based on estimates of the compute required to train frontier AI models as of 2023—a level just above GPT-4's training compute. According to the <R id="M2FlMTE1NT">Institute for Law & AI's analysis</R>, this threshold was designed to capture only the most capable systems while avoiding regulatory burden on smaller research projects. The lower 10^23 FLOP threshold applies specifically to models trained primarily on biological sequence data, reflecting heightened biosecurity concerns. However, the rapid pace of AI advancement means that these thresholds may need periodic adjustment as training efficiency improves and model capabilities increase.
 
 Compliance costs have varied significantly across different types of cloud providers. Large providers with existing sophisticated monitoring infrastructure have been able to implement compliance systems with relatively modest additional costs. Smaller providers and those serving specialized markets have faced disproportionate challenges, potentially creating competitive advantages for the largest providers who can more easily absorb compliance costs.
 
@@ -253,20 +253,20 @@ International security implications of monitoring systems need additional study,
 ## Key Sources
 
 **Policy Frameworks and Implementation**
-- <R id="340c76473ab0bb39">Executive Order 14110 on AI</R> - Original Biden administration framework (October 2023, rescinded January 2025)
-- <R id="adc7475b9d9e8300">Stanford HAI EO Implementation Tracker</R> - Progress monitoring across federal agencies
-- <R id="dc9c71640f5c01b3">Commerce Department KYC Proposed Rule</R> - IaaS provider requirements
-- <R id="1ad6dc89cded8b0c">EU AI Act on Systemic Risk</R> - European threshold-based governance
+- <R id="MjllOGE5NW">Executive Order 14110 on AI</R> - Original Biden administration framework (October 2023, rescinded January 2025)
+- <R id="NDU1Nzk5NW">Stanford HAI EO Implementation Tracker</R> - Progress monitoring across federal agencies
+- <R id="N2JkZTE4ZD">Commerce Department KYC Proposed Rule</R> - IaaS provider requirements
+- <R id="NzJjNjNjZG">EU AI Act on Systemic Risk</R> - European threshold-based governance
 
 **Technical Research**
-- <R id="ab7f0c2b472816cf">RAND Hardware-Enabled Governance Mechanisms</R> - Comprehensive HEM analysis and policy options
-- <R id="44a63fa0e7875bb8">CNAS Secure, Governable Chips</R> - On-chip governance feasibility
-- <R id="b52975eb93ce5be5">Future of Life Institute Hardware-Backed Governance</R> - Cryptographic verification research
-- <R id="1e392ce476b43c8f">RAND Game-Theoretic Compute Governance</R> - Detection gaps and strategic modeling
+- <R id="MTBkNWQ4YT">RAND Hardware-Enabled Governance Mechanisms</R> - Comprehensive HEM analysis and policy options
+- <R id="MDNlZmYwZT">CNAS Secure, Governable Chips</R> - On-chip governance feasibility
+- <R id="ZTk1ZmM5OD">Future of Life Institute Hardware-Backed Governance</R> - Cryptographic verification research
+- <R id="ODYxYzU5Yj">RAND Game-Theoretic Compute Governance</R> - Detection gaps and strategic modeling
 
 **Thresholds and Projections**
-- <R id="080da6a9f43ad376">Epoch AI Compute Threshold Projections</R> - Model counts and future estimates
-- <R id="510c42bfa643b8de">Institute for Law & AI Threshold Analysis</R> - Threshold design principles
-- <R id="166215ac6c1d1698">GovAI KYC for Compute Providers</R> - Implementation framework
+- <R id="ZmVmYmE5Nm">Epoch AI Compute Threshold Projections</R> - Model counts and future estimates
+- <R id="M2FlMTE1NT">Institute for Law & AI Threshold Analysis</R> - Threshold design principles
+- <R id="YTg3NzI1Mm">GovAI KYC for Compute Providers</R> - Implementation framework
 
 ---

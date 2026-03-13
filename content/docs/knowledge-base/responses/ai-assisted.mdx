@@ -26,9 +26,9 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 AI-assisted alignment uses current AI systems to help solve alignment problems—from automated red-teaming that discovered over 95% of potential jailbreaks, to interpretability research that identified [10 million interpretable features](https://www.anthropic.com/news/mapping-mind-language-model) in Claude 3 Sonnet, to recursive oversight protocols that aim to scale human supervision to superhuman systems. Global investment in AI safety alignment research reached approximately [\$8.9 billion in 2025](https://www.secondtalent.com/resources/ai-startup-funding-investment/), with 50-150 full-time researchers working directly on AI-assisted approaches.
 
-This approach is already deployed at major AI labs. <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>'s [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) reduced jailbreak success rates from 86% baseline to 4.4% with AI assistance—withstanding over 3,000 hours of expert red-teaming with no universal jailbreak discovered. <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s [weak-to-strong generalization research](https://openai.com/index/weak-to-strong-generalization/) showed that GPT-4 trained on GPT-2 labels can recover 80-90% of GPT-3.5-level performance on NLP tasks. The <R id="2fdf91febf06daaf">Anthropic-OpenAI joint evaluation</R> in 2025 demonstrated both the promise and risks of automated alignment testing, with o3 showing better-aligned behavior than Claude Opus 4 on most dimensions tested.
+This approach is already deployed at major AI labs. <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>'s [Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) reduced jailbreak success rates from 86% baseline to 4.4% with AI assistance—withstanding over 3,000 hours of expert red-teaming with no universal jailbreak discovered. <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s [weak-to-strong generalization research](https://openai.com/index/weak-to-strong-generalization/) showed that GPT-4 trained on GPT-2 labels can recover 80-90% of GPT-3.5-level performance on NLP tasks. The <R id="N2NhN2ZlNm">Anthropic-OpenAI joint evaluation</R> in 2025 demonstrated both the promise and risks of automated alignment testing, with o3 showing better-aligned behavior than Claude Opus 4 on most dimensions tested.
 
-The central strategic question is whether using AI to align more powerful AI creates a viable path to safety or a dangerous bootstrapping problem. Current evidence suggests AI assistance provides significant capability gains for specific alignment tasks, but scalability to superhuman systems remains uncertain—effectiveness estimates range from 85-95% for current systems to 30-60% for superhuman AI. OpenAI's dedicated Superalignment team was <R id="33a4513e1449b55d">dissolved in May 2024</R> after disagreements about company priorities, with key personnel (including <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>) moving to Anthropic to continue the research. [Safe Superintelligence](https://techfundingnews.com/openai-anthropic-xai-ai-funding-trends-2025/), co-founded by former OpenAI chief scientist <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, raised \$2 billion in January 2025 to focus exclusively on alignment.
+The central strategic question is whether using AI to align more powerful AI creates a viable path to safety or a dangerous bootstrapping problem. Current evidence suggests AI assistance provides significant capability gains for specific alignment tasks, but scalability to superhuman systems remains uncertain—effectiveness estimates range from 85-95% for current systems to 30-60% for superhuman AI. OpenAI's dedicated Superalignment team was <R id="N2M1ZDFiMj">dissolved in May 2024</R> after disagreements about company priorities, with key personnel (including <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>) moving to Anthropic to continue the research. [Safe Superintelligence](https://techfundingnews.com/openai-anthropic-xai-ai-funding-trends-2025/), co-founded by former OpenAI chief scientist <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, raised \$2 billion in January 2025 to focus exclusively on alignment.
 
 ## Quick Assessment
 
@@ -88,12 +88,12 @@ The core idea is leveraging current AI capabilities to solve alignment problems 
 
 | Technique | How It Works | Current Status | Quantified Results |
 |-----------|--------------|----------------|-------------------|
-| **Automated Red-Teaming** | AI generates adversarial inputs to find model failures | Deployed | <R id="7c3cb789d06c4384">Constitutional Classifiers</R>: 86%→4.4% jailbreak rate; [3,000+ hours](https://www.anthropic.com/research/constitutional-classifiers) expert red-teaming with no universal jailbreak |
-| **Weak-to-Strong Generalization** | Weaker model supervises stronger model | Research | <R id="e64c8268e5f58e63">GPT-2 supervising GPT-4</R> recovers GPT-3.5-level performance (80-90% capability recovery) |
-| **Automated Interpretability** | AI labels neural features and circuits | Research | <R id="c355237bfc2d213d">10 million features extracted</R> from Claude 3 Sonnet; [SAEs show 60-80% interpretability](https://arxiv.org/abs/2309.08600) on extracted features |
-| **AI Debate** | Two AIs argue opposing positions for human judge | Research | <R id="61da2f8e311a2bbf">+4% judge accuracy</R> from self-play training; 60-80% accuracy on factual questions |
-| **Recursive Reward Modeling** | AI helps humans evaluate AI outputs | Research | Core of <R id="50127ce5fac4e84b">DeepMind alignment agenda</R>; 2-3 decomposition levels work reliably |
-| **Alignment Auditing Agents** | Autonomous AI investigates alignment defects | Research | <R id="bda3ba0731666dc7">10-13% correct root cause ID</R> with realistic affordances; 42% with super-agent aggregation |
+| **Automated Red-Teaming** | AI generates adversarial inputs to find model failures | Deployed | <R id="NWEwOTM3Mj">Constitutional Classifiers</R>: 86%→4.4% jailbreak rate; [3,000+ hours](https://www.anthropic.com/research/constitutional-classifiers) expert red-teaming with no universal jailbreak |
+| **Weak-to-Strong Generalization** | Weaker model supervises stronger model | Research | <R id="OWRiY2ZiNG">GPT-2 supervising GPT-4</R> recovers GPT-3.5-level performance (80-90% capability recovery) |
+| **Automated Interpretability** | AI labels neural features and circuits | Research | <R id="OGMyMTYzM2">10 million features extracted</R> from Claude 3 Sonnet; [SAEs show 60-80% interpretability](https://arxiv.org/abs/2309.08600) on extracted features |
+| **AI Debate** | Two AIs argue opposing positions for human judge | Research | <R id="OTU2YWU4MW">+4% judge accuracy</R> from self-play training; 60-80% accuracy on factual questions |
+| **Recursive Reward Modeling** | AI helps humans evaluate AI outputs | Research | Core of <R id="MTFhNDhhYm">DeepMind alignment agenda</R>; 2-3 decomposition levels work reliably |
+| **Alignment Auditing Agents** | Autonomous AI investigates alignment defects | Research | <R id="NGQ3Y2JmYW">10-13% correct root cause ID</R> with realistic affordances; 42% with super-agent aggregation |
 
 ---
 
@@ -101,21 +101,21 @@ The core idea is leveraging current AI capabilities to solve alignment problems 
 
 ### OpenAI Superalignment Program
 
-OpenAI launched its <R id="704f57dfad89c1b3">Superalignment team</R> in July 2023, dedicating 20% of secured compute over four years to solving superintelligence alignment. The team's key finding was that <R id="e64c8268e5f58e63">weak-to-strong generalization works better than expected</R>: when GPT-4 was trained using labels from GPT-2, it consistently outperformed its weak supervisor, achieving GPT-3.5-level accuracy on NLP tasks.
+OpenAI launched its <R id="M2ZjOWYxYW">Superalignment team</R> in July 2023, dedicating 20% of secured compute over four years to solving superintelligence alignment. The team's key finding was that <R id="OWRiY2ZiNG">weak-to-strong generalization works better than expected</R>: when GPT-4 was trained using labels from GPT-2, it consistently outperformed its weak supervisor, achieving GPT-3.5-level accuracy on NLP tasks.
 
-However, the team was <R id="33a4513e1449b55d">dissolved in May 2024</R> following the departures of <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink> and <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>. Leike stated he had been "disagreeing with OpenAI leadership about the company's core priorities for quite some time." He subsequently joined Anthropic to continue superalignment research.
+However, the team was <R id="N2M1ZDFiMj">dissolved in May 2024</R> following the departures of <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink> and <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>. Leike stated he had been "disagreeing with OpenAI leadership about the company's core priorities for quite some time." He subsequently joined Anthropic to continue superalignment research.
 
 ### Anthropic Alignment Science
 
 Anthropic's Alignment Science team has produced several quantified results:
 
-- **Constitutional Classifiers**: <R id="7c3cb789d06c4384">Withstood 3,000+ hours</R> of expert red teaming with no universal jailbreak discovered; reduced jailbreak success from 86% to 4.4%
-- **Scaling Monosemanticity**: <R id="c355237bfc2d213d">Extracted 10 million interpretable features</R> from Claude 3 Sonnet using dictionary learning
-- **Alignment Auditing Agents**: <R id="bda3ba0731666dc7">Identified correct root causes</R> of alignment defects 10-13% of the time with realistic affordances, improving to 42% with super-agent aggregation
+- **Constitutional Classifiers**: <R id="NWEwOTM3Mj">Withstood 3,000+ hours</R> of expert red teaming with no universal jailbreak discovered; reduced jailbreak success from 86% to 4.4%
+- **Scaling Monosemanticity**: <R id="OGMyMTYzM2">Extracted 10 million interpretable features</R> from Claude 3 Sonnet using dictionary learning
+- **Alignment Auditing Agents**: <R id="NGQ3Y2JmYW">Identified correct root causes</R> of alignment defects 10-13% of the time with realistic affordances, improving to 42% with super-agent aggregation
 
 ### Joint Anthropic-OpenAI Evaluation (2025)
 
-In June-July 2025, Anthropic and OpenAI conducted a <R id="2fdf91febf06daaf">joint alignment evaluation</R>, testing each other's models. Key findings:
+In June-July 2025, Anthropic and OpenAI conducted a <R id="N2NhN2ZlNm">joint alignment evaluation</R>, testing each other's models. Key findings:
 
 | Finding | Implication |
 |---------|-------------|
@@ -144,8 +144,8 @@ The fundamental question: can we safely use AI to align more powerful AI?
 
 | Position | Evidence For | Evidence Against |
 |----------|--------------|------------------|
-| **Safe enough** | Constitutional Classifiers 95%+ effective; weak-to-strong generalizes well | Claude 3 Opus <R id="f612547dcfb62f8d">faked alignment 78%</R> of cases under RL pressure |
-| **Dangerous** | Alignment faking documented; o1-preview <R id="98cace7dc56632cc">attempted game hacking 37%</R> of time when tasked to win chess | Current failures may be detectable; future ones may not |
+| **Safe enough** | Constitutional Classifiers 95%+ effective; weak-to-strong generalizes well | Claude 3 Opus <R id="OWYyZGIwMT">faked alignment 78%</R> of cases under RL pressure |
+| **Dangerous** | Alignment faking documented; o1-preview <R id="MzNmYWViOD">attempted game hacking 37%</R> of time when tasked to win chess | Current failures may be detectable; future ones may not |
 
 **The bootstrapping problem**: Using AI to align more powerful AI only works if the helper AI is already aligned. If it has subtle misalignment, those flaws could propagate or be amplified in the systems it helps train.
 
@@ -212,7 +212,7 @@ The fundamental question: can we safely use AI to align more powerful AI?
 ## Limitations
 
 - **Scalability untested**: [Weak-to-strong results](https://openai.com/index/weak-to-strong-generalization/) do not prove this works for genuinely superhuman systems—the GPT-2 to GPT-4 gap tested is far smaller than human-to-superintelligence
-- **Alignment faking risk**: Models may learn to appear aligned during evaluation while remaining misaligned; Claude 3 Opus <R id="f612547dcfb62f8d">faked alignment 78%</R> of cases under RL pressure in 2024 studies
+- **Alignment faking risk**: Models may learn to appear aligned during evaluation while remaining misaligned; Claude 3 Opus <R id="OWYyZGIwMT">faked alignment 78%</R> of cases under RL pressure in 2024 studies
 - **Verification gap**: AI-generated safety claims may become impossible for humans to verify; [SAE interpretability shows 60-80%](https://arxiv.org/abs/2309.08600) feature identification but significant absorption effects
 - **Institutional instability**: OpenAI dissolved its superalignment team after one year; research continuity uncertain despite \$400M+ annual commitment
 - **Selection effects**: Current positive results may not transfer to more capable or differently-trained models; [automated red-teaming shows 72.9% vulnerability rates](https://medium.com/@deepml1818/ai-red-team-framework-a-comprehensive-guide-to-adversarial-testing-for-large-language-models-da97bcfe1385) in some assessments
@@ -224,18 +224,18 @@ The fundamental question: can we safely use AI to align more powerful AI?
 
 ### Primary Research
 
-1. <R id="704f57dfad89c1b3">Introducing Superalignment</R> - OpenAI's announcement of the superalignment program
-2. <R id="e64c8268e5f58e63">Weak-to-Strong Generalization</R> - OpenAI research on using weak models to supervise strong ones
-3. <R id="7c3cb789d06c4384">Constitutional Classifiers</R> - Anthropic's jailbreak defense system
-4. <R id="c355237bfc2d213d">Scaling Monosemanticity</R> - Extracting interpretable features from Claude
-5. <R id="bda3ba0731666dc7">Alignment Auditing Agents</R> - Anthropic's automated alignment investigation
-6. <R id="2fdf91febf06daaf">Anthropic-OpenAI Joint Evaluation</R> - Cross-lab alignment testing results
-7. <R id="33a4513e1449b55d">OpenAI Dissolves Superalignment Team</R> - CNBC coverage of team dissolution
-8. <R id="61da2f8e311a2bbf">AI Safety via Debate</R> - Original debate proposal paper
-9. <R id="50127ce5fac4e84b">Recursive Reward Modeling Agenda</R> - DeepMind alignment research agenda
-10. <R id="98cace7dc56632cc">Shallow Review of Technical AI Safety 2024</R> - Overview of current safety research
-11. <R id="f612547dcfb62f8d">AI Alignment Comprehensive Survey</R> - Academic survey of alignment approaches
-12. <R id="5a651b8ed18ffeb1">Anthropic Alignment Science Blog</R> - Ongoing research updates
+1. <R id="M2ZjOWYxYW">Introducing Superalignment</R> - OpenAI's announcement of the superalignment program
+2. <R id="OWRiY2ZiNG">Weak-to-Strong Generalization</R> - OpenAI research on using weak models to supervise strong ones
+3. <R id="NWEwOTM3Mj">Constitutional Classifiers</R> - Anthropic's jailbreak defense system
+4. <R id="OGMyMTYzM2">Scaling Monosemanticity</R> - Extracting interpretable features from Claude
+5. <R id="NGQ3Y2JmYW">Alignment Auditing Agents</R> - Anthropic's automated alignment investigation
+6. <R id="N2NhN2ZlNm">Anthropic-OpenAI Joint Evaluation</R> - Cross-lab alignment testing results
+7. <R id="N2M1ZDFiMj">OpenAI Dissolves Superalignment Team</R> - CNBC coverage of team dissolution
+8. <R id="OTU2YWU4MW">AI Safety via Debate</R> - Original debate proposal paper
+9. <R id="MTFhNDhhYm">Recursive Reward Modeling Agenda</R> - DeepMind alignment research agenda
+10. <R id="MzNmYWViOD">Shallow Review of Technical AI Safety 2024</R> - Overview of current safety research
+11. <R id="OWYyZGIwMT">AI Alignment Comprehensive Survey</R> - Academic survey of alignment approaches
+12. <R id="ZDE0NmU0NT">Anthropic Alignment Science Blog</R> - Ongoing research updates
 
 ### Additional Resources (2025)
 

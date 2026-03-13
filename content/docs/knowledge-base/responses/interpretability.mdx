@@ -126,15 +126,15 @@ The field has achieved several landmark results that demonstrate both promise an
 
 ### Anthropic's Scaling Monosemanticity (2024)
 
-Anthropic's <R id="e724db341d6e0065">sparse autoencoder research</R> represents the most significant recent breakthrough. Their 2024 work extracted interpretable features from Claude 3 Sonnet (a 70-billion parameter model) with unprecedented scale and quality. Using dictionary learning with a 16× expansion factor trained on 8 billion residual-stream activations, researchers extracted nearly 34 million interpretable features. Automated evaluation using Claude-3-Opus found that 90% of the highest-activating features have clear, human-interpretable explanations. Critically, researchers identified safety-relevant features including those related to security vulnerabilities and backdoors in code, bias, lying, deception, power-seeking, sycophancy, and dangerous/criminal content.
+Anthropic's <R id="ZWFmNWM5Mz">sparse autoencoder research</R> represents the most significant recent breakthrough. Their 2024 work extracted interpretable features from Claude 3 Sonnet (a 70-billion parameter model) with unprecedented scale and quality. Using dictionary learning with a 16× expansion factor trained on 8 billion residual-stream activations, researchers extracted nearly 34 million interpretable features. Automated evaluation using Claude-3-Opus found that 90% of the highest-activating features have clear, human-interpretable explanations. Critically, researchers identified safety-relevant features including those related to security vulnerabilities and backdoors in code, bias, lying, deception, power-seeking, sycophancy, and dangerous/criminal content.
 
 ### Attribution Graphs and Circuit Tracing (2025)
 
-Anthropic's <R id="fbc2b9d822be9900">circuit tracing research</R> (February 2025) applied attribution graphs to study Claude 3.5 Haiku, developing methods to trace circuits underlying specific types of reasoning. The team built a replacement model using cross-layer transcoders to represent circuits more sparsely, making them more interpretable. Key findings include mechanistic accounts of how planned words are computed, evidence of both forward and backward planning (using semantic and rhyming constraints to determine targets), and discovery that the model uses genuinely multilingual features in middle layers, though English remains mechanistically privileged.
+Anthropic's <R id="ZWU0NWFhNz">circuit tracing research</R> (February 2025) applied attribution graphs to study Claude 3.5 Haiku, developing methods to trace circuits underlying specific types of reasoning. The team built a replacement model using cross-layer transcoders to represent circuits more sparsely, making them more interpretable. Key findings include mechanistic accounts of how planned words are computed, evidence of both forward and backward planning (using semantic and rhyming constraints to determine targets), and discovery that the model uses genuinely multilingual features in middle layers, though English remains mechanistically privileged.
 
 ### DeepMind's Gemma Scope 2 (December 2024)
 
-Google DeepMind released <R id="a1036bc63472c5fc">Gemma Scope 2</R>, the largest open-source release of interpretability tools to date, covering all Gemma 3 model sizes from 270M to 27B parameters. Training required storing approximately 110 petabytes of activation data and fitting over 1 trillion total parameters across all interpretability models. The suite combines SAEs and transcoders to enable analysis of complex multi-step behaviors including jailbreaks, refusal mechanisms, and chain-of-thought faithfulness.
+Google DeepMind released <R id="NGMxZDQ2YW">Gemma Scope 2</R>, the largest open-source release of interpretability tools to date, covering all Gemma 3 model sizes from 270M to 27B parameters. Training required storing approximately 110 petabytes of activation data and fitting over 1 trillion total parameters across all interpretability models. The suite combines SAEs and transcoders to enable analysis of complex multi-step behaviors including jailbreaks, refusal mechanisms, and chain-of-thought faithfulness.
 
 ### Quantitative Progress Metrics
 
@@ -154,7 +154,7 @@ Activation steering experiments demonstrate that identified features have genuin
 
 However, significant limitations persist. Current techniques explain less than 5% of frontier model computations. Understanding remains largely limited to individual features and small circuits rather than complex, multi-step reasoning processes. The interpretability of features decreases as models scale, and some behaviors may be fundamentally distributed across many components in ways that resist decomposition.
 
-Notably, DeepMind's mechanistic interpretability team announced in March 2025 that they were <R id="244c1b93ef0a083c">deprioritizing SAE research</R> after finding that SAEs underperformed simple linear probes for detecting harmful intent in user prompts. This highlights ongoing uncertainty about which interpretability techniques will prove most valuable for safety applications.
+Notably, DeepMind's mechanistic interpretability team announced in March 2025 that they were <R id="YjRiOWIyNj">deprioritizing SAE research</R> after finding that SAEs underperformed simple linear probes for detecting harmful intent in user prompts. This highlights ongoing uncertainty about which interpretability techniques will prove most valuable for safety applications.
 
 ## Safety Applications and Deception Detection
 
@@ -201,15 +201,15 @@ Mechanistic interpretability has attracted substantial investment from major AI 
 | **Academic Sector** | \$10-20M | 30-50 | Theoretical foundations, benchmarking | Limited; often under \$1M/project |
 | **Total Global** | **\$75-150M** | **150-200** | — | **\$15-30M/year** |
 
-The academic ecosystem is growing rapidly, with key groups at MIT's Computer Science and Artificial Intelligence Laboratory, Stanford's Human-Computer Interaction Lab, and Harvard's Kempner Institute. However, the compute intensity creates a structural advantage for well-funded industry labs. Training SAEs for Claude 3 Sonnet cost approximately \$1-10 million in compute alone. EleutherAI's <R id="daaf778f7ff52bc2">open-source automated interpretability</R> work has demonstrated cost reduction potential—automatically interpreting 1.5 million GPT-2 features costs \$1,300 with Llama 3.1 or \$8,500 with Claude 3.5 Sonnet, compared to prior methods costing approximately \$200,000.
+The academic ecosystem is growing rapidly, with key groups at MIT's Computer Science and Artificial Intelligence Laboratory, Stanford's Human-Computer Interaction Lab, and Harvard's Kempner Institute. However, the compute intensity creates a structural advantage for well-funded industry labs. Training SAEs for Claude 3 Sonnet cost approximately \$1-10 million in compute alone. EleutherAI's <R id="MDQyNmMyZT">open-source automated interpretability</R> work has demonstrated cost reduction potential—automatically interpreting 1.5 million GPT-2 features costs \$1,300 with Llama 3.1 or \$8,500 with Claude 3.5 Sonnet, compared to prior methods costing approximately \$200,000.
 
 ### Talent and Skill Requirements
 
-Talent remains a significant bottleneck. Mechanistic interpretability requires deep expertise in machine learning, neuroscience-inspired analysis techniques, and often novel mathematical frameworks. The interdisciplinary nature creates barriers for researchers transitioning from traditional ML research. A <R id="e78a965cde8d82bd">Mechanistic Interpretability Workshop at NeurIPS 2025</R> and various fellowship programs aim to address these bottlenecks, though demand significantly exceeds supply for skilled researchers.
+Talent remains a significant bottleneck. Mechanistic interpretability requires deep expertise in machine learning, neuroscience-inspired analysis techniques, and often novel mathematical frameworks. The interdisciplinary nature creates barriers for researchers transitioning from traditional ML research. A <R id="OGJhNDAzMj">Mechanistic Interpretability Workshop at NeurIPS 2025</R> and various fellowship programs aim to address these bottlenecks, though demand significantly exceeds supply for skilled researchers.
 
 ### Research Infrastructure Challenges
 
-Compute requirements represent another resource constraint. Training sparse autoencoders for frontier models requires substantial computational resources—DeepMind's Gemma Scope 2 required storing 110 petabytes of activation data and fitting over 1 trillion parameters. This creates dependencies on large research organizations and may limit academic participation in cutting-edge interpretability research. However, recent architectural innovations like transcoders (which <R id="158f5d304b1dbcdd">beat SAEs for interpretability</R> on some metrics) may reduce compute requirements while improving feature quality.
+Compute requirements represent another resource constraint. Training sparse autoencoders for frontier models requires substantial computational resources—DeepMind's Gemma Scope 2 required storing 110 petabytes of activation data and fitting over 1 trillion parameters. This creates dependencies on large research organizations and may limit academic participation in cutting-edge interpretability research. However, recent architectural innovations like transcoders (which <R id="NGNhMjM2NG">beat SAEs for interpretability</R> on some metrics) may reduce compute requirements while improving feature quality.
 
 ## Future Trajectory and Timeline Projections
 
@@ -303,34 +303,34 @@ Despite these uncertainties, mechanistic interpretability represents one of the 
 
 ### Primary Research Publications
 
-- **Anthropic (2024):** <R id="e724db341d6e0065">Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet</R> - Landmark work extracting 34M interpretable features using sparse autoencoders
-- **Anthropic (2025):** <R id="fbc2b9d822be9900">On the Biology of a Large Language Model</R> - Attribution graphs applied to Claude 3.5 Haiku with mechanistic accounts of planning
-- **Anthropic (2025):** <R id="0a2ab4f291c4a773">Circuits Updates - July 2025</R> - Latest applications to biological systems and protein language models
-- **DeepMind (2024):** <R id="a1036bc63472c5fc">Gemma Scope 2: Helping the AI Safety Community Deepen Understanding of Complex Language Model Behavior</R> - Largest open-source interpretability tools release (110 PB data, 1T parameters)
-- **DeepMind (2025):** <R id="244c1b93ef0a083c">Negative Results for Sparse Autoencoders on Downstream Tasks</R> - Critical assessment of SAE limitations for safety applications
+- **Anthropic (2024):** <R id="ZWFmNWM5Mz">Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet</R> - Landmark work extracting 34M interpretable features using sparse autoencoders
+- **Anthropic (2025):** <R id="ZWU0NWFhNz">On the Biology of a Large Language Model</R> - Attribution graphs applied to Claude 3.5 Haiku with mechanistic accounts of planning
+- **Anthropic (2025):** <R id="NDJiODgxOT">Circuits Updates - July 2025</R> - Latest applications to biological systems and protein language models
+- **DeepMind (2024):** <R id="NGMxZDQ2YW">Gemma Scope 2: Helping the AI Safety Community Deepen Understanding of Complex Language Model Behavior</R> - Largest open-source interpretability tools release (110 PB data, 1T parameters)
+- **DeepMind (2025):** <R id="YjRiOWIyNj">Negative Results for Sparse Autoencoders on Downstream Tasks</R> - Critical assessment of SAE limitations for safety applications
 
 ### Methodological Reviews
 
-- **Bereska et al. (2024):** <R id="45c5b56ac029ef2d">Mechanistic Interpretability for AI Safety — A Review</R> - Comprehensive taxonomy of interpretability techniques
-- **Nanda (2024):** <R id="85aa9cf8692ba3fc">Attribution Patching: Activation Patching At Industrial Scale</R> - Scalable causal intervention methods
-- **InterpBench (2024):** <R id="25d0620e3c6a2ea4">Semi-Synthetic Transformers for Evaluating Mechanistic Interpretability Techniques</R> - Benchmarking framework with 86 realistic transformers with known circuits
+- **Bereska et al. (2024):** <R id="NjE2N2M4MG">Mechanistic Interpretability for AI Safety — A Review</R> - Comprehensive taxonomy of interpretability techniques
+- **Nanda (2024):** <R id="NWY0NTc2ZG">Attribution Patching: Activation Patching At Industrial Scale</R> - Scalable causal intervention methods
+- **InterpBench (2024):** <R id="N2RmN2NmOD">Semi-Synthetic Transformers for Evaluating Mechanistic Interpretability Techniques</R> - Benchmarking framework with 86 realistic transformers with known circuits
 
 ### Architectural Innovations
 
-- **ArXiv (2025):** <R id="158f5d304b1dbcdd">Transcoders Beat Sparse Autoencoders for Interpretability</R> - Novel architecture outperforming SAEs on interpretability metrics
-- **EleutherAI (2024):** <R id="daaf778f7ff52bc2">Open Source Automated Interpretability for Sparse Autoencoder Features</R> - Cost-effective automated feature labeling (\$1,300 vs \$200,000)
-- **ArXiv (2024):** <R id="8aae7b9df41d1455">Sparse Autoencoders Find Highly Interpretable Features in Language Models</R> - Foundational SAE methodology
+- **ArXiv (2025):** <R id="NGNhMjM2NG">Transcoders Beat Sparse Autoencoders for Interpretability</R> - Novel architecture outperforming SAEs on interpretability metrics
+- **EleutherAI (2024):** <R id="MDQyNmMyZT">Open Source Automated Interpretability for Sparse Autoencoder Features</R> - Cost-effective automated feature labeling (\$1,300 vs \$200,000)
+- **ArXiv (2024):** <R id="ODM0YmQ5NW">Sparse Autoencoders Find Highly Interpretable Features in Language Models</R> - Foundational SAE methodology
 
 ### Applications and Extensions
 
-- **PNAS (2024):** <R id="4d1186e8c443a9a9">Sparse autoencoders uncover biologically interpretable features in protein language model representations</R> - SAEs applied to protein language models
-- **MIT (2024):** <R id="79d34ba5f8c0407b">Sparse Autoencoders for Interpretability in Reinforcement Learning Models</R> - SAEs for interpreting deep Q-networks
-- **GitHub:** <R id="75ae5fb36bf37cea">Awesome Mechanistic Interpretability Papers</R> - Curated collection of key papers
+- **PNAS (2024):** <R id="M2M4NWZiMW">Sparse autoencoders uncover biologically interpretable features in protein language model representations</R> - SAEs applied to protein language models
+- **MIT (2024):** <R id="Njg4ZjQyZW">Sparse Autoencoders for Interpretability in Reinforcement Learning Models</R> - SAEs for interpreting deep Q-networks
+- **GitHub:** <R id="YmM1NGQ1Nz">Awesome Mechanistic Interpretability Papers</R> - Curated collection of key papers
 
 ### Community Resources
 
-- **Transformer Circuits:** <R id="5083d746c2728ff2">transformer-circuits.pub</R> - Main hub for Anthropic interpretability research
-- **Anthropic Research:** <R id="dfc21a319f95a75d">anthropic.com/research/team/interpretability</R> - Team overview and research priorities
-- **Mechanistic Interpretability Workshop:** <R id="e78a965cde8d82bd">NeurIPS 2025 Workshop</R> - Annual academic gathering
+- **Transformer Circuits:** <R id="MGJhYTk1MW">transformer-circuits.pub</R> - Main hub for Anthropic interpretability research
+- **Anthropic Research:** <R id="OTgyYjhlYj">anthropic.com/research/team/interpretability</R> - Team overview and research priorities
+- **Mechanistic Interpretability Workshop:** <R id="OGJhNDAzMj">NeurIPS 2025 Workshop</R> - Annual academic gathering
 
 ---
