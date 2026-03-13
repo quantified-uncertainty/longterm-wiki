@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { compareByValue, type SortDir } from "@/lib/sort-utils";
 
 export interface AiModelRow {
   id: string;
@@ -48,8 +49,6 @@ type SortKey =
   | "mmlu"
   | "gpqa"
   | "params";
-
-type SortDir = "asc" | "desc";
 
 function formatContext(tokens: number): string {
   if (tokens >= 1_000_000) return `${tokens / 1_000_000}M`;
@@ -157,45 +156,33 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       );
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: AiModelRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.title.toLowerCase();
-          case "developer":
-            return (row.developerName ?? "").toLowerCase();
-          case "releaseDate":
-            return row.releaseDate;
-          case "inputPrice":
-            return row.inputPrice;
-          case "outputPrice":
-            return row.outputPrice;
-          case "contextWindow":
-            return row.contextWindow;
-          case "sweBench":
-            return row.sweBenchScore;
-          case "mmlu":
-            return row.mmluScore;
-          case "gpqa":
-            return row.gpqaScore;
-          case "params":
-            return row.parameterCount ? parseParamCount(row.parameterCount) : null;
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
+    const getValue = (row: AiModelRow): string | number | null => {
+      switch (sortKey) {
+        case "name":
+          return row.title.toLowerCase();
+        case "developer":
+          return (row.developerName ?? "").toLowerCase();
+        case "releaseDate":
+          return row.releaseDate;
+        case "inputPrice":
+          return row.inputPrice;
+        case "outputPrice":
+          return row.outputPrice;
+        case "contextWindow":
+          return row.contextWindow;
+        case "sweBench":
+          return row.sweBenchScore;
+        case "mmlu":
+          return row.mmluScore;
+        case "gpqa":
+          return row.gpqaScore;
+        case "params":
+          return row.parameterCount ? parseParamCount(row.parameterCount) : null;
       }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    };
+    result = [...result].sort((a, b) =>
+      compareByValue(a, b, getValue, sortDir),
+    );
 
     return result;
   }, [rows, search, developerFilter, showFamilies, showOpenWeightOnly, sortKey, sortDir]);

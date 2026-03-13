@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { compareByValue, type SortDir } from "@/lib/sort-utils";
 
 export interface BenchmarkRow {
   id: string;
@@ -28,7 +29,6 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 type SortKey = "name" | "category" | "modelsCount" | "introducedDate" | "maintainer";
-type SortDir = "asc" | "desc";
 
 function SortHeader({
   label,
@@ -116,35 +116,23 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
       );
     }
 
-    const dir = sortDir === "asc" ? 1 : -1;
-    result = [...result].sort((a, b) => {
-      const getValue = (row: BenchmarkRow): string | number | null => {
-        switch (sortKey) {
-          case "name":
-            return row.title.toLowerCase();
-          case "category":
-            return (row.category ?? "").toLowerCase();
-          case "modelsCount":
-            return row.modelsCount;
-          case "introducedDate":
-            return row.introducedDate;
-          case "maintainer":
-            return (row.maintainer ?? "").toLowerCase();
-        }
-      };
-
-      const va = getValue(a);
-      const vb = getValue(b);
-
-      if (va == null && vb == null) return 0;
-      if (va == null) return 1;
-      if (vb == null) return -1;
-
-      if (typeof va === "string" && typeof vb === "string") {
-        return va.localeCompare(vb) * dir;
+    const getValue = (row: BenchmarkRow): string | number | null => {
+      switch (sortKey) {
+        case "name":
+          return row.title.toLowerCase();
+        case "category":
+          return (row.category ?? "").toLowerCase();
+        case "modelsCount":
+          return row.modelsCount;
+        case "introducedDate":
+          return row.introducedDate;
+        case "maintainer":
+          return (row.maintainer ?? "").toLowerCase();
       }
-      return ((va as number) - (vb as number)) * dir;
-    });
+    };
+    result = [...result].sort((a, b) =>
+      compareByValue(a, b, getValue, sortDir),
+    );
 
     return result;
   }, [rows, search, categoryFilter, sortKey, sortDir]);

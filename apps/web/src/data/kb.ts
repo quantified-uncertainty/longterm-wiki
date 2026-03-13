@@ -345,11 +345,17 @@ export function getKBAllRecordCollections(entity: string): Record<string, KBReco
   return { ...(records[key] ?? {}) };
 }
 
+/** Module-level cache for getAllKBRecords results (KB data is static at build time). */
+const _allRecordsCache = new Map<string, KBRecordEntry[]>();
+
 /**
  * Get all records across all entities for a specific collection.
  * Returns a flat array of all record entries.
  */
 export function getAllKBRecords(collection: string): KBRecordEntry[] {
+  const cached = _allRecordsCache.get(collection);
+  if (cached) return cached;
+
   const kb = getKB();
   if (!kb) return [];
 
@@ -366,15 +372,8 @@ export function getAllKBRecords(collection: string): KBRecordEntry[] {
       result.push(...collectionRecords);
     }
   }
+  _allRecordsCache.set(collection, result);
   return result;
-}
-
-/**
- * Get all records across all entities for a specific collection name.
- * Returns a flat array of record entries (convenience alias).
- */
-export function getAllKBRecordsByCollection(collection: string): KBRecordEntry[] {
-  return getAllKBRecords(collection);
 }
 
 /**
