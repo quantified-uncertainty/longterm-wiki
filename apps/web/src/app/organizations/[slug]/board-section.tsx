@@ -29,14 +29,14 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
                   ) : (
                     <span className="font-semibold text-sm">{m.personName}</span>
                   )}
-                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                     Current
                   </span>
                 </div>
                 {m.role && (
                   <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
                 )}
-                <div className="text-[10px] text-muted-foreground/50 mt-1">
+                <div className="text-[11px] text-muted-foreground mt-1">
                   {m.appointed ? `Since ${formatKBDate(m.appointed)}` : ""}
                   {m.appointedBy ? ` (${m.appointedBy})` : ""}
                 </div>
@@ -47,7 +47,7 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
         {former.length > 0 && (
           <>
             {current.length > 0 && (
-              <div className="px-4 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50 bg-muted/30 border-t border-border/40">
+              <div className="px-4 py-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground bg-muted/30 border-t border-border/40">
                 Former
               </div>
             )}
@@ -66,7 +66,7 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
                   {m.role && (
                     <div className="text-xs text-muted-foreground mt-0.5">{m.role}</div>
                   )}
-                  <div className="text-[10px] text-muted-foreground/50 mt-1">
+                  <div className="text-[11px] text-muted-foreground mt-1">
                     {m.appointed ? formatKBDate(m.appointed) : ""}
                     {m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : ""}
                   </div>

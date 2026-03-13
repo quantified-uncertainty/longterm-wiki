@@ -87,7 +87,7 @@ export function StatCard({
         {value}
       </div>
       {sub && (
-        <div className="text-[10px] text-muted-foreground/50 mt-1">{sub}</div>
+        <div className="text-[11px] text-muted-foreground mt-1">{sub}</div>
       )}
     </div>
   );
@@ -103,7 +103,7 @@ export function SectionHeader({ title, count }: { title: string; count?: number 
           {count}
         </span>
       )}
-      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" aria-hidden="true" />
     </div>
   );
 }
@@ -117,13 +117,14 @@ export function SourceLink({ source }: { source: string | undefined }) {
         href={safeHref(source)}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[10px] text-primary/50 hover:text-primary hover:underline transition-colors"
+        className="text-[11px] text-primary/70 hover:text-primary hover:underline transition-colors"
       >
         {shortDomain(source)}
+        <span className="sr-only"> (opens in new tab)</span>
       </a>
     );
   }
-  return <span className="text-[10px] text-muted-foreground">{source}</span>;
+  return <span className="text-[11px] text-muted-foreground">{source}</span>;
 }
 
 export function PersonRow({
@@ -145,7 +146,7 @@ export function PersonRow({
   end?: string;
   notes?: string;
 }) {
-  const href = slug
+  const href = slug && entityType
     ? entityType === "organization"
       ? `/organizations/${slug}`
       : `/people/${slug}`
@@ -153,7 +154,7 @@ export function PersonRow({
 
   return (
     <div className="flex items-start gap-3 py-2.5 border-b border-border/40 last:border-b-0">
-      <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary/70 mt-0.5">
+      <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary/70 mt-0.5" aria-hidden="true">
         {name
           .split(/\s+/)
           .map((w) => w[0])
@@ -175,7 +176,7 @@ export function PersonRow({
             <span className="font-semibold text-sm">{name}</span>
           )}
           {isFounder && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+            <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
               Founder
             </span>
           )}
@@ -183,12 +184,12 @@ export function PersonRow({
         {title && (
           <div className="text-xs text-muted-foreground">{title}</div>
         )}
-        <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+        <div className="text-[11px] text-muted-foreground mt-0.5">
           {start && formatKBDate(start)}
           {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
         </div>
         {notes && (
-          <div className="text-[10px] text-muted-foreground/50 mt-0.5 line-clamp-2">
+          <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
             {notes}
           </div>
         )}
@@ -202,7 +203,7 @@ export function Badge({ children, color }: { children: React.ReactNode; color?: 
     color ?? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
   return (
     <span
-      className={`inline-block px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${colorClass}`}
+      className={`inline-block px-1.5 py-0.5 rounded-full text-[11px] font-semibold ${colorClass}`}
     >
       {children}
     </span>

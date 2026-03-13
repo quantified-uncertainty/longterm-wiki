@@ -204,7 +204,9 @@ export function isUrl(s: string): boolean {
 export function titleCase(s: string): string {
   return s
     .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/\bMc(\w)/g, (_, c) => `Mc${c.toUpperCase()}`)
+    .replace(/\bO'(\w)/g, (_, c) => `O'${c.toUpperCase()}`);
 }
 
 /**

@@ -23,6 +23,31 @@ import {
 } from "@/components/wiki/kb/format";
 import { resolveRecipient } from "./org-shared";
 
+// ── Numeric / range helpers ──────────────────────────────────────────
+
+/** A numeric value that can be a single number or a [min, max] range. */
+export type NumericOrRange = number | [number, number];
+
+/** Parse a value that may be a single number or a 2-element array range. */
+export function parseNumericOrRange(value: unknown): NumericOrRange | null {
+  if (typeof value === "number") return value;
+  if (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((v) => typeof v === "number")
+  ) {
+    return [value[0], value[1]] as [number, number];
+  }
+  return null;
+}
+
+/** Get a single numeric value from NumericOrRange (midpoint for ranges). */
+export function numericValue(v: NumericOrRange | null): number {
+  if (v == null) return 0;
+  if (Array.isArray(v)) return (v[0] + v[1]) / 2;
+  return v;
+}
+
 // ── Types ─────────────────────────────────────────────────────────────
 
 export interface BoardMember {
@@ -51,7 +76,7 @@ export type ParsedGrantRecord = {
   recipient: string | null;
   recipientName: string;
   recipientHref: string | null;
-  amount: number | null;
+  amount: NumericOrRange | null;
   date: string | null;
   status: string | null;
   source: string | null;
@@ -160,6 +185,13 @@ export const MAX_GRANTS_SHOWN = 10;
 
 export function formatAmount(value: unknown): string | null {
   if (value == null) return null;
+  if (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((v) => typeof v === "number")
+  ) {
+    return `${formatKBNumber(value[0], "USD")}\u2013${formatKBNumber(value[1], "USD")}`;
+  }
   const num = typeof value === "number" ? value : Number(value);
   if (isNaN(num)) return String(value);
   return formatKBNumber(num, "USD");
@@ -222,7 +254,12 @@ export function computeOrgAge(foundedDateStr: string | undefined): string | null
 }
 
 // ── Format a stake fraction for display (e.g., 0.15 -> "15%") ────────
-export function formatStake(stake: number): string {
+export function formatStake(stake: NumericOrRange): string {
+  if (Array.isArray(stake)) {
+    const low = (stake[0] * 100).toFixed(1).replace(/\.0$/, "");
+    const high = (stake[1] * 100).toFixed(1).replace(/\.0$/, "");
+    return `${low}%\u2013${high}%`;
+  }
   return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
 }
 
@@ -238,7 +275,7 @@ export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
     recipient: recipientId,
     recipientName: resolved.name,
     recipientHref: resolved.href,
-    amount: typeof f.amount === "number" ? f.amount : null,
+    amount: parseNumericOrRange(f.amount),
     date: (f.date as string) ?? (f.period as string) ?? null,
     status: (f.status as string) ?? null,
     source: (f.source as string) ?? null,
@@ -340,8 +377,8 @@ export function parseInvestmentRecord(record: KBRecordEntry) {
     investorId: (f.investor as string) ?? null,
     roundName: (f.round_name as string) ?? null,
     date: (f.date as string) ?? null,
-    amount: typeof f.amount === "number" ? f.amount : null,
-    stakeAcquired: typeof f.stake_acquired === "number" ? f.stake_acquired : null,
+    amount: parseNumericOrRange(f.amount),
+    stakeAcquired: parseNumericOrRange(f.stake_acquired),
     instrument: (f.instrument as string) ?? null,
     role: (f.role as string) ?? null,
     source: (f.source as string) ?? null,
@@ -354,7 +391,7 @@ export function parseEquityPositionRecord(record: KBRecordEntry) {
   return {
     key: record.key,
     holderId: (f.holder as string) ?? null,
-    stake: typeof f.stake === "number" ? f.stake : null,
+    stake: parseNumericOrRange(f.stake),
     source: (f.source as string) ?? null,
     notes: (f.notes as string) ?? null,
     asOf: "asOf" in record ? (record as { asOf?: string }).asOf : undefined,
@@ -463,7 +500,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const grantRecords = getKBRecords(entity.id, "grants");
   const grantsMade = grantRecords
     .map(parseGrantRecord)
-    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+    .sort((a, b) => numericValue(b.amount) - numericValue(a.amount));
 
   // ── Funding Received (this org is a recipient in other orgs' grants) ──
   const allGrantRecords = getAllKBRecords("grants");
@@ -489,7 +526,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         funderHref: funderSlug ? `/organizations/${funderSlug}` : null,
       };
     })
-    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+    .sort((a, b) => numericValue(b.amount) - numericValue(a.amount));
 
   // ── Divisions (org subdivisions) ──
   const divisionRecords = getKBRecords(entity.id, "divisions");
@@ -561,7 +598,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         investorHref: resolved.href,
       };
     })
-    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+    .sort((a, b) => numericValue(b.amount) - numericValue(a.amount));
 
   // ── Equity Positions ──
   const equityPositionRecords = getKBRecords(entity.id, "equity-positions");
@@ -577,7 +614,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         holderHref: resolved.href,
       };
     })
-    .sort((a, b) => (b.stake ?? 0) - (a.stake ?? 0));
+    .sort((a, b) => numericValue(b.stake) - numericValue(a.stake));
 
   // ── Board of Directors ──
   const boardSeatRecords = allCollections["board-seats"] ?? [];
@@ -683,8 +720,8 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   // ── Computed stat cards ──
   const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
   const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
-  const totalGrantsMade = grantsMade.reduce((sum, g) => sum + (g.amount ?? 0), 0);
-  const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + (g.amount ?? 0), 0);
+  const totalGrantsMade = grantsMade.reduce((sum, g) => sum + numericValue(g.amount), 0);
+  const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + numericValue(g.amount), 0);
 
   return {
     orgType,

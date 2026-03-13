@@ -48,11 +48,11 @@ export function FundingProgramsSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Program</th>
-              <th className="text-left py-2 px-3 font-medium">Type</th>
-              <th className="text-right py-2 px-3 font-medium">Budget</th>
-              <th className="text-center py-2 px-3 font-medium">Status</th>
-              <th className="text-center py-2 px-3 font-medium">Deadline</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Program</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
+              <th scope="col" className="text-right py-2 px-3 font-medium">Budget</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -72,20 +72,20 @@ export function FundingProgramsSection({
                       href={safeHref(p.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                     >
                       source
                     </a>
                   )}
                   {p.description && (
-                    <div className="text-[10px] text-muted-foreground/60 mt-0.5 line-clamp-2">
+                    <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                       {p.description}
                     </div>
                   )}
                 </td>
                 <td className="py-2 px-3">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                    className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
                       PROGRAM_TYPE_COLORS[p.programType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                     }`}
                   >
@@ -100,7 +100,7 @@ export function FundingProgramsSection({
                 <td className="py-2 px-3 text-center text-xs">
                   {p.status && (
                     <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                      className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
                         p.status === "open"
                           ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                           : p.status === "awarded"
