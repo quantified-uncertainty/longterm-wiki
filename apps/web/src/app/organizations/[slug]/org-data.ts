@@ -128,11 +128,11 @@ export const CURATED_COLLECTIONS = new Set([
 export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
 export const ORG_TYPE_LABELS: Record<string, string> = {
-  "frontier-lab": "Frontier Lab",
-  "safety-org": "Safety Org",
+  "frontier-lab": "Frontier AI Lab",
+  "safety-org": "Safety Organization",
   academic: "Academic",
   startup: "Startup",
-  generic: "Lab",
+  generic: "AI Lab",
   funder: "Funder",
   government: "Government",
 };

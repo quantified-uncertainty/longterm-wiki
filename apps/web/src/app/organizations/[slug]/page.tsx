@@ -20,6 +20,7 @@ import {
   FactValueDisplay,
   FactsPanel,
 } from "@/components/directory";
+import { RelatedPages } from "@/components/RelatedPages";
 
 // Shared components & helpers
 import {
@@ -99,9 +100,53 @@ export default async function OrgProfilePage({
 
   const tabs: OrgTab[] = [];
 
-  // ── Overview tab: key metrics, related orgs, other data ──
+  // ── Build stat cards for Overview ──
+  const heroStatCards = HERO_STATS.map((propId) => {
+    const fact = getKBLatest(entity.id, propId);
+    if (!fact) return null;
+    const prop = getKBProperty(propId);
+    return (
+      <StatCard
+        key={propId}
+        label={prop?.name ?? titleCase(propId)}
+        value={<FactValueDisplay fact={fact} property={prop} />}
+        sub={fact.asOf ? `as of ${formatKBDate(fact.asOf)}` : undefined}
+      />
+    );
+  }).filter(Boolean);
+
+  // Add grants made stat (for funders)
+  if (data.totalGrantsMade > 0) {
+    heroStatCards.push(
+      <StatCard
+        key="grants-made"
+        label="Grants Made"
+        value={<span>{formatCompactCurrency(data.totalGrantsMade)}</span>}
+        sub={`${data.grantsMade.length} ${data.grantsMade.length === 1 ? "grant" : "grants"}`}
+      />
+    );
+  }
+  // Add AI models count
+  if (data.orgModels.length > 0) {
+    heroStatCards.push(
+      <StatCard
+        key="ai-models"
+        label="AI Models"
+        value={<span>{data.orgModels.length}</span>}
+      />
+    );
+  }
+
+  // ── Overview tab: stat cards, facts, related wiki pages, related orgs ──
   const overviewContent = (
     <div className="space-y-8">
+      {/* Stat cards */}
+      {heroStatCards.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {heroStatCards}
+        </div>
+      )}
+
       {/* Facts + Other Data */}
       {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -118,6 +163,9 @@ export default async function OrgProfilePage({
       {data.relatedOrgs.length > 0 && (
         <RelatedOrganizationsSection orgs={data.relatedOrgs} />
       )}
+
+      {/* Related Wiki Pages */}
+      <RelatedPages entityId={slug} entity={{ type: "organization" }} />
     </div>
   );
 
@@ -284,6 +332,17 @@ export default async function OrgProfilePage({
     });
   }
 
+  // ── Initials for avatar (skip stop words like "and", "the", "of", "for") ──
+  const STOP_WORDS = new Set(["and", "the", "of", "for", "in", "on", "at"]);
+  const initials = entity.name
+    .split(/\s+/)
+    .map((w) => w.replace(/[^a-zA-Z]/g, ""))
+    .filter((w) => w.length > 0 && !STOP_WORDS.has(w.toLowerCase()))
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
       <Breadcrumbs
@@ -293,75 +352,43 @@ export default async function OrgProfilePage({
         ]}
       />
 
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <div className="mb-8">
+      {/* ── Compact Header ─────────────────────────────────────── */}
+      <div className="mb-6">
         <div className="flex items-start gap-5">
           {/* Org avatar/icon */}
-          <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70" aria-hidden="true">
-            {entity.name
-              .split(/\s+/)
-              .map((w) => w[0])
-              .filter(Boolean)
-              .slice(0, 2)
-              .join("")
-              .toUpperCase()}
+          <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xl font-bold text-primary/70" aria-hidden="true">
+            {initials}
           </div>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-extrabold tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
+              <h1 className="text-2xl font-extrabold tracking-tight">
                 {entity.name}
               </h1>
               {data.orgType && (
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                <Link
+                  href={`/organizations?type=${data.orgType}`}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity ${
                     ORG_TYPE_COLORS[data.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                   }`}
                 >
                   {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}
-                </span>
+                </Link>
               )}
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
-              <p className="text-sm text-muted-foreground/70 mb-1">
+              <p className="text-xs text-muted-foreground/70 mb-0.5">
                 Also known as: {entity.aliases.join(", ")}
               </p>
             )}
 
-            {(data.foundedDateStr || data.founders.length > 0) && (
-              <p className="text-sm text-muted-foreground mb-1">
-                {data.foundedDateStr && (
-                  <span>
-                    Founded {formatKBDate(data.foundedDateStr)}
-                    {data.orgAge && <span className="text-muted-foreground"> ({data.orgAge})</span>}
-                  </span>
-                )}
-                {data.founders.length > 0 && (
-                  <span>
-                    {data.foundedDateStr ? " by " : "Founded by "}
-                    {data.founders.map((f, i) => (
-                      <span key={i}>
-                        {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
-                        {f.href ? (
-                          <Link href={f.href} className="text-primary hover:underline">
-                            {f.name}
-                          </Link>
-                        ) : (
-                          f.name
-                        )}
-                      </span>
-                    ))}
-                  </span>
-                )}
-              </p>
-            )}
-
-            {data.descriptionText && (
-              <p className="text-sm text-muted-foreground leading-relaxed mb-2 max-w-prose">
-                {data.descriptionText}
-              </p>
-            )}
-
-            <div className="flex items-center gap-4 text-sm flex-wrap">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+              {data.foundedDateStr && (
+                <span>
+                  Founded {formatKBDate(data.foundedDateStr)}
+                  {data.orgAge && <span> ({data.orgAge})</span>}
+                </span>
+              )}
+              {data.hqText && <span>HQ: {data.hqText}</span>}
               {data.websiteUrl && (
                 <a
                   href={safeHref(data.websiteUrl)}
@@ -369,84 +396,42 @@ export default async function OrgProfilePage({
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary/80 font-medium transition-colors"
                 >
-                  {shortDomain(data.websiteUrl)}{" "}
-                  &#8599;
-                  <span className="sr-only">(opens in new tab)</span>
+                  {shortDomain(data.websiteUrl)} &#8599;
                 </a>
               )}
-              {data.hqText && (
-                <span className="text-muted-foreground">
-                  HQ: {data.hqText}
-                </span>
-              )}
               {data.wikiHref && (
-                <Link
-                  href={data.wikiHref}
-                  className="text-primary hover:text-primary/80 font-medium transition-colors"
-                >
+                <Link href={data.wikiHref} className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Wiki page &rarr;
                 </Link>
               )}
-              <Link
-                href={`/kb/entity/${entity.id}`}
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
-              >
+              <Link href={`/kb/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
                 KB data &rarr;
               </Link>
             </div>
+
+            {data.founders.length > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Founded by{" "}
+                {data.founders.map((f, i) => (
+                  <span key={i}>
+                    {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
+                    {f.href ? (
+                      <Link href={f.href} className="text-primary hover:underline">{f.name}</Link>
+                    ) : (
+                      f.name
+                    )}
+                  </span>
+                ))}
+              </p>
+            )}
+
+            {data.descriptionText && (
+              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose">
+                {data.descriptionText}
+              </p>
+            )}
           </div>
         </div>
-      </div>
-
-      {/* ── Stat cards ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
-        {HERO_STATS.map((propId) => {
-          const fact = getKBLatest(entity.id, propId);
-          if (!fact) return null;
-          const prop = getKBProperty(propId);
-          return (
-            <StatCard
-              key={propId}
-              label={prop?.name ?? titleCase(propId)}
-              value={<FactValueDisplay fact={fact} property={prop} />}
-              sub={fact.asOf ? `as of ${formatKBDate(fact.asOf)}` : undefined}
-            />
-          );
-        })}
-        {data.currentKeyPeople > 0 && (
-          <StatCard
-            label="Key People"
-            value={<span>{data.currentKeyPeople}</span>}
-            sub={`${data.sortedPersons.length} total tracked`}
-          />
-        )}
-        {data.currentBoardMembers > 0 && (
-          <StatCard
-            label="Board Members"
-            value={<span>{data.currentBoardMembers}</span>}
-            sub={`${data.boardMembers.length} total`}
-          />
-        )}
-        {data.totalGrantsMade > 0 && (
-          <StatCard
-            label="Grants Made"
-            value={<span>{formatCompactCurrency(data.totalGrantsMade)}</span>}
-            sub={`${data.grantsMade.length} grants`}
-          />
-        )}
-        {data.totalGrantsReceived > 0 && (
-          <StatCard
-            label="Funding Received"
-            value={<span>{formatCompactCurrency(data.totalGrantsReceived)}</span>}
-            sub={`${data.grantsReceived.length} grants`}
-          />
-        )}
-        {data.orgModels.length > 0 && (
-          <StatCard
-            label="AI Models"
-            value={<span>{data.orgModels.length}</span>}
-          />
-        )}
       </div>
 
       {/* ── Tabbed content ─────────────────────────────────────── */}

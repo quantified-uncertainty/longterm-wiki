@@ -49,85 +49,67 @@ export function FundingHistorySection({
           View all &rarr;
         </Link>
       </div>
-      <div className="border border-border/60 rounded-xl bg-card px-4">
-        {rounds.slice(0, 8).map((round) => {
-          const name = field(round, "name") ?? titleCase(round.key);
-          const date = field(round, "date");
-          const raised = round.fields.raised;
-          const valuation = round.fields.valuation;
-          const leadInvestor = field(round, "lead_investor");
-          const { name: leadInvestorName, href: leadInvestorHref } =
-            resolveRefName(leadInvestor, undefined);
-          const instrument = field(round, "instrument");
-          const notes = field(round, "notes");
-          const source = field(round, "source");
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Raised</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Valuation</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Lead Investor</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {rounds.slice(0, 12).map((round) => {
+              const name = field(round, "name") ?? titleCase(round.key);
+              const date = field(round, "date");
+              const raised = round.fields.raised;
+              const valuation = round.fields.valuation;
+              const leadInvestor = field(round, "lead_investor");
+              const { name: leadInvestorName, href: leadInvestorHref } =
+                resolveRefName(leadInvestor, undefined);
+              const instrument = field(round, "instrument");
 
-          return (
-            <div
-              key={round.key}
-              className="flex gap-4 py-4 border-b border-border/40 last:border-b-0 group/row hover:bg-muted/20 -mx-4 px-4 transition-colors"
-            >
-              {/* Timeline dot */}
-              <div className="flex flex-col items-center pt-1" aria-hidden="true">
-                <div className="w-3 h-3 rounded-full border-2 border-primary/50 bg-card shrink-0 group-hover/row:border-primary transition-colors" />
-                <div className="w-px flex-1 bg-gradient-to-b from-border/50 to-transparent mt-1" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="font-semibold text-sm">{name}</span>
-                  {instrument && (
-                    <Badge>{instrument}</Badge>
-                  )}
-                  {date && (
-                    <span className="text-xs text-muted-foreground/70">
-                      {formatKBDate(date)}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-baseline gap-4 mt-1.5 flex-wrap">
-                  {raised != null && (
-                    <span className="text-base font-bold tabular-nums tracking-tight">
-                      {formatAmount(raised)}
-                    </span>
-                  )}
-                  {valuation != null && (
-                    <span className="text-xs text-muted-foreground">
-                      at {formatAmount(valuation)} valuation
-                    </span>
-                  )}
-                  {leadInvestor && (
-                    <span className="text-xs text-muted-foreground">
-                      Led by{" "}
-                      {leadInvestorHref ? (
-                        <Link
-                          href={leadInvestorHref}
-                          className="text-primary hover:underline"
-                        >
-                          {leadInvestorName}
-                        </Link>
-                      ) : (
-                        leadInvestorName
-                      )}
-                    </span>
-                  )}
-                </div>
-                {notes && (
-                  <div className="text-[11px] text-muted-foreground mt-1.5 line-clamp-2">
-                    {notes}
-                  </div>
-                )}
-                <SourceLink source={source} />
-              </div>
-            </div>
-          );
-        })}
+              return (
+                <tr key={round.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3 font-medium">{name}</td>
+                  <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
+                    {date ? formatKBDate(date) : "\u2014"}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                    {raised != null ? formatAmount(raised) : "\u2014"}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums text-muted-foreground whitespace-nowrap">
+                    {valuation != null ? formatAmount(valuation) : "\u2014"}
+                  </td>
+                  <td className="py-2 px-3">
+                    {leadInvestorHref ? (
+                      <Link href={leadInvestorHref} className="text-primary hover:underline">
+                        {leadInvestorName}
+                      </Link>
+                    ) : leadInvestor ? (
+                      <span>{leadInvestorName}</span>
+                    ) : (
+                      <span className="text-muted-foreground">\u2014</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 hidden lg:table-cell">
+                    {instrument && <Badge>{instrument}</Badge>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      {rounds.length > 8 && (
+      {rounds.length > 12 && (
         <Link
           href={`/organizations/${slug}/funding`}
           className="block mt-2 text-xs text-primary hover:underline text-center"
         >
-          +{rounds.length - 8} more rounds
+          +{rounds.length - 12} more rounds
         </Link>
       )}
     </section>
