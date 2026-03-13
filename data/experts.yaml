@@ -259,6 +259,19 @@
     - Mechanistic interpretability
     - neural network visualization
     - clarity of research communication
+  positions:
+    - topic: how-hard-is-alignment
+      view: Tractable via interpretability
+      estimate: Solvable with sufficient transparency tools
+      confidence: medium
+      source: 80,000 Hours Podcast #107 (2021)
+      sourceUrl: https://80000hours.org/podcast/episodes/chris-olah-interpretability-research/
+    - topic: will-advanced-ai-systems-be-deceptive
+      view: Detectable with interpretability
+      estimate: Interpretability provides a "mulligan" to catch deception
+      confidence: medium
+      source: Chris Olah's views on AGI safety (LessWrong)
+      sourceUrl: https://www.lesswrong.com/posts/X2i9dQQK3gETCyqh2/chris-olah-s-views-on-agi-safety
 - id: connor-leahy
   name: Connor Leahy
   affiliation: conjecture
@@ -349,6 +362,25 @@
     - Deep learning breakthroughs
     - OpenAI leadership
     - now focused on safe superintelligence
+  positions:
+    - topic: timelines
+      view: Medium
+      estimate: 5-20 years to superintelligence
+      confidence: medium
+      source: Dwarkesh Podcast (Nov 2025)
+      sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
+    - topic: current-approaches-scale
+      view: Insufficient — new paradigm needed
+      estimate: Scaling alone won't reach AGI
+      confidence: high
+      source: Dwarkesh Podcast (Nov 2025)
+      sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
+    - topic: how-hard-is-alignment
+      view: Hard but solvable
+      estimate: Alignment as a generalization problem
+      confidence: medium
+      source: Dwarkesh Podcast (Nov 2025)
+      sourceUrl: https://www.dwarkesh.com/p/ilya-sutskever-2
 - id: neel-nanda
   name: Neel Nanda
   affiliation: deepmind
@@ -541,6 +573,13 @@
   knownFor:
     - Co-founding Anthropic
     - Operations and business leadership
+  positions:
+    - topic: how-hard-is-alignment
+      view: Hard but tractable
+      estimate: Requires diverse research bets
+      confidence: medium
+      source: FLI Podcast — Daniela and Dario Amodei on Anthropic (2022)
+      sourceUrl: https://futureoflife.org/podcast/daniela-and-dario-amodei-on-anthropic/
 
 - id: shane-legg
   name: Shane Legg
@@ -551,6 +590,25 @@
     - Co-founding DeepMind
     - Early work on AGI
     - Machine super intelligence thesis
+  positions:
+    - topic: timelines
+      view: Short
+      estimate: 50% by 2028
+      confidence: high
+      source: Dwarkesh Podcast (Oct 2023)
+      sourceUrl: https://www.dwarkesh.com/p/shane-legg
+    - topic: p-doom
+      view: Wide range
+      estimate: 5-50%
+      confidence: low
+      source: Q&A with Shane Legg on risks from AI (LessWrong)
+      sourceUrl: https://www.lesswrong.com/posts/No5JpRCHzBrWA4jmS/q-and-a-with-shane-legg-on-risks-from-ai
+    - topic: how-hard-is-alignment
+      view: Solvable via deliberation
+      estimate: Function of model capability
+      confidence: medium
+      source: Dwarkesh Podcast (Oct 2023)
+      sourceUrl: https://www.dwarkesh.com/p/shane-legg
 
 - id: buck-shlegeris
   name: Buck Shlegeris
@@ -560,6 +618,19 @@
   knownFor:
     - AI safety research
     - Redwood Research leadership
+  positions:
+    - topic: how-hard-is-alignment
+      view: Very hard — focus on control instead
+      estimate: Easier to assume misalignment and control for it
+      confidence: high
+      source: 80,000 Hours Podcast #214 (2025)
+      sourceUrl: https://80000hours.org/podcast/episodes/buck-shlegeris-ai-control-scheming/
+    - topic: will-advanced-ai-systems-be-deceptive
+      view: Significant risk
+      estimate: ~30% probability of scheming before escape attempt
+      confidence: medium
+      source: AXRP Episode 27 — AI Control (2024)
+      sourceUrl: https://axrp.net/episode/2024/04/11/episode-27-ai-control-buck-shlegeris-ryan-greenblatt.html
 
 - id: ian-hogarth
   name: Ian Hogarth
@@ -568,6 +639,13 @@
   knownFor:
     - Leading UK AI Safety Institute
     - AI investor and writer
+  positions:
+    - topic: p-ai-catastrophe
+      view: Significant
+      estimate: High enough to warrant slowing development
+      confidence: medium
+      source: "We must slow down the race to God-like AI (Financial Times, Apr 2023)"
+      sourceUrl: https://www.ft.com/content/03895dc4-a3b7-481e-95cc-336a524f2ac2
 
 - id: elizabeth-kelly
   name: Elizabeth Kelly
