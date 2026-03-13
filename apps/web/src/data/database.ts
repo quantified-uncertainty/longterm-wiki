@@ -223,6 +223,7 @@ export interface ExpertPosition {
   confidence?: string;
   source?: string;
   sourceUrl?: string;
+  date?: string;
 }
 
 export interface Expert {

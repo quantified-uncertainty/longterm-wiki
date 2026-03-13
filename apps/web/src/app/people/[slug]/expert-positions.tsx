@@ -8,12 +8,27 @@ const CONFIDENCE_STYLES: Record<string, string> = {
   low: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
 
+/** Format a date string like "2023", "2023-05", or "2023-05-01" for display */
+function formatPositionDate(date: string): string {
+  if (/^\d{4}-\d{2}$/.test(date)) {
+    const [year, month] = date.split("-");
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+    return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+  }
+  return date;
+}
+
 export function ExpertPositions({
   positions,
 }: {
   positions: ExpertPosition[];
 }) {
   if (positions.length === 0) return null;
+
+  const hasAnyDates = positions.some((p) => p.date);
 
   return (
     <section>
@@ -40,6 +55,11 @@ export function ExpertPositions({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Confidence
                 </th>
+                {hasAnyDates && (
+                  <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Date
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -66,6 +86,11 @@ export function ExpertPositions({
                       </span>
                     )}
                   </td>
+                  {hasAnyDates && (
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      {pos.date ? formatPositionDate(pos.date) : "—"}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
