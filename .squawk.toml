@@ -23,11 +23,14 @@ pg_version = "16"
 #
 # require-concurrent-index-creation, require-concurrent-index-deletion,
 # disallowed-unique-constraint, constraint-missing-not-valid,
-# adding-not-nullable-field, adding-foreign-key-constraint:
+# adding-not-nullable-field, adding-foreign-key-constraint,
+# adding-serial-primary-key-field:
 #   Drizzle's migrator runs ALL statements in a single transaction (see pg-core/dialect.js
 #   line 60). CREATE/DROP INDEX CONCURRENTLY cannot run inside a transaction, and the NOT VALID
 #   two-step pattern for FK constraints requires two separate transactions — both impossible
-#   with Drizzle. Tables are small (hundreds of rows) so brief locking is acceptable.
+#   with Drizzle. The recommended "build index concurrently then ADD PRIMARY KEY USING INDEX"
+#   pattern also requires operations outside a transaction. Tables are small (hundreds of rows)
+#   so brief locking is acceptable.
 #   If large-table migrations are needed in the future, use a separate raw SQL runner
 #   outside Drizzle (see .claude/rules/database-migrations.md for the manual migration pattern).
 #
@@ -53,6 +56,7 @@ excluded_rules = [
   "constraint-missing-not-valid",
   "adding-not-nullable-field",
   "adding-foreign-key-constraint",
+  "adding-serial-primary-key-field",
   "renaming-table",
   "ban-drop-column",
   "changing-column-type",
