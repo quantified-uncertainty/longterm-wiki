@@ -6,8 +6,7 @@ import {
   getPersonSlugs,
   getOrgRolesForPerson,
   getBoardSeatsForPerson,
-  getCareerHistoryForPerson,
-  resolveOrgForCareer,
+  getCareerHistory,
 } from "../people-utils";
 import {
   getKBFacts,
@@ -82,8 +81,8 @@ export default async function PersonProfilePage({
   // Board seats across all organizations referencing this person
   const boardSeats = getBoardSeatsForPerson(entity.id);
 
-  // Career history records owned by this person
-  const careerHistory = getCareerHistoryForPerson(entity.id);
+  // Career history from KB records (populated via personnel table)
+  const careerHistory = getCareerHistory(entity.id);
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
@@ -117,16 +116,6 @@ export default async function PersonProfilePage({
     const sb = b.record.fields.appointed
       ? String(b.record.fields.appointed)
       : "";
-    return sb.localeCompare(sa);
-  });
-
-  // Sort career history: current first, then by start date
-  const sortedCareer = [...careerHistory].sort((a, b) => {
-    const endA = a.fields.end ? 1 : 0;
-    const endB = b.fields.end ? 1 : 0;
-    if (endA !== endB) return endA - endB;
-    const sa = a.fields.start ? String(a.fields.start) : "";
-    const sb = b.fields.start ? String(b.fields.start) : "";
     return sb.localeCompare(sa);
   });
 
@@ -246,54 +235,47 @@ export default async function PersonProfilePage({
           {/* Expert Positions */}
           <ExpertPositions positions={positions} />
 
-          {/* Career History */}
-          {sortedCareer.length > 0 && (
+          {/* Career Timeline */}
+          {careerHistory.length > 0 && (
             <section>
               <h2 className="text-lg font-bold tracking-tight mb-4">
                 Career History
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sortedCareer.length}
+                  {careerHistory.length}
                 </span>
               </h2>
-              <div className="border border-border/60 rounded-xl bg-card">
-                {sortedCareer.map((rec) => {
-                  const title = fieldStr(rec.fields, "title");
-                  const start = fieldStr(rec.fields, "start");
-                  const end = fieldStr(rec.fields, "end");
-                  const orgId = rec.fields.organization as string | undefined;
-                  const org = orgId ? resolveOrgForCareer(orgId) : null;
+              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+                {careerHistory.map((entry) => {
+                  const orgRef = resolveEntityRef(entry.organization);
+                  const orgSlug = orgRef
+                    ? getKBEntitySlug(orgRef.id)
+                    : undefined;
+                  const isCurrent = !entry.endDate;
+                  const isFounder = /founder/i.test(entry.title);
 
                   return (
-                    <div
-                      key={rec.key}
-                      className="px-4 py-3 border-b border-border/40 last:border-b-0"
-                    >
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {org?.slug ? (
-                          <Link
-                            href={`/organizations/${org.slug}`}
-                            className="font-semibold text-sm hover:text-primary transition-colors"
-                          >
-                            {org.name}
-                          </Link>
-                        ) : org ? (
-                          <span className="font-semibold text-sm">
-                            {org.name}
-                          </span>
-                        ) : orgId ? (
-                          <span className="font-semibold text-sm text-muted-foreground">
-                            {orgId}
-                          </span>
-                        ) : null}
-                        {!end && <CurrentBadge />}
+                    <div key={entry.key} className="px-5 py-3.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm">
+                          {entry.title}
+                        </span>
+                        {isFounder && <FounderBadge />}
+                        {isCurrent && <CurrentBadge />}
                       </div>
-                      {title && (
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {title}
-                        </div>
-                      )}
-                      <div className="text-[10px] text-muted-foreground/50 mt-1">
-                        {formatDateRange(start, end)}
+                      <div className="text-sm text-muted-foreground mt-0.5">
+                        {orgSlug ? (
+                          <Link
+                            href={`/organizations/${orgSlug}`}
+                            className="hover:text-primary transition-colors"
+                          >
+                            {orgRef?.name ?? entry.organization}
+                          </Link>
+                        ) : (
+                          <span>{orgRef?.name ?? entry.organization}</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground/60 mt-1">
+                        {formatDateRange(entry.startDate, entry.endDate)}
                       </div>
                     </div>
                   );
