@@ -2539,3 +2539,1506 @@
     - chinese-ai
     - open-weight
   lastUpdated: 2025-01
+
+# =============================================================================
+# Universities — Academic institutions receiving AI safety grants
+# =============================================================================
+
+- id: uc-berkeley
+  numericId: E1112
+  type: organization
+  orgType: academic
+  title: University of California, Berkeley
+  website: https://www.berkeley.edu
+  description: >-
+    Major public research university and a leading center for AI safety research,
+    home to CHAI (Center for Human-Compatible AI) and numerous AI alignment researchers.
+  tags:
+    - academic
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: stanford-university
+  numericId: E1113
+  type: organization
+  orgType: academic
+  title: Stanford University
+  website: https://www.stanford.edu
+  description: >-
+    Private research university in Stanford, California. Home to the Stanford
+    Institute for Human-Centered Artificial Intelligence (HAI) and the Center for
+    International Security and Cooperation (CISAC).
+  tags:
+    - academic
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: university-of-oxford
+  numericId: E1114
+  type: organization
+  orgType: academic
+  title: University of Oxford
+  website: https://www.ox.ac.uk
+  description: >-
+    Historic UK research university, home to the Global Priorities Institute and
+    formerly the Future of Humanity Institute.
+  tags:
+    - academic
+    - ai-safety
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: harvard-university
+  numericId: E1115
+  type: organization
+  orgType: academic
+  title: Harvard University
+  website: https://www.harvard.edu
+  description: >-
+    Private Ivy League research university in Cambridge, Massachusetts.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-pennsylvania
+  numericId: E1116
+  type: organization
+  orgType: academic
+  title: University of Pennsylvania
+  website: https://www.upenn.edu
+  description: >-
+    Private Ivy League research university in Philadelphia.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: yale-university
+  numericId: E1117
+  type: organization
+  orgType: academic
+  title: Yale University
+  website: https://www.yale.edu
+  description: >-
+    Private Ivy League research university in New Haven, Connecticut.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: usc
+  numericId: E1118
+  type: organization
+  orgType: academic
+  title: University of Southern California
+  website: https://www.usc.edu
+  description: >-
+    Private research university in Los Angeles.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: princeton-university
+  numericId: E1119
+  type: organization
+  orgType: academic
+  title: Princeton University
+  website: https://www.princeton.edu
+  description: >-
+    Private Ivy League research university in Princeton, New Jersey.
+  tags:
+    - academic
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: nyu
+  numericId: E1120
+  type: organization
+  orgType: academic
+  title: New York University
+  website: https://www.nyu.edu
+  description: >-
+    Private research university in New York City.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-washington
+  numericId: E1121
+  type: organization
+  orgType: academic
+  title: University of Washington
+  website: https://www.washington.edu
+  description: >-
+    Public research university in Seattle.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-chicago
+  numericId: E1122
+  type: organization
+  orgType: academic
+  title: University of Chicago
+  website: https://www.uchicago.edu
+  description: >-
+    Private research university in Chicago.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: mit
+  numericId: E1123
+  type: organization
+  orgType: academic
+  title: Massachusetts Institute of Technology
+  website: https://www.mit.edu
+  description: >-
+    Private research university in Cambridge, Massachusetts. A leading center for
+    AI and machine learning research.
+  tags:
+    - academic
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: columbia-university
+  numericId: E1124
+  type: organization
+  orgType: academic
+  title: Columbia University
+  website: https://www.columbia.edu
+  description: >-
+    Private Ivy League research university in New York City.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: carnegie-mellon-university
+  numericId: E1125
+  type: organization
+  orgType: academic
+  title: Carnegie Mellon University
+  website: https://www.cmu.edu
+  description: >-
+    Private research university in Pittsburgh with a leading computer science
+    and AI program.
+  tags:
+    - academic
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: georgetown-university
+  numericId: E1126
+  type: organization
+  orgType: academic
+  title: Georgetown University
+  website: https://www.georgetown.edu
+  description: >-
+    Private research university in Washington, D.C. Home to CSET and the
+    Center for Global Health Science and Security.
+  tags:
+    - academic
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: university-of-michigan
+  numericId: E1127
+  type: organization
+  orgType: academic
+  title: University of Michigan
+  website: https://umich.edu
+  description: >-
+    Public research university in Ann Arbor.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-maryland
+  numericId: E1128
+  type: organization
+  orgType: academic
+  title: University of Maryland
+  website: https://www.umd.edu
+  description: >-
+    Public research university in College Park.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: uc-davis
+  numericId: E1129
+  type: organization
+  orgType: academic
+  title: University of California, Davis
+  website: https://www.ucdavis.edu
+  description: >-
+    Public research university in Davis, California.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: uc-san-francisco
+  numericId: E1130
+  type: organization
+  orgType: academic
+  title: University of California, San Francisco
+  website: https://www.ucsf.edu
+  description: >-
+    Public research university in San Francisco focused on health sciences.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: dartmouth-college
+  numericId: E1131
+  type: organization
+  orgType: academic
+  title: Dartmouth College
+  website: https://home.dartmouth.edu
+  description: >-
+    Private Ivy League research university in Hanover, New Hampshire.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: rutgers-university
+  numericId: E1132
+  type: organization
+  orgType: academic
+  title: Rutgers University
+  website: https://www.rutgers.edu
+  description: >-
+    Public research university in New Jersey.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: cornell-university
+  numericId: E1133
+  type: organization
+  orgType: academic
+  title: Cornell University
+  website: https://www.cornell.edu
+  description: >-
+    Private Ivy League research university in Ithaca, New York.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: johns-hopkins-university
+  numericId: E1134
+  type: organization
+  orgType: academic
+  title: Johns Hopkins University
+  website: https://www.jhu.edu
+  description: >-
+    Private research university in Baltimore. Home to the Center for Health
+    Security and Bloomberg School of Public Health.
+  tags:
+    - academic
+    - biosecurity
+  lastUpdated: 2026-03
+
+- id: duke-university
+  numericId: E1135
+  type: organization
+  orgType: academic
+  title: Duke University
+  website: https://duke.edu
+  description: >-
+    Private research university in Durham, North Carolina.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-toronto
+  numericId: E1136
+  type: organization
+  orgType: academic
+  title: University of Toronto
+  website: https://www.utoronto.ca
+  description: >-
+    Public research university in Toronto, Canada. A major center for machine
+    learning research.
+  tags:
+    - academic
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: georgia-tech
+  numericId: E1137
+  type: organization
+  orgType: academic
+  title: Georgia Institute of Technology
+  website: https://www.gatech.edu
+  description: >-
+    Public research university in Atlanta.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: purdue-university
+  numericId: E1138
+  type: organization
+  orgType: academic
+  title: Purdue University
+  website: https://www.purdue.edu
+  description: >-
+    Public research university in West Lafayette, Indiana.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: washu
+  numericId: E1139
+  type: organization
+  orgType: academic
+  title: Washington University in St. Louis
+  website: https://wustl.edu
+  description: >-
+    Private research university in St. Louis.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-edinburgh
+  numericId: E1140
+  type: organization
+  orgType: academic
+  title: University of Edinburgh
+  website: https://www.ed.ac.uk
+  description: >-
+    Public research university in Edinburgh, Scotland.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-cambridge
+  numericId: E1141
+  type: organization
+  orgType: academic
+  title: University of Cambridge
+  website: https://www.cam.ac.uk
+  description: >-
+    Historic UK research university. Home to CSER.
+  tags:
+    - academic
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: brown-university
+  numericId: E1142
+  type: organization
+  orgType: academic
+  title: Brown University
+  website: https://www.brown.edu
+  description: >-
+    Private Ivy League research university in Providence, Rhode Island.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: northeastern-university
+  numericId: E1143
+  type: organization
+  orgType: academic
+  title: Northeastern University
+  website: https://www.northeastern.edu
+  description: >-
+    Private research university in Boston, Massachusetts.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-notre-dame
+  numericId: E1144
+  type: organization
+  orgType: academic
+  title: University of Notre Dame
+  website: https://www.nd.edu
+  description: >-
+    Private Catholic research university in Notre Dame, Indiana.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-glasgow
+  numericId: E1145
+  type: organization
+  orgType: academic
+  title: University of Glasgow
+  website: https://www.gla.ac.uk
+  description: >-
+    Public research university in Glasgow, Scotland.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-utah
+  numericId: E1146
+  type: organization
+  orgType: academic
+  title: University of Utah
+  website: https://www.utah.edu
+  description: >-
+    Public research university in Salt Lake City, Utah.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: uc-los-angeles
+  numericId: E1147
+  type: organization
+  orgType: academic
+  title: University of California, Los Angeles
+  website: https://www.ucla.edu
+  description: >-
+    Public research university in Los Angeles.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-ottawa
+  numericId: E1148
+  type: organization
+  orgType: academic
+  title: University of Ottawa
+  website: https://www.uottawa.ca
+  description: >-
+    Public research university in Ottawa, Canada.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+# =============================================================================
+# AI Safety and Existential Risk Organizations
+# =============================================================================
+
+- id: beri
+  numericId: E1149
+  type: organization
+  orgType: safety-org
+  title: Berkeley Existential Risk Initiative
+  website: https://existence.org
+  description: >-
+    Nonprofit supporting university-based existential risk research by providing
+    operational and financial support.
+  tags:
+    - ai-safety
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: ai-safety-support
+  numericId: E1150
+  type: organization
+  orgType: safety-org
+  title: AI Safety Support
+  website: https://www.aisafetysupport.org
+  description: >-
+    Organization providing career guidance, mentoring, and community support for
+    people transitioning into AI safety careers.
+  tags:
+    - ai-safety
+    - career-development
+  lastUpdated: 2026-03
+
+- id: cambridge-boston-alignment-initiative
+  numericId: E1151
+  type: organization
+  orgType: safety-org
+  title: Cambridge Boston Alignment Initiative
+  description: >-
+    Regional AI alignment research and community organization based in the
+    Cambridge/Boston area.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: lightcone-infrastructure
+  numericId: E1152
+  type: organization
+  orgType: safety-org
+  title: Lightcone Infrastructure
+  website: https://www.lightconeinfrastructure.com
+  description: >-
+    Organization operating LessWrong, the Alignment Forum, and the Lighthaven
+    event venue.
+  tags:
+    - ai-safety
+    - community
+  lastUpdated: 2026-03
+
+- id: global-catastrophic-risk-institute
+  numericId: E1153
+  type: organization
+  orgType: safety-org
+  title: Global Catastrophic Risk Institute
+  website: https://gcrinstitute.org
+  description: >-
+    Think tank focused on analysis of global catastrophic risks including AI,
+    nuclear, biological, and environmental threats.
+  tags:
+    - existential-risk
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: allfed
+  numericId: E1154
+  type: organization
+  orgType: safety-org
+  title: Alliance to Feed the Earth in Disasters
+  website: https://allfed.info
+  description: >-
+    Research organization focused on food supply resilience during global
+    catastrophic events.
+  tags:
+    - existential-risk
+    - food-security
+  lastUpdated: 2026-03
+
+- id: arena-alignment
+  numericId: E1155
+  type: organization
+  orgType: safety-org
+  title: Alignment Research Engineer Accelerator
+  description: >-
+    Training program that upskills software engineers to become alignment
+    researchers.
+  tags:
+    - ai-safety
+    - alignment
+    - career-development
+  lastUpdated: 2026-03
+
+- id: apart-research
+  numericId: E1156
+  type: organization
+  orgType: safety-org
+  title: Apart Research
+  website: https://apartresearch.com
+  description: >-
+    AI safety research organization running hackathons, fellowships, and
+    collaborative research projects.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: saferai
+  numericId: E1157
+  type: organization
+  orgType: safety-org
+  title: SaferAI
+  website: https://saferai.org
+  description: >-
+    Organization focused on AI safety standards and evaluation frameworks.
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: ai-safety-camp
+  numericId: E1158
+  type: organization
+  orgType: safety-org
+  title: AI Safety Camp
+  website: https://aisafety.camp
+  description: >-
+    Program running research camps for AI safety research with mentorship.
+  tags:
+    - ai-safety
+    - career-development
+  lastUpdated: 2026-03
+
+- id: london-initiative-safe-ai
+  numericId: E1159
+  type: organization
+  orgType: safety-org
+  title: London Initiative for Safe AI
+  description: >-
+    London-based AI safety initiative focused on policy engagement.
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: stanford-existential-risks-initiative
+  numericId: E1160
+  type: organization
+  orgType: safety-org
+  title: Stanford Existential Risks Initiative
+  website: https://seri.stanford.edu
+  description: >-
+    Stanford University initiative focused on existential risk research.
+  tags:
+    - existential-risk
+    - ai-safety
+    - academic
+  lastUpdated: 2026-03
+
+- id: existential-risk-observatory
+  numericId: E1161
+  type: organization
+  orgType: safety-org
+  title: Existential Risk Observatory
+  website: https://existentialriskobservatory.org
+  description: >-
+    Organization focused on raising public awareness of existential risks.
+  tags:
+    - existential-risk
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: pivotal-research
+  numericId: E1162
+  type: organization
+  orgType: safety-org
+  title: Pivotal Research
+  description: >-
+    Research organization working on AI safety and alignment research.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: center-on-long-term-risk
+  numericId: E1163
+  type: organization
+  orgType: safety-org
+  title: Center on Long-Term Risk
+  website: https://longtermrisk.org
+  description: >-
+    Research organization focused on reducing risks of astronomical suffering
+    (s-risks) from advanced AI.
+  tags:
+    - existential-risk
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: bluedot-impact
+  numericId: E1164
+  type: organization
+  orgType: safety-org
+  title: BlueDot Impact
+  website: https://bluedot.org
+  description: >-
+    Organization running AI safety and governance courses. Known for its AI
+    Safety Fundamentals and AI Governance courses.
+  tags:
+    - ai-safety
+    - ai-governance
+    - career-development
+  lastUpdated: 2026-03
+
+- id: median-group
+  numericId: E1209
+  type: organization
+  orgType: safety-org
+  title: Median Group
+  description: >-
+    Research group focused on AI timelines and AI safety research.
+  tags:
+    - ai-safety
+    - research
+  lastUpdated: 2026-03
+
+- id: modeling-cooperation
+  numericId: E1217
+  type: organization
+  orgType: safety-org
+  title: Modeling Cooperation
+  description: >-
+    Research organization focused on game theory and cooperation dynamics
+    relevant to AI safety.
+  tags:
+    - ai-safety
+    - research
+  lastUpdated: 2026-03
+
+# =============================================================================
+# EA Community Organizations
+# =============================================================================
+
+- id: ea-norway
+  numericId: E1165
+  type: organization
+  orgType: generic
+  title: Effective Altruism Norway
+  description: >-
+    Norwegian chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: czea
+  numericId: E1166
+  type: organization
+  orgType: generic
+  title: Czech Association for Effective Altruism
+  description: >-
+    Czech chapter of the effective altruism movement (CZEA).
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-sweden
+  numericId: E1167
+  type: organization
+  orgType: generic
+  title: Effektiv Altruism Sverige (EA Sweden)
+  description: >-
+    Swedish chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: founders-pledge
+  numericId: E1168
+  type: organization
+  orgType: generic
+  title: Founders Pledge
+  website: https://founderspledge.com
+  description: >-
+    Community of entrepreneurs who pledge to donate a portion of their proceeds
+    from company exits to effective charities.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: ea-funds
+  numericId: E1169
+  type: organization
+  orgType: funder
+  title: Effective Altruism Funds
+  website: https://funds.effectivealtruism.org
+  description: >-
+    Grantmaking platform operating four thematic funds to pool donations and
+    allocate them to high-impact opportunities.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: charity-entrepreneurship
+  numericId: E1170
+  type: organization
+  orgType: generic
+  title: Charity Entrepreneurship
+  website: https://www.charityentrepreneurship.com
+  description: >-
+    Incubation program that researches high-impact charity ideas and helps
+    launch new nonprofits.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: ea-geneva
+  numericId: E1171
+  type: organization
+  orgType: generic
+  title: Effective Altruism Geneva
+  description: >-
+    Geneva-based chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-poland
+  numericId: E1172
+  type: organization
+  orgType: generic
+  title: Effective Altruism Poland
+  description: >-
+    Polish chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-netherlands
+  numericId: E1173
+  type: organization
+  orgType: generic
+  title: Effective Altruism Netherlands
+  description: >-
+    Dutch chapter of the effective altruism movement (EAN).
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-singapore
+  numericId: E1174
+  type: organization
+  orgType: generic
+  title: Effective Altruism Singapore
+  description: >-
+    Singapore chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-finland
+  numericId: E1175
+  type: organization
+  orgType: generic
+  title: Effective Altruism Finland
+  description: >-
+    Finnish chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-israel
+  numericId: E1176
+  type: organization
+  orgType: generic
+  title: Effective Altruism Israel
+  description: >-
+    Israeli chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-foundation
+  numericId: E1177
+  type: organization
+  orgType: generic
+  title: Effective Altruism Foundation
+  description: >-
+    Swiss-based EA organization focused on reducing suffering, operating
+    research programs and grantmaking.
+  tags:
+    - ea-community
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: ea-new-zealand
+  numericId: E1178
+  type: organization
+  orgType: generic
+  title: Effective Altruism New Zealand
+  description: >-
+    New Zealand chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-australia
+  numericId: E1179
+  type: organization
+  orgType: generic
+  title: Effective Altruism Australia
+  description: >-
+    Australian chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-denmark
+  numericId: E1180
+  type: organization
+  orgType: generic
+  title: Effective Altruism Denmark
+  description: >-
+    Danish chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: ea-austria
+  numericId: E1181
+  type: organization
+  orgType: generic
+  title: Effective Altruism Austria
+  description: >-
+    Austrian chapter of the effective altruism movement.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: effective-ventures-usa
+  numericId: E1182
+  type: organization
+  orgType: generic
+  title: Effective Ventures Foundation USA
+  description: >-
+    US-based fiscal sponsor and operational hub for effective altruism projects.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: cambridge-ea
+  numericId: E1183
+  type: organization
+  orgType: generic
+  title: Cambridge Effective Altruism
+  description: >-
+    Cambridge-based chapter of the effective altruism movement, one of the
+    oldest and most active university EA groups.
+  tags:
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: one-for-the-world
+  numericId: E1216
+  type: organization
+  orgType: generic
+  title: One for the World
+  website: https://www.1fortheworld.org
+  description: >-
+    Nonprofit encouraging people to pledge a percentage of their income to
+    effective charities.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: non-trivial
+  numericId: E1204
+  type: organization
+  orgType: generic
+  title: Non-Trivial
+  website: https://www.non-trivial.org
+  description: >-
+    Fellowship program supporting ambitious young people working on important
+    problems.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: probably-good
+  numericId: E1205
+  type: organization
+  orgType: generic
+  title: Probably Good
+  website: https://probablygood.org
+  description: >-
+    Career guidance organization helping people find high-impact careers.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: atlas-fellowship
+  numericId: E1203
+  type: organization
+  orgType: generic
+  title: Atlas Fellowship
+  website: https://www.atlasfellowship.org
+  description: >-
+    Fellowship program for exceptional high school students interested in
+    improving the long-term future.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: high-impact-engineers
+  numericId: E1207
+  type: organization
+  orgType: generic
+  title: High Impact Engineers
+  description: >-
+    Community connecting engineers with high-impact career opportunities.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: high-impact-athletes
+  numericId: E1220
+  type: organization
+  orgType: generic
+  title: High Impact Athletes
+  website: https://www.highimpactathletes.org
+  description: >-
+    Organization partnering with professional athletes to direct donations
+    to effective charities.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: generation-pledge
+  numericId: E1221
+  type: organization
+  orgType: generic
+  title: Generation Pledge
+  website: https://www.generationpledge.org
+  description: >-
+    Community of inheritors pledging to donate inherited wealth to effective causes.
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: ceealar
+  numericId: E1222
+  type: organization
+  orgType: generic
+  title: CEEALAR
+  website: https://www.ceealar.org
+  description: >-
+    Co-living and co-working space in Blackpool, UK (formerly EA Hotel) for
+    people working on high-impact projects.
+  tags:
+    - ea-community
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: ambitious-impact
+  numericId: E1223
+  type: organization
+  orgType: generic
+  title: Ambitious Impact
+  description: >-
+    Organization supporting career transitions into high-impact roles.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: training-for-good
+  numericId: E1224
+  type: organization
+  orgType: generic
+  title: Training for Good
+  description: >-
+    Professional development and training programs for high-impact careers.
+  tags:
+    - ea-community
+    - career-development
+  lastUpdated: 2026-03
+
+- id: effective-institutions-project
+  numericId: E1225
+  type: organization
+  orgType: generic
+  title: Effective Institutions Project
+  website: https://www.effectiveinstitutions.org
+  description: >-
+    Research and advocacy organization working to improve institutional effectiveness.
+  tags:
+    - policy
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: the-unjournal
+  numericId: E1211
+  type: organization
+  orgType: generic
+  title: The Unjournal
+  website: https://unjournal.org
+  description: >-
+    Initiative providing journal-independent evaluation of research papers using
+    open peer review.
+  tags:
+    - research
+    - ea-community
+  lastUpdated: 2026-03
+
+# =============================================================================
+# Policy, Research, and Think Tank Organizations
+# =============================================================================
+
+- id: center-for-global-development
+  numericId: E1184
+  type: organization
+  orgType: generic
+  title: Center for Global Development
+  website: https://www.cgdev.org
+  description: >-
+    Independent think tank focused on reducing global poverty and inequality.
+  tags:
+    - development
+    - policy
+  lastUpdated: 2026-03
+
+- id: rand-corporation
+  numericId: E1185
+  type: organization
+  orgType: generic
+  title: RAND Corporation
+  website: https://www.rand.org
+  description: >-
+    Nonprofit global policy think tank. Active in AI policy, security studies,
+    and technology assessment.
+  tags:
+    - policy
+    - ai-governance
+    - security
+  lastUpdated: 2026-03
+
+- id: legal-priorities-project
+  numericId: E1186
+  type: organization
+  orgType: safety-org
+  title: Legal Priorities Project
+  website: https://www.legalpriorities.org
+  description: >-
+    Research organization studying legal questions relevant to reducing
+    existential and catastrophic risks.
+  tags:
+    - ai-governance
+    - existential-risk
+    - policy
+  lastUpdated: 2026-03
+
+- id: global-priorities-institute
+  numericId: E1187
+  type: organization
+  orgType: safety-org
+  title: Global Priorities Institute
+  website: https://globalprioritiesinstitute.org
+  description: >-
+    Research center at the University of Oxford conducting foundational academic
+    research on global prioritization.
+  tags:
+    - ea-community
+    - academic
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: simon-institute
+  numericId: E1188
+  type: organization
+  orgType: safety-org
+  title: Simon Institute for Longterm Governance
+  website: https://www.simoninstitute.ch
+  description: >-
+    Geneva-based think tank supporting international governance of AI and
+    other emerging technologies.
+  tags:
+    - ai-governance
+    - policy
+  lastUpdated: 2026-03
+
+- id: cnas
+  numericId: E1189
+  type: organization
+  orgType: generic
+  title: Center for a New American Security
+  website: https://www.cnas.org
+  description: >-
+    Bipartisan national security and defense policy think tank.
+  tags:
+    - policy
+    - ai-governance
+    - security
+  lastUpdated: 2026-03
+
+- id: federation-of-american-scientists
+  numericId: E1190
+  type: organization
+  orgType: generic
+  title: Federation of American Scientists
+  website: https://fas.org
+  description: >-
+    Nonprofit policy research and advocacy organization working on biosecurity,
+    nuclear policy, and AI governance.
+  tags:
+    - policy
+    - biosecurity
+  lastUpdated: 2026-03
+
+- id: institute-for-progress
+  numericId: E1191
+  type: organization
+  orgType: generic
+  title: Institute for Progress
+  website: https://progress.institute
+  description: >-
+    Think tank focused on science, technology, and innovation policy.
+  tags:
+    - policy
+  lastUpdated: 2026-03
+
+- id: foundation-for-american-innovation
+  numericId: E1192
+  type: organization
+  orgType: generic
+  title: Foundation for American Innovation
+  website: https://americaninnovators.org
+  description: >-
+    Organization promoting innovation and technology policy.
+  tags:
+    - policy
+  lastUpdated: 2026-03
+
+- id: iaps
+  numericId: E1193
+  type: organization
+  orgType: safety-org
+  title: Institute for AI Policy and Strategy
+  website: https://www.iaps.ai
+  description: >-
+    Research institute focused on AI governance and policy.
+  tags:
+    - ai-governance
+    - policy
+  lastUpdated: 2026-03
+
+- id: niskanen-center
+  numericId: E1194
+  type: organization
+  orgType: generic
+  title: Niskanen Center
+  website: https://www.niskanencenter.org
+  description: >-
+    Centrist think tank in Washington, D.C.
+  tags:
+    - policy
+  lastUpdated: 2026-03
+
+- id: carnegie-endowment
+  numericId: E1195
+  type: organization
+  orgType: generic
+  title: Carnegie Endowment for International Peace
+  website: https://carnegieendowment.org
+  description: >-
+    Global think tank focused on international affairs including AI governance.
+  tags:
+    - policy
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: oxford-china-policy-lab
+  numericId: E1196
+  type: organization
+  orgType: generic
+  title: Oxford China Policy Lab
+  description: >-
+    Research initiative at the University of Oxford focused on China-related
+    policy analysis.
+  tags:
+    - policy
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: bipartisan-commission-biodefense
+  numericId: E1197
+  type: organization
+  orgType: generic
+  title: Bipartisan Commission on Biodefense
+  website: https://biodefensecommission.org
+  description: >-
+    Commission focused on U.S. biodefense policy.
+  tags:
+    - biosecurity
+    - policy
+  lastUpdated: 2026-03
+
+- id: georgetown-cghss
+  numericId: E1198
+  type: organization
+  orgType: generic
+  title: Georgetown Center for Global Health Science and Security
+  website: https://ghss.georgetown.edu
+  description: >-
+    Research center at Georgetown University focused on health security.
+  tags:
+    - biosecurity
+    - academic
+  lastUpdated: 2026-03
+
+- id: vera-institute
+  numericId: E1199
+  type: organization
+  orgType: generic
+  title: Vera Institute of Justice
+  website: https://www.vera.org
+  description: >-
+    National nonprofit focused on criminal justice reform.
+  tags:
+    - policy
+    - justice
+  lastUpdated: 2026-03
+
+- id: the-future-society
+  numericId: E1213
+  type: organization
+  orgType: generic
+  title: The Future Society
+  website: https://thefuturesociety.org
+  description: >-
+    International nonprofit working on AI governance.
+  tags:
+    - ai-governance
+    - policy
+  lastUpdated: 2026-03
+
+- id: collective-intelligence-project
+  numericId: E1218
+  type: organization
+  orgType: generic
+  title: Collective Intelligence Project
+  website: https://cip.org
+  description: >-
+    Research organization developing democratic governance mechanisms for AI.
+  tags:
+    - ai-governance
+    - research
+  lastUpdated: 2026-03
+
+# =============================================================================
+# Other Grant Recipient Organizations
+# =============================================================================
+
+- id: givedirectly
+  numericId: E1200
+  type: organization
+  orgType: generic
+  title: GiveDirectly
+  website: https://www.givedirectly.org
+  description: >-
+    Nonprofit delivering cash transfers directly to people in extreme poverty.
+  tags:
+    - development
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: against-malaria-foundation
+  numericId: E1201
+  type: organization
+  orgType: generic
+  title: Against Malaria Foundation
+  website: https://www.againstmalaria.com
+  description: >-
+    Nonprofit providing insecticide-treated nets to protect against malaria.
+  tags:
+    - development
+    - global-health
+  lastUpdated: 2026-03
+
+- id: topos-institute
+  numericId: E1202
+  type: organization
+  orgType: generic
+  title: Topos Institute
+  website: https://topos.institute
+  description: >-
+    Research institute applying category theory to problems in computation
+    and societal structures.
+  tags:
+    - research
+  lastUpdated: 2026-03
+
+- id: arcadia-impact
+  numericId: E1206
+  type: organization
+  orgType: generic
+  title: Arcadia Impact
+  description: >-
+    Research organization focused on AI governance and existential risk reduction.
+  tags:
+    - ai-governance
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: sentience-institute
+  numericId: E1208
+  type: organization
+  orgType: generic
+  title: Sentience Institute
+  website: https://www.sentienceinstitute.org
+  description: >-
+    Think tank researching the expansion of humanity's moral circle.
+  tags:
+    - animal-welfare
+    - research
+  lastUpdated: 2026-03
+
+- id: foresight-institute
+  numericId: E1210
+  type: organization
+  orgType: generic
+  title: Foresight Institute
+  website: https://foresight.org
+  description: >-
+    Research organization focused on beneficial use of emerging technologies.
+  tags:
+    - existential-risk
+    - research
+  lastUpdated: 2026-03
+
+- id: charter-cities-institute
+  numericId: E1212
+  type: organization
+  orgType: generic
+  title: Charter Cities Institute
+  website: https://chartercitiesinstitute.org
+  description: >-
+    Research and advocacy organization focused on charter cities for
+    institutional reform.
+  tags:
+    - development
+    - policy
+  lastUpdated: 2026-03
+
+- id: our-world-in-data
+  numericId: E1214
+  type: organization
+  orgType: generic
+  title: Our World in Data
+  website: https://ourworldindata.org
+  description: >-
+    Research and data publication project making data on global problems accessible.
+  tags:
+    - research
+    - development
+  lastUpdated: 2026-03
+
+- id: idinsight
+  numericId: E1215
+  type: organization
+  orgType: generic
+  title: IDinsight
+  website: https://www.idinsight.org
+  description: >-
+    Data analytics organization helping development leaders maximize social impact.
+  tags:
+    - development
+    - research
+  lastUpdated: 2026-03
+
+- id: good-food-institute
+  numericId: E1219
+  type: organization
+  orgType: generic
+  title: The Good Food Institute
+  website: https://gfi.org
+  description: >-
+    Nonprofit accelerating development of alternative proteins.
+  tags:
+    - animal-welfare
+    - food-technology
+  lastUpdated: 2026-03
+
+- id: convergent-research
+  numericId: E1226
+  type: organization
+  orgType: generic
+  title: Convergent Research
+  website: https://www.convergentresearch.org
+  description: >-
+    Organization building Focused Research Organizations (FROs) to tackle
+    scientific bottlenecks.
+  tags:
+    - research
+  lastUpdated: 2026-03
+
+- id: innovations-for-poverty-action
+  numericId: E1227
+  type: organization
+  orgType: generic
+  title: Innovations for Poverty Action
+  website: https://www.poverty-action.org
+  description: >-
+    Research and policy nonprofit promoting effective solutions to global poverty.
+  tags:
+    - development
+    - research
+  lastUpdated: 2026-03
