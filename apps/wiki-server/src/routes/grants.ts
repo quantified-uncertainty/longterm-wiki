@@ -123,7 +123,7 @@ const grantsApp = new Hono()
     const rows = await db
       .select()
       .from(grants)
-      .orderBy(desc(grants.syncedAt))
+      .orderBy(desc(grants.syncedAt), grants.id)
       .limit(limit)
       .offset(offset);
 

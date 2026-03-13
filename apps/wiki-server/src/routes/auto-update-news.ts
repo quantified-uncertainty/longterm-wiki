@@ -28,6 +28,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 const DashboardQuery = z.object({
   runs: z.coerce.number().int().min(1).max(50).default(10),
+  limit: z.coerce.number().int().min(1).max(500).default(200),
 });
 
 // ---- Helpers ----
@@ -121,7 +122,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(eq(autoUpdateNewsItems.runId, runId))
-      .orderBy(desc(autoUpdateNewsItems.relevanceScore));
+      .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
     return c.json({ items: rows.map((r) => mapNewsRow(r.item, r.routedToPageSlug)) });
   })
@@ -144,7 +145,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
-      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore))
+      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
       .limit(limit)
       .offset(offset);
 
@@ -181,7 +182,7 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
       .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
-      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore));
+      .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
     // All results are routed to pageId (the URL param) — pass it directly as the slug override
     return c.json({
@@ -197,7 +198,7 @@ const autoUpdateNewsApp = new Hono()
     const parsed = DashboardQuery.safeParse(c.req.query());
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { runs: maxRuns } = parsed.data;
+    const { runs: maxRuns, limit: maxItems } = parsed.data;
     const db = getDrizzleDb();
 
     // Get the last N run IDs
@@ -214,7 +215,7 @@ const autoUpdateNewsApp = new Hono()
     const runIds = recentRuns.map((r) => r.id);
     const runDateMap = new Map(recentRuns.map((r) => [r.id, r.date]));
 
-    // Fetch all news items for these runs; LEFT JOIN wiki_pages to recover slug after Phase D2a
+    // Fetch news items for these runs, capped to stay under Next.js 2MB cache limit
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
@@ -223,7 +224,8 @@ const autoUpdateNewsApp = new Hono()
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
       .where(inArray(autoUpdateNewsItems.runId, runIds))
-      .orderBy(desc(autoUpdateNewsItems.relevanceScore));
+      .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
+      .limit(maxItems);
 
     return c.json({
       items: rows.map((r) => ({
