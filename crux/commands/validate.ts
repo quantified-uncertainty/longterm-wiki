@@ -126,6 +126,11 @@ const SCRIPTS = {
     description: 'Hallucination risk assessment report',
     passthrough: ['ci', 'json', 'top'],
   },
+  'entity-refs': {
+    script: 'validate/validate-entity-refs.ts',
+    description: 'Check entity reference integrity across KB records',
+    passthrough: ['ci', 'verbose', 'threshold'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
@@ -171,6 +176,8 @@ Examples:
   crux validate unified --rules=dollar-signs,markdown-lists
   crux validate unified --fix             Auto-fix unified rule issues
   crux validate entity-links --fix        Convert markdown links to EntityLink
+  crux validate entity-refs              Check KB record entity references
+  crux validate entity-refs --threshold=90  Fail if link rate < 90%
   crux validate all --skip=mermaid,style  Skip specific checks
 `;
 }
