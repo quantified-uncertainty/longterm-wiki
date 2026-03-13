@@ -1,6 +1,6 @@
 /**
  * Funding Rounds section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Round names link to /funding-rounds/[id] detail pages.
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";

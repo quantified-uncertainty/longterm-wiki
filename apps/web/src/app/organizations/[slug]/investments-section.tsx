@@ -1,6 +1,6 @@
 /**
  * Investments Received section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Investor names link to entity pages; "details" links to /investments/[id].
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -38,11 +38,21 @@ export function InvestmentsReceivedSection({
             {investments.map((inv) => (
               <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
+                  <span className="font-medium text-foreground text-xs">
+                    {inv.investorHref ? (
+                      <Link href={inv.investorHref} className="text-primary hover:underline">
+                        {inv.investorName}
+                      </Link>
+                    ) : (
+                      inv.investorName
+                    )}
+                  </span>
                   <Link
                     href={`/investments/${inv.key}`}
-                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                    className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    title="Investment details"
                   >
-                    {inv.investorHref ? inv.investorName : inv.investorName}
+                    details
                   </Link>
                   {inv.role && (
                     <span className="ml-1.5 text-[10px] text-muted-foreground/60">

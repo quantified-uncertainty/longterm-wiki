@@ -3,15 +3,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getAllKBRecords,
-  getKBEntity,
-  getKBEntitySlug,
   getKBRecords,
 } from "@/data/kb";
+import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
+import {
+  resolveEntityLink,
+  DetailSection,
+  EntityLinkDisplay,
+} from "@/lib/record-detail-ui";
 import {
   formatKBDate,
   titleCase,
@@ -51,20 +55,7 @@ interface ParsedInvestment {
   source: string | null;
 }
 
-// ── Resolution helpers ─────────────────────────────────────────────────
-
-function resolveEntityLink(entityId: string): { name: string; href: string | null } {
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
-      if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
-    }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
-  }
-  return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
-}
+// ── Parsers ───────────────────────────────────────────────────────────
 
 function parseFundingRound(record: KBRecordEntry): ParsedFundingRound {
   const f = record.fields;
@@ -339,7 +330,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
                     </td>
                     <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs text-muted-foreground">
                       {inv.stakeAcquired != null && (
-                        <span>{(inv.stakeAcquired * 100).toFixed(1).replace(/\.0$/, "")}%</span>
+                        <span>{formatStake(inv.stakeAcquired)}</span>
                       )}
                     </td>
                   </tr>
@@ -446,41 +437,3 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
   );
 }
 
-// ── Subcomponents ──────────────────────────────────────────────────────
-
-function DetailSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-        {title}
-      </div>
-      <div className="flex items-center gap-1 flex-wrap">{children}</div>
-    </div>
-  );
-}
-
-function EntityLinkDisplay({
-  name,
-  href,
-}: {
-  name: string;
-  href: string | null;
-}) {
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="text-sm font-medium text-primary hover:underline"
-      >
-        {name}
-      </Link>
-    );
-  }
-  return <span className="text-sm font-medium text-foreground">{name}</span>;
-}

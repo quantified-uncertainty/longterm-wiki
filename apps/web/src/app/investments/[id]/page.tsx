@@ -3,15 +3,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getAllKBRecords,
-  getKBEntity,
-  getKBEntitySlug,
   getKBRecords,
 } from "@/data/kb";
+import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/kb";
 import { getTypedEntityById } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
+import {
+  resolveEntityLink,
+  DetailSection,
+  EntityLinkDisplay,
+} from "@/lib/record-detail-ui";
 import {
   formatKBDate,
   titleCase,
@@ -39,20 +43,7 @@ interface ParsedInvestment {
   notes: string | null;
 }
 
-// ── Resolution helpers ─────────────────────────────────────────────────
-
-function resolveEntityLink(entityId: string): { name: string; href: string | null } {
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
-      if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
-    }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
-  }
-  return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
-}
+// ── Parsers ───────────────────────────────────────────────────────────
 
 function parseInvestment(record: KBRecordEntry): ParsedInvestment {
   const f = record.fields;
@@ -221,7 +212,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
         )}
         {investment.stakeAcquired != null && (
           <div className="text-lg tabular-nums tracking-tight text-muted-foreground">
-            {(investment.stakeAcquired * 100).toFixed(1).replace(/\.0$/, "")}%
+            {formatStake(investment.stakeAcquired)}
             <span className="text-sm font-normal ml-2">stake acquired</span>
           </div>
         )}
@@ -353,43 +344,6 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
 }
 
 // ── Subcomponents ──────────────────────────────────────────────────────
-
-function DetailSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-        {title}
-      </div>
-      <div className="flex items-center gap-1 flex-wrap">{children}</div>
-    </div>
-  );
-}
-
-function EntityLinkDisplay({
-  name,
-  href,
-}: {
-  name: string;
-  href: string | null;
-}) {
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className="text-sm font-medium text-primary hover:underline"
-      >
-        {name}
-      </Link>
-    );
-  }
-  return <span className="text-sm font-medium text-foreground">{name}</span>;
-}
 
 function RelatedInvestmentsSection({
   title,
