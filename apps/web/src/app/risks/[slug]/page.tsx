@@ -11,6 +11,11 @@ import {
 } from "@/components/directory";
 import { titleCase } from "@/components/wiki/kb/format";
 import type { RiskEntity } from "@/data/entity-schemas";
+import {
+  RISK_CATEGORY_COLORS,
+  RISK_CATEGORY_LABELS,
+  SEVERITY_COLORS,
+} from "@/app/risks/risk-constants";
 
 export function generateStaticParams() {
   return getRiskSlugs().map((slug) => ({ slug }));
@@ -31,31 +36,6 @@ export async function generateMetadata({
   };
 }
 
-// ── Risk category colors ──────────────────────────────────────────────
-const RISK_CATEGORY_COLORS: Record<string, string> = {
-  accident: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  misuse: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  structural: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  epistemic: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-};
-
-const RISK_CATEGORY_LABELS: Record<string, string> = {
-  accident: "Accident",
-  misuse: "Misuse",
-  structural: "Structural",
-  epistemic: "Epistemic",
-};
-
-// ── Severity badge colors ─────────────────────────────────────────────
-const SEVERITY_COLORS: Record<string, string> = {
-  low: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "medium-high": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  high: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  critical: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  catastrophic: "bg-red-200 text-red-900 dark:bg-red-900/40 dark:text-red-200",
-};
-
 // ── Helpers to extract display values from entity data ─────────────────
 
 function getLikelihoodDisplay(risk: RiskEntity): string | null {
@@ -74,7 +54,7 @@ function getTimeframeDisplay(risk: RiskEntity): string | null {
   if (risk.timeframe.display) return risk.timeframe.display;
   const parts: string[] = [];
   if (risk.timeframe.earliest && risk.timeframe.latest) {
-    parts.push(`${risk.timeframe.earliest}--${risk.timeframe.latest}`);
+    parts.push(`${risk.timeframe.earliest}\u2013${risk.timeframe.latest}`);
   }
   if (risk.timeframe.median) {
     if (parts.length > 0) {
