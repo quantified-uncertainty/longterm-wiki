@@ -26,7 +26,7 @@ import { RelatedPages } from "@/components/RelatedPages";
 import {
   StatCard,
   SectionHeader,
-  PersonRow,
+  PeopleTable,
   field,
   safeHref,
 } from "./org-shared";
@@ -40,7 +40,6 @@ import {
 } from "./org-data";
 
 // Section components
-import { BoardOfDirectorsSection } from "./board-section";
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
 import { GrantsMadeSection, FundingReceivedSection } from "./grants-section";
@@ -50,7 +49,6 @@ import { AiModelsSection } from "./ai-models-section";
 import {
   FundingHistorySection,
   InvestorParticipationSection,
-  ModelReleasesSection,
   ProductsSection,
   SafetyMilestonesSection,
   StrategicPartnershipsSection,
@@ -176,65 +174,109 @@ export default async function OrgProfilePage({
     data.sortedPersons.length > 0 || data.boardMembers.length > 0;
 
   if (hasPeopleData) {
+    // Build unified people list from key-persons + board members, deduplicating
+    const peopleByName = new Map<string, {
+      name: string;
+      title?: string;
+      slug?: string;
+      entityType?: string;
+      isFounder: boolean;
+      isBoard: boolean;
+      isCurrent: boolean;
+      start?: string;
+      end?: string;
+    }>();
+
+    // Add key persons first
+    for (const person of data.sortedPersons) {
+      const personRef = field(person, "person");
+      const personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
+      const personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      const name =
+        field(person, "display_name") ??
+        personEntity?.name ??
+        titleCase(personRef ?? person.key);
+      peopleByName.set(name, {
+        name,
+        title: field(person, "title"),
+        slug: personRef,
+        entityType: personEntity?.type,
+        isFounder: !!person.fields.is_founder,
+        isBoard: false,
+        isCurrent: !person.fields.end,
+        start: field(person, "start"),
+        end: field(person, "end"),
+      });
+    }
+
+    // Merge board members — if already present, just add board flag
+    for (const bm of data.boardMembers) {
+      const existing = peopleByName.get(bm.personName);
+      if (existing) {
+        existing.isBoard = true;
+      } else {
+        peopleByName.set(bm.personName, {
+          name: bm.personName,
+          title: bm.role ?? "Board Member",
+          slug: bm.personHref?.replace(/^\/(people|organizations)\//, ""),
+          entityType: bm.personHref?.startsWith("/people") ? "person" : undefined,
+          isFounder: false,
+          isBoard: true,
+          isCurrent: !bm.departed,
+          start: bm.appointed ?? undefined,
+          end: bm.departed ?? undefined,
+        });
+      }
+    }
+
+    const allPeople = [...peopleByName.values()].sort((a, b) => {
+      // Current before former
+      if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+      // Founders first
+      if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
+      // Then alphabetical
+      return a.name.localeCompare(b.name);
+    });
+
     tabs.push({
       id: "people",
       label: "People",
-      count: data.sortedPersons.length + data.boardMembers.length,
+      count: allPeople.length,
       content: (
-        <div className="space-y-8">
-          {data.sortedPersons.length > 0 && (
-            <section>
-              <SectionHeader title="Key People" count={data.sortedPersons.length} />
-              <div className="border border-border/60 rounded-xl bg-card px-4">
-                {data.sortedPersons.map((person) => {
-                  const personRef = field(person, "person");
-                  const personEntityId = personRef
-                    ? resolveKBSlug(personRef)
-                    : undefined;
-                  const personEntity = personEntityId
-                    ? getKBEntity(personEntityId)
-                    : undefined;
-                  const name =
-                    field(person, "display_name") ??
-                    personEntity?.name ??
-                    titleCase(personRef ?? person.key);
-
-                  return (
-                    <PersonRow
-                      key={person.key}
-                      name={name}
-                      title={field(person, "title")}
-                      slug={personRef}
-                      entityType={personEntity?.type}
-                      isFounder={!!person.fields.is_founder}
-                      start={field(person, "start")}
-                      end={field(person, "end")}
-                      notes={field(person, "notes")}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          )}
-          <BoardOfDirectorsSection members={data.boardMembers} />
-        </div>
+        <section>
+          <SectionHeader title="People" count={allPeople.length} />
+          <PeopleTable people={allPeople} />
+        </section>
       ),
     });
   }
 
   // ── Funding tab: rounds, investments, equity, grants, programs ──
+  // Filter out founding-round entries with no amount (these are founders, not investors)
+  const meaningfulInvestments = data.investments.filter((inv) => {
+    const roundName = typeof inv.fields.round_name === "string" ? inv.fields.round_name.toLowerCase() : "";
+    const hasAmount = inv.fields.amount != null;
+    if (roundName === "founding" && !hasAmount) return false;
+    return true;
+  });
+
+  // Filter equity positions to only those with a resolved holder name
+  const meaningfulEquity = data.equityPositions.filter((pos) => pos.holderName && pos.holderName !== "");
+
   const hasFundingData =
     data.sortedRounds.length > 0 ||
-    data.investments.length > 0 ||
-    data.equityPositions.length > 0 ||
+    meaningfulInvestments.length > 0 ||
+    meaningfulEquity.length > 0 ||
     data.grantsReceived.length > 0 ||
     data.grantsMade.length > 0 ||
+    data.sortedPartnerships.length > 0 ||
     data.fundingPrograms.length > 0;
 
   if (hasFundingData) {
     const fundingCount =
       data.sortedRounds.length +
-      data.investments.length +
+      meaningfulInvestments.length +
+      data.sortedPartnerships.length +
       data.grantsMade.length +
       data.grantsReceived.length;
 
@@ -244,15 +286,15 @@ export default async function OrgProfilePage({
       count: fundingCount,
       content: (
         <div className="space-y-8">
-          <FundingHistorySection rounds={data.sortedRounds} slug={slug} />
+          <FundingHistorySection rounds={data.sortedRounds} />
 
-          {(data.investments.length > 0 || data.equityPositions.length > 0) && (
+          {(meaningfulInvestments.length > 0 || meaningfulEquity.length > 0) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {data.investments.length > 0 && (
-                <InvestorParticipationSection investments={data.investments} />
+              {meaningfulInvestments.length > 0 && (
+                <InvestorParticipationSection investments={meaningfulInvestments} />
               )}
-              {data.equityPositions.length > 0 && (
-                <EquityPositionsSection positions={data.equityPositions} />
+              {meaningfulEquity.length > 0 && (
+                <EquityPositionsSection positions={meaningfulEquity} />
               )}
             </div>
           )}
@@ -268,6 +310,10 @@ export default async function OrgProfilePage({
             </div>
           )}
 
+          {data.sortedPartnerships.length > 0 && (
+            <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
+          )}
+
           {data.fundingPrograms.length > 0 && (
             <FundingProgramsSection programs={data.fundingPrograms} />
           )}
@@ -278,13 +324,11 @@ export default async function OrgProfilePage({
 
   // ── Products & Models tab ──
   const hasProductData =
-    data.sortedModels.length > 0 ||
     data.products.length > 0 ||
     data.orgModels.length > 0;
 
   if (hasProductData) {
-    const productCount =
-      data.sortedModels.length + data.products.length + data.orgModels.length;
+    const productCount = data.products.length + data.orgModels.length;
 
     tabs.push({
       id: "products",
@@ -292,27 +336,24 @@ export default async function OrgProfilePage({
       count: productCount,
       content: (
         <div className="space-y-8">
-          <ModelReleasesSection models={data.sortedModels} />
-          <ProductsSection products={data.products} />
           <AiModelsSection models={data.orgModels} />
+          <ProductsSection products={data.products} />
         </div>
       ),
     });
   }
 
   // ── Research & Safety tab ──
-  const hasSafetyData =
-    data.sortedMilestones.length > 0 || data.sortedPartnerships.length > 0;
+  const hasSafetyData = data.sortedMilestones.length > 0;
 
   if (hasSafetyData) {
     tabs.push({
       id: "safety",
       label: "Research & Safety",
-      count: data.sortedMilestones.length + data.sortedPartnerships.length,
+      count: data.sortedMilestones.length,
       content: (
         <div className="space-y-8">
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
-          <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
         </div>
       ),
     });

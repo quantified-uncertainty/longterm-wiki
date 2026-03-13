@@ -23,7 +23,6 @@ import {
 } from "./org-shared";
 import {
   formatAmount,
-  SAFETY_LEVEL_COLORS,
   MILESTONE_TYPE_COLORS,
 } from "./org-data";
 
@@ -31,24 +30,14 @@ import {
 
 export function FundingHistorySection({
   rounds,
-  slug,
 }: {
   rounds: KBRecordEntry[];
-  slug: string;
 }) {
   if (rounds.length === 0) return null;
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
-        <SectionHeader title="Funding History" count={rounds.length} />
-        <Link
-          href={`/organizations/${slug}/funding`}
-          className="text-xs text-primary hover:underline shrink-0"
-        >
-          View all &rarr;
-        </Link>
-      </div>
+      <SectionHeader title="Funding History" count={rounds.length} />
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -62,7 +51,7 @@ export function FundingHistorySection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {rounds.slice(0, 12).map((round) => {
+            {[...rounds].reverse().map((round) => {
               const name = field(round, "name") ?? titleCase(round.key);
               const date = field(round, "date");
               const raised = round.fields.raised;
@@ -92,7 +81,7 @@ export function FundingHistorySection({
                     ) : leadInvestor ? (
                       <span>{leadInvestorName}</span>
                     ) : (
-                      <span className="text-muted-foreground">\u2014</span>
+                      <span className="text-muted-foreground">{"\u2014"}</span>
                     )}
                   </td>
                   <td className="py-2 px-3 hidden lg:table-cell">
@@ -104,14 +93,6 @@ export function FundingHistorySection({
           </tbody>
         </table>
       </div>
-      {rounds.length > 12 && (
-        <Link
-          href={`/organizations/${slug}/funding`}
-          className="block mt-2 text-xs text-primary hover:underline text-center"
-        >
-          +{rounds.length - 12} more rounds
-        </Link>
-      )}
     </section>
   );
 }
@@ -128,122 +109,51 @@ export function InvestorParticipationSection({
   return (
     <section>
       <SectionHeader title="Investor Participation" count={investments.length} />
-      <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
-        {investments.map((inv) => {
-          const investorRef = field(inv, "investor");
-          const { name: investorName, href: investorHref } =
-            resolveRefName(
-              investorRef,
-              inv.displayName ?? field(inv, "display_name"),
-            );
-          const roundName = field(inv, "round_name");
-          const amount = inv.fields.amount;
-          const date = field(inv, "date");
-          const notes = field(inv, "notes");
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Investor</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Amount</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {investments.map((inv) => {
+              const investorRef = field(inv, "investor");
+              const { name: investorName, href: investorHref } =
+                resolveRefName(
+                  investorRef,
+                  inv.displayName ?? field(inv, "display_name"),
+                );
+              const roundName = field(inv, "round_name");
+              const amount = inv.fields.amount;
+              const date = field(inv, "date");
 
-          return (
-            <div
-              key={inv.key}
-              className="px-4 py-3"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  {investorHref ? (
-                    <Link
-                      href={investorHref}
-                      className="font-semibold text-sm text-primary hover:underline"
-                    >
-                      {investorName}
-                    </Link>
-                  ) : (
-                    <span className="font-semibold text-sm">
-                      {investorName}
-                    </span>
-                  )}
-                  {roundName && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {roundName}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 text-sm tabular-nums">
-                  {amount != null && (
-                    <span className="font-bold">
-                      {formatAmount(amount)}
-                    </span>
-                  )}
-                  {date && (
-                    <span className="text-xs text-muted-foreground">
-                      {formatKBDate(date)}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {notes && (
-                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
-                  {notes}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-// ── Model Releases ──────────────────────────────────────────────────
-
-export function ModelReleasesSection({
-  models,
-}: {
-  models: KBRecordEntry[];
-}) {
-  if (models.length === 0) return null;
-
-  return (
-    <section>
-      <SectionHeader title="Model Releases" count={models.length} />
-      <div className="border border-border/60 rounded-xl bg-card px-4">
-        {models.map((model) => {
-          const name = field(model, "name") ?? titleCase(model.key);
-          const released = field(model, "released");
-          const safetyLevel = field(model, "safety_level");
-          const description = field(model, "description");
-          const source = field(model, "source");
-
-          return (
-            <div
-              key={model.key}
-              className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-b-0"
-            >
-              <div className="min-w-[70px] text-xs text-muted-foreground pt-0.5">
-                {released ? formatKBDate(released) : "\u2014"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="font-medium text-sm">{name}</span>
-                  {safetyLevel && (
-                    <Badge
-                      color={
-                        SAFETY_LEVEL_COLORS[safetyLevel] ??
-                        "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                      }
-                    >
-                      {safetyLevel}
-                    </Badge>
-                  )}
-                </div>
-                {description && (
-                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                    {description}
-                  </p>
-                )}
-                <SourceLink source={source} />
-              </div>
-            </div>
-          );
-        })}
+              return (
+                <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-1.5 px-3">
+                    {investorHref ? (
+                      <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
+                        {investorName}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{investorName}</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground">{roundName ?? ""}</td>
+                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                    {amount != null ? formatAmount(amount) : ""}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
+                    {date ? formatKBDate(date) : ""}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );
@@ -313,43 +223,54 @@ export function SafetyMilestonesSection({
   return (
     <section>
       <SectionHeader title="Safety Milestones" count={milestones.length} />
-      <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
-        {milestones.map((ms) => {
-          const name = field(ms, "name") ?? titleCase(ms.key);
-          const date = field(ms, "date");
-          const msType = field(ms, "type");
-          const description = field(ms, "description");
-          const source = field(ms, "source");
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Milestone</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Description</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {milestones.map((ms) => {
+              const name = field(ms, "name") ?? titleCase(ms.key);
+              const date = field(ms, "date");
+              const msType = field(ms, "type");
+              const description = field(ms, "description");
+              const source = field(ms, "source");
 
-          return (
-            <div key={ms.key} className="px-4 py-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-sm">{name}</span>
-                {msType && (
-                  <Badge
-                    color={
-                      MILESTONE_TYPE_COLORS[msType] ??
-                      "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                    }
-                  >
-                    {titleCase(msType)}
-                  </Badge>
-                )}
-                {date && (
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {formatKBDate(date)}
-                  </span>
-                )}
-              </div>
-              {description && (
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {description}
-                </p>
-              )}
-              <SourceLink source={source} />
-            </div>
-          );
-        })}
+              return (
+                <tr key={ms.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-1.5 px-3 font-medium">{name}</td>
+                  <td className="py-1.5 px-3">
+                    {msType && (
+                      <Badge
+                        color={
+                          MILESTONE_TYPE_COLORS[msType] ??
+                          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                        }
+                      >
+                        {titleCase(msType)}
+                      </Badge>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
+                    {date ? formatKBDate(date) : ""}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
+                    {description ?? ""}
+                  </td>
+                  <td className="py-1.5 px-3">
+                    <SourceLink source={source} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );
@@ -367,63 +288,60 @@ export function StrategicPartnershipsSection({
   return (
     <section>
       <SectionHeader title="Strategic Partnerships" count={partnerships.length} />
-      <div className="border border-border/60 rounded-xl divide-y divide-border/40 bg-card">
-        {partnerships.map((sp) => {
-          const partnerRef = field(sp, "partner");
-          const { name: partnerName, href: partnerHref } =
-            resolveRefName(partnerRef, sp.displayName);
-          const date = field(sp, "date");
-          const spType = field(sp, "type");
-          const investmentAmount = sp.fields.investment_amount;
-          const computeCommitment = sp.fields.compute_commitment;
-          const notes = field(sp, "notes");
-          const source = field(sp, "source");
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Partner</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Investment</th>
+              <th scope="col" className="py-2 px-3 text-right font-medium">Compute</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {partnerships.map((sp) => {
+              const partnerRef = field(sp, "partner");
+              const { name: partnerName, href: partnerHref } =
+                resolveRefName(partnerRef, sp.displayName);
+              const date = field(sp, "date");
+              const spType = field(sp, "type");
+              const investmentAmount = sp.fields.investment_amount;
+              const computeCommitment = sp.fields.compute_commitment;
+              const notes = field(sp, "notes");
 
-          return (
-            <div key={sp.key} className="px-4 py-3">
-              <div className="flex items-center gap-2 mb-1">
-                {partnerHref ? (
-                  <Link
-                    href={partnerHref}
-                    className="font-semibold text-sm text-primary hover:underline"
-                  >
-                    {partnerName}
-                  </Link>
-                ) : (
-                  <span className="font-semibold text-sm">
-                    {partnerName}
-                  </span>
-                )}
-                {spType && (
-                  <Badge>{spType}</Badge>
-                )}
-                {date && (
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {formatKBDate(date)}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                {investmentAmount != null && (
-                  <span>
-                    Investment: <span className="font-semibold text-foreground">{formatAmount(investmentAmount)}</span>
-                  </span>
-                )}
-                {computeCommitment != null && (
-                  <span>
-                    Compute: <span className="font-semibold text-foreground">{formatAmount(computeCommitment)}</span>
-                  </span>
-                )}
-              </div>
-              {notes && (
-                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
-                  {notes}
-                </div>
-              )}
-              <SourceLink source={source} />
-            </div>
-          );
-        })}
+              return (
+                <tr key={sp.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-1.5 px-3">
+                    {partnerHref ? (
+                      <Link href={partnerHref} className="font-medium text-foreground hover:text-primary transition-colors">
+                        {partnerName}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{partnerName}</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-3">
+                    {spType && <Badge>{spType}</Badge>}
+                  </td>
+                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                    {investmentAmount != null ? formatAmount(investmentAmount) : ""}
+                  </td>
+                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                    {computeCommitment != null ? formatAmount(computeCommitment) : ""}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
+                    {date ? formatKBDate(date) : ""}
+                  </td>
+                  <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
+                    {notes ?? ""}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );
