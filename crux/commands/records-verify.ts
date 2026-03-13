@@ -86,113 +86,32 @@ interface VerificationError {
 
 // ── API helpers ──────────────────────────────────────────────────────
 
-/** Typed row for grant records from the API */
-interface GrantRow {
-  id: string;
-  organizationId: string;
-  granteeId: string | null;
-  name: string;
-  amount: number | null;
-  currency: string;
-  date: string | null;
-  period: string | null;
-  status: string | null;
-  source: string | null;
-  notes: string | null;
-  programId: string | null;
+/** Safe field access from untyped API response objects */
+function str(item: Record<string, unknown>, key: string): string {
+  const v = item[key];
+  return typeof v === 'string' ? v : String(v ?? '');
 }
 
-/** Typed row for personnel records from the API */
-interface PersonnelRow {
-  id: string;
-  personId: string;
-  organizationId: string;
-  role: string;
-  roleType: string;
-  startDate: string | null;
-  endDate: string | null;
-  isFounder: boolean;
-  source: string | null;
-  notes: string | null;
+function strOrNull(item: Record<string, unknown>, key: string): string | null {
+  const v = item[key];
+  return v == null ? null : String(v);
 }
 
-/** Typed row for division records from the API */
-interface DivisionRow {
-  id: string;
-  parentOrgId: string;
-  name: string;
-  slug: string;
-  divisionType: string;
-  status: string;
-  lead: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  source: string | null;
-  notes: string | null;
-}
-
-/** Typed row for funding program records from the API */
-interface FundingProgramRow {
-  id: string;
-  orgId: string;
-  divisionId: string | null;
-  name: string;
-  programType: string;
-  totalBudget: number | null;
-  currency: string;
-  deadline: string | null;
-  status: string | null;
-  source: string | null;
-  notes: string | null;
-}
-
-/** Typed row for funding round records from the API */
-interface FundingRoundRow {
-  id: string;
-  companyId: string;
-  date: string | null;
-  name: string;
-  raised: number | null;
-  valuation: number | null;
-  leadInvestor: string | null;
-  source: string | null;
-  notes: string | null;
-}
-
-/** Typed row for investment records from the API */
-interface InvestmentRow {
-  id: string;
-  companyId: string;
-  investorId: string;
-  roundName: string | null;
-  amount: number | null;
-  role: string | null;
-  date: string | null;
-  source: string | null;
-  notes: string | null;
-}
-
-/** Typed row for equity position records from the API */
-interface EquityPositionRow {
-  id: string;
-  companyId: string;
-  holderId: string;
-  stake: string | null;
-  asOf: string | null;
-  source: string | null;
-  notes: string | null;
+function numOrNull(item: Record<string, unknown>, key: string): number | null {
+  const v = item[key];
+  return typeof v === 'number' ? v : null;
 }
 
 /** API response wrapper for paginated results */
-interface PaginatedResponse<T> {
-  items?: T[];
-  grants?: T[];
-  personnel?: T[];
-  divisions?: T[];
-  programs?: T[];
-  rounds?: T[];
-  investments?: T[];
-  positions?: T[];
+interface PaginatedResponse {
+  items?: Record<string, unknown>[];
+  grants?: Record<string, unknown>[];
+  personnel?: Record<string, unknown>[];
+  divisions?: Record<string, unknown>[];
+  programs?: Record<string, unknown>[];
+  rounds?: Record<string, unknown>[];
+  investments?: Record<string, unknown>[];
+  positions?: Record<string, unknown>[];
   total?: number;
 }
 
@@ -202,7 +121,7 @@ async function fetchRecords(recordType: RecordType, entityFilter?: string): Prom
   const apiPath = getApiPath(recordType, entityFilter);
   if (!apiPath) return records;
 
-  const response = await apiRequest<PaginatedResponse<Record<string, unknown>>>('GET', apiPath);
+  const response = await apiRequest<PaginatedResponse>('GET', apiPath);
   if (!response.ok || !response.data) {
     console.warn(`[verify] Failed to fetch ${recordType} records: ${response.error ?? 'unknown error'}`);
     return records;
@@ -211,7 +130,7 @@ async function fetchRecords(recordType: RecordType, entityFilter?: string): Prom
   const items = extractItems(response.data, recordType);
 
   for (const item of items) {
-    const source = item.source as string | null;
+    const source = strOrNull(item, 'source');
     if (!source) continue;
 
     const record = buildRecordToVerify(recordType, item);
@@ -251,7 +170,7 @@ function getApiSegment(recordType: RecordType): string {
   }
 }
 
-function extractItems(data: PaginatedResponse<Record<string, unknown>>, recordType: RecordType): Record<string, unknown>[] {
+function extractItems(data: PaginatedResponse, recordType: RecordType): Record<string, unknown>[] {
   // API responses use different key names for the items array
   if (data.items) return data.items;
   if (data.grants) return data.grants;
@@ -274,80 +193,68 @@ function extractItems(data: PaginatedResponse<Record<string, unknown>>, recordTy
 }
 
 function buildRecordToVerify(recordType: RecordType, item: Record<string, unknown>): RecordToVerify | null {
-  const source = item.source as string | null;
+  const source = strOrNull(item, 'source');
   if (!source) return null;
 
+  const id = str(item, 'id');
+
   switch (recordType) {
-    case 'grant': {
-      const g = item as unknown as GrantRow;
+    case 'grant':
       return {
         recordType,
-        recordId: g.id,
-        description: `Grant: ${g.name} (${g.organizationId} → ${g.granteeId ?? 'unknown'})`,
+        recordId: id,
+        description: `Grant: ${str(item, 'name')} (${str(item, 'organizationId')} → ${strOrNull(item, 'granteeId') ?? 'unknown'})`,
         sourceUrl: source,
-        fields: { name: g.name, amount: g.amount, date: g.date, grantee: g.granteeId, funder: g.organizationId },
+        fields: { name: str(item, 'name'), amount: numOrNull(item, 'amount'), date: strOrNull(item, 'date'), grantee: strOrNull(item, 'granteeId'), funder: str(item, 'organizationId') },
       };
-    }
-    case 'personnel': {
-      const p = item as unknown as PersonnelRow;
+    case 'personnel':
       return {
         recordType,
-        recordId: p.id,
-        description: `Personnel: ${p.personId} at ${p.organizationId} (${p.role})`,
+        recordId: id,
+        description: `Personnel: ${str(item, 'personId')} at ${str(item, 'organizationId')} (${str(item, 'role')})`,
         sourceUrl: source,
-        fields: { person: p.personId, org: p.organizationId, role: p.role, roleType: p.roleType, startDate: p.startDate, endDate: p.endDate },
+        fields: { person: str(item, 'personId'), org: str(item, 'organizationId'), role: str(item, 'role'), roleType: str(item, 'roleType'), startDate: strOrNull(item, 'startDate'), endDate: strOrNull(item, 'endDate') },
       };
-    }
-    case 'division': {
-      const d = item as unknown as DivisionRow;
+    case 'division':
       return {
         recordType,
-        recordId: d.id,
-        description: `Division: ${d.name} (${d.parentOrgId})`,
+        recordId: id,
+        description: `Division: ${str(item, 'name')} (${str(item, 'parentOrgId')})`,
         sourceUrl: source,
-        fields: { name: d.name, parent: d.parentOrgId, type: d.divisionType, status: d.status, lead: d.lead },
+        fields: { name: str(item, 'name'), parent: str(item, 'parentOrgId'), type: str(item, 'divisionType'), status: str(item, 'status'), lead: strOrNull(item, 'lead') },
       };
-    }
-    case 'funding-program': {
-      const fp = item as unknown as FundingProgramRow;
+    case 'funding-program':
       return {
         recordType,
-        recordId: fp.id,
-        description: `Funding Program: ${fp.name} (${fp.orgId})`,
+        recordId: id,
+        description: `Funding Program: ${str(item, 'name')} (${str(item, 'orgId')})`,
         sourceUrl: source,
-        fields: { name: fp.name, org: fp.orgId, type: fp.programType, budget: fp.totalBudget, deadline: fp.deadline, status: fp.status },
+        fields: { name: str(item, 'name'), org: str(item, 'orgId'), type: str(item, 'programType'), budget: numOrNull(item, 'totalBudget'), deadline: strOrNull(item, 'deadline'), status: strOrNull(item, 'status') },
       };
-    }
-    case 'funding-round': {
-      const fr = item as unknown as FundingRoundRow;
+    case 'funding-round':
       return {
         recordType,
-        recordId: fr.id,
-        description: `Funding Round: ${fr.name} (${fr.companyId})`,
+        recordId: id,
+        description: `Funding Round: ${str(item, 'name')} (${str(item, 'companyId')})`,
         sourceUrl: source,
-        fields: { name: fr.name, company: fr.companyId, raised: fr.raised, valuation: fr.valuation, date: fr.date },
+        fields: { name: str(item, 'name'), company: str(item, 'companyId'), raised: numOrNull(item, 'raised'), valuation: numOrNull(item, 'valuation'), date: strOrNull(item, 'date') },
       };
-    }
-    case 'investment': {
-      const inv = item as unknown as InvestmentRow;
+    case 'investment':
       return {
         recordType,
-        recordId: inv.id,
-        description: `Investment: ${inv.investorId} → ${inv.companyId}`,
+        recordId: id,
+        description: `Investment: ${str(item, 'investorId')} → ${str(item, 'companyId')}`,
         sourceUrl: source,
-        fields: { investor: inv.investorId, company: inv.companyId, amount: inv.amount, round: inv.roundName, role: inv.role },
+        fields: { investor: str(item, 'investorId'), company: str(item, 'companyId'), amount: numOrNull(item, 'amount'), round: strOrNull(item, 'roundName'), role: strOrNull(item, 'role') },
       };
-    }
-    case 'equity-position': {
-      const eq = item as unknown as EquityPositionRow;
+    case 'equity-position':
       return {
         recordType,
-        recordId: eq.id,
-        description: `Equity: ${eq.holderId} in ${eq.companyId} (${eq.stake ?? '?'}%)`,
+        recordId: id,
+        description: `Equity: ${str(item, 'holderId')} in ${str(item, 'companyId')} (${strOrNull(item, 'stake') ?? '?'}%)`,
         sourceUrl: source,
-        fields: { holder: eq.holderId, company: eq.companyId, stake: eq.stake, asOf: eq.asOf },
+        fields: { holder: str(item, 'holderId'), company: str(item, 'companyId'), stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') },
       };
-    }
   }
 }
 
@@ -556,7 +463,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
     verdict: result.verdict,
     confidence: result.confidence,
     extractedValue: result.extractedValue,
-    checkerModel: 'claude-3-haiku',
+    checkerModel: MODELS.haiku,
     notes: result.reasoning,
   };
 
@@ -799,13 +706,13 @@ export async function recordsVerifyCommand(
         console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
       }
 
-      // Store result (best-effort)
-      storeVerificationResult(result).catch((e: unknown) => {
+      // Store result — await to avoid data loss on process exit
+      await storeVerificationResult(result).catch((e: unknown) => {
         console.warn(`[verify] Failed to store: ${e instanceof Error ? e.message : String(e)}`);
       });
 
-      // Store aggregate verdict (best-effort)
-      storeAggregateVerdict(
+      // Store aggregate verdict
+      await storeAggregateVerdict(
         result.recordType,
         result.recordId,
         result.verdict,

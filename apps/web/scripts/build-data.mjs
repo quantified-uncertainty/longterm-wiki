@@ -1223,7 +1223,6 @@ async function fetchRecordVerdicts() {
   }
 
   const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
   try {
     const pageSize = 200;
@@ -1231,7 +1230,7 @@ async function fetchRecordVerdicts() {
     let offset = 0;
     while (true) {
       const url = `${serverUrl}/api/record-verifications/verdicts?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
       if (!resp.ok) {
         console.log(`  record-verdicts: skipped (HTTP ${resp.status})`);
         return {};

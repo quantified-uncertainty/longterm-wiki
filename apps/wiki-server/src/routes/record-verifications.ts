@@ -185,8 +185,14 @@ const recordVerificationsApp = new Hono()
     const recordType = c.req.param("recordType");
     const recordId = c.req.param("recordId");
 
-    if (recordId.length > MAX_ID_LENGTH) {
-      return notFoundError(c, "Record verdict not found");
+    if (
+      recordId.length > MAX_ID_LENGTH ||
+      !(VALID_RECORD_TYPES as readonly string[]).includes(recordType)
+    ) {
+      return c.json(
+        { error: "not_found", message: "Record verdict not found" },
+        404
+      );
     }
 
     const db = getDrizzleDb();
@@ -262,6 +268,14 @@ const recordVerificationsApp = new Hono()
     async (c) => {
       const recordType = c.req.param("recordType");
       const recordId = c.req.param("recordId");
+
+      if (
+        recordId.length > MAX_ID_LENGTH ||
+        !(VALID_RECORD_TYPES as readonly string[]).includes(recordType)
+      ) {
+        return c.json({ verifications: [] });
+      }
+
       const { limit, offset } = c.req.valid("query");
       const db = getDrizzleDb();
 

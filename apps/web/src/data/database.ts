@@ -855,12 +855,12 @@ export function getRecordVerdictStats(recordType: string): {
 } {
   const verdicts = getRecordVerdicts();
   const stats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+  const validVerdicts = new Set(['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked']);
   for (const [key, v] of Object.entries(verdicts)) {
     if (!key.startsWith(`${recordType}:`)) continue;
     stats.total++;
-    const verdict = v.verdict as keyof typeof stats;
-    if (verdict in stats && verdict !== 'total') {
-      stats[verdict]++;
+    if (validVerdicts.has(v.verdict)) {
+      stats[v.verdict as 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial' | 'unchecked']++;
     }
   }
   return stats;

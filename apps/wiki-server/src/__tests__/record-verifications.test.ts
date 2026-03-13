@@ -337,6 +337,26 @@ describe("GET /api/record-verifications/verdicts/:recordType/:recordId", () => {
   });
 });
 
+describe("GET /api/record-verifications/by-record/:recordType/:recordId", () => {
+  it("returns verifications for a record", async () => {
+    const res = await app.request(
+      "/api/record-verifications/by-record/grant/GR_abc123"
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verifications).toBeInstanceOf(Array);
+  });
+
+  it("returns empty for invalid record type", async () => {
+    const res = await app.request(
+      "/api/record-verifications/by-record/invalid-type/GR_abc123"
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.verifications).toEqual([]);
+  });
+});
+
 describe("POST /api/record-verifications/verifications", () => {
   it("creates a verification", async () => {
     const res = await app.request(
