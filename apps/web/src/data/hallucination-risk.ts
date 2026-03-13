@@ -29,12 +29,3 @@ export function getLocalCitationQuotes(pageId: string) {
   return getDatabase().citationQuotes?.[pageId];
 }
 
-/**
- * Get build-time statement citation dot data for a page from database.json.
- * Keyed by page slug (not numeric ID). Returns undefined if no data was bundled.
- * Each entry uses footnoteResourceId (e.g. "cr-abc123") instead of numeric footnote numbers;
- * callers must resolve to numeric footnotes via the referenceMap from renderMdxPage().
- */
-export function getStatementCitationDots(pageId: string) {
-  return getDatabase().statementCitationDots?.[pageId];
-}

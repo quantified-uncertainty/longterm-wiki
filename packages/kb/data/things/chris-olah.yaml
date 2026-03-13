@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_PbzJNYhoQQ
     property: employed-by
-    value: !ref mK9pX3rQ7n:anthropic
+    value: !ref mK9pX3rQ7n
     asOf: 2021-01
     source: https://anthropic.com/company
     notes: "Co-founded Anthropic in January 2021; leads interpretability research"
@@ -24,14 +24,14 @@ facts:
 
   - id: f_RewqjBXgsA
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: "2018"
     validEnd: 2021-01
     notes: "Researcher at OpenAI before co-founding Anthropic"
 
   - id: f_fUPJ9kzk8w
     property: employed-by
-    value: !ref A4XoubikkQ:deepmind
+    value: !ref A4XoubikkQ
     asOf: "2015"
     validEnd: "2018"
     notes: "Research scientist at Google Brain (prior to DeepMind merger); published influential work on neural network visualization"

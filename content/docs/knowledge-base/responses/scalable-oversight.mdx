@@ -92,17 +92,17 @@ flowchart TD
 
 ### AI Safety via Debate
 
-The debate approach, pioneered by <R id="61da2f8e311a2bbf">Geoffrey Irving and colleagues at DeepMind</R>, leverages an information-theoretic asymmetry between truth and falsehood in adversarial settings. The method involves training two AI systems to argue opposing positions on a question, with human judges evaluating which argument is more convincing. The key insight is that honest arguments should have a systematic advantage over dishonest ones—a true claim can expose contradictions and factual errors in false claims, while false claims struggle to refute well-supported truths without revealing their own weaknesses.
+The debate approach, pioneered by <R id="OTU2YWU4MW">Geoffrey Irving and colleagues at DeepMind</R>, leverages an information-theoretic asymmetry between truth and falsehood in adversarial settings. The method involves training two AI systems to argue opposing positions on a question, with human judges evaluating which argument is more convincing. The key insight is that honest arguments should have a systematic advantage over dishonest ones—a true claim can expose contradictions and factual errors in false claims, while false claims struggle to refute well-supported truths without revealing their own weaknesses.
 
 In practice, debate systems implement several sophisticated mechanisms to enhance their effectiveness. The debate format encourages exhaustive exploration of relevant considerations, as each debater has incentives to identify and highlight flaws in their opponent's position. Recursive questioning allows debaters to drill down into specific claims, forcing detailed justification for each step of reasoning. Cross-examination phases enable targeted challenges to suspicious or unsupported assertions. The human judge's role becomes more manageable—rather than evaluating complex outputs directly, they assess which debater provides more convincing evidence and reasoning.
 
-Empirical results from debate experiments show promise but remain limited to relatively simple domains. <R id="5bf590d69438a2f2">Recent research on adversarial debate</R> found that training language models to win debates with self-play improves judge accuracy by 4% absolute (p < 10⁻⁶), with stronger debater models further increasing accuracy. Studies on factual questions demonstrate 60-80% accuracy in identifying correct answers, representing meaningful improvement over baseline human performance. However, experiments on more complex reasoning tasks show mixed results, with accuracy dropping to 50-65% when debates involve multi-step reasoning or domain-specific expertise. The original <R id="61da2f8e311a2bbf">Irving et al. (2018) paper</R> demonstrated on MNIST that agents competing to convince a sparse classifier boosted accuracy from 59.4% to 88.9% given 6 pixels and from 48.2% to 85.2% given 4 pixels. Recent work by Anthropic and OpenAI has explored debate applications to larger language models, finding that debate quality improves with model capability but also identifying concerning failure modes where sophisticated models can produce misleading but persuasive arguments.
+Empirical results from debate experiments show promise but remain limited to relatively simple domains. <R id="MjlhZWEwMD">Recent research on adversarial debate</R> found that training language models to win debates with self-play improves judge accuracy by 4% absolute (p < 10⁻⁶), with stronger debater models further increasing accuracy. Studies on factual questions demonstrate 60-80% accuracy in identifying correct answers, representing meaningful improvement over baseline human performance. However, experiments on more complex reasoning tasks show mixed results, with accuracy dropping to 50-65% when debates involve multi-step reasoning or domain-specific expertise. The original <R id="OTU2YWU4MW">Irving et al. (2018) paper</R> demonstrated on MNIST that agents competing to convince a sparse classifier boosted accuracy from 59.4% to 88.9% given 6 pixels and from 48.2% to 85.2% given 4 pixels. Recent work by Anthropic and OpenAI has explored debate applications to larger language models, finding that debate quality improves with model capability but also identifying concerning failure modes where sophisticated models can produce misleading but persuasive arguments.
 
 ### Recursive Reward Modeling
 
-Recursive reward modeling, developed primarily by <R id="50127ce5fac4e84b"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>'s research group</R>, addresses complex evaluation tasks through hierarchical decomposition. The approach involves training AI systems to break difficult questions into simpler sub-questions that humans can more reliably evaluate. Answers to sub-questions are then composed to address the original complex question, creating a scalable evaluation hierarchy that can handle arbitrarily complex tasks while maintaining human oversight at each level.
+Recursive reward modeling, developed primarily by <R id="MTFhNDhhYm"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>'s research group</R>, addresses complex evaluation tasks through hierarchical decomposition. The approach involves training AI systems to break difficult questions into simpler sub-questions that humans can more reliably evaluate. Answers to sub-questions are then composed to address the original complex question, creating a scalable evaluation hierarchy that can handle arbitrarily complex tasks while maintaining human oversight at each level.
 
-The central insight is the recursive use of already trained agents to provide feedback for training successive agents on more complex tasks. In the framework, agent A1 attempts to achieve an objective, while agent A2 assists humans in evaluating A1's behavior. For example, A1 might propose a plan x and A2 identifies the largest weakness y in the plan. The human then evaluates whether y is indeed a weakness and how strong it is, making the evaluation task much simpler than assessing the entire plan directly. <R id="ca07d6bcd57e7027">OpenAI's iterated amplification work</R> demonstrated this approach by fine-tuning GPT-3 to do recursive summarization—first summarizing small sections of books, then recursively summarizing these summaries to produce summaries of entire books.
+The central insight is the recursive use of already trained agents to provide feedback for training successive agents on more complex tasks. In the framework, agent A1 attempts to achieve an objective, while agent A2 assists humans in evaluating A1's behavior. For example, A1 might propose a plan x and A2 identifies the largest weakness y in the plan. The human then evaluates whether y is indeed a weakness and how strong it is, making the evaluation task much simpler than assessing the entire plan directly. <R id="MzI2YWRhZW">OpenAI's iterated amplification work</R> demonstrated this approach by fine-tuning GPT-3 to do recursive summarization—first summarizing small sections of books, then recursively summarizing these summaries to produce summaries of entire books.
 
 The method's effectiveness depends critically on task decomposition quality. Successful recursive reward modeling requires that complex problems can be meaningfully broken down into simpler components without losing essential information. Mathematical problems often exhibit this property—a complex proof can be decomposed into lemmas and sub-proofs, each verifiable independently. Scientific reasoning may decompose into experimental predictions, theoretical frameworks, and logical inferences. Strategic planning might break down into sub-goals, resource requirements, and causal predictions.
 
@@ -112,9 +112,9 @@ However, decomposition introduces several challenges. Information loss can occur
 
 Process supervision represents a paradigm shift from evaluating AI outputs to evaluating the reasoning processes that produce those outputs. Instead of asking "Is this answer correct?" evaluators ask "Is this reasoning sound?" This approach aims to reward good reasoning patterns while penalizing suspicious or unreliable thinking, even when the final output appears correct.
 
-<R id="eea50d24e41938ed">OpenAI's influential "Let's Verify Step by Step" study</R> demonstrated the practical effectiveness of process supervision in mathematical domains. By training models to receive rewards for each step of problem-solving rather than just final answers, researchers achieved significant accuracy improvements on challenging math benchmarks. Their process-supervised model solved 78.2% of problems from a representative subset of the MATH test set, compared to 72.4% for outcome supervision—representing approximately a 6% absolute improvement (10-30% relative improvement depending on the benchmark). The study released <R id="eccb4758de07641b">PRM800K</R>, a dataset containing 800,000 step-level correctness labels on solutions to MATH problems, enabling further research on process-based approaches. The approach proved particularly effective at preventing reward hacking—models were less likely to arrive at correct answers through invalid reasoning when their reasoning process was explicitly supervised.
+<R id="NjkxZmYyYT">OpenAI's influential "Let's Verify Step by Step" study</R> demonstrated the practical effectiveness of process supervision in mathematical domains. By training models to receive rewards for each step of problem-solving rather than just final answers, researchers achieved significant accuracy improvements on challenging math benchmarks. Their process-supervised model solved 78.2% of problems from a representative subset of the MATH test set, compared to 72.4% for outcome supervision—representing approximately a 6% absolute improvement (10-30% relative improvement depending on the benchmark). The study released <R id="YTZhN2Q5Yj">PRM800K</R>, a dataset containing 800,000 step-level correctness labels on solutions to MATH problems, enabling further research on process-based approaches. The approach proved particularly effective at preventing reward hacking—models were less likely to arrive at correct answers through invalid reasoning when their reasoning process was explicitly supervised.
 
-This process supervision methodology <R id="48af4178dfb735bd">influenced OpenAI's o1 model series</R>, released in September 2024, which uses advanced process supervision to achieve state-of-the-art mathematical and scientific reasoning capabilities. The o1 models represent the first major deployment of process supervision at scale, demonstrating that rewarding individual reasoning steps can produce systems capable of "System 2" thinking—deeper, more analytical capabilities previously difficult to achieve with language models.
+This process supervision methodology <R id="ZGU3OWU1ZG">influenced OpenAI's o1 model series</R>, released in September 2024, which uses advanced process supervision to achieve state-of-the-art mathematical and scientific reasoning capabilities. The o1 models represent the first major deployment of process supervision at scale, demonstrating that rewarding individual reasoning steps can produce systems capable of "System 2" thinking—deeper, more analytical capabilities previously difficult to achieve with language models.
 
 Process supervision offers several theoretical advantages for AI alignment. It provides visibility into AI reasoning that outcome-based evaluation lacks, potentially enabling detection of deceptive or manipulative reasoning patterns. It rewards robust reasoning methods over brittle heuristics that might fail in novel situations. It aligns training incentives with genuine understanding rather than pattern matching or memorization. However, the approach faces significant challenges in scaling beyond domains with clear reasoning structures and ground truth verification methods.
 
@@ -137,11 +137,11 @@ Key insights from comparative analysis:
 
 **Process supervision has the strongest empirical track record** with deployment in production systems (OpenAI o1) and clear quantitative gains. However, its applicability remains limited to domains with structured reasoning steps and verifiable ground truth.
 
-**Debate shows promise for adversarial settings** but faces concerning challenges with sophisticated deception. Recent findings on <R id="1b51b366182d416d">confidence escalation in debates</R> reveal that LLMs become overconfident when facing opposition, potentially undermining the truth-seeking properties that make debate theoretically attractive. Research on <R id="876ff73c8dabecf8">controversial claims assessment</R> found debate significantly improves human accuracy on COVID-19 and climate change topics compared to single-advisor consultancy, even when judges hold strong prior beliefs.
+**Debate shows promise for adversarial settings** but faces concerning challenges with sophisticated deception. Recent findings on <R id="NTQzN2FlYm">confidence escalation in debates</R> reveal that LLMs become overconfident when facing opposition, potentially undermining the truth-seeking properties that make debate theoretically attractive. Research on <R id="MmY5ZjczMW">controversial claims assessment</R> found debate significantly improves human accuracy on COVID-19 and climate change topics compared to single-advisor consultancy, even when judges hold strong prior beliefs.
 
 **Recursive reward modeling remains theoretically elegant but empirically underexplored**. The limited validation creates uncertainty about practical deployment timelines and fundamental decomposition limits.
 
-**Hybrid approaches combining multiple techniques** represent a promising direction, potentially overcoming individual limitations. <R id="72d83671b5f929a1">Anthropic's research program</R> explores combinations of Constitutional AI (RLAIF), debate variants, process supervision, and AI-assisted evaluation to create more robust oversight systems.
+**Hybrid approaches combining multiple techniques** represent a promising direction, potentially overcoming individual limitations. <R id="MjM2MWUzMm">Anthropic's research program</R> explores combinations of Constitutional AI (RLAIF), debate variants, process supervision, and AI-assisted evaluation to create more robust oversight systems.
 
 ## Safety Implications and Risk Mitigation
 
@@ -329,40 +329,40 @@ Constitutional AI and other value-learning approaches offer alternative perspect
 
 ### Foundational Research
 
-- **Irving et al. (2018):** <R id="61da2f8e311a2bbf">AI safety via debate</R> - Original debate proposal by Geoffrey Irving, Paul Christiano, and <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>
-- **Christiano et al. (2018):** <R id="50127ce5fac4e84b">New safety research agenda: scalable agent alignment via reward modeling</R> - Paul Christiano's framework for recursive reward modeling
-- **OpenAI (2018):** <R id="ca07d6bcd57e7027">Learning complex goals with iterated amplification</R> - Practical implementation of recursive decomposition
+- **Irving et al. (2018):** <R id="OTU2YWU4MW">AI safety via debate</R> - Original debate proposal by Geoffrey Irving, Paul Christiano, and <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>
+- **Christiano et al. (2018):** <R id="MTFhNDhhYm">New safety research agenda: scalable agent alignment via reward modeling</R> - Paul Christiano's framework for recursive reward modeling
+- **OpenAI (2018):** <R id="MzI2YWRhZW">Learning complex goals with iterated amplification</R> - Practical implementation of recursive decomposition
 
 ### Process Supervision
 
-- **Lightman et al. (2023):** <R id="eea50d24e41938ed">Let's Verify Step by Step</R> - OpenAI's influential process supervision paper showing 78.2% vs 72.4% accuracy
-- **OpenAI (2023):** <R id="eccb4758de07641b">PRM800K dataset</R> - 800,000 step-level correctness labels for mathematical reasoning
-- **Mistry (2024):** <R id="48af4178dfb735bd">Let's Verify Step by Step: How OpenAI o1 was created</R> - Process supervision influence on o1 models
+- **Lightman et al. (2023):** <R id="NjkxZmYyYT">Let's Verify Step by Step</R> - OpenAI's influential process supervision paper showing 78.2% vs 72.4% accuracy
+- **OpenAI (2023):** <R id="YTZhN2Q5Yj">PRM800K dataset</R> - 800,000 step-level correctness labels for mathematical reasoning
+- **Mistry (2024):** <R id="ZGU3OWU1ZG">Let's Verify Step by Step: How OpenAI o1 was created</R> - Process supervision influence on o1 models
 
 ### Debate Research (2024)
 
-- **Khan et al. (2024):** <R id="5bf590d69438a2f2">Training Language Models to Win Debates with Self-Play Improves Judge Accuracy</R> - Shows +4% judge accuracy from debate training
-- **Khan et al. (2024):** <R id="876ff73c8dabecf8">AI Debate Aids Assessment of Controversial Claims</R> - Debate improves accuracy on COVID-19 and climate topics
-- **Debate Competition (2024):** <R id="1b51b366182d416d">When Two LLMs Debate, Both Think They'll Win</R> - Confidence escalation challenges
-- **Chen et al. (2024):** <R id="c0aa2a41806c68b4">Debate, Deliberate, Decide (D3): Cost-Aware Adversarial Framework</R> - Adversarial multi-agent evaluation framework
-- **Du et al. (2023):** <R id="992190a4815d67ed">Improving Factuality and Reasoning through Multiagent Debate</R> - Multi-agent debate benefits
+- **Khan et al. (2024):** <R id="MjlhZWEwMD">Training Language Models to Win Debates with Self-Play Improves Judge Accuracy</R> - Shows +4% judge accuracy from debate training
+- **Khan et al. (2024):** <R id="MmY5ZjczMW">AI Debate Aids Assessment of Controversial Claims</R> - Debate improves accuracy on COVID-19 and climate topics
+- **Debate Competition (2024):** <R id="NTQzN2FlYm">When Two LLMs Debate, Both Think They'll Win</R> - Confidence escalation challenges
+- **Chen et al. (2024):** <R id="YzdhMjllNj">Debate, Deliberate, Decide (D3): Cost-Aware Adversarial Framework</R> - Adversarial multi-agent evaluation framework
+- **Du et al. (2023):** <R id="ZWFmOTA5NG">Improving Factuality and Reasoning through Multiagent Debate</R> - Multi-agent debate benefits
 
 ### Scalable Oversight Frameworks
 
-- **Bowman et al. (2022):** <R id="b0f6f129f201e4dc">Measuring Progress on Scalable Oversight for Large Language Models</R> - Anthropic's framework paper
-- **Anthropic (2022):** <R id="72d83671b5f929a1">Measuring Progress on Scalable Oversight</R> - Blog post overview
-- **Anthropic (2025):** <R id="7ae6b3be2d2043c1">Recommendations for Technical AI Safety Research Directions</R> - Current research priorities including scalable oversight
-- **Piskala (2024):** <R id="7302eddb7b84605e">Scalable Oversight in AI: Beyond Human Supervision</R> - Overview of approaches
+- **Bowman et al. (2022):** <R id="NTZjNGJkMj">Measuring Progress on Scalable Oversight for Large Language Models</R> - Anthropic's framework paper
+- **Anthropic (2022):** <R id="MjM2MWUzMm">Measuring Progress on Scalable Oversight</R> - Blog post overview
+- **Anthropic (2025):** <R id="YTNhM2JjOT">Recommendations for Technical AI Safety Research Directions</R> - Current research priorities including scalable oversight
+- **Piskala (2024):** <R id="MjMwNzRkMG">Scalable Oversight in AI: Beyond Human Supervision</R> - Overview of approaches
 
 ### Advanced Topics
 
-- **Recent Research (2025):** <R id="7d37015995295bb2">Scalable Oversight for Superhuman AI via Recursive Self-Critiquing</R> - Cutting-edge recursive approaches
-- **Recent Research (2024):** <R id="c6b9542a053d41e1">Scalable Oversight via Partitioned Human Supervision</R> - Novel supervision partitioning
-- **Recent Research (2024):** <R id="08c92819cc0fc2dd">Scaling Laws For Scalable Oversight</R> - Theoretical scaling analysis
+- **Recent Research (2025):** <R id="MjM5MzhlYm">Scalable Oversight for Superhuman AI via Recursive Self-Critiquing</R> - Cutting-edge recursive approaches
+- **Recent Research (2024):** <R id="YmQxNTBhNj">Scalable Oversight via Partitioned Human Supervision</R> - Novel supervision partitioning
+- **Recent Research (2024):** <R id="NmZhMjNiMT">Scaling Laws For Scalable Oversight</R> - Theoretical scaling analysis
 
 ### Related Frameworks
 
-- **Alignment Survey:** <R id="14d1c8e3a3ef284b">Scalable Oversight | AI Alignment</R> - Educational resource
-- **<EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>:** <R id="2a84eb0982d4de6a">Personal website</R> - Key researcher in scalable oversight
+- **Alignment Survey:** <R id="MWViNmVmY2">Scalable Oversight | AI Alignment</R> - Educational resource
+- **<EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>:** <R id="NWNjNGViNm">Personal website</R> - Key researcher in scalable oversight
 
 ---

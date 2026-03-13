@@ -3,7 +3,7 @@ import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } fro
 import { getTypedEntities, isOrganization, type OrganizationEntity } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
-import { OrganizationsTable, type OrgRow } from "@/app/organizations/organizations-table";
+import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -153,15 +153,15 @@ export default function OrganizationsPage() {
     };
   });
 
-  // Compute summary stats
+  // Compute summary stats (clickable in the client component)
   const withRevenue = rows.filter((r) => r.revenueNum != null).length;
   const withValuation = rows.filter((r) => r.valuationNum != null).length;
   const withHeadcount = rows.filter((r) => r.headcount != null).length;
-  const stats = [
-    { label: "Organizations", value: String(rows.length) },
-    { label: "With Revenue Data", value: String(withRevenue) },
-    { label: "With Valuation Data", value: String(withValuation) },
-    { label: "With Headcount", value: String(withHeadcount) },
+  const stats: OrgStatDef[] = [
+    { key: "all", label: "Organizations", value: String(rows.length) },
+    { key: "withRevenue", label: "With Revenue Data", value: String(withRevenue) },
+    { key: "withValuation", label: "With Valuation Data", value: String(withValuation) },
+    { key: "withHeadcount", label: "With Headcount", value: String(withHeadcount) },
   ];
 
   return (
@@ -176,24 +176,7 @@ export default function OrganizationsPage() {
         </p>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
-          >
-            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-              {stat.label}
-            </div>
-            <div className="text-2xl font-bold tabular-nums tracking-tight">
-              {stat.value}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <OrganizationsTable rows={rows} />
+      <OrganizationsTable rows={rows} stats={stats} />
     </div>
   );
 }

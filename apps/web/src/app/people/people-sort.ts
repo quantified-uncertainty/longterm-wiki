@@ -34,7 +34,7 @@ export function getPersonSortValue(
     case "publications":
       return row.publicationCount || null;
     case "careerHistory":
-      return row.careerHistoryCount;
+      return row.careerHistoryCount || null;
   }
 }
 

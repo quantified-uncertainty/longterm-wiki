@@ -223,7 +223,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Grant" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Funder" sortKey="organization" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Recipient" sortKey="recipient" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
@@ -252,7 +252,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                       href={safeHref(row.source)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Source"
                     >
                       source
@@ -275,7 +275,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   {row.organizationWikiPageId && (
                     <Link
                       href={`/wiki/${row.organizationWikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki
@@ -302,7 +302,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                   {row.recipientWikiPageId && (
                     <Link
                       href={`/wiki/${row.recipientWikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki

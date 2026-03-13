@@ -46,7 +46,7 @@ facts:
 
   - id: f_tO3oMx0qZs
     property: employed-by
-    value: !ref Zmw9nfUYWA:fhi
+    value: !ref Zmw9nfUYWA
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
 

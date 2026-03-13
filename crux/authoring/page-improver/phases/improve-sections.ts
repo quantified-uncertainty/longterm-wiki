@@ -63,19 +63,31 @@ const SKIP_SECTION_HEADINGS = new Set([
 /**
  * Decide which sections to rewrite based on the analysis phase output.
  *
- * Strategy:
+ * Strategy varies by tier:
+ *
+ * **Standard/deep tiers** (polishOnly=false):
  *  - Skip sections whose body is too short (< MIN_SECTION_WORDS words).
- *  - If the analysis improvements/gaps text mentions the section heading
- *    text, mark it as high priority.
- *  - All other substantial sections are also rewritten (safe default:
- *    each call to rewriteSection() can improve prose even without sources).
+ *  - All other substantial sections are rewritten.
+ *
+ * **Polish tier** (polishOnly=true):
+ *  - ONLY rewrite sections mentioned in analysis improvements/gaps OR
+ *    whose heading matches keywords from the directions.
+ *  - All other sections are passed through unchanged — this is the key
+ *    mechanism that keeps polish diffs small.
  */
 function decideSections(
   sections: ParsedSection[],
   analysis: AnalysisResult,
+  options: { polishOnly?: boolean; directions?: string } = {},
 ): SectionWriteDecision[] {
   const improvementText = (analysis.improvements ?? []).join(' ').toLowerCase();
   const gapsText = (analysis.gaps ?? []).join(' ').toLowerCase();
+  const directionsLower = (options.directions ?? '').toLowerCase();
+  // Extract meaningful keywords from directions (>3 chars, not stop words)
+  const directionKeywords = directionsLower
+    .split(/[\s,;:]+/)
+    .filter(w => w.length > 3)
+    .filter(w => !['this', 'that', 'with', 'from', 'have', 'been', 'will', 'should', 'about', 'into', 'also', 'more', 'than', 'only', 'make', 'some', 'when', 'very'].includes(w));
 
   return sections.map(section => {
     // Never rewrite terminal/citation sections — they contain footnote
@@ -107,6 +119,20 @@ function decideSections(
     const mentionedInAnalysis =
       improvementText.includes(headingKeywords) ||
       gapsText.includes(headingKeywords);
+
+    // For polish tier: only rewrite sections that are explicitly relevant
+    if (options.polishOnly) {
+      const matchesDirections = directionKeywords.some(kw =>
+        headingKeywords.includes(kw) || bodyText.toLowerCase().includes(kw)
+      );
+      if (!mentionedInAnalysis && !matchesDirections) {
+        return {
+          sectionId: section.id,
+          shouldRewrite: false,
+          reason: 'not mentioned in analysis or directions (polish: skip)',
+        };
+      }
+    }
 
     return {
       sectionId: section.id,
@@ -167,7 +193,12 @@ export async function improveSectionsPhase(
 
   // ── Decide which sections to rewrite ─────────────────────────────────────
 
-  const decisions = decideSections(split.sections, analysis);
+  const tier = options.tier || 'standard';
+  const isPolish = tier === 'polish';
+  const decisions = decideSections(split.sections, analysis, {
+    polishOnly: isPolish,
+    directions,
+  });
   const toRewriteCount = decisions.filter(d => d.shouldRewrite).length;
   log('improve-sections', `Rewriting ${toRewriteCount}/${sectionCount} section(s):`);
   for (const d of decisions) {
@@ -210,10 +241,14 @@ export async function improveSectionsPhase(
           sectionContent: section.content,
           pageContext,
           sourceCache: sectionSources,
-          directions: directions || undefined,
+          directions: isPolish
+            ? `POLISH TIER: Make minimal, targeted edits only. ${directions || ''}`
+            : (directions || undefined),
           constraints: {
             allowTrainingKnowledge: true,
             requireClaimMap: sectionSources.length > 0,
+            // Polish tier: limit new claims to prevent scope creep
+            ...(isPolish ? { maxNewClaims: 2 } : {}),
           },
         },
         { model: options.improveModel ?? MODELS.sonnet },

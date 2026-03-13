@@ -26,7 +26,7 @@ facts:
 
   - id: f_vAidx4lhTo
     property: employed-by
-    value: !ref mK9pX3rQ7n:anthropic
+    value: !ref mK9pX3rQ7n
     asOf: 2025-01
     source: https://www.anthropic.com/
     notes: "Joined Anthropic as Member of Technical Staff in early 2025; works on responsible scaling policy"

@@ -3,8 +3,8 @@
  * Reads properties.yaml, schemas/*.yaml, and things/*.yaml from a data directory.
  *
  * Supports !ref YAML tags for stable references between entities:
- *   value: !ref mK9pX3rQ7n:dario-amodei   → resolves stableId, cross-validates slug
- *   value: !ref mK9pX3rQ7n                 → bare stableId (deprecated, still works)
+ *   value: !ref mK9pX3rQ7n                 → bare stableId (preferred)
+ *   value: !ref mK9pX3rQ7n:dario-amodei   → stableId with slug hint (deprecated, still works)
  *
  * Supports !date YAML tags for explicit date typing:
  *   founded: !date 2019        → { type: "date", value: "2019" }
@@ -51,8 +51,8 @@ import type {
  * Marker class for !ref YAML tags. Created during YAML parsing,
  * resolved to entity IDs after all things are loaded.
  *
- * Format: !ref <entityId>:<slug>  (preferred — enables cross-validation)
- *         !ref <entityId>         (bare — still works)
+ * Format: !ref <entityId>         (preferred — bare stableId)
+ *         !ref <entityId>:<slug>  (deprecated — slug suffix still supported for cross-validation)
  */
 export class RefMarker {
   constructor(
@@ -63,7 +63,7 @@ export class RefMarker {
   ) {}
 }
 
-/** Custom YAML tag: !ref <stableId> or !ref <stableId>:<slug> */
+/** Custom YAML tag: !ref <stableId> (preferred) or !ref <stableId>:<slug> (deprecated) */
 const refTag: ScalarTag = {
   tag: "!ref",
   resolve(str: string): RefMarker {

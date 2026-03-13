@@ -250,17 +250,44 @@ export function ensureFrontmatterFields(originalContent: string, improvedContent
   const origKeys = getKeys(origMatch[1]);
   const newKeys = getKeys(newMatch[1]);
 
+  // Fields that must ALWAYS use the original value — these are managed by
+  // separate grading/editorial pipelines and should never be changed by the
+  // improve LLM, even if it regenerates them with different values.
+  const FROZEN_FIELDS = new Set([
+    'quality', 'readerImportance', 'researchImportance', 'tacticalValue',
+    'ratings', 'clusters', 'balanceFlags',
+  ]);
+
   const missing: string[] = [];
+  const restored: string[] = [];
   for (const [key, value] of origKeys) {
     if (!newKeys.has(key)) {
       missing.push(value);
+    } else if (FROZEN_FIELDS.has(key) && newKeys.get(key) !== value) {
+      // Force-restore frozen fields to original values
+      newKeys.set(key, value);
+      restored.push(key);
     }
   }
 
-  if (missing.length === 0) return improvedContent;
+  if (missing.length === 0 && restored.length === 0) return improvedContent;
 
-  log('frontmatter', `Restored ${missing.length} missing field(s): ${[...origKeys.keys()].filter(k => !newKeys.has(k)).join(', ')}`);
-  const newFm = newMatch[1] + '\n' + missing.join('\n');
+  if (restored.length > 0) {
+    log('frontmatter', `Restored ${restored.length} frozen field(s): ${restored.join(', ')}`);
+  }
+  if (missing.length > 0) {
+    log('frontmatter', `Restored ${missing.length} missing field(s): ${[...origKeys.keys()].filter(k => !newKeys.has(k)).join(', ')}`);
+  }
+
+  // Rebuild frontmatter from (possibly updated) newKeys + missing keys
+  const rebuiltLines: string[] = [];
+  for (const [, value] of newKeys) {
+    rebuiltLines.push(value);
+  }
+  for (const value of missing) {
+    rebuiltLines.push(value);
+  }
+  const newFm = rebuiltLines.join('\n');
   return '---\n' + newFm + '\n---' + improvedContent.slice(newMatch[0].length);
 }
 

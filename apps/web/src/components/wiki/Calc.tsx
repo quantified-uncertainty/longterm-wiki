@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import styles from "./tooltip.module.css";
 
 interface CalcProps {
-  /** Expression with {entity.propertyId} references, e.g. "{anthropic.revenue} / {anthropic.valuation}" */
+  /** Expression with {entity.propertyId} references, e.g. "{mK9pX3rQ7n.revenue} / {mK9pX3rQ7n.valuation}" */
   expr: string;
   /** Format mode: "currency" ($X billion), "percent" (X%), "number" (X,XXX), or auto */
   format?: CalcFormat;
@@ -62,10 +62,10 @@ function kbFactLookup(entity: string, propertyId: string): CalcFact | undefined 
  * Evaluates a math expression referencing KB facts, renders the result
  * inline with a hover tooltip showing the formula and inputs.
  *
- * Usage in MDX:
- *   <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
- *   <Calc expr="{anthropic.revenue-run-rate} * 2.5" format="currency" />
- *   <Calc expr="{anthropic.gross-margin}" format="percent" />
+ * Usage in MDX (entity references use stableIds):
+ *   <Calc expr="{mK9pX3rQ7n.valuation} / {mK9pX3rQ7n.revenue}" precision={0} suffix="x" />
+ *   <Calc expr="{mK9pX3rQ7n.revenue-run-rate} * 2.5" format="currency" />
+ *   <Calc expr="{mK9pX3rQ7n.gross-margin}" format="percent" />
  */
 export function Calc({
   expr,

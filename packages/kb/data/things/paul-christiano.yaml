@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_rPQmiVa1LH
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: 2017-01
     validEnd: 2021-10
     source: https://paulfchristiano.com/
@@ -18,7 +18,7 @@ facts:
 
   - id: f_qPXcXJF3Uv
     property: employed-by
-    value: !ref QsXVXtQ0zE:arc
+    value: !ref QsXVXtQ0zE
     asOf: 2021-10
     source: https://alignment.org/
     notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from day-to-day operations in 2023 due to a brain injury"

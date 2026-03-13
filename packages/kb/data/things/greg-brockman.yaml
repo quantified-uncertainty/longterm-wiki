@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_tZxixtemow
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: 2015-12
     source: https://openai.com/blog/introducing-openai
     notes: "Co-founded OpenAI December 2015; took leave of absence August 2024 but

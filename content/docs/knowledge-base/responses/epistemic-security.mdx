@@ -32,12 +32,12 @@ import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wik
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Threat Severity** | High and accelerating | Deepfake attacks increased 1,740% in North America 2022-2023; voice cloning fraud up 680% year-over-year (<R id="d786af9f7b112dc6">Deepstrike</R>) |
-| **Human Detection Accuracy** | Near-chance (55.5%) | Meta-analysis of 56 studies found humans detect <EntityLink id="E96" name="deepfakes">deepfakes</EntityLink> at 55.5% accuracy; high-quality videos only 24.5% (<R id="5c1ad27ec9acc6f4">ScienceDirect</R>) |
-| **AI Detection Accuracy** | 78% best-case, 50% drop in-the-wild | Best commercial detectors reach 78% AUC but drop 45-50% on novel deepfakes not in training data (<R id="919c9ed9593285fd">Deepfake-Eval-2024</R>) |
-| **Content Authentication Adoption** | Early stage, growing | C2PA market \$1.29B in 2024, growing 26% CAGR; 5,000+ CAI members; Meta, Google, <EntityLink id="E218" name="openai">OpenAI</EntityLink> joined 2024 (<R id="ff89bed1f7960ab2">C2PA</R>) |
-| **Inoculation Effectiveness** | Moderate (10-24% reduction) | Bad News game reduces susceptibility to <EntityLink id="E102" name="disinformation">disinformation</EntityLink> by 10-24% across tactics; effects last 3+ months (<R id="82f99c43d60a4fa2">Cambridge</R>) |
-| **Financial Impact** | \$500K+ per incident | Average deepfake fraud loss exceeds \$500K; projected \$40B fraud losses by 2027 from generative AI (<R id="c5681b00f52c7603">Brightside AI</R>) |
+| **Threat Severity** | High and accelerating | Deepfake attacks increased 1,740% in North America 2022-2023; voice cloning fraud up 680% year-over-year (<R id="ZDhjYTlmN2">Deepstrike</R>) |
+| **Human Detection Accuracy** | Near-chance (55.5%) | Meta-analysis of 56 studies found humans detect <EntityLink id="E96" name="deepfakes">deepfakes</EntityLink> at 55.5% accuracy; high-quality videos only 24.5% (<R id="NDFlYTRkZj">ScienceDirect</R>) |
+| **AI Detection Accuracy** | 78% best-case, 50% drop in-the-wild | Best commercial detectors reach 78% AUC but drop 45-50% on novel deepfakes not in training data (<R id="MDBmN2JmMT">Deepfake-Eval-2024</R>) |
+| **Content Authentication Adoption** | Early stage, growing | C2PA market \$1.29B in 2024, growing 26% CAGR; 5,000+ CAI members; Meta, Google, <EntityLink id="E218" name="openai">OpenAI</EntityLink> joined 2024 (<R id="N2ViOGYzZT">C2PA</R>) |
+| **Inoculation Effectiveness** | Moderate (10-24% reduction) | Bad News game reduces susceptibility to <EntityLink id="E102" name="disinformation">disinformation</EntityLink> by 10-24% across tactics; effects last 3+ months (<R id="NmQ5MzcyNz">Cambridge</R>) |
+| **Financial Impact** | \$500K+ per incident | Average deepfake fraud loss exceeds \$500K; projected \$40B fraud losses by 2027 from generative AI (<R id="OTJlZDcyMj">Brightside AI</R>) |
 | **Tractability** | Medium | Technical defenses exist but face adversarial arms race; institutional responses scaling slowly |
 
 ## Overview
@@ -108,16 +108,16 @@ The personalization capabilities of AI-driven disinformation represent a particu
 
 Synthetic media generation has evolved rapidly since 2020. While early deepfakes were detectable by obvious artifacts, current systems can produce convincing fake videos, audio recordings, and images that fool casual observers and sometimes even trained analysts. The technical barrier to entry has collapsed dramatically:
 
-- **Voice cloning now requires just 3 seconds of audio** according to <R id="03c3c9c434b5ad4f">Starling Bank research</R>—easily obtained from social media videos
+- **Voice cloning now requires just 3 seconds of audio** according to <R id="NzMxMzVhZj">Starling Bank research</R>—easily obtained from social media videos
 - **53% of people share their voices online**, providing ample training data for impersonation
 - **Convincing video deepfakes can be created in 45 minutes** using freely available software
 - **1 in 4 adults have experienced an AI voice scam**, with 1 in 10 personally targeted (McAfee 2024)
 
 High-profile fraud cases demonstrate the real-world impact:
-- **January 2024**: A finance worker at engineering firm Arup authorized 15 transfers totaling <R id="c5681b00f52c7603">\$25.5 million</R> after a video call where every person except the victim was an AI-generated deepfake
+- **January 2024**: A finance worker at engineering firm Arup authorized 15 transfers totaling <R id="OTJlZDcyMj">\$25.5 million</R> after a video call where every person except the victim was an AI-generated deepfake
 - **2024**: A UK energy firm lost \$220,000+ after an employee received a call from someone who sounded exactly like the CEO
 
-More concerning for epistemic security, the mere possibility of sophisticated fakes creates what <R id="e68bcc79e17f42df">Brookings researchers call the "liar's dividend"</R>—authentic evidence becomes deniable because people assume it might be artificially generated.
+More concerning for epistemic security, the mere possibility of sophisticated fakes creates what <R id="YmE4OGQ0Mj">Brookings researchers call the "liar's dividend"</R>—authentic evidence becomes deniable because people assume it might be artificially generated.
 
 ### The Speed Asymmetry
 
@@ -131,15 +131,15 @@ A deepfake attack now occurs every 5 minutes globally. Deepfake content grew fro
 
 | Approach | Mechanism | Current Effectiveness | Key Limitations | Adoption Status |
 |----------|-----------|----------------------|-----------------|-----------------|
-| **Content Authentication (C2PA)** | Cryptographic signatures embedded in content metadata | High when preserved; metadata survives only 40% of sharing scenarios | Voluntary adoption; bad actors simply avoid it; platforms strip metadata | \$1.29B market in 2024; major platforms joining (<R id="ff89bed1f7960ab2">C2PA</R>) |
+| **Content Authentication (C2PA)** | Cryptographic signatures embedded in content metadata | High when preserved; metadata survives only 40% of sharing scenarios | Voluntary adoption; bad actors simply avoid it; platforms strip metadata | \$1.29B market in 2024; major platforms joining (<R id="N2ViOGYzZT">C2PA</R>) |
 | **AI Detection Systems** | ML models trained to identify synthetic artifacts | 78% best-case accuracy; 45-50% drop on novel content | Arms race dynamic; detectors lag generators by 6-12 months | Microsoft Video Authenticator, various academic tools |
-| **Watermarking (SynthID)** | Imperceptible signatures in AI-generated content | Robust to mild edits; easily removed by translation or paraphrasing | Requires AI provider cooperation; malicious actors use unwatermarked models | 10B+ content pieces watermarked by Google (<R id="804f5f9f594ba214">DeepMind</R>) |
+| **Watermarking (SynthID)** | Imperceptible signatures in AI-generated content | Robust to mild edits; easily removed by translation or paraphrasing | Requires AI provider cooperation; malicious actors use unwatermarked models | 10B+ content pieces watermarked by Google (<R id="OTU3NjQ0MT">DeepMind</R>) |
 | **Fact-Checking Networks** | Human verification of claims | High accuracy but very low coverage (less than 0.1% of content) | Cannot scale to match AI generation rates; hours vs. milliseconds | 100+ orgs in IFCN network |
-| **Prebunking/Inoculation** | Pre-exposure to manipulation techniques | 10-24% reduction in susceptibility; 3+ month durability | Requires proactive engagement; limited reach | 15M+ players of Bad News game (<R id="183d200467e03c83">Cambridge</R>) |
+| **Prebunking/Inoculation** | Pre-exposure to manipulation techniques | 10-24% reduction in susceptibility; 3+ month durability | Requires proactive engagement; limited reach | 15M+ players of Bad News game (<R id="OTNlNzAwYT">Cambridge</R>) |
 
 ### Content Authentication
 
-Content authentication represents the most technically mature approach to epistemic security. The <R id="ff89bed1f7960ab2">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by major technology companies, has developed standards that embed cryptographic signatures in digital content, creating an unbroken chain of custody from creation to consumption. The C2PA market reached \$1.29 billion in 2024 and is projected to grow at 26% CAGR to \$1.63 billion in 2025. Major platforms joined the C2PA steering committee in 2024: Google (February), OpenAI (May), and Meta and Amazon (September). The <R id="760493eae0f684f3">Content Authenticity Initiative</R> now includes over 5,000 member organizations.
+Content authentication represents the most technically mature approach to epistemic security. The <R id="N2ViOGYzZT">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by major technology companies, has developed standards that embed cryptographic signatures in digital content, creating an unbroken chain of custody from creation to consumption. The C2PA market reached \$1.29 billion in 2024 and is projected to grow at 26% CAGR to \$1.63 billion in 2025. Major platforms joined the C2PA steering committee in 2024: Google (February), OpenAI (May), and Meta and Amazon (September). The <R id="NTg0ZjBjMj">Content Authenticity Initiative</R> now includes over 5,000 member organizations.
 
 Adobe's Content Credentials implementation, deployed across Creative Cloud applications since 2021, demonstrates how this technology can work in practice. Every edit, transformation, and republishing event gets recorded in the metadata, allowing consumers to verify a photo's provenance and editing history.
 
@@ -147,17 +147,17 @@ However, content authentication faces significant adoption challenges. The syste
 
 ### Detection Systems
 
-Detection systems represent the alternative technical approach: using AI to identify AI-generated content. A <R id="5c1ad27ec9acc6f4">comprehensive meta-analysis of 56 studies</R> found that humans detect deepfakes at only 55.5% accuracy (95% CI: 48.87-62.10%)—barely above chance. For high-quality deepfake videos specifically, human accuracy drops to just 24.5%. Detection accuracy varies by media type: audio (62%), video (57%), images (53%), and text (52%).
+Detection systems represent the alternative technical approach: using AI to identify AI-generated content. A <R id="NDFlYTRkZj">comprehensive meta-analysis of 56 studies</R> found that humans detect deepfakes at only 55.5% accuracy (95% CI: 48.87-62.10%)—barely above chance. For high-quality deepfake videos specifically, human accuracy drops to just 24.5%. Detection accuracy varies by media type: audio (62%), video (57%), images (53%), and text (52%).
 
-AI detection tools perform better but face significant challenges. The <R id="919c9ed9593285fd">Deepfake-Eval-2024 benchmark</R> found that the best commercial video detector achieved approximately 78% accuracy (AUC of 0.79). However, when tested on novel "in-the-wild" deepfakes not in training data, performance dropped dramatically: 50% AUC decline for video, 48% for audio, and 45% for images. Only 0.1% of participants in a 2025 iProov study correctly identified all fake and real media shown to them.
+AI detection tools perform better but face significant challenges. The <R id="MDBmN2JmMT">Deepfake-Eval-2024 benchmark</R> found that the best commercial video detector achieved approximately 78% accuracy (AUC of 0.79). However, when tested on novel "in-the-wild" deepfakes not in training data, performance dropped dramatically: 50% AUC decline for video, 48% for audio, and 45% for images. Only 0.1% of participants in a 2025 iProov study correctly identified all fake and real media shown to them.
 
 The theoretical limits of this arms race concern many researchers. In a 2023 paper published in Science, researchers at MIT demonstrated that perfect detection of AI-generated content may be mathematically impossible when generation models have access to the same training data as detection models. This "impossibility result" suggests that detection-based approaches cannot provide long-term epistemic security, though they may buy time for other defenses to develop.
 
 ### Watermarking
 
-Watermarking offers a middle path: embedding imperceptible but detectable signatures in AI-generated content. <R id="804f5f9f594ba214">Google's SynthID technology</R>, now deployed across Gemini, Imagen, Lyria, and Veo models, has watermarked over 10 billion pieces of content. In October 2024, SynthID's text watermarking was released as open-source. Large-scale testing confirmed effectiveness: among 20+ million Gemini app users, feedback showed no noticeable quality difference between watermarked and unwatermarked text.
+Watermarking offers a middle path: embedding imperceptible but detectable signatures in AI-generated content. <R id="OTU3NjQ0MT">Google's SynthID technology</R>, now deployed across Gemini, Imagen, Lyria, and Veo models, has watermarked over 10 billion pieces of content. In October 2024, SynthID's text watermarking was released as open-source. Large-scale testing confirmed effectiveness: among 20+ million Gemini app users, feedback showed no noticeable quality difference between watermarked and unwatermarked text.
 
-However, watermarking has significant limitations. Watermarks can be removed through translation (converting to another language and back) or thorough rewriting. The <R id="8d993b532c2f5f7b">EU AI Act</R>, which came into force August 2024, requires AI outputs to be marked in machine-readable format, with full compliance by August 2026—but enforcement remains challenging. Most critically, watermarking suffers from the cooperation problem—malicious actors simply won't use watermarked models, limiting the technique's effectiveness against deliberate disinformation.
+However, watermarking has significant limitations. Watermarks can be removed through translation (converting to another language and back) or thorough rewriting. The <R id="NjIwMTVmZm">EU AI Act</R>, which came into force August 2024, requires AI outputs to be marked in machine-readable format, with full compliance by August 2026—but enforcement remains challenging. Most critically, watermarking suffers from the cooperation problem—malicious actors simply won't use watermarked models, limiting the technique's effectiveness against deliberate disinformation.
 
 ## Institutional and Social Responses
 
@@ -167,13 +167,13 @@ However, watermarking has significant limitations. Watermarks can be removed thr
 |-------------|-------|---------------|----------------|--------------|
 | **Fact-Checking Networks** | 100+ orgs globally | High accuracy, very low coverage | Labor-intensive; 1,000 claims/day per major org | Cannot match AI generation rates; hours vs. milliseconds |
 | **Platform Governance** | Billions of users | Moderate; inconsistent enforcement | Major investment by platforms | Community Notes shows promise; vulnerable to coordination |
-| **Media Literacy (Finland model)** | National scale | High for traditional disinfo; unknown for AI | Integrated into all subjects since 2016 | Finland ranked #1 in Europe for 6+ consecutive years (<R id="c2fea619f51a404f">Media Literacy Index</R>) |
-| **Prebunking/Inoculation** | 15M+ game players | 10-24% reduction; 3+ month durability | Low per-person; scalable | Effects proven across 4+ languages; works on polarization, conspiracy (<R id="86a7f3b91265afaf">HKS</R>) |
+| **Media Literacy (Finland model)** | National scale | High for traditional disinfo; unknown for AI | Integrated into all subjects since 2016 | Finland ranked #1 in Europe for 6+ consecutive years (<R id="NzdmZmQwNz">Media Literacy Index</R>) |
+| **Prebunking/Inoculation** | 15M+ game players | 10-24% reduction; 3+ month durability | Low per-person; scalable | Effects proven across 4+ languages; works on polarization, conspiracy (<R id="MTE4OTM1ZD">HKS</R>) |
 | **AI-Assisted Fact-Checking** | Emerging | Unknown at scale | High R&D investment | Potential to close speed gap; accuracy concerns |
 
 ### Fact-Checking Organizations
 
-Fact-checking organizations have expanded rapidly to meet the challenge of AI-amplified disinformation, but face severe scaling limitations. The <R id="d2dd9546c1dddaf3">International Fact-Checking Network</R> now includes over 100 organizations worldwide, up from fewer than 30 in 2015. However, human fact-checkers can verify only a tiny fraction of the content being produced. Full Fact, one of the most advanced fact-checking organizations, uses automated tools to identify potentially false claims but still requires human verification for complex assessments. Their systems can process roughly 1,000 claims per day—a rate that pales compared to the millions of potentially false claims generated by AI systems.
+Fact-checking organizations have expanded rapidly to meet the challenge of AI-amplified disinformation, but face severe scaling limitations. The <R id="MGY0NGMxMD">International Fact-Checking Network</R> now includes over 100 organizations worldwide, up from fewer than 30 in 2015. However, human fact-checkers can verify only a tiny fraction of the content being produced. Full Fact, one of the most advanced fact-checking organizations, uses automated tools to identify potentially false claims but still requires human verification for complex assessments. Their systems can process roughly 1,000 claims per day—a rate that pales compared to the millions of potentially false claims generated by AI systems.
 
 ### Platform Governance
 
@@ -181,7 +181,7 @@ Platform governance represents another institutional response, though one fraugh
 
 ### Media Literacy: The Finland Model
 
-Finland's comprehensive media literacy curriculum, implemented nationwide in 2016 as "multiliteracy," represents the most successful national-scale intervention. <R id="c2fea619f51a404f">Finland has ranked #1 in Europe</R> in the Open Society Institute's Media Literacy Index for six consecutive years (2017-2022), demonstrating the highest resilience to misinformation among 41 European countries.
+Finland's comprehensive media literacy curriculum, implemented nationwide in 2016 as "multiliteracy," represents the most successful national-scale intervention. <R id="NzdmZmQwNz">Finland has ranked #1 in Europe</R> in the Open Society Institute's Media Literacy Index for six consecutive years (2017-2022), demonstrating the highest resilience to misinformation among 41 European countries.
 
 Key elements of Finland's approach include:
 - **Cross-curricular integration**: Every teacher—whether teaching PE, English, or math—must promote multiliteracy across all age groups
@@ -189,11 +189,11 @@ Key elements of Finland's approach include:
 - **Critical thinking emphasis**: Focus on evaluating information rather than standardized test performance
 - **Early start**: Media literacy education begins in pre-school
 
-A <R id="3dba6df8bc1d530a">2022 report</R> credited "widespread critical thinking skills among the Finnish population and a coherent government response" as key factors in resisting fake news campaigns.
+A <R id="ZDAyNDQ4Zm">2022 report</R> credited "widespread critical thinking skills among the Finnish population and a coherent government response" as key factors in resisting fake news campaigns.
 
 ### Prebunking and Inoculation
 
-Research on "prebunking" or inoculation theory shows promising results for building resistance to manipulation. The <R id="183d200467e03c83">University of Cambridge's "Bad News" game</R>, played by over 15 million people worldwide, demonstrates how exposing people to weakened forms of manipulation techniques builds psychological resistance.
+Research on "prebunking" or inoculation theory shows promising results for building resistance to manipulation. The <R id="OTNlNzAwYT">University of Cambridge's "Bad News" game</R>, played by over 15 million people worldwide, demonstrates how exposing people to weakened forms of manipulation techniques builds psychological resistance.
 
 Effectiveness by disinformation tactic:
 - **Impersonation** (mimicking trusted personalities): 24% reduction in perceived reliability
@@ -201,7 +201,7 @@ Effectiveness by disinformation tactic:
 - **Discrediting** (attacking sources with bias accusations): 19% reduction
 - **Polarization** (deliberately divisive content): 10% reduction
 
-<R id="86a7f3b91265afaf">Cross-cultural research</R> validated these effects across German, Greek, Polish, and Swedish populations. Importantly, intervention effects last at least 3 months—significantly longer than typical social psychology interventions. Follow-up games like "Go Viral!" (targeting COVID-19 misinformation) were developed with the UK Government, WHO, and UN.
+<R id="MTE4OTM1ZD">Cross-cultural research</R> validated these effects across German, Greek, Polish, and Swedish populations. Importantly, intervention effects last at least 3 months—significantly longer than typical social psychology interventions. Follow-up games like "Go Viral!" (targeting COVID-19 misinformation) were developed with the UK Government, WHO, and UN.
 
 ## Current Trajectory and Future Outlook
 
@@ -217,18 +217,18 @@ The epistemic security landscape shows a concerning divergence between rapidly e
 | **Average fraud loss per incident** | -- | -- | \$500,000+ | Increasing severity |
 | **GenAI fraud losses (projected)** | -- | -- | \$12.3B | 32% CAGR to \$40B by 2027 |
 
-Sources: <R id="d786af9f7b112dc6">Deepstrike</R>, <R id="c5681b00f52c7603">Brightside AI</R>
+Sources: <R id="ZDhjYTlmN2">Deepstrike</R>, <R id="OTJlZDcyMj">Brightside AI</R>
 
 ### The 2024 Election "Super-Cycle"
 
-2024 represented a critical test year for epistemic security, with 3.7 billion eligible voters in 72 countries going to the polls—the largest global election year in history. The <R id="23907ffc1e102448">World Economic Forum</R> ranked "AI-generated misinformation and disinformation" as the second most likely risk to cause a "crisis on a global scale" in 2024.
+2024 represented a critical test year for epistemic security, with 3.7 billion eligible voters in 72 countries going to the polls—the largest global election year in history. The <R id="YTZlNzJiYT">World Economic Forum</R> ranked "AI-generated misinformation and disinformation" as the second most likely risk to cause a "crisis on a global scale" in 2024.
 
-Public concern was high: <R id="c5144619dc7ab3c7">78% of Americans</R> expected AI abuses to affect the 2024 presidential election outcome, with 73% believing AI would be used to manipulate social media. However, according to <R id="5cc2037b750354e0">Harvard's Ash Center</R>, the "apocalypse that wasn't" saw AI used extensively but with limited measurable impact on outcomes—though this may reflect early stages rather than inherent limitations.
+Public concern was high: <R id="NWUxOGNmYz">78% of Americans</R> expected AI abuses to affect the 2024 presidential election outcome, with 73% believing AI would be used to manipulate social media. However, according to <R id="ZGQ4NDRiYW">Harvard's Ash Center</R>, the "apocalypse that wasn't" saw AI used extensively but with limited measurable impact on outcomes—though this may reflect early stages rather than inherent limitations.
 
 Notable 2024 incidents:
 - **New Hampshire (January)**: AI-generated Biden robocalls urged up to 25,000 Democratic primary voters not to vote
 - **Taiwan (January)**: Microsoft identified China-based operations using AI-generated content—the first confirmed nation-state use to influence foreign elections
-- **Global**: <R id="346f676914d549d4">OpenAI disrupted</R> an Iranian influence operation targeting U.S. elections using its own models
+- **Global**: <R id="ZDk0MDU0MD">OpenAI disrupted</R> an Iranian influence operation targeting U.S. elections using its own models
 
 ### 2-5 Year Outlook
 
@@ -269,31 +269,31 @@ Epistemic security thus represents both an immediate challenge requiring urgent 
 ## Sources and Further Reading
 
 ### Research on Detection and Synthetic Media
-- **Deepfake Detection Meta-Analysis**: <R id="5c1ad27ec9acc6f4">Human performance in detecting deepfakes: A systematic review and meta-analysis of 56 papers</R> - ScienceDirect, 2024
-- **Deepfake-Eval-2024 Benchmark**: <R id="919c9ed9593285fd">Multi-Modal In-the-Wild Benchmark</R> - arXiv, 2025
-- **Deepfake Statistics**: <R id="d786af9f7b112dc6">The Data Behind the AI Fraud Wave</R> - Deepstrike, 2025
+- **Deepfake Detection Meta-Analysis**: <R id="NDFlYTRkZj">Human performance in detecting deepfakes: A systematic review and meta-analysis of 56 papers</R> - ScienceDirect, 2024
+- **Deepfake-Eval-2024 Benchmark**: <R id="MDBmN2JmMT">Multi-Modal In-the-Wild Benchmark</R> - arXiv, 2025
+- **Deepfake Statistics**: <R id="ZDhjYTlmN2">The Data Behind the AI Fraud Wave</R> - Deepstrike, 2025
 
 ### Content Authentication and Watermarking
-- **C2PA Standards**: <R id="ff89bed1f7960ab2">Coalition for Content Provenance and Authenticity</R>
-- **Google SynthID**: <R id="804f5f9f594ba214">Watermarking and Detection Technology</R> - Google DeepMind
-- **Content Authenticity Initiative**: <R id="760493eae0f684f3">Wikipedia Overview</R>
+- **C2PA Standards**: <R id="N2ViOGYzZT">Coalition for Content Provenance and Authenticity</R>
+- **Google SynthID**: <R id="OTU3NjQ0MT">Watermarking and Detection Technology</R> - Google DeepMind
+- **Content Authenticity Initiative**: <R id="NTg0ZjBjMj">Wikipedia Overview</R>
 
 ### Media Literacy and Inoculation
-- **Finland Media Literacy Model**: <R id="c2fea619f51a404f">Finnish Media Literacy Deters Disinformation</R> - thisisFINLAND
-- **Bad News Game Research**: <R id="183d200467e03c83">Cambridge Social Decision-Making Lab</R>
-- **Global Inoculation Study**: <R id="86a7f3b91265afaf">Prebunking interventions reduce susceptibility across cultures</R> - Harvard Kennedy School
+- **Finland Media Literacy Model**: <R id="NzdmZmQwNz">Finnish Media Literacy Deters Disinformation</R> - thisisFINLAND
+- **Bad News Game Research**: <R id="OTNlNzAwYT">Cambridge Social Decision-Making Lab</R>
+- **Global Inoculation Study**: <R id="MTE4OTM1ZD">Prebunking interventions reduce susceptibility across cultures</R> - Harvard Kennedy School
 
 ### Elections and Disinformation
-- **2024 Election Analysis**: <R id="346f676914d549d4">How disinformation defined the 2024 election narrative</R> - Brookings
-- **AI in 2024 Elections**: <R id="5cc2037b750354e0">The apocalypse that wasn't</R> - Harvard Ash Center
-- **Public Concern Survey**: <R id="c5144619dc7ab3c7">Most Americans expect AI abuses in 2024 election</R> - Elon University
+- **2024 Election Analysis**: <R id="ZDk0MDU0MD">How disinformation defined the 2024 election narrative</R> - Brookings
+- **AI in 2024 Elections**: <R id="ZGQ4NDRiYW">The apocalypse that wasn't</R> - Harvard Ash Center
+- **Public Concern Survey**: <R id="NWUxOGNmYz">Most Americans expect AI abuses in 2024 election</R> - Elon University
 
 ### Fraud and Financial Impact
-- **Voice Cloning Fraud**: <R id="c5681b00f52c7603">Deepfake CEO Fraud Threatens CFOs</R> - Brightside AI
-- **AI Voice Scam Warning**: <R id="03c3c9c434b5ad4f">Starling Bank Study</R> - CNN
+- **Voice Cloning Fraud**: <R id="OTJlZDcyMj">Deepfake CEO Fraud Threatens CFOs</R> - Brightside AI
+- **AI Voice Scam Warning**: <R id="NzMxMzVhZj">Starling Bank Study</R> - CNN
 
 ### Regulatory and Policy
-- **EU AI Act**: <R id="8d993b532c2f5f7b">European Parliament Digital Issues</R>
-- **Liar's Dividend**: <R id="e68bcc79e17f42df">How AI and TikTok might affect elections</R> - Brookings
+- **EU AI Act**: <R id="NjIwMTVmZm">European Parliament Digital Issues</R>
+- **Liar's Dividend**: <R id="YmE4OGQ0Mj">How AI and TikTok might affect elections</R> - Brookings
 
 ---

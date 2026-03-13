@@ -42,10 +42,17 @@ import {
 // Section components
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
-import { GrantsMadeSection, FundingReceivedSection } from "./grants-section";
 import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
+
+// Section components — grants (main content column)
+import {
+  GrantsGivenSection,
+  GrantsReceivedSection,
+} from "./grants-section";
+
+// Section components — main content column
 import {
   FundingHistorySection,
   InvestorParticipationSection,
@@ -301,12 +308,11 @@ export default async function OrgProfilePage({
 
           {(data.grantsMade.length > 0 || data.grantsReceived.length > 0) && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <GrantsMadeSection
+              <GrantsGivenSection
                 grants={data.grantsMade}
                 orgName={entity.name}
-                totalCount={data.grantsMade.length}
               />
-              <FundingReceivedSection grants={data.grantsReceived} />
+              <GrantsReceivedSection grants={data.grantsReceived} />
             </div>
           )}
 

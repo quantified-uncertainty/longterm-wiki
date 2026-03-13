@@ -46,12 +46,38 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const entity = resolvePersonBySlug(slug);
+  if (!entity) {
+    return { title: "Person Not Found" };
+  }
+
+  const roleFact = getKBLatest(entity.id, "role");
+  const employedByFact = getKBLatest(entity.id, "employed-by");
+  const roleText =
+    roleFact?.value.type === "text" ? roleFact.value.value : null;
+  const employerRef =
+    employedByFact?.value.type === "ref"
+      ? resolveEntityRef(employedByFact.value.value)
+      : null;
+
+  let description: string;
+  if (roleText && employerRef) {
+    description = `Profile for ${entity.name}, ${roleText} at ${employerRef.name} — career history, positions, and publications.`;
+  } else if (roleText) {
+    description = `Profile for ${entity.name}, ${roleText} — career history, positions, and publications.`;
+  } else {
+    description = `Profile for ${entity.name} — roles, career history, and affiliations.`;
+  }
+
   return {
-    title: entity ? `${entity.name} | People` : "Person Not Found",
-    description: entity
-      ? `Profile for ${entity.name} — roles, career history, and affiliations.`
-      : undefined,
+    title: `${entity.name} | People`,
+    description,
   };
+}
+
+function EmptyPlaceholder({ label }: { label: string }) {
+  return (
+    <p className="text-xs text-muted-foreground/40 italic">{label}</p>
+  );
 }
 
 export default async function PersonProfilePage({
@@ -196,6 +222,15 @@ export default async function PersonProfilePage({
   const educationText =
     educationFact?.value.type === "text" ? educationFact.value.value : null;
 
+  // Determine which main sections have content
+  const hasPositions = positions.length > 0;
+  const hasCareer = careerHistory.length > 0;
+  const hasEducation = !!educationText;
+  const hasPublications = publications.length > 0;
+  const hasFunding = fundingConnections.length > 0;
+  const hasAnyMainContent =
+    hasPositions || hasCareer || hasEducation || hasPublications || hasFunding;
+
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
       <Breadcrumbs
@@ -260,6 +295,35 @@ export default async function PersonProfilePage({
           {educationText && <EducationSection education={educationText} />}
           <PublicationsSection publications={publications} />
           <FundingConnections fundingConnections={fundingConnections} />
+
+          {/* Empty-state placeholders for sections with no data */}
+          {!hasAnyMainContent && (
+            <div className="border border-border/40 border-dashed rounded-xl px-6 py-10 text-center">
+              <p className="text-sm text-muted-foreground/60">
+                No career history, positions, education, publications, or
+                funding connections recorded yet.
+              </p>
+            </div>
+          )}
+          {hasAnyMainContent && (
+            <div className="space-y-2 pt-2">
+              {!hasPositions && (
+                <EmptyPlaceholder label="No expert positions recorded." />
+              )}
+              {!hasCareer && (
+                <EmptyPlaceholder label="No career history recorded." />
+              )}
+              {!hasEducation && (
+                <EmptyPlaceholder label="No education information recorded." />
+              )}
+              {!hasPublications && (
+                <EmptyPlaceholder label="No publications recorded." />
+              )}
+              {!hasFunding && (
+                <EmptyPlaceholder label="No funding connections recorded." />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}

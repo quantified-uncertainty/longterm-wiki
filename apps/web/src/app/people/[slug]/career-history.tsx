@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/kb";
+import { getRecordVerdict } from "@data/database";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -25,6 +27,7 @@ export function CareerHistory({
           const orgSlug = orgRef ? getKBEntitySlug(orgRef.id) : undefined;
           const isCurrent = !entry.endDate;
           const isFounder = /founder/i.test(entry.title);
+          const verdict = getRecordVerdict("personnel", String(entry.key));
 
           return (
             <div key={entry.key} className="px-5 py-3.5">
@@ -32,6 +35,7 @@ export function CareerHistory({
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
+                <VerificationBadge verdict={verdict} />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">
                 {orgSlug ? (

@@ -7,9 +7,10 @@ import {
   getKBEntitySlug,
 } from "@/data/kb";
 import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById } from "@/data/database";
+import { getTypedEntityById, getRecordVerdict } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
@@ -132,6 +133,7 @@ export default async function GrantDetailPage({ params }: PageProps) {
   if (!record) notFound();
 
   const grant = parseGrant(record);
+  const grantVerdict = getRecordVerdict("grant", String(grant.key));
 
   // Find related grants: same funder or same recipient
   const relatedByFunder = allGrants
@@ -179,6 +181,7 @@ export default async function GrantDetailPage({ params }: PageProps) {
               {titleCase(grant.status)}
             </span>
           )}
+          <VerificationBadge verdict={grantVerdict} />
         </div>
 
         {/* Amount hero */}

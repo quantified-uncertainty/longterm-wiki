@@ -6,6 +6,7 @@ import { SortHeader } from "@/components/directory/SortHeader";
 import type { SortDir } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
+import { ORG_TYPE_LABELS, ORG_TYPE_COLORS } from "@/app/organizations/org-constants";
 
 export interface OrgRow {
   id: string;
@@ -35,34 +36,15 @@ export interface OrgRow {
   searchText: string;
 }
 
-const ORG_TYPE_LABELS: Record<string, string> = {
-  "frontier-lab": "Frontier Lab",
-  "safety-org": "Safety Org",
-  academic: "Academic",
-  startup: "Startup",
-  generic: "Lab",
-  funder: "Funder",
-  government: "Government",
-  other: "Other",
-};
-
-const ORG_TYPE_COLORS: Record<string, string> = {
-  "frontier-lab": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "safety-org": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  academic: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  startup: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  generic: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  funder: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  government: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-};
-
 type SortKey = OrgSortKey;
 
 function formatCompactNumber(n: number | null): string {
   if (n == null) return "";
   if (n >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
+  if (n >= 1e10) return `$${(n / 1e9).toFixed(0)}B`;
   if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e7) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
   return `$${n.toLocaleString()}`;
 }
@@ -88,9 +70,18 @@ function DateHint({ date }: { date: string | null }) {
   );
 }
 
-export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
+export type StatFilterKey = "all" | "withRevenue" | "withValuation" | "withHeadcount";
+
+export interface OrgStatDef {
+  key: StatFilterKey;
+  label: string;
+  value: string;
+}
+
+export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: OrgStatDef[] }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statFilter, setStatFilter] = useState<StatFilterKey>("all");
   const [sortKey, setSortKey] = useState<SortKey>("revenue");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -129,6 +120,20 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       result = result.filter((r) => r.orgType === typeFilter);
     }
 
+    if (statFilter !== "all") {
+      switch (statFilter) {
+        case "withRevenue":
+          result = result.filter((r) => r.revenueNum != null);
+          break;
+        case "withValuation":
+          result = result.filter((r) => r.valuationNum != null);
+          break;
+        case "withHeadcount":
+          result = result.filter((r) => r.headcount != null);
+          break;
+      }
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
@@ -139,10 +144,35 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
     );
 
     return result;
-  }, [rows, search, typeFilter, sortKey, sortDir]);
+  }, [rows, search, typeFilter, statFilter, sortKey, sortDir]);
 
   return (
     <div>
+      {/* Clickable stat cards */}
+      {stats && stats.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {stats.map((stat) => (
+            <button
+              key={stat.key}
+              type="button"
+              onClick={() => setStatFilter(statFilter === stat.key ? "all" : stat.key)}
+              className={`rounded-xl border p-4 text-left transition-all ${
+                statFilter === stat.key
+                  ? "border-primary/50 bg-primary/5 ring-2 ring-primary/20 shadow-sm"
+                  : "border-border/60 bg-gradient-to-br from-card to-muted/30 hover:border-primary/30 hover:shadow-md"
+              }`}
+            >
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
+                {stat.label}
+              </div>
+              <div className="text-xl font-bold tabular-nums tracking-tight">
+                {stat.value}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
@@ -192,7 +222,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Organization" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Type" sortKey="orgType" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -223,7 +253,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
                       title="Wiki page"
                     >
                       wiki
@@ -246,44 +276,52 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
 
                 {/* Revenue */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.revenueNum != null && (
+                  {row.revenueNum != null ? (
                     <>
                       <span className="font-semibold">{formatCompactNumber(row.revenueNum)}</span>
                       <DateHint date={row.revenueDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Valuation */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.valuationNum != null && (
+                  {row.valuationNum != null ? (
                     <>
                       <span className="font-semibold">{formatCompactNumber(row.valuationNum)}</span>
                       <DateHint date={row.valuationDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Headcount */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.headcount != null && (
+                  {row.headcount != null ? (
                     <>
                       <span>{formatHeadcount(row.headcount)}</span>
                       <DateHint date={row.headcountDate} />
                     </>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Total Funding */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.totalFundingNum != null && (
+                  {row.totalFundingNum != null ? (
                     <span className="font-semibold">{formatCompactNumber(row.totalFundingNum)}</span>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Founded */}
                 <td className="py-2.5 px-3 text-center text-muted-foreground">
-                  {row.foundedDate ?? ""}
+                  {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
 
               </tr>

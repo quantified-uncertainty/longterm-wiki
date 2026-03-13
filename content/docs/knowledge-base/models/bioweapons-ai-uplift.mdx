@@ -37,7 +37,7 @@ The concept of "uplift" quantifies how much AI assistance increases an attacker'
 
 The central challenge in assessing AI-enabled <EntityLink id="E42" name="bioweapons">bioweapons</EntityLink> risk is separating genuinely novel capabilities from information already accessible through scientific literature, textbooks, and expert consultation. Current <EntityLink id="E186" name="language-models">large language models</EntityLink> compress and make searchable vast amounts of published knowledge, but the question remains: **does AI meaningfully lower the barrier to bioweapons development, or is it largely redundant with existing information sources?** The answer appears to depend critically on actor type, with non-experts potentially gaining significant knowledge uplift while sophisticated state programs may see only marginal benefits from AI assistance.
 
-Early empirical evidence suggests current LLMs provide modest uplift for attack planning, but concerning capabilities in evading biosecurity measures. The <R id="0fe4cfa7ca5f2270">RAND Corporation's 2024 study</R> found no statistically significant difference between AI-assisted and non-AI groups in creating viable bioweapon attack plans, yet Microsoft's research demonstrated that AI-designed toxins could evade over 75% of DNA synthesis screening tools. This asymmetry—limited knowledge uplift but significant evasion uplift—has important implications for where defensive investments should be prioritized. The combination of LLMs with specialized biological design tools and increasing laboratory automation may create compound uplift effects that exceed any individual technology's contribution.
+Early empirical evidence suggests current LLMs provide modest uplift for attack planning, but concerning capabilities in evading biosecurity measures. The <R id="YmM4YmE2NG">RAND Corporation's 2024 study</R> found no statistically significant difference between AI-assisted and non-AI groups in creating viable bioweapon attack plans, yet Microsoft's research demonstrated that AI-designed toxins could evade over 75% of DNA synthesis screening tools. This asymmetry—limited knowledge uplift but significant evasion uplift—has important implications for where defensive investments should be prioritized. The combination of LLMs with specialized biological design tools and increasing laboratory automation may create compound uplift effects that exceed any individual technology's contribution.
 
 Critically, the risk landscape is evolving rapidly. The [CSIS report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should) on AI-enabled bioterrorism (August 2025) notes that while <EntityLink id="E218" name="openai">OpenAI</EntityLink> and <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> initially reported "little to no uplift" in 2024 assessments, both labs have since updated their evaluations to flag "substantial and immediate biorisks." OpenAI concluded in April 2025 that it expects its models to demonstrate "high risks" in the near future—meaning they could substantially increase the likelihood and frequency of bioterrorist attacks by providing meaningful assistance to novices. This rapid evolution underscores the importance of dynamic uplift assessment rather than static point-in-time evaluations.
 
@@ -176,16 +176,16 @@ The most likely outcome appears to be the "Asymmetric Uplift" scenario, where AI
 
 | Study | Year | Method | Key Finding | Uplift Estimate | Confidence |
 |-------|------|--------|-------------|-----------------|------------|
-| <R id="0fe4cfa7ca5f2270">RAND Corporation</R> | 2024 | Red team exercise (n=45) | No significant difference AI vs. internet-only | Knowledge: 1.0-1.2x | High |
+| <R id="YmM4YmE2NG">RAND Corporation</R> | 2024 | Red team exercise (n=45) | No significant difference AI vs. internet-only | Knowledge: 1.0-1.2x | High |
 | Microsoft Research | 2024 | Toxin design exercise | 75%+ evasion of DNA screening | Evasion: 2-3x | High |
-| <R id="c5bed41f6d28d09e">Gryphon Scientific/Anthropic</R> | 2023 | 150+ hour red team | "Post-doc level" knowledge provision | Knowledge: 1.5-2.5x | Medium |
+| <R id="MGFiMDU2ND">Gryphon Scientific/Anthropic</R> | 2023 | 150+ hour red team | "Post-doc level" knowledge provision | Knowledge: 1.5-2.5x | Medium |
 | OpenAI internal eval | 2024-25 | Expert uplift trials | o1 provided "measurable benefits to experts" | Expert: 1.3-1.8x | Medium |
 | Anthropic Claude 4.5 eval | 2025 | Protocol generation | "Substantially higher scores, fewer critical errors" | Expert: 1.5-2x | Medium |
 | [NASEM Report](https://nap.nationalacademies.org/read/28868/chapter/5) | 2025 | Expert consensus | BDTs cannot yet design self-replicating pathogens | Novel agents: &lt;1.2x | High |
 
 ### RAND Corporation Study (2024)
 
-The <R id="0fe4cfa7ca5f2270">RAND study</R> represents the most rigorous empirical assessment of AI uplift to date. Forty-five participants were randomly assigned to teams with varying degrees of expertise in both LLM technologies and biology, then tasked with planning biological attacks. Teams with access to LLMs in addition to the internet did not score significantly higher than those without LLM access. As lead author Christopher Mouton stated: "Just because today's LLMs aren't able to close the knowledge gap needed to facilitate biological weapons attack planning doesn't preclude the possibility that they may be able to in the future."
+The <R id="YmM4YmE2NG">RAND study</R> represents the most rigorous empirical assessment of AI uplift to date. Forty-five participants were randomly assigned to teams with varying degrees of expertise in both LLM technologies and biology, then tasked with planning biological attacks. Teams with access to LLMs in addition to the internet did not score significantly higher than those without LLM access. As lead author Christopher Mouton stated: "Just because today's LLMs aren't able to close the knowledge gap needed to facilitate biological weapons attack planning doesn't preclude the possibility that they may be able to in the future."
 
 The study found that while LLMs produced what researchers termed "unfortunate outputs"—problematic responses to prompts—these outputs "generally mirror information readily available on the internet." This suggests LLMs currently provide convenience rather than novel dangerous capabilities. Key methodological limitations include: testing planning rather than synthesis capability, use of 2023-era models that have since been superseded, and a relatively small sample size.
 
@@ -197,9 +197,9 @@ Microsoft's research revealed a more concerning capability: AI-designed toxins s
 
 Both Anthropic and OpenAI have conducted extensive internal evaluations of their models' dangerous capabilities, with findings that have evolved significantly over time:
 
-**Anthropic's Framework**: Anthropic's <R id="394ea6d17701b621">Responsible Scaling Policy</R> defines AI Safety Levels (ASL) modeled on biosafety level standards. ASL-3 capability threshold is reached when models could "significantly help individuals or groups with basic technical backgrounds (e.g., undergraduate STEM degrees) to create, obtain, and deploy CBRN weapons." In expert uplift trials for Claude Opus 4.5 (2025), the model was "meaningfully more helpful to participants than previous models, leading to substantially higher scores and fewer critical errors." However, models still "produced critical errors that yielded non-viable protocols." Anthropic interprets this as an indicator of general model progress where "a clear rule-out of the next capability threshold may soon be difficult or impossible."
+**Anthropic's Framework**: Anthropic's <R id="NGU0MjEyN2">Responsible Scaling Policy</R> defines AI Safety Levels (ASL) modeled on biosafety level standards. ASL-3 capability threshold is reached when models could "significantly help individuals or groups with basic technical backgrounds (e.g., undergraduate STEM degrees) to create, obtain, and deploy CBRN weapons." In expert uplift trials for Claude Opus 4.5 (2025), the model was "meaningfully more helpful to participants than previous models, leading to substantially higher scores and fewer critical errors." However, models still "produced critical errors that yielded non-viable protocols." Anthropic interprets this as an indicator of general model progress where "a clear rule-out of the next capability threshold may soon be difficult or impossible."
 
-**OpenAI's Framework**: OpenAI's <R id="ded0b05862511312">Preparedness Framework</R> categorizes biological capabilities from Low to Critical. The "High" threshold is breached when a model could "provide meaningful counterfactual assistance to 'novice' actors (anyone with a basic relevant technical background) that enables them to create known biological or chemical threats." OpenAI's o1 model demonstrated measurable benefits for experts, "particularly in synthesising existing threat information and enhancing access to previously obscure knowledge." In April 2025, OpenAI concluded it expects models to demonstrate "high risks" in the near future. In July 2025, OpenAI classified its new ChatGPT agent as "highly capable" in the biological portion of its Preparedness Framework.
+**OpenAI's Framework**: OpenAI's <R id="OTU2ZjU2MD">Preparedness Framework</R> categorizes biological capabilities from Low to Critical. The "High" threshold is breached when a model could "provide meaningful counterfactual assistance to 'novice' actors (anyone with a basic relevant technical background) that enables them to create known biological or chemical threats." OpenAI's o1 model demonstrated measurable benefits for experts, "particularly in synthesising existing threat information and enhancing access to previously obscure knowledge." In April 2025, OpenAI concluded it expects models to demonstrate "high risks" in the near future. In July 2025, OpenAI classified its new ChatGPT agent as "highly capable" in the biological portion of its Preparedness Framework.
 
 **Joint Evaluation (2025)**: In early summer 2025, OpenAI and Anthropic [collaborated on a first-of-its-kind joint evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/) where each lab ran their internal safety and misalignment evaluations on the other's publicly released models, marking an important step toward industry-wide safety standards.
 
@@ -333,27 +333,27 @@ Priority ranking: DNA synthesis screening offers best cost-effectiveness, follow
 
 ### Primary Research
 
-- <R id="0fe4cfa7ca5f2270">RAND Corporation</R>. "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study" (January 2024) - Most rigorous empirical assessment of LLM uplift
+- <R id="YmM4YmE2NG">RAND Corporation</R>. "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study" (January 2024) - Most rigorous empirical assessment of LLM uplift
 - Microsoft Research. "AI-designed toxins evade DNA synthesis screening" (2024) - Demonstrated 75%+ evasion of commercial screening tools
-- <R id="c5bed41f6d28d09e">Gryphon Scientific</R>. Red-team evaluation of Claude (November 2023) - 150+ hour assessment finding "post-doc level" knowledge provision
+- <R id="MGFiMDU2ND">Gryphon Scientific</R>. Red-team evaluation of Claude (November 2023) - 150+ hour assessment finding "post-doc level" knowledge provision
 - [National Academies of Sciences, Engineering, and Medicine](https://nap.nationalacademies.org/read/28868/chapter/5). "The Age of AI in the Life Sciences: Benefits and Biosecurity Considerations" (March 2025) - DOD-commissioned consensus report on AI-enabled biosecurity risks
 
 ### Policy Analysis
 
 - [CSIS](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should). "Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism" (August 2025) - Comprehensive policy recommendations
-- <R id="2b6675e423040e53">CNAS</R>. "AI and the Evolution of Biological National Security Risks" (August 2024) - Analysis of AI-biosecurity intersection
+- <R id="MmIzYWZmYT">CNAS</R>. "AI and the Evolution of Biological National Security Risks" (August 2024) - Analysis of AI-biosecurity intersection
 - [Johns Hopkins Center for Health Security](https://centerforhealthsecurity.org/2024/leaders-in-biosecurity-commend-nsceb-interim-report-and-aixbio-policy-options-paper). AIxBio policy recommendations (2024)
 - [NTI Biosecurity](https://www.nti.org/analysis/articles/statement-on-biosecurity-risks-at-the-convergence-of-ai-and-the-life-sciences/). "Statement on Biosecurity Risks at the Convergence of AI and the Life Sciences"
 
 ### Industry Frameworks
 
-- <R id="394ea6d17701b621">Anthropic</R>. Responsible Scaling Policy and CBRN evaluations (2024-2025)
-- <R id="ded0b05862511312">OpenAI</R>. Preparedness Framework and biological capability evaluations (2024-2025)
+- <R id="NGU0MjEyN2">Anthropic</R>. Responsible Scaling Policy and CBRN evaluations (2024-2025)
+- <R id="OTU2ZjU2MD">OpenAI</R>. Preparedness Framework and biological capability evaluations (2024-2025)
 - [OpenAI-Anthropic Joint Evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/). First collaborative safety evaluation exercise (Summer 2025)
 - [Future of Life Institute](https://futureoflife.org/ai-safety-index-summer-2025/). 2025 AI Safety Index - Industry safety practice assessment
 
 ### Government Frameworks
 
-- <R id="14ff22ab7e571166">White House OSTP</R>. Framework for Nucleic Acid Synthesis Screening (April 2024)
+- <R id="ZTU2ZDQ0NW">White House OSTP</R>. Framework for Nucleic Acid Synthesis Screening (April 2024)
 - Executive Order 14110. Safe, Secure, and Trustworthy Development and Use of AI (October 2023)
 - Trump Administration AI Action Plan (July 2025) - Acknowledged dual-use biotechnology risks

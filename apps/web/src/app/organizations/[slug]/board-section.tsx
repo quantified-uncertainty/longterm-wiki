@@ -4,6 +4,8 @@
  */
 import Link from "next/link";
 import { formatKBDate } from "@/components/wiki/kb/format";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader } from "./org-shared";
 import type { BoardMember } from "./org-data";
 
@@ -30,6 +32,7 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
           <tbody className="divide-y divide-border/50">
             {sorted.map((m) => {
               const isCurrent = !m.departed;
+              const verdict = getRecordVerdict("personnel", String(m.key));
               const tenure = m.appointed
                 ? `${formatKBDate(m.appointed)}${m.departed ? ` \u2013 ${formatKBDate(m.departed)}` : " \u2013 present"}`
                 : m.departed
@@ -42,13 +45,16 @@ export function BoardOfDirectorsSection({ members }: { members: BoardMember[] })
                   className={`hover:bg-muted/20 transition-colors${!isCurrent ? " opacity-60" : ""}`}
                 >
                   <td className="py-1.5 px-3">
-                    {m.personHref ? (
-                      <Link href={m.personHref} className="font-medium text-foreground hover:text-primary transition-colors">
-                        {m.personName}
-                      </Link>
-                    ) : (
-                      <span className="font-medium">{m.personName}</span>
-                    )}
+                    <span className="flex items-center gap-1.5">
+                      {m.personHref ? (
+                        <Link href={m.personHref} className="font-medium text-foreground hover:text-primary transition-colors">
+                          {m.personName}
+                        </Link>
+                      ) : (
+                        <span className="font-medium">{m.personName}</span>
+                      )}
+                      <VerificationBadge verdict={verdict} />
+                    </span>
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground">{m.role ?? ""}</td>
                   <td className="py-1.5 px-3">

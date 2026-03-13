@@ -87,8 +87,8 @@ flowchart TD
 
 | Response | Mechanism | Effectiveness |
 |----------|-----------|---------------|
-| <R id="acc5ad4063972046">EU AI Act</R> | Mandatory risk assessment, human oversight for high-risk AI | Medium-High |
-| <R id="54dbc15413425997">NIST AI Risk Management Framework</R> | Voluntary bias mitigation guidance | Low-Medium |
+| <R id="NDRlMGJiNj">EU AI Act</R> | Mandatory risk assessment, human oversight for high-risk AI | Medium-High |
+| <R id="N2EzYzdjMD">NIST AI Risk Management Framework</R> | Voluntary bias mitigation guidance | Low-Medium |
 | Algorithmic auditing | Third-party bias detection and fairness testing | Medium |
 | Diversity in AI vendors | Reduces correlated biases across institutions | Low-Medium |
 | Human oversight requirements | Mandatory review and override capability | Variable (automation bias limits effectiveness) |
@@ -111,7 +111,7 @@ Hospital administrators track "AI override rates" as a quality metric, with high
 
 The cognitive burden of constantly evaluating AI recommendations also creates natural pressure toward acceptance. A radiologist reviewing hundreds of scans per day cannot practically second-guess every AI assessment, particularly when the AI's recommendations align with standard protocols in 95% of cases. The remaining 5% begin to feel like edge cases requiring exceptional justification rather than routine professional judgment. Over time, the skills required for independent assessment begin to deteriorate as practitioners rely increasingly on AI analysis rather than developing pattern recognition and diagnostic reasoning capabilities.
 
-This phase sees the emergence of what researchers term "<R id="1597b60a507bf25b">algorithm appreciation</R>"—the tendency to view algorithmic recommendations as more objective and reliable than human judgment, even in domains where human expertise remains superior. Logg, Minson, and Moore (2019) documented this phenomenon across six experiments, showing that lay people adhere more to advice when they think it comes from an algorithm than from a person—even when making numeric estimates about visual stimuli and forecasting song popularity or romantic attraction. Algorithm appreciation persisted regardless of whether advice appeared jointly or separately. In institutional contexts, this translates to policy changes that formally or informally prioritize AI recommendations over human judgment.
+This phase sees the emergence of what researchers term "<R id="MjVhNWYyNz">algorithm appreciation</R>"—the tendency to view algorithmic recommendations as more objective and reliable than human judgment, even in domains where human expertise remains superior. Logg, Minson, and Moore (2019) documented this phenomenon across six experiments, showing that lay people adhere more to advice when they think it comes from an algorithm than from a person—even when making numeric estimates about visual stimuli and forecasting song popularity or romantic attraction. Algorithm appreciation persisted regardless of whether advice appeared jointly or separately. In institutional contexts, this translates to policy changes that formally or informally prioritize AI recommendations over human judgment.
 
 ### Systemic Capture (2030-2040)
 
@@ -127,7 +127,7 @@ The biases embedded in AI systems during this phase become the biases of institu
 
 The most well-documented source of bias in AI systems stems from training data that reflects historical patterns of discrimination or disparity. Unlike human bias, which can be inconsistent and subject to individual variation, AI bias based on training data is systematic and persistent across all decisions made by systems trained on similar datasets. This creates the potential for historical biases to be amplified and perpetuated at unprecedented scale.
 
-Healthcare provides the clearest documented example of this phenomenon. A landmark <R id="a2107d9d789b8124">2019 study published in Science</R> by Obermeyer et al. analyzed a commercial algorithm used by hospitals to identify patients who would benefit from additional care resources and found that the system systematically underestimated the health needs of Black patients. The algorithm was trained to predict healthcare costs rather than health needs, and because Black patients historically received less expensive care due to systemic barriers to access, the AI learned to associate being Black with lower care needs even when objective health measures indicated equivalent or greater need.
+Healthcare provides the clearest documented example of this phenomenon. A landmark <R id="ZDE3ZTI3MD">2019 study published in Science</R> by Obermeyer et al. analyzed a commercial algorithm used by hospitals to identify patients who would benefit from additional care resources and found that the system systematically underestimated the health needs of Black patients. The algorithm was trained to predict healthcare costs rather than health needs, and because Black patients historically received less expensive care due to systemic barriers to access, the AI learned to associate being Black with lower care needs even when objective health measures indicated equivalent or greater need.
 
 **Key statistics from the Obermeyer study:**
 - The algorithm affected allocation decisions for **more than 200 million US patients**
@@ -137,9 +137,9 @@ Healthcare provides the clearest documented example of this phenomenon. A landma
 
 This bias affected the allocation of care management resources across multiple hospital systems using the same algorithm, with Black patients being systematically under-referred to programs that could improve their health outcomes. Importantly, this bias was not intentional and was difficult to detect without sophisticated analysis—the algorithm appeared to be working correctly according to its training objectives.
 
-A <R id="e206c777c8b622b5">2025 systematic review in npj Digital Medicine</R> characterized bias potential across 690 clinical decision instruments, finding that **73% of study participants were white and 55% were male**, with **52% of research conducted in North America and 31% in Europe**. Only 1.9% of instruments explicitly used race/ethnicity as predictor variables, but the skewed training populations create systematic underperformance for underrepresented groups.
+A <R id="MDBmMDBhYW">2025 systematic review in npj Digital Medicine</R> characterized bias potential across 690 clinical decision instruments, finding that **73% of study participants were white and 55% were male**, with **52% of research conducted in North America and 31% in Europe**. Only 1.9% of instruments explicitly used race/ethnicity as predictor variables, but the skewed training populations create systematic underperformance for underrepresented groups.
 
-Criminal justice risk assessment tools demonstrate similar patterns. <R id="81813c9c33253098">ProPublica's 2016 analysis</R> of the COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) system examined over 10,000 criminal defendants in Broward County, Florida, comparing predicted recidivism with actual outcomes over two years.
+Criminal justice risk assessment tools demonstrate similar patterns. <R id="NzBiZGQ1YT">ProPublica's 2016 analysis</R> of the COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) system examined over 10,000 criminal defendants in Broward County, Florida, comparing predicted recidivism with actual outcomes over two years.
 
 **Key findings from the COMPAS analysis:**
 - Overall accuracy was approximately **61%** for both racial groups
@@ -149,7 +149,7 @@ Criminal justice risk assessment tools demonstrate similar patterns. <R id="8181
 - White defendants were more likely to be labeled low-risk but subsequently commit crimes
 - COMPAS and similar risk assessments are now used in **46 US states**
 
-While Northpointe (the system's developer, now Equivant) disputed aspects of the analysis, <R id="3bd4b29e4c338882">subsequent research</R> demonstrated that certain fairness criteria are mathematically incompatible—satisfying calibration (equal accuracy across groups) can conflict with equal error rates across groups. This "impossibility of fairness" theorem shows that algorithmic bias is not merely a technical problem but involves fundamental value trade-offs.
+While Northpointe (the system's developer, now Equivant) disputed aspects of the analysis, <R id="MDg0YjFmMT">subsequent research</R> demonstrated that certain fairness criteria are mathematically incompatible—satisfying calibration (equal accuracy across groups) can conflict with equal error rates across groups. This "impossibility of fairness" theorem shows that algorithmic bias is not merely a technical problem but involves fundamental value trade-offs.
 
 The systematic nature of these biases creates the potential for what Barocas and Selbst (2016) term "data mining discrimination"—patterns of disparate impact that emerge from seemingly neutral analytical techniques but reflect underlying biases in historical data. As these systems are adopted across multiple institutions, the biases become coordinated across decision-making contexts in ways that individual human bias rarely achieved.
 
@@ -157,7 +157,7 @@ The systematic nature of these biases creates the potential for what Barocas and
 
 A more subtle but potentially more dangerous source of bias emerges when AI systems are trained to optimize metrics that serve as proxies for desired outcomes but systematically diverge from those outcomes in particular contexts. This type of bias is particularly insidious because it can produce systems that appear to be working correctly according to their specified objectives while systematically undermining the broader goals they were intended to serve.
 
-Employment screening algorithms illustrate this dynamic clearly. <R id="398daf2d4c6eca6e">A 2024 University of Washington study</R> tested three state-of-the-art large language models on over 500 job listings, varying 120 first names associated with different racial and gender groups across more than 550 real resumes, generating over three million comparisons.
+Employment screening algorithms illustrate this dynamic clearly. <R id="NDc4MDljYW">A 2024 University of Washington study</R> tested three state-of-the-art large language models on over 500 job listings, varying 120 first names associated with different racial and gender groups across more than 550 real resumes, generating over three million comparisons.
 
 **Key findings from the UW hiring study:**
 - LLMs favored white-associated names **85%** of the time vs **9%** for Black-associated names
@@ -165,18 +165,18 @@ Employment screening algorithms illustrate this dynamic clearly. <R id="398daf2d
 - The systems **never** favored Black male-associated names over white male-associated names
 - Black female names were preferred **67%** of the time vs **15%** for Black male names (within-race gender disparity)
 
-This is particularly concerning given that <R id="4598c2ef620ae1f3">83% of employers now use some form of AI hiring tool</R>, including 99% of Fortune 500 companies. Most hiring AI systems are trained to identify candidates who resemble successful past hires, using metrics like tenure, performance ratings, or advancement within the organization. However, these metrics may reflect historical biases in hiring, management, and evaluation practices rather than genuine job performance capability. If women or minorities faced systematic barriers to advancement in previous eras, an AI system trained to identify candidates likely to advance will systematically screen against women and minorities, even though they may be equally or more capable of performing the job functions.
+This is particularly concerning given that <R id="MmQxZWY5MD">83% of employers now use some form of AI hiring tool</R>, including 99% of Fortune 500 companies. Most hiring AI systems are trained to identify candidates who resemble successful past hires, using metrics like tenure, performance ratings, or advancement within the organization. However, these metrics may reflect historical biases in hiring, management, and evaluation practices rather than genuine job performance capability. If women or minorities faced systematic barriers to advancement in previous eras, an AI system trained to identify candidates likely to advance will systematically screen against women and minorities, even though they may be equally or more capable of performing the job functions.
 
-A <R id="aa9bd39c247651f0">2024 UNESCO study</R> found that major LLMs associate women with "home" and "family" **four times more often** than men, while disproportionately linking male-sounding names to "business," "career," and "executive" roles.
+A <R id="ZTAxNmRiMW">2024 UNESCO study</R> found that major LLMs associate women with "home" and "family" **four times more often** than men, while disproportionately linking male-sounding names to "business," "career," and "executive" roles.
 
-Financial services face similar challenges with credit scoring algorithms that optimize for loan repayment rates rather than borrowers' actual capacity to repay. <R id="edca1d403eb2dff5">Research from Lehigh University</R> found that LLMs used in mortgage lending consistently recommended denying more loans and charging higher interest rates to Black applicants compared to otherwise identical white applicants.
+Financial services face similar challenges with credit scoring algorithms that optimize for loan repayment rates rather than borrowers' actual capacity to repay. <R id="MmQ0MjM4OW">Research from Lehigh University</R> found that LLMs used in mortgage lending consistently recommended denying more loans and charging higher interest rates to Black applicants compared to otherwise identical white applicants.
 
 **Key findings on AI credit discrimination:**
 - Black and Latino applicants face **61% rejection rates** compared to **48%** for other groups
-- <R id="90c93f4a5a4dbcfd">Stanford research</R> found credit scoring tools are **5-10% less accurate** for lower-income and minority borrowers
+- <R id="ZDUxMGRkZT">Stanford research</R> found credit scoring tools are **5-10% less accurate** for lower-income and minority borrowers
 - Bias was highest for "riskier" applications with low credit scores or high debt-to-income ratios
 - When decisions about minority applicants were assumed equally accurate as for white applicants, the **disparity dropped by 50%**
-- The <R id="6ac91c364421707b">Consumer Financial Protection Bureau estimates</R> that **20% of US adults** are underserved for credit, disproportionately from minority groups
+- The <R id="YTdiZDBmNm">Consumer Financial Protection Bureau estimates</R> that **20% of US adults** are underserved for credit, disproportionately from minority groups
 
 These systems may systematically deny credit to populations that historically had limited access to credit, not because those populations are inherently less creditworthy, but because they lack the credit history that the AI interprets as indicating reliability. This creates a self-perpetuating cycle where lack of access to credit prevents the development of credit history, which in turn justifies continued denial of credit access.
 
@@ -218,12 +218,12 @@ The challenge is further complicated by the fact that demonstrating systematic b
 
 ### Automation Bias and Accountability Diffusion
 
-The psychological phenomenon of automation bias creates additional challenges for detecting institutional capture because it systematically undermines the human oversight that is supposed to serve as a check on algorithmic decision-making. <R id="8b736db3fc699115">A systematic review</R> examining 74 studies found automation bias to be pervasive across domains, particularly in aviation and healthcare. Research by Parasuraman and Riley (1997) and subsequent studies have consistently demonstrated that humans tend to over-rely on automated systems, particularly when those systems demonstrate high reliability in initial use.
+The psychological phenomenon of automation bias creates additional challenges for detecting institutional capture because it systematically undermines the human oversight that is supposed to serve as a check on algorithmic decision-making. <R id="ZmU1NTdiZG">A systematic review</R> examining 74 studies found automation bias to be pervasive across domains, particularly in aviation and healthcare. Research by Parasuraman and Riley (1997) and subsequent studies have consistently demonstrated that humans tend to over-rely on automated systems, particularly when those systems demonstrate high reliability in initial use.
 
 **Recent research on automation bias:**
-- <R id="b9b538f4765a69af">A 2024 study in International Studies Quarterly</R> tested 9,000 adults across nine countries, finding a "Dunning-Kruger effect" where those with the lowest AI experience showed slight algorithm aversion, but automation bias increased at lower-to-moderate knowledge levels before leveling off
-- <R id="58e0055e5d5e0675">Research published in Scientific Reports</R> found that humans **inherit AI biases**: after working with biased AI recommendations, participants continued making the same errors even when the AI was no longer providing suggestions
-- A <R id="a96cbf6f98644f2f">2025 review in AI & Society</R> noted that human-in-the-loop processes can become "quasi-automated" where "the human contributes almost nothing" to oversight
+- <R id="YWMxZTRkZj">A 2024 study in International Studies Quarterly</R> tested 9,000 adults across nine countries, finding a "Dunning-Kruger effect" where those with the lowest AI experience showed slight algorithm aversion, but automation bias increased at lower-to-moderate knowledge levels before leveling off
+- <R id="Y2E0NmQyNW">Research published in Scientific Reports</R> found that humans **inherit AI biases**: after working with biased AI recommendations, participants continued making the same errors even when the AI was no longer providing suggestions
+- A <R id="ODZmOGExNW">2025 review in AI & Society</R> noted that human-in-the-loop processes can become "quasi-automated" where "the human contributes almost nothing" to oversight
 
 In institutional contexts, automation bias is amplified by organizational dynamics that make questioning AI recommendations professionally risky. A physician who frequently overrides AI diagnostic recommendations may face scrutiny from hospital administrators concerned about efficiency and consistency. A loan officer who deviates from AI credit assessments may be held responsible if those loans default at higher rates than AI-approved loans. A judge who ignores algorithmic risk assessments may face criticism if defendants assigned low risk scores by the AI commit crimes while on bail or probation.
 
@@ -293,7 +293,7 @@ More promising are approaches that focus on interpretability and explainability,
 
 ### Regulatory Frameworks and Limitations
 
-Regulatory approaches to preventing institutional capture face fundamental challenges related to the pace of technological development, the complexity of modern AI systems, and the distributed nature of algorithmic adoption across multiple sectors and jurisdictions. The <R id="acc5ad4063972046">European Union's AI Act</R> (Regulation EU 2024/1689), published in the EU Official Journal on July 12, 2024 and entering into force on August 1, 2024, represents the most comprehensive regulatory framework for AI governance to date.
+Regulatory approaches to preventing institutional capture face fundamental challenges related to the pace of technological development, the complexity of modern AI systems, and the distributed nature of algorithmic adoption across multiple sectors and jurisdictions. The <R id="NDRlMGJiNj">European Union's AI Act</R> (Regulation EU 2024/1689), published in the EU Official Journal on July 12, 2024 and entering into force on August 1, 2024, represents the most comprehensive regulatory framework for AI governance to date.
 
 **Key EU AI Act provisions for high-risk AI:**
 - Mandatory **risk assessment** and **conformity assessment** before deployment
@@ -379,45 +379,45 @@ Advances in AI interpretability, fairness techniques, and automated auditing lar
 
 ### Foundational Research
 
-- Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019). <R id="a2107d9d789b8124">Dissecting racial bias in an algorithm used to manage the health of populations</R>. *Science*, 366(6464), 447-453.
-- Angwin, J., Larson, J., Mattu, S., & Kirchner, L. (2016). <R id="81813c9c33253098">Machine Bias</R>. *ProPublica*.
-- Logg, J. M., Minson, J. A., & Moore, D. A. (2019). <R id="1597b60a507bf25b">Algorithm appreciation: People prefer algorithmic to human judgment</R>. *Organizational Behavior and Human Decision Processes*, 151, 90-103.
+- Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019). <R id="ZDE3ZTI3MD">Dissecting racial bias in an algorithm used to manage the health of populations</R>. *Science*, 366(6464), 447-453.
+- Angwin, J., Larson, J., Mattu, S., & Kirchner, L. (2016). <R id="NzBiZGQ1YT">Machine Bias</R>. *ProPublica*.
+- Logg, J. M., Minson, J. A., & Moore, D. A. (2019). <R id="MjVhNWYyNz">Algorithm appreciation: People prefer algorithmic to human judgment</R>. *Organizational Behavior and Human Decision Processes*, 151, 90-103.
 
 ### Hiring and Employment Discrimination
 
-- University of Washington (2024). <R id="398daf2d4c6eca6e">AI tools show biases in ranking job applicants' names according to perceived race and gender</R>.
-- Brookings Institution. <R id="aa9bd39c247651f0">Gender, race, and intersectional bias in AI resume screening via language model retrieval</R>.
-- NPR (2023). <R id="4598c2ef620ae1f3">Companies are turning to AI for hiring. That could lead to discrimination</R>.
+- University of Washington (2024). <R id="NDc4MDljYW">AI tools show biases in ranking job applicants' names according to perceived race and gender</R>.
+- Brookings Institution. <R id="ZTAxNmRiMW">Gender, race, and intersectional bias in AI resume screening via language model retrieval</R>.
+- NPR (2023). <R id="MmQxZWY5MD">Companies are turning to AI for hiring. That could lead to discrimination</R>.
 
 ### Healthcare Algorithms
 
-- npj Digital Medicine (2025). <R id="e206c777c8b622b5">Potential for Algorithmic Bias in Clinical Decision Instrument Development</R>.
-- Chicago Booth Review. <R id="dd87aea8332e4cfa">How Racial Bias Infected a Major Health-Care Algorithm</R>.
+- npj Digital Medicine (2025). <R id="MDBmMDBhYW">Potential for Algorithmic Bias in Clinical Decision Instrument Development</R>.
+- Chicago Booth Review. <R id="ZWQxYWY1MG">How Racial Bias Infected a Major Health-Care Algorithm</R>.
 
 ### Credit and Lending
 
-- Lehigh University (2024). <R id="edca1d403eb2dff5">AI Exhibits Racial Bias in Mortgage Underwriting Decisions</R>.
-- Stanford HAI. <R id="90c93f4a5a4dbcfd">How Flawed Data Aggravates Inequality in Credit</R>.
-- Brookings Institution. <R id="6ac91c364421707b">Reducing bias in AI-based financial services</R>.
+- Lehigh University (2024). <R id="MmQ0MjM4OW">AI Exhibits Racial Bias in Mortgage Underwriting Decisions</R>.
+- Stanford HAI. <R id="ZDUxMGRkZT">How Flawed Data Aggravates Inequality in Credit</R>.
+- Brookings Institution. <R id="YTdiZDBmNm">Reducing bias in AI-based financial services</R>.
 
 ### Automation Bias
 
-- Goddard, K., Roudsari, A., & Wyatt, J. C. (2012). <R id="8b736db3fc699115">Automation bias: a systematic review of frequency, effect mediators, and mitigators</R>. *Journal of the American Medical Informatics Association*, 19(1), 121-127.
-- Bauer, K., et al. (2024). <R id="b9b538f4765a69af">Bending the Automation Bias Curve: A Study of Human and AI-Based Decision Making in National Security Contexts</R>. *International Studies Quarterly*.
-- Leib, M., et al. (2023). <R id="58e0055e5d5e0675">Humans inherit artificial intelligence biases</R>. *Scientific Reports*.
+- Goddard, K., Roudsari, A., & Wyatt, J. C. (2012). <R id="ZmU1NTdiZG">Automation bias: a systematic review of frequency, effect mediators, and mitigators</R>. *Journal of the American Medical Informatics Association*, 19(1), 121-127.
+- Bauer, K., et al. (2024). <R id="YWMxZTRkZj">Bending the Automation Bias Curve: A Study of Human and AI-Based Decision Making in National Security Contexts</R>. *International Studies Quarterly*.
+- Leib, M., et al. (2023). <R id="Y2E0NmQyNW">Humans inherit artificial intelligence biases</R>. *Scientific Reports*.
 
 ### Regulatory Frameworks
 
-- European Commission. <R id="acc5ad4063972046">AI Act: Regulatory Framework for AI</R>.
-- European Parliament. <R id="373effab2c489c24">EU AI Act: First Regulation on Artificial Intelligence</R>.
-- OECD (2025). <R id="b09ff779df9ff054">AI in policy evaluation: Governing with Artificial Intelligence</R>.
+- European Commission. <R id="NDRlMGJiNj">AI Act: Regulatory Framework for AI</R>.
+- European Parliament. <R id="Yzc2ZjEwYm">EU AI Act: First Regulation on Artificial Intelligence</R>.
+- OECD (2025). <R id="MmQ0NzljOD">AI in policy evaluation: Governing with Artificial Intelligence</R>.
 
 ### Criminal Justice
 
-- ProPublica (2016). <R id="3e9713ca18618a69">How We Analyzed the COMPAS Recidivism Algorithm</R>.
-- ProPublica (2016). <R id="3bd4b29e4c338882">Bias in Criminal Risk Scores Is Mathematically Inevitable, Researchers Say</R>.
+- ProPublica (2016). <R id="YjE4ODg4Mz">How We Analyzed the COMPAS Recidivism Algorithm</R>.
+- ProPublica (2016). <R id="MDg0YjFmMT">Bias in Criminal Risk Scores Is Mathematically Inevitable, Researchers Say</R>.
 
 ### Government and Policy AI
 
-- MIT Media Lab. <R id="4acf2e33e690bafc">Algorithmic Decision Making and Governance in the Age of AI</R>.
-- Cambridge University Press. <R id="232261cfe3c236b9">Explainable and transparent artificial intelligence for public policymaking</R>.
+- MIT Media Lab. <R id="NTY3YzliYT">Algorithmic Decision Making and Governance in the Age of AI</R>.
+- Cambridge University Press. <R id="ODI1NTBhYz">Explainable and transparent artificial intelligence for public policymaking</R>.

@@ -589,6 +589,20 @@
       "when": 1775808000000,
       "tag": "0083_facts_entity_id_to_stable_id",
       "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1775894400000,
+      "tag": "0084_facts_fk_safety_cleanup",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1775980800000,
+      "tag": "0085_summaries_entity_id_to_stable_id",
+      "breakpoints": true
     }
   ]
 }

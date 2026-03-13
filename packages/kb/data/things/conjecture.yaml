@@ -35,7 +35,7 @@ facts:
   - id: f_Tu50nzl3OA
     property: founded-by
     value:
-      - !ref CrXoCsIucX:connor-leahy
+      - !ref CrXoCsIucX
       - sid-black
       - gabriel-alfour
     source: https://www.conjecture.dev/
