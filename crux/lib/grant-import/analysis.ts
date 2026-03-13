@@ -102,6 +102,18 @@ export function getByFunder(syncGrants: SyncGrant[]): FunderBreakdown[] {
 export function printMatchStats(grants: RawGrant[]): void {
   const stats = getMatchStats(grants);
 
+  // Warn about numeric-only grantee names (internal IDs from external systems)
+  const numericGrantees = grants.filter(
+    (g) => g.granteeId === null && /^\d+$/.test(g.granteeName.trim())
+  );
+  if (numericGrantees.length > 0) {
+    const uniqueNumeric = new Set(numericGrantees.map((g) => g.granteeName));
+    console.log(
+      `WARNING: ${numericGrantees.length} grants have numeric-only grantee names (${uniqueNumeric.size} unique IDs).`
+    );
+    console.log(`  These appear to be internal IDs from an external system and will be stored with null granteeId.\n`);
+  }
+
   console.log(`Entity matching:`);
   console.log(`  Matched: ${stats.matched} (${(stats.matchRate * 100).toFixed(1)}%)`);
   console.log(`  Unmatched: ${stats.unmatched} (stored as display names)\n`);

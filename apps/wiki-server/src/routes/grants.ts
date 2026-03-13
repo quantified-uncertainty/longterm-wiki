@@ -52,7 +52,7 @@ const SyncGrantsBatchSchema = z.object({
 
 const BatchUpdateGranteeItemSchema = z.object({
   id: z.string().length(10),
-  granteeId: z.string().max(200),
+  granteeId: z.string().max(200).nullable(),
 });
 
 const BatchUpdateGranteeSchema = z.object({
