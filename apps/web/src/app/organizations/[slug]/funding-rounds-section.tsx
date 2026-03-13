@@ -1,6 +1,6 @@
 /**
  * Funding Rounds section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Round names link to /funding-rounds/[id] detail pages.
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -39,7 +39,12 @@ export function FundingRoundsSection({
             {rounds.map((r) => (
               <tr key={r.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">{r.name}</span>
+                  <Link
+                    href={`/funding-rounds/${r.key}`}
+                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                  >
+                    {r.name}
+                  </Link>
                   {r.instrument && (
                     <span className="ml-1.5 text-[11px] text-muted-foreground">
                       ({r.instrument})

@@ -1,6 +1,6 @@
 /**
  * Investments Received section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Investor names link to entity pages; "details" links to /investments/[id].
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -48,6 +48,13 @@ export function InvestmentsReceivedSection({
                       inv.investorName
                     )}
                   </span>
+                  <Link
+                    href={`/investments/${inv.key}`}
+                    className="ml-1.5 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                    title="Investment details"
+                  >
+                    details
+                  </Link>
                   {inv.role && (
                     <span className="ml-1.5 text-[11px] text-muted-foreground">
                       ({inv.role})
