@@ -1,4 +1,4 @@
-import { getAllKBRecords, getKBEntity } from "@/data/kb";
+import { getAllKBRecordEntries, getKBEntity } from "@/data/kb";
 import { titleCase } from "@/components/wiki/kb/format";
 import { KBRecordsTable } from "./kb-records-table";
 
@@ -13,7 +13,7 @@ export interface RecordRow {
 }
 
 export function KBRecordsExplorerContent() {
-  const allRecords = getAllKBRecords();
+  const allRecords = getAllKBRecordEntries();
 
   const rows: RecordRow[] = allRecords.map(({ entityId, collection, entry }) => {
     const entity = getKBEntity(entityId);

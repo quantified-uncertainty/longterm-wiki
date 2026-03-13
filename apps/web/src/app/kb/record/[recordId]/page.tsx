@@ -9,7 +9,7 @@ import {
   getKBRecords,
   getKBRecordByKey,
   getKBRecordSchema,
-  getAllKBRecords,
+  getAllKBRecordEntries,
 } from "@/data/kb";
 import {
   formatKBCellValue,
@@ -22,7 +22,7 @@ import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
 // ── Static params ────────────────────────────────────────────────────
 
 export function generateStaticParams() {
-  const allRecords = getAllKBRecords();
+  const allRecords = getAllKBRecordEntries();
 
   // Assert global uniqueness of record keys at build time
   const seen = new Map<string, string>();

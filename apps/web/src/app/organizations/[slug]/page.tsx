@@ -25,7 +25,7 @@ import {
 } from "@/components/wiki/kb/format";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
-import type { Fact, Property, RecordEntry } from "@longterm-wiki/kb";
+import type { Fact, Property } from "@longterm-wiki/kb";
 import Link from "next/link";
 import {
   Breadcrumbs,
@@ -73,7 +73,7 @@ function formatAmount(value: unknown): string | null {
 }
 
 /** Safely get a string field from a record, or undefined. */
-function field(item: RecordEntry, key: string): string | undefined {
+function field(item: KBRecordEntry, key: string): string | undefined {
   const v = item.fields[key];
   if (v == null) return undefined;
   return String(v);
@@ -345,20 +345,6 @@ const ORG_TYPE_COLORS: Record<string, string> = {
     "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
 };
 
-function SectionHeader({ title, count }: { title: string; count?: number }) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <h2 className="text-base font-bold tracking-tight">{title}</h2>
-      {count != null && (
-        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-          {count}
-        </span>
-      )}
-      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-    </div>
-  );
-}
-
 // ── Grant helpers ─────────────────────────────────────────────────────
 
 const MAX_GRANTS_SHOWN = 10;
@@ -378,7 +364,7 @@ function resolveRecipient(recipientId: string): { name: string; href: string | n
 }
 
 /** Parse grant record fields into a structured object for display. */
-function parseGrantRecord(record: RecordEntry): {
+function parseGrantRecord(record: KBRecordEntry): {
   key: string;
   name: string;
   recipient: string | null;
@@ -581,7 +567,7 @@ const DIVISION_TYPE_COLORS: Record<string, string> = {
   "program-area": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
 };
 
-function parseDivisionRecord(record: RecordEntry) {
+function parseDivisionRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
@@ -711,7 +697,7 @@ const PROGRAM_TYPE_COLORS: Record<string, string> = {
   call: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
 };
 
-function parseFundingProgramRecord(record: RecordEntry) {
+function parseFundingProgramRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
@@ -846,7 +832,7 @@ const ROLE_TYPE_COLORS: Record<string, string> = {
   career: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
 };
 
-function parsePersonnelRecord(record: RecordEntry) {
+function parsePersonnelRecord(record: KBRecordEntry) {
   const f = record.fields;
   const schema = record.schema;
 
@@ -970,7 +956,7 @@ function KeyPersonnelSection({
 
 // ── Funding Round helpers ────────────────────────────────────────────
 
-function parseFundingRoundRecord(record: RecordEntry) {
+function parseFundingRoundRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
@@ -1071,7 +1057,7 @@ function FundingRoundsSection({
 
 // ── Investment helpers ───────────────────────────────────────────────
 
-function parseInvestmentRecord(record: RecordEntry) {
+function parseInvestmentRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
@@ -1169,7 +1155,7 @@ function InvestmentsReceivedSection({
 
 // ── Equity Position helpers ─────────────────────────────────────────
 
-function parseEquityPositionRecord(record: RecordEntry) {
+function parseEquityPositionRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
@@ -1277,7 +1263,7 @@ export default async function OrgProfilePage({
   const allCollections = getKBAllRecordCollections(entity.id);
 
   // Curated collections
-  const fundingRounds = allCollections["funding-rounds"] ?? [];
+  const rawFundingRounds = allCollections["funding-rounds"] ?? [];
   const keyPersons = allCollections["key-persons"] ?? [];
   const investments = allCollections["investments"] ?? [];
   const products = allCollections["products"] ?? [];
@@ -1296,7 +1282,7 @@ export default async function OrgProfilePage({
   );
 
   // Sort collections by date (most recent first)
-  const sortedRounds = sortKBRecords(fundingRounds, "date", false);
+  const sortedRounds = sortKBRecords(rawFundingRounds, "date", false);
   const sortedModels = sortKBRecords(modelReleases, "released", false);
   const sortedMilestones = sortKBRecords(safetyMilestones, "date", false);
   const sortedPartnerships = sortKBRecords(strategicPartnerships, "date", false);
