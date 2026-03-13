@@ -34,8 +34,10 @@ export interface PersonMention {
   canonicalName: string;
   /** 1-based line number in the file */
   line: number;
-  /** Whether this mention is already inside an EntityLink */
-  alreadyLinked: boolean;
+  /** Character offset within the line (0-based) */
+  lineOffset: number;
+  /** Whether this mention is in an excluded zone (EntityLink, heading, code, markdown link, etc.) */
+  excluded: boolean;
 }
 
 export interface PageMentions {
@@ -57,8 +59,7 @@ export interface PageMentions {
  *
  * Includes:
  * - Full name (cleaned of parentheticals)
- * - Diacritic-stripped variant
- * - Manual aliases for known variations
+ * - Diacritic-stripped variant (via normalizeName)
  */
 export function buildPersonLookup(
   people: PersonEntity[],
@@ -71,18 +72,6 @@ export function buildPersonLookup(
     const normalized = normalizeName(cleanName);
     if (normalized.length > 0) {
       lookup.set(normalized, person);
-    }
-  }
-
-  // Manual aliases for known name variations
-  const aliases: Record<string, string> = {
-    'nuno sempere': 'nuno-sempere',
-  };
-
-  for (const [alias, entityId] of Object.entries(aliases)) {
-    const person = people.find((p) => p.id === entityId);
-    if (person) {
-      lookup.set(normalizeName(alias), person);
     }
   }
 
@@ -111,6 +100,7 @@ interface ExcludedZone {
  * - Headings (lines starting with #)
  * - MDX comments (curly-brace-slash-star blocks)
  * - Import/export statements
+ * - Markdown links: inline `[text](url)`, images `![alt](url)`, reference `[text][ref]`
  */
 export function findExcludedZones(content: string): ExcludedZone[] {
   const zones: ExcludedZone[] = [];
@@ -190,6 +180,33 @@ export function findExcludedZones(content: string): ExcludedZone[] {
   // Footnote reference definitions: [^...]: ...
   const footnoteDefRegex = /^\[\^[^\]]+\]:\s+.*$/gm;
   for (const match of content.matchAll(footnoteDefRegex)) {
+    zones.push({
+      start: match.index!,
+      end: match.index! + match[0].length,
+    });
+  }
+
+  // Markdown inline links: [text](url)
+  const inlineLinkRegex = /\[([^\]]*)\]\([^)]*\)/g;
+  for (const match of content.matchAll(inlineLinkRegex)) {
+    zones.push({
+      start: match.index!,
+      end: match.index! + match[0].length,
+    });
+  }
+
+  // Markdown images: ![alt](url)
+  const imageRegex = /!\[([^\]]*)\]\([^)]*\)/g;
+  for (const match of content.matchAll(imageRegex)) {
+    zones.push({
+      start: match.index!,
+      end: match.index! + match[0].length,
+    });
+  }
+
+  // Markdown reference links: [text][ref]
+  const refLinkRegex = /\[([^\]]*)\]\[[^\]]*\]/g;
+  for (const match of content.matchAll(refLinkRegex)) {
     zones.push({
       start: match.index!,
       end: match.index! + match[0].length,
@@ -318,6 +335,10 @@ export function detectPersonMentions(
       // Check if in excluded zone
       const inExcluded = isInExcludedZone(origPos, origLength, excludedZones);
 
+      // Compute character offset within the line
+      const lineStartPos = lineStarts[lineNum - 1];
+      const lineOffset = origPos - lineStartPos;
+
       // Mark positions as matched
       for (let i = origPos; i < origPos + origLength; i++) {
         matchedPositions.add(i);
@@ -329,7 +350,8 @@ export function detectPersonMentions(
         matchedText,
         canonicalName: person.title.replace(/\s*\(.*?\)\s*$/, '').trim(),
         line: lineNum,
-        alreadyLinked: inExcluded,
+        lineOffset,
+        excluded: inExcluded,
       });
     }
   }
@@ -397,15 +419,6 @@ export function buildPositionMap(original: string): number[] {
 // Apply logic — wrap first occurrence of each person in EntityLink
 // ---------------------------------------------------------------------------
 
-export interface ApplyResult {
-  filePath: string;
-  originalContent: string;
-  modifiedContent: string;
-  appliedCount: number;
-  /** Person IDs that were linked */
-  linkedPersons: string[];
-}
-
 /**
  * Apply EntityLink wrapping to the first unlinked occurrence of each person
  * in the given content.
@@ -417,7 +430,7 @@ export function applyEntityLinks(
   // Group by personId, take only unlinked, and pick the first occurrence
   const firstByPerson = new Map<string, PersonMention>();
   for (const m of mentions) {
-    if (m.alreadyLinked) continue;
+    if (m.excluded) continue;
     if (!firstByPerson.has(m.personId)) {
       firstByPerson.set(m.personId, m);
     }
@@ -442,12 +455,14 @@ export function applyEntityLinks(
     const replacement = `<EntityLink id="${idAttr}" name="${nameAttr}">${mention.matchedText}</EntityLink>`;
 
     // Find the exact position of this mention in the content
-    // We search line by line to find the right occurrence
+    // We search line by line, starting from the stored lineOffset to find the right occurrence
     const lines = result.split('\n');
     const targetLine = mention.line - 1; // 0-indexed
     if (targetLine >= 0 && targetLine < lines.length) {
       const line = lines[targetLine];
-      const idx = line.indexOf(mention.matchedText);
+      // Use lineOffset as the starting search position to avoid matching
+      // an earlier occurrence that might be inside an excluded zone (e.g., EntityLink)
+      const idx = line.indexOf(mention.matchedText, mention.lineOffset);
       if (idx !== -1) {
         // Verify this position is not inside an excluded zone in the current content
         const excludedZones = findExcludedZones(result);

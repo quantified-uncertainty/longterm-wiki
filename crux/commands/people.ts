@@ -1639,7 +1639,7 @@ function scanMdxFiles(
           results.push({
             filePath: relativePath,
             mentions,
-            unlinkedMentions: mentions.filter((m) => !m.alreadyLinked),
+            unlinkedMentions: mentions.filter((m) => !m.excluded),
           });
         }
       }
@@ -1699,8 +1699,8 @@ async function suggestLinksCommand(
     for (const page of allPages) {
       lines.push(`\n  \x1b[36m${page.filePath}\x1b[0m`);
       for (const m of page.mentions) {
-        const status = m.alreadyLinked
-          ? '\x1b[32m[linked]\x1b[0m'
+        const status = m.excluded
+          ? '\x1b[32m[excluded]\x1b[0m'
           : '\x1b[33m[unlinked]\x1b[0m';
         lines.push(
           `    L${m.line}: ${status} "${m.matchedText}" -> ${m.personId}`,

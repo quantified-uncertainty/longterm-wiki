@@ -33,9 +33,9 @@ describe('buildPersonLookup', () => {
     expect(lookup.get('sam bankman-fried (ftx)')).toBeUndefined();
   });
 
-  it('includes manual aliases for known variations', () => {
+  it('maps diacritic-stripped names (Nuño -> nuno)', () => {
     const lookup = buildPersonLookup(samplePeople);
-    // "Nuno Sempere" (without tilde) should match "Nuño Sempere"
+    // normalizeName("Nuño Sempere") strips the tilde, so "nuno sempere" maps naturally
     expect(lookup.get('nuno sempere')?.id).toBe('nuno-sempere');
   });
 });
@@ -83,6 +83,24 @@ describe('findExcludedZones', () => {
     const zones = findExcludedZones(content);
     expect(zones.some((z) => content.substring(z.start, z.end).includes('Dario Amodei'))).toBe(true);
   });
+
+  it('excludes markdown inline links', () => {
+    const content = 'See [Dario Amodei](https://example.com) for details';
+    const zones = findExcludedZones(content);
+    expect(zones.some((z) => content.substring(z.start, z.end).includes('Dario Amodei'))).toBe(true);
+  });
+
+  it('excludes markdown image alt text', () => {
+    const content = '![Dario Amodei speaking](https://example.com/photo.jpg)';
+    const zones = findExcludedZones(content);
+    expect(zones.some((z) => content.substring(z.start, z.end).includes('Dario Amodei'))).toBe(true);
+  });
+
+  it('excludes markdown reference links', () => {
+    const content = 'See [Dario Amodei][ref1] for details';
+    const zones = findExcludedZones(content);
+    expect(zones.some((z) => content.substring(z.start, z.end).includes('Dario Amodei'))).toBe(true);
+  });
 });
 
 describe('buildPositionMap', () => {
@@ -119,7 +137,7 @@ describe('detectPersonMentions', () => {
     expect(mentions.length).toBe(1);
     expect(mentions[0].personId).toBe('dario-amodei');
     expect(mentions[0].matchedText).toBe('Dario Amodei');
-    expect(mentions[0].alreadyLinked).toBe(false);
+    expect(mentions[0].excluded).toBe(false);
   });
 
   it('detects multiple different people', () => {
@@ -134,13 +152,13 @@ describe('detectPersonMentions', () => {
       '<EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> said something.';
     const mentions = detectPersonMentions(content, lookup);
     expect(mentions.length).toBe(1);
-    expect(mentions[0].alreadyLinked).toBe(true);
+    expect(mentions[0].excluded).toBe(true);
   });
 
   it('skips mentions in frontmatter', () => {
     const content = '---\ntitle: Dario Amodei Profile\n---\nContent here.';
     const mentions = detectPersonMentions(content, lookup);
-    const unlinked = mentions.filter((m) => !m.alreadyLinked);
+    const unlinked = mentions.filter((m) => !m.excluded);
     // "Dario Amodei" in frontmatter should be marked as already linked (excluded)
     expect(unlinked.length).toBe(0);
   });
@@ -148,7 +166,7 @@ describe('detectPersonMentions', () => {
   it('skips mentions in code blocks', () => {
     const content = '```\nDario Amodei in code\n```\nDario Amodei in text.';
     const mentions = detectPersonMentions(content, lookup);
-    const unlinked = mentions.filter((m) => !m.alreadyLinked);
+    const unlinked = mentions.filter((m) => !m.excluded);
     expect(unlinked.length).toBe(1);
     expect(unlinked[0].matchedText).toBe('Dario Amodei');
   });
@@ -156,7 +174,7 @@ describe('detectPersonMentions', () => {
   it('skips mentions in headings', () => {
     const content = '## Dario Amodei\nDario Amodei is a CEO.';
     const mentions = detectPersonMentions(content, lookup);
-    const unlinked = mentions.filter((m) => !m.alreadyLinked);
+    const unlinked = mentions.filter((m) => !m.excluded);
     expect(unlinked.length).toBe(1);
   });
 
@@ -166,7 +184,7 @@ describe('detectPersonMentions', () => {
     expect(mentions.length).toBe(1);
     expect(mentions[0].personId).toBe('nuno-sempere');
     expect(mentions[0].matchedText).toBe('Nuno Sempere');
-    expect(mentions[0].alreadyLinked).toBe(false);
+    expect(mentions[0].excluded).toBe(false);
   });
 
   it('is case-insensitive', () => {
@@ -193,8 +211,28 @@ describe('detectPersonMentions', () => {
   it('handles multiple mentions of the same person', () => {
     const content = 'Dario Amodei said X. Later, Dario Amodei said Y.';
     const mentions = detectPersonMentions(content, lookup);
-    const unlinked = mentions.filter((m) => !m.alreadyLinked);
+    const unlinked = mentions.filter((m) => !m.excluded);
     expect(unlinked.length).toBe(2);
+  });
+
+  it('excludes person name inside markdown link', () => {
+    const content = 'Read about [Dario Amodei](https://example.com/dario) and his work.';
+    const mentions = detectPersonMentions(content, lookup);
+    // The mention inside the markdown link should be excluded
+    expect(mentions.length).toBe(1);
+    expect(mentions[0].excluded).toBe(true);
+  });
+
+  it('same name twice on one line: first in EntityLink (excluded), second plain text (detected)', () => {
+    const content = '<EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> met with Dario Amodei again.';
+    const mentions = detectPersonMentions(content, lookup);
+    expect(mentions.length).toBe(2);
+    // First occurrence (inside EntityLink) should be excluded
+    const excludedMentions = mentions.filter((m) => m.excluded);
+    const unlinkedMentions = mentions.filter((m) => !m.excluded);
+    expect(excludedMentions.length).toBe(1);
+    expect(unlinkedMentions.length).toBe(1);
+    expect(unlinkedMentions[0].matchedText).toBe('Dario Amodei');
   });
 });
 
@@ -256,6 +294,27 @@ describe('applyEntityLinks', () => {
     const content = 'No person names here.';
     const mentions = detectPersonMentions(content, lookup);
     const result = applyEntityLinks(content, mentions);
+    expect(result.appliedCount).toBe(0);
+    expect(result.content).toBe(content);
+  });
+
+  it('links the second occurrence when first is in EntityLink on same line', () => {
+    const content = '<EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> met with Dario Amodei again.';
+    const mentions = detectPersonMentions(content, lookup);
+    const result = applyEntityLinks(content, mentions);
+    // Should link the second (plain text) occurrence, not try to re-link inside EntityLink
+    expect(result.appliedCount).toBe(1);
+    // The second "Dario Amodei" should be wrapped
+    expect(result.content).toMatch(
+      /met with <EntityLink id="E91" name="dario-amodei">Dario Amodei<\/EntityLink> again\./,
+    );
+  });
+
+  it('does not wrap person name inside markdown link', () => {
+    const content = 'Read about [Dario Amodei](https://example.com/dario) for details.';
+    const mentions = detectPersonMentions(content, lookup);
+    const result = applyEntityLinks(content, mentions);
+    // Should not wrap the name since it is inside a markdown link
     expect(result.appliedCount).toBe(0);
     expect(result.content).toBe(content);
   });
