@@ -4,7 +4,7 @@ import {
   numericValue,
   formatStake,
   formatAmount,
-} from "../[slug]/org-data";
+} from "@/app/organizations/[slug]/org-data";
 
 describe("parseNumericOrRange", () => {
   it("returns a single number as-is", () => {

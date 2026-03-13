@@ -9,7 +9,7 @@ import {
   getKBLatest,
 } from "@/data/kb";
 import { formatKBDate, isUrl, shortDomain } from "@/components/wiki/kb/format";
-import { formatAmount } from "../org-data";
+import { formatAmount } from "@/app/organizations/[slug]/org-data";
 import type { Fact, RecordEntry } from "@longterm-wiki/kb";
 import { Breadcrumbs } from "@/components/directory";
 
@@ -75,7 +75,10 @@ export default async function OrgFundingPage({
 
   // Count unique investors (not investment records)
   const uniqueInvestorCount = new Set(
-    investments.map(inv => String(inv.fields.investor ?? inv.displayName ?? inv.key)).filter(Boolean)
+    investments
+      .map(inv => inv.fields.investor ?? inv.displayName ?? inv.key)
+      .filter((v): v is string | number => v != null)
+      .map(String)
   ).size;
 
   // Sort valuation facts chronologically

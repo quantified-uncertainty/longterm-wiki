@@ -5,8 +5,8 @@
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
-import type { ParsedInvestmentRecord } from "./org-data";
-import { formatAmount, numericValue } from "./org-data";
+import type { ParsedInvestmentRecord } from "@/app/organizations/[slug]/org-data";
+import { formatAmount, numericValue } from "@/app/organizations/[slug]/org-data";
 
 export function InvestmentsReceivedSection({
   investments,
