@@ -121,5 +121,12 @@ export async function buildKbContextForPage(
     }
   }
 
+  // Record collections
+  const collections = graph.getRecordCollectionNames(entity.id);
+  if (collections.length > 0) {
+    lines.push('');
+    lines.push(`Record collections: ${collections.join(', ')} (use <KBF> or <KBRecordCollection> to render)`);
+  }
+
   return lines.join('\n');
 }

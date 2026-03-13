@@ -2,6 +2,7 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
+  getKBRecords,
 } from "@/data/kb";
 import type { Fact } from "@longterm-wiki/kb";
 import { KBEntitiesTable } from "./kb-entities-table";
@@ -39,6 +40,22 @@ export function KBEntityCoverageContent() {
         ? Math.round((factsWithSource / structuredFacts.length) * 100)
         : 0;
 
+    // Count records across all collections
+    let itemCount = 0;
+    const commonCollections = [
+      "funding-rounds",
+      "key-persons",
+      "products",
+      "model-releases",
+      "board-seats",
+      "strategic-partnerships",
+      "safety-milestones",
+      "research-areas",
+    ];
+    for (const collection of commonCollections) {
+      itemCount += getKBRecords(entity.id, collection).length;
+    }
+
     const propertyNames = [...propertyIds]
       .map((pid) => propertiesById.get(pid)?.name ?? pid)
       .sort();
@@ -49,7 +66,7 @@ export function KBEntityCoverageContent() {
       entityType: entity.type,
       factCount: structuredFacts.length,
       propertyCount: propertyIds.size,
-      itemCount: 0, // Records removed — field kept for interface compatibility
+      itemCount,
       sourceCoverage,
       properties: propertyNames,
     });

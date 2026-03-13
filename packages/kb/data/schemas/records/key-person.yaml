@@ -1,0 +1,20 @@
+name: Key Person
+description: "Current and former key personnel including founders, executives, and notable researchers."
+collectionName: key-persons
+temporal: true
+
+endpoints:
+  person:
+    types: [person]
+    required: true
+  organization:
+    types: [organization]
+    implicit: true
+
+fields:
+  title: { type: text, required: true, description: "Job title or role description" }
+  start: { type: date, description: "Start date at this organization (YYYY-MM)" }
+  end: { type: date, description: "End date if no longer in role (YYYY-MM); omit if current" }
+  is_founder: { type: boolean, description: "True if this person co-founded the organization" }
+  source: { type: text, description: "URL confirming the role" }
+  notes: { type: text, description: "Context about the role or transition" }
