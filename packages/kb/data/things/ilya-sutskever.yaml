@@ -57,6 +57,14 @@ facts:
     value: "@iabornamore"
     source: https://x.com/iabornamore
 
+  - id: f_iS_wiki_url
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Ilya_Sutskever"
+
+  - id: f_iS_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=x04W_mMAAAAJ"
+
   - id: f_h3HeIqbtpA
     property: employed-by
     value: "Google Brain"

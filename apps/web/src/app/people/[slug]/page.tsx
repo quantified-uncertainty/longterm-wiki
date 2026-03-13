@@ -32,6 +32,7 @@ import {
 import { formatKBDate } from "@/components/wiki/kb/format";
 import { getExpertById, getPublicationsForPerson } from "@/data";
 import { ExpertPositions } from "./expert-positions";
+import { SocialLinks } from "./social-links";
 
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
@@ -69,6 +70,19 @@ export default async function PersonProfilePage({
   const educationFact = getKBLatest(entity.id, "education");
   const notableForFact = getKBLatest(entity.id, "notable-for");
   const socialMediaFact = getKBLatest(entity.id, "social-media");
+  const websiteFact = getKBLatest(entity.id, "website");
+  const googleScholarFact = getKBLatest(entity.id, "google-scholar");
+  const githubFact = getKBLatest(entity.id, "github-profile");
+  const wikipediaFact = getKBLatest(entity.id, "wikipedia-url");
+
+  // Social links facts for the sidebar component
+  const socialLinkFacts = {
+    "website": websiteFact,
+    "social-media": socialMediaFact,
+    "github-profile": githubFact,
+    "google-scholar": googleScholarFact,
+    "wikipedia-url": wikipediaFact,
+  };
 
   // Expert positions from experts.yaml
   const expert = getExpertById(slug);
@@ -217,9 +231,14 @@ export default async function PersonProfilePage({
               KB data &rarr;
             </Link>
             {socialMediaFact?.value.type === "text" && (
-              <span className="text-muted-foreground">
+              <a
+                href={`https://x.com/${socialMediaFact.value.value.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
                 {socialMediaFact.value.value}
-              </span>
+              </a>
             )}
           </div>
         </div>
@@ -531,6 +550,9 @@ export default async function PersonProfilePage({
 
         {/* Sidebar */}
         <div className="space-y-8">
+          {/* Social Links */}
+          <SocialLinks facts={socialLinkFacts} />
+
           {/* Organization Roles (from org key-person records) */}
           {sortedOrgRoles.length > 0 && (
             <section>

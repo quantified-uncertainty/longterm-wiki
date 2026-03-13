@@ -52,6 +52,18 @@ facts:
     value: "@ch402"
     source: https://x.com/ch402
 
+  - id: f_cO_website
+    property: website
+    value: "https://colah.github.io"
+
+  - id: f_cO_github
+    property: github-profile
+    value: "https://github.com/colah"
+
+  - id: f_cO_scholar
+    property: google-scholar
+    value: "https://scholar.google.com/citations?user=vKAKE1gAAAAJ"
+
 records:
   career-history:
     i_cO1zA2bC3d:
