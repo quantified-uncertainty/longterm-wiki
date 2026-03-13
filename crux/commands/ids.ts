@@ -64,16 +64,17 @@ Examples:
     return { exitCode: 1, output: `Error: ${result.message}` };
   }
 
-  const { numericId, created, createdAt } = result.data;
+  const { numericId, stableId, created, createdAt } = result.data;
   const verb = created ? 'Allocated new' : 'Found existing';
 
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify(result.data) };
   }
 
+  const stableIdLine = stableId ? `\n  Stable ID: ${stableId}` : '';
   return {
     exitCode: 0,
-    output: `${verb} ID: ${numericId} → ${slug}\n  Created: ${createdAt}`,
+    output: `${verb} ID: ${numericId} → ${slug}${stableIdLine}\n  Created: ${createdAt}`,
   };
 }
 
@@ -117,9 +118,10 @@ Examples:
     return { exitCode: 0, output: JSON.stringify(result.data) };
   }
 
+  const stableIdLine = result.data.stableId ? `\n  Stable ID: ${result.data.stableId}` : '';
   return {
     exitCode: 0,
-    output: `${result.data.numericId} → ${slug}\n  Created: ${result.data.createdAt}`,
+    output: `${result.data.numericId} → ${slug}${stableIdLine}\n  Created: ${result.data.createdAt}`,
   };
 }
 
@@ -155,7 +157,8 @@ async function listCommand(
   ];
 
   for (const entry of ids) {
-    lines.push(`  ${entry.numericId.padEnd(8)} ${entry.slug}`);
+    const stableId = (entry as { stableId?: string | null }).stableId ?? '—';
+    lines.push(`  ${entry.numericId.padEnd(8)} ${stableId.padEnd(12)} ${entry.slug}`);
   }
 
   if (offset + ids.length < total) {

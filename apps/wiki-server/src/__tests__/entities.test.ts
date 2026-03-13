@@ -28,7 +28,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- entities: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"entities"')) {
-    const COLS = 13;
+    const COLS = 14;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -40,17 +40,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row: Record<string, unknown> = {
         id,
         numeric_id: params[o + 1],
-        entity_type: params[o + 2],
-        title: params[o + 3],
-        description: params[o + 4],
-        website: params[o + 5],
-        tags: params[o + 6],
-        clusters: params[o + 7],
-        status: params[o + 8],
-        last_updated: params[o + 9],
-        custom_fields: params[o + 10],
-        related_entries: params[o + 11],
-        sources: params[o + 12],
+        stable_id: params[o + 2],
+        entity_type: params[o + 3],
+        title: params[o + 4],
+        description: params[o + 5],
+        website: params[o + 6],
+        tags: params[o + 7],
+        clusters: params[o + 8],
+        status: params[o + 9],
+        last_updated: params[o + 10],
+        custom_fields: params[o + 11],
+        related_entries: params[o + 12],
+        sources: params[o + 13],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
@@ -86,7 +87,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- entities: SELECT with WHERE + OR (get by id or numeric_id) ---
+  // --- entities: SELECT with WHERE + OR (get by id, numeric_id, or stable_id) ---
   if (
     q.includes('"entities"') &&
     q.includes("where") &&
@@ -95,9 +96,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   ) {
     const id = params[0] as string;
     const numericId = params[1] as string;
+    const stableId = params[2] as string;
     const results: Record<string, unknown>[] = [];
     for (const row of entitiesStore.values()) {
-      if (row.id === id || row.numeric_id === numericId) {
+      if (row.id === id || row.numeric_id === numericId || row.stable_id === stableId) {
         results.push(row);
       }
     }
