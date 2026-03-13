@@ -771,10 +771,15 @@ function parseRecordEntry(
   // Warn about missing required explicit endpoints
   for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
     if (endpointDef.implicit) continue;
-    if (endpointDef.required && !fields[endpointName] && !displayName) {
+    // display_name only satisfies endpoints that opt into it (allowDisplayName)
+    const hasFallback = displayName && endpointDef.allowDisplayName;
+    if (endpointDef.required && !fields[endpointName] && !hasFallback) {
       console.warn(
         `[kb/loader] Record "${ownerEntityId}/${schemaId}/${key}" is missing ` +
-        `required endpoint "${endpointName}" (and no display_name fallback)`
+        `required endpoint "${endpointName}"` +
+        (displayName && !endpointDef.allowDisplayName
+          ? ` (display_name present but endpoint does not allow it)`
+          : ` (and no display_name fallback)`)
       );
     }
   }
