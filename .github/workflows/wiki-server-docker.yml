@@ -309,12 +309,24 @@ jobs:
           echo "Sync smoke test passed: upserted=$UPSERTED"
 
           # 3. Cleanup — delete the smoke-test row so it does not persist in the database
-          DELETE_RESPONSE=$(curl -sf -X DELETE \
-            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
-            "${LONGTERMWIKI_SERVER_URL}/api/pages/__smoke-test__")
-          DELETED=$(echo "$DELETE_RESPONSE" | jq -r '.deleted')
+          #    Retries up to 3 times with backoff to handle transient errors during rolling deploys.
+          #    Uses -s without -f so the response body is always captured for debugging.
+          DELETED=""
+          DELETE_HTTP_CODE=""
+          DELETE_RESPONSE=""
+          for i in 1 2 3; do
+            DELETE_RAW=$(curl -s -w "\n%{http_code}" -X DELETE \
+              -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+              "${LONGTERMWIKI_SERVER_URL}/api/pages/__smoke-test__" 2>&1 || true)
+            DELETE_HTTP_CODE=$(echo "$DELETE_RAW" | tail -1)
+            DELETE_RESPONSE=$(echo "$DELETE_RAW" | sed '$d')
+            DELETED=$(echo "$DELETE_RESPONSE" | jq -r '.deleted // empty' 2>/dev/null || true)
+            if [ "$DELETED" = "1" ]; then break; fi
+            echo "Delete cleanup attempt $i/3 failed (HTTP $DELETE_HTTP_CODE): $DELETE_RESPONSE"
+            if [ "$i" -lt 3 ]; then sleep $((i * 3)); fi
+          done
           if [ "$DELETED" != "1" ]; then
-            echo "::error::Smoke test cleanup failed: $DELETE_RESPONSE"
+            echo "::error::Smoke test cleanup failed after 3 attempts (HTTP $DELETE_HTTP_CODE): $DELETE_RESPONSE"
             exit 1
           fi
           echo "Smoke test cleanup passed: deleted=$DELETED"
