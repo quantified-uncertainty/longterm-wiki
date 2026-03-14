@@ -1447,7 +1447,7 @@ records:
     research:
       name: "AI Research"
       divisionType: department
-      lead: jared-kaplan  # no KB entity yet
+      lead: fUf1JGoMxA  # jared-kaplan
       status: active
       startDate: "2021-01"
       notes: "Core research org. Includes pretraining, alignment science,
@@ -1457,7 +1457,7 @@ records:
     pretraining:
       name: "Pretraining"
       divisionType: team
-      lead: nick-joseph  # no KB entity yet
+      lead: NbQZshguEg  # nick-joseph
       status: active
       startDate: "2021-01"
       notes: "Training Claude models at scale; scaling laws, compute efficiency.
@@ -1484,7 +1484,7 @@ records:
     safeguards-research:
       name: "Safeguards Research"
       divisionType: team
-      lead: mrinank-sharma  # no KB entity yet
+      lead: d7PzFxFD7w  # mrinank-sharma
       status: active
       startDate: "2023-01"
       notes: "Jailbreak robustness, automated red teaming, constitutional
@@ -1493,7 +1493,7 @@ records:
     anthropic-institute:
       name: "Anthropic Institute"
       divisionType: department
-      lead: jack-clark  # no KB entity yet
+      lead: BDokfhKAQQ  # jack-clark
       status: active
       startDate: "2026-03"
       source: https://www.anthropic.com/news/anthropic-institute
@@ -1521,7 +1521,7 @@ records:
     engineering:
       name: "Engineering & Infrastructure"
       divisionType: department
-      lead: rahul-patil  # no KB entity yet
+      lead: UV6uZIp0RA  # rahul-patil
       status: active
       startDate: "2021-01"
       notes: "Product engineering, infrastructure, inference, security,
@@ -1550,7 +1550,7 @@ records:
     policy:
       name: "Policy & Societal Impact"
       divisionType: department
-      lead: jack-clark  # no KB entity yet
+      lead: BDokfhKAQQ  # jack-clark
       status: active
       startDate: "2021-01"
       notes: "Government affairs, regulatory policy, societal impact research.
@@ -1584,7 +1584,7 @@ records:
     finance:
       name: "Finance & Operations"
       divisionType: department
-      lead: krishna-rao  # no KB entity yet
+      lead: ggrpeAtXwg  # krishna-rao
       status: active
       startDate: "2024-05"
       notes: "Led by CFO Krishna Rao (ex-Airbnb, first CFO hired May 2024).
