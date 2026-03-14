@@ -27,6 +27,7 @@ import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/kb/data/things");
 const EXPERTS_FILE = join(PROJECT_ROOT, "data/experts.yaml");
 const PEOPLE_RESOURCES_FILE = join(PROJECT_ROOT, "data/people-resources.yaml");
 
@@ -64,6 +65,7 @@ interface YamlEntity {
 
 export interface SyncEntity {
   id: string;
+  stableId: string | null;
   numericId: string | null;
   entityType: string;
   title: string;
@@ -231,6 +233,7 @@ export function mergeExpertData(
 export function transformEntity(e: YamlEntity): SyncEntity {
   return {
     id: e.id,
+    stableId: e.stableId ?? null,
     numericId: e.numericId ?? null,
     entityType: resolveEntityType(e.type) ?? e.type,
     title: e.title,
@@ -286,6 +289,46 @@ export function loadEntityYamls(
   }
 
   return { entities, errorFiles };
+}
+
+/**
+ * Load KB-only entities from packages/kb/data/things/*.yaml.
+ * Only returns entities NOT already present in the entityIds set.
+ * KB YAML structure: { thing: { id, stableId, type, name, numericId, aliases } }
+ */
+export function loadKBOnlyEntities(
+  existingIds: Set<string>,
+  dir: string = KB_THINGS_DIR,
+): YamlEntity[] {
+  const entities: YamlEntity[] = [];
+  let files: string[];
+  try {
+    files = readdirSync(dir).filter((f) => f.endsWith(".yaml"));
+  } catch {
+    return entities; // KB dir may not exist in all environments
+  }
+
+  for (const file of files) {
+    try {
+      const raw = readFileSync(join(dir, file), "utf-8");
+      const parsed = parseYaml(raw) as { thing?: { id?: string; stableId?: string; type?: string; name?: string; numericId?: string } };
+      const thing = parsed?.thing;
+      if (!thing?.id || !thing?.type || !thing?.name) continue;
+      if (existingIds.has(thing.id)) continue; // Already in entity YAML
+
+      entities.push({
+        id: thing.id,
+        stableId: thing.stableId,
+        numericId: thing.numericId,
+        type: thing.type,
+        title: thing.name,
+      });
+    } catch {
+      // Skip unparseable files
+    }
+  }
+
+  return entities;
 }
 
 /**
@@ -388,12 +431,20 @@ async function main() {
     process.exit(1);
   }
 
-  // Load entities
+  // Load entities from YAML
   console.log(`Reading entities from: ${ENTITIES_DIR}`);
   const { entities: yamlEntities, errorFiles } = loadEntityYamls();
-
   if (errorFiles > 0) {
     console.warn(`  ${errorFiles} file(s) had errors`);
+  }
+  console.log(`  Loaded ${yamlEntities.length} entities from YAML`);
+
+  // Load KB-only entities (not in entity YAML but have facts)
+  const entityIds = new Set(yamlEntities.map((e) => e.id));
+  const kbOnlyEntities = loadKBOnlyEntities(entityIds);
+  if (kbOnlyEntities.length > 0) {
+    console.log(`  Loaded ${kbOnlyEntities.length} KB-only entities`);
+    yamlEntities.push(...kbOnlyEntities);
   }
 
   // Load expert data and publication counts
