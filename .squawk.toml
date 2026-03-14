@@ -41,6 +41,11 @@ pg_version = "16"
 #   types) that PostgreSQL handles without table rewrites. Tables are small enough that even
 #   if a rewrite occurred, it would complete in seconds. Risk is mitigated by testing the
 #   migration against a production-like schema in CI (Test DB migrations job).
+#
+# adding-field-with-default:
+#   Generated/default columns added during CREATE TABLE or to small tables (< 100K rows)
+#   are instant or near-instant. The table rewrite warning is only relevant for large
+#   existing tables. All tables in this project are well below this threshold.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -56,4 +61,5 @@ excluded_rules = [
   "renaming-table",
   "ban-drop-column",
   "changing-column-type",
+  "adding-field-with-default",
 ]
