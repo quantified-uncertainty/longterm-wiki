@@ -113,12 +113,9 @@ export function FundingProgramsSection({
             {programs.map((p) => (
               <tr key={p.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
-                  <Link
-                    href={`/funding-programs/${p.key}`}
-                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                  >
+                  <span className="font-medium text-foreground text-xs">
                     {p.name}
-                  </Link>
+                  </span>
                   {p.description && (
                     <div className="text-[10px] text-muted-foreground/60 mt-0.5 line-clamp-2">
                       {p.description}
@@ -168,12 +165,17 @@ export function FundingProgramsSection({
 
 // ── Grants Section ──────────────────────────────────────────────────
 
+const MAX_GRANTS_SHOWN = 50;
+
 export function DivisionGrantsSection({
   grants,
 }: {
   grants: ParsedDivisionGrant[];
 }) {
   if (grants.length === 0) return null;
+
+  const displayed = grants.slice(0, MAX_GRANTS_SHOWN);
+  const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
 
   return (
     <section className="mb-8">
@@ -182,6 +184,11 @@ export function DivisionGrantsSection({
         <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
           {grants.length}
         </span>
+        {totalAmount > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {formatCompactCurrency(totalAmount)} total
+          </span>
+        )}
         <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
       </div>
       <div className="border border-border/60 rounded-xl overflow-x-auto">
@@ -195,7 +202,7 @@ export function DivisionGrantsSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {grants.map((g) => (
+            {displayed.map((g) => (
               <tr key={g.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
                   <span className="font-medium text-foreground text-xs">
@@ -229,6 +236,11 @@ export function DivisionGrantsSection({
           </tbody>
         </table>
       </div>
+      {grants.length > MAX_GRANTS_SHOWN && (
+        <p className="text-xs text-muted-foreground mt-2">
+          Showing top {MAX_GRANTS_SHOWN} of {grants.length} grants by amount.
+        </p>
+      )}
     </section>
   );
 }

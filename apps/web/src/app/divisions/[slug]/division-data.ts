@@ -316,18 +316,25 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
   const parentTypedEntity = getTypedEntityById(division.ownerEntityId);
   const parentWikiPageId = parentTypedEntity?.numericId ?? null;
 
-  // Find grants associated with this division (by divisionName or divisionId)
+  // Find grants associated with this division via: grant.programId → funding-program.divisionId → division.key
+  const programKeysForDivision = new Set(
+    divisionPrograms.map((p) => p.key),
+  );
   const parentGrants = getKBRecords(division.ownerEntityId, "grants");
-  const divisionName = division.name.toLowerCase();
-  const divisionKey = division.key.toLowerCase();
   const grants: ParsedDivisionGrant[] = parentGrants
     .filter((g) => {
+      const programId = g.fields.programId as string | undefined;
+      if (programId && programKeysForDivision.has(programId)) return true;
+      // Fallback: direct divisionName/program match
       const gDiv = g.fields.divisionName as string | undefined;
       const gProgram = g.fields.program as string | undefined;
-      if (!gDiv && !gProgram) return false;
-      const matchDiv = gDiv?.toLowerCase() === divisionName || gDiv?.toLowerCase() === divisionKey;
-      const matchProgram = gProgram?.toLowerCase() === divisionKey;
-      return matchDiv || matchProgram;
+      const divisionName = division.name.toLowerCase();
+      const divisionKey = division.key.toLowerCase();
+      if (gDiv) {
+        if (gDiv.toLowerCase() === divisionName || gDiv.toLowerCase() === divisionKey) return true;
+      }
+      if (gProgram && gProgram.toLowerCase() === divisionKey) return true;
+      return false;
     })
     .map((g) => {
       const recipientId = g.fields.recipient as string | undefined;
