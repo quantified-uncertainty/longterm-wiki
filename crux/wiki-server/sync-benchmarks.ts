@@ -155,18 +155,104 @@ export function loadBenchmarks(filePath: string = BENCHMARKS_FILE): YamlBenchmar
   const raw = readFileSync(filePath, "utf-8");
   const parsed = parseYaml(raw);
   if (!Array.isArray(parsed)) {
-    throw new Error(`${filePath}: expected array, got ${typeof parsed}`);
+    return [];
   }
   return parsed.filter(
     (b: YamlBenchmark) => b.id && b.type === "benchmark" && b.title
   );
 }
 
+/**
+ * Load benchmark results from ai-models.yaml, filtering to only benchmarks
+ * whose slug is in the provided set. Returns results with benchmarkId = slug.
+ */
+export function loadBenchmarkResults(
+  benchmarkIds: Set<string>,
+  filePath: string = AI_MODELS_FILE,
+): SyncBenchmarkResult[] {
+  const models = loadModels(filePath);
+
+  // Build a name → slug map using the static aliases
+  const nameToSlug = new Map<string, string>();
+  const aliases: Record<string, string> = {
+    "mmlu": "mmlu",
+    "swe-bench": "swe-bench-verified",
+    "swe-bench verified": "swe-bench-verified",
+    "math": "math-benchmark",
+    "humaneval": "humaneval",
+    "gpqa diamond": "gpqa-diamond",
+    "gpqa": "gpqa-diamond",
+    "arc-agi": "arc-agi",
+    "arc-agi-2": "arc-agi-2",
+    "aime 2025": "aime-2025",
+    "aime 2024": "aime-2024",
+    "aime": "aime-2025",
+    "osworld": "osworld",
+    "terminal-bench hard": "terminal-bench-hard",
+    "terminal-bench 2": "terminal-bench-2",
+    "terminal-bench 2.0": "terminal-bench-2",
+    "mmlu-pro": "mmlu-pro",
+    "simpleqa": "simpleqa",
+    "humanity's last exam": "humanitys-last-exam",
+    "hle": "humanitys-last-exam",
+    "ifeval": "ifeval",
+    "chatbot arena elo": "chatbot-arena-elo",
+    "chatbot arena": "chatbot-arena-elo",
+    "livecodebench": "livecodebench",
+    "livebench": "livebench",
+    "bfcl": "bfcl",
+    "frontiermath": "frontiermath",
+    "bbh": "bbh",
+    "big-bench hard": "bbh",
+    "hellaswag": "hellaswag",
+    "re-bench": "re-bench",
+    "mle-bench": "mle-bench",
+    "webarena": "webarena",
+    "tau-bench": "tau-bench",
+    "mgsm": "mgsm",
+    "mathvista": "mathvista",
+    "codeforces": "codeforces-rating",
+    "codeforces rating": "codeforces-rating",
+  };
+
+  for (const [alias, slug] of Object.entries(aliases)) {
+    if (benchmarkIds.has(slug)) {
+      nameToSlug.set(alias, slug);
+    }
+  }
+  // Also add direct benchmark IDs
+  for (const id of benchmarkIds) {
+    nameToSlug.set(id.toLowerCase(), id);
+  }
+
+  const results: SyncBenchmarkResult[] = [];
+  for (const model of models) {
+    if (!model.benchmarks?.length) continue;
+    for (const b of model.benchmarks) {
+      const slug = nameToSlug.get(b.name.toLowerCase());
+      if (!slug) continue;
+
+      results.push({
+        id: contentHash(["benchmark-result", slug, model.id]),
+        benchmarkId: slug,
+        modelId: model.id,
+        score: b.score,
+        unit: b.unit ?? null,
+        date: b.date ?? null,
+        sourceUrl: b.source ?? null,
+        notes: null,
+      });
+    }
+  }
+
+  return results;
+}
+
 export function loadModels(filePath: string = AI_MODELS_FILE): YamlModel[] {
   const raw = readFileSync(filePath, "utf-8");
   const parsed = parseYaml(raw);
   if (!Array.isArray(parsed)) {
-    throw new Error(`${filePath}: expected array, got ${typeof parsed}`);
+    return [];
   }
   return parsed.filter(
     (m: YamlModel) => m.id && m.type === "ai-model"

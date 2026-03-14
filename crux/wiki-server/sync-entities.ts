@@ -127,6 +127,56 @@ export function loadEntityYamls(
 }
 
 /**
+ * Sort entities so that dependencies (referenced entities) come before
+ * the entities that reference them. This prevents batch validation failures
+ * where a batch references entities that haven't been synced yet.
+ *
+ * Uses topological sort with cycle-breaking (circular refs are allowed
+ * within the same batch since the server validates intra-batch refs).
+ */
+export function sortByDependencies(entities: SyncEntity[]): SyncEntity[] {
+  const idSet = new Set(entities.map((e) => e.id));
+  const entityMap = new Map(entities.map((e) => [e.id, e]));
+
+  // Build dependency graph: entity → set of entities it depends on (within sync set)
+  const deps = new Map<string, Set<string>>();
+  for (const e of entities) {
+    const externalDeps = new Set<string>();
+    for (const rel of e.relatedEntries ?? []) {
+      if (idSet.has(rel.id) && rel.id !== e.id) {
+        externalDeps.add(rel.id);
+      }
+    }
+    deps.set(e.id, externalDeps);
+  }
+
+  const sorted: SyncEntity[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+
+  function visit(id: string) {
+    if (visited.has(id)) return;
+    if (visiting.has(id)) {
+      // Circular dependency — break cycle, will be handled within same batch
+      return;
+    }
+    visiting.add(id);
+    for (const dep of deps.get(id) ?? []) {
+      visit(dep);
+    }
+    visiting.delete(id);
+    visited.add(id);
+    sorted.push(entityMap.get(id)!);
+  }
+
+  for (const e of entities) {
+    visit(e.id);
+  }
+
+  return sorted;
+}
+
+/**
  * Sync entities to the wiki-server in batches.
  * Exported for testing.
  */
@@ -221,8 +271,11 @@ async function main() {
     process.exit(1);
   }
 
+  // Sort by dependencies so referenced entities are synced before referencing entities
+  const sortedPayloads = sortByDependencies(syncPayloads);
+
   // Sync
-  const result = await syncEntities(serverUrl, syncPayloads, batchSize);
+  const result = await syncEntities(serverUrl, sortedPayloads, batchSize);
 
   console.log(`\nSync complete:`);
   console.log(`  Upserted: ${result.upserted}`);
