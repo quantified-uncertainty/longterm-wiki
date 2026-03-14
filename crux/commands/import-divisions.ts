@@ -468,6 +468,194 @@ const DIVISIONS: DivisionDef[] = [
     notes:
       "Cost-effectiveness research team evaluating global health and development interventions. Recommends ~$500M+ annually in grants.",
   },
+
+  // ---- RAND Corporation ----
+  {
+    idSeed: "div|rand|ai-policy",
+    parentOrgId: ORG_IDS.RAND,
+    name: "AI Policy",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.rand.org/topics/artificial-intelligence.html",
+    notes:
+      "AI policy research covering governance, regulation, and societal impacts of AI. Part of RAND's broader technology policy portfolio.",
+  },
+  {
+    idSeed: "div|rand|technology-applied-sciences",
+    parentOrgId: ORG_IDS.RAND,
+    name: "Technology & Applied Sciences",
+    divisionType: "department",
+    status: "active",
+    source: "https://www.rand.org/topics/science-and-technology.html",
+    notes:
+      "Research on emerging technologies, cybersecurity, space, and applied science policy.",
+  },
+  {
+    idSeed: "div|rand|international-security",
+    parentOrgId: ORG_IDS.RAND,
+    name: "International Security & Defense",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.rand.org/topics/international-affairs.html",
+    notes:
+      "National security, defense strategy, and geopolitics research. One of RAND's founding focus areas.",
+  },
+
+  // ---- ARC (Alignment Research Center) ----
+  {
+    idSeed: "div|arc|evals",
+    parentOrgId: ORG_IDS.ARC,
+    name: "ARC Evals",
+    divisionType: "team",
+    status: "active",
+    source: "https://evals.alignment.org/",
+    notes:
+      "Evaluates frontier AI models for dangerous capabilities (e.g., autonomous replication). Spun out as METR in 2024 but ARC continues related eval work.",
+  },
+  {
+    idSeed: "div|arc|theory",
+    parentOrgId: ORG_IDS.ARC,
+    name: "ARC Theory",
+    divisionType: "team",
+    status: "active",
+    source: "https://alignment.org/",
+    notes:
+      "Theoretical alignment research led by Paul Christiano. Focuses on ELK (Eliciting Latent Knowledge) and foundational alignment theory.",
+  },
+
+  // ---- Redwood Research ----
+  {
+    idSeed: "div|redwood|research",
+    parentOrgId: ORG_IDS.REDWOOD_RESEARCH,
+    name: "Redwood Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.redwoodresearch.org/",
+    notes:
+      "Core research team working on interpretability and adversarial training techniques. Small org (~15-20 people) focused on applied alignment research including causal scrubbing and circuit-level interpretability.",
+  },
+
+  // ---- CHAI (Center for Human-Compatible AI) ----
+  {
+    idSeed: "div|chai|research",
+    parentOrgId: ORG_IDS.CHAI,
+    name: "CHAI Research",
+    divisionType: "lab",
+    status: "active",
+    source: "https://humancompatible.ai/research",
+    notes:
+      "Academic AI safety research lab at UC Berkeley founded by Stuart Russell. Researches value alignment, cooperative inverse reinforcement learning (CIRL), and human-AI interaction.",
+  },
+
+  // ---- CAIS (Center for AI Safety) ----
+  {
+    idSeed: "div|cais|research",
+    parentOrgId: ORG_IDS.CAIS,
+    name: "Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.safe.ai/research",
+    notes:
+      "Technical AI safety research on robustness, interpretability, and alignment. Led by Dan Hendrycks.",
+  },
+  {
+    idSeed: "div|cais|compute-cluster",
+    parentOrgId: ORG_IDS.CAIS,
+    name: "Compute Cluster",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.safe.ai/compute",
+    notes:
+      "Provides free compute access to academic AI safety researchers. One of the largest non-industry compute resources available for safety research.",
+  },
+  {
+    idSeed: "div|cais|field-building",
+    parentOrgId: ORG_IDS.CAIS,
+    name: "Field-Building",
+    divisionType: "program-area",
+    status: "active",
+    source: "https://www.safe.ai/",
+    notes:
+      "Programs to grow the AI safety research community, including the Statement on AI Risk signed by hundreds of researchers and the ML Safety course.",
+  },
+
+  // ---- GovAI ----
+  {
+    idSeed: "div|govai|research",
+    parentOrgId: ORG_IDS.GOVAI,
+    name: "GovAI Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.governance.ai/research",
+    notes:
+      "AI governance research at the University of Oxford. Publishes research on international AI governance, compute governance, and AI policy design.",
+  },
+  {
+    idSeed: "div|govai|policy",
+    parentOrgId: ORG_IDS.GOVAI,
+    name: "GovAI Policy",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.governance.ai/",
+    notes:
+      "Policy engagement and fellowships program. Places fellows in government offices and international organizations to work on AI policy.",
+  },
+
+  // ---- CSET (Georgetown) ----
+  {
+    idSeed: "div|cset|research",
+    parentOrgId: ORG_IDS.CSET,
+    name: "CSET Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://cset.georgetown.edu/publications/",
+    notes:
+      "Research on emerging technology policy at Georgetown University. Produces reports on AI workforce, semiconductor supply chains, and China's AI ecosystem.",
+  },
+  {
+    idSeed: "div|cset|policy",
+    parentOrgId: ORG_IDS.CSET,
+    name: "CSET Policy",
+    divisionType: "team",
+    status: "active",
+    source: "https://cset.georgetown.edu/",
+    notes:
+      "Policy engagement and government advisory work. Advises Congress and executive agencies on technology and national security policy.",
+  },
+
+  // ---- Epoch AI ----
+  {
+    idSeed: "div|epoch|research",
+    parentOrgId: ORG_IDS.EPOCH_AI,
+    name: "Epoch Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://epochai.org/research",
+    notes:
+      "Research on AI trends, forecasting, and compute scaling. Publishes influential analyses on training compute trends, parameter counts, and dataset sizes.",
+  },
+  {
+    idSeed: "div|epoch|data",
+    parentOrgId: ORG_IDS.EPOCH_AI,
+    name: "Epoch Data",
+    divisionType: "team",
+    status: "active",
+    source: "https://epochai.org/data",
+    notes:
+      "Maintains the Parameter, Compute and Data Trends database — one of the most cited datasets on ML model scaling. Tracks 700+ notable ML systems.",
+  },
+
+  // ---- Apollo Research ----
+  {
+    idSeed: "div|apollo|evals",
+    parentOrgId: ORG_IDS.APOLLO_RESEARCH,
+    name: "Apollo Evals",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.apolloresearch.ai/",
+    notes:
+      "AI safety evaluations focused on detecting deceptive and scheming behaviors in frontier models. Published influential research on in-context scheming in 2024.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
