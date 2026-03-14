@@ -35,15 +35,142 @@
   type: policy
   summaryPage: governance-overview
   title: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
+  introduced: February 2024
+  policyStatus: Vetoed September 29, 2024
+  author: Senator Scott Wiener
+  scope: State
+  billNumber: SB 1047
+  jurisdiction: California
+  session: "2023-2024"
+  fullTextUrl: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1047
+  vetoReason: >-
+    Governor Newsom cited concerns that the bill focuses on model size (compute/cost) rather than
+    deployment risk. He argued smaller models in high-risk contexts would not be covered, while large
+    models in benign contexts would be over-regulated. He preferred federal regulation and signed 18
+    other narrower AI bills simultaneously.
+  votes:
+    - chamber: Senate Committee
+      date: April 2024
+      result: Passed
+    - chamber: Senate Floor
+      date: May 21, 2024
+      result: Passed
+      ayes: 32
+      noes: 1
+    - chamber: Assembly Floor
+      date: August 28, 2024
+      result: Passed
+      ayes: 45
+      noes: 11
+  provisions:
+    - title: Safety Testing
+      description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment
+      category: Pre-deployment
+    - title: Shutdown Capability
+      description: Full shutdown of all model instances including during training, before beginning training
+      category: Pre-deployment
+    - title: Cybersecurity
+      description: Protection of model weights from theft; secure infrastructure; incident response plans
+      category: Security
+    - title: Third-Party Auditing
+      description: Annual independent audits starting Jan 1, 2026; 5-year record retention
+      category: Oversight
+    - title: Incident Reporting
+      description: Report AI safety incidents to Attorney General within 72 hours
+      category: Oversight
+    - title: Whistleblower Protection
+      description: Prohibit retaliation; anonymous reporting process; 7-year complaint retention
+      category: Worker protections
+    - title: Compute Cluster Reporting
+      description: Clusters >10^26 ops/second must report to state with customer information
+      category: Transparency
+    - title: Liability Framework
+      description: Affirmative defense for compliance; AG can sue for violations causing harm; penalties up to 10% of training costs
+      category: Enforcement
+  stakeholders:
+    - name: Center for AI Safety
+      entityId: cais
+      position: support
+      reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
+    - name: Future of Life Institute
+      position: support
+      reason: Supports proactive regulation of frontier AI
+    - name: Yoshua Bengio
+      entityId: yoshua-bengio
+      position: support
+      reason: Turing Award winner supporting frontier AI safety regulation
+    - name: Geoffrey Hinton
+      entityId: geoffrey-hinton
+      position: support
+      reason: Godfather of AI, warning about AI risks
+    - name: Stuart Russell
+      entityId: stuart-russell
+      position: support
+      reason: Leading AI researcher supporting enforceable safety requirements
+    - name: Elon Musk
+      entityId: elon-musk
+      position: support
+      reason: Publicly endorsed the bill
+    - name: OpenAI
+      entityId: openai
+      position: oppose
+      reason: Initially opposed; argued it would stifle innovation and drive development out of California
+      source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
+    - name: Anthropic
+      entityId: anthropic
+      position: mixed
+      reason: "Called final version 'benefits likely outweigh costs' but remained uncertain about approach"
+      source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
+    - name: Google DeepMind
+      entityId: deepmind
+      position: oppose
+      reason: Opposed on grounds of premature regulation and preference for federal approach
+    - name: Meta AI
+      entityId: meta-ai
+      position: oppose
+      reason: Strongly opposed; concerned about open-source implications and compliance burden
+    - name: Y Combinator
+      position: oppose
+      reason: Concerned about startup ecosystem impact and compliance costs
+    - name: Andreessen Horowitz
+      position: oppose
+      reason: Opposed on innovation and competition grounds
+    - name: Yann LeCun
+      entityId: yann-lecun
+      position: oppose
+      reason: Turing Award winner opposing the regulatory approach
+    - name: Andrew Ng
+      position: oppose
+      reason: Stanford professor and Google Brain co-founder opposing the bill
+    - name: Fei-Fei Li
+      position: oppose
+      reason: Stanford professor; later appointed by Newsom to expert panel on alternative approach
+  keyPoliticians:
+    - name: Senator Scott Wiener
+      role: Primary Author / Sponsor
+    - name: Governor Gavin Newsom
+      role: Vetoed the bill
+  amendments:
+    - date: April 2024
+      description: Narrowed scope to truly frontier models (>10^26 FLOP or >$100M training cost)
+    - date: June 2024
+      description: Added safe harbors and affirmative defenses for compliant developers; reduced liability provisions
+    - date: August 2024
+      description: Removed Frontier Model Division and criminal penalties; clarified open-source exemptions
+      author: Senator Wiener
   customFields:
     - label: Introduced
       value: February 2024
+    - label: Passed Committee
+      value: April 2024
+    - label: Passed Senate
+      value: May 21, 2024
+    - label: Passed Assembly
+      value: August 28, 2024
     - label: Passed Legislature
       value: August 29, 2024
     - label: Vetoed
       value: September 29, 2024
-    - label: Author
-      value: Senator Scott Wiener
   relatedEntries:
     - id: us-executive-order
       type: policy
@@ -52,6 +179,8 @@
     - id: eu-ai-act
       type: policy
     - id: voluntary-commitments
+      type: policy
+    - id: california-sb53
       type: policy
   sources:
     - title: SB 1047 Bill Text (Final Amended Version)
@@ -74,7 +203,8 @@
   description: >-
     SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California state
     legislation that would have required safety testing and liability measures for developers of the most powerful AI
-    models.
+    models. Passed the legislature with strong majorities (Senate 32-1, Assembly 45-11) but was vetoed by Governor
+    Newsom, who cited concerns about regulating based on model size rather than risk.
   tags:
     - regulation
     - state-policy
@@ -266,6 +396,10 @@
   type: policy
   summaryPage: governance-overview
   title: EU AI Act
+  introduced: April 2021
+  policyStatus: In Effect (August 2024)
+  author: European Commission
+  scope: International
   customFields:
     - label: Type
       value: Binding Regulation
@@ -524,6 +658,10 @@
   type: policy
   summaryPage: governance-overview
   title: US Executive Order on Safe, Secure, and Trustworthy AI
+  introduced: October 30, 2023
+  policyStatus: Revoked January 2025
+  author: President Biden
+  scope: Federal
   customFields:
     - label: Type
       value: Executive Order

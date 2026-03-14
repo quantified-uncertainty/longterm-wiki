@@ -124,12 +124,55 @@ const OrganizationEntitySchema = BaseEntity.extend({
   parentOrg: z.string().optional(),
 });
 
+const PolicyStakeholder = z.object({
+  name: z.string(),
+  entityId: z.string().optional(),
+  position: z.enum(["support", "oppose", "neutral", "mixed"]),
+  reason: z.string().optional(),
+  source: z.string().optional(),
+});
+
+const PolicyProvision = z.object({
+  title: z.string(),
+  description: z.string(),
+  category: z.string().optional(),
+});
+
+const PolicyVote = z.object({
+  chamber: z.string(),
+  date: z.string().optional(),
+  result: z.string(),
+  ayes: z.number().optional(),
+  noes: z.number().optional(),
+  abstain: z.number().optional(),
+});
+
+const PolicyAmendment = z.object({
+  date: z.string(),
+  description: z.string(),
+  author: z.string().optional(),
+});
+
 const PolicyEntitySchema = BaseEntity.extend({
   entityType: z.literal("policy"),
   introduced: z.string().optional(),
   policyStatus: z.string().optional(),
   author: z.string().optional(),
   scope: z.string().optional(),
+  billNumber: z.string().optional(),
+  jurisdiction: z.string().optional(),
+  session: z.string().optional(),
+  fullTextUrl: z.string().optional(),
+  vetoReason: z.string().optional(),
+  stakeholders: z.array(PolicyStakeholder).default([]),
+  provisions: z.array(PolicyProvision).default([]),
+  votes: z.array(PolicyVote).default([]),
+  amendments: z.array(PolicyAmendment).default([]),
+  keyPoliticians: z.array(z.object({
+    name: z.string(),
+    entityId: z.string().optional(),
+    role: z.string(),
+  })).default([]),
 });
 
 const ApproachEntitySchema = BaseEntity.extend({
