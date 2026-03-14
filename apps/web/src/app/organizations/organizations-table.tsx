@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import type { SortDir } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
 import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
+import { useServerTable } from "@/hooks/use-server-table";
 
 export interface OrgRow {
   id: string;
@@ -78,14 +79,101 @@ export interface OrgStatDef {
   value: string;
 }
 
-export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: OrgStatDef[] }) {
-  const [search, setSearch] = useState("");
+// ── Server response shape ──────────────────────────────────────────
+
+interface ServerOrg {
+  id: string;
+  numericId: string | null;
+  stableId: string | null;
+  title: string;
+  description: string | null;
+  website: string | null;
+  revenueNum: number | null;
+  revenueDate: string | null;
+  valuationNum: number | null;
+  valuationDate: string | null;
+  headcount: number | null;
+  headcountDate: string | null;
+  totalFundingNum: number | null;
+  foundedDate: string | null;
+}
+
+// Map OrgSortKey to server sort field names.
+// orgType is not sortable server-side (not in DB).
+const SORT_KEY_TO_SERVER_FIELD: Partial<Record<SortKey, string>> = {
+  name: "name",
+  revenue: "revenue",
+  valuation: "valuation",
+  headcount: "headcount",
+  totalFunding: "totalFunding",
+  founded: "founded",
+};
+
+const PAGE_SIZE = 50;
+
+// Stable module-level transform function — avoids re-renders
+function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number } {
+  const data = json as { organizations?: ServerOrg[]; total?: number };
+  return {
+    rows: (data.organizations ?? []).map((org) => ({
+      id: org.id,
+      slug: org.id,
+      name: org.title,
+      numericId: org.numericId,
+      orgType: null, // Will be enriched client-side from orgTypeMap
+      wikiPageId: org.numericId,
+      revenue: null,
+      revenueNum: org.revenueNum,
+      revenueDate: org.revenueDate,
+      valuation: null,
+      valuationNum: org.valuationNum,
+      valuationDate: org.valuationDate,
+      headcount: org.headcount,
+      headcountDate: org.headcountDate,
+      totalFunding: null,
+      totalFundingNum: org.totalFundingNum,
+      foundedDate: org.foundedDate,
+      searchText: "",
+    })),
+    total: data.total ?? 0,
+  };
+}
+
+// ── Component ───────────────────────────────────────────────────────
+
+export function OrganizationsTable({
+  rows,
+  stats,
+  serverEnabled = false,
+  orgTypeMap,
+}: {
+  rows: OrgRow[];
+  stats?: OrgStatDef[];
+  /** When true, uses server-side search/sort/pagination via /api/organizations */
+  serverEnabled?: boolean;
+  /** Maps entity id -> orgType for enriching server results (orgType is not in the DB) */
+  orgTypeMap?: Record<string, string>;
+}) {
+  const serverMode = serverEnabled;
+
+  // ── Server-side state (hook always called for consistent hook order) ──
+  const server = useServerTable<OrgRow>({
+    endpoint: "/api/organizations",
+    defaultPageSize: PAGE_SIZE,
+    defaultSort: { field: "name", dir: "asc" },
+    transform: transformOrgsResponse,
+    enabled: serverMode,
+  });
+
+  // ── Local (static) state ──
+  const [localSearch, setLocalSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statFilter, setStatFilter] = useState<StatFilterKey>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("revenue");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [localSortKey, setLocalSortKey] = useState<SortKey>("revenue");
+  const [localSortDir, setLocalSortDir] = useState<SortDir>("desc");
+  const [localPage, setLocalPage] = useState(0);
 
-  // Collect unique org types for filter
+  // Collect unique org types for filter (always from static rows)
   const orgTypes = useMemo(() => {
     const types = new Set<string>();
     for (const r of rows) {
@@ -94,7 +182,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
     return [...types].sort();
   }, [rows]);
 
-  // Count by type for badges
+  // Count by type for badges (always from static rows)
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = { all: rows.length };
     for (const r of rows) {
@@ -104,17 +192,53 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
     return counts;
   }, [rows]);
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  // ── Unified search handler ──
+  const search = serverMode ? server.search : localSearch;
+  const { setSearch: serverSetSearch, setSort: serverSetSort, setPage: serverSetPage } = server;
+  const handleSearch = useCallback((value: string) => {
+    if (serverMode) {
+      serverSetSearch(value);
     } else {
-      setSortKey(key);
-      setSortDir(key === "name" ? "asc" : "desc");
+      setLocalSearch(value);
+      setLocalPage(0);
     }
-  };
+  }, [serverMode, serverSetSearch]);
 
-  const filtered = useMemo(() => {
-    let result = rows;
+  // ── Unified sort ──
+  const sortKey: SortKey = serverMode
+    ? (server.sort.field as SortKey)
+    : localSortKey;
+  const sortDir: SortDir = serverMode ? server.sort.dir : localSortDir;
+
+  const handleSort = useCallback((key: SortKey) => {
+    if (serverMode) {
+      const serverField = SORT_KEY_TO_SERVER_FIELD[key];
+      if (serverField) {
+        serverSetSort(serverField);
+      }
+    } else {
+      if (localSortKey === key) {
+        setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      } else {
+        setLocalSortKey(key);
+        setLocalSortDir(key === "name" ? "asc" : "desc");
+      }
+      setLocalPage(0);
+    }
+  }, [serverMode, serverSetSort, localSortKey]);
+
+  // ── Enrich server data with orgType from static map ──
+  const enrichedServerData = useMemo(() => {
+    if (!serverMode) return [];
+    return server.data.map((row) => ({
+      ...row,
+      orgType: orgTypeMap?.[row.id] ?? null,
+    }));
+  }, [serverMode, server.data, orgTypeMap]);
+
+  // ── Client-side type/stat filtering (applied on both modes) ──
+  const applyClientFilters = useCallback((data: OrgRow[]): OrgRow[] => {
+    let result = data;
 
     if (typeFilter !== "all") {
       result = result.filter((r) => r.orgType === typeFilter);
@@ -134,17 +258,71 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
       }
     }
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    return result;
+  }, [typeFilter, statFilter]);
+
+  // ── Static mode: full client-side pipeline ──
+  const localFiltered = useMemo(() => {
+    if (serverMode) return [];
+    let result = applyClientFilters(rows);
+
+    if (localSearch.trim()) {
+      const q = localSearch.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
     }
 
     result = [...result].sort((a, b) =>
-      compareOrgRows(a, b, sortKey, sortDir),
+      compareOrgRows(a, b, localSortKey, localSortDir),
     );
 
     return result;
-  }, [rows, search, typeFilter, statFilter, sortKey, sortDir]);
+  }, [serverMode, rows, localSearch, localSortKey, localSortDir, applyClientFilters]);
+
+  // ── Pagination ──
+  const localTotalPages = Math.max(1, Math.ceil(localFiltered.length / PAGE_SIZE));
+  const localSafePage = Math.min(localPage, localTotalPages - 1);
+  const localPageRows = serverMode
+    ? []
+    : localFiltered.slice(localSafePage * PAGE_SIZE, (localSafePage + 1) * PAGE_SIZE);
+
+  // Server mode: apply client-side type/stat filters on top of server results
+  const serverFiltered = useMemo(() => {
+    if (!serverMode) return [];
+    return applyClientFilters(enrichedServerData);
+  }, [serverMode, enrichedServerData, applyClientFilters]);
+
+  // ── Unified display values ──
+  const displayRows = serverMode ? serverFiltered : localPageRows;
+  const currentPage = serverMode ? server.meta.page - 1 : localSafePage;
+  const totalPages = serverMode ? server.meta.pageCount : localTotalPages;
+  const displayTotal = serverMode ? server.meta.total : rows.length;
+  const filteredTotal = serverMode ? serverFiltered.length : localFiltered.length;
+  const isLoading = serverMode ? server.isLoading : false;
+  const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
+
+  const handlePageChange = useCallback((p: number) => {
+    if (serverMode) {
+      serverSetPage(p + 1); // hook uses 1-indexed pages
+    } else {
+      setLocalPage(p);
+    }
+  }, [serverMode, serverSetPage]);
+
+  /** Whether a column supports sorting in current mode */
+  const isSortable = (key: SortKey) =>
+    !serverMode || !!SORT_KEY_TO_SERVER_FIELD[key];
+
+  // ── Status text ──
+  const statusText = (() => {
+    if (serverMode) {
+      if (isLoading) return "Loading...";
+      if (typeFilter !== "all" || statFilter !== "all") {
+        return `${filteredTotal} of ${displayTotal} organizations (filtered)`;
+      }
+      return `${displayTotal} organizations`;
+    }
+    return `Showing ${filteredTotal} of ${rows.length} organizations`;
+  })();
 
   return (
     <div>
@@ -180,7 +358,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
           placeholder="Search name, type, people, funding programs, description..."
           aria-label="Search organizations"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
         />
         <div className="flex flex-wrap gap-1.5">
@@ -218,7 +396,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
 
       {/* Results count */}
       <div className="text-xs text-muted-foreground mb-3">
-        Showing {filtered.length} of {rows.length} organizations
+        {statusText}
       </div>
 
       {/* Table */}
@@ -227,7 +405,11 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Organization" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <SortHeader label="Type" sortKey="orgType" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              {isSortable("orgType") ? (
+                <SortHeader label="Type" sortKey="orgType" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              ) : (
+                <th className="py-2.5 px-3 font-medium text-left">Type</th>
+              )}
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Valuation" sortKey="valuation" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Headcount" sortKey="headcount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -236,106 +418,170 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {filtered.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-muted/20 transition-colors"
-              >
-                {/* Name */}
-                <td className="py-2.5 px-3">
-                  {row.slug ? (
-                    <Link
-                      href={`/organizations/${row.slug}`}
-                      className="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{row.name}</span>
-                  )}
-                  {row.wikiPageId && (
-                    <Link
-                      href={`/wiki/${row.wikiPageId}`}
-                      className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                      title="Wiki page"
-                    >
-                      wiki
-                    </Link>
-                  )}
+            {isInitialLoad ? (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="py-8 text-center text-muted-foreground text-sm"
+                >
+                  Loading organizations...
                 </td>
-
-                {/* Type */}
-                <td className="py-2.5 px-3">
-                  {row.orgType && (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        ORG_TYPE_COLORS[row.orgType] ?? DEFAULT_ORG_TYPE_COLOR
-                      }`}
-                    >
-                      {ORG_TYPE_LABELS[row.orgType] ?? row.orgType}
-                    </span>
-                  )}
-                </td>
-
-                {/* Revenue */}
-                <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.revenueNum != null ? (
-                    <>
-                      <span className="font-semibold">{formatCompactNumber(row.revenueNum)}</span>
-                      <DateHint date={row.revenueDate} />
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground/40">{"\u2014"}</span>
-                  )}
-                </td>
-
-                {/* Valuation */}
-                <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.valuationNum != null ? (
-                    <>
-                      <span className="font-semibold">{formatCompactNumber(row.valuationNum)}</span>
-                      <DateHint date={row.valuationDate} />
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground/40">{"\u2014"}</span>
-                  )}
-                </td>
-
-                {/* Headcount */}
-                <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.headcount != null ? (
-                    <>
-                      <span>{formatHeadcount(row.headcount)}</span>
-                      <DateHint date={row.headcountDate} />
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground/40">{"\u2014"}</span>
-                  )}
-                </td>
-
-                {/* Total Funding */}
-                <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.totalFundingNum != null ? (
-                    <span className="font-semibold">{formatCompactNumber(row.totalFundingNum)}</span>
-                  ) : (
-                    <span className="text-muted-foreground/40">{"\u2014"}</span>
-                  )}
-                </td>
-
-                {/* Founded */}
-                <td className="py-2.5 px-3 text-center text-muted-foreground">
-                  {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                </td>
-
               </tr>
-            ))}
+            ) : (
+              <>
+                {displayRows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className={`hover:bg-muted/20 transition-colors ${isLoading ? "opacity-50" : ""}`}
+                  >
+                    {/* Name */}
+                    <td className="py-2.5 px-3">
+                      {row.slug ? (
+                        <Link
+                          href={`/organizations/${row.slug}`}
+                          className="font-medium text-foreground hover:text-primary transition-colors"
+                        >
+                          {row.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-foreground">{row.name}</span>
+                      )}
+                      {row.wikiPageId && (
+                        <Link
+                          href={`/wiki/${row.wikiPageId}`}
+                          className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                          title="Wiki page"
+                        >
+                          wiki
+                        </Link>
+                      )}
+                    </td>
+
+                    {/* Type */}
+                    <td className="py-2.5 px-3">
+                      {row.orgType && (
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            ORG_TYPE_COLORS[row.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                          }`}
+                        >
+                          {ORG_TYPE_LABELS[row.orgType] ?? row.orgType}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Revenue */}
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                      {row.revenueNum != null ? (
+                        <>
+                          <span className="font-semibold">{formatCompactNumber(row.revenueNum)}</span>
+                          <DateHint date={row.revenueDate} />
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+
+                    {/* Valuation */}
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                      {row.valuationNum != null ? (
+                        <>
+                          <span className="font-semibold">{formatCompactNumber(row.valuationNum)}</span>
+                          <DateHint date={row.valuationDate} />
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+
+                    {/* Headcount */}
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                      {row.headcount != null ? (
+                        <>
+                          <span>{formatHeadcount(row.headcount)}</span>
+                          <DateHint date={row.headcountDate} />
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+
+                    {/* Total Funding */}
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
+                      {row.totalFundingNum != null ? (
+                        <span className="font-semibold">{formatCompactNumber(row.totalFundingNum)}</span>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+
+                    {/* Founded */}
+                    <td className="py-2.5 px-3 text-center text-muted-foreground">
+                      {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+
+                  </tr>
+                ))}
+                {displayRows.length === 0 && !isInitialLoad && (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="py-8 text-center text-muted-foreground text-sm"
+                    >
+                      {search
+                        ? "No organizations match your search."
+                        : "No organizations found."}
+                    </td>
+                  </tr>
+                )}
+              </>
+            )}
           </tbody>
         </table>
       </div>
 
-      {filtered.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          No organizations match your search.
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
+          <span>
+            Page {currentPage + 1} of {totalPages}
+          </span>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              disabled={currentPage === 0}
+              onClick={() => handlePageChange(0)}
+              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              First
+            </button>
+            <button
+              type="button"
+              disabled={currentPage === 0}
+              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              disabled={currentPage >= totalPages - 1}
+              onClick={() =>
+                handlePageChange(Math.min(totalPages - 1, currentPage + 1))
+              }
+              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              disabled={currentPage >= totalPages - 1}
+              onClick={() => handlePageChange(totalPages - 1)}
+              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Last
+            </button>
+          </div>
         </div>
       )}
     </div>

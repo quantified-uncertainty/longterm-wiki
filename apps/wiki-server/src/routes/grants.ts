@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, or, ilike, count, sql, desc } from "drizzle-orm";
+import { eq, and, count, sql, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { logger } from "../logger.js";
@@ -9,10 +9,9 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  escapeIlike,
   zv,
 } from "./utils.js";
-import { parseSort } from "./query-helpers.js";
+import { parseSort, buildSearchCondition } from "./query-helpers.js";
 import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
@@ -165,12 +164,9 @@ const grantsApp = new Hono()
     const conditions: SQL[] = [eq(grants.organizationId, entityId)];
 
     if (q) {
-      const pattern = `%${escapeIlike(q.trim())}%`;
-      const searchCond = or(
-        ilike(grants.name, pattern),
-        ilike(grants.notes, pattern),
-        ilike(grants.granteeId, pattern),
-        ilike(grants.programId, pattern),
+      const searchCond = buildSearchCondition(
+        [grants.name, grants.notes, grants.granteeId, grants.programId],
+        q,
       );
       if (searchCond) conditions.push(searchCond);
     }
