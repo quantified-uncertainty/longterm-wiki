@@ -290,17 +290,22 @@ const factsApp = new Hono()
           },
         });
       // Dual-write to things table
+      const toFactThingKey = (entityId: string, factId: string) =>
+        `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+
       await upsertThingsInTx(
         tx,
         items.map((f) => ({
-          id: `${f.entityId}:${f.factId}`,
+          id: toFactThingKey(f.entityId, f.factId),
           thingType: "fact" as const,
           title: f.label || `${f.factId} for ${f.entityId}`,
           sourceTable: "facts",
-          sourceId: `${f.entityId}:${f.factId}`,
+          sourceId: toFactThingKey(f.entityId, f.factId),
           description: f.value
             ? `${f.label || f.factId}: ${f.value}`
-            : undefined,
+            : f.numeric != null
+              ? `${f.label || f.factId}: ${f.numeric}`
+              : undefined,
         }))
       );
 
