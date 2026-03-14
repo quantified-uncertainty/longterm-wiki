@@ -13,6 +13,7 @@ import {
 import { Search } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
+import { formatType } from "./publication-utils";
 import {
   Table,
   TableBody,
@@ -64,12 +65,6 @@ const TYPE_COLORS: Record<string, string> = {
 const DEFAULT_TYPE_COLOR =
   "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
-function formatType(type: string): string {
-  return type
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function makeColumns(): ColumnDef<PublicationRow>[] {
   return [
     {
@@ -79,7 +74,7 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
       ),
       cell: ({ row }) => (
         <Link
-          href={`/kb/publications/${row.original.id}`}
+          href={`/publications/${row.original.id}`}
           className="text-primary hover:underline text-xs font-medium max-w-[250px] truncate block"
           title={row.original.name}
         >
@@ -113,7 +108,7 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
         const c = row.original.credibility;
         if (c == null)
           return (
-            <span className="text-muted-foreground/40 text-xs">-</span>
+            <span className="text-muted-foreground/40 text-xs">{"\u2014"}</span>
           );
         return <CredibilityBadge level={c} size="sm" showLabel />;
       },
@@ -126,7 +121,7 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
       ),
       cell: ({ row }) => (
         <span className="text-xs text-muted-foreground">
-          {row.original.peerReviewed ? "Yes" : "-"}
+          {row.original.peerReviewed ? "Yes" : <span className="text-muted-foreground/40">{"\u2014"}</span>}
         </span>
       ),
     },
@@ -262,8 +257,8 @@ export function PublicationsTable({
 
         <span className="text-xs text-muted-foreground whitespace-nowrap">
           {filtered === total
-            ? `${total} publications`
-            : `${filtered} of ${total} publications`}
+            ? `${total.toLocaleString()} publications`
+            : `${filtered.toLocaleString()} of ${total.toLocaleString()} publications`}
         </span>
       </div>
 
