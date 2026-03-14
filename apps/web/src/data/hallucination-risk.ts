@@ -2,7 +2,7 @@
  * Hallucination risk stats and citation quote lookups.
  */
 
-import { getDatabase, fetchFromWikiServer, withApiFallback } from "./database";
+import { getDatabase, getEntityBundle, fetchFromWikiServer, withApiFallback } from "./database";
 
 export interface RiskStats {
   total: number;
@@ -22,10 +22,14 @@ export async function getRiskStats(): Promise<RiskStats | null> {
 }
 
 /**
- * Get build-time citation quotes for a page from database.json.
+ * Get build-time citation quotes for a page.
+ * Tries per-entity bundle first, falls back to database.json.
  * Returns undefined if no citation data was bundled at build time.
  */
 export function getLocalCitationQuotes(pageId: string) {
+  // Try per-entity bundle first (avoids loading full database.json)
+  const bundle = getEntityBundle(pageId);
+  if (bundle?.citationQuotes) return bundle.citationQuotes;
   return getDatabase().citationQuotes?.[pageId];
 }
 

@@ -2562,6 +2562,70 @@ async function main() {
   console.log('✓ Written individual JSON files');
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');
 
+  // =========================================================================
+  // PER-ENTITY JSON FILES
+  // =========================================================================
+  // Generate individual JSON files per entity containing all data needed to
+  // render that entity's wiki page, so the full database.json doesn't need
+  // to be loaded for single-entity pages.
+  console.log('\nGenerating per-entity JSON files...');
+  const ENTITY_DIR = join(OUTPUT_DIR, 'generated', 'entities');
+  if (!existsSync(ENTITY_DIR)) {
+    mkdirSync(ENTITY_DIR, { recursive: true });
+  }
+
+  // Build lookup maps for efficient per-entity bundling
+  const typedEntityMap = new Map(typedEntities.map(e => [e.id, e]));
+  const pageMap = new Map(pages.map(p => [p.id, p]));
+
+  // Collect all entity IDs that have either a typed entity or a page
+  const allEntityIds = new Set([
+    ...typedEntities.map(e => e.id),
+    ...pages.map(p => p.id),
+  ]);
+
+  let entityFilesWritten = 0;
+  for (const entityId of allEntityIds) {
+    const bundle = {};
+
+    // Entity data
+    const entity = typedEntityMap.get(entityId);
+    if (entity) bundle.entity = entity;
+
+    // Page metadata
+    const page = pageMap.get(entityId);
+    if (page) bundle.page = page;
+
+    // Backlinks for this entity
+    const entityBacklinks = backlinks[entityId];
+    if (entityBacklinks) bundle.backlinks = entityBacklinks;
+
+    // Related graph entries
+    const entityRelated = relatedGraph[entityId];
+    if (entityRelated) bundle.relatedGraph = entityRelated;
+
+    // Citation quotes
+    const entityCitationQuotes = databaseForOutput.citationQuotes?.[entityId];
+    if (entityCitationQuotes) bundle.citationQuotes = entityCitationQuotes;
+
+    // Page references
+    const entityPageRefs = databaseForOutput.pageReferenceIndex?.[entityId];
+    if (entityPageRefs) bundle.pageReferences = entityPageRefs;
+
+    // Page resources
+    const entityPageResources = databaseForOutput.pageResources?.[entityId];
+    if (entityPageResources) bundle.pageResources = entityPageResources;
+
+    // Only write if there's meaningful data
+    if (Object.keys(bundle).length > 0) {
+      // Sanitize entityId for use as filename (some IDs contain path separators like __index__/...)
+      const safeFilename = entityId.replace(/\//g, '__');
+      writeFileSync(join(ENTITY_DIR, `${safeFilename}.json`), JSON.stringify(bundle));
+      entityFilesWritten++;
+    }
+  }
+  console.log(`✓ Written ${entityFilesWritten} per-entity JSON files to ${ENTITY_DIR}`);
+
   // Generate link health data
   if (CONTENT_ONLY) {
     console.log('\nLink health: skipped (content-only scope)');
