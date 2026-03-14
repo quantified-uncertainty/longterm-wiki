@@ -139,7 +139,7 @@ describe("matchProgram", () => {
       name: "Humane Society campaign",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+    expect(result).toBe(PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE);
   });
 
   it("matches Cage-Free Reforms to farm animal welfare", () => {
@@ -150,7 +150,7 @@ describe("matchProgram", () => {
       name: "Corporate campaign",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+    expect(result).toBe(PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE);
   });
 
   it("matches Alternatives to Animal Products to farm animal welfare", () => {
@@ -161,7 +161,7 @@ describe("matchProgram", () => {
       name: "Alt protein research",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+    expect(result).toBe(PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE);
   });
 
   it("matches Criminal Justice Reform to dedicated program", () => {
@@ -183,7 +183,7 @@ describe("matchProgram", () => {
       name: "EA community support",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_GCR_OPPORTUNITIES);
+    expect(result).toBe(PROGRAM_IDS.CG_GCR_OPPORTUNITIES);
   });
 
   it("matches Effective Giving & Careers to dedicated program", () => {
@@ -194,7 +194,7 @@ describe("matchProgram", () => {
       name: "80,000 Hours support",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_EFFECTIVE_GIVING);
+    expect(result).toBe(PROGRAM_IDS.CG_EFFECTIVE_GIVING);
   });
 
   it("matches Forecasting to dedicated program", () => {
@@ -205,7 +205,7 @@ describe("matchProgram", () => {
       name: "Metaculus support",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_FORECASTING);
+    expect(result).toBe(PROGRAM_IDS.CG_FORECASTING);
   });
 
   it("matches Abundance & Growth to dedicated program", () => {
@@ -216,7 +216,7 @@ describe("matchProgram", () => {
       name: "Innovation policy",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_ABUNDANCE_GROWTH);
+    expect(result).toBe(PROGRAM_IDS.CG_ABUNDANCE_GROWTH);
   });
 
   it("matches Innovation Policy to abundance & growth", () => {
@@ -227,7 +227,7 @@ describe("matchProgram", () => {
       name: "Tech policy project",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_ABUNDANCE_GROWTH);
+    expect(result).toBe(PROGRAM_IDS.CG_ABUNDANCE_GROWTH);
   });
 
   it("matches Scientific Research to science & health R&D", () => {
@@ -238,7 +238,7 @@ describe("matchProgram", () => {
       name: "Research grant",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_SCIENCE_HEALTH_RD);
+    expect(result).toBe(PROGRAM_IDS.CG_SCIENCE_RD);
   });
 
   it("matches Global Health R&D to science & health R&D", () => {
@@ -249,7 +249,7 @@ describe("matchProgram", () => {
       name: "Vaccine research",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_SCIENCE_HEALTH_RD);
+    expect(result).toBe(PROGRAM_IDS.CG_SCIENCE_RD);
   });
 
   it("matches GiveWell-Recommended Charities to global health", () => {
@@ -263,7 +263,7 @@ describe("matchProgram", () => {
     expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
   });
 
-  it("matches South Asian Air Quality to global health", () => {
+  it("matches South Asian Air Quality to air quality program", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
@@ -271,10 +271,10 @@ describe("matchProgram", () => {
       name: "Air quality research",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
+    expect(result).toBe(PROGRAM_IDS.CG_AIR_QUALITY);
   });
 
-  it("matches Global Aid Policy to global health", () => {
+  it("matches Global Aid Policy to global aid program", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
@@ -282,7 +282,7 @@ describe("matchProgram", () => {
       name: "Policy research",
       description: null,
     });
-    expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
+    expect(result).toBe(PROGRAM_IDS.CG_GLOBAL_AID);
   });
 
   it("matches GCR opportunities", () => {

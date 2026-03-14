@@ -27,13 +27,7 @@ export const PROGRAM_IDS = {
   OP_AI_SAFETY: progId("prog|open-philanthropy|ai-safety"),
   OP_BIOSECURITY: progId("prog|open-philanthropy|biosecurity"),
   OP_GLOBAL_HEALTH: progId("prog|open-philanthropy|global-health"),
-  OP_FARM_ANIMAL_WELFARE: progId("prog|coefficient-giving|farm-animal-welfare"),
-  OP_SCIENCE_HEALTH_RD: progId("prog|coefficient-giving|science-health-rd"),
-  OP_GCR_OPPORTUNITIES: progId("prog|coefficient-giving|gcr-opportunities"),
   OP_CRIMINAL_JUSTICE: progId("prog|coefficient-giving|criminal-justice"),
-  OP_EFFECTIVE_GIVING: progId("prog|coefficient-giving|effective-giving"),
-  OP_FORECASTING: progId("prog|coefficient-giving|forecasting"),
-  OP_ABUNDANCE_GROWTH: progId("prog|coefficient-giving|abundance-growth-grants"),
 
   // Coefficient Giving — specific programs
   CG_GCR_OPPORTUNITIES: progId("prog|coefficient-giving|gcr-opportunities"),
