@@ -23,8 +23,17 @@ import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server/client.ts";
+import { getServerUrl, buildHeaders } from "../lib/wiki-server/client.ts";
 import { waitForHealthy, fetchWithRetry } from "./sync-common.ts";
+import { OLD_TYPE_MAP } from "../../apps/web/src/data/entity-type-names.ts";
+
+/** Remap raw YAML entity type to canonical type (e.g. "lab" → "organization") */
+function resolveEntityType(rawType: string): string {
+  return OLD_TYPE_MAP[rawType] ?? rawType;
+}
+
+const SUPPORTED_TYPES = ["entity", "resource"] as const;
+type SupportedType = (typeof SUPPORTED_TYPES)[number];
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 
@@ -71,7 +80,7 @@ function loadEntities(): ThingRecord[] {
         title: e.title,
         sourceTable: "entities",
         sourceId: e.id,
-        entityType: e.type,
+        entityType: resolveEntityType(e.type),
         description: e.description,
         sourceUrl: e.website,
         numericId: e.numericId,
@@ -124,7 +133,14 @@ async function main() {
   }
 
   const dryRun = args.flags.has("dry-run");
-  const filterType = args.options.get("type");
+  const filterType = args.options.get("type") as SupportedType | undefined;
+
+  if (filterType && !SUPPORTED_TYPES.includes(filterType as SupportedType)) {
+    console.error(
+      `Unknown --type="${filterType}". Supported: ${SUPPORTED_TYPES.join(", ")}`
+    );
+    process.exit(1);
+  }
 
   console.log("Loading things from YAML data...\n");
 

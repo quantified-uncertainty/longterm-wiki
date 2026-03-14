@@ -226,6 +226,7 @@ export function ThingsTable({ data, typeFilter }: ThingsTableProps) {
           <input
             type="text"
             placeholder="Search things..."
+            aria-label="Search things"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
@@ -235,6 +236,7 @@ export function ThingsTable({ data, typeFilter }: ThingsTableProps) {
         <select
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value)}
+          aria-label="Filter things by type"
           className="px-3 py-2 text-sm border rounded-md bg-background"
         >
           <option value="">All types ({data.length})</option>

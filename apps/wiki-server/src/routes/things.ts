@@ -261,11 +261,13 @@ const thingsApp = new Hono()
     const id = c.req.param("id");
     const db = getDrizzleDb();
 
-    // Look up by thing ID or source_id
+    // Look up by thing ID only (primary key) — sourceId lookup was
+    // nondeterministic since multiple things can share the same sourceId
+    // across different sourceTables.
     const rows = await db
       .select()
       .from(things)
-      .where(or(eq(things.id, id), eq(things.sourceId, id)))
+      .where(eq(things.id, id))
       .limit(1);
 
     if (rows.length === 0) {
@@ -403,13 +405,12 @@ const thingsApp = new Hono()
         .insert(things)
         .values(allVals)
         .onConflictDoUpdate({
-          target: things.id,
+          target: [things.sourceTable, things.sourceId],
           set: {
+            id: sql`excluded.id`,
             thingType: sql`excluded.thing_type`,
             title: sql`excluded.title`,
             parentThingId: sql`excluded.parent_thing_id`,
-            sourceTable: sql`excluded.source_table`,
-            sourceId: sql`excluded.source_id`,
             entityType: sql`excluded.entity_type`,
             description: sql`excluded.description`,
             sourceUrl: sql`excluded.source_url`,
