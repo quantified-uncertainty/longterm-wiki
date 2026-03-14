@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/kb";
-import { getTypedEntities, isOrganization, type OrganizationEntity } from "@/data";
+import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
@@ -221,7 +221,7 @@ function loadFromLocal(): OrgPageData {
       name: org.title,
       numericId: org.numericId ?? null,
       orgType: org.orgType ?? null,
-      wikiPageId: org.numericId ?? null,
+      wikiPageId: org.numericId && getPageById(org.id) ? org.numericId : null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
       revenueNum: numericValue(revenueFact),
