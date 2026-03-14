@@ -23,10 +23,23 @@ function progId(seed: string): string {
 
 // Pre-compute program IDs for all known programs
 export const PROGRAM_IDS = {
-  // Open Philanthropy
+  // Open Philanthropy / Coefficient Giving — broad programs
   OP_AI_SAFETY: progId("prog|open-philanthropy|ai-safety"),
   OP_BIOSECURITY: progId("prog|open-philanthropy|biosecurity"),
   OP_GLOBAL_HEALTH: progId("prog|open-philanthropy|global-health"),
+
+  // Coefficient Giving — specific programs
+  CG_GCR_OPPORTUNITIES: progId("prog|coefficient-giving|gcr-opportunities"),
+  CG_FARM_ANIMAL_WELFARE: progId("prog|coefficient-giving|farm-animal-welfare"),
+  CG_SCIENCE_RD: progId("prog|coefficient-giving|science-rd"),
+  CG_FORECASTING: progId("prog|coefficient-giving|forecasting"),
+  CG_EFFECTIVE_GIVING: progId("prog|coefficient-giving|effective-giving-careers"),
+  CG_GLOBAL_AID: progId("prog|coefficient-giving|global-aid-policy"),
+  CG_GLOBAL_GROWTH: progId("prog|coefficient-giving|global-growth"),
+  CG_AIR_QUALITY: progId("prog|coefficient-giving|air-quality"),
+  CG_LEAF: progId("prog|coefficient-giving|lead-exposure"),
+  CG_ABUNDANCE_GROWTH: progId("prog|coefficient-giving|abundance-growth-grants"),
+  CG_TECHNICAL_AI_SAFETY_RFP: progId("prog|coefficient-giving|technical-ai-safety-rfp-2025"),
 
   // EA Funds
   LTFF_GRANTS: progId("prog|ea-funds|ltff-grants"),
@@ -99,20 +112,114 @@ const RULES: ProgramRule[] = [
   },
 
   // ===== Coefficient Giving (Open Philanthropy) =====
-  // Coefficient Giving grants have focusArea for the program area
+  // Coefficient Giving grants have focusArea extracted from bracketed prefix in notes.
+  // More specific rules come first; general catch-all is last.
+
+  // --- Specific programs (most specific patterns first) ---
+
+  // Technical AI Safety RFP — specific RFP under the AI safety umbrella
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /technical ai safety rfp|technical ai safety research rfp/i,
+    programId: PROGRAM_IDS.CG_TECHNICAL_AI_SAFETY_RFP,
+  },
+
+  // AI Safety (broad) — covers AI governance, AI policy, alignment research
   {
     source: "coefficient-giving",
     focusAreaPattern: /potential risks from advanced ai|ai safety|ai governance|technical ai safety|ai policy/i,
     programId: PROGRAM_IDS.OP_AI_SAFETY,
   },
+
+  // Biosecurity and Pandemic Preparedness
   {
     source: "coefficient-giving",
     focusAreaPattern: /biosecurity|pandemic preparedness|global catastrophic biological/i,
     programId: PROGRAM_IDS.OP_BIOSECURITY,
   },
+
+  // GCR Opportunities — global catastrophic risks beyond AI/bio
   {
     source: "coefficient-giving",
-    focusAreaPattern: /global health|farm animal|criminal justice|land use|immigration|macroeconomic/i,
+    focusAreaPattern: /global catastrophic risks|gcr|existential risk/i,
+    programId: PROGRAM_IDS.CG_GCR_OPPORTUNITIES,
+  },
+
+  // Farm Animal Welfare — must match before general global health catch-all
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /farm animal welfare/i,
+    programId: PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE,
+  },
+
+  // Science & Global Health R&D
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /science.*global health r&d|scientific research|global health r&d/i,
+    programId: PROGRAM_IDS.CG_SCIENCE_RD,
+  },
+
+  // Forecasting
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /forecasting/i,
+    programId: PROGRAM_IDS.CG_FORECASTING,
+  },
+
+  // Effective Giving & Careers / EA Community Building
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /effective giving|effective altruism community|community building/i,
+    programId: PROGRAM_IDS.CG_EFFECTIVE_GIVING,
+  },
+
+  // Global Aid Policy
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /global aid|u\.s\. policy/i,
+    programId: PROGRAM_IDS.CG_GLOBAL_AID,
+  },
+
+  // Global Growth / Economic Growth in Developing Countries
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /global economic growth|economic growth.*developing/i,
+    programId: PROGRAM_IDS.CG_GLOBAL_GROWTH,
+  },
+
+  // Air Quality
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /air quality|south asian air quality/i,
+    programId: PROGRAM_IDS.CG_AIR_QUALITY,
+  },
+
+  // Lead Exposure Action Fund (LEAF)
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /lead exposure|lead poisoning/i,
+    programId: PROGRAM_IDS.CG_LEAF,
+  },
+
+  // Abundance & Growth Grants
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /abundance|scientific innovation/i,
+    programId: PROGRAM_IDS.CG_ABUNDANCE_GROWTH,
+  },
+
+  // --- General catch-all for remaining Coefficient Giving grants ---
+  // Catches global health, criminal justice, land use, immigration, macroeconomic, etc.
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /global health|criminal justice|land use|immigration|macroeconomic/i,
+    programId: PROGRAM_IDS.OP_GLOBAL_HEALTH,
+  },
+
+  // Final fallback for any coefficient-giving grant with a focus area
+  // that didn't match any specific program above
+  {
+    source: "coefficient-giving",
     programId: PROGRAM_IDS.OP_GLOBAL_HEALTH,
   },
 
