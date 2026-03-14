@@ -2,7 +2,7 @@
  * Hallucination risk stats and citation quote lookups.
  */
 
-import { getDatabase, getEntityBundle, fetchFromWikiServer, withApiFallback } from "./database";
+import { getDatabase, getEntityBundle, resolveId, fetchFromWikiServer, withApiFallback } from "./database";
 
 export interface RiskStats {
   total: number;
@@ -30,6 +30,7 @@ export function getLocalCitationQuotes(pageId: string) {
   // Try per-entity bundle first (avoids loading full database.json)
   const bundle = getEntityBundle(pageId);
   if (bundle?.citationQuotes) return bundle.citationQuotes;
-  return getDatabase().citationQuotes?.[pageId];
+  // DB keys are slugs, so resolve numeric IDs (e.g. E123) to slugs
+  return getDatabase().citationQuotes?.[resolveId(pageId)];
 }
 

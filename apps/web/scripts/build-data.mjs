@@ -18,7 +18,7 @@
  *                    history, coverage, rankings, schedule, transform, write
 */
 
-import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
@@ -2574,6 +2574,11 @@ async function main() {
     mkdirSync(ENTITY_DIR, { recursive: true });
   }
 
+  // Scan existing .json files before writing so we can remove stale ones afterward
+  const existingEntityFiles = new Set(
+    readdirSync(ENTITY_DIR).filter(f => f.endsWith('.json'))
+  );
+
   // Build lookup maps for efficient per-entity bundling
   const typedEntityMap = new Map(typedEntities.map(e => [e.id, e]));
   const pageMap = new Map(pages.map(p => [p.id, p]));
@@ -2584,6 +2589,7 @@ async function main() {
     ...pages.map(p => p.id),
   ]);
 
+  const writtenEntityFiles = new Set();
   let entityFilesWritten = 0;
   for (const entityId of allEntityIds) {
     const bundle = {};
@@ -2620,11 +2626,25 @@ async function main() {
     if (Object.keys(bundle).length > 0) {
       // Sanitize entityId for use as filename (some IDs contain path separators like __index__/...)
       const safeFilename = entityId.replace(/\//g, '__');
-      writeFileSync(join(ENTITY_DIR, `${safeFilename}.json`), JSON.stringify(bundle));
+      const filename = `${safeFilename}.json`;
+      writeFileSync(join(ENTITY_DIR, filename), JSON.stringify(bundle));
+      writtenEntityFiles.add(filename);
       entityFilesWritten++;
     }
   }
+
+  // Remove stale entity files from previous builds (deleted/renamed entities)
+  let staleFilesRemoved = 0;
+  for (const existingFile of existingEntityFiles) {
+    if (!writtenEntityFiles.has(existingFile)) {
+      unlinkSync(join(ENTITY_DIR, existingFile));
+      staleFilesRemoved++;
+    }
+  }
   console.log(`✓ Written ${entityFilesWritten} per-entity JSON files to ${ENTITY_DIR}`);
+  if (staleFilesRemoved > 0) {
+    console.log(`  Removed ${staleFilesRemoved} stale entity file(s)`);
+  }
 
   // Generate link health data
   if (CONTENT_ONLY) {
