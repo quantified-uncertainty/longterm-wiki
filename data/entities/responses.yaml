@@ -1,20 +1,6 @@
 # Responses Entities
 # Auto-generated from entities.yaml - edit this file directly
 
-- id: ai-executive-order
-  stableId: DltF1Zn3KQ
-  numericId: E8
-  type: policy
-  title: "AI Executive Order"
-  description: "US executive orders establishing AI safety requirements and oversight"
-
-- id: responsible-scaling-policies
-  stableId: 13l06h7veg
-  numericId: E252
-  type: policy
-  title: "Responsible Scaling Policies"
-  description: "Industry self-regulation frameworks establishing capability thresholds that trigger safety evaluations."
-
 - id: ai-safety-institutes
   stableId: aCEdTooCBw
   numericId: E13
