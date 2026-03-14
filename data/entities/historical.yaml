@@ -6,6 +6,10 @@
   numericId: E95
   type: historical
   title: Deep Learning Revolution Era
+  eventDate: "2012"
+  endDate: "2020"
+  eventType: milestone
+  significance: critical
   customFields:
     - label: Period
       value: 2012-2020
@@ -72,6 +76,10 @@
   numericId: E107
   type: historical
   title: Early Warnings Era
+  eventDate: "1950"
+  endDate: "2000"
+  eventType: milestone
+  significance: high
   customFields:
     - label: Period
       value: 1950s-2000
@@ -131,6 +139,9 @@
   numericId: E195
   type: historical
   title: Mainstream Era
+  eventDate: "2020"
+  eventType: milestone
+  significance: critical
   customFields:
     - label: Period
       value: 2020-Present
@@ -194,6 +205,10 @@
   numericId: E203
   type: historical
   title: The MIRI Era
+  eventDate: "2000"
+  endDate: "2015"
+  eventType: milestone
+  significance: high
   customFields:
     - label: Period
       value: 2000-2015
@@ -253,6 +268,10 @@
   numericId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
+  eventDate: November 1-2, 2023
+  location: Bletchley Park, UK
+  eventType: summit
+  significance: critical
   description: >-
     International summit on AI safety held at Bletchley Park, UK in November 2023, resulting in the Bletchley
     Declaration.
