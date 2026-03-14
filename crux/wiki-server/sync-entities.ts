@@ -47,6 +47,17 @@ interface YamlEntity {
   customFields?: Array<{ label: string; value: string; link?: string }>;
   relatedEntries?: Array<{ id: string; type: string; relationship?: string }>;
   sources?: Array<{ title: string; url?: string; author?: string; date?: string }>;
+  // Type-specific fields (stored in metadata JSONB)
+  orgType?: string;
+  summaryPage?: string;
+  developer?: string;
+  releaseDate?: string;
+  contextWindow?: number;
+  inputPrice?: number;
+  outputPrice?: number;
+  safetyLevel?: string;
+  riskCategory?: string;
+  [key: string]: unknown; // Allow other type-specific fields
 }
 
 export interface SyncEntity {
@@ -63,9 +74,31 @@ export interface SyncEntity {
   customFields: Array<{ label: string; value: string; link?: string }> | null;
   relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
   sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+  metadata: Record<string, unknown> | null;
 }
 
 // --- Helpers ---
+
+/** Fields that are part of the base entity schema (not metadata). */
+const BASE_FIELDS = new Set([
+  "id", "numericId", "stableId", "type", "title", "description", "website",
+  "tags", "clusters", "status", "lastUpdated", "customFields",
+  "relatedEntries", "sources",
+]);
+
+/**
+ * Extract type-specific fields from the YAML entity into a metadata object.
+ * Any field not in BASE_FIELDS is considered type-specific metadata.
+ */
+function extractMetadata(e: YamlEntity): Record<string, unknown> | null {
+  const metadata: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(e)) {
+    if (!BASE_FIELDS.has(key) && value !== undefined) {
+      metadata[key] = value;
+    }
+  }
+  return Object.keys(metadata).length > 0 ? metadata : null;
+}
 
 export function transformEntity(e: YamlEntity): SyncEntity {
   return {
@@ -82,6 +115,7 @@ export function transformEntity(e: YamlEntity): SyncEntity {
     customFields: e.customFields ?? null,
     relatedEntries: e.relatedEntries ?? null,
     sources: e.sources ?? null,
+    metadata: extractMetadata(e),
   };
 }
 

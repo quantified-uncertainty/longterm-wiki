@@ -2,6 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/kb";
+import { getTypedEntityById, isOrganization } from "@/data";
 import {
   getKBLatest,
   getKBProperty,
@@ -39,6 +40,7 @@ import {
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
   DEFAULT_ORG_TYPE_COLOR,
+  type OrgEntity,
 } from "./org-data";
 import type { AuthorRef } from "./org-data";
 
@@ -85,13 +87,21 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const entity = resolveOrgBySlug(slug);
-  return {
-    title: entity ? `${entity.name} | Organizations` : "Organization Not Found",
-    description: entity
-      ? `Profile and key metrics for ${entity.name}.`
-      : undefined,
-  };
+  const kbEntity = resolveOrgBySlug(slug);
+  if (kbEntity) {
+    return {
+      title: `${kbEntity.name} | Organizations`,
+      description: `Profile and key metrics for ${kbEntity.name}.`,
+    };
+  }
+  const typedEntity = getTypedEntityById(slug);
+  if (typedEntity && isOrganization(typedEntity)) {
+    return {
+      title: `${typedEntity.title} | Organizations`,
+      description: `Profile and key metrics for ${typedEntity.title}.`,
+    };
+  }
+  return { title: "Organization Not Found" };
 }
 
 // ── Main page ─────────────────────────────────────────────────────────
@@ -102,11 +112,27 @@ export default async function OrgProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entity = resolveOrgBySlug(slug);
-  if (!entity) {
+
+  // Try KB entity first (full data), then fall back to typed entity (minimal data)
+  let entity: OrgEntity;
+  const kbEntity = resolveOrgBySlug(slug);
+  if (kbEntity) {
+    entity = kbEntity;
+  } else {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/organizations/${canonical}`);
-    return notFound();
+
+    const typedEntity = getTypedEntityById(slug);
+    if (!typedEntity || !isOrganization(typedEntity)) {
+      return notFound();
+    }
+
+    entity = {
+      id: slug,
+      name: typedEntity.title,
+      numericId: typedEntity.numericId,
+      wikiPageId: typedEntity.numericId,
+    };
   }
 
   const data = loadOrgPageData(entity, slug);

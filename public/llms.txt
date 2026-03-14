@@ -1,0 +1,33 @@
+# LongtermWiki
+
+> Version: 0.0.1 | Generated: 2026-03-14
+>
+> A comprehensive knowledge base for AI safety research, covering risks, responses, organizations, and the AI transition model.
+
+This file provides an index of site content for LLMs. For full documentation, see: https://www.longtermwiki.com
+
+## LLM Context Files
+
+- [Core Documentation (llms-core.txt)](https://www.longtermwiki.com/llms-core.txt): High reader-importance pages (~30K tokens) - fits in chat context
+- [Full Documentation (llms-full.txt)](https://www.longtermwiki.com/llms-full.txt): Complete content - for embeddings/RAG
+- [Sitemap](https://www.longtermwiki.com/sitemap.xml): XML sitemap of all pages
+- Per-page plain text: append `.txt` to any wiki URL (e.g. https://www.longtermwiki.com/wiki/E1.txt)
+
+## Site Structure
+
+## Statistics
+
+- Total pages: 0
+- Pages with LLM summaries: 0
+- High reader-importance pages (≥60): 0
+
+## Usage Notes
+
+- Each page has an `llmSummary` field optimized for LLM consumption
+- Pages are rated by `readerImportance` (0-100) and `quality` (0-100)
+- Pages include `hallucinationRisk` (level: low/medium/high, score: 0-100, factors[])
+- All content is AI-generated; higher risk scores indicate pages more likely to contain hallucinations
+- Verification priority = readerImportance × hallucinationRisk.score / 100
+- Risk factors include: biographical-claims, no-citations, low-citation-density, specific-factual-claims, low-rigor-score
+- Machine-readable risk data is available in pages.json for automated triage
+- Use llms-core.txt for quick context, llms-full.txt for comprehensive knowledge

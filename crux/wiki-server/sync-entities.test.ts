@@ -18,6 +18,7 @@ function makeEntity(id: string, overrides: Partial<SyncEntity> = {}): SyncEntity
     customFields: null,
     relatedEntries: null,
     sources: null,
+    metadata: null,
     ...overrides,
   };
 }
@@ -44,6 +45,7 @@ describe("transformEntity", () => {
       customFields: null,
       relatedEntries: null,
       sources: null,
+      metadata: null,
     });
   });
 
@@ -120,6 +122,38 @@ describe("transformEntity", () => {
     expect(result.entityType).toBe("my-custom-type");
   });
 
+  it("extracts type-specific fields into metadata", () => {
+    const result = transformEntity({
+      id: "anthropic",
+      type: "organization",
+      title: "Anthropic",
+      orgType: "frontier-lab",
+      summaryPage: "labs-overview",
+    });
+
+    expect(result.metadata).toEqual({
+      orgType: "frontier-lab",
+      summaryPage: "labs-overview",
+    });
+  });
+
+  it("extracts AI model metadata fields", () => {
+    const result = transformEntity({
+      id: "gpt-4",
+      type: "ai-model",
+      title: "GPT-4",
+      developer: "openai",
+      releaseDate: "2023-03-14",
+      contextWindow: 128000,
+    });
+
+    expect(result.metadata).toEqual({
+      developer: "openai",
+      releaseDate: "2023-03-14",
+      contextWindow: 128000,
+    });
+  });
+
   it("converts undefined optional fields to null", () => {
     const result = transformEntity({
       id: "test",
@@ -137,6 +171,7 @@ describe("transformEntity", () => {
     expect(result.customFields).toBeNull();
     expect(result.relatedEntries).toBeNull();
     expect(result.sources).toBeNull();
+    expect(result.metadata).toBeNull();
   });
 });
 

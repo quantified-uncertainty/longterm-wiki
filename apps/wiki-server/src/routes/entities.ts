@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, and, count, asc, sql, ilike, or } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { entities } from "../schema.js";
+import { entities, facts } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
@@ -50,6 +50,12 @@ const OrganizationsQuery = z.object({
   sort: z.string().max(50).optional(),
 });
 
+const DirectoryQuery = z.object({
+  entityType: z.string().min(1).max(100),
+  /** Comma-separated list of fact measures to include (e.g., "revenue,headcount") */
+  measures: z.string().max(500).optional(),
+});
+
 // ---- Helpers ----
 
 function formatEntity(e: typeof entities.$inferSelect) {
@@ -68,6 +74,7 @@ function formatEntity(e: typeof entities.$inferSelect) {
     customFields: e.customFields,
     relatedEntries: e.relatedEntries,
     sources: e.sources,
+    metadata: e.metadata,
     syncedAt: e.syncedAt,
     createdAt: e.createdAt,
     updatedAt: e.updatedAt,
@@ -267,6 +274,119 @@ const entitiesApp = new Hono()
     });
   })
 
+  // ---- GET /directory?entityType=organization&measures=revenue,headcount ----
+  // Returns all entities of a type with their latest facts for directory pages.
+  .get("/directory", zv("query", DirectoryQuery), async (c) => {
+    const { entityType, measures } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // 1. Get all entities of the requested type
+    const entityRows = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.entityType, entityType))
+      .orderBy(asc(entities.title));
+
+    // 2. Get latest facts for these entities (if measures requested)
+    const measureList = measures
+      ? measures.split(",").map((m) => m.trim()).filter(Boolean)
+      : [];
+
+    type FactRow = {
+      entityId: string | null;
+      measure: string | null;
+      factId: string;
+      value: string | null;
+      numeric: number | null;
+      asOf: string | null;
+      label: string | null;
+      format: string | null;
+      formatDivisor: number | null;
+    };
+
+    let factRows: FactRow[] = [];
+    if (measureList.length > 0) {
+      const stableIds = entityRows
+        .map((e) => e.stableId)
+        .filter((id): id is string => id != null);
+
+      if (stableIds.length > 0) {
+        // Get latest fact per entity per measure using DISTINCT ON
+        factRows = await db.execute<FactRow>(sql`
+          SELECT DISTINCT ON (f.entity_id, f.measure)
+            f.entity_id AS "entityId",
+            f.measure,
+            f.fact_id AS "factId",
+            f.value,
+            f.numeric,
+            f.as_of AS "asOf",
+            f.label,
+            f.format,
+            f.format_divisor AS "formatDivisor"
+          FROM facts f
+          WHERE f.entity_id = ANY(${stableIds})
+            AND f.measure = ANY(${measureList})
+          ORDER BY f.entity_id, f.measure, f.as_of DESC NULLS LAST
+        `);
+      }
+    }
+
+    // 3. Build a map: stableId → { measure → fact }
+    const factMap = new Map<string, Map<string, FactRow>>();
+    for (const f of factRows) {
+      if (!f.entityId) continue;
+      let entityFacts = factMap.get(f.entityId);
+      if (!entityFacts) {
+        entityFacts = new Map();
+        factMap.set(f.entityId, entityFacts);
+      }
+      if (f.measure && !entityFacts.has(f.measure)) {
+        entityFacts.set(f.measure, f);
+      }
+    }
+
+    // 4. Build response
+    const items = entityRows.map((e) => {
+      const entityFacts = e.stableId ? factMap.get(e.stableId) : undefined;
+      const factsObj: Record<string, {
+        value: string | null;
+        numeric: number | null;
+        asOf: string | null;
+        label: string | null;
+        format: string | null;
+        formatDivisor: number | null;
+      }> = {};
+
+      if (entityFacts) {
+        for (const [measure, f] of entityFacts) {
+          factsObj[measure] = {
+            value: f.value,
+            numeric: f.numeric,
+            asOf: f.asOf,
+            label: f.label,
+            format: f.format,
+            formatDivisor: f.formatDivisor,
+          };
+        }
+      }
+
+      return {
+        id: e.id,
+        numericId: e.numericId,
+        stableId: e.stableId,
+        entityType: e.entityType,
+        title: e.title,
+        description: e.description,
+        website: e.website,
+        metadata: e.metadata,
+        tags: e.tags,
+        facts: factsObj,
+      };
+    });
+
+    return c.json({ entities: items, total: items.length });
+  })
+
   // ---- GET /:id ----
 
   .get("/:id", async (c) => {
@@ -386,6 +506,7 @@ const entitiesApp = new Hono()
         customFields: e.customFields ?? null,
         relatedEntries: e.relatedEntries ?? null,
         sources: e.sources ?? null,
+        metadata: e.metadata ?? null,
       }));
 
       await tx
@@ -409,6 +530,7 @@ const entitiesApp = new Hono()
             customFields: sql`excluded.custom_fields`,
             relatedEntries: sql`excluded.related_entries`,
             sources: sql`excluded.sources`,
+            metadata: sql`excluded.metadata`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },
