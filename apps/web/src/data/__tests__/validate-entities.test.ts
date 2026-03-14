@@ -236,7 +236,7 @@ describe("Entity data validation", () => {
           );
         }
       }
-      // Warn but don't fail hard — parent orgs like uk-dsit and nist may not
+      // Warn but don't fail hard — some parent orgs may not
       // have entity entries yet. This test documents the gaps.
       if (invalid.length > 0) {
         console.warn(

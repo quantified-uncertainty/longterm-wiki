@@ -1,9 +1,9 @@
 ---
+numericId: E105
 title: AI Distributional Shift
 description: When AI systems fail due to differences between training and deployment contexts. Research shows 40-45% accuracy drops when models encounter novel distributions (ObjectNet vs ImageNet), with failures affecting autonomous vehicles, medical AI, and deployed ML systems at scale.
 sidebar:
   order: 16
-entityType: risk
 subcategory: accident
 quality: 91
 maturity: Mature
@@ -23,7 +23,6 @@ clusters:
 ---
 import {DataInfoBox, R, Mermaid, EntityLink} from '@components/wiki';
 
-<DataInfoBox entityId="E105" />
 
 ## Quick Assessment
 
@@ -84,7 +83,7 @@ flowchart TD
     subgraph Shift["Types of Shift"]
         CS[Covariate Shift<br/>P'X ≠ PX]
         PS[Prior Shift<br/>P'Y ≠ PY]
-        CD[Concept Drift<br/>P'Y|X ≠ PY|X]
+        CD["Concept Drift<br/>P'(Y given X) ≠ P(Y given X)"]
     end
 
     TD -.->|"Distribution<br/>Mismatch"| DD

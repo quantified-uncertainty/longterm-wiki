@@ -110,7 +110,7 @@ function SessionRow({ session }: { session: PageChangesSession }) {
           <span className="font-medium text-foreground">
             {formatDate(session.date)}
           </span>
-          <span className="ml-1 text-muted-foreground/60">
+          <span className="ml-1 text-muted-foreground/60" suppressHydrationWarning>
             ({formatRelativeDate(session.date)})
           </span>
         </span>
@@ -266,7 +266,7 @@ export function PageChangesSessions({
         <div className="space-y-6">
           {grouped.map(([label, groupSessions]) => (
             <section key={label}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 pb-1 border-b border-border/60">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 pb-1 border-b border-border/60" suppressHydrationWarning>
                 {label}
                 <span className="ml-2 font-normal normal-case">
                   ({groupSessions.length} session

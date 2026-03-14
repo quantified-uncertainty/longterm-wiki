@@ -49,14 +49,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-background text-foreground">
+      <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
         {/* Top nav bar */}
         <header className="sticky top-0 z-40 border-b border-border bg-card">
-          <div className="flex items-center">
+          <div className="flex items-center max-w-full overflow-hidden">
             <Link href="/" className="w-64 shrink-0 px-4 py-3 text-lg font-bold no-underline text-foreground max-md:w-auto">
               Longterm Wiki
             </Link>
-            <nav className="flex-1 flex items-center justify-end gap-4 px-6 py-3">
+            <nav className="flex-1 flex items-center justify-end gap-4 px-6 py-3 min-w-0">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}

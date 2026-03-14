@@ -73,7 +73,7 @@ function RelativeTime({ date }: { date: string }) {
   else label = `${Math.round(hoursAgo / 24)}d ago`;
 
   return (
-    <span className="text-xs text-muted-foreground tabular-nums">{label}</span>
+    <span className="text-xs text-muted-foreground tabular-nums" suppressHydrationWarning>{label}</span>
   );
 }
 

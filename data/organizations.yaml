@@ -149,7 +149,7 @@
     safety standards, coordinates internationally.
   keyPeople:
     - ian-hogarth
-  parentOrg: uk-dsit
+  # parentOrg: uk-dsit — removed, no entity exists for DSIT
   safetyFocus: >
     Pre-deployment evaluation, dangerous capability assessment, Inspect framework.
 
@@ -164,7 +164,7 @@
   keyPeople:
     - paul-christiano
     - elizabeth-kelly
-  parentOrg: nist
+  parentOrg: nist-ai
   safetyFocus: >
     Evaluation guidelines, coordinating with UK AISI, supporting executive order.
 

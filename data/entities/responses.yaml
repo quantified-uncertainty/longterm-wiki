@@ -29,6 +29,34 @@
       author: Summit Participants
   description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
+- id: ai-executive-order
+  stableId: Jn7939O5ls
+  numericId: E8
+  type: policy
+  summaryPage: governance-overview
+  title: AI Executive Order
+  description: >-
+    US executive orders establishing AI safety requirements and oversight,
+    including EO 14110 (October 2023) on safe, secure, and trustworthy AI
+    development. Revoked by the Trump administration in January 2025.
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-03
+- id: responsible-scaling-policies
+  stableId: Gone2rYYpD
+  numericId: E252
+  type: policy
+  summaryPage: governance-overview
+  title: Responsible Scaling Policies
+  description: >-
+    Industry self-regulation frameworks establishing capability thresholds that
+    trigger safety evaluations before further scaling. Pioneered by Anthropic's
+    RSP and adopted in various forms by major AI labs.
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-03
 - id: california-sb1047
   stableId: XcGTez1oFw
   numericId: E48
@@ -1758,7 +1786,7 @@
       type: organization
     - id: apollo-research
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: evaluation-awareness
       type: approach
@@ -1915,7 +1943,7 @@
       type: organization
     - id: scheming
       type: risk
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2063,7 +2091,7 @@
       type: risk
     - id: scheming
       type: risk
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2123,7 +2151,7 @@
       type: organization
     - id: metr
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2236,7 +2264,7 @@
       type: organization
     - id: representation-engineering
       type: approach
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2421,7 +2449,7 @@
   relatedEntries:
     - id: coefficient-giving
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: interpretability
       type: concept
@@ -2462,7 +2490,7 @@
       type: policy
     - id: metr
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: anthropic
       type: organization
@@ -2564,7 +2592,7 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: openai
       type: organization
@@ -2725,7 +2753,7 @@
       type: organization
     - id: cais
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: pause-moratorium
       type: policy
@@ -2993,7 +3021,7 @@
       type: policy
     - id: ai-safety-institutes
       type: policy
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -3129,7 +3157,7 @@
       type: approach
     - id: ai-safety-institutes
       type: policy
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: eu-ai-act
       type: policy

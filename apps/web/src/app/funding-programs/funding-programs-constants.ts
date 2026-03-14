@@ -13,4 +13,10 @@ export const PROGRAM_TYPE_LABELS: Record<string, string> = {
   prize: "Prize",
   solicitation: "Solicitation",
   call: "Call",
+  fund: "Fund",
+  program: "Program",
+  initiative: "Initiative",
+  round: "Round",
+  "big-bet": "Big Bet",
+  commitment: "Commitment",
 };

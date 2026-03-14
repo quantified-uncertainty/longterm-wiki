@@ -45,7 +45,7 @@
     - id: constitutional-ai
       type: concept
       relationship: research
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
       relationship: related
     - id: sleeper-agents
@@ -798,8 +798,7 @@
   numericId: E364
   type: organization
   orgType: government
-  # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: uk-dsit
+  # parentOrg: uk-dsit — removed, no entity exists for DSIT
   summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -855,8 +854,8 @@
   numericId: E365
   type: organization
   orgType: government
-  # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: nist
+  # parentOrg: nist — changed to nist-ai (valid entity ID)
+  parentOrg: nist-ai
   summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
@@ -869,7 +868,7 @@
       type: organization
     - id: compute-governance
       type: policy
-    - id: ai-executive-order
+    - id: us-executive-order
       type: policy
     - id: anthropic
       type: organization
@@ -1046,8 +1045,10 @@
   orgType: academic
   summaryPage: safety-orgs-overview
   title: Future of Humanity Institute
-  website: https://www.fhi.ox.ac.uk/
-  description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
+  description: >-
+    Oxford University research center focused on existential risks, founded by
+    Nick Bostrom. Closed in April 2024. Website (fhi.ox.ac.uk) no longer
+    available.
   status: stub
   relatedEntries:
     - id: nick-bostrom
@@ -1774,7 +1775,7 @@
   orgType: government
   summaryPage: government-orgs-overview
   title: Global Partnership on Artificial Intelligence (GPAI)
-  website: https://gpai.ai/
+  website: https://oecd.ai/en/gpai
   description: >-
     GPAI represents the first major multilateral AI governance initiative but
     operates as a non-binding policy laboratory with limited enforcement power
@@ -3667,7 +3668,8 @@
   website: https://ea-foundation.org/
   description: >-
     Swiss-based EA organization focused on reducing suffering, operating
-    research programs and grantmaking.
+    research programs and grantmaking. Rebranded operations under the Center on
+    Long-Term Risk (CLR).
   tags:
     - ea-community
     - existential-risk
@@ -3731,7 +3733,7 @@
   type: organization
   orgType: generic
   title: Effective Ventures Foundation USA
-  website: https://www.effectiveventures.org
+  website: https://www.ev.org
   description: >-
     US-based fiscal sponsor and operational hub for effective altruism projects.
   tags:
@@ -3817,9 +3819,9 @@
   type: organization
   orgType: generic
   title: High Impact Engineers
-  website: https://www.highimpactengineers.org/
   description: >-
     Community connecting engineers with high-impact career opportunities.
+    Website no longer available.
   tags:
     - ea-community
     - career-development
@@ -3889,9 +3891,9 @@
   type: organization
   orgType: generic
   title: Training for Good
-  website: https://www.trainingforgood.com/
   description: >-
     Professional development and training programs for high-impact careers.
+    Website no longer available.
   tags:
     - ea-community
     - career-development

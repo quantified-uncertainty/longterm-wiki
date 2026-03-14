@@ -294,28 +294,11 @@ const monitoringApp = new Hono()
 
     const incident = firstOrThrow(inserted, "incident insert");
 
-    // For critical incidents, create a monitoring-alert job for agents to claim
-    if (d.severity === "critical") {
-      await db
-        .insert(jobs)
-        .values({
-          type: "monitoring-alert",
-          params: {
-            incidentId: incident.id,
-            service: d.service,
-            title: d.title,
-            severity: d.severity,
-          },
-          priority: 100,
-          maxRetries: 1,
-        })
-        .catch((err: unknown) => {
-          logger.error(
-            { err: err instanceof Error ? err.message : String(err) },
-            "Failed to create monitoring-alert job",
-          );
-        });
-    }
+    // Note: Previously created a "monitoring-alert" job for critical incidents,
+    // but no job handler exists for this type — every such job permanently failed
+    // with "Unknown job type: monitoring-alert". Removed in #2193.
+    // The incident is already recorded in service_health_incidents and the
+    // groundskeeper handles alerting via GitHub issues and Discord.
 
     return c.json(incident, 201);
   })
