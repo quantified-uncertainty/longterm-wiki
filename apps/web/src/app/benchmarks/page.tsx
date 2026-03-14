@@ -42,6 +42,7 @@ export default function BenchmarksPage() {
     title: b.title,
     category: b.category ?? null,
     higherIsBetter: b.higherIsBetter ?? true,
+    resultCount: (resultsByBenchmark.get(b.id) ?? []).length,
   }));
 
   // Collect unique models and build score grid

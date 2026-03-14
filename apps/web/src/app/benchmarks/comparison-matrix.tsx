@@ -8,6 +8,8 @@ export interface MatrixBenchmark {
   title: string;
   category: string | null;
   higherIsBetter: boolean;
+  /** Number of models with scores for this benchmark */
+  resultCount: number;
 }
 
 export interface MatrixModel {
@@ -54,6 +56,8 @@ const CATEGORY_HEADER_COLORS: Record<string, string> = {
   general: "bg-slate-50 dark:bg-slate-950/30",
 };
 
+const MIN_RESULTS_THRESHOLD = 5;
+
 type SortMode = "score" | "name" | "developer";
 
 function formatScore(score: number, unit?: string): string {
@@ -91,22 +95,39 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
   const [sortMode, setSortMode] = useState<SortMode>("score");
   const [developerFilter, setDeveloperFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [showAllBenchmarks, setShowAllBenchmarks] = useState(false);
 
-  // Sort benchmarks by category order, then alphabetically
+  // Sort benchmarks by category order, then by result count descending
   const sortedBenchmarks = useMemo(() => {
     let filtered = [...benchmarks];
+
+    // Filter by category
     if (categoryFilter !== "all") {
       filtered = filtered.filter((b) => b.category === categoryFilter);
     }
+
+    // Filter by minimum coverage unless "show all" is on
+    if (!showAllBenchmarks && categoryFilter === "all") {
+      filtered = filtered.filter((b) => b.resultCount >= MIN_RESULTS_THRESHOLD);
+    }
+
     return filtered.sort((a, b) => {
       const catA = CATEGORY_ORDER.indexOf(a.category ?? "");
       const catB = CATEGORY_ORDER.indexOf(b.category ?? "");
       const orderA = catA >= 0 ? catA : 99;
       const orderB = catB >= 0 ? catB : 99;
       if (orderA !== orderB) return orderA - orderB;
+      // Within same category, sort by result count descending (most popular first)
+      if (b.resultCount !== a.resultCount) return b.resultCount - a.resultCount;
       return a.title.localeCompare(b.title);
     });
-  }, [benchmarks, categoryFilter]);
+  }, [benchmarks, categoryFilter, showAllBenchmarks]);
+
+  // Count how many benchmarks are hidden
+  const hiddenBenchmarks = useMemo(() => {
+    if (showAllBenchmarks || categoryFilter !== "all") return 0;
+    return benchmarks.filter((b) => b.resultCount < MIN_RESULTS_THRESHOLD).length;
+  }, [benchmarks, showAllBenchmarks, categoryFilter]);
 
   // Compute min/max per benchmark for normalization
   const benchmarkRanges = useMemo(() => {
@@ -171,18 +192,21 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
         return a.title.localeCompare(b.title);
       });
     } else {
-      // Sort by average normalized score (descending)
+      // Sort by coverage-weighted score (descending)
       filtered.sort((a, b) => {
-        const avgA = averageNormalized(a.id);
-        const avgB = averageNormalized(b.id);
-        return avgB - avgA;
+        const scoreA = rankingScore(a.id);
+        const scoreB = rankingScore(b.id);
+        return scoreB - scoreA;
       });
     }
 
     return filtered;
   }, [models, sortedBenchmarks, scores, sortMode, developerFilter, benchmarkRanges]);
 
-  function averageNormalized(modelId: string): number {
+  /** Score that balances performance and coverage:
+   *  avgNormalized * sqrt(coverage), so models tested on more benchmarks
+   *  rank higher than models with just 1-2 top scores. */
+  function rankingScore(modelId: string): number {
     let sum = 0;
     let count = 0;
     for (const b of sortedBenchmarks) {
@@ -193,7 +217,10 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
         count++;
       }
     }
-    return count > 0 ? sum / count : 0;
+    if (count === 0) return 0;
+    const avg = sum / count;
+    const coverage = count / sortedBenchmarks.length;
+    return avg * Math.sqrt(coverage);
   }
 
   // Coverage stats
@@ -255,36 +282,53 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
           </div>
         </div>
 
-        <div className="text-xs text-muted-foreground">
-          {sortedModels.length} models, {sortedBenchmarks.length} benchmarks, {coveragePct}% coverage ({filledCells}/{totalCells} cells)
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span>
+            {sortedModels.length} models, {sortedBenchmarks.length} benchmarks, {coveragePct}% coverage
+          </span>
+          {hiddenBenchmarks > 0 && (
+            <button
+              onClick={() => setShowAllBenchmarks(!showAllBenchmarks)}
+              className="text-primary hover:text-primary/80 transition-colors"
+            >
+              {showAllBenchmarks
+                ? `Hide sparse benchmarks`
+                : `Show ${hiddenBenchmarks} more with \u003C${MIN_RESULTS_THRESHOLD} results`}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Matrix */}
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="text-xs border-collapse">
-          {/* Column headers — benchmark names */}
+          {/* Column headers — rotated benchmark names */}
           <thead>
             <tr className="border-b border-border bg-muted/30">
-              <th className="sticky left-0 z-20 bg-muted/30 backdrop-blur-sm py-2 px-3 text-left font-medium text-muted-foreground min-w-[180px]">
+              <th className="sticky left-0 z-20 bg-muted/30 backdrop-blur-sm py-2 px-3 text-left font-medium text-muted-foreground min-w-[180px] align-bottom">
                 Model
               </th>
               {sortedBenchmarks.map((b) => (
                 <th
                   key={b.id}
-                  className={`py-2 px-1.5 text-center font-medium min-w-[60px] max-w-[80px] ${
+                  className={`p-0 align-bottom ${
                     CATEGORY_HEADER_COLORS[b.category ?? ""] ?? ""
                   }`}
+                  style={{ width: 56, minWidth: 56 }}
                 >
-                  <Link
-                    href={`/benchmarks/${b.id}`}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    title={b.title}
-                  >
-                    <span className="block truncate text-[10px] leading-tight">
+                  <div className="h-[90px] relative">
+                    <Link
+                      href={`/benchmarks/${b.id}`}
+                      className="absolute bottom-1 left-1/2 origin-bottom-left text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap text-[10px] font-medium"
+                      title={`${b.title} (${b.resultCount} models)`}
+                      style={{
+                        transform: "rotate(-55deg) translateX(-50%)",
+                        transformOrigin: "bottom center",
+                      }}
+                    >
                       {abbreviate(b.title)}
-                    </span>
-                  </Link>
+                    </Link>
+                  </div>
                 </th>
               ))}
             </tr>
@@ -299,18 +343,18 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
                     {model.numericId ? (
                       <Link
                         href={`/wiki/${model.numericId}`}
-                        className="font-medium hover:text-primary transition-colors truncate max-w-[140px]"
+                        className="font-medium hover:text-primary transition-colors truncate max-w-[130px]"
                         title={model.title}
                       >
                         {model.title}
                       </Link>
                     ) : (
-                      <span className="font-medium truncate max-w-[140px]" title={model.title}>
+                      <span className="font-medium truncate max-w-[130px]" title={model.title}>
                         {model.title}
                       </span>
                     )}
                     {model.developerName && (
-                      <span className="text-[9px] text-muted-foreground/60 truncate max-w-[60px]" title={model.developerName}>
+                      <span className="text-[9px] text-muted-foreground/50 truncate max-w-[55px]" title={model.developerName}>
                         {model.developerName}
                       </span>
                     )}
@@ -324,9 +368,10 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
                     return (
                       <td
                         key={b.id}
-                        className="py-1.5 px-1 text-center text-muted-foreground/20"
+                        className="py-1.5 px-0.5 text-center"
+                        style={{ width: 56, minWidth: 56 }}
                       >
-                        --
+                        <span className="text-muted-foreground/15">&#183;</span>
                       </td>
                     );
                   }
@@ -340,7 +385,8 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
                   return (
                     <td
                       key={b.id}
-                      className={`py-1.5 px-1 text-center tabular-nums font-medium ${colorClass}`}
+                      className={`py-1.5 px-0.5 text-center tabular-nums font-medium ${colorClass}`}
+                      style={{ width: 56, minWidth: 56 }}
                       title={`${model.title} on ${b.title}: ${formatScore(s.score, s.unit)}`}
                     >
                       {formatScore(s.score, s.unit)}
@@ -361,25 +407,17 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
 
       {/* Legend */}
       <div className="flex items-center gap-3 mt-4 text-xs text-muted-foreground">
-        <span>Score percentile:</span>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-3 rounded bg-red-100 dark:bg-red-900/30" />
-          <span>Low</span>
+        <span>Score rank within column:</span>
+        <div className="flex items-center gap-0.5">
+          <div className="w-5 h-3 rounded-l bg-red-100 dark:bg-red-900/30" />
+          <div className="w-5 h-3 bg-orange-100 dark:bg-orange-900/30" />
+          <div className="w-5 h-3 bg-yellow-100 dark:bg-yellow-900/30" />
+          <div className="w-5 h-3 bg-emerald-100 dark:bg-emerald-900/30" />
+          <div className="w-5 h-3 rounded-r bg-emerald-200 dark:bg-emerald-900/50" />
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-3 rounded bg-orange-100 dark:bg-orange-900/30" />
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-3 rounded bg-yellow-100 dark:bg-yellow-900/30" />
-          <span>Mid</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-3 rounded bg-emerald-100 dark:bg-emerald-900/30" />
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-3 rounded bg-emerald-200 dark:bg-emerald-900/50" />
-          <span>High</span>
-        </div>
+        <span className="text-muted-foreground/50">Low</span>
+        <span className="text-muted-foreground/50">&#8594;</span>
+        <span className="text-muted-foreground/50">High</span>
       </div>
     </div>
   );
@@ -388,14 +426,15 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
 /** Shorten benchmark names for column headers. */
 function abbreviate(title: string): string {
   const abbrevs: Record<string, string> = {
-    "SWE-bench Verified": "SWE-b",
+    "SWE-bench Verified": "SWE-bench",
     "GPQA Diamond": "GPQA-D",
-    "Chatbot Arena Elo": "Arena",
-    "Codeforces Rating": "CF",
-    "Artificial Analysis Intelligence Index": "AA-Idx",
+    "Chatbot Arena Elo": "Arena Elo",
+    "Codeforces Rating": "Codeforces",
+    "Artificial Analysis Intelligence Index": "AA Index",
     "Humanity's Last Exam": "HLE",
     "Terminal-Bench Hard": "TB-Hard",
     "Terminal-Bench 2": "TB-2",
+    "MMLU-Pro": "MMLU-Pro",
   };
   return abbrevs[title] ?? title;
 }
