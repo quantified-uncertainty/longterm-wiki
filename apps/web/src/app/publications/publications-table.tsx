@@ -236,7 +236,7 @@ export function PublicationsTable({
         {/* Credibility filter */}
         <select
           value={credFilter}
-          aria-label="Filter by year"
+          aria-label="Filter by credibility"
           onChange={(e) => setCredFilter(e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm"
         >
