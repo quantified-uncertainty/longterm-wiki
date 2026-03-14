@@ -55,7 +55,7 @@ export default async function ProjectDetailPage({
   if (!entity) return notFound();
 
   const url = entity.projectUrl || entity.website;
-  const wikiHref = entity.numericId ? getWikiHref(entity.id) : null;
+  const wikiHref = getWikiHref(entity.id);
 
   // Resolve related entities
   const relatedEntities = entity.relatedEntries

@@ -46,7 +46,7 @@ export default function ProjectsPage() {
         {projects
           .sort((a, b) => a.title.localeCompare(b.title))
           .map((project) => {
-            const wikiHref = project.numericId ? getWikiHref(project.id) : null;
+            const wikiHref = getWikiHref(project.id);
             const url = project.projectUrl || project.website;
             return (
               <div
