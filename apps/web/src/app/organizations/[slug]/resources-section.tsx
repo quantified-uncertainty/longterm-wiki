@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { safeHref } from "@/lib/format-compact";
-import type { OrgResourceRow } from "./org-data";
+import type { OrgResourceRow, AuthorRef } from "./org-data";
 
 const TYPE_COLORS: Record<string, string> = {
   paper: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
@@ -73,7 +73,18 @@ function makeColumns(opts: {
           </Link>
           {row.original.authors.length > 0 && (
             <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
-              {row.original.authors.slice(0, 3).join(", ")}
+              {row.original.authors.slice(0, 3).map((a, i) => (
+                <span key={i}>
+                  {i > 0 && ", "}
+                  {a.href ? (
+                    <Link href={a.href} className="hover:text-primary hover:underline">
+                      {a.name}
+                    </Link>
+                  ) : (
+                    a.name
+                  )}
+                </span>
+              ))}
               {row.original.authors.length > 3 &&
                 ` +${row.original.authors.length - 3}`}
             </div>
