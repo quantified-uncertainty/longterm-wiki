@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_N2rrW9c6JA
     property: employed-by
-    value: !ref 1LcLlMGLbw:openai
+    value: !ref 1LcLlMGLbw
     asOf: 2015-12
     validEnd: 2018-02
     source: https://openai.com/blog/introducing-openai
@@ -25,7 +25,7 @@ facts:
 
   - id: f_7FJCjl4c9Q
     property: employed-by
-    value: !ref GLXKjYAEKw:xai
+    value: !ref GLXKjYAEKw
     asOf: 2023-03
     source: https://x.ai
     notes: "Founded xAI in March 2023 to develop AI; also CEO of Tesla and SpaceX"

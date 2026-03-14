@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_86Rr7EPOYw
     property: employed-by
-    value: !ref A4XoubikkQ:deepmind
+    value: !ref A4XoubikkQ
     asOf: 2010-09
     source: https://deepmind.google/about/
     notes: "Co-founded DeepMind in September 2010; became CEO of Google DeepMind after the 2023 merger with Google Brain"

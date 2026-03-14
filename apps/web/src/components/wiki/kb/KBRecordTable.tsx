@@ -6,9 +6,9 @@
  * types and renders EntityLinks for ref fields, smart currency formatting
  * for USD amounts, and formatted dates.
  *
- * Usage in MDX:
- *   <KBRecordTable entity="anthropic" collection="funding-rounds" />
- *   <KBRecordTable entity="anthropic" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
+ * Usage in MDX (entity references use stableIds):
+ *   <KBRecordTable entity="mK9pX3rQ7n" collection="funding-rounds" />
+ *   <KBRecordTable entity="mK9pX3rQ7n" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
  */
 
 import {
@@ -26,7 +26,7 @@ import { titleCase } from "./format";
 import { KBCellValue } from "./KBCellValue";
 
 interface KBRecordTableProps {
-  /** KB thing ID (e.g., "anthropic") */
+  /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
   entity: string;
   /** Collection name (e.g., "funding-rounds") */
   collection: string;

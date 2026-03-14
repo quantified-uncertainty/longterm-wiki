@@ -34,7 +34,7 @@ facts:
   - id: f_AX7AnnLZQQ
     property: founded-by
     value:
-      - !ref Aqcyu3onCA:demis-hassabis
+      - !ref Aqcyu3onCA
       - shane-legg
       - mustafa-suleyman
     source: https://en.wikipedia.org/wiki/Google_DeepMind

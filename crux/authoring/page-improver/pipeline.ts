@@ -16,7 +16,7 @@ import type {
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
   EnrichResult, AuditResult, PhaseContext,
 } from './types.ts';
-import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
+import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage, ensureFrontmatterFields } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
@@ -398,19 +398,43 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       process.exit(1);
     }
 
-    fs.writeFileSync(filePath, contentToApply);
-    console.log(`\nChanges applied to ${filePath}`);
+    // Defense-in-depth: force-restore frozen frontmatter fields right before the
+    // final write. The improve phase already calls ensureFrontmatterFields, but
+    // later phases (enrich, validate auto-fixes, gap-fill) can re-modify content.
+    contentToApply = ensureFrontmatterFields(originalContent, contentToApply);
 
-    // Semantic diff: analyze factual claim changes for safety audit
-    // Non-blocking: runs after write, warns but never blocks on analysis failure
+    // Semantic diff: analyze factual claim changes for safety audit.
+    // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
+    // Change-ratio limits depend on tier: polish is strict, standard/deep are lenient.
+    const TIER_MAX_CHANGE_RATIO: Record<string, number> = {
+      polish: 0.30,    // Polish: max 30% substantive changes (full ratio capped at 90%)
+      standard: 0.70,  // Standard: max 70% substantive changes
+      deep: 0.85,      // Deep: max 85% substantive changes
+    };
+    let semanticDiffBlocked = false;
     try {
       const semanticDiff = await runSemanticDiff(
         page.id,
         originalContent,
         contentToApply,
-        { agent: 'crux-improve', tier, verbose: false },
+        {
+          agent: 'crux-improve',
+          tier,
+          verbose: false,
+          maxChangeRatio: TIER_MAX_CHANGE_RATIO[tier],
+          // Contradiction blocking disabled — produces too many false positives
+          // on numeric-heavy pages (cross-comparing unrelated metrics). Contradictions
+          // are still logged as warnings for human review.
+          blockOnHighContradictions: false,
+        },
       );
-      if (semanticDiff.assessment !== 'safe') {
+      if (semanticDiff.assessment === 'block') {
+        log('semantic-diff', `BLOCKED: changes exceed scope limits for ${tier} tier`);
+        for (const issue of semanticDiff.issues) {
+          log('semantic-diff', `  ${issue}`);
+        }
+        semanticDiffBlocked = true;
+      } else if (semanticDiff.assessment !== 'safe') {
         log('semantic-diff', `Assessment: ${semanticDiff.assessment.toUpperCase()}`);
         for (const issue of semanticDiff.issues) {
           log('semantic-diff', `  ${issue}`);
@@ -422,6 +446,19 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       const error = err instanceof Error ? err : new Error(String(err));
       log('semantic-diff', `Warning: semantic diff failed (non-blocking): ${error.message}`);
     }
+
+    if (semanticDiffBlocked) {
+      console.error(`\n❌ Semantic diff blocked apply — changes too large for ${tier} tier.`);
+      console.error(`   Original content preserved at: ${filePath}`);
+      console.error(`   Pipeline output preserved at: ${finalPath}`);
+      // Exit with code 75 (EX_TEMPFAIL) so the auto-update orchestrator can
+      // distinguish "blocked by scope check" from real errors (exit 1) and
+      // success (exit 0). The orchestrator treats 75 as 'blocked'.
+      process.exit(75);
+    }
+
+    fs.writeFileSync(filePath, contentToApply);
+    console.log(`\nChanges applied to ${filePath}`);
 
     // Post-apply cleanup: run auto-fixers on the written file
     const cleanupResult = await runPostApplyCleanup(filePath);

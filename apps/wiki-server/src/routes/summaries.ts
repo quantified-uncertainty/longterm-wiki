@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc, asc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { summaries, entities } from "../schema.js";
-import { checkRefsExist } from "./ref-check.js";
+import { summaries } from "../schema.js";
+import { resolveEntityStableId } from "./entity-resolution.js";
 import {
   parseJsonBody,
   validationError,
@@ -34,9 +34,9 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 
 type SummaryInput = z.infer<typeof UpsertSummarySchema>;
 
-function summaryValues(d: SummaryInput) {
+function summaryValues(d: SummaryInput, resolvedEntityId: string) {
   return {
-    entityId: d.entityId,
+    entityId: resolvedEntityId,
     entityType: d.entityType,
     oneLiner: d.oneLiner ?? null,
     summary: d.summary ?? null,
@@ -78,13 +78,13 @@ const summariesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Validate entity reference
-    const missing = await checkRefsExist(db, entities, entities.id, [parsed.data.entityId]);
-    if (missing.length > 0) {
-      return validationError(c, `Referenced entity not found: ${missing.join(", ")}`);
+    // Resolve entity identifier to stableId
+    const stableId = await resolveEntityStableId(db, parsed.data.entityId);
+    if (!stableId) {
+      return validationError(c, `Referenced entity not found: ${parsed.data.entityId}`);
     }
 
-    const vals = summaryValues(parsed.data);
+    const vals = summaryValues(parsed.data, stableId);
 
     const rows = await db
       .insert(summaries)
@@ -123,14 +123,27 @@ const summariesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Validate entity references
-    const entityIds = [...new Set(items.map((i) => i.entityId))];
-    const missing = await checkRefsExist(db, entities, entities.id, entityIds);
-    if (missing.length > 0) {
-      return validationError(c, `Referenced entities not found: ${missing.join(", ")}`);
+    // Resolve all entity identifiers to stableIds
+    const uniqueIds = [...new Set(items.map((i) => i.entityId))];
+    const resolvedMap = new Map<string, string>();
+    const missingIds: string[] = [];
+
+    for (const id of uniqueIds) {
+      const stableId = await resolveEntityStableId(db, id);
+      if (stableId) {
+        resolvedMap.set(id, stableId);
+      } else {
+        missingIds.push(id);
+      }
     }
 
-    const allVals = items.map(summaryValues);
+    if (missingIds.length > 0) {
+      return validationError(c, `Referenced entities not found: ${missingIds.join(", ")}`);
+    }
+
+    const allVals = items.map((item) =>
+      summaryValues(item, resolvedMap.get(item.entityId)!)
+    );
 
     const results = await db
       .insert(summaries)
@@ -230,17 +243,21 @@ const summariesApp = new Hono()
 
   // ---- GET /:entityId (get by entity ID) ----
   .get("/:entityId", async (c) => {
-    const entityId = c.req.param("entityId");
+    const rawId = c.req.param("entityId");
     const db = getDrizzleDb();
+
+    // Resolve identifier (slug, stableId, or numericId) to stableId
+    const stableId = await resolveEntityStableId(db, rawId);
+    const lookupId = stableId ?? rawId;
 
     const rows = await db
       .select()
       .from(summaries)
-      .where(eq(summaries.entityId, entityId))
+      .where(eq(summaries.entityId, lookupId))
       .limit(1);
 
     if (rows.length === 0) {
-      return notFoundError(c, `Summary not found: ${entityId}`);
+      return notFoundError(c, `Summary not found: ${rawId}`);
     }
 
     return c.json(formatSummary(rows[0]));

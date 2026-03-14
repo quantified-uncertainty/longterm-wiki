@@ -20,12 +20,13 @@ import {
   FactValueDisplay,
   FactsPanel,
 } from "@/components/directory";
+import { RelatedPages } from "@/components/RelatedPages";
 
 // Shared components & helpers
 import {
   StatCard,
   SectionHeader,
-  PersonRow,
+  PeopleTable,
   field,
   safeHref,
 } from "./org-shared";
@@ -38,13 +39,15 @@ import {
   ORG_TYPE_COLORS,
 } from "./org-data";
 
-// Section components — sidebar
-import { BoardOfDirectorsSection } from "./board-section";
+// Section components
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
 import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
+
+// Section components — publications
+import { KeyPublicationsSection } from "./publications-section";
 
 // Section components — grants (main content column)
 import {
@@ -52,16 +55,21 @@ import {
   GrantsReceivedSection,
 } from "./grants-section";
 
+// Section components — resources
+import { OrgResourcesSection } from "./resources-section";
+
 // Section components — main content column
 import {
   FundingHistorySection,
   InvestorParticipationSection,
-  ModelReleasesSection,
   ProductsSection,
   SafetyMilestonesSection,
   StrategicPartnershipsSection,
   OtherDataSection,
 } from "./main-content-sections";
+
+// Client-side tabs
+import { OrgProfileTabs, type OrgTab } from "./org-tabs";
 
 export function generateStaticParams() {
   return getOrgSlugs().map((slug) => ({ slug }));
@@ -99,6 +107,360 @@ export default async function OrgProfilePage({
 
   const data = loadOrgPageData(entity, slug);
 
+  // ── Build tabs from available data ──────────────────────────────────
+
+  const tabs: OrgTab[] = [];
+
+  // ── Build stat cards for Overview ──
+  const heroStatCards = HERO_STATS.map((propId) => {
+    const fact = getKBLatest(entity.id, propId);
+    if (!fact) return null;
+    const prop = getKBProperty(propId);
+    return (
+      <StatCard
+        key={propId}
+        label={prop?.name ?? titleCase(propId)}
+        value={<FactValueDisplay fact={fact} property={prop} />}
+        sub={fact.asOf ? `as of ${formatKBDate(fact.asOf)}` : undefined}
+      />
+    );
+  }).filter(Boolean);
+
+  // Add grants made stat (for funders)
+  if (data.totalGrantsMade > 0) {
+    heroStatCards.push(
+      <StatCard
+        key="grants-made"
+        label="Grants Made"
+        value={<span>{formatCompactCurrency(data.totalGrantsMade)}</span>}
+        sub={`${data.grantsMade.length} ${data.grantsMade.length === 1 ? "grant" : "grants"}`}
+      />
+    );
+  }
+  // Add AI models count
+  if (data.orgModels.length > 0) {
+    heroStatCards.push(
+      <StatCard
+        key="ai-models"
+        label="AI Models"
+        value={<span>{data.orgModels.length}</span>}
+      />
+    );
+  }
+
+  // ── Overview tab: stat cards, facts, related wiki pages, related orgs ──
+  const overviewContent = (
+    <div className="space-y-8">
+      {/* Stat cards */}
+      {heroStatCards.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {heroStatCards}
+        </div>
+      )}
+
+      {/* Facts + Other Data */}
+      {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {data.allFacts.length > 0 && (
+            <FactsPanel facts={data.allFacts} entityId={entity.id} />
+          )}
+          {data.otherCollections.length > 0 && (
+            <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
+          )}
+        </div>
+      )}
+
+      {/* Related Orgs */}
+      {data.relatedOrgs.length > 0 && (
+        <RelatedOrganizationsSection orgs={data.relatedOrgs} />
+      )}
+
+      {/* Related Wiki Pages */}
+      <RelatedPages entityId={slug} entity={{ type: "organization" }} />
+    </div>
+  );
+
+  tabs.push({ id: "overview", label: "Overview", content: overviewContent });
+
+  // ── People tab: key personnel + board of directors ──
+  const hasPeopleData =
+    data.sortedPersons.length > 0 || data.boardMembers.length > 0;
+
+  if (hasPeopleData) {
+    // Build unified people list from key-persons + board members, deduplicating
+    const peopleByName = new Map<string, {
+      name: string;
+      title?: string;
+      slug?: string;
+      entityType?: string;
+      isFounder: boolean;
+      isBoard: boolean;
+      isCurrent: boolean;
+      start?: string;
+      end?: string;
+    }>();
+
+    // Add key persons first
+    for (const person of data.sortedPersons) {
+      const personRef = field(person, "person");
+      const personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
+      const personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      const name =
+        field(person, "display_name") ??
+        personEntity?.name ??
+        titleCase(personRef ?? person.key);
+      peopleByName.set(name, {
+        name,
+        title: field(person, "title"),
+        slug: personRef,
+        entityType: personEntity?.type,
+        isFounder: !!person.fields.is_founder,
+        isBoard: false,
+        isCurrent: !person.fields.end,
+        start: field(person, "start"),
+        end: field(person, "end"),
+      });
+    }
+
+    // Merge board members — if already present, just add board flag
+    for (const bm of data.boardMembers) {
+      const existing = peopleByName.get(bm.personName);
+      if (existing) {
+        existing.isBoard = true;
+      } else {
+        peopleByName.set(bm.personName, {
+          name: bm.personName,
+          title: bm.role ?? "Board Member",
+          slug: bm.personHref?.replace(/^\/(people|organizations)\//, ""),
+          entityType: bm.personHref?.startsWith("/people") ? "person" : undefined,
+          isFounder: false,
+          isBoard: true,
+          isCurrent: !bm.departed,
+          start: bm.appointed ?? undefined,
+          end: bm.departed ?? undefined,
+        });
+      }
+    }
+
+    const allPeople = [...peopleByName.values()].sort((a, b) => {
+      // Current before former
+      if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+      // Founders first
+      if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
+      // Then alphabetical
+      return a.name.localeCompare(b.name);
+    });
+
+    tabs.push({
+      id: "people",
+      label: "People",
+      count: allPeople.length,
+      content: (
+        <section>
+          <SectionHeader title="People" count={allPeople.length} />
+          <PeopleTable people={allPeople} />
+        </section>
+      ),
+    });
+  }
+
+  // ── Funding tab: rounds, investments, equity, grants, programs ──
+  // Filter out founding-round entries with no amount (these are founders, not investors)
+  const meaningfulInvestments = data.investments.filter((inv) => {
+    const roundName = typeof inv.fields.round_name === "string" ? inv.fields.round_name.toLowerCase() : "";
+    const hasAmount = inv.fields.amount != null;
+    if (roundName === "founding" && !hasAmount) return false;
+    return true;
+  });
+
+  // Filter equity positions to only those with a resolved holder name
+  const meaningfulEquity = data.equityPositions.filter((pos) => pos.holderName && pos.holderName !== "");
+
+  const hasFundingData =
+    data.sortedRounds.length > 0 ||
+    meaningfulInvestments.length > 0 ||
+    meaningfulEquity.length > 0 ||
+    data.grantsReceived.length > 0 ||
+    data.grantsMade.length > 0 ||
+    data.sortedPartnerships.length > 0 ||
+    data.fundingPrograms.length > 0;
+
+  if (hasFundingData) {
+    const fundingCount =
+      data.sortedRounds.length +
+      meaningfulInvestments.length +
+      data.sortedPartnerships.length +
+      data.grantsMade.length +
+      data.grantsReceived.length;
+
+    tabs.push({
+      id: "funding",
+      label: "Funding",
+      count: fundingCount,
+      content: (
+        <div className="space-y-8">
+          <FundingHistorySection rounds={data.sortedRounds} />
+
+          {(meaningfulInvestments.length > 0 || meaningfulEquity.length > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {meaningfulInvestments.length > 0 && (
+                <InvestorParticipationSection investments={meaningfulInvestments} />
+              )}
+              {meaningfulEquity.length > 0 && (
+                <EquityPositionsSection positions={meaningfulEquity} />
+              )}
+            </div>
+          )}
+
+          {(data.grantsMade.length > 0 || data.grantsReceived.length > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <GrantsGivenSection
+                grants={data.grantsMade}
+                orgName={entity.name}
+              />
+              <GrantsReceivedSection grants={data.grantsReceived} />
+            </div>
+          )}
+
+          {data.sortedPartnerships.length > 0 && (
+            <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
+          )}
+
+          {data.fundingPrograms.length > 0 && (
+            <FundingProgramsSection programs={data.fundingPrograms} />
+          )}
+        </div>
+      ),
+    });
+  }
+
+  // ── Products & Models tab ──
+  const hasProductData =
+    data.products.length > 0 ||
+    data.orgModels.length > 0;
+
+  if (hasProductData) {
+    const productCount = data.products.length + data.orgModels.length;
+
+    tabs.push({
+      id: "products",
+      label: "Products & Models",
+      count: productCount,
+      content: (
+        <div className="space-y-8">
+          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
+          <ProductsSection products={data.products} />
+        </div>
+      ),
+    });
+  }
+
+  // ── Safety tab (milestones — renamed from "Research & Safety" since papers are in Publications) ──
+  const hasSafetyData = data.sortedMilestones.length > 0;
+
+  if (hasSafetyData) {
+    tabs.push({
+      id: "safety",
+      label: "Safety",
+      count: data.sortedMilestones.length,
+      content: (
+        <div className="space-y-8">
+          <SafetyMilestonesSection milestones={data.sortedMilestones} />
+        </div>
+      ),
+    });
+  }
+
+  // ── Publications tab (research papers + literature papers, deduplicated) ──
+  // Deduplicate key publications that already appear in the resources table (by title match)
+  const resourcePubTitles = new Set(
+    data.resourcePublications.map((r) => r.title.toLowerCase().trim()),
+  );
+  const dedupedKeyPubs = data.keyPublications.filter(
+    (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
+  );
+
+  const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
+  if (hasPublications) {
+    const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
+    tabs.push({
+      id: "publications",
+      label: "Publications",
+      count: pubCount,
+      content: (
+        <div className="space-y-8">
+          {data.resourcePublications.length > 0 && (
+            <OrgResourcesSection
+              resources={data.resourcePublications}
+              title="Research & Technical Papers"
+              emptyMessage=""
+            />
+          )}
+          {dedupedKeyPubs.length > 0 && (
+            <KeyPublicationsSection publications={dedupedKeyPubs} />
+          )}
+        </div>
+      ),
+    });
+  }
+
+  // ── Announcements tab (news, blog posts, other org content) ──
+  if (data.resourceAnnouncements.length > 0) {
+    tabs.push({
+      id: "announcements",
+      label: "Announcements",
+      count: data.resourceAnnouncements.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourceAnnouncements}
+          title="News & Announcements"
+          emptyMessage=""
+        />
+      ),
+    });
+  }
+
+  // ── Coverage tab (external resources about the org) ──
+  if (data.resourcesAboutOrg.length > 0) {
+    tabs.push({
+      id: "coverage",
+      label: "Coverage",
+      count: data.resourcesAboutOrg.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourcesAboutOrg}
+          title="External Coverage & References"
+          emptyMessage=""
+        />
+      ),
+    });
+  }
+
+  // ── Structure tab (divisions only — funding programs are in Funding) ──
+  if (data.divisions.length > 0) {
+    tabs.push({
+      id: "structure",
+      label: "Structure",
+      count: data.divisions.length,
+      content: (
+        <div className="space-y-8">
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
+        </div>
+      ),
+    });
+  }
+
+  // ── Initials for avatar (skip stop words like "and", "the", "of", "for") ──
+  const STOP_WORDS = new Set(["and", "the", "of", "for", "in", "on", "at"]);
+  const initials = entity.name
+    .split(/\s+/)
+    .map((w) => w.replace(/[^a-zA-Z]/g, ""))
+    .filter((w) => w.length > 0 && !STOP_WORDS.has(w.toLowerCase()))
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
       <Breadcrumbs
@@ -108,78 +470,43 @@ export default async function OrgProfilePage({
         ]}
       />
 
-      {/* Header */}
-      <div className="mb-8">
+      {/* ── Compact Header ─────────────────────────────────────── */}
+      <div className="mb-6">
         <div className="flex items-start gap-5">
           {/* Org avatar/icon */}
-          <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70" aria-hidden="true">
-            {entity.name
-              .split(/\s+/)
-              .map((w) => w[0])
-              .filter(Boolean)
-              .slice(0, 2)
-              .join("")
-              .toUpperCase()}
+          <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xl font-bold text-primary/70" aria-hidden="true">
+            {initials}
           </div>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-extrabold tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
+              <h1 className="text-2xl font-extrabold tracking-tight">
                 {entity.name}
               </h1>
               {data.orgType && (
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                <Link
+                  href={`/organizations?type=${data.orgType}`}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity ${
                     ORG_TYPE_COLORS[data.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                   }`}
                 >
                   {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}
-                </span>
+                </Link>
               )}
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
-              <p className="text-sm text-muted-foreground/70 mb-1">
+              <p className="text-xs text-muted-foreground/70 mb-0.5">
                 Also known as: {entity.aliases.join(", ")}
               </p>
             )}
 
-            {/* Founded info */}
-            {(data.foundedDateStr || data.founders.length > 0) && (
-              <p className="text-sm text-muted-foreground mb-1">
-                {data.foundedDateStr && (
-                  <span>
-                    Founded {formatKBDate(data.foundedDateStr)}
-                    {data.orgAge && <span className="text-muted-foreground"> ({data.orgAge})</span>}
-                  </span>
-                )}
-                {data.founders.length > 0 && (
-                  <span>
-                    {data.foundedDateStr ? " by " : "Founded by "}
-                    {data.founders.map((f, i) => (
-                      <span key={i}>
-                        {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
-                        {f.href ? (
-                          <Link href={f.href} className="text-primary hover:underline">
-                            {f.name}
-                          </Link>
-                        ) : (
-                          f.name
-                        )}
-                      </span>
-                    ))}
-                  </span>
-                )}
-              </p>
-            )}
-
-            {/* Description */}
-            {data.descriptionText && (
-              <p className="text-sm text-muted-foreground leading-relaxed mb-2 max-w-prose">
-                {data.descriptionText}
-              </p>
-            )}
-
-            {/* Metadata row: website, headquarters, links */}
-            <div className="flex items-center gap-4 text-sm flex-wrap">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+              {data.foundedDateStr && (
+                <span>
+                  Founded {formatKBDate(data.foundedDateStr)}
+                  {data.orgAge && <span> ({data.orgAge})</span>}
+                </span>
+              )}
+              {data.hqText && <span>HQ: {data.hqText}</span>}
               {data.websiteUrl && (
                 <a
                   href={safeHref(data.websiteUrl)}
@@ -187,154 +514,46 @@ export default async function OrgProfilePage({
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary/80 font-medium transition-colors"
                 >
-                  {shortDomain(data.websiteUrl)}{" "}
-                  &#8599;
-                  <span className="sr-only">(opens in new tab)</span>
+                  {shortDomain(data.websiteUrl)} &#8599;
                 </a>
               )}
-              {data.hqText && (
-                <span className="text-muted-foreground">
-                  HQ: {data.hqText}
-                </span>
-              )}
               {data.wikiHref && (
-                <Link
-                  href={data.wikiHref}
-                  className="text-primary hover:text-primary/80 font-medium transition-colors"
-                >
+                <Link href={data.wikiHref} className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Wiki page &rarr;
                 </Link>
               )}
-              <Link
-                href={`/kb/entity/${entity.id}`}
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
-              >
+              <Link href={`/kb/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
                 KB data &rarr;
               </Link>
             </div>
+
+            {data.founders.length > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Founded by{" "}
+                {data.founders.map((f, i) => (
+                  <span key={i}>
+                    {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
+                    {f.href ? (
+                      <Link href={f.href} className="text-primary hover:underline">{f.name}</Link>
+                    ) : (
+                      f.name
+                    )}
+                  </span>
+                ))}
+              </p>
+            )}
+
+            {data.descriptionText && (
+              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose line-clamp-3">
+                {data.descriptionText}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Stat cards — KB hero stats + computed counts */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
-        {HERO_STATS.map((propId) => {
-          const fact = getKBLatest(entity.id, propId);
-          if (!fact) return null;
-          const prop = getKBProperty(propId);
-          return (
-            <StatCard
-              key={propId}
-              label={prop?.name ?? titleCase(propId)}
-              value={<FactValueDisplay fact={fact} property={prop} />}
-              sub={fact.asOf ? `as of ${formatKBDate(fact.asOf)}` : undefined}
-            />
-          );
-        })}
-        {data.currentKeyPeople > 0 && (
-          <StatCard
-            label="Key People"
-            value={<span>{data.currentKeyPeople}</span>}
-            sub={`${data.sortedPersons.length} total tracked`}
-          />
-        )}
-        {data.currentBoardMembers > 0 && (
-          <StatCard
-            label="Board Members"
-            value={<span>{data.currentBoardMembers}</span>}
-            sub={`${data.boardMembers.length} total`}
-          />
-        )}
-        {data.totalGrantsMade > 0 && (
-          <StatCard
-            label="Grants Made"
-            value={<span>{formatCompactCurrency(data.totalGrantsMade)}</span>}
-            sub={`${data.grantsMade.length} grants`}
-          />
-        )}
-        {data.totalGrantsReceived > 0 && (
-          <StatCard
-            label="Funding Received"
-            value={<span>{formatCompactCurrency(data.totalGrantsReceived)}</span>}
-            sub={`${data.grantsReceived.length} grants`}
-          />
-        )}
-        {data.orgModels.length > 0 && (
-          <StatCard
-            label="AI Models"
-            value={<span>{data.orgModels.length}</span>}
-          />
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-8">
-          <FundingHistorySection rounds={data.sortedRounds} slug={slug} />
-          <InvestorParticipationSection investments={data.investments} />
-          <GrantsGivenSection
-            grants={data.grantsMade}
-            orgName={entity.name}
-          />
-          <GrantsReceivedSection grants={data.grantsReceived} />
-          <ModelReleasesSection models={data.sortedModels} />
-          <ProductsSection products={data.products} />
-          <SafetyMilestonesSection milestones={data.sortedMilestones} />
-          <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
-          <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Key People */}
-          {data.sortedPersons.length > 0 && (
-            <section>
-              <SectionHeader title="Key People" count={data.sortedPersons.length} />
-              <div className="border border-border/60 rounded-xl bg-card px-4">
-                {data.sortedPersons.map((person) => {
-                  const personRef = field(person, "person");
-                  const personEntityId = personRef
-                    ? resolveKBSlug(personRef)
-                    : undefined;
-                  const personEntity = personEntityId
-                    ? getKBEntity(personEntityId)
-                    : undefined;
-                  const name =
-                    field(person, "display_name") ??
-                    personEntity?.name ??
-                    titleCase(personRef ?? person.key);
-
-                  return (
-                    <PersonRow
-                      key={person.key}
-                      name={name}
-                      title={field(person, "title")}
-                      slug={personRef}
-                      entityType={personEntity?.type}
-                      isFounder={!!person.fields.is_founder}
-                      start={field(person, "start")}
-                      end={field(person, "end")}
-                      notes={field(person, "notes")}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          <BoardOfDirectorsSection members={data.boardMembers} />
-          <RelatedOrganizationsSection orgs={data.relatedOrgs} />
-
-          {data.allFacts.length > 0 && (
-            <FactsPanel facts={data.allFacts} entityId={entity.id} />
-          )}
-
-          <DivisionsSection divisions={data.divisions} />
-          <FundingProgramsSection programs={data.fundingPrograms} />
-          <EquityPositionsSection positions={data.equityPositions} />
-          <AiModelsSection models={data.orgModels} />
-        </div>
-      </div>
+      {/* ── Tabbed content ─────────────────────────────────────── */}
+      <OrgProfileTabs tabs={tabs} />
     </div>
   );
 }

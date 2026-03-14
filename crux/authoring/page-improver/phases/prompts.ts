@@ -276,8 +276,18 @@ usage and its import if no other usage remains.
 
 ### Frontmatter Rules
 - Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
-- Do NOT remove or change the \`quality:\` field — it is managed by a separate grading pipeline.
-
+- Do NOT change \`quality:\`, \`readerImportance:\`, \`researchImportance:\`, \`tacticalValue:\`, \`ratings:\`, \`clusters:\`, or \`balanceFlags:\` fields — these are managed by separate grading/editorial pipelines and will be force-restored to their original values.
+- Do NOT add new frontmatter fields that are not in the original (e.g., \`reviewNote\`).
+- You may update \`description:\` and \`llmSummary:\` to reflect content changes.
+${isPolish ? `
+### Polish Tier Constraints (CRITICAL)
+This is a POLISH-tier update. Your changes must be MINIMAL:
+- Do NOT add new sections (## headings) that did not exist before
+- Do NOT add substantial new paragraphs (>3 sentences) to existing sections
+- Do NOT restructure, reorder, or merge sections
+- ONLY make: sentence-level edits, factual corrections, citation fixes, wording improvements, EntityLink additions
+- If the news directions don't warrant any changes to this page, return the content unchanged
+` : ''}
 ### Output Format
 Output the COMPLETE improved MDX file content. Include all frontmatter and content.
 Do not output markdown code blocks - output the raw MDX directly.

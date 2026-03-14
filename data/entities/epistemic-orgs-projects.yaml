@@ -3,6 +3,7 @@
 
 # Organizations
 - id: quri
+  stableId: Khej79OA8g
   numericId: E238
   type: organization
   title: QURI (Quantified Uncertainty Research Institute)
@@ -11,6 +12,7 @@
   lastUpdated: 2026-01
 
 - id: metaculus
+  stableId: CUBiiyCfOA
   numericId: E199
   type: organization
   title: Metaculus
@@ -19,6 +21,7 @@
   lastUpdated: 2026-01
 
 - id: fri
+  stableId: KslhqGaeJw
   numericId: E147
   type: organization
   title: Forecasting Research Institute (FRI)
@@ -28,6 +31,7 @@
 
 # Projects
 - id: squiggle
+  stableId: nAjP2vwwSw
   numericId: E286
   type: project
   title: Squiggle
@@ -37,6 +41,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: metaforecast
+  stableId: 1tpQRlyyIQ
   numericId: E200
   type: project
   title: Metaforecast
@@ -46,6 +51,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: squiggleai
+  stableId: 8slnDr4emg
   numericId: E287
   type: project
   title: SquiggleAI
@@ -55,6 +61,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: xpt
+  stableId: PnUBtoCeMw
   numericId: E379
   type: project
   title: XPT (Existential Risk Persuasion Tournament)
@@ -64,6 +71,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: forecastbench
+  stableId: 2smzyptQJg
   numericId: E144
   type: project
   title: ForecastBench
@@ -73,6 +81,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: ai-forecasting-benchmark
+  stableId: fNqR8JGdog
   numericId: E10
   type: project
   title: AI Forecasting Benchmark Tournament
@@ -91,6 +100,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: grokipedia
+  stableId: 2QDkp6k5pw
   numericId: E682
   type: project
   title: Grokipedia

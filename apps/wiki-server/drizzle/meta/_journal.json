@@ -596,6 +596,27 @@
       "when": 1775894400000,
       "tag": "0084_facts_fk_safety_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1775980800000,
+      "tag": "0085_summaries_entity_id_to_stable_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1776067200000,
+      "tag": "0086_create_things_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1776153600000,
+      "tag": "0087_populate_things_from_domain_tables",
+      "breakpoints": true
     }
   ]
 }

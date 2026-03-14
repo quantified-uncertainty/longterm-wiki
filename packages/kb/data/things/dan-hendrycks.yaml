@@ -44,7 +44,7 @@ facts:
 
   - id: f_dH3oMx0qZs
     property: employed-by
-    value: !ref oa9A0OV0RX:center-for-ai-safety
+    value: !ref oa9A0OV0RX
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
 

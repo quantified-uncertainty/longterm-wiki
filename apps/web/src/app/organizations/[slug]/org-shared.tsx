@@ -127,73 +127,83 @@ export function SourceLink({ source }: { source: string | undefined }) {
   return <span className="text-[11px] text-muted-foreground">{source}</span>;
 }
 
-export function PersonRow({
-  name,
-  title,
-  slug,
-  entityType,
-  isFounder,
-  start,
-  end,
-  notes,
+/** Compact unified people table with tags inline next to name. */
+export function PeopleTable({
+  people,
 }: {
-  name: string;
-  title?: string;
-  slug?: string;
-  entityType?: string;
-  isFounder?: boolean;
-  start?: string;
-  end?: string;
-  notes?: string;
+  people: Array<{
+    name: string;
+    title?: string;
+    slug?: string;
+    entityType?: string;
+    isFounder?: boolean;
+    isBoard?: boolean;
+    isCurrent?: boolean;
+    start?: string;
+    end?: string;
+  }>;
 }) {
-  const href = slug && entityType
-    ? entityType === "organization"
-      ? `/organizations/${slug}`
-      : `/people/${slug}`
-    : undefined;
+  if (people.length === 0) return null;
 
   return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-border/40 last:border-b-0">
-      <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xs font-semibold text-primary/70 mt-0.5" aria-hidden="true">
-        {name
-          .split(/\s+/)
-          .map((w) => w[0])
-          .filter(Boolean)
-          .slice(0, 2)
-          .join("")
-          .toUpperCase()}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {href ? (
-            <Link
-              href={href}
-              className="font-semibold text-sm hover:text-primary transition-colors"
-            >
-              {name}
-            </Link>
-          ) : (
-            <span className="font-semibold text-sm">{name}</span>
-          )}
-          {isFounder && (
-            <span className="px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-              Founder
-            </span>
-          )}
-        </div>
-        {title && (
-          <div className="text-xs text-muted-foreground">{title}</div>
-        )}
-        <div className="text-[11px] text-muted-foreground mt-0.5">
-          {start && formatKBDate(start)}
-          {end ? ` \u2013 ${formatKBDate(end)}` : start ? " \u2013 present" : ""}
-        </div>
-        {notes && (
-          <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-            {notes}
-          </div>
-        )}
-      </div>
+    <div className="border border-border rounded-xl overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <th scope="col" className="py-2 px-3 text-left font-medium">Name</th>
+            <th scope="col" className="py-2 px-3 text-left font-medium">Role</th>
+            <th scope="col" className="py-2 px-3 text-left font-medium">Tenure</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border/50">
+          {people.map((person, i) => {
+            const href = person.slug && person.entityType
+              ? person.entityType === "organization"
+                ? `/organizations/${person.slug}`
+                : `/people/${person.slug}`
+              : undefined;
+
+            const tenure = person.start
+              ? `${formatKBDate(person.start)}${person.end ? ` \u2013 ${formatKBDate(person.end)}` : " \u2013 present"}`
+              : "";
+
+            const isFormer = person.isCurrent === false;
+            const hasTags = person.isFounder || person.isBoard;
+
+            return (
+              <tr key={`${person.name}-${i}`} className={`hover:bg-muted/20 transition-colors${isFormer ? " opacity-60" : ""}`}>
+                <td className="py-1.5 px-3">
+                  <span className="flex items-center gap-1.5">
+                    {href ? (
+                      <Link href={href} className="font-medium text-foreground hover:text-primary transition-colors">
+                        {person.name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{person.name}</span>
+                    )}
+                    {hasTags && (
+                      <>
+                        {person.isFounder && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                            Founder
+                          </span>
+                        )}
+                        {person.isBoard && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                            Board
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </span>
+                </td>
+                <td className="py-1.5 px-3 text-muted-foreground">{person.title ?? ""}</td>
+                <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">{tenure}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

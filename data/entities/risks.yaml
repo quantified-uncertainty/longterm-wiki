@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: authentication-collapse
+  stableId: GvV1xPNXRw
   numericId: E27
   type: risk
   summaryPage: epistemic-overview
@@ -57,6 +58,7 @@
     - provenance
   lastUpdated: 2025-12
 - id: authoritarian-tools
+  stableId: eXd3Fe8Lzg
   numericId: E30
   type: risk
   summaryPage: misuse-overview
@@ -114,6 +116,7 @@
     - governance
   lastUpdated: 2025-12
 - id: automation-bias
+  stableId: 72cwRMbzMA
   numericId: E32
   type: risk
   summaryPage: accident-overview
@@ -155,6 +158,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: autonomous-weapons
+  stableId: cm5KEblCZg
   numericId: E35
   type: risk
   summaryPage: misuse-overview
@@ -206,6 +210,7 @@
     - warfare
   lastUpdated: 2025-12
 - id: bioweapons
+  stableId: wAglEMR2mg
   numericId: E42
   type: risk
   summaryPage: misuse-overview
@@ -267,6 +272,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: concentration-of-power
+  stableId: KpMBQkdQ5g
   numericId: E68
   type: risk
   summaryPage: structural-overview
@@ -318,6 +324,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: consensus-manufacturing
+  stableId: gMaUtaXGaw
   numericId: E72
   type: risk
   summaryPage: epistemic-overview
@@ -375,6 +382,7 @@
     - democratic-process
   lastUpdated: 2025-12
 - id: corrigibility-failure
+  stableId: aE60G9uLyA
   numericId: E80
   type: risk
   summaryPage: accident-overview
@@ -415,6 +423,7 @@
     - self-preservation
   lastUpdated: 2025-12
 - id: cyber-psychosis
+  stableId: lD6bPNfEEg
   numericId: E83
   type: risk
   summaryPage: epistemic-overview
@@ -474,6 +483,7 @@
     - disinformation
   lastUpdated: 2025-12
 - id: cyberweapons
+  stableId: 7c6UC46TWQ
   numericId: E86
   type: risk
   summaryPage: misuse-overview
@@ -529,6 +539,7 @@
     - national-security
   lastUpdated: 2025-12
 - id: deceptive-alignment
+  stableId: vc60Nthkcg
   numericId: E93
   type: risk
   summaryPage: accident-overview
@@ -577,6 +588,7 @@
     - interpretability
   lastUpdated: 2025-12
 - id: deepfakes
+  stableId: MUGUxfl2YA
   numericId: E96
   type: risk
   summaryPage: misuse-overview
@@ -632,6 +644,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: disinformation
+  stableId: AaAOkTHkug
   numericId: E102
   type: risk
   summaryPage: misuse-overview
@@ -686,6 +699,7 @@
     - deepfakes
   lastUpdated: 2025-12
 - id: distributional-shift
+  stableId: qYk1BOLgqA
   numericId: E105
   type: risk
   summaryPage: accident-overview
@@ -722,6 +736,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: economic-disruption
+  stableId: hRRC36tWDg
   numericId: E108
   type: risk
   summaryPage: structural-overview
@@ -778,6 +793,7 @@
     - economic-policy
   lastUpdated: 2025-12
 - id: emergent-capabilities
+  stableId: x19LcGDk6Q
   numericId: E117
   type: risk
   summaryPage: accident-overview
@@ -822,6 +838,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: enfeeblement
+  stableId: 13OO6CP98g
   numericId: E118
   type: risk
   summaryPage: structural-overview
@@ -876,6 +893,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: epistemic-collapse
+  stableId: GeYirWJrwA
   numericId: E119
   type: risk
   summaryPage: epistemic-overview
@@ -917,6 +935,7 @@
     - democracy
   lastUpdated: 2025-12
 - id: erosion-of-agency
+  stableId: 54ItAwh4QA
   numericId: E126
   type: risk
   summaryPage: structural-overview
@@ -972,6 +991,7 @@
     - digital-rights
   lastUpdated: 2025-12
 - id: expertise-atrophy
+  stableId: ks0lqvZqUg
   numericId: E133
   type: risk
   summaryPage: epistemic-overview
@@ -1030,6 +1050,7 @@
     - resilience
   lastUpdated: 2025-12
 - id: flash-dynamics
+  stableId: 0t2GLN0sBA
   numericId: E142
   type: risk
   summaryPage: structural-overview
@@ -1079,6 +1100,7 @@
     - human-oversight
   lastUpdated: 2025-12
 - id: fraud
+  stableId: GnUTRJhA4g
   numericId: E145
   type: risk
   summaryPage: misuse-overview
@@ -1131,6 +1153,7 @@
     - identity
   lastUpdated: 2025-12
 - id: goal-misgeneralization
+  stableId: nYPuaov1hA
   numericId: E151
   type: risk
   summaryPage: accident-overview
@@ -1175,6 +1198,7 @@
     - out-of-distribution
   lastUpdated: 2025-12
 - id: historical-revisionism
+  stableId: jiqdwTucCA
   numericId: E155
   type: risk
   summaryPage: epistemic-overview
@@ -1229,6 +1253,7 @@
     - collective-memory
   lastUpdated: 2025-12
 - id: institutional-capture
+  stableId: IqKOqHEKag
   numericId: E166
   type: risk
   summaryPage: epistemic-overview
@@ -1290,6 +1315,7 @@
     - institutional-risk
   lastUpdated: 2025-12
 - id: instrumental-convergence
+  stableId: BYKermZj1A
   numericId: E168
   type: risk
   summaryPage: accident-overview
@@ -1335,6 +1361,7 @@
     - orthogonality-thesis
   lastUpdated: 2025-12
 - id: irreversibility
+  stableId: 7e3rvE5YgA
   numericId: E179
   type: risk
   summaryPage: structural-overview
@@ -1388,6 +1415,7 @@
     - long-term-future
   lastUpdated: 2025-12
 - id: knowledge-monopoly
+  stableId: TaBC4uj0Bw
   numericId: E183
   type: risk
   summaryPage: epistemic-overview
@@ -1445,6 +1473,7 @@
     - information-infrastructure
   lastUpdated: 2025-12
 - id: learned-helplessness
+  stableId: SFFrl4Pmag
   numericId: E187
   type: risk
   summaryPage: epistemic-overview
@@ -1500,6 +1529,7 @@
     - democratic-decay
   lastUpdated: 2025-12
 - id: legal-evidence-crisis
+  stableId: 52V4qNAQjw
   numericId: E188
   type: risk
   summaryPage: epistemic-overview
@@ -1559,6 +1589,7 @@
     - content-provenance
   lastUpdated: 2025-12
 - id: lock-in
+  stableId: nFwuCHi9qw
   numericId: E189
   type: risk
   summaryPage: structural-overview
@@ -1617,6 +1648,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: authoritarian-takeover
+  stableId: AV6AJU1FhQ
   numericId: E29
   type: risk
   summaryPage: structural-overview
@@ -1661,6 +1693,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: mesa-optimization
+  stableId: 8Bv92x9G1A
   numericId: E197
   type: risk
   summaryPage: accident-overview
@@ -1706,6 +1739,7 @@
     - base-optimizer
   lastUpdated: 2025-12
 - id: multipolar-trap
+  stableId: FAvAr2lvzg
   numericId: E209
   type: risk
   summaryPage: structural-overview
@@ -1756,6 +1790,7 @@
     - collective-action
   lastUpdated: 2025-12
 - id: power-seeking
+  stableId: hwDgNNDsDQ
   numericId: E226
   type: risk
   summaryPage: accident-overview
@@ -1801,6 +1836,7 @@
     - resource-acquisition
   lastUpdated: 2025-12
 - id: preference-manipulation
+  stableId: eM6SuO5nUw
   numericId: E230
   type: risk
   summaryPage: epistemic-overview
@@ -1858,6 +1894,7 @@
     - digital-manipulation
   lastUpdated: 2025-12
 - id: proliferation
+  stableId: Pr5xmThNfA
   numericId: E232
   type: risk
   summaryPage: structural-overview
@@ -1910,6 +1947,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: racing-dynamics
+  stableId: SUZgWeZLNA
   numericId: E239
   type: risk
   summaryPage: structural-overview
@@ -1963,6 +2001,7 @@
     - arms-race
   lastUpdated: 2025-12
 - id: reality-fragmentation
+  stableId: 4Rz7XtP9Uw
   numericId: E244
   type: risk
   summaryPage: epistemic-overview
@@ -2021,6 +2060,7 @@
     - shared-reality
   lastUpdated: 2025-12
 - id: reward-hacking
+  stableId: 9XN9QMfecA
   numericId: E253
   type: risk
   summaryPage: accident-overview
@@ -2067,6 +2107,7 @@
     - proxy-gaming
   lastUpdated: 2025-12
 - id: sandbagging
+  stableId: GzX9hnrzWw
   numericId: E270
   type: risk
   summaryPage: accident-overview
@@ -2109,6 +2150,7 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: scheming
+  stableId: JqMTO0YVEA
   numericId: E274
   type: risk
   summaryPage: accident-overview
@@ -2161,6 +2203,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: scientific-corruption
+  stableId: IK5egiQE9w
   numericId: E276
   type: risk
   summaryPage: epistemic-overview
@@ -2221,6 +2264,7 @@
     - ai-detection
   lastUpdated: 2025-12
 - id: sharp-left-turn
+  stableId: AMhUctK34Q
   numericId: E281
   type: risk
   summaryPage: accident-overview
@@ -2263,6 +2307,7 @@
     - takeoff-speed
   lastUpdated: 2025-12
 - id: surveillance
+  stableId: 9ToBZjhsVg
   numericId: E292
   type: risk
   summaryPage: misuse-overview
@@ -2318,6 +2363,7 @@
     - governance
   lastUpdated: 2025-12
 - id: us-ai-surveillance-democratic-erosion
+  stableId: Tnd9iuHdjw
   numericId: E1003
   type: risk
   summaryPage: misuse-overview
@@ -2372,6 +2418,7 @@
     - us-policy
   lastUpdated: 2026-03
 - id: sycophancy
+  stableId: 8BWfogRouw
   numericId: E295
   type: risk
   summaryPage: accident-overview
@@ -2415,6 +2462,7 @@
     - ai-assistants
   lastUpdated: 2025-12
 - id: epistemic-sycophancy
+  stableId: zzLBCdjXEw
   numericId: E124
   type: risk
   summaryPage: epistemic-overview
@@ -2470,6 +2518,7 @@
     - epistemic-integrity
   lastUpdated: 2025-12
 - id: treacherous-turn
+  stableId: tRj4bS6V8Q
   numericId: E359
   type: risk
   summaryPage: accident-overview
@@ -2513,6 +2562,7 @@
     - corrigibility
   lastUpdated: 2025-12
 - id: rogue-ai-scenarios
+  stableId: jfSHBPsKiA
   numericId: E490
   type: risk
   summaryPage: accident-overview
@@ -2562,6 +2612,7 @@
     - delegation
   lastUpdated: 2026-02
 - id: trust-cascade
+  stableId: IQ4E6VkW9A
   numericId: E360
   type: risk
   summaryPage: epistemic-overview
@@ -2619,6 +2670,7 @@
     - democratic-backsliding
   lastUpdated: 2025-12
 - id: trust-decline
+  stableId: 1NWLygwzGw
   numericId: E362
   type: risk
   summaryPage: epistemic-overview
@@ -2658,6 +2710,7 @@
     - polarization
   lastUpdated: 2025-12
 - id: winner-take-all
+  stableId: YOMDe574Ew
   numericId: E374
   type: risk
   summaryPage: structural-overview
@@ -2705,6 +2758,7 @@
     - regional-development
   lastUpdated: 2025-12
 - id: autonomous-replication
+  stableId: 3EuTey4ung
   numericId: E34
   type: risk
   title: Autonomous Replication
@@ -2728,6 +2782,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: cyber-offense
+  stableId: VPk7sdZtkg
   numericId: E82
   type: risk
   title: AI-Enabled Cyberattacks
@@ -2746,6 +2801,7 @@
     - dangerous-capabilities
   lastUpdated: 2025-12
 - id: bio-risk
+  stableId: kZQP3vYrXA
   numericId: E40
   type: risk
   title: AI-Enabled Biological Risks
@@ -2767,6 +2823,7 @@
   lastUpdated: 2025-12
 
 - id: sleeper-agents
+  stableId: D8dD07y5oQ
   numericId: E489
   type: risk
   summaryPage: accident-overview
@@ -2798,6 +2855,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: compute-concentration
+  stableId: MvImONf1YA
   numericId: E684
   type: risk
   summaryPage: structural-overview
@@ -2865,6 +2923,7 @@
   lastUpdated: 2026-02
 
 - id: concentrated-compute-cybersecurity-risk
+  stableId: VP53MHxfEg
   numericId: E689
   type: risk
   summaryPage: structural-overview
@@ -2900,6 +2959,7 @@
   lastUpdated: 2026-02
 
 - id: financial-stability-risks-ai-capex
+  stableId: Q0msUgaClw
   numericId: E690
   type: risk
   summaryPage: structural-overview
@@ -2937,6 +2997,7 @@
   lastUpdated: 2026-02
 
 - id: steganography
+  stableId: 5dNWb70CDA
   numericId: E603
   type: risk
   summaryPage: accident-overview
@@ -2952,6 +3013,7 @@
   lastUpdated: 2026-02
 
 - id: ai-enabled-untraceable-misuse
+  stableId: 6c238j1BMw
   numericId: E691
   type: risk
   summaryPage: misuse-overview
@@ -3015,6 +3077,7 @@
     - governance
   lastUpdated: 2026-02
 - id: ai-investigation-risks
+  stableId: cJPcbuv5fw
   numericId: E694
   type: risk
   title: AI-Powered Investigation Risks
@@ -3084,6 +3147,7 @@
     - governance
   lastUpdated: 2026-02
 - id: deanonymization
+  stableId: 0J0pDyhVtQ
   numericId: E699
   type: risk
   title: AI-Powered Deanonymization
@@ -3140,6 +3204,7 @@
   lastUpdated: 2026-02
 
 - id: near-term-risks
+  stableId: zTPtio1cDA
   numericId: E1005
   type: risk
   title: Key Near-Term AI Risks

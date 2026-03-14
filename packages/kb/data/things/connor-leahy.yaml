@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_6RTYYOtNHd
     property: employed-by
-    value: !ref 0u4J70VqFY:conjecture
+    value: !ref 0u4J70VqFY
     asOf: 2022-03
     source: https://www.conjecture.dev/
     notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"

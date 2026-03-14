@@ -216,6 +216,31 @@ export interface PersonPublication {
   publications: PersonPublicationEntry[];
 }
 
+/** A paper from literature.yaml */
+export interface LiteraturePaper {
+  title: string;
+  authors: string[];
+  organization?: string;
+  year: number;
+  type: string;
+  summary: string;
+  importance: string;
+  link?: string;
+  linkLabel?: string;
+}
+
+/** A category from literature.yaml */
+export interface LiteratureCategory {
+  id: string;
+  name: string;
+  papers: LiteraturePaper[];
+}
+
+/** Top-level structure of literature.yaml */
+export interface LiteratureData {
+  categories: LiteratureCategory[];
+}
+
 export interface ExpertPosition {
   topic: string;
   view: string;
@@ -364,6 +389,7 @@ interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
+  literature?: LiteratureData;
   experts: Expert[];
   organizations: Organization[];
   cruxes: CruxData[];
@@ -419,26 +445,6 @@ interface DatabaseShape {
     accuracyIssues: string | null;
     accuracySupportingQuotes: string | null;
     verificationDifficulty: string | null;
-    accuracyCheckedAt: string | null;
-  }>>;
-  /**
-   * Statement-backed citation dot data bundled at build time, keyed by page slug.
-   * Populated by buildStatementCitationDots() from /api/statements/citation-dots/all.
-   * Each entry is keyed by footnoteResourceId (e.g. "cr-abc123") and must be mapped
-   * to a numeric footnote number via the referenceMap from renderMdxPage().
-   */
-  statementCitationDots?: Record<string, Array<{
-    footnoteResourceId: string;
-    claimText: string;
-    url: string | null;
-    resourceId: string | null;
-    sourceQuote: string | null;
-    sourceTitle: string | null;
-    sourceType: string | null;
-    quoteVerified: boolean;
-    accuracyVerdict: string | null;
-    accuracyScore: number | null;
-    accuracyIssues: string | null;
     accuracyCheckedAt: string | null;
   }>>;
   /** KB fact verification status: factId → verdict (from citation quotes cross-reference) */
@@ -739,6 +745,13 @@ export function getAllPublications(): Publication[] {
   return db.publications ?? [];
 }
 
+/** Get all literature papers (from literature.yaml loaded at build time). */
+export function getLiteraturePapers(): LiteraturePaper[] {
+  const db = getDatabase();
+  if (!db.literature?.categories) return [];
+  return db.literature.categories.flatMap((c) => c.papers ?? []);
+}
+
 /** Get resources that belong to a publication */
 export function getResourcesForPublication(publicationId: string): Resource[] {
   return getAllResources().filter((r) => r.publication_id === publicationId);
@@ -853,9 +866,7 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 
 // ============================================================================
 // RECORD VERDICTS
-// Note: These functions have no frontend consumer yet. The fetchRecordVerdicts()
-// call in build-data.mjs is commented out to save build time. Re-enable when
-// the record verification dashboard is built (see #2243).
+// Used by VerificationBadge on organization, grant, and funding-round detail pages.
 // ============================================================================
 
 export interface RecordVerdict {

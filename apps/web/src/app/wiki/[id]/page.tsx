@@ -42,6 +42,14 @@ import { KBAutoFacts } from "@/components/wiki/kb/KBAutoFacts";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
+ * Numeric entity IDs that should redirect to standalone listing pages
+ * instead of rendering the MDX wiki page shell.
+ */
+const STANDALONE_PAGE_REDIRECTS: Record<string, string> = {
+  E1044: "/publications",
+};
+
+/**
  * Build a reference map from citation quotes and footnote index data.
  * Maps footnote numbers to rich reference data for the FootnoteTooltip component.
  */
@@ -460,6 +468,11 @@ export default async function WikiPage({ params }: PageProps) {
   const { id } = await params;
 
   if (isNumericId(id)) {
+    // Redirect to standalone listing pages that replaced MDX stubs (before slug
+    // canonicalization to avoid an extra redirect hop)
+    const standaloneRedirect = STANDALONE_PAGE_REDIRECTS[id.toUpperCase()];
+    if (standaloneRedirect) permanentRedirect(standaloneRedirect);
+
     // Numeric ID like E42 — look up slug and render
     const slug = numericIdToSlug(id.toUpperCase());
     if (!slug) notFound();

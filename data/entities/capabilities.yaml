@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: agentic-ai
+  stableId: 95ASV0XEwQ
   numericId: E2
   type: capability
   title: Agentic AI
@@ -36,6 +37,7 @@
     - ai-control
   lastUpdated: 2025-12
 - id: coding
+  stableId: 64WDhlxxKA
   numericId: E61
   type: capability
   title: Autonomous Coding
@@ -70,6 +72,7 @@
     - ai-assisted-development
   lastUpdated: 2025-12
 - id: language-models
+  stableId: MznJisvptw
   numericId: E186
   type: capability
   title: Large Language Models
@@ -106,6 +109,7 @@
     - claude
   lastUpdated: 2025-12
 - id: long-horizon
+  stableId: ymixRXGD3A
   numericId: E192
   type: capability
   title: Long-Horizon Autonomous Tasks
@@ -142,6 +146,7 @@
     - memory-systems
   lastUpdated: 2025-12
 - id: persuasion
+  stableId: n9Mqc0XteA
   numericId: E224
   type: capability
   title: Persuasion and Social Manipulation
@@ -179,6 +184,7 @@
     - human-autonomy
   lastUpdated: 2025-12
 - id: reasoning
+  stableId: hD7bZ2b7BQ
   numericId: E246
   type: capability
   title: Reasoning and Planning
@@ -215,6 +221,7 @@
     - philosophy
   lastUpdated: 2025-12
 - id: rlhf
+  stableId: rSE7kY5k4Q
   numericId: E259
   type: capability
   title: RLHF
@@ -236,6 +243,7 @@
     - human-feedback
     - alignment
 - id: scientific-research
+  stableId: dpTZOF78vg
   numericId: E277
   type: capability
   title: Scientific Research Capabilities
@@ -274,6 +282,7 @@
     - bioweapons-risk
   lastUpdated: 2025-12
 - id: self-improvement
+  stableId: eUR0jvxO5A
   numericId: E278
   type: capability
   title: Self-Improvement and Recursive Enhancement
@@ -313,6 +322,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: situational-awareness
+  stableId: 5maTNr0PGA
   numericId: E282
   type: capability
   title: Situational Awareness
@@ -383,6 +393,7 @@
     - training-gaming
   lastUpdated: 2025-12
 - id: tool-use
+  stableId: C5XsvYDQGA
   numericId: E356
   type: capability
   title: Tool Use and Computer Use
@@ -542,6 +553,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sparse-moe
+  stableId: qSUpeYPEoQ
   numericId: E500
   type: capability
   title: Sparse / MoE Transformers
@@ -555,6 +567,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ssm-mamba
+  stableId: DjKKneEtdA
   numericId: E501
   type: capability
   title: State-Space Models / Mamba
@@ -581,6 +594,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-powered-investigation
+  stableId: N0NF4lvS4Q
   numericId: E698
   type: capability
   title: AI-Powered Investigation
@@ -617,6 +631,7 @@
     - cyber
   lastUpdated: 2026-02
 - id: world-models
+  stableId: vQugEFw5nA
   numericId: E503
   type: capability
   title: World Models + Planning

@@ -28,7 +28,7 @@ facts:
 
   - id: f_nS9wS5jH8d
     property: employed-by
-    value: !ref puAffUjWSS:miri
+    value: !ref puAffUjWSS
     asOf: 2015-01
     notes: Enriched from entity description; became Executive Director around 2015
 

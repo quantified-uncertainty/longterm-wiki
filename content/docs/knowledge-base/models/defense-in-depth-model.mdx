@@ -54,7 +54,7 @@ AI safety operates through five defensive layers, each protecting against differ
 
 | Layer | Primary Function | Key Interventions | Failure Rate Range |
 |-------|-----------------|------------------|-------------------|
-| **Training Safety** | Build aligned goals during development | <R id="1098fc60be7ca2b0"><EntityLink id="E259" name="rlhf">RLHF</EntityLink></R>, <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, data curation | 20-40% |
+| **Training Safety** | Build aligned goals during development | <R id="MjZiZTdhMW"><EntityLink id="E259" name="rlhf">RLHF</EntityLink></R>, <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, data curation | 20-40% |
 | **Evaluation Safety** | Detect problems before deployment | Red-teaming, interpretability, capability evals | 25-35% |
 | **Runtime Safety** | Monitor deployed systems | <EntityLink id="E595" name="output-filtering">Output filtering</EntityLink>, monitoring, sandboxing | 30-50% |
 | **Institutional Safety** | Governance and oversight | <EntityLink id="E252" name="responsible-scaling-policies">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
@@ -152,7 +152,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 **Function**: Detect problems before deployment
 
-**Current gaps according to <R id="45370a5153534152">METR</R>**: 
+**Current gaps according to <R id="NWFiOTg0MD">METR</R>**: 
 - Cannot test for unknown capabilities
 - Red teams often less capable than models
 - <EntityLink id="E174" name="interpretability">Interpretability</EntityLink> incomplete at scale
@@ -188,9 +188,9 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 | Mechanism | Independence Level | Current Status | Effectiveness |
 |-----------|-------------------|----------------|---------------|
-| **<EntityLink id="E252" name="responsible-scaling-policies">Responsible scaling policies</EntityLink>** | Medium | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> implementing | Unproven at scale |
-| **External audits** | High | <R id="fdf68a8f30f57dee">AISI</R> developing frameworks | Early stage |
-| **Regulatory oversight** | High | <R id="1102501c88207df3">EU AI Act</R>, US <R id="59118f0c5d534110">executive order</R> | Implementation gaps |
+| **<EntityLink id="E252" name="responsible-scaling-policies">Responsible scaling policies</EntityLink>** | Medium | <R id="MWRkOTFhMm">Anthropic</R>, <R id="ZWE4ZTJlZW">OpenAI</R> implementing | Unproven at scale |
+| **External audits** | High | <R id="MDhiMzZiZj">AISI</R> developing frameworks | Early stage |
+| **Regulatory oversight** | High | <R id="MDc3ZmNmMj">EU AI Act</R>, US <R id="NjEyNThiOG">executive order</R> | Implementation gaps |
 
 ### Layer 5: Recovery Safety
 
@@ -233,8 +233,8 @@ flowchart TD
 
 | Approach | Mechanism | Promise | Status |
 |----------|-----------|---------|--------|
-| **Interpretability** | Direct cognition analysis | Could detect deceptive reasoning | <R id="f771d4f56ad4dbaa">Research ongoing</R> |
-| **AI Control** | Assume deception, limit capabilities | Reduces impact regardless | <R id="187aaa26886ce183">Promising results</R> |
+| **Interpretability** | Direct cognition analysis | Could detect deceptive reasoning | <R id="NzQyNGViND">Research ongoing</R> |
+| **AI Control** | Assume deception, limit capabilities | Reduces impact regardless | <R id="MGJmNGQyNW">Promising results</R> |
 | **Diverse evaluation** | Multiple testing approaches | Different deception vulnerabilities | Early development |
 | **Adversarial training** | Train against deception | May teach better deception | Mixed results |
 
@@ -246,7 +246,7 @@ Sudden capability jumps can defeat multiple layers calibrated for weaker systems
 |----------|----------------|------------------|------------|
 | **Training surprise** | 1-3 | Safety measures insufficient | Conservative thresholds |
 | **Evaluation gap** | 2-3 | Tests miss new capabilities | Broad capability assessment |
-| **Runtime escape** | 3-5 | Monitoring inadequate | <R id="71fda98623acc80d">Staged deployment</R> |
+| **Runtime escape** | 3-5 | Monitoring inadequate | <R id="ODYxYzBhYz">Staged deployment</R> |
 
 ## Optimal Defense Strategy
 
@@ -321,9 +321,9 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 
 > "The key insight is that we need multiple diverse approaches, not just better versions of the same approach." - <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> on alignment strategy
 
-> "Defense in depth is essential, but we must be realistic about correlation. Deceptive alignment could defeat multiple technical layers simultaneously." - <R id="f771d4f56ad4dbaa"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R> on correlated failures
+> "Defense in depth is essential, but we must be realistic about correlation. Deceptive alignment could defeat multiple technical layers simultaneously." - <R id="NzQyNGViND"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R> on correlated failures
 
-> "Institutional oversight may be our most important defense because it operates independently of technical capabilities." - <R id="f35c467b353f990f">Allan Dafoe</R> on governance importance
+> "Institutional oversight may be our most important defense because it operates independently of technical capabilities." - <R id="YTgxMDMzYT">Allan Dafoe</R> on governance importance
 
 ## Key Uncertainties
 
@@ -359,27 +359,27 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 
 | Paper | Key Contribution | Link |
 |-------|-----------------|------|
-| Greenblatt et al. (2024) | AI Control framework assuming potential deception | <R id="187aaa26886ce183">arXiv:2312.06942</R> |
-| Shevlane et al. (2023) | Model evaluation for extreme risks | <R id="490028792929073c">arXiv:2305.15324</R> |
-| Ouyang et al. (2022) | Training language models to follow instructions with human feedback | <R id="1098fc60be7ca2b0">arXiv:2203.02155</R> |
-| Hubinger et al. (2024) | Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training | <R id="e5c0904211c7d0cc">arXiv:2401.05566</R> |
+| Greenblatt et al. (2024) | AI Control framework assuming potential deception | <R id="MGJmNGQyNW">arXiv:2312.06942</R> |
+| Shevlane et al. (2023) | Model evaluation for extreme risks | <R id="NGUzMTYxYT">arXiv:2305.15324</R> |
+| Ouyang et al. (2022) | Training language models to follow instructions with human feedback | <R id="MjZiZTdhMW">arXiv:2203.02155</R> |
+| Hubinger et al. (2024) | Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training | <R id="MzM4OWZlM2">arXiv:2401.05566</R> |
 
 ### Organization Reports
 
 | Organization | Report | Focus | Link |
 |--------------|--------|-------|------|
-| **Anthropic** | Responsible Scaling Policy | Layer implementation framework | <R id="71fda98623acc80d">anthropic.com</R> |
-| **METR** | Model Evaluation Research | Evaluation layer gaps | <R id="45370a5153534152">metr.org</R> |
-| **MIRI** | Security Mindset and AI Alignment | Adversarial perspective | <R id="bee76a6251b2a079">intelligence.org</R> |
-| **RAND** | Defense in Depth for AI Systems | Military security applications | <R id="cf5fd74e8db11565">rand.org</R> |
+| **Anthropic** | Responsible Scaling Policy | Layer implementation framework | <R id="ODYxYzBhYz">anthropic.com</R> |
+| **METR** | Model Evaluation Research | Evaluation layer gaps | <R id="NWFiOTg0MD">metr.org</R> |
+| **MIRI** | Security Mindset and AI Alignment | Adversarial perspective | <R id="MmY2MjU2Mz">intelligence.org</R> |
+| **RAND** | Defense in Depth for AI Systems | Military security applications | <R id="MmI4MGUzYm">rand.org</R> |
 
 ### Policy Documents
 
 | Document | Jurisdiction | Relevance | Link |
 |----------|--------------|-----------|------|
-| EU AI Act | European Union | Regulatory requirements for layered oversight | <R id="1102501c88207df3">digital-strategy.ec.europa.eu</R> |
-| Executive Order on AI | United States | Federal approach to AI safety requirements | <R id="59118f0c5d534110">whitehouse.gov</R> |
-| UK AI Safety Summit | United Kingdom | International coordination on safety measures | <R id="254bcdc7bfcdcd73">gov.uk</R> |
+| EU AI Act | European Union | Regulatory requirements for layered oversight | <R id="MDc3ZmNmMj">digital-strategy.ec.europa.eu</R> |
+| Executive Order on AI | United States | Federal approach to AI safety requirements | <R id="NjEyNThiOG">whitehouse.gov</R> |
+| UK AI Safety Summit | United Kingdom | International coordination on safety measures | <R id="NDRlMWNlOG">gov.uk</R> |
 
 ## Related Models and Concepts
 

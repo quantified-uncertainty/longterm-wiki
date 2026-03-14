@@ -2,14 +2,21 @@
  * Grants Given / Grants Received sections for organization profile pages.
  *
  * Placed in the main content column with summary stats, expandable tables,
- * and full-width layout. Shows first 10 grants with a "Show all" toggle.
+ * and progressive loading. Only the first MAX_RENDERED_ROWS rows are
+ * serialized to the client to keep the RSC payload manageable for orgs
+ * with thousands of grants (e.g. Coefficient Giving: 2,627).
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
 import { formatAmount, numericValue } from "./org-data";
 import { ExpandableGrantsTable } from "./expandable-grants-table";
+
+/** Cap server-rendered rows to keep RSC payload reasonable. */
+const MAX_RENDERED_ROWS = 200;
 
 /** Grants Given section — for orgs that are funders. */
 export function GrantsGivenSection({
@@ -26,43 +33,48 @@ export function GrantsGivenSection({
     0,
   );
 
-  const rows = grants.map((g) => (
-    <tr key={g.key} className="hover:bg-muted/20 transition-colors">
-      <td className="py-2.5 px-4">
-        <span className="font-medium text-foreground text-sm">{g.name}</span>
-        {g.source && (
-          <a
-            href={safeHref(g.source)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-          >
-            source
-          </a>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-sm">
-        {g.recipientHref ? (
-          <Link
-            href={g.recipientHref}
-            className="text-primary hover:underline"
-          >
-            {g.recipientName}
-          </Link>
-        ) : (
-          <span className="text-muted-foreground">{g.recipientName}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-        {g.amount != null && (
-          <span className="font-semibold">{formatAmount(g.amount)}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-        {g.date ?? ""}
-      </td>
-    </tr>
-  ));
+  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
+  const rows = renderedGrants.map((g) => {
+    const verdict = getRecordVerdict("grant", String(g.key));
+    return (
+      <tr key={g.key} className="hover:bg-muted/20 transition-colors">
+        <td className="py-2.5 px-4">
+          <span className="font-medium text-foreground text-sm">{g.name}</span>
+          {g.source && (
+            <a
+              href={safeHref(g.source)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+            >
+              source
+            </a>
+          )}
+          <VerificationBadge verdict={verdict} />
+        </td>
+        <td className="py-2.5 px-4 text-sm">
+          {g.recipientHref ? (
+            <Link
+              href={g.recipientHref}
+              className="text-primary hover:underline"
+            >
+              {g.recipientName}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">{g.recipientName}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
+          {g.amount != null && (
+            <span className="font-semibold">{formatAmount(g.amount)}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
+          {g.date ?? ""}
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <section>
@@ -73,7 +85,7 @@ export function GrantsGivenSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border/60 rounded-xl overflow-x-auto bg-card">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
@@ -92,7 +104,10 @@ export function GrantsGivenSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable totalCount={grants.length}>
+            <ExpandableGrantsTable
+              totalCount={grants.length}
+              renderedCount={renderedGrants.length}
+            >
               {rows}
             </ExpandableGrantsTable>
           </tbody>
@@ -115,43 +130,48 @@ export function GrantsReceivedSection({
     0,
   );
 
-  const rows = grants.map((g) => (
-    <tr
-      key={`received-${g.key}`}
-      className="hover:bg-muted/20 transition-colors"
-    >
-      <td className="py-2.5 px-4">
-        <span className="font-medium text-foreground text-sm">{g.name}</span>
-        {g.source && (
-          <a
-            href={safeHref(g.source)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-          >
-            source
-          </a>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-sm">
-        {g.funderHref ? (
-          <Link href={g.funderHref} className="text-primary hover:underline">
-            {g.funderName}
-          </Link>
-        ) : (
-          <span className="text-muted-foreground">{g.funderName}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-        {g.amount != null && (
-          <span className="font-semibold">{formatAmount(g.amount)}</span>
-        )}
-      </td>
-      <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-        {g.date ?? ""}
-      </td>
-    </tr>
-  ));
+  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
+  const rows = renderedGrants.map((g) => {
+    const verdict = getRecordVerdict("grant", String(g.key));
+    return (
+      <tr
+        key={`received-${g.key}`}
+        className="hover:bg-muted/20 transition-colors"
+      >
+        <td className="py-2.5 px-4">
+          <span className="font-medium text-foreground text-sm">{g.name}</span>
+          {g.source && (
+            <a
+              href={safeHref(g.source)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+            >
+              source
+            </a>
+          )}
+          <VerificationBadge verdict={verdict} />
+        </td>
+        <td className="py-2.5 px-4 text-sm">
+          {g.funderHref ? (
+            <Link href={g.funderHref} className="text-primary hover:underline">
+              {g.funderName}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground">{g.funderName}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
+          {g.amount != null && (
+            <span className="font-semibold">{formatAmount(g.amount)}</span>
+          )}
+        </td>
+        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
+          {g.date ?? ""}
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <section>
@@ -162,7 +182,7 @@ export function GrantsReceivedSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border/60 rounded-xl overflow-x-auto bg-card">
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
@@ -181,7 +201,10 @@ export function GrantsReceivedSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable totalCount={grants.length}>
+            <ExpandableGrantsTable
+              totalCount={grants.length}
+              renderedCount={renderedGrants.length}
+            >
               {rows}
             </ExpandableGrantsTable>
           </tbody>

@@ -5,9 +5,9 @@
  * (e.g., revenue over time). Values are formatted using smart unit-aware
  * formatting (e.g., "$850 million") with fallback to property display config.
  *
- * Usage in MDX:
- *   <KBFactTable entity="anthropic" property="revenue" />
- *   <KBFactTable entity="anthropic" property="revenue" title="Annual Revenue" />
+ * Usage in MDX (entity references use stableIds):
+ *   <KBFactTable entity="mK9pX3rQ7n" property="revenue" />
+ *   <KBFactTable entity="mK9pX3rQ7n" property="revenue" title="Annual Revenue" />
  */
 
 import {
@@ -24,7 +24,7 @@ import { formatKBDate, isUrl, shortDomain } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
 
 interface KBFactTableProps {
-  /** KB thing ID (e.g., "anthropic") */
+  /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
   entity: string;
   /** KB property ID (e.g., "revenue") */
   property: string;

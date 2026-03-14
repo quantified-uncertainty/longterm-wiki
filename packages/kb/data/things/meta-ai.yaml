@@ -28,7 +28,7 @@ facts:
   - id: f_lhQD26Idvw
     property: founded-by
     value:
-      - !ref cMbVUVK29Q:yann-lecun
+      - !ref cMbVUVK29Q
     source: https://ai.meta.com/research/
 
   - id: f_Hh20Dvc90g

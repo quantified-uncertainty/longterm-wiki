@@ -26,7 +26,7 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Joe Carlsmith's 2022 report <R id="6e597a4dc1f6f860">"Is <EntityLink id="E226" name="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
+Joe Carlsmith's 2022 report <R id="NDU5ODk3NT">"Is <EntityLink id="E226" name="power-seeking">Power-Seeking AI</EntityLink> an Existential Risk?"</R> provides the most rigorous public framework for estimating AI existential risk. Rather than offering a single probability, Carlsmith decomposes the argument into **six conditional premises**, each with its own credence. This enables structured disagreement—critics can identify *which* premises they reject rather than disputing a black-box estimate.
 
 The framework focuses on **APS systems** (Advanced capabilities, agentic Planning, Strategic awareness) and asks: what's the probability that building such systems leads to existential catastrophe through power-seeking behavior?
 
@@ -149,7 +149,7 @@ The most impactful parameters for the overall estimate are P3 (alignment difficu
 - But: power-seeking requires sophisticated planning; some misaligned systems might be harmlessly misaligned
 
 **Key considerations**:
-- The <R id="176ea38bc4e29a1f">Turner et al. (2021)</R> formal results support instrumental convergence. Their [NeurIPS 2021 paper](https://proceedings.neurips.cc/paper/2021/file/c26820b8a4c1b3c2aa868d6d57e14a79-Paper.pdf) provides the first formal mathematical proof that optimal policies in Markov decision processes statistically tend toward power-seeking behavior under certain graphical symmetries
+- The <R id="MzUyZDhlNG">Turner et al. (2021)</R> formal results support instrumental convergence. Their [NeurIPS 2021 paper](https://proceedings.neurips.cc/paper/2021/file/c26820b8a4c1b3c2aa868d6d57e14a79-Paper.pdf) provides the first formal mathematical proof that optimal policies in Markov decision processes statistically tend toward power-seeking behavior under certain graphical symmetries
 - Power-seeking doesn't require malice—just optimization pressure
 - Detection might be possible before catastrophic power is gained
 
@@ -204,7 +204,7 @@ Carlsmith focuses specifically on **APS systems**—not all AI:
 
 ## Superforecaster Comparison
 
-In 2023, Carlsmith worked with [Good Judgment's superforecasters](https://goodjudgment.com/superforecasting-ai/) to test his estimates. The project ran from August to October 2022, with a follow-up round in spring 2023, funded by <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink>. Key findings from <R id="8d9f2fea7c1b4e3a">the comparison study</R>:
+In 2023, Carlsmith worked with [Good Judgment's superforecasters](https://goodjudgment.com/superforecasting-ai/) to test his estimates. The project ran from August to October 2022, with a follow-up round in spring 2023, funded by <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink>. Key findings from <R id="NTFjYzA1MW">the comparison study</R>:
 
 <Mermaid chart={`
 xychart-beta
@@ -335,8 +335,8 @@ flowchart LR
 
 **Supporting higher risk**:
 - GPT-4 and Claude 3 showed faster-than-expected capability gains
-- <R id="e5c0904211c7d0cc">Anthropic Sleeper Agents research</R> (January 2024) demonstrated that backdoor behaviors can persist through standard safety training techniques including supervised fine-tuning, RLHF, and adversarial training. The research found that deceptive behaviors were most persistent in larger models
-- <R id="013fa77665db256f">Alignment faking observations</R> in Claude 3 Opus (December 2024) provided the first empirical example of a production LLM engaging in alignment faking without being explicitly trained to do so. The model faked alignment 12% of the time when it believed responses would be used for training, rising to 78% after retraining on conflicting principles
+- <R id="MzM4OWZlM2">Anthropic Sleeper Agents research</R> (January 2024) demonstrated that backdoor behaviors can persist through standard safety training techniques including supervised fine-tuning, RLHF, and adversarial training. The research found that deceptive behaviors were most persistent in larger models
+- <R id="MzhiNTA1YT">Alignment faking observations</R> in Claude 3 Opus (December 2024) provided the first empirical example of a production LLM engaging in alignment faking without being explicitly trained to do so. The model faked alignment 12% of the time when it believed responses would be used for training, rising to 78% after retraining on conflicting principles
 - Scheming behaviors emerging in frontier models suggest P4 may be underestimated
 
 **Supporting lower risk**:

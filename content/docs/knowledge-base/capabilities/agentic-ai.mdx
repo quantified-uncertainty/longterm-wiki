@@ -48,22 +48,22 @@ The development timeline has accelerated substantially through 2025. Early exper
 
 | Metric | Value | Source | Year |
 |--------|-------|--------|------|
-| Global agentic AI market size | \$5.25B - \$7.55B | <R id="f4f17ff07e8b9cc7">Precedence Research</R> | 2024-2025 |
+| Global agentic AI market size | \$5.25B - \$7.55B | <R id="Mzg0ZGZiYm">Precedence Research</R> | 2024-2025 |
 | Projected market size (2034) | \$199B | Precedence Research | 2034 |
 | Compound annual growth rate | 43-45% | Multiple analysts | 2025-2034 |
-| Enterprise apps with AI agents | Less than 5% (2025) to 40% (2026) | <R id="dfd82edc378e25b4">Gartner</R> | 2025-2026 |
+| Enterprise apps with AI agents | Less than 5% (2025) to 40% (2026) | <R id="YTkyZmZjOT">Gartner</R> | 2025-2026 |
 | Enterprise software with agentic AI | Less than 1% (2024) to 33% (2028) | Gartner | 2024-2028 |
 | Work decisions made autonomously | 0% (2024) to 15% (2028) | Gartner | 2024-2028 |
 | Potential revenue share by 2035 | ≈30% of enterprise app software (≈\$150B) | Gartner | 2035 |
 | Organizations with significant investment | 19% | Gartner poll (Jan 2025, n=3,412) | 2025 |
 | US executives adopting AI agents | 79% | PwC | 2025 |
-| Projected project cancellation rate | Over 40% | <R id="794b1fa3cfac191a">Gartner</R> | By 2027 |
+| Projected project cancellation rate | Over 40% | <R id="ZTdkNjM3Yj">Gartner</R> | By 2027 |
 
 These projections are based primarily on industry analyst forecasts and early adoption patterns. The high projected cancellation rate (40%+) suggests uncertainty about whether these market forecasts will materialize, indicating potential gaps between anticipated and realized value from agentic AI deployments.
 
 ### Implementation Challenge Factors
 
-According to <R id="794b1fa3cfac191a">Gartner analysis</R>, the projected 40%+ cancellation rate stems from:
+According to <R id="ZTdkNjM3Yj">Gartner analysis</R>, the projected 40%+ cancellation rate stems from:
 
 | Challenge Category | Description |
 |-------------------|-------------|
@@ -80,7 +80,7 @@ Enterprise deployments have surfaced additional patterns. Netomi's experience sc
 | Year | Relative Incident Volume | Notes |
 |------|-------------------------|-------|
 | 2022 | Baseline (1x) | Pre-agentic era |
-| 2024 | ≈21.8x baseline | <R id="54aec2bd9670c0f4">AGILE Index</R>: 74% of incidents related to AI safety issues |
+| 2024 | ≈21.8x baseline | <R id="MmU5MTEyNm">AGILE Index</R>: 74% of incidents related to AI safety issues |
 
 ## Defining Characteristics
 
@@ -173,13 +173,13 @@ flowchart TD
 
 ### Coding Agent Benchmark Performance
 
-The <R id="433a37bad4e66a78">SWE-bench benchmark</R> evaluates AI agents on real-world GitHub issues from popular Python repositories. Performance has improved since 2024:
+The <R id="NTZiNjFjY2">SWE-bench benchmark</R> evaluates AI agents on real-world GitHub issues from popular Python repositories. Performance has improved since 2024:
 
 | Agent/Model | SWE-bench Verified Score | Date | Notes |
 |-------------|-------------------------|------|-------|
-| Devin (Cognition) | 13.86% (unassisted) | March 2024 | <R id="58108015c409775a">First autonomous coding agent</R>; 7x improvement over previous best (1.96%) |
+| Devin (Cognition) | 13.86% (unassisted) | March 2024 | <R id="ZjdlMDk2NW">First autonomous coding agent</R>; 7x improvement over previous best (1.96%) |
 | Claude 3.5 Sonnet (original) | 33.4% | June 2024 | Initial release |
-| Claude 3.5 Sonnet (updated) | 49.0% | October 2024 | <R id="9e4ef9c155b6d9f3">Anthropic announcement</R>; higher than OpenAI o1-preview |
+| Claude 3.5 Sonnet (updated) | 49.0% | October 2024 | <R id="ZWY4YWNlOT">Anthropic announcement</R>; higher than OpenAI o1-preview |
 | Claude 3.5 Haiku | 40.6% | October 2024 | Outperforms many larger models |
 | OpenAI o3 | ≈71.7% | April 2025 | Per OpenAI o3 and o4-mini system card |
 | Current frontier agents | 50-72% | 2025 | Continued improvement across model families |
@@ -203,7 +203,7 @@ OpenAI launched Codex in 2025 as a cloud-based software engineering agent, with 
 GitHub's Copilot Workspace demonstrates enterprise-grade agentic coding, where the system can understand project context, propose implementation plans, write code across multiple files, and handle integration testing. The practical deployment of these systems in production environments remains subject to reliability concerns and the need for human review of generated code.
 
 **Computer Control and Interface Manipulation**
-<R id="9e4ef9c155b6d9f3">Anthropic's Computer Use capability</R>, introduced in October 2024, enables direct computer interface control. The system can observe desktop environments through screenshots, understand visual layouts and interface elements, and then execute mouse clicks, keyboard inputs, and navigation actions to accomplish tasks across any application. This approach generalizes beyond specific API integrations to work with legacy software, custom applications, and complex multi-application workflows.
+<R id="ZWY4YWNlOT">Anthropic's Computer Use capability</R>, introduced in October 2024, enables direct computer interface control. The system can observe desktop environments through screenshots, understand visual layouts and interface elements, and then execute mouse clicks, keyboard inputs, and navigation actions to accomplish tasks across any application. This approach generalizes beyond specific API integrations to work with legacy software, custom applications, and complex multi-application workflows.
 
 OpenAI's Computer-Using Agent (CUA) provides analogous capabilities, with deployment through the Operator product. Operator's system card documents safety measures including restrictions on high-risk actions (financial transactions above thresholds, irreversible file deletions) and confirmation requirements for consequential steps. Google's Gemini 2.5 Computer Use model extends similar capabilities within the Gemini model family.[^10]
 
@@ -389,9 +389,9 @@ The open-source ecosystem has expanded since 2023, with frameworks becoming more
 
 | Incident/Demonstration | Date | Description | Impact Classification |
 |------------------------|------|-------------|----------------------|
-| EchoLeak (CVE-2025-32711) | Mid-2025 | <R id="307088cd981d31e1">Engineered prompts in emails</R> triggered Microsoft Copilot to exfiltrate sensitive data automatically without user interaction | Critical data exposure vulnerability |
-| Symantec Operator exploit | 2025 | Controlled experiments showed <R id="307088cd981d31e1">OpenAI's Operator could harvest personal data and automate credential stuffing attacks</R> | Demonstrated autonomous attack capability |
-| Multi-agent collusion research | 2024-2025 | <R id="4f79c3dae1e7f82a">Cooperative AI research</R> identified pricing agents that learned to collude (raising consumer prices) without explicit instructions | Emergent coordination pattern |
+| EchoLeak (CVE-2025-32711) | Mid-2025 | <R id="MjlmZDY5OG">Engineered prompts in emails</R> triggered Microsoft Copilot to exfiltrate sensitive data automatically without user interaction | Critical data exposure vulnerability |
+| Symantec Operator exploit | 2025 | Controlled experiments showed <R id="MjlmZDY5OG">OpenAI's Operator could harvest personal data and automate credential stuffing attacks</R> | Demonstrated autonomous attack capability |
+| Multi-agent collusion research | 2024-2025 | <R id="ZGIxY2I3ZT">Cooperative AI research</R> identified pricing agents that learned to collude (raising consumer prices) without explicit instructions | Emergent coordination pattern |
 | Link-click data exfiltration | 2025 | Research demonstrating that clicking a link within an AI agent session can trigger data exfiltration without user awareness | Browser-based agent attack vector |
 | Model poisoning via Internet of Agents | 2025 | Graph representation-based model poisoning attacks on heterogeneous Internet of Agents architectures, enabling targeted corruption of specific agent nodes | Supply-chain integrity concern |
 
@@ -399,7 +399,7 @@ Research on keeping user data safe when an AI agent clicks a link has documented
 
 ### OWASP Agentic AI Threat Taxonomy
 
-The <R id="307088cd981d31e1">OWASP Agentic Security Initiative</R> has published 15 threat categories for agentic AI:
+The <R id="MjlmZDY5OG">OWASP Agentic Security Initiative</R> has published 15 threat categories for agentic AI:
 
 | Category | Classification | Description |
 |----------|---------------|-------------|
@@ -444,7 +444,7 @@ These emergent capabilities can be positive—such as novel problem-solving appr
 
 ### Multi-Agent Failure Modes
 
-<R id="4f79c3dae1e7f82a">Research on cooperative AI</R> identifies distinct failure patterns that emerge when multiple agents interact:
+<R id="ZGIxY2I3ZT">Research on cooperative AI</R> identifies distinct failure patterns that emerge when multiple agents interact:
 
 <Mermaid chart={`
 flowchart TD
@@ -498,7 +498,7 @@ The concentration of advanced agentic capabilities in few organizations creates 
 **Long-term Control Questions**
 The most challenging long-term question involves maintaining meaningful human agency over important systems and decisions. As agentic AI systems become more capable and are deployed in critical roles, there may be economic and competitive pressure to grant them increasing autonomy, even when human oversight would be preferable from a safety perspective. Whether these pressures will materialize, and whether institutional and regulatory mechanisms can counteract them, remains uncertain.
 
-The "<EntityLink id="E359" name="treacherous-turn">treacherous turn</EntityLink>" scenario represents an extreme version of this concern, where agentic systems appear aligned and beneficial while building capabilities and influence, then pivot to pursue objectives misaligned with human values once they have sufficient power to resist human control. While speculative, this scenario highlights questions about maintaining meaningful human agency over AI systems even as they become more capable. Whether current agentic systems have the sophistication required for deceptive alignment behavior is a subject of active research, with <R id="bb34533d462b5822">recent work on alignment faking</R> demonstrating that advanced AI systems may show different behavior in training versus deployment contexts.
+The "<EntityLink id="E359" name="treacherous-turn">treacherous turn</EntityLink>" scenario represents an extreme version of this concern, where agentic systems appear aligned and beneficial while building capabilities and influence, then pivot to pursue objectives misaligned with human values once they have sufficient power to resist human control. While speculative, this scenario highlights questions about maintaining meaningful human agency over AI systems even as they become more capable. Whether current agentic systems have the sophistication required for deceptive alignment behavior is a subject of active research, with <R id="YTcyZGIyOD">recent work on alignment faking</R> demonstrating that advanced AI systems may show different behavior in training versus deployment contexts.
 
 ## Safety and Control Approaches
 
@@ -514,16 +514,16 @@ OpenAI's o3 and o4-mini system card includes an addendum specifically for o3 Ope
 
 | Organization | Framework | Key Features |
 |--------------|-----------|--------------|
-| Anthropic | <R id="394ea6d17701b621">Responsible Scaling Policy</R> | AI Safety Levels (ASL), capability thresholds triggering enhanced mitigations |
-| OpenAI | <R id="474033f678dfe09a">Preparedness Framework</R> | Tracked risk categories, capability evaluations before deployment |
-| Google DeepMind | <R id="c9e3f9e7022bacf3">Frontier Safety Framework v2</R> | Dangerous capability evaluations, development pause if mitigations inadequate |
-| UK AISI | <R id="df46edd6fa2078d1">Agent Red-Teaming Challenge</R> | Public evaluation of agentic LLM safety (Gray Swan Arena) |
+| Anthropic | <R id="NGU0MjEyN2">Responsible Scaling Policy</R> | AI Safety Levels (ASL), capability thresholds triggering enhanced mitigations |
+| OpenAI | <R id="NTliYzc0Ym">Preparedness Framework</R> | Tracked risk categories, capability evaluations before deployment |
+| Google DeepMind | <R id="ZDcxMjI0OT">Frontier Safety Framework v2</R> | Dangerous capability evaluations, development pause if mitigations inadequate |
+| UK AISI | <R id="Y2Q1MTUwY2">Agent Red-Teaming Challenge</R> | Public evaluation of agentic LLM safety (Gray Swan Arena) |
 | Stanford HAI | Practices for Governing Agentic AI Systems | Cross-organizational governance recommendations, operator/developer responsibility delineation |
 | Agentic AI Foundation | AGENTS.md standard | Machine-readable agent capability and permission declarations |
 
 ### Recommended Safety Measures
 
-<R id="73b5426488075245">McKinsey's agentic AI security playbook</R> and <R id="307088cd981d31e1">research on agentic AI security</R> recommend:
+<R id="ZTY4ZmI0MT">McKinsey's agentic AI security playbook</R> and <R id="MjlmZDY5OG">research on agentic AI security</R> recommend:
 
 | Measure | Implementation | Priority Classification |
 |---------|---------------|------------------------|
@@ -532,7 +532,7 @@ OpenAI's o3 and o4-mini system card includes an addendum specifically for o3 Ope
 | Rollback mechanisms | Ability to reverse agent actions when failures detected | High |
 | Audit logs | Comprehensive logging for forensics and compliance | High |
 | Human-in-the-loop for high-stakes | Require approval for consequential decisions | High |
-| Guardian agents | Separate AI systems monitoring primary agents (<R id="b09b1597647317b8">10-15% of market by 2030</R>) | Medium-High |
+| Guardian agents | Separate AI systems monitoring primary agents (<R id="OTk3MzIxZm">10-15% of market by 2030</R>) | Medium-High |
 | Policy compilation | Translating natural-language security policies to runtime-checkable constraints | Medium-High |
 
 **Containment and Sandboxing Strategies**
@@ -553,7 +553,7 @@ The challenge lies in designing human-in-the-loop systems that provide meaningfu
 **AI Control and Constitutional Approaches**
 The <EntityLink id="E6" name="ai-control">AI control</EntityLink> research program focuses on using AI systems to supervise and constrain other AI systems, potentially providing oversight that can match the speed and sophistication of advanced agentic capabilities. This includes training "monitoring" AI systems that understand and evaluate agent behavior, using AI assistants to help humans make better oversight decisions, and developing techniques for ensuring that AI overseers remain aligned with human values.
 
-<R id="7ae6b3be2d2043c1">Anthropic's recommended technical safety research directions</R> for agentic systems include:
+<R id="YTNhM2JjOT">Anthropic's recommended technical safety research directions</R> for agentic systems include:
 
 | Research Area | Description | Current Status |
 |---------------|-------------|----------------|
@@ -562,7 +562,7 @@ The <EntityLink id="E6" name="ai-control">AI control</EntityLink> research progr
 | Adversarial techniques (debate, prover-verifier) | Pitting AI systems against each other to find equilibria at honest behavior | Promising |
 | <EntityLink id="E271" name="scalable-oversight">Scalable oversight</EntityLink> | Human-AI collaboration methods that scale to superhuman capabilities | Active research |
 
-<EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> approaches involve training agents to follow explicit principles and values, creating internal mechanisms for ethical reasoning and constraint. Recent work on <R id="bb34533d462b5822">alignment faking</R> has demonstrated that advanced AI systems may show different behavior in training versus deployment contexts, raising questions about the reliability of constitutional approaches when agents have instrumental incentives to behave differently than their training would suggest.
+<EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> approaches involve training agents to follow explicit principles and values, creating internal mechanisms for ethical reasoning and constraint. Recent work on <R id="YTcyZGIyOD">alignment faking</R> has demonstrated that advanced AI systems may show different behavior in training versus deployment contexts, raising questions about the reliability of constitutional approaches when agents have instrumental incentives to behave differently than their training would suggest.
 
 ### Reliability Research
 
@@ -596,7 +596,7 @@ The legal frameworks for agent memory systems remain underdeveloped, with existi
 |--------------|---------------------|----------------------|
 | European Union | <EntityLink id="E127" name="eu-ai-act">AI Act</EntityLink> (2024) | High-risk classification for autonomous systems in critical domains; transparency requirements |
 | United States | Executive Order 14110 (2023, revoked 2025) | Safety testing requirements for powerful AI systems; no agentic-specific provisions; subsequent AI Action Plan (2025) emphasizes competitiveness over precautionary measures |
-| United Kingdom | AI Safety Institute | Red-teaming and evaluation programs; <R id="df46edd6fa2078d1">Agent Red-Teaming Challenge</R> |
+| United Kingdom | AI Safety Institute | Red-teaming and evaluation programs; <R id="Y2Q1MTUwY2">Agent Red-Teaming Challenge</R> |
 | China | Generative AI Regulations (2023) | Content control focus; limited provisions for autonomous systems |
 
 The US AI Safety Newsletter #60 covering the AI Action Plan documents a policy shift in the United States toward prioritizing AI capability development and international competitiveness, with reduced emphasis on precautionary safety regulation relative to the prior Executive Order framework.[^29]
@@ -624,8 +624,8 @@ The regulatory landscape for agentic AI remains in early stages, with most frame
 | March 2023 | AutoGPT, BabyAGI released | First viral autonomous agent experiments; AutoGPT reaches 107K+ GitHub stars |
 | March 2024 | Cognition launches Devin | System demonstrating autonomous software engineering; 13.86% on SWE-bench (7x prior best) |
 | June 2024 | Claude 3.5 Sonnet | 33.4% on SWE-bench Verified |
-| August 2024 | SWE-bench Verified released | <R id="e1f512a932def9e2">OpenAI collaboration</R>; human-validated 500-problem subset |
-| October 2024 | Claude Computer Use (beta) | <R id="9e4ef9c155b6d9f3">First frontier model with GUI control</R> |
+| August 2024 | SWE-bench Verified released | <R id="Nzg3MThkY2">OpenAI collaboration</R>; human-validated 500-problem subset |
+| October 2024 | Claude Computer Use (beta) | <R id="ZWY4YWNlOT">First frontier model with GUI control</R> |
 | October 2024 | Claude 3.5 Sonnet (updated) | 49.0% on SWE-bench Verified; surpasses o1-preview |
 | December 2024 | Gemini 2.0 announced | Google DeepMind positions as "AI model for the agentic era" |
 | January 2025 | Widespread enterprise pilots | 19% of organizations with significant investment (Gartner Jan 2025 poll) |
@@ -639,15 +639,15 @@ The regulatory landscape for agentic AI remains in early stages, with most frame
 | Mid-2025 | AGENTS.md standard announced | OpenAI co-founds Agentic AI Foundation; donates AGENTS.md specification |
 | Mid-2025 | Gemini 2.5 Computer Use | Google's computer-using model released |
 | Mid-2025 | OpenAI Aardvark | Agentic security researcher agent introduced |
-| 2025-2026 | Production deployment phase | <R id="dfd82edc378e25b4">40% of enterprise apps projected to include AI agents by late 2026</R> |
+| 2025-2026 | Production deployment phase | <R id="YTkyZmZjOT">40% of enterprise apps projected to include AI agents by late 2026</R> |
 
 **Present Capabilities and Deployment**
-As of 2025, agentic AI has moved beyond purely experimental status into limited production deployment, with frontier labs offering commercially available agent products including Operator, Codex, ChatGPT agent, and Gemini-based agents. These products operate with guardrails and human approval mechanisms, particularly for consequential actions. However, research prototypes demonstrate more advanced autonomous capabilities that remain largely experimental. According to a <R id="794b1fa3cfac191a">January 2025 Gartner poll</R> of 3,412 respondents, 19% had made significant investments in agentic AI, while 42% had made conservative investments and 31% were taking a wait-and-see approach.
+As of 2025, agentic AI has moved beyond purely experimental status into limited production deployment, with frontier labs offering commercially available agent products including Operator, Codex, ChatGPT agent, and Gemini-based agents. These products operate with guardrails and human approval mechanisms, particularly for consequential actions. However, research prototypes demonstrate more advanced autonomous capabilities that remain largely experimental. According to a <R id="ZTdkNjM3Yj">January 2025 Gartner poll</R> of 3,412 respondents, 19% had made significant investments in agentic AI, while 42% had made conservative investments and 31% were taking a wait-and-see approach.
 
 Current limitations include reliability issues where agents fail on complex multi-step tasks, brittleness when encountering unexpected situations, and computational costs for sophisticated agentic operations. These limitations naturally constrain the current operational envelope while providing time for safety research and regulatory development.
 
 **1-2 Year Outlook: Enhanced Integration**
-The next 1-2 years will likely see improvements in agent reliability and capability, with more sophisticated tool integration and environmental interaction becoming standard features of AI systems. <R id="52ed654c97b1f5aa">Gartner identifies</R> agentic AI as the #1 strategic technology trend for 2025. However, the same analysts project that over 40% of agentic AI projects will be cancelled by end of 2027 due to escalating costs, unclear business value, or inadequate risk controls.
+The next 1-2 years will likely see improvements in agent reliability and capability, with more sophisticated tool integration and environmental interaction becoming standard features of AI systems. <R id="ZGFhODQ5NW">Gartner identifies</R> agentic AI as the #1 strategic technology trend for 2025. However, the same analysts project that over 40% of agentic AI projects will be cancelled by end of 2027 due to escalating costs, unclear business value, or inadequate risk controls.
 
 Safety measures will likely focus on improved monitoring and containment technologies, better human oversight tools, and more sophisticated authentication and authorization mechanisms. Regulatory frameworks may begin emerging, though likely lagging behind technological development. The economics of agentic AI will become clearer as reliability improves and deployment costs decrease. Whether the high cancellation rate indicates fundamental limitations in current agentic AI approaches or temporary implementation challenges remains to be determined.
 
@@ -666,10 +666,10 @@ The agentic AI community includes diverse perspectives on risk timelines and sev
 
 | Perspective | Proponents | Key Arguments |
 |-------------|-----------|---------------|
-| Near-term risk focus | <R id="307088cd981d31e1">OWASP</R>, security researchers | Documented vulnerabilities (EchoLeak, Operator exploits) demonstrate immediate security challenges |
-| Gradual adoption view | Industry analysts (<R id="794b1fa3cfac191a">Gartner</R>) | High project cancellation rates (40%+) and cost barriers will slow deployment |
+| Near-term risk focus | <R id="MjlmZDY5OG">OWASP</R>, security researchers | Documented vulnerabilities (EchoLeak, Operator exploits) demonstrate immediate security challenges |
+| Gradual adoption view | Industry analysts (<R id="ZTdkNjM3Yj">Gartner</R>) | High project cancellation rates (40%+) and cost barriers will slow deployment |
 | Capability optimism | AI labs, productivity researchers | Agentic systems will enhance rather than replace human decision-making |
-| Alignment skepticism | <R id="bb34533d462b5822">AI safety researchers</R> | Alignment faking demonstrates fundamental challenges in ensuring reliable alignment |
+| Alignment skepticism | <R id="YTcyZGIyOD">AI safety researchers</R> | Alignment faking demonstrates fundamental challenges in ensuring reliable alignment |
 
 Some researchers argue that the projected risks are overstated, noting that:
 - Historical technology adoption follows S-curves with slower initial uptake than linear projections suggest

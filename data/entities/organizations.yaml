@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: anthropic
+  stableId: mK9pX3rQ7n
   numericId: E22
   type: organization
   orgType: frontier-lab
@@ -116,6 +117,7 @@
     - racing-dynamics
   lastUpdated: 2025-12
 - id: deepmind
+  stableId: A4XoubikkQ
   numericId: E98
   type: organization
   orgType: frontier-lab
@@ -190,6 +192,7 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: openai
+  stableId: 1LcLlMGLbw
   numericId: E218
   type: organization
   orgType: frontier-lab
@@ -263,6 +266,7 @@
     - alignment-research
   lastUpdated: 2025-12
 - id: xai
+  stableId: GLXKjYAEKw
   numericId: E378
   type: organization
   orgType: frontier-lab
@@ -308,6 +312,7 @@
     - agi-development
   lastUpdated: 2025-12
 - id: chai
+  stableId: zMfgJqiEPQ
   numericId: E57
   type: organization
   orgType: academic
@@ -342,6 +347,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: apollo-research
+  stableId: pKeaWwP6sQ
   numericId: E24
   type: organization
   orgType: safety-org
@@ -426,6 +432,7 @@
     - ai-risk-communication
   lastUpdated: 2025-12
 - id: conjecture
+  stableId: 0u4J70VqFY
   numericId: E70
   type: organization
   orgType: safety-org
@@ -472,6 +479,7 @@
     - alternative-paradigms
   lastUpdated: 2025-12
 - id: far-ai
+  stableId: lCiT37k9pA
   numericId: E138
   type: organization
   orgType: safety-org
@@ -519,6 +527,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: govai
+  stableId: XLLyzaEaCA
   numericId: E153
   type: organization
   orgType: safety-org
@@ -547,6 +556,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: metr
+  stableId: rQEkFJxS5w
   numericId: E201
   type: organization
   orgType: safety-org
@@ -608,6 +618,7 @@
     - preparedness-framework
   lastUpdated: 2025-12
 - id: arc
+  stableId: QsXVXtQ0zE
   numericId: E25
   type: organization
   orgType: safety-org
@@ -667,6 +678,7 @@
     - sandbagging
   lastUpdated: 2025-12
 - id: epoch-ai
+  stableId: cBPkzcVBBQ
   numericId: E125
   type: organization
   orgType: safety-org
@@ -718,6 +730,7 @@
     - trend-extrapolation
   lastUpdated: 2025-12
 - id: miri
+  stableId: puAffUjWSS
   numericId: E202
   type: organization
   orgType: safety-org
@@ -780,6 +793,7 @@
     - deconfusion
   lastUpdated: 2025-12
 - id: uk-aisi
+  stableId: aX0jkoaekQ
   numericId: E364
   type: organization
   orgType: government
@@ -836,6 +850,7 @@
     - regulatory-framework
   lastUpdated: 2025-12
 - id: us-aisi
+  stableId: fYyAxYlHDQ
   numericId: E365
   type: organization
   orgType: government
@@ -1003,6 +1018,7 @@
     - international
   lastUpdated: 2026-03
 - id: arc-evals
+  stableId: myeSKJXTMA
   numericId: E26
   type: organization
   orgType: safety-org
@@ -1019,6 +1035,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: fhi
+  stableId: Zmw9nfUYWA
   numericId: E140
   type: organization
   orgType: academic
@@ -1040,6 +1057,7 @@
 # Generated 2026-02-08
 
 - id: openai-foundation
+  stableId: GQuPhNkZbg
   numericId: E421
   type: organization
   orgType: generic
@@ -1071,6 +1089,7 @@
   lastUpdated: 2026-02
 
 - id: leading-the-future
+  stableId: pg7Ym4EQ9A
   numericId: E422
   type: organization
   orgType: generic
@@ -1096,6 +1115,7 @@
   lastUpdated: 2026-02
 
 - id: johns-hopkins-center-for-health-security
+  stableId: vKC8BA9hHA
   numericId: E423
   type: organization
   orgType: academic
@@ -1121,6 +1141,7 @@
   lastUpdated: 2026-02
 
 - id: nist-ai
+  stableId: Eac7pHF06Q
   numericId: E424
   type: organization
   orgType: government
@@ -1148,6 +1169,7 @@
   lastUpdated: 2026-02
 
 - id: ssi
+  stableId: 1OSiYOaWVL
   numericId: E425
   type: organization
   orgType: frontier-lab
@@ -1179,6 +1201,7 @@
   lastUpdated: 2026-02
 
 - id: controlai
+  stableId: uhTh3ndt0Q
   numericId: E426
   type: organization
   orgType: safety-org
@@ -1208,6 +1231,7 @@
   lastUpdated: 2026-02
 
 - id: frontier-model-forum
+  stableId: LgiqvRCrvg
   numericId: E427
   type: organization
   orgType: generic
@@ -1239,6 +1263,7 @@
   lastUpdated: 2026-02
 
 - id: palisade-research
+  stableId: sgEt2BpyOg
   numericId: E428
   type: organization
   orgType: safety-org
@@ -1272,6 +1297,7 @@
   lastUpdated: 2026-02
 
 - id: centre-for-long-term-resilience
+  stableId: yfUBQLMfgw
   numericId: E429
   type: organization
   orgType: safety-org
@@ -1298,6 +1324,7 @@
   lastUpdated: 2026-02
 
 - id: goodfire
+  stableId: H74rOLotqg
   numericId: E430
   type: organization
   orgType: safety-org
@@ -1333,6 +1360,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: 1day-sooner
+  stableId: 9k7drw6Qpg
   numericId: E509
   type: organization
   title: 1Day Sooner
@@ -1348,6 +1376,7 @@
     - governance
   lastUpdated: 2026-02
 - id: 80000-hours
+  stableId: hvg9ecR3nA
   numericId: E510
   type: organization
   orgType: safety-org
@@ -1364,6 +1393,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-futures-project
+  stableId: KDYvrwkgtw
   numericId: E511
   type: organization
   orgType: safety-org
@@ -1380,6 +1410,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-impacts
+  stableId: TdbypiKyCw
   numericId: E512
   type: organization
   orgType: safety-org
@@ -1411,6 +1442,7 @@
     - governance
   lastUpdated: 2026-02
 - id: arb-research
+  stableId: 6rEo4U4WPw
   numericId: E514
   type: organization
   orgType: safety-org
@@ -1427,6 +1459,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: blueprint-biosecurity
+  stableId: lZRKSfs5wg
   numericId: E515
   type: organization
   orgType: safety-org
@@ -1442,6 +1475,7 @@
     - governance
   lastUpdated: 2026-02
 - id: bridgewater-aia-labs
+  stableId: 19XMJpUWqQ
   numericId: E516
   type: organization
   orgType: generic
@@ -1458,6 +1492,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cea
+  stableId: gNsqAes7Dw
   numericId: E517
   type: organization
   orgType: safety-org
@@ -1471,6 +1506,7 @@
     - community
   lastUpdated: 2026-02
 - id: center-for-applied-rationality
+  stableId: l5K9ZdbXww
   numericId: E518
   type: organization
   summaryPage: community-building-overview
@@ -1485,6 +1521,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: chan-zuckerberg-initiative
+  stableId: rYERluiUwH
   numericId: E519
   type: organization
   orgType: funder
@@ -1499,6 +1536,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coalition-for-epidemic-preparedness-innovations
+  stableId: ILE6N4wiDA
   numericId: E520
   type: organization
   orgType: funder
@@ -1513,6 +1551,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coefficient-giving
+  stableId: ULjDXpSLCI
   numericId: E521
   type: organization
   orgType: funder
@@ -1529,6 +1568,7 @@
     - governance
   lastUpdated: 2026-02
 - id: council-on-strategic-risks
+  stableId: FL52kVPTlA
   numericId: E522
   type: organization
   orgType: safety-org
@@ -1543,6 +1583,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cser
+  stableId: Qns43S795w
   numericId: E523
   type: organization
   orgType: academic
@@ -1561,6 +1602,7 @@
     - governance
   lastUpdated: 2026-02
 - id: cset
+  stableId: lvsDuyzPcg
   numericId: E524
   type: organization
   orgType: academic
@@ -1577,6 +1619,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ea-global
+  stableId: k4IPgRP98A
   numericId: E525
   type: organization
   orgType: generic
@@ -1591,6 +1634,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: elicit
+  stableId: 2VexoROapg
   numericId: E526
   type: organization
   orgType: startup
@@ -1606,6 +1650,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: fli
+  stableId: d9sWZtyVwg
   numericId: E528
   type: organization
   orgType: safety-org
@@ -1622,6 +1667,7 @@
     - governance
   lastUpdated: 2026-02
 - id: founders-fund
+  stableId: LYfneQJbSA
   numericId: E529
   type: organization
   orgType: funder
@@ -1636,6 +1682,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: futuresearch
+  stableId: PIC4ivhNpw
   numericId: E530
   type: organization
   orgType: startup
@@ -1652,6 +1699,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: giving-pledge
+  stableId: 3w5hW5liew
   numericId: E531
   type: organization
   orgType: funder
@@ -1665,6 +1713,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: good-judgment
+  stableId: Zx7ckq6syw
   numericId: E532
   type: organization
   orgType: generic
@@ -1680,6 +1729,7 @@
     - community
   lastUpdated: 2026-02
 - id: gpai
+  stableId: p2h6bEqhvQ
   numericId: E533
   type: organization
   orgType: government
@@ -1697,6 +1747,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: gratified
+  stableId: 2v7A8mb7Ww
   numericId: E534
   type: organization
   orgType: generic
@@ -1711,6 +1762,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: hewlett-foundation
+  stableId: 9nUCGERzgQ
   numericId: E535
   type: organization
   orgType: funder
@@ -1725,6 +1777,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ibbis
+  stableId: 55HJBLrOzg
   numericId: E536
   type: organization
   orgType: academic
@@ -1740,6 +1793,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: kalshi
+  stableId: M7656wW5Bg
   numericId: E537
   type: organization
   orgType: startup
@@ -1755,6 +1809,7 @@
     - community
   lastUpdated: 2026-02
 - id: lesswrong
+  stableId: BEKEqQDmkQ
   numericId: E538
   type: organization
   orgType: generic
@@ -1770,6 +1825,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: lighthaven
+  stableId: 7E2ylGl7Ug
   numericId: E539
   type: organization
   orgType: generic
@@ -1786,6 +1842,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: lightning-rod-labs
+  stableId: 4804DX6Zbg
   numericId: E540
   type: organization
   summaryPage: safety-orgs-overview
@@ -1800,6 +1857,7 @@
     - community
   lastUpdated: 2026-02
 - id: lionheart-ventures
+  stableId: fACyX00cnQ
   numericId: E541
   type: organization
   orgType: funder
@@ -1814,6 +1872,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: longview-philanthropy
+  stableId: gV4U3qi2QA
   numericId: E542
   type: organization
   orgType: funder
@@ -1831,6 +1890,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: ltff
+  stableId: yA12C1KcjQ
   numericId: E543
   type: organization
   orgType: funder
@@ -1846,6 +1906,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: macarthur-foundation
+  stableId: 8q2GhtEmkA
   numericId: E544
   type: organization
   orgType: funder
@@ -1859,6 +1920,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: manifest
+  stableId: KYKdAOzynA
   numericId: E545
   type: organization
   orgType: generic
@@ -1874,6 +1936,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifold
+  stableId: Y8MiLNuAWA
   numericId: E546
   type: organization
   orgType: startup
@@ -1889,6 +1952,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifund
+  stableId: fFVOuFZCRf
   numericId: E547
   type: organization
   orgType: funder
@@ -1904,6 +1968,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: mats
+  stableId: yYtGSTsXuw
   numericId: E548
   type: organization
   orgType: safety-org
@@ -1920,6 +1985,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: meta-ai
+  stableId: tt0f5PYDCw
   numericId: E549
   type: organization
   orgType: frontier-lab
@@ -1937,6 +2003,7 @@
     - governance
   lastUpdated: 2026-02
 - id: microsoft
+  stableId: OIY5gaPpBA
   numericId: E550
   type: organization
   orgType: frontier-lab
@@ -1954,6 +2021,7 @@
     - governance
   lastUpdated: 2026-02
 - id: nti-bio
+  stableId: D9lqMW2HVw
   numericId: E551
   type: organization
   orgType: safety-org
@@ -1970,6 +2038,7 @@
     - community
   lastUpdated: 2026-02
 - id: open-philanthropy
+  stableId: NifCYhN75w
   numericId: E552
   type: organization
   orgType: funder
@@ -1983,6 +2052,7 @@
     - governance
   lastUpdated: 2026-02
 - id: pause-ai
+  stableId: woL5lkqLpg
   numericId: E553
   type: organization
   orgType: safety-org
@@ -2013,6 +2083,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: polymarket
+  stableId: fRo2H0Q2xQ
   numericId: E555
   type: organization
   orgType: startup
@@ -2028,6 +2099,7 @@
     - community
   lastUpdated: 2026-02
 - id: red-queen-bio
+  stableId: W9J9yMK82X
   numericId: E556
   type: organization
   orgType: startup
@@ -2043,6 +2115,7 @@
     - governance
   lastUpdated: 2026-02
 - id: redwood-research
+  stableId: dwMzc9WzPa
   numericId: E557
   type: organization
   orgType: safety-org
@@ -2095,6 +2168,7 @@
     - community
   lastUpdated: 2026-02
 - id: rethink-priorities
+  stableId: t0p43V5oLA
   numericId: E558
   type: organization
   orgType: safety-org
@@ -2112,6 +2186,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: samotsvety
+  stableId: 9hPhtQ9AXw
   numericId: E560
   type: organization
   orgType: generic
@@ -2127,6 +2202,7 @@
     - community
   lastUpdated: 2026-02
 - id: schmidt-futures
+  stableId: h6ntSGk8fg
   numericId: E561
   type: organization
   orgType: funder
@@ -2141,6 +2217,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: secure-ai-project
+  stableId: Mj1xuvdboQ
   numericId: E562
   type: organization
   orgType: safety-org
@@ -2158,6 +2235,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securebio
+  stableId: QFIL8r7vPA
   numericId: E563
   type: organization
   orgType: safety-org
@@ -2175,6 +2253,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securedna
+  stableId: m4vhGiF5RQ
   numericId: E564
   type: organization
   orgType: safety-org
@@ -2191,6 +2270,7 @@
     - governance
   lastUpdated: 2026-02
 - id: seldon-lab
+  stableId: eBYk2wn75Q
   numericId: E565
   type: organization
   orgType: safety-org
@@ -2207,6 +2287,7 @@
     - governance
   lastUpdated: 2026-02
 - id: sentinel
+  stableId: JzhBAecjaA
   numericId: E566
   type: organization
   orgType: safety-org
@@ -2239,6 +2320,7 @@
     - governance
   lastUpdated: 2026-02
 - id: situational-awareness-lp
+  stableId: FxJ9jQ7SlA
   numericId: E568
   type: organization
   orgType: generic
@@ -2254,6 +2336,7 @@
     - governance
   lastUpdated: 2026-02
 - id: swift-centre
+  stableId: YlrwnKhMqQ
   numericId: E569
   type: organization
   orgType: safety-org
@@ -2268,6 +2351,7 @@
     - community
   lastUpdated: 2026-02
 - id: the-foundation-layer
+  stableId: 5jfxLzMZYg
   numericId: E697
   type: organization
   orgType: funder
@@ -2306,6 +2390,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: turion
+  stableId: wixiIVSZdg
   numericId: E571
   type: organization
   orgType: generic
@@ -2320,6 +2405,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vara
+  stableId: 4RoymCjuvA
   numericId: E572
   type: organization
   orgType: generic
@@ -2349,6 +2435,7 @@
     - community
   lastUpdated: 2026-02
 - id: astralis-foundation
+  stableId: QeknHipQPA
   numericId: E702
   type: organization
   orgType: funder
@@ -2390,6 +2477,7 @@
     - community
   lastUpdated: 2026-02
 - id: nvidia
+  stableId: UvpZCnW3wA
   numericId: E693
   type: organization
   orgType: frontier-lab
@@ -2406,6 +2494,7 @@
     - community
   lastUpdated: 2026-02
 - id: ftx
+  stableId: yevJm2XDsQ
   numericId: E856
   type: organization
   orgType: generic
@@ -2429,6 +2518,7 @@
     - community
   lastUpdated: 2026-02
 - id: ftx-future-fund
+  stableId: JhIGCaI3Ng
   numericId: E855
   type: organization
   orgType: funder
@@ -2455,6 +2545,7 @@
   lastUpdated: 2026-02
 
 - id: giving-what-we-can
+  stableId: aKZsmUeuWg
   numericId: E863
   type: organization
   orgType: safety-org

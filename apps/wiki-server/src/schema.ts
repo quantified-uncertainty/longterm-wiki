@@ -343,7 +343,7 @@ export const summaries = pgTable(
   {
     entityId: text("entity_id")
       .primaryKey()
-      .references(() => entities.id, { onDelete: "cascade" }),
+      .references(() => entities.stableId, { onDelete: "cascade" }),
     entityType: text("entity_type").notNull(),
     oneLiner: text("one_liner"),
     summary: text("summary"),
@@ -1838,5 +1838,68 @@ export const recordVerdicts = pgTable(
     index("idx_rvd_verdict").on(table.verdict),
     index("idx_rvd_recheck").on(table.needsRecheck),
     index("idx_rvd_type").on(table.recordType),
+  ]
+);
+
+// ── Unified Things Table ───────────────────────────────────────────────
+//
+// Every identifiable item in the system gets a single row here. Enables
+// cross-domain queries, unified verification status, and a single browse UI.
+
+export const VALID_THING_TYPES = [
+  "entity",
+  "fact",
+  "grant",
+  "resource",
+  "personnel",
+  "division",
+  "funding-round",
+  "investment",
+  "equity-position",
+  "benchmark",
+  "benchmark-result",
+  "funding-program",
+  "division-personnel",
+] as const;
+
+export type ThingType = (typeof VALID_THING_TYPES)[number];
+
+export const things = pgTable(
+  "things",
+  {
+    id: text("id").primaryKey(),
+    thingType: text("thing_type").notNull(),
+    title: text("title").notNull(),
+    parentThingId: text("parent_thing_id").references((): any => things.id, {
+      onDelete: "set null",
+    }),
+    sourceTable: text("source_table").notNull(),
+    sourceId: text("source_id").notNull(),
+    entityType: text("entity_type"),
+    description: text("description"),
+    sourceUrl: text("source_url"),
+    numericId: text("numeric_id"),
+    verdict: text("verdict"),
+    verdictConfidence: real("verdict_confidence"),
+    verdictAt: timestamp("verdict_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    // search_vector tsvector column is managed via migration SQL (generated column)
+  },
+  (table) => [
+    index("idx_things_type").on(table.thingType),
+    index("idx_things_parent").on(table.parentThingId),
+    index("idx_things_entity_type").on(table.entityType),
+    index("idx_things_verdict").on(table.verdict),
+    index("idx_things_updated").on(table.updatedAt),
+    uniqueIndex("idx_things_source_unique").on(table.sourceTable, table.sourceId),
+    // GIN index on search_vector is created in migration SQL
   ]
 );

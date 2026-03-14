@@ -4,6 +4,8 @@
  */
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/database";
+import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingRoundRecord } from "./org-data";
 
@@ -36,55 +38,59 @@ export function FundingRoundsSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {rounds.map((r) => (
-              <tr key={r.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <Link
-                    href={`/funding-rounds/${r.key}`}
-                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                  >
-                    {r.name}
-                  </Link>
-                  {r.instrument && (
-                    <span className="ml-1.5 text-[11px] text-muted-foreground">
-                      ({r.instrument})
-                    </span>
-                  )}
-                  {r.source && (
-                    <a
-                      href={safeHref(r.source)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+            {rounds.map((r) => {
+              const verdict = getRecordVerdict("funding-round", String(r.key));
+              return (
+                <tr key={r.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <Link
+                      href={`/funding-rounds/${r.key}`}
+                      className="font-medium text-foreground text-xs hover:text-primary transition-colors"
                     >
-                      source
-                    </a>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                  {r.raised != null && (
-                    <span className="font-semibold">{formatCompactCurrency(r.raised)}</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                  {r.valuation != null && (
-                    <span className="text-muted-foreground">{formatCompactCurrency(r.valuation)}</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-xs">
-                  {r.leadInvestorHref ? (
-                    <Link href={r.leadInvestorHref} className="text-primary hover:underline">
-                      {r.leadInvestorName}
+                      {r.name}
                     </Link>
-                  ) : r.leadInvestorName ? (
-                    <span className="text-muted-foreground">{r.leadInvestorName}</span>
-                  ) : null}
-                </td>
-                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                  {r.date ?? ""}
-                </td>
-              </tr>
-            ))}
+                    {r.instrument && (
+                      <span className="ml-1.5 text-[11px] text-muted-foreground">
+                        ({r.instrument})
+                      </span>
+                    )}
+                    {r.source && (
+                      <a
+                        href={safeHref(r.source)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        source
+                      </a>
+                    )}
+                    <VerificationBadge verdict={verdict} />
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                    {r.raised != null && (
+                      <span className="font-semibold">{formatCompactCurrency(r.raised)}</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                    {r.valuation != null && (
+                      <span className="text-muted-foreground">{formatCompactCurrency(r.valuation)}</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-xs">
+                    {r.leadInvestorHref ? (
+                      <Link href={r.leadInvestorHref} className="text-primary hover:underline">
+                        {r.leadInvestorName}
+                      </Link>
+                    ) : r.leadInvestorName ? (
+                      <span className="text-muted-foreground">{r.leadInvestorName}</span>
+                    ) : null}
+                  </td>
+                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                    {r.date ?? ""}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

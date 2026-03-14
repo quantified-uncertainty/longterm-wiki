@@ -5,10 +5,13 @@
  * mirroring the pattern of the old <F> component but backed by KB data.
  *
  * Usage in MDX:
- *   <KBF entity="anthropic" property="revenue" />
- *   <KBF entity="anthropic" property="revenue" showDate />
- *   <KBF entity="anthropic" property="revenue" asOf="2025-12" />
- *   <KBF entity="anthropic" property="revenue">$19 billion</KBF>
+ *   <KBF entity="mK9pX3rQ7n" property="revenue" />
+ *   <KBF entity="mK9pX3rQ7n" property="revenue" showDate />
+ *   <KBF entity="mK9pX3rQ7n" property="revenue" asOf="2025-12" />
+ *   <KBF entity="mK9pX3rQ7n" property="revenue">$19 billion</KBF>
+ *
+ * The entity prop accepts KB stableIds (preferred, e.g. "mK9pX3rQ7n") or
+ * legacy slugs (e.g. "anthropic") — both are resolved via the KB data layer.
  */
 
 import Link from "next/link";
@@ -24,7 +27,7 @@ import {
 import styles from "./tooltip.module.css";
 
 interface KBFProps {
-  /** KB entity ID (slug like "anthropic") */
+  /** KB entity identifier — stableId (e.g. "mK9pX3rQ7n") or legacy slug (e.g. "anthropic") */
   entity: string;
   /** KB property ID (like "revenue", "valuation") */
   property: string;

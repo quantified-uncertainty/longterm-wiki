@@ -32,7 +32,7 @@ facts:
   - id: f_QYWh1IZqjA
     property: founded-by
     value:
-      - !ref fS1tEGKuNq:eliezer-yudkowsky
+      - !ref fS1tEGKuNq
     source: https://intelligence.org/about/
 
   - id: f_EUnXQGwIzd

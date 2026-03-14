@@ -1,6 +1,6 @@
 /**
  * Divisions section for organization profile pages.
- * Extracted from page.tsx as a pure refactor — no visual changes.
+ * Shows org subdivisions with optional team lead resolution to person links.
  */
 import Link from "next/link";
 import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
@@ -26,8 +26,10 @@ const DIVISION_TYPE_COLORS: Record<string, string> = {
 /** Divisions section for org pages. */
 export function DivisionsSection({
   divisions,
+  leadResolved,
 }: {
   divisions: ParsedDivisionRecord[];
+  leadResolved?: Map<string, { name: string; href: string | null }>;
 }) {
   if (divisions.length === 0) return null;
 
@@ -46,69 +48,85 @@ export function DivisionsSection({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {divisions.map((d) => (
-              <tr key={d.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">
-                    {d.slug ? (
-                      <Link
-                        href={`/divisions/${d.slug}`}
-                        className="text-primary hover:underline"
+            {divisions.map((d) => {
+              const resolvedLead = leadResolved?.get(d.key);
+              return (
+                <tr key={d.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <span className="font-medium text-foreground text-xs">
+                      {d.slug ? (
+                        <Link
+                          href={`/divisions/${d.slug}`}
+                          className="text-primary hover:underline"
+                        >
+                          {d.name}
+                        </Link>
+                      ) : (
+                        d.name
+                      )}
+                    </span>
+                    {d.source && (
+                      <a
+                        href={safeHref(d.source)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                       >
-                        {d.name}
-                      </Link>
-                    ) : (
-                      d.name
+                        source
+                      </a>
                     )}
-                  </span>
-                  {d.source && (
-                    <a
-                      href={safeHref(d.source)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      source
-                    </a>
-                  )}
-                </td>
-                <td className="py-2 px-3">
-                  <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                      DIVISION_TYPE_COLORS[d.divisionType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                    }`}
-                  >
-                    {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
-                  </span>
-                </td>
-                <td className="py-2 px-3 text-xs text-muted-foreground">
-                  {d.lead ?? ""}
-                </td>
-                <td className="py-2 px-3 text-center text-xs">
-                  {d.status && (
+                  </td>
+                  <td className="py-2 px-3">
                     <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                        d.status === "active"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                          : d.status === "inactive"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                            : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                        DIVISION_TYPE_COLORS[d.divisionType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
-                      {titleCase(d.status)}
+                      {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
                     </span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                  {d.startDate && (
-                    <span>
-                      {formatKBDate(d.startDate)}
-                      {d.endDate ? ` \u2013 ${formatKBDate(d.endDate)}` : " \u2013 present"}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="py-2 px-3 text-xs text-muted-foreground">
+                    {resolvedLead ? (
+                      resolvedLead.href ? (
+                        <Link
+                          href={resolvedLead.href}
+                          className="text-primary hover:underline"
+                        >
+                          {resolvedLead.name}
+                        </Link>
+                      ) : (
+                        resolvedLead.name
+                      )
+                    ) : (
+                      d.lead ?? ""
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-center text-xs">
+                    {d.status && (
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                          d.status === "active"
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                            : d.status === "inactive"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        }`}
+                      >
+                        {titleCase(d.status)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                    {d.startDate && (
+                      <span>
+                        {formatKBDate(d.startDate)}
+                        {d.endDate ? ` \u2013 ${formatKBDate(d.endDate)}` : " \u2013 present"}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

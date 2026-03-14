@@ -18,6 +18,16 @@ function validateCurrency(currency: string | undefined): string {
 }
 
 /**
+ * Check if a grantee name is a numeric-only ID from an external system
+ * (e.g., Open Philanthropy's internal database). These should not be stored
+ * as granteeId because they're not meaningful display names and can't be
+ * resolved to entities.
+ */
+export function isNumericGranteeId(name: string): boolean {
+  return /^\d+$/.test(name.trim());
+}
+
+/**
  * Convert a RawGrant to a SyncGrant.
  * The defaultSourceUrl is used unless the raw grant has its own sourceUrl (e.g. Manifund).
  */
@@ -28,7 +38,14 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
 
   // Use the matched entity stableId when available; fall back to display name.
   // This allows the grants table to link grantees to their entity pages.
-  const granteeId = (raw.granteeId ?? raw.granteeName).substring(0, 200);
+  // Skip purely numeric grantee names — these are internal IDs from external
+  // systems (e.g., Open Philanthropy) that aren't meaningful as display names.
+  const fallbackName = raw.granteeName;
+  const granteeId = raw.granteeId
+    ? raw.granteeId.substring(0, 200)
+    : isNumericGranteeId(fallbackName)
+      ? null
+      : fallbackName.substring(0, 200);
 
   // Truncate notes
   let notes: string | null = null;

@@ -267,6 +267,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Divisions", href: internalHref("divisions-dashboard") },
         { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
         { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
+        { label: "Things", href: internalHref("things-dashboard") },
       ],
     },
     {
@@ -404,8 +405,8 @@ export function getSourcesNav(): NavSection[] {
       defaultOpen: true,
       items: [
         { label: "Overview", href: "/wiki/E1049" },
-        { label: "Resources", href: "/wiki/E1043" },
-        { label: "Publications", href: "/wiki/E1044" },
+        { label: "Resources", href: "/resources" },
+        { label: "Publications", href: "/publications" },
       ],
     },
   ];

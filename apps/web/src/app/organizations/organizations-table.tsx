@@ -70,9 +70,18 @@ function DateHint({ date }: { date: string | null }) {
   );
 }
 
-export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
+export type StatFilterKey = "all" | "withRevenue" | "withValuation" | "withHeadcount";
+
+export interface OrgStatDef {
+  key: StatFilterKey;
+  label: string;
+  value: string;
+}
+
+export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: OrgStatDef[] }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statFilter, setStatFilter] = useState<StatFilterKey>("all");
   const [sortKey, setSortKey] = useState<SortKey>("revenue");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -111,6 +120,20 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       result = result.filter((r) => r.orgType === typeFilter);
     }
 
+    if (statFilter !== "all") {
+      switch (statFilter) {
+        case "withRevenue":
+          result = result.filter((r) => r.revenueNum != null);
+          break;
+        case "withValuation":
+          result = result.filter((r) => r.valuationNum != null);
+          break;
+        case "withHeadcount":
+          result = result.filter((r) => r.headcount != null);
+          break;
+      }
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
@@ -121,10 +144,35 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
     );
 
     return result;
-  }, [rows, search, typeFilter, sortKey, sortDir]);
+  }, [rows, search, typeFilter, statFilter, sortKey, sortDir]);
 
   return (
     <div>
+      {/* Clickable stat cards */}
+      {stats && stats.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {stats.map((stat) => (
+            <button
+              key={stat.key}
+              type="button"
+              onClick={() => setStatFilter(statFilter === stat.key ? "all" : stat.key)}
+              className={`rounded-xl border p-4 text-left transition-all ${
+                statFilter === stat.key
+                  ? "border-primary/50 bg-primary/5 ring-2 ring-primary/20 shadow-sm"
+                  : "border-border/60 bg-gradient-to-br from-card to-muted/30 hover:border-primary/30 hover:shadow-md"
+              }`}
+            >
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
+                {stat.label}
+              </div>
+              <div className="text-xl font-bold tabular-nums tracking-tight">
+                {stat.value}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
@@ -174,7 +222,7 @@ export function OrganizationsTable({ rows }: { rows: OrgRow[] }) {
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Organization" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Type" sortKey="orgType" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />

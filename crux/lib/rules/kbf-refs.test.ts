@@ -7,25 +7,66 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Severity } from '../validation/validation-engine.ts';
 
+// Entity YAML file contents (slug -> YAML string)
+const ENTITY_YAML: Record<string, string> = {
+  'anthropic.yaml': 'thing:\n  id: anthropic\n  stableId: mK9pX3rQ7n\n  type: organization\n  name: Anthropic',
+  'openai.yaml': 'thing:\n  id: openai\n  stableId: 1LcLlMGLbw\n  type: organization\n  name: OpenAI',
+  'xai.yaml': 'thing:\n  id: xai\n  stableId: xAi7bC2dEf\n  type: organization\n  name: xAI',
+};
+
+const PROPERTIES_YAML = [
+  'properties:',
+  '  valuation:',
+  '    name: Valuation',
+  '  revenue:',
+  '    name: Revenue',
+  '  headcount:',
+  '    name: Headcount',
+].join('\n');
+
+// Minimal Dirent-like objects for readdirSync({ withFileTypes: true })
+function makeDirent(name: string, isFile: boolean) {
+  return {
+    name,
+    isFile: () => isFile,
+    isDirectory: () => !isFile,
+    isBlockDevice: () => false,
+    isCharacterDevice: () => false,
+    isSymbolicLink: () => false,
+    isFIFO: () => false,
+    isSocket: () => false,
+    path: '',
+    parentPath: '',
+  };
+}
+
 // vi.mock is hoisted before all imports by vitest — fs is mocked before
 // kbf-refs.ts initialises its module-level caches.
 vi.mock('fs', () => ({
-  readdirSync: vi.fn(() => [
-    'anthropic.yaml',
-    'openai.yaml',
-    'xai.yaml',
-  ]),
-  readFileSync: vi.fn(() =>
-    [
-      'properties:',
-      '  valuation:',
-      '    name: Valuation',
-      '  revenue:',
-      '    name: Revenue',
-      '  headcount:',
-      '    name: Headcount',
-    ].join('\n'),
-  ),
+  readdirSync: vi.fn((_path: string, opts?: { withFileTypes?: boolean }) => {
+    if (opts?.withFileTypes) {
+      return [
+        makeDirent('anthropic.yaml', true),
+        makeDirent('openai.yaml', true),
+        makeDirent('xai.yaml', true),
+      ];
+    }
+    return ['anthropic.yaml', 'openai.yaml', 'xai.yaml'];
+  }),
+  readFileSync: vi.fn((filePath: string) => {
+    // Return properties YAML for the properties file
+    if (typeof filePath === 'string' && filePath.includes('properties.yaml')) {
+      return PROPERTIES_YAML;
+    }
+    // Return entity YAML for individual thing files
+    for (const [name, content] of Object.entries(ENTITY_YAML)) {
+      if (typeof filePath === 'string' && filePath.endsWith('/' + name)) {
+        return content;
+      }
+    }
+    // Default fallback
+    return PROPERTIES_YAML;
+  }),
 }));
 
 // Import AFTER vi.mock so the mocked fs is used when the module initialises.
@@ -43,7 +84,7 @@ function mockContent(
     path: (opts.path as string) ?? 'content/docs/test-page.mdx',
     relativePath: (opts.relativePath as string) ?? 'test-page.mdx',
     body,
-    raw: `---\ntitle: Test\n---\n${body}`,
+    raw: '---\ntitle: Test\n---\n' + body,
     frontmatter: { title: 'Test Page' },
     isIndex: false,
   };
@@ -117,6 +158,26 @@ describe('kbf-refs rule', () => {
     const issues = await kbfRefsRule.check(content as any, {} as any);
     expect(issues.length).toBe(1);
     expect(issues[0].line).toBe(3);
+  });
+
+  // ── stableId support ──────────────────────────────────────────────────
+
+  it('passes when KBF entity uses a stableId instead of slug', async () => {
+    const content = mockContent('<KBF entity="mK9pX3rQ7n" property="valuation" />');
+    const issues = await kbfRefsRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('passes for Calc expressions using stableIds', async () => {
+    const content = mockContent('<Calc expr="{mK9pX3rQ7n.valuation} / {mK9pX3rQ7n.revenue}" precision={0} suffix="x" />');
+    const issues = await kbfRefsRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('passes for mixed slug and stableId Calc references', async () => {
+    const content = mockContent('<Calc expr="{mK9pX3rQ7n.valuation} / {openai.revenue}" />');
+    const issues = await kbfRefsRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
   });
 
   // ── Calc expression checks ─────────────────────────────────────────────

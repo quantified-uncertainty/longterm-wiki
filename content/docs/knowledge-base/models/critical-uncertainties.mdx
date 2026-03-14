@@ -32,9 +32,9 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 Effective AI risk prioritization requires identifying which uncertainties most affect expected outcomes. This model maps 35 high-leverage variables across six domains—hardware, algorithms, governance, economics, safety research, and capability thresholds—to help researchers and policymakers focus evidence-gathering where it matters most. The central question: **which empirical uncertainties, if resolved, would most change our strategic recommendations for AI safety?**
 
-The key insight is that a small number of cruxes—perhaps 8-12 variables—drive the majority of disagreement about AI risk levels and appropriate responses. Expert surveys consistently show wide disagreement on these specific parameters: the <R id="3f9927ec7945e4f2"><EntityLink id="E512" name="ai-impacts">AI Impacts</EntityLink> 2023 survey</R> found that 41-51% of AI researchers assign greater than 10% probability to human extinction or severe disempowerment from AI, yet the remaining researchers assign much lower probabilities. This disagreement stems primarily from differing estimates of alignment difficulty, takeoff speed, and governance tractability—all variables included in this model.
+The key insight is that a small number of cruxes—perhaps 8-12 variables—drive the majority of disagreement about AI risk levels and appropriate responses. Expert surveys consistently show wide disagreement on these specific parameters: the <R id="MWQ4NDM1Yz"><EntityLink id="E512" name="ai-impacts">AI Impacts</EntityLink> 2023 survey</R> found that 41-51% of AI researchers assign greater than 10% probability to human extinction or severe disempowerment from AI, yet the remaining researchers assign much lower probabilities. This disagreement stems primarily from differing estimates of alignment difficulty, takeoff speed, and governance tractability—all variables included in this model.
 
-The model synthesizes data from multiple authoritative sources. <R id="bb81f2a99fdba0ec"><EntityLink id="E199" name="metaculus">Metaculus</EntityLink> forecasts</R> show <EntityLink id="E399" name="agi-timeline">AGI timeline</EntityLink> estimates have collapsed from 50 years (2020) to approximately 5 years (2024), with current median around 2027-2031. <R id="9587b65b1192289d"><EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> research</R> projects training compute could reach 10^28-10^30 FLOP by 2030, while their data analysis suggests high-quality training data may be exhausted by 2025-2028 depending on overtraining factors. These empirical findings directly inform the parameter estimates visualized below.
+The model synthesizes data from multiple authoritative sources. <R id="YzE3YjNhYj"><EntityLink id="E199" name="metaculus">Metaculus</EntityLink> forecasts</R> show <EntityLink id="E399" name="agi-timeline">AGI timeline</EntityLink> estimates have collapsed from 50 years (2020) to approximately 5 years (2024), with current median around 2027-2031. <R id="NTZlMGFiY2"><EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> research</R> projects training compute could reach 10^28-10^30 FLOP by 2030, while their data analysis suggests high-quality training data may be exhausted by 2025-2028 depending on overtraining factors. These empirical findings directly inform the parameter estimates visualized below.
 
 **Core thesis**: Focus on ~35 nodes that are (1) high-leverage, (2) genuinely uncertain, and (3) empirically resolvable or at least operationalizable.
 
@@ -638,10 +638,10 @@ This model draws on multiple evidence streams to estimate parameter values and u
 
 | Source Type | Examples | Variables Informed | Update Frequency |
 |-------------|----------|-------------------|------------------|
-| **Expert Surveys** | <R id="3f9927ec7945e4f2">AI Impacts</R>, <R id="40fcdcc3ffba5188">Pew Research</R>, <R id="b163447fdc804872">International AI Safety Report</R> | Alignment difficulty, extinction probability, timeline estimates | Annual |
-| **Forecasting Platforms** | <R id="bb81f2a99fdba0ec">Metaculus</R>, <EntityLink id="E546" name="manifold">Manifold</EntityLink>, <EntityLink id="E555" name="polymarket">Polymarket</EntityLink> | AGI timelines, capability milestones, policy outcomes | Continuous |
-| **Industry Reports** | <R id="da87f2b213eb9272">Stanford AI Index</R>, <R id="c1e31a3255ae290d">McKinsey State of AI</R>, <R id="9587b65b1192289d">Epoch AI</R> | Compute trends, algorithmic progress, economic value | Annual |
-| **Governance Tracking** | <R id="d5796bc00a131872">IAPP AI Governance</R>, regulatory databases | Policy stringency, compliance rates, enforcement actions | Quarterly |
+| **Expert Surveys** | <R id="MWQ4NDM1Yz">AI Impacts</R>, <R id="YjQ2Yjk5Yz">Pew Research</R>, <R id="ZjdiMDdkNW">International AI Safety Report</R> | Alignment difficulty, extinction probability, timeline estimates | Annual |
+| **Forecasting Platforms** | <R id="YzE3YjNhYj">Metaculus</R>, <EntityLink id="E546" name="manifold">Manifold</EntityLink>, <EntityLink id="E555" name="polymarket">Polymarket</EntityLink> | AGI timelines, capability milestones, policy outcomes | Continuous |
+| **Industry Reports** | <R id="MzI4NWFjZj">Stanford AI Index</R>, <R id="OWE0Yjg0ND">McKinsey State of AI</R>, <R id="NTZlMGFiY2">Epoch AI</R> | Compute trends, algorithmic progress, economic value | Annual |
+| **Governance Tracking** | <R id="OGNjYzcwYT">IAPP AI Governance</R>, regulatory databases | Policy stringency, compliance rates, enforcement actions | Quarterly |
 | **Safety Research** | Lab publications, interpretability benchmarks, red-team exercises | Alignment tax, deception detection, oversight limits | Ongoing |
 
 **Methodology notes:** Parameter estimates use median values from multiple sources where available. Uncertainty ranges reflect the 10th-90th percentile of expert/forecaster distributions. The "resolvable via" column identifies empirical pathways to reduce uncertainty. Variables are classified as high-leverage if resolving uncertainty would shift expected loss by >\$1T or change recommended interventions.
@@ -650,7 +650,7 @@ This model draws on multiple evidence streams to estimate parameter values and u
 
 ## Key Expert Survey Findings
 
-The <R id="3f9927ec7945e4f2">AI Impacts 2023 survey</R> of 2,788 AI researchers provides crucial data on expert disagreement:
+The <R id="MWQ4NDM1Yz">AI Impacts 2023 survey</R> of 2,788 AI researchers provides crucial data on expert disagreement:
 
 | Finding | Value | Implications |
 |---------|-------|--------------|
@@ -659,7 +659,7 @@ The <R id="3f9927ec7945e4f2">AI Impacts 2023 survey</R> of 2,788 AI researchers 
 | Median AGI timeline | 2047 (50% probability) | But 10% chance by 2027 |
 | Timeline shift from 2022 to 2023 survey | 13-48 years earlier | Rapid updating toward shorter timelines |
 
-The <R id="40fcdcc3ffba5188">Pew Research survey</R> (2024) of 1,013 AI experts found 56% believe AI will have positive impact over 20 years vs. only 17% of the public—a 39-percentage-point gap that influences political feasibility of governance interventions.
+The <R id="YjQ2Yjk5Yz">Pew Research survey</R> (2024) of 1,013 AI experts found 56% believe AI will have positive impact over 20 years vs. only 17% of the public—a 39-percentage-point gap that influences political feasibility of governance interventions.
 
 ---
 
@@ -745,7 +745,7 @@ flowchart TD
 
 ### Coordination & Governance (8 nodes)
 
-The <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> found that only 25% of organizations have fully implemented AI governance programs despite 78% using AI—a 53-percentage-point gap. The <R id="da87f2b213eb9272">Stanford AI Index 2025</R> reports U.S. federal agencies introduced 59 AI regulations in 2024, double the 2023 count.
+The <R id="OGNjYzcwYT">IAPP AI Governance Survey 2024</R> found that only 25% of organizations have fully implemented AI governance programs despite 78% using AI—a 53-percentage-point gap. The <R id="MzI4NWFjZj">Stanford AI Index 2025</R> reports U.S. federal agencies introduced 59 AI regulations in 2024, double the 2023 count.
 
 | Variable | Current Estimate | Uncertainty Range | Resolvable Via |
 |----------|------------------|-------------------|----------------|
@@ -758,7 +758,7 @@ The <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> found that only 
 | Whistleblower frequency | 0.5/year | 0.1-3/year | Disclosed incidents |
 | International AI institution | 2/10 | 1-6/10 by 2030 | Institution-building efforts |
 
-**Governance maturity gap:** According to <R id="3af85afb86e7987b">Infosys research</R>, only 2% of companies meet gold-standard benchmarks for responsible AI controls—comprehensive controls, continuous monitoring, and proven effectiveness across the AI lifecycle.
+**Governance maturity gap:** According to <R id="NjE3ZGExZT">Infosys research</R>, only 2% of companies meet gold-standard benchmarks for responsible AI controls—comprehensive controls, continuous monitoring, and proven effectiveness across the AI lifecycle.
 
 ### Economic & Strategic (6 nodes)
 
@@ -773,7 +773,7 @@ The <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> found that only 
 
 ### Safety & Alignment (10 nodes)
 
-The <R id="9a357b5d11fc5f72">safety funding gap</R> is stark: capability investment to safety research is approximately 10,000:1 by some estimates. AI safety incidents surged 56.4% in 2024, with 233 documented failures. Total AI safety funding reached approximately \$100-650M annually (including internal lab budgets), versus \$10B+ in capability development. Mechanistic interpretability research, while <R id="45c5b56ac029ef2d">progressing</R>, still lacks standardized metrics for "percentage of model explained."
+The <R id="YmEzMGE1MT">safety funding gap</R> is stark: capability investment to safety research is approximately 10,000:1 by some estimates. AI safety incidents surged 56.4% in 2024, with 233 documented failures. Total AI safety funding reached approximately \$100-650M annually (including internal lab budgets), versus \$10B+ in capability development. Mechanistic interpretability research, while <R id="NjE2N2M4MG">progressing</R>, still lacks standardized metrics for "percentage of model explained."
 
 | Variable | Current Estimate | Uncertainty Range | Resolvable Via |
 |----------|------------------|-------------------|----------------|
@@ -892,7 +892,7 @@ This model has several important limitations that users should consider when app
 
 **Parameter independence assumption.** The model treats many variables as conditionally independent when in reality they may be deeply correlated. For example, "alignment tax" and "interpretability progress" likely share underlying drivers (researcher talent, algorithmic insights) that create correlations not captured in the causal graph. Sensitivity analyses should explore correlated parameter movements.
 
-**Expert survey limitations.** Much of the underlying data comes from expert surveys, which have known biases: AI researchers may systematically under- or over-estimate risks in their own field; sample selection may exclude important perspectives; and framing effects can significantly shift probability estimates. The <R id="3f9927ec7945e4f2">AI Impacts survey</R> notes that question phrasing affected timeline estimates by 13-48 years.
+**Expert survey limitations.** Much of the underlying data comes from expert surveys, which have known biases: AI researchers may systematically under- or over-estimate risks in their own field; sample selection may exclude important perspectives; and framing effects can significantly shift probability estimates. The <R id="MWQ4NDM1Yz">AI Impacts survey</R> notes that question phrasing affected timeline estimates by 13-48 years.
 
 **Rapidly changing ground truth.** Parameter estimates become outdated quickly. Metaculus AGI forecasts shifted from 50 years (2020) to ~5 years (2024)—a factor of 10 change in four years. Users should check original sources for current values rather than relying on point estimates from this page.
 
@@ -919,20 +919,20 @@ This critical uncertainties framework connects to several other analytical tools
 ## Sources
 
 ### Expert Surveys
-- <R id="3f9927ec7945e4f2">AI Impacts 2023 Survey</R> - 2,788 AI researchers on timelines, risks, and alignment difficulty
-- <R id="40fcdcc3ffba5188">Pew Research AI Survey 2024</R> - Expert vs. public opinion on AI impacts
-- <R id="b163447fdc804872">International AI Safety Report 2025</R> - 96 experts from 30 countries
+- <R id="MWQ4NDM1Yz">AI Impacts 2023 Survey</R> - 2,788 AI researchers on timelines, risks, and alignment difficulty
+- <R id="YjQ2Yjk5Yz">Pew Research AI Survey 2024</R> - Expert vs. public opinion on AI impacts
+- <R id="ZjdiMDdkNW">International AI Safety Report 2025</R> - 96 experts from 30 countries
 
 ### Industry & Research Reports
-- <R id="da87f2b213eb9272">Stanford AI Index 2025</R> - Comprehensive AI trends and metrics
-- <R id="9587b65b1192289d">Epoch AI: Can Scaling Continue Through 2030?</R> - Compute and data projections
-- <R id="d5796bc00a131872">IAPP AI Governance Survey 2024</R> - Organizational governance maturity
-- <R id="c1e31a3255ae290d">McKinsey State of AI 2025</R> - Enterprise AI adoption and risk management
+- <R id="MzI4NWFjZj">Stanford AI Index 2025</R> - Comprehensive AI trends and metrics
+- <R id="NTZlMGFiY2">Epoch AI: Can Scaling Continue Through 2030?</R> - Compute and data projections
+- <R id="OGNjYzcwYT">IAPP AI Governance Survey 2024</R> - Organizational governance maturity
+- <R id="OWE0Yjg0ND">McKinsey State of AI 2025</R> - Enterprise AI adoption and risk management
 
 ### Forecasting Platforms
-- <R id="bb81f2a99fdba0ec">Metaculus AGI Forecasts</R> - Community predictions on capability milestones
-- <R id="f2394e3212f072f5">80,000 Hours: Shrinking AGI Timelines</R> - Analysis of expert forecast evolution
+- <R id="YzE3YjNhYj">Metaculus AGI Forecasts</R> - Community predictions on capability milestones
+- <R id="NjNiMTk2ZD">80,000 Hours: Shrinking AGI Timelines</R> - Analysis of expert forecast evolution
 
 ### Safety Research
-- <R id="45c5b56ac029ef2d">Mechanistic Interpretability Review</R> - State of the field assessment
-- <R id="b1ab921f9cbae109">AI Safety Funding Overview</R> - Funding landscape analysis
+- <R id="NjE2N2M4MG">Mechanistic Interpretability Review</R> - State of the field assessment
+- <R id="NmEzYWI0MW">AI Safety Funding Overview</R> - Funding landscape analysis

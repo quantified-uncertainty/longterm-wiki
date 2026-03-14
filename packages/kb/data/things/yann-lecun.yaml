@@ -10,7 +10,7 @@ thing:
 facts:
   - id: f_y9K773heIw
     property: employed-by
-    value: !ref tt0f5PYDCw:meta-ai
+    value: !ref tt0f5PYDCw
     asOf: 2013-12
     source: https://ai.meta.com/people/yann-lecun/
     notes: "Joined Facebook AI Research (FAIR) as founding director in December 2013; became Chief AI Scientist at Meta"
