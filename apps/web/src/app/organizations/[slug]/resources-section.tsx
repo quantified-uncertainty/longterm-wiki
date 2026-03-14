@@ -37,15 +37,32 @@ const TYPE_COLORS: Record<string, string> = {
 
 const DEFAULT_COLOR = "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
-function makeColumns(): ColumnDef<OrgResourceRow>[] {
-  return [
+/** Compute which optional columns have enough data to be worth showing. */
+function computeColumnVisibility(resources: OrgResourceRow[]) {
+  const total = resources.length || 1;
+  const withDate = resources.filter((r) => r.publishedDate).length;
+  const withPub = resources.filter((r) => r.publicationName).length;
+  const withCred = resources.filter((r) => r.credibility != null).length;
+  return {
+    showDate: withDate / total >= 0.2,
+    showPublication: withPub / total >= 0.15,
+    showCredibility: withCred / total >= 0.15,
+  };
+}
+
+function makeColumns(opts: {
+  showDate: boolean;
+  showPublication: boolean;
+  showCredibility: boolean;
+}): ColumnDef<OrgResourceRow>[] {
+  const cols: ColumnDef<OrgResourceRow>[] = [
     {
       accessorKey: "title",
       header: ({ column }) => (
         <SortableHeader column={column}>Title</SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="min-w-[200px] max-w-[350px]">
+        <div className="min-w-[200px] max-w-[400px]">
           <Link
             href={`/resources/${row.original.id}`}
             className="text-primary hover:underline text-xs font-medium line-clamp-2"
@@ -79,7 +96,10 @@ function makeColumns(): ColumnDef<OrgResourceRow>[] {
         );
       },
     },
-    {
+  ];
+
+  if (opts.showPublication) {
+    cols.push({
       accessorKey: "publicationName",
       header: ({ column }) => (
         <SortableHeader column={column}>Publication</SortableHeader>
@@ -94,8 +114,11 @@ function makeColumns(): ColumnDef<OrgResourceRow>[] {
         );
       },
       sortUndefined: "last",
-    },
-    {
+    });
+  }
+
+  if (opts.showDate) {
+    cols.push({
       accessorKey: "publishedDate",
       header: ({ column }) => (
         <SortableHeader column={column}>Published</SortableHeader>
@@ -110,8 +133,11 @@ function makeColumns(): ColumnDef<OrgResourceRow>[] {
         );
       },
       sortUndefined: "last",
-    },
-    {
+    });
+  }
+
+  if (opts.showCredibility) {
+    cols.push({
       accessorKey: "credibility",
       header: ({ column }) => (
         <SortableHeader column={column}>Cred.</SortableHeader>
@@ -131,7 +157,10 @@ function makeColumns(): ColumnDef<OrgResourceRow>[] {
         );
       },
       sortUndefined: "last",
-    },
+    });
+  }
+
+  cols.push(
     {
       accessorKey: "citingPageCount",
       header: ({ column }) => (
@@ -159,7 +188,9 @@ function makeColumns(): ColumnDef<OrgResourceRow>[] {
       ),
       enableSorting: false,
     },
-  ];
+  );
+
+  return cols;
 }
 
 export function OrgResourcesSection({
@@ -194,11 +225,14 @@ function OrgResourcesTable({
   resources: OrgResourceRow[];
   title: string;
 }) {
-  const columns = useMemo(() => makeColumns(), []);
+  const colVis = useMemo(() => computeColumnVisibility(resources), [resources]);
+  const columns = useMemo(() => makeColumns(colVis), [colVis]);
 
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "publishedDate", desc: true },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>(
+    colVis.showDate
+      ? [{ id: "publishedDate", desc: true }]
+      : [{ id: "title", desc: false }],
+  );
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 25 });

@@ -465,15 +465,33 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 
+/** Fix common AI acronym casing from URL-slug-derived titles. */
+function fixAcronymCasing(title: string): string {
+  return title
+    .replace(/\bAi\b/g, "AI")
+    .replace(/\bLlm(s?)\b/g, "LLM$1")
+    .replace(/\bMl\b/g, "ML")
+    .replace(/\bGpt\b/g, "GPT")
+    .replace(/\bAsl\b/g, "ASL")
+    .replace(/\bRlhf\b/g, "RLHF")
+    .replace(/\bRsp\b/g, "RSP")
+    .replace(/\bApi\b/g, "API");
+}
+
 /** Clean up a resource title: strip trailing URL noise, org suffixes, etc. */
 function cleanTitle(title: string, orgName: string): string {
   let t = decodeHtmlEntities(title);
+  // Strip MDX-escaped dollar signs
+  t = t.replace(/\\(\$)/g, "$1");
   // Strip " | OrgName (https://...)" suffixes
   t = t.replace(/\s*\|\s*[^|]+\(https?:\/\/[^)]+\)\s*$/, "");
   // Strip " | OrgName" suffix
-  t = t.replace(new RegExp(`\\s*\\|\\s*${orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i"), "");
+  const escaped = orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  t = t.replace(new RegExp(`\\s*\\|\\s*${escaped}\\s*$`, "i"), "");
   // Strip " - OrgName" suffix
-  t = t.replace(new RegExp(`\\s*-\\s*${orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i"), "");
+  t = t.replace(new RegExp(`\\s*-\\s*${escaped}\\s*$`, "i"), "");
+  // Strip " \ OrgName" suffix (backslash variant)
+  t = t.replace(new RegExp(`\\s*\\\\\\s*${escaped}\\s*$`, "i"), "");
   // If the title is a full URL, derive from path
   if (/^https?:\/\//.test(t.trim())) {
     const derived = titleFromUrl(t.trim());
@@ -489,9 +507,10 @@ function titleFromUrl(url: string): string | null {
     const lastSegment = path.split("/").filter(Boolean).pop();
     if (!lastSegment) return null;
     // Convert slug to title: "claude-3-model-card" → "Claude 3 Model Card"
-    return lastSegment
+    const raw = lastSegment
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase());
+    return fixAcronymCasing(raw);
   } catch {
     return null;
   }
@@ -555,6 +574,11 @@ function normalizeRow(r: Resource, orgName: string): OrgResourceRow | null {
     if (derived) row.title = derived;
   }
 
+  // Override type: research URLs should display as "paper" not "web"
+  if (row.type === "web" && isResearchUrl(r.url)) {
+    row.type = "paper";
+  }
+
   return row;
 }
 
@@ -586,6 +610,9 @@ function getOrgResources(
   const publicationsMap = new Map<string, OrgResourceRow>();
   const announcementsMap = new Map<string, OrgResourceRow>();
   const allOrgIds = new Set<string>();
+  // Track URLs and titles to deduplicate entries
+  const seenUrls = new Set<string>();
+  const seenTitles = new Set<string>();
 
   if (orgDomains.size > 0) {
     for (const r of allResources) {
@@ -593,6 +620,17 @@ function getOrgResources(
       if (!rDomain || !orgDomains.has(rDomain)) continue;
       const row = normalizeRow(r, orgName);
       if (!row) continue;
+
+      // Deduplicate by normalized URL (strip trailing slash + fragment)
+      const normUrl = r.url.replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase();
+      if (seenUrls.has(normUrl)) continue;
+      seenUrls.add(normUrl);
+
+      // Deduplicate by title (case-insensitive) — keep first seen
+      const normTitle = row.title.toLowerCase().trim();
+      if (seenTitles.has(normTitle)) continue;
+      seenTitles.add(normTitle);
+
       allOrgIds.add(r.id);
 
       if (isResearchUrl(r.url) || r.type === "paper") {

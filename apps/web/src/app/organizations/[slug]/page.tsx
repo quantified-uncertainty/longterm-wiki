@@ -355,13 +355,13 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Research & Safety tab ──
+  // ── Safety tab (milestones — renamed from "Research & Safety" since papers are in Publications) ──
   const hasSafetyData = data.sortedMilestones.length > 0;
 
   if (hasSafetyData) {
     tabs.push({
       id: "safety",
-      label: "Research & Safety",
+      label: "Safety",
       count: data.sortedMilestones.length,
       content: (
         <div className="space-y-8">
@@ -371,10 +371,18 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Publications tab (research papers + literature papers) ──
-  const hasPublications = data.resourcePublications.length > 0 || data.keyPublications.length > 0;
+  // ── Publications tab (research papers + literature papers, deduplicated) ──
+  // Deduplicate key publications that already appear in the resources table (by title match)
+  const resourcePubTitles = new Set(
+    data.resourcePublications.map((r) => r.title.toLowerCase().trim()),
+  );
+  const dedupedKeyPubs = data.keyPublications.filter(
+    (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
+  );
+
+  const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
   if (hasPublications) {
-    const pubCount = data.resourcePublications.length + data.keyPublications.length;
+    const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
     tabs.push({
       id: "publications",
       label: "Publications",
@@ -388,8 +396,8 @@ export default async function OrgProfilePage({
               emptyMessage=""
             />
           )}
-          {data.keyPublications.length > 0 && (
-            <KeyPublicationsSection publications={data.keyPublications} />
+          {dedupedKeyPubs.length > 0 && (
+            <KeyPublicationsSection publications={dedupedKeyPubs} />
           )}
         </div>
       ),
