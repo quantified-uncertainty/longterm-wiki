@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, ilike, or } from "drizzle-orm";
+import { eq, and, count, asc, sql, ilike, or, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { entities, facts } from "../schema.js";
@@ -345,7 +345,86 @@ const entitiesApp = new Hono()
       }
     }
 
-    // 4. Build response
+    // 4. Resolve ref-type fact values (entity IDs → names + slugs)
+    // Collect all values that look like entity stable IDs (10-char alphanumeric)
+    const refPattern = /^[a-zA-Z0-9]{10}$/;
+    const refCandidates = new Set<string>();
+    for (const entityFacts of factMap.values()) {
+      for (const f of entityFacts.values()) {
+        if (f.value && refPattern.test(f.value)) {
+          refCandidates.add(f.value);
+        }
+      }
+    }
+
+    // Batch-resolve ref candidates to entity names and slugs
+    const refResolutionMap = new Map<string, { name: string; entityId: string }>();
+    if (refCandidates.size > 0) {
+      const refIds = [...refCandidates];
+      const refRows = await db
+        .select({
+          stableId: entities.stableId,
+          title: entities.title,
+          id: entities.id,
+        })
+        .from(entities)
+        .where(inArray(entities.stableId, refIds));
+
+      for (const r of refRows) {
+        if (r.stableId) {
+          refResolutionMap.set(r.stableId, { name: r.title, entityId: r.id });
+        }
+      }
+    }
+
+    // 5. Fetch domain table counts (personnel + grants)
+    const stableIds = entityRows
+      .map((e) => e.stableId)
+      .filter((id): id is string => id != null);
+
+    // Personnel counts: person_id → count (career history entries)
+    const personnelCountMap = new Map<string, number>();
+    if (stableIds.length > 0) {
+      type PersonnelCountRow = { personId: string; cnt: number };
+      const personnelCounts = await db.execute<PersonnelCountRow>(sql`
+        SELECT person_id AS "personId", COUNT(*)::int AS cnt
+        FROM personnel
+        WHERE person_id = ANY(${stableIds})
+          AND role_type = 'career'
+        GROUP BY person_id
+      `);
+      for (const r of personnelCounts) {
+        personnelCountMap.set(r.personId, r.cnt);
+      }
+    }
+
+    // Grant counts: organization_id → grantsGiven, grantee_id → grantsReceived
+    const grantsGivenMap = new Map<string, number>();
+    const grantsReceivedMap = new Map<string, number>();
+    if (stableIds.length > 0) {
+      type GrantCountRow = { entityId: string; cnt: number };
+      const grantsGiven = await db.execute<GrantCountRow>(sql`
+        SELECT organization_id AS "entityId", COUNT(*)::int AS cnt
+        FROM grants
+        WHERE organization_id = ANY(${stableIds})
+        GROUP BY organization_id
+      `);
+      for (const r of grantsGiven) {
+        grantsGivenMap.set(r.entityId, r.cnt);
+      }
+
+      const grantsReceived = await db.execute<GrantCountRow>(sql`
+        SELECT grantee_id AS "entityId", COUNT(*)::int AS cnt
+        FROM grants
+        WHERE grantee_id = ANY(${stableIds})
+        GROUP BY grantee_id
+      `);
+      for (const r of grantsReceived) {
+        grantsReceivedMap.set(r.entityId, r.cnt);
+      }
+    }
+
+    // 6. Build response
     const items = entityRows.map((e) => {
       const entityFacts = e.stableId ? factMap.get(e.stableId) : undefined;
       const factsObj: Record<string, {
@@ -357,6 +436,9 @@ const entitiesApp = new Hono()
         formatDivisor: number | null;
       }> = {};
 
+      // Build resolvedRefs for this entity's facts
+      const resolvedRefs: Record<string, { name: string; entityId: string }> = {};
+
       if (entityFacts) {
         for (const [measure, f] of entityFacts) {
           factsObj[measure] = {
@@ -367,8 +449,20 @@ const entitiesApp = new Hono()
             format: f.format,
             formatDivisor: f.formatDivisor,
           };
+
+          // If this fact's value resolved to an entity, include it
+          if (f.value && refResolutionMap.has(f.value)) {
+            resolvedRefs[measure] = refResolutionMap.get(f.value)!;
+          }
         }
       }
+
+      const sid = e.stableId;
+      const counts = {
+        careerHistory: sid ? (personnelCountMap.get(sid) ?? 0) : 0,
+        grantsGiven: sid ? (grantsGivenMap.get(sid) ?? 0) : 0,
+        grantsReceived: sid ? (grantsReceivedMap.get(sid) ?? 0) : 0,
+      };
 
       return {
         id: e.id,
@@ -381,6 +475,8 @@ const entitiesApp = new Hono()
         metadata: e.metadata,
         tags: e.tags,
         facts: factsObj,
+        resolvedRefs,
+        counts,
       };
     });
 
