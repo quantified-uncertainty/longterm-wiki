@@ -178,6 +178,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
         <input
           type="text"
           placeholder="Search name, type, people, funding programs, description..."
+          aria-label="Search organizations"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
@@ -185,6 +186,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setTypeFilter("all")}
+            aria-pressed={typeFilter === "all"}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               typeFilter === "all"
                 ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -198,6 +200,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
             <button
               key={t}
               onClick={() => setTypeFilter(typeFilter === t ? "all" : t)}
+              aria-pressed={typeFilter === t}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 typeFilter === t
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"

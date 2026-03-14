@@ -33,6 +33,7 @@ export function SortHeader<K extends string>({
     >
       <button
         type="button"
+        aria-label={`Sort by ${label}`}
         className={`inline-flex items-center gap-1 cursor-pointer select-none hover:text-foreground transition-colors ${
           isActive ? "text-foreground" : ""
         }`}

@@ -146,6 +146,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           <input
             type="text"
             placeholder="Search models..."
+            aria-label="Search models"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
@@ -153,6 +154,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setDeveloperFilter("all")}
+              aria-pressed={developerFilter === "all"}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 developerFilter === "all"
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -166,6 +168,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <button
                 key={devId}
                 onClick={() => setDeveloperFilter(developerFilter === devId ? "all" : devId)}
+                aria-pressed={developerFilter === devId}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   developerFilter === devId
                     ? "bg-primary/10 border-primary/30 text-primary font-semibold"

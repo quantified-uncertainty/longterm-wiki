@@ -106,6 +106,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         <input
           type="text"
           placeholder="Search risks..."
+          aria-label="Search risks"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
@@ -113,6 +114,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setCategoryFilter("all")}
+            aria-pressed={categoryFilter === "all"}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               categoryFilter === "all"
                 ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -126,6 +128,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
             <button
               key={c}
               onClick={() => setCategoryFilter(categoryFilter === c ? "all" : c)}
+              aria-pressed={categoryFilter === c}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 categoryFilter === c
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
