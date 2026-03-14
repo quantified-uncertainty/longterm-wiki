@@ -46,6 +46,7 @@ import { benchmarksRoute } from "./routes/benchmarks.js";
 import { benchmarkResultsRoute } from "./routes/benchmark-results.js";
 import { recordVerificationsRoute } from "./routes/record-verifications.js";
 import { thingsRoute } from "./routes/things.js";
+import { researchAreasRoute } from "./routes/research-areas.js";
 
 let requestCounter = 0;
 
@@ -167,6 +168,7 @@ export function createApp() {
   app.route("/api/benchmark-results", benchmarkResultsRoute);
   app.route("/api/record-verifications", recordVerificationsRoute);
   app.route("/api/things", thingsRoute);
+  app.route("/api/research-areas", researchAreasRoute);
 
   return app;
 }

@@ -37,6 +37,7 @@ import {
   Brain,
   FileText,
   LayoutList,
+  Beaker,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -259,6 +260,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
     headerColor: "#059669",
   },
+  "research-area": {
+    label: "Research Area",
+    icon: Beaker,
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    badgeColor: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+    headerColor: "#0891b2",
+  },
 };
 
 /**
@@ -302,7 +310,7 @@ const DEFAULT_BADGE_COLOR = "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:
 export const ENTITY_GROUPS: { label: string; types: string[] }[] = [
   { label: "All", types: [] },
   { label: "Risks", types: ["risk", "risk-factor"] },
-  { label: "Responses", types: ["approach", "safety-agenda", "policy"] },
+  { label: "Responses", types: ["research-area", "approach", "safety-agenda", "policy"] },
   { label: "AI Models", types: ["ai-model"] },
   { label: "Benchmarks", types: ["benchmark"] },
   { label: "Projects", types: ["project"] },

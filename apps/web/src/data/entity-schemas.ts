@@ -320,6 +320,10 @@ const AiModelEntitySchema = BaseEntity.extend({
   trainingCutoff: z.string().optional(),
 });
 
+const ResearchAreaEntitySchema = BaseEntity.extend({
+  entityType: z.literal("research-area"),
+});
+
 // Catch-all for entity types we haven't explicitly modeled
 const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
@@ -363,6 +367,7 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   IntelligenceParadigmEntitySchema,
   AiModelEntitySchema,
   BenchmarkEntitySchema,
+  ResearchAreaEntitySchema,
 ]);
 
 // ============================================================================
@@ -378,6 +383,7 @@ export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
 export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
+export type ResearchAreaEntity = z.infer<typeof ResearchAreaEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -412,4 +418,7 @@ export function isProject(e: TypedEntity | GenericEntity): e is ProjectEntity {
   return e.entityType === "project";
 }
 
+export function isResearchArea(e: TypedEntity | GenericEntity): e is ResearchAreaEntity {
+  return e.entityType === "research-area";
+}
 

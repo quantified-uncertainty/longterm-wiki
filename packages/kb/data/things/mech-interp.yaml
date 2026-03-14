@@ -1,7 +1,7 @@
 thing:
   id: mech-interp
   stableId: 0vyIQ4YLIA
-  type: approach
+  type: research-area
   name: Mechanistic Interpretability
   numericId: E477
 facts:

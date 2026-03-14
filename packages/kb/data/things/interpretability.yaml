@@ -1,7 +1,7 @@
 thing:
   id: interpretability
   stableId: 73qTEkYyWA
-  type: approach
+  type: research-area
   name: Interpretability
   numericId: E174
 facts:

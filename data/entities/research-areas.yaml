@@ -1,0 +1,136 @@
+# Research Area Entities — Minimal YAML stubs for EntityLink resolution.
+#
+# Rich data (orgs, papers, grants, risks) lives in PG research_areas table.
+# These stubs exist only so that EntityLink, explore page, and wiki page
+# routing work for research areas that have MDX pages.
+#
+# Do NOT add relatedEntries, sources, or customFields here — that data
+# lives in PG and is served via /api/research-areas.
+
+# ── Alignment Training ─────────────────────────────────────────────────
+
+- id: rlhf
+  stableId: rSE7kY5k4Q
+  numericId: E259
+  type: research-area
+  title: RLHF
+  description: "Reinforcement Learning from Human Feedback — training technique that fine-tunes AI models using human preference ratings to align outputs with human values."
+  tags:
+    - training
+    - human-feedback
+    - alignment
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+# ── Interpretability ───────────────────────────────────────────────────
+
+- id: interpretability
+  stableId: 73qTEkYyWA
+  numericId: E174
+  type: research-area
+  title: Interpretability
+  description: "Research field focused on understanding how AI models work internally."
+  tags:
+    - interpretability
+    - safety-research
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: mech-interp
+  stableId: 0vyIQ4YLIA
+  numericId: E477
+  type: research-area
+  title: Mechanistic Interpretability
+  description: "Reverse-engineering neural networks to identify circuits, features, and algorithms that explain behavior."
+  tags:
+    - interpretability
+    - neural-network-analysis
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+# ── Evaluation ─────────────────────────────────────────────────────────
+
+- id: evals
+  stableId: etuIjQhFbQ
+  numericId: E128
+  type: research-area
+  title: AI Evaluations
+  description: "Systematic testing and measurement of AI system capabilities, alignment, and safety properties."
+  tags:
+    - evaluations
+    - safety-research
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: red-teaming
+  stableId: k6BfxaEwuQ
+  numericId: E449
+  type: research-area
+  title: Red Teaming
+  description: "Adversarial testing of AI systems to discover failure modes, both manual and automated."
+  tags:
+    - red-teaming
+    - safety-testing
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+# ── AI Control ─────────────────────────────────────────────────────────
+
+- id: ai-control
+  stableId: sFjyY5xXZA
+  numericId: E6
+  type: research-area
+  title: AI Control
+  description: "Research on deploying AI systems with sufficient safeguards even if they are misaligned."
+  tags:
+    - ai-control
+    - safety-research
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+# ── Scalable Oversight ─────────────────────────────────────────────────
+
+- id: scalable-oversight
+  stableId: MBGtb3Qlkw
+  numericId: E271
+  type: research-area
+  title: Scalable Oversight
+  description: "Research on supervising AI systems that approach or exceed human-level capabilities."
+  tags:
+    - scalable-oversight
+    - safety-research
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: corrigibility
+  stableId: aUMeFdALrA
+  numericId: E79
+  type: research-area
+  title: Corrigibility
+  description: "Research on building AI systems that allow themselves to be corrected, modified, or shut down."
+  tags:
+    - corrigibility
+    - safety-research
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: value-learning
+  stableId: Ub7IaobzDA
+  numericId: E368
+  type: research-area
+  title: Value Learning
+  description: "Research on AI systems that learn and internalize human values through interaction."
+  tags:
+    - value-learning
+    - alignment
+  clusters:
+    - ai-safety
+  lastUpdated: 2026-03
