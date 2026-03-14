@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, and, or, ilike, count, sql, desc } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { logger } from "../logger.js";
 import { grants } from "../schema.js";
@@ -8,8 +9,10 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  escapeIlike,
   zv,
 } from "./utils.js";
+import { parseSort } from "./query-helpers.js";
 
 // ---- Constants ----
 
@@ -17,9 +20,17 @@ const MAX_PAGE_SIZE = 200;
 
 // ---- Query schemas ----
 
+const SORT_ALLOWED = ["amount", "date", "name", "recipient"] as const;
+
 const ByEntityQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+  q: z.string().max(200).optional(),
+  sort: z.string().max(50).optional(),
+  status: z.string().max(50).optional(),
+  amountMin: z.coerce.number().optional(),
+  amountMax: z.coerce.number().optional(),
+  program: z.string().max(200).optional(),
 });
 
 const AllQuery = z.object({
@@ -141,24 +152,72 @@ const grantsApp = new Hono()
   })
 
   // ---- GET /by-entity/:entityId ----
+  // Supports server-side search (?q=), sort (?sort=amount:desc),
+  // and filters (?status=, ?amountMin=, ?amountMax=, ?program=).
   .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
     const entityId = c.req.param("entityId");
-    const { limit, offset } = c.req.valid("query");
+    const { limit, offset, q, sort, status, amountMin, amountMax, program } =
+      c.req.valid("query");
     const db = getDrizzleDb();
 
+    // Build WHERE conditions
+    const conditions: SQL[] = [eq(grants.organizationId, entityId)];
+
+    if (q) {
+      const pattern = `%${escapeIlike(q.trim())}%`;
+      const searchCond = or(
+        ilike(grants.name, pattern),
+        ilike(grants.notes, pattern),
+        ilike(grants.granteeId, pattern),
+        ilike(grants.programId, pattern),
+      );
+      if (searchCond) conditions.push(searchCond);
+    }
+
+    if (status) {
+      conditions.push(eq(grants.status, status));
+    }
+    if (amountMin !== undefined) {
+      conditions.push(sql`${grants.amount} >= ${amountMin}`);
+    }
+    if (amountMax !== undefined) {
+      conditions.push(sql`${grants.amount} <= ${amountMax}`);
+    }
+    if (program) {
+      conditions.push(eq(grants.programId, program));
+    }
+
+    // Safe: conditions always has at least the organizationId equality check
+    const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
+
+    // Build ORDER BY (whitelist-validated, with id tiebreaker for stable pagination)
+    const { field, dir } = parseSort(sort, SORT_ALLOWED, "amount", "desc");
+    const sortColMap: Record<string, SQL> = {
+      amount: sql`${grants.amount}`,
+      date: sql`${grants.date}`,
+      name: sql`${grants.name}`,
+      recipient: sql`${grants.granteeId}`,
+    };
+    const sortCol = sortColMap[field] ?? sql`${grants.amount}`;
+    const orderClause =
+      dir === "desc"
+        ? sql`${sortCol} DESC NULLS LAST`
+        : sql`${sortCol} ASC NULLS LAST`;
+
+    // Filtered count
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(grants)
+      .where(where);
+
+    // Data query
     const rows = await db
       .select()
       .from(grants)
-      .where(eq(grants.organizationId, entityId))
-      .orderBy(desc(grants.syncedAt))
+      .where(where)
+      .orderBy(orderClause, grants.id)
       .limit(limit)
       .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(grants)
-      .where(eq(grants.organizationId, entityId));
-    const total = countResult[0].count;
 
     return c.json({
       entityId,
