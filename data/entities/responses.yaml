@@ -1786,7 +1786,7 @@
       type: organization
     - id: apollo-research
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: evaluation-awareness
       type: approach
@@ -1943,7 +1943,7 @@
       type: organization
     - id: scheming
       type: risk
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2091,7 +2091,7 @@
       type: risk
     - id: scheming
       type: risk
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2151,7 +2151,7 @@
       type: organization
     - id: metr
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2264,7 +2264,7 @@
       type: organization
     - id: representation-engineering
       type: approach
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -2449,7 +2449,7 @@
   relatedEntries:
     - id: coefficient-giving
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: interpretability
       type: concept
@@ -2490,7 +2490,7 @@
       type: policy
     - id: metr
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: anthropic
       type: organization
@@ -2592,7 +2592,7 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: openai
       type: organization
@@ -2753,7 +2753,7 @@
       type: organization
     - id: cais
       type: organization
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: pause-moratorium
       type: policy
@@ -3021,7 +3021,7 @@
       type: policy
     - id: ai-safety-institutes
       type: policy
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
   lastUpdated: 2026-02
 
@@ -3157,7 +3157,7 @@
       type: approach
     - id: ai-safety-institutes
       type: policy
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: eu-ai-act
       type: policy

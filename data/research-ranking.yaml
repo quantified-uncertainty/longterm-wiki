@@ -425,7 +425,7 @@ ranking:
   - ai-assisted
   - yann-lecun-predictions
   - ai-forecasting-benchmark
-  - ai-executive-order
+  - us-executive-order
   - ai-assisted-knowledge-management
   - ai-for-human-reasoning-fellowship
   - ai-forecasting
@@ -494,7 +494,7 @@ ranking:
   - reward-modeling
   - refusal-training
   - rlhf
-  - responsible-scaling-policies
+  - rsp
   - rsp
   - research-agendas
   - donations-list-website

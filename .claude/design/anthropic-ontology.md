@@ -336,7 +336,7 @@ These are model-specific findings (belong on Claude/Claude Opus 4 entities), gen
 
 ### Policy Commitments (0 → 2)
 
-The RSP is Anthropic's most distinctive governance contribution. It already exists as its own entity: `responsible-scaling-policies` (E252) with a comprehensive wiki page. These statements should cross-reference E252.
+The RSP is Anthropic's most distinctive governance contribution. It already exists as its own entity: `rsp` (E461) with a comprehensive wiki page. These statements should cross-reference E461.
 
 The RSP has gone through multiple versions with controversies:
 - **v1** (Sept 2023): Initial publication, ASL-1 through ASL-4
@@ -344,13 +344,13 @@ The RSP has gone through multiple versions with controversies:
 - **v2.1** (March 2025): Minor clarification of capability thresholds
 - SaferAI grades Anthropic's RSP 1.9-2.2/5 for specificity — and grade **declined** before Claude 4 release
 
-These RSP version facts arguably belong on the RSP entity (E252) rather than on Anthropic. The Anthropic statements should capture *Anthropic's relationship to the RSP* — "Anthropic published the first RSP" — not the RSP's content evolution.
+These RSP version facts arguably belong on the RSP entity (E461) rather than on Anthropic. The Anthropic statements should capture *Anthropic's relationship to the RSP* — "Anthropic published the first RSP" — not the RSP's content evolution.
 
 - [x] CLASSIFY #11874 property="policy-commitment"
   > "Anthropic published its initial Responsible Scaling Policy in September 2023, the first commitment framework of its kind among frontier AI labs."
   > Source: anthropic.com/news/anthropics-responsible-scaling-policy
   > ⚠ **Citation check**: "first commitment framework of its kind" is editorial — not stated in the cited source. The RSP content (ASL-1 through ASL-4) IS supported. Consider softening the statement text.
-  > Should cross-reference entity `responsible-scaling-policies` (E252).
+  > Should cross-reference entity `rsp` (E461).
 
 - [x] CLASSIFY #11875 property="policy-commitment"
   > "In March 2025, Anthropic published a comprehensive update to its Responsible Scaling Policy (RSP), expanding it to cover model welfare considerations, third-party auditing commitments."
@@ -361,7 +361,7 @@ These RSP version facts arguably belong on the RSP entity (E252) rather than on 
   > 3. "Third-party auditing commitments" is overstated — only mentions sharing methodology with AI Safety Institutes
   > 4. There IS a v2.1 from March 2025, but it was a minor clarification, not a "comprehensive update"
   > **Action needed**: Fix statement text, date (Oct 2024), and citation URL before classifying.
-  > Should cross-reference entity `responsible-scaling-policies` (E252).
+  > Should cross-reference entity `rsp` (E461).
 
 ### Policy Positions (0 → 4)
 
@@ -723,7 +723,7 @@ The draft so far treats Anthropic in isolation. But Anthropic's most important o
 graph TD
     A[anthropic<br/>E22 · organization] -->|created| C[claude<br/>E1041 · project]
     A -->|governs| LTBT[long-term-benefit-trust<br/>E407]
-    A -->|published| RSP[responsible-scaling-policies<br/>E252 · policy]
+    A -->|published| RSP[rsp<br/>E461 · policy]
     C -->|includes| C3O[claude-3-opus<br/>E1027]
     C -->|includes| C3S[claude-3-sonnet<br/>E1028]
     C -->|includes| C35S[claude-3-5-sonnet<br/>E1029]
@@ -946,7 +946,7 @@ Defined in Q5 above: `policy-position`, `policy-commitment`, `regulatory-engagem
 9. #11875 needs statement text, date, and citation URL corrected before classifying (see Q5).
 10. #11710 (Google $300M) date needs correction from "2022" to "2023-02".
 11. **Property naming**: Rename `interpretability-team-size` → `interpretability-researcher-count` to match `safety-researcher-count` pattern? Standardize on `-count` for all headcount properties.
-12. **RSP as entity**: RSP version history, controversies, and SaferAI grades should live on the `responsible-scaling-policies` entity (E252), not on Anthropic. Anthropic statements should only capture "Anthropic published/updated RSP."
+12. **RSP as entity**: RSP version history, controversies, and SaferAI grades should live on the `rsp` entity (E461), not on Anthropic. Anthropic statements should only capture "Anthropic published/updated RSP."
 13. **Model releases**: Move model-specific launches (#11494, #11498) to their respective Claude model entities (E1027–E1040). Keep platform launches (Claude.ai, Claude Code, Enterprise) on Anthropic.
 14. **LTBT board**: Track both Anthropic corporate board AND LTBT trustee board (E407). LTBT trustees hold special voting shares — arguably more important governance data.
 15. **Release-date dedup**: 16 duplicate release-date statements on `claude` entity. Retract the thinner duplicate in each pair.
