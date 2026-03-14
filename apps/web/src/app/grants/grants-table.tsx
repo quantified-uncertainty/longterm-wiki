@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 import { compareGrantRows, type SortDir } from "./grants-sort";
+import { STATUS_COLORS } from "./grants-constants";
 
 export interface GrantRow {
   /** Composite key: entityId-recordKey for uniqueness */
@@ -23,6 +24,8 @@ export interface GrantRow {
   recipientName: string | null;
   /** Slug for linking to /organizations/ or /people/ */
   recipientSlug: string | null;
+  /** Computed href for the recipient (type-aware: /organizations/ or /people/) */
+  recipientHref: string | null;
   /** Numeric wiki page ID for the recipient entity */
   recipientWikiPageId: string | null;
   program: string | null;
@@ -33,16 +36,9 @@ export interface GrantRow {
   source: string | null;
 }
 
-type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "period" | "date" | "status";
+type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "date" | "status";
 
 const PAGE_SIZE = 100;
-
-const STATUS_COLORS: Record<string, string> = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  completed: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  "winding-down": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  terminated: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-};
 
 function PaginationControls({
   page,
@@ -288,9 +284,9 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                 {/* Recipient */}
                 <td className="py-2.5 px-3 text-muted-foreground">
                   {row.recipientName ? (
-                    row.recipientSlug ? (
+                    row.recipientHref ? (
                       <Link
-                        href={`/organizations/${row.recipientSlug}`}
+                        href={row.recipientHref}
                         className="text-foreground hover:text-primary transition-colors"
                       >
                         {row.recipientName}
@@ -314,7 +310,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
 
                 {/* Program */}
                 <td className="py-2.5 px-3 text-muted-foreground text-xs">
-                  {row.program ?? ""}
+                  {row.program ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
 
                 {/* Amount */}
