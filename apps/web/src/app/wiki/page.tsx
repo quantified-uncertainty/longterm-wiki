@@ -49,6 +49,7 @@ export default async function WikiIndex({
 
   return (
     <div className="pt-4 pb-8">
+      <h1 className="sr-only">Longterm Wiki</h1>
       <Suspense fallback={<div className="max-w-7xl mx-auto px-6 text-muted-foreground">Loading...</div>}>
         <ExploreGrid
           initialItems={serverData?.items ?? items}

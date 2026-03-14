@@ -540,7 +540,7 @@ export default async function OrgProfilePage({
               {data.foundedDateStr && (
                 <span>
                   Founded {formatKBDate(data.foundedDateStr)}
-                  {data.orgAge && <span> ({data.orgAge})</span>}
+                  {data.orgAge && <span suppressHydrationWarning> ({data.orgAge})</span>}
                 </span>
               )}
               {data.hqText && <span>HQ: {data.hqText}</span>}

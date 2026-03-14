@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  fetchDetailed,
-  type RpcFundingProgramsStatsResult,
-  type RpcFundingProgramsAllResult,
-  type RpcFundingProgramRow,
-} from "@lib/wiki-server";
-import { getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { parseFundingProgram } from "./[id]/program-data";
 import {
   FundingProgramsListTable,
   type FundingProgramListRow,
@@ -20,9 +15,6 @@ export const metadata: Metadata = {
   description:
     "Directory of funding programs across AI safety and related organizations, including RFPs, grant rounds, fellowships, and prizes.",
 };
-
-/** ISR revalidation: refresh every 5 minutes */
-export const revalidate = 300;
 
 /**
  * Resolve an org entity ID to its display name and slug for linking.
@@ -39,22 +31,24 @@ function resolveOrg(orgId: string): {
   return { name: orgId, slug: null };
 }
 
-/**
- * Enrich raw API rows with resolved organization names and slugs.
- */
-function enrichRows(programs: RpcFundingProgramRow[]): FundingProgramListRow[] {
-  return programs.map((p) => {
-    const org = resolveOrg(p.orgId);
+export default function FundingProgramsPage() {
+  // Load all funding programs from local KB data (build-time, no API call)
+  const allRecords = getAllKBRecords("funding-programs");
+  const programs = allRecords.map(parseFundingProgram);
+
+  // Build enriched rows for the table
+  const rows: FundingProgramListRow[] = programs.map((p) => {
+    const org = resolveOrg(p.ownerEntityId);
     return {
-      id: p.id,
+      id: p.key,
       name: p.name,
-      orgId: p.orgId,
+      orgId: p.ownerEntityId,
       orgName: org.name,
       orgSlug: org.slug,
       divisionId: p.divisionId,
       programType: p.programType,
       totalBudget: p.totalBudget,
-      currency: p.currency ?? "USD",
+      currency: p.currency,
       applicationUrl: p.applicationUrl,
       openDate: p.openDate,
       deadline: p.deadline,
@@ -63,34 +57,25 @@ function enrichRows(programs: RpcFundingProgramRow[]): FundingProgramListRow[] {
       description: p.description,
     };
   });
-}
-
-export default async function FundingProgramsPage() {
-  // Fetch stats and full program list from wiki-server in parallel
-  const [statsResult, allResult] = await Promise.all([
-    fetchDetailed<RpcFundingProgramsStatsResult>(
-      "/api/funding-programs/stats",
-      { revalidate: 300 },
-    ),
-    fetchDetailed<RpcFundingProgramsAllResult>(
-      "/api/funding-programs/all?limit=500",
-      { revalidate: 300 },
-    ),
-  ]);
-
-  const stats = statsResult.ok ? statsResult.data : null;
-  const programs = allResult.ok ? allResult.data.fundingPrograms : [];
-  const rows = enrichRows(programs);
 
   // Compute summary stats
-  const totalPrograms = stats?.total ?? rows.length;
-  const totalBudget =
-    stats?.totalBudget ??
-    rows.reduce((sum, r) => sum + (r.totalBudget ?? 0), 0);
+  const totalPrograms = rows.length;
+  const totalBudget = rows.reduce((sum, r) => sum + (r.totalBudget ?? 0), 0);
   const uniqueOrgs = new Set(rows.map((r) => r.orgId)).size;
-  const openCount =
-    stats?.byStatus.open ??
-    rows.filter((r) => r.status === "open").length;
+  const openCount = rows.filter((r) => r.status === "open").length;
+
+  // Build type summary
+  const typeCounts = new Map<string, number>();
+  for (const r of rows) {
+    typeCounts.set(r.programType, (typeCounts.get(r.programType) ?? 0) + 1);
+  }
+  const typeSummary = [...typeCounts.entries()]
+    .map(([type, count]) => ({
+      type,
+      label: PROGRAM_TYPE_LABELS[type] ?? type,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count);
 
   // Build org summary (sorted by total budget desc)
   const orgTotals = new Map<
@@ -121,33 +106,6 @@ export default async function FundingProgramsPage() {
   const topOrgs = [...orgTotals.values()].sort(
     (a, b) => b.totalBudget - a.totalBudget,
   );
-
-  // Build type summary
-  const typeSummary: { type: string; label: string; count: number }[] = [];
-  if (stats) {
-    for (const [type, count] of Object.entries(stats.byType)) {
-      if ((count as number) > 0) {
-        typeSummary.push({
-          type,
-          label: PROGRAM_TYPE_LABELS[type] ?? type,
-          count: count as number,
-        });
-      }
-    }
-  } else {
-    const typeCounts = new Map<string, number>();
-    for (const r of rows) {
-      typeCounts.set(r.programType, (typeCounts.get(r.programType) ?? 0) + 1);
-    }
-    for (const [type, count] of typeCounts) {
-      typeSummary.push({
-        type,
-        label: PROGRAM_TYPE_LABELS[type] ?? type,
-        count,
-      });
-    }
-  }
-  typeSummary.sort((a, b) => b.count - a.count);
 
   const summaryStats = [
     { label: "Total Programs", value: totalPrograms.toLocaleString() },
@@ -247,8 +205,7 @@ export default async function FundingProgramsPage() {
             No funding programs available
           </p>
           <p className="text-sm">
-            Funding program data is loaded from the wiki-server API. Check that
-            the server is configured and reachable.
+            Funding program data is loaded from the knowledge base.
           </p>
         </div>
       )}

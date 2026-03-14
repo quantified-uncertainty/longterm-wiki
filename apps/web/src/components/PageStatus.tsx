@@ -1241,16 +1241,6 @@ export function PageStatus({
         )}
       </div>
 
-      {/* Summary */}
-      {llmSummary ? (
-        <div className="border-t border-border px-3.5 pt-2 pb-2.5">
-          <SectionHeader>Summary</SectionHeader>
-          <p className="m-0 text-[13px] leading-relaxed text-muted-foreground">
-            {llmSummary}
-          </p>
-        </div>
-      ) : null}
-
       {/* Content — boolean chips + numeric metrics table */}
       <ContentCoverageSection
         llmSummary={llmSummary}

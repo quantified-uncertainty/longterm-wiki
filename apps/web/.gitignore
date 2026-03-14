@@ -9,6 +9,7 @@ src/data/*.json
 src/data/pages.json
 src/data/stats.json
 src/data/link-health.json
+src/data/generated/
 
 # Search index served at runtime (copied from src/data by prebuild)
 public/search-index.json

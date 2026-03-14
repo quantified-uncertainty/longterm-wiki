@@ -284,7 +284,7 @@ function DateCell({ date }: { date: string | null }) {
   const label = days <= 7 ? `${days}d` : days <= 60 ? `${Math.round(days / 7)}w` : `${Math.round(days / 30)}mo`;
   const color = days <= 30 ? "text-emerald-600" : days <= 90 ? "text-blue-500" : days <= 180 ? "text-amber-500" : "text-red-400";
   return (
-    <span className={`text-xs tabular-nums ${color}`} title={date}>
+    <span className={`text-xs tabular-nums ${color}`} title={date} suppressHydrationWarning>
       {label}
     </span>
   );

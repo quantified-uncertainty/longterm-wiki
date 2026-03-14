@@ -2,7 +2,7 @@
  * Entity navigation: URL resolution, backlinks, and related graph.
  */
 
-import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, type BacklinkEntry } from "./database";
+import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./database";
 import type { WithSource } from "./database";
 import { getKBEntitySlug } from "./kb";
 
@@ -102,8 +102,9 @@ export function getBacklinksFor(
   relationship?: string;
 }> {
   const slug = resolveId(entityId);
-  const db = getDatabase();
-  const links = db.backlinks?.[slug] || [];
+  // Try per-entity bundle first (avoids loading full database.json)
+  const bundle = getEntityBundle(slug);
+  const links = bundle?.backlinks ?? getDatabase().backlinks?.[slug] ?? [];
   return links.map((link: BacklinkEntry) => ({
     ...link,
     href: getEntityHref(link.id, link.type),
@@ -138,8 +139,9 @@ export function getRelatedGraphFor(
   label?: string;
 }> {
   const slug = resolveId(entityId);
-  const db = getDatabase();
-  const entries = db.relatedGraph?.[slug] || [];
+  // Try per-entity bundle first (avoids loading full database.json)
+  const bundle = getEntityBundle(slug);
+  const entries = bundle?.relatedGraph ?? getDatabase().relatedGraph?.[slug] ?? [];
   return entries.map((entry) => ({
     ...entry,
     href: getEntityHref(entry.id, entry.type),
