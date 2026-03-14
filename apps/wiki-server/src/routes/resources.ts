@@ -30,6 +30,7 @@ import {
   type ResourceStatsResult,
 } from "../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "./page-id-helpers.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Raw SQL row types ----
 
@@ -330,6 +331,20 @@ const resourcesApp = new Hono()
             setweight(to_tsvector('english', coalesce(review, '')), 'D')
           WHERE id IN (${idList})
         `);
+
+        // Dual-write to things table
+        await upsertThingsInTx(
+          tx,
+          items.map((r) => ({
+            id: r.stableId || r.id,
+            thingType: "resource" as const,
+            title: r.title || r.url,
+            sourceTable: "resources",
+            sourceId: r.id,
+            description: r.summary,
+            sourceUrl: r.url,
+          }))
+        );
       });
     } catch (err) {
       return dbError(c, "resources batch upsert", err, { itemCount: items.length });

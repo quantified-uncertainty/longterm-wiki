@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -247,6 +248,20 @@ const personnelApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((p) => ({
+          id: p.id,
+          thingType: "personnel" as const,
+          title: `${p.personId} — ${p.role} at ${p.organizationId}`,
+          sourceTable: "personnel",
+          sourceId: p.id,
+          sourceUrl: p.source,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
