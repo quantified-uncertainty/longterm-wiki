@@ -6,6 +6,10 @@
   numericId: E95
   type: historical
   title: Deep Learning Revolution Era
+  eventDate: "2012"
+  endDate: "2020"
+  eventType: milestone
+  significance: critical
   customFields:
     - label: Period
       value: 2012-2020
@@ -72,6 +76,10 @@
   numericId: E107
   type: historical
   title: Early Warnings Era
+  eventDate: "1950"
+  endDate: "2000"
+  eventType: milestone
+  significance: high
   customFields:
     - label: Period
       value: 1950s-2000
@@ -131,6 +139,9 @@
   numericId: E195
   type: historical
   title: Mainstream Era
+  eventDate: "2020"
+  eventType: milestone
+  significance: critical
   customFields:
     - label: Period
       value: 2020-Present
@@ -194,6 +205,10 @@
   numericId: E203
   type: historical
   title: The MIRI Era
+  eventDate: "2000"
+  endDate: "2015"
+  eventType: milestone
+  significance: high
   customFields:
     - label: Period
       value: 2000-2015
@@ -253,6 +268,10 @@
   numericId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
+  eventDate: November 1-2, 2023
+  location: Bletchley Park, UK
+  eventType: summit
+  significance: critical
   description: >-
     International summit on AI safety held at Bletchley Park, UK in November 2023, resulting in the Bletchley
     Declaration.
@@ -265,3 +284,129 @@
     - international
     - governance
   lastUpdated: 2025-12
+- id: chatgpt-launch
+  type: event
+  title: ChatGPT Launch
+  eventDate: November 30, 2022
+  eventType: announcement
+  significance: critical
+  description: >-
+    OpenAI releases ChatGPT, a conversational AI based on GPT-3.5. Reaches 100 million users in
+    two months, becoming the fastest-growing consumer application in history. Transforms AI from
+    a specialist concern into a mainstream technology and political issue.
+  relatedEntries:
+    - id: openai
+      type: organization
+  tags:
+    - chatgpt
+    - openai
+    - milestone
+  lastUpdated: 2026-03
+- id: gpt4-release
+  type: event
+  title: GPT-4 Release
+  eventDate: March 14, 2023
+  eventType: announcement
+  significance: high
+  description: >-
+    OpenAI releases GPT-4, demonstrating significant capability improvements over GPT-3.5 including
+    passing the bar exam (90th percentile), multimodal understanding, and stronger reasoning.
+  relatedEntries:
+    - id: openai
+      type: organization
+  tags:
+    - gpt-4
+    - openai
+    - frontier-models
+  lastUpdated: 2026-03
+- id: pause-letter-2023
+  type: event
+  title: "Pause Giant AI Experiments: Open Letter"
+  eventDate: March 22, 2023
+  eventType: publication
+  significance: high
+  description: >-
+    Future of Life Institute publishes an open letter calling for a 6-month pause on training AI
+    systems more powerful than GPT-4. Signed by over 33,000 people including Elon Musk, Yoshua
+    Bengio, and Stuart Russell.
+  relatedEntries:
+    - id: fli
+      type: organization
+  tags:
+    - pause-debate
+    - open-letter
+  lastUpdated: 2026-03
+- id: openai-board-crisis
+  type: event
+  title: OpenAI Board Crisis
+  eventDate: November 17, 2023
+  endDate: November 22, 2023
+  eventType: incident
+  significance: critical
+  description: >-
+    OpenAI's board fires CEO Sam Altman, triggering a 5-day crisis. Over 700 of 770 employees
+    threaten to resign. Altman reinstated with reconstituted board. Raises fundamental questions
+    about nonprofit control of frontier AI and whether safety governance can survive commercial pressures.
+  relatedEntries:
+    - id: openai
+      type: organization
+  tags:
+    - openai
+    - corporate-governance
+  lastUpdated: 2026-03
+- id: executive-order-14110
+  type: event
+  title: Biden Signs AI Executive Order
+  eventDate: October 30, 2023
+  location: Washington, D.C.
+  eventType: policy
+  significance: high
+  description: >-
+    President Biden signs Executive Order 14110 requiring companies training models above 10^26
+    FLOP to report to the government. Establishes US AI Safety Institute within NIST. Revoked
+    by President Trump in January 2025.
+  relatedEntries:
+    - id: us-executive-order
+      type: policy
+  tags:
+    - executive-order
+    - regulation
+  lastUpdated: 2026-03
+- id: eu-ai-act-enters-force
+  type: event
+  title: EU AI Act Enters into Force
+  eventDate: August 1, 2024
+  location: Brussels, Belgium
+  eventType: policy
+  significance: critical
+  description: >-
+    The EU AI Act officially enters into force, becoming the world's first comprehensive AI
+    regulation. Unacceptable-risk bans effective February 2025, GPAI obligations August 2025,
+    full high-risk requirements August 2026.
+  relatedEntries:
+    - id: eu-ai-act
+      type: policy
+  tags:
+    - eu-ai-act
+    - regulation
+    - milestone
+  lastUpdated: 2026-03
+- id: sb1047-vetoed
+  type: event
+  title: California SB 1047 Vetoed
+  eventDate: September 29, 2024
+  location: Sacramento, California
+  eventType: policy
+  significance: high
+  description: >-
+    Governor Newsom vetoes SB 1047 after it passed the legislature with strong majorities
+    (Senate 32-1, Assembly 45-11). Cites concerns about regulating based on model size rather
+    than deployment risk. Signs 18 other AI bills the same day.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - sb-1047
+    - california
+    - veto
+  lastUpdated: 2026-03

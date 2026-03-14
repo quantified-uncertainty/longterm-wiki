@@ -286,14 +286,35 @@ function transformEntity(raw, expertMap, orgMap) {
         maintainer: raw.maintainer,
       };
 
+    case 'project':
+      return {
+        ...base,
+        entityType: 'project',
+        projectStatus: raw.projectStatus || cf('Status'),
+        projectUrl: raw.projectUrl || raw.website,
+        organization: raw.organization,
+        startDate: raw.startDate || cf('Started') || cf('Founded'),
+        techStack: raw.techStack || [],
+      };
+
+    case 'event':
+    case 'historical':
+      return {
+        ...base,
+        entityType: canonicalType,
+        eventDate: raw.eventDate || cf('Date'),
+        endDate: raw.endDate,
+        location: raw.location || cf('Location'),
+        eventType: raw.eventType,
+        significance: raw.significance,
+      };
+
     case 'approach':
     case 'concept':
     case 'crux':
     case 'model':
     case 'capability':
-    case 'project':
     case 'analysis':
-    case 'historical':
     case 'argument':
     case 'scenario':
     case 'case-study':

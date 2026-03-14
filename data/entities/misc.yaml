@@ -6,6 +6,10 @@
   numericId: E924
   type: event
   title: Anthropic-Pentagon Standoff (2026)
+  eventDate: February 2026
+  location: Washington, D.C.
+  eventType: incident
+  significance: critical
   customFields:
     - label: Key Question
       value: Will the supply chain risk designation survive legal challenge?
