@@ -164,6 +164,18 @@ export default function OrganizationsPage() {
     { key: "withHeadcount", label: "With Headcount", value: String(withHeadcount) },
   ];
 
+  // Build orgType lookup map for enriching server-side results
+  // (orgType is only in database.json, not synced to wiki-server)
+  const orgTypeMap: Record<string, string> = {};
+  for (const org of orgs) {
+    if (org.orgType) {
+      orgTypeMap[org.id] = org.orgType;
+    }
+  }
+
+  // Server mode is enabled when wiki-server is configured
+  const serverEnabled = !!process.env.LONGTERMWIKI_SERVER_URL;
+
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
       <div className="mb-8">
@@ -176,7 +188,12 @@ export default function OrganizationsPage() {
         </p>
       </div>
 
-      <OrganizationsTable rows={rows} stats={stats} />
+      <OrganizationsTable
+        rows={rows}
+        stats={stats}
+        serverEnabled={serverEnabled}
+        orgTypeMap={orgTypeMap}
+      />
     </div>
   );
 }
