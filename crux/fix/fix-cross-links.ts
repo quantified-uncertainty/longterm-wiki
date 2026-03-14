@@ -332,8 +332,8 @@ function loadEntityLookup(): Map<string, EntityEntry> {
 
     // Concepts - alternate names
     'RLHF': 'rlhf',
-    'RSPs': 'responsible-scaling-policies',
-    'RSP': 'responsible-scaling-policies',
+    'RSPs': 'rsp',
+    'RSP': 'rsp',
   };
 
   for (const [alias, id] of Object.entries(aliases)) {

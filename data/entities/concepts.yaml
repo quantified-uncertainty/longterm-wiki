@@ -795,7 +795,7 @@
   relatedEntries:
     - id: interpretability
       type: concept
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
     - id: epistemic-infrastructure
       type: concept

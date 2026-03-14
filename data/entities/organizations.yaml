@@ -45,7 +45,7 @@
     - id: constitutional-ai
       type: concept
       relationship: research
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
       relationship: related
     - id: sleeper-agents
@@ -869,7 +869,7 @@
       type: organization
     - id: compute-governance
       type: policy
-    - id: ai-executive-order
+    - id: us-executive-order
       type: policy
     - id: anthropic
       type: organization
