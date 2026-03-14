@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   getCoreRowModel,
@@ -56,6 +56,9 @@ function getDomain(url: string): string | null {
     return null;
   }
 }
+
+// Order for the type tabs — most important first, rest sorted by count
+const TYPE_ORDER = ["entity", "resource", "grant", "benchmark"];
 
 // ---------------------------------------------------------------------------
 // Columns
@@ -159,15 +162,15 @@ const PAGE_SIZE = 100;
 
 interface ThingsTableProps {
   data: ThingRow[];
-  typeFilter?: string;
+  typeCounts: Record<string, number>;
 }
 
-export function ThingsTable({ data, typeFilter }: ThingsTableProps) {
+export function ThingsTable({ data, typeCounts }: ThingsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "title", desc: false },
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [selectedType, setSelectedType] = useState(typeFilter || "");
+  const [selectedType, setSelectedType] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: PAGE_SIZE,
@@ -178,11 +181,30 @@ export function ThingsTable({ data, typeFilter }: ThingsTableProps) {
     setPagination((p) => ({ ...p, pageIndex: 0 }));
   }, [globalFilter, selectedType]);
 
-  // Compute type counts
-  const typeCounts: Record<string, number> = {};
-  for (const row of data) {
-    typeCounts[row.thingType] = (typeCounts[row.thingType] || 0) + 1;
-  }
+  // Build ordered tab list: known types first, then remaining by count
+  const tabs = useMemo(() => {
+    const ordered: { type: string; count: number }[] = [];
+    const seen = new Set<string>();
+
+    for (const type of TYPE_ORDER) {
+      if (typeCounts[type]) {
+        ordered.push({ type, count: typeCounts[type] });
+        seen.add(type);
+      }
+    }
+
+    const remaining = Object.entries(typeCounts)
+      .filter(([t]) => !seen.has(t))
+      .sort(([, a], [, b]) => b - a);
+
+    for (const [type, count] of remaining) {
+      ordered.push({ type, count });
+    }
+
+    return ordered;
+  }, [typeCounts]);
+
+  const totalAll = Object.values(typeCounts).reduce((a, b) => a + b, 0);
 
   const filteredData = selectedType
     ? data.filter((r) => r.thingType === selectedType)
@@ -209,42 +231,53 @@ export function ThingsTable({ data, typeFilter }: ThingsTableProps) {
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search things..."
-            aria-label="Search things"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
-          />
-        </div>
-
-        <select
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-          aria-label="Filter things by type"
-          className="px-3 py-2 text-sm border rounded-md bg-background"
+      {/* Type tabs */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setSelectedType("")}
+          className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+            selectedType === ""
+              ? "bg-foreground text-background border-foreground font-medium"
+              : "bg-card border-border text-muted-foreground hover:bg-muted/50"
+          }`}
         >
-          <option value="">All types ({data.length})</option>
-          {Object.entries(typeCounts)
-            .sort(([, a], [, b]) => b - a)
-            .map(([type, count]) => (
-              <option key={type} value={type}>
-                {type} ({count})
-              </option>
-            ))}
-        </select>
+          All{" "}
+          <span className="text-xs opacity-70">{totalAll.toLocaleString()}</span>
+        </button>
+        {tabs.map(({ type, count }) => (
+          <button
+            key={type}
+            onClick={() => setSelectedType(type === selectedType ? "" : type)}
+            className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+              selectedType === type
+                ? "bg-foreground text-background border-foreground font-medium"
+                : "bg-card border-border text-muted-foreground hover:bg-muted/50"
+            }`}
+          >
+            {type}{" "}
+            <span className="text-xs opacity-70">{count.toLocaleString()}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder={selectedType ? `Search ${selectedType}s...` : "Search all things..."}
+          aria-label="Search things"
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
+        />
       </div>
 
       {/* Count */}
       <p className="text-sm text-muted-foreground">
         Showing {totalFiltered === 0 ? 0 : rangeStart}–
         {rangeEnd} of {totalFiltered} things
-        {totalFiltered !== data.length && ` (${data.length} total)`}
+        {globalFilter && totalFiltered !== filteredData.length && ` (filtered from ${filteredData.length})`}
       </p>
 
       {/* Table */}

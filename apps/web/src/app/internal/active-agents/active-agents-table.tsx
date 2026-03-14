@@ -61,7 +61,7 @@ function HeartbeatCell({ heartbeatAt, status }: { heartbeatAt: string; status: s
   if (minutesAgo > 30) cls = "text-red-500";
 
   return (
-    <span className={`text-xs tabular-nums ${cls}`}>
+    <span className={`text-xs tabular-nums ${cls}`} suppressHydrationWarning>
       {minutesAgo < 1 ? "<1m ago" : `${minutesAgo}m ago`}
     </span>
   );
@@ -186,7 +186,7 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
     cell: ({ row }) => {
       const date = new Date(row.original.startedAt);
       return (
-        <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+        <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap" suppressHydrationWarning>
           {date.toLocaleDateString()}{" "}
           {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>

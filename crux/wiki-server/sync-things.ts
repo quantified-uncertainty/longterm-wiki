@@ -1,13 +1,17 @@
 /**
- * Wiki Server Things Sync
+ * Wiki Server Things Sync — YAML Reconciliation
  *
- * Reconciles the unified `things` table by reading data from all domain
- * sync endpoints and upserting via /api/things/sync.
+ * Reconciles the unified `things` table for YAML-sourced data (entities
+ * and resources). Run this to fill gaps, fix drift, or after editing
+ * entity/resource YAML files.
  *
- * In practice, the things table is populated by migration 0087 and
- * kept up-to-date by domain sync endpoints that dual-write to things.
- * This script is a reconciliation tool: run it to fill gaps, fix drift,
- * or after adding a new domain table.
+ * Architecture:
+ *   - Entities + resources: sourced from YAML files in data/, synced here
+ *   - Grants, personnel, divisions, funding-rounds, investments,
+ *     equity-positions, benchmarks, benchmark-results, funding-programs,
+ *     division-personnel: sourced from wiki-server domain tables, populated
+ *     by migration 0087 and kept current by domain sync endpoints that
+ *     dual-write to the things table. NOT handled by this script.
  *
  * Usage:
  *   pnpm crux wiki-server sync-things

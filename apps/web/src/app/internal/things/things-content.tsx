@@ -196,36 +196,8 @@ export async function ThingsContent() {
         />
       </div>
 
-      {/* Type breakdown */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold mb-3">By Type</h2>
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(stats.byType)
-            .sort(([, a], [, b]) => b - a)
-            .map(([type, count]) => (
-              <div
-                key={type}
-                className="bg-card border rounded-md px-3 py-2 text-sm"
-              >
-                <span className="font-medium">{type}</span>
-                <span className="text-muted-foreground ml-2">
-                  {count.toLocaleString()}
-                </span>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* Things table */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3">
-          All Things{" "}
-          <span className="text-muted-foreground font-normal">
-            ({items.length.toLocaleString()})
-          </span>
-        </h2>
-        <ThingsTable data={rows} />
-      </div>
+      {/* Things table with type tabs */}
+      <ThingsTable data={rows} typeCounts={stats.byType} />
     </>
   );
 }

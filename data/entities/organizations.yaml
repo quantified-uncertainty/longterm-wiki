@@ -45,7 +45,7 @@
     - id: constitutional-ai
       type: concept
       relationship: research
-    - id: responsible-scaling-policies
+    - id: rsp
       type: policy
       relationship: related
     - id: sleeper-agents
@@ -798,8 +798,7 @@
   numericId: E364
   type: organization
   orgType: government
-  # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: uk-dsit
+  # parentOrg: uk-dsit — removed, no entity exists for DSIT
   summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -855,8 +854,8 @@
   numericId: E365
   type: organization
   orgType: government
-  # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: nist
+  # parentOrg: nist — changed to nist-ai (valid entity ID)
+  parentOrg: nist-ai
   summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
@@ -869,7 +868,7 @@
       type: organization
     - id: compute-governance
       type: policy
-    - id: ai-executive-order
+    - id: us-executive-order
       type: policy
     - id: anthropic
       type: organization
