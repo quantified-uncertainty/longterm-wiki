@@ -14,7 +14,6 @@ import { compareRiskRows, type RiskSortKey } from "./risks-sort";
 
 export interface RiskRow {
   id: string;
-  slug: string | null;
   name: string;
   numericId: string | null;
   wikiPageId: string | null;
@@ -150,16 +149,12 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  {row.slug ? (
-                    <Link
-                      href={`/risks/${row.slug}`}
-                      className="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{row.name}</span>
-                  )}
+                  <Link
+                    href={`/risks/${row.id}`}
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {row.name}
+                  </Link>
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}

@@ -36,7 +36,6 @@ export default function RisksPage() {
 
   const rows: RiskRow[] = risks.map((risk) => ({
     id: risk.id,
-    slug: risk.id,
     name: risk.title,
     numericId: risk.numericId ?? null,
     wikiPageId: risk.numericId ?? null,
