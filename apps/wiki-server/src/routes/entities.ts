@@ -390,6 +390,7 @@ const entitiesApp = new Hono()
         SELECT person_id AS "personId", COUNT(*)::int AS cnt
         FROM personnel
         WHERE person_id = ANY(${stableIds})
+          AND role_type = 'career'
         GROUP BY person_id
       `);
       for (const r of personnelCounts) {
