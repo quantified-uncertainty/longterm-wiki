@@ -624,6 +624,13 @@
       "when": 1776240000000,
       "tag": "0088_create_thing_verification_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1776326400000,
+      "tag": "0089_drop_redundant_things_index",
+      "breakpoints": true
     }
   ]
 }
