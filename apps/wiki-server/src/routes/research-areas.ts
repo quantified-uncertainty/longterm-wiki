@@ -133,32 +133,28 @@ const researchAreasApp = new Hono()
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
 
-    const [statsRow] = await db
-      .select({ total: count() })
-      .from(researchAreas);
-
-    // Count by cluster
-    const clusterRows = await db
-      .select({
-        cluster: researchAreas.cluster,
-        count: count(),
-      })
-      .from(researchAreas)
-      .groupBy(researchAreas.cluster);
+    const [[statsRow], clusterRows, statusRows] = await Promise.all([
+      db.select({ total: count() }).from(researchAreas),
+      db
+        .select({
+          cluster: researchAreas.cluster,
+          count: count(),
+        })
+        .from(researchAreas)
+        .groupBy(researchAreas.cluster),
+      db
+        .select({
+          status: researchAreas.status,
+          count: count(),
+        })
+        .from(researchAreas)
+        .groupBy(researchAreas.status),
+    ]);
 
     const byCluster: Record<string, number> = {};
     for (const row of clusterRows) {
       byCluster[row.cluster ?? "uncategorized"] = row.count;
     }
-
-    // Count by status
-    const statusRows = await db
-      .select({
-        status: researchAreas.status,
-        count: count(),
-      })
-      .from(researchAreas)
-      .groupBy(researchAreas.status);
 
     const byStatus: Record<string, number> = {};
     for (const row of statusRows) {
@@ -281,28 +277,26 @@ const researchAreasApp = new Hono()
       );
     }
 
-    // Fetch related data
-    const orgs = await db
-      .select()
-      .from(researchAreaOrganizations)
-      .where(eq(researchAreaOrganizations.researchAreaId, id));
-
-    const papers = await db
-      .select()
-      .from(researchAreaPapers)
-      .where(eq(researchAreaPapers.researchAreaId, id))
-      .orderBy(researchAreaPapers.sortOrder);
-
-    const risks = await db
-      .select()
-      .from(researchAreaRisks)
-      .where(eq(researchAreaRisks.researchAreaId, id));
-
-    // Child areas
-    const children = await db
-      .select()
-      .from(researchAreas)
-      .where(eq(researchAreas.parentAreaId, id));
+    // Fetch related data in parallel
+    const [orgs, papers, risks, children] = await Promise.all([
+      db
+        .select()
+        .from(researchAreaOrganizations)
+        .where(eq(researchAreaOrganizations.researchAreaId, id)),
+      db
+        .select()
+        .from(researchAreaPapers)
+        .where(eq(researchAreaPapers.researchAreaId, id))
+        .orderBy(researchAreaPapers.sortOrder),
+      db
+        .select()
+        .from(researchAreaRisks)
+        .where(eq(researchAreaRisks.researchAreaId, id)),
+      db
+        .select()
+        .from(researchAreas)
+        .where(eq(researchAreas.parentAreaId, id)),
+    ]);
 
     return c.json({
       ...formatRow(row),
@@ -470,21 +464,36 @@ const researchAreasApp = new Hono()
     const db = getDrizzleDb();
     let inserted = 0;
 
+    // Group items by researchAreaId for delete+insert pattern
+    const byArea = new Map<string, typeof parsed.data.items>();
+    for (const item of parsed.data.items) {
+      const existing = byArea.get(item.researchAreaId) ?? [];
+      existing.push(item);
+      byArea.set(item.researchAreaId, existing);
+    }
+
     await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx.insert(researchAreaPapers).values({
-          researchAreaId: item.researchAreaId,
-          resourceId: item.resourceId ?? null,
-          title: item.title,
-          url: item.url ?? null,
-          authors: item.authors ?? null,
-          publishedDate: item.publishedDate ?? null,
-          citationCount: item.citationCount ?? null,
-          isSeminal: item.isSeminal,
-          sortOrder: item.sortOrder,
-          notes: item.notes ?? null,
-        });
-        inserted++;
+      // Delete existing papers for each area being synced, then insert fresh
+      for (const [areaId, items] of byArea) {
+        await tx
+          .delete(researchAreaPapers)
+          .where(eq(researchAreaPapers.researchAreaId, areaId));
+
+        for (const item of items) {
+          await tx.insert(researchAreaPapers).values({
+            researchAreaId: item.researchAreaId,
+            resourceId: item.resourceId ?? null,
+            title: item.title,
+            url: item.url ?? null,
+            authors: item.authors ?? null,
+            publishedDate: item.publishedDate ?? null,
+            citationCount: item.citationCount ?? null,
+            isSeminal: item.isSeminal,
+            sortOrder: item.sortOrder,
+            notes: item.notes ?? null,
+          });
+          inserted++;
+        }
       }
     });
 

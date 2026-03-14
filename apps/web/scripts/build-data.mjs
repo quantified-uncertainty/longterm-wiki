@@ -1227,6 +1227,49 @@ async function fetchBenchmarkResults() {
 }
 
 /**
+ * Fetch enriched research areas from wiki-server PG tables.
+ * Returns an array of enriched research area objects.
+ * Falls back to empty array if wiki-server is unavailable.
+ */
+async function fetchResearchAreas() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  research-areas: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return [];
+  }
+
+  const headers = buildHeaders();
+  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
+
+  try {
+    const pageSize = 200;
+    let allItems = [];
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/research-areas/enriched?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, fetchOpts);
+      if (!resp.ok) {
+        console.log(`  research-areas: skipped (HTTP ${resp.status})`);
+        return [];
+      }
+      const data = await resp.json();
+      const items = data.researchAreas || [];
+      allItems = allItems.concat(items);
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    if (allItems.length > 0) {
+      console.log(`  research-areas: ${allItems.length} enriched areas fetched from PG`);
+    }
+    return allItems;
+  } catch (err) {
+    console.log(`  research-areas: skipped (${err instanceof Error ? err.message : err})`);
+    return [];
+  }
+}
+
+/**
  * Fetch record verification verdicts from wiki-server.
  * Returns a map keyed by "recordType:recordId" → verdict info.
  */
@@ -2064,7 +2107,7 @@ async function main() {
   if (!CONTENT_ONLY) {
     const [benchmarkResults, researchAreasData, recordVerdicts] = await Promise.all([
       fetchBenchmarkResults(),
-      fetchAllPages('/api/research-areas/enriched', 'researchAreas').then(r => r ?? []),
+      fetchResearchAreas(),
       fetchRecordVerdicts(),
     ]);
     database.benchmarkResults = benchmarkResults;

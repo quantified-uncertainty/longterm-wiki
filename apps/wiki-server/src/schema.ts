@@ -2079,6 +2079,9 @@ export const researchAreaPapers = pgTable(
       .defaultNow(),
   },
   (table) => [
+    uniqueIndex("idx_rap_area_url")
+      .on(table.researchAreaId, table.url)
+      .where(sql`url IS NOT NULL`),
     index("idx_rap_area").on(table.researchAreaId),
     index("idx_rap_resource").on(table.resourceId),
   ]

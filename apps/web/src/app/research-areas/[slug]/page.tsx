@@ -231,10 +231,10 @@ export default async function ResearchAreaDetailPage({
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-right tabular-nums">
-                      {child.orgCount || "-"}
+                      {child.orgCount ?? "-"}
                     </td>
                     <td className="py-2.5 px-3 text-right tabular-nums">
-                      {child.paperCount || "-"}
+                      {child.paperCount ?? "-"}
                     </td>
                   </tr>
                 ))}

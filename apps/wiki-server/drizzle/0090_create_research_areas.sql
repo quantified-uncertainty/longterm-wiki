@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS research_areas (
   parent_area_id TEXT REFERENCES research_areas(id) ON DELETE SET NULL,
   first_proposed TEXT,                    -- '2017 (Christiano et al.)'
   first_proposed_year INT,               -- 2017 (for sorting)
-  tags TEXT[] NOT NULL DEFAULT '{}',      -- flexible facets: 'function:specification', 'stage:training'
+  tags JSONB NOT NULL DEFAULT '[]'::jsonb,  -- flexible facets: 'function:specification', 'stage:training'
   metadata JSONB NOT NULL DEFAULT '{}',   -- extensible: annual_investment, maturity_score, etc.
   source TEXT,                            -- primary reference URL
   notes TEXT,
@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS research_areas (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_ra_status ON research_areas(status);
-CREATE INDEX idx_ra_cluster ON research_areas(cluster);
-CREATE INDEX idx_ra_parent ON research_areas(parent_area_id);
-CREATE INDEX idx_ra_tags ON research_areas USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_ra_status ON research_areas(status);
+CREATE INDEX IF NOT EXISTS idx_ra_cluster ON research_areas(cluster);
+CREATE INDEX IF NOT EXISTS idx_ra_parent ON research_areas(parent_area_id);
+CREATE INDEX IF NOT EXISTS idx_ra_tags ON research_areas USING GIN(tags jsonb_ops);
 
 -- ── Organization links ──────────────────────────────────────────────────
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS research_area_organizations (
   PRIMARY KEY (research_area_id, organization_id)
 );
 
-CREATE INDEX idx_rao_org ON research_area_organizations(organization_id);
+CREATE INDEX IF NOT EXISTS idx_rao_org ON research_area_organizations(organization_id);
 
 -- ── Key papers / resources ──────────────────────────────────────────────
 
@@ -58,8 +58,9 @@ CREATE TABLE IF NOT EXISTS research_area_papers (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_rap_area ON research_area_papers(research_area_id);
-CREATE INDEX idx_rap_resource ON research_area_papers(resource_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rap_area_url ON research_area_papers(research_area_id, url) WHERE url IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_rap_area ON research_area_papers(research_area_id);
+CREATE INDEX IF NOT EXISTS idx_rap_resource ON research_area_papers(resource_id);
 
 -- ── Risk links ──────────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS research_area_risks (
   PRIMARY KEY (research_area_id, risk_id)
 );
 
-CREATE INDEX idx_rar_risk ON research_area_risks(risk_id);
+CREATE INDEX IF NOT EXISTS idx_rar_risk ON research_area_risks(risk_id);
 
 -- ── Grant links (many-to-many with existing grants table) ───────────────
 
@@ -85,4 +86,4 @@ CREATE TABLE IF NOT EXISTS grant_research_areas (
   PRIMARY KEY (grant_id, research_area_id)
 );
 
-CREATE INDEX idx_gra_area ON grant_research_areas(research_area_id);
+CREATE INDEX IF NOT EXISTS idx_gra_area ON grant_research_areas(research_area_id);

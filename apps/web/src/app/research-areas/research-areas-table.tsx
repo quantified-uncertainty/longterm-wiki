@@ -73,7 +73,7 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
             case "paperCount": return row.paperCount;
             case "grantCount": return row.grantCount;
             case "totalFunding": return parseFloat(row.totalFunding);
-            case "firstProposedYear": return row.firstProposedYear ?? 9999;
+            case "firstProposedYear": return row.firstProposedYear ?? Infinity;
           }
         };
         return compareByValue(a, b, getValue, sortDir);
@@ -205,9 +205,9 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.orgCount || "-"}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.paperCount || "-"}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.grantCount || "-"}</td>
+                <td className="px-3 py-2.5 text-right tabular-nums">{row.orgCount ?? "-"}</td>
+                <td className="px-3 py-2.5 text-right tabular-nums">{row.paperCount ?? "-"}</td>
+                <td className="px-3 py-2.5 text-right tabular-nums">{row.grantCount ?? "-"}</td>
                 <td className="px-3 py-2.5 text-right tabular-nums">{formatFunding(row.totalFunding)}</td>
                 <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
                   {row.firstProposedYear ?? "-"}
