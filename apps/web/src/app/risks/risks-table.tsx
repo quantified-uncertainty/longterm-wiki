@@ -9,6 +9,7 @@ import {
   RISK_CATEGORY_COLORS,
   SEVERITY_COLORS_DISPLAY,
   LIKELIHOOD_COLORS_DISPLAY,
+  DEFAULT_BADGE_COLOR,
 } from "./risk-constants";
 import { compareRiskRows, type RiskSortKey } from "./risks-sort";
 
@@ -171,7 +172,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.riskCategory ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        RISK_CATEGORY_COLORS[row.riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        RISK_CATEGORY_COLORS[row.riskCategory] ?? DEFAULT_BADGE_COLOR
                       }`}
                     >
                       {RISK_CATEGORY_LABELS[row.riskCategory] ?? row.riskCategory}
@@ -186,7 +187,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.severity ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        SEVERITY_COLORS_DISPLAY[row.severity] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        SEVERITY_COLORS_DISPLAY[row.severity] ?? DEFAULT_BADGE_COLOR
                       }`}
                     >
                       {row.severity}
@@ -201,7 +202,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
                   {row.likelihood ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        LIKELIHOOD_COLORS_DISPLAY[row.likelihood] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        LIKELIHOOD_COLORS_DISPLAY[row.likelihood] ?? DEFAULT_BADGE_COLOR
                       }`}
                     >
                       {row.likelihood}

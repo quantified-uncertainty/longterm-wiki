@@ -38,6 +38,7 @@ import {
   HERO_STATS,
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
+  DEFAULT_ORG_TYPE_COLOR,
 } from "./org-data";
 import type { AuthorRef } from "./org-data";
 
@@ -508,7 +509,7 @@ export default async function OrgProfilePage({
                 <Link
                   href={`/organizations?type=${data.orgType}`}
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity ${
-                    ORG_TYPE_COLORS[data.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    ORG_TYPE_COLORS[data.orgType] ?? DEFAULT_ORG_TYPE_COLOR
                   }`}
                 >
                   {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}

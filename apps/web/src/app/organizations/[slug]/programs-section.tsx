@@ -7,26 +7,9 @@ import { titleCase } from "@/components/wiki/kb/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/database";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
+import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
-
-const PROGRAM_TYPE_LABELS: Record<string, string> = {
-  rfp: "RFP",
-  "grant-round": "Grant Round",
-  fellowship: "Fellowship",
-  prize: "Prize",
-  solicitation: "Solicitation",
-  call: "Call",
-};
-
-const PROGRAM_TYPE_COLORS: Record<string, string> = {
-  rfp: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  "grant-round": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  fellowship: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  prize: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  solicitation: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-  call: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-};
 
 /** Funding Programs section for org pages. */
 export function FundingProgramsSection({
@@ -91,7 +74,7 @@ export function FundingProgramsSection({
                   <td className="py-2 px-3">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                        PROGRAM_TYPE_COLORS[p.programType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        PROGRAM_TYPE_COLORS[p.programType] ?? DEFAULT_ORG_TYPE_COLOR
                       }`}
                     >
                       {PROGRAM_TYPE_LABELS[p.programType] ?? p.programType}
@@ -118,7 +101,7 @@ export function FundingProgramsSection({
                     )}
                   </td>
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                    {p.deadline ?? p.openDate ?? ""}
+                    {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                 </tr>
               );

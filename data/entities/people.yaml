@@ -310,7 +310,7 @@
   stableId: 1CHfDs0vsg
   numericId: E115
   type: person
-  title: Elizabeth Kelly (US AISI Director)
+  title: Elizabeth Kelly
   description: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
   customFields:
     - label: Role
@@ -587,7 +587,7 @@
   stableId: 5MVd90lzCg
   numericId: E212
   type: person
-  title: Nate Soares (MIRI)
+  title: Nate Soares
   description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   stableId: zaRXTCXPPk
@@ -944,7 +944,7 @@
   stableId: 69vftmr1jg
   numericId: E116
   type: person
-  title: Elon Musk (AI Industry)
+  title: Elon Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   status: stub
   relatedEntries:
@@ -979,7 +979,7 @@
   stableId: JjyNWsA91A
   numericId: E431
   type: person
-  title: David Sacks (White House AI Czar)
+  title: David Sacks
   description: >-
     South African-American entrepreneur, venture capitalist, and White House AI and
     Crypto Czar who co-founded Craft Ventures and played key roles at PayPal and
@@ -1010,7 +1010,7 @@
   stableId: qspeazccPg
   numericId: E432
   type: person
-  title: Marc Andreessen (AI Investor)
+  title: Marc Andreessen
   description: >-
     American software engineer, entrepreneur, and venture capitalist who co-created
     Mosaic, founded Netscape, and co-founded Andreessen Horowitz. Known for
@@ -1070,7 +1070,7 @@
   stableId: BCisPStEdQ
   numericId: E434
   type: person
-  title: Philip Tetlock (Forecasting Pioneer)
+  title: Philip Tetlock
   description: >-
     Psychologist and forecasting researcher who pioneered the science of
     superforecasting through the Good Judgment Project, demonstrating that
@@ -1129,7 +1129,7 @@
   stableId: Jtj6jHbuQ7
   numericId: E436
   type: person
-  title: Dustin Moskovitz (AI Safety Funder)
+  title: Dustin Moskovitz
   description: >-
     Facebook co-founder who became the world's youngest self-made billionaire in
     2011. Together with his wife Cari Tuna, he has given away over $4 billion

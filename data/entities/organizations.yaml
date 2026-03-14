@@ -319,7 +319,7 @@
   # parentOrg = legally separate part of another org (not an internal division)
   parentOrg: uc-berkeley
   summaryPage: safety-orgs-overview
-  title: CHAI
+  title: Center for Human-Compatible AI (CHAI)
   website: https://humancompatible.ai
   relatedEntries:
     - id: value-learning
@@ -406,7 +406,7 @@
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
-  title: CAIS
+  title: Center for AI Safety (CAIS)
   website: https://safe.ai
   relatedEntries:
     - id: existential-risk
@@ -624,7 +624,7 @@
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
-  title: ARC
+  title: Alignment Research Center (ARC)
   website: https://alignment.org
   relatedEntries:
     - id: paul-christiano
@@ -736,7 +736,7 @@
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
-  title: MIRI
+  title: Machine Intelligence Research Institute (MIRI)
   website: https://intelligence.org
   relatedEntries:
     - id: eliezer-yudkowsky
@@ -1179,7 +1179,7 @@
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
-  title: Safe Superintelligence Inc (SSI)
+  title: Safe Superintelligence Inc. (SSI)
   description: >-
     AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
     with a singular focus on developing safe superintelligence without commercial
@@ -1307,6 +1307,7 @@
   type: organization
   orgType: safety-org
   title: Centre for Long-Term Resilience
+  website: https://www.longtermresilience.org
   description: >-
     UK-based think tank focused on extreme risks from AI, biosecurity, and
     improving government risk management through policy research and direct
@@ -1387,6 +1388,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: 80,000 Hours
+  website: https://80000hours.org
   description: >-
     80,000 Hours is the largest EA career organization, reaching 10M+ readers
     and reporting 3,000+ significant career plan changes, with 80% of $10M+
@@ -1504,6 +1506,7 @@
   orgType: safety-org
   summaryPage: community-building-overview
   title: Centre for Effective Altruism
+  website: https://www.centreforeffectivealtruism.org
   description: >-
     Oxford-based organization that coordinates the effective altruism movement,
     running EA Global conferences, supporting local groups, and maintaining the
@@ -1517,6 +1520,7 @@
   type: organization
   summaryPage: community-building-overview
   title: Center for Applied Rationality
+  website: https://rationality.org
   description: >-
     Berkeley nonprofit founded 2012 teaching applied rationality through
     workshops ($3,900 for 4.5 days), trained 1,300+ alumni reporting 9.2/10
@@ -1562,6 +1566,7 @@
   type: organization
   orgType: funder
   title: Coefficient Giving
+  website: https://www.coefficientgiving.org
   description: >-
     Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants
     since 2014, including $336M to AI safety (~60% of external funding). The
@@ -1661,6 +1666,7 @@
   type: organization
   orgType: safety-org
   title: Future of Life Institute (FLI)
+  website: https://futureoflife.org
   description: >-
     Comprehensive profile of FLI documenting $25M+ in grants distributed (2015:
     $7M to 37 projects, 2021: $25M program), major public campaigns (Asilomar
@@ -2180,6 +2186,7 @@
   type: organization
   orgType: safety-org
   title: Rethink Priorities
+  website: https://rethinkpriorities.org
   description: >-
     Rethink Priorities is a research organization founded in 2018 that grew from
     2 to ~130 people by 2022, conducting evidence-based analysis across animal
@@ -3644,6 +3651,7 @@
   type: organization
   orgType: generic
   title: Effective Ventures Foundation USA
+  website: https://www.effectiveventures.org
   description: >-
     US-based fiscal sponsor and operational hub for effective altruism projects.
   tags:

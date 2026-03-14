@@ -13,7 +13,8 @@ import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import {
   PublicationResourcesTable,
   type PublicationResourceRow,
-} from "@/app/kb/publications/[id]/publication-resources-table";
+} from "@/app/publications/[id]/publication-resources-table";
+import { formatType } from "@/app/publications/publication-utils";
 import Link from "next/link";
 import {
   ExternalLink,
@@ -51,12 +52,6 @@ const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
   2: "Mixed quality. Some useful content but inconsistent editorial standards. Claims should be verified.",
   1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
 };
-
-function formatType(type: string): string {
-  return type
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 function getPageTitle(pageId: string): string {
   const entity = getEntityById(pageId);

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/directory-utils";
 import type { FundingConnection } from "../people-utils";
 
+const FUNDING_CONNECTIONS_LIMIT = 20;
+
 export function FundingConnections({
   fundingConnections,
 }: {
@@ -9,6 +11,7 @@ export function FundingConnections({
 }) {
   if (fundingConnections.length === 0) return null;
 
+  // Calculate stats from ALL connections (not just the displayed slice)
   const totalAmount = fundingConnections.reduce(
     (sum, c) => sum + (c.amount ?? 0),
     0,
@@ -19,6 +22,8 @@ export function FundingConnections({
   const receivedCount = fundingConnections.filter(
     (c) => c.direction === "received" || c.direction === "personal",
   ).length;
+
+  const displayed = fundingConnections.slice(0, FUNDING_CONNECTIONS_LIMIT);
 
   return (
     <section>
@@ -51,7 +56,7 @@ export function FundingConnections({
           )}
         </div>
         <div className="divide-y divide-border/40">
-          {fundingConnections.slice(0, 20).map((conn) => (
+          {displayed.map((conn) => (
             <div key={conn.key} className="px-5 py-3.5">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
@@ -149,10 +154,10 @@ export function FundingConnections({
             </div>
           ))}
         </div>
-        {fundingConnections.length > 20 && (
+        {fundingConnections.length > FUNDING_CONNECTIONS_LIMIT && (
           <div className="px-5 py-3 border-t border-border/40 text-center">
             <span className="text-xs text-muted-foreground">
-              Showing 20 of {fundingConnections.length} connections
+              Showing {FUNDING_CONNECTIONS_LIMIT} of {fundingConnections.length} connections
             </span>
           </div>
         )}

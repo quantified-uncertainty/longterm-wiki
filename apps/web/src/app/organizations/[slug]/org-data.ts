@@ -146,7 +146,7 @@ export const CURATED_COLLECTIONS = new Set([
 
 export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
-export { ORG_TYPE_LABELS, ORG_TYPE_COLORS } from "@/app/organizations/org-constants";
+export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 
 export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
   { id: "financial", label: "Financial", order: 0 },
@@ -496,12 +496,22 @@ function isGenericTitle(title: string, orgName: string): boolean {
 function isSectionPage(title: string, orgName: string): boolean {
   const t = title.toLowerCase().trim();
   const org = orgName.toLowerCase();
-  // Generic section pages: "Org Blog", "Org Research", "Org Safety Blog", "Org careers"
+  // Standalone generic section words
+  const standaloneWords = new Set([
+    "careers", "team", "about", "blog", "publications",
+    "research", "news", "press", "leadership", "contact", "jobs",
+  ]);
+  if (standaloneWords.has(t)) return true;
+  // Generic section pages: "Org Blog", "Org Research", "About Org", etc.
   const sectionPatterns = [
     `${org} blog`, `${org} safety blog`, `${org} research`,
     `${org} safety research`, `${org} alignment science`,
     `${org} careers`, `${org} news`, `${org} updates`,
     `${org} evals`, `${org} documented`,
+    `${org} team`, `${org} about`, `${org} press`,
+    `${org} leadership`, `${org} contact`, `${org} jobs`,
+    `${org} publications`,
+    `about ${org}`,
   ];
   return sectionPatterns.includes(t);
 }
@@ -511,10 +521,17 @@ function decodeHtmlEntities(s: string): string {
   return s
     .replace(/&#x27;/g, "'")
     .replace(/&#39;/g, "'")
+    .replace(/&#8211;/g, "–")
+    .replace(/&#8212;/g, "—")
+    .replace(/&#8216;/g, "\u2018")
+    .replace(/&#8217;/g, "\u2019")
+    .replace(/&#8220;/g, "\u201C")
+    .replace(/&#8221;/g, "\u201D")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
+    .replace(/&nbsp;/g, " ")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 
@@ -536,6 +553,11 @@ function cleanTitle(title: string, orgName: string): string {
   let t = decodeHtmlEntities(title);
   // Strip MDX-escaped dollar signs
   t = t.replace(/\\(\$)/g, "$1");
+  // Strip inline citation format: 'Author, "Title" (https://...)' or 'Author, *Title* (https://...)'
+  const citationMatch = t.match(/^.{2,50},\s*[*"'](.+?)[*"']\s*\(https?:\/\//);
+  if (citationMatch) {
+    t = citationMatch[1];
+  }
   // Strip " | OrgName (https://...)" suffixes
   t = t.replace(/\s*\|\s*[^|]+\(https?:\/\/[^)]+\)\s*$/, "");
   // Strip " | OrgName" suffix
@@ -552,6 +574,9 @@ function cleanTitle(title: string, orgName: string): string {
   if (trailingSource && SOURCE_NAMES.has(trailingSource[1].toLowerCase().trim())) {
     t = t.slice(0, -trailingSource[0].length);
   }
+  // Strip markdown emphasis wrapping: **text** → text, *text* → text
+  t = t.replace(/^\*\*(.+)\*\*$/, "$1");
+  t = t.replace(/^\*(.+)\*$/, "$1");
   // If the title is a full URL, derive from path
   if (/^https?:\/\//.test(t.trim())) {
     const derived = titleFromUrl(t.trim());

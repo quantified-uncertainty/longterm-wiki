@@ -1,7 +1,9 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import {
+  ServerPaginatedTable,
+  type ColumnDef,
+} from "@/components/server-paginated-table";
 import type { NewsRow } from "./auto-update-news-content";
 
 function RelevanceBadge({ score }: { score: number }) {
@@ -59,91 +61,75 @@ function RoutingBadge({
 
 const columns: ColumnDef<NewsRow>[] = [
   {
-    accessorKey: "relevanceScore",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Score</SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <RelevanceBadge score={row.original.relevanceScore} />
-    ),
+    id: "relevanceScore",
+    header: "Score",
+    sortField: "relevanceScore",
+    align: "right" as const,
+    accessor: (row) => <RelevanceBadge score={row.relevanceScore} />,
   },
   {
-    accessorKey: "title",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Title</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "title",
+    header: "Title",
+    sortField: "title",
+    accessor: (row) => (
       <div className="max-w-[350px]">
-        {row.original.url ? (
+        {row.url ? (
           <a
-            href={row.original.url}
+            href={row.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm font-medium text-accent-foreground hover:underline no-underline"
           >
-            {row.original.title}
+            {row.title}
           </a>
         ) : (
           <span className="text-sm font-medium text-foreground">
-            {row.original.title}
+            {row.title}
           </span>
         )}
-        {row.original.summary && (
+        {row.summary && (
           <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
-            {row.original.summary.slice(0, 200)}
+            {row.summary.slice(0, 200)}
           </p>
         )}
       </div>
     ),
-    filterFn: "includesString",
   },
   {
-    accessorKey: "sourceId",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Source</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "sourceId",
+    header: "Source",
+    sortField: "sourceId",
+    accessor: (row) => (
       <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground">
-        {row.original.sourceId}
+        {row.sourceId}
       </span>
     ),
   },
   {
-    accessorKey: "publishedAt",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Published</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "publishedAt",
+    header: "Published",
+    sortField: "publishedAt",
+    accessor: (row) => (
       <span className="text-xs tabular-nums text-muted-foreground whitespace-nowrap">
-        {row.original.publishedAt}
+        {row.publishedAt}
       </span>
     ),
   },
   {
-    accessorKey: "routedTo",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Routed To</SortableHeader>
+    id: "routedTo",
+    header: "Routed To",
+    sortField: "routedTo",
+    accessor: (row) => (
+      <RoutingBadge routedTo={row.routedTo} tier={row.routedTier} />
     ),
-    cell: ({ row }) => (
-      <RoutingBadge
-        routedTo={row.original.routedTo}
-        tier={row.original.routedTier}
-      />
-    ),
-    sortingFn: (rowA, rowB) => {
-      const a = rowA.original.routedTo ? 1 : 0;
-      const b = rowB.original.routedTo ? 1 : 0;
-      return a - b;
-    },
   },
   {
-    accessorKey: "runDate",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Run</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "runDate",
+    header: "Run",
+    sortField: "runDate",
+    accessor: (row) => (
       <span className="text-xs tabular-nums text-muted-foreground">
-        {row.original.runDate}
+        {row.runDate}
       </span>
     ),
   },
@@ -151,14 +137,32 @@ const columns: ColumnDef<NewsRow>[] = [
 
 export function NewsTable({ data }: { data: NewsRow[] }) {
   return (
-    <DataTable
+    <ServerPaginatedTable<NewsRow>
       columns={columns}
-      data={data}
+      rows={data}
+      rowKey={(row) => `${row.runDate}-${row.title}`}
+      defaultSortId="relevanceScore"
+      defaultSortDir="desc"
       searchPlaceholder="Search news items..."
-      defaultSorting={[{ id: "relevanceScore", desc: true }]}
-      getRowClassName={(row) =>
-        row.original.routedTo ? "bg-emerald-500/[0.02]" : ""
-      }
+      itemLabel="news items"
+      searchFields={["title", "sourceId", "summary", "routedTo"]}
+      staticSort={(a, b, sortId, dir) => {
+        let cmp = 0;
+        if (sortId === "relevanceScore") {
+          cmp = a.relevanceScore - b.relevanceScore;
+        } else if (sortId === "title") {
+          cmp = a.title.localeCompare(b.title);
+        } else if (sortId === "sourceId") {
+          cmp = a.sourceId.localeCompare(b.sourceId);
+        } else if (sortId === "publishedAt") {
+          cmp = a.publishedAt.localeCompare(b.publishedAt);
+        } else if (sortId === "routedTo") {
+          cmp = (a.routedTo ? 1 : 0) - (b.routedTo ? 1 : 0);
+        } else if (sortId === "runDate") {
+          cmp = a.runDate.localeCompare(b.runDate);
+        }
+        return dir === "asc" ? cmp : -cmp;
+      }}
     />
   );
 }

@@ -1,7 +1,12 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { resolveRiskBySlug, getRiskSlugs } from "@/app/risks/risk-utils";
+import {
+  resolveRiskBySlug,
+  getRiskSlugs,
+  getLikelihoodDisplay,
+  getTimeframeDisplay,
+} from "@/app/risks/risk-utils";
 import { resolveSlugAlias } from "@/data/kb";
 import { getKBEntity, getKBEntitySlug } from "@/data/kb";
 import { getTypedEntityById, isRisk } from "@/data";
@@ -11,11 +16,11 @@ import {
   Breadcrumbs,
 } from "@/components/directory";
 import { titleCase } from "@/components/wiki/kb/format";
-import type { RiskEntity } from "@/data/entity-schemas";
 import {
   RISK_CATEGORY_COLORS,
   RISK_CATEGORY_LABELS,
   SEVERITY_COLORS,
+  DEFAULT_BADGE_COLOR,
 } from "@/app/risks/risk-constants";
 
 export function generateStaticParams() {
@@ -35,36 +40,6 @@ export async function generateMetadata({
       ? `Profile and assessment data for ${entity.name}.`
       : undefined,
   };
-}
-
-// ── Helpers to extract display values from entity data ─────────────────
-
-function getLikelihoodDisplay(risk: RiskEntity): string | null {
-  if (!risk.likelihood) return null;
-  if (typeof risk.likelihood === "string") return titleCase(risk.likelihood);
-  const parts: string[] = [];
-  if (risk.likelihood.level) parts.push(titleCase(risk.likelihood.level));
-  if (risk.likelihood.status) parts.push(`(${risk.likelihood.status})`);
-  if (risk.likelihood.display) return risk.likelihood.display;
-  return parts.length > 0 ? parts.join(" ") : null;
-}
-
-function getTimeframeDisplay(risk: RiskEntity): string | null {
-  if (!risk.timeframe) return null;
-  if (typeof risk.timeframe === "string") return risk.timeframe;
-  if (risk.timeframe.display) return risk.timeframe.display;
-  const parts: string[] = [];
-  if (risk.timeframe.earliest && risk.timeframe.latest) {
-    parts.push(`${risk.timeframe.earliest}\u2013${risk.timeframe.latest}`);
-  }
-  if (risk.timeframe.median) {
-    if (parts.length > 0) {
-      parts.push(`(median ${risk.timeframe.median})`);
-    } else {
-      parts.push(`~${risk.timeframe.median}`);
-    }
-  }
-  return parts.length > 0 ? parts.join(" ") : null;
 }
 
 // ── Main page ─────────────────────────────────────────────────────────
@@ -101,11 +76,11 @@ export default async function RiskProfilePage({
   if (risk?.severity) {
     stats.push({ label: "Severity", value: titleCase(risk.severity) });
   }
-  const likelihoodStr = risk ? getLikelihoodDisplay(risk) : null;
+  const likelihoodStr = risk ? getLikelihoodDisplay(risk.likelihood) : null;
   if (likelihoodStr) {
     stats.push({ label: "Likelihood", value: likelihoodStr });
   }
-  const timeframeStr = risk ? getTimeframeDisplay(risk) : null;
+  const timeframeStr = risk ? getTimeframeDisplay(risk.timeframe) : null;
   if (timeframeStr) {
     stats.push({ label: "Time Horizon", value: timeframeStr });
   }
@@ -162,7 +137,7 @@ export default async function RiskProfilePage({
           {riskCategory && (
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                RISK_CATEGORY_COLORS[riskCategory] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                RISK_CATEGORY_COLORS[riskCategory] ?? DEFAULT_BADGE_COLOR
               }`}
             >
               {RISK_CATEGORY_LABELS[riskCategory] ?? riskCategory}
@@ -171,7 +146,7 @@ export default async function RiskProfilePage({
           {risk?.severity && (
             <span
               className={`px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                SEVERITY_COLORS[risk.severity] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                SEVERITY_COLORS[risk.severity] ?? DEFAULT_BADGE_COLOR
               }`}
             >
               {titleCase(risk.severity)}

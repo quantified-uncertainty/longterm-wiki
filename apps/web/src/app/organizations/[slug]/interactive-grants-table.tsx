@@ -623,7 +623,7 @@ function CellContent({
         </Link>
       ) : (
         <span className="text-muted-foreground">
-          {grant.funderName ?? ""}
+          {grant.funderName ?? "\u2014"}
         </span>
       );
     case "amount":
@@ -634,18 +634,18 @@ function CellContent({
       ) : null;
     case "date":
       return (
-        <span className="text-muted-foreground">{grant.date ?? ""}</span>
+        <span className="text-muted-foreground">{grant.date ?? "\u2014"}</span>
       );
     case "program":
       return (
         <span className="text-muted-foreground text-xs">
-          {grant.programName ?? ""}
+          {grant.programName ?? "\u2014"}
         </span>
       );
     case "division":
       return (
         <span className="text-muted-foreground text-xs">
-          {grant.divisionName ?? ""}
+          {grant.divisionName ?? "\u2014"}
         </span>
       );
     case "status":

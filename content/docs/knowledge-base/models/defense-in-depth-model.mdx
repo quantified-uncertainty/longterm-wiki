@@ -57,7 +57,7 @@ AI safety operates through five defensive layers, each protecting against differ
 | **Training Safety** | Build aligned goals during development | <R id="MjZiZTdhMW"><EntityLink id="E259" name="rlhf">RLHF</EntityLink></R>, <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, data curation | 20-40% |
 | **Evaluation Safety** | Detect problems before deployment | Red-teaming, interpretability, capability evals | 25-35% |
 | **Runtime Safety** | Monitor deployed systems | <EntityLink id="E595" name="output-filtering">Output filtering</EntityLink>, monitoring, sandboxing | 30-50% |
-| **Institutional Safety** | Governance and oversight | <EntityLink id="E252" name="responsible-scaling-policies">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
+| **Institutional Safety** | Governance and oversight | <EntityLink id="E461" name="rsp">Responsible scaling</EntityLink>, audits, regulation | 40-60% |
 | **Recovery Safety** | Respond to failures | Incident response, shutdown, rollback | 20-40% |
 
 <Mermaid chart={`
@@ -188,7 +188,7 @@ $$P_{\text{eff}} = P_{\text{ind}}^{(1-\rho)} \times P_{\text{corr}}^{\rho}$$
 
 | Mechanism | Independence Level | Current Status | Effectiveness |
 |-----------|-------------------|----------------|---------------|
-| **<EntityLink id="E252" name="responsible-scaling-policies">Responsible scaling policies</EntityLink>** | Medium | <R id="MWRkOTFhMm">Anthropic</R>, <R id="ZWE4ZTJlZW">OpenAI</R> implementing | Unproven at scale |
+| **<EntityLink id="E461" name="rsp">Responsible scaling policies</EntityLink>** | Medium | <R id="MWRkOTFhMm">Anthropic</R>, <R id="ZWE4ZTJlZW">OpenAI</R> implementing | Unproven at scale |
 | **External audits** | High | <R id="MDhiMzZiZj">AISI</R> developing frameworks | Early stage |
 | **Regulatory oversight** | High | <R id="MDc3ZmNmMj">EU AI Act</R>, US <R id="NjEyNThiOG">executive order</R> | Implementation gaps |
 
@@ -386,4 +386,4 @@ $$\prod_{i=1}^{n} P_i^{weak} < P_{single}^{strong}$$
 - <EntityLink id="E53" name="capability-threshold-model" /> - When individual defenses become insufficient
 - <EntityLink id="E94" name="deceptive-alignment-decomposition" label="Deceptive Alignment Decomposition" /> - Primary correlation driver
 - <EntityLink id="E6" name="ai-control">AI Control</EntityLink> - Defense assuming potential deception
-- <EntityLink id="E252" name="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> - Institutional layer implementation
+- <EntityLink id="E461" name="rsp">Responsible Scaling Policies</EntityLink> - Institutional layer implementation

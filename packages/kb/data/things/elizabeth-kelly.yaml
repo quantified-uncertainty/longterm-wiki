@@ -2,7 +2,9 @@ thing:
   id: elizabeth-kelly
   stableId: 1CHfDs0vsg
   type: person
-  name: Elizabeth Kelly (US AISI Director)
+  name: Elizabeth Kelly
+  aliases:
+    - "Elizabeth Kelly (US AISI Director)"
   numericId: E115
 facts:
   - id: f_UJ9mqFHBHQ

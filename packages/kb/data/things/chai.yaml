@@ -2,7 +2,9 @@ thing:
   id: chai
   stableId: zMfgJqiEPQ
   type: organization
-  name: CHAI
+  name: Center for Human-Compatible AI (CHAI)
+  aliases:
+    - CHAI
   numericId: E57
 facts:
   - id: f_yNQJE8kYNw

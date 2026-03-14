@@ -1,7 +1,9 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import {
+  ServerPaginatedTable,
+  type ColumnDef,
+} from "@/components/server-paginated-table";
 import type { GroundskeeperRunRow } from "./groundskeeper-runs-content";
 
 // ── Event Badge ──────────────────────────────────────────────────────────
@@ -30,12 +32,11 @@ function EventBadge({ event }: { event: string }) {
 
 const columns: ColumnDef<GroundskeeperRunRow>[] = [
   {
-    accessorKey: "timestamp",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Time</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.original.timestamp);
+    id: "timestamp",
+    header: "Time",
+    sortField: "timestamp",
+    accessor: (row) => {
+      const date = new Date(row.timestamp);
       return (
         <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
           {date.toLocaleDateString()}{" "}
@@ -47,34 +48,31 @@ const columns: ColumnDef<GroundskeeperRunRow>[] = [
         </span>
       );
     },
-    sortingFn: "datetime",
   },
   {
-    accessorKey: "taskName",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Task</SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <span className="text-sm font-medium">{row.original.taskName}</span>
+    id: "taskName",
+    header: "Task",
+    sortField: "taskName",
+    accessor: (row) => (
+      <span className="text-sm font-medium">{row.taskName}</span>
     ),
   },
   {
-    accessorKey: "event",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Event</SortableHeader>
-    ),
-    cell: ({ row }) => <EventBadge event={row.original.event} />,
+    id: "event",
+    header: "Event",
+    sortField: "event",
+    accessor: (row) => <EventBadge event={row.event} />,
   },
   {
-    accessorKey: "durationMs",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Duration</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const ms = row.original.durationMs;
+    id: "durationMs",
+    header: "Duration",
+    sortField: "durationMs",
+    align: "right" as const,
+    accessor: (row) => {
+      const ms = row.durationMs;
       if (ms === null || ms === undefined) {
         return (
-          <span className="text-xs text-muted-foreground/50">—</span>
+          <span className="text-xs text-muted-foreground/50">&mdash;</span>
         );
       }
       return (
@@ -85,13 +83,13 @@ const columns: ColumnDef<GroundskeeperRunRow>[] = [
     },
   },
   {
-    accessorKey: "summary",
+    id: "summary",
     header: "Summary",
-    cell: ({ row }) => {
-      const text = row.original.summary ?? row.original.errorMessage;
+    accessor: (row) => {
+      const text = row.summary ?? row.errorMessage;
       if (!text) {
         return (
-          <span className="text-xs text-muted-foreground/50">—</span>
+          <span className="text-xs text-muted-foreground/50">&mdash;</span>
         );
       }
       return (
@@ -105,13 +103,15 @@ const columns: ColumnDef<GroundskeeperRunRow>[] = [
     },
   },
   {
-    accessorKey: "consecutiveFailures",
+    id: "consecutiveFailures",
     header: "Failures",
-    cell: ({ row }) => {
-      const n = row.original.consecutiveFailures;
+    sortField: "consecutiveFailures",
+    align: "right" as const,
+    accessor: (row) => {
+      const n = row.consecutiveFailures;
       if (n === null || n === undefined || n === 0) {
         return (
-          <span className="text-xs text-muted-foreground/50">—</span>
+          <span className="text-xs text-muted-foreground/50">&mdash;</span>
         );
       }
       return (
@@ -124,12 +124,12 @@ const columns: ColumnDef<GroundskeeperRunRow>[] = [
     },
   },
   {
-    accessorKey: "circuitBreakerActive",
+    id: "circuitBreakerActive",
     header: "CB",
-    cell: ({ row }) => {
-      if (!row.original.circuitBreakerActive) {
+    accessor: (row) => {
+      if (!row.circuitBreakerActive) {
         return (
-          <span className="text-xs text-muted-foreground/50">—</span>
+          <span className="text-xs text-muted-foreground/50">&mdash;</span>
         );
       }
       return (
@@ -149,11 +149,30 @@ export function GroundskeeperRunsTable({
   data: GroundskeeperRunRow[];
 }) {
   return (
-    <DataTable
+    <ServerPaginatedTable<GroundskeeperRunRow>
       columns={columns}
-      data={data}
-      defaultSorting={[{ id: "timestamp", desc: true }]}
+      rows={data}
+      rowKey={(row) => String(row.id)}
+      defaultSortId="timestamp"
+      defaultSortDir="desc"
       searchPlaceholder="Search runs..."
+      itemLabel="runs"
+      searchFields={["taskName", "event", "summary", "errorMessage"]}
+      staticSort={(a, b, sortId, dir) => {
+        let cmp = 0;
+        if (sortId === "timestamp") {
+          cmp = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+        } else if (sortId === "durationMs") {
+          cmp = (a.durationMs ?? -1) - (b.durationMs ?? -1);
+        } else if (sortId === "consecutiveFailures") {
+          cmp = (a.consecutiveFailures ?? 0) - (b.consecutiveFailures ?? 0);
+        } else if (sortId === "taskName") {
+          cmp = a.taskName.localeCompare(b.taskName);
+        } else if (sortId === "event") {
+          cmp = a.event.localeCompare(b.event);
+        }
+        return dir === "asc" ? cmp : -cmp;
+      }}
     />
   );
 }

@@ -81,7 +81,7 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
         const d = row.original.publishedDate;
         if (!d)
           return (
-            <span className="text-muted-foreground/40 text-xs">-</span>
+            <span className="text-muted-foreground/40 text-xs">{"\u2014"}</span>
           );
         return (
           <span className="text-xs text-muted-foreground font-mono">

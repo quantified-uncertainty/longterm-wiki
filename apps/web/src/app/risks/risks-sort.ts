@@ -3,7 +3,7 @@ export type { SortDir } from "@/lib/sort-utils";
 import type { SortDir } from "@/lib/sort-utils";
 
 import type { RiskRow } from "./risks-table";
-import { SEVERITY_ORDER, LIKELIHOOD_ORDER } from "./risk-constants";
+import { SEVERITY_ORDER, LIKELIHOOD_ORDER, extractEarliestYear } from "./risk-constants";
 
 export type RiskSortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
 
@@ -21,7 +21,7 @@ export function getRiskSortValue(
     case "likelihood":
       return row.likelihood ? (LIKELIHOOD_ORDER[row.likelihood] ?? 0) : null;
     case "timeHorizon":
-      return row.timeHorizon ?? null;
+      return extractEarliestYear(row.timeHorizon);
   }
 }
 

@@ -2,7 +2,9 @@ thing:
   id: nate-soares
   stableId: 5MVd90lzCg
   type: person
-  name: Nate Soares (MIRI)
+  name: Nate Soares
+  aliases:
+    - "Nate Soares (MIRI)"
   numericId: E212
 facts:
   - id: f_MCKelTrhAw

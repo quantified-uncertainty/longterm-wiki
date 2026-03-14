@@ -1,17 +1,18 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import {
+  ServerPaginatedTable,
+  type ColumnDef,
+} from "@/components/server-paginated-table";
 import type { SourceRow } from "./auto-update-news-content";
 
 const columns: ColumnDef<SourceRow>[] = [
   {
-    accessorKey: "enabled",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Status</SortableHeader>
-    ),
-    cell: ({ row }) =>
-      row.original.enabled ? (
+    id: "enabled",
+    header: "Status",
+    sortField: "enabled",
+    accessor: (row) =>
+      row.enabled ? (
         <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-emerald-500/15 text-emerald-600">
           ON
         </span>
@@ -20,51 +21,39 @@ const columns: ColumnDef<SourceRow>[] = [
           OFF
         </span>
       ),
-    sortingFn: (rowA, rowB) => {
-      return (rowA.original.enabled ? 1 : 0) - (rowB.original.enabled ? 1 : 0);
-    },
   },
   {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Name</SortableHeader>
+    id: "name",
+    header: "Name",
+    sortField: "name",
+    accessor: (row) => (
+      <span className="text-sm font-medium text-foreground">{row.name}</span>
     ),
-    cell: ({ row }) => (
-      <span className="text-sm font-medium text-foreground">
-        {row.original.name}
-      </span>
-    ),
-    filterFn: "includesString",
   },
   {
-    accessorKey: "type",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Type</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "type",
+    header: "Type",
+    sortField: "type",
+    accessor: (row) => (
       <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground">
-        {row.original.type}
+        {row.type}
       </span>
     ),
   },
   {
-    accessorKey: "frequency",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Frequency</SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {row.original.frequency}
-      </span>
+    id: "frequency",
+    header: "Frequency",
+    sortField: "frequency",
+    accessor: (row) => (
+      <span className="text-xs text-muted-foreground">{row.frequency}</span>
     ),
   },
   {
-    accessorKey: "reliability",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Reliability</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const r = row.original.reliability;
+    id: "reliability",
+    header: "Reliability",
+    sortField: "reliability",
+    accessor: (row) => {
+      const r = row.reliability;
       const color =
         r === "high"
           ? "bg-emerald-500/15 text-emerald-600"
@@ -81,24 +70,23 @@ const columns: ColumnDef<SourceRow>[] = [
     },
   },
   {
-    accessorKey: "categories",
+    id: "categories",
     header: "Categories",
-    cell: ({ row }) => (
+    accessor: (row) => (
       <span className="text-[11px] text-muted-foreground">
-        {row.original.categories}
+        {row.categories}
       </span>
     ),
   },
   {
-    accessorKey: "lastFetched",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Last Fetched</SortableHeader>
-    ),
-    cell: ({ row }) => (
+    id: "lastFetched",
+    header: "Last Fetched",
+    sortField: "lastFetched",
+    accessor: (row) => (
       <span className="text-xs tabular-nums text-muted-foreground">
-        {row.original.lastFetched
-          ? row.original.lastFetched.slice(0, 16).replace("T", " ")
-          : "—"}
+        {row.lastFetched
+          ? row.lastFetched.slice(0, 16).replace("T", " ")
+          : "\u2014"}
       </span>
     ),
   },
@@ -106,11 +94,34 @@ const columns: ColumnDef<SourceRow>[] = [
 
 export function SourcesTable({ data }: { data: SourceRow[] }) {
   return (
-    <DataTable
+    <ServerPaginatedTable<SourceRow>
       columns={columns}
-      data={data}
+      rows={data}
+      rowKey={(row) => row.id}
+      defaultSortId="enabled"
+      defaultSortDir="desc"
       searchPlaceholder="Search sources..."
-      defaultSorting={[{ id: "enabled", desc: true }]}
+      itemLabel="sources"
+      searchFields={["name", "type", "categories", "reliability"]}
+      showColumnPicker={false}
+      staticSort={(a, b, sortId, dir) => {
+        let cmp = 0;
+        if (sortId === "enabled") {
+          cmp = (a.enabled ? 1 : 0) - (b.enabled ? 1 : 0);
+        } else if (sortId === "name") {
+          cmp = a.name.localeCompare(b.name);
+        } else if (sortId === "type") {
+          cmp = a.type.localeCompare(b.type);
+        } else if (sortId === "frequency") {
+          cmp = a.frequency.localeCompare(b.frequency);
+        } else if (sortId === "reliability") {
+          const order: Record<string, number> = { high: 0, medium: 1, low: 2 };
+          cmp = (order[a.reliability] ?? 3) - (order[b.reliability] ?? 3);
+        } else if (sortId === "lastFetched") {
+          cmp = (a.lastFetched ?? "").localeCompare(b.lastFetched ?? "");
+        }
+        return dir === "asc" ? cmp : -cmp;
+      }}
     />
   );
 }

@@ -2,7 +2,9 @@ thing:
   id: david-sacks
   stableId: JjyNWsA91A
   type: person
-  name: David Sacks (White House AI Czar)
+  name: David Sacks
+  aliases:
+    - "David Sacks (White House AI Czar)"
   numericId: E431
 facts:
   - id: f_XwwBzQAhXg
