@@ -65,7 +65,18 @@ describe("matchProgram", () => {
 
   // ---- Coefficient Giving (Open Philanthropy) ----
 
-  it("matches OP AI safety grants", () => {
+  it("matches Navigating Transformative AI to AI safety", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Navigating Transformative AI",
+      name: "MIRI general support",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_AI_SAFETY);
+  });
+
+  it("matches legacy 'Potential Risks from Advanced AI' to AI safety", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
@@ -80,7 +91,7 @@ describe("matchProgram", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
-      focusArea: "Biosecurity and Pandemic Preparedness",
+      focusArea: "Biosecurity & Pandemic Preparedness",
       name: "NTI Bio support",
       description: null,
     });
@@ -98,23 +109,177 @@ describe("matchProgram", () => {
     expect(result).toBe(PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE);
   });
 
-  it("matches 'Global Health and Wellbeing — Farm Animal Welfare' to farm animal welfare", () => {
+  it("matches Science Supporting Biosecurity to biosecurity", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
-      focusArea: "Global Health and Wellbeing — Farm Animal Welfare",
+      focusArea: "Science Supporting Biosecurity and Pandemic Preparedness",
+      name: "IARPA project",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_BIOSECURITY);
+  });
+
+  it("matches Farm Animal Welfare grants", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Farm Animal Welfare",
       name: "Good Food Institute",
       description: null,
     });
     expect(result).toBe(PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE);
   });
 
-  it("matches OP criminal justice grants to global health program", () => {
+  it("matches Broiler Chicken Welfare to farm animal welfare", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Broiler Chicken Welfare",
+      name: "Humane Society campaign",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+  });
+
+  it("matches Cage-Free Reforms to farm animal welfare", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Cage-Free Reforms",
+      name: "Corporate campaign",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+  });
+
+  it("matches Alternatives to Animal Products to farm animal welfare", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Alternatives to Animal Products",
+      name: "Alt protein research",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_FARM_ANIMAL_WELFARE);
+  });
+
+  it("matches Criminal Justice Reform to dedicated program", () => {
     const result = matchProgram({
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
       focusArea: "Criminal Justice Reform",
       name: "Vera Institute support",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_CRIMINAL_JUSTICE);
+  });
+
+  it("matches Global Catastrophic Risks to GCR program", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Global Catastrophic Risks Capacity Building",
+      name: "EA community support",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_GCR_OPPORTUNITIES);
+  });
+
+  it("matches Effective Giving & Careers to dedicated program", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Effective Giving & Careers",
+      name: "80,000 Hours support",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_EFFECTIVE_GIVING);
+  });
+
+  it("matches Forecasting to dedicated program", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Forecasting",
+      name: "Metaculus support",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_FORECASTING);
+  });
+
+  it("matches Abundance & Growth to dedicated program", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Abundance & Growth",
+      name: "Innovation policy",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_ABUNDANCE_GROWTH);
+  });
+
+  it("matches Innovation Policy to abundance & growth", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Innovation Policy",
+      name: "Tech policy project",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_ABUNDANCE_GROWTH);
+  });
+
+  it("matches Scientific Research to science & health R&D", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Scientific Research",
+      name: "Research grant",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_SCIENCE_HEALTH_RD);
+  });
+
+  it("matches Global Health R&D to science & health R&D", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Global Health R&D",
+      name: "Vaccine research",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_SCIENCE_HEALTH_RD);
+  });
+
+  it("matches GiveWell-Recommended Charities to global health", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "GiveWell-Recommended Charities",
+      name: "AMF grant",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
+  });
+
+  it("matches South Asian Air Quality to global health", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "South Asian Air Quality",
+      name: "Air quality research",
+      description: null,
+    });
+    expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
+  });
+
+  it("matches Global Aid Policy to global health", () => {
+    const result = matchProgram({
+      source: "coefficient-giving",
+      funderId: "ULjDXpSLCI",
+      focusArea: "Global Aid Policy",
+      name: "Policy research",
       description: null,
     });
     expect(result).toBe(PROGRAM_IDS.OP_GLOBAL_HEALTH);
