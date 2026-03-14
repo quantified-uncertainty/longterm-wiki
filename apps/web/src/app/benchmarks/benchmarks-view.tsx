@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { BenchmarksTable, type BenchmarkRow } from "./benchmarks-table";
+import { BenchmarksTable, type BenchmarkRow } from "@/app/benchmarks/benchmarks-table";
 import {
   ComparisonMatrix,
   type MatrixBenchmark,
   type MatrixModel,
   type ScoreGrid,
-} from "./comparison-matrix";
+} from "@/app/benchmarks/comparison-matrix";
 
 type ViewMode = "directory" | "matrix";
 

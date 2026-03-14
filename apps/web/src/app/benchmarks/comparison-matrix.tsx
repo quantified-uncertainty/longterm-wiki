@@ -180,7 +180,7 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
     }
 
     return filtered;
-  }, [models, sortedBenchmarks, scores, sortMode, developerFilter]);
+  }, [models, sortedBenchmarks, scores, sortMode, developerFilter, benchmarkRanges]);
 
   function averageNormalized(modelId: string): number {
     let sum = 0;

@@ -225,10 +225,13 @@ export default async function BenchmarkDetailPage({
               <tbody className="divide-y divide-border/50">
                 {sorted.map((row, i) => {
                   // Bar width: normalize score relative to range, with min bar at 15%
-                  const barPct =
+                  // For lower-is-better benchmarks, invert so lower scores get wider bars
+                  const rawNormalized =
                     maxScore > minScore
-                      ? 15 + ((row.score - minScore) / (maxScore - minScore)) * 85
-                      : 50;
+                      ? (row.score - minScore) / (maxScore - minScore)
+                      : 0.5;
+                  const adjusted = entity.higherIsBetter ? rawNormalized : 1 - rawNormalized;
+                  const barPct = 15 + adjusted * 85;
                   const barColor =
                     DEVELOPER_BAR_COLORS[row.developer ?? ""] ??
                     "bg-primary/20 dark:bg-primary/15";
