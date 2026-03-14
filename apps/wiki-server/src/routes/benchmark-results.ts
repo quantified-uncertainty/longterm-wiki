@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -186,6 +187,19 @@ const benchmarkResultsApp = new Hono()
           });
         upserted++;
       }
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        parsed.data.items.map((br) => ({
+          id: br.id,
+          thingType: "benchmark-result" as const,
+          title: `${br.modelId} on ${br.benchmarkId}: ${br.score}`,
+          sourceTable: "benchmark_results",
+          sourceId: br.id,
+          sourceUrl: br.sourceUrl,
+        }))
+      );
     });
 
     return c.json({ upserted });

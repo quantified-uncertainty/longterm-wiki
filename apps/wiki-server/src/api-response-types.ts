@@ -289,3 +289,4 @@ export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'
 
 /** A single open PR entry. */
 export type OpenPRRow = GithubPullsResult['pulls'][number];
+

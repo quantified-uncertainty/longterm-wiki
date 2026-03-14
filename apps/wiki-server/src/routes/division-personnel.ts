@@ -11,6 +11,7 @@ import {
   invalidJsonError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Query schemas ----
 
@@ -201,6 +202,20 @@ const divisionPersonnelApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((dp) => ({
+          id: dp.id,
+          thingType: "division-personnel" as const,
+          title: `${dp.personId} — ${dp.role}`,
+          sourceTable: "division_personnel",
+          sourceId: dp.id,
+          sourceUrl: dp.source,
+        }))
+      );
+
       upserted = allVals.length;
     });
 

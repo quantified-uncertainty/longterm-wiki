@@ -16,6 +16,7 @@ import {
   SyncEntitySchema as SharedSyncEntitySchema,
   SyncEntitiesBatchSchema,
 } from "../api-types.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -262,6 +263,23 @@ const entitiesApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((e) => ({
+          id: e.stableId || e.id,
+          thingType: "entity" as const,
+          title: e.title,
+          sourceTable: "entities",
+          sourceId: e.id,
+          entityType: e.entityType,
+          description: e.description,
+          numericId: e.numericId,
+          sourceUrl: e.website,
+        }))
+      );
+
       upserted = allVals.length;
     });
 

@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -209,6 +210,20 @@ const equityPositionsApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((ep) => ({
+          id: ep.id,
+          thingType: "equity-position" as const,
+          title: `${ep.holderId} stake in ${ep.companyId}`,
+          sourceTable: "equity_positions",
+          sourceId: ep.id,
+          sourceUrl: ep.source,
+        }))
+      );
+
       upserted = allVals.length;
     });
 

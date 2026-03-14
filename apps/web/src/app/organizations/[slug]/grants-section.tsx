@@ -1,30 +1,53 @@
 /**
  * Grants Given / Grants Received sections for organization profile pages.
  *
- * Placed in the main content column with summary stats, expandable tables,
- * and progressive loading. Only the first MAX_RENDERED_ROWS rows are
- * serialized to the client to keep the RSC payload manageable for orgs
- * with thousands of grants (e.g. Coefficient Giving: 2,627).
+ * Supports two modes:
+ * - **Static mode** (small datasets): Serializes all grants into the RSC payload
+ *   and does client-side search/sort/paginate.
+ * - **Server mode** (large datasets, 200+ grants): Passes only the entity ID
+ *   to the client component, which fetches paginated data from the wiki-server
+ *   via /api/grants/by-entity/:entityId.
  */
-import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { getRecordVerdict } from "@data/database";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
-import { SectionHeader, safeHref } from "./org-shared";
+import { SectionHeader } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
 import { formatAmount, numericValue } from "./org-data";
-import { ExpandableGrantsTable } from "./expandable-grants-table";
+import { InteractiveGrantsTable, type GrantRow } from "./interactive-grants-table";
 
-/** Cap server-rendered rows to keep RSC payload reasonable. */
-const MAX_RENDERED_ROWS = 200;
+/** Grants above this threshold use server-side pagination. */
+const SERVER_MODE_THRESHOLD = 200;
+
+/** Cap for static mode. Only applies when server mode is not used. */
+const MAX_RENDERED_ROWS = 5000;
+
+/** Convert a ParsedGrantRecord to a serializable GrantRow for the client. */
+function toGrantRow(g: ParsedGrantRecord): GrantRow {
+  return {
+    key: g.key,
+    name: g.name,
+    recipientName: g.recipientName,
+    recipientHref: g.recipientHref,
+    amount: numericValue(g.amount) || null,
+    amountDisplay: g.amount != null ? formatAmount(g.amount) : null,
+    date: g.date,
+    status: g.status,
+    source: g.source,
+    programName: g.programName,
+    divisionName: g.divisionName,
+    notes: g.notes,
+  };
+}
 
 /** Grants Given section — for orgs that are funders. */
 export function GrantsGivenSection({
   grants,
   orgName,
+  entityId,
 }: {
   grants: ParsedGrantRecord[];
   orgName: string;
+  /** Entity stable ID (e.g. "ULjDXpSLCI") — enables server-side pagination for large datasets. */
+  entityId?: string;
 }) {
   if (grants.length === 0) return null;
 
@@ -33,48 +56,10 @@ export function GrantsGivenSection({
     0,
   );
 
-  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
-  const rows = renderedGrants.map((g) => {
-    const verdict = getRecordVerdict("grant", String(g.key));
-    return (
-      <tr key={g.key} className="hover:bg-muted/20 transition-colors">
-        <td className="py-2.5 px-4">
-          <span className="font-medium text-foreground text-sm">{g.name}</span>
-          {g.source && (
-            <a
-              href={safeHref(g.source)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-            >
-              source
-            </a>
-          )}
-          <VerificationBadge verdict={verdict} />
-        </td>
-        <td className="py-2.5 px-4 text-sm">
-          {g.recipientHref ? (
-            <Link
-              href={g.recipientHref}
-              className="text-primary hover:underline"
-            >
-              {g.recipientName}
-            </Link>
-          ) : (
-            <span className="text-muted-foreground">{g.recipientName}</span>
-          )}
-        </td>
-        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-          {g.amount != null && (
-            <span className="font-semibold">{formatAmount(g.amount)}</span>
-          )}
-        </td>
-        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-          {g.date ?? ""}
-        </td>
-      </tr>
-    );
-  });
+  // Note: the header summary (count + total) always comes from KB data,
+  // while server mode table data comes from wiki-server. These should be
+  // in sync (same source data), but could diverge if sync is stale.
+  const useServerMode = entityId && grants.length >= SERVER_MODE_THRESHOLD;
 
   return (
     <section>
@@ -85,34 +70,18 @@ export function GrantsGivenSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th scope="col" className="text-left py-2.5 px-4 font-medium">
-                Grant
-              </th>
-              <th scope="col" className="text-left py-2.5 px-4 font-medium">
-                Recipient
-              </th>
-              <th scope="col" className="text-right py-2.5 px-4 font-medium">
-                Amount
-              </th>
-              <th scope="col" className="text-center py-2.5 px-4 font-medium">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable
-              totalCount={grants.length}
-              renderedCount={renderedGrants.length}
-            >
-              {rows}
-            </ExpandableGrantsTable>
-          </tbody>
-        </table>
-      </div>
+      {useServerMode ? (
+        <InteractiveGrantsTable
+          entityId={entityId}
+          mode="given"
+        />
+      ) : (
+        <InteractiveGrantsTable
+          grants={grants.slice(0, MAX_RENDERED_ROWS).map(toGrantRow)}
+          totalCount={grants.length}
+          mode="given"
+        />
+      )}
     </section>
   );
 }
@@ -130,48 +99,14 @@ export function GrantsReceivedSection({
     0,
   );
 
+  // Grants received are aggregated from multiple orgs' KB data,
+  // so server mode is not applicable (wiki-server tracks by grantor, not grantee).
   const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
-  const rows = renderedGrants.map((g) => {
-    const verdict = getRecordVerdict("grant", String(g.key));
-    return (
-      <tr
-        key={`received-${g.key}`}
-        className="hover:bg-muted/20 transition-colors"
-      >
-        <td className="py-2.5 px-4">
-          <span className="font-medium text-foreground text-sm">{g.name}</span>
-          {g.source && (
-            <a
-              href={safeHref(g.source)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-            >
-              source
-            </a>
-          )}
-          <VerificationBadge verdict={verdict} />
-        </td>
-        <td className="py-2.5 px-4 text-sm">
-          {g.funderHref ? (
-            <Link href={g.funderHref} className="text-primary hover:underline">
-              {g.funderName}
-            </Link>
-          ) : (
-            <span className="text-muted-foreground">{g.funderName}</span>
-          )}
-        </td>
-        <td className="py-2.5 px-4 text-right tabular-nums whitespace-nowrap text-sm">
-          {g.amount != null && (
-            <span className="font-semibold">{formatAmount(g.amount)}</span>
-          )}
-        </td>
-        <td className="py-2.5 px-4 text-center text-muted-foreground text-sm">
-          {g.date ?? ""}
-        </td>
-      </tr>
-    );
-  });
+  const rows: GrantRow[] = renderedGrants.map((g) => ({
+    ...toGrantRow(g),
+    funderName: g.funderName,
+    funderHref: g.funderHref,
+  }));
 
   return (
     <section>
@@ -182,34 +117,11 @@ export function GrantsReceivedSection({
           {formatCompactCurrency(totalAmount)}
         </span>
       </div>
-      <div className="border border-border rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th scope="col" className="text-left py-2.5 px-4 font-medium">
-                Grant
-              </th>
-              <th scope="col" className="text-left py-2.5 px-4 font-medium">
-                Funder
-              </th>
-              <th scope="col" className="text-right py-2.5 px-4 font-medium">
-                Amount
-              </th>
-              <th scope="col" className="text-center py-2.5 px-4 font-medium">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/50">
-            <ExpandableGrantsTable
-              totalCount={grants.length}
-              renderedCount={renderedGrants.length}
-            >
-              {rows}
-            </ExpandableGrantsTable>
-          </tbody>
-        </table>
-      </div>
+      <InteractiveGrantsTable
+        grants={rows}
+        totalCount={grants.length}
+        mode="received"
+      />
     </section>
   );
 }

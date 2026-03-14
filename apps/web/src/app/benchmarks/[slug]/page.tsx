@@ -46,6 +46,16 @@ const DEVELOPER_COLORS: Record<string, string> = {
   deepseek: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
 };
 
+const DEVELOPER_BAR_COLORS: Record<string, string> = {
+  anthropic: "bg-amber-400/40 dark:bg-amber-500/30",
+  openai: "bg-green-400/40 dark:bg-green-500/30",
+  deepmind: "bg-blue-400/40 dark:bg-blue-500/30",
+  "meta-ai": "bg-indigo-400/40 dark:bg-indigo-500/30",
+  "mistral-ai": "bg-orange-400/40 dark:bg-orange-500/30",
+  xai: "bg-slate-400/40 dark:bg-slate-500/30",
+  deepseek: "bg-cyan-400/40 dark:bg-cyan-500/30",
+};
+
 export default async function BenchmarkDetailPage({
   params,
 }: {
@@ -66,6 +76,11 @@ export default async function BenchmarkDetailPage({
   const sorted = [...results].sort((a, b) =>
     entity.higherIsBetter ? b.score - a.score : a.score - b.score,
   );
+
+  // Compute score range for bar widths
+  const allScores = sorted.map((r) => r.score);
+  const minScore = allScores.length > 0 ? Math.min(...allScores) : 0;
+  const maxScore = allScores.length > 0 ? Math.max(...allScores) : 1;
 
   // Compute stats
   const modelCount = sorted.length;
@@ -204,60 +219,90 @@ export default async function BenchmarkDetailPage({
                   <th className="py-2.5 px-3 text-center w-12">#</th>
                   <th className="py-2.5 px-3 text-left font-medium">Model</th>
                   <th className="py-2.5 px-3 text-left font-medium">Developer</th>
-                  <th className="py-2.5 px-3 text-right font-medium">Score</th>
+                  <th className="py-2.5 px-3 text-left font-medium w-[40%]">Score</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {sorted.map((row, i) => (
-                  <tr
-                    key={row.modelId}
-                    className={`hover:bg-muted/20 transition-colors ${
-                      i < 3 ? "font-medium" : ""
-                    }`}
-                  >
-                    <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
-                      {i === 0 ? (
-                        <span className="text-amber-500" title="1st place">
-                          {"\uD83E\uDD47"}
-                        </span>
-                      ) : i === 1 ? (
-                        <span className="text-gray-400" title="2nd place">
-                          {"\uD83E\uDD48"}
-                        </span>
-                      ) : i === 2 ? (
-                        <span className="text-orange-400" title="3rd place">
-                          {"\uD83E\uDD49"}
-                        </span>
-                      ) : (
-                        i + 1
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <Link
-                        href={`/ai-models/${row.modelId}`}
-                        className="hover:text-primary transition-colors"
-                      >
-                        {row.modelTitle}
-                      </Link>
-                    </td>
-                    <td className="py-2.5 px-3">
-                      {row.developer && row.developerName && (
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                            DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                          }`}
-                        >
-                          {row.developerName}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-right tabular-nums">
-                      <span className={i < 3 ? "font-bold" : "font-semibold"}>
-                        {formatScore(row.score, row.unit)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {sorted.map((row, i) => {
+                  // Bar width: normalize score relative to range, with min bar at 15%
+                  // For lower-is-better benchmarks, invert so lower scores get wider bars
+                  const rawNormalized =
+                    maxScore > minScore
+                      ? (row.score - minScore) / (maxScore - minScore)
+                      : 0.5;
+                  const adjusted = entity.higherIsBetter ? rawNormalized : 1 - rawNormalized;
+                  const barPct = 15 + adjusted * 85;
+                  const barColor =
+                    DEVELOPER_BAR_COLORS[row.developer ?? ""] ??
+                    "bg-primary/20 dark:bg-primary/15";
+
+                  return (
+                    <tr
+                      key={row.modelId}
+                      className={`hover:bg-muted/20 transition-colors ${
+                        i < 3 ? "font-medium" : ""
+                      }`}
+                    >
+                      <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
+                        {i === 0 ? (
+                          <span className="text-amber-500" title="1st place">
+                            {"\uD83E\uDD47"}
+                          </span>
+                        ) : i === 1 ? (
+                          <span className="text-gray-400" title="2nd place">
+                            {"\uD83E\uDD48"}
+                          </span>
+                        ) : i === 2 ? (
+                          <span className="text-orange-400" title="3rd place">
+                            {"\uD83E\uDD49"}
+                          </span>
+                        ) : (
+                          i + 1
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {row.numericId ? (
+                          <Link
+                            href={`/wiki/${row.numericId}`}
+                            className="hover:text-primary transition-colors"
+                          >
+                            {row.modelTitle}
+                          </Link>
+                        ) : (
+                          <span>{row.modelTitle}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {row.developer && row.developerName && (
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                            }`}
+                          >
+                            {row.developerName}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 relative h-5 rounded-md bg-muted/30 overflow-hidden">
+                            <div
+                              className={`absolute inset-y-0 left-0 rounded-md ${barColor} transition-all`}
+                              style={{ width: `${barPct}%` }}
+                            />
+                            <span
+                              className={`absolute inset-y-0 flex items-center px-2 text-xs tabular-nums ${
+                                i < 3 ? "font-bold" : "font-semibold"
+                              }`}
+                            >
+                              {formatScore(row.score, row.unit)}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

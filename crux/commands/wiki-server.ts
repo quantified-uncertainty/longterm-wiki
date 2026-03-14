@@ -43,6 +43,11 @@ const SCRIPTS = {
     description: 'Sync data/auto-update/runs/*.yaml to wiki-server',
     passthrough: ['dryRun', 'dry-run'],
   },
+  'sync-benchmarks': {
+    script: 'wiki-server/sync-benchmarks.ts',
+    description: 'Sync benchmark definitions + model scores to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'snapshot-resources': {
     script: 'wiki-server/snapshot-resources.ts',
     description: 'Export PG resources to data/resources-snapshot.json',

@@ -617,6 +617,13 @@
       "when": 1776153600000,
       "tag": "0087_populate_things_from_domain_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1776240000000,
+      "tag": "0088_create_thing_verification_tables",
+      "breakpoints": true
     }
   ]
 }

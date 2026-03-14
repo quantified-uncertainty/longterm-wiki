@@ -2,6 +2,7 @@ import {
   fetchDetailed,
   withApiFallback,
   type FetchResult,
+  getWikiServerConfig,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { ThingsTable, type ThingRow } from "./things-table";
@@ -54,7 +55,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const [statsResult, itemsResult] = await Promise.all([
     fetchDetailed<ThingsStatsResult>("/api/things/stats", { revalidate: 60 }),
     fetchDetailed<ThingsListResult>(
-      "/api/things?limit=200&sort=title&order=asc",
+      "/api/things?limit=1000&sort=title&order=asc",
       { revalidate: 60 }
     ),
   ]);
@@ -134,8 +135,8 @@ export async function ThingsContent() {
 
   // Compute verdict stats
   const verified = stats.byVerdict["confirmed"] || 0;
-  const unverified = stats.byVerdict["unverified"] || 0;
-  const contradicted = stats.byVerdict["contradicted"] || 0;
+
+  const wikiServerUrl = getWikiServerConfig()?.serverUrl || "";
 
   return (
     <>
@@ -220,10 +221,10 @@ export async function ThingsContent() {
         <h2 className="text-lg font-semibold mb-3">
           All Things{" "}
           <span className="text-muted-foreground font-normal">
-            ({total > 200 ? `showing 200 of ${total.toLocaleString()}` : total.toLocaleString()})
+            ({total > items.length ? `showing ${items.length.toLocaleString()} of ${total.toLocaleString()}` : total.toLocaleString()})
           </span>
         </h2>
-        <ThingsTable data={rows} />
+        <ThingsTable data={rows} wikiServerUrl={wikiServerUrl} />
       </div>
     </>
   );

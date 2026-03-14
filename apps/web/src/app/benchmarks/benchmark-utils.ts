@@ -35,8 +35,8 @@ export interface BenchmarkResultRow {
   unit?: string;
 }
 
-// Name aliases mapping inline benchmark names to benchmark entity IDs
-const BENCHMARK_NAME_ALIASES: Record<string, string> = {
+// Common name aliases for benchmark resolution
+const BENCHMARK_ALIASES: Record<string, string> = {
   "mmlu": "mmlu",
   "swe-bench": "swe-bench-verified",
   "swe-bench verified": "swe-bench-verified",
@@ -47,12 +47,59 @@ const BENCHMARK_NAME_ALIASES: Record<string, string> = {
   "arc-agi": "arc-agi",
   "arc-agi-2": "arc-agi-2",
   "aime 2025": "aime-2025",
-  "aime": "aime-2025",
+  "aime 2024": "aime-2024",
   "osworld": "osworld",
   "terminal-bench hard": "terminal-bench-hard",
   "terminal-bench 2": "terminal-bench-2",
+  "terminal-bench 2.0": "terminal-bench-2",
   "artificial analysis intelligence index": "artificial-analysis-intelligence-index",
+  "mmlu-pro": "mmlu-pro",
+  "simpleqa": "simpleqa",
+  "humanity's last exam": "humanitys-last-exam",
+  "hle": "humanitys-last-exam",
+  "ifeval": "ifeval",
+  "chatbot arena elo": "chatbot-arena-elo",
+  "chatbot arena": "chatbot-arena-elo",
+  "livecodebench": "livecodebench",
+  "livebench": "livebench",
+  "bfcl": "bfcl",
+  "frontiermath": "frontiermath",
+  "bbh": "bbh",
+  "big-bench hard": "bbh",
+  "hellaswag": "hellaswag",
+  "re-bench": "re-bench",
+  "mle-bench": "mle-bench",
+  "webarena": "webarena",
+  "tau-bench": "tau-bench",
+  "mgsm": "mgsm",
+  "mathvista": "mathvista",
+  "codeforces": "codeforces-rating",
+  "codeforces rating": "codeforces-rating",
 };
+
+/**
+ * Build the full name→slug lookup map (benchmark titles + aliases).
+ */
+export function buildBenchmarkNameToSlugMap(): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const e of getTypedEntities()) {
+    if (isBenchmark(e)) {
+      map.set(e.title.toLowerCase(), e.id);
+    }
+  }
+  for (const [alias, slug] of Object.entries(BENCHMARK_ALIASES)) {
+    map.set(alias, slug);
+  }
+  return map;
+}
+
+/**
+ * Resolve a benchmark display name to its slug.
+ */
+export function resolveBenchmarkName(name: string): string | undefined {
+  return buildBenchmarkNameToSlugMap().get(name.toLowerCase());
+}
+
 
 /**
  * Resolve a benchmark display name to its slug for linking.
@@ -60,7 +107,7 @@ const BENCHMARK_NAME_ALIASES: Record<string, string> = {
  */
 export function getBenchmarkSlugByName(name: string): string | undefined {
   const lower = name.toLowerCase();
-  const fromAlias = BENCHMARK_NAME_ALIASES[lower];
+  const fromAlias = BENCHMARK_ALIASES[lower];
   if (fromAlias) return fromAlias;
   for (const e of getBenchmarkEntities()) {
     if (e.title.toLowerCase() === lower) return e.id;
@@ -137,18 +184,7 @@ function buildFromInlineData(
 ): Map<string, BenchmarkResultRow[]> {
   const results = new Map<string, BenchmarkResultRow[]>();
 
-  // Build name-to-slug map from benchmark entities + aliases
-  const nameToSlug = new Map<string, string>();
-  for (const e of allEntities) {
-    if (isBenchmark(e)) {
-      nameToSlug.set(e.title.toLowerCase(), e.id);
-    }
-  }
-
-
-  for (const [alias, slug] of Object.entries(BENCHMARK_NAME_ALIASES)) {
-    nameToSlug.set(alias, slug);
-  }
+  const nameToSlug = buildBenchmarkNameToSlugMap();
 
   for (const entity of allEntities) {
     if (!isAiModel(entity)) continue;

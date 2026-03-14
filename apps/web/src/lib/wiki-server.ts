@@ -223,6 +223,12 @@ export type RpcGrantsAllResult = InferResponseType<GrantsClient['all']['$get'], 
 /** A single grant row from the all-grants list */
 export type RpcGrantRow = RpcGrantsAllResult['grants'][number];
 
+/** Inferred response type for GET /api/grants/by-entity/:entityId */
+export type RpcGrantsByEntityResult = InferResponseType<GrantsClient['by-entity'][':entityId']['$get'], 200>;
+
+/** A single grant row from the by-entity endpoint */
+export type RpcGrantsByEntityRow = RpcGrantsByEntityResult['grants'][number];
+
 /** Inferred response type for GET /api/grants/by-org-summary */
 export type RpcGrantsOrgSummaryResult = InferResponseType<GrantsClient['by-org-summary']['$get'], 200>;
 
