@@ -9,7 +9,6 @@ export type GrantSortKey =
   | "recipient"
   | "program"
   | "amount"
-  | "period"
   | "date"
   | "status";
 
@@ -28,8 +27,6 @@ export function getGrantSortValue(
       return row.program?.toLowerCase() ?? null;
     case "amount":
       return row.amount;
-    case "period":
-      return row.period;
     case "date":
       return row.date;
     case "status":

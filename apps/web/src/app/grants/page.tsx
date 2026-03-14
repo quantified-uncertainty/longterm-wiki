@@ -28,6 +28,7 @@ const CEA_SLUG_ALIAS = "cea";
 function resolveRecipient(recipientId: string): {
   name: string;
   slug: string | null;
+  href: string | null;
   wikiPageId: string | null;
 } {
   const entity = getKBEntity(recipientId);
@@ -35,10 +36,19 @@ function resolveRecipient(recipientId: string): {
     const slug = getKBEntitySlug(recipientId) ?? null;
     const typedEntity = getTypedEntityById(recipientId);
     const wikiPageId = typedEntity?.numericId ?? null;
-    return { name: entity.name, slug, wikiPageId };
+    // Build type-aware href: /organizations/ for orgs, /people/ for people
+    let href: string | null = null;
+    if (slug) {
+      if (entity.type === "person") {
+        href = `/people/${slug}`;
+      } else {
+        href = `/organizations/${slug}`;
+      }
+    }
+    return { name: entity.name, slug, href, wikiPageId };
   }
   // Not a known entity — return the raw ID as the display name
-  return { name: recipientId, slug: null, wikiPageId: null };
+  return { name: recipientId, slug: null, href: null, wikiPageId: null };
 }
 
 export default function GrantsPage() {
@@ -77,6 +87,7 @@ export default function GrantsPage() {
       recipient: recipientId,
       recipientName: resolved?.name ?? null,
       recipientSlug: resolved?.slug ?? null,
+      recipientHref: resolved?.href ?? null,
       recipientWikiPageId: resolved?.wikiPageId ?? null,
       program:
         typeof record.fields.program === "string"

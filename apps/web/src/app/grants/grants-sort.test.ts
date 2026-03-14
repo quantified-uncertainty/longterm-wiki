@@ -15,6 +15,7 @@ function makeRow(overrides: Partial<GrantRow> = {}): GrantRow {
     recipient: null,
     recipientName: null,
     recipientSlug: null,
+    recipientHref: null,
     recipientWikiPageId: null,
     program: null,
     amount: null,
@@ -72,13 +73,6 @@ describe("getGrantSortValue", () => {
       500000,
     );
     expect(getGrantSortValue(makeRow({ amount: null }), "amount")).toBe(null);
-  });
-
-  it("returns period as string", () => {
-    expect(
-      getGrantSortValue(makeRow({ period: "2023-2025" }), "period"),
-    ).toBe("2023-2025");
-    expect(getGrantSortValue(makeRow({ period: null }), "period")).toBe(null);
   });
 
   it("returns date as string", () => {
