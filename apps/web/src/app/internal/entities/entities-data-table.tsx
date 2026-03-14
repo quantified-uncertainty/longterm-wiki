@@ -2,21 +2,11 @@
 
 import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import type {
-  ColumnDef,
-  SortingState,
-  VisibilityState,
-} from "@tanstack/react-table";
 import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Search, Columns3, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { DataTable } from "@/components/ui/data-table";
-import { SortableHeader } from "@/components/ui/sortable-header";
+  ServerPaginatedTable,
+  type ColumnDef,
+  type SortDir,
+} from "@/components/server-paginated-table";
 
 // ---------------------------------------------------------------------------
 // Unified row type — merges entity metadata + page coverage + importance
@@ -291,137 +281,76 @@ function DateCell({ date }: { date: string | null }) {
 }
 
 // ---------------------------------------------------------------------------
-// Column definitions — ALL columns from all three pages
+// Column definitions — ALL columns using SPT ColumnDef format
 // ---------------------------------------------------------------------------
 
-const COLUMN_LABELS: Record<string, string> = {
-  // Entity core
-  id: "Entity ID",
-  numericId: "Numeric ID",
-  entityType: "Type",
-  title: "Title",
-  description: "Description",
-  status: "Status",
-  tags: "Tags",
-  relatedCount: "Related Entities",
-  hasPage: "Has Page",
-  // Importance / rankings
-  quality: "Quality",
-  readerRank: "Readership Rank",
-  researchRank: "Research Rank",
-  readerImportance: "Reader Importance",
-  researchImportance: "Research Importance",
-  tacticalValue: "Tactical Value",
-  // Page classification
-  contentFormat: "Content Format",
-  wordCount: "Word Count",
-  category: "Category",
-  subcategory: "Subcategory",
-  lastUpdated: "Last Updated",
-  updateFrequency: "Update Freq (days)",
-  // Coverage
-  coverageScore: "Coverage Score",
-  // Risk
-  riskLevel: "Hallucination Risk",
-  riskScore: "Risk Score",
-  // Ratings
-  novelty: "Novelty",
-  rigor: "Rigor",
-  actionability: "Actionability",
-  completeness: "Completeness",
-  // Citations
-  citationTotal: "Citations Total",
-  citationWithQuotes: "Citations w/ Quotes",
-  citationAccuracyChecked: "Citations Checked",
-  citationAvgScore: "Avg Accuracy Score",
-  // Structural
-  backlinkCount: "Backlinks",
-  sectionCount: "Sections",
-  unconvertedLinkCount: "Unconverted Links",
-  // Boolean
-  booleans: "Bool (Summary, Schedule, Entity, History)",
-  // Coverage metrics
-  tablesCov: "Tables",
-  diagramsCov: "Diagrams",
-  internalLinksCov: "Internal Links",
-  externalLinksCov: "External Links",
-  footnotesCov: "Footnotes",
-  referencesCov: "References",
-  quotesCov: "Quotes Verified",
-  accuracyCov: "Accuracy Verified",
-};
-
-const columns: ColumnDef<UnifiedEntityRow>[] = [
+const ALL_COLUMNS: ColumnDef<UnifiedEntityRow>[] = [
   // --- Entity Core ---
   {
-    accessorKey: "title",
-    header: ({ column }) => <SortableHeader column={column} title="Entity / page title">Title</SortableHeader>,
-    cell: ({ row }) => (
+    id: "title",
+    header: "Title",
+    sortField: "title",
+    accessor: (row) => (
       <Link
-        href={row.original.href}
+        href={row.href}
         className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[220px] truncate block"
       >
-        {row.original.title}
+        {row.title}
       </Link>
     ),
-    filterFn: "includesString",
-    size: 220,
   },
   {
-    accessorKey: "id",
-    header: ({ column }) => <SortableHeader column={column} title="Entity slug ID">ID</SortableHeader>,
-    cell: ({ row }) => (
+    id: "id",
+    header: "ID",
+    sortField: "id",
+    accessor: (row) => (
       <Link
-        href={row.original.href}
+        href={row.href}
         className="text-primary hover:underline text-xs font-mono font-medium"
       >
-        {row.original.id}
+        {row.id}
       </Link>
     ),
-    filterFn: "includesString",
   },
   {
-    accessorKey: "numericId",
-    header: ({ column }) => <SortableHeader column={column} title="Numeric entity ID (e.g. E42)">EID</SortableHeader>,
-    cell: ({ row }) => (
+    id: "numericId",
+    header: "EID",
+    sortField: "numericId",
+    accessor: (row) => (
       <span className="font-mono text-xs text-muted-foreground">
-        {row.original.numericId || "-"}
+        {row.numericId || "-"}
       </span>
     ),
-    sortUndefined: "last",
   },
   {
-    accessorKey: "entityType",
-    header: ({ column }) => <SortableHeader column={column} title="Entity type">Type</SortableHeader>,
-    cell: ({ row }) => {
-      const t = row.original.entityType;
-      const color = TYPE_COLORS[t] || DEFAULT_TYPE_COLOR;
+    id: "entityType",
+    header: "Type",
+    sortField: "entityType",
+    accessor: (row) => {
+      const color = TYPE_COLORS[row.entityType] || DEFAULT_TYPE_COLOR;
       return (
         <span className={`text-xs px-1.5 py-0.5 rounded ${color}`}>
-          {t}
+          {row.entityType}
         </span>
       );
     },
-    filterFn: "includesString",
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => <SortableHeader column={column} title="Entity status">Status</SortableHeader>,
-    cell: ({ row }) => {
-      const s = row.original.status;
-      if (!s) return <Dash />;
-      return <span className="text-xs text-muted-foreground">{s}</span>;
+    id: "status",
+    header: "Status",
+    sortField: "status",
+    accessor: (row) => {
+      if (!row.status) return <Dash />;
+      return <span className="text-xs text-muted-foreground">{row.status}</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "tags",
+    id: "tags",
     header: "Tags",
-    cell: ({ row }) => {
-      const tags = row.original.tags;
-      if (!tags.length) return <Dash />;
-      const display = tags.slice(0, 3);
-      const remaining = tags.length - display.length;
+    accessor: (row) => {
+      if (!row.tags.length) return <Dash />;
+      const display = row.tags.slice(0, 3);
+      const remaining = row.tags.length - display.length;
       return (
         <span className="flex flex-wrap gap-0.5 max-w-[200px]">
           {display.map((tag) => (
@@ -435,27 +364,23 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
         </span>
       );
     },
-    filterFn: (row, _columnId, filterValue: string) => {
-      return row.original.tags.some((tag) =>
-        tag.toLowerCase().includes(filterValue.toLowerCase())
-      );
-    },
   },
   {
-    accessorKey: "relatedCount",
-    header: ({ column }) => <SortableHeader column={column} title="Number of related entities">Rel</SortableHeader>,
-    cell: ({ row }) => (
+    id: "relatedCount",
+    header: "Rel",
+    sortField: "relatedCount",
+    accessor: (row) => (
       <span className="text-xs tabular-nums text-muted-foreground">
-        {row.original.relatedCount}
+        {row.relatedCount}
       </span>
     ),
   },
   {
     id: "hasPage",
-    accessorFn: (row) => (row.hasPage ? "yes" : "no"),
-    header: ({ column }) => <SortableHeader column={column} title="Whether this entity has a wiki page">Page</SortableHeader>,
-    cell: ({ row }) => {
-      if (row.original.hasPage) {
+    header: "Page",
+    sortField: "hasPage",
+    accessor: (row) => {
+      if (row.hasPage) {
         return (
           <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded dark:bg-green-900 dark:text-green-300">
             yes
@@ -470,94 +395,89 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     },
   },
   {
-    accessorKey: "description",
+    id: "description",
     header: "Description",
-    cell: ({ row }) => (
+    accessor: (row) => (
       <span
         className="text-xs text-muted-foreground max-w-[250px] truncate block"
-        title={row.original.description ?? undefined}
+        title={row.description ?? undefined}
       >
-        {row.original.description || "-"}
+        {row.description || "-"}
       </span>
     ),
   },
 
   // --- Quality & Importance ---
   {
-    accessorKey: "quality",
-    header: ({ column }) => <SortableHeader column={column} title="Quality score (0-100)">Qual</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.quality} thresholds={scoreThresholds} />,
-    sortUndefined: "last",
+    id: "quality",
+    header: "Qual",
+    sortField: "quality",
+    accessor: (row) => <NumericCell value={row.quality} thresholds={scoreThresholds} />,
   },
   {
-    accessorKey: "readerRank",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Readership importance rank and score">Readership</SortableHeader>,
-    cell: ({ row }) => (
+    id: "readerRank",
+    header: "Readership",
+    sortField: "readerRank",
+    accessor: (row) => (
       <RankWithScore
-        rank={row.original.readerRank}
-        score={row.original.readerImportance}
+        rank={row.readerRank}
+        score={row.readerImportance}
         thresholds={readerThresholds}
       />
     ),
   },
   {
-    accessorKey: "researchRank",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Research importance rank and score">Research</SortableHeader>,
-    cell: ({ row }) => (
+    id: "researchRank",
+    header: "Research",
+    sortField: "researchRank",
+    accessor: (row) => (
       <RankWithScore
-        rank={row.original.researchRank}
-        score={row.original.researchImportance}
+        rank={row.researchRank}
+        score={row.researchImportance}
         thresholds={researchThresholds}
       />
     ),
   },
   {
-    accessorKey: "readerImportance",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Reader importance (0-100)">Imp</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.readerImportance} thresholds={scoreThresholds} />,
+    id: "readerImportance",
+    header: "Imp",
+    sortField: "readerImportance",
+    accessor: (row) => <NumericCell value={row.readerImportance} thresholds={scoreThresholds} />,
   },
   {
-    accessorKey: "researchImportance",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Research importance (0-100)">Res</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.researchImportance} thresholds={scoreThresholds} />,
+    id: "researchImportance",
+    header: "Res",
+    sortField: "researchImportance",
+    accessor: (row) => <NumericCell value={row.researchImportance} thresholds={scoreThresholds} />,
   },
   {
-    accessorKey: "tacticalValue",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Tactical / shareability value (0-100)">Tact</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.tacticalValue} thresholds={scoreThresholds} />,
+    id: "tacticalValue",
+    header: "Tact",
+    sortField: "tacticalValue",
+    accessor: (row) => <NumericCell value={row.tacticalValue} thresholds={scoreThresholds} />,
   },
 
   // --- Coverage ---
   {
     id: "coverageScore",
-    accessorKey: "coverageScore",
-    header: ({ column }) => <SortableHeader column={column} title="Coverage: passing items out of 13">Cov</SortableHeader>,
-    cell: ({ row }) => <ScoreBadge score={row.original.coverageScore} total={row.original.coverageTotal} />,
-    sortUndefined: "last",
+    header: "Cov",
+    sortField: "coverageScore",
+    accessor: (row) => <ScoreBadge score={row.coverageScore} total={row.coverageTotal} />,
   },
 
   // --- Risk ---
   {
     id: "riskLevel",
-    accessorKey: "riskLevel",
-    header: ({ column }) => <SortableHeader column={column} title="Hallucination risk level">Risk</SortableHeader>,
-    cell: ({ row }) => <RiskBadge level={row.original.riskLevel} />,
-    sortingFn: (a, b) => {
-      const order: Record<string, number> = { high: 0, medium: 1, low: 2 };
-      return (order[a.original.riskLevel ?? ""] ?? 3) - (order[b.original.riskLevel ?? ""] ?? 3);
-    },
+    header: "Risk",
+    sortField: "riskLevel",
+    accessor: (row) => <RiskBadge level={row.riskLevel} />,
   },
   {
-    accessorKey: "riskScore",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Hallucination risk score (0-100, higher = riskier)">RiskN</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.riskScore;
+    id: "riskScore",
+    header: "RiskN",
+    sortField: "riskScore",
+    accessor: (row) => {
+      const v = row.riskScore;
       if (v == null) return <Dash />;
       const color = v >= 70 ? "text-red-500" : v >= 40 ? "text-amber-500" : "text-emerald-500";
       return <span className={`text-xs tabular-nums font-medium ${color}`}>{Math.round(v)}</span>;
@@ -566,17 +486,17 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
 
   // --- Temporal ---
   {
-    accessorKey: "lastUpdated",
-    header: ({ column }) => <SortableHeader column={column} title="Time since last update">Updated</SortableHeader>,
-    cell: ({ row }) => <DateCell date={row.original.lastUpdated} />,
-    sortUndefined: "last",
+    id: "lastUpdated",
+    header: "Updated",
+    sortField: "lastUpdated",
+    accessor: (row) => <DateCell date={row.lastUpdated} />,
   },
   {
-    accessorKey: "updateFrequency",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Target update frequency in days">Freq</SortableHeader>,
-    cell: ({ row }) => {
-      const f = row.original.updateFrequency;
+    id: "updateFrequency",
+    header: "Freq",
+    sortField: "updateFrequency",
+    accessor: (row) => {
+      const f = row.updateFrequency;
       if (f == null) return <Dash />;
       return <span className="text-xs tabular-nums text-muted-foreground">{f}d</span>;
     },
@@ -584,106 +504,106 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
 
   // --- Classification ---
   {
-    accessorKey: "contentFormat",
-    header: ({ column }) => <SortableHeader column={column} title="Content format">Fmt</SortableHeader>,
-    cell: ({ row }) => {
-      const f = row.original.contentFormat;
+    id: "contentFormat",
+    header: "Fmt",
+    sortField: "contentFormat",
+    accessor: (row) => {
+      const f = row.contentFormat;
       return f ? <span className="text-xs text-muted-foreground">{f}</span> : <Dash />;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "wordCount",
-    header: ({ column }) => <SortableHeader column={column} title="Word count">Words</SortableHeader>,
-    cell: ({ row }) => {
-      const wc = row.original.wordCount;
+    id: "wordCount",
+    header: "Words",
+    sortField: "wordCount",
+    accessor: (row) => {
+      const wc = row.wordCount;
       if (wc == null) return <Dash />;
       return <span className="text-xs tabular-nums text-muted-foreground">{wc >= 1000 ? `${(wc / 1000).toFixed(1)}k` : wc}</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "category",
-    header: ({ column }) => <SortableHeader column={column} title="Page category">Cat</SortableHeader>,
-    cell: ({ row }) => {
-      const c = row.original.category;
+    id: "category",
+    header: "Cat",
+    sortField: "category",
+    accessor: (row) => {
+      const c = row.category;
       return c ? <span className="text-xs text-muted-foreground">{c}</span> : <Dash />;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "subcategory",
-    header: ({ column }) => <SortableHeader column={column} title="Page subcategory">Sub</SortableHeader>,
-    cell: ({ row }) => {
-      const s = row.original.subcategory;
+    id: "subcategory",
+    header: "Sub",
+    sortField: "subcategory",
+    accessor: (row) => {
+      const s = row.subcategory;
       return s ? <span className="text-xs text-muted-foreground">{s}</span> : <Dash />;
     },
-    sortUndefined: "last",
   },
 
   // --- Ratings (1-10) ---
   {
-    accessorKey: "novelty",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Novelty rating (1-10)">Nov</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.novelty} thresholds={ratingThresholds} />,
+    id: "novelty",
+    header: "Nov",
+    sortField: "novelty",
+    accessor: (row) => <NumericCell value={row.novelty} thresholds={ratingThresholds} />,
   },
   {
-    accessorKey: "rigor",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Rigor rating (1-10)">Rig</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.rigor} thresholds={ratingThresholds} />,
+    id: "rigor",
+    header: "Rig",
+    sortField: "rigor",
+    accessor: (row) => <NumericCell value={row.rigor} thresholds={ratingThresholds} />,
   },
   {
-    accessorKey: "actionability",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Actionability rating (1-10)">Act</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.actionability} thresholds={ratingThresholds} />,
+    id: "actionability",
+    header: "Act",
+    sortField: "actionability",
+    accessor: (row) => <NumericCell value={row.actionability} thresholds={ratingThresholds} />,
   },
   {
-    accessorKey: "completeness",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Completeness rating (1-10)">Comp</SortableHeader>,
-    cell: ({ row }) => <NumericCell value={row.original.completeness} thresholds={ratingThresholds} />,
+    id: "completeness",
+    header: "Comp",
+    sortField: "completeness",
+    accessor: (row) => <NumericCell value={row.completeness} thresholds={ratingThresholds} />,
   },
 
   // --- Citation health ---
   {
-    accessorKey: "citationTotal",
-    header: ({ column }) => <SortableHeader column={column} title="Total citations on this page">Cit</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.citationTotal;
+    id: "citationTotal",
+    header: "Cit",
+    sortField: "citationTotal",
+    accessor: (row) => {
+      const v = row.citationTotal;
       if (v == null) return <Dash />;
       return v > 0 ? <span className="text-xs tabular-nums text-muted-foreground">{v}</span> : <span className="text-muted-foreground/30 text-xs">0</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "citationWithQuotes",
-    header: ({ column }) => <SortableHeader column={column} title="Citations with supporting quotes">CitQ</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.citationWithQuotes;
+    id: "citationWithQuotes",
+    header: "CitQ",
+    sortField: "citationWithQuotes",
+    accessor: (row) => {
+      const v = row.citationWithQuotes;
       if (v == null) return <Dash />;
       return v > 0 ? <span className="text-xs tabular-nums text-muted-foreground">{v}</span> : <span className="text-muted-foreground/30 text-xs">0</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "citationAccuracyChecked",
-    header: ({ column }) => <SortableHeader column={column} title="Citations with accuracy verification">CitA</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.citationAccuracyChecked;
+    id: "citationAccuracyChecked",
+    header: "CitA",
+    sortField: "citationAccuracyChecked",
+    accessor: (row) => {
+      const v = row.citationAccuracyChecked;
       if (v == null) return <Dash />;
       return v > 0 ? <span className="text-xs tabular-nums text-muted-foreground">{v}</span> : <span className="text-muted-foreground/30 text-xs">0</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "citationAvgScore",
-    sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Average citation accuracy score">AvgA</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.citationAvgScore;
+    id: "citationAvgScore",
+    header: "AvgA",
+    sortField: "citationAvgScore",
+    accessor: (row) => {
+      const v = row.citationAvgScore;
       if (v == null) return <Dash />;
       const color = v >= 0.8 ? "text-emerald-500" : v >= 0.5 ? "text-amber-500" : "text-red-400";
       return <span className={`text-xs tabular-nums font-medium ${color}`}>{(v * 100).toFixed(0)}%</span>;
@@ -692,54 +612,50 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
 
   // --- Structural ---
   {
-    accessorKey: "backlinkCount",
-    header: ({ column }) => <SortableHeader column={column} title="Pages linking to this page">BL</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.backlinkCount;
+    id: "backlinkCount",
+    header: "BL",
+    sortField: "backlinkCount",
+    accessor: (row) => {
+      const v = row.backlinkCount;
       if (v == null) return <Dash />;
       return <span className="text-xs tabular-nums text-muted-foreground">{v}</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "sectionCount",
-    header: ({ column }) => <SortableHeader column={column} title="Number of sections">Sec</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.sectionCount;
+    id: "sectionCount",
+    header: "Sec",
+    sortField: "sectionCount",
+    accessor: (row) => {
+      const v = row.sectionCount;
       if (v == null) return <Dash />;
       return <span className="text-xs tabular-nums text-muted-foreground">{v}</span>;
     },
-    sortUndefined: "last",
   },
   {
-    accessorKey: "unconvertedLinkCount",
-    header: ({ column }) => <SortableHeader column={column} title="Markdown links that should be EntityLinks">Unconv</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.unconvertedLinkCount;
+    id: "unconvertedLinkCount",
+    header: "Unconv",
+    sortField: "unconvertedLinkCount",
+    accessor: (row) => {
+      const v = row.unconvertedLinkCount;
       if (v == null) return <Dash />;
       return v > 0
         ? <span className="text-xs tabular-nums text-amber-500">{v}</span>
         : <span className="text-muted-foreground/30 text-xs">0</span>;
     },
-    sortUndefined: "last",
   },
 
   // --- Boolean items ---
   {
     id: "booleans",
-    header: () => (
-      <span className="text-xs font-medium cursor-help" title="Boolean checks: LLM Summary, Update Schedule, Entity, Edit History">
-        Bool
-      </span>
-    ),
-    cell: ({ row }) => {
-      if (row.original.llmSummary == null) return <Dash />;
+    header: "Bool",
+    accessor: (row) => {
+      if (row.llmSummary == null) return <Dash />;
       return (
         <span className="inline-flex items-center gap-1">
-          <BoolIcon value={row.original.llmSummary} label="LLM Summary" />
-          <BoolIcon value={row.original.schedule} label="Update Schedule" />
-          <BoolIcon value={row.original.entity} label="Entity" />
-          <BoolIcon value={row.original.editHistory} label="Edit History" />
+          <BoolIcon value={row.llmSummary} label="LLM Summary" />
+          <BoolIcon value={row.schedule} label="Update Schedule" />
+          <BoolIcon value={row.entity} label="Entity" />
+          <BoolIcon value={row.editHistory} label="Edit History" />
         </span>
       );
     },
@@ -748,59 +664,51 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   // --- Coverage metrics (actual/target) ---
   {
     id: "tablesCov",
-    accessorFn: (row) => row.tablesActual,
-    header: ({ column }) => <SortableHeader column={column} title="Tables: actual / target">Tbl</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.tablesActual} target={row.original.tablesTarget} status={row.original.tables} />,
-    sortUndefined: "last",
+    header: "Tbl",
+    sortField: "tablesActual",
+    accessor: (row) => <MetricCell actual={row.tablesActual} target={row.tablesTarget} status={row.tables} />,
   },
   {
     id: "diagramsCov",
-    accessorFn: (row) => row.diagramsActual,
-    header: ({ column }) => <SortableHeader column={column} title="Diagrams: actual / target">Dia</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.diagramsActual} target={row.original.diagramsTarget} status={row.original.diagrams} />,
-    sortUndefined: "last",
+    header: "Dia",
+    sortField: "diagramsActual",
+    accessor: (row) => <MetricCell actual={row.diagramsActual} target={row.diagramsTarget} status={row.diagrams} />,
   },
   {
     id: "internalLinksCov",
-    accessorFn: (row) => row.internalLinksActual,
-    header: ({ column }) => <SortableHeader column={column} title="Internal links: actual / target">Int</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.internalLinksActual} target={row.original.internalLinksTarget} status={row.original.internalLinks} />,
-    sortUndefined: "last",
+    header: "Int",
+    sortField: "internalLinksActual",
+    accessor: (row) => <MetricCell actual={row.internalLinksActual} target={row.internalLinksTarget} status={row.internalLinks} />,
   },
   {
     id: "externalLinksCov",
-    accessorFn: (row) => row.externalLinksActual,
-    header: ({ column }) => <SortableHeader column={column} title="External links: actual / target">Ext</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.externalLinksActual} target={row.original.externalLinksTarget} status={row.original.externalLinks} />,
-    sortUndefined: "last",
+    header: "Ext",
+    sortField: "externalLinksActual",
+    accessor: (row) => <MetricCell actual={row.externalLinksActual} target={row.externalLinksTarget} status={row.externalLinks} />,
   },
   {
     id: "footnotesCov",
-    accessorFn: (row) => row.footnotesActual,
-    header: ({ column }) => <SortableHeader column={column} title="Footnotes: actual / target">Fn</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.footnotesActual} target={row.original.footnotesTarget} status={row.original.footnotes} />,
-    sortUndefined: "last",
+    header: "Fn",
+    sortField: "footnotesActual",
+    accessor: (row) => <MetricCell actual={row.footnotesActual} target={row.footnotesTarget} status={row.footnotes} />,
   },
   {
     id: "referencesCov",
-    accessorFn: (row) => row.referencesActual,
-    header: ({ column }) => <SortableHeader column={column} title="Resource references: actual / target">Ref</SortableHeader>,
-    cell: ({ row }) => <MetricCell actual={row.original.referencesActual} target={row.original.referencesTarget} status={row.original.references} />,
-    sortUndefined: "last",
+    header: "Ref",
+    sortField: "referencesActual",
+    accessor: (row) => <MetricCell actual={row.referencesActual} target={row.referencesTarget} status={row.references} />,
   },
   {
     id: "quotesCov",
-    accessorFn: (row) => row.quotesActual,
-    header: ({ column }) => <SortableHeader column={column} title="Citations with quotes: verified / total">Qt</SortableHeader>,
-    cell: ({ row }) => <RatioCell actual={row.original.quotesActual} total={row.original.quotesTotal} status={row.original.quotes} />,
-    sortUndefined: "last",
+    header: "Qt",
+    sortField: "quotesActual",
+    accessor: (row) => <RatioCell actual={row.quotesActual} total={row.quotesTotal} status={row.quotes} />,
   },
   {
     id: "accuracyCov",
-    accessorFn: (row) => row.accuracyActual,
-    header: ({ column }) => <SortableHeader column={column} title="Accuracy verified: checked / total">Acc</SortableHeader>,
-    cell: ({ row }) => <RatioCell actual={row.original.accuracyActual} total={row.original.accuracyTotal} status={row.original.accuracy} />,
-    sortUndefined: "last",
+    header: "Acc",
+    sortField: "accuracyActual",
+    accessor: (row) => <RatioCell actual={row.accuracyActual} total={row.accuracyTotal} status={row.accuracy} />,
   },
 ];
 
@@ -808,15 +716,14 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
 // Presets
 // ---------------------------------------------------------------------------
 
-const ALL_COLUMN_IDS = columns.map((c) =>
-  ("id" in c && c.id) || ("accessorKey" in c && String(c.accessorKey)) || ""
-).filter(Boolean);
+const ALL_COLUMN_IDS = ALL_COLUMNS.map((c) => c.id);
 
 interface Preset {
   label: string;
   description: string;
   columns: string[];
-  defaultSort: SortingState;
+  defaultSortId: string;
+  defaultSortDir: SortDir;
 }
 
 const PRESETS: Record<string, Preset> = {
@@ -824,58 +731,101 @@ const PRESETS: Record<string, Preset> = {
     label: "Overview",
     description: "Key quality, risk, and status metrics for pages with content",
     columns: ["title", "entityType", "quality", "readerImportance", "coverageScore", "riskLevel", "lastUpdated", "wordCount", "category"],
-    defaultSort: [{ id: "quality", desc: true }],
+    defaultSortId: "quality",
+    defaultSortDir: "desc",
   },
   entities: {
     label: "Entities",
     description: "All entities with metadata (ID, type, status, tags, related count)",
     columns: ["title", "id", "numericId", "entityType", "status", "tags", "relatedCount", "hasPage", "lastUpdated"],
-    defaultSort: [{ id: "title", desc: false }],
+    defaultSortId: "title",
+    defaultSortDir: "asc",
   },
   importance: {
     label: "Importance",
     description: "Readership and research importance rankings with scores",
     columns: ["title", "readerRank", "researchRank", "quality", "tacticalValue", "category", "wordCount"],
-    defaultSort: [{ id: "readerRank", desc: false }],
+    defaultSortId: "readerRank",
+    defaultSortDir: "asc",
   },
   quality: {
     label: "Quality",
     description: "Quality ratings and content assessment",
     columns: ["title", "quality", "readerImportance", "researchImportance", "tacticalValue", "novelty", "rigor", "actionability", "completeness", "wordCount"],
-    defaultSort: [{ id: "quality", desc: true }],
+    defaultSortId: "quality",
+    defaultSortDir: "desc",
   },
   coverage: {
     label: "Coverage",
     description: "Structural completeness targets and metrics",
     columns: ["title", "coverageScore", "wordCount", "booleans", "tablesCov", "diagramsCov", "internalLinksCov", "externalLinksCov", "footnotesCov", "referencesCov", "quotesCov", "accuracyCov"],
-    defaultSort: [{ id: "coverageScore", desc: false }],
+    defaultSortId: "coverageScore",
+    defaultSortDir: "asc",
   },
   citations: {
     label: "Citations",
     description: "Citation health and accuracy metrics",
     columns: ["title", "citationTotal", "citationWithQuotes", "citationAccuracyChecked", "citationAvgScore", "quotesCov", "accuracyCov", "quality", "wordCount"],
-    defaultSort: [{ id: "citationTotal", desc: true }],
+    defaultSortId: "citationTotal",
+    defaultSortDir: "desc",
   },
   updates: {
     label: "Updates",
     description: "Freshness and update scheduling",
     columns: ["title", "lastUpdated", "updateFrequency", "quality", "readerImportance", "riskLevel", "wordCount", "category"],
-    defaultSort: [{ id: "lastUpdated", desc: false }],
+    defaultSortId: "lastUpdated",
+    defaultSortDir: "asc",
   },
   all: {
     label: "All",
     description: "Every available column",
     columns: ALL_COLUMN_IDS,
-    defaultSort: [{ id: "title", desc: false }],
+    defaultSortId: "title",
+    defaultSortDir: "asc",
   },
 };
 
-function presetToVisibility(presetColumns: string[]): VisibilityState {
-  const vis: VisibilityState = {};
-  for (const id of ALL_COLUMN_IDS) {
-    vis[id] = presetColumns.includes(id);
+// ---------------------------------------------------------------------------
+// Static sort comparator
+// ---------------------------------------------------------------------------
+
+const RISK_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
+function compareNullable(
+  a: string | number | boolean | null | undefined,
+  b: string | number | boolean | null | undefined,
+  dir: SortDir
+): number {
+  // nulls always last regardless of direction
+  if (a == null && b == null) return 0;
+  if (a == null) return 1;
+  if (b == null) return -1;
+  const mult = dir === "asc" ? 1 : -1;
+  if (typeof a === "boolean" && typeof b === "boolean") {
+    return (Number(a) - Number(b)) * mult;
   }
-  return vis;
+  if (typeof a === "number" && typeof b === "number") {
+    return (a - b) * mult;
+  }
+  return String(a).localeCompare(String(b)) * mult;
+}
+
+function staticSort(a: UnifiedEntityRow, b: UnifiedEntityRow, sortId: string, dir: SortDir): number {
+  // Special sort for risk level
+  if (sortId === "riskLevel") {
+    const aVal = RISK_ORDER[a.riskLevel ?? ""] ?? 3;
+    const bVal = RISK_ORDER[b.riskLevel ?? ""] ?? 3;
+    return dir === "asc" ? aVal - bVal : bVal - aVal;
+  }
+
+  const key = sortId as keyof UnifiedEntityRow;
+  const aVal = a[key];
+  const bVal = b[key];
+  return compareNullable(
+    aVal as string | number | boolean | null,
+    bVal as string | number | boolean | null,
+    dir
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -883,16 +833,9 @@ function presetToVisibility(presetColumns: string[]): VisibilityState {
 // ---------------------------------------------------------------------------
 
 export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }) {
-  const [sorting, setSorting] = useState<SortingState>(PRESETS.overview.defaultSort);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    presetToVisibility(PRESETS.overview.columns)
-  );
   const [activePreset, setActivePreset] = useState<string>("overview");
-  const [showColumnPicker, setShowColumnPicker] = useState(false);
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [pageFilter, setPageFilter] = useState<string>("");
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
 
   const types = useMemo(() => {
     const counts = new Map<string, number>();
@@ -915,77 +858,46 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
     return data;
   }, [entities, typeFilter, pageFilter]);
 
+  const preset = PRESETS[activePreset] || PRESETS.overview;
+
+  // Build columns array filtered by the current preset
+  const presetColumns = useMemo(() => {
+    const presetColIds = new Set(preset.columns);
+    return ALL_COLUMNS.map((col) => ({
+      ...col,
+      defaultVisible: presetColIds.has(col.id),
+    }));
+  }, [preset]);
+
   const applyPreset = useCallback((key: string) => {
-    const preset = PRESETS[key];
-    if (!preset) return;
-    setColumnVisibility(presetToVisibility(preset.columns));
-    setSorting(preset.defaultSort);
     setActivePreset(key);
   }, []);
-
-  const table = useReactTable({
-    data: filteredData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onColumnVisibilityChange: (updater) => {
-      setColumnVisibility(updater);
-      setActivePreset("");
-    },
-    globalFilterFn: "includesString",
-    state: { sorting, globalFilter, columnVisibility, pagination },
-  });
-
-  const filtered = table.getFilteredRowModel().rows.length;
-  const total = entities.length;
 
   return (
     <div className="space-y-3">
       {/* Preset buttons */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        {Object.entries(PRESETS).map(([key, preset]) => (
+        {Object.entries(PRESETS).map(([key, p]) => (
           <button
             key={key}
             onClick={() => applyPreset(key)}
-            title={preset.description}
+            title={p.description}
             className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
               activePreset === key
                 ? "bg-foreground text-background border-foreground"
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
             }`}
           >
-            {preset.label}
+            {p.label}
           </button>
         ))}
       </div>
 
-      {/* Toolbar */}
+      {/* External filters (type + page) */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            placeholder="Search entities..."
-            value={globalFilter ?? ""}
-            onChange={(e) => {
-              setGlobalFilter(e.target.value);
-              setPagination((p) => ({ ...p, pageIndex: 0 }));
-            }}
-            className="h-9 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-          />
-        </div>
-
-        {/* Type filter */}
         <select
           value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setPagination((p) => ({ ...p, pageIndex: 0 }));
-          }}
+          onChange={(e) => setTypeFilter(e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm"
         >
           <option value="">All types</option>
@@ -996,104 +908,33 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
           ))}
         </select>
 
-        {/* Page filter */}
         <select
           value={pageFilter}
-          onChange={(e) => {
-            setPageFilter(e.target.value);
-            setPagination((p) => ({ ...p, pageIndex: 0 }));
-          }}
+          onChange={(e) => setPageFilter(e.target.value)}
           className="h-9 rounded-lg border border-border bg-background px-3 text-sm shadow-sm"
         >
           <option value="">All entities</option>
           <option value="with">With page</option>
           <option value="without">Without page</option>
         </select>
-
-        {/* Column picker */}
-        <div className="relative">
-          <button
-            onClick={() => setShowColumnPicker((v) => !v)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border border-border rounded-md bg-background text-muted-foreground hover:bg-muted transition-colors"
-          >
-            <Columns3 className="h-3.5 w-3.5" />
-            Columns
-          </button>
-          {showColumnPicker && (
-            <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[240px] max-h-[60vh] overflow-y-auto">
-              {table.getAllLeafColumns().map((col) => (
-                <label
-                  key={col.id}
-                  className="flex items-center gap-2 px-2 py-1 text-xs hover:bg-muted rounded cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={col.getIsVisible()}
-                    onChange={col.getToggleVisibilityHandler()}
-                    className="rounded"
-                  />
-                  {COLUMN_LABELS[col.id] ?? col.id.charAt(0).toUpperCase() + col.id.slice(1).replace(/([A-Z])/g, " $1")}
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {filtered === total ? `${total} entities` : `${filtered} of ${total} entities`}
-        </span>
       </div>
 
-      <DataTable table={table} stickyFirstColumn />
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Rows per page:</span>
-          <select
-            value={pagination.pageSize}
-            onChange={(e) => setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })}
-            className="h-7 rounded border border-border bg-background px-2 text-xs"
-          >
-            {[25, 50, 100, 200].map((size) => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">
-            Page {pagination.pageIndex + 1} of {table.getPageCount() || 1}
-          </span>
-          <button
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      {/* SPT table — key forces re-mount when preset changes to reset column visibility */}
+      <ServerPaginatedTable<UnifiedEntityRow>
+        key={activePreset}
+        columns={presetColumns}
+        rows={filteredData}
+        searchFields={["title", "id", "entityType", "description"]}
+        rowKey={(row) => row.id}
+        pageSize={50}
+        defaultSortId={preset.defaultSortId}
+        defaultSortDir={preset.defaultSortDir}
+        searchPlaceholder="Search entities..."
+        itemLabel="entities"
+        showColumnPicker
+        staticSort={staticSort}
+        stickyFirstColumn
+      />
     </div>
   );
 }
