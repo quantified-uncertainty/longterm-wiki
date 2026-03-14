@@ -36,12 +36,12 @@ export function getRelatedModels(
   return allModels.filter(
     (m) =>
       m.id !== model.id &&
-      !isFamily(m) &&
+      !isModelFamily(m) &&
       (m.modelFamily === model.modelFamily || m.developer === model.developer),
   );
 }
 
 /** Check if an entity is a family entry (no tier, no release date). */
-function isFamily(entity: AiModelEntity): boolean {
+export function isModelFamily(entity: Pick<AiModelEntity, "modelTier" | "releaseDate">): boolean {
   return !entity.modelTier && !entity.releaseDate;
 }

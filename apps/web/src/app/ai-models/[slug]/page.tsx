@@ -6,6 +6,7 @@ import {
   resolveAiModelBySlug,
   getAiModelSlugs,
   getRelatedModels,
+  isModelFamily,
 } from "../ai-model-utils";
 import { resolveSlugAlias } from "@/data/kb";
 import {
@@ -67,7 +68,7 @@ export default async function AiModelDetailPage({
   );
 
   // Is this a family entry?
-  const isFamily = !entity.modelTier && !entity.releaseDate;
+  const isFamily = isModelFamily(entity);
 
   // Build stat cards
   const stats: Array<{
@@ -311,15 +312,15 @@ export default async function AiModelDetailPage({
                             </Link>
                           </td>
                           <td className="py-2.5 px-4 text-muted-foreground capitalize">
-                            {m.modelTier ?? ""}
+                            {m.modelTier ?? <span className="text-muted-foreground/40">&mdash;</span>}
                           </td>
                           <td className="py-2.5 px-4 text-muted-foreground">
-                            {m.releaseDate ?? ""}
+                            {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
                           </td>
                           <td className="py-2.5 px-4 text-right tabular-nums">
                             {m.inputPrice != null
                               ? formatPrice(m.inputPrice)
-                              : ""}
+                              : <span className="text-muted-foreground/40">&mdash;</span>}
                           </td>
                         </tr>
                       ))}
@@ -354,7 +355,7 @@ export default async function AiModelDetailPage({
                           {m.title}
                         </Link>
                         <span className="text-xs text-muted-foreground tabular-nums">
-                          {m.releaseDate ?? ""}
+                          {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
                         </span>
                       </div>
                       {m.modelFamily && (
