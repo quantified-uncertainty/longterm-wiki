@@ -4,8 +4,6 @@ thing:
   type: person
   name: "Jan Leike"
   numericId: "E182"
-  aliases:
-    - "Jan Leike"
 
 facts:
   - id: f_dF5bX8wC3g
