@@ -12,6 +12,7 @@ import {
   zv,
 } from "./utils.js";
 import { SyncFactsBatchSchema } from "../api-types.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -288,6 +289,26 @@ const factsApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+      // Dual-write to things table
+      const toFactThingKey = (entityId: string, factId: string) =>
+        `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+
+      await upsertThingsInTx(
+        tx,
+        items.map((f) => ({
+          id: toFactThingKey(f.entityId, f.factId),
+          thingType: "fact" as const,
+          title: f.label || `${f.factId} for ${f.entityId}`,
+          sourceTable: "facts",
+          sourceId: toFactThingKey(f.entityId, f.factId),
+          description: f.value
+            ? `${f.label || f.factId}: ${f.value}`
+            : f.numeric != null
+              ? `${f.label || f.factId}: ${f.numeric}`
+              : undefined,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
