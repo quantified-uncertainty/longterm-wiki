@@ -46,11 +46,17 @@ import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
 
+// Section components — publications
+import { KeyPublicationsSection } from "./publications-section";
+
 // Section components — grants (main content column)
 import {
   GrantsGivenSection,
   GrantsReceivedSection,
 } from "./grants-section";
+
+// Section components — resources
+import { OrgResourcesSection } from "./resources-section";
 
 // Section components — main content column
 import {
@@ -342,25 +348,90 @@ export default async function OrgProfilePage({
       count: productCount,
       content: (
         <div className="space-y-8">
-          <AiModelsSection models={data.orgModels} />
+          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
           <ProductsSection products={data.products} />
         </div>
       ),
     });
   }
 
-  // ── Research & Safety tab ──
+  // ── Safety tab (milestones — renamed from "Research & Safety" since papers are in Publications) ──
   const hasSafetyData = data.sortedMilestones.length > 0;
 
   if (hasSafetyData) {
     tabs.push({
       id: "safety",
-      label: "Research & Safety",
+      label: "Safety",
       count: data.sortedMilestones.length,
       content: (
         <div className="space-y-8">
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
         </div>
+      ),
+    });
+  }
+
+  // ── Publications tab (research papers + literature papers, deduplicated) ──
+  // Deduplicate key publications that already appear in the resources table (by title match)
+  const resourcePubTitles = new Set(
+    data.resourcePublications.map((r) => r.title.toLowerCase().trim()),
+  );
+  const dedupedKeyPubs = data.keyPublications.filter(
+    (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
+  );
+
+  const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
+  if (hasPublications) {
+    const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
+    tabs.push({
+      id: "publications",
+      label: "Publications",
+      count: pubCount,
+      content: (
+        <div className="space-y-8">
+          {data.resourcePublications.length > 0 && (
+            <OrgResourcesSection
+              resources={data.resourcePublications}
+              title="Research & Technical Papers"
+              emptyMessage=""
+            />
+          )}
+          {dedupedKeyPubs.length > 0 && (
+            <KeyPublicationsSection publications={dedupedKeyPubs} />
+          )}
+        </div>
+      ),
+    });
+  }
+
+  // ── Announcements tab (news, blog posts, other org content) ──
+  if (data.resourceAnnouncements.length > 0) {
+    tabs.push({
+      id: "announcements",
+      label: "Announcements",
+      count: data.resourceAnnouncements.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourceAnnouncements}
+          title="News & Announcements"
+          emptyMessage=""
+        />
+      ),
+    });
+  }
+
+  // ── Coverage tab (external resources about the org) ──
+  if (data.resourcesAboutOrg.length > 0) {
+    tabs.push({
+      id: "coverage",
+      label: "Coverage",
+      count: data.resourcesAboutOrg.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourcesAboutOrg}
+          title="External Coverage & References"
+          emptyMessage=""
+        />
       ),
     });
   }
@@ -373,7 +444,7 @@ export default async function OrgProfilePage({
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
-          <DivisionsSection divisions={data.divisions} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
         </div>
       ),
     });
