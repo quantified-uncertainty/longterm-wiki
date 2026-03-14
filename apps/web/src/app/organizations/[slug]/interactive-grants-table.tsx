@@ -76,6 +76,9 @@ function transformGrantsResponse(json: unknown): {
   };
 }
 
+// Stable empty array constant — avoids new reference on every render in server mode
+const EMPTY_GRANTS: GrantRow[] = [];
+
 // ── Column definitions ──────────────────────────────────────────────
 
 type ColumnId =
@@ -190,7 +193,7 @@ export function InteractiveGrantsTable({
   const [localSortDir, setLocalSortDir] = useState<SortDir>("desc");
   const [localPage, setLocalPage] = useState(0);
 
-  const allGrants = staticGrants ?? [];
+  const allGrants = staticGrants ?? EMPTY_GRANTS;
 
   // Static-mode: filter
   const localFiltered = useMemo(() => {
@@ -275,7 +278,10 @@ export function InteractiveGrantsTable({
     ? server.meta.total
     : staticTotalCount ?? allGrants.length;
   const filteredTotal = serverMode ? server.meta.total : localFiltered.length;
-  const isLoading = serverMode ? server.isLoading : false;
+  // In server mode, treat initial state (no data yet) as loading
+  const isLoading = serverMode
+    ? server.isLoading || (server.data.length === 0 && !server.error)
+    : false;
 
   const handleSearch = (value: string) => {
     if (serverMode) {
@@ -352,7 +358,12 @@ export function InteractiveGrantsTable({
 
   const activeCols = availableColumns.filter((c) => visibleCols.has(c.id));
 
+  /** Whether a column supports server-side sorting */
+  const isSortable = (col: ColumnId) =>
+    !serverMode || !!COLUMN_TO_SORT_FIELD[col];
+
   const sortIndicator = (col: ColumnId) => {
+    if (!isSortable(col)) return null;
     if (sortCol !== col)
       return (
         <span className="text-muted-foreground/30 ml-1">{"\u2195"}</span>
@@ -441,23 +452,30 @@ export function InteractiveGrantsTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              {activeCols.map((col) => (
-                <th
-                  key={col.id}
-                  scope="col"
-                  className={`py-2.5 px-4 font-medium cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap ${
-                    col.align === "right"
-                      ? "text-right"
-                      : col.align === "center"
-                        ? "text-center"
-                        : "text-left"
-                  }`}
-                  onClick={() => handleSort(col.id)}
-                >
-                  {col.label}
-                  {sortIndicator(col.id)}
-                </th>
-              ))}
+              {activeCols.map((col) => {
+                const sortable = isSortable(col.id);
+                return (
+                  <th
+                    key={col.id}
+                    scope="col"
+                    className={`py-2.5 px-4 font-medium select-none whitespace-nowrap ${
+                      sortable
+                        ? "cursor-pointer hover:text-foreground"
+                        : "cursor-default"
+                    } transition-colors ${
+                      col.align === "right"
+                        ? "text-right"
+                        : col.align === "center"
+                          ? "text-center"
+                          : "text-left"
+                    }`}
+                    onClick={sortable ? () => handleSort(col.id) : undefined}
+                  >
+                    {col.label}
+                    {sortIndicator(col.id)}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

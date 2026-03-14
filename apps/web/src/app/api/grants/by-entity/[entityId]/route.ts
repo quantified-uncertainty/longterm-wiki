@@ -41,9 +41,12 @@ export async function GET(
     });
 
     if (!res.ok) {
+      // Forward client errors (400, 404) so the UI can distinguish
+      // "bad request" from "server down"
+      const status = res.status >= 400 && res.status < 500 ? res.status : 503;
       return NextResponse.json(
-        { error: "Wiki server error" },
-        { status: 503 },
+        { error: `Wiki server error: ${res.status}` },
+        { status },
       );
     }
 

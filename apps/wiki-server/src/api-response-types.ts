@@ -15,7 +15,6 @@
 import type { hc, InferResponseType } from 'hono/client';
 
 // Route type imports
-import type { GrantsRoute } from './routes/grants.js';
 import type { CitationsRoute } from './routes/citations.js';
 import type { SessionsRoute } from './routes/sessions.js';
 import type { AgentSessionsRoute } from './routes/agent-sessions.js';
@@ -54,7 +53,6 @@ type EntitiesRpc = ReturnType<typeof hc<EntitiesRoute>>;
 type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
 type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
-type GrantsRpc = ReturnType<typeof hc<GrantsRoute>>;
 type GithubPullsRpc = ReturnType<typeof hc<GithubPullsRoute>>;
 
 // ---------------------------------------------------------------------------
@@ -292,12 +290,3 @@ export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'
 /** A single open PR entry. */
 export type OpenPRRow = GithubPullsResult['pulls'][number];
 
-// ---------------------------------------------------------------------------
-// Grants (by-entity)
-// ---------------------------------------------------------------------------
-
-/** Grants by entity response (paginated, searchable, filterable). */
-export type GrantsByEntityResult = InferResponseType<GrantsRpc['by-entity'][':entityId']['$get'], 200>;
-
-/** A single grant row from the by-entity endpoint. */
-export type GrantsByEntityRow = GrantsByEntityResult['grants'][number];

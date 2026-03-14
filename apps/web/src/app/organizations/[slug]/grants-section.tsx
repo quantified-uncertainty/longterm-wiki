@@ -46,7 +46,7 @@ export function GrantsGivenSection({
 }: {
   grants: ParsedGrantRecord[];
   orgName: string;
-  /** Entity slug — enables server-side pagination for large datasets. */
+  /** Entity stable ID (e.g. "ULjDXpSLCI") — enables server-side pagination for large datasets. */
   entityId?: string;
 }) {
   if (grants.length === 0) return null;
@@ -56,6 +56,9 @@ export function GrantsGivenSection({
     0,
   );
 
+  // Note: the header summary (count + total) always comes from KB data,
+  // while server mode table data comes from wiki-server. These should be
+  // in sync (same source data), but could diverge if sync is stale.
   const useServerMode = entityId && grants.length >= SERVER_MODE_THRESHOLD;
 
   return (

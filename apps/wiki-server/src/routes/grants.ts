@@ -178,15 +178,16 @@ const grantsApp = new Hono()
       conditions.push(eq(grants.status, status));
     }
     if (amountMin !== undefined) {
-      conditions.push(sql`CAST(${grants.amount} AS numeric) >= ${amountMin}`);
+      conditions.push(sql`${grants.amount} >= ${amountMin}`);
     }
     if (amountMax !== undefined) {
-      conditions.push(sql`CAST(${grants.amount} AS numeric) <= ${amountMax}`);
+      conditions.push(sql`${grants.amount} <= ${amountMax}`);
     }
     if (program) {
       conditions.push(eq(grants.programId, program));
     }
 
+    // Safe: conditions always has at least the organizationId equality check
     const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
 
     // Build ORDER BY (whitelist-validated, with id tiebreaker for stable pagination)
