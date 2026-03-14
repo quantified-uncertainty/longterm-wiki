@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: deep-learning-era
+  stableId: SbxvDZzTsQ
   numericId: E95
   type: historical
   title: Deep Learning Revolution Era
@@ -67,6 +68,7 @@
     - dario-amodei
   lastUpdated: 2025-12
 - id: early-warnings
+  stableId: PjjrjKmJvg
   numericId: E107
   type: historical
   title: Early Warnings Era

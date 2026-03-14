@@ -112,6 +112,7 @@ import * as importFundingProgramsCommands from './commands/import-funding-progra
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
+import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 
 const domains = {
@@ -163,6 +164,7 @@ const domains = {
   people: peopleCommands,
   orgs: orgsCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
+  'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   verify: recordsVerifyCommands,
 };
 

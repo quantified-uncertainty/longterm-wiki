@@ -401,6 +401,7 @@
     - adversarial-testing
   lastUpdated: 2025-12
 - id: cais
+  stableId: y4bieqSeag
   numericId: E47
   type: organization
   orgType: safety-org
@@ -905,6 +906,7 @@
     - standard-setting
   lastUpdated: 2025-12
 - id: japan-aisi
+  stableId: Nc5G0HG5nA
   numericId: E1013
   type: organization
   orgType: government
@@ -935,6 +937,7 @@
     - international
   lastUpdated: 2026-03
 - id: singapore-aisi
+  stableId: ljAkbGE59A
   numericId: E1014
   type: organization
   orgType: government
@@ -963,6 +966,7 @@
     - international
   lastUpdated: 2026-03
 - id: canada-aisi
+  stableId: 22LBI06kLw
   numericId: E1015
   type: organization
   orgType: government
@@ -989,6 +993,7 @@
     - international
   lastUpdated: 2026-03
 - id: eu-ai-office
+  stableId: aobKGolfow
   numericId: E1016
   type: organization
   orgType: government
@@ -1427,6 +1432,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: ai-revenue-sources
+  stableId: B7uHMuvA0Q
   numericId: E513
   type: organization
   orgType: generic
@@ -2069,6 +2075,7 @@
     - governance
   lastUpdated: 2026-02
 - id: peter-thiel-philanthropy
+  stableId: y4AUeiPifQ
   numericId: E554
   type: organization
   orgType: funder
@@ -2304,6 +2311,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sff
+  stableId: pvJ50HupEQ
   numericId: E567
   type: organization
   orgType: funder
@@ -2376,6 +2384,7 @@
     - governance
   lastUpdated: 2026-02
 - id: the-sequences
+  stableId: mwlHBrbdBQ
   numericId: E570
   type: organization
   orgType: generic
@@ -2420,6 +2429,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vitalik-buterin-philanthropy
+  stableId: 2fEPReD49A
   numericId: E573
   type: organization
   orgType: funder
@@ -2587,6 +2597,7 @@
   lastUpdated: 2026-02
 
 - id: mistral-ai
+  stableId: RFHVboBnHg
   numericId: E1097
   type: organization
   orgType: frontier-lab
@@ -2612,6 +2623,7 @@
   lastUpdated: 2025-04
 
 - id: deepseek
+  stableId: otUkuVHDKw
   numericId: E1098
   type: organization
   orgType: frontier-lab
@@ -2642,6 +2654,7 @@
 # =============================================================================
 
 - id: uc-berkeley
+  stableId: ksqqi7fyeA
   numericId: E1112
   type: organization
   orgType: academic
@@ -2656,6 +2669,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-university
+  stableId: ngrgdfqafw
   numericId: E1113
   type: organization
   orgType: academic
@@ -2672,6 +2686,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-oxford
+  stableId: 18K3KG3bpg
   numericId: E1114
   type: organization
   orgType: academic
@@ -2687,6 +2702,7 @@
   lastUpdated: 2026-03
 
 - id: harvard-university
+  stableId: r90ivRT8lA
   numericId: E1115
   type: organization
   orgType: academic
@@ -2699,6 +2715,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-pennsylvania
+  stableId: mGoIaAqCmA
   numericId: E1116
   type: organization
   orgType: academic
@@ -2711,6 +2728,7 @@
   lastUpdated: 2026-03
 
 - id: yale-university
+  stableId: 1tZbcfTFfw
   numericId: E1117
   type: organization
   orgType: academic
@@ -2723,6 +2741,7 @@
   lastUpdated: 2026-03
 
 - id: usc
+  stableId: 5YprRPwFOg
   numericId: E1118
   type: organization
   orgType: academic
@@ -2735,6 +2754,7 @@
   lastUpdated: 2026-03
 
 - id: princeton-university
+  stableId: 5Lc4bpqlng
   numericId: E1119
   type: organization
   orgType: academic
@@ -2748,6 +2768,7 @@
   lastUpdated: 2026-03
 
 - id: nyu
+  stableId: 5IBy869q9Q
   numericId: E1120
   type: organization
   orgType: academic
@@ -2760,6 +2781,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-washington
+  stableId: 1K9RsqC7yg
   numericId: E1121
   type: organization
   orgType: academic
@@ -2772,6 +2794,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-chicago
+  stableId: 63eBrDMmpg
   numericId: E1122
   type: organization
   orgType: academic
@@ -2784,6 +2807,7 @@
   lastUpdated: 2026-03
 
 - id: mit
+  stableId: Z1df97RYbw
   numericId: E1123
   type: organization
   orgType: academic
@@ -2798,6 +2822,7 @@
   lastUpdated: 2026-03
 
 - id: columbia-university
+  stableId: OyPqGFqL5A
   numericId: E1124
   type: organization
   orgType: academic
@@ -2810,6 +2835,7 @@
   lastUpdated: 2026-03
 
 - id: carnegie-mellon-university
+  stableId: lOV3OFaWMg
   numericId: E1125
   type: organization
   orgType: academic
@@ -2824,6 +2850,7 @@
   lastUpdated: 2026-03
 
 - id: georgetown-university
+  stableId: zab6VSUgQw
   numericId: E1126
   type: organization
   orgType: academic
@@ -2838,6 +2865,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-michigan
+  stableId: CBeGcCyOyw
   numericId: E1127
   type: organization
   orgType: academic
@@ -2850,6 +2878,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-maryland
+  stableId: qHM9LBFxXg
   numericId: E1128
   type: organization
   orgType: academic
@@ -2862,6 +2891,7 @@
   lastUpdated: 2026-03
 
 - id: uc-davis
+  stableId: tW8PGgszJg
   numericId: E1129
   type: organization
   orgType: academic
@@ -2874,6 +2904,7 @@
   lastUpdated: 2026-03
 
 - id: uc-san-francisco
+  stableId: 0ILtQkmkeA
   numericId: E1130
   type: organization
   orgType: academic
@@ -2886,6 +2917,7 @@
   lastUpdated: 2026-03
 
 - id: dartmouth-college
+  stableId: NTfUXx7j5Q
   numericId: E1131
   type: organization
   orgType: academic
@@ -2898,6 +2930,7 @@
   lastUpdated: 2026-03
 
 - id: rutgers-university
+  stableId: N7LanuxgEw
   numericId: E1132
   type: organization
   orgType: academic
@@ -2910,6 +2943,7 @@
   lastUpdated: 2026-03
 
 - id: cornell-university
+  stableId: ItehzmANzA
   numericId: E1133
   type: organization
   orgType: academic
@@ -2922,6 +2956,7 @@
   lastUpdated: 2026-03
 
 - id: johns-hopkins-university
+  stableId: ntpulDMo9w
   numericId: E1134
   type: organization
   orgType: academic
@@ -2936,6 +2971,7 @@
   lastUpdated: 2026-03
 
 - id: duke-university
+  stableId: vfxNzRQfgg
   numericId: E1135
   type: organization
   orgType: academic
@@ -2948,6 +2984,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-toronto
+  stableId: G4vgO5B8oA
   numericId: E1136
   type: organization
   orgType: academic
@@ -2962,6 +2999,7 @@
   lastUpdated: 2026-03
 
 - id: georgia-tech
+  stableId: Mj36YWAj4A
   numericId: E1137
   type: organization
   orgType: academic
@@ -2974,6 +3012,7 @@
   lastUpdated: 2026-03
 
 - id: purdue-university
+  stableId: ZTE66CIDxA
   numericId: E1138
   type: organization
   orgType: academic
@@ -2986,6 +3025,7 @@
   lastUpdated: 2026-03
 
 - id: washu
+  stableId: 09jjMN7a9g
   numericId: E1139
   type: organization
   orgType: academic
@@ -2998,6 +3038,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-edinburgh
+  stableId: RtQm1h5XqQ
   numericId: E1140
   type: organization
   orgType: academic
@@ -3010,6 +3051,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-cambridge
+  stableId: xfad5FwoTA
   numericId: E1141
   type: organization
   orgType: academic
@@ -3023,6 +3065,7 @@
   lastUpdated: 2026-03
 
 - id: brown-university
+  stableId: LUrRQBRfOg
   numericId: E1142
   type: organization
   orgType: academic
@@ -3035,6 +3078,7 @@
   lastUpdated: 2026-03
 
 - id: northeastern-university
+  stableId: nBi0ynYp3g
   numericId: E1143
   type: organization
   orgType: academic
@@ -3047,6 +3091,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-notre-dame
+  stableId: feVUShox8A
   numericId: E1144
   type: organization
   orgType: academic
@@ -3059,6 +3104,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-glasgow
+  stableId: BRLCwQt0jg
   numericId: E1145
   type: organization
   orgType: academic
@@ -3071,6 +3117,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-utah
+  stableId: Ea8GGLkqdg
   numericId: E1146
   type: organization
   orgType: academic
@@ -3083,6 +3130,7 @@
   lastUpdated: 2026-03
 
 - id: uc-los-angeles
+  stableId: 483amkzufg
   numericId: E1147
   type: organization
   orgType: academic
@@ -3095,6 +3143,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-ottawa
+  stableId: znFFeDac6Q
   numericId: E1148
   type: organization
   orgType: academic
@@ -3111,6 +3160,7 @@
 # =============================================================================
 
 - id: beri
+  stableId: CgscaZc0lA
   numericId: E1149
   type: organization
   orgType: safety-org
@@ -3125,6 +3175,7 @@
   lastUpdated: 2026-03
 
 - id: ai-safety-support
+  stableId: gCnFEWPFqw
   numericId: E1150
   type: organization
   orgType: safety-org
@@ -3139,6 +3190,7 @@
   lastUpdated: 2026-03
 
 - id: cambridge-boston-alignment-initiative
+  stableId: T9M80clN1w
   numericId: E1151
   type: organization
   orgType: safety-org
@@ -3152,6 +3204,7 @@
   lastUpdated: 2026-03
 
 - id: lightcone-infrastructure
+  stableId: 47Rkb1DGmw
   numericId: E1152
   type: organization
   orgType: safety-org
@@ -3166,6 +3219,7 @@
   lastUpdated: 2026-03
 
 - id: global-catastrophic-risk-institute
+  stableId: cth6HTkyhA
   numericId: E1153
   type: organization
   orgType: safety-org
@@ -3180,6 +3234,7 @@
   lastUpdated: 2026-03
 
 - id: allfed
+  stableId: Pc9GysNWZA
   numericId: E1154
   type: organization
   orgType: safety-org
@@ -3194,6 +3249,7 @@
   lastUpdated: 2026-03
 
 - id: arena-alignment
+  stableId: knwcFNXNQQ
   numericId: E1155
   type: organization
   orgType: safety-org
@@ -3208,6 +3264,7 @@
   lastUpdated: 2026-03
 
 - id: apart-research
+  stableId: 5WqgebIWFQ
   numericId: E1156
   type: organization
   orgType: safety-org
@@ -3222,6 +3279,7 @@
   lastUpdated: 2026-03
 
 - id: saferai
+  stableId: VtjvwHCa6g
   numericId: E1157
   type: organization
   orgType: safety-org
@@ -3235,6 +3293,7 @@
   lastUpdated: 2026-03
 
 - id: ai-safety-camp
+  stableId: 2BUn75004w
   numericId: E1158
   type: organization
   orgType: safety-org
@@ -3248,6 +3307,7 @@
   lastUpdated: 2026-03
 
 - id: london-initiative-safe-ai
+  stableId: fffMhacRCQ
   numericId: E1159
   type: organization
   orgType: safety-org
@@ -3260,6 +3320,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-existential-risks-initiative
+  stableId: 8uY7BBVJww
   numericId: E1160
   type: organization
   orgType: safety-org
@@ -3274,6 +3335,7 @@
   lastUpdated: 2026-03
 
 - id: existential-risk-observatory
+  stableId: TFEmCZBWPA
   numericId: E1161
   type: organization
   orgType: safety-org
@@ -3287,6 +3349,7 @@
   lastUpdated: 2026-03
 
 - id: pivotal-research
+  stableId: Ay7z1aaMsQ
   numericId: E1162
   type: organization
   orgType: safety-org
@@ -3299,6 +3362,7 @@
   lastUpdated: 2026-03
 
 - id: center-on-long-term-risk
+  stableId: i7Y3OcXV8A
   numericId: E1163
   type: organization
   orgType: safety-org
@@ -3313,6 +3377,7 @@
   lastUpdated: 2026-03
 
 - id: bluedot-impact
+  stableId: kHgmzyol5w
   numericId: E1164
   type: organization
   orgType: safety-org
@@ -3328,6 +3393,7 @@
   lastUpdated: 2026-03
 
 - id: median-group
+  stableId: Ii1sWbYtOQ
   numericId: E1209
   type: organization
   orgType: safety-org
@@ -3340,6 +3406,7 @@
   lastUpdated: 2026-03
 
 - id: modeling-cooperation
+  stableId: ivJ9P4p2cQ
   numericId: E1217
   type: organization
   orgType: safety-org
@@ -3357,6 +3424,7 @@
 # =============================================================================
 
 - id: ea-norway
+  stableId: vrCKTVoFbw
   numericId: E1165
   type: organization
   orgType: generic
@@ -3368,6 +3436,7 @@
   lastUpdated: 2026-03
 
 - id: czea
+  stableId: 1assBhWMcg
   numericId: E1166
   type: organization
   orgType: generic
@@ -3379,6 +3448,7 @@
   lastUpdated: 2026-03
 
 - id: ea-sweden
+  stableId: zkLhbMDSVQ
   numericId: E1167
   type: organization
   orgType: generic
@@ -3390,6 +3460,7 @@
   lastUpdated: 2026-03
 
 - id: founders-pledge
+  stableId: TBgnF576Vg
   numericId: E1168
   type: organization
   orgType: generic
@@ -3404,6 +3475,7 @@
   lastUpdated: 2026-03
 
 - id: ea-funds
+  stableId: GURMOHZrFA
   numericId: E1169
   type: organization
   orgType: funder
@@ -3418,6 +3490,7 @@
   lastUpdated: 2026-03
 
 - id: charity-entrepreneurship
+  stableId: O4RL1JXU6w
   numericId: E1170
   type: organization
   orgType: generic
@@ -3432,6 +3505,7 @@
   lastUpdated: 2026-03
 
 - id: ea-geneva
+  stableId: 2WT9rbzjkA
   numericId: E1171
   type: organization
   orgType: generic
@@ -3443,6 +3517,7 @@
   lastUpdated: 2026-03
 
 - id: ea-poland
+  stableId: snkmOerhsw
   numericId: E1172
   type: organization
   orgType: generic
@@ -3454,6 +3529,7 @@
   lastUpdated: 2026-03
 
 - id: ea-netherlands
+  stableId: Wb5XO6qYwQ
   numericId: E1173
   type: organization
   orgType: generic
@@ -3465,6 +3541,7 @@
   lastUpdated: 2026-03
 
 - id: ea-singapore
+  stableId: Fr0DnL9USw
   numericId: E1174
   type: organization
   orgType: generic
@@ -3476,6 +3553,7 @@
   lastUpdated: 2026-03
 
 - id: ea-finland
+  stableId: bxNPwLZN3A
   numericId: E1175
   type: organization
   orgType: generic
@@ -3487,6 +3565,7 @@
   lastUpdated: 2026-03
 
 - id: ea-israel
+  stableId: eDOLLPm77g
   numericId: E1176
   type: organization
   orgType: generic
@@ -3498,6 +3577,7 @@
   lastUpdated: 2026-03
 
 - id: ea-foundation
+  stableId: 4YEaHrpWUQ
   numericId: E1177
   type: organization
   orgType: generic
@@ -3511,6 +3591,7 @@
   lastUpdated: 2026-03
 
 - id: ea-new-zealand
+  stableId: HscPCr9okw
   numericId: E1178
   type: organization
   orgType: generic
@@ -3522,6 +3603,7 @@
   lastUpdated: 2026-03
 
 - id: ea-australia
+  stableId: ho6fSE1Aow
   numericId: E1179
   type: organization
   orgType: generic
@@ -3533,6 +3615,7 @@
   lastUpdated: 2026-03
 
 - id: ea-denmark
+  stableId: 0xZurnQ8SQ
   numericId: E1180
   type: organization
   orgType: generic
@@ -3544,6 +3627,7 @@
   lastUpdated: 2026-03
 
 - id: ea-austria
+  stableId: 2FQ7p7Wgnw
   numericId: E1181
   type: organization
   orgType: generic
@@ -3555,6 +3639,7 @@
   lastUpdated: 2026-03
 
 - id: effective-ventures-usa
+  stableId: L04KZ3Ylsw
   numericId: E1182
   type: organization
   orgType: generic
@@ -3566,6 +3651,7 @@
   lastUpdated: 2026-03
 
 - id: cambridge-ea
+  stableId: z7spMQKjLQ
   numericId: E1183
   type: organization
   orgType: generic
@@ -3578,6 +3664,7 @@
   lastUpdated: 2026-03
 
 - id: one-for-the-world
+  stableId: O6YSnkAMqg
   numericId: E1216
   type: organization
   orgType: generic
@@ -3592,6 +3679,7 @@
   lastUpdated: 2026-03
 
 - id: non-trivial
+  stableId: e1q5WWd7gQ
   numericId: E1204
   type: organization
   orgType: generic
@@ -3606,6 +3694,7 @@
   lastUpdated: 2026-03
 
 - id: probably-good
+  stableId: AndlA1NTng
   numericId: E1205
   type: organization
   orgType: generic
@@ -3619,6 +3708,7 @@
   lastUpdated: 2026-03
 
 - id: atlas-fellowship
+  stableId: VqPPJRKsrQ
   numericId: E1203
   type: organization
   orgType: generic
@@ -3633,6 +3723,7 @@
   lastUpdated: 2026-03
 
 - id: high-impact-engineers
+  stableId: 4VggZAoQcg
   numericId: E1207
   type: organization
   orgType: generic
@@ -3645,6 +3736,7 @@
   lastUpdated: 2026-03
 
 - id: high-impact-athletes
+  stableId: OmMYaAgZpw
   numericId: E1220
   type: organization
   orgType: generic
@@ -3659,6 +3751,7 @@
   lastUpdated: 2026-03
 
 - id: generation-pledge
+  stableId: slFh7JjUqQ
   numericId: E1221
   type: organization
   orgType: generic
@@ -3672,6 +3765,7 @@
   lastUpdated: 2026-03
 
 - id: ceealar
+  stableId: 0d2STsaG4A
   numericId: E1222
   type: organization
   orgType: generic
@@ -3686,6 +3780,7 @@
   lastUpdated: 2026-03
 
 - id: ambitious-impact
+  stableId: Umu2ZOchow
   numericId: E1223
   type: organization
   orgType: generic
@@ -3698,6 +3793,7 @@
   lastUpdated: 2026-03
 
 - id: training-for-good
+  stableId: 0Ab6GjAl0A
   numericId: E1224
   type: organization
   orgType: generic
@@ -3710,6 +3806,7 @@
   lastUpdated: 2026-03
 
 - id: effective-institutions-project
+  stableId: jweZ80FQSQ
   numericId: E1225
   type: organization
   orgType: generic
@@ -3723,6 +3820,7 @@
   lastUpdated: 2026-03
 
 - id: the-unjournal
+  stableId: zuzXwcuOLw
   numericId: E1211
   type: organization
   orgType: generic
@@ -3741,6 +3839,7 @@
 # =============================================================================
 
 - id: center-for-global-development
+  stableId: b4M1tU9tGw
   numericId: E1184
   type: organization
   orgType: generic
@@ -3754,6 +3853,7 @@
   lastUpdated: 2026-03
 
 - id: rand-corporation
+  stableId: 8grDoD8kig
   numericId: E1185
   type: organization
   orgType: generic
@@ -3769,6 +3869,7 @@
   lastUpdated: 2026-03
 
 - id: legal-priorities-project
+  stableId: 8zy1QbFxOg
   numericId: E1186
   type: organization
   orgType: safety-org
@@ -3784,6 +3885,7 @@
   lastUpdated: 2026-03
 
 - id: global-priorities-institute
+  stableId: VTigs5s4gg
   numericId: E1187
   type: organization
   orgType: safety-org
@@ -3799,6 +3901,7 @@
   lastUpdated: 2026-03
 
 - id: simon-institute
+  stableId: CneUT6LNVg
   numericId: E1188
   type: organization
   orgType: safety-org
@@ -3813,6 +3916,7 @@
   lastUpdated: 2026-03
 
 - id: cnas
+  stableId: dYjY3Ma1Hw
   numericId: E1189
   type: organization
   orgType: generic
@@ -3827,6 +3931,7 @@
   lastUpdated: 2026-03
 
 - id: federation-of-american-scientists
+  stableId: 2avSHj60sQ
   numericId: E1190
   type: organization
   orgType: generic
@@ -3841,6 +3946,7 @@
   lastUpdated: 2026-03
 
 - id: institute-for-progress
+  stableId: 7ked5Nus0g
   numericId: E1191
   type: organization
   orgType: generic
@@ -3853,6 +3959,7 @@
   lastUpdated: 2026-03
 
 - id: foundation-for-american-innovation
+  stableId: rjdYwdLAvw
   numericId: E1192
   type: organization
   orgType: generic
@@ -3865,6 +3972,7 @@
   lastUpdated: 2026-03
 
 - id: iaps
+  stableId: NI4hqOL33A
   numericId: E1193
   type: organization
   orgType: safety-org
@@ -3878,6 +3986,7 @@
   lastUpdated: 2026-03
 
 - id: niskanen-center
+  stableId: O5jCdIWixQ
   numericId: E1194
   type: organization
   orgType: generic
@@ -3890,6 +3999,7 @@
   lastUpdated: 2026-03
 
 - id: carnegie-endowment
+  stableId: wrbWEng9gg
   numericId: E1195
   type: organization
   orgType: generic
@@ -3903,6 +4013,7 @@
   lastUpdated: 2026-03
 
 - id: oxford-china-policy-lab
+  stableId: 6T3yDF5wvg
   numericId: E1196
   type: organization
   orgType: generic
@@ -3916,6 +4027,7 @@
   lastUpdated: 2026-03
 
 - id: bipartisan-commission-biodefense
+  stableId: wHfFIBrPcA
   numericId: E1197
   type: organization
   orgType: generic
@@ -3929,6 +4041,7 @@
   lastUpdated: 2026-03
 
 - id: georgetown-cghss
+  stableId: vgdN9zIzqA
   numericId: E1198
   type: organization
   orgType: generic
@@ -3942,6 +4055,7 @@
   lastUpdated: 2026-03
 
 - id: vera-institute
+  stableId: m4bxbv1MVA
   numericId: E1199
   type: organization
   orgType: generic
@@ -3955,6 +4069,7 @@
   lastUpdated: 2026-03
 
 - id: the-future-society
+  stableId: u3Yf4JXH4Q
   numericId: E1213
   type: organization
   orgType: generic
@@ -3968,6 +4083,7 @@
   lastUpdated: 2026-03
 
 - id: collective-intelligence-project
+  stableId: 0TFmORNnKQ
   numericId: E1218
   type: organization
   orgType: generic
@@ -3985,6 +4101,7 @@
 # =============================================================================
 
 - id: givedirectly
+  stableId: wk3kStH8bw
   numericId: E1200
   type: organization
   orgType: generic
@@ -3998,6 +4115,7 @@
   lastUpdated: 2026-03
 
 - id: against-malaria-foundation
+  stableId: c5rNf1vl2A
   numericId: E1201
   type: organization
   orgType: generic
@@ -4011,6 +4129,7 @@
   lastUpdated: 2026-03
 
 - id: topos-institute
+  stableId: K40O5WixNQ
   numericId: E1202
   type: organization
   orgType: generic
@@ -4024,6 +4143,7 @@
   lastUpdated: 2026-03
 
 - id: arcadia-impact
+  stableId: 8VWjCOOGbg
   numericId: E1206
   type: organization
   orgType: generic
@@ -4036,6 +4156,7 @@
   lastUpdated: 2026-03
 
 - id: sentience-institute
+  stableId: NKNm02bYjQ
   numericId: E1208
   type: organization
   orgType: generic
@@ -4049,6 +4170,7 @@
   lastUpdated: 2026-03
 
 - id: foresight-institute
+  stableId: NPPTvNqRXA
   numericId: E1210
   type: organization
   orgType: generic
@@ -4062,6 +4184,7 @@
   lastUpdated: 2026-03
 
 - id: charter-cities-institute
+  stableId: tGw4aneRnA
   numericId: E1212
   type: organization
   orgType: generic
@@ -4076,6 +4199,7 @@
   lastUpdated: 2026-03
 
 - id: our-world-in-data
+  stableId: iHh40BybGQ
   numericId: E1214
   type: organization
   orgType: generic
@@ -4089,6 +4213,7 @@
   lastUpdated: 2026-03
 
 - id: idinsight
+  stableId: zkgz9y0CSw
   numericId: E1215
   type: organization
   orgType: generic
@@ -4102,6 +4227,7 @@
   lastUpdated: 2026-03
 
 - id: good-food-institute
+  stableId: NwOpgmI4Kw
   numericId: E1219
   type: organization
   orgType: generic
@@ -4115,6 +4241,7 @@
   lastUpdated: 2026-03
 
 - id: convergent-research
+  stableId: WTKOsF10bw
   numericId: E1226
   type: organization
   orgType: generic
@@ -4128,6 +4255,7 @@
   lastUpdated: 2026-03
 
 - id: innovations-for-poverty-action
+  stableId: 3km4O0U8mg
   numericId: E1227
   type: organization
   orgType: generic
@@ -4145,6 +4273,7 @@
 # =============================================================================
 
 - id: malaria-consortium
+  stableId: VZunwIHG2Q
   numericId: E1228
   type: organization
   orgType: generic
@@ -4161,6 +4290,7 @@
   lastUpdated: 2026-03
 
 - id: evidence-action
+  stableId: 83v83rovnA
   numericId: E1229
   type: organization
   orgType: generic
@@ -4176,6 +4306,7 @@
   lastUpdated: 2026-03
 
 - id: helen-keller-international
+  stableId: SJtVOOdDKQ
   numericId: E1230
   type: organization
   orgType: generic
@@ -4191,6 +4322,7 @@
   lastUpdated: 2026-03
 
 - id: gates-philanthropy-partners
+  stableId: l9EjmCxIMA
   numericId: E1231
   type: organization
   orgType: funder
@@ -4206,6 +4338,7 @@
   lastUpdated: 2026-03
 
 - id: the-humane-league
+  stableId: zbjE2ZHmsA
   numericId: E1232
   type: organization
   orgType: generic
@@ -4220,6 +4353,7 @@
   lastUpdated: 2026-03
 
 - id: anima-international
+  stableId: g5RgWEXUCg
   numericId: E1233
   type: organization
   orgType: generic
@@ -4234,6 +4368,7 @@
   lastUpdated: 2026-03
 
 - id: compassion-in-world-farming
+  stableId: ZmtYxrupIA
   numericId: E1234
   type: organization
   orgType: generic

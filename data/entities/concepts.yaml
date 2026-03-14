@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: ea-shareholder-diversification-anthropic
+  stableId: bbKjzXS1lQ
   numericId: E858
   type: concept
   title: EA Shareholder Diversification from Anthropic
@@ -28,6 +29,7 @@
   lastUpdated: 2026-02
 
 - id: corporate-influence
+  stableId: pxRqsPtwjg
   numericId: E78
   type: crux
   title: Corporate Influence on AI Policy
@@ -79,6 +81,7 @@
     - corporate-governance
   lastUpdated: 2025-12
 - id: field-building
+  stableId: 4vlIteCy4Q
   numericId: E141
   type: crux
   title: AI Safety Field Building and Community
@@ -123,6 +126,7 @@
     - career-development
   lastUpdated: 2025-12
 - id: governance-policy
+  stableId: khXUiwWtkg
   numericId: E154
   type: crux
   title: AI Governance and Policy
@@ -172,6 +176,7 @@
     - export-controls
     - ai-safety-summits
 - id: research-agendas
+  stableId: 91aiRK6RgA
   numericId: E251
   type: crux
   title: AI Alignment Research Agendas
@@ -223,6 +228,7 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: technical-research
+  stableId: buPrZrnpSw
   numericId: E297
   type: crux
   title: Technical AI Safety Research
@@ -275,6 +281,7 @@
     - robustness
   lastUpdated: 2025-12
 - id: misuse
+  stableId: DAaRZ9Q15A
   numericId: E206
   type: concept
   title: AI Misuse
@@ -411,6 +418,7 @@
     - safety
   lastUpdated: 2025-12
 - id: natural-abstractions
+  stableId: jHU2ZaCpdQ
   numericId: E213
   type: concept
   title: Natural Abstractions
@@ -497,6 +505,7 @@
     - limitations
   lastUpdated: 2025-12
 - id: is-ai-xrisk-real
+  stableId: 6AGWnGH8cg
   numericId: E181
   type: crux
   title: Is AI Existential Risk Real?
@@ -514,6 +523,7 @@
     - fundamental
   lastUpdated: 2025-01
 - id: open-vs-closed
+  stableId: 9jV0lwtvEQ
   numericId: E217
   type: crux
   title: Open vs Closed Source AI
@@ -531,6 +541,7 @@
     - governance
   lastUpdated: 2025-01
 - id: pause-debate
+  stableId: ho1C93UpIA
   numericId: E223
   type: crux
   title: Should We Pause AI Development?
@@ -548,6 +559,7 @@
     - governance
   lastUpdated: 2025-01
 - id: agi-timeline-debate
+  stableId: W59ZdZXNgw
   numericId: E4
   type: crux
   title: When Will AGI Arrive?
@@ -565,6 +577,7 @@
     - agi
   lastUpdated: 2025-01
 - id: regulation-debate
+  stableId: Ql7oWeGbQw
   numericId: E248
   type: crux
   title: Government Regulation vs Industry Self-Governance
@@ -582,6 +595,7 @@
     - governance
   lastUpdated: 2025-01
 - id: interpretability-sufficient
+  stableId: YOnFkCixlw
   numericId: E176
   type: crux
   title: Is Interpretability Sufficient for Safety?
@@ -599,6 +613,7 @@
     - safety-research
   lastUpdated: 2025-01
 - id: scaling-debate
+  stableId: E2BOiahT9A
   numericId: E272
   type: crux
   title: Is Scaling All You Need?
@@ -616,6 +631,7 @@
     - capabilities
   lastUpdated: 2025-01
 - id: why-alignment-easy
+  stableId: DbvIIgLAMA
   numericId: E372
   type: argument
   title: Why Alignment Might Be Easy
@@ -635,6 +651,7 @@
     - optimistic
   lastUpdated: 2025-01
 - id: case-against-xrisk
+  stableId: 0n7ROm8oow
   numericId: E55
   type: argument
   title: The Case Against AI Existential Risk
@@ -652,6 +669,7 @@
     - skeptical
   lastUpdated: 2025-01
 - id: why-alignment-hard
+  stableId: 1Y5n2IYUFg
   numericId: E373
   type: argument
   title: Why Alignment Might Be Hard
@@ -671,6 +689,7 @@
     - pessimistic
   lastUpdated: 2025-01
 - id: case-for-xrisk
+  stableId: D1s139xdig
   numericId: E56
   type: argument
   title: The Case For AI Existential Risk
@@ -720,6 +739,7 @@
   lastUpdated: 2026-02
 
 - id: misuse-risks
+  stableId: 9v7wxee33g
   numericId: E392
   type: crux
   title: AI Misuse Risk Cruxes
@@ -753,6 +773,7 @@
   lastUpdated: 2026-02
 
 - id: solutions
+  stableId: Ped7HAlI0A
   numericId: E393
   type: crux
   title: AI Safety Solution Cruxes
@@ -781,6 +802,7 @@
   lastUpdated: 2026-02
 
 - id: accident-risks
+  stableId: 9bhkg6CsdQ
   numericId: E394
   type: crux
   title: AI Accident Risk Cruxes
@@ -813,6 +835,7 @@
   lastUpdated: 2026-02
 
 - id: structural-risks
+  stableId: U8q54nae2A
   numericId: E395
   type: crux
   title: AI Structural Risk Cruxes
@@ -839,6 +862,7 @@
   lastUpdated: 2026-02
 
 - id: epistemic-risks
+  stableId: zFMkgYF35w
   numericId: E396
   type: crux
   title: AI Epistemic Cruxes
@@ -869,6 +893,7 @@
   lastUpdated: 2026-02
 
 - id: governance-focused
+  stableId: H20G0Nc3zQ
   numericId: E397
   type: concept
   title: Governance-Focused Worldview
@@ -898,6 +923,7 @@
   lastUpdated: 2026-02
 
 - id: critical-uncertainties
+  stableId: hDyfgJTQZw
   numericId: E398
   type: crux
   title: AI Risk Critical Uncertainties Model
@@ -994,6 +1020,7 @@
   lastUpdated: 2026-02
 
 - id: heavy-scaffolding
+  stableId: NCLlwmOTkg
   numericId: E401
   type: concept
   title: Heavy Scaffolding / Agentic Systems
@@ -1090,6 +1117,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: doomer
+  stableId: DDCrE9J2eQ
   numericId: E504
   type: concept
   title: AI Doomer Worldview
@@ -1104,6 +1132,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: long-timelines
+  stableId: m87MfZdIHg
   numericId: E505
   type: concept
   title: Long-Timelines Technical Worldview
@@ -1118,6 +1147,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: ea-funding-absorption-capacity
+  stableId: qkp5pxu0Fg
   numericId: E695
   type: concept
   title: EA Funding Absorption Capacity
@@ -1127,6 +1157,7 @@
     Anthropic-linked capital. Key constraints are talent, management capacity, and strategic clarity.
   lastUpdated: 2026-02
 - id: ftx-collapse-ea-funding-lessons
+  stableId: XfOw9fm0kQ
   numericId: E696
   type: concept
   title: "FTX Collapse: Lessons for EA Funding Resilience"
@@ -1136,6 +1167,7 @@
     disbursed and revealed structural vulnerabilities in EA's funding infrastructure.
   lastUpdated: 2026-02
 - id: autonomous-cooperative-agents
+  stableId: qqM20Mquew
   numericId: E921
   type: concept
   title: Autonomous Cooperative Agents
@@ -1170,6 +1202,7 @@
   lastUpdated: 2026-02
 
 - id: cooperate-bot
+  stableId: p7pqkvIWfw
   numericId: E922
   type: concept
   title: Cooperate-Bot
@@ -1197,6 +1230,7 @@
   lastUpdated: 2026-02
 
 - id: cooperative-funding-mechanisms
+  stableId: XuunnMt8vQ
   numericId: E923
   type: concept
   title: Cooperative Funding Mechanisms
@@ -1225,6 +1259,7 @@
   lastUpdated: 2026-02
 
 - id: optimistic
+  stableId: VhzJsfCVOA
   numericId: E506
   type: concept
   title: Optimistic Alignment Worldview
