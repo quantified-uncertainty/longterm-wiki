@@ -159,3 +159,272 @@
   higherIsBetter: true
   introducedDate: "2025-02"
   maintainer: "Mathematical Association of America"
+
+- id: mmlu-pro
+  numericId: E1301
+  type: benchmark
+  title: MMLU-Pro
+  description: "A harder variant of MMLU with 10 answer choices (vs 4), chain-of-thought reasoning, and reduced sensitivity to prompt format. Designed to better discriminate among top models."
+  category: knowledge
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  maintainer: "TIGER Lab"
+  website: "https://github.com/TIGER-AI-Lab/MMLU-Pro"
+  sources:
+    - title: "MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark"
+      url: "https://arxiv.org/abs/2406.01574"
+
+- id: simpleqa
+  numericId: E1302
+  type: benchmark
+  title: SimpleQA
+  description: "A factual question-answering benchmark from OpenAI testing short, fact-seeking questions with verifiable answers. Evaluates factual accuracy and calibration."
+  category: knowledge
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-10"
+  maintainer: "OpenAI"
+  sources:
+    - title: "SimpleQA: Measuring short-form factuality in large language models"
+      url: "https://openai.com/index/introducing-simpleqa/"
+
+- id: humanitys-last-exam
+  numericId: E1235
+  type: benchmark
+  title: "Humanity's Last Exam"
+  description: "A benchmark of 2,500+ expert-level questions across dozens of academic disciplines, designed to be the hardest public AI evaluation. Questions contributed by domain experts worldwide."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2025-01"
+  maintainer: "Scale AI / Center for AI Safety"
+  website: "https://lastexam.ai"
+  sources:
+    - title: "Humanity's Last Exam"
+      url: "https://arxiv.org/abs/2501.14249"
+
+- id: ifeval
+  numericId: E1236
+  type: benchmark
+  title: IFEval
+  description: "Instruction-Following Evaluation benchmark testing whether LLMs can follow explicit formatting constraints (e.g., 'write exactly 3 paragraphs', 'include these keywords')."
+  category: general
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2023-11"
+  maintainer: "Google Research"
+  sources:
+    - title: "Instruction-Following Evaluation for Large Language Models"
+      url: "https://arxiv.org/abs/2311.07911"
+
+- id: chatbot-arena-elo
+  numericId: E1237
+  type: benchmark
+  title: Chatbot Arena Elo
+  description: "Community-driven model ranking based on pairwise human preference votes. Users compare anonymous model outputs and vote for the better response. Over 2 million votes collected."
+  category: general
+  scoringMethod: elo
+  higherIsBetter: true
+  introducedDate: "2023-05"
+  maintainer: "LMArena (formerly LMSYS)"
+  website: "https://arena.ai"
+  sources:
+    - title: "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference"
+      url: "https://arxiv.org/abs/2403.04132"
+
+- id: livecodebench
+  numericId: E1238
+  type: benchmark
+  title: LiveCodeBench
+  description: "A contamination-free coding benchmark using new competitive programming problems from LeetCode, AtCoder, and Codeforces. Problems are refreshed continuously to prevent data leakage."
+  category: coding
+  scoringMethod: pass_at_1
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  maintainer: "LiveCodeBench Team"
+  website: "https://livecodebench.github.io"
+  sources:
+    - title: "LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code"
+      url: "https://arxiv.org/abs/2403.07974"
+
+- id: livebench
+  numericId: E1240
+  type: benchmark
+  title: LiveBench
+  description: "A monthly-refreshed benchmark with objective ground-truth answers across math, coding, reasoning, language, instruction following, and data analysis. Designed to resist contamination."
+  category: general
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  maintainer: "LiveBench Team"
+  website: "https://livebench.ai"
+  sources:
+    - title: "LiveBench: A Challenging, Contamination-Free LLM Benchmark"
+      url: "https://arxiv.org/abs/2406.19314"
+
+- id: bfcl
+  numericId: E1241
+  type: benchmark
+  title: BFCL
+  description: "Berkeley Function Calling Leaderboard — evaluates LLMs on their ability to correctly generate function/tool calls including parameter extraction, type handling, and multi-turn interactions."
+  category: coding
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-02"
+  maintainer: "UC Berkeley"
+  website: "https://gorilla.cs.berkeley.edu/leaderboard.html"
+  sources:
+    - title: "Berkeley Function Calling Leaderboard"
+      url: "https://arxiv.org/abs/2402.15491"
+
+- id: frontiermath
+  numericId: E1242
+  type: benchmark
+  title: FrontierMath
+  description: "Research-grade mathematics benchmark from Epoch AI featuring original problems created by professional mathematicians. Designed to remain unsaturated for years."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-11"
+  maintainer: "Epoch AI"
+  website: "https://epoch.ai/frontiermath"
+  sources:
+    - title: "FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI"
+      url: "https://arxiv.org/abs/2411.04872"
+
+- id: aime-2024
+  numericId: E1243
+  type: benchmark
+  title: AIME 2024
+  description: "American Invitational Mathematics Examination 2024 — a prestigious math competition testing advanced problem-solving. 30 problems with integer answers 0-999."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-02"
+  maintainer: "Mathematical Association of America"
+
+- id: bbh
+  numericId: E1245
+  type: benchmark
+  title: BBH
+  description: "BIG-Bench Hard — a curated subset of 23 challenging tasks from BIG-Bench where language models previously failed to outperform average human raters. Tests multi-step reasoning."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2022-10"
+  maintainer: "Google / Stanford"
+  sources:
+    - title: "Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them"
+      url: "https://arxiv.org/abs/2210.09261"
+
+- id: hellaswag
+  numericId: E1247
+  type: benchmark
+  title: HellaSwag
+  description: "A commonsense natural language inference benchmark testing whether models can predict the most plausible continuation of a scenario. Uses adversarial filtering against LMs."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2019-05"
+  maintainer: "AI2 / University of Washington"
+  sources:
+    - title: "HellaSwag: Can a Machine Really Finish Your Sentence?"
+      url: "https://arxiv.org/abs/1905.07830"
+
+- id: re-bench
+  numericId: E1249
+  type: benchmark
+  title: RE-Bench
+  description: "Research Engineering Benchmark from METR — evaluates AI agents on 7 challenging ML research engineering tasks requiring multi-step problem solving over extended time horizons."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-11"
+  maintainer: "METR"
+  sources:
+    - title: "RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts"
+      url: "https://arxiv.org/abs/2411.15114"
+
+- id: mle-bench
+  numericId: E1251
+  type: benchmark
+  title: MLE-bench
+  description: "Machine Learning Engineering benchmark from OpenAI — evaluates AI agents on 75 real Kaggle competitions testing data science and ML engineering skills."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-09"
+  maintainer: "OpenAI"
+  sources:
+    - title: "MLE-bench: Evaluating Machine Learning Agents on Machine Learning Engineering"
+      url: "https://arxiv.org/abs/2410.07095"
+
+- id: webarena
+  numericId: E1253
+  type: benchmark
+  title: WebArena
+  description: "A realistic web agent benchmark where AI must complete tasks on self-hosted replicas of real websites (Reddit, GitLab, shopping, maps). Tests multi-step web navigation and interaction."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2023-07"
+  maintainer: "CMU"
+  website: "https://webarena.dev"
+  sources:
+    - title: "WebArena: A Realistic Web Environment for Building Autonomous Agents"
+      url: "https://arxiv.org/abs/2307.13854"
+
+- id: tau-bench
+  numericId: E1254
+  type: benchmark
+  title: TAU-bench
+  description: "Tool Agent User benchmark from Sierra AI — evaluates AI agents on realistic customer service scenarios requiring multi-turn tool use across airline and retail domains."
+  category: agentic
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  maintainer: "Sierra AI"
+  sources:
+    - title: "TAU-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"
+      url: "https://arxiv.org/abs/2407.12841"
+
+- id: mgsm
+  numericId: E1255
+  type: benchmark
+  title: MGSM
+  description: "Multilingual Grade School Math — a benchmark of 250 grade-school math problems translated into 10 typologically diverse languages. Tests multilingual mathematical reasoning."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2022-10"
+  maintainer: "Google Research"
+  sources:
+    - title: "Language Models are Multilingual Chain-of-Thought Reasoners"
+      url: "https://arxiv.org/abs/2210.03057"
+
+- id: mathvista
+  numericId: E1256
+  type: benchmark
+  title: MathVista
+  description: "A benchmark for mathematical reasoning in visual contexts — combines visual understanding with mathematical problem-solving across geometry, charts, scientific figures, and more."
+  category: multimodal
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2023-10"
+  maintainer: "UCLA / Microsoft Research"
+  sources:
+    - title: "MathVista: Evaluating Mathematical Reasoning of Foundation Models in Visual Contexts"
+      url: "https://arxiv.org/abs/2310.02255"
+
+- id: codeforces-rating
+  numericId: E1257
+  type: benchmark
+  title: Codeforces Rating
+  description: "Performance rating on Codeforces competitive programming platform, measuring algorithmic problem-solving ability. Ratings range from ~800 (beginner) to 3500+ (legendary grandmaster)."
+  category: coding
+  scoringMethod: elo
+  higherIsBetter: true
+  introducedDate: "2024"
+  maintainer: "Codeforces"
+  website: "https://codeforces.com"
