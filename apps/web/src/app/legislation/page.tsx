@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTypedEntities, isPolicy } from "@/data";
+import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
-import { getCustomField, getPolicyWikiHref, inferScope } from "./legislation-utils";
+import { getCustomField, inferScope } from "./legislation-utils";
 
 export const metadata: Metadata = {
   title: "Legislation",
@@ -10,60 +11,39 @@ export const metadata: Metadata = {
     "Directory of AI-related legislation, policies, and regulatory frameworks tracked in the knowledge base.",
 };
 
+/** Derive the effective status string for a policy entity. */
+function deriveStatus(entity: { policyStatus?: string; customFields: Array<{ label: string; value: string }> }): string | null {
+  // Typed field from build transform (already promotes cf('Status'))
+  if (entity.policyStatus) return entity.policyStatus;
+  // Fallback: infer from timeline custom fields
+  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Vetoed")) return "Vetoed";
+  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Enacted")) return "Enacted";
+  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Signed")) return "Enacted";
+  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "In Force") ||
+      getCustomField(entity as Parameters<typeof getCustomField>[0], "Effective")) return "In Effect";
+  return null;
+}
+
 export default function LegislationPage() {
   const allEntities = getTypedEntities();
   const policies = allEntities.filter(isPolicy);
 
   const rows: LegislationRow[] = policies.map((entity) => {
-    // Extract status from typed field or customFields
-    const rawStatus =
-      entity.policyStatus ??
-      getCustomField(entity, "Status") ??
-      getCustomField(entity, "Vetoed")
-        ? "Vetoed"
-        : getCustomField(entity, "Enacted")
-          ? "Enacted"
-          : null;
-
-    // Extract author from typed field or customFields
-    const author =
-      entity.author ?? getCustomField(entity, "Author") ?? null;
-
-    // Extract introduced date
-    const introduced =
-      entity.introduced ?? getCustomField(entity, "Introduced") ?? null;
-
-    // Infer scope from tags or typed field
-    const scope =
-      entity.scope ?? inferScope(entity.tags, entity.id) ?? null;
-
-    // Infer status from customFields if not set
-    let effectiveStatus = rawStatus;
-    if (!effectiveStatus) {
-      if (getCustomField(entity, "Vetoed")) effectiveStatus = "Vetoed";
-      else if (getCustomField(entity, "Enacted")) effectiveStatus = "Enacted";
-      else if (getCustomField(entity, "Signed")) effectiveStatus = "Enacted";
-      else if (
-        getCustomField(entity, "In Force") ||
-        getCustomField(entity, "Effective")
-      )
-        effectiveStatus = "In Effect";
-    }
+    const effectiveStatus = deriveStatus(entity);
+    const scope = entity.scope ?? inferScope(entity.tags, entity.id) ?? null;
 
     return {
       id: entity.id,
       title: entity.title,
       numericId: entity.numericId ?? null,
-      introduced,
+      introduced: entity.introduced ?? null,
       policyStatus: effectiveStatus,
       statusKey: normalizeStatus(effectiveStatus),
-      author,
+      author: entity.author ?? null,
       scope,
       description: entity.description ?? null,
       tags: entity.tags,
       sourceCount: entity.sources.length,
-      relatedCount: entity.relatedEntries.length,
-      hasWikiPage: !!entity.numericId,
     };
   });
 
@@ -97,17 +77,7 @@ export default function LegislationPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
-          >
-            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-              {stat.label}
-            </div>
-            <div className="text-2xl font-bold tabular-nums tracking-tight">
-              {stat.value}
-            </div>
-          </div>
+          <ProfileStatCard key={stat.label} label={stat.label} value={stat.value} />
         ))}
       </div>
 
@@ -115,4 +85,3 @@ export default function LegislationPage() {
     </div>
   );
 }
-

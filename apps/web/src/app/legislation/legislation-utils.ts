@@ -7,13 +7,15 @@ import {
   isPolicy,
   type PolicyEntity,
 } from "@/data";
-import { getEntityHref } from "@/data/entity-nav";
+import { getEntityHref, getWikiHref } from "@/data/entity-nav";
 
 /**
  * Get all policy entities.
  */
+let _cached: PolicyEntity[] | null = null;
 export function getPolicyEntities(): PolicyEntity[] {
-  return getTypedEntities().filter(isPolicy);
+  if (!_cached) _cached = getTypedEntities().filter(isPolicy);
+  return _cached;
 }
 
 /**
@@ -29,7 +31,8 @@ export function getPolicySlugs(): string[] {
 export function resolvePolicyBySlug(
   slug: string,
 ): PolicyEntity | undefined {
-  return getPolicyEntities().find((e) => e.id === slug);
+  const entity = getTypedEntityById(slug);
+  return entity && isPolicy(entity) ? entity : undefined;
 }
 
 /**
@@ -49,7 +52,7 @@ export function getCustomField(
  */
 export function getPolicyWikiHref(entity: PolicyEntity): string | null {
   if (!entity.numericId) return null;
-  return `/wiki/${entity.numericId}`;
+  return getWikiHref(entity.id);
 }
 
 /**
@@ -70,12 +73,13 @@ export function getRelatedPolicies(
 }
 
 /**
- * Resolve an entity ID to a displayable name and href.
+ * Resolve an entity ID to a href, or null if the entity doesn't exist.
  */
-export function resolveEntityRef(id: string): { name: string; href: string } | null {
-  const entity = getTypedEntityById(id);
+export function resolveEntityHref(entityId: string | undefined): string | null {
+  if (!entityId) return null;
+  const entity = getTypedEntityById(entityId);
   if (!entity) return null;
-  return { name: entity.title, href: getEntityHref(id) };
+  return getEntityHref(entityId);
 }
 
 /** Infer scope from entity tags or ID. */

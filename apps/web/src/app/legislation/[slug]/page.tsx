@@ -10,7 +10,7 @@ import {
   getPolicySlugs,
   getCustomField,
   getRelatedPolicies,
-  resolveEntityRef,
+  resolveEntityHref,
   getPolicyWikiHref,
   inferScope,
 } from "../legislation-utils";
@@ -59,24 +59,17 @@ export default async function LegislationDetailPage({
   const entity = resolvePolicyBySlug(slug);
   if (!entity) return notFound();
 
-  // Extract structured data
-  const introduced =
-    entity.introduced ?? getCustomField(entity, "Introduced") ?? null;
-  const author =
-    entity.author ?? getCustomField(entity, "Author") ?? null;
+  // Extract structured data (typed fields are promoted by entity-transform at build time)
+  const introduced = entity.introduced ?? null;
+  const author = entity.author ?? null;
   const rawStatus =
     entity.policyStatus ??
-    getCustomField(entity, "Status") ??
-    (getCustomField(entity, "Vetoed")
-      ? `Vetoed ${getCustomField(entity, "Vetoed")}`
-      : null) ??
-    (getCustomField(entity, "Enacted")
-      ? `Enacted ${getCustomField(entity, "Enacted")}`
-      : null);
+    (getCustomField(entity, "Vetoed") ? `Vetoed ${getCustomField(entity, "Vetoed")}` : null) ??
+    (getCustomField(entity, "Enacted") ? `Enacted ${getCustomField(entity, "Enacted")}` : null);
   const statusKey = normalizeStatus(rawStatus);
   const scope = entity.scope ?? inferScope(entity.tags, entity.id);
-  const billNumber = entity.billNumber ?? getCustomField(entity, "Bill Number");
-  const jurisdiction = entity.jurisdiction ?? getCustomField(entity, "Jurisdiction");
+  const billNumber = entity.billNumber ?? null;
+  const jurisdiction = entity.jurisdiction ?? null;
 
   // Timeline events from customFields
   const TIMELINE_LABELS = new Set([
@@ -94,8 +87,9 @@ export default async function LegislationDetailPage({
   const relatedEntities = entity.relatedEntries
     .filter((r) => r.type !== "policy")
     .map((r) => {
-      const ref = resolveEntityRef(r.id);
-      return ref ? { ...ref, relationship: r.relationship } : null;
+      const ent = getTypedEntityById(r.id);
+      if (!ent) return null;
+      return { name: ent.title, href: getEntityHref(r.id), relationship: r.relationship };
     })
     .filter(Boolean) as Array<{
     name: string;
@@ -111,13 +105,6 @@ export default async function LegislationDetailPage({
   const opponents = entity.stakeholders.filter((s) => s.position === "oppose");
   const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral");
 
-  // Resolve stakeholder entity links
-  function resolveStakeholderHref(entityId: string | undefined): string | null {
-    if (!entityId) return null;
-    const ent = getTypedEntityById(entityId);
-    if (!ent) return null;
-    return getEntityHref(entityId);
-  }
 
   // Group provisions by category
   const provisionsByCategory = new Map<string, typeof entity.provisions>();
@@ -322,7 +309,7 @@ export default async function LegislationDetailPage({
                   <tbody className="divide-y divide-border/50">
                     {/* Supporters first, then mixed, then opponents */}
                     {[...supporters, ...mixed, ...opponents].map((stakeholder, i) => {
-                      const href = resolveStakeholderHref(stakeholder.entityId);
+                      const href = resolveEntityHref(stakeholder.entityId);
                       return (
                         <tr key={i} className="hover:bg-muted/20">
                           <td className="py-2 px-3">
@@ -389,7 +376,7 @@ export default async function LegislationDetailPage({
               <h2 className="text-lg font-bold mb-4">Key Politicians</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {entity.keyPoliticians.map((politician, i) => {
-                  const href = resolveStakeholderHref(politician.entityId);
+                  const href = resolveEntityHref(politician.entityId);
                   return (
                     <div key={i} className="rounded-lg border border-border/60 bg-card p-3 flex items-center gap-3">
                       <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-sm font-bold text-violet-600 dark:text-violet-400">

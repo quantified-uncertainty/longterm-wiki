@@ -19,8 +19,6 @@ export interface LegislationRow {
   description: string | null;
   tags: string[];
   sourceCount: number;
-  relatedCount: number;
-  hasWikiPage: boolean;
 }
 
 type SortKey =
