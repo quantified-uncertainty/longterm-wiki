@@ -1,0 +1,21 @@
+name: Division
+description: "Organizational subdivision — department, team, or lab."
+collectionName: divisions
+temporal: false
+
+endpoints:
+  organization:
+    types: [organization]
+    implicit: true
+
+fields:
+  name: { type: text, required: true, description: "Division name" }
+  divisionType: { type: text, description: "Type: department, team, lab, program-area" }
+  lead: { type: text, description: "Entity ref (stableId) or display name of division lead" }
+  slug: { type: text, description: "URL slug if division has its own page" }
+  status: { type: text, description: "Current status (active, inactive, merged)" }
+  startDate: { type: date, description: "When the division was established" }
+  endDate: { type: date, description: "When the division was disbanded/merged" }
+  website: { type: text, description: "Division-specific website URL" }
+  source: { type: text, description: "URL to announcement or reference" }
+  notes: { type: text, description: "Context, scope, team size, and notable details" }
