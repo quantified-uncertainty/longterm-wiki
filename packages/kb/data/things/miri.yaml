@@ -2,7 +2,7 @@ thing:
   id: miri
   stableId: puAffUjWSS
   type: organization
-  name: "Machine Intelligence Research Institute"
+  name: "Machine Intelligence Research Institute (MIRI)"
   numericId: "E202"
   aliases:
     - MIRI

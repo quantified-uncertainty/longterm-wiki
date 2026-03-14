@@ -29,6 +29,8 @@
       date: "2023"
 - id: sam-altman
   name: Sam Altman
+  affiliation: openai
+  role: CEO
   positions:
     - topic: timelines
       view: Short
@@ -37,6 +39,8 @@
       date: "2024"
 - id: demis-hassabis
   name: Demis Hassabis
+  affiliation: deepmind
+  role: CEO, Google DeepMind
   positions:
     - topic: timelines
       view: Short-medium
@@ -117,6 +121,8 @@
       date: "2023"
 - id: gary-marcus
   name: Gary Marcus
+  affiliation: nyu
+  role: Professor Emeritus of Psychology and Neural Science
   positions:
     - topic: timelines
       view: Long
@@ -285,7 +291,9 @@
       source: Interviews (2021-2023)
       date: "2023"
 - id: nate-soares
-  name: Nate Soares (MIRI)
+  name: Nate Soares
+  affiliation: miri
+  role: Executive Director
   positions:
     - topic: inner-alignment-solvability
       view: Extremely difficult
@@ -391,9 +399,9 @@
       date: "2023-05"
 - id: holden-karnofsky
   name: Holden Karnofsky
-  affiliation: coefficient-giving
-  role: Co-CEO
-  website: https://www.openphilanthropy.org
+  affiliation: anthropic
+  role: Member of Technical Staff
+  website: https://www.cold-takes.com
   knownFor:
     - Directing billions toward AI safety
     - effective altruism leadership
@@ -729,13 +737,15 @@
 - id: elizabeth-kelly
   name: Elizabeth Kelly
   affiliation: us-aisi
-  role: Director
+  role: Director of the US AI Safety Institute
   knownFor:
     - Leading US AI Safety Institute
     - AI policy
 
 - id: evan-hubinger
   name: Evan Hubinger
+  affiliation: anthropic
+  role: Head of Alignment Stress-Testing
   positions:
     - topic: likelihood-of-deceptive-alignment
       view: Possible
@@ -745,6 +755,8 @@
       date: "2019"
 - id: robin-hanson
   name: Robin Hanson
+  affiliation: george-mason-university
+  role: Associate Professor of Economics
   positions:
     - topic: how-fast-would-takeoff-be
       view: Gradual

@@ -2,7 +2,9 @@ thing:
   id: marc-andreessen
   stableId: qspeazccPg
   type: person
-  name: Marc Andreessen (AI Investor)
+  name: Marc Andreessen
+  aliases:
+    - "Marc Andreessen (AI Investor)"
   numericId: E432
 facts:
   - id: f_TthTvMe4kQ

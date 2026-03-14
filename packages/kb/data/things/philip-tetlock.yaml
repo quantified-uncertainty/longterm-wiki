@@ -2,7 +2,9 @@ thing:
   id: philip-tetlock
   stableId: BCisPStEdQ
   type: person
-  name: Philip Tetlock (Forecasting Pioneer)
+  name: Philip Tetlock
+  aliases:
+    - "Philip Tetlock (Forecasting Pioneer)"
   numericId: E434
 facts:
   - id: f_gv0LsY9KoQ
