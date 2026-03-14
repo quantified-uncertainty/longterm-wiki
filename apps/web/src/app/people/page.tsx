@@ -27,6 +27,9 @@ function resolveRef(fact: Fact | undefined): { id: string; name: string } | null
   return { id: entity.id, name: entity.name };
 }
 
+/** Properties already handled explicitly or not useful for search (URLs/handles). */
+const SKIP_PROPERTIES = new Set(['role', 'employed-by', 'social-media', 'google-scholar', 'github-profile', 'wikipedia-url']);
+
 export default function PeoplePage() {
   const allEntities = getKBEntities();
   const people = allEntities.filter((e) => e.type === "person");
@@ -88,8 +91,6 @@ export default function PeoplePage() {
     }
 
     // KB fact text values (notable-for, education, etc.)
-    // Skip properties already added explicitly above, and non-useful URL/handle properties
-    const SKIP_PROPERTIES = new Set(['role', 'employed-by', 'social-media', 'google-scholar', 'github-profile', 'wikipedia-url']);
     const allFacts = getKBFacts(entity.id);
     for (const fact of allFacts) {
       if (SKIP_PROPERTIES.has(fact.propertyId)) continue;

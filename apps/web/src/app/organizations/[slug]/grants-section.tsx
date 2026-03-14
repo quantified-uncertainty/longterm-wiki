@@ -1,12 +1,16 @@
 /**
- * Grants Given / Grants Received sections for organization profile pages.
+ * Unified Grants section for organization profile pages.
+ *
+ * Supports two directions:
+ * - **given**: grants made by this org (funder view)
+ * - **received**: grants received by this org (grantee view)
  *
  * Supports two modes:
  * - **Static mode** (small datasets): Serializes all grants into the RSC payload
  *   and does client-side search/sort/paginate.
  * - **Server mode** (large datasets, 200+ grants): Passes only the entity ID
  *   to the client component, which fetches paginated data from the wiki-server
- *   via /api/grants/by-entity/:entityId.
+ *   via /api/grants/by-entity/:entityId. Only available for "given" direction.
  */
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader } from "./org-shared";
@@ -32,21 +36,24 @@ function toGrantRow(g: ParsedGrantRecord): GrantRow {
     date: g.date,
     status: g.status,
     source: g.source,
-    programName: g.programName,
-    divisionName: g.divisionName,
-    notes: g.notes,
+    // These fields exist on GrantRow (populated by server mode) but are not
+    // part of ParsedGrantRecord (KB-sourced static data). Set to null so the
+    // table gracefully omits them.
+    programName: null,
+    divisionName: null,
+    notes: null,
   };
 }
 
-/** Grants Given section — for orgs that are funders. */
-export function GrantsGivenSection({
+/** Unified grants section — handles both "given" (funder) and "received" (grantee) directions. */
+export function GrantsSection({
   grants,
-  orgName,
+  direction,
   entityId,
 }: {
-  grants: ParsedGrantRecord[];
-  orgName: string;
-  /** Entity stable ID (e.g. "ULjDXpSLCI") — enables server-side pagination for large datasets. */
+  grants: ParsedGrantRecord[] | ReceivedGrant[];
+  direction: "given" | "received";
+  /** Entity stable ID (e.g. "ULjDXpSLCI") — enables server-side pagination for large "given" datasets. */
   entityId?: string;
 }) {
   if (grants.length === 0) return null;
@@ -56,14 +63,27 @@ export function GrantsGivenSection({
     0,
   );
 
-  // Note: the header summary (count + total) always comes from KB data,
-  // while server mode table data comes from wiki-server. These should be
-  // in sync (same source data), but could diverge if sync is stale.
-  const useServerMode = entityId && grants.length >= SERVER_MODE_THRESHOLD;
+  const title = direction === "given" ? "Grants Given" : "Grants Received";
+
+  // Server mode is only applicable for "given" direction.
+  // Grants received are aggregated from multiple orgs' KB data,
+  // so wiki-server (which tracks by grantor, not grantee) can't serve them.
+  const useServerMode =
+    direction === "given" && entityId && grants.length >= SERVER_MODE_THRESHOLD;
+
+  // Build rows — received grants include funder info
+  const rows: GrantRow[] =
+    direction === "received"
+      ? (grants as ReceivedGrant[]).slice(0, MAX_RENDERED_ROWS).map((g) => ({
+          ...toGrantRow(g),
+          funderName: g.funderName,
+          funderHref: g.funderHref,
+        }))
+      : grants.slice(0, MAX_RENDERED_ROWS).map(toGrantRow);
 
   return (
     <section>
-      <SectionHeader title="Grants Given" count={grants.length} />
+      <SectionHeader title={title} count={grants.length} />
       <div className="text-sm text-muted-foreground mb-3">
         {grants.length} grant{grants.length !== 1 ? "s" : ""} totaling{" "}
         <span className="font-semibold text-foreground">
@@ -73,55 +93,15 @@ export function GrantsGivenSection({
       {useServerMode ? (
         <InteractiveGrantsTable
           entityId={entityId}
-          mode="given"
+          mode={direction}
         />
       ) : (
         <InteractiveGrantsTable
-          grants={grants.slice(0, MAX_RENDERED_ROWS).map(toGrantRow)}
+          grants={rows}
           totalCount={grants.length}
-          mode="given"
+          mode={direction}
         />
       )}
-    </section>
-  );
-}
-
-/** Grants Received section — for orgs that are grantees. */
-export function GrantsReceivedSection({
-  grants,
-}: {
-  grants: ReceivedGrant[];
-}) {
-  if (grants.length === 0) return null;
-
-  const totalAmount = grants.reduce(
-    (sum, g) => sum + numericValue(g.amount),
-    0,
-  );
-
-  // Grants received are aggregated from multiple orgs' KB data,
-  // so server mode is not applicable (wiki-server tracks by grantor, not grantee).
-  const renderedGrants = grants.slice(0, MAX_RENDERED_ROWS);
-  const rows: GrantRow[] = renderedGrants.map((g) => ({
-    ...toGrantRow(g),
-    funderName: g.funderName,
-    funderHref: g.funderHref,
-  }));
-
-  return (
-    <section>
-      <SectionHeader title="Grants Received" count={grants.length} />
-      <div className="text-sm text-muted-foreground mb-3">
-        {grants.length} grant{grants.length !== 1 ? "s" : ""} totaling{" "}
-        <span className="font-semibold text-foreground">
-          {formatCompactCurrency(totalAmount)}
-        </span>
-      </div>
-      <InteractiveGrantsTable
-        grants={rows}
-        totalCount={grants.length}
-        mode="received"
-      />
     </section>
   );
 }

@@ -50,10 +50,7 @@ import { AiModelsSection } from "./ai-models-section";
 import { KeyPublicationsSection } from "./publications-section";
 
 // Section components — grants (main content column)
-import {
-  GrantsGivenSection,
-  GrantsReceivedSection,
-} from "./grants-section";
+import { GrantsSection } from "./grants-section";
 
 // Section components — resources
 import { OrgResourcesSection } from "./resources-section";
@@ -313,14 +310,17 @@ export default async function OrgProfilePage({
           )}
 
           {data.grantsMade.length > 0 && (
-            <GrantsGivenSection
+            <GrantsSection
               grants={data.grantsMade}
-              orgName={entity.name}
+              direction="given"
               entityId={entity.id}
             />
           )}
           {data.grantsReceived.length > 0 && (
-            <GrantsReceivedSection grants={data.grantsReceived} />
+            <GrantsSection
+              grants={data.grantsReceived}
+              direction="received"
+            />
           )}
 
           {data.sortedPartnerships.length > 0 && (
