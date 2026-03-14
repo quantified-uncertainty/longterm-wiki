@@ -12,6 +12,7 @@ import {
   notFoundError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -265,6 +266,20 @@ const divisionsApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((d) => ({
+          id: d.id,
+          thingType: "division" as const,
+          title: d.name,
+          sourceTable: "divisions",
+          sourceId: d.id,
+          sourceUrl: d.website,
+        }))
+      );
+
       upserted = allVals.length;
     });
 

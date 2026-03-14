@@ -1903,3 +1903,76 @@ export const things = pgTable(
     // GIN index on search_vector is created in migration SQL
   ]
 );
+
+// ── Thing Verification ───────────────────────────────────────────────
+//
+// Evidence + aggregate pattern for thing-level verification.
+// Mirrors record_verifications / record_verdicts but keyed by things.id.
+
+/**
+ * Per-source verification checks for things.
+ * Each row records a single check of one thing against one source.
+ */
+export const thingResourceVerifications = pgTable(
+  "thing_resource_verifications",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    thingId: text("thing_id")
+      .notNull()
+      .references(() => things.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id").references(() => resources.id),
+    sourceUrl: text("source_url"),
+    fieldName: text("field_name"),
+    expectedValue: text("expected_value"),
+    verdict: text("verdict").notNull(),
+    confidence: real("confidence"),
+    extractedValue: text("extracted_value"),
+    checkerModel: text("checker_model"),
+    isPrimarySource: boolean("is_primary_source").default(false),
+    notes: text("notes"),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_trv_thing").on(table.thingId),
+    index("idx_trv_verdict").on(table.verdict),
+  ]
+);
+
+/**
+ * Aggregate per-thing verdicts — one row per thing, derived from
+ * thing_resource_verifications.
+ */
+export const thingVerdicts = pgTable(
+  "thing_verdicts",
+  {
+    thingId: text("thing_id")
+      .primaryKey()
+      .references(() => things.id, { onDelete: "cascade" }),
+    verdict: text("verdict").notNull(),
+    confidence: real("confidence"),
+    reasoning: text("reasoning"),
+    sourcesChecked: integer("sources_checked").default(0),
+    needsRecheck: boolean("needs_recheck").notNull().default(false),
+    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_tvd_verdict").on(table.verdict),
+    index("idx_tvd_recheck").on(table.needsRecheck),
+  ]
+);

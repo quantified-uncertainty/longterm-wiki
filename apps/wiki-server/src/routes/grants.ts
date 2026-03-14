@@ -13,6 +13,7 @@ import {
   zv,
 } from "./utils.js";
 import { parseSort } from "./query-helpers.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -391,6 +392,17 @@ const grantsApp = new Hono()
       WHERE grants.id = v.id
     `);
 
+    // Touch things.updatedAt for affected grants
+    const grantIds = items.map((item) => item.id);
+    const thingIdList = sql.join(
+      grantIds.map((id) => sql`${id}`),
+      sql`, `
+    );
+    await db.execute(sql`
+      UPDATE things SET updated_at = now()
+      WHERE source_table = 'grants' AND source_id IN (${thingIdList})
+    `);
+
     // db.execute returns rowCount at runtime (postgres.js) but it's not in Drizzle's type
     const updated = "rowCount" in result ? Number(result.rowCount) : items.length;
 
@@ -447,6 +459,20 @@ const grantsApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((g) => ({
+          id: g.id,
+          thingType: "grant" as const,
+          title: g.name,
+          sourceTable: "grants",
+          sourceId: g.id,
+          sourceUrl: g.source,
+        }))
+      );
+
       upserted = allVals.length;
     });
 

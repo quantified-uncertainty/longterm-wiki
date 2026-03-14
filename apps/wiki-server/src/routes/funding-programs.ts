@@ -12,6 +12,7 @@ import {
   notFoundError,
   zv,
 } from "./utils.js";
+import { upsertThingsInTx } from "./thing-sync.js";
 
 // ---- Constants ----
 
@@ -310,6 +311,21 @@ const fundingProgramsApp = new Hono()
             updatedAt: sql`now()`,
           },
         });
+
+      // Dual-write to things table
+      await upsertThingsInTx(
+        tx,
+        items.map((fp) => ({
+          id: fp.id,
+          thingType: "funding-program" as const,
+          title: fp.name,
+          sourceTable: "funding_programs",
+          sourceId: fp.id,
+          description: fp.description,
+          sourceUrl: fp.source,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
