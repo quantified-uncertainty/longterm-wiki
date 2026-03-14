@@ -194,14 +194,15 @@ export function OrganizationsTable({
 
   // ── Unified search handler ──
   const search = serverMode ? server.search : localSearch;
+  const { setSearch: serverSetSearch, setSort: serverSetSort, setPage: serverSetPage } = server;
   const handleSearch = useCallback((value: string) => {
     if (serverMode) {
-      server.setSearch(value);
+      serverSetSearch(value);
     } else {
       setLocalSearch(value);
       setLocalPage(0);
     }
-  }, [serverMode, server]);
+  }, [serverMode, serverSetSearch]);
 
   // ── Unified sort ──
   const sortKey: SortKey = serverMode
@@ -213,7 +214,7 @@ export function OrganizationsTable({
     if (serverMode) {
       const serverField = SORT_KEY_TO_SERVER_FIELD[key];
       if (serverField) {
-        server.setSort(serverField);
+        serverSetSort(serverField);
       }
     } else {
       if (localSortKey === key) {
@@ -224,7 +225,7 @@ export function OrganizationsTable({
       }
       setLocalPage(0);
     }
-  }, [serverMode, server, localSortKey]);
+  }, [serverMode, serverSetSort, localSortKey]);
 
   // ── Enrich server data with orgType from static map ──
   const enrichedServerData = useMemo(() => {
@@ -301,11 +302,11 @@ export function OrganizationsTable({
 
   const handlePageChange = useCallback((p: number) => {
     if (serverMode) {
-      server.setPage(p + 1); // hook uses 1-indexed pages
+      serverSetPage(p + 1); // hook uses 1-indexed pages
     } else {
       setLocalPage(p);
     }
-  }, [serverMode, server]);
+  }, [serverMode, serverSetPage]);
 
   /** Whether a column supports sorting in current mode */
   const isSortable = (key: SortKey) =>

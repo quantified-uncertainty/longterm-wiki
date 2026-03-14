@@ -57,7 +57,7 @@ function serverPersonToRow(p: ServerPerson): PersonRow {
     slug: p.slug,
     name: p.name,
     numericId: p.numericId,
-    wikiPageId: p.numericId ? `E${p.numericId}` : null,
+    wikiPageId: p.numericId ?? null,
     role: p.role,
     employerId: p.employerId,
     employerName: p.employerName,

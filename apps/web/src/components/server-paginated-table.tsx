@@ -75,6 +75,9 @@ export function ServerPaginatedTable<T>({
     enabled: serverMode,
   });
 
+  // Destructure stable method refs to avoid re-creating callbacks when `server` object identity changes
+  const { setSearch: serverSetSearch, setSort: serverSetSort, setPage: serverSetPage } = server;
+
   // ── Static-mode state ──
   const [localSearch, setLocalSearch] = useState("");
   const [localSortId, setLocalSortId] = useState(defaultSortId ?? "");
@@ -138,15 +141,15 @@ export function ServerPaginatedTable<T>({
   const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
 
   const handleSearch = useCallback((value: string) => {
-    if (serverMode) { server.setSearch(value); }
+    if (serverMode) { serverSetSearch(value); }
     else { setLocalSearch(value); setLocalPage(0); }
-  }, [serverMode, server]);
+  }, [serverMode, serverSetSearch]);
 
   const handleSort = useCallback((colId: string) => {
     const col = columns.find((c) => c.id === colId);
     if (!col) return;
     if (serverMode) {
-      if (col.sortField) server.setSort(col.sortField);
+      if (col.sortField) serverSetSort(col.sortField);
     } else {
       if (localSortId === colId) {
         setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -156,12 +159,12 @@ export function ServerPaginatedTable<T>({
       }
       setLocalPage(0);
     }
-  }, [columns, serverMode, server, localSortId, defaultSortDir]);
+  }, [columns, serverMode, serverSetSort, localSortId, defaultSortDir]);
 
   const handlePageChange = useCallback((p: number) => {
-    if (serverMode) { server.setPage(p + 1); } // hook uses 1-indexed pages
+    if (serverMode) { serverSetPage(p + 1); } // hook uses 1-indexed pages
     else { setLocalPage(p); }
-  }, [serverMode, server]);
+  }, [serverMode, serverSetPage]);
 
   // ── Column visibility ──
   const [showPicker, setShowPicker] = useState(false);
