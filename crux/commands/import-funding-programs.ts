@@ -109,7 +109,7 @@ const PROGRAMS: FundingProgramDef[] = [
   {
     idSeed: "prog|coefficient-giving|lead-exposure",
     orgId: ORG_IDS.OPEN_PHILANTHROPY,
-    divisionIdSeed: "div|open-philanthropy|global-health-and-wellbeing",
+    divisionIdSeed: "div|coefficient-giving|lead-exposure",
     name: "Lead Exposure Action Fund (LEAF)",
     description:
       "Multi-donor pooled fund addressing lead exposure globally. $100-125M raised with Gates Foundation, UNICEF, and others.",
@@ -131,6 +131,96 @@ const PROGRAMS: FundingProgramDef[] = [
     status: "open",
     source: "https://coefficientgiving.org/funds/abundance-and-growth",
     notes: "Led by Matt Clancy. Launched March 2025.",
+  },
+
+  {
+    idSeed: "prog|coefficient-giving|farm-animal-welfare",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|farm-animal-welfare",
+    name: "Farm Animal Welfare Grantmaking",
+    description:
+      "Grants for corporate cage-free campaigns, alt-protein research, and animal advocacy. Contributed to 3,000+ corporate cage-free commitments.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://coefficientgiving.org/funds/farm-animal-welfare",
+    notes: "Led by Lewis Bollard.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|science-rd",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|science-rd",
+    name: "Science and Global Health R&D Grantmaking",
+    description:
+      "330+ grants and 30+ social investments ($550M+) for treatments, vaccines, and diagnostics for low-income populations.",
+    programType: "grant-round",
+    totalBudget: 550_000_000,
+    status: "open",
+    source: "https://coefficientgiving.org/funds/science-and-global-health-rd",
+    notes: "Led by Jacob Trefethen.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|forecasting",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|forecasting",
+    name: "Forecasting Grantmaking",
+    description:
+      "30+ grants totaling ~$50M supporting forecasting infrastructure and research.",
+    programType: "grant-round",
+    totalBudget: 50_000_000,
+    status: "open",
+    source: "https://coefficientgiving.org/funds/forecasting",
+    notes: "Led by Benjamin Tereick.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|effective-giving-careers",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|effective-giving-careers",
+    name: "Effective Giving & Careers Grantmaking",
+    description:
+      "Support for CEA, 80,000 Hours, EA Funds, and community infrastructure.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://coefficientgiving.org/funds/effective-giving-and-careers",
+    notes: "Led by Melanie Basnak and Sam Donald.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|global-aid-policy",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|global-aid-policy",
+    name: "Global Aid Policy Grantmaking",
+    description:
+      "50+ grants totaling ~$30M encouraging generous and cost-effective international aid.",
+    programType: "grant-round",
+    totalBudget: 30_000_000,
+    status: "open",
+    source: "https://coefficientgiving.org/funds/global-aid-policy",
+    notes: "Led by Norma Altshuler.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|global-growth",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|global-growth",
+    name: "Global Growth Grantmaking",
+    description:
+      "$40M+ committed over 3 years for policy research on economic growth in low/middle-income countries.",
+    programType: "grant-round",
+    totalBudget: 40_000_000,
+    status: "open",
+    source: "https://coefficientgiving.org/funds/global-growth",
+    notes: "Led by Justin Sandefur. Launched October 2024.",
+  },
+  {
+    idSeed: "prog|coefficient-giving|air-quality",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|air-quality",
+    name: "Air Quality Grantmaking",
+    description:
+      "40+ grants totaling ~$20M focused on air quality improvement in South Asia and high-pollution areas.",
+    programType: "grant-round",
+    totalBudget: 20_000_000,
+    status: "open",
+    source: "https://coefficientgiving.org/funds/air-quality",
+    notes: "Led by Santosh Harish.",
   },
 
   // ---- EA Funds grant rounds ----
