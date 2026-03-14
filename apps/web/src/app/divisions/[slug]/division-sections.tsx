@@ -10,6 +10,7 @@ import type {
   ParsedDivisionPersonnel,
   ParsedFundingProgram,
   ParsedDivisionGrant,
+  DivisionRecipient,
 } from "./division-data";
 import {
   PROGRAM_TYPE_LABELS,
@@ -239,6 +240,78 @@ export function DivisionGrantsSection({
       {grants.length > MAX_GRANTS_SHOWN && (
         <p className="text-xs text-muted-foreground mt-2">
           Showing top {MAX_GRANTS_SHOWN} of {grants.length} grants by amount.
+        </p>
+      )}
+    </section>
+  );
+}
+
+// ── Recipients Section ──────────────────────────────────────────────
+
+const MAX_RECIPIENTS_SHOWN = 50;
+
+export function RecipientsSection({
+  recipients,
+}: {
+  recipients: DivisionRecipient[];
+}) {
+  if (recipients.length === 0) return null;
+
+  const displayed = recipients.slice(0, MAX_RECIPIENTS_SHOWN);
+
+  return (
+    <section className="mb-8">
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-base font-bold tracking-tight">Funded Organizations</h2>
+        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {recipients.length}
+        </span>
+        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+      </div>
+      <div className="border border-border/60 rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th className="text-left py-2 px-3 font-medium">Organization</th>
+              <th className="text-right py-2 px-3 font-medium">Total Funded</th>
+              <th className="text-center py-2 px-3 font-medium">Grants</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {displayed.map((r) => (
+              <tr key={r.name} className="hover:bg-muted/20 transition-colors">
+                <td className="py-2 px-3">
+                  {r.href ? (
+                    <Link
+                      href={r.href}
+                      className="font-medium text-primary text-xs hover:underline"
+                    >
+                      {r.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-foreground text-xs">
+                      {r.name}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                  {r.totalAmount > 0 && (
+                    <span className="font-semibold">
+                      {formatCompactCurrency(r.totalAmount)}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-center tabular-nums text-xs text-muted-foreground">
+                  {r.grantCount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {recipients.length > MAX_RECIPIENTS_SHOWN && (
+        <p className="text-xs text-muted-foreground mt-2">
+          Showing top {MAX_RECIPIENTS_SHOWN} of {recipients.length} recipients by total funding.
         </p>
       )}
     </section>

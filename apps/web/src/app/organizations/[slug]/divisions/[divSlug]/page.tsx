@@ -21,6 +21,7 @@ import {
 import {
   TeamMembersSection,
   DivisionGrantsSection,
+  RecipientsSection,
   BackToParentLink,
 } from "@/app/divisions/[slug]/division-sections";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
@@ -48,6 +49,14 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
     });
   }
 
+  if (data.recipients.length > 0) {
+    tabs.push({
+      id: "recipients",
+      label: "Recipients",
+      count: data.recipients.length,
+      content: <RecipientsSection recipients={data.recipients} />,
+    });
+  }
 
   if (tabs.length === 0) return null;
 

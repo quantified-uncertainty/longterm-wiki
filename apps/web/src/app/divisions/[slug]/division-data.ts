@@ -52,6 +52,13 @@ export interface ParsedDivisionGrant {
   status: string | null;
 }
 
+export interface DivisionRecipient {
+  name: string;
+  href: string | null;
+  grantCount: number;
+  totalAmount: number;
+}
+
 export interface ParsedDivisionPersonnel {
   key: string;
   personId: string;
@@ -297,6 +304,7 @@ export interface DivisionPageData {
   personnel: ParsedDivisionPersonnel[];
   divisionPrograms: ParsedFundingProgram[];
   grants: ParsedDivisionGrant[];
+  recipients: DivisionRecipient[];
 }
 
 export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry): DivisionPageData {
@@ -368,6 +376,26 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
     })
     .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
 
+  // Aggregate unique recipients from grants
+  const recipientMap = new Map<string, DivisionRecipient>();
+  for (const g of grants) {
+    if (!g.recipientName) continue;
+    const existing = recipientMap.get(g.recipientName);
+    if (existing) {
+      existing.grantCount++;
+      existing.totalAmount += g.amount ?? 0;
+    } else {
+      recipientMap.set(g.recipientName, {
+        name: g.recipientName,
+        href: g.recipientHref,
+        grantCount: 1,
+        totalAmount: g.amount ?? 0,
+      });
+    }
+  }
+  const recipients = [...recipientMap.values()]
+    .sort((a, b) => b.totalAmount - a.totalAmount);
+
   return {
     division,
     parent,
@@ -377,5 +405,6 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
     personnel,
     divisionPrograms,
     grants,
+    recipients,
   };
 }
