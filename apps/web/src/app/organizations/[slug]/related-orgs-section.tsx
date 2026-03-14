@@ -18,36 +18,45 @@ export function RelatedOrganizationsSection({ orgs }: { orgs: RelatedOrg[] }) {
   return (
     <section>
       <SectionHeader title="Related Organizations" count={orgs.length} />
-      <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-        {displayed.map((org, idx) => (
-          <div key={`${org.id}-${idx}`} className="px-4 py-3">
-            <div className="flex items-center gap-2">
-              {org.slug ? (
-                <Link
-                  href={`/organizations/${org.slug}`}
-                  className="font-semibold text-sm text-primary hover:underline"
-                >
-                  {org.name}
-                </Link>
-              ) : (
-                <span className="font-semibold text-sm">{org.name}</span>
-              )}
-              <span className="text-[11px] text-muted-foreground/70 px-1.5 py-0.5 rounded-full bg-muted">
-                {org.relationship}
-              </span>
-            </div>
-            {org.date && (
-              <div className="text-[11px] text-muted-foreground mt-0.5">
-                {formatKBDate(org.date)}
-              </div>
+      <div className="border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+              <th scope="col" className="py-2 px-3 text-left font-medium">Organization</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Relationship</th>
+              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border/50">
+            {displayed.map((org, idx) => (
+              <tr key={`${org.id}-${idx}`} className="hover:bg-muted/20 transition-colors">
+                <td className="py-1.5 px-3">
+                  {org.slug ? (
+                    <Link
+                      href={`/organizations/${org.slug}`}
+                      className="font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      {org.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium">{org.name}</span>
+                  )}
+                </td>
+                <td className="py-1.5 px-3 text-muted-foreground">{org.relationship}</td>
+                <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">
+                  {org.date ? formatKBDate(org.date) : ""}
+                </td>
+              </tr>
+            ))}
+            {overflow > 0 && (
+              <tr>
+                <td colSpan={3} className="py-2 px-3 text-center text-xs text-muted-foreground">
+                  +{overflow} more
+                </td>
+              </tr>
             )}
-          </div>
-        ))}
-        {overflow > 0 && (
-          <div className="px-4 py-2.5 text-center text-xs text-muted-foreground">
-            +{overflow} more
-          </div>
-        )}
+          </tbody>
+        </table>
       </div>
     </section>
   );

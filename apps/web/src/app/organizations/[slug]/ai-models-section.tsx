@@ -6,7 +6,7 @@ import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import { Badge } from "./org-shared";
+import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 
 interface AiModelEntry {
@@ -77,6 +77,13 @@ function pickTopBenchmarks(
   return picked;
 }
 
+/** Check if a column has meaningful variance (not all the same value). */
+function hasVariance<T>(values: (T | null | undefined)[]): boolean {
+  const defined = values.filter((v) => v != null);
+  if (defined.length <= 1) return true; // show if 0-1 values
+  return new Set(defined.map(String)).size > 1;
+}
+
 export function AiModelsSection({
   models,
   benchmarksByModel,
@@ -86,19 +93,26 @@ export function AiModelsSection({
 }) {
   if (models.length === 0) return null;
 
-  const hasSafetyLevel = models.some((m) => m.safetyLevel);
+  const safetyLevels = models.map((m) => m.safetyLevel);
+  const contextWindows = models.map((m) => m.contextWindow);
+  const hasSafetyLevel = models.some((m) => m.safetyLevel) && hasVariance(safetyLevels);
+  const hasContext = models.some((m) => m.contextWindow != null) && hasVariance(contextWindows);
+  const hasPricing = models.some((m) => m.inputPrice != null && m.outputPrice != null);
   const hasBenchmarks =
     benchmarksByModel && benchmarksByModel.size > 0;
 
+  // If safety level is uniform, show it as a note rather than a column
+  const uniformSafety = !hasVariance(safetyLevels) && safetyLevels.some((s) => s != null)
+    ? safetyLevels.find((s) => s != null)
+    : null;
+
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold tracking-tight">
-          AI Models ({models.length})
-        </h2>
+      <div className="flex items-center justify-between">
+        <SectionHeader title="AI Models" count={models.length} />
         <Link
-          href={`/ai-models`}
-          className="text-xs text-primary hover:underline"
+          href="/ai-models"
+          className="text-xs text-primary hover:underline shrink-0"
         >
           View all models &rarr;
         </Link>
@@ -112,8 +126,12 @@ export function AiModelsSection({
               {hasSafetyLevel && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Safety</th>
               )}
-              <th scope="col" className="py-2 px-3 text-right font-medium">Pricing (in/out)</th>
-              <th scope="col" className="py-2 px-3 text-right font-medium">Context</th>
+              {hasPricing && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">$/MTok (in/out)</th>
+              )}
+              {hasContext && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">Context</th>
+              )}
               {hasBenchmarks && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Benchmarks</th>
               )}
@@ -150,16 +168,20 @@ export function AiModelsSection({
                       )}
                     </td>
                   )}
-                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
-                    {model.inputPrice != null && model.outputPrice != null
-                      ? `$${model.inputPrice} / $${model.outputPrice}`
-                      : ""}
-                  </td>
-                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
-                    {model.contextWindow != null
-                      ? `${formatCompactNumber(model.contextWindow)} tokens`
-                      : ""}
-                  </td>
+                  {hasPricing && (
+                    <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
+                      {model.inputPrice != null && model.outputPrice != null
+                        ? `$${model.inputPrice} / $${model.outputPrice}`
+                        : ""}
+                    </td>
+                  )}
+                  {hasContext && (
+                    <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap">
+                      {model.contextWindow != null
+                        ? `${formatCompactNumber(model.contextWindow)} tokens`
+                        : ""}
+                    </td>
+                  )}
                   {hasBenchmarks && (
                     <td className="py-2 px-3">
                       {topBenchmarks.length > 0 ? (
@@ -184,6 +206,11 @@ export function AiModelsSection({
           </tbody>
         </table>
       </div>
+      {uniformSafety && (
+        <p className="text-xs text-muted-foreground mt-1.5">
+          All models classified as <Badge color={SAFETY_LEVEL_COLORS[uniformSafety]}>{uniformSafety}</Badge>
+        </p>
+      )}
     </section>
   );
 }
