@@ -13,6 +13,7 @@ import {
 } from "@/data/kb";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import type { Entity } from "@longterm-wiki/kb";
+import { getTypedEntities, isPerson, isRisk } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
 
@@ -87,18 +88,41 @@ export function resolveEntityBySlug(
   return entity;
 }
 
+/** Type guard filter for typed entities by directory type. */
+const TYPE_FILTERS: Record<string, (e: { entityType: string }) => boolean> = {
+  person: (e) => isPerson(e as Parameters<typeof isPerson>[0]),
+  risk: (e) => isRisk(e as Parameters<typeof isRisk>[0]),
+};
+
 /**
  * Get all slugs for entities of a given type (for generateStaticParams).
+ *
+ * Sources ALL entities — both KB-backed (slug map) and entity YAML
+ * (typed entities). This ensures every entity in the directory listing
+ * has a corresponding detail page.
  */
 export function getEntitySlugs(type: "person" | "organization" | "risk"): string[] {
+  const allSlugs = new Set<string>();
+
+  // KB-backed slugs (from slug map)
   const slugMap = getKBSlugMap();
-  const entities = getKBEntities();
-  const ids = new Set(
-    entities.filter((e) => e.type === type).map((e) => e.id),
+  const kbEntities = getKBEntities();
+  const kbIds = new Set(
+    kbEntities.filter((e) => e.type === type).map((e) => e.id),
   );
-  return Object.entries(slugMap)
-    .filter(([, id]) => ids.has(id))
-    .map(([slug]) => slug);
+  for (const [slug, id] of Object.entries(slugMap)) {
+    if (kbIds.has(id)) allSlugs.add(slug);
+  }
+
+  // Entity YAML slugs (typed entities from database.json)
+  const filter = TYPE_FILTERS[type];
+  if (filter) {
+    for (const e of getTypedEntities()) {
+      if (filter(e)) allSlugs.add(e.id);
+    }
+  }
+
+  return [...allSlugs];
 }
 
 // ── Date formatting ─────────────────────────────────────────────
