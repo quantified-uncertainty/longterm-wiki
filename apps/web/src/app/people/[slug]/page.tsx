@@ -23,6 +23,8 @@ import {
   ProfileStatCard,
   Breadcrumbs,
   FactsPanel,
+  ProfileTabs,
+  type ProfileTab,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import { getExpertById, getPublicationsForPerson } from "@/data";
@@ -72,12 +74,6 @@ export async function generateMetadata({
     title: `${entity.name} | People`,
     description,
   };
-}
-
-function EmptyPlaceholder({ label }: { label: string }) {
-  return (
-    <p className="text-xs text-muted-foreground/40 italic">{label}</p>
-  );
 }
 
 export default async function PersonProfilePage({
@@ -222,14 +218,56 @@ export default async function PersonProfilePage({
   const educationText =
     educationFact?.value.type === "text" ? educationFact.value.value : null;
 
-  // Determine which main sections have content
-  const hasPositions = positions.length > 0;
-  const hasCareer = careerHistory.length > 0;
-  const hasEducation = !!educationText;
-  const hasPublications = publications.length > 0;
-  const hasFunding = fundingConnections.length > 0;
-  const hasAnyMainContent =
-    hasPositions || hasCareer || hasEducation || hasPublications || hasFunding;
+  // ── Build tabs from available data ──
+  const overviewCount =
+    positions.length + sortedOrgRoles.length + sortedBoardSeats.length + (educationText ? 1 : 0);
+
+  const tabs: ProfileTab[] = [];
+
+  // Overview: expert positions, org roles, board seats, education
+  tabs.push({
+    id: "overview",
+    label: "Overview",
+    content: (
+      <div className="space-y-8">
+        <ExpertPositions positions={positions} />
+        <OrgRoles orgRoles={sortedOrgRoles} />
+        <BoardSeats boardSeats={sortedBoardSeats} />
+        {educationText && <EducationSection education={educationText} />}
+        {overviewCount === 0 && (
+          <div className="border border-border/40 border-dashed rounded-xl px-6 py-10 text-center">
+            <p className="text-sm text-muted-foreground/60">
+              No positions, roles, or education recorded yet.
+            </p>
+          </div>
+        )}
+      </div>
+    ),
+  });
+
+  // Career history
+  tabs.push({
+    id: "career",
+    label: "Career",
+    count: careerHistory.length,
+    content: <CareerHistory careerHistory={careerHistory} />,
+  });
+
+  // Publications
+  tabs.push({
+    id: "publications",
+    label: "Publications",
+    count: publications.length,
+    content: <PublicationsSection publications={publications} />,
+  });
+
+  // Funding connections
+  tabs.push({
+    id: "funding",
+    label: "Funding",
+    count: fundingConnections.length,
+    content: <FundingConnections fundingConnections={fundingConnections} />,
+  });
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
@@ -288,49 +326,14 @@ export default async function PersonProfilePage({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-8">
-          <ExpertPositions positions={positions} />
-          <CareerHistory careerHistory={careerHistory} />
-          {educationText && <EducationSection education={educationText} />}
-          <PublicationsSection publications={publications} />
-          <FundingConnections fundingConnections={fundingConnections} />
-
-          {/* Empty-state placeholders for sections with no data */}
-          {!hasAnyMainContent && (
-            <div className="border border-border/40 border-dashed rounded-xl px-6 py-10 text-center">
-              <p className="text-sm text-muted-foreground/60">
-                No career history, positions, education, publications, or
-                funding connections recorded yet.
-              </p>
-            </div>
-          )}
-          {hasAnyMainContent && (
-            <div className="space-y-2 pt-2">
-              {!hasPositions && (
-                <EmptyPlaceholder label="No expert positions recorded." />
-              )}
-              {!hasCareer && (
-                <EmptyPlaceholder label="No career history recorded." />
-              )}
-              {!hasEducation && (
-                <EmptyPlaceholder label="No education information recorded." />
-              )}
-              {!hasPublications && (
-                <EmptyPlaceholder label="No publications recorded." />
-              )}
-              {!hasFunding && (
-                <EmptyPlaceholder label="No funding connections recorded." />
-              )}
-            </div>
-          )}
+        {/* Main content — tabbed */}
+        <div className="lg:col-span-2">
+          <ProfileTabs tabs={tabs} />
         </div>
 
         {/* Sidebar */}
         <div className="space-y-8">
           <SocialLinks facts={socialLinkFacts} />
-          <OrgRoles orgRoles={sortedOrgRoles} />
-          <BoardSeats boardSeats={sortedBoardSeats} />
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}

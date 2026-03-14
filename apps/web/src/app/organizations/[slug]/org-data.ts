@@ -8,6 +8,7 @@ import {
   getKBFacts,
   getKBProperty,
   getKBEntity,
+  getKBEntities,
   getKBAllRecordCollections,
   resolveKBSlug,
   getKBEntitySlug,
@@ -409,6 +410,11 @@ export function parseBoardSeatRecord(record: KBRecordEntry): Omit<BoardMember, "
 
 // ── Resource helpers ─────────────────────────────────────────────────
 
+export interface AuthorRef {
+  name: string;
+  href: string | null;
+}
+
 export interface OrgResourceRow {
   id: string;
   title: string;
@@ -418,7 +424,7 @@ export interface OrgResourceRow {
   credibility: number | null;
   citingPageCount: number;
   publishedDate: string | null;
-  authors: string[];
+  authors: AuthorRef[];
 }
 
 /** Extract the bare domain (no www) from a URL. Returns null on parse failure. */
@@ -522,6 +528,33 @@ function titleFromUrl(url: string): string | null {
   }
 }
 
+/** Lazy-init: name (lowercase) → person slug for author linking. */
+let _personNameIndex: Map<string, string> | null = null;
+
+function getPersonNameIndex(): Map<string, string> {
+  if (_personNameIndex) return _personNameIndex;
+  _personNameIndex = new Map();
+  for (const entity of getKBEntities()) {
+    if (entity.type !== "person") continue;
+    const slug = getKBEntitySlug(entity.id);
+    if (!slug) continue;
+    _personNameIndex.set(entity.name.toLowerCase(), slug);
+    // Also index aliases
+    if (entity.aliases) {
+      for (const alias of entity.aliases) {
+        _personNameIndex.set(alias.toLowerCase(), slug);
+      }
+    }
+  }
+  return _personNameIndex;
+}
+
+/** Resolve an author name string to an AuthorRef with optional link. */
+function resolveAuthor(name: string): AuthorRef {
+  const slug = getPersonNameIndex().get(name.toLowerCase().trim());
+  return { name, href: slug ? `/people/${slug}` : null };
+}
+
 /** Convert a Resource to an OrgResourceRow. */
 function toOrgResourceRow(r: Resource): OrgResourceRow {
   const publication = getResourcePublication(r);
@@ -536,7 +569,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     credibility: credibility ?? null,
     citingPageCount: citingPages.length,
     publishedDate: r.published_date ?? null,
-    authors: r.authors ?? [],
+    authors: (r.authors ?? []).map(resolveAuthor),
   };
 }
 
