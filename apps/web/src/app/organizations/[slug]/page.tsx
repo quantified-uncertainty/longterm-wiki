@@ -312,14 +312,15 @@ export default async function OrgProfilePage({
             </div>
           )}
 
-          {(data.grantsMade.length > 0 || data.grantsReceived.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <GrantsGivenSection
-                grants={data.grantsMade}
-                orgName={entity.name}
-              />
-              <GrantsReceivedSection grants={data.grantsReceived} />
-            </div>
+          {data.grantsMade.length > 0 && (
+            <GrantsGivenSection
+              grants={data.grantsMade}
+              orgName={entity.name}
+              entityId={entity.id}
+            />
+          )}
+          {data.grantsReceived.length > 0 && (
+            <GrantsReceivedSection grants={data.grantsReceived} />
           )}
 
           {data.sortedPartnerships.length > 0 && (
