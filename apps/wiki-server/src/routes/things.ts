@@ -384,6 +384,20 @@ const thingsApp = new Hono()
 
     const items = parsed.data.things;
 
+    // Reject duplicate (sourceTable, sourceId) within the batch — duplicates
+    // would cause the multi-row upsert to fail and roll back.
+    const seenSourceKeys = new Set<string>();
+    for (const item of items) {
+      const key = `${item.sourceTable}\0${item.sourceId}`;
+      if (seenSourceKeys.has(key)) {
+        return validationError(
+          c,
+          `Duplicate source key in batch: (${item.sourceTable}, ${item.sourceId})`
+        );
+      }
+      seenSourceKeys.add(key);
+    }
+
     const db = getDrizzleDb();
     let upserted = 0;
 
