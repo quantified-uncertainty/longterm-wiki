@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { recordVerifications, recordVerdicts } from "../schema.js";
+import { recordVerifications, recordVerdicts, things } from "../schema.js";
 import {
   zv,
   notFoundError,
@@ -20,6 +20,17 @@ import {
 const MAX_PAGE_SIZE = 200;
 const MAX_ID_LENGTH = 10;
 const MAX_URL_LENGTH = 2048;
+
+/** Maps record_verdicts.recordType to things.source_table */
+const RECORD_TYPE_TO_SOURCE_TABLE: Record<string, string> = {
+  grant: "grants",
+  personnel: "personnel",
+  division: "divisions",
+  "funding-program": "funding_programs",
+  "funding-round": "funding_rounds",
+  investment: "investments",
+  "equity-position": "equity_positions",
+};
 
 // ---- Query schemas ----
 
@@ -388,6 +399,33 @@ const recordVerificationsApp = new Hono()
           updatedAt: now,
         },
       });
+
+    // Sync verdict to the things table's denormalized columns
+    const sourceTable = RECORD_TYPE_TO_SOURCE_TABLE[body.recordType];
+    if (sourceTable) {
+      await db
+        .update(things)
+        .set({
+          verdict: body.verdict,
+          verdictConfidence: body.confidence ?? null,
+          verdictAt: now,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(things.sourceTable, sourceTable),
+            eq(things.sourceId, body.recordId),
+          ),
+        )
+        .catch((e: unknown) => {
+          // Best-effort sync — don't fail the verdict write if things sync fails
+          console.warn(
+            `[record-verifications] Failed to sync verdict to things table: ${
+              e instanceof Error ? e.message : String(e)
+            }`,
+          );
+        });
+    }
 
     return c.json({ ok: true }, 200);
   });

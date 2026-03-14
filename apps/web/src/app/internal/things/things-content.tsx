@@ -2,6 +2,7 @@ import {
   fetchDetailed,
   withApiFallback,
   type FetchResult,
+  getWikiServerConfig,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { ThingsTable, type ThingRow } from "./things-table";
@@ -48,42 +49,90 @@ interface DashboardData {
   total: number;
 }
 
-// ── Data Loading ──────────────────────────────────────────────────────────
+// ── Detail page URL mapping ──────────────────────────────────────────────
+// Maps thingType → URL prefix for types with dedicated detail pages.
 
-const PAGE_SIZE = 200;
+const THING_DETAIL_ROUTES: Record<string, string> = {
+  grant: "/grants",
+  resource: "/resources",
+  division: "/divisions",
+  "funding-program": "/funding-programs",
+  "funding-round": "/funding-rounds",
+  investment: "/investments",
+  benchmark: "/benchmarks",
+};
 
-/** Fetch all items by paginating through the API in batches of PAGE_SIZE. */
-async function fetchAllItems(): Promise<FetchResult<{ things: ThingsApiItem[]; total: number }>> {
-  const allItems: ThingsApiItem[] = [];
-  let offset = 0;
-  let total = 0;
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const result = await fetchDetailed<ThingsListResult>(
-      `/api/things?limit=${PAGE_SIZE}&offset=${offset}&sort=title&order=asc`,
-      { revalidate: 60 }
-    );
-
-    if (!result.ok) return result;
-
-    allItems.push(...result.data.things);
-    total = result.data.total;
-
-    if (allItems.length >= total || result.data.things.length < PAGE_SIZE) {
-      break;
+/**
+ * Resolve the best internal href for any thing type.
+ * Priority: dedicated detail page > entity page > sourceUrl > undefined
+ */
+function resolveThingHref(item: ThingsApiItem): string | undefined {
+  // Entities: use entity href resolution (handles directory pages, wiki pages)
+  if (item.thingType === "entity") {
+    if (item.numericId) {
+      // Try directory href first via getEntityHref (which prefers directory URLs)
+      return getEntityHref(item.sourceId);
     }
-
-    offset += PAGE_SIZE;
+    return getEntityHref(item.sourceId);
   }
 
-  return { ok: true, data: { things: allItems, total } };
+  // Things with dedicated detail pages
+  const routePrefix = THING_DETAIL_ROUTES[item.thingType];
+  if (routePrefix && item.sourceId) {
+    return `${routePrefix}/${encodeURIComponent(item.sourceId)}`;
+  }
+
+  // Facts: link to the parent entity's page (sourceId format: "entityId:factId")
+  if (item.thingType === "fact" && item.sourceId.includes(":")) {
+    const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
+    try {
+      return getEntityHref(entityId);
+    } catch {
+      // Entity not in database.json — skip
+    }
+  }
+
+  // Benchmark results: link to parent benchmark
+  if (item.thingType === "benchmark-result" && item.sourceId) {
+    // sourceId is the benchmark_result PG ID; the title contains "model on benchmark: score"
+    // Try extracting benchmark ID from parentThingId later (handled in row building)
+  }
+
+  return undefined;
 }
+
+/**
+ * Resolve the parent entity href for a thing using the loaded things map.
+ * Walks the parent chain up to 3 levels to find the nearest entity ancestor.
+ */
+function resolveParentEntityHref(
+  item: ThingsApiItem,
+  thingMap: Map<string, ThingsApiItem>,
+  depth = 0,
+): { title: string; href: string } | undefined {
+  if (depth > 3 || !item.parentThingId) return undefined;
+
+  const parent = thingMap.get(item.parentThingId);
+  if (!parent) return undefined;
+
+  if (parent.thingType === "entity") {
+    const href = getEntityHref(parent.sourceId);
+    return { title: parent.title, href };
+  }
+
+  // Walk up the chain (e.g., division-personnel -> division -> org entity)
+  return resolveParentEntityHref(parent, thingMap, depth + 1);
+}
+
+// ── Data Loading ──────────────────────────────────────────────────────────
 
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const [statsResult, itemsResult] = await Promise.all([
     fetchDetailed<ThingsStatsResult>("/api/things/stats", { revalidate: 60 }),
-    fetchAllItems(),
+    fetchDetailed<ThingsListResult>(
+      "/api/things?limit=1000&sort=title&order=asc",
+      { revalidate: 60 }
+    ),
   ]);
 
   if (!statsResult.ok) return statsResult;
@@ -127,52 +176,48 @@ function StatCard({
   );
 }
 
-// ── Row Building ─────────────────────────────────────────────────────────
-
-/** Validate that a URL is parseable before using it as a link target. */
-function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function buildHref(item: ThingsApiItem): string | undefined {
-  if (item.thingType === "entity") {
-    if (item.numericId) return `/wiki/${item.numericId}`;
-    return getEntityHref(item.sourceId);
-  }
-
-  // Resources, grants, and everything else: link to sourceUrl if it's a valid URL
-  if (item.sourceUrl && isValidUrl(item.sourceUrl)) return item.sourceUrl;
-
-  return undefined;
-}
-
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function ThingsContent() {
   const { data, source, apiError } = await withApiFallback(loadFromApi, emptyFallback);
-  const { stats, items } = data;
+  const { stats, items, total } = data;
 
+  // Build a lookup map for parent chain resolution
+  const thingMap = new Map<string, ThingsApiItem>();
+  for (const item of items) {
+    thingMap.set(item.id, item);
+  }
+
+  // Build rows with hrefs for all thing types
   const rows: ThingRow[] = items.map((item) => {
-    const href = buildHref(item);
-    const isExternal =
-      item.thingType !== "entity" && !!href && href.startsWith("http");
+    const href = resolveThingHref(item);
+    const parentEntity = resolveParentEntityHref(item, thingMap);
+
     return {
       id: item.id,
       thingType: item.thingType,
       title: item.title,
+      parentThingId: item.parentThingId,
+      parentTitle: parentEntity?.title,
+      parentHref: parentEntity?.href,
+      sourceTable: item.sourceTable,
+      sourceId: item.sourceId,
       entityType: item.entityType,
       description: item.description,
       sourceUrl: item.sourceUrl,
       numericId: item.numericId,
+      verdict: item.verdict,
+      verdictConfidence: item.verdictConfidence,
       href,
-      isExternal,
     };
   });
+
+  // Compute verdict stats
+  const withVerdict = Object.entries(stats.byVerdict)
+    .filter(([v]) => v !== "unverified")
+    .reduce((sum, [, c]) => sum + c, 0);
+
+  const wikiServerUrl = getWikiServerConfig()?.serverUrl || "";
 
   return (
     <>
@@ -191,6 +236,15 @@ export async function ThingsContent() {
             .join(", ")}
         />
         <StatCard
+          label="With Verdicts"
+          value={withVerdict}
+          sub={
+            stats.total > 0
+              ? `${((withVerdict / stats.total) * 100).toFixed(1)}% of total`
+              : undefined
+          }
+        />
+        <StatCard
           label="Entity Types"
           value={Object.keys(stats.byEntityType).length}
           sub={Object.entries(stats.byEntityType)
@@ -198,11 +252,6 @@ export async function ThingsContent() {
             .slice(0, 3)
             .map(([t, c]) => `${t}: ${c}`)
             .join(", ")}
-        />
-        <StatCard
-          label="Items Loaded"
-          value={items.length.toLocaleString()}
-          sub={items.length === stats.total ? "all items" : `of ${stats.total.toLocaleString()}`}
         />
       </div>
 
@@ -226,15 +275,37 @@ export async function ThingsContent() {
         </div>
       </div>
 
+      {/* Verdict breakdown */}
+      {Object.keys(stats.byVerdict).length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-3">Verification Status</h2>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(stats.byVerdict)
+              .sort(([, a], [, b]) => b - a)
+              .map(([verdict, count]) => (
+                <div
+                  key={verdict}
+                  className="bg-card border rounded-md px-3 py-2 text-sm"
+                >
+                  <span className="font-medium">{verdict}</span>
+                  <span className="text-muted-foreground ml-2">
+                    {count.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Things table */}
       <div>
         <h2 className="text-lg font-semibold mb-3">
           All Things{" "}
           <span className="text-muted-foreground font-normal">
-            ({items.length.toLocaleString()})
+            ({total > items.length ? `showing ${items.length.toLocaleString()} of ${total.toLocaleString()}` : total.toLocaleString()})
           </span>
         </h2>
-        <ThingsTable data={rows} />
+        <ThingsTable data={rows} wikiServerUrl={wikiServerUrl} />
       </div>
     </>
   );
