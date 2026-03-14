@@ -4,6 +4,12 @@
  * Centralised here so the listing table and detail pages stay in sync.
  */
 
+// ── Default fallback ──────────────────────────────────────────────────
+
+/** Fallback badge colour used when a value has no specific colour mapping. */
+export const DEFAULT_BADGE_COLOR =
+  "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
+
 // ── Risk category ──────────────────────────────────────────────────────
 
 export const RISK_CATEGORY_LABELS: Record<string, string> = {
