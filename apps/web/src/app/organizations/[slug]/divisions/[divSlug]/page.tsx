@@ -20,7 +20,6 @@ import {
 } from "@/app/divisions/[slug]/division-data";
 import {
   TeamMembersSection,
-  FundingProgramsSection,
   DivisionGrantsSection,
   BackToParentLink,
 } from "@/app/divisions/[slug]/division-sections";
@@ -49,14 +48,6 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
     });
   }
 
-  if (data.divisionPrograms.length > 0) {
-    tabs.push({
-      id: "programs",
-      label: "Programs",
-      count: data.divisionPrograms.length,
-      content: <FundingProgramsSection programs={data.divisionPrograms} />,
-    });
-  }
 
   if (tabs.length === 0) return null;
 

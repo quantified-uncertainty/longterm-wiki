@@ -154,6 +154,31 @@ export function getDivisionHref(division: { key: string; ownerEntityId: string }
   return `/organizations/${orgSlug}/divisions/${division.key}`;
 }
 
+// ── Deduplication ────────────────────────────────────────────────────
+
+/** Count how many populated fields a division record has. */
+function divisionFieldCount(d: KBRecordEntry): number {
+  const f = d.fields;
+  return [f.lead, f.status, f.startDate, f.slug, f.website, f.source, f.notes].filter(Boolean).length;
+}
+
+/**
+ * Deduplicate division records by name within each owner entity.
+ * Keeps the record with more populated fields.
+ */
+function deduplicateDivisions(divisions: KBRecordEntry[]): KBRecordEntry[] {
+  const byOwnerAndName = new Map<string, KBRecordEntry>();
+  for (const d of divisions) {
+    const name = (d.fields.name as string) ?? d.key;
+    const mapKey = `${d.ownerEntityId}::${name}`;
+    const existing = byOwnerAndName.get(mapKey);
+    if (!existing || divisionFieldCount(d) > divisionFieldCount(existing)) {
+      byOwnerAndName.set(mapKey, d);
+    }
+  }
+  return [...byOwnerAndName.values()];
+}
+
 // ── Lookup helpers ────────────────────────────────────────────────────
 
 /** Find a division by org slug + division ID (record key). */
@@ -175,9 +200,9 @@ export function findDivisionByLegacySlug(slug: string): KBRecordEntry | undefine
   });
 }
 
-/** Get all {slug, divSlug} pairs for static generation. */
+/** Get all {slug, divSlug} pairs for static generation. Deduplicates by name. */
 export function getAllDivisionParams(): Array<{ slug: string; divSlug: string }> {
-  const allDivisions = getAllKBRecords("divisions");
+  const allDivisions = deduplicateDivisions(getAllKBRecords("divisions"));
   const params: Array<{ slug: string; divSlug: string }> = [];
   for (const d of allDivisions) {
     const orgSlug = getOrgSlugForEntity(d.ownerEntityId);
