@@ -533,8 +533,8 @@ export function getTypedEntities(): AnyEntity[] {
 // TYPES (re-exported for consumers)
 // ============================================================================
 
-export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity, EventEntity } from "./entity-schemas";
-export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject, isEvent } from "./entity-schemas";
+export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity } from "./entity-schemas";
+export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
 interface Entity {

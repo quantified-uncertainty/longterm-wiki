@@ -302,19 +302,8 @@ function transformEntity(raw, expertMap, orgMap) {
     case 'crux':
     case 'model':
     case 'capability':
-
     case 'event':
     case 'historical':
-      return {
-        ...base,
-        entityType: canonicalType,
-        eventDate: raw.eventDate || cf('Date'),
-        endDate: raw.endDate,
-        location: raw.location || cf('Location'),
-        eventType: raw.eventType,
-        significance: raw.significance,
-      };
-
     case 'analysis':
     case 'argument':
     case 'scenario':

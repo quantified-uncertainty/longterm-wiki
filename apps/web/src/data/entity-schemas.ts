@@ -254,11 +254,6 @@ const InternalEntitySchema = BaseEntity.extend({
 
 const EventEntitySchema = BaseEntity.extend({
   entityType: z.literal("event"),
-  eventDate: z.string().optional(),
-  endDate: z.string().optional(),
-  location: z.string().optional(),
-  eventType: z.enum(["summit", "incident", "announcement", "publication", "policy", "milestone"]).optional(),
-  significance: z.enum(["low", "medium", "high", "critical"]).optional(),
 });
 
 const DebateEntitySchema = BaseEntity.extend({
@@ -383,7 +378,6 @@ export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
 export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
-export type EventEntity = z.infer<typeof EventEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -418,7 +412,4 @@ export function isProject(e: TypedEntity | GenericEntity): e is ProjectEntity {
   return e.entityType === "project";
 }
 
-export function isEvent(e: TypedEntity | GenericEntity): e is EventEntity {
-  return e.entityType === "event";
-}
 

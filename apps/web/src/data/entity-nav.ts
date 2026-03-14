@@ -19,7 +19,6 @@ const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
   "ai-model": "/ai-models",
   policy: "/legislation",
   project: "/projects",
-  event: "/events",
 };
 
 /**
@@ -27,7 +26,7 @@ const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
  * Returns null if the entity type doesn't have a directory or has no slug.
  */
 /** Entity types that use entity ID as slug instead of KB slug resolution. */
-const NON_KB_DIRECTORY_TYPES = new Set(["benchmark", "ai-model", "policy", "project", "event"]);
+const NON_KB_DIRECTORY_TYPES = new Set(["benchmark", "ai-model", "policy", "project"]);
 
 export function getDirectoryHref(id: string): string | null {
   const entity = getTypedEntityById(id);
