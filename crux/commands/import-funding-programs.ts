@@ -109,7 +109,7 @@ const PROGRAMS: FundingProgramDef[] = [
   {
     idSeed: "prog|coefficient-giving|lead-exposure",
     orgId: ORG_IDS.OPEN_PHILANTHROPY,
-    divisionIdSeed: "div|open-philanthropy|global-health-and-wellbeing",
+    divisionIdSeed: "div|coefficient-giving|lead-exposure",
     name: "Lead Exposure Action Fund (LEAF)",
     description:
       "Multi-donor pooled fund addressing lead exposure globally. $100-125M raised with Gates Foundation, UNICEF, and others.",
@@ -151,7 +151,7 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|coefficient-giving|science-rd",
     name: "Science and Global Health R&D Grantmaking",
     description:
-      "330+ grants and 30+ social investments ($90M+) for treatments, vaccines, and diagnostics for low-income populations.",
+      "330+ grants and 30+ social investments ($550M+) for treatments, vaccines, and diagnostics for low-income populations.",
     programType: "grant-round",
     totalBudget: 550_000_000,
     status: "open",
