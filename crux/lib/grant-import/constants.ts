@@ -31,4 +31,13 @@ export const ORG_IDS = {
   OPENAI: "1LcLlMGLbw",
   DEEPMIND: "A4XoubikkQ",
   MIRI: "puAffUjWSS",
+  RAND: "8grDoD8kig",
+  ARC: "QsXVXtQ0zE",
+  REDWOOD_RESEARCH: "dwMzc9WzPa",
+  CHAI: "zMfgJqiEPQ",
+  CAIS: "y4bieqSeag",
+  GOVAI: "XLLyzaEaCA",
+  CSET: "lvsDuyzPcg",
+  EPOCH_AI: "cBPkzcVBBQ",
+  APOLLO_RESEARCH: "pKeaWwP6sQ",
 } as const;

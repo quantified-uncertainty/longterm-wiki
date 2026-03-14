@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function SessionInsightsPage() {
-  redirect("/wiki/E913");
+  redirect("/wiki/E1281");
 }

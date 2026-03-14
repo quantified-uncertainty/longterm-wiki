@@ -20,6 +20,8 @@ export default defineConfig({
       "@components": path.resolve(__dirname, "./src/components"),
       "@data": path.resolve(__dirname, "./src/data/index.ts"),
       "@lib": path.resolve(__dirname, "./src/lib"),
+      "@wiki-server/api-response-types": path.resolve(__dirname, "../wiki-server/src/api-response-types.ts"),
+      "@wiki-server/api-types": path.resolve(__dirname, "../wiki-server/src/api-types.ts"),
     },
   },
 });

@@ -415,6 +415,19 @@
   type: policy
   summaryPage: governance-overview
   title: Compute Governance
+  introduced: '2022'
+  policyStatus: Emerging policy area
+  scope: International
+  provisions:
+    - title: Chip Export Controls
+      description: Restrictions on high-performance semiconductor exports to China and allies
+      category: Hardware
+    - title: Supply Volume Caps
+      description: Exports to China capped at 50% of chips shipped to US customers
+      category: Hardware
+    - title: Know-Your-Customer Requirements
+      description: Verification that chips not used for WMD or military intelligence
+      category: Enforcement
   customFields:
     - label: Approach
       value: Regulate AI via compute access
@@ -607,6 +620,8 @@
   type: policy
   summaryPage: governance-overview
   title: Failed and Stalled AI Proposals
+  policyStatus: Historical analysis of failed AI governance efforts
+  scope: Federal
   customFields:
     - label: Purpose
       value: Learning from unsuccessful efforts
@@ -630,6 +645,19 @@
   type: policy
   summaryPage: governance-overview
   title: International AI Safety Summit Series
+  introduced: November 2023
+  policyStatus: Active; ongoing summit series (Seoul 2024, Paris 2025)
+  scope: International
+  provisions:
+    - title: Bletchley Declaration
+      description: 28 countries acknowledge catastrophic AI risks
+      category: Agreements
+    - title: Seoul Safety Commitments
+      description: 16 companies commit to safety frameworks, testing, incident reporting
+      category: Industry
+    - title: AI Safety Institute Network
+      description: 10+ national institutes with combined budgets of $100-400M annually
+      category: Institutions
   customFields:
     - label: First Summit
       value: Bletchley Park, UK (Nov 2023)
@@ -690,6 +718,20 @@
   type: policy
   summaryPage: governance-overview
   title: NIST AI Risk Management Framework (AI RMF)
+  introduced: January 2023
+  policyStatus: Voluntary guidance; mandatory for federal agencies under EO 14110
+  author: NIST
+  scope: Federal
+  provisions:
+    - title: Four-Function Framework
+      description: GOVERN, MAP, MEASURE, MANAGE lifecycle risk management structure
+      category: Framework
+    - title: Seven Trustworthiness Characteristics
+      description: Valid/Reliable, Safe, Secure/Resilient, Accountable, Explainable, Privacy-Enhanced, Fair
+      category: Principles
+    - title: Generative AI Profile
+      description: AI 600-1 identifying 12+ unique risks for LLMs including content authenticity and training data privacy
+      category: Extension
   customFields:
     - label: Version
       value: '1.0'
@@ -719,6 +761,9 @@
   type: policy
   summaryPage: governance-overview
   title: Seoul Declaration on AI Safety
+  introduced: May 22, 2024
+  policyStatus: Active; non-binding commitments
+  scope: International
   customFields:
     - label: Predecessor
       value: Bletchley Declaration (Nov 2023)
@@ -824,6 +869,9 @@
   type: policy
   summaryPage: governance-overview
   title: US State AI Legislation Landscape
+  introduced: '2019'
+  policyStatus: Active; 1,080+ bills introduced in 2025, 11% passage rate
+  scope: State
   customFields:
     - label: Most active states
       value: California, Colorado, Texas, Illinois
@@ -2386,6 +2434,16 @@
   numericId: E459
   type: policy
   title: Evals-Based Deployment Gates
+  introduced: '2023'
+  policyStatus: Active; EU binding, UK/Lab voluntary
+  scope: International
+  provisions:
+    - title: EU Conformity Assessment
+      description: High-risk AI systems must undergo adversarial testing; GPAI above 10^25 FLOP evaluated for systemic risks
+      category: EU
+    - title: Pre-Deployment Evaluation
+      description: UK AISI conducts pre-release evaluations of 30+ frontier models
+      category: UK
   description: >-
     Evals-based deployment gates require AI models to pass safety evaluations before deployment or
     capability scaling. The EU AI Act mandates conformity assessments for high-risk systems with
@@ -2415,6 +2473,8 @@
   numericId: E460
   type: policy
   title: Pause / Moratorium
+  policyStatus: Proposed; no implementation
+  scope: International
   description: >-
     Proposals to pause or slow frontier AI development until safety is better understood, offering
     potentially high safety benefits if implemented but facing significant coordination challenges
@@ -2521,6 +2581,9 @@
   numericId: E463
   type: policy
   title: Hardware-Enabled Governance
+  introduced: '2024'
+  policyStatus: Research phase; early proposals
+  scope: International
   description: >-
     Technical mechanisms built into AI chips enabling monitoring, access control, and enforcement
     of AI governance policies. RAND analysis identifies attestation-based licensing as most feasible
@@ -2765,6 +2828,9 @@
   numericId: E701
   type: policy
   title: Singapore Consensus on AI Safety Research Priorities
+  introduced: '2025'
+  policyStatus: Active consensus document
+  scope: International
   description: >-
     Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers
     from 11 countries, organizing AI safety research into a defence-in-depth framework across three
@@ -2897,6 +2963,16 @@
   type: policy
   summaryPage: governance-overview
   title: Model Registries
+  introduced: '2023'
+  policyStatus: Active; implementation in US, EU, China
+  scope: International
+  provisions:
+    - title: Pre-Deployment Notification
+      description: 30-90 day advance notice before model release with training compute, intended use, safety evaluation summary
+      category: Transparency
+    - title: EU GPAI Registration
+      description: Registration with EU AI Office for models above 10^25 FLOP
+      category: EU
   description: >-
     Centralized databases of frontier AI models that enable governments to track development,
     enforce safety requirements, and coordinate international oversight, serving as foundational
@@ -3529,6 +3605,9 @@
   numericId: E587
   type: policy
   title: Council of Europe Framework Convention on Artificial Intelligence
+  introduced: '2024'
+  policyStatus: Active; binding treaty
+  scope: International
   description: >-
     The Council of Europe's AI Framework Convention represents the first legally
     binding international AI treaty, establishing human rights-focused
