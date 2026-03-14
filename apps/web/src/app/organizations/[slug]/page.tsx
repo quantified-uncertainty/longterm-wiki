@@ -68,6 +68,9 @@ import {
   OtherDataSection,
 } from "./main-content-sections";
 
+// Charts
+import { ChartsSection } from "./charts-section";
+
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
 
@@ -157,6 +160,9 @@ export default async function OrgProfilePage({
           {heroStatCards}
         </div>
       )}
+
+      {/* Charts */}
+      <ChartsSection chartData={data.chartData} orgName={entity.name} />
 
       {/* Facts + Other Data */}
       {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (

@@ -1080,6 +1080,9 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const totalGrantsMade = grantsMade.reduce((sum, g) => sum + numericValue(g.amount), 0);
   const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + numericValue(g.amount), 0);
 
+  // ── Chart data: time series from KB facts ──
+  const chartData = buildChartData(entity.id, sortedRounds, equityPositions);
+
   return {
     orgType,
     hqText,
@@ -1122,5 +1125,136 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     keyPublications,
     modelBenchmarks,
     divisionLeadResolved,
+    chartData,
+  };
+}
+
+// ── Chart data extraction ─────────────────────────────────────────────
+
+/** Extract numeric value from a Fact, handling ranges. */
+function factNumericValue(fact: Fact): number | null {
+  if (fact.value.type === "number") return fact.value.value;
+  if (fact.value.type === "range") return (fact.value.low + fact.value.high) / 2;
+  return null;
+}
+
+function factRange(fact: Fact): { low?: number; high?: number } {
+  if (fact.value.type === "range") return { low: fact.value.low, high: fact.value.high };
+  return {};
+}
+
+export interface ChartDataBundle {
+  /** Valuation over time (from KB facts) */
+  valuationSeries: Array<{ date: string; value: number; label?: string }>;
+  /** Revenue over time (from KB facts) */
+  revenueSeries: Array<{ date: string; value: number; low?: number; high?: number }>;
+  /** Headcount over time (from KB facts) */
+  headcountSeries: Array<{ date: string; value: number; low?: number; high?: number }>;
+  /** Equity holders for breakdown chart */
+  equityHolders: Array<{
+    name: string;
+    stakePercent: number;
+    stakeLow?: number;
+    stakeHigh?: number;
+    color: string;
+    href: string | null;
+  }>;
+  /** Latest valuation for equity value computation */
+  latestValuation: number | null;
+  /** Funding round annotations for valuation chart */
+  fundingAnnotations: Array<{ date: string; label: string; raised?: number; valuation?: number }>;
+}
+
+function buildChartData(
+  entityId: string,
+  sortedRounds: KBRecordEntry[],
+  equityPositions: ParsedEquityPositionRecord[],
+): ChartDataBundle {
+  // Extract fact time series
+  const valuationFacts = getKBFacts(entityId, "valuation");
+  const revenueFacts = getKBFacts(entityId, "revenue");
+  const headcountFacts = getKBFacts(entityId, "headcount");
+
+  const valuationSeries = valuationFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => {
+      // Try to match to a funding round for label
+      const round = sortedRounds.find((r) => {
+        const roundDate = r.fields.date ? String(r.fields.date) : "";
+        return roundDate && f.asOf && roundDate.startsWith(f.asOf.slice(0, 7));
+      });
+      const roundName = round ? (round.fields.name ? String(round.fields.name) : titleCase(round.key)) : undefined;
+      return { date: f.asOf!, value: factNumericValue(f)!, label: roundName };
+    })
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const revenueSeries = revenueFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => ({
+      date: f.asOf!,
+      value: factNumericValue(f)!,
+      ...factRange(f),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const headcountSeries = headcountFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => ({
+      date: f.asOf!,
+      value: factNumericValue(f)!,
+      ...factRange(f),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  // Equity holders with colors
+  const EQUITY_COLORS = [
+    "#ef4444", "#f59e0b", "#22c55e", "#3b82f6", "#8b5cf6",
+    "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#64748b",
+    "#a855f7", "#06b6d4",
+  ];
+
+  const equityHolders = equityPositions
+    .filter((p) => p.holderName && numericValue(p.stake) > 0)
+    .map((p, i) => {
+      const midpoint = numericValue(p.stake);
+      const isRange = Array.isArray(p.stake);
+      return {
+        name: p.holderName,
+        stakePercent: midpoint * 100,
+        stakeLow: isRange ? (p.stake as [number, number])[0] * 100 : undefined,
+        stakeHigh: isRange ? (p.stake as [number, number])[1] * 100 : undefined,
+        href: p.holderHref,
+      };
+    });
+
+  // Assign colors after sorting
+  equityHolders.sort((a, b) => b.stakePercent - a.stakePercent);
+  const coloredEquity = equityHolders.map((h, i) => ({
+    ...h,
+    color: EQUITY_COLORS[i % EQUITY_COLORS.length],
+  }));
+
+  const latestValuation = valuationSeries.length > 0
+    ? valuationSeries[valuationSeries.length - 1].value
+    : null;
+
+  // Funding round annotations
+  const fundingAnnotations = sortedRounds
+    .filter((r) => r.fields.date)
+    .map((r) => ({
+      date: String(r.fields.date),
+      label: r.fields.name ? String(r.fields.name) : titleCase(r.key),
+      raised: typeof r.fields.raised === "number" ? r.fields.raised : undefined,
+      valuation: typeof r.fields.valuation === "number" ? r.fields.valuation : undefined,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return {
+    valuationSeries,
+    revenueSeries,
+    headcountSeries,
+    equityHolders: coloredEquity,
+    latestValuation,
+    fundingAnnotations,
   };
 }
