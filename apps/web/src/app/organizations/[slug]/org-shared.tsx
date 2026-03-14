@@ -15,7 +15,7 @@ import {
   getKBEntity,
   getKBEntitySlug,
 } from "@/data/kb";
-import { safeHref } from "@/lib/directory-utils";
+import { safeHref } from "@/lib/format-compact";
 
 // Re-export so existing consumers of { safeHref } from "./org-shared" keep working.
 export { safeHref };

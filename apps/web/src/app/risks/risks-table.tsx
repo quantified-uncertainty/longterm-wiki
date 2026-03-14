@@ -3,15 +3,14 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import type { SortDir } from "@/lib/sort-utils";
 import {
   RISK_CATEGORY_LABELS,
   RISK_CATEGORY_COLORS,
-  SEVERITY_ORDER,
   SEVERITY_COLORS_DISPLAY,
-  LIKELIHOOD_ORDER,
   LIKELIHOOD_COLORS_DISPLAY,
 } from "./risk-constants";
+import { compareRiskRows, type RiskSortKey } from "./risks-sort";
 
 export interface RiskRow {
   id: string;
@@ -25,12 +24,10 @@ export interface RiskRow {
   timeHorizon: string | null;
 }
 
-type SortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
-
 export function RisksTable({ rows }: { rows: RiskRow[] }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortKey, setSortKey] = useState<RiskSortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   // Collect unique categories for filter
@@ -52,7 +49,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     return counts;
   }, [rows]);
 
-  const handleSort = (key: SortKey) => {
+  const handleSort = (key: RiskSortKey) => {
     if (sortKey === key) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -76,24 +73,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       });
     }
 
-    const getValue = (row: RiskRow): string | number | null => {
-      switch (sortKey) {
-        case "name":
-          return row.name.toLowerCase();
-        case "category":
-          return row.riskCategory ?? "";
-        case "severity":
-          return row.severity ? (SEVERITY_ORDER[row.severity] ?? 0) : null;
-        case "likelihood":
-          return row.likelihood
-            ? (LIKELIHOOD_ORDER[row.likelihood] ?? 0)
-            : null;
-        case "timeHorizon":
-          return row.timeHorizon ?? null;
-      }
-    };
     result = [...result].sort((a, b) =>
-      compareByValue(a, b, getValue, sortDir),
+      compareRiskRows(a, b, sortKey, sortDir),
     );
 
     return result;
