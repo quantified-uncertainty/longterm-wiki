@@ -1207,6 +1207,43 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     }
   }
 
+  // ── Division spending stats ──
+  // Compute total grant spending per division via: division → funding programs → grants
+  const divisionSpending = new Map<string, { totalAmount: number; grantCount: number }>();
+  for (const d of divisions) {
+    // Find programs linked to this division
+    const divPrograms = fundingPrograms.filter((p) => {
+      const raw = fundingProgramRecords.find((r) => r.key === p.key);
+      return raw && (raw.fields.divisionId as string) === d.key;
+    });
+    const programKeys = new Set(divPrograms.map((p) => p.key));
+
+    // Find grants matching those programs (or direct division name/key match)
+    let totalAmount = 0;
+    let grantCount = 0;
+    for (const g of grantRecords) {
+      const programId = g.fields.programId as string | undefined;
+      const gDiv = g.fields.divisionName as string | undefined;
+      const gProgram = g.fields.program as string | undefined;
+      const divName = d.name.toLowerCase();
+      const divKey = d.key.toLowerCase();
+
+      const matches =
+        (programId && programKeys.has(programId)) ||
+        (gDiv && (gDiv.toLowerCase() === divName || gDiv.toLowerCase() === divKey)) ||
+        (gProgram && gProgram.toLowerCase() === divKey);
+
+      if (matches) {
+        const amount = typeof g.fields.amount === "number" ? g.fields.amount : 0;
+        totalAmount += amount;
+        grantCount++;
+      }
+    }
+    if (grantCount > 0) {
+      divisionSpending.set(d.key, { totalAmount, grantCount });
+    }
+  }
+
   // ── Computed stat cards ──
   const currentKeyPeople = sortedPersons.filter((p) => !p.fields.end).length;
   const currentBoardMembers = boardMembers.filter((m) => !m.departed).length;
@@ -1258,6 +1295,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     keyPublications,
     modelBenchmarks,
     divisionLeadResolved,
+    divisionSpending,
     chartData,
     dilutionStages,
   };

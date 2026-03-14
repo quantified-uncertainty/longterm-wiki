@@ -140,15 +140,6 @@ export function parseDivisionPersonnel(record: KBRecordEntry): ParsedDivisionPer
 
 // ── Slug helpers ─────────────────────────────────────────────────────
 
-/** Convert a division name to a URL-safe slug. */
-export function divisionNameToSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[&]/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 /** Get the org slug for a division's ownerEntityId. */
 function getOrgSlugForEntity(entityId: string): string | null {
   return getKBEntitySlug(entityId) ?? null;

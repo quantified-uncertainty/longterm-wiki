@@ -499,7 +499,7 @@ export default async function OrgProfilePage({
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
-          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} />
         </div>
       ),
     });

@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
+import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
@@ -127,13 +128,17 @@ function DivisionCard({
   );
 }
 
+type SpendingMap = Map<string, { totalAmount: number; grantCount: number }>;
+
 /** Divisions section for org pages. */
 export function DivisionsSection({
   divisions,
   leadResolved,
+  spending,
 }: {
   divisions: ParsedDivisionRecord[];
   leadResolved?: LeadMap;
+  spending?: SpendingMap;
 }) {
   if (divisions.length === 0) return null;
 
@@ -142,6 +147,8 @@ export function DivisionsSection({
   const teams = divisions.filter((d) => d.divisionType === "team");
   const other = divisions.filter((d) => d.divisionType !== "department" && d.divisionType !== "team");
   const grouped = [...departments, ...teams, ...other];
+
+  const hasSpending = spending && spending.size > 0;
 
   return (
     <section>
@@ -153,6 +160,12 @@ export function DivisionsSection({
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Name</th>
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Type</th>
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Lead</th>
+              {hasSpending && (
+                <th scope="col" className="text-right py-2.5 px-3 font-medium">Total Spending</th>
+              )}
+              {hasSpending && (
+                <th scope="col" className="text-center py-2.5 px-3 font-medium">Grants</th>
+              )}
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Status</th>
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Since</th>
             </tr>
@@ -160,6 +173,7 @@ export function DivisionsSection({
           <tbody className="divide-y divide-border/50">
             {grouped.map((d) => {
               const resolvedLead = leadResolved?.get(d.key);
+              const stats = spending?.get(d.key);
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
@@ -214,6 +228,20 @@ export function DivisionsSection({
                       d.lead ?? ""
                     )}
                   </td>
+                  {hasSpending && (
+                    <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                      {stats && stats.totalAmount > 0 && (
+                        <span className="font-semibold">
+                          {formatCompactCurrency(stats.totalAmount)}
+                        </span>
+                      )}
+                    </td>
+                  )}
+                  {hasSpending && (
+                    <td className="py-2.5 px-3 text-center tabular-nums text-xs text-muted-foreground">
+                      {stats ? stats.grantCount : ""}
+                    </td>
+                  )}
                   <td className="py-2.5 px-3 text-center text-xs">
                     {d.status && (
                       <span

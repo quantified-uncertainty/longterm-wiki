@@ -20,10 +20,12 @@ import {
 } from "@/app/divisions/[slug]/division-data";
 import {
   TeamMembersSection,
-  DivisionGrantsSection,
-  RecipientsSection,
   BackToParentLink,
 } from "@/app/divisions/[slug]/division-sections";
+import {
+  PaginatedGrantsTable,
+  PaginatedRecipientsTable,
+} from "@/app/divisions/[slug]/paginated-tables";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
 
 // ── Tabs builder ──────────────────────────────────────────────────────
@@ -45,7 +47,7 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
       id: "grants",
       label: "Grants",
       count: data.grants.length,
-      content: <DivisionGrantsSection grants={data.grants} />,
+      content: <PaginatedGrantsTable grants={data.grants} />,
     });
   }
 
@@ -54,7 +56,7 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
       id: "recipients",
       label: "Recipients",
       count: data.recipients.length,
-      content: <RecipientsSection recipients={data.recipients} />,
+      content: <PaginatedRecipientsTable recipients={data.recipients} />,
     });
   }
 
