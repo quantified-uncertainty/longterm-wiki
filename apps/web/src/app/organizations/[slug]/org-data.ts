@@ -424,6 +424,79 @@ function extractDomain(url: string): string | null {
   }
 }
 
+/**
+ * Check if a resource title is generic/useless (e.g. just the org name).
+ * Returns true if the title should be replaced or the resource filtered out.
+ */
+function isGenericTitle(title: string, orgName: string): boolean {
+  const t = title.toLowerCase().trim();
+  const org = orgName.toLowerCase();
+  // Exact org name, or org name with year suffix, or possessive form, or very short fragments
+  if (t === org) return true;
+  if (new RegExp(`^${org.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\(\\d{4}\\)$`).test(t)) return true;
+  if (t === `${org}'s` || t === `${org} acknowledged`) return true;
+  if (t.length < 10 && t.startsWith(org.slice(0, 5))) return true;
+  return false;
+}
+
+/** Check if a title is a landing/section page rather than a real resource. */
+function isSectionPage(title: string, orgName: string): boolean {
+  const t = title.toLowerCase().trim();
+  const org = orgName.toLowerCase();
+  // Generic section pages: "Org Blog", "Org Research", "Org Safety Blog", "Org careers"
+  const sectionPatterns = [
+    `${org} blog`, `${org} safety blog`, `${org} research`,
+    `${org} safety research`, `${org} alignment science`,
+    `${org} careers`, `${org} news`, `${org} updates`,
+    `${org} evals`, `${org} documented`,
+  ];
+  return sectionPatterns.includes(t);
+}
+
+/** Decode common HTML entities in titles. */
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
+/** Clean up a resource title: strip trailing URL noise, org suffixes, etc. */
+function cleanTitle(title: string, orgName: string): string {
+  let t = decodeHtmlEntities(title);
+  // Strip " | OrgName (https://...)" suffixes
+  t = t.replace(/\s*\|\s*[^|]+\(https?:\/\/[^)]+\)\s*$/, "");
+  // Strip " | OrgName" suffix
+  t = t.replace(new RegExp(`\\s*\\|\\s*${orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i"), "");
+  // Strip " - OrgName" suffix
+  t = t.replace(new RegExp(`\\s*-\\s*${orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i"), "");
+  // If the title is a full URL, derive from path
+  if (/^https?:\/\//.test(t.trim())) {
+    const derived = titleFromUrl(t.trim());
+    if (derived) return derived;
+  }
+  return t.trim();
+}
+
+/** Derive a human-readable title from a URL path when the DB title is junk. */
+function titleFromUrl(url: string): string | null {
+  try {
+    const path = new URL(url).pathname.replace(/\/$/, "");
+    const lastSegment = path.split("/").filter(Boolean).pop();
+    if (!lastSegment) return null;
+    // Convert slug to title: "claude-3-model-card" → "Claude 3 Model Card"
+    return lastSegment
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  } catch {
+    return null;
+  }
+}
+
 /** Convert a Resource to an OrgResourceRow. */
 function toOrgResourceRow(r: Resource): OrgResourceRow {
   const publication = getResourcePublication(r);
@@ -431,7 +504,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
   const citingPages = getPagesForResource(r.id);
   return {
     id: r.id,
-    title: r.title,
+    title: r.title ?? "(untitled)",
     url: r.url,
     type: r.type,
     publicationName: publication?.name ?? null,
@@ -442,15 +515,64 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
   };
 }
 
+/** Check if a resource URL looks like a research/publication path. */
+function isResearchUrl(url: string): boolean {
+  try {
+    const path = new URL(url).pathname.toLowerCase();
+    return path.startsWith("/research");
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Get resources split by relationship to the org:
- *  - byOrg: authored by the org (URL domain matches org website)
- *  - aboutOrg: cited on the org's wiki page but not authored by them
+ * Normalize a resource row: fix generic titles, skip untitled.
+ * Returns null if the resource should be filtered out.
+ */
+function normalizeRow(r: Resource, orgName: string): OrgResourceRow | null {
+  if (!r.title?.trim()) return null;
+  const row = toOrgResourceRow(r);
+
+  // Clean up the title (decode entities, strip URL suffixes)
+  row.title = cleanTitle(row.title, orgName);
+
+  // Filter out generic org-name-only titles
+  if (isGenericTitle(row.title, orgName)) {
+    const derived = titleFromUrl(r.url);
+    if (derived) {
+      row.title = derived;
+    } else {
+      return null;
+    }
+  }
+
+  // Filter out section/landing pages
+  if (isSectionPage(row.title, orgName)) return null;
+
+  // If the title still looks like a raw URL path (contains domain), derive from URL
+  if (row.title.includes("://") || /^[a-z0-9-]+\.\w{2,}\//.test(row.title)) {
+    const derived = titleFromUrl(r.url);
+    if (derived) row.title = derived;
+  }
+
+  return row;
+}
+
+/**
+ * Get resources split into three categories:
+ *  - publications: research papers / technical content by the org
+ *  - announcements: news, blog posts, and other org content
+ *  - aboutOrg: external resources cited on the org's wiki page
  */
 function getOrgResources(
   orgSlug: string,
+  orgName: string,
   websiteUrl: string | null,
-): { byOrg: OrgResourceRow[]; aboutOrg: OrgResourceRow[] } {
+): {
+  publications: OrgResourceRow[];
+  announcements: OrgResourceRow[];
+  aboutOrg: OrgResourceRow[];
+} {
   const allResources = getAllResources();
 
   // Determine the org's domain(s) for matching
@@ -460,37 +582,50 @@ function getOrgResources(
     if (d) orgDomains.add(d);
   }
 
-  // Resources authored BY the org (URL domain matches)
-  const byOrgMap = new Map<string, OrgResourceRow>();
+  // Split org resources into publications vs announcements
+  const publicationsMap = new Map<string, OrgResourceRow>();
+  const announcementsMap = new Map<string, OrgResourceRow>();
+  const allOrgIds = new Set<string>();
+
   if (orgDomains.size > 0) {
     for (const r of allResources) {
       const rDomain = extractDomain(r.url);
-      if (rDomain && orgDomains.has(rDomain)) {
-        byOrgMap.set(r.id, toOrgResourceRow(r));
+      if (!rDomain || !orgDomains.has(rDomain)) continue;
+      const row = normalizeRow(r, orgName);
+      if (!row) continue;
+      allOrgIds.add(r.id);
+
+      if (isResearchUrl(r.url) || r.type === "paper") {
+        publicationsMap.set(r.id, row);
+      } else {
+        announcementsMap.set(r.id, row);
       }
     }
   }
 
-  // Resources cited on the org's wiki page (ABOUT the org)
+  // Resources cited on the org's wiki page (ABOUT the org, external only)
   const pageResourceIds = getResourcesForPage(orgSlug);
   const aboutOrgMap = new Map<string, OrgResourceRow>();
   for (const rid of pageResourceIds) {
-    if (byOrgMap.has(rid)) continue; // Already in "by org"
+    if (allOrgIds.has(rid)) continue;
     const r = getResourceById(rid);
     if (!r) continue;
-    aboutOrgMap.set(rid, toOrgResourceRow(r));
+    const row = normalizeRow(r, orgName);
+    if (!row) continue;
+    aboutOrgMap.set(rid, row);
   }
 
-  // Sort both by date (newest first), then by title
+  // Sort all by date (newest first), then by title
   const sortByDate = (a: OrgResourceRow, b: OrgResourceRow) => {
     const da = a.publishedDate ?? "";
     const db = b.publishedDate ?? "";
     if (da !== db) return db.localeCompare(da);
-    return a.title.localeCompare(b.title);
+    return (a.title ?? "").localeCompare(b.title ?? "");
   };
 
   return {
-    byOrg: [...byOrgMap.values()].sort(sortByDate),
+    publications: [...publicationsMap.values()].sort(sortByDate),
+    announcements: [...announcementsMap.values()].sort(sortByDate),
     aboutOrg: [...aboutOrgMap.values()].sort(sortByDate),
   };
 }
@@ -814,8 +949,11 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   }
 
   // ── Resources ──
-  const { byOrg: resourcesByOrg, aboutOrg: resourcesAboutOrg } =
-    getOrgResources(slug, websiteUrl);
+  const {
+    publications: resourcePublications,
+    announcements: resourceAnnouncements,
+    aboutOrg: resourcesAboutOrg,
+  } = getOrgResources(slug, entity.name, websiteUrl);
 
   // ── Key Publications (from literature.yaml) ──
   const orgMatchNames = new Set<string>([
@@ -899,7 +1037,8 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     totalGrantsReceived,
     investments,
     products,
-    resourcesByOrg,
+    resourcePublications,
+    resourceAnnouncements,
     resourcesAboutOrg,
     keyPublications,
     modelBenchmarks,

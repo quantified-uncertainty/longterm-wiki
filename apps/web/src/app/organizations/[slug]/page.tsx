@@ -371,21 +371,21 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Their Content tab (resources authored by the org + key publications) ──
-  const hasTheirContent = data.resourcesByOrg.length > 0 || data.keyPublications.length > 0;
-  if (hasTheirContent) {
-    const theirContentCount = data.resourcesByOrg.length + data.keyPublications.length;
+  // ── Publications tab (research papers + literature papers) ──
+  const hasPublications = data.resourcePublications.length > 0 || data.keyPublications.length > 0;
+  if (hasPublications) {
+    const pubCount = data.resourcePublications.length + data.keyPublications.length;
     tabs.push({
-      id: "their-content",
-      label: "Their Content",
-      count: theirContentCount,
+      id: "publications",
+      label: "Publications",
+      count: pubCount,
       content: (
         <div className="space-y-8">
-          {data.resourcesByOrg.length > 0 && (
+          {data.resourcePublications.length > 0 && (
             <OrgResourcesSection
-              resources={data.resourcesByOrg}
-              title="Resources"
-              emptyMessage="No resources from this organization found."
+              resources={data.resourcePublications}
+              title="Research & Technical Papers"
+              emptyMessage=""
             />
           )}
           {data.keyPublications.length > 0 && (
@@ -396,7 +396,23 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Coverage tab (resources about the org) ──
+  // ── Announcements tab (news, blog posts, other org content) ──
+  if (data.resourceAnnouncements.length > 0) {
+    tabs.push({
+      id: "announcements",
+      label: "Announcements",
+      count: data.resourceAnnouncements.length,
+      content: (
+        <OrgResourcesSection
+          resources={data.resourceAnnouncements}
+          title="News & Announcements"
+          emptyMessage=""
+        />
+      ),
+    });
+  }
+
+  // ── Coverage tab (external resources about the org) ──
   if (data.resourcesAboutOrg.length > 0) {
     tabs.push({
       id: "coverage",
@@ -405,8 +421,8 @@ export default async function OrgProfilePage({
       content: (
         <OrgResourcesSection
           resources={data.resourcesAboutOrg}
-          title="Coverage & References"
-          emptyMessage="No external coverage found."
+          title="External Coverage & References"
+          emptyMessage=""
         />
       ),
     });
