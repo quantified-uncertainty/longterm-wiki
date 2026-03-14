@@ -161,7 +161,7 @@
   maintainer: "Mathematical Association of America"
 
 - id: mmlu-pro
-  numericId: E1233
+  numericId: E1301
   type: benchmark
   title: MMLU-Pro
   description: "A harder variant of MMLU with 10 answer choices (vs 4), chain-of-thought reasoning, and reduced sensitivity to prompt format. Designed to better discriminate among top models."
@@ -176,7 +176,7 @@
       url: "https://arxiv.org/abs/2406.01574"
 
 - id: simpleqa
-  numericId: E1234
+  numericId: E1302
   type: benchmark
   title: SimpleQA
   description: "A factual question-answering benchmark from OpenAI testing short, fact-seeking questions with verifiable answers. Evaluates factual accuracy and calibration."
