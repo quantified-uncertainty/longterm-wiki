@@ -269,26 +269,32 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
 
                 {/* Positions */}
                 <td className="py-2.5 px-3 text-center tabular-nums">
-                  {row.positionCount > 0 && (
+                  {row.positionCount > 0 ? (
                     <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                       {row.positionCount}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
                 {/* Publications */}
                 <td className="py-2.5 px-3 text-center tabular-nums">
-                  {row.publicationCount > 0 && (
+                  {row.publicationCount > 0 ? (
                     <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400">
                       {row.publicationCount}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
                 {/* Career History */}
                 <td className="py-2.5 px-3 text-center">
-                  {row.careerHistoryCount > 0 && (
+                  {row.careerHistoryCount > 0 ? (
                     <span className="tabular-nums">{row.careerHistoryCount}</span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
               </tr>

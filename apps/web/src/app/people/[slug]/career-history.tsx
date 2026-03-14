@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/kb";
-import { getRecordVerdict } from "@data/database";
+import { getRecordVerdict } from "@/data/database";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import type { CareerHistoryEntry } from "../people-utils";
