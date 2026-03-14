@@ -171,6 +171,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
               setStatusFilter("all");
               setPage(0);
             }}
+            aria-pressed={statusFilter === "all"}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               statusFilter === "all"
                 ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -190,6 +191,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                 setStatusFilter(statusFilter === s ? "all" : s);
                 setPage(0);
               }}
+              aria-pressed={statusFilter === s}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 statusFilter === s
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
