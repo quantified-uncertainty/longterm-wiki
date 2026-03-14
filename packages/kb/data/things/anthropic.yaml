@@ -75,21 +75,21 @@ facts:
     notes: "Nearing $20B ARR; company guidance $20-26B for 2026"
 
   # ── Valuation ───────────────────────────────────────────────────
-  - id: f_val_seriesA
+  - id: f_Ovz6tO7Sw0
     property: valuation
     value: 5.5e+8
     asOf: 2021-05
     source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
     notes: "Series A post-money valuation ($124M raised)"
 
-  - id: f_val_seriesB
+  - id: f_EWHMgxrxiJ
     property: valuation
     value: 4e+9
     asOf: 2022-04
     source: https://techcrunch.com/2022/04/28/anthropic-raises-580-million-in-series-b-funding/
     notes: "Series B post-money valuation ($580M raised, led by Spark Capital)"
 
-  - id: f_val_seriesC
+  - id: f_P58xiOXz6l
     property: valuation
     value: 4.1e+9
     asOf: 2023-05
@@ -166,7 +166,7 @@ facts:
     notes: "Point estimate 1097 from LinkedIn/consistent sources; full range
       870-2847 depending on methodology"
 
-  - id: f_hc_2023q2
+  - id: f_Z7oaVivRvE
     property: headcount
     value:
       - 300
@@ -175,7 +175,7 @@ facts:
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Approximate headcount mid-2023 from multiple sources"
 
-  - id: f_hc_2024q1
+  - id: f_0PxEBZyv45
     property: headcount
     value:
       - 500
@@ -184,7 +184,7 @@ facts:
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Estimated headcount early 2024, pre rapid hiring"
 
-  - id: f_hc_2025q1
+  - id: f_J3yAxRJ05k
     property: headcount
     value:
       - 1500
@@ -193,7 +193,7 @@ facts:
     source: https://electroiq.com/stats/anthropic-statistics/
     notes: "Rapid growth period; hiring across engineering, sales, policy"
 
-  - id: f_hc_2025q3
+  - id: f_arY5X2VqcY
     property: headcount
     value:
       - 2500
