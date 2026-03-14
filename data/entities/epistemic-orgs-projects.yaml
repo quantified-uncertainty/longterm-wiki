@@ -35,6 +35,9 @@
   numericId: E286
   type: project
   title: Squiggle
+  projectStatus: active
+  projectUrl: https://www.squiggle-language.com
+  organization: quantified-uncertainty
   description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
   path: /knowledge-base/responses/squiggle/
   lastUpdated: 2026-01
@@ -45,6 +48,9 @@
   numericId: E200
   type: project
   title: Metaforecast
+  projectStatus: maintained
+  projectUrl: https://metaforecast.org
+  organization: quantified-uncertainty
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
   path: /knowledge-base/responses/metaforecast/
   lastUpdated: 2026-01
@@ -55,6 +61,8 @@
   numericId: E287
   type: project
   title: SquiggleAI
+  projectStatus: active
+  organization: quantified-uncertainty
   description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
   path: /knowledge-base/responses/squiggleai/
   lastUpdated: 2026-01
@@ -65,6 +73,8 @@
   numericId: E379
   type: project
   title: XPT (Existential Risk Persuasion Tournament)
+  projectStatus: active
+  projectUrl: https://xpt.forecastingresearch.org
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
@@ -75,6 +85,8 @@
   numericId: E144
   type: project
   title: ForecastBench
+  projectStatus: active
+  projectUrl: https://forecastbench.org
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
@@ -85,6 +97,7 @@
   numericId: E10
   type: project
   title: AI Forecasting Benchmark Tournament
+  projectStatus: active
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
@@ -105,6 +118,8 @@
   numericId: E682
   type: project
   title: Grokipedia
+  projectStatus: active
+  projectUrl: https://grokipedia.com
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02
