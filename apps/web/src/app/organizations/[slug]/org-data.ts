@@ -653,11 +653,13 @@ function getOrgResources(
     aboutOrgMap.set(rid, row);
   }
 
-  // Sort all by date (newest first), then by title
+  // Sort all by date (newest first), dateless items last, then by title
   const sortByDate = (a: OrgResourceRow, b: OrgResourceRow) => {
-    const da = a.publishedDate ?? "";
-    const db = b.publishedDate ?? "";
-    if (da !== db) return db.localeCompare(da);
+    const da = a.publishedDate;
+    const db = b.publishedDate;
+    if (da && !db) return -1;
+    if (!da && db) return 1;
+    if (da && db && da !== db) return db.localeCompare(da);
     return (a.title ?? "").localeCompare(b.title ?? "");
   };
 

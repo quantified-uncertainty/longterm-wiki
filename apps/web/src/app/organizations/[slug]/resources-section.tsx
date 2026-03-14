@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "./org-data";
 
 const TYPE_COLORS: Record<string, string> = {
@@ -177,7 +178,7 @@ function makeColumns(opts: {
       header: "",
       cell: ({ row }) => (
         <a
-          href={row.original.url}
+          href={safeHref(row.original.url)}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-primary hover:text-primary/80"
