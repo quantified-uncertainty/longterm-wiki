@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { DEVELOPER_COLORS, formatContext } from "./ai-model-constants";
+import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
 
 export interface AiModelRow {
   id: string;
@@ -305,7 +305,9 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Safety Level */}
                 <td className="py-2.5 px-3">
                   {row.safetyLevel ? (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                      SAFETY_LEVEL_COLORS[row.safetyLevel] ?? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                    }`}>
                       {row.safetyLevel}
                     </span>
                   ) : (
