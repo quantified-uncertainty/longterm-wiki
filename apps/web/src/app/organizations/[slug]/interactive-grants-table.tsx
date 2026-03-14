@@ -278,10 +278,9 @@ export function InteractiveGrantsTable({
     ? server.meta.total
     : staticTotalCount ?? allGrants.length;
   const filteredTotal = serverMode ? server.meta.total : localFiltered.length;
-  // In server mode, treat initial state (no data yet) as loading
-  const isLoading = serverMode
-    ? server.isLoading || (server.data.length === 0 && !server.error)
-    : false;
+  const isLoading = serverMode ? server.isLoading : false;
+  // In server mode, show loading on the very first fetch (no data yet, request in flight)
+  const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
 
   const handleSearch = (value: string) => {
     if (serverMode) {
@@ -479,7 +478,7 @@ export function InteractiveGrantsTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {isLoading && rows.length === 0 ? (
+            {isInitialLoad ? (
               <tr>
                 <td
                   colSpan={activeCols.length}
