@@ -32,13 +32,21 @@ export function SidebarProvider({
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = React.useState(() => {
-    if (typeof window === "undefined") return defaultOpen;
-    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    return stored !== null ? stored === "true" : defaultOpen;
-  });
+  // Always initialize with defaultOpen to match server-rendered HTML.
+  // Reading localStorage in useState causes hydration mismatch (React #418)
+  // because the server renders with defaultOpen=true but the client may
+  // read a stored "false" value, producing different initial HTML.
+  const [open, setOpen] = React.useState(defaultOpen);
   // Mobile sidebar is closed by default
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  // Sync sidebar state from localStorage after hydration
+  React.useEffect(() => {
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (stored !== null) {
+      setOpen(stored === "true");
+    }
+  }, []);
 
   const toggleSidebar = React.useCallback(() => {
     setOpen((prev) => {

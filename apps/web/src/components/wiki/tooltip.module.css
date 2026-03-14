@@ -9,6 +9,13 @@
   transition: opacity 150ms ease, visibility 150ms ease;
 }
 
+/* Position tooltip left-aligned by default, but constrain to viewport */
+.tooltipPositioned {
+  left: 0;
+  /* Prevent tooltip from extending past the right edge of the viewport */
+  max-width: min(280px, calc(100vw - 2rem));
+}
+
 @media (hover: hover) {
   .wrapper:hover .tooltip,
   .wrapper:focus-within .tooltip {
