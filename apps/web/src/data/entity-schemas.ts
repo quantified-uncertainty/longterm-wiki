@@ -202,6 +202,11 @@ const CapabilityEntitySchema = BaseEntity.extend({
 
 const ProjectEntitySchema = BaseEntity.extend({
   entityType: z.literal("project"),
+  projectStatus: z.enum(["active", "maintained", "archived", "abandoned", "beta"]).optional(),
+  projectUrl: z.string().optional(),
+  organization: z.string().optional(),
+  startDate: z.string().optional(),
+  techStack: z.array(z.string()).default([]),
 });
 
 const AnalysisEntitySchema = BaseEntity.extend({
@@ -372,6 +377,7 @@ export type PolicyEntity = z.infer<typeof PolicyEntitySchema>;
 export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
 export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
+export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -401,4 +407,9 @@ export function isAiModel(e: TypedEntity | GenericEntity): e is AiModelEntity {
 export function isBenchmark(e: TypedEntity | GenericEntity): e is BenchmarkEntity {
   return e.entityType === "benchmark";
 }
+
+export function isProject(e: TypedEntity | GenericEntity): e is ProjectEntity {
+  return e.entityType === "project";
+}
+
 

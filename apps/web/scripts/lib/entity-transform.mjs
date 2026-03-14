@@ -286,14 +286,25 @@ function transformEntity(raw, expertMap, orgMap) {
         maintainer: raw.maintainer,
       };
 
+    case 'project':
+      return {
+        ...base,
+        entityType: 'project',
+        projectStatus: raw.projectStatus || cf('Status'),
+        projectUrl: raw.projectUrl || raw.website,
+        organization: raw.organization,
+        startDate: raw.startDate || cf('Started') || cf('Founded'),
+        techStack: raw.techStack || [],
+      };
+
     case 'approach':
     case 'concept':
     case 'crux':
     case 'model':
     case 'capability':
-    case 'project':
-    case 'analysis':
+    case 'event':
     case 'historical':
+    case 'analysis':
     case 'argument':
     case 'scenario':
     case 'case-study':

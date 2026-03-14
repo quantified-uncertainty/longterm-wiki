@@ -65,6 +65,30 @@ longterm-wiki/
 └── package.json                # Workspace root
 ```
 
+## Entity Directory Pages
+
+The site has structured directory pages for browsing entities by type. Before creating a new directory, check if one already exists:
+
+| Directory | Entity Type | Route | Description |
+|-----------|------------|-------|-------------|
+| Organizations | `organization` | `/organizations` | Companies, labs, nonprofits with KB facts, funding, people |
+| People | `person` | `/people` | Researchers, executives with roles, affiliations, publications |
+| Risks | `risk` | `/risks` | AI safety risks with severity, likelihood, timeframe |
+| AI Models | `ai-model` | `/ai-models` | Models with benchmarks, pricing, safety levels |
+| Benchmarks | `benchmark` | `/benchmarks` | Evaluation benchmarks with scores across models |
+| Legislation | `policy` | `/legislation` | Laws, regulations, executive orders with provisions, stakeholders, votes |
+| Projects | `project` | `/projects` | Tools, platforms, research projects |
+| Grants | — | `/grants` | Grant records from funding sources |
+| Funding Programs | — | `/funding-programs` | Open funding opportunities |
+| Divisions | — | `/divisions` | Organizational sub-units |
+| Publications | — | `/publications` | Research papers and publications |
+| Investments | — | `/investments` | Investment records |
+| Funding Rounds | — | `/funding-rounds` | Company funding rounds |
+
+Entity types without directories (too abstract or sparse for tables): `approach` (70), `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5), `event` (1).
+
+Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
+
 ## Data Flow
 
 1. YAML files in `data/` define entities and resources; KB facts in `packages/kb/data/things/`
