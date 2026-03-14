@@ -286,11 +286,6 @@ function transformEntity(raw, expertMap, orgMap) {
         maintainer: raw.maintainer,
       };
 
-    case 'approach':
-    case 'concept':
-    case 'crux':
-    case 'model':
-    case 'capability':
     case 'project':
       return {
         ...base,
@@ -301,6 +296,12 @@ function transformEntity(raw, expertMap, orgMap) {
         startDate: raw.startDate || cf('Started') || cf('Founded'),
         techStack: raw.techStack || [],
       };
+
+    case 'approach':
+    case 'concept':
+    case 'crux':
+    case 'model':
+    case 'capability':
 
     case 'event':
     case 'historical':
