@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getBenchmarkEntities, getBenchmarkResultsFromModels } from "./benchmark-utils";
-import { BenchmarksTable, type BenchmarkRow } from "./benchmarks-table";
+import type { BenchmarkRow } from "./benchmarks-table";
+import type { MatrixBenchmark, MatrixModel, ScoreGrid } from "./comparison-matrix";
+import { BenchmarksView } from "./benchmarks-view";
 
 export const metadata: Metadata = {
   title: "AI Benchmarks",
@@ -33,6 +35,41 @@ export default function BenchmarksPage() {
       modelsCount: results.length,
     };
   });
+
+  // Build matrix data
+  const matrixBenchmarks: MatrixBenchmark[] = benchmarks.map((b) => ({
+    id: b.id,
+    title: b.title,
+    category: b.category ?? null,
+    higherIsBetter: b.higherIsBetter ?? true,
+  }));
+
+  // Collect unique models and build score grid
+  const modelsMap = new Map<string, MatrixModel>();
+  const matrixScores: ScoreGrid = {};
+
+  for (const [benchmarkSlug, results] of resultsByBenchmark.entries()) {
+    for (const r of results) {
+      if (!modelsMap.has(r.modelId)) {
+        modelsMap.set(r.modelId, {
+          id: r.modelId,
+          title: r.modelTitle,
+          developer: r.developer,
+          developerName: r.developerName,
+          numericId: r.numericId,
+        });
+      }
+      if (!matrixScores[r.modelId]) {
+        matrixScores[r.modelId] = {};
+      }
+      matrixScores[r.modelId][benchmarkSlug] = {
+        score: r.score,
+        unit: r.unit,
+      };
+    }
+  }
+
+  const matrixModels = [...modelsMap.values()];
 
   // Stats
   const totalBenchmarks = benchmarks.length;
@@ -79,7 +116,12 @@ export default function BenchmarksPage() {
         ))}
       </div>
 
-      <BenchmarksTable rows={rows} />
+      <BenchmarksView
+        rows={rows}
+        matrixBenchmarks={matrixBenchmarks}
+        matrixModels={matrixModels}
+        matrixScores={matrixScores}
+      />
     </div>
   );
 }
