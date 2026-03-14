@@ -1,6 +1,6 @@
 import { compareByValue } from "@/lib/sort-utils";
-export type { SortDir } from "@/lib/sort-utils";
 import type { SortDir } from "@/lib/sort-utils";
+export type { SortDir };
 import type { OrgRow } from "./organizations-table";
 
 export type OrgSortKey =
