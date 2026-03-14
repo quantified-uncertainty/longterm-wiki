@@ -28,7 +28,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- entities: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"entities"')) {
-    const COLS = 14;
+    const COLS = 15;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -52,6 +52,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         custom_fields: params[o + 11],
         related_entries: params[o + 12],
         sources: params[o + 13],
+        metadata: params[o + 14],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
@@ -154,6 +155,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const limit = (params[limitIdx] as number) || 50;
     const offset = (params[limitIdx + 1] as number) || 0;
     return filtered.slice(offset, offset + limit);
+  }
+
+  // --- facts: DISTINCT ON query for directory endpoint ---
+  if (q.includes("distinct on") && q.includes("facts")) {
+    return []; // No facts in test — return empty
   }
 
   // --- entity_ids: COUNT (for health check) ---

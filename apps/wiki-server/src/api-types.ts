@@ -687,6 +687,7 @@ export const SyncEntitySchema = z.object({
     .max(100)
     .nullable()
     .optional(),
+  metadata: z.record(z.unknown()).nullable().optional(),
 });
 export type SyncEntity = z.infer<typeof SyncEntitySchema>;
 

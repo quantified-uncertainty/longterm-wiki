@@ -645,6 +645,7 @@ export const entities = pgTable(
     sources: jsonb("sources").$type<
       Array<{ title: string; url?: string; author?: string; date?: string }>
     >(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

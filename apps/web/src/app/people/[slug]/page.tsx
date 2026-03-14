@@ -27,7 +27,8 @@ import {
   type ProfileTab,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import { getExpertById, getPublicationsForPerson } from "@/data";
+import { getExpertById, getPublicationsForPerson, getTypedEntityById, isPerson } from "@/data";
+import type { Entity } from "@longterm-wiki/kb";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
 import { CareerHistory } from "./career-history";
@@ -41,16 +42,34 @@ export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
 }
 
+/** Resolve a slug to a person entity (KB-first, typed entity fallback). */
+function resolvePersonEntity(slug: string): Entity | undefined {
+  const kbEntity = resolvePersonBySlug(slug);
+  if (kbEntity) return kbEntity;
+
+  // Fall back to typed entity from database.json
+  const typedEntity = getTypedEntityById(slug);
+  if (typedEntity && isPerson(typedEntity)) {
+    return {
+      id: slug,
+      stableId: slug,
+      type: "person",
+      name: typedEntity.title,
+      numericId: typedEntity.numericId,
+      wikiPageId: typedEntity.numericId,
+    };
+  }
+  return undefined;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const entity = resolvePersonBySlug(slug);
-  if (!entity) {
-    return { title: "Person Not Found" };
-  }
+  const entity = resolvePersonEntity(slug);
+  if (!entity) return { title: "Person Not Found" };
 
   const roleFact = getKBLatest(entity.id, "role");
   const employedByFact = getKBLatest(entity.id, "employed-by");
@@ -82,7 +101,7 @@ export default async function PersonProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entity = resolvePersonBySlug(slug);
+  const entity = resolvePersonEntity(slug);
   if (!entity) {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/people/${canonical}`);
