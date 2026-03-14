@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, asc, sql, ilike, or } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { entities } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
@@ -11,12 +12,14 @@ import {
   notFoundError,
   paginationQuery,
   escapeIlike,
+  zv,
 } from "./utils.js";
 import {
   SyncEntitySchema as SharedSyncEntitySchema,
   SyncEntitiesBatchSchema,
 } from "../api-types.js";
 import { upsertThingsInTx } from "./thing-sync.js";
+import { buildSearchCondition, parseSort } from "./query-helpers.js";
 
 // ---- Constants ----
 
@@ -34,6 +37,17 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
   limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+// ---- Organizations query schema ----
+
+const ORG_SORT_ALLOWED = ["name", "revenue", "valuation", "headcount", "totalFunding", "founded"] as const;
+
+const OrganizationsQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+  q: z.string().max(200).optional(),
+  sort: z.string().max(50).optional(),
 });
 
 // ---- Helpers ----
@@ -114,6 +128,142 @@ const entitiesApp = new Hono()
       byType: Object.fromEntries(
         byType.map((r) => [r.entityType, r.count])
       ),
+    });
+  })
+
+  // ---- GET /organizations ----
+  // Paginated list of organizations with latest financial facts.
+  // Supports search (?q=), sort (?sort=revenue:desc), and pagination.
+  .get("/organizations", zv("query", OrganizationsQuery), async (c) => {
+    const { limit, offset, q, sort } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Build WHERE — always filter to organization entity type
+    const conditions: SQL[] = [eq(entities.entityType, "organization")];
+
+    if (q) {
+      const searchCond = buildSearchCondition(
+        [entities.title, entities.id, entities.description],
+        q,
+      );
+      if (searchCond) conditions.push(searchCond);
+    }
+
+    const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
+
+    // Subquery for latest fact value by factId
+    const latestFact = (factId: string) => sql`(
+      SELECT f.numeric
+      FROM facts f
+      WHERE f.entity_id = ${entities.stableId}
+        AND f.fact_id = ${factId}
+        AND f.numeric IS NOT NULL
+      ORDER BY f.as_of DESC NULLS LAST, f.id DESC
+      LIMIT 1
+    )`;
+
+    const latestFactAsOf = (factId: string) => sql`(
+      SELECT f.as_of
+      FROM facts f
+      WHERE f.entity_id = ${entities.stableId}
+        AND f.fact_id = ${factId}
+        AND f.numeric IS NOT NULL
+      ORDER BY f.as_of DESC NULLS LAST, f.id DESC
+      LIMIT 1
+    )`;
+
+    const latestFactText = (factId: string) => sql`(
+      SELECT COALESCE(f.value, CAST(f.numeric AS TEXT))
+      FROM facts f
+      WHERE f.entity_id = ${entities.stableId}
+        AND f.fact_id = ${factId}
+      ORDER BY f.as_of DESC NULLS LAST, f.id DESC
+      LIMIT 1
+    )`;
+
+    // Build ORDER BY
+    const { field, dir } = parseSort(sort, ORG_SORT_ALLOWED, "name", "asc");
+    const sortColMap: Record<string, SQL> = {
+      name: sql`${entities.title}`,
+      revenue: latestFact("revenue"),
+      valuation: latestFact("valuation"),
+      headcount: latestFact("headcount"),
+      totalFunding: latestFact("total-funding"),
+      founded: latestFactText("founded-date"),
+    };
+    const sortCol = sortColMap[field] ?? sql`${entities.title}`;
+    const orderClause =
+      dir === "desc"
+        ? sql`${sortCol} DESC NULLS LAST`
+        : sql`${sortCol} ASC NULLS LAST`;
+
+    // Filtered count
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(entities)
+      .where(where);
+
+    // Data query with lateral fact subqueries
+    interface OrgRow {
+      id: string;
+      numericId: string | null;
+      stableId: string | null;
+      title: string;
+      description: string | null;
+      website: string | null;
+      revenueNum: number | null;
+      revenueDate: string | null;
+      valuationNum: number | null;
+      valuationDate: string | null;
+      headcount: number | null;
+      headcountDate: string | null;
+      totalFundingNum: number | null;
+      foundedDate: string | null;
+    }
+
+    const rows: OrgRow[] = await db
+      .select({
+        id: entities.id,
+        numericId: entities.numericId,
+        stableId: entities.stableId,
+        title: entities.title,
+        description: entities.description,
+        website: entities.website,
+        revenueNum: sql<number | null>`${latestFact("revenue")}`,
+        revenueDate: sql<string | null>`${latestFactAsOf("revenue")}`,
+        valuationNum: sql<number | null>`${latestFact("valuation")}`,
+        valuationDate: sql<string | null>`${latestFactAsOf("valuation")}`,
+        headcount: sql<number | null>`${latestFact("headcount")}`,
+        headcountDate: sql<string | null>`${latestFactAsOf("headcount")}`,
+        totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
+        foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
+      })
+      .from(entities)
+      .where(where)
+      .orderBy(orderClause, entities.id)
+      .limit(limit)
+      .offset(offset);
+
+    return c.json({
+      organizations: rows.map((r) => ({
+        id: r.id,
+        numericId: r.numericId,
+        stableId: r.stableId,
+        title: r.title,
+        description: r.description,
+        website: r.website,
+        revenueNum: r.revenueNum != null ? Number(r.revenueNum) : null,
+        revenueDate: r.revenueDate,
+        valuationNum: r.valuationNum != null ? Number(r.valuationNum) : null,
+        valuationDate: r.valuationDate,
+        headcount: r.headcount != null ? Number(r.headcount) : null,
+        headcountDate: r.headcountDate,
+        totalFundingNum: r.totalFundingNum != null ? Number(r.totalFundingNum) : null,
+        foundedDate: r.foundedDate,
+      })),
+      total,
+      limit,
+      offset,
     });
   })
 
