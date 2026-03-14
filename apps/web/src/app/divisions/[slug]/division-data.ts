@@ -42,6 +42,16 @@ export interface ParsedFundingProgram {
   openDate: string | null;
 }
 
+export interface ParsedDivisionGrant {
+  key: string;
+  name: string;
+  recipientName: string;
+  recipientHref: string | null;
+  amount: number | null;
+  date: string | null;
+  status: string | null;
+}
+
 export interface ParsedDivisionPersonnel {
   key: string;
   personId: string;
@@ -121,9 +131,46 @@ export function parseDivisionPersonnel(record: KBRecordEntry): ParsedDivisionPer
   };
 }
 
+// ── Slug helpers ─────────────────────────────────────────────────────
+
+/** Convert a division name to a URL-safe slug. */
+export function divisionNameToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[&]/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** Get the org slug for a division's ownerEntityId. */
+function getOrgSlugForEntity(entityId: string): string | null {
+  return getKBEntitySlug(entityId) ?? null;
+}
+
+/** Build the canonical href for a division: /organizations/[orgSlug]/divisions/[divSlug] */
+export function getDivisionHref(division: { name: string; ownerEntityId: string }): string | null {
+  const orgSlug = getOrgSlugForEntity(division.ownerEntityId);
+  if (!orgSlug) return null;
+  return `/organizations/${orgSlug}/divisions/${divisionNameToSlug(division.name)}`;
+}
+
 // ── Lookup helpers ────────────────────────────────────────────────────
 
-export function findDivisionBySlug(slug: string): KBRecordEntry | undefined {
+/** Find a division by org slug + division slug. */
+export function findDivision(orgSlug: string, divSlug: string): KBRecordEntry | undefined {
+  const entityId = getKBEntitySlug(orgSlug) ? undefined : undefined; // need reverse lookup
+  // Get all divisions for all orgs, filter by org + div slug match
+  const allDivisions = getAllKBRecords("divisions");
+  return allDivisions.find((d) => {
+    const ownerOrgSlug = getOrgSlugForEntity(d.ownerEntityId);
+    if (ownerOrgSlug !== orgSlug) return false;
+    const name = (d.fields.name as string) ?? d.key;
+    return divisionNameToSlug(name) === divSlug;
+  });
+}
+
+/** Legacy: find by old-style slug (key or fields.slug). Used for redirects. */
+export function findDivisionByLegacySlug(slug: string): KBRecordEntry | undefined {
   const allDivisions = getAllKBRecords("divisions");
   return allDivisions.find((d) => {
     const divSlug = d.fields.slug as string | undefined;
@@ -131,6 +178,30 @@ export function findDivisionBySlug(slug: string): KBRecordEntry | undefined {
   });
 }
 
+/** Get all {orgSlug, divSlug} pairs for static generation. */
+export function getAllDivisionParams(): Array<{ slug: string; divSlug: string }> {
+  const allDivisions = getAllKBRecords("divisions");
+  const seen = new Set<string>();
+  const params: Array<{ slug: string; divSlug: string }> = [];
+  for (const d of allDivisions) {
+    const orgSlug = getOrgSlugForEntity(d.ownerEntityId);
+    if (!orgSlug) continue;
+    const name = (d.fields.name as string) ?? d.key;
+    const divSlug = divisionNameToSlug(name);
+    const key = `${orgSlug}/${divSlug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    params.push({ slug: orgSlug, divSlug });
+  }
+  return params;
+}
+
+/** @deprecated Use findDivision(orgSlug, divSlug) instead. */
+export function findDivisionBySlug(slug: string): KBRecordEntry | undefined {
+  return findDivisionByLegacySlug(slug);
+}
+
+/** @deprecated Use getAllDivisionParams() instead. */
 export function getAllDivisionSlugs(): string[] {
   const allDivisions = getAllKBRecords("divisions");
   const slugs: string[] = [];
@@ -209,6 +280,7 @@ export interface DivisionPageData {
   leadHref: string | null;
   personnel: ParsedDivisionPersonnel[];
   divisionPrograms: ParsedFundingProgram[];
+  grants: ParsedDivisionGrant[];
 }
 
 export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry): DivisionPageData {
@@ -244,6 +316,35 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
   const parentTypedEntity = getTypedEntityById(division.ownerEntityId);
   const parentWikiPageId = parentTypedEntity?.numericId ?? null;
 
+  // Find grants associated with this division (by divisionName or divisionId)
+  const parentGrants = getKBRecords(division.ownerEntityId, "grants");
+  const divisionName = division.name.toLowerCase();
+  const divisionKey = division.key.toLowerCase();
+  const grants: ParsedDivisionGrant[] = parentGrants
+    .filter((g) => {
+      const gDiv = g.fields.divisionName as string | undefined;
+      const gProgram = g.fields.program as string | undefined;
+      if (!gDiv && !gProgram) return false;
+      const matchDiv = gDiv?.toLowerCase() === divisionName || gDiv?.toLowerCase() === divisionKey;
+      const matchProgram = gProgram?.toLowerCase() === divisionKey;
+      return matchDiv || matchProgram;
+    })
+    .map((g) => {
+      const recipientId = g.fields.recipient as string | undefined;
+      const resolved = recipientId ? resolveEntityLink(recipientId) : { name: "", href: null };
+      const amount = typeof g.fields.amount === "number" ? g.fields.amount : null;
+      return {
+        key: g.key,
+        name: (g.fields.name as string) ?? g.key,
+        recipientName: resolved.name,
+        recipientHref: resolved.href,
+        amount,
+        date: (g.fields.date as string) ?? (g.fields.period as string) ?? null,
+        status: (g.fields.status as string) ?? null,
+      };
+    })
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+
   return {
     division,
     parent,
@@ -252,5 +353,6 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
     leadHref,
     personnel,
     divisionPrograms,
+    grants,
   };
 }

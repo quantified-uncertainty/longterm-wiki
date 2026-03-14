@@ -284,6 +284,7 @@ export function parseDivisionRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
     key: record.key,
+    ownerEntityId: record.ownerEntityId,
     slug: (f.slug as string) ?? null,
     name: (f.name as string) ?? record.key,
     divisionType: (f.divisionType as string) ?? "team",
@@ -941,9 +942,24 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
 
   // ── Divisions (org subdivisions) ──
   const divisionRecords = getKBRecords(entity.id, "divisions");
-  const divisions = divisionRecords
-    .map((r) => {
-      const parsed = parseDivisionRecord(r);
+  // Deduplicate divisions by name — keep the entry with more data (e.g. has a lead)
+  const divisionsByName = new Map<string, ReturnType<typeof parseDivisionRecord>>();
+  for (const r of divisionRecords) {
+    const parsed = parseDivisionRecord(r);
+    const existing = divisionsByName.get(parsed.name);
+    if (!existing) {
+      divisionsByName.set(parsed.name, parsed);
+    } else {
+      // Prefer the entry with more populated fields
+      const countFields = (d: typeof parsed) =>
+        [d.lead, d.status, d.startDate, d.slug, d.website, d.source].filter(Boolean).length;
+      if (countFields(parsed) > countFields(existing)) {
+        divisionsByName.set(parsed.name, parsed);
+      }
+    }
+  }
+  const divisions = [...divisionsByName.values()]
+    .map((parsed) => {
       // Resolve lead slug/stableId to human-readable name
       if (parsed.lead) {
         // Try KB entity resolution first (handles both slugs and stableIds)

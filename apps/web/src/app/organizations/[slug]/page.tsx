@@ -47,7 +47,7 @@ import type { AuthorRef } from "./org-data";
 // Section components
 import { RelatedOrganizationsSection } from "./related-orgs-section";
 import { EquityPositionsSection } from "./equity-section";
-import { DivisionsSection } from "./divisions-section";
+import { DivisionsSection, DivisionsOverview } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
 import { PolicyPositionsSection, getOrgPolicyPositions } from "./policy-positions-section";
@@ -201,6 +201,11 @@ export default async function OrgProfilePage({
             <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
           )}
         </div>
+      )}
+
+      {/* Divisions overview */}
+      {data.divisions.length > 0 && (
+        <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
       )}
 
       {/* Related Orgs */}
@@ -473,8 +478,8 @@ export default async function OrgProfilePage({
   // ── Coverage tab (external resources about the org) ──
   if (data.resourcesAboutOrg.length > 0) {
     tabs.push({
-      id: "coverage",
-      label: "Coverage",
+      id: "press",
+      label: "Press",
       count: data.resourcesAboutOrg.length,
       content: (
         <OrgResourcesSection
@@ -489,8 +494,8 @@ export default async function OrgProfilePage({
   // ── Structure tab (divisions only — funding programs are in Funding) ──
   if (data.divisions.length > 0) {
     tabs.push({
-      id: "structure",
-      label: "Structure",
+      id: "divisions",
+      label: "Divisions",
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
