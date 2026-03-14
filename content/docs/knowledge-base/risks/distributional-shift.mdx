@@ -84,7 +84,7 @@ flowchart TD
     subgraph Shift["Types of Shift"]
         CS[Covariate Shift<br/>P'X ≠ PX]
         PS[Prior Shift<br/>P'Y ≠ PY]
-        CD[Concept Drift<br/>P'Y|X ≠ PY|X]
+        CD["Concept Drift<br/>P'(Y given X) ≠ P(Y given X)"]
     end
 
     TD -.->|"Distribution<br/>Mismatch"| DD
