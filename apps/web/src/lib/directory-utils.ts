@@ -13,7 +13,7 @@ import {
 } from "@/data/kb";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import type { Entity } from "@longterm-wiki/kb";
-import { getTypedEntities, isPerson, isRisk } from "@/data";
+import { getTypedEntities, isPerson, isRisk, isOrganization } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
 
@@ -92,6 +92,7 @@ export function resolveEntityBySlug(
 const TYPE_FILTERS: Record<string, (e: { entityType: string }) => boolean> = {
   person: (e) => isPerson(e as Parameters<typeof isPerson>[0]),
   risk: (e) => isRisk(e as Parameters<typeof isRisk>[0]),
+  organization: (e) => isOrganization(e as Parameters<typeof isOrganization>[0]),
 };
 
 /**
