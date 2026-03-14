@@ -453,6 +453,16 @@ function extractDomain(url: string): string | null {
   }
 }
 
+/** Well-known news/media source names that aren't real titles. */
+const SOURCE_NAMES = new Set([
+  "reuters", "cnbc", "bbc", "nytimes", "the new york times",
+  "the washington post", "the guardian", "wired", "techcrunch",
+  "the verge", "ars technica", "nature", "science", "arxiv",
+  "rand", "fortune", "bloomberg", "the information", "time",
+  "the economist", "mit technology review", "financial times",
+  "associated press", "ap news", "vox", "politico", "axios",
+]);
+
 /**
  * Check if a resource title is generic/useless (e.g. just the org name).
  * Returns true if the title should be replaced or the resource filtered out.
@@ -465,6 +475,20 @@ function isGenericTitle(title: string, orgName: string): boolean {
   if (new RegExp(`^${org.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\(\\d{4}\\)$`).test(t)) return true;
   if (t === `${org}'s` || t === `${org} acknowledged`) return true;
   if (t.length < 10 && t.startsWith(org.slice(0, 5))) return true;
+
+  // Source-name-only titles ("Reuters", "CNBC", "arXiv")
+  if (SOURCE_NAMES.has(t)) return true;
+
+  // Bibliographic format: "Author et al. (YYYY)" or "Author & Author (YYYY)"
+  if (/^[A-Z][a-z]+(\s+(et\s+al\.|&\s+[A-Z][a-z]+))\s*\(\d{4}\)\s*$/i.test(title.trim())) return true;
+
+  // Very short fragments that aren't useful (<15 chars, no spaces = likely a slug/version)
+  if (t.length < 15 && !t.includes(" ")) return true;
+
+  // Single-word titles or version-like strings ("2.0", "v4", "interpretability")
+  if (/^\d[\d.]*$/.test(t)) return true;
+  if (/^v\d/i.test(t) && t.length < 10) return true;
+
   return false;
 }
 
@@ -521,6 +545,13 @@ function cleanTitle(title: string, orgName: string): string {
   t = t.replace(new RegExp(`\\s*-\\s*${escaped}\\s*$`, "i"), "");
   // Strip " \ OrgName" suffix (backslash variant)
   t = t.replace(new RegExp(`\\s*\\\\\\s*${escaped}\\s*$`, "i"), "");
+  // Strip embedded URL in parens: "Title (https://example.com/...)" → "Title"
+  t = t.replace(/\s*\(https?:\/\/[^)]+\)\s*$/, "");
+  // Strip trailing " - Source" where Source is a known news outlet
+  const trailingSource = t.match(/\s*[-–—]\s*(.+)$/);
+  if (trailingSource && SOURCE_NAMES.has(trailingSource[1].toLowerCase().trim())) {
+    t = t.slice(0, -trailingSource[0].length);
+  }
   // If the title is a full URL, derive from path
   if (/^https?:\/\//.test(t.trim())) {
     const derived = titleFromUrl(t.trim());
@@ -567,7 +598,7 @@ function getPersonNameIndex(): Map<string, string> {
 }
 
 /** Resolve an author name string to an AuthorRef with optional link. */
-function resolveAuthor(name: string): AuthorRef {
+export function resolveAuthor(name: string): AuthorRef {
   const slug = getPersonNameIndex().get(name.toLowerCase().trim());
   return { name, href: slug ? `/people/${slug}` : null };
 }
@@ -601,6 +632,16 @@ function isResearchUrl(url: string): boolean {
 }
 
 /**
+ * Check if a string looks like a person name (2-3 capitalized words, no other content).
+ * Used to filter out person-name-only resource titles that aren't informative.
+ */
+function isPersonNameOnly(title: string): boolean {
+  const parts = title.trim().split(/\s+/);
+  if (parts.length < 2 || parts.length > 4) return false;
+  return parts.every((p) => /^[A-Z][a-z]+\.?$/.test(p) || /^(de|van|von|al|el|bin|ibn|del|la|di)$/i.test(p));
+}
+
+/**
  * Normalize a resource row: fix generic titles, skip untitled.
  * Returns null if the resource should be filtered out.
  */
@@ -628,6 +669,24 @@ function normalizeRow(r: Resource, orgName: string): OrgResourceRow | null {
   if (row.title.includes("://") || /^[a-z0-9-]+\.\w{2,}\//.test(row.title)) {
     const derived = titleFromUrl(r.url);
     if (derived) row.title = derived;
+  }
+
+  // Person-name-only titles → try URL-derived fallback
+  if (isPersonNameOnly(row.title)) {
+    const derived = titleFromUrl(r.url);
+    if (derived && !isPersonNameOnly(derived)) {
+      row.title = derived;
+    } else {
+      return null;
+    }
+  }
+
+  // Short titles (<20 chars) with no spaces are likely slugs — try URL fallback
+  if (row.title.length < 20 && !row.title.includes(" ")) {
+    const derived = titleFromUrl(r.url);
+    if (derived && derived.length > row.title.length) {
+      row.title = derived;
+    }
   }
 
   // Override type: research URLs should display as "paper" not "web"

@@ -2,8 +2,10 @@
  * Key Publications section for organization profile pages.
  * Shows papers from literature.yaml that are attributed to this org.
  */
+import Link from "next/link";
 import type { LiteraturePaper } from "@/data";
 import { SectionHeader, Badge, safeHref } from "./org-shared";
+import type { AuthorRef } from "./org-data";
 
 const TYPE_COLORS: Record<string, string> = {
   Paper: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
@@ -20,8 +22,10 @@ const TYPE_COLORS: Record<string, string> = {
 
 export function KeyPublicationsSection({
   publications,
+  resolvedAuthors,
 }: {
   publications: LiteraturePaper[];
+  resolvedAuthors?: Map<string, AuthorRef>;
 }) {
   if (publications.length === 0) return null;
 
@@ -65,7 +69,21 @@ export function KeyPublicationsSection({
                 </Badge>
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                {paper.authors.join(", ")}
+                {paper.authors.map((name, i) => {
+                  const ref = resolvedAuthors?.get(name);
+                  return (
+                    <span key={i}>
+                      {i > 0 && ", "}
+                      {ref?.href ? (
+                        <Link href={ref.href} className="hover:text-primary hover:underline">
+                          {name}
+                        </Link>
+                      ) : (
+                        name
+                      )}
+                    </span>
+                  );
+                })}
               </div>
               {paper.summary && (
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">

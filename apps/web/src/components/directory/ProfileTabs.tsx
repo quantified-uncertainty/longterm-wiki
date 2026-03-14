@@ -36,9 +36,12 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
           >
             {tab.label}
             {tab.count != null && tab.count > 0 && (
-              <span className="ml-1.5 text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                {tab.count}
-              </span>
+              <>
+                <span className="sr-only"> ({tab.count})</span>
+                <span aria-hidden="true" className="ml-1.5 text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                  {tab.count}
+                </span>
+              </>
             )}
           </TabsTrigger>
         ))}
