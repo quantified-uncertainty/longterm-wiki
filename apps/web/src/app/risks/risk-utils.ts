@@ -71,10 +71,5 @@ export function getTimeframeDisplay(
  *   "By 2040" → 2040
  *   "unknown" → null
  */
-export function extractEarliestYear(
-  timeframe: string | null | undefined,
-): number | null {
-  if (!timeframe) return null;
-  const match = timeframe.match(/(\d{4})/);
-  return match ? parseInt(match[1], 10) : null;
-}
+// extractEarliestYear moved to risk-constants.ts (client-safe)
+export { extractEarliestYear } from "./risk-constants";

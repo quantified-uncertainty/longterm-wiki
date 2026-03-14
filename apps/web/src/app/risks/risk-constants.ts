@@ -98,3 +98,14 @@ export const LIKELIHOOD_COLORS_DISPLAY: Record<string, string> = {
   "Very High":
     "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
+
+// ── Pure helpers (client-safe) ────────────────────────────────────────
+
+/** Extract the earliest 4-digit year from a timeframe string like "2025-2030". */
+export function extractEarliestYear(
+  timeframe: string | null | undefined,
+): number | null {
+  if (!timeframe) return null;
+  const match = timeframe.match(/(\d{4})/);
+  return match ? parseInt(match[1], 10) : null;
+}
