@@ -942,19 +942,23 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
 
   // ── Divisions (org subdivisions) ──
   const divisionRecords = getKBRecords(entity.id, "divisions");
-  // Deduplicate divisions by name — keep the entry with more data (e.g. has a lead)
+  // Deduplicate divisions by name — merge fields from all copies so that
+  // metadata (lead, website) and program connections (via key) are both preserved.
   const divisionsByName = new Map<string, ReturnType<typeof parseDivisionRecord>>();
+  const divisionAltKeys = new Map<string, Set<string>>(); // name → all keys for this division
   for (const r of divisionRecords) {
     const parsed = parseDivisionRecord(r);
     const existing = divisionsByName.get(parsed.name);
     if (!existing) {
       divisionsByName.set(parsed.name, parsed);
+      divisionAltKeys.set(parsed.name, new Set([parsed.key]));
     } else {
-      // Prefer the entry with more populated fields
-      const countFields = (d: typeof parsed) =>
-        [d.lead, d.status, d.startDate, d.slug, d.website, d.source].filter(Boolean).length;
-      if (countFields(parsed) > countFields(existing)) {
-        divisionsByName.set(parsed.name, parsed);
+      // Merge: fill in any null fields from the new copy
+      divisionAltKeys.get(parsed.name)!.add(parsed.key);
+      for (const field of ["lead", "status", "startDate", "endDate", "slug", "website", "source"] as const) {
+        if (!existing[field] && parsed[field]) {
+          (existing as Record<string, unknown>)[field] = parsed[field];
+        }
       }
     }
   }
@@ -1208,30 +1212,36 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   }
 
   // ── Division spending stats ──
-  // Compute total grant spending per division via: division → funding programs → grants
+  // Compute total grant spending per division via: division → funding programs → grants.
+  // Uses ALL alternate keys (from merged duplicates) to match funding programs.
   const divisionSpending = new Map<string, { totalAmount: number; grantCount: number }>();
   for (const d of divisions) {
-    // Find programs linked to this division
+    // All keys for this division (including duplicates that were merged)
+    const allKeys = divisionAltKeys.get(d.name) ?? new Set([d.key]);
+
+    // Find programs linked to ANY of this division's keys
     const divPrograms = fundingPrograms.filter((p) => {
       const raw = fundingProgramRecords.find((r) => r.key === p.key);
-      return raw && (raw.fields.divisionId as string) === d.key;
+      if (!raw) return false;
+      const divId = raw.fields.divisionId as string;
+      return allKeys.has(divId);
     });
     const programKeys = new Set(divPrograms.map((p) => p.key));
 
     // Find grants matching those programs (or direct division name/key match)
     let totalAmount = 0;
     let grantCount = 0;
+    const allKeysLower = new Set([...allKeys].map((k) => k.toLowerCase()));
     for (const g of grantRecords) {
       const programId = g.fields.programId as string | undefined;
       const gDiv = g.fields.divisionName as string | undefined;
       const gProgram = g.fields.program as string | undefined;
       const divName = d.name.toLowerCase();
-      const divKey = d.key.toLowerCase();
 
       const matches =
         (programId && programKeys.has(programId)) ||
-        (gDiv && (gDiv.toLowerCase() === divName || gDiv.toLowerCase() === divKey)) ||
-        (gProgram && gProgram.toLowerCase() === divKey);
+        (gDiv && (gDiv.toLowerCase() === divName || allKeysLower.has(gDiv.toLowerCase()))) ||
+        (gProgram && allKeysLower.has(gProgram.toLowerCase()));
 
       if (matches) {
         const amount = typeof g.fields.amount === "number" ? g.fields.amount : 0;
