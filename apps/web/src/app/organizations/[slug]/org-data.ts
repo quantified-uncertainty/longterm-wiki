@@ -94,6 +94,9 @@ export type ParsedGrantRecord = {
   date: string | null;
   status: string | null;
   source: string | null;
+  programName: string | null;
+  divisionName: string | null;
+  notes: string | null;
 };
 
 export type ReceivedGrant = ParsedGrantRecord & {
@@ -269,6 +272,9 @@ export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
     date: (f.date as string) ?? (f.period as string) ?? null,
     status: (f.status as string) ?? null,
     source: (f.source as string) ?? null,
+    programName: (f.programName as string) ?? null,
+    divisionName: (f.divisionName as string) ?? null,
+    notes: (f.notes as string) ?? null,
   };
 }
 
