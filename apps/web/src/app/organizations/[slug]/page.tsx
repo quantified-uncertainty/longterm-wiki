@@ -34,10 +34,12 @@ import {
 // Data loading & constants
 import {
   loadOrgPageData,
+  resolveAuthor,
   HERO_STATS,
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
 } from "./org-data";
+import type { AuthorRef } from "./org-data";
 
 // Section components
 import { RelatedOrganizationsSection } from "./related-orgs-section";
@@ -387,6 +389,16 @@ export default async function OrgProfilePage({
     (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
   );
 
+  // Build resolved author map for key publications author linking
+  const keyPubAuthorMap = new Map<string, AuthorRef>();
+  for (const pub of dedupedKeyPubs) {
+    for (const name of pub.authors) {
+      if (!keyPubAuthorMap.has(name)) {
+        keyPubAuthorMap.set(name, resolveAuthor(name));
+      }
+    }
+  }
+
   const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
   if (hasPublications) {
     const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
@@ -404,7 +416,10 @@ export default async function OrgProfilePage({
             />
           )}
           {dedupedKeyPubs.length > 0 && (
-            <KeyPublicationsSection publications={dedupedKeyPubs} />
+            <KeyPublicationsSection
+              publications={dedupedKeyPubs}
+              resolvedAuthors={keyPubAuthorMap}
+            />
           )}
         </div>
       ),

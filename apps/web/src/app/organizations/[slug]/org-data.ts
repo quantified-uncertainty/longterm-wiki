@@ -567,7 +567,7 @@ function getPersonNameIndex(): Map<string, string> {
 }
 
 /** Resolve an author name string to an AuthorRef with optional link. */
-function resolveAuthor(name: string): AuthorRef {
+export function resolveAuthor(name: string): AuthorRef {
   const slug = getPersonNameIndex().get(name.toLowerCase().trim());
   return { name, href: slug ? `/people/${slug}` : null };
 }
