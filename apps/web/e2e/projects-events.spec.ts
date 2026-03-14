@@ -32,10 +32,9 @@ test.describe("Projects Directory", () => {
   test("project cards link to detail pages", async ({ page }) => {
     await page.goto("/projects");
     const squiggleLink = page.locator('a[href="/projects/squiggle"]');
-    if (await squiggleLink.count() > 0) {
-      await squiggleLink.first().click();
-      await expect(page).toHaveURL(/\/projects\/squiggle/);
-    }
+    await expect(squiggleLink.first()).toBeVisible();
+    await squiggleLink.first().click();
+    await expect(page).toHaveURL(/\/projects\/squiggle/);
   });
 });
 

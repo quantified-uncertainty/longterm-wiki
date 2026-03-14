@@ -3,6 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
 import { RelatedPages } from "@/components/RelatedPages";
+
+function safeHostname(url: string): string {
+  try { return new URL(url).hostname.replace("www.", ""); }
+  catch { return url; }
+}
 import { getTypedEntities, getTypedEntityById, isProject, type ProjectEntity } from "@/data";
 import { getEntityHref, getWikiHref } from "@/data/entity-nav";
 
@@ -100,7 +105,7 @@ export default async function ProjectDetailPage({
               {entity.startDate && <span>Started {entity.startDate}</span>}
               {url && (
                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  {new URL(url).hostname.replace("www.", "")} &#8599;
+                  {safeHostname(url)} &#8599;
                 </a>
               )}
               {wikiHref && (
