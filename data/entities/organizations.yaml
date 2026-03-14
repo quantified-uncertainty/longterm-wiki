@@ -1046,6 +1046,7 @@
   orgType: academic
   summaryPage: safety-orgs-overview
   title: Future of Humanity Institute
+  website: https://www.fhi.ox.ac.uk/
   description: Oxford University research center focused on existential risks, founded by Nick Bostrom. Closed in 2024.
   status: stub
   relatedEntries:
@@ -1067,6 +1068,7 @@
   type: organization
   orgType: generic
   title: OpenAI Foundation
+  website: https://openai.com/
   description: >-
     Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC,
     with governance control through board appointment rights and philanthropic
@@ -1099,6 +1101,7 @@
   type: organization
   orgType: generic
   title: Leading the Future super PAC
+  website: https://www.leadingthefuture.com/
   description: >-
     Pro-AI industry super PAC launched in 2025 to influence federal AI regulation
     and the 2026 midterm elections, backed by over $125 million from OpenAI,
@@ -1125,6 +1128,7 @@
   type: organization
   orgType: academic
   title: Johns Hopkins Center for Health Security
+  website: https://centerforhealthsecurity.org/
   description: >-
     Independent nonprofit research organization focused on preventing and preparing
     for epidemics, pandemics, and biological threats, with significant work on
@@ -1152,6 +1156,7 @@
   orgType: government
   summaryPage: government-orgs-overview
   title: NIST and AI Safety
+  website: https://www.nist.gov/artificial-intelligence
   description: >-
     The National Institute of Standards and Technology's role in developing AI
     standards, risk management frameworks, and safety guidelines for the United
@@ -1180,6 +1185,7 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Safe Superintelligence Inc. (SSI)
+  website: https://ssi.inc/
   description: >-
     AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
     with a singular focus on developing safe superintelligence without commercial
@@ -1212,6 +1218,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: ControlAI
+  website: https://controlai.com/
   description: >-
     UK-based AI safety advocacy organization focused on preventing artificial
     superintelligence development through policy campaigns and grassroots outreach
@@ -1242,6 +1249,7 @@
   orgType: generic
   summaryPage: safety-orgs-overview
   title: Frontier Model Forum
+  website: https://www.frontiermodelforum.org/
   description: >-
     Industry-led non-profit organization promoting self-governance in frontier AI
     safety through collaborative frameworks, research funding, and best practices
@@ -1274,6 +1282,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Palisade Research
+  website: https://palisaderesearch.org/
   description: >-
     Nonprofit organization investigating offensive AI capabilities and
     controllability of frontier AI models through empirical research on autonomous
@@ -1336,6 +1345,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Goodfire
+  website: https://www.goodfire.ai/
   description: >-
     AI interpretability research lab developing tools to decode and control neural
     network internals for safer AI systems.
@@ -1370,6 +1380,7 @@
   numericId: E509
   type: organization
   title: 1Day Sooner
+  website: https://www.1daysooner.org/
   description: >-
     A pandemic preparedness nonprofit originally founded to advocate for
     COVID-19 human challenge trials, now working on indoor air quality
@@ -1406,6 +1417,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: AI Futures Project
+  website: https://www.aifutures.org/
   description: >-
     AI Futures Project is a nonprofit founded in 2024-2025 by former OpenAI
     researcher Daniel Kokotajlo that produces detailed AI capability forecasts,
@@ -1422,6 +1434,7 @@
   type: organization
   orgType: safety-org
   title: AI Impacts
+  website: https://aiimpacts.org/
   description: >-
     AI Impacts is a research organization that conducts empirical analysis of AI
     timelines and risks through surveys and historical trend analysis,
@@ -1455,6 +1468,7 @@
   type: organization
   orgType: safety-org
   title: Arb Research
+  website: https://arbresearch.com/
   description: >-
     Arb Research is a small AI safety consulting firm that produces
     methodologically rigorous research and evaluations, particularly known for
@@ -1472,6 +1486,7 @@
   type: organization
   orgType: safety-org
   title: Blueprint Biosecurity
+  website: https://blueprintbiosecurity.org/
   description: >-
     An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated
     to achieving breakthroughs in pandemic prevention through far-UVC germicidal
@@ -1489,6 +1504,7 @@
   orgType: generic
   summaryPage: labs-overview
   title: Bridgewater AIA Labs
+  website: https://www.bridgewater.com/aia-labs
   description: >-
     Bridgewater AIA Labs launched a $2B AI-driven macro fund in July 2024 that
     returned 11.9% in 2025, using proprietary ML models plus LLMs from
@@ -1536,6 +1552,7 @@
   type: organization
   orgType: funder
   title: Chan Zuckerberg Initiative
+  website: https://chanzuckerberg.com/
   description: >-
     The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted
     dramatically from broad social causes to AI-powered biomedical research,
@@ -1551,6 +1568,7 @@
   type: organization
   orgType: funder
   title: Coalition for Epidemic Preparedness Innovations
+  website: https://cepi.net/
   description: >-
     CEPI is an international vaccine development partnership founded in 2017
     that addresses market failures in pandemic preparedness by funding vaccines
@@ -1584,6 +1602,7 @@
   type: organization
   orgType: safety-org
   title: Council on Strategic Risks
+  website: https://councilonstrategicrisks.org/
   description: >-
     The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that
     focuses on climate-security intersections, strategic weapons, and ecological
@@ -1600,6 +1619,7 @@
   orgType: academic
   summaryPage: safety-orgs-overview
   title: CSER (Centre for the Study of Existential Risk)
+  website: https://www.cser.ac.uk/
   description: >-
     CSER is a Cambridge-based existential risk research centre founded in 2012,
     now funded at ~$1M+ annually from FLI and other sources, producing 24+
@@ -1619,6 +1639,7 @@
   orgType: academic
   summaryPage: safety-orgs-overview
   title: CSET (Center for Security and Emerging Technology)
+  website: https://cset.georgetown.edu/
   description: >-
     CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven AI
     policy research, particularly on U.S.-China competition and export controls.
@@ -1636,6 +1657,7 @@
   orgType: generic
   summaryPage: community-building-overview
   title: EA Global
+  website: https://www.effectivealtruism.org/ea-global
   description: >-
     EA Global is a series of selective conferences organized by the Centre for
     Effective Altruism that connects committed EA practitioners to collaborate
@@ -1650,6 +1672,7 @@
   type: organization
   orgType: startup
   title: Elicit (AI Research Tool)
+  website: https://elicit.com/
   description: >-
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
     and automates literature reviews, founded by AI alignment researchers from
@@ -1684,6 +1707,7 @@
   type: organization
   orgType: funder
   title: Founders Fund
+  website: https://www.foundersfund.com/
   description: >-
     Founders Fund is a $17B contrarian VC firm that has backed major AI
     companies like OpenAI and DeepMind but shows no explicit focus on AI safety
@@ -1699,6 +1723,7 @@
   type: organization
   orgType: startup
   title: FutureSearch
+  website: https://futuresearch.ai/
   description: >-
     FutureSearch is an AI forecasting startup founded by former Metaculus
     leaders that combines LLM research agents with human judgment, demonstrating
@@ -1716,6 +1741,7 @@
   type: organization
   orgType: funder
   title: Giving Pledge
+  website: https://givingpledge.org/
   description: >-
     The Giving Pledge, while attracting 250+ billionaire signatories since 2010,
     has a disappointing track record with only 36% of deceased pledgers actually
@@ -1730,6 +1756,7 @@
   type: organization
   orgType: generic
   title: Good Judgment (Forecasting)
+  website: https://goodjudgment.com/
   description: >-
     Good Judgment Inc. is a commercial forecasting organization that emerged
     from successful IARPA research, demonstrating that trained
@@ -1747,6 +1774,7 @@
   orgType: government
   summaryPage: government-orgs-overview
   title: Global Partnership on Artificial Intelligence (GPAI)
+  website: https://gpai.ai/
   description: >-
     GPAI represents the first major multilateral AI governance initiative but
     operates as a non-binding policy laboratory with limited enforcement power
@@ -1779,6 +1807,7 @@
   type: organization
   orgType: funder
   title: William and Flora Hewlett Foundation
+  website: https://www.hewlett.org/
   description: >-
     The Hewlett Foundation is a $14.8 billion philanthropic organization that
     focuses primarily on AI cybersecurity rather than AI alignment or
@@ -1794,6 +1823,7 @@
   type: organization
   orgType: academic
   title: IBBIS (International Biosecurity and Biosafety Initiative for Science)
+  website: https://ibbis.bio/
   description: >-
     An independent Swiss foundation launched in February 2024, spun out of NTI |
     bio, that develops free open-source tools for DNA synthesis screening and
@@ -1810,6 +1840,7 @@
   type: organization
   orgType: startup
   title: Kalshi (Prediction Market)
+  website: https://kalshi.com/
   description: >-
     This is a comprehensive corporate profile of Kalshi, a US prediction market
     platform that offers some AI safety-related contracts but is primarily
@@ -1827,6 +1858,7 @@
   orgType: generic
   summaryPage: community-building-overview
   title: LessWrong
+  website: https://www.lesswrong.com/
   description: >-
     LessWrong is a rationality-focused community blog founded in 2009 that has
     influenced AI safety discourse, receiving $5M+ in funding and serving as the
@@ -1843,6 +1875,7 @@
   orgType: generic
   summaryPage: community-building-overview
   title: Lighthaven (Event Venue)
+  website: https://lighthaven.space/
   description: >-
     Lighthaven is a Berkeley conference venue operated by Lightcone
     Infrastructure that serves as physical infrastructure for AI safety,
@@ -1859,6 +1892,7 @@
   type: organization
   summaryPage: safety-orgs-overview
   title: Lightning Rod Labs
+  website: https://www.lightningrod.ai/
   description: >-
     Lightning Rod Labs is an early-stage AI company using temporal data to train
     prediction models, claiming 10% returns on prediction markets but with
@@ -1874,6 +1908,7 @@
   type: organization
   orgType: funder
   title: Lionheart Ventures
+  website: https://www.lionheart.vc/
   description: >-
     Lionheart Ventures is a small venture capital firm ($25M inaugural fund)
     focused on AI safety and mental health investments, notable for its
@@ -1889,6 +1924,7 @@
   type: organization
   orgType: funder
   title: Longview Philanthropy
+  website: https://www.longview.org/
   description: >-
     Longview Philanthropy is a philanthropic advisory organization founded in
     2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
@@ -1907,6 +1943,7 @@
   type: organization
   orgType: funder
   title: Long-Term Future Fund (LTFF)
+  website: https://funds.effectivealtruism.org/funds/far-future
   description: >-
     LTFF is a regranting program that has distributed $20M since 2017
     (approximately $10M to AI safety) with median grants of $25K, filling a
@@ -1923,6 +1960,7 @@
   type: organization
   orgType: funder
   title: MacArthur Foundation
+  website: https://www.macfound.org/
   description: >-
     Comprehensive profile of the $9 billion MacArthur Foundation documenting its
     evolution from 1978 to present, with $8.27 billion in total grants across
@@ -1938,6 +1976,7 @@
   orgType: generic
   summaryPage: community-building-overview
   title: Manifest (Forecasting Conference)
+  website: https://manifest.is/
   description: >-
     Manifest is a 2024 forecasting conference that generated significant
     controversy within EA/rationalist communities due to speaker selection
@@ -1953,6 +1992,7 @@
   type: organization
   orgType: startup
   title: Manifold (Prediction Market)
+  website: https://manifold.markets/
   description: >-
     Manifold is a play-money prediction market with millions of predictions and
     ~2,000 peak daily users, showing AGI by 2030 at ~60% vs Metaculus ~45%.
@@ -1969,6 +2009,7 @@
   type: organization
   orgType: funder
   title: Manifund
+  website: https://manifund.org/
   description: >-
     Manifund is a $2M+ annual charitable regranting platform (founded 2022) that
     provides fast grants (<1 week) to AI safety projects through expert
@@ -1986,6 +2027,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: MATS ML Alignment Theory Scholars program
+  website: https://www.matsprogram.org/
   description: >-
     MATS is a well-documented 12-week fellowship program that has successfully
     trained 213 AI safety researchers with strong career outcomes (80% in
@@ -2003,6 +2045,7 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Meta AI (FAIR)
+  website: https://ai.meta.com/
   description: >-
     Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted
     for 2027, pioneering open-source AI through PyTorch (63% market share) and
@@ -2021,6 +2064,7 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Microsoft AI
+  website: https://www.microsoft.com/en-us/ai
   description: >-
     Microsoft invested $80B+ in AI infrastructure (FY2025) with a restructured
     $135B stake (27%) in OpenAI, generating $13B AI revenue run rate (175% YoY
@@ -2038,6 +2082,7 @@
   type: organization
   orgType: safety-org
   title: "NTI | bio (Nuclear Threat Initiative - Biological Program)"
+  website: https://www.nti.org/
   description: >-
     The biosecurity division of the Nuclear Threat Initiative, NTI | bio works
     to reduce global catastrophic biological risks through DNA synthesis
@@ -2055,6 +2100,7 @@
   type: organization
   orgType: funder
   title: Open Philanthropy
+  website: https://www.openphilanthropy.org/
   description: >-
     Open Philanthropy rebranded to Coefficient Giving in November 2025. See the
     Coefficient Giving page for current information.
@@ -2070,6 +2116,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Pause AI
+  website: https://pauseai.info/
   description: >-
     Pause AI is a grassroots advocacy movement founded May 2023 calling for
     international pause on frontier AI development until safety proven, growing
@@ -2086,6 +2133,7 @@
   type: organization
   orgType: funder
   title: Peter Thiel (Funder)
+  website: https://www.thielfoundation.org/
   description: >-
     Peter Thiel funded MIRI ($1.6M+) in its early years but has stated he
     believed they were "building an AGI" rather than doing safety research. He
@@ -2101,6 +2149,7 @@
   type: organization
   orgType: startup
   title: Polymarket
+  website: https://polymarket.com/
   description: >-
     This is a comprehensive overview of Polymarket as a prediction market
     platform, covering its history, mechanics, and accuracy, but has minimal
@@ -2117,6 +2166,7 @@
   type: organization
   orgType: startup
   title: Red Queen Bio
+  website: https://www.redqueen.bio/
   description: >-
     An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
     Eroshenko and Hannu Rajaniemi (co-founders of HelixNano), spun out to build
@@ -2205,6 +2255,7 @@
   type: organization
   orgType: generic
   title: Samotsvety
+  website: https://samotsvety.org/
   description: >-
     Elite forecasting group Samotsvety dominated INFER competitions 2020-2022
     with relative Brier scores twice as good as competitors, providing
@@ -2221,6 +2272,7 @@
   type: organization
   orgType: funder
   title: Schmidt Futures
+  website: https://www.schmidtfutures.com/
   description: >-
     Schmidt Futures is a major philanthropic initiative founded by Eric Schmidt
     that has committed substantial funding to AI safety research ($135M across
@@ -2237,6 +2289,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Secure AI Project
+  website: https://secureaiproject.org/
   description: >-
     Policy advocacy organization founded ~2022-2023 by Nick Beckstead focusing
     on legislative requirements for AI safety protocols, whistleblower
@@ -2254,6 +2307,7 @@
   type: organization
   orgType: safety-org
   title: SecureBio
+  website: https://securebio.org/
   description: >-
     A biosecurity nonprofit applying the Delay/Detect/Defend framework to
     protect against catastrophic pandemics, including AI-enabled biological
@@ -2272,6 +2326,7 @@
   type: organization
   orgType: safety-org
   title: SecureDNA
+  website: https://securedna.org/
   description: >-
     A Swiss nonprofit foundation providing free, privacy-preserving DNA
     synthesis screening software using novel cryptographic protocols. Co-founded
@@ -2290,6 +2345,7 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Seldon Lab
+  website: https://seldonlab.com/
   description: >-
     Seldon Lab is a San Francisco-based AI safety accelerator founded in early
     2025 that combines research publication with startup investment, claiming
@@ -2306,6 +2362,7 @@
   type: organization
   orgType: safety-org
   title: Sentinel (Catastrophic Risk Foresight)
+  website: https://sentinel-team.org/
   description: >-
     Sentinel is a 2024-founded foresight organization led by Nuño Sempere that
     processes millions of news items weekly through AI filtering and elite
@@ -2323,6 +2380,7 @@
   type: organization
   orgType: funder
   title: Survival and Flourishing Fund (SFF)
+  website: https://survivalandflourishing.fund/
   description: >-
     SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M
     fortune), with the 2025 round totaling $34.33M (86% to AI safety). Uses
@@ -2340,6 +2398,7 @@
   type: organization
   orgType: generic
   title: Situational Awareness LP
+  website: https://situationalawarenesslp.com/
   description: >-
     Situational Awareness LP is a hedge fund founded by Leopold Aschenbrenner in
     2024 that manages ~$2B in AI-focused public equities (semiconductors, energy
@@ -2356,6 +2415,7 @@
   type: organization
   orgType: safety-org
   title: Swift Centre
+  website: https://www.swiftcentre.org/
   description: >-
     Swift Centre is a UK forecasting organization that provides conditional
     forecasting services to various clients including some AI companies, but is
@@ -3202,6 +3262,7 @@
   type: organization
   orgType: safety-org
   title: Cambridge Boston Alignment Initiative
+  website: https://www.cbai.ai/
   description: >-
     Regional AI alignment research and community organization based in the
     Cambridge/Boston area.
@@ -3261,6 +3322,7 @@
   type: organization
   orgType: safety-org
   title: Alignment Research Engineer Accelerator
+  website: https://www.arena.education/
   description: >-
     Training program that upskills software engineers to become alignment
     researchers.
@@ -3319,6 +3381,7 @@
   type: organization
   orgType: safety-org
   title: London Initiative for Safe AI
+  website: https://www.safeai.org.uk/
   description: >-
     London-based AI safety initiative focused on policy engagement.
   tags:
@@ -3361,6 +3424,7 @@
   type: organization
   orgType: safety-org
   title: Pivotal Research
+  website: https://www.pivotal-research.org/
   description: >-
     Research organization working on AI safety and alignment research.
   tags:
@@ -3405,6 +3469,7 @@
   type: organization
   orgType: safety-org
   title: Median Group
+  website: https://mediangroup.org/
   description: >-
     Research group focused on AI timelines and AI safety research.
   tags:
@@ -3418,6 +3483,7 @@
   type: organization
   orgType: safety-org
   title: Modeling Cooperation
+  website: https://www.modelingcooperation.com/
   description: >-
     Research organization focused on game theory and cooperation dynamics
     relevant to AI safety.
@@ -3436,6 +3502,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Norway
+  website: https://effektivaltruisme.no/
   description: >-
     Norwegian chapter of the effective altruism movement.
   tags:
@@ -3448,6 +3515,7 @@
   type: organization
   orgType: generic
   title: Czech Association for Effective Altruism
+  website: https://efektivni-altruismus.cz/
   description: >-
     Czech chapter of the effective altruism movement (CZEA).
   tags:
@@ -3460,6 +3528,7 @@
   type: organization
   orgType: generic
   title: Effektiv Altruism Sverige (EA Sweden)
+  website: https://www.effektivaltruism.org/
   description: >-
     Swedish chapter of the effective altruism movement.
   tags:
@@ -3517,6 +3586,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Geneva
+  website: https://eageneva.org/
   description: >-
     Geneva-based chapter of the effective altruism movement.
   tags:
@@ -3529,6 +3599,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Poland
+  website: https://efektywnyaltruizm.org/
   description: >-
     Polish chapter of the effective altruism movement.
   tags:
@@ -3541,6 +3612,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Netherlands
+  website: https://effectiefaltruisme.nl/
   description: >-
     Dutch chapter of the effective altruism movement (EAN).
   tags:
@@ -3553,6 +3625,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Singapore
+  website: https://www.effectivealtruism.sg/
   description: >-
     Singapore chapter of the effective altruism movement.
   tags:
@@ -3565,6 +3638,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Finland
+  website: https://www.altruismi.fi/
   description: >-
     Finnish chapter of the effective altruism movement.
   tags:
@@ -3577,6 +3651,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Israel
+  website: https://www.effective-altruism.org.il/
   description: >-
     Israeli chapter of the effective altruism movement.
   tags:
@@ -3589,6 +3664,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Foundation
+  website: https://ea-foundation.org/
   description: >-
     Swiss-based EA organization focused on reducing suffering, operating
     research programs and grantmaking.
@@ -3603,6 +3679,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism New Zealand
+  website: https://effectivealtruism.nz/
   description: >-
     New Zealand chapter of the effective altruism movement.
   tags:
@@ -3615,6 +3692,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Australia
+  website: https://effectivealtruism.org.au/
   description: >-
     Australian chapter of the effective altruism movement.
   tags:
@@ -3627,6 +3705,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Denmark
+  website: https://effectivealtruism.dk/
   description: >-
     Danish chapter of the effective altruism movement.
   tags:
@@ -3639,6 +3718,7 @@
   type: organization
   orgType: generic
   title: Effective Altruism Austria
+  website: https://effectivealtruism.at/
   description: >-
     Austrian chapter of the effective altruism movement.
   tags:
@@ -3664,6 +3744,7 @@
   type: organization
   orgType: generic
   title: Cambridge Effective Altruism
+  website: https://www.eacambridge.org/
   description: >-
     Cambridge-based chapter of the effective altruism movement, one of the
     oldest and most active university EA groups.
@@ -3736,6 +3817,7 @@
   type: organization
   orgType: generic
   title: High Impact Engineers
+  website: https://www.highimpactengineers.org/
   description: >-
     Community connecting engineers with high-impact career opportunities.
   tags:
@@ -3793,6 +3875,7 @@
   type: organization
   orgType: generic
   title: Ambitious Impact
+  website: https://www.ambitiousimpact.com/
   description: >-
     Organization supporting career transitions into high-impact roles.
   tags:
@@ -3806,6 +3889,7 @@
   type: organization
   orgType: generic
   title: Training for Good
+  website: https://www.trainingforgood.com/
   description: >-
     Professional development and training programs for high-impact careers.
   tags:
@@ -4026,6 +4110,7 @@
   type: organization
   orgType: generic
   title: Oxford China Policy Lab
+  website: https://www.oxfordchinapolicylab.com/
   description: >-
     Research initiative at the University of Oxford focused on China-related
     policy analysis.
@@ -4156,6 +4241,7 @@
   type: organization
   orgType: generic
   title: Arcadia Impact
+  website: https://www.arcadiaimpact.org/
   description: >-
     Research organization focused on AI governance and existential risk reduction.
   tags:
