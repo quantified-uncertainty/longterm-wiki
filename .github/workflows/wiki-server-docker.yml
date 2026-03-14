@@ -312,6 +312,7 @@ jobs:
           #    Retries up to 3 times with backoff to handle transient errors during rolling deploys.
           #    Uses -s without -f so the response body is always captured for debugging.
           DELETED=""
+          CLEANUP_OK=false
           DELETE_HTTP_CODE=""
           DELETE_RESPONSE=""
           for i in 1 2 3; do
@@ -321,11 +322,21 @@ jobs:
             DELETE_HTTP_CODE=$(echo "$DELETE_RAW" | tail -1)
             DELETE_RESPONSE=$(echo "$DELETE_RAW" | sed '$d')
             DELETED=$(echo "$DELETE_RESPONSE" | jq -r '.deleted // empty' 2>/dev/null || true)
-            if [ "$DELETED" = "1" ]; then break; fi
+            if [ "$DELETED" = "1" ]; then
+              CLEANUP_OK=true
+              break
+            fi
+            # A prior attempt may have deleted successfully but its response was lost;
+            # retries then return 404 — treat as success since the page is already gone.
+            if [ "$DELETE_HTTP_CODE" = "404" ]; then
+              CLEANUP_OK=true
+              echo "Delete cleanup already complete (HTTP 404 on attempt $i)."
+              break
+            fi
             echo "Delete cleanup attempt $i/3 failed (HTTP $DELETE_HTTP_CODE): $DELETE_RESPONSE"
             if [ "$i" -lt 3 ]; then sleep $((i * 3)); fi
           done
-          if [ "$DELETED" != "1" ]; then
+          if [ "$CLEANUP_OK" != "true" ]; then
             echo "::error::Smoke test cleanup failed after 3 attempts (HTTP $DELETE_HTTP_CODE): $DELETE_RESPONSE"
             exit 1
           fi
