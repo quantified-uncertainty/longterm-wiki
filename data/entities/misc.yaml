@@ -56,6 +56,7 @@
   lastUpdated: 2026-02
 
 - id: effectiveness-assessment
+  stableId: zkLy1cxn9Q
   numericId: E113
   type: analysis
   title: AI Policy Effectiveness
@@ -76,6 +77,7 @@
   description: 'As AI governance efforts multiply, a critical question emerges: Which policies are actually working?'
   lastUpdated: 2025-12
 - id: openai-foundation-governance
+  stableId: Hk7IvggnEA
   numericId: E404
   type: analysis
   title: OpenAI Foundation Governance Paradox
@@ -136,6 +138,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-stakeholders
+  stableId: P43tBraTCQ
   numericId: E815
   type: table
   title: Anthropic Stakeholders
@@ -206,6 +209,7 @@
   lastUpdated: 2026-02
 
 - id: long-term-benefit-trust
+  stableId: eNJ3h95yWw
   numericId: E407
   type: analysis
   title: Long-Term Benefit Trust (Anthropic)
@@ -399,6 +403,7 @@
   lastUpdated: 2026-02
 
 - id: anthropic-impact
+  stableId: FARt52IXiw
   numericId: E413
   type: analysis
   title: Anthropic Impact Assessment Model
@@ -430,6 +435,7 @@
   lastUpdated: 2026-02
 
 - id: capability-alignment-race
+  stableId: CWaxxnWsDg
   numericId: E414
   type: analysis
   title: Capability-Alignment Race Model
@@ -462,6 +468,7 @@
   lastUpdated: 2026-02
 
 - id: short-timeline-policy-implications
+  stableId: MmXWq74Dsg
   numericId: E415
   type: analysis
   title: Short AI Timeline Policy Implications
@@ -492,6 +499,7 @@
   lastUpdated: 2026-02
 
 - id: technical-pathways
+  stableId: 0PWgAZVUwA
   numericId: E416
   type: analysis
   title: AI Safety Technical Pathway Decomposition
@@ -522,6 +530,7 @@
   lastUpdated: 2026-02
 
 - id: feedback-loops
+  stableId: 2FJMAcGv5A
   numericId: E417
   type: analysis
   title: AI Risk Feedback Loop & Cascade Model
@@ -549,6 +558,7 @@
   lastUpdated: 2026-02
 
 - id: multi-actor-landscape
+  stableId: w9q6Ircp5w
   numericId: E418
   type: analysis
   title: AI Safety Multi-Actor Strategic Landscape
@@ -609,6 +619,7 @@
   lastUpdated: 2026-02
 
 - id: ea-biosecurity-scope
+  stableId: Vg0FPAOTbw
   numericId: E420
   type: analysis
   title: Is EA Biosecurity Work Limited to Restricting LLM Biological Use?

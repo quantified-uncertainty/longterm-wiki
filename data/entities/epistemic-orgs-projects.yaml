@@ -91,6 +91,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: ai-assisted-knowledge-management
+  stableId: TWli6On67Q
   numericId: E681
   type: concept
   title: AI-Assisted Knowledge Management
@@ -110,6 +111,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: wikipedia-and-ai
+  stableId: xJjtghDmcw
   numericId: E683
   type: concept
   title: Wikipedia and AI Content
