@@ -86,7 +86,7 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
 
     employerId: employer?.entityId ?? null,
     employerName: employer?.name ?? null,
-    employerSlug: employer?.entityId ?? null,
+    employerSlug: employer ? getKBEntitySlug(employer.entityId) ?? null : null,
 
     bornYear: bornYear?.numeric ?? null,
     netWorthNum: netWorth?.numeric ?? null,
