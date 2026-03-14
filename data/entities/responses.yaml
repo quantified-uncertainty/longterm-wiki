@@ -220,13 +220,27 @@
   type: policy
   summaryPage: governance-overview
   title: Artificial Intelligence and Data Act (AIDA)
+  introduced: June 16, 2022
+  policyStatus: Died in Parliament January 2025
+  author: Canadian federal government
+  scope: National
+  billNumber: Bill C-27, Part 3
+  jurisdiction: Canada
+  provisions:
+    - title: High-Impact AI Risk Assessment
+      description: Pre-deployment risk assessment for AI systems affecting employment, access to services, health/safety, economic interests
+      category: Risk management
+    - title: Mitigation Requirements
+      description: Document potential harms; implement safeguards; establish human oversight; monitor performance
+      category: Oversight
+    - title: Transparency Obligations
+      description: Plain-language system descriptions; user notification requirements
+      category: Transparency
   customFields:
     - label: Introduced
       value: June 2022 (as part of Bill C-27)
     - label: Current Status
       value: Died with Parliament dissolution (January 2025)
-    - label: Scope
-      value: High-impact AI systems
     - label: Approach
       value: Risk-based, principles-focused
   sources:
@@ -253,6 +267,24 @@
   type: policy
   summaryPage: governance-overview
   title: China AI Regulatory Framework
+  introduced: "2021"
+  policyStatus: Active; comprehensive ongoing framework
+  author: Chinese government (CAC, State Council, MIIT)
+  scope: National
+  jurisdiction: China
+  provisions:
+    - title: Algorithm Recommendation Provisions
+      description: Effective March 2022; algorithm registration; user opt-out rights
+      category: Content regulation
+    - title: Deep Synthesis Provisions
+      description: Effective January 2023; mandatory labeling of deepfakes; real-name registration
+      category: Content regulation
+    - title: Generative AI Interim Measures
+      description: Effective August 2023; pre-deployment CAC approval; training data requirements
+      category: AI governance
+    - title: Personal Information Protection Law
+      description: Automated decision-making transparency; opt-out rights; impact assessments
+      category: Privacy
   customFields:
     - label: Approach
       value: Sector-specific, iterative
@@ -317,11 +349,45 @@
   type: policy
   summaryPage: governance-overview
   title: Colorado Artificial Intelligence Act
+  introduced: May 2024
+  policyStatus: Enacted May 17, 2024; enforcement delayed to June 30, 2026
+  author: Senator Robert Rodriguez
+  scope: State
+  billNumber: SB 24-205
+  jurisdiction: Colorado
+  provisions:
+    - title: High-Risk AI System Coverage
+      description: Regulates AI systems making consequential decisions in employment, housing, education, healthcare, lending, insurance, legal services, and government services
+      category: Scope
+    - title: Algorithmic Discrimination Prevention
+      description: Protects 12+ characteristics (age, race, disability, sex, religion, etc.) from disparate treatment and impact
+      category: Consumer protection
+    - title: Developer Documentation
+      description: Developers must provide training data summary, performance metrics, bias risk assessment, usage guidelines, and testing results
+      category: Transparency
+    - title: Deployer Impact Assessment
+      description: Annual impact assessment required for high-risk systems; 3-year retention
+      category: Oversight
+    - title: Consumer Disclosures
+      description: Clear AI involvement notification before each consequential decision; human review option for adverse decisions
+      category: Consumer protection
+  stakeholders:
+    - name: Google
+      entityId: deepmind
+      position: support
+      reason: Applauded risk-based approach; suggested alignment with future national/global laws
+    - name: Microsoft
+      position: oppose
+      reason: Opposed proactive AG notification requirements for discrimination risks
+    - name: Tech Industry Coalition
+      position: oppose
+      reason: Mobilized 150+ lobbyists during August 2024 special session; multiple attempts to gut law failed
+  amendments:
+    - date: August 28, 2025
+      description: SB 25B-004 delayed enforcement from February 1, 2026 to June 30, 2026
   customFields:
     - label: Signed
       value: May 17, 2024
-    - label: Sponsor
-      value: Senator Robert Rodriguez
     - label: Approach
       value: Risk-based, EU-influenced
   sources:
@@ -333,8 +399,15 @@
       author: Reuters
       date: May 2024
   description: >-
-    The Colorado AI Act (SB 21-205) is the first comprehensive AI regulation enacted by a US state. Signed into law on
-    May 17, 2024, it takes effect February 1, 2026.
+    The Colorado AI Act (SB 24-205) is the first comprehensive AI regulation enacted by a US state. Signed into law on
+    May 17, 2024, it takes effect June 30, 2026. Establishes a risk-based framework regulating AI systems making
+    consequential decisions, with developer documentation requirements and deployer impact assessments.
+  tags:
+    - regulation
+    - state-policy
+    - risk-based-regulation
+    - algorithmic-discrimination
+    - colorado
   lastUpdated: 2025-12
 - id: compute-governance
   stableId: lfvY1bGeoA
@@ -400,11 +473,45 @@
   policyStatus: In Effect (August 2024)
   author: European Commission
   scope: International
+  jurisdiction: European Union (+ extraterritorial)
+  provisions:
+    - title: Unacceptable Risk Prohibitions
+      description: Bans social scoring, subliminal manipulation, real-time biometric ID (with exceptions), emotion recognition in workplaces/schools
+      category: Prohibitions
+    - title: High-Risk System Requirements
+      description: Risk assessments, EU database registration, conformity assessment, CE marking, human oversight
+      category: High-risk AI
+    - title: Foundation Model Regulation
+      description: Two-tier GPAI obligations; systemic risk models (>10^25 FLOPs) require model evaluations, adversarial testing, incident reporting
+      category: Foundation models
+    - title: Transparency Requirements
+      description: Chatbots, deepfakes, emotion recognition systems must disclose AI involvement
+      category: Transparency
+  stakeholders:
+    - name: European Commission (AI Office)
+      position: support
+      reason: Leads enforcement for GPAI; fines up to 3% revenue or 15M euros
+    - name: France, Germany, Italy
+      position: oppose
+      reason: Lobbied against strict GPAI regulation during negotiations; concerned about European competitiveness
+    - name: European Parliament
+      position: support
+      reason: Advocated for treating foundation models as high-risk
+  votes:
+    - chamber: European Parliament
+      date: March 13, 2024
+      result: Passed
+      ayes: 523
+      noes: 46
+    - chamber: European Council
+      date: May 21, 2024
+      result: Adopted unanimously
+  amendments:
+    - date: December 2023
+      description: Compromise on foundation models; two-tier approach with systemic risk designation
   customFields:
     - label: Type
       value: Binding Regulation
-    - label: Scope
-      value: Risk-based
   relatedEntries:
     - id: compute-governance
       type: policy
@@ -421,7 +528,8 @@
       url: https://governance.ai/eu-ai-act
   description: >-
     The EU AI Act is the world's first comprehensive legal framework for artificial intelligence. Adopted in 2024, it
-    establishes a risk-based approach to AI regulation, with stricter requirements for higher-risk AI systems.
+    establishes a risk-based approach to AI regulation, with stricter requirements for higher-risk AI systems. Fines
+    up to 7% of global revenue for violations.
   tags:
     - regulation
     - gpai
@@ -435,11 +543,42 @@
   type: policy
   summaryPage: governance-overview
   title: US AI Chip Export Controls
+  introduced: October 2022
+  policyStatus: Active; multiple rounds of escalation through 2025
+  author: Bureau of Industry and Security (BIS)
+  scope: Federal
+  jurisdiction: United States
+  provisions:
+    - title: Advanced Logic Chip Restrictions
+      description: A100, H100, H200 series restricted; performance thresholds 4,800 TOPS INT8 or 300 TFLOPS FP16
+      category: Hardware
+    - title: Semiconductor Manufacturing Equipment
+      description: EUV/DUV lithography and specialized tools for sub-10nm fabrication restricted
+      category: Hardware
+    - title: Entity List
+      description: 600+ Chinese entities subject to restrictions with presumption of denial
+      category: Enforcement
+    - title: Extraterritorial Reach
+      description: Applies to foreign-produced items with 25% US components (0% for most sensitive items)
+      category: Scope
+  stakeholders:
+    - name: Netherlands (ASML)
+      position: support
+      reason: EUV equipment restrictions; expanded DUV licensing requirements
+    - name: Japan (Tokyo Electron, Nikon)
+      position: support
+      reason: Equipment restrictions aligned with US
+    - name: Chinese AI companies
+      position: oppose
+      reason: Disrupted procurement; forced domestic alternatives
+  amendments:
+    - date: October 2023
+      description: First expansion; lower thresholds; A800/H800 banned
+    - date: December 2024
+      description: Major update; 140+ entity additions; HBM controls
+    - date: January 2025
+      description: AI Diffusion Rule; global performance thresholds
   customFields:
-    - label: Initial Rules
-      value: October 2022
-    - label: Major Updates
-      value: October 2023, December 2024
     - label: Primary Target
       value: China
     - label: Enforcing Agency
@@ -573,34 +712,6 @@
   description: >-
     The NIST AI Risk Management Framework (AI RMF) is a voluntary guidance document developed by the National Institute
     of Standards and Technology to help organizations manage risks associated with AI systems.
-  lastUpdated: 2025-12
-- id: responsible-scaling-policies
-  stableId: 13l06h7veg
-  numericId: E252
-  type: policy
-  summaryPage: governance-overview
-  title: Responsible Scaling Policies (RSPs)
-  customFields:
-    - label: Type
-      value: Self-regulation
-    - label: Key Labs
-      value: Anthropic, OpenAI, Google DeepMind
-    - label: Origin
-      value: '2023'
-  sources:
-    - title: Anthropic's Responsible Scaling Policy
-      url: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
-      author: Anthropic
-      date: September 2023
-    - title: OpenAI Preparedness Framework
-      url: https://openai.com/safety/preparedness
-      author: OpenAI
-      date: December 2023
-    - title: Google DeepMind Frontier Safety Framework
-      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-      author: Google DeepMind
-      date: May 2024
-  description: "Voluntary commitments by frontier AI labs to pause or restrict development when models exceed defined capability thresholds unless corresponding safety measures are in place. Pioneered by Anthropic's RSP and adopted in similar forms by OpenAI and Google DeepMind. Central to debates about binding vs. voluntary safety governance."
   lastUpdated: 2025-12
 - id: seoul-declaration
   stableId: 1i59OZ3q5w
@@ -737,6 +848,39 @@
   type: policy
   summaryPage: governance-overview
   title: Voluntary AI Safety Commitments
+  introduced: July 2023
+  policyStatus: Active; 16+ companies participating with varying compliance (53% mean)
+  author: White House
+  scope: International
+  provisions:
+    - title: Security Testing
+      description: Pre-deployment adversarial testing for safety, security, and societal risks (70-85% compliance)
+      category: Safety
+    - title: Information Sharing
+      description: Share safety information with government, industry, civil society (20-35% compliance)
+      category: Transparency
+    - title: Cybersecurity Safeguards
+      description: Investment in protecting model weights and proprietary information (75-90% compliance)
+      category: Security
+    - title: Watermarking
+      description: Technical systems to identify AI-generated content (40-55% compliance; text watermarking 0%)
+      category: Transparency
+  stakeholders:
+    - name: OpenAI
+      entityId: openai
+      position: support
+      reason: 83.3% compliance score across 30 indicators
+    - name: Anthropic
+      entityId: anthropic
+      position: support
+      reason: 80.0% compliance; ASL framework developed
+    - name: Google DeepMind
+      entityId: deepmind
+      position: support
+      reason: 76.7% compliance; Frontier Safety Framework published
+    - name: Apple
+      position: mixed
+      reason: 13.3% compliance (joined July 2024); minimal engagement
   customFields:
     - label: Nature
       value: Non-binding voluntary pledges
@@ -1541,23 +1685,6 @@
     - alignment
     - research-agenda
   lastUpdated: 2025-12
-- id: ai-executive-order
-  stableId: DltF1Zn3KQ
-  numericId: E8
-  type: policy
-  title: Biden AI Executive Order
-  description: >-
-    Executive Order 14110 on AI safety signed by President Biden in October 2023, establishing AI safety reporting
-    requirements.
-  status: stub
-  relatedEntries:
-    - id: us-aisi
-      type: organization
-  tags:
-    - policy
-    - us-government
-    - regulation
-  lastUpdated: 2025-12
 - id: eval-saturation
   stableId: qGR2sFQRoQ
   numericId: E437
@@ -2158,10 +2285,51 @@
   numericId: E457
   type: policy
   title: California SB 53
+  introduced: "2025"
+  policyStatus: Signed September 29, 2025; effective January 1, 2026
+  author: Senator Scott Wiener
+  scope: State
+  billNumber: SB 53
+  jurisdiction: California
+  provisions:
+    - title: Large Frontier Developer Definition
+      description: Annual revenue >$500M; models trained with >10^26 FLOPs
+      category: Scope
+    - title: Public Safety Frameworks
+      description: Required annually on company websites; incorporate NIST AI RMF and industry best practices
+      category: Transparency
+    - title: Critical Safety Incident Reporting
+      description: 15 days standard, 24 hours for imminent danger to California Office of Emergency Services
+      category: Accountability
+    - title: Whistleblower Protections
+      description: Anonymous internal reporting; civil penalties for retaliation; attorney fees recovery
+      category: Worker protections
+    - title: CalCompute Consortium
+      description: 14-member consortium developing state-owned public computing cluster for AI research/startups
+      category: Infrastructure
+  stakeholders:
+    - name: Governor Gavin Newsom
+      position: support
+      reason: Signed after vetoing more ambitious SB 1047
+    - name: Anthropic
+      entityId: anthropic
+      position: support
+      reason: Backed final version; worked with sponsors on framework
+    - name: OpenAI
+      entityId: openai
+      position: mixed
+      reason: Opposed stricter SB 1047; less opposed to SB 53 transparency focus
+  votes:
+    - chamber: Senate
+      date: "2025"
+      result: Passed
+      ayes: 29
+      noes: 8
   description: >-
     California's Transparency in Frontier Artificial Intelligence Act, the first U.S. state law
     regulating frontier AI models through transparency requirements, safety reporting, and
-    whistleblower protections.
+    whistleblower protections. Signed September 29, 2025 after Governor Newsom vetoed the more
+    ambitious SB 1047 a year earlier.
   tags:
     - regulation
     - state-policy
@@ -2275,7 +2443,11 @@
   stableId: i1qSgjAj5A
   numericId: E461
   type: policy
+  summaryPage: governance-overview
   title: Responsible Scaling Policies
+  policyStatus: Active; 20+ companies participating
+  introduced: September 2023
+  scope: International
   description: >-
     Responsible Scaling Policies (RSPs) are voluntary commitments by AI labs to pause scaling when
     capability or safety thresholds are crossed. As of December 2025, 20 companies have published
@@ -2298,6 +2470,19 @@
       type: organization
     - id: metr
       type: organization
+  sources:
+    - title: Anthropic's Responsible Scaling Policy
+      url: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
+      author: Anthropic
+      date: September 2023
+    - title: OpenAI Preparedness Framework
+      url: https://openai.com/safety/preparedness
+      author: OpenAI
+      date: December 2023
+    - title: Google DeepMind Frontier Safety Framework
+      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+      author: Google DeepMind
+      date: May 2024
   lastUpdated: 2026-02
 
 - id: corporate
@@ -2517,9 +2702,42 @@
   type: policy
   summaryPage: governance-overview
   title: Bletchley Declaration
+  introduced: November 1-2, 2023
+  policyStatus: Active; follow-up summits ongoing
+  author: UK government (Rishi Sunak)
+  scope: International
+  jurisdiction: International (28 countries + EU)
+  provisions:
+    - title: Shared Risk Understanding
+      description: Evidence-based understanding of frontier AI safety risks including misuse, loss of control, catastrophic consequences
+      category: Principles
+    - title: Developer Responsibility
+      description: Frontier AI developers bear particularly strong responsibility for safety through testing, evaluations, mitigation
+      category: Accountability
+    - title: AI Safety Institutes
+      description: UK AISI established with 100M pounds; US AISI within NIST; 10+ countries committed to institutes
+      category: Institutions
+  stakeholders:
+    - name: United Kingdom
+      position: support
+      reason: Hosted summit; established AISI with 100M pounds funding
+    - name: United States
+      position: support
+      reason: VP Kamala Harris attended; committed to NIST AI Safety Institute
+    - name: China
+      position: support
+      reason: Signed declaration despite US tensions
+    - name: European Union
+      position: support
+      reason: Commission President Von der Leyen attended
+  votes:
+    - chamber: Summit
+      date: November 2, 2023
+      result: Signed by 28 countries + EU
   description: >-
     World-first international agreement on AI safety signed by 28 countries at the November 2023
-    AI Safety Summit, committing to cooperation on frontier AI risks.
+    AI Safety Summit, committing to cooperation on frontier AI risks. Follow-up summits in Seoul
+    (May 2024) and Paris (February 2025) expanded commitments.
   tags:
     - international-agreement
     - ai-summit
@@ -2615,6 +2833,41 @@
   type: policy
   summaryPage: governance-overview
   title: New York RAISE Act
+  introduced: Early 2025
+  policyStatus: Signed December 19, 2025; effective January 1, 2027
+  author: Senator Andrew Gounardes, Assemblymember Alex Bores
+  scope: State
+  jurisdiction: New York
+  provisions:
+    - title: Frontier Model Coverage
+      description: Models trained with >10^26 FLOPs by developers with >$500M annual revenue
+      category: Scope
+    - title: Safety Protocol Requirements
+      description: Risk identification for critical harm (death/serious injury to 100+ people, >$1B damage, WMD assistance)
+      category: Safety
+    - title: Third-Party Audits
+      description: Independent annual audits to verify compliance and assess risk mitigation
+      category: Oversight
+    - title: Incident Reporting
+      description: Report safety incidents within 72 hours to AG and Division of Homeland Security
+      category: Accountability
+    - title: Whistleblower Protections
+      description: Anonymous internal reporting; protections for contractors; civil penalties for retaliation
+      category: Worker protections
+  stakeholders:
+    - name: Governor Kathy Hochul
+      position: support
+      reason: Signed into law; called it nation-leading legislation
+    - name: AI companies
+      position: mixed
+      reason: Original penalties $10M/$30M reduced to $1M/$3M; deployment ban removed
+  votes:
+    - chamber: New York Legislature
+      date: June 2025
+      result: Passed
+    - chamber: Governor
+      date: December 19, 2025
+      result: Signed
   description: >-
     State legislation requiring safety protocols, incident reporting, and transparency from
     developers of frontier AI models. Signed December 2025, effective January 2027, with civil
@@ -3615,13 +3868,47 @@
   stableId: 561xbhJAeQ
   numericId: E602
   type: policy
-  title: Texas TRAIGA Responsible AI Governance Act
+  title: Texas Responsible AI Governance Act (TRAIGA)
+  introduced: December 2024
+  policyStatus: Signed June 22, 2025; effective January 1, 2026
+  author: Representative Giovanni Capriglione
+  scope: State
+  billNumber: HB 149
+  jurisdiction: Texas
+  provisions:
+    - title: Prohibited AI Practices
+      description: Intent-based liability for harmful AI uses including behavioral manipulation, constitutional rights violations, unlawful discrimination
+      category: Enforcement
+    - title: Government Disclosure Requirements
+      description: Clear notice before interaction with government AI; plain language; no dark patterns
+      category: Transparency
+    - title: AI Advisory Council
+      description: 7-member council appointed by governor/lt. governor/speaker; ethical AI oversight (advisory only)
+      category: Governance
+    - title: Regulatory Sandbox
+      description: 36-month program allowing testing of AI systems with waivers of certain laws
+      category: Innovation
+  stakeholders:
+    - name: Governor Greg Abbott
+      position: support
+      reason: Signed into law June 22, 2025
+    - name: Tech industry
+      position: support
+      reason: Preferred simplified intent-based approach vs comprehensive requirements
+  votes:
+    - chamber: House
+      date: April 23, 2025
+      result: Passed
+      ayes: 146
+      noes: 3
+    - chamber: Senate
+      date: May 23, 2025
+      result: Passed
   description: >-
-    TRAIGA represents a state-level AI regulation focused on intent-based
-    liability for harmful AI practices rather than comprehensive safety
-    requirements, creating enforcement mechanisms but avoiding technical safety
-    standards. The law establishes useful precedent for AI governance but
-    doesn't address 
+    Texas TRAIGA is a state-level AI regulation focused on intent-based liability for harmful AI
+    practices rather than comprehensive safety requirements. Passed with near-unanimous support
+    (House 146-3, Senate unanimous). Creates enforcement mechanisms and a regulatory sandbox but
+    avoids prescriptive technical safety standards.
   clusters:
     - governance
     - ai-safety
