@@ -73,7 +73,7 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
             case "paperCount": return row.paperCount;
             case "grantCount": return row.grantCount;
             case "totalFunding": return parseFloat(row.totalFunding);
-            case "firstProposedYear": return row.firstProposedYear ?? Infinity;
+            case "firstProposedYear": return row.firstProposedYear ?? 0;
           }
         };
         return compareByValue(a, b, getValue, sortDir);
