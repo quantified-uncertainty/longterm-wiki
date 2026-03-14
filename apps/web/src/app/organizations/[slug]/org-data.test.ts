@@ -36,11 +36,20 @@ function isGenericTitle(title: string, orgName: string): boolean {
 function isSectionPage(title: string, orgName: string): boolean {
   const t = title.toLowerCase().trim();
   const org = orgName.toLowerCase();
+  const standaloneWords = new Set([
+    "careers", "team", "about", "blog", "publications",
+    "research", "news", "press", "leadership", "contact", "jobs",
+  ]);
+  if (standaloneWords.has(t)) return true;
   const sectionPatterns = [
     `${org} blog`, `${org} safety blog`, `${org} research`,
     `${org} safety research`, `${org} alignment science`,
     `${org} careers`, `${org} news`, `${org} updates`,
     `${org} evals`, `${org} documented`,
+    `${org} team`, `${org} about`, `${org} press`,
+    `${org} leadership`, `${org} contact`, `${org} jobs`,
+    `${org} publications`,
+    `about ${org}`,
   ];
   return sectionPatterns.includes(t);
 }
@@ -55,10 +64,17 @@ function decodeHtmlEntities(s: string): string {
   return s
     .replace(/&#x27;/g, "'")
     .replace(/&#39;/g, "'")
+    .replace(/&#8211;/g, "–")
+    .replace(/&#8212;/g, "—")
+    .replace(/&#8216;/g, "\u2018")
+    .replace(/&#8217;/g, "\u2019")
+    .replace(/&#8220;/g, "\u201C")
+    .replace(/&#8221;/g, "\u201D")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
+    .replace(/&nbsp;/g, " ")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 
@@ -91,6 +107,11 @@ function titleFromUrl(url: string): string | null {
 function cleanTitle(title: string, orgName: string): string {
   let t = decodeHtmlEntities(title);
   t = t.replace(/\\(\$)/g, "$1");
+  // Strip inline citation format: 'Author, "Title" (https://...)' or 'Author, *Title* (https://...)'
+  const citationMatch = t.match(/^.{2,50},\s*[*"'](.+?)[*"']\s*\(https?:\/\//);
+  if (citationMatch) {
+    t = citationMatch[1];
+  }
   t = t.replace(/\s*\|\s*[^|]+\(https?:\/\/[^)]+\)\s*$/, "");
   const escaped = orgName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   t = t.replace(new RegExp(`\\s*\\|\\s*${escaped}\\s*$`, "i"), "");
@@ -101,6 +122,9 @@ function cleanTitle(title: string, orgName: string): string {
   if (trailingSource && SOURCE_NAMES.has(trailingSource[1].toLowerCase().trim())) {
     t = t.slice(0, -trailingSource[0].length);
   }
+  // Strip markdown emphasis wrapping: **text** → text, *text* → text
+  t = t.replace(/^\*\*(.+)\*\*$/, "$1");
+  t = t.replace(/^\*(.+)\*$/, "$1");
   if (/^https?:\/\//.test(t.trim())) {
     const derived = titleFromUrl(t.trim());
     if (derived) return derived;
@@ -160,6 +184,35 @@ describe("isSectionPage", () => {
     expect(isSectionPage("Anthropic Careers", "Anthropic")).toBe(true);
   });
 
+  it("matches standalone section words", () => {
+    expect(isSectionPage("Careers", "Anthropic")).toBe(true);
+    expect(isSectionPage("Team", "OpenAI")).toBe(true);
+    expect(isSectionPage("About", "DeepMind")).toBe(true);
+    expect(isSectionPage("Blog", "Anthropic")).toBe(true);
+    expect(isSectionPage("Publications", "MIRI")).toBe(true);
+    expect(isSectionPage("Research", "Anthropic")).toBe(true);
+    expect(isSectionPage("News", "OpenAI")).toBe(true);
+    expect(isSectionPage("Press", "DeepMind")).toBe(true);
+    expect(isSectionPage("Leadership", "Anthropic")).toBe(true);
+    expect(isSectionPage("Contact", "OpenAI")).toBe(true);
+    expect(isSectionPage("Jobs", "DeepMind")).toBe(true);
+  });
+
+  it("matches new org-prefixed section patterns", () => {
+    expect(isSectionPage("Anthropic Team", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic About", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic Press", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic Leadership", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic Contact", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic Jobs", "Anthropic")).toBe(true);
+    expect(isSectionPage("Anthropic Publications", "Anthropic")).toBe(true);
+  });
+
+  it("matches 'About Org' pattern", () => {
+    expect(isSectionPage("About Anthropic", "Anthropic")).toBe(true);
+    expect(isSectionPage("About OpenAI", "OpenAI")).toBe(true);
+  });
+
   it("does NOT match real pages", () => {
     expect(isSectionPage("Anthropic's Responsible Scaling Policy", "Anthropic")).toBe(false);
   });
@@ -213,6 +266,45 @@ describe("cleanTitle", () => {
 
   it("strips MDX-escaped dollar signs", () => {
     expect(cleanTitle("Raises \\$2B", "Org")).toBe("Raises $2B");
+  });
+
+  it("strips inline citation format with quotes", () => {
+    expect(cleanTitle('AISI, "Funding 60 projects" (https://example.com/foo)', "Org")).toBe("Funding 60 projects");
+  });
+
+  it("strips inline citation format with asterisks", () => {
+    expect(cleanTitle("Author, *Some Important Title* (https://example.com/bar)", "Org")).toBe("Some Important Title");
+  });
+
+  it("strips inline citation format with single quotes", () => {
+    expect(cleanTitle("Smith, 'A New Approach' (https://example.com/baz)", "Org")).toBe("A New Approach");
+  });
+
+  it("strips markdown bold wrapping", () => {
+    expect(cleanTitle("**Bold Title Here**", "Org")).toBe("Bold Title Here");
+  });
+
+  it("strips markdown italic wrapping", () => {
+    expect(cleanTitle("*Italic Title Here*", "Org")).toBe("Italic Title Here");
+  });
+
+  it("does NOT strip mid-title asterisks", () => {
+    expect(cleanTitle("H*-complexity in AI systems", "Org")).toBe("H*-complexity in AI systems");
+  });
+
+  it("decodes en-dash and em-dash HTML entities", () => {
+    expect(cleanTitle("AI &#8211; Safety", "Org")).toBe("AI – Safety");
+    expect(cleanTitle("AI &#8212; Safety", "Org")).toBe("AI — Safety");
+  });
+
+  it("decodes smart quote HTML entities", () => {
+    expect(cleanTitle("&#8216;Hello&#8217;", "Org")).toBe("\u2018Hello\u2019");
+    // Single quotes should be proper Unicode curly quotes
+    expect(cleanTitle("&#8220;Hello&#8221;", "Org")).toBe("\u201CHello\u201D");
+  });
+
+  it("decodes &nbsp; entity", () => {
+    expect(cleanTitle("AI&nbsp;Safety", "Org")).toBe("AI Safety");
   });
 });
 
