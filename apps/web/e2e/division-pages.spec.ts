@@ -67,9 +67,9 @@ test.describe("Division pages — navigation from org page", () => {
 
 test.describe("Division detail pages — direct URL access", () => {
   const DIVISION_URLS = [
-    "/organizations/coefficient-giving/divisions/global-health-and-wellbeing",
-    "/organizations/coefficient-giving/divisions/abundance-and-growth",
-    "/organizations/anthropic/divisions/alignment-science",
+    "/organizations/coefficient-giving/divisions/Cs0fLbZ1KO", // Global Health and Wellbeing
+    "/organizations/coefficient-giving/divisions/vQ4qEI1Ghg", // Abundance & Growth
+    "/organizations/anthropic/divisions/QNrOKtOTXC", // Alignment Science
   ];
 
   for (const url of DIVISION_URLS) {
@@ -122,7 +122,7 @@ test.describe("Division page — grants tab", () => {
     page.on("pageerror", (err) => pageErrors.push(err.message));
 
     await page.goto(
-      "/organizations/coefficient-giving/divisions/global-health-and-wellbeing",
+      "/organizations/coefficient-giving/divisions/Cs0fLbZ1KO",
       { waitUntil: "networkidle", timeout: 30000 }
     );
 

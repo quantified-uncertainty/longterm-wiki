@@ -147,25 +147,22 @@ function getOrgSlugForEntity(entityId: string): string | null {
   return getKBEntitySlug(entityId) ?? null;
 }
 
-/** Build the canonical href for a division: /organizations/[orgSlug]/divisions/[divSlug] */
-export function getDivisionHref(division: { name: string; ownerEntityId: string }): string | null {
+/** Build the canonical href for a division: /organizations/[orgSlug]/divisions/[divId] */
+export function getDivisionHref(division: { key: string; ownerEntityId: string }): string | null {
   const orgSlug = getOrgSlugForEntity(division.ownerEntityId);
   if (!orgSlug) return null;
-  return `/organizations/${orgSlug}/divisions/${divisionNameToSlug(division.name)}`;
+  return `/organizations/${orgSlug}/divisions/${division.key}`;
 }
 
 // ── Lookup helpers ────────────────────────────────────────────────────
 
-/** Find a division by org slug + division slug. */
-export function findDivision(orgSlug: string, divSlug: string): KBRecordEntry | undefined {
-  const entityId = getKBEntitySlug(orgSlug) ? undefined : undefined; // need reverse lookup
-  // Get all divisions for all orgs, filter by org + div slug match
+/** Find a division by org slug + division ID (record key). */
+export function findDivision(orgSlug: string, divId: string): KBRecordEntry | undefined {
   const allDivisions = getAllKBRecords("divisions");
   return allDivisions.find((d) => {
+    if (d.key !== divId) return false;
     const ownerOrgSlug = getOrgSlugForEntity(d.ownerEntityId);
-    if (ownerOrgSlug !== orgSlug) return false;
-    const name = (d.fields.name as string) ?? d.key;
-    return divisionNameToSlug(name) === divSlug;
+    return ownerOrgSlug === orgSlug;
   });
 }
 
@@ -178,20 +175,14 @@ export function findDivisionByLegacySlug(slug: string): KBRecordEntry | undefine
   });
 }
 
-/** Get all {orgSlug, divSlug} pairs for static generation. */
+/** Get all {slug, divSlug} pairs for static generation. */
 export function getAllDivisionParams(): Array<{ slug: string; divSlug: string }> {
   const allDivisions = getAllKBRecords("divisions");
-  const seen = new Set<string>();
   const params: Array<{ slug: string; divSlug: string }> = [];
   for (const d of allDivisions) {
     const orgSlug = getOrgSlugForEntity(d.ownerEntityId);
     if (!orgSlug) continue;
-    const name = (d.fields.name as string) ?? d.key;
-    const divSlug = divisionNameToSlug(name);
-    const key = `${orgSlug}/${divSlug}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    params.push({ slug: orgSlug, divSlug });
+    params.push({ slug: orgSlug, divSlug: d.key });
   }
   return params;
 }
