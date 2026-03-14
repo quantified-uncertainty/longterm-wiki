@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS thing_resource_verifications (
   id BIGSERIAL PRIMARY KEY,
   thing_id TEXT NOT NULL REFERENCES things(id) ON DELETE CASCADE,
-  resource_id TEXT REFERENCES resources(id),
+  resource_id TEXT REFERENCES resources(id) ON DELETE SET NULL,
   source_url TEXT,
   field_name TEXT,
   expected_value TEXT,

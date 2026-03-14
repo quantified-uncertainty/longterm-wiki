@@ -1920,7 +1920,9 @@ export const thingResourceVerifications = pgTable(
     thingId: text("thing_id")
       .notNull()
       .references(() => things.id, { onDelete: "cascade" }),
-    resourceId: text("resource_id").references(() => resources.id),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
     sourceUrl: text("source_url"),
     fieldName: text("field_name"),
     expectedValue: text("expected_value"),

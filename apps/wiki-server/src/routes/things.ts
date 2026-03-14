@@ -370,28 +370,32 @@ const thingsApp = new Hono()
       );
     }
 
-    const [inserted] = await db
-      .insert(thingResourceVerifications)
-      .values({
-        thingId: data.thingId,
-        resourceId: data.resourceId ?? null,
-        sourceUrl: data.sourceUrl ?? null,
-        fieldName: data.fieldName ?? null,
-        expectedValue: data.expectedValue ?? null,
-        verdict: data.verdict,
-        confidence: data.confidence ?? null,
-        extractedValue: data.extractedValue ?? null,
-        checkerModel: data.checkerModel ?? null,
-        isPrimarySource: data.isPrimarySource ?? false,
-        notes: data.notes ?? null,
-      })
-      .returning();
+    const inserted = await db.transaction(async (tx) => {
+      const [row] = await tx
+        .insert(thingResourceVerifications)
+        .values({
+          thingId: data.thingId,
+          resourceId: data.resourceId ?? null,
+          sourceUrl: data.sourceUrl ?? null,
+          fieldName: data.fieldName ?? null,
+          expectedValue: data.expectedValue ?? null,
+          verdict: data.verdict,
+          confidence: data.confidence ?? null,
+          extractedValue: data.extractedValue ?? null,
+          checkerModel: data.checkerModel ?? null,
+          isPrimarySource: data.isPrimarySource ?? false,
+          notes: data.notes ?? null,
+        })
+        .returning();
 
-    // Auto-flag the aggregate verdict for recheck
-    await db
-      .update(thingVerdicts)
-      .set({ needsRecheck: true, updatedAt: new Date() })
-      .where(eq(thingVerdicts.thingId, data.thingId));
+      // Auto-flag the aggregate verdict for recheck
+      await tx
+        .update(thingVerdicts)
+        .set({ needsRecheck: true, updatedAt: new Date() })
+        .where(eq(thingVerdicts.thingId, data.thingId));
+
+      return row;
+    });
 
     return c.json(formatVerification(inserted), 201);
   })
@@ -443,42 +447,46 @@ const thingsApp = new Hono()
 
     const now = new Date();
 
-    // Upsert the aggregate verdict
-    const [upserted] = await db
-      .insert(thingVerdicts)
-      .values({
-        thingId: data.thingId,
-        verdict: data.verdict,
-        confidence: data.confidence ?? null,
-        reasoning: data.reasoning ?? null,
-        sourcesChecked: data.sourcesChecked ?? 0,
-        needsRecheck: data.needsRecheck ?? false,
-        lastComputedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: thingVerdicts.thingId,
-        set: {
-          verdict: sql`excluded.verdict`,
-          confidence: sql`excluded.confidence`,
-          reasoning: sql`excluded.reasoning`,
-          sourcesChecked: sql`excluded.sources_checked`,
-          needsRecheck: sql`excluded.needs_recheck`,
-          lastComputedAt: sql`excluded.last_computed_at`,
-          updatedAt: sql`now()`,
-        },
-      })
-      .returning();
+    const upserted = await db.transaction(async (tx) => {
+      // Upsert the aggregate verdict
+      const [row] = await tx
+        .insert(thingVerdicts)
+        .values({
+          thingId: data.thingId,
+          verdict: data.verdict,
+          confidence: data.confidence ?? null,
+          reasoning: data.reasoning ?? null,
+          sourcesChecked: data.sourcesChecked ?? 0,
+          needsRecheck: data.needsRecheck ?? false,
+          lastComputedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: thingVerdicts.thingId,
+          set: {
+            verdict: sql`excluded.verdict`,
+            confidence: sql`excluded.confidence`,
+            reasoning: sql`excluded.reasoning`,
+            sourcesChecked: sql`excluded.sources_checked`,
+            needsRecheck: sql`excluded.needs_recheck`,
+            lastComputedAt: sql`excluded.last_computed_at`,
+            updatedAt: sql`now()`,
+          },
+        })
+        .returning();
 
-    // Also update the denormalized verdict on the things row
-    await db
-      .update(things)
-      .set({
-        verdict: data.verdict,
-        verdictConfidence: data.confidence ?? null,
-        verdictAt: now,
-        updatedAt: now,
-      })
-      .where(eq(things.id, data.thingId));
+      // Also update the denormalized verdict on the things row
+      await tx
+        .update(things)
+        .set({
+          verdict: data.verdict,
+          verdictConfidence: data.confidence ?? null,
+          verdictAt: now,
+          updatedAt: now,
+        })
+        .where(eq(things.id, data.thingId));
+
+      return row;
+    });
 
     return c.json(formatVerdict(upserted));
   })

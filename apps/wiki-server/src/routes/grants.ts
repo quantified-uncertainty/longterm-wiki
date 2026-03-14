@@ -386,22 +386,27 @@ const grantsApp = new Hono()
       .map((item) => sql`(${item.id}, ${item.programId})`)
       .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
 
-    const result = await db.execute(sql`
-      UPDATE grants SET program_id = v.program_id, updated_at = now()
-      FROM (VALUES ${valuesList}) AS v(id, program_id)
-      WHERE grants.id = v.id
-    `);
-
-    // Touch things.updatedAt for affected grants
     const grantIds = items.map((item) => item.id);
     const thingIdList = sql.join(
       grantIds.map((id) => sql`${id}`),
       sql`, `
     );
-    await db.execute(sql`
-      UPDATE things SET updated_at = now()
-      WHERE source_table = 'grants' AND source_id IN (${thingIdList})
-    `);
+
+    const result = await db.transaction(async (tx) => {
+      const res = await tx.execute(sql`
+        UPDATE grants SET program_id = v.program_id, updated_at = now()
+        FROM (VALUES ${valuesList}) AS v(id, program_id)
+        WHERE grants.id = v.id
+      `);
+
+      // Touch things.updatedAt for affected grants
+      await tx.execute(sql`
+        UPDATE things SET updated_at = now()
+        WHERE source_table = 'grants' AND source_id IN (${thingIdList})
+      `);
+
+      return res;
+    });
 
     // db.execute returns rowCount at runtime (postgres.js) but it's not in Drizzle's type
     const updated = "rowCount" in result ? Number(result.rowCount) : items.length;

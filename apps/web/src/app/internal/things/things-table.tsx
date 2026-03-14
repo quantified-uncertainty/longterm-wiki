@@ -259,11 +259,12 @@ function ThingExpandedDetail({
           {/* Verification rollup */}
           {(() => {
             const verified = children.filter((c) => c.verdict === "confirmed").length;
-            const total = children.length;
-            const pct = total > 0 ? ((verified / total) * 100).toFixed(0) : "0";
+            const loaded = children.length;
+            const pct = loaded > 0 ? ((verified / loaded) * 100).toFixed(0) : "0";
             return (
               <div className="text-xs text-muted-foreground mt-1">
-                {verified} of {total} children verified ({pct}%)
+                {verified} of {loaded} loaded children verified ({pct}%)
+                {childrenTotal > loaded && ` — ${childrenTotal} total`}
               </div>
             );
           })()}
