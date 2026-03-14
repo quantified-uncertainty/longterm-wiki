@@ -391,32 +391,10 @@ export function getKBDataNav(): NavSection[] {
 }
 
 // ============================================================================
-// SOURCES SECTION NAV (resources + publications)
-// ============================================================================
-
-/**
- * Build sidebar navigation for the /sources/ section.
- * Resources and publications — citation infrastructure distinct from KB YAML data.
- */
-export function getSourcesNav(): NavSection[] {
-  return [
-    {
-      title: "Sources",
-      defaultOpen: true,
-      items: [
-        { label: "Overview", href: "/wiki/E1049" },
-        { label: "Resources", href: "/resources" },
-        { label: "Publications", href: "/publications" },
-      ],
-    },
-  ];
-}
-
-// ============================================================================
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "internal" | "about" | "kb-data" | "sources" | "kb" | "section" | null;
+export type WikiSidebarType = "models" | "internal" | "about" | "kb-data" | "kb" | "section" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -443,11 +421,6 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
 
   if (entityPath.startsWith("/internal/") || entityPath === "/internal") {
     return "internal";
-  }
-
-  // Sources section — resources and publications
-  if (entityPath.startsWith("/sources/") || entityPath === "/sources") {
-    return "sources";
   }
 
   // KB Data section — public structured data pages at /kb/
@@ -520,8 +493,6 @@ export function getWikiNav(
       return getAboutNav();
     case "internal":
       return getInternalNav();
-    case "sources":
-      return getSourcesNav();
     case "kb-data":
       return getKBDataNav();
     case "kb": {
