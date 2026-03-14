@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createHash } from "crypto";
 
 // Mock fs before importing the module under test
 vi.mock("fs", () => ({
@@ -8,15 +7,13 @@ vi.mock("fs", () => ({
 
 import { readFileSync } from "fs";
 import { loadBenchmarks, loadBenchmarkResults } from "./sync-benchmarks.ts";
+import { contentHash } from "../../packages/kb/src/ids.ts";
 
 const mockReadFileSync = vi.mocked(readFileSync);
 
-// Helper: compute the same deterministic ID that generateResultId produces
+// Helper: compute the same deterministic ID that contentHash produces
 function expectedResultId(benchmarkId: string, modelId: string): string {
-  return createHash("md5")
-    .update(`br:${benchmarkId}:${modelId}`)
-    .digest("hex")
-    .slice(0, 10);
+  return contentHash(["benchmark-result", benchmarkId, modelId]);
 }
 
 beforeEach(() => {
@@ -45,7 +42,6 @@ describe("generateResultId (via loadBenchmarkResults)", () => {
     expect(results).toHaveLength(1);
     expect(results[0].id).toBe(expectedResultId("mmlu", "gpt-4"));
     expect(results[0].id).toHaveLength(10);
-    expect(results[0].id).toBe("8f0fc62a0d");
   });
 
   it("produces different IDs for different (benchmarkId, modelId) pairs", () => {
