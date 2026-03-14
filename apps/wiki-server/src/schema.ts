@@ -1861,6 +1861,7 @@ export const VALID_THING_TYPES = [
   "benchmark-result",
   "funding-program",
   "division-personnel",
+  "research-area",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -1977,5 +1978,154 @@ export const thingVerdicts = pgTable(
   (table) => [
     index("idx_tvd_verdict").on(table.verdict),
     index("idx_tvd_recheck").on(table.needsRecheck),
+  ]
+);
+
+// ── Research Areas ──────────────────────────────────────────────────────
+//
+// Bodies of work with papers, organizations, and ongoing activity.
+// PG-first (like grants, personnel, benchmarks). Rich data lives here;
+// minimal YAML entity stubs exist only for EntityLink resolution.
+
+/**
+ * Research areas — fields, techniques, and research programs in AI safety.
+ *
+ * Each row represents a body of work that has papers, organizations, and
+ * potentially grant funding. Examples: RLHF, mechanistic interpretability,
+ * scalable oversight, red-teaming.
+ */
+export const researchAreas = pgTable(
+  "research_areas",
+  {
+    id: text("id").primaryKey(), // slug: 'rlhf', 'mech-interp'
+    numericId: text("numeric_id"), // 'E259' — links to entity_ids for wiki pages
+    title: text("title").notNull(),
+    description: text("description"),
+    status: text("status").notNull().default("active"), // active | emerging | mature | declining | archived
+    cluster: text("cluster"), // grouping: 'alignment-training', 'interpretability', etc.
+    parentAreaId: text("parent_area_id").references((): any => researchAreas.id, {
+      onDelete: "set null",
+    }),
+    firstProposed: text("first_proposed"), // '2017 (Christiano et al.)'
+    firstProposedYear: integer("first_proposed_year"), // 2017 (for sorting)
+    tags: jsonb("tags").$type<string[]>().notNull().default([]), // flexible facets
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    source: text("source"), // primary reference URL
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ra_status").on(table.status),
+    index("idx_ra_cluster").on(table.cluster),
+    index("idx_ra_parent").on(table.parentAreaId),
+    // GIN index on tags created in migration SQL
+  ]
+);
+
+/**
+ * Organizations working on a research area.
+ */
+export const researchAreaOrganizations = pgTable(
+  "research_area_organizations",
+  {
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id").notNull(), // entity stableId or slug
+    role: text("role").notNull().default("active"), // pioneer | active | major | funder | emerging
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.researchAreaId, table.organizationId] }),
+    index("idx_rao_org").on(table.organizationId),
+  ]
+);
+
+/**
+ * Key papers associated with a research area.
+ * Links to the resources table when available; otherwise stores title+url inline.
+ */
+export const researchAreaPapers = pgTable(
+  "research_area_papers",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    url: text("url"),
+    authors: text("authors"),
+    publishedDate: text("published_date"), // YYYY or YYYY-MM
+    citationCount: integer("citation_count"),
+    isSeminal: boolean("is_seminal").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_rap_area").on(table.researchAreaId),
+    index("idx_rap_resource").on(table.resourceId),
+  ]
+);
+
+/**
+ * Risks that a research area addresses, studies, or relates to.
+ */
+export const researchAreaRisks = pgTable(
+  "research_area_risks",
+  {
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    riskId: text("risk_id").notNull(), // entity slug
+    relevance: text("relevance").notNull().default("addresses"), // addresses | studies | exacerbates
+    effectiveness: text("effectiveness"), // high | moderate | low | uncertain
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.researchAreaId, table.riskId] }),
+    index("idx_rar_risk").on(table.riskId),
+  ]
+);
+
+/**
+ * Many-to-many link between grants and research areas.
+ */
+export const grantResearchAreas = pgTable(
+  "grant_research_areas",
+  {
+    grantId: varchar("grant_id", { length: 10 })
+      .notNull()
+      .references(() => grants.id, { onDelete: "cascade" }),
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    confidence: real("confidence"), // 0-1; how confident is the tag
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.grantId, table.researchAreaId] }),
+    index("idx_gra_area").on(table.researchAreaId),
   ]
 );

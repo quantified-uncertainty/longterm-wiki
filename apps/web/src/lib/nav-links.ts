@@ -8,6 +8,7 @@ export const NAV_LINKS = [
   { href: "/ai-models", label: "AI Models" },
   { href: "/benchmarks", label: "Benchmarks" },
   { href: "/projects", label: "Projects" },
+  { href: "/research-areas", label: "Research Areas" },
   { href: "/sources", label: "Sources" },
   { href: "/funding-programs", label: "Funding" },
   { href: "/kb", label: "Data" },

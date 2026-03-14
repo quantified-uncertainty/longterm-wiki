@@ -2060,14 +2060,16 @@ async function main() {
     }
   }
 
-  // Fetch benchmark results from PG (separate from kb.records since these are model-keyed)
+  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts)
   if (!CONTENT_ONLY) {
-    database.benchmarkResults = await fetchBenchmarkResults();
-  }
-
-  // Fetch record verification verdicts from PG (used by VerificationBadge on detail pages)
-  if (!CONTENT_ONLY) {
-    database.recordVerdicts = await fetchRecordVerdicts();
+    const [benchmarkResults, researchAreasData, recordVerdicts] = await Promise.all([
+      fetchBenchmarkResults(),
+      fetchAllPages('/api/research-areas/enriched', 'researchAreas').then(r => r ?? []),
+      fetchRecordVerdicts(),
+    ]);
+    database.benchmarkResults = benchmarkResults;
+    database.researchAreas = researchAreasData;
+    database.recordVerdicts = recordVerdicts;
   }
 
   // Build URL → resource map for unconverted link detection

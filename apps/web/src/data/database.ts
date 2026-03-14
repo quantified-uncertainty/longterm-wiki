@@ -459,6 +459,27 @@ interface DatabaseShape {
     date: string | null;
     sourceUrl: string | null;
   }>>;
+  /** Enriched research areas from PG (with computed stats) */
+  researchAreas?: Array<{
+    id: string;
+    numericId: string | null;
+    title: string;
+    description: string | null;
+    status: string;
+    cluster: string | null;
+    parentAreaId: string | null;
+    firstProposed: string | null;
+    firstProposedYear: number | null;
+    tags: string[];
+    metadata: Record<string, unknown>;
+    source: string | null;
+    notes: string | null;
+    orgCount: number;
+    paperCount: number;
+    grantCount: number;
+    totalFunding: string;
+    riskCount: number;
+  }>;
   /** Record verification verdicts, keyed by "recordType:recordId" */
   recordVerdicts?: Record<string, RecordVerdict>;
 }
@@ -936,6 +957,17 @@ export function getBenchmarkResults(): Record<string, PGBenchmarkResult[]> {
 /** Get PG benchmark results for a specific model. Returns empty array if none. */
 export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[] {
   return getBenchmarkResults()[modelId] ?? [];
+}
+
+// ============================================================================
+// RESEARCH AREAS
+// ============================================================================
+
+export type PGResearchArea = NonNullable<DatabaseShape["researchAreas"]>[number];
+
+/** Get all enriched research areas from PG. Returns empty array if not available. */
+export function getResearchAreasFromPG(): PGResearchArea[] {
+  return getDatabase().researchAreas ?? [];
 }
 
 // ============================================================================
