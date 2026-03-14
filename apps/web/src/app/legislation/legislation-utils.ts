@@ -82,11 +82,42 @@ export function resolveEntityHref(entityId: string | undefined): string | null {
   return getEntityHref(entityId);
 }
 
-/** Infer scope from entity tags or ID. */
+/**
+ * Derive the effective status string for a policy entity.
+ * Checks the typed policyStatus field first (set by build transform),
+ * then falls back to inferring from timeline custom fields.
+ */
+export function deriveStatus(entity: PolicyEntity): string | null {
+  if (entity.policyStatus) return entity.policyStatus;
+  // Fallback: infer from timeline custom fields
+  if (getCustomField(entity, "Vetoed")) return "Vetoed";
+  if (getCustomField(entity, "Enacted")) return "Enacted";
+  if (getCustomField(entity, "Signed")) return "Enacted";
+  if (getCustomField(entity, "In Force") || getCustomField(entity, "Effective")) return "In Effect";
+  return null;
+}
+
+/** Valid jurisdiction scope values. */
+const VALID_SCOPES = new Set(["state", "federal", "international", "national"]);
+
+/** Infer scope from entity tags or ID. Falls back to null if not determinable. */
 export function inferScope(tags: string[], id: string): string | null {
-  if (tags.includes("state-policy") || id.startsWith("california-") || id.startsWith("colorado-") || id.startsWith("new-york-")) return "State";
-  if (tags.includes("federal") || id.startsWith("us-")) return "Federal";
-  if (tags.includes("international") || id.startsWith("eu-") || id.includes("international")) return "International";
+  if (tags.includes("state-policy") || id.startsWith("california-") || id.startsWith("colorado-") || id.startsWith("new-york-") || id.startsWith("texas-")) return "State";
+  if (tags.includes("federal") || id.startsWith("us-") || id.startsWith("nist-")) return "Federal";
+  if (tags.includes("international") || id.startsWith("eu-") || id.includes("international") || id.includes("summits") || id.includes("declaration") || id.includes("convention") || id.includes("consensus")) return "International";
   if (id.startsWith("canada-") || id.startsWith("china-") || id.startsWith("uk-")) return "National";
   return null;
+}
+
+/**
+ * Get the jurisdiction scope for a policy entity.
+ * Uses the typed `scope` field if it's a valid jurisdiction value,
+ * otherwise falls back to inference from tags/ID.
+ */
+export function getPolicyScope(entity: PolicyEntity): string | null {
+  // Only use entity.scope if it's a recognized jurisdiction value
+  if (entity.scope && VALID_SCOPES.has(entity.scope.toLowerCase())) {
+    return entity.scope;
+  }
+  return inferScope(entity.tags, entity.id);
 }

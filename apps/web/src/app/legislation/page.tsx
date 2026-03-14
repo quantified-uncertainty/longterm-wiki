@@ -3,7 +3,7 @@ import { getTypedEntities, isPolicy } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
-import { getCustomField, inferScope } from "./legislation-utils";
+import { deriveStatus, getPolicyScope } from "./legislation-utils";
 
 export const metadata: Metadata = {
   title: "Legislation",
@@ -11,26 +11,13 @@ export const metadata: Metadata = {
     "Directory of AI-related legislation, policies, and regulatory frameworks tracked in the knowledge base.",
 };
 
-/** Derive the effective status string for a policy entity. */
-function deriveStatus(entity: { policyStatus?: string; customFields: Array<{ label: string; value: string }> }): string | null {
-  // Typed field from build transform (already promotes cf('Status'))
-  if (entity.policyStatus) return entity.policyStatus;
-  // Fallback: infer from timeline custom fields
-  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Vetoed")) return "Vetoed";
-  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Enacted")) return "Enacted";
-  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "Signed")) return "Enacted";
-  if (getCustomField(entity as Parameters<typeof getCustomField>[0], "In Force") ||
-      getCustomField(entity as Parameters<typeof getCustomField>[0], "Effective")) return "In Effect";
-  return null;
-}
-
 export default function LegislationPage() {
   const allEntities = getTypedEntities();
   const policies = allEntities.filter(isPolicy);
 
   const rows: LegislationRow[] = policies.map((entity) => {
     const effectiveStatus = deriveStatus(entity);
-    const scope = entity.scope ?? inferScope(entity.tags, entity.id) ?? null;
+    const scope = getPolicyScope(entity);
 
     return {
       id: entity.id,

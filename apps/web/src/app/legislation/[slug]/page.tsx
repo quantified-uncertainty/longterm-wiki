@@ -12,7 +12,8 @@ import {
   getRelatedPolicies,
   resolveEntityHref,
   getPolicyWikiHref,
-  inferScope,
+  getPolicyScope,
+  deriveStatus,
 } from "../legislation-utils";
 import {
   STATUS_COLORS,
@@ -62,12 +63,9 @@ export default async function LegislationDetailPage({
   // Extract structured data (typed fields are promoted by entity-transform at build time)
   const introduced = entity.introduced ?? null;
   const author = entity.author ?? null;
-  const rawStatus =
-    entity.policyStatus ??
-    (getCustomField(entity, "Vetoed") ? `Vetoed ${getCustomField(entity, "Vetoed")}` : null) ??
-    (getCustomField(entity, "Enacted") ? `Enacted ${getCustomField(entity, "Enacted")}` : null);
+  const rawStatus = deriveStatus(entity);
   const statusKey = normalizeStatus(rawStatus);
-  const scope = entity.scope ?? inferScope(entity.tags, entity.id);
+  const scope = getPolicyScope(entity);
   const billNumber = entity.billNumber ?? null;
   const jurisdiction = entity.jurisdiction ?? null;
 
