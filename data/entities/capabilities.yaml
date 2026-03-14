@@ -220,28 +220,7 @@
     - uncertainty
     - philosophy
   lastUpdated: 2025-12
-- id: rlhf
-  stableId: rSE7kY5k4Q
-  numericId: E259
-  type: capability
-  title: RLHF
-  customFields:
-    - label: Full Name
-      value: Reinforcement Learning from Human Feedback
-    - label: Used By
-      value: All major labs
-  relatedEntries:
-    - id: reward-hacking
-      type: risk
-    - id: sycophancy
-      type: risk
-    - id: scalable-oversight
-      type: safety-agenda
-  description: "Reinforcement Learning from Human Feedback (RLHF) is a training technique that fine-tunes AI models using human preference ratings to align outputs with human values and intentions. Pioneered at OpenAI and Anthropic, RLHF became a core component of instruction-following models and is central to debates about scalability of alignment techniques."
-  tags:
-    - training
-    - human-feedback
-    - alignment
+# rlhf (E259) moved to data/entities/research-areas.yaml
 - id: scientific-research
   stableId: dpTZOF78vg
   numericId: E277

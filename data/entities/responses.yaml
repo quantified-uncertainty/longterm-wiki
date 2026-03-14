@@ -1086,51 +1086,7 @@
     - content-authentication
     - information-security
   lastUpdated: 2025-12
-- id: ai-control
-  stableId: sFjyY5xXZA
-  numericId: E6
-  type: safety-agenda
-  title: AI Control
-  customFields:
-    - label: Goal
-      value: Maintain human control over AI
-    - label: Key Research
-      value: Redwood Research
-  relatedEntries:
-    - id: redwood-research
-      type: organization
-    - id: deceptive-alignment
-      type: risk
-    - id: scheming
-      type: risk
-    - id: treacherous-turn
-      type: risk
-    - id: sandbagging
-      type: risk
-    - id: power-seeking
-      type: risk
-    - id: mesa-optimization
-      type: risk
-    - id: agentic-ai
-      type: capability
-  sources:
-    - title: 'AI Control: Improving Safety Despite Intentional Subversion'
-      url: https://arxiv.org/abs/2312.06942
-      author: Greenblatt et al.
-      date: '2023'
-    - title: 'Redwood Research: AI Control'
-      url: https://www.redwoodresearch.org/control
-  description: >-
-    AI Control is a research agenda that focuses on maintaining safety even when using AI systems that might be actively
-    trying to subvert safety measures. Rather than assuming alignment succeeds, it asks: "How can we safely use AI
-    systems that might be misaligned?"
-  tags:
-    - monitoring
-    - containment
-    - defense-in-depth
-    - red-teaming
-    - untrusted-ai
-  lastUpdated: 2025-12
+# ai-control (E6) moved to data/entities/research-areas.yaml
 - id: anthropic-core-views
   stableId: CsWO4o3gZw
   numericId: E23
@@ -1169,152 +1125,10 @@
     - anthropic
     - research-agenda
   lastUpdated: 2025-12
-- id: corrigibility
-  stableId: aUMeFdALrA
-  numericId: E79
-  type: safety-agenda
-  title: Corrigibility
-  customFields:
-    - label: Goal
-      value: AI allows human correction
-    - label: Status
-      value: Active research
-  relatedEntries:
-    - id: ai-control
-      type: safety-agenda
-    - id: corrigibility-failure
-      type: risk
-    - id: power-seeking
-      type: risk
-    - id: instrumental-convergence
-      type: risk
-    - id: treacherous-turn
-      type: risk
-  description: "The property of an AI system that allows it to be safely corrected, adjusted, or shut down by its operators. Highly corrigible systems defer to human judgment; the key research challenge is making corrigibility robust under capability scaling."
-  tags:
-    - shutdown-problem
-    - ai-control
-    - value-learning
-- id: evals
-  stableId: etuIjQhFbQ
-  numericId: E128
-  type: safety-agenda
-  title: AI Evaluations
-  customFields:
-    - label: Goal
-      value: Measure AI capabilities and safety
-    - label: Key Orgs
-      value: METR, Apollo, UK AISI
-  relatedEntries:
-    - id: sandbagging
-      type: risk
-    - id: emergent-capabilities
-      type: risk
-    - id: scheming
-      type: risk
-    - id: deceptive-alignment
-      type: risk
-    - id: bioweapons
-      type: risk
-    - id: cyberweapons
-      type: risk
-  description: "AI evaluation—systematic methods for measuring model capabilities, safety properties, and alignment. Includes capability evaluations (red-teaming, benchmarks), dangerous capability evaluations, and behavioral assessments used by frontier labs in their responsible scaling policies."
-  tags:
-    - benchmarks
-    - red-teaming
-    - capability-assessment
-- id: interpretability
-  stableId: 73qTEkYyWA
-  numericId: E174
-  type: safety-agenda
-  title: Interpretability
-  customFields:
-    - label: Goal
-      value: Understand model internals
-    - label: Key Labs
-      value: Anthropic, DeepMind
-  relatedEntries:
-    - id: anthropic
-      type: organization
-    - id: deceptive-alignment
-      type: risk
-    - id: mesa-optimization
-      type: risk
-    - id: goal-misgeneralization
-      type: risk
-    - id: scheming
-      type: risk
-    - id: reward-hacking
-      type: risk
-    - id: redwood-research
-      type: organization
-  sources:
-    - title: Scaling Monosemanticity
-      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-      author: Anthropic
-      date: '2024'
-    - title: 'Zoom In: An Introduction to Circuits'
-      url: https://distill.pub/2020/circuits/zoom-in/
-      author: Olah et al.
-    - title: Transformer Circuits Thread
-      url: https://transformer-circuits.pub/
-  description: >-
-    Mechanistic interpretability is a research field focused on reverse-engineering neural networks to understand how
-    they work internally. Rather than treating models as black boxes, researchers aim to identify meaningful circuits,
-    features, and algorithms that explain model behavior.
-  tags:
-    - sparse-autoencoders
-    - features
-    - circuits
-    - superposition
-    - probing
-    - activation-patching
-  lastUpdated: 2025-12
-- id: scalable-oversight
-  stableId: MBGtb3Qlkw
-  numericId: E271
-  type: safety-agenda
-  title: Scalable Oversight
-  customFields:
-    - label: Goal
-      value: Supervise AI beyond human ability
-    - label: Key Labs
-      value: Anthropic, OpenAI, DeepMind
-  relatedEntries:
-    - id: arc
-      type: organization
-    - id: deepmind
-      type: organization
-    - id: deceptive-alignment
-      type: risk
-    - id: sycophancy
-      type: risk
-    - id: reward-hacking
-      type: risk
-    - id: power-seeking
-      type: risk
-    - id: corrigibility-failure
-      type: risk
-  sources:
-    - title: AI Safety via Debate
-      url: https://arxiv.org/abs/1805.00899
-      author: Irving et al.
-    - title: Scalable Agent Alignment via Reward Modeling
-      url: https://arxiv.org/abs/1811.07871
-      author: Leike et al.
-    - title: Measuring Progress on Scalable Oversight
-      url: https://arxiv.org/abs/2211.03540
-  description: >-
-    Scalable oversight addresses a fundamental challenge: How can humans supervise AI systems on tasks where humans
-    can't directly evaluate the AI's output?
-  tags:
-    - debate
-    - recursive-reward-modeling
-    - process-supervision
-    - ai-evaluation
-    - rlhf
-    - superhuman-ai
-  lastUpdated: 2025-12
+# corrigibility (E79) moved to data/entities/research-areas.yaml
+# evals (E128) moved to data/entities/research-areas.yaml
+# interpretability (E174) moved to data/entities/research-areas.yaml
+# scalable-oversight (E271) moved to data/entities/research-areas.yaml
 - id: ai-forecasting
   stableId: RW4LTglM1Q
   numericId: E9
@@ -1729,25 +1543,7 @@
     - collective-intelligence
     - decision-making
   lastUpdated: 2025-12
-- id: value-learning
-  stableId: Ub7IaobzDA
-  numericId: E368
-  type: safety-agenda
-  title: AI Value Learning
-  description: >-
-    Research agenda focused on AI systems learning human values from data, behavior, or feedback rather than explicit
-    specification.
-  status: stub
-  relatedEntries:
-    - id: rlhf
-      type: approach
-    - id: reward-hacking
-      type: risk
-  tags:
-    - alignment
-    - values
-    - learning
-  lastUpdated: 2025-12
+# value-learning (E368) moved to data/entities/research-areas.yaml
 - id: prosaic-alignment
   stableId: EQgTf1t7dg
   numericId: E235
@@ -2126,34 +1922,7 @@
       type: risk
   lastUpdated: 2026-02
 
-- id: red-teaming
-  stableId: k6BfxaEwuQ
-  numericId: E449
-  type: approach
-  title: "Red Teaming"
-  description: >-
-    Adversarial testing methodologies to systematically identify AI system vulnerabilities, dangerous
-    capabilities, and failure modes through structured adversarial evaluation. Effectiveness rates vary from
-    10-80% depending on attack method.
-  tags:
-    - adversarial-testing
-    - vulnerability-discovery
-    - jailbreaking
-    - safety-testing
-    - cybersecurity
-  clusters:
-    - ai-safety
-    - cyber
-  relatedEntries:
-    - id: anthropic
-      type: organization
-    - id: openai
-      type: organization
-    - id: metr
-      type: organization
-    - id: rsp
-      type: policy
-  lastUpdated: 2026-02
+# red-teaming (E449) moved to data/entities/research-areas.yaml
 
 - id: model-auditing
   stableId: BOvl3v7ZYg
@@ -3192,36 +2961,7 @@
       type: approach
   lastUpdated: 2026-02
 
-- id: mech-interp
-  stableId: 0vyIQ4YLIA
-  numericId: E477
-  type: approach
-  title: Mechanistic Interpretability
-  description: >-
-    Mechanistic interpretability reverse-engineers neural networks to understand their internal
-    computations and circuits. With $500M+ annual investment, Anthropic extracted 30M+ features
-    from Claude 3 Sonnet in 2024, while DeepMind deprioritized SAE research after finding linear
-    probes outperform on practical tasks.
-  tags:
-    - interpretability
-    - neural-network-analysis
-    - feature-extraction
-    - circuit-discovery
-    - deception-detection
-  clusters:
-    - ai-safety
-  relatedEntries:
-    - id: sparse-autoencoders
-      type: approach
-    - id: representation-engineering
-      type: approach
-    - id: deceptive-alignment
-      type: risk
-    - id: scheming
-      type: risk
-    - id: anthropic
-      type: organization
-  lastUpdated: 2026-02
+# mech-interp (E477) moved to data/entities/research-areas.yaml
 
 - id: circuit-breakers
   stableId: tyNVsTtRVA

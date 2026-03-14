@@ -6,6 +6,7 @@ const noSleep = async () => {};
 function makeEntity(id: string, overrides: Partial<SyncEntity> = {}): SyncEntity {
   return {
     id,
+    stableId: null,
     numericId: null,
     entityType: "organization",
     title: `Entity ${id}`,
@@ -33,6 +34,7 @@ describe("transformEntity", () => {
 
     expect(result).toEqual({
       id: "anthropic",
+      stableId: null,
       numericId: null,
       entityType: "organization",
       title: "Anthropic",
@@ -161,6 +163,7 @@ describe("transformEntity", () => {
       title: "Test",
     });
 
+    expect(result.stableId).toBeNull();
     expect(result.numericId).toBeNull();
     expect(result.description).toBeNull();
     expect(result.website).toBeNull();

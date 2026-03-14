@@ -612,9 +612,8 @@ const entitiesApp = new Hono()
           target: entities.id,
           set: {
             numericId: sql`excluded.numeric_id`,
-            // Preserve existing stableId if already set; only fill in from
-            // incoming data when the row has no stableId yet.
-            stableId: sql`COALESCE("entities"."stable_id", excluded.stable_id)`,
+            // Use incoming stableId when provided; fall back to existing.
+            stableId: sql`COALESCE(excluded.stable_id, "entities"."stable_id")`,
             entityType: sql`excluded.entity_type`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,

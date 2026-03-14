@@ -152,7 +152,7 @@ export function createSafetyApproachesColumns(): ColumnDef<SafetyApproach>[] {
       accessorKey: "architectureRelevance",
       header: () => (
         <a
-          href="/knowledge-base/architecture-scenarios/table"
+          href="/knowledge-base/architecture-scenarios-table"
           className="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
         >
           Architectures

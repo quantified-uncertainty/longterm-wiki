@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.longtermwiki.auto-update</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ozziegooen/Documents/GitHub.nosync/lw/a10/.claude/scripts/auto-update-cron.sh</string>
+    </array>
+
+    <!-- Run daily at 9:00 AM -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>9</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ozziegooen/.claude/auto-update-logs/launchd-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/ozziegooen/.claude/auto-update-logs/launchd-stderr.log</string>
+
+    <!-- Environment for Claude Code CLI -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ozziegooen/Documents/GitHub.nosync/lw/a10</string>
+</dict>
+</plist>

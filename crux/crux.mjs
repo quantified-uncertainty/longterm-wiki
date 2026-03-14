@@ -114,6 +114,7 @@ import * as orgsCommands from './commands/orgs.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
+import * as qaSweepCommands from './commands/qa-sweep.ts';
 
 const domains = {
   validate: validateCommands,
@@ -166,6 +167,7 @@ const domains = {
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   verify: recordsVerifyCommands,
+  'qa-sweep': qaSweepCommands,
 };
 
 /**
