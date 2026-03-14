@@ -84,28 +84,21 @@ export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
   const totalAmount = grants.reduce((sum, g) => sum + (g.amount ?? 0), 0);
 
   return (
-    <section className="mb-8">
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-base font-bold tracking-tight">Grants</h2>
-        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-          {grants.length}
-        </span>
-        {totalAmount > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {formatCompactCurrency(totalAmount)} total
-          </span>
-        )}
-        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-      </div>
+    <div>
+      {totalAmount > 0 && (
+        <p className="text-xs text-muted-foreground mb-3">
+          {formatCompactCurrency(totalAmount)} total
+        </p>
+      )}
       <div className="border border-border/60 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                <th className="text-left py-2 px-3 font-medium">Grant</th>
-                <th className="text-left py-2 px-3 font-medium">Recipient</th>
-                <th className="text-right py-2 px-3 font-medium">Amount</th>
-                <th className="text-center py-2 px-3 font-medium">Date</th>
+                <th scope="col" className="text-left py-2 px-3 font-medium">Grant</th>
+                <th scope="col" className="text-left py-2 px-3 font-medium">Recipient</th>
+                <th scope="col" className="text-right py-2 px-3 font-medium">Amount</th>
+                <th scope="col" className="text-center py-2 px-3 font-medium">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -147,7 +140,7 @@ export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
           onPageChange={setPage}
         />
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -166,22 +159,15 @@ export function PaginatedRecipientsTable({ recipients }: { recipients: Recipient
   const displayed = recipients.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
-    <section className="mb-8">
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-base font-bold tracking-tight">Funded Organizations</h2>
-        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-          {recipients.length}
-        </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-      </div>
+    <div>
       <div className="border border-border/60 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                <th className="text-left py-2 px-3 font-medium">Organization</th>
-                <th className="text-right py-2 px-3 font-medium">Total Funded</th>
-                <th className="text-center py-2 px-3 font-medium">Grants</th>
+                <th scope="col" className="text-left py-2 px-3 font-medium">Recipient</th>
+                <th scope="col" className="text-right py-2 px-3 font-medium">Total Funded</th>
+                <th scope="col" className="text-center py-2 px-3 font-medium">Grants</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -220,6 +206,6 @@ export function PaginatedRecipientsTable({ recipients }: { recipients: Recipient
           onPageChange={setPage}
         />
       </div>
-    </section>
+    </div>
   );
 }

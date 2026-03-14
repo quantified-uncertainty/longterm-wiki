@@ -27,9 +27,9 @@ export function TeamMembersSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th className="text-left py-2 px-3 font-medium">Name</th>
-              <th className="text-left py-2 px-3 font-medium">Role</th>
-              <th className="text-center py-2 px-3 font-medium">Dates</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Name</th>
+              <th scope="col" className="text-left py-2 px-3 font-medium">Role</th>
+              <th scope="col" className="text-center py-2 px-3 font-medium">Dates</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

@@ -95,6 +95,7 @@ function DivisionCard({
         </span>
         {getDivisionHref(d) && (
           <svg
+            aria-hidden="true"
             className="shrink-0 w-3.5 h-3.5 text-muted-foreground/30 group-hover/card:text-muted-foreground/60 transition-colors"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
           >
@@ -250,7 +251,9 @@ export function DivisionsSection({
                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                             : d.status === "inactive"
                               ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                              : d.status === "dissolved"
+                                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                         }`}
                       >
                         {titleCase(d.status)}

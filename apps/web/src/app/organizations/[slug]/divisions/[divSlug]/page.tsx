@@ -205,6 +205,11 @@ export default async function DivisionDetailPage({ params }: PageProps) {
 
       {/* Tabbed content */}
       <DivisionTabs data={data} />
+      {data.personnel.length === 0 && data.grants.length === 0 && data.recipients.length === 0 && (
+        <p className="text-sm text-muted-foreground italic py-8 text-center">
+          No detailed data available for this division yet.
+        </p>
+      )}
 
       {/* Back to parent org */}
       <BackToParentLink parent={data.parent} />
