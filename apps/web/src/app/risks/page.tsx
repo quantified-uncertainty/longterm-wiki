@@ -1,34 +1,15 @@
 import type { Metadata } from "next";
 import { getTypedEntities, isRisk } from "@/data";
-import type { RiskEntity } from "@/data/entity-schemas";
 import { titleCase } from "@/components/wiki/kb/format";
 import { ProfileStatCard } from "@/components/directory";
 import { RisksTable, type RiskRow } from "./risks-table";
+import { getLikelihoodDisplay, getTimeframeDisplay } from "./risk-utils";
 
 export const metadata: Metadata = {
   title: "Risks",
   description:
     "Directory of AI-related risks tracked in the knowledge base, including accident risks, misuse risks, structural risks, and epistemic risks.",
 };
-
-/** Extract a display string from a likelihood field (string or object). */
-function getLikelihoodStr(likelihood: RiskEntity["likelihood"]): string | null {
-  if (!likelihood) return null;
-  if (typeof likelihood === "string") return titleCase(likelihood);
-  if (likelihood.display) return likelihood.display;
-  if (likelihood.level) return titleCase(likelihood.level);
-  return null;
-}
-
-/** Extract a display string from a timeframe field (string or object). */
-function getTimeframeStr(timeframe: RiskEntity["timeframe"]): string | null {
-  if (!timeframe) return null;
-  if (typeof timeframe === "string") return timeframe;
-  if (timeframe.display) return timeframe.display;
-  if (timeframe.earliest && timeframe.latest) return `${timeframe.earliest}–${timeframe.latest}`;
-  if (timeframe.median) return `~${timeframe.median}`;
-  return null;
-}
 
 export default function RisksPage() {
   const allEntities = getTypedEntities();
@@ -41,8 +22,8 @@ export default function RisksPage() {
     wikiPageId: risk.numericId ?? null,
     riskCategory: risk.riskCategory ?? null,
     severity: risk.severity ? titleCase(risk.severity) : null,
-    likelihood: getLikelihoodStr(risk.likelihood),
-    timeHorizon: getTimeframeStr(risk.timeframe),
+    likelihood: getLikelihoodDisplay(risk.likelihood),
+    timeHorizon: getTimeframeDisplay(risk.timeframe),
   }));
 
   // Compute summary stats
