@@ -1,10 +1,10 @@
 /**
  * Wiki Server Benchmarks Sync
  *
- * Reads data/entities/benchmarks.yaml and inline benchmark results from
- * data/entities/ai-models.yaml, then syncs both to the wiki-server:
- *   - Benchmark definitions → /api/benchmarks/sync
- *   - Benchmark results (model scores) → /api/benchmark-results/sync
+ * Reads data/entities/benchmarks.yaml (benchmark definitions) and
+ * data/entities/ai-models.yaml (inline benchmark results), then syncs
+ * both to the wiki-server's /api/benchmarks/sync and
+ * /api/benchmark-results/sync endpoints.
  *
  * Usage:
  *   pnpm crux wiki-server sync-benchmarks
@@ -18,15 +18,16 @@
 
 import { readFileSync } from "fs";
 import { join } from "path";
-import { createHash } from "crypto";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
+import { contentHash } from "../../packages/kb/src/ids.ts";
 import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
-const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
+const BENCHMARKS_FILE = join(PROJECT_ROOT, "data/entities/benchmarks.yaml");
+const AI_MODELS_FILE = join(PROJECT_ROOT, "data/entities/ai-models.yaml");
 
 // --- Configuration ---
 const DEFAULT_BATCH_SIZE = 100;
@@ -48,6 +49,21 @@ interface YamlBenchmark {
   sources?: Array<{ title: string; url?: string }>;
 }
 
+interface YamlModel {
+  id: string;
+  numericId?: string;
+  type: string;
+  title: string;
+  developer?: string;
+  benchmarks?: Array<{
+    name: string;
+    score: number;
+    unit?: string;
+    date?: string;
+    source?: string;
+  }>;
+}
+
 interface SyncBenchmark {
   id: string;
   slug: string;
@@ -62,14 +78,6 @@ interface SyncBenchmark {
   source: string | null;
 }
 
-interface YamlAiModel {
-  id: string;
-  type: string;
-  title: string;
-  developer?: string;
-  benchmarks?: Array<{ name: string; score: number; unit?: string }>;
-}
-
 interface SyncBenchmarkResult {
   id: string;
   benchmarkId: string;
@@ -81,42 +89,102 @@ interface SyncBenchmarkResult {
   notes: string | null;
 }
 
-// --- Alias map: inline benchmark name → benchmark entity ID ---
-const BENCHMARK_NAME_ALIASES: Record<string, string> = {
-  mmlu: "mmlu",
-  "swe-bench": "swe-bench-verified",
-  "swe-bench verified": "swe-bench-verified",
-  math: "math-benchmark",
-  humaneval: "humaneval",
-  "gpqa diamond": "gpqa-diamond",
-  gpqa: "gpqa-diamond",
-  "arc-agi": "arc-agi",
-  "arc-agi-2": "arc-agi-2",
-  "aime 2025": "aime-2025",
-  aime: "aime-2025",
-  osworld: "osworld",
-  "terminal-bench hard": "terminal-bench-hard",
-  "terminal-bench 2": "terminal-bench-2",
-  "artificial analysis intelligence index":
-    "artificial-analysis-intelligence-index",
-};
+// --- Benchmark name → slug aliases (same as benchmark-utils.ts) ---
 
-// --- Helpers ---
+function buildNameToSlugMap(benchmarks: YamlBenchmark[]): Map<string, string> {
+  const map = new Map<string, string>();
 
-/**
- * Generate a deterministic 10-char ID for a benchmark result
- * from the (benchmarkId, modelId) pair.
- */
-function generateResultId(benchmarkId: string, modelId: string): string {
-  const hash = createHash("md5")
-    .update(`br:${benchmarkId}:${modelId}`)
-    .digest("hex");
-  return hash.slice(0, 10);
+  // Map by title
+  for (const b of benchmarks) {
+    map.set(b.title.toLowerCase(), b.id);
+  }
+
+  // Common aliases
+  const aliases: Record<string, string> = {
+    "mmlu": "mmlu",
+    "swe-bench": "swe-bench-verified",
+    "swe-bench verified": "swe-bench-verified",
+    "math": "math-benchmark",
+    "humaneval": "humaneval",
+    "gpqa diamond": "gpqa-diamond",
+    "gpqa": "gpqa-diamond",
+    "arc-agi": "arc-agi",
+    "arc-agi-2": "arc-agi-2",
+    "aime 2025": "aime-2025",
+    "aime 2024": "aime-2024",
+    "aime": "aime-2025",
+    "osworld": "osworld",
+    "terminal-bench hard": "terminal-bench-hard",
+    "terminal-bench 2": "terminal-bench-2",
+    "terminal-bench 2.0": "terminal-bench-2",
+    "artificial analysis intelligence index": "artificial-analysis-intelligence-index",
+    "mmlu-pro": "mmlu-pro",
+    "simpleqa": "simpleqa",
+    "humanity's last exam": "humanitys-last-exam",
+    "hle": "humanitys-last-exam",
+    "ifeval": "ifeval",
+    "chatbot arena elo": "chatbot-arena-elo",
+    "chatbot arena": "chatbot-arena-elo",
+    "livecodebench": "livecodebench",
+    "livebench": "livebench",
+    "bfcl": "bfcl",
+    "frontiermath": "frontiermath",
+    "bbh": "bbh",
+    "big-bench hard": "bbh",
+    "hellaswag": "hellaswag",
+    "re-bench": "re-bench",
+    "mle-bench": "mle-bench",
+    "webarena": "webarena",
+    "tau-bench": "tau-bench",
+    "mgsm": "mgsm",
+    "mathvista": "mathvista",
+    "codeforces": "codeforces-rating",
+    "codeforces rating": "codeforces-rating",
+  };
+
+  for (const [alias, slug] of Object.entries(aliases)) {
+    map.set(alias, slug);
+  }
+
+  return map;
 }
 
+// --- Data loading ---
+
+export function loadBenchmarks(filePath: string = BENCHMARKS_FILE): YamlBenchmark[] {
+  const raw = readFileSync(filePath, "utf-8");
+  const parsed = parseYaml(raw);
+  if (!Array.isArray(parsed)) {
+    throw new Error(`${filePath}: expected array, got ${typeof parsed}`);
+  }
+  return parsed.filter(
+    (b: YamlBenchmark) => b.id && b.type === "benchmark" && b.title
+  );
+}
+
+export function loadModels(filePath: string = AI_MODELS_FILE): YamlModel[] {
+  const raw = readFileSync(filePath, "utf-8");
+  const parsed = parseYaml(raw);
+  if (!Array.isArray(parsed)) {
+    throw new Error(`${filePath}: expected array, got ${typeof parsed}`);
+  }
+  return parsed.filter(
+    (m: YamlModel) => m.id && m.type === "ai-model"
+  );
+}
+
+// --- Transform ---
+
 function transformBenchmark(b: YamlBenchmark): SyncBenchmark {
+  // Use the numericId's stable ID from the ID registry
+  // The numericId like "E1100" maps to a 10-char stable ID
+  // For the sync, we need the 10-char stable PK.
+  // Since benchmarks.yaml uses numericId like "E1100", we derive a deterministic
+  // 10-char ID from the slug to ensure idempotent syncs.
+  const stableId = contentHash(["benchmark", b.id]);
+
   return {
-    id: b.id,
+    id: stableId,
     slug: b.id,
     name: b.title,
     category: b.category ?? null,
@@ -130,66 +198,90 @@ function transformBenchmark(b: YamlBenchmark): SyncBenchmark {
   };
 }
 
-/**
- * Load benchmark entities from benchmarks.yaml.
- */
-export function loadBenchmarks(): YamlBenchmark[] {
-  const filePath = join(ENTITIES_DIR, "benchmarks.yaml");
-  const raw = readFileSync(filePath, "utf-8");
-  const parsed = parseYaml(raw);
-  if (!Array.isArray(parsed)) {
-    console.warn("  WARN: benchmarks.yaml is not an array");
-    return [];
-  }
-  return parsed.filter(
-    (e: YamlBenchmark) => e.id && e.type === "benchmark" && e.title,
-  );
-}
-
-/**
- * Load ai-model entities and extract inline benchmark results.
- */
-export function loadBenchmarkResults(
-  benchmarkIds: Set<string>,
-): SyncBenchmarkResult[] {
-  const filePath = join(ENTITIES_DIR, "ai-models.yaml");
-  const raw = readFileSync(filePath, "utf-8");
-  const parsed = parseYaml(raw) as YamlAiModel[];
-  if (!Array.isArray(parsed)) return [];
-
-  // Build name-to-slug map from benchmarkIds + aliases
-  const nameToSlug = new Map<string, string>();
-  for (const id of benchmarkIds) {
-    nameToSlug.set(id.toLowerCase(), id);
-  }
-  for (const [alias, slug] of Object.entries(BENCHMARK_NAME_ALIASES)) {
-    if (benchmarkIds.has(slug)) {
-      nameToSlug.set(alias, slug);
-    }
-  }
-
+function extractBenchmarkResults(
+  models: YamlModel[],
+  benchmarks: YamlBenchmark[],
+  benchmarkSyncMap: Map<string, string>, // slug → 10-char stable ID
+): { results: SyncBenchmarkResult[]; unmatchedNames: Set<string> } {
+  const nameToSlug = buildNameToSlugMap(benchmarks);
   const results: SyncBenchmarkResult[] = [];
-  for (const model of parsed) {
-    if (model.type !== "ai-model" || !model.benchmarks) continue;
+  const unmatchedNames = new Set<string>();
+
+  for (const model of models) {
+    if (!model.benchmarks?.length) continue;
 
     for (const b of model.benchmarks) {
-      const benchmarkId = nameToSlug.get(b.name.toLowerCase());
-      if (!benchmarkId) continue;
+      const slug = nameToSlug.get(b.name.toLowerCase());
+      if (!slug) {
+        unmatchedNames.add(b.name);
+        continue;
+      }
+
+      const benchmarkId = benchmarkSyncMap.get(slug);
+      if (!benchmarkId) {
+        unmatchedNames.add(b.name);
+        continue;
+      }
+
+      // Deterministic ID from (benchmarkSlug, modelId) — idempotent
+      const resultId = contentHash(["benchmark-result", slug, model.id]);
 
       results.push({
-        id: generateResultId(benchmarkId, model.id),
+        id: resultId,
         benchmarkId,
         modelId: model.id,
         score: b.score,
         unit: b.unit ?? null,
-        date: null,
-        sourceUrl: null,
+        date: b.date ?? null,
+        sourceUrl: b.source ?? null,
         notes: null,
       });
     }
   }
 
-  return results;
+  return { results, unmatchedNames };
+}
+
+// --- Sync functions ---
+
+export async function syncBenchmarkDefinitions(
+  serverUrl: string,
+  items: SyncBenchmark[],
+  batchSize: number,
+  options: { _sleep?: (ms: number) => Promise<void> } = {}
+): Promise<{ upserted: number; errors: number }> {
+  const result = await batchSync(
+    `${serverUrl}/api/benchmarks/sync`,
+    items,
+    batchSize,
+    {
+      bodyKey: "items",
+      responseCountKey: "upserted",
+      itemLabel: "benchmarks",
+      _sleep: options._sleep,
+    },
+  );
+  return { upserted: result.count, errors: result.errors };
+}
+
+export async function syncBenchmarkResults(
+  serverUrl: string,
+  items: SyncBenchmarkResult[],
+  batchSize: number,
+  options: { _sleep?: (ms: number) => Promise<void> } = {}
+): Promise<{ upserted: number; errors: number }> {
+  const result = await batchSync(
+    `${serverUrl}/api/benchmark-results/sync`,
+    items,
+    batchSize,
+    {
+      bodyKey: "items",
+      responseCountKey: "upserted",
+      itemLabel: "benchmark results",
+      _sleep: options._sleep,
+    },
+  );
+  return { upserted: result.count, errors: result.errors };
 }
 
 // --- CLI ---
@@ -203,40 +295,74 @@ async function main() {
   const apiKey = getApiKey();
 
   if (!serverUrl) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_URL environment variable is required",
-    );
+    console.error("Error: LONGTERMWIKI_SERVER_URL environment variable is required");
     process.exit(1);
   }
   if (!apiKey) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_API_KEY environment variable is required",
-    );
+    console.error("Error: LONGTERMWIKI_SERVER_API_KEY environment variable is required");
     process.exit(1);
   }
 
-  // Load benchmarks
-  console.log(`Reading benchmarks from: ${ENTITIES_DIR}`);
+  // Load data
+  console.log("Reading benchmarks from:", BENCHMARKS_FILE);
   const benchmarks = loadBenchmarks();
-  const syncBenchmarks = benchmarks.map(transformBenchmark);
-  console.log(`  Found ${syncBenchmarks.length} benchmark definitions`);
+  console.log(`  Found ${benchmarks.length} benchmark definitions`);
 
-  // Load benchmark results from ai-model inline data
-  const benchmarkIds = new Set(benchmarks.map((b) => b.id));
-  const results = loadBenchmarkResults(benchmarkIds);
-  console.log(`  Found ${results.length} benchmark results from ai-models`);
+  console.log("Reading models from:", AI_MODELS_FILE);
+  const models = loadModels();
+  const modelsWithBenchmarks = models.filter((m) => m.benchmarks?.length);
+  console.log(`  Found ${modelsWithBenchmarks.length} models with benchmark data`);
+
+  // Transform benchmarks
+  const syncBenchmarks = benchmarks.map(transformBenchmark);
+
+  // Build slug → stable ID map for result linking
+  const benchmarkIdMap = new Map<string, string>();
+  for (const sb of syncBenchmarks) {
+    benchmarkIdMap.set(sb.slug, sb.id);
+  }
+
+  // Extract results
+  const { results, unmatchedNames } = extractBenchmarkResults(
+    models,
+    benchmarks,
+    benchmarkIdMap,
+  );
+
+  if (unmatchedNames.size > 0) {
+    console.warn(`\n  WARNING: ${unmatchedNames.size} unmatched benchmark name(s):`);
+    for (const name of unmatchedNames) {
+      console.warn(`    - "${name}"`);
+    }
+  }
+
+  // Summary
+  const byBenchmark = new Map<string, number>();
+  for (const r of results) {
+    const slug = syncBenchmarks.find((b) => b.id === r.benchmarkId)?.slug ?? r.benchmarkId;
+    byBenchmark.set(slug, (byBenchmark.get(slug) ?? 0) + 1);
+  }
+
+  console.log(`\nSync plan:`);
+  console.log(`  Benchmarks: ${syncBenchmarks.length} definitions`);
+  console.log(`  Results:    ${results.length} model scores`);
+  console.log(`  Coverage:   ${[...byBenchmark.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}(${v})`).join(", ")}`);
 
   if (dryRun) {
-    console.log("\n[dry-run] Benchmark definitions:");
-    for (const b of syncBenchmarks) {
-      console.log(`  ${b.id} [${b.category ?? "?"}] — ${b.name}`);
+    console.log("\n[dry-run] Would sync:");
+    console.log("  Benchmarks:");
+    for (const b of syncBenchmarks.slice(0, 5)) {
+      console.log(`    ${b.slug} — ${b.name} [${b.category}]`);
     }
-    console.log("\n[dry-run] Benchmark results (first 20):");
-    for (const r of results.slice(0, 20)) {
-      console.log(`  ${r.benchmarkId} / ${r.modelId}: ${r.score}`);
+    if (syncBenchmarks.length > 5) {
+      console.log(`    ... and ${syncBenchmarks.length - 5} more`);
     }
-    if (results.length > 20) {
-      console.log(`  ... and ${results.length - 20} more`);
+    console.log("  Results:");
+    for (const r of results.slice(0, 5)) {
+      console.log(`    ${r.modelId} on ${r.benchmarkId}: ${r.score}`);
+    }
+    if (results.length > 5) {
+      console.log(`    ... and ${results.length - 5} more`);
     }
     process.exit(0);
   }
@@ -245,51 +371,37 @@ async function main() {
   console.log("\nChecking server health...");
   const healthy = await waitForHealthy(serverUrl);
   if (!healthy) {
-    console.error(
-      `Error: Server at ${serverUrl} is not healthy after retries. Aborting sync.`,
-    );
+    console.error(`Error: Server at ${serverUrl} is not healthy after retries. Aborting sync.`);
     process.exit(1);
   }
 
-  // Sync benchmark definitions first (results have FK to benchmarks)
-  console.log(
-    `\nSyncing ${syncBenchmarks.length} benchmarks to ${serverUrl}...`,
-  );
-  const benchmarkResult = await batchSync(
-    `${serverUrl}/api/benchmarks/sync`,
+  // Sync benchmarks first (results depend on benchmark IDs existing)
+  console.log("\nSyncing benchmark definitions...");
+  const benchmarkResult = await syncBenchmarkDefinitions(
+    serverUrl,
     syncBenchmarks,
     batchSize,
-    {
-      bodyKey: "items",
-      responseCountKey: "upserted",
-      itemLabel: "benchmarks",
-    },
   );
-  console.log(`  Benchmarks upserted: ${benchmarkResult.count}`);
+  console.log(`  Upserted: ${benchmarkResult.upserted}`);
   if (benchmarkResult.errors > 0) {
-    console.error(`  Benchmark errors: ${benchmarkResult.errors}`);
+    console.error(`  Errors: ${benchmarkResult.errors}`);
     process.exit(1);
   }
 
-  // Sync benchmark results
-  console.log(`\nSyncing ${results.length} benchmark results...`);
-  const resultsResult = await batchSync(
-    `${serverUrl}/api/benchmark-results/sync`,
+  // Sync results
+  console.log("\nSyncing benchmark results...");
+  const resultsResult = await syncBenchmarkResults(
+    serverUrl,
     results,
     batchSize,
-    {
-      bodyKey: "items",
-      responseCountKey: "upserted",
-      itemLabel: "benchmark results",
-    },
   );
-  console.log(`  Results upserted: ${resultsResult.count}`);
+  console.log(`  Upserted: ${resultsResult.upserted}`);
   if (resultsResult.errors > 0) {
-    console.error(`  Result errors: ${resultsResult.errors}`);
+    console.error(`  Errors: ${resultsResult.errors}`);
     process.exit(1);
   }
 
-  console.log("\nSync complete.");
+  console.log(`\nSync complete: ${benchmarkResult.upserted} benchmarks, ${resultsResult.upserted} results`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
