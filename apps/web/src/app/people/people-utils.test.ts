@@ -159,7 +159,7 @@ describe("getOrgRolesForPerson", () => {
   it("defaults org type to 'organization' when entity has no type", () => {
     // Intentionally omit type to test fallback to "organization"
     const orgEntity = makeEntity({ id: "org1", name: "SomeOrg" });
-    (orgEntity as Record<string, unknown>).type = undefined;
+    delete (orgEntity as Partial<typeof orgEntity>).type;
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "key-persons") {
