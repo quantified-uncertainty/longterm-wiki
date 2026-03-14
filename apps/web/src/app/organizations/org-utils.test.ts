@@ -10,14 +10,22 @@ vi.mock("@/data/kb", () => ({
   getKBSlugMap: vi.fn(() => ({})),
 }));
 
+// Mock the typed entity data layer
+vi.mock("@/data", () => ({
+  getTypedEntities: vi.fn(() => []),
+  isOrganization: vi.fn((e: { entityType?: string }) => e.entityType === "organization"),
+}));
+
 import { resolveOrgBySlug, getOrgSlugs } from "./org-utils";
 import { getKBEntity, getKBEntities, resolveKBSlug, getKBSlugMap } from "@/data/kb";
+import { getTypedEntities } from "@/data";
 
 // Typed mocks for convenience
 const mockGetKBEntity = vi.mocked(getKBEntity);
 const mockGetKBEntities = vi.mocked(getKBEntities);
 const mockResolveKBSlug = vi.mocked(resolveKBSlug);
 const mockGetKBSlugMap = vi.mocked(getKBSlugMap);
+const mockGetTypedEntities = vi.mocked(getTypedEntities);
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -37,6 +45,7 @@ beforeEach(() => {
   mockGetKBEntities.mockReturnValue([]);
   mockResolveKBSlug.mockReturnValue(undefined);
   mockGetKBSlugMap.mockReturnValue({});
+  mockGetTypedEntities.mockReturnValue([]);
 });
 
 // ═══════════════════════════════════════════════════════════════════
