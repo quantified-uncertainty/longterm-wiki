@@ -4,6 +4,8 @@ import { getTypedEntities, isOrganization, type OrganizationEntity } from "@/dat
 import { formatKBFactValue } from "@/components/wiki/kb/format";
 import type { Fact, Property } from "@longterm-wiki/kb";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
+import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -93,7 +95,101 @@ function buildOrgSearchText(
   return parts.join(" ").toLowerCase();
 }
 
-export default function OrganizationsPage() {
+// ── API response shape (matches wiki-server GET /api/entities/organizations) ──
+
+interface ApiOrg {
+  id: string;
+  numericId: string | null;
+  stableId: string | null;
+  title: string;
+  description: string | null;
+  website: string | null;
+  revenueNum: number | null;
+  revenueDate: string | null;
+  valuationNum: number | null;
+  valuationDate: string | null;
+  headcount: number | null;
+  headcountDate: string | null;
+  totalFundingNum: number | null;
+  foundedDate: string | null;
+}
+
+interface ApiOrgsResponse {
+  organizations: ApiOrg[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// ── Data loading helpers ─────────────────────────────────────────────────
+
+interface OrgPageData {
+  rows: OrgRow[];
+  stats: OrgStatDef[];
+  orgTypeMap: Record<string, string>;
+  serverEnabled: boolean;
+}
+
+/**
+ * Try loading organizations from the wiki-server API.
+ * orgTypeMap is always built from local data since orgType is not in the DB.
+ */
+async function loadFromApi(
+  orgTypeMap: Record<string, string>,
+): Promise<FetchResult<OrgPageData>> {
+  const result = await fetchDetailed<ApiOrgsResponse>(
+    "/api/entities/organizations?limit=200",
+    { revalidate: 60 },
+  );
+
+  if (!result.ok) return result;
+
+  const { organizations } = result.data;
+
+  const rows: OrgRow[] = organizations.map((org) => {
+    const orgType = orgTypeMap[org.id] ?? null;
+    const searchParts = [org.title];
+    if (org.description) searchParts.push(org.description);
+    if (orgType) searchParts.push(orgType);
+
+    return {
+      id: org.id,
+      slug: org.id,
+      name: org.title,
+      numericId: org.numericId,
+      orgType,
+      wikiPageId: org.numericId,
+
+      revenue: null, // Display formatting handled by client component
+      revenueNum: org.revenueNum,
+      revenueDate: org.revenueDate,
+
+      valuation: null,
+      valuationNum: org.valuationNum,
+      valuationDate: org.valuationDate,
+
+      headcount: org.headcount,
+      headcountDate: org.headcountDate,
+
+      totalFunding: null,
+      totalFundingNum: org.totalFundingNum,
+
+      foundedDate: org.foundedDate,
+
+      searchText: searchParts.join(" ").toLowerCase(),
+    };
+  });
+
+  const stats = buildStats(rows);
+
+  return {
+    ok: true,
+    data: { rows, stats, orgTypeMap, serverEnabled: true },
+  };
+}
+
+/** Load organizations from local database.json + KB data. */
+function loadFromLocal(): OrgPageData {
   const allEntities = getTypedEntities();
   const orgs = allEntities.filter(isOrganization);
 
@@ -153,16 +249,7 @@ export default function OrganizationsPage() {
     };
   });
 
-  // Compute summary stats (clickable in the client component)
-  const withRevenue = rows.filter((r) => r.revenueNum != null).length;
-  const withValuation = rows.filter((r) => r.valuationNum != null).length;
-  const withHeadcount = rows.filter((r) => r.headcount != null).length;
-  const stats: OrgStatDef[] = [
-    { key: "all", label: "Organizations", value: String(rows.length) },
-    { key: "withRevenue", label: "With Revenue Data", value: String(withRevenue) },
-    { key: "withValuation", label: "With Valuation Data", value: String(withValuation) },
-    { key: "withHeadcount", label: "With Headcount", value: String(withHeadcount) },
-  ];
+  const stats = buildStats(rows);
 
   // Build orgType lookup map for enriching server-side results
   // (orgType is only in database.json, not synced to wiki-server)
@@ -176,6 +263,40 @@ export default function OrganizationsPage() {
   // Server mode is enabled when wiki-server is configured
   const serverEnabled = !!process.env.LONGTERMWIKI_SERVER_URL;
 
+  return { rows, stats, orgTypeMap, serverEnabled };
+}
+
+/** Compute summary stats from rows (shared between API and local paths). */
+function buildStats(rows: OrgRow[]): OrgStatDef[] {
+  const withRevenue = rows.filter((r) => r.revenueNum != null).length;
+  const withValuation = rows.filter((r) => r.valuationNum != null).length;
+  const withHeadcount = rows.filter((r) => r.headcount != null).length;
+  return [
+    { key: "all", label: "Organizations", value: String(rows.length) },
+    { key: "withRevenue", label: "With Revenue Data", value: String(withRevenue) },
+    { key: "withValuation", label: "With Valuation Data", value: String(withValuation) },
+    { key: "withHeadcount", label: "With Headcount", value: String(withHeadcount) },
+  ];
+}
+
+// ── Page component ───────────────────────────────────────────────────────
+
+export default async function OrganizationsPage() {
+  // Always build orgTypeMap from local data — orgType is not in the wiki-server DB
+  const allEntities = getTypedEntities();
+  const orgs = allEntities.filter(isOrganization);
+  const orgTypeMap: Record<string, string> = {};
+  for (const org of orgs) {
+    if (org.orgType) {
+      orgTypeMap[org.id] = org.orgType;
+    }
+  }
+
+  const { data, source, apiError } = await withApiFallback(
+    () => loadFromApi(orgTypeMap),
+    () => loadFromLocal(),
+  );
+
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
       <div className="mb-8">
@@ -188,11 +309,13 @@ export default function OrganizationsPage() {
         </p>
       </div>
 
+      <DataSourceBanner source={source} apiError={apiError} />
+
       <OrganizationsTable
-        rows={rows}
-        stats={stats}
-        serverEnabled={serverEnabled}
-        orgTypeMap={orgTypeMap}
+        rows={data.rows}
+        stats={data.stats}
+        serverEnabled={data.serverEnabled}
+        orgTypeMap={data.orgTypeMap}
       />
     </div>
   );

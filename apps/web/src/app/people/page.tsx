@@ -3,7 +3,9 @@ import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getK
 import type { Fact } from "@longterm-wiki/kb";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getExpertById, getPublicationsForPerson } from "@/data";
+import { getExpertById, getPublicationsForPerson, getTypedEntities, isPerson } from "@/data";
+import { fetchDetailed } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -11,6 +13,110 @@ export const metadata: Metadata = {
   description:
     "Directory of key people in AI safety, frontier AI research, policy, and effective altruism with roles, affiliations, and key metrics.",
 };
+
+// ── Types for API response ────────────────────────────────────────────────
+
+interface DirectoryFact {
+  value: string | null;
+  numeric: number | null;
+  asOf: string | null;
+  label: string | null;
+  format: string | null;
+  formatDivisor: number | null;
+}
+
+interface DirectoryEntity {
+  id: string;
+  numericId: string | null;
+  stableId: string | null;
+  entityType: string;
+  title: string;
+  description: string | null;
+  website: string | null;
+  metadata: Record<string, unknown> | null;
+  tags: string[] | null;
+  facts: Record<string, DirectoryFact>;
+  resolvedRefs: Record<string, { name: string; entityId: string }>;
+  counts: { careerHistory: number; grantsGiven: number; grantsReceived: number };
+}
+
+interface DirectoryResult {
+  entities: DirectoryEntity[];
+  total: number;
+}
+
+// ── API-first data loading ────────────────────────────────────────────────
+
+const PERSON_MEASURES = ["role", "employed-by", "born-year", "net-worth"];
+
+function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
+  const role = e.facts["role"];
+  const bornYear = e.facts["born-year"];
+  const netWorth = e.facts["net-worth"];
+  const employer = e.resolvedRefs["employed-by"];
+
+  // Expert data from entity metadata (synced from experts.yaml)
+  const meta = e.metadata ?? {};
+  const expertPositions = meta.expertPositions as Array<{ topic: string; view: string }> | undefined;
+  const knownFor = meta.knownFor as string[] | undefined;
+  const publicationCount = (meta.publicationCount as number) ?? 0;
+  const topics = expertPositions?.map((p) => p.topic) ?? [];
+
+  // Build search text from all available API data
+  const searchParts: string[] = [e.title];
+  if (e.description) searchParts.push(e.description);
+  if (role?.value) searchParts.push(role.value);
+  if (employer?.name) searchParts.push(employer.name);
+  if (e.tags) searchParts.push(...e.tags);
+  if (knownFor) searchParts.push(...knownFor);
+  if (expertPositions) {
+    for (const p of expertPositions) {
+      searchParts.push(p.topic, p.view);
+    }
+  }
+
+  return {
+    id: e.stableId ?? e.id,
+    slug: e.id,
+    name: e.title,
+    numericId: e.numericId ?? null,
+    wikiPageId: e.numericId ?? null,
+
+    role: role?.value ?? null,
+
+    employerId: employer?.entityId ?? null,
+    employerName: employer?.name ?? null,
+    employerSlug: employer ? getKBEntitySlug(employer.entityId) ?? null : null,
+
+    bornYear: bornYear?.numeric ?? null,
+    netWorthNum: netWorth?.numeric ?? null,
+
+    positionCount: expertPositions?.length ?? 0,
+    topics,
+    publicationCount,
+    careerHistoryCount: e.counts.careerHistory,
+
+    searchText: searchParts.join(" ").toLowerCase(),
+  };
+}
+
+async function loadFromApi(): Promise<{ rows: PersonRow[]; source: "api" | "local" }> {
+  const result = await fetchDetailed<DirectoryResult>(
+    `/api/entities/directory?entityType=person&measures=${PERSON_MEASURES.join(",")}`,
+    { revalidate: 60 },
+  );
+
+  if (result.ok) {
+    return {
+      rows: result.data.entities.map(apiEntityToPersonRow),
+      source: "api",
+    };
+  }
+
+  return { rows: loadFromLocal(), source: "local" };
+}
+
+// ── Local data loading (fallback) ─────────────────────────────────────────
 
 function numericValue(fact: Fact | undefined): number | null {
   if (!fact) return null;
@@ -30,11 +136,12 @@ function resolveRef(fact: Fact | undefined): { id: string; name: string } | null
 /** Properties already handled explicitly or not useful for search (URLs/handles). */
 const SKIP_PROPERTIES = new Set(['role', 'employed-by', 'social-media', 'google-scholar', 'github-profile', 'wikipedia-url']);
 
-export default function PeoplePage() {
-  const allEntities = getKBEntities();
-  const people = allEntities.filter((e) => e.type === "person");
+function loadFromLocal(): PersonRow[] {
+  // Start with KB-backed people (rich data: facts, records, career history)
+  const kbPeople = getKBEntities().filter((e) => e.type === "person");
+  const kbSlugs = new Set<string>();
 
-  const rows: PersonRow[] = people.map((entity) => {
+  const rows: PersonRow[] = kbPeople.map((entity) => {
     const roleFact = getKBLatest(entity.id, "role");
     const employedByFact = getKBLatest(entity.id, "employed-by");
     const bornYearFact = getKBLatest(entity.id, "born-year");
@@ -44,6 +151,7 @@ export default function PeoplePage() {
     const employer = resolveRef(employedByFact);
 
     const slug = getKBEntitySlug(entity.id) ?? entity.id;
+    kbSlugs.add(slug);
     const expert = getExpertById(slug);
     const positionCount = expert?.positions?.length ?? 0;
     const topics = expert?.positions?.map((p) => p.topic) ?? [];
@@ -51,46 +159,31 @@ export default function PeoplePage() {
 
     const roleText = roleFact?.value.type === "text" ? roleFact.value.value : null;
 
-    // Build searchable text from all available data sources
     const searchParts: string[] = [entity.name];
-
-    // Entity aliases (alternative names)
     if (entity.aliases) searchParts.push(...entity.aliases);
-
-    // Role and employer
     if (roleText) searchParts.push(roleText);
     if (employer?.name) searchParts.push(employer.name);
-
-    // Expert position views and topics
     if (expert?.positions) {
       for (const p of expert.positions) {
         searchParts.push(p.topic, p.view);
       }
     }
-
-    // Expert knownFor
     if (expert?.knownFor) searchParts.push(...expert.knownFor);
-
-    // Publication titles
     for (const pub of publications) {
       searchParts.push(pub.title);
     }
-
-    // Career history role titles and org names from record fields
     for (const entry of careerHistory) {
       const fields = entry.fields;
       if (typeof fields.role === "string") searchParts.push(fields.role);
       if (typeof fields.title === "string") searchParts.push(fields.title);
       if (typeof fields.organization === "string") {
-        searchParts.push(fields.organization); // always include raw value
+        searchParts.push(fields.organization);
         const org = getKBEntity(fields.organization);
         if (org && org.name !== fields.organization) {
           searchParts.push(org.name);
         }
       }
     }
-
-    // KB fact text values (notable-for, education, etc.)
     const allFacts = getKBFacts(entity.id);
     for (const fact of allFacts) {
       if (SKIP_PROPERTIES.has(fact.propertyId)) continue;
@@ -105,24 +198,51 @@ export default function PeoplePage() {
       name: entity.name,
       numericId: entity.numericId ?? null,
       wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
-
       role: roleText,
-
       employerId: employer?.id ?? null,
       employerName: employer?.name ?? null,
       employerSlug: employer?.id ? getKBEntitySlug(employer.id) ?? null : null,
-
       bornYear: numericValue(bornYearFact),
       netWorthNum: numericValue(netWorthFact),
-
       positionCount,
       topics,
       publicationCount: publications.length,
       careerHistoryCount: careerHistory.length,
-
       searchText: searchParts.join(" ").toLowerCase(),
     };
   });
+
+  // Merge in typed entity people that aren't in KB
+  const typedPeople = getTypedEntities().filter(isPerson);
+  for (const tp of typedPeople) {
+    if (kbSlugs.has(tp.id)) continue;
+    rows.push({
+      id: tp.id,
+      slug: tp.id,
+      name: tp.title,
+      numericId: tp.numericId ?? null,
+      wikiPageId: tp.numericId ?? null,
+      role: null,
+      employerId: null,
+      employerName: null,
+      employerSlug: null,
+      bornYear: null,
+      netWorthNum: null,
+      positionCount: 0,
+      topics: [],
+      publicationCount: 0,
+      careerHistoryCount: 0,
+      searchText: [tp.title, tp.description ?? ""].join(" ").toLowerCase(),
+    });
+  }
+
+  return rows;
+}
+
+// ── Page component ────────────────────────────────────────────────────────
+
+export default async function PeoplePage() {
+  const { rows, source } = await loadFromApi();
 
   const withRole = rows.filter((r) => r.role != null).length;
   const withEmployer = rows.filter((r) => r.employerName != null).length;
@@ -179,6 +299,8 @@ export default function PeoplePage() {
           View Network Graph
         </Link>
       </div>
+
+      <DataSourceBanner source={source} />
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-3 mb-8">

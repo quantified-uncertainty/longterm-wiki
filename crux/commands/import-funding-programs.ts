@@ -139,11 +139,11 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|coefficient-giving|farm-animal-welfare",
     name: "Farm Animal Welfare Grantmaking",
     description:
-      "Grants for corporate cage-free campaigns, alt-protein research, and animal advocacy. Contributed to 3,000+ corporate cage-free commitments.",
+      "Grantmaking for farm animal welfare: corporate cage-free campaigns, broiler welfare, alt-protein research, fish welfare, and advocacy in Asia. Contributed to 3,000+ corporate cage-free commitments.",
     programType: "grant-round",
     status: "open",
     source: "https://coefficientgiving.org/funds/farm-animal-welfare",
-    notes: "Led by Lewis Bollard.",
+    notes: "Led by Lewis Bollard. 500+ grants. Largest Coefficient Giving program by grant count.",
   },
   {
     idSeed: "prog|coefficient-giving|science-rd",
@@ -151,7 +151,7 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|coefficient-giving|science-rd",
     name: "Science and Global Health R&D Grantmaking",
     description:
-      "330+ grants and 30+ social investments ($550M+) for treatments, vaccines, and diagnostics for low-income populations.",
+      "Grantmaking for scientific research, global health R&D, transformative basic science, and health innovation. 330+ grants and 30+ social investments ($550M+).",
     programType: "grant-round",
     totalBudget: 550_000_000,
     status: "open",
@@ -159,12 +159,24 @@ const PROGRAMS: FundingProgramDef[] = [
     notes: "Led by Jacob Trefethen.",
   },
   {
+    idSeed: "prog|coefficient-giving|criminal-justice",
+    orgId: ORG_IDS.OPEN_PHILANTHROPY,
+    divisionIdSeed: "div|coefficient-giving|criminal-justice",
+    name: "Criminal Justice Reform Grantmaking",
+    description:
+      "Historical grantmaking for criminal justice reform. Program wound down in 2022.",
+    programType: "grant-round",
+    status: "closed",
+    source: "https://coefficientgiving.org/grants/?q=&focus-area=criminal-justice-reform",
+    notes: "~$200M total grants. 398 grants. Focused on reducing incarceration.",
+  },
+  {
     idSeed: "prog|coefficient-giving|forecasting",
     orgId: ORG_IDS.OPEN_PHILANTHROPY,
     divisionIdSeed: "div|coefficient-giving|forecasting",
     name: "Forecasting Grantmaking",
     description:
-      "30+ grants totaling ~$50M supporting forecasting infrastructure and research.",
+      "Grantmaking for forecasting infrastructure, prediction markets, and forecasting research. 30+ grants totaling ~$50M.",
     programType: "grant-round",
     totalBudget: 50_000_000,
     status: "open",
@@ -177,7 +189,7 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|coefficient-giving|effective-giving-careers",
     name: "Effective Giving & Careers Grantmaking",
     description:
-      "Support for CEA, 80,000 Hours, EA Funds, and community infrastructure.",
+      "Support for effective giving infrastructure, career guidance, and EA community capacity building. Support for CEA, 80,000 Hours, EA Funds.",
     programType: "grant-round",
     status: "open",
     source: "https://coefficientgiving.org/funds/effective-giving-and-careers",

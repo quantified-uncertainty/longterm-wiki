@@ -631,6 +631,13 @@
       "when": 1776326400000,
       "tag": "0089_drop_redundant_things_index",
       "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1776412800000,
+      "tag": "0090_add_entities_metadata",
+      "breakpoints": true
     }
   ]
 }

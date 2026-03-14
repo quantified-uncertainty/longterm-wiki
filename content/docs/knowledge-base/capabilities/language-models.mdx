@@ -9,7 +9,7 @@ quality: 60
 readerImportance: 94
 researchImportance: 76.5
 tacticalValue: 74
-lastEdited: "2026-03-13"
+lastEdited: "2026-03-14"
 update_frequency: 21
 llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed \\$1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, and growing autonomous agent capabilities."
 ratings:
@@ -354,6 +354,8 @@ Key safety implications of OpenAI's open-weight release:
 - Open weights enable mechanistic interpretability research that would otherwise require API-level access
 - Fine-tuning safety guardrails out of open-weight models remains tractable for technically sophisticated users, a concern acknowledged in the gpt-oss model card
 - Governance frameworks targeting API access do not apply to locally deployed open-weight models
+
+In August 2025, OpenAI published ["Estimating Worst-Case Frontier Risks of Open-Weight LLMs"](https://openai.com/index/estimating-worst-case-frontier-risks-of-open-weight-llms/) ([arXiv:2508.03153](https://arxiv.org/abs/2508.03153)), which introduced a **malicious fine-tuning (MFT)** methodology to estimate the worst-case risk of open-weight releases. Researchers attempted to elicit maximum capabilities from gpt-oss by fine-tuning it in agentic environments for biorisk (web-browsing threat creation tasks) and cybersecurity (capture-the-flag challenges). The key finding: MFT gpt-oss underperformed <EntityLink id="E1074" name="o3">o3</EntityLink>, a closed-weight model rated below OpenAI's "Preparedness High" threshold for both risk categories. The study concluded that gpt-oss may marginally increase biological capabilities over existing open-weight models but does not substantially advance the frontier of dangerous capabilities. This represents the first systematic attempt by a major lab to quantify worst-case open-weight risk prior to release.
 
 ### Economic Impacts Research
 

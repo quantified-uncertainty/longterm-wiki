@@ -27,13 +27,34 @@ export function generateStaticParams() {
   return getRiskSlugs().map((slug) => ({ slug }));
 }
 
+import type { Entity } from "@longterm-wiki/kb";
+
+/** Resolve a slug to a risk entity (KB-first, typed entity fallback). */
+function resolveRiskEntity(slug: string): Entity | undefined {
+  const kbEntity = resolveRiskBySlug(slug);
+  if (kbEntity) return kbEntity;
+
+  const typedEntity = getTypedEntityById(slug);
+  if (typedEntity && isRisk(typedEntity)) {
+    return {
+      id: slug,
+      stableId: slug,
+      type: "risk",
+      name: typedEntity.title,
+      numericId: typedEntity.numericId,
+      wikiPageId: typedEntity.numericId,
+    };
+  }
+  return undefined;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const entity = resolveRiskBySlug(slug);
+  const entity = resolveRiskEntity(slug);
   return {
     title: entity ? `${entity.name} | Risks` : "Risk Not Found",
     description: entity
@@ -50,7 +71,7 @@ export default async function RiskProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entity = resolveRiskBySlug(slug);
+  const entity = resolveRiskEntity(slug);
   if (!entity) {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/risks/${canonical}`);

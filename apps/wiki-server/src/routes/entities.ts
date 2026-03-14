@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, ilike, or } from "drizzle-orm";
+import { eq, and, count, asc, sql, ilike, or, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { entities } from "../schema.js";
+import { entities, facts } from "../schema.js";
 import { checkRefsExist } from "./ref-check.js";
 import {
   parseJsonBody,
@@ -50,6 +50,12 @@ const OrganizationsQuery = z.object({
   sort: z.string().max(50).optional(),
 });
 
+const DirectoryQuery = z.object({
+  entityType: z.string().min(1).max(100),
+  /** Comma-separated list of fact measures to include (e.g., "revenue,headcount") */
+  measures: z.string().max(500).optional(),
+});
+
 // ---- Helpers ----
 
 function formatEntity(e: typeof entities.$inferSelect) {
@@ -68,6 +74,7 @@ function formatEntity(e: typeof entities.$inferSelect) {
     customFields: e.customFields,
     relatedEntries: e.relatedEntries,
     sources: e.sources,
+    metadata: e.metadata,
     syncedAt: e.syncedAt,
     createdAt: e.createdAt,
     updatedAt: e.updatedAt,
@@ -267,6 +274,215 @@ const entitiesApp = new Hono()
     });
   })
 
+  // ---- GET /directory?entityType=organization&measures=revenue,headcount ----
+  // Returns all entities of a type with their latest facts for directory pages.
+  .get("/directory", zv("query", DirectoryQuery), async (c) => {
+    const { entityType, measures } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // 1. Get all entities of the requested type
+    const entityRows = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.entityType, entityType))
+      .orderBy(asc(entities.title));
+
+    // 2. Get latest facts for these entities (if measures requested)
+    const measureList = measures
+      ? measures.split(",").map((m) => m.trim()).filter(Boolean)
+      : [];
+
+    type FactRow = {
+      entityId: string | null;
+      measure: string | null;
+      factId: string;
+      value: string | null;
+      numeric: number | null;
+      asOf: string | null;
+      label: string | null;
+      format: string | null;
+      formatDivisor: number | null;
+    };
+
+    let factRows: FactRow[] = [];
+    if (measureList.length > 0) {
+      const stableIds = entityRows
+        .map((e) => e.stableId)
+        .filter((id): id is string => id != null);
+
+      if (stableIds.length > 0) {
+        // Get latest fact per entity per measure using DISTINCT ON
+        factRows = await db.execute<FactRow>(sql`
+          SELECT DISTINCT ON (f.entity_id, f.measure)
+            f.entity_id AS "entityId",
+            f.measure,
+            f.fact_id AS "factId",
+            f.value,
+            f.numeric,
+            f.as_of AS "asOf",
+            f.label,
+            f.format,
+            f.format_divisor AS "formatDivisor"
+          FROM facts f
+          WHERE f.entity_id = ANY(${stableIds})
+            AND f.measure = ANY(${measureList})
+          ORDER BY f.entity_id, f.measure, f.as_of DESC NULLS LAST
+        `);
+      }
+    }
+
+    // 3. Build a map: stableId → { measure → fact }
+    const factMap = new Map<string, Map<string, FactRow>>();
+    for (const f of factRows) {
+      if (!f.entityId) continue;
+      let entityFacts = factMap.get(f.entityId);
+      if (!entityFacts) {
+        entityFacts = new Map();
+        factMap.set(f.entityId, entityFacts);
+      }
+      if (f.measure && !entityFacts.has(f.measure)) {
+        entityFacts.set(f.measure, f);
+      }
+    }
+
+    // 4. Resolve ref-type fact values (entity IDs → names + slugs)
+    // Collect all values that look like entity stable IDs (10-char alphanumeric)
+    const refPattern = /^[a-zA-Z0-9]{10}$/;
+    const refCandidates = new Set<string>();
+    for (const entityFacts of factMap.values()) {
+      for (const f of entityFacts.values()) {
+        if (f.value && refPattern.test(f.value)) {
+          refCandidates.add(f.value);
+        }
+      }
+    }
+
+    // Batch-resolve ref candidates to entity names and slugs
+    const refResolutionMap = new Map<string, { name: string; entityId: string }>();
+    if (refCandidates.size > 0) {
+      const refIds = [...refCandidates];
+      const refRows = await db
+        .select({
+          stableId: entities.stableId,
+          title: entities.title,
+          id: entities.id,
+        })
+        .from(entities)
+        .where(inArray(entities.stableId, refIds));
+
+      for (const r of refRows) {
+        if (r.stableId) {
+          refResolutionMap.set(r.stableId, { name: r.title, entityId: r.id });
+        }
+      }
+    }
+
+    // 5. Fetch domain table counts (personnel + grants)
+    const stableIds = entityRows
+      .map((e) => e.stableId)
+      .filter((id): id is string => id != null);
+
+    // Personnel counts: person_id → count (career history entries)
+    const personnelCountMap = new Map<string, number>();
+    if (stableIds.length > 0) {
+      type PersonnelCountRow = { personId: string; cnt: number };
+      const personnelCounts = await db.execute<PersonnelCountRow>(sql`
+        SELECT person_id AS "personId", COUNT(*)::int AS cnt
+        FROM personnel
+        WHERE person_id = ANY(${stableIds})
+          AND role_type = 'career'
+        GROUP BY person_id
+      `);
+      for (const r of personnelCounts) {
+        personnelCountMap.set(r.personId, r.cnt);
+      }
+    }
+
+    // Grant counts: organization_id → grantsGiven, grantee_id → grantsReceived
+    const grantsGivenMap = new Map<string, number>();
+    const grantsReceivedMap = new Map<string, number>();
+    if (stableIds.length > 0) {
+      type GrantCountRow = { entityId: string; cnt: number };
+      const grantsGiven = await db.execute<GrantCountRow>(sql`
+        SELECT organization_id AS "entityId", COUNT(*)::int AS cnt
+        FROM grants
+        WHERE organization_id = ANY(${stableIds})
+        GROUP BY organization_id
+      `);
+      for (const r of grantsGiven) {
+        grantsGivenMap.set(r.entityId, r.cnt);
+      }
+
+      const grantsReceived = await db.execute<GrantCountRow>(sql`
+        SELECT grantee_id AS "entityId", COUNT(*)::int AS cnt
+        FROM grants
+        WHERE grantee_id = ANY(${stableIds})
+        GROUP BY grantee_id
+      `);
+      for (const r of grantsReceived) {
+        grantsReceivedMap.set(r.entityId, r.cnt);
+      }
+    }
+
+    // 6. Build response
+    const items = entityRows.map((e) => {
+      const entityFacts = e.stableId ? factMap.get(e.stableId) : undefined;
+      const factsObj: Record<string, {
+        value: string | null;
+        numeric: number | null;
+        asOf: string | null;
+        label: string | null;
+        format: string | null;
+        formatDivisor: number | null;
+      }> = {};
+
+      // Build resolvedRefs for this entity's facts
+      const resolvedRefs: Record<string, { name: string; entityId: string }> = {};
+
+      if (entityFacts) {
+        for (const [measure, f] of entityFacts) {
+          factsObj[measure] = {
+            value: f.value,
+            numeric: f.numeric,
+            asOf: f.asOf,
+            label: f.label,
+            format: f.format,
+            formatDivisor: f.formatDivisor,
+          };
+
+          // If this fact's value resolved to an entity, include it
+          if (f.value && refResolutionMap.has(f.value)) {
+            resolvedRefs[measure] = refResolutionMap.get(f.value)!;
+          }
+        }
+      }
+
+      const sid = e.stableId;
+      const counts = {
+        careerHistory: sid ? (personnelCountMap.get(sid) ?? 0) : 0,
+        grantsGiven: sid ? (grantsGivenMap.get(sid) ?? 0) : 0,
+        grantsReceived: sid ? (grantsReceivedMap.get(sid) ?? 0) : 0,
+      };
+
+      return {
+        id: e.id,
+        numericId: e.numericId,
+        stableId: e.stableId,
+        entityType: e.entityType,
+        title: e.title,
+        description: e.description,
+        website: e.website,
+        metadata: e.metadata,
+        tags: e.tags,
+        facts: factsObj,
+        resolvedRefs,
+        counts,
+      };
+    });
+
+    return c.json({ entities: items, total: items.length });
+  })
+
   // ---- GET /:id ----
 
   .get("/:id", async (c) => {
@@ -386,6 +602,7 @@ const entitiesApp = new Hono()
         customFields: e.customFields ?? null,
         relatedEntries: e.relatedEntries ?? null,
         sources: e.sources ?? null,
+        metadata: e.metadata ?? null,
       }));
 
       await tx
@@ -409,6 +626,7 @@ const entitiesApp = new Hono()
             customFields: sql`excluded.custom_fields`,
             relatedEntries: sql`excluded.related_entries`,
             sources: sql`excluded.sources`,
+            metadata: sql`excluded.metadata`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },

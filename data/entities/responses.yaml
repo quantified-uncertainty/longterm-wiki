@@ -3605,6 +3605,7 @@
   numericId: E386
   type: project
   title: AI Watch
+  projectStatus: active
   description: >-
     AI Watch is a tracking database by Issa Rice that monitors AI safety
     organizations, people, funding, and publications as part of his broader
@@ -3665,6 +3666,7 @@
   numericId: E381
   type: project
   title: X Community Notes
+  projectStatus: active
   description: >-
     Community Notes uses a bridging algorithm requiring cross-partisan consensus
     to display fact-checks, reducing retweets 25-50% when notes appear. However,
@@ -3736,6 +3738,7 @@
   numericId: E389
   type: project
   title: Donations List Website
+  projectStatus: active
   description: >-
     Comprehensive documentation of an open-source database tracking $72.8B in
     philanthropic donations (1969-2023) across 75+ donors, with particular
@@ -3780,6 +3783,9 @@
   numericId: E384
   type: project
   title: Longterm Wiki
+  projectStatus: active
+  projectUrl: https://www.longtermwiki.com
+  organization: quantified-uncertainty
   description: >-
     A self-referential documentation page describing the Longterm Wiki platform
     itself—a strategic intelligence tool with ~550 pages, crux mapping of ~50
@@ -3796,6 +3802,7 @@
   numericId: E383
   type: project
   title: MIT AI Risk Repository
+  projectStatus: active
   summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
@@ -3828,6 +3835,7 @@
   numericId: E388
   type: project
   title: Org Watch
+  projectStatus: active
   description: >-
     Org Watch is a tracking website by Issa Rice that monitors EA and AI safety
     organizations, but the article lacks concrete information about its actual
@@ -3942,6 +3950,7 @@
   numericId: E385
   type: project
   title: RoastMyPost
+  projectStatus: active
   description: >-
     RoastMyPost is an LLM tool (Claude Sonnet 4.5 + Perplexity) that evaluates
     written content through multiple specialized AI agents—fact-checking,
@@ -3959,6 +3968,8 @@
   numericId: E382
   type: project
   title: Stampy / AISafety.info
+  projectStatus: active
+  projectUrl: https://aisafety.info
   description: >-
     AISafety.info is a volunteer-maintained wiki with 280+ answers on AI
     existential risk, complemented by Stampy, an LLM chatbot searching 10K-100K
@@ -4025,6 +4036,8 @@
   numericId: E387
   type: project
   title: Timelines Wiki
+  projectStatus: active
+  projectUrl: https://timelines.issarice.com
   description: >-
     Timelines Wiki is a specialized MediaWiki project documenting chronological
     histories of AI safety and EA organizations, created by Issa Rice with
@@ -4040,6 +4053,7 @@
   numericId: E390
   type: project
   title: Wikipedia Views
+  projectStatus: active
   description: >-
     This article provides a comprehensive overview of Wikipedia pageview
     analytics tools and their declining traffic due to AI summaries reducing

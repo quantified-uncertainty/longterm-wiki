@@ -27,6 +27,13 @@ export const PROGRAM_IDS = {
   OP_AI_SAFETY: progId("prog|open-philanthropy|ai-safety"),
   OP_BIOSECURITY: progId("prog|open-philanthropy|biosecurity"),
   OP_GLOBAL_HEALTH: progId("prog|open-philanthropy|global-health"),
+  OP_FARM_ANIMAL_WELFARE: progId("prog|coefficient-giving|farm-animal-welfare"),
+  OP_SCIENCE_HEALTH_RD: progId("prog|coefficient-giving|science-health-rd"),
+  OP_GCR_OPPORTUNITIES: progId("prog|coefficient-giving|gcr-opportunities"),
+  OP_CRIMINAL_JUSTICE: progId("prog|coefficient-giving|criminal-justice"),
+  OP_EFFECTIVE_GIVING: progId("prog|coefficient-giving|effective-giving"),
+  OP_FORECASTING: progId("prog|coefficient-giving|forecasting"),
+  OP_ABUNDANCE_GROWTH: progId("prog|coefficient-giving|abundance-growth-grants"),
 
   // Coefficient Giving — specific programs
   CG_GCR_OPPORTUNITIES: progId("prog|coefficient-giving|gcr-opportunities"),
@@ -127,14 +134,14 @@ const RULES: ProgramRule[] = [
   // AI Safety (broad) — covers AI governance, AI policy, alignment research
   {
     source: "coefficient-giving",
-    focusAreaPattern: /potential risks from advanced ai|ai safety|ai governance|technical ai safety|ai policy/i,
+    focusAreaPattern: /navigating transformative ai|potential risks from advanced ai|ai safety|ai governance|technical ai safety|ai policy/i,
     programId: PROGRAM_IDS.OP_AI_SAFETY,
   },
 
   // Biosecurity and Pandemic Preparedness
   {
     source: "coefficient-giving",
-    focusAreaPattern: /biosecurity|pandemic preparedness|global catastrophic biological/i,
+    focusAreaPattern: /biosecurity|pandemic preparedness|global catastrophic biological|science supporting biosecurity/i,
     programId: PROGRAM_IDS.OP_BIOSECURITY,
   },
 
@@ -148,14 +155,21 @@ const RULES: ProgramRule[] = [
   // Farm Animal Welfare — must match before general global health catch-all
   {
     source: "coefficient-giving",
-    focusAreaPattern: /farm animal welfare/i,
+    focusAreaPattern: /farm animal welfare|broiler chicken|cage.free|alternatives to animal|fish welfare/i,
     programId: PROGRAM_IDS.CG_FARM_ANIMAL_WELFARE,
+  },
+
+  // Criminal Justice Reform — dissolved program, kept for historical data
+  {
+    source: "coefficient-giving",
+    focusAreaPattern: /criminal justice/i,
+    programId: PROGRAM_IDS.OP_CRIMINAL_JUSTICE,
   },
 
   // Science & Global Health R&D
   {
     source: "coefficient-giving",
-    focusAreaPattern: /science.*global health r&d|scientific research|global health r&d/i,
+    focusAreaPattern: /science.*global health r&d|scientific research|global health r&d|transformative basic science|scientific innovation|other scientific|science for global health|global public health/i,
     programId: PROGRAM_IDS.CG_SCIENCE_RD,
   },
 
@@ -176,14 +190,14 @@ const RULES: ProgramRule[] = [
   // Global Aid Policy
   {
     source: "coefficient-giving",
-    focusAreaPattern: /global aid|u\.s\. policy/i,
+    focusAreaPattern: /global aid|u\.s\. policy|global aid policy/i,
     programId: PROGRAM_IDS.CG_GLOBAL_AID,
   },
 
   // Global Growth / Economic Growth in Developing Countries
   {
     source: "coefficient-giving",
-    focusAreaPattern: /global economic growth|economic growth.*developing/i,
+    focusAreaPattern: /global economic growth|economic growth.*developing|economic growth in lmics/i,
     programId: PROGRAM_IDS.CG_GLOBAL_GROWTH,
   },
 
@@ -204,15 +218,15 @@ const RULES: ProgramRule[] = [
   // Abundance & Growth Grants
   {
     source: "coefficient-giving",
-    focusAreaPattern: /abundance|scientific innovation/i,
+    focusAreaPattern: /abundance|scientific innovation|innovation policy/i,
     programId: PROGRAM_IDS.CG_ABUNDANCE_GROWTH,
   },
 
   // --- General catch-all for remaining Coefficient Giving grants ---
-  // Catches global health, criminal justice, land use, immigration, macroeconomic, etc.
+  // Catches global health, land use, immigration, macroeconomic, etc.
   {
     source: "coefficient-giving",
-    focusAreaPattern: /global health|criminal justice|land use|immigration|macroeconomic/i,
+    focusAreaPattern: /global health|givewell|human health|land use|immigration|macroeconomic|housing policy|history of philanthropy|other areas/i,
     programId: PROGRAM_IDS.OP_GLOBAL_HEALTH,
   },
 

@@ -10,14 +10,23 @@ vi.mock("@/data/kb", () => ({
   getKBSlugMap: vi.fn(() => ({})),
 }));
 
+// Mock the data layer (for getTypedEntities/isOrganization used by getOrgSlugs)
+vi.mock("@/data", () => ({
+  getTypedEntities: vi.fn(() => []),
+  isOrganization: vi.fn(() => false),
+}));
+
 import { resolveOrgBySlug, getOrgSlugs } from "./org-utils";
 import { getKBEntity, getKBEntities, resolveKBSlug, getKBSlugMap } from "@/data/kb";
+import { getTypedEntities, isOrganization } from "@/data";
 
 // Typed mocks for convenience
 const mockGetKBEntity = vi.mocked(getKBEntity);
 const mockGetKBEntities = vi.mocked(getKBEntities);
 const mockResolveKBSlug = vi.mocked(resolveKBSlug);
 const mockGetKBSlugMap = vi.mocked(getKBSlugMap);
+const mockGetTypedEntities = vi.mocked(getTypedEntities);
+const mockIsOrganization = vi.mocked(isOrganization);
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -37,6 +46,8 @@ beforeEach(() => {
   mockGetKBEntities.mockReturnValue([]);
   mockResolveKBSlug.mockReturnValue(undefined);
   mockGetKBSlugMap.mockReturnValue({});
+  mockGetTypedEntities.mockReturnValue([]);
+  mockIsOrganization.mockReturnValue(false);
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -85,65 +96,77 @@ describe("resolveOrgBySlug", () => {
 // ═══════════════════════════════════════════════════════════════════
 
 describe("getOrgSlugs", () => {
-  it("returns slugs only for organization entities", () => {
+  it("returns slugs from both KB and typed entities", () => {
+    // KB has org1 with slug "anthropic"
     mockGetKBEntities.mockReturnValue([
       mockEntity({ id: "org1", name: "Anthropic", type: "organization" }),
-      mockEntity({ id: "org2", name: "OpenAI", type: "organization" }),
+    ]);
+    mockGetKBSlugMap.mockReturnValue({ anthropic: "org1" });
+
+    // Typed entities have an additional org not in KB
+    mockGetTypedEntities.mockReturnValue([
+      { id: "small-org", entityType: "organization", title: "Small Org" },
+    ] as any);
+    mockIsOrganization.mockImplementation(
+      (e: any) => e.entityType === "organization",
+    );
+
+    const slugs = getOrgSlugs();
+    expect(slugs).toContain("anthropic");
+    expect(slugs).toContain("small-org");
+    expect(slugs).toHaveLength(2);
+  });
+
+  it("deduplicates slugs present in both KB and typed entities", () => {
+    mockGetKBEntities.mockReturnValue([
+      mockEntity({ id: "org1", name: "Anthropic", type: "organization" }),
+    ]);
+    mockGetKBSlugMap.mockReturnValue({ anthropic: "org1" });
+
+    // Same org also exists in typed entities with the slug as id
+    mockGetTypedEntities.mockReturnValue([
+      { id: "anthropic", entityType: "organization", title: "Anthropic" },
+    ] as any);
+    mockIsOrganization.mockReturnValue(true);
+
+    const slugs = getOrgSlugs();
+    expect(slugs).toContain("anthropic");
+    // "anthropic" appears from both KB slug map and typed entities, but should be deduped
+    expect(slugs).toHaveLength(1);
+  });
+
+  it("returns KB slugs only for organization entities", () => {
+    mockGetKBEntities.mockReturnValue([
+      mockEntity({ id: "org1", name: "Anthropic", type: "organization" }),
       mockEntity({ id: "p1", name: "Alice", type: "person" }),
     ]);
-
     mockGetKBSlugMap.mockReturnValue({
       anthropic: "org1",
-      openai: "org2",
       alice: "p1",
     });
 
     const slugs = getOrgSlugs();
     expect(slugs).toContain("anthropic");
-    expect(slugs).toContain("openai");
     expect(slugs).not.toContain("alice");
-    expect(slugs).toHaveLength(2);
   });
 
   it("returns empty array when no organizations exist", () => {
     mockGetKBEntities.mockReturnValue([
       mockEntity({ id: "p1", name: "Alice", type: "person" }),
     ]);
-
-    mockGetKBSlugMap.mockReturnValue({
-      alice: "p1",
-    });
+    mockGetKBSlugMap.mockReturnValue({ alice: "p1" });
 
     expect(getOrgSlugs()).toEqual([]);
   });
 
   it("returns empty array when no entities exist", () => {
-    mockGetKBEntities.mockReturnValue([]);
-    mockGetKBSlugMap.mockReturnValue({});
-
     expect(getOrgSlugs()).toEqual([]);
-  });
-
-  it("handles entities without slugs in the slug map", () => {
-    mockGetKBEntities.mockReturnValue([
-      mockEntity({ id: "org1", name: "Anthropic", type: "organization" }),
-      mockEntity({ id: "org2", name: "SecretOrg", type: "organization" }),
-    ]);
-
-    // Only org1 has a slug mapping
-    mockGetKBSlugMap.mockReturnValue({
-      anthropic: "org1",
-    });
-
-    const slugs = getOrgSlugs();
-    expect(slugs).toEqual(["anthropic"]);
   });
 
   it("handles multiple slugs pointing to the same organization", () => {
     mockGetKBEntities.mockReturnValue([
       mockEntity({ id: "org1", name: "Anthropic", type: "organization" }),
     ]);
-
     mockGetKBSlugMap.mockReturnValue({
       anthropic: "org1",
       "anthropic-pbc": "org1",

@@ -7,6 +7,7 @@ import {
   resolveKBSlug,
   getKBSlugMap,
 } from "@/data/kb";
+import { getTypedEntities, isOrganization } from "@/data";
 import type { Entity } from "@longterm-wiki/kb";
 
 /**
@@ -23,15 +24,30 @@ export function resolveOrgBySlug(slug: string): Entity | undefined {
 
 /**
  * Get all organization slugs for generateStaticParams.
+ *
+ * Sources ALL organization entities — not just KB-backed ones.
+ * This ensures every org in the directory listing has a detail page.
  */
 export function getOrgSlugs(): string[] {
-  const slugMap = getKBSlugMap();
-  const entities = getKBEntities();
-  const orgIds = new Set(
-    entities.filter((e) => e.type === "organization").map((e) => e.id),
+  // Primary source: typed entities from database.json (covers all YAML entities)
+  const allEntitySlugs = new Set(
+    getTypedEntities()
+      .filter(isOrganization)
+      .map((e) => e.id),
   );
 
-  return Object.entries(slugMap)
-    .filter(([, id]) => orgIds.has(id))
-    .map(([slug]) => slug);
+  // Also include KB-backed slugs (in case any exist only in KB)
+  const slugMap = getKBSlugMap();
+  const kbOrgIds = new Set(
+    getKBEntities()
+      .filter((e) => e.type === "organization")
+      .map((e) => e.id),
+  );
+  for (const [slug, id] of Object.entries(slugMap)) {
+    if (kbOrgIds.has(id)) {
+      allEntitySlugs.add(slug);
+    }
+  }
+
+  return [...allEntitySlugs];
 }

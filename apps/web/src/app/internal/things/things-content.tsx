@@ -129,14 +129,24 @@ function StatCard({
 
 // ── Row Building ─────────────────────────────────────────────────────────
 
+/** Validate that a URL is parseable before using it as a link target. */
+function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function buildHref(item: ThingsApiItem): string | undefined {
   if (item.thingType === "entity") {
     if (item.numericId) return `/wiki/${item.numericId}`;
     return getEntityHref(item.sourceId);
   }
 
-  // Resources, grants, and everything else: link to sourceUrl if available
-  if (item.sourceUrl) return item.sourceUrl;
+  // Resources, grants, and everything else: link to sourceUrl if it's a valid URL
+  if (item.sourceUrl && isValidUrl(item.sourceUrl)) return item.sourceUrl;
 
   return undefined;
 }
