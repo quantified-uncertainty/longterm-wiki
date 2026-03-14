@@ -48,6 +48,7 @@ import { EquityPositionsSection } from "./equity-section";
 import { DivisionsSection } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
 import { AiModelsSection } from "./ai-models-section";
+import { PolicyPositionsSection, getOrgPolicyPositions } from "./policy-positions-section";
 
 // Section components — publications
 import { KeyPublicationsSection } from "./publications-section";
@@ -469,6 +470,19 @@ export default async function OrgProfilePage({
         <div className="space-y-8">
           <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
         </div>
+      ),
+    });
+  }
+
+  // ── Policy Positions tab ──
+  const policyPositions = getOrgPolicyPositions(entity.id, entity.name);
+  if (policyPositions.length > 0) {
+    tabs.push({
+      id: "policy",
+      label: "Policy Positions",
+      count: policyPositions.length,
+      content: (
+        <PolicyPositionsSection positions={policyPositions} />
       ),
     });
   }
