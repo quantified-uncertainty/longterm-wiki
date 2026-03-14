@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTypedEntities, getTypedEntityById, isAiModel } from "@/data";
 import { AiModelsTable, type AiModelRow } from "./ai-models-table";
+import { isModelFamily } from "./ai-model-utils";
 
 export const metadata: Metadata = {
   title: "AI Models",
@@ -36,7 +37,7 @@ export default function AiModelsPage() {
       entity.benchmarks?.find((b) => !isSweBench(b.name)) ?? null;
 
     // Is this a family entry (no tier, no release date)?
-    const isFamily = !entity.modelTier && !entity.releaseDate;
+    const isFamily = isModelFamily(entity);
 
     return {
       id: entity.id,

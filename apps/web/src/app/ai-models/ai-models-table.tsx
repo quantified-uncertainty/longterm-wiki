@@ -306,7 +306,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 <td className="py-2.5 px-3">
                   {row.safetyLevel ? (
                     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                      SAFETY_LEVEL_COLORS[row.safetyLevel] ?? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                      SAFETY_LEVEL_COLORS[row.safetyLevel] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                     }`}>
                       {row.safetyLevel}
                     </span>
