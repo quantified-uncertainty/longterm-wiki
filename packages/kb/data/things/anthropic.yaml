@@ -75,6 +75,27 @@ facts:
     notes: "Nearing $20B ARR; company guidance $20-26B for 2026"
 
   # ── Valuation ───────────────────────────────────────────────────
+  - id: f_val_seriesA
+    property: valuation
+    value: 5.5e+8
+    asOf: 2021-05
+    source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
+    notes: "Series A post-money valuation ($124M raised)"
+
+  - id: f_val_seriesB
+    property: valuation
+    value: 4e+9
+    asOf: 2022-04
+    source: https://techcrunch.com/2022/04/28/anthropic-raises-580-million-in-series-b-funding/
+    notes: "Series B post-money valuation ($580M raised, led by Spark Capital)"
+
+  - id: f_val_seriesC
+    property: valuation
+    value: 4.1e+9
+    asOf: 2023-05
+    source: https://www.anthropic.com/news/anthropic-series-c
+    notes: "Series C post-money valuation ($450M raised, led by Spark Capital)"
+
   - id: f_CdywhhCodg
     property: valuation
     value: 1.8e+10
@@ -144,6 +165,42 @@ facts:
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Point estimate 1097 from LinkedIn/consistent sources; full range
       870-2847 depending on methodology"
+
+  - id: f_hc_2023q2
+    property: headcount
+    value:
+      - 300
+      - 400
+    asOf: 2023-06
+    source: https://seo.ai/blog/how-many-people-work-at-anthropic
+    notes: "Approximate headcount mid-2023 from multiple sources"
+
+  - id: f_hc_2024q1
+    property: headcount
+    value:
+      - 500
+      - 700
+    asOf: 2024-03
+    source: https://seo.ai/blog/how-many-people-work-at-anthropic
+    notes: "Estimated headcount early 2024, pre rapid hiring"
+
+  - id: f_hc_2025q1
+    property: headcount
+    value:
+      - 1500
+      - 2000
+    asOf: 2025-03
+    source: https://electroiq.com/stats/anthropic-statistics/
+    notes: "Rapid growth period; hiring across engineering, sales, policy"
+
+  - id: f_hc_2025q3
+    property: headcount
+    value:
+      - 2500
+      - 3500
+    asOf: 2025-09
+    source: https://electroiq.com/stats/anthropic-statistics/
+    notes: "Estimate at time of Series F; international expansion underway"
 
   - id: f_BdGi5l9dOg
     property: headcount
@@ -1384,3 +1441,152 @@ records:
       started: "2024-01"
       notes: "Kyle Fish hired as first full-time AI welfare researcher at a major AI
         lab"
+
+  # ── Divisions / Departments ────────────────────────────────────
+  divisions:
+    research:
+      name: "AI Research"
+      divisionType: department
+      lead: jared-kaplan  # no KB entity yet
+      status: active
+      startDate: "2021-01"
+      notes: "Core research org. Includes pretraining, alignment science,
+        interpretability, alignment finetuning, safeguards research.
+        ~65 open roles as of Mar 2026."
+
+    pretraining:
+      name: "Pretraining"
+      divisionType: team
+      lead: nick-joseph  # no KB entity yet
+      status: active
+      startDate: "2021-01"
+      notes: "Training Claude models at scale; scaling laws, compute efficiency.
+        ~40+ members. Led by Nick Joseph (founding employee)."
+
+    alignment-science:
+      name: "Alignment Science"
+      divisionType: team
+      lead: hQ7mR2kN5p  # jan-leike
+      status: active
+      startDate: "2024-05"
+      notes: "Scalable oversight, weak-to-strong generalization, adversarial
+        robustness, AI control. Led by Jan Leike (ex-OpenAI Superalignment)."
+
+    interpretability:
+      name: "Interpretability"
+      divisionType: team
+      lead: Tz48rTriBg  # chris-olah
+      status: active
+      startDate: "2021-01"
+      notes: "Mechanistic interpretability, circuit tracing, sparse autoencoders.
+        ~50 members. Transformer Circuits thread."
+
+    safeguards-research:
+      name: "Safeguards Research"
+      divisionType: team
+      lead: mrinank-sharma  # no KB entity yet
+      status: active
+      startDate: "2023-01"
+      notes: "Jailbreak robustness, automated red teaming, constitutional
+        classifiers. Separate from Trust & Safety enforcement."
+
+    anthropic-institute:
+      name: "Anthropic Institute"
+      divisionType: department
+      lead: jack-clark  # no KB entity yet
+      status: active
+      startDate: "2026-03"
+      source: https://www.anthropic.com/news/anthropic-institute
+      notes: "Public benefit research arm. Consolidates Frontier Red Team,
+        Societal Impacts, and Economic Research. ~30 initial staff.
+        Led by Jack Clark (Head of Public Benefit)."
+
+    labs:
+      name: "Labs (Internal Incubator)"
+      divisionType: department
+      status: active
+      startDate: "2024-06"
+      notes: "Experimental AI products. Co-led by Mike Krieger and Ben Mann.
+        Incubated Claude Code ($2.5B ARR), MCP (100M monthly downloads),
+        Artifacts. Planned to double in size early 2026."
+
+    product:
+      name: "Product"
+      divisionType: department
+      status: active
+      startDate: "2023-07"
+      notes: "Product management, design, UX. Led by Ami Vora (ex-WhatsApp,
+        joined late 2025). Previously Mike Krieger (CPO 2024-Jan 2026)."
+
+    engineering:
+      name: "Engineering & Infrastructure"
+      divisionType: department
+      lead: rahul-patil  # no KB entity yet
+      status: active
+      startDate: "2021-01"
+      notes: "Product engineering, infrastructure, inference, security,
+        data science. ~33 open roles infrastructure, ~31 product eng.
+        Led by CTO Rahul Patil (ex-Stripe, joined Oct 2025)."
+
+    compute:
+      name: "Compute & Data Center"
+      divisionType: team
+      status: active
+      startDate: "2023-09"
+      notes: "Data center infrastructure, compute lifecycle, capacity allocation.
+        ~13 open roles. Key hires: Tim Hughes (ex-Stack Infrastructure),
+        Brett Rogers & Winnie Leung (ex-Google)."
+
+    sales:
+      name: "Sales & Commercial"
+      divisionType: department
+      status: active
+      startDate: "2023-03"
+      notes: "Largest department (~135 open roles). Led by Paul Smith (CCO,
+        ex-ServiceNow). Enterprise sales, partnerships, revenue ops.
+        Regional heads: Chris Ciauri (International), Guillaume Princen
+        (EMEA), Kate Jensen (Americas), Hidetoshi Tojo (Japan)."
+
+    policy:
+      name: "Policy & Societal Impact"
+      divisionType: department
+      lead: jack-clark  # no KB entity yet
+      status: active
+      startDate: "2021-01"
+      notes: "Government affairs, regulatory policy, societal impact research.
+        Led by Jack Clark through 2025; now partly within Anthropic Institute."
+
+    trust-safety:
+      name: "Trust & Safety"
+      divisionType: department
+      status: active
+      startDate: "2023-07"
+      notes: "Enforcement, monitoring, platform safety, content moderation,
+        Usage Policy enforcement. ~15 open roles. Separate from Safeguards
+        Research."
+
+    frontier-red-team:
+      name: "Frontier Red Team"
+      divisionType: team
+      status: active
+      startDate: "2023-09"
+      notes: "Stress-testing AI models for cybersecurity, biosecurity, autonomous
+        systems risks. ~15 members. Led by Logan Graham. Now part of
+        Anthropic Institute."
+
+    people:
+      name: "People & HR"
+      divisionType: department
+      status: active
+      notes: "Led by Hannah Pritchett (Head of People). Recruiting, culture,
+        benefits, DEI."
+
+    finance:
+      name: "Finance & Operations"
+      divisionType: department
+      lead: krishna-rao  # no KB entity yet
+      status: active
+      startDate: "2024-05"
+      notes: "Led by CFO Krishna Rao (ex-Airbnb, first CFO hired May 2024).
+        Financial planning, legal (GC Jeff Bleich), CISO
+        (Vitaly Gudanets, ex-Netflix)."
