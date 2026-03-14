@@ -77,3 +77,12 @@ export function resolveEntityRef(id: string): { name: string; href: string } | n
   if (!entity) return null;
   return { name: entity.title, href: getEntityHref(id) };
 }
+
+/** Infer scope from entity tags or ID. */
+export function inferScope(tags: string[], id: string): string | null {
+  if (tags.includes("state-policy") || id.startsWith("california-") || id.startsWith("colorado-") || id.startsWith("new-york-")) return "State";
+  if (tags.includes("federal") || id.startsWith("us-")) return "Federal";
+  if (tags.includes("international") || id.startsWith("eu-") || id.includes("international")) return "International";
+  if (id.startsWith("canada-") || id.startsWith("china-") || id.startsWith("uk-")) return "National";
+  return null;
+}

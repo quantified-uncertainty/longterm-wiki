@@ -6,8 +6,6 @@
 export const STATUS_COLORS: Record<string, string> = {
   enacted:
     "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  signed:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   vetoed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   expired: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",

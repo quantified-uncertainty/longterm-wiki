@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTypedEntities, isPolicy } from "@/data";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
-import { getCustomField, getPolicyWikiHref } from "./legislation-utils";
+import { getCustomField, getPolicyWikiHref, inferScope } from "./legislation-utils";
 
 export const metadata: Metadata = {
   title: "Legislation",
@@ -116,11 +116,3 @@ export default function LegislationPage() {
   );
 }
 
-/** Infer scope from entity tags or ID. */
-function inferScope(tags: string[], id: string): string | null {
-  if (tags.includes("state-policy") || id.startsWith("california-") || id.startsWith("colorado-") || id.startsWith("new-york-")) return "State";
-  if (tags.includes("federal") || id.startsWith("us-")) return "Federal";
-  if (tags.includes("international") || id.startsWith("eu-") || id.includes("international")) return "International";
-  if (id.startsWith("canada-") || id.startsWith("china-") || id.startsWith("uk-")) return "National";
-  return null;
-}

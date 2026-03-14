@@ -12,6 +12,7 @@ import {
   getRelatedPolicies,
   resolveEntityRef,
   getPolicyWikiHref,
+  inferScope,
 } from "../legislation-utils";
 import {
   STATUS_COLORS,
@@ -471,7 +472,7 @@ export default async function LegislationDetailPage({
           )}
 
           {/* ── Related Wiki Pages ───────────────────────────────── */}
-          <RelatedPages entityId={slug} entity={{ type: "policy" }} />
+          <RelatedPages entityId={entity.id} entity={{ type: "policy" }} />
         </div>
 
         {/* ── Right sidebar ──────────────────────────────────────── */}
@@ -614,11 +615,3 @@ export default async function LegislationDetailPage({
   );
 }
 
-/** Infer scope from entity tags or ID. */
-function inferScope(tags: string[], id: string): string | null {
-  if (tags.includes("state-policy") || id.startsWith("california-") || id.startsWith("colorado-") || id.startsWith("new-york-")) return "State";
-  if (tags.includes("federal") || id.startsWith("us-")) return "Federal";
-  if (tags.includes("international") || id.startsWith("eu-") || id.includes("international")) return "International";
-  if (id.startsWith("canada-") || id.startsWith("china-") || id.startsWith("uk-")) return "National";
-  return null;
-}
