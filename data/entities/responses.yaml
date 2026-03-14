@@ -651,6 +651,7 @@
     - safety-standards
   lastUpdated: 2025-12
 - id: epistemic-security
+  stableId: UboRnYcrgg
   numericId: E123
   type: approach
   title: AI-Era Epistemic Security
@@ -773,6 +774,7 @@
     - untrusted-ai
   lastUpdated: 2025-12
 - id: anthropic-core-views
+  stableId: CsWO4o3gZw
   numericId: E23
   type: safety-agenda
   title: Anthropic Core Views
@@ -1008,6 +1010,7 @@
     - calibration
   lastUpdated: 2025-12
 - id: content-authentication
+  stableId: pZOVjv0Bng
   numericId: E74
   type: approach
   title: AI Content Authentication
@@ -1067,6 +1070,7 @@
     - trust
   lastUpdated: 2025-12
 - id: coordination-tech
+  stableId: DnYQRsR1pw
   numericId: E77
   type: approach
   title: AI Governance Coordination Technologies
@@ -1126,6 +1130,7 @@
     - verification
   lastUpdated: 2025-12
 - id: deliberation
+  stableId: 3a66Dwt6xg
   numericId: E100
   type: approach
   title: AI-Assisted Deliberation
@@ -1179,6 +1184,7 @@
     - consensus-building
   lastUpdated: 2025-12
 - id: epistemic-infrastructure
+  stableId: pkCwkyxL0w
   numericId: E122
   type: approach
   title: AI-Era Epistemic Infrastructure
@@ -1241,6 +1247,7 @@
     - ai-for-good
   lastUpdated: 2025-12
 - id: hybrid-systems
+  stableId: nvE06LwtpQ
   numericId: E161
   type: approach
   title: AI-Human Hybrid Systems
@@ -1302,6 +1309,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: prediction-markets
+  stableId: l8ZPtVJdsA
   numericId: E228
   type: approach
   title: Prediction Markets (AI Forecasting)
@@ -1413,6 +1421,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: eval-saturation
+  stableId: qGR2sFQRoQ
   numericId: E437
   type: approach
   title: "Eval Saturation & The Evals Gap"
@@ -1443,6 +1452,7 @@
   lastUpdated: 2026-02
 
 - id: evaluation-awareness
+  stableId: YDMiSB8wyg
   numericId: E438
   type: approach
   title: "Evaluation Awareness"
@@ -1504,6 +1514,7 @@
   lastUpdated: 2026-02
 
 - id: scalable-eval-approaches
+  stableId: oSVXwc9bmQ
   numericId: E440
   type: approach
   title: "Scalable Eval Approaches"
@@ -1625,6 +1636,7 @@
   lastUpdated: 2026-02
 
 - id: safety-cases
+  stableId: oC5rwRVZ8Q
   numericId: E444
   type: approach
   title: "AI Safety Cases"
@@ -1684,6 +1696,7 @@
   lastUpdated: 2026-02
 
 - id: ai-assisted
+  stableId: 5TCMXLVhQQ
   numericId: E446
   type: approach
   title: "AI-Assisted Alignment"
@@ -1711,6 +1724,7 @@
   lastUpdated: 2026-02
 
 - id: evaluation
+  stableId: Fvlh8Exefg
   numericId: E447
   type: approach
   title: "AI Evaluation"
@@ -1801,6 +1815,7 @@
   lastUpdated: 2026-02
 
 - id: model-auditing
+  stableId: BOvl3v7ZYg
   numericId: E450
   type: approach
   title: "Third-Party Model Auditing"
@@ -2031,6 +2046,7 @@
   lastUpdated: 2026-02
 
 - id: intervention-portfolio
+  stableId: 1tYGw60kig
   numericId: E458
   type: approach
   title: AI Safety Intervention Portfolio
@@ -2147,6 +2163,7 @@
   lastUpdated: 2026-02
 
 - id: corporate
+  stableId: KeRi5RnokQ
   numericId: E462
   type: approach
   title: Corporate AI Safety Responses
@@ -2267,6 +2284,7 @@
   lastUpdated: 2026-02
 
 - id: lab-culture
+  stableId: OVgVMhhdHQ
   numericId: E466
   type: approach
   title: AI Lab Safety Culture
@@ -2297,6 +2315,7 @@
   lastUpdated: 2026-02
 
 - id: pause
+  stableId: Wa3RyF9Y9A
   numericId: E467
   type: approach
   title: Pause Advocacy
@@ -2327,6 +2346,7 @@
   lastUpdated: 2026-02
 
 - id: training-programs
+  stableId: GZzovyoIJg
   numericId: E468
   type: approach
   title: AI Safety Training Programs
@@ -2590,6 +2610,7 @@
   lastUpdated: 2026-02
 
 - id: open-source
+  stableId: edQjxUBncw
   numericId: E474
   type: approach
   title: Open Source AI Safety
@@ -2650,6 +2671,7 @@
   lastUpdated: 2026-02
 
 - id: field-building-analysis
+  stableId: R07X01PXQA
   numericId: E476
   type: approach
   title: AI Safety Field Building Analysis
@@ -3011,6 +3033,7 @@
   lastUpdated: 2026-02
 
 - id: multi-agent
+  stableId: N0ImU3ZcXA
   numericId: E488
   type: approach
   title: Multi-Agent Safety
@@ -3068,6 +3091,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-for-human-reasoning-fellowship
+  stableId: xPfsyJ9s4Q
   numericId: E585
   type: approach
   title: AI for Human Reasoning Fellowship
@@ -3125,6 +3149,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: collective-epistemics-design-sketches
+  stableId: mPQolusDhA
   numericId: E588
   type: approach
   title: Design Sketches for Collective Epistemics
@@ -3153,6 +3178,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
+  stableId: XjCjieOWOA
   numericId: E589
   type: approach
   title: Community Notes for Everything
@@ -3166,6 +3192,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: x-com-epistemics
+  stableId: e6XlST4rvg
   numericId: E692
   type: approach
   title: X.com Platform Epistemics
@@ -3179,6 +3206,7 @@
     - governance
   lastUpdated: 2026-02
 - id: cooperative-ai
+  stableId: LSqNo6FATg
   numericId: E590
   type: approach
   title: Cooperative AI
@@ -3191,6 +3219,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: deepfake-detection
+  stableId: PvtGbXshHw
   numericId: E591
   type: approach
   title: Deepfake Detection
@@ -3220,6 +3249,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
+  stableId: TpG1dUwTlw
   numericId: E592
   type: approach
   title: Epistemic Virtue Evals
@@ -3233,6 +3263,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: labor-transition
+  stableId: v8IXZwLO2A
   numericId: E593
   type: approach
   title: "AI Labor Transition & Economic Resilience"
@@ -3309,6 +3340,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
+  stableId: JbV7e3EaHA
   numericId: E595
   type: approach
   title: AI Output Filtering
@@ -3337,6 +3369,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: provenance-tracing
+  stableId: PZUWcqSnMg
   numericId: E597
   type: approach
   title: AI Content Provenance Tracing
@@ -3350,6 +3383,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: public-education
+  stableId: 4t0cluB6wg
   numericId: E598
   type: approach
   title: AI Risk Public Education
@@ -3364,6 +3398,7 @@
     - governance
   lastUpdated: 2026-02
 - id: reliability-tracking
+  stableId: jqhqx6lUxA
   numericId: E599
   type: approach
   title: AI System Reliability Tracking
@@ -3391,6 +3426,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: rhetoric-highlighting
+  stableId: CH9mPwPU6Q
   numericId: E601
   type: approach
   title: AI-Assisted Rhetoric Highlighting
@@ -3527,6 +3563,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-accountability
+  stableId: oifBdRbmYg
   numericId: E700
   type: approach
   title: AI for Accountability and Anti-Corruption
@@ -3557,6 +3594,7 @@
     - governance
   lastUpdated: 2026-02
 - id: state-capacity-ai-governance
+  stableId: y8Ib2pmieA
   numericId: E852
   type: concept
   title: State Capacity and AI Governance
@@ -3591,6 +3629,7 @@
     being toothless or counterproductive.
   lastUpdated: 2026-02
 - id: recoding-america
+  stableId: 7ptWHyqwBA
   numericId: E853
   type: resource
   title: "Recoding America"
@@ -3620,6 +3659,7 @@
     policy from implementation, creating a "cascade of rigidity" with implications for AI governance and state capacity.
   lastUpdated: 2026-02
 - id: reducing-hallucinations
+  stableId: IKC9d6Tf1A
   numericId: E814
   type: approach
   title: Reducing Hallucinations in AI-Generated Wiki Content

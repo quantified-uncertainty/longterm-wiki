@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import { SortHeader } from "@/components/directory/SortHeader";
 
 export interface BenchmarkRow {
   id: string;
@@ -29,42 +30,6 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 type SortKey = "name" | "category" | "modelsCount" | "introducedDate" | "maintainer";
-
-function SortHeader({
-  label,
-  sortKey,
-  currentSort,
-  currentDir,
-  onSort,
-  className,
-}: {
-  label: string;
-  sortKey: SortKey;
-  currentSort: SortKey;
-  currentDir: SortDir;
-  onSort: (key: SortKey) => void;
-  className?: string;
-}) {
-  const isActive = currentSort === sortKey;
-  return (
-    <th className={`py-2.5 px-3 font-medium ${className ?? ""}`}>
-      <button
-        type="button"
-        className={`inline-flex items-center gap-1 cursor-pointer select-none hover:text-foreground transition-colors ${
-          isActive ? "text-foreground" : ""
-        }`}
-        onClick={() => onSort(sortKey)}
-      >
-        {label}
-        {isActive && (
-          <span className="text-[10px]">
-            {currentDir === "asc" ? "\u25B2" : "\u25BC"}
-          </span>
-        )}
-      </button>
-    </th>
-  );
-}
 
 export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
   const [search, setSearch] = useState("");

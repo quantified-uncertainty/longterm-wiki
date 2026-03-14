@@ -3,6 +3,7 @@
 # Benchmark results (model scores) are stored in the wiki-server PG database.
 
 - id: mmlu
+  stableId: pDqehtEoiw
   numericId: E1100
   type: benchmark
   title: MMLU
@@ -18,6 +19,7 @@
       url: "https://arxiv.org/abs/2009.03300"
 
 - id: swe-bench-verified
+  stableId: FaFyApPcNQ
   numericId: E1101
   type: benchmark
   title: SWE-bench Verified
@@ -33,6 +35,7 @@
       url: "https://arxiv.org/abs/2310.06770"
 
 - id: math-benchmark
+  stableId: j76swRBTVA
   numericId: E1102
   type: benchmark
   title: MATH
@@ -47,6 +50,7 @@
       url: "https://arxiv.org/abs/2103.03874"
 
 - id: humaneval
+  stableId: 7nyWJfSgOQ
   numericId: E1103
   type: benchmark
   title: HumanEval
@@ -61,6 +65,7 @@
       url: "https://arxiv.org/abs/2107.03374"
 
 - id: gpqa-diamond
+  stableId: TOj1uhYwMA
   numericId: E1104
   type: benchmark
   title: GPQA Diamond
@@ -75,6 +80,7 @@
       url: "https://arxiv.org/abs/2311.12022"
 
 - id: arc-agi
+  stableId: GtNBCWxnjA
   numericId: E1105
   type: benchmark
   title: ARC-AGI
@@ -90,6 +96,7 @@
       url: "https://arxiv.org/abs/1911.01547"
 
 - id: arc-agi-2
+  stableId: C7CZ1MleIQ
   numericId: E1106
   type: benchmark
   title: ARC-AGI-2
@@ -102,6 +109,7 @@
   website: "https://arcprize.org"
 
 - id: terminal-bench-hard
+  stableId: 9kQIZcOluA
   numericId: E1107
   type: benchmark
   title: Terminal-Bench Hard
@@ -115,6 +123,7 @@
       url: "https://github.com/terminal-bench/terminal-bench"
 
 - id: terminal-bench-2
+  stableId: lbTyjIb90A
   numericId: E1108
   type: benchmark
   title: Terminal-Bench 2
@@ -125,6 +134,7 @@
   introducedDate: "2025-06"
 
 - id: artificial-analysis-intelligence-index
+  stableId: dEzoE9HQTg
   numericId: E1109
   type: benchmark
   title: Artificial Analysis Intelligence Index
@@ -137,6 +147,7 @@
   website: "https://artificialanalysis.ai"
 
 - id: osworld
+  stableId: WYTefOxYPQ
   numericId: E1110
   type: benchmark
   title: OSWorld
@@ -150,6 +161,7 @@
       url: "https://arxiv.org/abs/2404.07972"
 
 - id: aime-2025
+  stableId: OiqJ2XUuMQ
   numericId: E1111
   type: benchmark
   title: AIME 2025
@@ -161,6 +173,7 @@
   maintainer: "Mathematical Association of America"
 
 - id: mmlu-pro
+  stableId: RT858MkjuQ
   numericId: E1301
   type: benchmark
   title: MMLU-Pro
@@ -176,6 +189,7 @@
       url: "https://arxiv.org/abs/2406.01574"
 
 - id: simpleqa
+  stableId: oxtbxgfUUg
   numericId: E1302
   type: benchmark
   title: SimpleQA
@@ -190,6 +204,7 @@
       url: "https://openai.com/index/introducing-simpleqa/"
 
 - id: humanitys-last-exam
+  stableId: Lh6IqIxepw
   numericId: E1235
   type: benchmark
   title: "Humanity's Last Exam"
@@ -205,6 +220,7 @@
       url: "https://arxiv.org/abs/2501.14249"
 
 - id: ifeval
+  stableId: 3DEqmUEGPQ
   numericId: E1236
   type: benchmark
   title: IFEval
@@ -219,6 +235,7 @@
       url: "https://arxiv.org/abs/2311.07911"
 
 - id: chatbot-arena-elo
+  stableId: HcdwpPmRSw
   numericId: E1237
   type: benchmark
   title: Chatbot Arena Elo
@@ -234,6 +251,7 @@
       url: "https://arxiv.org/abs/2403.04132"
 
 - id: livecodebench
+  stableId: RoW25Cag2g
   numericId: E1238
   type: benchmark
   title: LiveCodeBench
@@ -249,6 +267,7 @@
       url: "https://arxiv.org/abs/2403.07974"
 
 - id: livebench
+  stableId: QZHbwL6aHg
   numericId: E1240
   type: benchmark
   title: LiveBench
@@ -264,6 +283,7 @@
       url: "https://arxiv.org/abs/2406.19314"
 
 - id: bfcl
+  stableId: 67KLm5yAHQ
   numericId: E1241
   type: benchmark
   title: BFCL
@@ -279,6 +299,7 @@
       url: "https://arxiv.org/abs/2402.15491"
 
 - id: frontiermath
+  stableId: MnqcmhPTaQ
   numericId: E1242
   type: benchmark
   title: FrontierMath
@@ -294,6 +315,7 @@
       url: "https://arxiv.org/abs/2411.04872"
 
 - id: aime-2024
+  stableId: lUijiPGVBw
   numericId: E1243
   type: benchmark
   title: AIME 2024
@@ -305,6 +327,7 @@
   maintainer: "Mathematical Association of America"
 
 - id: bbh
+  stableId: oojQVYfPfw
   numericId: E1245
   type: benchmark
   title: BBH
@@ -319,6 +342,7 @@
       url: "https://arxiv.org/abs/2210.09261"
 
 - id: hellaswag
+  stableId: Huw5YsSoMg
   numericId: E1247
   type: benchmark
   title: HellaSwag
@@ -333,6 +357,7 @@
       url: "https://arxiv.org/abs/1905.07830"
 
 - id: re-bench
+  stableId: sOJOmnwGmA
   numericId: E1249
   type: benchmark
   title: RE-Bench
@@ -347,6 +372,7 @@
       url: "https://arxiv.org/abs/2411.15114"
 
 - id: mle-bench
+  stableId: dPZFXNFXcA
   numericId: E1251
   type: benchmark
   title: MLE-bench
@@ -361,6 +387,7 @@
       url: "https://arxiv.org/abs/2410.07095"
 
 - id: webarena
+  stableId: 0HEF0o51UA
   numericId: E1253
   type: benchmark
   title: WebArena
@@ -376,6 +403,7 @@
       url: "https://arxiv.org/abs/2307.13854"
 
 - id: tau-bench
+  stableId: Z6tH7RnpHg
   numericId: E1254
   type: benchmark
   title: TAU-bench
@@ -390,6 +418,7 @@
       url: "https://arxiv.org/abs/2407.12841"
 
 - id: mgsm
+  stableId: tDWpiYrrkQ
   numericId: E1255
   type: benchmark
   title: MGSM
@@ -404,6 +433,7 @@
       url: "https://arxiv.org/abs/2210.03057"
 
 - id: mathvista
+  stableId: 1mGW7D6lwQ
   numericId: E1256
   type: benchmark
   title: MathVista
@@ -418,6 +448,7 @@
       url: "https://arxiv.org/abs/2310.02255"
 
 - id: codeforces-rating
+  stableId: 2deBrz125g
   numericId: E1257
   type: benchmark
   title: Codeforces Rating

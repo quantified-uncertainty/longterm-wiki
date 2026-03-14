@@ -3,19 +3,17 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { compareByValue, type SortDir } from "@/lib/sort-utils";
+import type { SortDir } from "@/lib/sort-utils";
 import {
   RISK_CATEGORY_LABELS,
   RISK_CATEGORY_COLORS,
-  SEVERITY_ORDER,
   SEVERITY_COLORS_DISPLAY,
-  LIKELIHOOD_ORDER,
   LIKELIHOOD_COLORS_DISPLAY,
 } from "./risk-constants";
+import { compareRiskRows, type RiskSortKey } from "./risks-sort";
 
 export interface RiskRow {
   id: string;
-  slug: string | null;
   name: string;
   numericId: string | null;
   wikiPageId: string | null;
@@ -25,12 +23,10 @@ export interface RiskRow {
   timeHorizon: string | null;
 }
 
-type SortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
-
 export function RisksTable({ rows }: { rows: RiskRow[] }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortKey, setSortKey] = useState<RiskSortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   // Collect unique categories for filter
@@ -52,7 +48,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     return counts;
   }, [rows]);
 
-  const handleSort = (key: SortKey) => {
+  const handleSort = (key: RiskSortKey) => {
     if (sortKey === key) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -76,24 +72,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       });
     }
 
-    const getValue = (row: RiskRow): string | number | null => {
-      switch (sortKey) {
-        case "name":
-          return row.name.toLowerCase();
-        case "category":
-          return row.riskCategory ?? "";
-        case "severity":
-          return row.severity ? (SEVERITY_ORDER[row.severity] ?? 0) : null;
-        case "likelihood":
-          return row.likelihood
-            ? (LIKELIHOOD_ORDER[row.likelihood] ?? 0)
-            : null;
-        case "timeHorizon":
-          return row.timeHorizon ?? null;
-      }
-    };
     result = [...result].sort((a, b) =>
-      compareByValue(a, b, getValue, sortDir),
+      compareRiskRows(a, b, sortKey, sortDir),
     );
 
     return result;
@@ -106,6 +86,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         <input
           type="text"
           placeholder="Search risks..."
+          aria-label="Search risks"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
@@ -113,6 +94,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setCategoryFilter("all")}
+            aria-pressed={categoryFilter === "all"}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               categoryFilter === "all"
                 ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -126,6 +108,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
             <button
               key={c}
               onClick={() => setCategoryFilter(categoryFilter === c ? "all" : c)}
+              aria-pressed={categoryFilter === c}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 categoryFilter === c
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -166,16 +149,12 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  {row.slug ? (
-                    <Link
-                      href={`/risks/${row.slug}`}
-                      className="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{row.name}</span>
-                  )}
+                  <Link
+                    href={`/risks/${row.id}`}
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {row.name}
+                  </Link>
                   {row.wikiPageId && (
                     <Link
                       href={`/wiki/${row.wikiPageId}`}

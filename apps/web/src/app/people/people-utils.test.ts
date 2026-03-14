@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { KBRecordEntry } from "@/data/kb";
+import type { Entity } from "@longterm-wiki/kb";
 
 // Mock the KB data layer
 vi.mock("@/data/kb", () => ({
@@ -51,13 +52,14 @@ function makeRecord(
   };
 }
 
-function makeEntity(overrides: { id: string; name: string; type?: string; aliases?: string[] }) {
+function makeEntity(overrides: { id: string; name: string; type?: string; aliases?: string[] }): Entity {
   return {
     id: overrides.id,
+    stableId: overrides.id,
     name: overrides.name,
     type: overrides.type ?? "organization",
     aliases: overrides.aliases,
-  } as ReturnType<typeof getKBEntity> & object;
+  };
 }
 
 // ── Reset mocks ──────────────────────────────────────────────────
@@ -99,7 +101,7 @@ describe("getOrgRolesForPerson", () => {
     });
 
     mockGetKBEntity.mockImplementation((id: string) => {
-      if (id === "org1") return orgEntity as any;
+      if (id === "org1") return orgEntity;
       return undefined;
     });
 
@@ -145,7 +147,7 @@ describe("getOrgRolesForPerson", () => {
     });
 
     mockGetKBEntity.mockImplementation((id: string) => {
-      if (id === "org1") return orgEntity as any;
+      if (id === "org1") return orgEntity;
       return undefined;
     });
 
@@ -155,7 +157,9 @@ describe("getOrgRolesForPerson", () => {
   });
 
   it("defaults org type to 'organization' when entity has no type", () => {
-    const orgEntity = { id: "org1", name: "SomeOrg", type: undefined } as any;
+    // Intentionally omit type to test fallback to "organization"
+    const orgEntity = makeEntity({ id: "org1", name: "SomeOrg" });
+    delete (orgEntity as Partial<typeof orgEntity>).type;
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "key-persons") {
@@ -226,7 +230,7 @@ describe("getBoardSeatsForPerson", () => {
     });
 
     mockGetKBEntity.mockImplementation((id: string) => {
-      if (id === "org1") return orgEntity as any;
+      if (id === "org1") return orgEntity;
       return undefined;
     });
 
@@ -264,7 +268,7 @@ describe("getBoardSeatsForPerson", () => {
     });
 
     mockGetKBEntity.mockImplementation((id: string) => {
-      if (id === "org1") return orgEntity as any;
+      if (id === "org1") return orgEntity;
       return undefined;
     });
 
@@ -400,8 +404,8 @@ describe("getFundingConnectionsForPerson", () => {
     const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
 
     mockGetKBEntity.mockImplementation((id: string) => {
-      if (id === "person1") return personEntity as any;
-      if (id === "org1") return orgEntity as any;
+      if (id === "person1") return personEntity;
+      if (id === "org1") return orgEntity;
       return undefined;
     });
 
@@ -483,9 +487,9 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
-        if (id === "rec1") return recipientEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
+        if (id === "rec1") return recipientEntity;
         return undefined;
       });
 
@@ -524,9 +528,9 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
-        if (id === "funder1") return funderEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
+        if (id === "funder1") return funderEntity;
         return undefined;
       });
 
@@ -563,8 +567,8 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
         if (id === "funder1") return undefined; // funder not in KB
         return undefined;
       });
@@ -595,8 +599,8 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
         return undefined; // "Anthropic" as ID won't resolve
       });
 
@@ -612,12 +616,12 @@ describe("getFundingConnectionsForPerson", () => {
     });
 
     it("resolves received grants by alias matching", () => {
-      const orgEntity = {
+      const orgEntity = makeEntity({
         id: "org1",
         name: "Anthropic",
         type: "organization",
         aliases: ["Anthropic PBC"],
-      } as any;
+      });
 
       setupPerson({
         grantRecords: [
@@ -631,7 +635,7 @@ describe("getFundingConnectionsForPerson", () => {
 
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
+        if (id === "person1") return personEntity;
         if (id === "org1") return orgEntity;
         return undefined;
       });
@@ -737,8 +741,8 @@ describe("getFundingConnectionsForPerson", () => {
 
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "funder1") return funderEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "funder1") return funderEntity;
         return undefined;
       });
 
@@ -909,9 +913,9 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
-        if (id === "rec1") return recipientEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
+        if (id === "rec1") return recipientEntity;
         return undefined;
       });
 
@@ -945,9 +949,9 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
-        if (id === "rec1") return recipientEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
+        if (id === "rec1") return recipientEntity;
         return undefined;
       });
 
@@ -1014,9 +1018,9 @@ describe("getFundingConnectionsForPerson", () => {
       const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
       const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
       mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity as any;
-        if (id === "org1") return orgEntity as any;
-        if (id === "rec1") return recipientEntity as any;
+        if (id === "person1") return personEntity;
+        if (id === "org1") return orgEntity;
+        if (id === "rec1") return recipientEntity;
         return undefined;
       });
 

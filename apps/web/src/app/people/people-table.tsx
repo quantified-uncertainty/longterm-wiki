@@ -108,6 +108,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
           <input
             type="text"
             placeholder="Search name, role, affiliation, publications, positions..."
+            aria-label="Search people"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
@@ -116,6 +117,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => setAffiliationFilter("all")}
+                aria-pressed={affiliationFilter === "all"}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   affiliationFilter === "all"
                     ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -129,6 +131,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
                 <button
                   key={name}
                   onClick={() => setAffiliationFilter(affiliationFilter === name ? "all" : name)}
+                  aria-pressed={affiliationFilter === name}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                     affiliationFilter === name
                       ? "bg-primary/10 border-primary/30 text-primary font-semibold"
@@ -149,6 +152,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
             <span className="text-xs text-muted-foreground font-medium mr-1">Topics:</span>
             <button
               onClick={() => setTopicFilter("all")}
+              aria-pressed={topicFilter === "all"}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 topicFilter === "all"
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"
@@ -161,6 +165,7 @@ export function PeopleTable({ rows }: { rows: PersonRow[] }) {
               <button
                 key={slug}
                 onClick={() => setTopicFilter(topicFilter === slug ? "all" : slug)}
+                aria-pressed={topicFilter === slug}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   topicFilter === slug
                     ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"

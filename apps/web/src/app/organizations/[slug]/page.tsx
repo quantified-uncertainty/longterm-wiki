@@ -34,10 +34,12 @@ import {
 // Data loading & constants
 import {
   loadOrgPageData,
+  resolveAuthor,
   HERO_STATS,
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
 } from "./org-data";
+import type { AuthorRef } from "./org-data";
 
 // Section components
 import { RelatedOrganizationsSection } from "./related-orgs-section";
@@ -50,10 +52,7 @@ import { AiModelsSection } from "./ai-models-section";
 import { KeyPublicationsSection } from "./publications-section";
 
 // Section components — grants (main content column)
-import {
-  GrantsGivenSection,
-  GrantsReceivedSection,
-} from "./grants-section";
+import { GrantsSection } from "./grants-section";
 
 // Section components — resources
 import { OrgResourcesSection } from "./resources-section";
@@ -67,6 +66,9 @@ import {
   StrategicPartnershipsSection,
   OtherDataSection,
 } from "./main-content-sections";
+
+// Charts
+import { ChartsSection } from "./charts-section";
 
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
@@ -157,6 +159,9 @@ export default async function OrgProfilePage({
           {heroStatCards}
         </div>
       )}
+
+      {/* Charts */}
+      <ChartsSection chartData={data.chartData} orgName={entity.name} dilutionStages={data.dilutionStages} />
 
       {/* Facts + Other Data */}
       {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
@@ -313,14 +318,17 @@ export default async function OrgProfilePage({
           )}
 
           {data.grantsMade.length > 0 && (
-            <GrantsGivenSection
+            <GrantsSection
               grants={data.grantsMade}
-              orgName={entity.name}
+              direction="given"
               entityId={entity.id}
             />
           )}
           {data.grantsReceived.length > 0 && (
-            <GrantsReceivedSection grants={data.grantsReceived} />
+            <GrantsSection
+              grants={data.grantsReceived}
+              direction="received"
+            />
           )}
 
           {data.sortedPartnerships.length > 0 && (
@@ -381,6 +389,16 @@ export default async function OrgProfilePage({
     (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
   );
 
+  // Build resolved author map for key publications author linking
+  const keyPubAuthorMap = new Map<string, AuthorRef>();
+  for (const pub of dedupedKeyPubs) {
+    for (const name of pub.authors) {
+      if (!keyPubAuthorMap.has(name)) {
+        keyPubAuthorMap.set(name, resolveAuthor(name));
+      }
+    }
+  }
+
   const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
   if (hasPublications) {
     const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
@@ -398,7 +416,10 @@ export default async function OrgProfilePage({
             />
           )}
           {dedupedKeyPubs.length > 0 && (
-            <KeyPublicationsSection publications={dedupedKeyPubs} />
+            <KeyPublicationsSection
+              publications={dedupedKeyPubs}
+              resolvedAuthors={keyPubAuthorMap}
+            />
           )}
         </div>
       ),

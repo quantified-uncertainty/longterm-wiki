@@ -139,6 +139,7 @@ export const CURATED_COLLECTIONS = new Set([
   "personnel",
   "grants",
   "equity-positions",
+  "dilution-stages",
 ]);
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -383,6 +384,22 @@ export function parseInvestmentRecord(record: KBRecordEntry) {
   };
 }
 
+export function parseDilutionStageRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    round: (f.round as string) ?? record.key,
+    date: (f.date as string) ?? null,
+    foundersPercent: typeof f.foundersPercent === "number" ? f.foundersPercent : 0,
+    employeesPercent: typeof f.employeesPercent === "number" ? f.employeesPercent : 0,
+    investorsPercent: typeof f.investorsPercent === "number" ? f.investorsPercent : 0,
+    valuation: typeof f.valuation === "number" ? f.valuation : undefined,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export type ParsedDilutionStageRecord = ReturnType<typeof parseDilutionStageRecord>;
+
 export function parseEquityPositionRecord(record: KBRecordEntry) {
   const f = record.fields;
   return {
@@ -436,6 +453,16 @@ function extractDomain(url: string): string | null {
   }
 }
 
+/** Well-known news/media source names that aren't real titles. */
+const SOURCE_NAMES = new Set([
+  "reuters", "cnbc", "bbc", "nytimes", "the new york times",
+  "the washington post", "the guardian", "wired", "techcrunch",
+  "the verge", "ars technica", "nature", "science", "arxiv",
+  "rand", "fortune", "bloomberg", "the information", "time",
+  "the economist", "mit technology review", "financial times",
+  "associated press", "ap news", "vox", "politico", "axios",
+]);
+
 /**
  * Check if a resource title is generic/useless (e.g. just the org name).
  * Returns true if the title should be replaced or the resource filtered out.
@@ -448,6 +475,20 @@ function isGenericTitle(title: string, orgName: string): boolean {
   if (new RegExp(`^${org.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\(\\d{4}\\)$`).test(t)) return true;
   if (t === `${org}'s` || t === `${org} acknowledged`) return true;
   if (t.length < 10 && t.startsWith(org.slice(0, 5))) return true;
+
+  // Source-name-only titles ("Reuters", "CNBC", "arXiv")
+  if (SOURCE_NAMES.has(t)) return true;
+
+  // Bibliographic format: "Author et al. (YYYY)" or "Author & Author (YYYY)"
+  if (/^[A-Z][a-z]+(\s+(et\s+al\.|&\s+[A-Z][a-z]+))\s*\(\d{4}\)\s*$/i.test(title.trim())) return true;
+
+  // Very short fragments that aren't useful (<15 chars, no spaces = likely a slug/version)
+  if (t.length < 15 && !t.includes(" ")) return true;
+
+  // Single-word titles or version-like strings ("2.0", "v4", "interpretability")
+  if (/^\d[\d.]*$/.test(t)) return true;
+  if (/^v\d/i.test(t) && t.length < 10) return true;
+
   return false;
 }
 
@@ -504,6 +545,13 @@ function cleanTitle(title: string, orgName: string): string {
   t = t.replace(new RegExp(`\\s*-\\s*${escaped}\\s*$`, "i"), "");
   // Strip " \ OrgName" suffix (backslash variant)
   t = t.replace(new RegExp(`\\s*\\\\\\s*${escaped}\\s*$`, "i"), "");
+  // Strip embedded URL in parens: "Title (https://example.com/...)" → "Title"
+  t = t.replace(/\s*\(https?:\/\/[^)]+\)\s*$/, "");
+  // Strip trailing " - Source" where Source is a known news outlet
+  const trailingSource = t.match(/\s*[-–—]\s*(.+)$/);
+  if (trailingSource && SOURCE_NAMES.has(trailingSource[1].toLowerCase().trim())) {
+    t = t.slice(0, -trailingSource[0].length);
+  }
   // If the title is a full URL, derive from path
   if (/^https?:\/\//.test(t.trim())) {
     const derived = titleFromUrl(t.trim());
@@ -550,7 +598,7 @@ function getPersonNameIndex(): Map<string, string> {
 }
 
 /** Resolve an author name string to an AuthorRef with optional link. */
-function resolveAuthor(name: string): AuthorRef {
+export function resolveAuthor(name: string): AuthorRef {
   const slug = getPersonNameIndex().get(name.toLowerCase().trim());
   return { name, href: slug ? `/people/${slug}` : null };
 }
@@ -584,6 +632,16 @@ function isResearchUrl(url: string): boolean {
 }
 
 /**
+ * Check if a string looks like a person name (2-3 capitalized words, no other content).
+ * Used to filter out person-name-only resource titles that aren't informative.
+ */
+function isPersonNameOnly(title: string): boolean {
+  const parts = title.trim().split(/\s+/);
+  if (parts.length < 2 || parts.length > 4) return false;
+  return parts.every((p) => /^[A-Z][a-z]+\.?$/.test(p) || /^(de|van|von|al|el|bin|ibn|del|la|di)$/i.test(p));
+}
+
+/**
  * Normalize a resource row: fix generic titles, skip untitled.
  * Returns null if the resource should be filtered out.
  */
@@ -611,6 +669,24 @@ function normalizeRow(r: Resource, orgName: string): OrgResourceRow | null {
   if (row.title.includes("://") || /^[a-z0-9-]+\.\w{2,}\//.test(row.title)) {
     const derived = titleFromUrl(r.url);
     if (derived) row.title = derived;
+  }
+
+  // Person-name-only titles → try URL-derived fallback
+  if (isPersonNameOnly(row.title)) {
+    const derived = titleFromUrl(r.url);
+    if (derived && !isPersonNameOnly(derived)) {
+      row.title = derived;
+    } else {
+      return null;
+    }
+  }
+
+  // Short titles (<20 chars) with no spaces are likely slugs — try URL fallback
+  if (row.title.length < 20 && !row.title.includes(" ")) {
+    const derived = titleFromUrl(r.url);
+    if (derived && derived.length > row.title.length) {
+      row.title = derived;
+    }
   }
 
   // Override type: research URLs should display as "paper" not "web"
@@ -841,8 +917,24 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   // ── Divisions (org subdivisions) ──
   const divisionRecords = getKBRecords(entity.id, "divisions");
   const divisions = divisionRecords
-    .map(parseDivisionRecord)
+    .map((r) => {
+      const parsed = parseDivisionRecord(r);
+      // Resolve lead slug/stableId to human-readable name
+      if (parsed.lead) {
+        // Try KB entity resolution first (handles both slugs and stableIds)
+        const entityId = resolveKBSlug(parsed.lead);
+        const leadEntity = entityId ? getKBEntity(entityId) : getKBEntity(parsed.lead);
+        parsed.lead = leadEntity?.name ?? titleCase(parsed.lead.replace(/-/g, " "));
+      }
+      return parsed;
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  // ── Dilution Stages ──
+  const dilutionStageRecords = getKBRecords(entity.id, "dilution-stages");
+  const dilutionStages = dilutionStageRecords
+    .map(parseDilutionStageRecord)
+    .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
 
   // ── Funding Programs (RFPs, grant rounds, fellowships, etc.) ──
   const fundingProgramRecords = getKBRecords(entity.id, "funding-programs");
@@ -1080,6 +1172,9 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const totalGrantsMade = grantsMade.reduce((sum, g) => sum + numericValue(g.amount), 0);
   const totalGrantsReceived = grantsReceived.reduce((sum, g) => sum + numericValue(g.amount), 0);
 
+  // ── Chart data: time series from KB facts ──
+  const chartData = buildChartData(entity.id, sortedRounds, equityPositions);
+
   return {
     orgType,
     hqText,
@@ -1122,5 +1217,137 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     keyPublications,
     modelBenchmarks,
     divisionLeadResolved,
+    chartData,
+    dilutionStages,
+  };
+}
+
+// ── Chart data extraction ─────────────────────────────────────────────
+
+/** Extract numeric value from a Fact, handling ranges. */
+function factNumericValue(fact: Fact): number | null {
+  if (fact.value.type === "number") return fact.value.value;
+  if (fact.value.type === "range") return (fact.value.low + fact.value.high) / 2;
+  return null;
+}
+
+function factRange(fact: Fact): { low?: number; high?: number } {
+  if (fact.value.type === "range") return { low: fact.value.low, high: fact.value.high };
+  return {};
+}
+
+export interface ChartDataBundle {
+  /** Valuation over time (from KB facts) */
+  valuationSeries: Array<{ date: string; value: number; label?: string }>;
+  /** Revenue over time (from KB facts) */
+  revenueSeries: Array<{ date: string; value: number; low?: number; high?: number }>;
+  /** Headcount over time (from KB facts) */
+  headcountSeries: Array<{ date: string; value: number; low?: number; high?: number }>;
+  /** Equity holders for breakdown chart */
+  equityHolders: Array<{
+    name: string;
+    stakePercent: number;
+    stakeLow?: number;
+    stakeHigh?: number;
+    color: string;
+    href: string | null;
+  }>;
+  /** Latest valuation for equity value computation */
+  latestValuation: number | null;
+  /** Funding round annotations for valuation chart */
+  fundingAnnotations: Array<{ date: string; label: string; raised?: number; valuation?: number }>;
+}
+
+function buildChartData(
+  entityId: string,
+  sortedRounds: KBRecordEntry[],
+  equityPositions: ParsedEquityPositionRecord[],
+): ChartDataBundle {
+  // Extract fact time series
+  const valuationFacts = getKBFacts(entityId, "valuation");
+  const revenueFacts = getKBFacts(entityId, "revenue");
+  const headcountFacts = getKBFacts(entityId, "headcount");
+
+  const valuationSeries = valuationFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => {
+      // Try to match to a funding round for label
+      const round = sortedRounds.find((r) => {
+        const roundDate = r.fields.date ? String(r.fields.date) : "";
+        return roundDate && f.asOf && roundDate.startsWith(f.asOf.slice(0, 7));
+      });
+      const roundName = round ? (round.fields.name ? String(round.fields.name) : titleCase(round.key)) : undefined;
+      return { date: f.asOf!, value: factNumericValue(f)!, label: roundName };
+    })
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const revenueSeries = revenueFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => ({
+      date: f.asOf!,
+      value: factNumericValue(f)!,
+      ...factRange(f),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const headcountSeries = headcountFacts
+    .filter((f) => f.asOf && factNumericValue(f) != null)
+    .map((f) => ({
+      date: f.asOf!,
+      value: factNumericValue(f)!,
+      ...factRange(f),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  // Equity holders with colors
+  const EQUITY_COLORS = [
+    "#ef4444", "#f59e0b", "#22c55e", "#3b82f6", "#8b5cf6",
+    "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#64748b",
+    "#a855f7", "#06b6d4",
+  ];
+
+  const equityHolders = equityPositions
+    .filter((p) => p.holderName && numericValue(p.stake) > 0)
+    .map((p, i) => {
+      const midpoint = numericValue(p.stake);
+      const isRange = Array.isArray(p.stake);
+      return {
+        name: p.holderName,
+        stakePercent: midpoint * 100,
+        stakeLow: isRange ? (p.stake as [number, number])[0] * 100 : undefined,
+        stakeHigh: isRange ? (p.stake as [number, number])[1] * 100 : undefined,
+        href: p.holderHref,
+      };
+    });
+
+  // Assign colors after sorting
+  equityHolders.sort((a, b) => b.stakePercent - a.stakePercent);
+  const coloredEquity = equityHolders.map((h, i) => ({
+    ...h,
+    color: EQUITY_COLORS[i % EQUITY_COLORS.length],
+  }));
+
+  const latestValuation = valuationSeries.length > 0
+    ? valuationSeries[valuationSeries.length - 1].value
+    : null;
+
+  // Funding round annotations
+  const fundingAnnotations = sortedRounds
+    .filter((r) => r.fields.date)
+    .map((r) => ({
+      date: String(r.fields.date),
+      label: r.fields.name ? String(r.fields.name) : titleCase(r.key),
+      raised: typeof r.fields.raised === "number" ? r.fields.raised : undefined,
+      valuation: typeof r.fields.valuation === "number" ? r.fields.valuation : undefined,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return {
+    valuationSeries,
+    revenueSeries,
+    headcountSeries,
+    equityHolders: coloredEquity,
+    latestValuation,
+    fundingAnnotations,
   };
 }
