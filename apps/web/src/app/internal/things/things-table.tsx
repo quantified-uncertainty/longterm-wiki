@@ -146,15 +146,14 @@ function ThingExpandedDetail({
   cache: Record<string, DetailCacheEntry>;
   onLoad: (id: string) => void;
 }) {
+  const cached = cache[thingId];
   useEffect(() => {
-    if (!cache[thingId]) {
+    if (!cached) {
       onLoad(thingId);
     }
-  }, [thingId, cache, onLoad]);
+  }, [thingId, cached, onLoad]);
 
-  const entry = cache[thingId];
-
-  if (!entry || entry.status === "loading") {
+  if (!cached || cached.status === "loading") {
     return (
       <div className="p-4 bg-muted/30 flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
@@ -163,10 +162,10 @@ function ThingExpandedDetail({
     );
   }
 
-  if (entry.status === "error") {
+  if (cached.status === "error") {
     return (
       <div className="p-4 bg-muted/30 text-sm">
-        <span className="text-red-600">Failed to load details: {entry.message}</span>
+        <span className="text-red-600">Failed to load details: {cached.message}</span>
         <button
           type="button"
           onClick={() => onLoad(thingId)}
@@ -178,7 +177,7 @@ function ThingExpandedDetail({
     );
   }
 
-  const { children, childrenTotal, verdict } = entry.data;
+  const { children, childrenTotal, verdict } = cached.data;
   const sourceTableRoutes: Record<string, string> = {
     entities: "/internal/entities",
     grants: "/internal/grants",

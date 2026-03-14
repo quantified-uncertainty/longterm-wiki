@@ -648,7 +648,9 @@ const thingsApp = new Hono()
         .onConflictDoUpdate({
           target: [things.sourceTable, things.sourceId],
           set: {
-            id: sql`excluded.id`,
+            // Do NOT update `id` — it's the PK referenced by thing_verdicts
+            // and thing_resource_verifications FKs. Changing it would cause
+            // constraint violations or cascade-delete verification data.
             thingType: sql`excluded.thing_type`,
             title: sql`excluded.title`,
             parentThingId: sql`excluded.parent_thing_id`,
