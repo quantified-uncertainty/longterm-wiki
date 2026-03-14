@@ -3,8 +3,7 @@ export type { SortDir } from "@/lib/sort-utils";
 import type { SortDir } from "@/lib/sort-utils";
 
 import type { RiskRow } from "./risks-table";
-import { SEVERITY_ORDER, LIKELIHOOD_ORDER } from "./risk-constants";
-import { extractEarliestYear } from "./risk-utils";
+import { SEVERITY_ORDER, LIKELIHOOD_ORDER, extractEarliestYear } from "./risk-constants";
 
 export type RiskSortKey = "name" | "category" | "severity" | "likelihood" | "timeHorizon";
 
