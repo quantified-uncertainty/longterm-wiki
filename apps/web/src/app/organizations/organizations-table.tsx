@@ -6,7 +6,7 @@ import { SortHeader } from "@/components/directory/SortHeader";
 import type { SortDir } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
-import { ORG_TYPE_LABELS, ORG_TYPE_COLORS } from "@/app/organizations/org-constants";
+import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 
 export interface OrgRow {
   id: string;
@@ -269,7 +269,7 @@ export function OrganizationsTable({ rows, stats }: { rows: OrgRow[]; stats?: Or
                   {row.orgType && (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        ORG_TYPE_COLORS[row.orgType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        ORG_TYPE_COLORS[row.orgType] ?? DEFAULT_ORG_TYPE_COLOR
                       }`}
                     >
                       {ORG_TYPE_LABELS[row.orgType] ?? row.orgType}

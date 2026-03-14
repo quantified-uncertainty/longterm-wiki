@@ -142,12 +142,12 @@ export function InvestorParticipationSection({
                       <span className="font-medium">{investorName}</span>
                     )}
                   </td>
-                  <td className="py-1.5 px-3 text-muted-foreground">{roundName ?? ""}</td>
+                  <td className="py-1.5 px-3 text-muted-foreground">{roundName ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}</td>
                   <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {amount != null ? formatAmount(amount) : ""}
+                    {amount != null ? formatAmount(amount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
-                    {date ? formatKBDate(date) : ""}
+                    {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                 </tr>
               );
@@ -202,16 +202,16 @@ export function ProductsSection({
                 <tr key={prod.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3 font-medium">{name}</td>
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
-                    {launched ? formatKBDate(launched) : ""}
+                    {launched ? formatKBDate(launched) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   {hasDescription && (
                     <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
-                      {description ?? ""}
+                      {description ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
                   {hasSource && (
                     <td className="py-1.5 px-3">
-                      {source && isUrl(source) ? <SourceLink source={source} /> : ""}
+                      {source && isUrl(source) ? <SourceLink source={source} /> : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
                 </tr>
@@ -271,10 +271,10 @@ export function SafetyMilestonesSection({
                     )}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
-                    {date ? formatKBDate(date) : ""}
+                    {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
-                    {description ?? ""}
+                    {description ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3">
                     <SourceLink source={source} />
@@ -339,16 +339,16 @@ export function StrategicPartnershipsSection({
                     {spType && <Badge>{spType}</Badge>}
                   </td>
                   <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {investmentAmount != null ? formatAmount(investmentAmount) : ""}
+                    {investmentAmount != null ? formatAmount(investmentAmount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {computeCommitment != null ? formatAmount(computeCommitment) : ""}
+                    {computeCommitment != null ? formatAmount(computeCommitment) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
-                    {date ? formatKBDate(date) : ""}
+                    {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
-                    {notes ?? ""}
+                    {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                 </tr>
               );

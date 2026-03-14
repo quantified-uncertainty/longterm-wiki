@@ -224,7 +224,7 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
   ];
 }
 
-const DEFAULT_HIDDEN: Record<string, boolean> = {
+const INITIAL_COLUMN_VISIBILITY: Record<string, boolean> = {
   id: false,
   tags: false,
 };
@@ -237,7 +237,7 @@ export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>(DEFAULT_HIDDEN);
+    useState<VisibilityState>(INITIAL_COLUMN_VISIBILITY);
   const [showColumnPicker, setShowColumnPicker] = useState(false);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -286,6 +286,7 @@ export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {
         <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
+            aria-label="Search resources"
             placeholder="Search resources..."
             value={globalFilter ?? ""}
             onChange={(e) => {
@@ -298,6 +299,7 @@ export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {
 
         {/* Type filter */}
         <select
+          aria-label="Filter by resource type"
           value={typeFilter}
           onChange={(e) => {
             setTypeFilter(e.target.value);

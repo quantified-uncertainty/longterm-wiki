@@ -61,7 +61,7 @@ export function EquityPositionsSection({
                     )}
                   </td>
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                    {pos.asOf ?? ""}
+                    {pos.asOf ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
                 </tr>
               );

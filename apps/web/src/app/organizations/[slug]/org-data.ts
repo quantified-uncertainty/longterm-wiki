@@ -146,7 +146,7 @@ export const CURATED_COLLECTIONS = new Set([
 
 export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
-export { ORG_TYPE_LABELS, ORG_TYPE_COLORS } from "@/app/organizations/org-constants";
+export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 
 export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
   { id: "financial", label: "Financial", order: 0 },
