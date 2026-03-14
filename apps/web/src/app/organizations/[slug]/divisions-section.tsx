@@ -10,9 +10,9 @@ import type { ParsedDivisionRecord } from "./org-data";
 const DIVISION_TYPE_LABELS: Record<string, string> = {
   fund: "Fund",
   team: "Team",
-  department: "Department",
+  department: "Dept",
   lab: "Lab",
-  "program-area": "Program Area",
+  "program-area": "Program",
 };
 
 const DIVISION_TYPE_COLORS: Record<string, string> = {
@@ -33,26 +33,32 @@ export function DivisionsSection({
 }) {
   if (divisions.length === 0) return null;
 
+  // Group by type: departments first, then teams
+  const departments = divisions.filter((d) => d.divisionType === "department");
+  const teams = divisions.filter((d) => d.divisionType === "team");
+  const other = divisions.filter((d) => d.divisionType !== "department" && d.divisionType !== "team");
+  const grouped = [...departments, ...teams, ...other];
+
   return (
     <section>
-      <SectionHeader title="Divisions" count={divisions.length} />
-      <div className="border border-border/60 rounded-xl overflow-x-auto">
+      <SectionHeader title="Divisions & Teams" count={divisions.length} />
+      <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-              <th scope="col" className="text-left py-2 px-3 font-medium">Name</th>
-              <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
-              <th scope="col" className="text-left py-2 px-3 font-medium">Lead</th>
-              <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
-              <th scope="col" className="text-center py-2 px-3 font-medium">Dates</th>
+              <th scope="col" className="text-left py-2.5 px-3 font-medium">Name</th>
+              <th scope="col" className="text-left py-2.5 px-3 font-medium">Type</th>
+              <th scope="col" className="text-left py-2.5 px-3 font-medium">Lead</th>
+              <th scope="col" className="text-center py-2.5 px-3 font-medium">Status</th>
+              <th scope="col" className="text-center py-2.5 px-3 font-medium">Since</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {divisions.map((d) => {
+            {grouped.map((d) => {
               const resolvedLead = leadResolved?.get(d.key);
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
-                  <td className="py-2 px-3">
+                  <td className="py-2.5 px-3">
                     <span className="font-medium text-foreground text-xs">
                       {d.slug ? (
                         <Link
@@ -76,7 +82,7 @@ export function DivisionsSection({
                       </a>
                     )}
                   </td>
-                  <td className="py-2 px-3">
+                  <td className="py-2.5 px-3">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
                         DIVISION_TYPE_COLORS[d.divisionType] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
@@ -85,7 +91,7 @@ export function DivisionsSection({
                       {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
                     </span>
                   </td>
-                  <td className="py-2 px-3 text-xs text-muted-foreground">
+                  <td className="py-2.5 px-3 text-xs text-muted-foreground">
                     {resolvedLead ? (
                       resolvedLead.href ? (
                         <Link
@@ -101,7 +107,7 @@ export function DivisionsSection({
                       d.lead ?? ""
                     )}
                   </td>
-                  <td className="py-2 px-3 text-center text-xs">
+                  <td className="py-2.5 px-3 text-center text-xs">
                     {d.status && (
                       <span
                         className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
@@ -116,13 +122,8 @@ export function DivisionsSection({
                       </span>
                     )}
                   </td>
-                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                    {d.startDate && (
-                      <span>
-                        {formatKBDate(d.startDate)}
-                        {d.endDate ? ` \u2013 ${formatKBDate(d.endDate)}` : " \u2013 present"}
-                      </span>
-                    )}
+                  <td className="py-2.5 px-3 text-center text-muted-foreground text-xs">
+                    {d.startDate && formatKBDate(d.startDate)}
                   </td>
                 </tr>
               );

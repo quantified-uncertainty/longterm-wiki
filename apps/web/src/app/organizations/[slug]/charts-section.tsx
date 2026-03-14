@@ -4,18 +4,21 @@
  * Only shows charts where sufficient data exists (≥2 data points).
  */
 import { SectionHeader } from "./org-shared";
-import type { ChartDataBundle } from "./org-data";
+import type { ChartDataBundle, ParsedDilutionStageRecord } from "./org-data";
 import {
   TimeSeriesChart,
   EquityBreakdownChart,
+  DilutionWaterfallChart,
 } from "./org-charts";
 
 export function ChartsSection({
   chartData,
   orgName,
+  dilutionStages,
 }: {
   chartData: ChartDataBundle;
   orgName: string;
+  dilutionStages?: ParsedDilutionStageRecord[];
 }) {
   const { valuationSeries, revenueSeries, headcountSeries, equityHolders, latestValuation, fundingAnnotations } = chartData;
 
@@ -23,8 +26,9 @@ export function ChartsSection({
   const hasRevenue = revenueSeries.length >= 2;
   const hasHeadcount = headcountSeries.length >= 2;
   const hasEquity = equityHolders.length >= 2;
+  const hasDilution = (dilutionStages?.length ?? 0) >= 2;
 
-  if (!hasValuation && !hasRevenue && !hasHeadcount && !hasEquity) return null;
+  if (!hasValuation && !hasRevenue && !hasHeadcount && !hasEquity && !hasDilution) return null;
 
   // Build valuation annotations from funding rounds
   const valuationAnnotations = fundingAnnotations
@@ -70,7 +74,7 @@ export function ChartsSection({
 
       {/* Row 2: Headcount + Equity side by side */}
       {(hasHeadcount || hasEquity) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           {hasHeadcount && (
             <TimeSeriesChart
               title="Headcount"
@@ -88,9 +92,26 @@ export function ChartsSection({
             <EquityBreakdownChart
               holders={equityHolders}
               valuation={latestValuation ?? undefined}
-              title={`Equity Breakdown${latestValuation ? "" : ""}`}
+              title="Equity Breakdown"
             />
           )}
+        </div>
+      )}
+
+      {/* Row 3: Dilution waterfall */}
+      {hasDilution && dilutionStages && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <DilutionWaterfallChart
+            stages={dilutionStages.map((s) => ({
+              round: s.round,
+              date: s.date ?? "",
+              foundersPercent: s.foundersPercent,
+              employeesPercent: s.employeesPercent,
+              investorsPercent: s.investorsPercent,
+              valuation: s.valuation,
+            }))}
+            title="Ownership Dilution Over Time"
+          />
         </div>
       )}
     </section>

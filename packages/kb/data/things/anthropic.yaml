@@ -1447,7 +1447,7 @@ records:
     research:
       name: "AI Research"
       divisionType: department
-      lead: fUf1JGoMxA  # jared-kaplan
+      lead: jared-kaplan  # fUf1JGoMxA
       status: active
       startDate: "2021-01"
       notes: "Core research org. Includes pretraining, alignment science,
@@ -1457,7 +1457,7 @@ records:
     pretraining:
       name: "Pretraining"
       divisionType: team
-      lead: NbQZshguEg  # nick-joseph
+      lead: nick-joseph  # NbQZshguEg
       status: active
       startDate: "2021-01"
       notes: "Training Claude models at scale; scaling laws, compute efficiency.
@@ -1466,7 +1466,7 @@ records:
     alignment-science:
       name: "Alignment Science"
       divisionType: team
-      lead: hQ7mR2kN5p  # jan-leike
+      lead: jan-leike  # hQ7mR2kN5p
       status: active
       startDate: "2024-05"
       notes: "Scalable oversight, weak-to-strong generalization, adversarial
@@ -1475,7 +1475,7 @@ records:
     interpretability:
       name: "Interpretability"
       divisionType: team
-      lead: Tz48rTriBg  # chris-olah
+      lead: chris-olah  # Tz48rTriBg
       status: active
       startDate: "2021-01"
       notes: "Mechanistic interpretability, circuit tracing, sparse autoencoders.
@@ -1484,7 +1484,7 @@ records:
     safeguards-research:
       name: "Safeguards Research"
       divisionType: team
-      lead: d7PzFxFD7w  # mrinank-sharma
+      lead: mrinank-sharma  # d7PzFxFD7w
       status: active
       startDate: "2023-01"
       notes: "Jailbreak robustness, automated red teaming, constitutional
@@ -1493,7 +1493,7 @@ records:
     anthropic-institute:
       name: "Anthropic Institute"
       divisionType: department
-      lead: BDokfhKAQQ  # jack-clark
+      lead: jack-clark  # BDokfhKAQQ
       status: active
       startDate: "2026-03"
       source: https://www.anthropic.com/news/anthropic-institute
@@ -1513,6 +1513,7 @@ records:
     product:
       name: "Product"
       divisionType: department
+      lead: ami-vora  # zNeHmNzQ8A
       status: active
       startDate: "2023-07"
       notes: "Product management, design, UX. Led by Ami Vora (ex-WhatsApp,
@@ -1521,7 +1522,7 @@ records:
     engineering:
       name: "Engineering & Infrastructure"
       divisionType: department
-      lead: UV6uZIp0RA  # rahul-patil
+      lead: rahul-patil  # UV6uZIp0RA
       status: active
       startDate: "2021-01"
       notes: "Product engineering, infrastructure, inference, security,
@@ -1540,6 +1541,7 @@ records:
     sales:
       name: "Sales & Commercial"
       divisionType: department
+      lead: paul-smith  # h2ynheHZgg
       status: active
       startDate: "2023-03"
       notes: "Largest department (~135 open roles). Led by Paul Smith (CCO,
@@ -1550,7 +1552,7 @@ records:
     policy:
       name: "Policy & Societal Impact"
       divisionType: department
-      lead: BDokfhKAQQ  # jack-clark
+      lead: jack-clark  # BDokfhKAQQ
       status: active
       startDate: "2021-01"
       notes: "Government affairs, regulatory policy, societal impact research.
@@ -1568,6 +1570,7 @@ records:
     frontier-red-team:
       name: "Frontier Red Team"
       divisionType: team
+      lead: logan-graham  # GQh9aWFYXw
       status: active
       startDate: "2023-09"
       notes: "Stress-testing AI models for cybersecurity, biosecurity, autonomous
@@ -1577,16 +1580,134 @@ records:
     people:
       name: "People & HR"
       divisionType: department
+      lead: hannah-pritchett  # 886X8EGnSw
       status: active
       notes: "Led by Hannah Pritchett (Head of People). Recruiting, culture,
         benefits, DEI."
 
+    alignment-finetuning:
+      name: "Alignment Finetuning"
+      divisionType: team
+      lead: amanda-askell  # 2qcak72NwQ
+      status: active
+      startDate: "2021-01"
+      notes: "Character training, constitution design, value alignment. Led by
+        Amanda Askell ('Claude whisperer'). Responsible for Claude's persona
+        and behavioral guidelines."
+
+    security:
+      name: "Security"
+      divisionType: department
+      lead: vitaly-gudanets  # 9vx0nRAuoA
+      status: active
+      startDate: "2023-01"
+      notes: "CISO Vitaly Gudanets (ex-Netflix, joined ~2025). Deputy CISO
+        Jason Clinton (founding CISO, ex-Google). Detection/response,
+        compliance, physical security, cloud security. ~31 open roles."
+
+    legal:
+      name: "Legal"
+      divisionType: department
+      lead: jeff-bleich  # rqP3Es47dg
+      status: active
+      startDate: "2022-01"
+      notes: "General Counsel Jeff Bleich (ex-Ambassador to Australia, ex-Cruise).
+        Deputy GCs: Janel Thamkul, Aparna Sridhar. ~9 open roles."
+
+    communications:
+      name: "Communications"
+      divisionType: department
+      lead: sasha-de-marigny  # o8udQmkbbQ
+      status: active
+      startDate: "2023-01"
+      notes: "Chief Communications Officer Sasha de Marigny. Brand, press,
+        external communications."
+
     finance:
       name: "Finance & Operations"
       divisionType: department
-      lead: ggrpeAtXwg  # krishna-rao
+      lead: krishna-rao  # ggrpeAtXwg
       status: active
       startDate: "2024-05"
       notes: "Led by CFO Krishna Rao (ex-Airbnb, first CFO hired May 2024).
         Financial planning, legal (GC Jeff Bleich), CISO
         (Vitaly Gudanets, ex-Netflix)."
+
+  # ── Dilution History ──────────────────────────────────────────────
+  # Estimated ownership percentages at each funding stage.
+  # All values are estimates derived from public data — see notes.
+  # Source: https://www.premieralts.com/companies/anthropic/cap-table
+  # Source: https://www.revenuememo.com/p/who-owns-anthropic
+  dilution-stages:
+    founding:
+      round: "Founding"
+      date: "2021-01"
+      foundersPercent: 85
+      employeesPercent: 15
+      investorsPercent: 0
+      valuation: 0
+      notes: "7 co-founders from OpenAI; ~15% initial option pool"
+
+    series-a:
+      round: "Series A"
+      date: "2021-05"
+      foundersPercent: 53
+      employeesPercent: 12
+      investorsPercent: 35
+      valuation: 5.5e+8
+      notes: "Tallinn, Moskovitz, Schmidt led. $124M at $550M post-money."
+
+    series-b:
+      round: "Series B + FTX"
+      date: "2022-04"
+      foundersPercent: 38
+      employeesPercent: 10
+      investorsPercent: 52
+      valuation: 4e+9
+      notes: "$580M round + $500M FTX. ~22% combined new issuance."
+
+    series-c:
+      round: "Series C"
+      date: "2023-05"
+      foundersPercent: 34
+      employeesPercent: 9
+      investorsPercent: 57
+      valuation: 4.1e+9
+      notes: "Spark Capital led. $450M at $4.1B."
+
+    series-d:
+      round: "Series D + converts"
+      date: "2024-02"
+      foundersPercent: 27
+      employeesPercent: 10
+      investorsPercent: 63
+      valuation: 1.84e+10
+      notes: "Menlo-led $750M + Google $2B note + Amazon $4B converts.
+        Option pool likely refreshed."
+
+    series-e:
+      round: "Series E"
+      date: "2025-03"
+      foundersPercent: 25.5
+      employeesPercent: 9.5
+      investorsPercent: 65
+      valuation: 6.15e+10
+      notes: "$3.5B at $61.5B. FTX stake sold in 2024."
+
+    series-f:
+      round: "Series F"
+      date: "2025-09"
+      foundersPercent: 23.7
+      employeesPercent: 8.8
+      investorsPercent: 67.5
+      valuation: 1.83e+11
+      notes: "$13B at $183B. Largest single AI fundraise at the time."
+
+    series-g:
+      round: "Series G"
+      date: "2026-02"
+      foundersPercent: 21.8
+      employeesPercent: 8.1
+      investorsPercent: 70.1
+      valuation: 3.8e+11
+      notes: "$30B at $380B. Microsoft and Nvidia strategic investments."

@@ -162,7 +162,7 @@ export default async function OrgProfilePage({
       )}
 
       {/* Charts */}
-      <ChartsSection chartData={data.chartData} orgName={entity.name} />
+      <ChartsSection chartData={data.chartData} orgName={entity.name} dilutionStages={data.dilutionStages} />
 
       {/* Facts + Other Data */}
       {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (

@@ -1,0 +1,19 @@
+name: Dilution Stage
+description: "Estimated ownership percentages at a funding stage."
+collectionName: dilution-stages
+temporal: false
+
+endpoints:
+  organization:
+    types: [organization]
+    implicit: true
+
+fields:
+  round: { type: text, required: true, description: "Funding round name (e.g. Series A)" }
+  date: { type: date, description: "Date of the funding round" }
+  foundersPercent: { type: number, description: "Estimated combined founder ownership (%)" }
+  employeesPercent: { type: number, description: "Estimated employee pool ownership (%)" }
+  investorsPercent: { type: number, description: "Estimated total investor ownership (%)" }
+  valuation: { type: number, unit: USD, description: "Post-money valuation at this stage" }
+  source: { type: text, description: "URL to source data" }
+  notes: { type: text, description: "Methodology notes, caveats, confidence level" }

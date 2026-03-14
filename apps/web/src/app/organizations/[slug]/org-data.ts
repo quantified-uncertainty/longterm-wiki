@@ -139,6 +139,7 @@ export const CURATED_COLLECTIONS = new Set([
   "personnel",
   "grants",
   "equity-positions",
+  "dilution-stages",
 ]);
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -382,6 +383,22 @@ export function parseInvestmentRecord(record: KBRecordEntry) {
     notes: (f.notes as string) ?? null,
   };
 }
+
+export function parseDilutionStageRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    round: (f.round as string) ?? record.key,
+    date: (f.date as string) ?? null,
+    foundersPercent: typeof f.foundersPercent === "number" ? f.foundersPercent : 0,
+    employeesPercent: typeof f.employeesPercent === "number" ? f.employeesPercent : 0,
+    investorsPercent: typeof f.investorsPercent === "number" ? f.investorsPercent : 0,
+    valuation: typeof f.valuation === "number" ? f.valuation : undefined,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export type ParsedDilutionStageRecord = ReturnType<typeof parseDilutionStageRecord>;
 
 export function parseEquityPositionRecord(record: KBRecordEntry) {
   const f = record.fields;
@@ -841,8 +858,24 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   // ── Divisions (org subdivisions) ──
   const divisionRecords = getKBRecords(entity.id, "divisions");
   const divisions = divisionRecords
-    .map(parseDivisionRecord)
+    .map((r) => {
+      const parsed = parseDivisionRecord(r);
+      // Resolve lead slug/stableId to human-readable name
+      if (parsed.lead) {
+        // Try KB entity resolution first (handles both slugs and stableIds)
+        const entityId = resolveKBSlug(parsed.lead);
+        const leadEntity = entityId ? getKBEntity(entityId) : getKBEntity(parsed.lead);
+        parsed.lead = leadEntity?.name ?? titleCase(parsed.lead.replace(/-/g, " "));
+      }
+      return parsed;
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  // ── Dilution Stages ──
+  const dilutionStageRecords = getKBRecords(entity.id, "dilution-stages");
+  const dilutionStages = dilutionStageRecords
+    .map(parseDilutionStageRecord)
+    .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
 
   // ── Funding Programs (RFPs, grant rounds, fellowships, etc.) ──
   const fundingProgramRecords = getKBRecords(entity.id, "funding-programs");
@@ -1126,6 +1159,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     modelBenchmarks,
     divisionLeadResolved,
     chartData,
+    dilutionStages,
   };
 }
 
