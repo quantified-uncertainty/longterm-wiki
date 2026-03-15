@@ -70,17 +70,18 @@ function formatCellValue(cell: CellValue): string {
   return str.charAt(0).toUpperCase();
 }
 
-function getEntityCounts(row: EntityTypeRow): { entities: number | null; pages: number | null } {
-  // Prefer build_entity_count (from database.json) over yaml_entity_count
-  const buildCell = row.cells["build_entity_count"];
-  const yamlCell = row.cells["yaml_entity_count"];
+function getEntityCounts(row: EntityTypeRow): {
+  db: number | null;
+  kb: number | null;
+  wiki: number | null;
+} {
+  const dbCell = row.cells["db_record_count"];
+  const kbCell = row.cells["kb_fact_count"];
   const mdxCell = row.cells["mdx_page_count"];
-  const entities = typeof buildCell?.raw === "number" ? buildCell.raw
-    : typeof yamlCell?.raw === "number" ? yamlCell.raw
-    : null;
   return {
-    entities,
-    pages: typeof mdxCell?.raw === "number" ? mdxCell.raw : null,
+    db: typeof dbCell?.raw === "number" ? dbCell.raw : null,
+    kb: typeof kbCell?.raw === "number" ? kbCell.raw : null,
+    wiki: typeof mdxCell?.raw === "number" ? mdxCell.raw : null,
   };
 }
 
@@ -219,22 +220,17 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
   }, [snapshot.dimensions, snapshot.dimensionGroups]);
 
   // Summary stats
-  const totalYaml = useMemo(() => {
-    let sum = 0;
+  const { totalDb, totalKb, totalWiki } = useMemo(() => {
+    let db = 0, kb = 0, wiki = 0;
     for (const row of snapshot.rows) {
-      const c = row.cells["yaml_entity_count"];
-      if (c && typeof c.raw === "number") sum += c.raw;
+      const dbCell = row.cells["db_record_count"];
+      const kbCell = row.cells["kb_fact_count"];
+      const mdxCell = row.cells["mdx_page_count"];
+      if (dbCell && typeof dbCell.raw === "number") db += dbCell.raw;
+      if (kbCell && typeof kbCell.raw === "number") kb += kbCell.raw;
+      if (mdxCell && typeof mdxCell.raw === "number") wiki += mdxCell.raw;
     }
-    return sum;
-  }, [snapshot.rows]);
-
-  const totalMdx = useMemo(() => {
-    let sum = 0;
-    for (const row of snapshot.rows) {
-      const c = row.cells["mdx_page_count"];
-      if (c && typeof c.raw === "number") sum += c.raw;
-    }
-    return sum;
+    return { totalDb: db, totalKb: kb, totalWiki: wiki };
   }, [snapshot.rows]);
 
   return (
@@ -271,7 +267,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
           </select>
         </div>
         <div style={{ color: "#6b7280", fontSize: "0.75rem" }}>
-          {totalYaml.toLocaleString()} entities &middot; {totalMdx.toLocaleString()} pages
+          {totalDb.toLocaleString()} DB &middot; {totalKb.toLocaleString()} KB &middot; {totalWiki.toLocaleString()} wiki
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginLeft: "auto", fontSize: "0.75rem", color: "#6b7280" }}>
           <span style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
@@ -305,8 +301,8 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 40 }}>
                 Score
               </th>
-              <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 48 }} title="YAML entities / MDX pages">
-                Count
+              <th className="px-2 py-2 text-center font-medium border-r" colSpan={3} style={{ minWidth: 100 }} title="DB records / KB entries / Wiki pages">
+                Counts
               </th>
               <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 56 }} title="Links to directory and sample entity">
                 Links
@@ -325,9 +321,14 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
             <tr className="bg-muted/30">
               <th className="sticky left-0 z-20 bg-muted/30 border-r" />
               <th className="border-r" />
-              <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
-                <div>Entities</div>
-                <div>/Pages</div>
+              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Postgres database records">
+                DB
+              </th>
+              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Knowledge base entries">
+                KB
+              </th>
+              <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="MDX wiki pages">
+                Wiki
               </th>
               <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
                 <div>Dir /</div>
@@ -380,8 +381,14 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
                   {snapshot.overallScore}
                 </span>
               </td>
-              <td className="px-2 py-2 text-center border-r border-t" style={{ fontSize: "0.625rem", color: "#6b7280" }}>
-                {totalYaml} / {totalMdx}
+              <td className="px-1 py-2 text-center border-t" style={{ fontSize: "0.625rem", color: "#6b7280" }}>
+                {totalDb}
+              </td>
+              <td className="px-1 py-2 text-center border-t" style={{ fontSize: "0.625rem", color: "#6b7280" }}>
+                {totalKb}
+              </td>
+              <td className="px-1 py-2 text-center border-r border-t" style={{ fontSize: "0.625rem", color: "#6b7280" }}>
+                {totalWiki}
               </td>
               <td className="px-2 py-2 border-r border-t" />
               {groupedDims.map(({ dims }) =>
@@ -470,20 +477,20 @@ function MatrixRow({
           {row.aggregateScore}
         </span>
       </td>
-      <td className="px-2 py-1.5 text-center border-r" style={{ fontSize: "0.625rem", color: "#6b7280", whiteSpace: "nowrap" }}>
-        {counts.entities !== null || counts.pages !== null ? (
-          <>
-            <span style={{ color: counts.entities ? "#374151" : "#d1d5db" }}>
-              {counts.entities ?? "—"}
-            </span>
-            <span style={{ color: "#d1d5db" }}> / </span>
-            <span style={{ color: counts.pages ? "#374151" : "#d1d5db" }}>
-              {counts.pages ?? "—"}
-            </span>
-          </>
-        ) : (
-          <span style={{ color: "#d1d5db" }}>—</span>
-        )}
+      <td className="px-1 py-1.5 text-center" style={{ fontSize: "0.625rem" }}>
+        <span style={{ color: counts.db ? "#374151" : "#d1d5db" }}>
+          {counts.db ?? "—"}
+        </span>
+      </td>
+      <td className="px-1 py-1.5 text-center" style={{ fontSize: "0.625rem" }}>
+        <span style={{ color: counts.kb ? "#374151" : "#d1d5db" }}>
+          {counts.kb ?? "—"}
+        </span>
+      </td>
+      <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem" }}>
+        <span style={{ color: counts.wiki ? "#374151" : "#d1d5db" }}>
+          {counts.wiki ?? "—"}
+        </span>
       </td>
       <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem", whiteSpace: "nowrap" }}>
         <span style={{ display: "inline-flex", gap: "0.375rem" }}>
@@ -494,19 +501,28 @@ function MatrixRow({
               title={`Browse all ${row.label}s`}
               onClick={(e) => e.stopPropagation()}
             >
-              All
+              Index
             </a>
           )}
-          {row.sampleEntityId && (
+          {row.sampleEntitySlug && entityMeta?.profileRoute ? (
+            <a
+              href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
+              style={{ color: "#6b7280", textDecoration: "none" }}
+              title={`Sample: ${row.sampleEntitySlug}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Ex
+            </a>
+          ) : row.sampleEntityId ? (
             <a
               href={`/wiki/${row.sampleEntityId}`}
               style={{ color: "#6b7280", textDecoration: "none" }}
-              title={`Sample ${row.label}: ${row.sampleEntityId}`}
+              title={`Sample: ${row.sampleEntityId}`}
               onClick={(e) => e.stopPropagation()}
             >
-              {row.sampleEntityId}
+              Ex
             </a>
-          )}
+          ) : null}
           {!entityMeta?.directoryRoute && !row.sampleEntityId && (
             <span style={{ color: "#d1d5db" }}>—</span>
           )}
@@ -572,11 +588,13 @@ function ExpandedDetail({
         <span style={aggregateToStyle(row.aggregateScore)}>
           {row.aggregateScore}%
         </span>
-        {(counts.entities !== null || counts.pages !== null) && (
+        {(counts.db !== null || counts.kb !== null || counts.wiki !== null) && (
           <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-            {counts.entities !== null && `${counts.entities} entities`}
-            {counts.entities !== null && counts.pages !== null && " · "}
-            {counts.pages !== null && `${counts.pages} pages`}
+            {counts.db !== null && `${counts.db} DB`}
+            {counts.db !== null && counts.kb !== null && " · "}
+            {counts.kb !== null && `${counts.kb} KB`}
+            {(counts.db !== null || counts.kb !== null) && counts.wiki !== null && " · "}
+            {counts.wiki !== null && `${counts.wiki} wiki`}
           </span>
         )}
         {(entityMeta?.directoryRoute || row.sampleEntityId) && (
@@ -586,11 +604,15 @@ function ExpandedDetail({
                 Browse all
               </a>
             )}
-            {row.sampleEntityId && (
-              <a href={`/wiki/${row.sampleEntityId}`} style={{ color: "#6b7280" }}>
-                Sample: {row.sampleEntityId}
+            {row.sampleEntitySlug && entityMeta?.profileRoute ? (
+              <a href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`} style={{ color: "#6b7280" }}>
+                Example: {row.sampleEntitySlug}
               </a>
-            )}
+            ) : row.sampleEntityId ? (
+              <a href={`/wiki/${row.sampleEntityId}`} style={{ color: "#6b7280" }}>
+                Example: {row.sampleEntityId}
+              </a>
+            ) : null}
           </span>
         )}
       </div>

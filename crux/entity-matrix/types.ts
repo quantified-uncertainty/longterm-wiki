@@ -89,6 +89,8 @@ export interface EntityTypeRow {
   groupScores: Record<string, number>;
   /** Sample entity numericId (e.g., "E42") for quick navigation */
   sampleEntityId?: string;
+  /** Sample entity slug for directory-style URLs */
+  sampleEntitySlug?: string;
 }
 
 // ============================================================================

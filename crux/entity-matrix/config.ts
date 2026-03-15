@@ -83,6 +83,15 @@ export const DIMENSIONS: DimensionDef[] = [
     importance: 7,
   },
   {
+    id: "db_record_count",
+    label: "DB Records",
+    group: "data-foundation",
+    description: "Count of records in the wiki-server Postgres database",
+    detection: "api",
+    valueType: "count",
+    importance: 8,
+  },
+  {
     id: "kb_fact_count",
     label: "KB Facts",
     group: "data-foundation",
@@ -683,6 +692,8 @@ export function scoreDimension(dimensionId: string, raw: unknown): number {
     case "yaml_entity_count":
       return scoreCount(raw as number, { yellow: 10, green: 50 });
     case "build_entity_count":
+      return scoreCount(raw as number, { yellow: 10, green: 50 });
+    case "db_record_count":
       return scoreCount(raw as number, { yellow: 10, green: 50 });
     case "kb_fact_count":
       return scoreCount(raw as number, { yellow: 10, green: 30 });

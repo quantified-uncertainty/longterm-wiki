@@ -28,7 +28,7 @@ const filterType = args.type as string | undefined;
 // ============================================================================
 
 console.error("Scanning for gaps...");
-const snapshot = scanMatrix();
+const snapshot = await scanMatrix();
 
 // ============================================================================
 // FIND GAPS

@@ -22,7 +22,7 @@ const brief = args.brief === true;
 // ============================================================================
 
 console.error("Scanning entity completeness matrix...");
-const snapshot = scanMatrix();
+const snapshot = await scanMatrix();
 console.error(
   `Scanned ${snapshot.rows.length} entity types × ${snapshot.dimensions.length} dimensions\n`,
 );

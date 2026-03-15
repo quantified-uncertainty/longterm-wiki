@@ -59,6 +59,7 @@ export interface EntityTypeRow {
   aggregateScore: number;
   groupScores: Record<string, number>;
   sampleEntityId?: string;
+  sampleEntitySlug?: string;
 }
 
 export interface MatrixSnapshot {

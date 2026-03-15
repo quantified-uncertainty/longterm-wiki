@@ -20,7 +20,7 @@ const OUTPUT_PATH = join(
 );
 
 console.log("  entity-matrix: scanning...");
-const snapshot = scanMatrix();
+const snapshot = await scanMatrix();
 writeFileSync(OUTPUT_PATH, JSON.stringify(snapshot));
 console.log(
   `  entity-matrix: ${snapshot.rows.length} types × ${snapshot.dimensions.length} dims → entity-matrix.json (${snapshot.overallScore}% overall)`,

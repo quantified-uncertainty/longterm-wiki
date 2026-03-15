@@ -10,6 +10,7 @@ import { existsSync, readdirSync, readFileSync, statSync, globSync } from "fs";
 import { join, basename } from "path";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { ENTITY_TYPES, DIMENSIONS, DIMENSION_GROUPS, scoreDimension } from "./config.ts";
+import { apiRequest, type ApiResult } from "../lib/wiki-server/client.ts";
 import type {
   CellValue,
   EntityTypeMeta,
@@ -82,6 +83,60 @@ function getWikiServerSchemaContent(): string {
       : "";
   }
   return _wikiServerSchemaContent;
+}
+
+// ============================================================================
+// WIKI-SERVER DB STATS (cached, optional)
+// ============================================================================
+
+interface DbStats {
+  entityCounts: Record<string, number>;  // entityType → count from entities table
+  tableCounts: Record<string, number>;   // table name → count (grants, personnel, etc.)
+}
+
+let _dbStats: DbStats | null | undefined = undefined; // undefined = not fetched yet
+async function fetchDbStats(): Promise<DbStats | null> {
+  if (_dbStats !== undefined) return _dbStats;
+
+  try {
+    const entityResult = await apiRequest<{ total: number; byType: Record<string, number> }>(
+      "GET", "/api/entities/stats",
+    );
+
+    const entityCounts: Record<string, number> = {};
+    if (entityResult.ok) {
+      Object.assign(entityCounts, entityResult.data.byType);
+    }
+
+    // Fetch sub-entity table counts
+    const tableCounts: Record<string, number> = {};
+    const subEntityEndpoints = [
+      { route: "/api/grants", key: "grants" },
+      { route: "/api/personnel", key: "personnel" },
+      { route: "/api/divisions", key: "divisions" },
+      { route: "/api/funding-rounds", key: "fundingRounds" },
+      { route: "/api/investments", key: "investments" },
+      { route: "/api/equity-positions", key: "equityPositions" },
+      { route: "/api/funding-programs", key: "fundingPrograms" },
+      { route: "/api/benchmarks", key: "benchmarks" },
+    ];
+
+    await Promise.all(
+      subEntityEndpoints.map(async ({ route, key }) => {
+        const result = await apiRequest<{ total: number }>("GET", `${route}/stats`);
+        if (result.ok && typeof result.data.total === "number") {
+          tableCounts[key] = result.data.total;
+        }
+      }),
+    );
+
+    _dbStats = { entityCounts, tableCounts };
+    return _dbStats;
+  } catch (e) {
+    console.warn(`  entity-matrix: wiki-server unavailable for DB stats: ${e instanceof Error ? e.message : String(e)}`);
+    _dbStats = null;
+    return null;
+  }
 }
 
 // ============================================================================
@@ -172,7 +227,7 @@ function getDatabaseJson(): DatabaseJson | null {
 
 type DimensionScanner = (
   meta: EntityTypeMeta,
-) => CellValue;
+) => CellValue | Promise<CellValue>;
 
 function naCell(details?: string): CellValue {
   return { raw: null, score: -1, details: details ?? "N/A" };
@@ -221,6 +276,25 @@ function scanBuildEntityCount(meta: EntityTypeMeta): CellValue {
   ).length;
 
   return cell(count, "build_entity_count", `${count} entities in database.json`);
+}
+
+async function scanDbRecordCount(meta: EntityTypeMeta): Promise<CellValue> {
+  const stats = await fetchDbStats();
+  if (!stats) return naCell("Wiki-server unavailable");
+
+  // Canonical types → entities table (by entityType)
+  if (meta.tier === "canonical") {
+    const count = stats.entityCounts[meta.id] ?? 0;
+    return cell(count, "db_record_count", `${count} rows in entities table`);
+  }
+
+  // Sub-entities → dedicated table
+  if (meta.dbTable && stats.tableCounts[meta.dbTable] !== undefined) {
+    const count = stats.tableCounts[meta.dbTable];
+    return cell(count, "db_record_count", `${count} rows in ${meta.dbTable} table`);
+  }
+
+  return naCell("No DB table for this type");
 }
 
 function scanKbFactCount(meta: EntityTypeMeta): CellValue {
@@ -789,6 +863,7 @@ const SCANNERS: Record<string, DimensionScanner> = {
   // Data Foundation
   yaml_entity_count: scanYamlEntityCount,
   build_entity_count: scanBuildEntityCount,
+  db_record_count: scanDbRecordCount,
   kb_fact_count: scanKbFactCount,
   db_table_exists: scanDbTableExists,
   field_completeness: scanFieldCompleteness,
@@ -838,7 +913,7 @@ const SCANNERS: Record<string, DimensionScanner> = {
 // MAIN SCAN FUNCTION
 // ============================================================================
 
-export function scanMatrix(): MatrixSnapshot {
+export async function scanMatrix(): Promise<MatrixSnapshot> {
   const rows: EntityTypeRow[] = [];
 
   for (const entityType of ENTITY_TYPES) {
@@ -848,7 +923,7 @@ export function scanMatrix(): MatrixSnapshot {
       const scanner = SCANNERS[dim.id];
       if (scanner) {
         try {
-          cells[dim.id] = scanner(entityType);
+          cells[dim.id] = await scanner(entityType);
         } catch (e) {
           cells[dim.id] = {
             raw: null,
@@ -910,11 +985,21 @@ export function scanMatrix(): MatrixSnapshot {
       }
     }
 
-    // Pick a sample entity for quick navigation
+    // Pick a sample entity that has an actual MDX page
     const db = getDatabaseJson();
-    const sampleEntity = db?.typedEntities?.find(
-      (e) => e.entityType === entityType.id && e.numericId,
+    const pageIds = new Set(
+      db?.pages
+        ?.filter((p) => p.entityType === entityType.id && p.numericId)
+        .map((p) => p.numericId) ?? [],
     );
+    // Prefer an entity that has a page; fall back to any entity with a numericId
+    const sampleEntity = pageIds.size > 0
+      ? db?.typedEntities?.find(
+          (e) => e.entityType === entityType.id && pageIds.has(e.numericId),
+        )
+      : db?.typedEntities?.find(
+          (e) => e.entityType === entityType.id && e.numericId,
+        );
 
     rows.push({
       entityType: entityType.id,
@@ -924,6 +1009,7 @@ export function scanMatrix(): MatrixSnapshot {
       aggregateScore,
       groupScores,
       sampleEntityId: sampleEntity?.numericId,
+      sampleEntitySlug: sampleEntity?.slug,
     });
   }
 
