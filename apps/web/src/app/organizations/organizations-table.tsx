@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";

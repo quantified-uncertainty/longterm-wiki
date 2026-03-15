@@ -64,7 +64,8 @@ export function useDirectoryUrl(
     }
 
     const pageParam = searchParams.get("page");
-    const page = pageParam ? Math.max(0, parseInt(pageParam, 10) - 1) : 0;
+    const parsedPage = pageParam ? parseInt(pageParam, 10) : NaN;
+    const page = Number.isNaN(parsedPage) ? 0 : Math.max(0, parsedPage - 1);
 
     const filters: Record<string, string> = {};
     for (const name of filterNames) {
