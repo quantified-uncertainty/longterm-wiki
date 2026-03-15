@@ -25,7 +25,6 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
 tableOfContents: false
 ---
-import CauseEffectGraph from '@components/CauseEffectGraph';
 import {Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
@@ -38,597 +37,102 @@ The model synthesizes data from multiple authoritative sources. <R id="YzE3YjNhY
 
 **Core thesis**: Focus on ~35 nodes that are (1) high-leverage, (2) genuinely uncertain, and (3) empirically resolvable or at least operationalizable.
 
-<div class="breakout">
-<CauseEffectGraph
-  height={1200}
-  fitViewPadding={0.04}
-  initialNodes={[
-    {
-      id: 'gpu-growth',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'GPU Production Growth',
-        description: 'FLOP/s per $, annual % change.',
-        type: 'cause',
-        confidence: 2.5,
-        confidenceLabel: 'years to 2x',
-        details: 'Currently ~2x every 2.5 years. Could accelerate to 2x/18mo or decelerate. Depends on TSMC/Samsung fab capacity, ASML EUV production.',
-        relatedConcepts: ['TSMC', 'ASML', 'Semiconductors']
-      }
-    },
-    {
-      id: 'effective-compute',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Effective Compute Available',
-        description: 'ExaFLOP/s-years at frontier labs.',
-        type: 'intermediate',
-        confidence: 25,
-        confidenceLabel: 'log₁₀ FLOP',
-        details: 'Not just hardware - includes utilization rates, cluster efficiency. Current leader ~10^25 FLOP, could be 10^27 by 2027 or plateau.',
-        relatedConcepts: ['Training runs', 'Clusters', 'Efficiency']
-      }
-    },
-    {
-      id: 'compute-governance',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Compute Governance',
-        description: 'Can governments track/limit training runs?',
-        type: 'cause',
-        confidence: 3,
-        confidenceLabel: 'effectiveness (0-10)',
-        details: 'Chip tracking infrastructure, cloud monitoring, enforcement. Currently ~3/10.',
-        relatedConcepts: ['Export controls', 'Monitoring', 'KYC']
-      }
-    },
-    {
-      id: 'china-gap',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'China-US Compute Gap',
-        description: 'Chinese vs US lab compute access.',
-        type: 'cause',
-        confidence: 0.3,
-        confidenceLabel: 'ratio (China/US)',
-        details: 'Export controls vs. smuggling, domestic production, algorithmic efficiency. Currently ~0.3x.',
-        relatedConcepts: ['Export controls', 'Smuggling', 'Domestic chips']
-      }
-    },
-    {
-      id: 'compute-cost',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Compute Cost Trajectory',
-        description: '$/FLOP, % change per year.',
-        type: 'cause',
-        confidence: 50,
-        confidenceLabel: '% decline/year',
-        details: 'Training cost declining ~50% annually. Non-linear if new architectures (analog, photonic) emerge.',
-        relatedConcepts: ['Costs', 'Efficiency', 'Hardware']
-      }
-    },
-    {
-      id: 'energy-available',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Energy for AI',
-        description: 'TWh/year allocated to AI.',
-        type: 'cause',
-        confidence: 50,
-        confidenceLabel: 'TWh/year',
-        details: 'Physical constraint: data center energy becoming political issue. Currently ~50 TWh/year.',
-        relatedConcepts: ['Grid', 'Nuclear', 'Data centers']
-      }
-    },
-    {
-      id: 'algo-efficiency',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Algorithmic Efficiency Gains',
-        description: 'Vs 2024 baseline, multiplicative.',
-        type: 'intermediate',
-        confidence: 16,
-        confidenceLabel: 'months to 2x',
-        details: 'Historical: ~2x every ~16 months. Could accelerate or hit wall.',
-        relatedConcepts: ['Algorithms', 'Efficiency', 'Progress']
-      }
-    },
-    {
-      id: 'scaling-breakdown',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Scaling Law Breakdown Point',
-        description: 'FLOP at which current laws fail.',
-        type: 'cause',
-        confidence: 28,
-        confidenceLabel: 'log₁₀ FLOP (est.)',
-        details: 'Do capabilities keep scaling predictably or hit ceiling? Crucial for timeline estimates. Estimated ~10^28.',
-        relatedConcepts: ['Scaling laws', 'Chinchilla', 'Diminishing returns']
-      }
-    },
-    {
-      id: 'data-ceiling',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Data Quality Ceiling',
-        description: '% of internet text useful for pretraining.',
-        type: 'cause',
-        confidence: 0.4,
-        confidenceLabel: 'fraction remaining',
-        details: 'Running out of high-quality text by 2026-2028. Synthetic data, multimodal, embodied data as solutions.',
-        relatedConcepts: ['Data', 'Synthetic data', 'Multimodal']
-      }
-    },
-    {
-      id: 'post-training',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Post-Training Effectiveness',
-        description: 'Capability gain vs pretraining.',
-        type: 'intermediate',
-        confidence: 0.5,
-        confidenceLabel: 'ratio to pretrain',
-        details: 'RLHF, Constitutional AI, inference-time compute. Trend: increasing importance, could dominate pretraining.',
-        relatedConcepts: ['RLHF', 'CAI', 'Fine-tuning']
-      }
-    },
-    {
-      id: 'test-time-compute',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Test-Time Compute Scaling',
-        description: 'Capability gain per 10x inference compute.',
-        type: 'intermediate',
-        confidence: 0.4,
-        confidenceLabel: 'gain per 10x',
-        details: 'AlphaGo/o1-style reasoning - how far does this go? Could enable massive capability jumps without new training.',
-        relatedConcepts: ['o1', 'Chain-of-thought', 'Search']
-      }
-    },
-    {
-      id: 'us-regulation',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'US Regulatory Stringency',
-        description: 'Scale 0-10 by 2028.',
-        type: 'intermediate',
-        confidence: 3,
-        confidenceLabel: 'stringency (0-10)',
-        details: 'Will US implement meaningful AI regulation or stay hands-off? Currently ~3/10.',
-        relatedConcepts: ['SB 1047', 'NIST', 'Legislation']
-      }
-    },
-    {
-      id: 'us-china-treaty',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'US-China Coordination',
-        description: 'P(meaningful treaty by 2030).',
-        type: 'intermediate',
-        confidence: 0.1,
-        confidenceLabel: 'probability',
-        details: 'Arms control on AI development - possible or fantasy? Currently ~10%.',
-        relatedConcepts: ['Treaty', 'Diplomacy', 'Arms control']
-      }
-    },
-    {
-      id: 'lab-coordination',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Frontier Lab Coordination',
-        description: 'Quality of safety info sharing.',
-        type: 'intermediate',
-        confidence: 4,
-        confidenceLabel: 'quality (0-10)',
-        details: 'Do leading labs actually share safety info, coordinate deployment? RSPs, voluntary commitments. Currently ~4/10.',
-        relatedConcepts: ['RSPs', 'Commitments', 'Sharing']
-      }
-    },
-    {
-      id: 'compute-monitoring',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Compute Monitoring Infrastructure',
-        description: '% of frontier compute tracked by 2028.',
-        type: 'intermediate',
-        confidence: 0.2,
-        confidenceLabel: 'fraction tracked',
-        details: 'Can governments actually see large training runs? Currently ~20%.',
-        relatedConcepts: ['KYC', 'Cloud', 'Chips']
-      }
-    },
-    {
-      id: 'public-concern',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Public AI Concern',
-        description: '% viewing AI as existential risk.',
-        type: 'intermediate',
-        confidence: 0.25,
-        confidenceLabel: 'fraction concerned',
-        details: 'Currently ~15-30% in US. Could rise sharply with incidents.',
-        relatedConcepts: ['Polling', 'Public opinion', 'Media']
-      }
-    },
-    {
-      id: 'economic-value',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'AI Economic Value Growth',
-        description: 'Total market size, % growth.',
-        type: 'intermediate',
-        confidence: 200,
-        confidenceLabel: '$B market',
-        details: 'Currently ≈\$200B market, could be \$2T+ by 2028. Determines racing incentives.',
-        relatedConcepts: ['Revenue', 'Market', 'Investment']
-      }
-    },
-    {
-      id: 'winner-take-all',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Winner-Take-All Dynamics',
-        description: 'Strength of first-mover advantage.',
-        type: 'cause',
-        confidence: 5,
-        confidenceLabel: 'strength (0-10)',
-        details: 'Does first-mover get durable advantage or quick commoditization? Network effects, moats, or rapid diffusion?',
-        relatedConcepts: ['Moats', 'Commoditization', 'Network effects']
-      }
-    },
-    {
-      id: 'lab-lead-time',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Lead Time Between Labs',
-        description: 'Months, 1st to 2nd place.',
-        type: 'intermediate',
-        confidence: 9,
-        confidenceLabel: 'months',
-        details: 'How tight is the race? Tighter = more pressure to cut corners. Currently ~6-12 months.',
-        relatedConcepts: ['Competition', 'Lead', 'Racing']
-      }
-    },
-    {
-      id: 'open-source-lag',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Open Source Capability Lag',
-        description: 'Months behind frontier.',
-        type: 'intermediate',
-        confidence: 15,
-        confidenceLabel: 'months',
-        details: 'How fast do capabilities diffuse to open models? Currently ~12-18 months, could shrink dramatically.',
-        relatedConcepts: ['Open source', 'Diffusion', 'Llama']
-      }
-    },
-    {
-      id: 'alignment-tax',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Alignment Tax',
-        description: '% capability reduction from safety measures.',
-        type: 'cause',
-        confidence: 0.12,
-        confidenceLabel: 'fraction',
-        details: 'How much does safety slow you down? Currently ~5-20%. Could improve or worsen.',
-        relatedConcepts: ['Safety cost', 'Trade-off', 'Capability hit']
-      }
-    },
-    {
-      id: 'interp-progress',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Interpretability Progress',
-        description: '% of model behavior explainable.',
-        type: 'intermediate',
-        confidence: 0.05,
-        confidenceLabel: 'fraction explained',
-        details: 'Are we making progress understanding models? Currently &lt;5% for frontier models.',
-        relatedConcepts: ['Interpretability', 'Circuits', 'Mech interp']
-      }
-    },
-    {
-      id: 'scalable-oversight',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Scalable Oversight Effectiveness',
-        description: 'Capability level where oversight breaks.',
-        type: 'cause',
-        confidence: 27,
-        confidenceLabel: 'log₁₀ FLOP limit',
-        details: 'At what point can\'t humans oversee AI training? Estimated ~10^27 FLOP.',
-        relatedConcepts: ['Oversight', 'Supervision', 'Debate']
-      }
-    },
-    {
-      id: 'deception-detection',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Deception Detection Capability',
-        description: 'True positive / false positive rate.',
-        type: 'intermediate',
-        confidence: 0.3,
-        confidenceLabel: 'detection rate',
-        details: 'Can we catch scheming models? Currently mostly theoretical. ~30% estimated true positive.',
-        relatedConcepts: ['Deception', 'Sandbagging', 'Evals']
-      }
-    },
-    {
-      id: 'safety-funding-ratio',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Safety Funding Ratio',
-        description: 'Safety $ / capabilities $.',
-        type: 'cause',
-        confidence: 0.03,
-        confidenceLabel: 'ratio',
-        details: 'Currently ~1:20 to 1:50. Could improve with concern.',
-        relatedConcepts: ['Funding', 'Investment', 'Ratio']
-      }
-    },
-    {
-      id: 'safety-talent',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Safety Researcher Pipeline',
-        description: 'PhDs/year, experienced researchers.',
-        type: 'cause',
-        confidence: 350,
-        confidenceLabel: 'researchers',
-        details: 'Bottleneck on safety research. Currently ~200-500 serious researchers, growing ~20%/year.',
-        relatedConcepts: ['Talent', 'PhDs', 'Pipeline']
-      }
-    },
-    {
-      id: 'warning-shot',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Warning Shot Severity',
-        description: 'Economic loss $B or lives lost.',
-        type: 'intermediate',
-        confidence: 0,
-        confidenceLabel: 'incidents so far',
-        details: 'How bad does an AI accident need to be to trigger response? Could be \$1B loss or 100+ deaths.',
-        relatedConcepts: ['Incident', 'Accident', 'Trigger']
-      }
-    },
-    {
-      id: 'warning-lag',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Warning → Regulation Lag',
-        description: 'Months from incident to policy.',
-        type: 'cause',
-        confidence: 18,
-        confidenceLabel: 'months',
-        details: 'How fast can institutions respond? Historical: financial crisis ~18 months.',
-        relatedConcepts: ['Response time', 'Policy', 'Lag']
-      }
-    },
-    {
-      id: 'autonomous-rnd',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Autonomous AI R&D',
-        description: 'Years until median ML researcher equivalent.',
-        type: 'intermediate',
-        confidence: 3,
-        confidenceLabel: 'years away',
-        details: 'Most important threshold - enables recursive improvement. Currently: ~10-20% of median researcher.',
-        relatedConcepts: ['Automation', 'Recursive', 'Research']
-      }
-    },
-    {
-      id: 'persuasion-cap',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Persuasion Capability',
-        description: '% of population swayable.',
-        type: 'intermediate',
-        confidence: 0.35,
-        confidenceLabel: 'fraction swayable',
-        details: 'Determines information warfare, social stability risks. Currently: ~20-40% on specific issues.',
-        relatedConcepts: ['Persuasion', 'Manipulation', 'Influence']
-      }
-    },
-    {
-      id: 'cyber-cap',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Cyber Offense Capability',
-        description: '% of critical infrastructure vulnerable.',
-        type: 'intermediate',
-        confidence: 0.3,
-        confidenceLabel: 'fraction vulnerable',
-        details: 'Already significant, could become dominant. Currently ~30% of critical infra vulnerable.',
-        relatedConcepts: ['Cyber', 'Hacking', 'Infrastructure']
-      }
-    },
-    {
-      id: 'bio-cap',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Bioweapon Design Capability',
-        description: 'Expert-equivalent virology knowledge.',
-        type: 'intermediate',
-        confidence: 0.6,
-        confidenceLabel: 'expert equivalence',
-        details: 'When can AI autonomously design novel pathogens? Currently: assists but doesn\'t exceed human experts (~60%).',
-        relatedConcepts: ['Biology', 'Pathogens', 'Synthesis']
-      }
-    },
-    {
-      id: 'strategic-cap',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Strategic Planning Capability',
-        description: 'Equivalent to % of professional strategists.',
-        type: 'intermediate',
-        confidence: 0.4,
-        confidenceLabel: 'expert equivalence',
-        details: 'Long-horizon, adversarial planning. Determines autonomous operation risk. Currently ~40% of experts.',
-        relatedConcepts: ['Strategy', 'Planning', 'Agency']
-      }
-    },
-    {
-      id: 'misalignment-loss',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Expected Misalignment Loss',
-        description: '$T, conditional on TAI by 2030.',
-        type: 'effect',
-        confidence: 50,
-        confidenceLabel: '$T expected',
-        details: 'What\'s the downside if we get it wrong? Wide distribution: 0.1% think \$0, 20% think &gt;\$100T.',
-        relatedConcepts: ['Loss', 'Damage', 'Cost']
-      }
-    },
-    {
-      id: 'bio-deaths',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Expected Bio Deaths',
-        description: 'Log scale, conditional on release.',
-        type: 'effect',
-        confidence: 5,
-        confidenceLabel: 'log₁₀ deaths',
-        details: 'Quantify worst-case misuse scenario. Could be 10^3 (contained), 10^6 (epidemic), 10^9 (pandemic).',
-        relatedConcepts: ['Bioweapon', 'Pandemic', 'Deaths']
-      }
-    },
-    {
-      id: 'infra-deaths',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Expected Infrastructure Deaths',
-        description: 'Log scale, from AI-caused failures.',
-        type: 'effect',
-        confidence: 4,
-        confidenceLabel: 'log₁₀ deaths',
-        details: 'Cyberattacks on power/water/transport. Could be 10^2 (local) to 10^6 (cascading).',
-        relatedConcepts: ['Infrastructure', 'Cascade', 'Cyber']
-      }
-    }
-  ]}
-  initialEdges={[
-    { id: 'e-gpu-compute', source: 'gpu-growth', target: 'effective-compute', data: { impact: 0.35 } },
-    { id: 'e-cost-compute', source: 'compute-cost', target: 'effective-compute', data: { impact: 0.25 } },
-    { id: 'e-energy-compute', source: 'energy-available', target: 'effective-compute', data: { impact: 0.20 } },
-    { id: 'e-gov-compute', source: 'compute-governance', target: 'effective-compute', data: { impact: 0.20 } },
-    { id: 'e-compute-algo', source: 'effective-compute', target: 'algo-efficiency', data: { impact: 0.40 } },
-    { id: 'e-data-algo', source: 'data-ceiling', target: 'algo-efficiency', data: { impact: 0.30 } },
-    { id: 'e-scaling-algo', source: 'scaling-breakdown', target: 'algo-efficiency', data: { impact: 0.30 } },
-    { id: 'e-algo-postrain', source: 'algo-efficiency', target: 'post-training', data: { impact: 0.50 } },
-    { id: 'e-compute-postrain', source: 'effective-compute', target: 'post-training', data: { impact: 0.30 } },
-    { id: 'e-scaling-postrain', source: 'scaling-breakdown', target: 'post-training', data: { impact: 0.20 } },
-    { id: 'e-postrain-testtime', source: 'post-training', target: 'test-time-compute', data: { impact: 0.60 } },
-    { id: 'e-algo-testtime', source: 'algo-efficiency', target: 'test-time-compute', data: { impact: 0.40 } },
-    { id: 'e-gov-chinagap', source: 'compute-governance', target: 'china-gap', data: { impact: 0.50 } },
-    { id: 'e-gpu-chinagap', source: 'gpu-growth', target: 'china-gap', data: { impact: 0.30 } },
-    { id: 'e-algo-chinagap', source: 'algo-efficiency', target: 'china-gap', data: { impact: 0.20 } },
-    { id: 'e-chinagap-treaty', source: 'china-gap', target: 'us-china-treaty', data: { impact: 0.35 } },
-    { id: 'e-concern-treaty', source: 'public-concern', target: 'us-china-treaty', data: { impact: 0.35 } },
-    { id: 'e-usreg-treaty', source: 'us-regulation', target: 'us-china-treaty', data: { impact: 0.30 } },
-    { id: 'e-concern-usreg', source: 'public-concern', target: 'us-regulation', data: { impact: 0.40 } },
-    { id: 'e-warning-concern', source: 'warning-shot', target: 'public-concern', data: { impact: 0.50 } },
-    { id: 'e-econ-concern', source: 'economic-value', target: 'public-concern', data: { impact: 0.30 } },
-    { id: 'e-cyber-concern', source: 'cyber-cap', target: 'public-concern', data: { impact: 0.20 } },
-    { id: 'e-usreg-labcoord', source: 'us-regulation', target: 'lab-coordination', data: { impact: 0.40 } },
-    { id: 'e-concern-labcoord', source: 'public-concern', target: 'lab-coordination', data: { impact: 0.35 } },
-    { id: 'e-leadtime-labcoord', source: 'lab-lead-time', target: 'lab-coordination', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-gov-monitoring', source: 'compute-governance', target: 'compute-monitoring', data: { impact: 0.50 } },
-    { id: 'e-usreg-monitoring', source: 'us-regulation', target: 'compute-monitoring', data: { impact: 0.30 } },
-    { id: 'e-treaty-monitoring', source: 'us-china-treaty', target: 'compute-monitoring', data: { impact: 0.20 } },
-    { id: 'e-econ-wta', source: 'economic-value', target: 'winner-take-all', data: { impact: 0.50 } },
-    { id: 'e-algo-wta', source: 'algo-efficiency', target: 'winner-take-all', data: { impact: 0.30 } },
-    { id: 'e-compute-wta', source: 'effective-compute', target: 'winner-take-all', data: { impact: 0.20 } },
-    { id: 'e-wta-leadtime', source: 'winner-take-all', target: 'lab-lead-time', data: { impact: 0.40 } },
-    { id: 'e-compute-leadtime', source: 'effective-compute', target: 'lab-lead-time', data: { impact: 0.35 } },
-    { id: 'e-algo-leadtime', source: 'algo-efficiency', target: 'lab-lead-time', data: { impact: 0.25 } },
-    { id: 'e-leadtime-opensource', source: 'lab-lead-time', target: 'open-source-lag', data: { impact: 0.40 } },
-    { id: 'e-algo-opensource', source: 'algo-efficiency', target: 'open-source-lag', data: { impact: 0.35 } },
-    { id: 'e-usreg-opensource', source: 'us-regulation', target: 'open-source-lag', data: { impact: 0.25 } },
-    { id: 'e-safetyfund-interp', source: 'safety-funding-ratio', target: 'interp-progress', data: { impact: 0.40 } },
-    { id: 'e-talent-interp', source: 'safety-talent', target: 'interp-progress', data: { impact: 0.40 } },
-    { id: 'e-algo-interp', source: 'algo-efficiency', target: 'interp-progress', data: { impact: 0.20 } },
-    { id: 'e-interp-detection', source: 'interp-progress', target: 'deception-detection', data: { impact: 0.50 } },
-    { id: 'e-talent-detection', source: 'safety-talent', target: 'deception-detection', data: { impact: 0.30 } },
-    { id: 'e-safetyfund-detection', source: 'safety-funding-ratio', target: 'deception-detection', data: { impact: 0.20 } },
-    { id: 'e-interp-tax', source: 'interp-progress', target: 'alignment-tax', data: { impact: 0.40 } },
-    { id: 'e-algo-tax', source: 'algo-efficiency', target: 'alignment-tax', data: { impact: 0.35 } },
-    { id: 'e-postrain-tax', source: 'post-training', target: 'alignment-tax', data: { impact: 0.25 } },
-    { id: 'e-compute-oversight', source: 'effective-compute', target: 'scalable-oversight', data: { impact: 0.40 } },
-    { id: 'e-talent-oversight', source: 'safety-talent', target: 'scalable-oversight', data: { impact: 0.35 } },
-    { id: 'e-interp-oversight', source: 'interp-progress', target: 'scalable-oversight', data: { impact: 0.25 } },
-    { id: 'e-warning-lag', source: 'warning-shot', target: 'warning-lag', data: { impact: 0.40 } },
-    { id: 'e-concern-lag', source: 'public-concern', target: 'warning-lag', data: { impact: 0.35 } },
-    { id: 'e-usreg-lag', source: 'us-regulation', target: 'warning-lag', data: { impact: 0.25 } },
-    { id: 'e-testtime-rnd', source: 'test-time-compute', target: 'autonomous-rnd', data: { impact: 0.35 } },
-    { id: 'e-algo-rnd', source: 'algo-efficiency', target: 'autonomous-rnd', data: { impact: 0.35 } },
-    { id: 'e-compute-rnd', source: 'effective-compute', target: 'autonomous-rnd', data: { impact: 0.30 } },
-    { id: 'e-testtime-persuasion', source: 'test-time-compute', target: 'persuasion-cap', data: { impact: 0.40 } },
-    { id: 'e-postrain-persuasion', source: 'post-training', target: 'persuasion-cap', data: { impact: 0.35 } },
-    { id: 'e-algo-persuasion', source: 'algo-efficiency', target: 'persuasion-cap', data: { impact: 0.25 } },
-    { id: 'e-algo-cyber', source: 'algo-efficiency', target: 'cyber-cap', data: { impact: 0.40 } },
-    { id: 'e-compute-cyber', source: 'effective-compute', target: 'cyber-cap', data: { impact: 0.35 } },
-    { id: 'e-opensource-cyber', source: 'open-source-lag', target: 'cyber-cap', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-algo-bio', source: 'algo-efficiency', target: 'bio-cap', data: { impact: 0.40 } },
-    { id: 'e-testtime-bio', source: 'test-time-compute', target: 'bio-cap', data: { impact: 0.35 } },
-    { id: 'e-data-bio', source: 'data-ceiling', target: 'bio-cap', data: { impact: 0.25 } },
-    { id: 'e-testtime-strategic', source: 'test-time-compute', target: 'strategic-cap', data: { impact: 0.40 } },
-    { id: 'e-rnd-strategic', source: 'autonomous-rnd', target: 'strategic-cap', data: { impact: 0.35 } },
-    { id: 'e-algo-strategic', source: 'algo-efficiency', target: 'strategic-cap', data: { impact: 0.25 } },
-    { id: 'e-rnd-loss', source: 'autonomous-rnd', target: 'misalignment-loss', data: { impact: 0.25 } },
-    { id: 'e-detection-loss', source: 'deception-detection', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-oversight-loss', source: 'scalable-oversight', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-tax-loss', source: 'alignment-tax', target: 'misalignment-loss', data: { impact: 0.25 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-bio-deaths', source: 'bio-cap', target: 'bio-deaths', data: { impact: 0.50 } },
-    { id: 'e-opensource-biodeaths', source: 'open-source-lag', target: 'bio-deaths', data: { impact: 0.30 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-monitoring-biodeaths', source: 'compute-monitoring', target: 'bio-deaths', data: { impact: 0.20 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-cyber-infra', source: 'cyber-cap', target: 'infra-deaths', data: { impact: 0.50 } },
-    { id: 'e-opensource-infra', source: 'open-source-lag', target: 'infra-deaths', data: { impact: 0.30 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-monitoring-infra', source: 'compute-monitoring', target: 'infra-deaths', data: { impact: 0.20 }, style: { strokeDasharray: '5,5' } }
-  ]}
-/>
-</div>
+<Mermaid chart={`flowchart TD
+    subgraph HW["Hardware & Compute"]
+        GPU["GPU Production Growth<br/>2x every 2.5 years"]
+        COST["Compute Cost<br/>-50%/year"]
+        ENERGY["Energy for AI<br/>~50 TWh/year"]
+        COMPUTE["Effective Compute<br/>~10^25 FLOP"]
+    end
+
+    subgraph ALGO["Algorithms & Scaling"]
+        SCALING["Scaling Law Breakdown<br/>~10^28 FLOP?"]
+        DATA["Data Quality Ceiling<br/>40% remaining"]
+        ALGOEFF["Algorithmic Efficiency<br/>2x every 16 months"]
+        TESTTIME["Test-Time Compute<br/>+40% per 10x"]
+    end
+
+    subgraph SAFETY["Safety Research"]
+        FUNDING["Safety Funding Ratio<br/>~1:33"]
+        INTERP["Interpretability<br/>~5% explained"]
+        DECEPTION["Deception Detection<br/>~30% rate"]
+        OVERSIGHT["Scalable Oversight<br/>limit ~10^27 FLOP"]
+    end
+
+    subgraph GOV["Governance"]
+        USREG["US Regulation<br/>3/10 stringency"]
+        TREATY["US-China Coordination<br/>~10% P by 2030"]
+        CONCERN["Public AI Concern<br/>~25%"]
+        MONITORING["Compute Monitoring<br/>~20% tracked"]
+    end
+
+    subgraph CAPS["Dangerous Capabilities"]
+        AUTORND["Autonomous AI R&D<br/>~3 years away"]
+        CYBER["Cyber Offense<br/>30% infra vulnerable"]
+        BIO["Bioweapon Design<br/>60% expert-equiv"]
+    end
+
+    subgraph OUTCOMES["Risk Outcomes"]
+        LOSS["Misalignment Loss<br/>expected ~\\$50T"]
+        BIODEATHS["Bio Deaths<br/>10^3 to 10^9"]
+        INFRADEATHS["Infrastructure Deaths<br/>10^2 to 10^6"]
+    end
+
+    GPU --> COMPUTE
+    COST --> COMPUTE
+    ENERGY --> COMPUTE
+
+    COMPUTE --> ALGOEFF
+    SCALING --> ALGOEFF
+    DATA --> ALGOEFF
+    ALGOEFF --> TESTTIME
+
+    COMPUTE --> AUTORND
+    TESTTIME --> AUTORND
+    ALGOEFF --> AUTORND
+
+    ALGOEFF --> CYBER
+    TESTTIME --> BIO
+    ALGOEFF --> BIO
+
+    CONCERN --> USREG
+    USREG --> TREATY
+    USREG --> MONITORING
+
+    FUNDING --> INTERP
+    INTERP --> DECEPTION
+    INTERP --> OVERSIGHT
+
+    AUTORND --> LOSS
+    DECEPTION -.-> LOSS
+    OVERSIGHT -.-> LOSS
+    CYBER --> INFRADEATHS
+    BIO --> BIODEATHS
+    MONITORING -.-> BIODEATHS
+
+    style GPU fill:#e1f5fe
+    style COST fill:#e1f5fe
+    style ENERGY fill:#e1f5fe
+    style COMPUTE fill:#e1f5fe
+    style SCALING fill:#bbdefb
+    style DATA fill:#bbdefb
+    style ALGOEFF fill:#bbdefb
+    style TESTTIME fill:#bbdefb
+    style FUNDING fill:#c8e6c9
+    style INTERP fill:#c8e6c9
+    style DECEPTION fill:#c8e6c9
+    style OVERSIGHT fill:#c8e6c9
+    style USREG fill:#e8f5e9
+    style TREATY fill:#e8f5e9
+    style CONCERN fill:#e8f5e9
+    style MONITORING fill:#e8f5e9
+    style AUTORND fill:#fff3e0
+    style CYBER fill:#fff3e0
+    style BIO fill:#fff3e0
+    style LOSS fill:#ffcdd2
+    style BIODEATHS fill:#ffcdd2
+    style INFRADEATHS fill:#ffcdd2
+`} />
 
 ---
 

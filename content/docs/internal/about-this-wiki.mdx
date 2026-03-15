@@ -198,24 +198,6 @@ Flowcharts, sequences, and graphs for static illustrations:
 
 **See <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> for guidelines.**
 
-### Cause-Effect Graphs
-
-Interactive causal diagrams using ReactFlow for complex causal models:
-
-```mdx
-import {CauseEffectGraph} from '@components/CauseEffectGraph';
-
-<CauseEffectGraph
-  initialNodes={graphNodes}
-  initialEdges={graphEdges}
-  selectedNodeId="current-factor"
-/>
-```
-
-Features: zoom, pan, minimap, node highlighting, path tracing, entity linking.
-
-**See <EntityLink id="E758" name="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> for schema and examples.**
-
 ---
 
 ## Automation Tools
@@ -273,7 +255,6 @@ The validation suite includes 20+ rules:
 | **Components** | React 19 |
 | **Styling** | Tailwind CSS 4 |
 | **Type Safety** | TypeScript + Zod schemas |
-| **Graphs** | ReactFlow (XYFlow) + Dagre/ELK layout |
 | **Diagrams** | Mermaid 11 |
 | **Math** | KaTeX |
 | **Data** | YAML sources → JSON build artifacts |
@@ -289,7 +270,6 @@ apps/longterm/
 │   │   └── internal/           # Contributor docs and style guides
 │   ├── components/
 │   │   ├── wiki/               # 50+ content components
-│   │   ├── CauseEffectGraph/   # Interactive graph system
 │   │   └── ui/                 # shadcn components
 │   ├── data/
 │   │   ├── *.yaml              # Source data files
@@ -368,6 +348,5 @@ npm run validate         # Full validation
 - <EntityLink id="E741" name="rating-system">Rating System</EntityLink> — Quality scoring system
 - <EntityLink id="E759" name="content-database">Content Database</EntityLink> — Storage architecture (PostgreSQL, caching, YAML)
 - <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> — All scripts and workflows
-- <EntityLink id="E758" name="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> — Graph schema and examples
 - <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> — Diagram guidelines
 - <EntityLink id="E760" name="documentation-maintenance">Documentation Maintenance</EntityLink> — Keeping docs updated

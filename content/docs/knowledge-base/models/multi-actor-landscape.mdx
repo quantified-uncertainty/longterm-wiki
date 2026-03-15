@@ -24,352 +24,74 @@ todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
 tableOfContents: false
 ---
-import CauseEffectGraph from '@components/CauseEffectGraph';
 import {Mermaid, R, EntityLink} from '@components/wiki';
 
 **Core thesis**: Risk is primarily determined by which actors develop TAI and their incentive structures. The strategic landscape of competition and cooperation shapes outcomes.
 
-<div class="breakout">
-<CauseEffectGraph
-  height={950}
-  fitViewPadding={0.05}
-  initialNodes={[
-    {
-      id: 'us-labs',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'US Lab Capability',
-        description: 'Aggregate capability of leading US AI labs.',
-        type: 'cause',
-        confidence: 0.85,
-        confidenceLabel: 'vs frontier',
-        details: 'OpenAI, Anthropic, Google DeepMind, Meta AI. Currently at frontier (~0.85 of theoretical max).',
-        relatedConcepts: ['OpenAI', 'Anthropic', 'Google', 'Meta']
-      }
-    },
-    {
-      id: 'china-labs',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'China Lab Capability',
-        description: 'Aggregate capability of leading Chinese AI labs.',
-        type: 'cause',
-        confidence: 0.65,
-        confidenceLabel: 'vs frontier',
-        details: 'ByteDance, Baidu, Alibaba, DeepSeek, etc. Currently ~0.65 of US frontier.',
-        relatedConcepts: ['DeepSeek', 'Baidu', 'Alibaba', 'ByteDance']
-      }
-    },
-    {
-      id: 'opensource',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Open-Source Capability',
-        description: 'Best freely available AI models.',
-        type: 'cause',
-        confidence: 0.55,
-        confidenceLabel: 'vs frontier',
-        details: 'Llama, Mistral, etc. Currently ~0.55 of frontier, closing gap rapidly.',
-        relatedConcepts: ['Llama', 'Mistral', 'Hugging Face', 'Open weights']
-      }
-    },
-    {
-      id: 'malicious-access',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Malicious Actor Access',
-        description: 'AI capability available to bad actors.',
-        type: 'cause',
-        confidence: 0.4,
-        confidenceLabel: 'vs frontier',
-        details: 'Criminals, terrorists, rogue states. Access through open-source, theft, or APIs. Currently ~0.4 of frontier.',
-        relatedConcepts: ['Cybercrime', 'Terrorism', 'Rogue states']
-      }
-    },
-    {
-      id: 'us-china-competition',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'US-China Competition',
-        description: 'Intensity of strategic AI competition.',
-        type: 'cause',
-        confidence: 0.75,
-        confidenceLabel: 'intensity (0-1)',
-        details: 'Geopolitical rivalry driving AI race. Currently high (~0.75). Affects safety investment.',
-        relatedConcepts: ['Decoupling', 'Chip war', 'Tech rivalry']
-      }
-    },
-    {
-      id: 'profit-pressure',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Profit Pressure',
-        description: 'Corporate pressure to monetize AI.',
-        type: 'cause',
-        confidence: 0.8,
-        confidenceLabel: 'intensity (0-1)',
-        details: 'Investor pressure, revenue targets, market share. Very high (~0.8). Drives deployment speed.',
-        relatedConcepts: ['Investors', 'Revenue', 'Market share']
-      }
-    },
-    {
-      id: 'democratic-oversight',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Democratic Oversight',
-        description: 'Strength of democratic accountability over AI.',
-        type: 'cause',
-        confidence: 0.35,
-        confidenceLabel: 'strength (0-1)',
-        details: 'Congressional oversight, public input, transparency requirements. Currently weak (~0.35).',
-        relatedConcepts: ['Congress', 'FOIA', 'Public comment']
-      }
-    },
-    {
-      id: 'authoritarian-control',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Authoritarian AI Goals',
-        description: 'Intensity of authoritarian control objectives.',
-        type: 'cause',
-        confidence: 0.7,
-        confidenceLabel: 'intensity (0-1)',
-        details: 'Surveillance, censorship, control priorities. China: ~0.7. Shapes AI development direction.',
-        relatedConcepts: ['Surveillance', 'Censorship', 'Social credit']
-      }
-    },
-    {
-      id: 'transparency',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Capability Transparency',
-        description: 'Honesty about AI capabilities.',
-        type: 'cause',
-        confidence: 0.4,
-        confidenceLabel: 'level (0-1)',
-        details: 'How much do labs reveal about capabilities? Currently ~0.4 (moderate secrecy).',
-        relatedConcepts: ['Model cards', 'Evals', 'Disclosure']
-      }
-    },
-    {
-      id: 'safety-sharing',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Safety Research Sharing',
-        description: 'How much safety research is shared.',
-        type: 'cause',
-        confidence: 0.6,
-        confidenceLabel: 'openness (0-1)',
-        details: 'Alignment research, red-teaming results. Currently ~0.6 (fairly open).',
-        relatedConcepts: ['Publications', 'Alignment Forum', 'Conferences']
-      }
-    },
-    {
-      id: 'us-alignment',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'US Actor Alignment',
-        description: 'Quality of alignment in US-developed AI.',
-        type: 'intermediate',
-        confidence: 0.5,
-        confidenceLabel: 'quality (0-1)',
-        details: 'How well-aligned are models from US labs? Currently ~0.5 (partial).',
-        relatedConcepts: ['RLHF', 'Constitutional AI', 'Safety teams']
-      }
-    },
-    {
-      id: 'china-alignment',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'China Actor Alignment',
-        description: 'Quality of alignment in Chinese AI.',
-        type: 'intermediate',
-        confidence: 0.35,
-        confidenceLabel: 'quality (0-1)',
-        details: 'Less transparency, different values. Currently ~0.35 (lower than US).',
-        relatedConcepts: ['CCP values', 'Censorship', 'State priorities']
-      }
-    },
-    {
-      id: 'first-mover',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'First-Mover Advantage',
-        description: 'How large is the TAI first-mover advantage?',
-        type: 'intermediate',
-        confidence: 0.7,
-        confidenceLabel: 'magnitude (0-1)',
-        details: 'Winner-take-all dynamics. Currently estimated high (~0.7).',
-        relatedConcepts: ['Decisive advantage', 'Lock-in', 'Monopoly']
-      }
-    },
-    {
-      id: 'multipolar',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Multipolar AI World',
-        description: 'Probability of multiple AI powers.',
-        type: 'intermediate',
-        confidence: 0.55,
-        confidenceLabel: 'probability',
-        details: 'Multiple actors with powerful AI vs. singleton. Currently ~55% multipolar.',
-        relatedConcepts: ['Bipolar', 'Multipolar', 'Singleton']
-      }
-    },
-    {
-      id: 'diffusion-speed',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Technology Diffusion',
-        description: 'How fast do AI capabilities spread?',
-        type: 'intermediate',
-        confidence: 0.7,
-        confidenceLabel: 'speed (0-1)',
-        details: 'Open-source, espionage, independent development. Currently fast (~0.7).',
-        relatedConcepts: ['Proliferation', 'Espionage', 'Reverse engineering']
-      }
-    },
-    {
-      id: 'offense-defense',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Offense-Defense Balance',
-        description: 'Does AI favor offense or defense?',
-        type: 'intermediate',
-        confidence: 0.65,
-        confidenceLabel: 'offense advantage',
-        details: 'Cyber, bio, manipulation. Currently offense-favored (~0.65).',
-        relatedConcepts: ['Cyber offense', 'Defense', 'Asymmetry']
-      }
-    },
-    {
-      id: 'unaligned-singleton',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Unaligned Singleton',
-        description: 'Risk of single unaligned AI dominance.',
-        type: 'intermediate',
-        confidence: 0.08,
-        confidenceLabel: 'expected loss',
-        details: 'One misaligned AI gains decisive advantage.',
-        relatedConcepts: ['Singleton', 'Takeoff', 'Decisive advantage']
-      }
-    },
-    {
-      id: 'multi-agent-conflict',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Multi-Agent Conflict',
-        description: 'Risk from AI systems in conflict.',
-        type: 'intermediate',
-        confidence: 0.06,
-        confidenceLabel: 'expected loss',
-        details: 'Multiple powerful AI systems with conflicting goals.',
-        relatedConcepts: ['AI war', 'Escalation', 'Coordination failure']
-      }
-    },
-    {
-      id: 'authoritarian-lock',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Authoritarian Lock-in',
-        description: 'Risk of permanent authoritarian control via AI.',
-        type: 'intermediate',
-        confidence: 0.05,
-        confidenceLabel: 'expected loss',
-        details: 'AI enables permanent surveillance state or dictatorship.',
-        relatedConcepts: ['Surveillance', 'Totalitarianism', 'Lock-in']
-      }
-    },
-    {
-      id: 'misuse-catastrophe',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Catastrophic Misuse',
-        description: 'Risk of catastrophic intentional misuse.',
-        type: 'intermediate',
-        confidence: 0.07,
-        confidenceLabel: 'expected loss',
-        details: 'Bioweapons, cyberattacks, manipulation at scale.',
-        relatedConcepts: ['Bioweapons', 'Cyber', 'WMD']
-      }
-    },
-    {
-      id: 'total-risk',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Combined X-Risk',
-        description: 'Total existential risk from all pathways.',
-        type: 'effect',
-        confidence: 0.25,
-        confidenceLabel: 'expected loss',
-        details: 'Sum of singleton, conflict, lock-in, and misuse risks.',
-        relatedConcepts: ['P(doom)', 'Existential risk', 'Catastrophe']
-      }
-    }
-  ]}
-  initialEdges={[
-    { id: 'e-us-competition', source: 'us-labs', target: 'us-china-competition', data: { impact: 0.30 } },
-    { id: 'e-china-competition', source: 'china-labs', target: 'us-china-competition', data: { impact: 0.30 } },
-    { id: 'e-us-first', source: 'us-labs', target: 'first-mover', data: { impact: 0.35 } },
-    { id: 'e-china-first', source: 'china-labs', target: 'first-mover', data: { impact: 0.25 } },
-    { id: 'e-competition-first', source: 'us-china-competition', target: 'first-mover', data: { impact: 0.40 } },
-    { id: 'e-opensource-diffusion', source: 'opensource', target: 'diffusion-speed', data: { impact: 0.50 } },
-    { id: 'e-transparency-diffusion', source: 'transparency', target: 'diffusion-speed', data: { impact: 0.25 } },
-    { id: 'e-competition-diffusion', source: 'us-china-competition', target: 'diffusion-speed', data: { impact: 0.25 } },
-    { id: 'e-opensource-malicious', source: 'opensource', target: 'malicious-access', data: { impact: 0.60 } },
-    { id: 'e-diffusion-malicious', source: 'diffusion-speed', target: 'malicious-access', data: { impact: 0.40 } },
-    { id: 'e-us-usalign', source: 'us-labs', target: 'us-alignment', data: { impact: 0.30 } },
-    { id: 'e-democratic-usalign', source: 'democratic-oversight', target: 'us-alignment', data: { impact: 0.25 } },
-    { id: 'e-profit-usalign', source: 'profit-pressure', target: 'us-alignment', data: { impact: 0.25 } },
-    { id: 'e-sharing-usalign', source: 'safety-sharing', target: 'us-alignment', data: { impact: 0.20 } },
-    { id: 'e-china-cnalign', source: 'china-labs', target: 'china-alignment', data: { impact: 0.30 } },
-    { id: 'e-auth-cnalign', source: 'authoritarian-control', target: 'china-alignment', data: { impact: 0.40 } },
-    { id: 'e-sharing-cnalign', source: 'safety-sharing', target: 'china-alignment', data: { impact: 0.30 } },
-    { id: 'e-first-multipolar', source: 'first-mover', target: 'multipolar', data: { impact: 0.50 } },
-    { id: 'e-diffusion-multipolar', source: 'diffusion-speed', target: 'multipolar', data: { impact: 0.50 } },
-    { id: 'e-competition-offense', source: 'us-china-competition', target: 'offense-defense', data: { impact: 0.50 } },
-    { id: 'e-us-offense', source: 'us-labs', target: 'offense-defense', data: { impact: 0.25 } },
-    { id: 'e-china-offense', source: 'china-labs', target: 'offense-defense', data: { impact: 0.25 } },
-    { id: 'e-usalign-singleton', source: 'us-alignment', target: 'unaligned-singleton', data: { impact: 0.35 } },
-    { id: 'e-cnalign-singleton', source: 'china-alignment', target: 'unaligned-singleton', data: { impact: 0.35 } },
-    { id: 'e-first-singleton', source: 'first-mover', target: 'unaligned-singleton', data: { impact: 0.30 } },
-    { id: 'e-multipolar-conflict', source: 'multipolar', target: 'multi-agent-conflict', data: { impact: 0.50 } },
-    { id: 'e-offense-conflict', source: 'offense-defense', target: 'multi-agent-conflict', data: { impact: 0.30 } },
-    { id: 'e-competition-conflict', source: 'us-china-competition', target: 'multi-agent-conflict', data: { impact: 0.20 } },
-    { id: 'e-auth-lock', source: 'authoritarian-control', target: 'authoritarian-lock', data: { impact: 0.50 } },
-    { id: 'e-china-lock', source: 'china-labs', target: 'authoritarian-lock', data: { impact: 0.30 } },
-    { id: 'e-democratic-lock', source: 'democratic-oversight', target: 'authoritarian-lock', data: { impact: 0.20 } },
-    { id: 'e-malicious-misuse', source: 'malicious-access', target: 'misuse-catastrophe', data: { impact: 0.60 } },
-    { id: 'e-offense-misuse', source: 'offense-defense', target: 'misuse-catastrophe', data: { impact: 0.40 } },
-    { id: 'e-singleton-total', source: 'unaligned-singleton', target: 'total-risk', data: { impact: 0.30 } },
-    { id: 'e-conflict-total', source: 'multi-agent-conflict', target: 'total-risk', data: { impact: 0.25 } },
-    { id: 'e-lock-total', source: 'authoritarian-lock', target: 'total-risk', data: { impact: 0.20 } },
-    { id: 'e-misuse-total', source: 'misuse-catastrophe', target: 'total-risk', data: { impact: 0.25 } }
-  ]}
-/>
-</div>
+<Mermaid chart={`
+flowchart TD
+    subgraph Actors["Key Actors"]
+        USL["US Frontier Labs<br/>~100% capability"]
+        CNL["Chinese Labs<br/>~98% capability"]
+        OSS["Open-Source Models<br/>~98% capability"]
+        MAL["Malicious Actors<br/>~40-60% capability"]
+    end
+
+    subgraph Pressures["Competitive Pressures"]
+        COMP["US-China Competition<br/>intensity: 0.75"]
+        PROFIT["Profit Pressure<br/>intensity: 0.80"]
+        AUTH["Authoritarian Goals<br/>intensity: 0.70"]
+    end
+
+    subgraph Dynamics["Strategic Dynamics"]
+        FMA["First-Mover Advantage"]
+        DIFF["Technology Diffusion"]
+        ALIGN_US["US Alignment Quality"]
+        ALIGN_CN["China Alignment Quality"]
+        MULTI["Multipolar vs Singleton"]
+        OFFENSE["Offense-Defense Balance"]
+    end
+
+    subgraph Risks["Risk Pathways"]
+        SING["Unaligned Singleton<br/>8%"]
+        CONFLICT["Multi-Agent Conflict<br/>6%"]
+        LOCK["Authoritarian Lock-in<br/>5%"]
+        MISUSE["Catastrophic Misuse<br/>7%"]
+    end
+
+    TOTAL["Combined X-Risk ~25%"]
+
+    USL --> COMP
+    CNL --> COMP
+    COMP --> FMA
+    USL --> FMA
+    OSS --> DIFF
+    DIFF --> MAL
+    PROFIT --> ALIGN_US
+    AUTH --> ALIGN_CN
+    FMA --> MULTI
+    DIFF --> MULTI
+    COMP --> OFFENSE
+
+    ALIGN_US --> SING
+    ALIGN_CN --> SING
+    FMA --> SING
+    MULTI --> CONFLICT
+    OFFENSE --> CONFLICT
+    AUTH --> LOCK
+    MAL --> MISUSE
+    OFFENSE --> MISUSE
+
+    SING --> TOTAL
+    CONFLICT --> TOTAL
+    LOCK --> TOTAL
+    MISUSE --> TOTAL
+
+    style Actors fill:#e6f3ff
+    style Pressures fill:#fff3e6
+    style Dynamics fill:#f0e6ff
+    style Risks fill:#ffe6e6
+`} />
 
 ## Overview
 

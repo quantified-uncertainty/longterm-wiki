@@ -22,7 +22,6 @@ clusters:
   - governance
 tableOfContents: false
 ---
-import CauseEffectGraph from '@components/CauseEffectGraph';
 import { Mermaid, EntityLink } from '@components/wiki';
 
 ## Overview
@@ -35,385 +34,68 @@ The central question is whether society can build adequate response capacity bef
 
 **Core thesis**: Institutional capacity, public opinion, and coordination mechanisms are decisive for AI outcomes.
 
-<div class="breakout">
-<CauseEffectGraph
-  height={1000}
-  fitViewPadding={0.05}
-  initialNodes={[
-    {
-      id: 'accidents',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'AI Accident Rate',
-        description: 'Frequency of visible AI failures.',
-        type: 'cause',
-        confidence: 0.3,
-        confidenceLabel: 'per year (normalized)',
-        details: 'Near-misses, public failures, harm incidents. Currently ~0.3 serious incidents per year. Rising with deployment.',
-        relatedConcepts: ['Near miss', 'Incident', 'Harm']
-      }
-    },
-    {
-      id: 'expert-warnings',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Expert Warning Strength',
-        description: 'Consensus and visibility of expert concerns.',
-        type: 'cause',
-        confidence: 0.6,
-        confidenceLabel: 'strength (0-1)',
-        details: 'Hinton, Bengio, safety researchers. Currently ~0.6 consensus on significant risk.',
-        relatedConcepts: ['Hinton', 'Bengio', 'Open letter']
-      }
-    },
-    {
-      id: 'media-coverage',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Media Coverage',
-        description: 'Intensity and accuracy of AI risk coverage.',
-        type: 'cause',
-        confidence: 0.5,
-        confidenceLabel: 'quality (0-1)',
-        details: 'Mix of hype and substance. Currently ~0.5 quality. Drives public opinion.',
-        relatedConcepts: ['Journalism', 'Hype', 'Coverage']
-      }
-    },
-    {
-      id: 'economic-disruption',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Economic Disruption',
-        description: 'Rate of AI-caused job displacement.',
-        type: 'cause',
-        confidence: 0.15,
-        confidenceLabel: 'workforce/year',
-        details: 'Currently ~15% of workforce facing significant change. Accelerating.',
-        relatedConcepts: ['Automation', 'Jobs', 'Displacement']
-      }
-    },
-    {
-      id: 'public-concern',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Public Concern',
-        description: 'Level of public worry about AI.',
-        type: 'intermediate',
-        confidence: 0.45,
-        confidenceLabel: 'level (0-1)',
-        details: 'Polls show ~45% concerned about AI risks. Rising but not dominant issue.',
-        relatedConcepts: ['Polling', 'Concern', 'Awareness']
-      }
-    },
-    {
-      id: 'trust-tech',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Trust in Tech Companies',
-        description: 'Public trust in AI developers.',
-        type: 'cause',
-        confidence: 0.35,
-        confidenceLabel: 'trust level (0-1)',
-        details: 'Declining after various scandals. Currently ~35%. Affects regulation demands.',
-        relatedConcepts: ['Big Tech', 'Trust', 'Reputation']
-      }
-    },
-    {
-      id: 'trust-gov',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Trust in Government',
-        description: 'Public trust in government AI regulation.',
-        type: 'cause',
-        confidence: 0.3,
-        confidenceLabel: 'trust level (0-1)',
-        details: 'Low trust in government competence on tech. ~30%.',
-        relatedConcepts: ['Government', 'Regulation', 'Competence']
-      }
-    },
-    {
-      id: 'polarization',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Political Polarization',
-        description: 'Partisan divide on AI policy.',
-        type: 'cause',
-        confidence: 0.4,
-        confidenceLabel: 'level (0-1)',
-        details: 'AI becoming partisan issue. Currently ~0.4 polarization. Hampers coordination.',
-        relatedConcepts: ['Partisanship', 'Divide', 'Politics']
-      }
-    },
-    {
-      id: 'gov-understanding',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Government AI Understanding',
-        description: 'Quality of policymaker AI knowledge.',
-        type: 'cause',
-        confidence: 0.25,
-        confidenceLabel: 'quality (0-1)',
-        details: 'Most legislators have poor AI understanding. ~25% adequate.',
-        relatedConcepts: ['Congress', 'Expertise', 'Policy']
-      }
-    },
-    {
-      id: 'legislative-speed',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Legislative Speed',
-        description: 'How fast can AI laws pass?',
-        type: 'cause',
-        confidence: 24,
-        confidenceLabel: 'months (median)',
-        details: 'Major AI legislation takes ~24 months. Tech moves faster.',
-        relatedConcepts: ['Congress', 'Bills', 'Timeline']
-      }
-    },
-    {
-      id: 'regulatory-capacity',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Regulatory Capacity',
-        description: 'Agency ability to regulate AI.',
-        type: 'cause',
-        confidence: 0.2,
-        confidenceLabel: 'capacity (0-1)',
-        details: 'FTC, NIST, etc. severely understaffed and underfunded. ~20% capacity.',
-        relatedConcepts: ['FTC', 'NIST', 'Agencies']
-      }
-    },
-    {
-      id: 'institutional-response',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Institutional Response',
-        description: 'Overall government/institutional capacity.',
-        type: 'intermediate',
-        confidence: 0.25,
-        confidenceLabel: 'adequacy (0-1)',
-        details: 'Combined legislative, regulatory, and advisory capacity. Currently weak (~25%).',
-        relatedConcepts: ['Government', 'Institutions', 'Capacity']
-      }
-    },
-    {
-      id: 'industry-self-reg',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Industry Self-Regulation',
-        description: 'Voluntary safety commitments.',
-        type: 'cause',
-        confidence: 0.35,
-        confidenceLabel: 'strength (0-1)',
-        details: 'White House commitments, RSPs. Currently ~35% effective. Mixed incentives.',
-        relatedConcepts: ['Voluntary', 'RSPs', 'Commitments']
-      }
-    },
-    {
-      id: 'safety-pipeline',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Safety Researcher Pipeline',
-        description: 'Flow of talent into AI safety.',
-        type: 'cause',
-        confidence: 500,
-        confidenceLabel: 'new researchers/year',
-        details: 'Growing but small. ~500 new serious safety researchers per year globally.',
-        relatedConcepts: ['Talent', 'Training', 'Careers']
-      }
-    },
-    {
-      id: 'safety-funding',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Safety Research Funding',
-        description: 'Resources for alignment research.',
-        type: 'cause',
-        confidence: 1,
-        confidenceLabel: '$B/year',
-        details: 'Currently ≈\$1B/year total. Small vs capabilities investment.',
-        relatedConcepts: ['Funding', 'Grants', 'Investment']
-      }
-    },
-    {
-      id: 'research-ecosystem',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Research Ecosystem',
-        description: 'Overall health of safety research.',
-        type: 'intermediate',
-        confidence: 0.35,
-        confidenceLabel: 'health (0-1)',
-        details: 'Talent + funding + collaboration. Currently ~35% of needed capacity.',
-        relatedConcepts: ['Research', 'Academia', 'Labs']
-      }
-    },
-    {
-      id: 'retraining',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Workforce Retraining',
-        description: 'Effectiveness of job transition programs.',
-        type: 'cause',
-        confidence: 0.2,
-        confidenceLabel: 'effectiveness (0-1)',
-        details: 'Current retraining programs reach ~20% of displaced workers effectively.',
-        relatedConcepts: ['Training', 'Jobs', 'Transition']
-      }
-    },
-    {
-      id: 'inequality',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Wealth Inequality',
-        description: 'AI-driven concentration of wealth.',
-        type: 'intermediate',
-        confidence: 0.6,
-        confidenceLabel: 'trajectory (0=flat, 1=extreme)',
-        details: 'AI accelerating inequality. Currently on ~0.6 trajectory toward concentration.',
-        relatedConcepts: ['Inequality', 'Concentration', 'Distribution']
-      }
-    },
-    {
-      id: 'political-stability',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Political Stability',
-        description: 'Stability of democratic governance.',
-        type: 'intermediate',
-        confidence: 0.6,
-        confidenceLabel: 'stability (0-1)',
-        details: 'Disruption strains democracy. Currently ~0.6 stable but declining.',
-        relatedConcepts: ['Democracy', 'Stability', 'Governance']
-      }
-    },
-    {
-      id: 'coordination-mech',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Coordination Mechanisms',
-        description: 'Tools for collective action on AI.',
-        type: 'intermediate',
-        confidence: 0.3,
-        confidenceLabel: 'effectiveness (0-1)',
-        details: 'Info sharing, voluntary commitments, auditing. Currently ~30% effective.',
-        relatedConcepts: ['Coordination', 'Commitments', 'Sharing']
-      }
-    },
-    {
-      id: 'pause-likelihood',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Pause/Slowdown Likelihood',
-        description: 'Probability of major development pause.',
-        type: 'intermediate',
-        confidence: 0.15,
-        confidenceLabel: 'probability',
-        details: 'Voluntary or mandated pause on frontier development. Currently ~15%.',
-        relatedConcepts: ['Pause', 'Moratorium', 'Slowdown']
-      }
-    },
-    {
-      id: 'governance-adequacy',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Governance Adequacy',
-        description: 'Is governance sufficient for safe AI?',
-        type: 'intermediate',
-        confidence: 0.25,
-        confidenceLabel: 'adequacy (0-1)',
-        details: 'Combined institutional response, coordination, and enforcement. Currently ~25%.',
-        relatedConcepts: ['Governance', 'Regulation', 'Coordination']
-      }
-    },
-    {
-      id: 'civilizational-resilience',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Civilizational Resilience',
-        description: 'Ability to recover from AI shocks.',
-        type: 'intermediate',
-        confidence: 0.5,
-        confidenceLabel: 'resilience (0-1)',
-        details: 'Economic, political, social capacity to absorb disruption. Currently ~0.5.',
-        relatedConcepts: ['Resilience', 'Recovery', 'Adaptation']
-      }
-    },
-    {
-      id: 'existential-safety',
-      type: 'causeEffect',
-      position: { x: 0, y: 0 },
-      data: {
-        label: 'Existential Safety',
-        description: 'Probability of avoiding existential catastrophe.',
-        type: 'effect',
-        confidence: 0.75,
-        confidenceLabel: 'P(safe)',
-        details: 'Combined effect of societal response factors. Currently ~75% safe.',
-        relatedConcepts: ['Safety', 'Survival', 'Success']
-      }
-    }
-  ]}
-  initialEdges={[
-    { id: 'e-accidents-concern', source: 'accidents', target: 'public-concern', data: { impact: 0.30 } },
-    { id: 'e-expert-concern', source: 'expert-warnings', target: 'public-concern', data: { impact: 0.25 } },
-    { id: 'e-media-concern', source: 'media-coverage', target: 'public-concern', data: { impact: 0.25 } },
-    { id: 'e-econ-concern', source: 'economic-disruption', target: 'public-concern', data: { impact: 0.20 } },
-    { id: 'e-trust-tech-concern', source: 'trust-tech', target: 'public-concern', data: { impact: 0.15 }, style: { strokeDasharray: '5,5' } },
-    { id: 'e-gov-inst', source: 'gov-understanding', target: 'institutional-response', data: { impact: 0.25 } },
-    { id: 'e-leg-inst', source: 'legislative-speed', target: 'institutional-response', data: { impact: 0.25 } },
-    { id: 'e-reg-inst', source: 'regulatory-capacity', target: 'institutional-response', data: { impact: 0.30 } },
-    { id: 'e-concern-inst', source: 'public-concern', target: 'institutional-response', data: { impact: 0.20 } },
-    { id: 'e-pipeline-research', source: 'safety-pipeline', target: 'research-ecosystem', data: { impact: 0.50 } },
-    { id: 'e-funding-research', source: 'safety-funding', target: 'research-ecosystem', data: { impact: 0.50 } },
-    { id: 'e-econ-inequality', source: 'economic-disruption', target: 'inequality', data: { impact: 0.50 } },
-    { id: 'e-retrain-inequality', source: 'retraining', target: 'inequality', data: { impact: 0.50 } },
-    { id: 'e-inequality-stability', source: 'inequality', target: 'political-stability', data: { impact: 0.40 } },
-    { id: 'e-polarization-stability', source: 'polarization', target: 'political-stability', data: { impact: 0.35 } },
-    { id: 'e-trust-gov-stability', source: 'trust-gov', target: 'political-stability', data: { impact: 0.25 } },
-    { id: 'e-inst-coord', source: 'institutional-response', target: 'coordination-mech', data: { impact: 0.40 } },
-    { id: 'e-industry-coord', source: 'industry-self-reg', target: 'coordination-mech', data: { impact: 0.35 } },
-    { id: 'e-research-coord', source: 'research-ecosystem', target: 'coordination-mech', data: { impact: 0.25 } },
-    { id: 'e-concern-pause', source: 'public-concern', target: 'pause-likelihood', data: { impact: 0.35 } },
-    { id: 'e-inst-pause', source: 'institutional-response', target: 'pause-likelihood', data: { impact: 0.35 } },
-    { id: 'e-accidents-pause', source: 'accidents', target: 'pause-likelihood', data: { impact: 0.30 } },
-    { id: 'e-inst-gov', source: 'institutional-response', target: 'governance-adequacy', data: { impact: 0.35 } },
-    { id: 'e-coord-gov', source: 'coordination-mech', target: 'governance-adequacy', data: { impact: 0.30 } },
-    { id: 'e-stability-gov', source: 'political-stability', target: 'governance-adequacy', data: { impact: 0.20 } },
-    { id: 'e-pause-gov', source: 'pause-likelihood', target: 'governance-adequacy', data: { impact: 0.15 } },
-    { id: 'e-stability-resilience', source: 'political-stability', target: 'civilizational-resilience', data: { impact: 0.35 } },
-    { id: 'e-inequality-resilience', source: 'inequality', target: 'civilizational-resilience', data: { impact: 0.30 } },
-    { id: 'e-research-resilience', source: 'research-ecosystem', target: 'civilizational-resilience', data: { impact: 0.20 } },
-    { id: 'e-coord-resilience', source: 'coordination-mech', target: 'civilizational-resilience', data: { impact: 0.15 } },
-    { id: 'e-gov-safety', source: 'governance-adequacy', target: 'existential-safety', data: { impact: 0.40 } },
-    { id: 'e-resilience-safety', source: 'civilizational-resilience', target: 'existential-safety', data: { impact: 0.30 } },
-    { id: 'e-research-safety', source: 'research-ecosystem', target: 'existential-safety', data: { impact: 0.30 } }
-  ]}
-/>
-</div>
+<Mermaid chart={`
+flowchart TD
+    subgraph Signals["Early Warning Signals"]
+        ACC["AI Accidents"]
+        EXP["Expert Warnings<br/>consensus: 0.6"]
+        MED["Media Coverage"]
+        ECON["Economic Disruption<br/>15% workforce affected"]
+    end
+
+    subgraph Opinion["Public Opinion"]
+        CONCERN["Public Concern<br/>~50%"]
+        TRUST["Trust in Institutions<br/>30-35%"]
+        POLAR["Political Polarization"]
+    end
+
+    subgraph Institutional["Institutional Capacity"]
+        GOV["Government Understanding<br/>25% adequate"]
+        LEG["Legislative Speed<br/>24+ months"]
+        REG["Regulatory Capacity<br/>20%"]
+        SELF["Industry Self-Regulation<br/>35% effective"]
+    end
+
+    subgraph Research["Research Ecosystem"]
+        PIPE["Safety Pipeline<br/>500 researchers/yr"]
+        FUND["Safety Funding<br/>~\\$1B/yr"]
+    end
+
+    subgraph Outcomes["Response Outcomes"]
+        INST["Institutional Response<br/>25% adequate"]
+        COORD["Coordination<br/>30% effective"]
+        RESIL["Civilizational Resilience"]
+        GOVADQ["Governance Adequacy<br/>25%"]
+    end
+
+    SAFETY["Existential Safety<br/>P safe ~75%"]
+
+    ACC --> CONCERN
+    EXP --> CONCERN
+    MED --> CONCERN
+    ECON --> CONCERN
+    CONCERN --> INST
+    TRUST --> REG
+    POLAR --> LEG
+    GOV --> INST
+    LEG --> INST
+    REG --> INST
+    SELF --> COORD
+    PIPE --> COORD
+    FUND --> COORD
+    INST --> GOVADQ
+    COORD --> GOVADQ
+    ECON --> RESIL
+    POLAR --> RESIL
+    GOVADQ --> SAFETY
+    RESIL --> SAFETY
+
+    style Signals fill:#ffe6cc
+    style Opinion fill:#dae8fc
+    style Institutional fill:#d5e8d4
+    style Research fill:#e1d5e7
+    style Outcomes fill:#f8cecc
+`} />
 
 ## Conceptual Framework
 
