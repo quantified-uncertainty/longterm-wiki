@@ -26,7 +26,7 @@ import {
   ProfileTabs,
   type ProfileTab,
 } from "@/components/directory";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getExpertById, getPublicationsForPerson, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";

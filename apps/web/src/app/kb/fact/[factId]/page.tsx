@@ -13,8 +13,8 @@ import {
 } from "@/data/factbase";
 import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/factbase";
-import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/kb/format";
-import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
+import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
+import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).

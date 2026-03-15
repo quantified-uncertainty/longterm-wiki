@@ -3,7 +3,7 @@
  * Shows org subdivisions with optional team lead resolution to person links.
  */
 import Link from "next/link";
-import { titleCase, formatKBDate } from "@/components/wiki/kb/format";
+import { titleCase, formatKBDate } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";

@@ -23,7 +23,7 @@ import {
   titleCase,
   isUrl,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 // ── Types ──────────────────────────────────────────────────────────────
 

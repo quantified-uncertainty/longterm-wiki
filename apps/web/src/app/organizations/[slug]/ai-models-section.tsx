@@ -5,7 +5,7 @@
 import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
 import { formatCompactNumber } from "@/lib/format-compact";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 

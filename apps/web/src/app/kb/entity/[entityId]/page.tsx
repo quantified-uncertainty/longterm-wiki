@@ -19,7 +19,7 @@ import {
   shortDomain,
   titleCase,
   isUrl,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 import {
   WikiSidebar,

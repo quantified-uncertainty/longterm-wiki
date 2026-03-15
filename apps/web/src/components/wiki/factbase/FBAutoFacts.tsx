@@ -1,7 +1,7 @@
 /**
- * KBAutoFacts -- Auto-rendered KB structured data section for entity pages.
+ * FBAutoFacts -- Auto-rendered factbase structured data section for entity pages.
  *
- * Server component that checks if an entity has substantive KB facts
+ * Server component that checks if an entity has substantive factbase facts
  * (beyond just a description stub) and renders them in a visually rich
  * section with hero stat cards, person cards, funding timeline, and
  * categorized fact tables. Designed to be
@@ -19,10 +19,10 @@ import {
   isFactExpired,
 } from "@data/factbase";
 import type { Fact, Property, RecordEntry, RecordSchema, FieldDef } from "@longterm-wiki/factbase";
-import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/kb/format";
-import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
-import { KBCellValue } from "@components/wiki/kb/KBCellValue";
-import { KBRefLink } from "@components/wiki/kb/KBRefLink";
+import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/factbase/format";
+import { FBFactValueDisplay } from "@components/wiki/factbase/FBFactValueDisplay";
+import { FBCellValue } from "@components/wiki/factbase/FBCellValue";
+import { FBRefLink } from "@components/wiki/factbase/FBRefLink";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { formatAmount } from "@/lib/directory-utils";
 
-interface KBAutoFactsProps {
+interface FBAutoFactsProps {
   /** Page slug / KB entity ID (e.g., "anthropic") */
   entityId: string;
 }
@@ -282,7 +282,7 @@ function StatCard({
         {prop?.name ?? titleCase(propertyId)}
       </div>
       <div className="text-lg font-bold tabular-nums tracking-tight text-foreground">
-        <KBFactValueDisplay fact={fact} property={prop} />
+        <FBFactValueDisplay fact={fact} property={prop} />
       </div>
       {fact.asOf && (
         <div className="text-[10px] text-muted-foreground/50 mt-0.5">
@@ -320,7 +320,7 @@ function PersonCard({ item }: { item: RecordEntry }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
             {personId ? (
-              <KBRefLink id={personId} className="font-semibold text-sm leading-tight text-foreground group-hover:text-primary transition-colors" />
+              <FBRefLink id={personId} className="font-semibold text-sm leading-tight text-foreground group-hover:text-primary transition-colors" />
             ) : (
               <span className="font-semibold text-sm leading-tight">{name}</span>
             )}
@@ -383,7 +383,7 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
       {(leadInvestor || (source && isUrl(source))) && (
         <div className="flex items-baseline gap-2 text-xs text-muted-foreground">
           {leadInvestor && (
-            <span>Led by <KBRefLink id={leadInvestor} /></span>
+            <span>Led by <FBRefLink id={leadInvestor} /></span>
           )}
           {source && isUrl(source) && (
             <a
@@ -495,7 +495,7 @@ function TimeSeriesFactRow({
           {label}
         </td>
         <td className="py-1.5 pr-3 text-sm align-baseline">
-          <KBFactValueDisplay fact={latest.fact} property={prop} />
+          <FBFactValueDisplay fact={latest.fact} property={prop} />
         </td>
         <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
           {formatKBDate(latest.fact.asOf)}
@@ -526,7 +526,7 @@ function TimeSeriesFactRow({
                       {formatKBDate(item.fact.asOf)}
                     </span>
                     <span className="text-foreground/70">
-                      <KBFactValueDisplay fact={item.fact} property={prop} />
+                      <FBFactValueDisplay fact={item.fact} property={prop} />
                     </span>
                     <span className="ml-auto">
                       <SourceCell source={item.fact.source} />
@@ -567,7 +567,7 @@ function SingleFactRow({
         {label}
       </td>
       <td className="py-1.5 pr-3 text-sm align-baseline">
-        <KBFactValueDisplay fact={fact} property={prop} />
+        <FBFactValueDisplay fact={fact} property={prop} />
       </td>
       <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
         {fact.asOf ? formatKBDate(fact.asOf) : ""}
@@ -629,9 +629,9 @@ function RecordCollectionSection({
                     className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
                   >
                     {endpointCols.has(col) && typeof item.fields[col] === "string" ? (
-                      <KBRefLink id={item.fields[col] as string} />
+                      <FBRefLink id={item.fields[col] as string} />
                     ) : (
-                      <KBCellValue
+                      <FBCellValue
                         value={item.fields[col]}
                         fieldName={col}
                         fieldDef={fieldDefs?.[col]}
@@ -650,7 +650,7 @@ function RecordCollectionSection({
 
 // ── Main component ───────────────────────────────────────────────────
 
-export function KBAutoFacts({ entityId }: KBAutoFactsProps) {
+export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
   const allFacts = getKBFacts(entityId);
   const kbEntity = getKBEntity(entityId);
 

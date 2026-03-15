@@ -9,7 +9,7 @@ import {
   titleCase,
   shortDomain,
   isUrl,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import {
   resolveKBSlug,
   getKBEntity,

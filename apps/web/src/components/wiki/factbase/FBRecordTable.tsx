@@ -1,5 +1,5 @@
 /**
- * KBRecordTable — Record collection table for KB data.
+ * FBRecordTable — Record collection table for factbase data.
  *
  * Server component that renders a record collection for a given entity
  * (e.g., funding rounds, key people). Uses the schema to determine field
@@ -7,8 +7,8 @@
  * for USD amounts, and formatted dates.
  *
  * Usage in MDX (entity references use stableIds):
- *   <KBRecordTable entity="mK9pX3rQ7n" collection="funding-rounds" />
- *   <KBRecordTable entity="mK9pX3rQ7n" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
+ *   <FBRecordTable entity="mK9pX3rQ7n" collection="funding-rounds" />
+ *   <FBRecordTable entity="mK9pX3rQ7n" collection="key-persons" columns={["person", "title", "start", "is_founder"]} />
  */
 
 import {
@@ -23,9 +23,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBRecords, getKBRecordSchema } from "@data/factbase";
 import type { RecordEntry } from "@longterm-wiki/factbase";
 import { titleCase } from "./format";
-import { KBCellValue } from "./KBCellValue";
+import { FBCellValue } from "./FBCellValue";
 
-interface KBRecordTableProps {
+interface FBRecordTableProps {
   /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
   entity: string;
   /** Collection name (e.g., "funding-rounds") */
@@ -50,12 +50,12 @@ function resolveColumns(items: RecordEntry[], columns?: string[]): string[] {
   return Array.from(seen);
 }
 
-export function KBRecordTable({
+export function FBRecordTable({
   entity,
   collection,
   title,
   columns,
-}: KBRecordTableProps) {
+}: FBRecordTableProps) {
   const items = getKBRecords(entity, collection);
   const heading = title ?? titleCase(collection);
 
@@ -100,7 +100,7 @@ export function KBRecordTable({
               <TableRow key={item.key}>
                 {cols.map((col) => (
                   <TableCell key={col} className="whitespace-normal">
-                    <KBCellValue
+                    <FBCellValue
                       value={item.fields[col]}
                       fieldName={col}
                       fieldDef={fieldDefs?.[col]}

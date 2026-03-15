@@ -2,7 +2,7 @@ import Image from "next/image";
 import { EntityLink, MultiEntityLinks } from "@/components/wiki/EntityLink";
 import { ResourceLink, R } from "@/components/wiki/ResourceLink";
 import { References } from "@/components/wiki/References";
-import { KBF } from "@/components/wiki/KBF";
+import { FBF } from "@/components/wiki/FBF";
 import { Calc } from "@/components/wiki/Calc";
 import { MermaidDiagram } from "@/components/wiki/MermaidDiagram";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
@@ -19,15 +19,15 @@ import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
-// KB (Knowledge Base) components — typed facts, properties, records
-import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
-import { KBRecordTable } from "@/components/wiki/kb/KBRecordTable";
-import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
-import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
-import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
-import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
-import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
-import { KBCompareTable } from "@/components/wiki/kb/KBCompareTable";
+// FactBase components — typed facts, properties, records
+import { FBFactTable } from "@/components/wiki/factbase/FBFactTable";
+import { FBRecordTable } from "@/components/wiki/factbase/FBRecordTable";
+import { FBFactValue } from "@/components/wiki/factbase/FBFactValue";
+import { FBEntityFacts } from "@/components/wiki/factbase/FBEntityFacts";
+import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
+import { FBEntitySidebar } from "@/components/wiki/factbase/FBEntitySidebar";
+import { FBRefLink } from "@/components/wiki/factbase/FBRefLink";
+import { FBCompareTable } from "@/components/wiki/factbase/FBCompareTable";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -150,7 +150,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ResourceLink,
   R,
   References,
-  KBF,
+  FBF,
+  KBF: FBF, // backwards compat alias
   Calc,
   DataInfoBox,
   Backlinks,
@@ -186,15 +187,24 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Anthropic-specific table
   AnthropicStakeholdersTable,
 
-  // KB (Knowledge Base) — typed facts, record collections, entity data
-  KBFactTable,
-  KBRecordTable,
-  KBFactValue,
-  KBEntityFacts,
-  KBRecordCollection,
-  KBEntitySidebar,
-  KBRefLink,
-  KBCompareTable,
+  // FactBase — typed facts, record collections, entity data
+  FBFactTable,
+  FBRecordTable,
+  FBFactValue,
+  FBEntityFacts,
+  FBRecordCollection,
+  FBEntitySidebar,
+  FBRefLink,
+  FBCompareTable,
+  // Backwards compat aliases (remove after all MDX migrated)
+  KBFactTable: FBFactTable,
+  KBRecordTable: FBRecordTable,
+  KBFactValue: FBFactValue,
+  KBEntityFacts: FBEntityFacts,
+  KBRecordCollection: FBRecordCollection,
+  KBEntitySidebar: FBEntitySidebar,
+  KBRefLink: FBRefLink,
+  KBCompareTable: FBCompareTable,
 
   // Epic tracking
   EpicTracker,

@@ -1,13 +1,13 @@
 /**
- * KBFactTable — Time series fact table for KB data.
+ * FBFactTable — Time series fact table for factbase data.
  *
  * Server component that renders a table of facts for a given entity and property
  * (e.g., revenue over time). Values are formatted using smart unit-aware
  * formatting (e.g., "$850 million") with fallback to property display config.
  *
  * Usage in MDX (entity references use stableIds):
- *   <KBFactTable entity="mK9pX3rQ7n" property="revenue" />
- *   <KBFactTable entity="mK9pX3rQ7n" property="revenue" title="Annual Revenue" />
+ *   <FBFactTable entity="mK9pX3rQ7n" property="revenue" />
+ *   <FBFactTable entity="mK9pX3rQ7n" property="revenue" title="Annual Revenue" />
  */
 
 import {
@@ -21,9 +21,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBProperty, isFactExpired } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain } from "./format";
-import { KBFactValueDisplay } from "./KBFactValueDisplay";
+import { FBFactValueDisplay } from "./FBFactValueDisplay";
 
-interface KBFactTableProps {
+interface FBFactTableProps {
   /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
   entity: string;
   /** KB property ID (e.g., "revenue") */
@@ -34,7 +34,7 @@ interface KBFactTableProps {
   includeExpired?: boolean;
 }
 
-export function KBFactTable({ entity, property, title, includeExpired }: KBFactTableProps) {
+export function FBFactTable({ entity, property, title, includeExpired }: FBFactTableProps) {
   const allFacts = getKBFacts(entity, property);
   const facts = includeExpired ? allFacts : allFacts.filter((f) => !isFactExpired(f));
   const prop = getKBProperty(property);
@@ -78,7 +78,7 @@ export function KBFactTable({ entity, property, title, includeExpired }: KBFactT
                   {formatKBDate(fact.asOf)}
                 </TableCell>
                 <TableCell className="font-medium tabular-nums">
-                  <KBFactValueDisplay fact={fact} property={prop} />
+                  <FBFactValueDisplay fact={fact} property={prop} />
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate">
                   {fact.source ? (

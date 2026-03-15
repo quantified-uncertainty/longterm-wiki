@@ -20,12 +20,12 @@ ratings:
 import { Mermaid } from '@components/wiki';
 
 <Aside type="note" title="Status: Vision Document">
-This is an architecture proposal, not a description of the current system. Some elements have been partially implemented (section-level rewriting, KB fact system, basic citation verification), but the full multi-agent orchestrator has not been built. The KB system (`packages/kb/`) now provides the structured data layer that this architecture assumes as a prerequisite — structured facts in YAML, `<KBF>` for inline values, and `<Calc>` for computed values.
+This is an architecture proposal, not a description of the current system. Some elements have been partially implemented (section-level rewriting, KB fact system, basic citation verification), but the full multi-agent orchestrator has not been built. The KB system (`packages/kb/`) now provides the structured data layer that this architecture assumes as a prerequisite — structured facts in YAML, `<FBF>` for inline values, and `<Calc>` for computed values.
 </Aside>
 
 ## Executive Summary
 
-**See also**: The Claim-First Wiki Architecture proposal (removed) was a companion proposal that inverted the data model, making verified atomic claims the primary artifact. That proposal's structured-data ideas have been partially superseded by the KB system (`packages/kb/`), which provides entity-level structured facts in YAML, the `<KBF>` component for inline fact values, and `<Calc>` for computed values.
+**See also**: The Claim-First Wiki Architecture proposal (removed) was a companion proposal that inverted the data model, making verified atomic claims the primary artifact. That proposal's structured-data ideas have been partially superseded by the KB system (`packages/kb/`), which provides entity-level structured facts in YAML, the `<FBF>` component for inline fact values, and `<Calc>` for computed values.
 
 Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
 
@@ -322,11 +322,11 @@ This is the biggest departure from the current system. Instead of one synthesis 
 
 **Pass E4: Fact Extraction**
 - Input: Draft + existing KB facts
-- Process: Extract key quantitative claims from the page and propose additions to KB facts in `packages/kb/data/things/`. Link computed facts to their source pages via `<KBF>` references.
-- Output: Proposed KB fact entries + draft with `<KBF>` references
+- Process: Extract key quantitative claims from the page and propose additions to KB facts in `packages/kb/data/things/`. Link computed facts to their source pages via `<FBF>` references.
+- Output: Proposed KB fact entries + draft with `<FBF>` references
 - Agent: Enricher
 - Cost: \$0.25
-- **Status**: The KB system now partially serves this role. Structured facts for 360+ entities exist in `packages/kb/data/things/*.yaml`, with properties defined in `packages/kb/data/properties.yaml`. Pages can reference these via `<KBF>` components and `[^kb-factId]` footnotes. The automated extraction pipeline (proposing new facts from page content) has not been built.
+- **Status**: The KB system now partially serves this role. Structured facts for 360+ entities exist in `packages/kb/data/things/*.yaml`, with properties defined in `packages/kb/data/properties.yaml`. Pages can reference these via `<FBF>` components and `[^kb-factId]` footnotes. The automated extraction pipeline (proposing new facts from page content) has not been built.
 
 #### Verification Passes
 
@@ -473,7 +473,7 @@ These summaries can be used by the Writer agent as context when synthesizing con
 
 ### The Vision
 
-**Partial implementation note**: The `<Calc>` and `<KBF>` (KB Fact) components now partially implement the "computation embedding" vision described here. `<KBF>` pulls live values from KB YAML files in `packages/kb/data/things/`, and `<Calc>` computes derived values from those facts. The Squiggle-based uncertainty modeling described below remains aspirational.
+**Partial implementation note**: The `<Calc>` and `<FBF>` (KB Fact) components now partially implement the "computation embedding" vision described here. `<FBF>` pulls live values from KB YAML files in `packages/kb/data/things/`, and `<Calc>` computes derived values from those facts. The Squiggle-based uncertainty modeling described below remains aspirational.
 
 Wiki pages shouldn't just *state* numbers -- they should *compute* them from the knowledge base.
 
@@ -714,7 +714,7 @@ A page with good prose but no diagrams gets diagram tools. A page with bad sourc
 | Module | Purpose | Standalone CLI | Cost |
 |--------|---------|----------------|------|
 | `add-entity-links` | Insert EntityLink components for mentioned entities | `crux enrich entity-links <id>` | \$0.05 (Haiku) |
-| `add-fact-refs` | Wrap hardcoded numbers in `<KBF>` tags referencing KB facts | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
+| `add-fact-refs` | Wrap hardcoded numbers in `<FBF>` tags referencing KB facts | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
 | `add-diagram` | Generate Mermaid diagram for a section | `crux enrich diagram <id>` | \$0.10-0.20 |
 | `add-squiggle` | Add uncertainty modeling for a section | `crux enrich squiggle <id>` | \$0.10-0.20 |
 

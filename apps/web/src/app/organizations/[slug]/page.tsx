@@ -13,7 +13,7 @@ import {
   formatKBDate,
   titleCase,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import Link from "next/link";
 import {

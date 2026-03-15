@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/database";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";

@@ -4,7 +4,7 @@
  */
 import { resolveEntityBySlug, getEntitySlugs } from "@/lib/directory-utils";
 import type { Entity } from "@longterm-wiki/factbase";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import type { RiskEntity } from "@/data/entity-schemas";
 
 /** Resolve a URL slug to a KB risk entity. */

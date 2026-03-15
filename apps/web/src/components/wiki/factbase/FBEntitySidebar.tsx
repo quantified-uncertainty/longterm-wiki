@@ -1,17 +1,18 @@
 /**
- * KBEntitySidebar -- Wikipedia-style infobox for KB entities.
+ * FBEntitySidebar -- Wikipedia-style infobox for factbase entities.
  *
- * Server component that renders a compact sidebar showing key facts about a KB
- * entity. Shows: name, type, founded date, headquarters, latest revenue/valuation,
- * headcount, legal structure, and safety level. Only shows facts that exist.
+ * Server component that renders a compact sidebar showing key facts about a
+ * factbase entity. Shows: name, type, founded date, headquarters, latest
+ * revenue/valuation, headcount, legal structure, and safety level. Only shows
+ * facts that exist.
  *
- * Designed to complement the existing InfoBox component with KB-sourced data,
- * providing a structured data alternative that pulls directly from the knowledge
- * base rather than frontmatter.
+ * Designed to complement the existing InfoBox component with factbase-sourced data,
+ * providing a structured data alternative that pulls directly from the factbase
+ * rather than frontmatter.
  *
  * Usage in MDX:
- *   <KBEntitySidebar entity="anthropic" />
- *   <KBEntitySidebar entity="anthropic" properties={["revenue", "valuation", "headcount"]} />
+ *   <FBEntitySidebar entity="anthropic" />
+ *   <FBEntitySidebar entity="anthropic" properties={["revenue", "valuation", "headcount"]} />
  */
 
 import { cn } from "@/lib/utils";
@@ -19,9 +20,9 @@ import { Card } from "@/components/ui/card";
 import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
-import { KBFactValueDisplay } from "./KBFactValueDisplay";
+import { FBFactValueDisplay } from "./FBFactValueDisplay";
 
-interface KBEntitySidebarProps {
+interface FBEntitySidebarProps {
   /** KB entity ID (e.g., "anthropic") */
   entity: string;
   /** Optional list of property IDs to show (defaults to key properties for the entity type) */
@@ -105,16 +106,16 @@ const DEFAULT_PROPERTIES: Record<string, string[]> = {
   ],
 };
 
-export function KBEntitySidebar({
+export function FBEntitySidebar({
   entity,
   properties,
   title,
   className,
-}: KBEntitySidebarProps) {
+}: FBEntitySidebarProps) {
   const kbEntity = getKBEntity(entity);
   if (!kbEntity) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[KBEntitySidebar] Unknown KB entity: "${entity}"`);
+      console.warn(`[FBEntitySidebar] Unknown factbase entity: "${entity}"`);
     }
     return null;
   }
@@ -183,7 +184,7 @@ export function KBEntitySidebar({
               {property?.name ?? titleCase(propertyId)}
             </span>
             <div className="flex-1 text-xs break-words">
-              <KBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
+              <FBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
               {fact.asOf && (
                 <span className="block text-xs text-muted-foreground/60 mt-0.5">
                   as of {formatKBDate(fact.asOf)}

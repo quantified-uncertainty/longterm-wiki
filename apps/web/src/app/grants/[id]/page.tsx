@@ -17,7 +17,7 @@ import {
   titleCase,
   isUrl,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import { STATUS_COLORS } from "../grants-constants";
 
 // ── Types ──────────────────────────────────────────────────────────────

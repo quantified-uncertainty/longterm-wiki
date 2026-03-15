@@ -11,7 +11,7 @@ import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/database";
 import {
   titleCase,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 // ── Types ──────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 /**
- * KBCompareTable — Cross-entity comparison table for KB data.
+ * FBCompareTable — Cross-entity comparison table for factbase data.
  *
- * Server component that renders a table comparing a single KB property across
+ * Server component that renders a table comparing a single factbase property across
  * multiple entities side-by-side. Supports both latest-value and full time-series
  * modes, determined automatically based on the property's temporal flag.
  *
@@ -11,10 +11,10 @@
  * column is rendered with an optional "as of" date.
  *
  * Usage in MDX:
- *   <KBCompareTable property="revenue" />
- *   <KBCompareTable property="headcount" entities={["anthropic", "openai", "deepmind"]} />
- *   <KBCompareTable property="valuation" title="AI Lab Valuations" />
- *   <KBCompareTable property="revenue" mode="latest" />
+ *   <FBCompareTable property="revenue" />
+ *   <FBCompareTable property="headcount" entities={["anthropic", "openai", "deepmind"]} />
+ *   <FBCompareTable property="valuation" title="AI Lab Valuations" />
+ *   <FBCompareTable property="revenue" mode="latest" />
  */
 
 import {
@@ -35,13 +35,13 @@ import {
 } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, formatKBFactValue, titleCase } from "./format";
-import { KBRefLink } from "./KBRefLink";
+import { FBRefLink } from "./FBRefLink";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type CompareMode = "timeseries" | "latest" | "auto";
 
-interface KBCompareTableProps {
+interface FBCompareTableProps {
   /** KB property ID to compare across entities (e.g., "revenue", "headcount") */
   property: string;
   /**
@@ -71,7 +71,7 @@ function extractYear(asOf: string): string {
 
 /**
  * Given a fact, render its value as a React node.
- * Ref/refs values get KBRefLink; everything else gets the text formatter.
+ * Ref/refs values get FBRefLink; everything else gets the text formatter.
  */
 function FactCellValue({
   fact,
@@ -87,7 +87,7 @@ function FactCellValue({
   const v = fact.value;
 
   if (v.type === "ref") {
-    return <KBRefLink id={v.value} />;
+    return <FBRefLink id={v.value} />;
   }
 
   if (v.type === "refs") {
@@ -95,7 +95,7 @@ function FactCellValue({
       <span className="inline-flex flex-wrap gap-1">
         {v.value.map((refId, i) => (
           <span key={`${refId}-${i}`}>
-            <KBRefLink id={refId} />
+            <FBRefLink id={refId} />
             {i < v.value.length - 1 && (
               <span className="text-muted-foreground">,</span>
             )}
@@ -158,7 +158,7 @@ function TimeSeriesTable({
           return (
             <TableRow key={entityId}>
               <TableCell className="font-medium">
-                <KBRefLink id={entityId} label={name} />
+                <FBRefLink id={entityId} label={name} />
               </TableCell>
               {years.map((year) => {
                 const fact = factsByYear.get(year);
@@ -203,7 +203,7 @@ function LatestValueTable({
         {entityRows.map(({ entityId, name, fact }) => (
           <TableRow key={entityId}>
             <TableCell className="font-medium">
-              <KBRefLink id={entityId} label={name} />
+              <FBRefLink id={entityId} label={name} />
             </TableCell>
             <TableCell className="text-right font-medium">
               {fact ? (
@@ -224,12 +224,12 @@ function LatestValueTable({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function KBCompareTable({
+export function FBCompareTable({
   property: propertyId,
   entities: entityFilter,
   title,
   mode = "auto",
-}: KBCompareTableProps) {
+}: FBCompareTableProps) {
   const prop = getKBProperty(propertyId);
   const heading = title ?? prop?.name ?? titleCase(propertyId);
 

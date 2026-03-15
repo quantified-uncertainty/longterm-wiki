@@ -1,5 +1,5 @@
 /**
- * KBEntityFacts -- Renders all facts for a KB entity, grouped by property category.
+ * FBEntityFacts -- Renders all facts for a factbase entity, grouped by property category.
  *
  * Server component that displays facts organized into sections (financial, people,
  * safety, etc.). Time-series facts (multiple values over time) render as compact
@@ -7,18 +7,18 @@
  * Ref values render as links to the referenced entity page.
  *
  * Usage in MDX:
- *   <KBEntityFacts entity="anthropic" />
- *   <KBEntityFacts entity="anthropic" categories={["financial", "safety"]} />
+ *   <FBEntityFacts entity="anthropic" />
+ *   <FBEntityFacts entity="anthropic" categories={["financial", "safety"]} />
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerification } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
-import { KBFactValueDisplay } from "./KBFactValueDisplay";
+import { FBFactValueDisplay } from "./FBFactValueDisplay";
 import { VerificationDot } from "./VerificationDot";
 
-interface KBEntityFactsProps {
+interface FBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
   entity: string;
   /** Optional filter: only show facts in these categories */
@@ -99,7 +99,7 @@ function TimeSeriesProperty({
                 {formatKBDate(item.fact.asOf)}
               </span>
               <span className="text-sm text-right">
-                <KBFactValueDisplay fact={item.fact} property={prop} />
+                <FBFactValueDisplay fact={item.fact} property={prop} />
               </span>
               {item.fact.source && isUrl(item.fact.source) && (
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
@@ -154,7 +154,7 @@ function SingleValueProperty({
         {label}
       </span>
       <div className="text-sm text-right flex items-center gap-2">
-        <KBFactValueDisplay fact={fact} property={prop} />
+        <FBFactValueDisplay fact={fact} property={prop} />
         {fact.asOf && (
           <span className="text-xs text-muted-foreground/60">
             ({formatKBDate(fact.asOf)})
@@ -185,11 +185,11 @@ function sortCategories(categories: string[]): string[] {
   });
 }
 
-export function KBEntityFacts({
+export function FBEntityFacts({
   entity,
   categories,
   title,
-}: KBEntityFactsProps) {
+}: FBEntityFactsProps) {
   const allFacts = getKBFacts(entity);
   const kbEntity = getKBEntity(entity);
   const allProperties = getKBProperties();

@@ -1,7 +1,7 @@
 /**
- * KBCellValue — Shared cell value renderer for KB table components.
+ * FBCellValue — Shared cell value renderer for factbase table components.
  *
- * Used by both KBRecordTable and KBRecordCollection to render type-aware cell values
+ * Used by both FBRecordTable and FBRecordCollection to render type-aware cell values
  * with consistent formatting. Supports refs, URLs, numbers, dates, and booleans.
  */
 
@@ -13,7 +13,7 @@ import {
   isUrl,
   shortDomain,
 } from "./format";
-import { KBRefLink } from "./KBRefLink";
+import { FBRefLink } from "./FBRefLink";
 
 /** Fields that store fractions (0-1) representing percentages. */
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
@@ -31,13 +31,13 @@ function formatPercent(v: number): string {
   return pct % 1 === 0 ? `${pct}%` : `${pct.toFixed(1)}%`;
 }
 
-interface KBCellValueProps {
+interface FBCellValueProps {
   value: unknown;
   fieldName: string;
   fieldDef?: FieldDef;
 }
 
-export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
+export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground">{"\u2014"}</span>;
   }
@@ -46,7 +46,7 @@ export function KBCellValue({ value, fieldName, fieldDef }: KBCellValueProps) {
 
   // Entity references
   if (fieldType === "ref" && typeof value === "string") {
-    return <KBRefLink id={value} />;
+    return <FBRefLink id={value} />;
   }
 
   // Source / key-publication URLs

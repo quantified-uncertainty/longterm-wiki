@@ -1,5 +1,5 @@
 import { getAllKBRecordEntries, getKBEntity } from "@/data/factbase";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import { KBRecordsTable } from "./kb-records-table";
 
 export interface RecordRow {

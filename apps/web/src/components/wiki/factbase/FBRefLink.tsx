@@ -1,13 +1,13 @@
 /**
- * KBRefLink -- Renders a KB entity reference as a clickable link.
+ * FBRefLink -- Renders a factbase entity reference as a clickable link.
  *
  * Resolves a stableId or slug to the entity's display name and renders an
  * EntityLink. Falls back to a plain text label if the entity is not found
  * in the wiki's entity registry.
  *
  * Usage in MDX:
- *   <KBRefLink id="anthropic" />
- *   <KBRefLink id="mK9pX3rQ7n" />
+ *   <FBRefLink id="anthropic" />
+ *   <FBRefLink id="mK9pX3rQ7n" />
  */
 
 import { cn } from "@lib/utils";
@@ -15,7 +15,7 @@ import { getKBEntity } from "@data/factbase";
 import { getEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
 
-interface KBRefLinkProps {
+interface FBRefLinkProps {
   /** KB entity slug (e.g., "anthropic") or stableId */
   id: string;
   /** Override display label */
@@ -23,7 +23,7 @@ interface KBRefLinkProps {
   className?: string;
 }
 
-export function KBRefLink({ id, label, className }: KBRefLinkProps) {
+export function FBRefLink({ id, label, className }: FBRefLinkProps) {
   const kbEntity = getKBEntity(id);
 
   // Try wiki entity lookup (KB slug or direct id)

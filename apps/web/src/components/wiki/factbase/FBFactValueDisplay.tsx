@@ -1,30 +1,30 @@
 /**
- * KBFactValueDisplay — Shared fact value renderer for KB components.
+ * FBFactValueDisplay — Shared fact value renderer for factbase components.
  *
- * Used by both KBEntityFacts and KBEntitySidebar to render fact values
+ * Used by both FBEntityFacts and FBEntitySidebar to render fact values
  * with consistent handling of refs, ref-lists, and formatted values.
  */
 
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue } from "./format";
-import { KBRefLink } from "./KBRefLink";
+import { FBRefLink } from "./FBRefLink";
 
-interface KBFactValueDisplayProps {
+interface FBFactValueDisplayProps {
   fact: Fact;
   property: Property | undefined;
   className?: string;
 }
 
-export function KBFactValueDisplay({
+export function FBFactValueDisplay({
   fact,
   property,
   className = "font-medium tabular-nums",
-}: KBFactValueDisplayProps) {
+}: FBFactValueDisplayProps) {
   const v = fact.value;
 
   // Ref values link to the entity page
   if (v.type === "ref") {
-    return <KBRefLink id={v.value} />;
+    return <FBRefLink id={v.value} />;
   }
 
   // Refs (plural) render as a comma-separated list of links
@@ -33,7 +33,7 @@ export function KBFactValueDisplay({
       <span className="inline-flex flex-wrap gap-1">
         {v.value.map((refId, i) => (
           <span key={`${refId}-${i}`}>
-            <KBRefLink id={refId} />
+            <FBRefLink id={refId} />
             {i < v.value.length - 1 && (
               <span className="text-muted-foreground">,</span>
             )}

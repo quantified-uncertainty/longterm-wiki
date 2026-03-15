@@ -22,20 +22,20 @@ ratings:
 The canonical facts system lets us store key numbers (valuations, revenue, headcounts) in YAML and reference them across wiki pages. When a number changes, we update one YAML file and every page that references it stays correct.
 
 Two MDX components power this:
-- **`<KBF>`** — display a single KB fact inline (with hover tooltip showing metadata)
+- **`<FBF>`** — display a single KB fact inline (with hover tooltip showing metadata)
 - **`<Calc>`** — compute a derived value from 2+ facts (e.g. revenue multiples, growth rates)
 
 ## Quick Reference
 
 ```jsx
 {/* Simple fact display */}
-<KBF entity="anthropic" property="valuation">$380B</KBF>
+<FBF entity="anthropic" property="valuation">$380B</FBF>
 
 {/* Fact with auto-rendered value (no children needed) */}
-<KBF entity="anthropic" property="valuation" />
+<FBF entity="anthropic" property="valuation" />
 
 {/* Fact with inline date — renders "300,000+ (as of 2025)" */}
-<KBF entity="anthropic" property="business-customers" showDate />
+<FBF entity="anthropic" property="business-customers" showDate />
 
 {/* Computed value from two facts */}
 <Calc expr="{anthropic.valuation} / {anthropic.revenue}" precision={0} suffix="x" />
@@ -71,7 +71,7 @@ Numbers that **change over time** but currently appear on only 1 page.
 | Prediction market probabilities | Change daily |
 | Net cash burn rates | Updated quarterly |
 
-Even on one page, wrapping these in `<KBF>` means the update workflow is "edit KB YAML" not "search through prose."
+Even on one page, wrapping these in `<FBF>` means the update workflow is "edit KB YAML" not "search through prose."
 
 ### Should NOT be facts (Tier 3)
 
@@ -91,21 +91,21 @@ Making these into facts adds overhead with no benefit.
 2. Does it appear on 2+ pages? **Yes** → must be a fact (Tier 1)
 3. Appears on 1 page but will change? **Yes** → should be a fact (Tier 2)
 
-## When to Use `<KBF>` vs `<Calc>`
+## When to Use `<FBF>` vs `<Calc>`
 
-### Use `<KBF>` for single fact display
+### Use `<FBF>` for single fact display
 
-Any time you're showing a stored number — a valuation, revenue figure, headcount, date — use `<KBF>`.
+Any time you're showing a stored number — a valuation, revenue figure, headcount, date — use `<FBF>`.
 
 ```jsx
 {/* With explicit display text */}
-<KBF entity="anthropic" property="valuation">\$380 billion</KBF>
+<FBF entity="anthropic" property="valuation">\$380 billion</FBF>
 
 {/* Auto-display from the fact's value field */}
-<KBF entity="anthropic" property="valuation" />
+<FBF entity="anthropic" property="valuation" />
 
 {/* With inline date for temporal claims */}
-Over <KBF entity="anthropic" property="business-customers" showDate /> business customers
+Over <FBF entity="anthropic" property="business-customers" showDate /> business customers
 {/* Renders: "Over 300,000+ (as of 2025) business customers" */}
 ```
 
@@ -131,14 +131,14 @@ The power: when **either** input fact updates, the derived number auto-updates t
 
 ### Do NOT use `<Calc>` for single values
 
-If you're just displaying one fact with no computation, use `<KBF>`, not `<Calc>`. `<Calc>` is for math, `<KBF>` is for display.
+If you're just displaying one fact with no computation, use `<FBF>`, not `<Calc>`. `<Calc>` is for math, `<FBF>` is for display.
 
 ```jsx
 {/* Wrong — no computation happening */}
 <Calc expr="{anthropic.valuation}" format="currency" />
 
 {/* Right — just display the fact */}
-<KBF entity="anthropic" property="valuation" />
+<FBF entity="anthropic" property="valuation" />
 ```
 
 ### Use plain text for everything else
@@ -216,7 +216,7 @@ born:    !date 2023-06-15  # ✓ { type: "date", value: "2023-06-15" }
 
 1. Add the entry to the appropriate `packages/kb/data/things/<entity>.yaml` file
 2. Run `pnpm build` to rebuild
-3. Reference in MDX with `<KBF entity="entity" property="property" />`
+3. Reference in MDX with `<FBF entity="entity" property="property" />`
 
 ## Updating Facts
 
@@ -225,7 +225,7 @@ When new data arrives:
 1. Edit the YAML file in `packages/kb/data/things/<entity>.yaml`
 2. Add a new entry with updated `value` and `asOf` (keep old entries for historical reference)
 3. Run `pnpm build` to rebuild
-4. Every `<KBF>` and `<Calc>` referencing that property auto-updates
+4. Every `<FBF>` and `<Calc>` referencing that property auto-updates
 
 **Keep old point-in-time facts as separate entries** when pages reference them explicitly:
 
@@ -253,7 +253,7 @@ For entities not yet in KB, `data/facts/*.yaml` remains authoritative. See <Enti
 
 ## Scaling Strategy
 
-Current state: 9+ entity KB YAML files in `packages/kb/data/things/`, 60 properties across the KB schema, ~13 pages actively using `<KBF>` tags. Priority order for expansion:
+Current state: 9+ entity KB YAML files in `packages/kb/data/things/`, 60 properties across the KB schema, ~13 pages actively using `<FBF>` tags. Priority order for expansion:
 
 **Phase 1 — Migrate remaining organizations with old facts files**
 Google DeepMind, Center for AI Safety, Chan Zuckerberg Initiative, and other entities still using `data/facts/*.yaml`. Move their structured data into KB YAML.
@@ -271,13 +271,13 @@ Don't try to fact-ify everything at once. Expand entity-by-entity as pages get c
 ### Valuation with context
 
 ```jsx
-valued at <KBF entity="anthropic" property="valuation" /> in its latest funding round
+valued at <FBF entity="anthropic" property="valuation" /> in its latest funding round
 ```
 
 ### Temporal metric in prose
 
 ```jsx
-Over <KBF entity="anthropic" property="business-customers" showDate /> business customers
+Over <FBF entity="anthropic" property="business-customers" showDate /> business customers
 {/* → "Over 300,000+ (as of 2025) business customers" */}
 ```
 

@@ -35,7 +35,7 @@ import {
   formatKBNumber,
   titleCase,
   sortKBRecords,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import { resolveRecipient } from "./org-shared";
 
 // ── Numeric / range helpers ──────────────────────────────────────────

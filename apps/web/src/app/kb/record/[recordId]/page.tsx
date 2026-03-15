@@ -15,8 +15,8 @@ import {
   titleCase,
   shortDomain,
   isUrl,
-} from "@/components/wiki/kb/format";
-import { KVRow, KVTable } from "@/components/wiki/kb/kb-detail-shared";
+} from "@/components/wiki/factbase/format";
+import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-shared";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~351 pages saved).

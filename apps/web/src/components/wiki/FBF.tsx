@@ -1,41 +1,59 @@
 /**
- * KBFactValue — Inline fact value from KB data.
+ * FBF — Inline factbase fact component for wiki prose.
  *
- * Server component that renders a single fact value inline with a hover tooltip
- * showing metadata (property name, full value, asOf date, source).
+ * Server component that renders a factbase fact value inline with a hover tooltip,
+ * mirroring the pattern of the old <F> component but backed by factbase data.
  *
  * Usage in MDX:
- *   <KBFactValue entity="anthropic" property="revenue" />
- *   <KBFactValue entity="anthropic" property="headquarters" />
- *   <KBFactValue entity="anthropic" property="revenue" asOf="2024-01" />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" showDate />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2025-12" />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue">$19 billion</FBF>
+ *
+ * The entity prop accepts factbase stableIds (preferred, e.g. "mK9pX3rQ7n") or
+ * legacy slugs (e.g. "anthropic") — both are resolved via the factbase data layer.
  */
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/factbase";
+import { getKBFacts, getKBLatest, getKBProperty } from "@data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
-import { CURRENCIES, resolveCurrency } from "@longterm-wiki/factbase/currencies";
-import { formatValue } from "@lib/format-value";
-import { formatKBFactValue, formatKBDate, isUrl } from "./format";
-import { VerificationDot } from "./VerificationDot";
-import styles from "../tooltip.module.css";
+import {
+  formatKBFactValue,
+  formatKBDate,
+  isUrl,
+  shortDomain,
+} from "./factbase/format";
+import styles from "./tooltip.module.css";
 
-interface KBFactValueProps {
-  /** KB thing ID (e.g., "anthropic") */
+interface FBFProps {
+  /** KB entity identifier — stableId (e.g. "mK9pX3rQ7n") or legacy slug (e.g. "anthropic") */
   entity: string;
-  /** KB property ID (e.g., "revenue") */
+  /** KB property ID (like "revenue", "valuation") */
   property: string;
-  /** Specific date to look up (defaults to latest) */
+  /** Show asOf date inline after the value */
+  showDate?: boolean;
+  /** Get value at specific date instead of latest */
   asOf?: string;
+  /** Custom display override (discouraged) */
+  children?: React.ReactNode;
   className?: string;
 }
 
-export function KBFactValue({
+/**
+ * FBF — Inline factbase fact component.
+ *
+ * Renders the latest (or date-specific) fact value from the factbase data layer
+ * with a hover tooltip showing metadata (property name, value, date, source).
+ */
+export function FBF({
   entity,
   property,
+  showDate,
   asOf,
+  children,
   className,
-}: KBFactValueProps) {
+}: FBFProps) {
   const prop = getKBProperty(property);
 
   // Find the right fact: specific asOf or latest
@@ -47,6 +65,7 @@ export function KBFactValue({
     fact = getKBLatest(entity, property);
   }
 
+  // Error state: red badge for missing fact
   if (!fact) {
     return (
       <span
@@ -56,17 +75,32 @@ export function KBFactValue({
         )}
         title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
-        [missing: {entity}.{property}]
+        {children || `[missing: ${entity}.${property}]`}
       </span>
     );
   }
 
-  const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
-  const currencyCode = resolveCurrency(fact.currency, prop?.unit);
-  const propertyName = prop?.name ?? property;
-  const verification = getKBFactVerification(fact.id);
-  const hasMetadata = propertyName || fact.asOf || fact.source;
+  const formattedValue = formatKBFactValue(fact, prop?.unit, prop?.display);
+  const baseValue = children || formattedValue;
 
+  // Inline date display (only when not using children override)
+  const showDateInline = showDate && fact.asOf && !children;
+  const displayValue = showDateInline ? (
+    <>
+      {baseValue}{" "}
+      <span className="text-muted-foreground font-normal">
+        (as of {formatKBDate(fact.asOf!)})
+      </span>
+    </>
+  ) : (
+    baseValue
+  );
+
+  const propertyName = prop?.name ?? property;
+  const hasMetadata =
+    propertyName || fact.asOf || fact.source || fact.notes;
+
+  // No metadata: render plain value
   if (!hasMetadata) {
     return (
       <span
@@ -78,11 +112,12 @@ export function KBFactValue({
     );
   }
 
+  // Full render: value with hover tooltip
   return (
     <span className={styles.wrapper}>
       <span
         className={cn(
-          "inline border-b border-dotted border-muted-foreground/40 cursor-help font-medium",
+          "inline border-b border-dotted border-muted-foreground/40 cursor-help",
           className,
         )}
         data-kb-fact={`${entity}.${property}`}
@@ -97,34 +132,35 @@ export function KBFactValue({
         )}
         role="tooltip"
       >
-        <span className="block text-xs font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+        {/* Property name (uppercase, muted) */}
+        <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
           {propertyName}
         </span>
+
+        {/* Formatted value (bold) */}
         <span className="block font-semibold text-foreground mb-1">
-          {displayValue}
+          {formattedValue}
         </span>
-        {currencyCode !== "USD" && Object.hasOwn(CURRENCIES, currencyCode) && (
-          <span className="block text-muted-foreground">
-            Currency: {CURRENCIES[currencyCode].name} ({currencyCode})
-            {fact.usdEquivalent != null && (
-              <> (~{formatValue(fact.usdEquivalent, "USD")})</>
-            )}
-          </span>
-        )}
+
+        {/* As-of date */}
         {fact.asOf && (
           <span className="block text-muted-foreground">
             As of: {formatKBDate(fact.asOf)}
           </span>
         )}
+
+        {/* Notes */}
         {fact.notes && (
           <span className="block text-muted-foreground mt-1">
             {fact.notes}
           </span>
         )}
+
+        {/* Source (show domain only for URLs, truncated) */}
         {fact.source && (
           <span className="block text-muted-foreground mt-1 truncate">
             {isUrl(fact.source) ? (
-              <span className="inline-flex items-center gap-1">
+              <>
                 Source:{" "}
                 <a
                   href={fact.source}
@@ -132,23 +168,15 @@ export function KBFactValue({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Link
+                  {shortDomain(fact.source)}
                 </a>
-                {verification && <VerificationDot verdict={verification} />}
-              </span>
+              </>
             ) : (
-              <span className="inline-flex items-center gap-1">
-                Source: {fact.source}
-                {verification && <VerificationDot verdict={verification} />}
-              </span>
+              <>Source: {fact.source}</>
             )}
           </span>
         )}
-        {verification && (
-          <span className="block text-muted-foreground/80 mt-0.5">
-            <VerificationDot verdict={verification} showLabel />
-          </span>
-        )}
+
         {/* Fact detail link */}
         <span className="block mt-1.5">
           <Link

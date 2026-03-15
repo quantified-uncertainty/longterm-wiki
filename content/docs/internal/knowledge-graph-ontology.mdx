@@ -1262,7 +1262,7 @@ This eliminates the dual-store problem. The original proposal's distinction betw
 
 ### Phase 3: Extraction and display tooling — COMPLETE
 
-1. ~~Integrate KB facts into wiki pages~~ -- Done: `<KBF>`, `<KBFactValue>`, and `<Calc>` MDX components
+1. ~~Integrate KB facts into wiki pages~~ -- Done: `<FBF>`, `<FBFactValue>`, and `<Calc>` MDX components
 2. ~~Build fact extraction pipeline~~ -- Done: `crux footnotes` commands for migrating claims to KB facts
 3. ~~Validate property constraints and source coverage~~ -- Done: KB validation rules
 
@@ -1286,9 +1286,9 @@ Some original questions have been resolved by KB; others remain open.
 
 2. **~~File granularity.~~** Resolved: One file per entity in `packages/kb/data/things/`. Large entities have many facts in one file, which works well in practice.
 
-3. **Who maintains facts?** Partially resolved. The `crux footnotes` pipeline can migrate prose claims to KB facts. The content improve pipeline (`crux content improve`) writes prose but does not yet update KB facts directly. KB facts and prose coexist, with `<KBF>` components bridging them in MDX.
+3. **Who maintains facts?** Partially resolved. The `crux footnotes` pipeline can migrate prose claims to KB facts. The content improve pipeline (`crux content improve`) writes prose but does not yet update KB facts directly. KB facts and prose coexist, with `<FBF>` components bridging them in MDX.
 
-4. **How do facts and prose stay in sync?** The `<KBF>` and `<KBFactValue>` MDX components render KB fact values inline in prose, so updating a KB fact automatically updates the displayed value. For prose that doesn't use these components, sync remains manual.
+4. **How do facts and prose stay in sync?** The `<FBF>` and `<FBFactValue>` MDX components render KB fact values inline in prose, so updating a KB fact automatically updates the displayed value. For prose that doesn't use these components, sync remains manual.
 
 5. **Property hierarchy.** Not yet implemented. KB properties have `category` groupings (financial, people, biographical, organization, product, etc.) but no formal sub-property relationships. With 95 properties, some hierarchy may become useful for dashboard navigation.
 
@@ -1310,7 +1310,7 @@ Some original questions have been resolved by KB; others remain open.
 | Record collections (funding-rounds, etc.) | Implemented | Entity type schemas |
 | Display configuration | Implemented (divisor, prefix, suffix) | `properties.yaml` display config |
 | Validation | Implemented (23 rules) | KB validation system |
-| MDX integration | Implemented (`<KBF>`, `<KBFactValue>`, `<Calc>`) | MDX components |
+| MDX integration | Implemented (`<FBF>`, `<FBFactValue>`, `<Calc>`) | MDX components |
 | Fact extraction pipeline | Implemented | `crux footnotes` commands |
 | Claim-type taxonomy | Not implemented | — |
 | Confidence / verification levels | Not implemented | — |

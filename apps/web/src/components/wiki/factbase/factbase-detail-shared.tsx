@@ -1,5 +1,5 @@
 /**
- * Shared layout components for KB detail pages (fact, property, item).
+ * Shared layout components for factbase detail pages (fact, property, item).
  * Extracted to avoid duplicating identical KV-table markup across pages.
  */
 

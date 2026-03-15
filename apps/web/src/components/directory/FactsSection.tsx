@@ -11,7 +11,7 @@ import {
 import {
   formatKBFactValue,
   titleCase,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 
 // ── Constants ────────────────────────────────────────────────────────

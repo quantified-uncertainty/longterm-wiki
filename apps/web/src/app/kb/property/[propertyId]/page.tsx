@@ -16,8 +16,8 @@ import {
   formatKBDate,
   shortDomain,
   isUrl,
-} from "@/components/wiki/kb/format";
-import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
+} from "@/components/wiki/factbase/format";
+import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size.

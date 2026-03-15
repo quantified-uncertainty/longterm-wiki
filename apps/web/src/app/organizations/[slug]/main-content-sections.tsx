@@ -12,8 +12,8 @@ import {
   formatKBDate,
   titleCase,
   isUrl,
-} from "@/components/wiki/kb/format";
-import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
+} from "@/components/wiki/factbase/format";
+import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
 import {
   SectionHeader,
   SourceLink,
@@ -375,7 +375,7 @@ export function OtherDataSection({
     <section>
       <SectionHeader title="Other Data" />
       {collections.map(([name]) => (
-        <KBRecordCollection
+        <FBRecordCollection
           key={name}
           entity={entityId}
           collection={name}

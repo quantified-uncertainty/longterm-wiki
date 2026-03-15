@@ -1,7 +1,7 @@
 /**
  * VerificationDot — Small colored dot indicating citation verification status.
  *
- * Server component. Used in KBFactValue tooltips and KBEntityFacts rows to show
+ * Server component. Used in FBFactValue tooltips and FBEntityFacts rows to show
  * whether a KB fact's source URL has been citation-verified.
  *
  * Color scheme matches CitationOverlay.tsx for consistency:

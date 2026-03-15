@@ -15,7 +15,7 @@ import {
   ProfileStatCard,
   Breadcrumbs,
 } from "@/components/directory";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import {
   RISK_CATEGORY_COLORS,
   RISK_CATEGORY_LABELS,

@@ -80,7 +80,7 @@ When adding a new entity to KB:
    # KB YAML is authoritative. This file is kept only for any remaining <F> tag references.
    ```
 
-4. Search for `<F e="<slug>"` in MDX pages — these will continue to render from the old facts file until they are updated to use KB data components (`<KBFactTable>`, `<KBEntitySidebar>`, etc.)
+4. Search for `<F e="<slug>"` in MDX pages — these will continue to render from the old facts file until they are updated to use KB data components (`<FBFactTable>`, `<FBEntitySidebar>`, etc.)
 5. File an issue to migrate any remaining `<F>` tag usage on pages for that entity
 
 Do not delete old facts files outright if there are still active `<F>` tags referencing them — the `<F>` component reads from `data/facts/`, not from KB YAML.
@@ -97,7 +97,7 @@ Do not delete old facts files outright if there are still active `<F>` tags refe
 | Cross-entity refs | Yes — `!ref` format for entity references | No |
 | Custom YAML tags | `!ref` (entity references), `!date` (explicit date typing) | None |
 | Time series | Yes — multiple facts per property with `asOf` | Yes — multiple entries with `asOf` |
-| Display components | `<KBFactTable>`, `<KBEntitySidebar>`, `<KBEntityFacts>` | `<F>`, `<Calc>` inline components |
+| Display components | `<FBFactTable>`, `<FBEntitySidebar>`, `<FBEntityFacts>` | `<F>`, `<Calc>` inline components |
 | Update workflow | Edit KB YAML file | Edit facts YAML file |
 | Build integration | Compiled into `database.json` via build-data | Compiled into `database.json` via build-data |
 
@@ -109,18 +109,18 @@ The `KBCompareTable` component renders a single property across multiple KB enti
 
 ```mdx
 {/* Compare revenue across all orgs that have it */}
-<KBCompareTable property="revenue" />
+<FBCompareTable property="revenue" />
 
 {/* Filter to specific entities */}
-<KBCompareTable property="headcount" entities={["anthropic", "openai", "deepmind", "meta-ai", "xai"]} />
+<FBCompareTable property="headcount" entities={["anthropic", "openai", "deepmind", "meta-ai", "xai"]} />
 
 {/* Force latest-only mode */}
-<KBCompareTable property="valuation" mode="latest" title="AI Lab Valuations" />
+<FBCompareTable property="valuation" mode="latest" title="AI Lab Valuations" />
 ```
 
 Example — revenue run-rate for frontier AI labs:
 
-<KBCompareTable
+<FBCompareTable
   property="revenue"
   entities={["anthropic", "openai", "xai", "meta-ai", "deepmind"]}
   title="AI Lab Revenue (ARR, time series)"
@@ -128,7 +128,7 @@ Example — revenue run-rate for frontier AI labs:
 
 Example — latest valuation across labs with KB data:
 
-<KBCompareTable
+<FBCompareTable
   property="valuation"
   entities={["anthropic", "openai", "xai", "ssi"]}
   mode="latest"

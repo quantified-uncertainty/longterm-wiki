@@ -11,7 +11,7 @@ import {
   getKBEntities,
   resolveKBSlug,
 } from "@/data/factbase";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 import type { Entity } from "@longterm-wiki/factbase";
 import { getTypedEntities, isPerson, isRisk, isOrganization } from "@/data";
 
@@ -21,7 +21,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 export { formatCompactCurrency, formatCompactNumber, safeHref } from "@/lib/format-compact";
 
 // Re-export from format.ts so server consumers don't need two imports
-export { isUrl, shortDomain, formatKBDate } from "@/components/wiki/kb/format";
+export { isUrl, shortDomain, formatKBDate } from "@/components/wiki/factbase/format";
 
 // ── Currency formatting (server-only, handles unknown input) ────
 

@@ -7,7 +7,7 @@ import {
   getKBEntity,
   getKBEntitySlug,
 } from "@/data/factbase";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 
 /**
  * Resolve a KB entity ID to a display name and optional href.

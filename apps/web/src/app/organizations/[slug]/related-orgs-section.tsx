@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 import { SectionHeader } from "./org-shared";
 import type { RelatedOrg } from "./org-data";
 
