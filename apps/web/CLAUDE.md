@@ -48,7 +48,7 @@ Available aliases:
 ### MDX Components
 All MDX components are registered in `src/components/mdx-components.tsx`. Import statements in MDX source are stripped by `preprocessMdx()` — components are injected globally.
 
-Key ported components: `EntityLink`, `ResourceLink`, `R`, `KBFactValue`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `SquiggleEstimate`, `Callout`
+Key ported components: `EntityLink`, `ResourceLink`, `R`, `FBFactValue`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `SquiggleEstimate`, `Callout`
 
 42+ stub components exist for not-yet-ported Astro components.
 
@@ -111,8 +111,8 @@ Wiki pages use `generateStaticParams()` to pre-render all pages at build time fr
 3. `compileMDX()` from next-mdx-remote/rsc compiles with remark/rehype plugins
 4. Components injected via `mdxComponents` map
 
-### Knowledge Base (KB)
-Structured facts are defined in `packages/kb/data/things/*.yaml` and accessed via the KB data layer (`src/data/kb.ts`). Use `<KBF>` for inline fact values, `<KBFactValue>` for standalone display, and `<Calc>` for computed expressions referencing KB facts.
+### FactBase (Structured Facts)
+Structured facts are defined in `packages/factbase/data/things/*.yaml` and accessed via the FactBase data layer (`src/data/factbase.ts`). Use `<FBF>` for inline fact values, `<FBFactValue>` for standalone display, and `<Calc>` for computed expressions referencing FactBase facts.
 
 ### Content Architecture
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:

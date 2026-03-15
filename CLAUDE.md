@@ -89,11 +89,19 @@ Entity types without directories (too abstract or sparse for tables): `approach`
 
 Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
 
+## Data Layer Terminology — Three Bases
+
+| Name | What it is | Key files |
+|------|-----------|-----------|
+| **TableBase** | Typed relational records (Postgres/YAML entities) | `apps/web/src/data/tablebase.ts`, `data/entities/` |
+| **FactBase** | Structured triples with temporal data, provenance | `packages/factbase/`, `apps/web/src/data/factbase.ts` |
+| **WikiBase** | Long-form prose MDX articles | `content/docs/`, `Page` interface in `tablebase.ts` |
+
 ## Data Flow
 
-1. YAML files in `data/` define entities and resources; KB facts in `packages/kb/data/things/`
-2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json`
-3. Next.js app reads `database.json` at build time
+1. YAML files in `data/` define entities and resources; FactBase data in `packages/factbase/data/things/`
+2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json` + `factbase-data.json`
+3. Next.js app reads `database.json` and `factbase-data.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
 ## Key Conventions
@@ -103,7 +111,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
-- **KB facts & Calc**: KB YAML (`packages/kb/data/things/`) is the sole authoritative source for structured facts. Use `<KBF>` / `<KBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
+- **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/things/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands — never raw `curl`
 - **Entity IDs**: Never manually invent — always `pnpm crux ids allocate <slug>`

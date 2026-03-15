@@ -272,6 +272,7 @@ export interface Organization {
   employees?: string;
 }
 
+/** WikiBase: a long-form prose wiki page (MDX article). */
 export interface Page {
   id: string;
   path: string;
