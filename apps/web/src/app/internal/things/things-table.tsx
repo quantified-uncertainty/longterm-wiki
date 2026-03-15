@@ -8,32 +8,18 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search, ExternalLink, Loader2 } from "lucide-react";
+import { Search, ExternalLink, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
-import { searchThings, type ThingSearchRow } from "./actions";
+import { searchThings, fetchThingsPage, type ThingSearchRow } from "./actions";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface ThingRow {
-  id: string;
-  thingType: string;
-  title: string;
-  parentThingId: string | null;
-  parentTitle?: string;
-  parentHref?: string;
-  sourceTable: string;
-  sourceId: string;
-  entityType: string | null;
-  description: string | null;
-  sourceUrl: string | null;
-  numericId: string | null;
-  verdict: string | null;
-  verdictConfidence: number | null;
-  href?: string;
-}
+export type ThingRow = ThingSearchRow;
+
+const PAGE_SIZE = 100;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -59,7 +45,6 @@ function verdictBadge(verdict: string | null) {
 }
 
 function thingTypeBadge(type: string, entityType: string | null) {
-  // For entities, show the specific entityType (organization, person, etc.)
   const displayType = type === "entity" && entityType ? entityType : type;
 
   const colors: Record<string, string> = {
@@ -141,10 +126,7 @@ const columns: ColumnDef<ThingRow>[] = [
       }
 
       return (
-        <span
-          className="text-sm max-w-[400px] truncate block"
-          title={thing.title}
-        >
+        <span className="text-sm max-w-[400px] truncate block" title={thing.title}>
           {displayTitle}
         </span>
       );
@@ -166,20 +148,12 @@ const columns: ColumnDef<ThingRow>[] = [
           : thing.parentTitle;
       if (thing.parentHref) {
         return (
-          <a
-            href={thing.parentHref}
-            className="text-xs text-accent-foreground hover:underline no-underline"
-            title={thing.parentTitle}
-          >
+          <a href={thing.parentHref} className="text-xs text-accent-foreground hover:underline no-underline" title={thing.parentTitle}>
             {displayName}
           </a>
         );
       }
-      return (
-        <span className="text-xs text-muted-foreground" title={thing.parentTitle}>
-          {displayName}
-        </span>
-      );
+      return <span className="text-xs text-muted-foreground" title={thing.parentTitle}>{displayName}</span>;
     },
   },
   {
@@ -193,26 +167,15 @@ const columns: ColumnDef<ThingRow>[] = [
         try {
           const domain = new URL(thing.href).hostname.replace("www.", "");
           return (
-            <a
-              href={thing.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:underline no-underline inline-flex items-center gap-0.5"
-            >
+            <a href={thing.href} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline no-underline inline-flex items-center gap-0.5">
               {domain}
               <ExternalLink className="h-2.5 w-2.5" />
             </a>
           );
-        } catch {
-          return null;
-        }
+        } catch { return null; }
       }
-      // Internal link — show the path
       return (
-        <a
-          href={thing.href}
-          className="text-xs text-accent-foreground hover:underline no-underline"
-        >
+        <a href={thing.href} className="text-xs text-accent-foreground hover:underline no-underline">
           {thing.href.length > 35 ? thing.href.slice(0, 32) + "..." : thing.href}
         </a>
       );
@@ -247,8 +210,8 @@ const columns: ColumnDef<ThingRow>[] = [
 // ---------------------------------------------------------------------------
 
 interface ThingsTableProps {
-  data: ThingRow[];
-  typeFilter?: string;
+  total: number;
+  typeCounts: Record<string, number>;
 }
 
 export function ThingsTable(props: ThingsTableProps) {
@@ -259,88 +222,92 @@ export function ThingsTable(props: ThingsTableProps) {
   );
 }
 
-function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
+function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "title", desc: false },
-  ]);
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("q") || ""
-  );
-  const [selectedType, setSelectedType] = useState(
-    typeFilter || searchParams.get("type") || ""
-  );
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [selectedType, setSelectedType] = useState(searchParams.get("type") || "");
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
 
-  // Server-side search state
-  const [serverResults, setServerResults] = useState<ThingRow[] | null>(null);
+  // Data state
+  const [rows, setRows] = useState<ThingRow[]>([]);
+  const [pageTotal, setPageTotal] = useState(total);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [mode, setMode] = useState<"browse" | "search">("browse");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Update URL when filters change
+  // Update URL
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedType) params.set("type", selectedType);
     if (searchQuery) params.set("q", searchQuery);
+    if (currentPage > 1) params.set("page", String(currentPage));
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
-  }, [selectedType, searchQuery, router]);
+  }, [selectedType, searchQuery, currentPage, router]);
+
+  // Fetch page data
+  const loadPage = useCallback(async (page: number, thingType: string) => {
+    setIsLoading(true);
+    try {
+      const result = await fetchThingsPage(page, PAGE_SIZE, thingType || undefined);
+      if (result) {
+        setRows(result.rows);
+        setPageTotal(result.total);
+      }
+    } catch {
+      // Keep existing data on error
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Load initial page and on type/page change
+  useEffect(() => {
+    if (mode === "browse") {
+      loadPage(currentPage, selectedType);
+    }
+  }, [currentPage, selectedType, mode, loadPage]);
 
   // Server-side search with debounce
-  const doServerSearch = useCallback(async (query: string, thingType: string) => {
+  const doSearch = useCallback(async (query: string, thingType: string) => {
     if (query.length < 2) {
-      setServerResults(null);
+      setMode("browse");
       return;
     }
-
+    setMode("search");
     setIsSearching(true);
     try {
       const result = await searchThings(query, thingType || undefined);
       if (result) {
-        // Server action resolves hrefs (entity pages, resource pages, sourceUrls)
-        setServerResults(result.results as ThingRow[]);
-      } else {
-        setServerResults([]);
+        setRows(result.results);
+        setPageTotal(result.total);
       }
     } catch {
-      setServerResults(null);
+      // Keep existing data
     } finally {
       setIsSearching(false);
     }
   }, []);
 
-  // Debounced search trigger
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
     if (searchQuery.length >= 2) {
-      debounceTimer.current = setTimeout(() => {
-        doServerSearch(searchQuery, selectedType);
-      }, 300);
-    } else {
-      setServerResults(null);
+      debounceTimer.current = setTimeout(() => doSearch(searchQuery, selectedType), 300);
+    } else if (searchQuery.length === 0) {
+      setMode("browse");
     }
+    return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
+  }, [searchQuery, selectedType, doSearch]);
 
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, [searchQuery, selectedType, doServerSearch]);
-
-  // Compute type counts from preloaded data
-  const typeCounts: Record<string, number> = {};
-  for (const row of data) {
-    typeCounts[row.thingType] = (typeCounts[row.thingType] || 0) + 1;
-  }
-
-  // Use server results when searching, preloaded data otherwise
-  const isServerSearch = searchQuery.length >= 2;
-  const displayData = isServerSearch && serverResults ? serverResults : (
-    selectedType ? data.filter((r) => r.thingType === selectedType) : data
-  );
+  // Reset page when type changes
+  useEffect(() => { setCurrentPage(1); }, [selectedType]);
 
   const table = useReactTable({
-    data: displayData,
+    data: rows,
     columns,
     getRowId: (row) => row.id,
     state: { sorting },
@@ -349,7 +316,8 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const visibleRows = table.getRowModel().rows.length;
+  const totalPages = Math.ceil(pageTotal / PAGE_SIZE);
+  const showPagination = mode === "browse" && totalPages > 1;
 
   return (
     <div className="space-y-4">
@@ -359,13 +327,13 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search all 12,000+ things..."
+            placeholder={`Search all ${total.toLocaleString()} things...`}
             aria-label="Search things"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
           />
-          {isSearching && (
+          {(isSearching || isLoading) && (
             <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
           )}
         </div>
@@ -376,26 +344,78 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
           aria-label="Filter things by type"
           className="px-3 py-2 text-sm border rounded-md bg-background"
         >
-          <option value="">All types ({data.length})</option>
+          <option value="">All types ({total.toLocaleString()})</option>
           {Object.entries(typeCounts)
             .sort(([, a], [, b]) => b - a)
             .map(([type, count]) => (
               <option key={type} value={type}>
-                {type} ({count})
+                {type} ({count.toLocaleString()})
               </option>
             ))}
         </select>
       </div>
 
-      {/* Count */}
-      <p className="text-sm text-muted-foreground">
-        {isServerSearch
-          ? `${visibleRows} search result${visibleRows !== 1 ? "s" : ""} across all things`
-          : `Showing ${visibleRows} of ${data.length} things`}
-      </p>
+      {/* Status */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {mode === "search"
+            ? `${rows.length} search result${rows.length !== 1 ? "s" : ""}`
+            : `Page ${currentPage} of ${totalPages} (${pageTotal.toLocaleString()} things)`}
+        </p>
+
+        {/* Pagination */}
+        {showPagination && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1 || isLoading}
+              className="px-2 py-1 text-sm border rounded-md hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Prev
+            </button>
+            <span className="text-sm text-muted-foreground">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages || isLoading}
+              className="px-2 py-1 text-sm border rounded-md hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       <DataTable table={table} />
+
+      {/* Bottom pagination */}
+      {showPagination && (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage <= 1 || isLoading}
+            className="px-2 py-1 text-sm border rounded-md hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+          >
+            <ChevronLeft className="h-4 w-4" /> Prev
+          </button>
+          <span className="text-sm text-muted-foreground">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages || isLoading}
+            className="px-2 py-1 text-sm border rounded-md hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+          >
+            Next <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

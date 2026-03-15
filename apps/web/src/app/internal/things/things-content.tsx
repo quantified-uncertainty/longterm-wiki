@@ -4,36 +4,9 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { ThingsTable, type ThingRow } from "./things-table";
-import { getEntityHref } from "@data/entity-nav";
+import { ThingsTable } from "./things-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
-
-interface ThingsApiItem {
-  id: string;
-  thingType: string;
-  title: string;
-  parentThingId: string | null;
-  sourceTable: string;
-  sourceId: string;
-  entityType: string | null;
-  description: string | null;
-  sourceUrl: string | null;
-  numericId: string | null;
-  verdict: string | null;
-  verdictConfidence: number | null;
-  verdictAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  syncedAt: string;
-}
-
-interface ThingsListResult {
-  things: ThingsApiItem[];
-  total: number;
-  limit: number;
-  offset: number;
-}
 
 interface ThingsStatsResult {
   total: number;
@@ -42,135 +15,14 @@ interface ThingsStatsResult {
   byEntityType: Record<string, number>;
 }
 
-interface DashboardData {
-  stats: ThingsStatsResult;
-  items: ThingsApiItem[];
-  total: number;
-}
-
-// ── Link resolution ─────────────────────────────────────────────────────
-// Only entities get reliable internal links (sourceId = entity slug).
-// Non-entity types have PG primary keys as sourceId, which don't match
-// the KB record keys that detail pages expect. For those, use sourceUrl.
-
-// Types where sourceId matches the detail page URL param.
-// Resources: sourceId = PG hash ID, resolveResource() looks up by hash ID ✓
-// Other types (grants, divisions, etc.): sourceId = PG stableId, but detail
-// pages use KB record keys — these DON'T match, so we can't link to them.
-const TYPES_WITH_DETAIL_PAGES: Record<string, string> = {
-  resource: "/resources",
-};
-
-// Entity types that have directory pages where sourceId = slug works directly
-const ENTITY_DIR_PREFIXES: Record<string, string> = {
-  organization: "/organizations",
-  person: "/people",
-  risk: "/risks",
-};
-
-function resolveThingHref(item: ThingsApiItem): string | undefined {
-  // Entities: try getEntityHref first, fall back to directory URL
-  if (item.thingType === "entity") {
-    let href = getEntityHref(item.sourceId);
-    // getEntityHref may return /wiki/E{id} when KB slug lookup fails.
-    // For known directory types, use the slug directly.
-    if (href?.startsWith("/wiki/") && item.entityType) {
-      const prefix = ENTITY_DIR_PREFIXES[item.entityType];
-      if (prefix) href = `${prefix}/${item.sourceId}`;
-    }
-    return href;
-  }
-
-  // Types with working detail page links
-  const routePrefix = TYPES_WITH_DETAIL_PAGES[item.thingType];
-  if (routePrefix && item.sourceId) {
-    return `${routePrefix}/${encodeURIComponent(item.sourceId)}`;
-  }
-
-  // Facts: link to the parent entity's page (sourceId format: "entityId:factId")
-  if (item.thingType === "fact" && item.sourceId.includes(":")) {
-    const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
-    try {
-      return getEntityHref(entityId);
-    } catch {
-      // Entity not in database.json
-    }
-  }
-
-  // Remaining types: use sourceUrl as external link if available
-  if (item.sourceUrl) {
-    return item.sourceUrl;
-  }
-
-  return undefined;
-}
-
-/**
- * Resolve the parent entity for a thing using the loaded things map.
- * Walks the parent chain up to 3 levels to find the nearest entity ancestor.
- */
-function resolveParentEntityHref(
-  item: ThingsApiItem,
-  thingMap: Map<string, ThingsApiItem>,
-  depth = 0,
-): { title: string; href: string } | undefined {
-  // Facts: parse entity ID from sourceId ("entityId:factId")
-  if (item.thingType === "fact" && !item.parentThingId && item.sourceId.includes(":")) {
-    const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
-    for (const t of thingMap.values()) {
-      if (t.thingType === "entity" && t.sourceId === entityId) {
-        return { title: t.title, href: getEntityHref(t.sourceId) };
-      }
-    }
-    try {
-      return { title: entityId.replace(/-/g, " "), href: getEntityHref(entityId) };
-    } catch {
-      return undefined;
-    }
-  }
-
-  if (depth > 3 || !item.parentThingId) return undefined;
-
-  const parent = thingMap.get(item.parentThingId);
-  if (!parent) return undefined;
-
-  if (parent.thingType === "entity") {
-    return { title: parent.title, href: getEntityHref(parent.sourceId) };
-  }
-
-  return resolveParentEntityHref(parent, thingMap, depth + 1);
-}
-
 // ── Data Loading ──────────────────────────────────────────────────────────
 
-async function loadFromApi(): Promise<FetchResult<DashboardData>> {
-  const [statsResult, itemsResult] = await Promise.all([
-    fetchDetailed<ThingsStatsResult>("/api/things/stats", { revalidate: 60 }),
-    fetchDetailed<ThingsListResult>(
-      "/api/things?limit=1000&sort=title&order=asc",
-      { revalidate: 60 }
-    ),
-  ]);
-
-  if (!statsResult.ok) return statsResult;
-  if (!itemsResult.ok) return itemsResult;
-
-  return {
-    ok: true,
-    data: {
-      stats: statsResult.data,
-      items: itemsResult.data.things,
-      total: itemsResult.data.total,
-    },
-  };
+async function loadStats(): Promise<FetchResult<ThingsStatsResult>> {
+  return fetchDetailed<ThingsStatsResult>("/api/things/stats", { revalidate: 60 });
 }
 
-function emptyFallback(): DashboardData {
-  return {
-    stats: { total: 0, byType: {}, byVerdict: {}, byEntityType: {} },
-    items: [],
-    total: 0,
-  };
+function emptyStats(): ThingsStatsResult {
+  return { total: 0, byType: {}, byVerdict: {}, byEntityType: {} };
 }
 
 // ── Stats Card ────────────────────────────────────────────────────────────
@@ -196,40 +48,8 @@ function StatCard({
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function ThingsContent() {
-  const { data, source, apiError } = await withApiFallback(loadFromApi, emptyFallback);
-  const { stats, items, total } = data;
+  const { data: stats, source, apiError } = await withApiFallback(loadStats, emptyStats);
 
-  // Build a lookup map for parent chain resolution
-  const thingMap = new Map<string, ThingsApiItem>();
-  for (const item of items) {
-    thingMap.set(item.id, item);
-  }
-
-  // Build rows with hrefs
-  const rows: ThingRow[] = items.map((item) => {
-    const href = resolveThingHref(item);
-    const parentEntity = resolveParentEntityHref(item, thingMap);
-
-    return {
-      id: item.id,
-      thingType: item.thingType,
-      title: item.title,
-      parentThingId: item.parentThingId,
-      parentTitle: parentEntity?.title,
-      parentHref: parentEntity?.href,
-      sourceTable: item.sourceTable,
-      sourceId: item.sourceId,
-      entityType: item.entityType,
-      description: item.description,
-      sourceUrl: item.sourceUrl,
-      numericId: item.numericId,
-      verdict: item.verdict,
-      verdictConfidence: item.verdictConfidence,
-      href,
-    };
-  });
-
-  // Compute verdict stats
   const withVerdict = Object.entries(stats.byVerdict)
     .filter(([v]) => v !== "unchecked")
     .reduce((sum, [, c]) => sum + c, 0);
@@ -312,15 +132,10 @@ export async function ThingsContent() {
         </div>
       )}
 
-      {/* Things table */}
+      {/* Things table — fetches pages via server actions */}
       <div>
-        <h2 className="text-lg font-semibold mb-3">
-          All Things{" "}
-          <span className="text-muted-foreground font-normal">
-            ({total > items.length ? `showing ${items.length.toLocaleString()} of ${total.toLocaleString()}` : total.toLocaleString()})
-          </span>
-        </h2>
-        <ThingsTable data={rows} />
+        <h2 className="text-lg font-semibold mb-3">All Things</h2>
+        <ThingsTable total={stats.total} typeCounts={stats.byType} />
       </div>
     </>
   );
