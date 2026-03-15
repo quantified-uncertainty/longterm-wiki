@@ -2,7 +2,7 @@
  * Backfill stableIds into entity YAML files.
  *
  * For each entity in data/entities/*.yaml that lacks a stableId:
- *   1. Checks packages/kb/data/things/{slug}.yaml for an existing stableId
+ *   1. Checks packages/factbase/data/things/{slug}.yaml for an existing stableId
  *   2. If none, generates a new random 10-char alphanumeric ID
  *   3. Inserts the stableId line right after the `id:` line in the YAML
  *
@@ -16,12 +16,12 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
-import { generateId } from '../../packages/kb/src/ids.ts';
+import { generateId } from '../../packages/factbase/src/ids.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
 
 interface KBThing {
   thing?: {
@@ -229,7 +229,7 @@ Backfill stableIds into Entity YAML Files
 
 Reads entity YAML files from data/entities/*.yaml and inserts a stableId
 field for any entity that doesn't have one. StableIds are sourced from
-KB thing files (packages/kb/data/things/*.yaml) when available, otherwise
+KB thing files (packages/factbase/data/things/*.yaml) when available, otherwise
 a new random 10-char alphanumeric ID is generated.
 
 Usage:

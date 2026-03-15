@@ -20,8 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBRecords, getKBRecordSchema } from "@data/kb";
-import type { RecordEntry } from "@longterm-wiki/kb";
+import { getKBRecords, getKBRecordSchema } from "@data/factbase";
+import type { RecordEntry } from "@longterm-wiki/factbase";
 import { titleCase } from "./format";
 import { KBCellValue } from "./KBCellValue";
 

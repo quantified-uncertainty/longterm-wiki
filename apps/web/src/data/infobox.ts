@@ -15,7 +15,7 @@ import {
   isAiModel,
 } from "./database";
 import { getEntityHref } from "./entity-nav";
-import { resolveKBSlug } from "./kb";
+import { resolveKBSlug } from "./factbase";
 
 export interface ChildPageEntry {
   id: string;

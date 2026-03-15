@@ -4,10 +4,10 @@
  * Checks that all <KBF entity="..." property="..."> and <Calc expr="{entity.property}">
  * components reference valid KB entity identifiers (slugs or stableIds) and property IDs.
  *
- * Entity identifiers come from packages/kb/data/things/ — both the YAML filename
+ * Entity identifiers come from packages/factbase/data/things/ — both the YAML filename
  * (slug) and the thing.stableId field inside each file are accepted.
  *
- * Property IDs come from packages/kb/data/properties.yaml (all keys under the
+ * Property IDs come from packages/factbase/data/properties.yaml (all keys under the
  * top-level `properties:` mapping).
  */
 
@@ -17,8 +17,8 @@ import { parse as parseYaml } from 'yaml';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { PROJECT_ROOT } from '../content-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages/kb/data/things');
-const KB_PROPERTIES_FILE = join(PROJECT_ROOT, 'packages/kb/data/properties.yaml');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages/factbase/data/things');
+const KB_PROPERTIES_FILE = join(PROJECT_ROOT, 'packages/factbase/data/properties.yaml');
 
 // ── Caches (populated on first use, like resource-ref-integrity) ─────────────
 // undefined = not yet attempted; null = load failed; Set = loaded successfully
@@ -206,7 +206,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<KBF entity="${entity}"> does not match any KB entity slug or stableId in packages/kb/data/things/`,
+            message: `<KBF entity="${entity}"> does not match any KB entity slug or stableId in packages/factbase/data/things/`,
             severity: Severity.ERROR,
           }));
         }
@@ -219,7 +219,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<KBF property="${property}"> does not match any property in packages/kb/data/properties.yaml`,
+            message: `<KBF property="${property}"> does not match any property in packages/factbase/data/properties.yaml`,
             severity: Severity.ERROR,
           }));
         }
@@ -245,7 +245,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<Calc> references entity "${entity}" which does not match any KB entity slug or stableId in packages/kb/data/things/`,
+            message: `<Calc> references entity "${entity}" which does not match any KB entity slug or stableId in packages/factbase/data/things/`,
             severity: Severity.ERROR,
           }));
         }
@@ -255,7 +255,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<Calc> references property "${property}" which does not match any property in packages/kb/data/properties.yaml`,
+            message: `<Calc> references property "${property}" which does not match any property in packages/factbase/data/properties.yaml`,
             severity: Severity.ERROR,
           }));
         }

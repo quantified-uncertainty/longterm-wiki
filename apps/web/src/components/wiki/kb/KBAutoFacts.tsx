@@ -17,8 +17,8 @@ import {
   getKBAllRecordCollections,
   getKBRecordSchema,
   isFactExpired,
-} from "@data/kb";
-import type { Fact, Property, RecordEntry, RecordSchema, FieldDef } from "@longterm-wiki/kb";
+} from "@data/factbase";
+import type { Fact, Property, RecordEntry, RecordSchema, FieldDef } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/kb/format";
 import { KBFactValueDisplay } from "@components/wiki/kb/KBFactValueDisplay";
 import { KBCellValue } from "@components/wiki/kb/KBCellValue";

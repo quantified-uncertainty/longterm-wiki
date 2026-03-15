@@ -1,4 +1,4 @@
-import type { Fact } from "@longterm-wiki/kb";
+import type { Fact } from "@longterm-wiki/factbase";
 import { safeHref } from "@/lib/directory-utils";
 
 /**

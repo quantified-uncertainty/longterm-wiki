@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Graph } from '../../packages/kb/src/graph.ts';
-import type { RecordEntry, Entity } from '../../packages/kb/src/types.ts';
+import { Graph } from '../../packages/factbase/src/graph.ts';
+import type { RecordEntry, Entity } from '../../packages/factbase/src/types.ts';
 import {
   personnelId,
   grantId,

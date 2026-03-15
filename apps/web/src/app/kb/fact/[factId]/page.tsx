@@ -10,9 +10,9 @@ import {
   getKBFactById,
   getKBProperty,
   isFactExpired,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { getEntityHref } from "@/data";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/kb/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/kb/kb-detail-shared";
 
@@ -319,7 +319,7 @@ export default async function FactDetailPage({ params }: PageProps) {
         </KVRow>
         <KVRow label="YAML File">
           <span className="font-mono text-xs">
-            packages/kb/data/things/{fact.subjectId}.yaml
+            packages/factbase/data/things/{fact.subjectId}.yaml
           </span>
         </KVRow>
       </KVTable>

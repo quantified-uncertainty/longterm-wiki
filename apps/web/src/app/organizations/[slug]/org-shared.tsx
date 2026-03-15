@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import type { KBRecordEntry } from "@/data/kb";
+import type { KBRecordEntry } from "@/data/factbase";
 import {
   formatKBDate,
   titleCase,
@@ -14,7 +14,7 @@ import {
   resolveKBSlug,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { safeHref } from "@/lib/format-compact";
 
 // Re-export so existing consumers of { safeHref } from "./org-shared" keep working.

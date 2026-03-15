@@ -1,14 +1,14 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
-import { resolveSlugAlias } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById, isOrganization } from "@/data";
 import {
   getKBLatest,
   getKBProperty,
   resolveKBSlug,
   getKBEntity,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   formatKBDate,
   titleCase,

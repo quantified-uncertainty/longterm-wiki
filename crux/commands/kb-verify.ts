@@ -14,9 +14,9 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { formatFactValue } from '../../packages/kb/src/format.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, Property } from '../../packages/kb/src/types.ts';
+import { formatFactValue } from '../../packages/factbase/src/format.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
+import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
@@ -27,8 +27,8 @@ import {
   classifyFetchError,
   type SourceFetchErrorType,
 } from '../lib/search/paywall-detection.ts';
-import { loadGraphFull, resolveEntity } from '../lib/kb-loader.ts';
-import type { LoadedKB } from '../lib/kb-loader.ts';
+import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
+import type { LoadedKB } from '../lib/factbase-loader.ts';
 
 // ── Constants ─────────────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@ import {
   getKBEntity,
   getKBEntitySlug,
   getAllKBRecords,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { getExpertById } from "@/data";
 import Link from "next/link";
 import {

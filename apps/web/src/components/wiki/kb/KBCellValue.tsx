@@ -5,7 +5,7 @@
  * with consistent formatting. Supports refs, URLs, numbers, dates, and booleans.
  */
 
-import type { FieldDef } from "@longterm-wiki/kb";
+import type { FieldDef } from "@longterm-wiki/factbase";
 import {
   formatKBCellValue,
   formatKBDate,

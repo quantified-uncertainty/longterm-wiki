@@ -14,7 +14,7 @@ import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT } from './content-types.ts';
 import { normalizeUrlForDedup } from './footnote-parser.ts';
 
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data', 'things');
+const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
 
 interface RawKBFact {
   id: string;

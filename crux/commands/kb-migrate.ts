@@ -3,12 +3,12 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, renameSync } from
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { generateStableId, generateFactId } from '../../packages/kb/src/ids.ts';
+import { generateStableId, generateFactId } from '../../packages/factbase/src/ids.ts';
 
 // ── Paths ─────────────────────────────────────────────────────────────
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -276,7 +276,7 @@ async function migrateCommand(
       exitCode: 1,
       output: `Usage: crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
-  Migrate an entity from data/entities/*.yaml to packages/kb/data/things/*.yaml.
+  Migrate an entity from data/entities/*.yaml to packages/factbase/data/things/*.yaml.
 
 Options:
   --dry-run    Print the generated YAML without writing any files
@@ -370,7 +370,7 @@ Examples:
   if (!dryRun) {
     lines.push('');
     lines.push('Next steps:');
-    lines.push(`  1. Review and enrich: packages/kb/data/things/${slug}.yaml`);
+    lines.push(`  1. Review and enrich: packages/factbase/data/things/${slug}.yaml`);
     lines.push('  2. Add facts (born-year, role, employed-by, etc.) with sources');
     lines.push('  3. Validate: pnpm crux kb validate');
     lines.push('  4. Check: pnpm crux kb show ' + slug);
@@ -393,7 +393,7 @@ Usage:
   crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Reads an entity from data/entities/*.yaml and creates a new KB thing file
-  at packages/kb/data/things/<slug>.yaml with the mapped structure.
+  at packages/factbase/data/things/<slug>.yaml with the mapped structure.
 
 Options:
   --dry-run    Print the generated YAML without writing any files

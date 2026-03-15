@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { titleCase } from "@/components/wiki/kb/format";
 
 /**

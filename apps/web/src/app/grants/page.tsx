@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data/database";
 import { ProfileStatCard } from "@/components/directory";

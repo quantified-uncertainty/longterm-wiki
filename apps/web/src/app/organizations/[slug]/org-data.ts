@@ -2,7 +2,7 @@
  * Data-fetching and parsing logic for organization profile pages.
  * Extracted from page.tsx as a pure refactor — no behavioral changes.
  */
-import type { KBRecordEntry } from "@/data/kb";
+import type { KBRecordEntry } from "@/data/factbase";
 import {
   getKBLatest,
   getKBFacts,
@@ -14,8 +14,8 @@ import {
   getKBEntitySlug,
   getKBRecords,
   getAllKBRecords,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import {
   getTypedEntityById,
   getTypedEntities,

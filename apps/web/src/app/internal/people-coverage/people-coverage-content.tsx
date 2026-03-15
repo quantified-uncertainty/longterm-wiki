@@ -5,7 +5,7 @@ import {
   getAllPages,
   getIdRegistry,
 } from "@/data";
-import { getKBFacts } from "@/data/kb";
+import { getKBFacts } from "@/data/factbase";
 import { PeopleCoverageTable, type PersonCoverageRow } from "./people-coverage-table";
 
 /** Check whether a person entity has a wiki page. */

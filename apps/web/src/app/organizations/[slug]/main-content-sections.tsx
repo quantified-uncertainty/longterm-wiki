@@ -7,7 +7,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import type { KBRecordEntry } from "@/data/kb";
+import type { KBRecordEntry } from "@/data/factbase";
 import {
   formatKBDate,
   titleCase,

@@ -13,7 +13,7 @@
  *   blue   = verified (source confirmed, accuracy not checked)
  */
 
-import type { KBFactVerdict } from "@data/kb";
+import type { KBFactVerdict } from "@data/factbase";
 
 interface VerificationDotConfig {
   dotColor: string;

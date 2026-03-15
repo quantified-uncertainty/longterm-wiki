@@ -23,7 +23,7 @@ import path from "path";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const CONTENT_DIR = path.join(ROOT, "content/docs");
-const KB_THINGS_DIR = path.join(ROOT, "packages/kb/data/things");
+const KB_THINGS_DIR = path.join(ROOT, "packages/factbase/data/things");
 
 const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");

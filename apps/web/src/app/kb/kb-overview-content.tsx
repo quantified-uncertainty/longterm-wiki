@@ -3,8 +3,8 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import { Database, BarChart3, Layers, BookOpen } from "lucide-react";
 
 /**

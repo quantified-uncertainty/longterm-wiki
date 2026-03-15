@@ -12,9 +12,9 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/kb";
-import type { Fact } from "@longterm-wiki/kb";
-import { CURRENCIES, resolveCurrency } from "@longterm-wiki/kb/currencies";
+import { getKBFacts, getKBLatest, getKBProperty, getKBFactVerification } from "@data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
+import { CURRENCIES, resolveCurrency } from "@longterm-wiki/factbase/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 import { VerificationDot } from "./VerificationDot";

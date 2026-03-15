@@ -3,8 +3,8 @@ import { z } from "zod";
 import { eq, and, count, sql, desc, or } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import {
-  kbFactVerdicts,
-  kbFactResourceVerifications,
+  factbaseVerdicts,
+  factbaseResourceVerifications,
   facts,
   entities,
 } from "../schema.js";
@@ -69,19 +69,19 @@ const kbVerificationsApp = new Hono()
     const [statsRow] = await db
       .select({
         total: count(),
-        needsRecheck: sql<number>`count(*) filter (where ${kbFactVerdicts.needsRecheck} = true)`,
-        avgConfidence: sql<number>`coalesce(avg(${kbFactVerdicts.confidence}), 0)`,
+        needsRecheck: sql<number>`count(*) filter (where ${factbaseVerdicts.needsRecheck} = true)`,
+        avgConfidence: sql<number>`coalesce(avg(${factbaseVerdicts.confidence}), 0)`,
       })
-      .from(kbFactVerdicts);
+      .from(factbaseVerdicts);
 
     // Breakdown by verdict (still a separate query — GROUP BY can't merge into the aggregate above)
     const byVerdictRows = await db
       .select({
-        verdict: kbFactVerdicts.verdict,
+        verdict: factbaseVerdicts.verdict,
         count: count(),
       })
-      .from(kbFactVerdicts)
-      .groupBy(kbFactVerdicts.verdict);
+      .from(factbaseVerdicts)
+      .groupBy(factbaseVerdicts.verdict);
 
     const byVerdict: Record<string, number> = {};
     for (const row of byVerdictRows) {
@@ -104,10 +104,10 @@ const kbVerificationsApp = new Hono()
 
     const conditions = [];
     if (verdict) {
-      conditions.push(eq(kbFactVerdicts.verdict, verdict));
+      conditions.push(eq(factbaseVerdicts.verdict, verdict));
     }
     if (needs_recheck !== undefined) {
-      conditions.push(eq(kbFactVerdicts.needsRecheck, needs_recheck));
+      conditions.push(eq(factbaseVerdicts.needsRecheck, needs_recheck));
     }
 
     // Filter by entity_id via the joined facts table.
@@ -140,22 +140,22 @@ const kbVerificationsApp = new Hono()
     // breaks, switch to a DISTINCT ON subquery.
     const rows = await db
       .select({
-        factId: kbFactVerdicts.factId,
-        verdict: kbFactVerdicts.verdict,
-        confidence: kbFactVerdicts.confidence,
-        reasoning: kbFactVerdicts.reasoning,
-        sourcesChecked: kbFactVerdicts.sourcesChecked,
-        needsRecheck: kbFactVerdicts.needsRecheck,
-        lastComputedAt: kbFactVerdicts.lastComputedAt,
-        createdAt: kbFactVerdicts.createdAt,
-        updatedAt: kbFactVerdicts.updatedAt,
+        factId: factbaseVerdicts.factId,
+        verdict: factbaseVerdicts.verdict,
+        confidence: factbaseVerdicts.confidence,
+        reasoning: factbaseVerdicts.reasoning,
+        sourcesChecked: factbaseVerdicts.sourcesChecked,
+        needsRecheck: factbaseVerdicts.needsRecheck,
+        lastComputedAt: factbaseVerdicts.lastComputedAt,
+        createdAt: factbaseVerdicts.createdAt,
+        updatedAt: factbaseVerdicts.updatedAt,
         entityId: facts.entityId,
         factLabel: facts.label,
       })
-      .from(kbFactVerdicts)
-      .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
+      .from(factbaseVerdicts)
+      .leftJoin(facts, eq(factbaseVerdicts.factId, facts.factId))
       .where(whereClause)
-      .orderBy(desc(kbFactVerdicts.lastComputedAt))
+      .orderBy(desc(factbaseVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
@@ -163,12 +163,12 @@ const kbVerificationsApp = new Hono()
     const countQuery = entity_id
       ? db
           .select({ count: count() })
-          .from(kbFactVerdicts)
-          .leftJoin(facts, eq(kbFactVerdicts.factId, facts.factId))
+          .from(factbaseVerdicts)
+          .leftJoin(facts, eq(factbaseVerdicts.factId, facts.factId))
           .where(whereClause)
       : db
           .select({ count: count() })
-          .from(kbFactVerdicts)
+          .from(factbaseVerdicts)
           .where(whereClause);
     const countResult = await countQuery;
     const total = countResult[0].count;
@@ -204,8 +204,8 @@ const kbVerificationsApp = new Hono()
 
     const verdictRows = await db
       .select()
-      .from(kbFactVerdicts)
-      .where(eq(kbFactVerdicts.factId, factId))
+      .from(factbaseVerdicts)
+      .where(eq(factbaseVerdicts.factId, factId))
       .limit(1);
 
     if (verdictRows.length === 0) {
@@ -216,9 +216,9 @@ const kbVerificationsApp = new Hono()
 
     const verifications = await db
       .select()
-      .from(kbFactResourceVerifications)
-      .where(eq(kbFactResourceVerifications.factId, factId))
-      .orderBy(desc(kbFactResourceVerifications.checkedAt));
+      .from(factbaseResourceVerifications)
+      .where(eq(factbaseResourceVerifications.factId, factId))
+      .orderBy(desc(factbaseResourceVerifications.checkedAt));
 
     return c.json({
       verdict: {
@@ -265,7 +265,7 @@ const kbVerificationsApp = new Hono()
 
     // Insert the resource verification
     const [inserted] = await db
-      .insert(kbFactResourceVerifications)
+      .insert(factbaseResourceVerifications)
       .values({
         factId: body.factId,
         resourceId: body.resourceId ?? null,
@@ -280,15 +280,15 @@ const kbVerificationsApp = new Hono()
         createdAt: now,
         updatedAt: now,
       })
-      .returning({ id: kbFactResourceVerifications.id });
+      .returning({ id: factbaseResourceVerifications.id });
 
     // Auto-set needs_recheck on the corresponding verdict if one exists.
     // When new evidence is inserted, the aggregate verdict may be stale.
     const updated = await db
-      .update(kbFactVerdicts)
+      .update(factbaseVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
-      .where(eq(kbFactVerdicts.factId, body.factId))
-      .returning({ factId: kbFactVerdicts.factId });
+      .where(eq(factbaseVerdicts.factId, body.factId))
+      .returning({ factId: factbaseVerdicts.factId });
 
     return c.json({
       id: inserted.id,

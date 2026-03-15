@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformFact } from "./sync-facts.ts";
-import type { Fact, Property } from "../../packages/kb/src/types.ts";
+import type { Fact, Property } from "../../packages/factbase/src/types.ts";
 
 describe("transformFact", () => {
   it("transforms a number fact", () => {

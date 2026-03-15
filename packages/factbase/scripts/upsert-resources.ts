@@ -1,6 +1,6 @@
 /**
  * Upsert all source URLs from KB entity files to the wiki-server resources DB.
- * Run: WIKI_SERVER_ENV=prod npx tsx packages/kb/scripts/upsert-resources.ts
+ * Run: WIKI_SERVER_ENV=prod npx tsx packages/factbase/scripts/upsert-resources.ts
  */
 import "dotenv/config";
 import yaml from "yaml";

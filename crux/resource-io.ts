@@ -17,7 +17,7 @@ import { loadPages as loadPagesJson, type PageEntry, DATA_DIR_ABS as DATA_DIR } 
 import { PUBLICATIONS_FILE } from './resource-types.ts';
 import type { Resource, Publication } from './resource-types.ts';
 import { apiRequest } from './lib/wiki-server/client.ts';
-import { generateId } from '../packages/kb/src/ids.ts';
+import { generateId } from '../packages/factbase/src/ids.ts';
 import { normalizeDate, normalizeTimestamp } from './lib/date-utils.ts';
 import { generateSnapshot } from './wiki-server/snapshot-resources.ts';
 

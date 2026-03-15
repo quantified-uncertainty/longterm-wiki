@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { isFactExpired } from "../kb";
-import type { Fact } from "@longterm-wiki/kb";
+import { isFactExpired } from "../factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 
 /** Create a minimal fact stub for testing isFactExpired. */
 function makeFact(validEnd?: string): Fact {

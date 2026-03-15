@@ -2,8 +2,8 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
-} from "@/data/kb";
-import type { Fact, Property, Entity } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/kb/format";
 import { KBFactsTable } from "./kb-facts-table";
 

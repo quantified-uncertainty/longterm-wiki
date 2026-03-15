@@ -10,9 +10,9 @@ import {
   getKBSlugMap,
   getKBEntities,
   resolveKBSlug,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/kb/format";
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 import { getTypedEntities, isPerson, isRisk, isOrganization } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";

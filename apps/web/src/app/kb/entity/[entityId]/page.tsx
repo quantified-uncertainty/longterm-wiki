@@ -9,9 +9,9 @@ import {
   getKBProperty,
   getKBRecordSchema,
   getKBLatest,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { getEntityHref } from "@/data";
-import type { Fact, Property, RecordEntry } from "@longterm-wiki/kb";
+import type { Fact, Property, RecordEntry } from "@longterm-wiki/factbase";
 import {
   formatKBFactValue,
   formatKBDate,
@@ -929,7 +929,7 @@ export default async function KBEntityPage({
                   )}
                   <tr>
                     <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">YAML Source</td>
-                    <td className="py-1.5 px-3 font-mono">packages/kb/data/things/{entityId}.yaml</td>
+                    <td className="py-1.5 px-3 font-mono">packages/factbase/data/things/{entityId}.yaml</td>
                   </tr>
                   <tr>
                     <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Facts</td>

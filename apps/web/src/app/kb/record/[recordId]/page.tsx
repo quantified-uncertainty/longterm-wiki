@@ -9,7 +9,7 @@ import {
   getKBRecords,
   getKBRecordByKey,
   getKBRecordSchema,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   formatKBCellValue,
   titleCase,
@@ -127,7 +127,7 @@ export default async function RecordDetailPage({ params }: PageProps) {
         )}
         <KVRow label="YAML File">
           <code className="text-xs">
-            packages/kb/data/things/{entityId}.yaml
+            packages/factbase/data/things/{entityId}.yaml
           </code>
         </KVRow>
       </KVTable>

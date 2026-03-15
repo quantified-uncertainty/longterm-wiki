@@ -5,7 +5,7 @@ import {
   escapeMarkdownInQuote,
   type FactLookupFn,
 } from "../fact-footnote-preprocessor";
-import type { Fact } from "@longterm-wiki/kb";
+import type { Fact } from "@longterm-wiki/factbase";
 
 // ---------------------------------------------------------------------------
 // Helpers

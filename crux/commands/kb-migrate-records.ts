@@ -13,13 +13,13 @@
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { contentHash } from '../../packages/kb/src/ids.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { RecordEntry } from '../../packages/kb/src/types.ts';
+import { loadKB } from '../../packages/factbase/src/loader.ts';
+import { contentHash } from '../../packages/factbase/src/ids.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
+import type { RecordEntry } from '../../packages/factbase/src/types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data');
 
 interface MigrateOptions extends BaseOptions {
   dryRun?: boolean;

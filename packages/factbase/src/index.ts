@@ -1,5 +1,5 @@
 /**
- * Public API for the @longterm-wiki/kb package.
+ * Public API for the @longterm-wiki/factbase package.
  */
 
 export { loadKB, CUSTOM_TAGS, RefMarker, DateMarker, SrcMarker } from "./loader";

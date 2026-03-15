@@ -3,8 +3,8 @@ import {
   getKBProperties,
   getKBFacts,
   getKBRecords,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import { KBEntitiesTable } from "./kb-entities-table";
 
 export interface EntityRow {

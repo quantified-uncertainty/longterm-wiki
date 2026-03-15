@@ -10,16 +10,16 @@ import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'nod
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { commands, resolveEntityArg } from './kb.ts';
-import { loadGraphFull } from '../lib/kb-loader.ts';
+import { loadGraphFull } from '../lib/factbase-loader.ts';
 import {
   readEntityDocument,
   appendFact,
   writeEntityDocument,
   findEntityFilePath,
-} from '../lib/kb-writer.ts';
-import type { RawFactInput } from '../lib/kb-writer.ts';
+} from '../lib/factbase-writer.ts';
+import type { RawFactInput } from '../lib/factbase-writer.ts';
 
-// The tests load real data from packages/kb/data/ — no mocking needed.
+// The tests load real data from packages/factbase/data/ — no mocking needed.
 // They are integration-style tests that exercise the full show/list/lookup flow.
 
 describe('crux kb list', () => {

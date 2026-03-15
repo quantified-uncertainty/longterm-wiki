@@ -6,8 +6,8 @@
  */
 
 import { formatValue as smartFormatValue } from "@lib/format-value";
-import { CURRENCIES } from "@longterm-wiki/kb/currencies";
-import type { Fact, FieldDef, RecordEntry, PropertyDisplay } from "@longterm-wiki/kb";
+import { CURRENCIES } from "@longterm-wiki/factbase/currencies";
+import type { Fact, FieldDef, RecordEntry, PropertyDisplay } from "@longterm-wiki/factbase";
 
 // ── Date formatting ────────────────────────────────────────────────
 

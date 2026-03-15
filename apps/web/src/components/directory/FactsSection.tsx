@@ -7,12 +7,12 @@ import {
   getKBProperty,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   formatKBFactValue,
   titleCase,
 } from "@/components/wiki/kb/format";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 
 // ── Constants ────────────────────────────────────────────────────────
 

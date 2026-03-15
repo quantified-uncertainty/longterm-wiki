@@ -123,7 +123,7 @@ interface BrokenKbfRef {
 
 // ── KB data loaders ────────────────────────────────────────────────────
 
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data');
 
 /**
  * Load valid KB property IDs by parsing properties.yaml keys.
@@ -148,7 +148,7 @@ function loadKbPropertyIds(): Set<string> {
 
 /**
  * Load valid KB entity slugs from the filesystem.
- * An entity has KB data if `packages/kb/data/things/<slug>.yaml` exists.
+ * An entity has KB data if `packages/factbase/data/things/<slug>.yaml` exists.
  */
 function loadKbEntitySlugs(): Set<string> {
   try {
@@ -572,8 +572,8 @@ async function main(): Promise<void> {
     for (const ref of issues.brokenKbfRefs) {
       console.log(`  ${c.yellow}${ref.file}:${ref.line}${c.reset}`);
       const desc = ref.reason === 'unknown-entity'
-        ? `entity "${ref.entity}" not found in packages/kb/data/things/`
-        : `property "${ref.property}" not found in packages/kb/data/properties.yaml`;
+        ? `entity "${ref.entity}" not found in packages/factbase/data/things/`
+        : `property "${ref.property}" not found in packages/factbase/data/properties.yaml`;
       console.log(`    <${ref.component} entity="${ref.entity}" property="${ref.property}" />`);
       log.dim(`    ${desc}`);
       console.log();

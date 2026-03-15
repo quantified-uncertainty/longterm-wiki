@@ -2,8 +2,8 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import { KBPropertiesTable } from "./kb-properties-table";
 
 export interface PropertyRow {

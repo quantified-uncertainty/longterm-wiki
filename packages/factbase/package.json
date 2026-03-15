@@ -1,5 +1,5 @@
 {
-  "name": "@longterm-wiki/kb",
+  "name": "@longterm-wiki/factbase",
   "version": "0.1.0",
   "private": true,
   "type": "module",

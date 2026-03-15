@@ -1,7 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { resolveSlugAlias } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
 import {
   resolvePersonBySlug,
   getPersonSlugs,
@@ -13,7 +13,7 @@ import {
 import {
   getKBFacts,
   getKBLatest,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   resolveEntityRef,
   formatAmount,
@@ -28,7 +28,7 @@ import {
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/kb/format";
 import { getExpertById, getPublicationsForPerson, getTypedEntityById, isPerson } from "@/data";
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
 import { CareerHistory } from "./career-history";

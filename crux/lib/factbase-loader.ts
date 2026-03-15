@@ -7,14 +7,16 @@
 
 import { join } from 'path';
 import { PROJECT_ROOT } from './content-types.ts';
-import { loadKB } from '../../packages/kb/src/loader.ts';
-import { computeInverses } from '../../packages/kb/src/inverse.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity } from '../../packages/kb/src/types.ts';
+import { loadKB } from '../../packages/factbase/src/loader.ts';
+import { computeInverses } from '../../packages/factbase/src/inverse.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
+import type { Entity } from '../../packages/factbase/src/types.ts';
 
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+const FACTBASE_DATA_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data');
 
-export { KB_DATA_DIR };
+/** @deprecated Use FACTBASE_DATA_DIR */
+export const KB_DATA_DIR = FACTBASE_DATA_DIR;
+export { FACTBASE_DATA_DIR };
 
 /** Loaded KB with filenameMap for reverse lookups. */
 export interface LoadedKB {
@@ -28,7 +30,7 @@ export interface LoadedKB {
  * Load the KB graph with inverses computed and filename maps built.
  */
 export async function loadGraphFull(): Promise<LoadedKB> {
-  const { graph, filenameMap } = await loadKB(KB_DATA_DIR);
+  const { graph, filenameMap } = await loadKB(FACTBASE_DATA_DIR);
   computeInverses(graph);
   const idByFilename = new Map<string, string>();
   for (const [entityId, filename] of filenameMap) {

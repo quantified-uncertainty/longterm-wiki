@@ -8,7 +8,7 @@
 import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
-import { buildKbContextForPage } from '../../../lib/kb-context.ts';
+import { buildKbContextForPage } from '../../../lib/factbase-context.ts';
 import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
 import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';

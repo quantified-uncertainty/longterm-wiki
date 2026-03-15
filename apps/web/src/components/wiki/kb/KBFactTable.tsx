@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBProperty, isFactExpired } from "@data/kb";
+import { getKBFacts, getKBProperty, isFactExpired } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
 

@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import type { KBRecordEntry } from "@/data/kb";
-import type { Entity } from "@longterm-wiki/kb";
+import type { KBRecordEntry } from "@/data/factbase";
+import type { Entity } from "@longterm-wiki/factbase";
 
 // Mock the KB data layer
-vi.mock("@/data/kb", () => ({
+vi.mock("@/data/factbase", () => ({
   getKBRecords: vi.fn(() => []),
   getAllKBRecords: vi.fn(() => []),
   getKBEntity: vi.fn(() => undefined),
@@ -31,7 +31,7 @@ import {
   getKBEntity,
   getKBEntitySlug,
   resolveKBSlug,
-} from "@/data/kb";
+} from "@/data/factbase";
 
 // Typed mocks for convenience
 const mockGetKBRecords = vi.mocked(getKBRecords);

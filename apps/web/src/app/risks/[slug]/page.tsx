@@ -7,8 +7,8 @@ import {
   getLikelihoodDisplay,
   getTimeframeDisplay,
 } from "@/app/risks/risk-utils";
-import { resolveSlugAlias } from "@/data/kb";
-import { getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
+import { getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getTypedEntityById, isRisk } from "@/data";
 import { getEntityWikiHref, safeHref } from "@/lib/directory-utils";
 import {
@@ -27,7 +27,7 @@ export function generateStaticParams() {
   return getRiskSlugs().map((slug) => ({ slug }));
 }
 
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 
 /** Resolve a slug to a risk entity (KB-first, typed entity fallback). */
 function resolveRiskEntity(slug: string): Entity | undefined {

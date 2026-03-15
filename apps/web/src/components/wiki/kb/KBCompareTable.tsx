@@ -32,8 +32,8 @@ import {
   getKBEntities,
   getKBProperty,
   getKBEntity,
-} from "@data/kb";
-import type { Fact, Property } from "@longterm-wiki/kb";
+} from "@data/factbase";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, formatKBFactValue, titleCase } from "./format";
 import { KBRefLink } from "./KBRefLink";
 

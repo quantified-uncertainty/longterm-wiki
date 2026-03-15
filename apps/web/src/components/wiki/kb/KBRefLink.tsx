@@ -11,7 +11,7 @@
  */
 
 import { cn } from "@lib/utils";
-import { getKBEntity } from "@data/kb";
+import { getKBEntity } from "@data/factbase";
 import { getEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
 

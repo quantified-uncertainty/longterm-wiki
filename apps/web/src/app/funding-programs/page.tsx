@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { parseFundingProgram } from "./[id]/program-data";

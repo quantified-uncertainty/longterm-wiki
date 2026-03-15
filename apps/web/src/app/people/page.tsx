@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 import { getExpertById, getPublicationsForPerson, getTypedEntities, isPerson } from "@/data";

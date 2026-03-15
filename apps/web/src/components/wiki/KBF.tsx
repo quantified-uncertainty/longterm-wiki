@@ -16,8 +16,8 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getKBFacts, getKBLatest, getKBProperty } from "@data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+import { getKBFacts, getKBLatest, getKBProperty } from "@data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import {
   formatKBFactValue,
   formatKBDate,

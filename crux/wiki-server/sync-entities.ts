@@ -27,7 +27,7 @@ import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
-const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/kb/data/things");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
 const EXPERTS_FILE = join(PROJECT_ROOT, "data/experts.yaml");
 const PEOPLE_RESOURCES_FILE = join(PROJECT_ROOT, "data/people-resources.yaml");
 
@@ -292,7 +292,7 @@ export function loadEntityYamls(
 }
 
 /**
- * Load KB-only entities from packages/kb/data/things/*.yaml.
+ * Load KB-only entities from packages/factbase/data/things/*.yaml.
  * Only returns entities NOT already present in the entityIds set.
  * KB YAML structure: { thing: { id, stableId, type, name, numericId, aliases } }
  */

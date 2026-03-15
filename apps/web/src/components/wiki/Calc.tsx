@@ -1,4 +1,4 @@
-import { getKBLatest, getKBProperty } from "@data/kb";
+import { getKBLatest, getKBProperty } from "@data/factbase";
 import { calc, formatValue, type CalcFormat, type CalcFact } from "@/lib/calc-engine";
 import { cn } from "@/lib/utils";
 import styles from "./tooltip.module.css";

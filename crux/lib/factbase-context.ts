@@ -9,10 +9,10 @@
  * - Avoid contradicting structured data when writing prose
  */
 
-import { formatFactValue } from '../../packages/kb/src/format.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact } from '../../packages/kb/src/types.ts';
-import { loadGraph } from './kb-loader.ts';
+import { formatFactValue } from '../../packages/factbase/src/format.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
+import type { Entity, Fact } from '../../packages/factbase/src/types.ts';
+import { loadGraph } from './factbase-loader.ts';
 
 let _graph: Graph | null = null;
 

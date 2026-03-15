@@ -10,7 +10,7 @@
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
-import { loadGraphFull } from '../lib/kb-loader.ts';
+import { loadGraphFull } from '../lib/factbase-loader.ts';
 import { apiRequest, getServerUrl, isServerAvailable } from '../lib/wiki-server/client.ts';
 
 interface BackfillResult {
@@ -120,7 +120,7 @@ export function getHelp(): string {
   return `
 Backfill Stable IDs
 
-Reads stableIds from KB YAML files (packages/kb/data/things/*.yaml) and
+Reads stableIds from KB YAML files (packages/factbase/data/things/*.yaml) and
 writes them to the wiki-server entity_ids table. Then generates new stableIds
 for any entities that don't have KB entries.
 

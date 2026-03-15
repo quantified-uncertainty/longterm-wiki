@@ -1,36 +1,36 @@
 /**
- * KB data access layer.
+ * FactBase data access layer.
  *
- * Reads kb-data.json (populated by build-data.mjs) — a dedicated file
+ * Reads factbase-data.json (populated by build-data.mjs) — a dedicated file
  * split out from database.json for faster incremental builds and smaller
  * main database bundle.
  *
- * The KB data may not exist if build-data hasn't been wired up yet,
+ * The FactBase data may not exist if build-data hasn't been wired up yet,
  * so all accessors return undefined/empty gracefully.
  */
 
 import fs from "fs";
 import path from "path";
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/kb";
-import type { SerializedKB } from "@longterm-wiki/kb";
+import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/factbase";
+import type { SerializedKB } from "@longterm-wiki/factbase";
 
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
 
-let _kbData: SerializedKB | undefined | null = null; // null = not yet loaded
+let _factbaseData: SerializedKB | undefined | null = null; // null = not yet loaded
 
-/** Get the full serialized KB data (or undefined if not available). */
-export function getKB(): SerializedKB | undefined {
-  if (_kbData !== null) return _kbData;
+/** Get the full serialized FactBase data (or undefined if not available). */
+export function getFactBase(): SerializedKB | undefined {
+  if (_factbaseData !== null) return _factbaseData;
 
-  const kbPath = path.join(LOCAL_DATA_DIR, "kb-data.json");
+  const factbasePath = path.join(LOCAL_DATA_DIR, "factbase-data.json");
   try {
-    const raw = fs.readFileSync(kbPath, "utf-8");
-    _kbData = JSON.parse(raw) as SerializedKB;
+    const raw = fs.readFileSync(factbasePath, "utf-8");
+    _factbaseData = JSON.parse(raw) as SerializedKB;
   } catch {
-    _kbData = undefined;
+    _factbaseData = undefined;
   }
-  return _kbData;
+  return _factbaseData;
 }
 
 
@@ -39,8 +39,8 @@ export function getKB(): SerializedKB | undefined {
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
  */
-function resolveEntityKey(entityOrSlug: string, kb?: SerializedKB): string {
-  const resolved = kb ?? getKB();
+function resolveEntityKey(entityOrSlug: string, fb?: SerializedKB): string {
+  const resolved = fb ?? getFactBase();
   if (!resolved?.slugToEntityId) return entityOrSlug;
   // If it's a slug, resolve to entity ID; otherwise return as-is (already an ID)
   return resolved.slugToEntityId[entityOrSlug] ?? entityOrSlug;
@@ -63,13 +63,13 @@ let factByIdIndex: Map<string, Fact> | undefined;
  * Look up a single fact by its ID (e.g. "f_dW5cR9mJ8q").
  * Uses a lazy-built index for O(1) lookups after initial build.
  */
-export function getKBFactById(factId: string): Fact | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
+export function getFactBaseFactById(factId: string): Fact | undefined {
+  const fb = getFactBase();
+  if (!fb) return undefined;
 
   if (!factByIdIndex) {
     factByIdIndex = new Map();
-    for (const facts of Object.values(kb.facts)) {
+    for (const facts of Object.values(fb.facts)) {
       for (const f of facts) {
         factByIdIndex.set(f.id, f);
       }
@@ -82,12 +82,12 @@ export function getKBFactById(factId: string): Fact | undefined {
  * Get all facts for an entity, optionally filtered by property.
  * Returns facts sorted most-recent-first (by asOf).
  */
-export function getKBFacts(entity: string, property?: string): Fact[] {
-  const kb = getKB();
-  if (!kb) return [];
+export function getFactBaseFacts(entity: string, property?: string): Fact[] {
+  const fb = getFactBase();
+  if (!fb) return [];
 
-  const key = resolveEntityKey(entity, kb);
-  const facts = kb.facts[key] ?? [];
+  const key = resolveEntityKey(entity, fb);
+  const facts = fb.facts[key] ?? [];
   const filtered = property
     ? facts.filter((f) => f.propertyId === property)
     : facts;
@@ -120,12 +120,12 @@ export function isFactExpired(fact: Fact): boolean {
  * By default, excludes expired facts (those with a validEnd in the past).
  * Set includeExpired=true to return expired facts as well.
  */
-export function getKBLatest(
+export function getFactBaseLatest(
   entity: string,
   property: string,
   options?: { includeExpired?: boolean },
 ): Fact | undefined {
-  const facts = getKBFacts(entity, property);
+  const facts = getFactBaseFacts(entity, property);
   if (options?.includeExpired) {
     return facts[0]; // Already sorted most-recent-first
   }
@@ -139,13 +139,13 @@ let propertyByIdIndex: Map<string, Property> | undefined;
  * Get a property definition by ID.
  * Uses a lazy-built index for O(1) lookups after initial build.
  */
-export function getKBProperty(propertyId: string): Property | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
+export function getFactBaseProperty(propertyId: string): Property | undefined {
+  const fb = getFactBase();
+  if (!fb) return undefined;
 
   if (!propertyByIdIndex) {
     propertyByIdIndex = new Map();
-    for (const p of kb.properties) {
+    for (const p of fb.properties) {
       propertyByIdIndex.set(p.id, p);
     }
   }
@@ -160,49 +160,49 @@ let entityByIdIndex: Map<string, Entity> | undefined;
  * Accepts either an internal entity ID (e.g. "mK9pX3rQ7n") or a YAML slug
  * (e.g. "anthropic"). Uses a lazy-built index for O(1) lookups after initial build.
  */
-export function getKBEntity(entityId: string): Entity | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
+export function getFactBaseEntity(entityId: string): Entity | undefined {
+  const fb = getFactBase();
+  if (!fb) return undefined;
 
   if (!entityByIdIndex) {
     entityByIdIndex = new Map();
-    for (const e of kb.entities) {
+    for (const e of fb.entities) {
       entityByIdIndex.set(e.id, e);
     }
   }
   // Try direct ID lookup first, then resolve as slug
   const direct = entityByIdIndex.get(entityId);
   if (direct) return direct;
-  const resolvedId = resolveEntityKey(entityId, kb);
+  const resolvedId = resolveEntityKey(entityId, fb);
   return resolvedId !== entityId ? entityByIdIndex.get(resolvedId) : undefined;
 }
 
 /**
- * Get all KB entities.
+ * Get all FactBase entities.
  */
-export function getKBEntities(): Entity[] {
-  const kb = getKB();
-  if (!kb) return [];
+export function getFactBaseEntities(): Entity[] {
+  const fb = getFactBase();
+  if (!fb) return [];
 
-  return kb.entities;
+  return fb.entities;
 }
 
 /**
- * Get all KB properties.
+ * Get all FactBase properties.
  */
-export function getKBProperties(): Property[] {
-  const kb = getKB();
-  if (!kb) return [];
+export function getFactBaseProperties(): Property[] {
+  const fb = getFactBase();
+  if (!fb) return [];
 
-  return kb.properties;
+  return fb.properties;
 }
 
 /**
- * Verification verdict values that can be returned by getKBFactVerification.
+ * Verification verdict values that can be returned by getFactBaseFactVerification.
  * Matches the accuracy verdicts from the citation system plus 'verified'
  * (source quote verified but not accuracy-checked).
  */
-export type KBFactVerdict =
+export type FactBaseVerdict =
   | "accurate"
   | "minor_issues"
   | "inaccurate"
@@ -220,16 +220,16 @@ const VALID_VERDICTS: Set<string> = new Set([
 ]);
 
 /**
- * Get the citation verification status for a KB fact.
+ * Get the citation verification status for a FactBase fact.
  * Returns the best verdict found by cross-referencing the fact's source URL
  * against citation quotes at build time, or undefined if no match.
  */
-export function getKBFactVerification(factId: string): KBFactVerdict | undefined {
+export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
   try {
     const db = getDatabase();
     const verdict = db.kbFactVerification?.[factId];
     if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
-    return verdict as KBFactVerdict;
+    return verdict as FactBaseVerdict;
   } catch {
     return undefined;
   }
@@ -241,19 +241,19 @@ export function getKBFactVerification(factId: string): KBFactVerdict | undefined
  * Optionally filtered to a subset of entity IDs.
  * By default, excludes expired facts (those with a validEnd in the past).
  */
-export function getKBFactsByProperty(
+export function getFactBaseFactsByProperty(
   propertyId: string,
   entityIds?: string[],
   options?: { includeExpired?: boolean },
 ): Map<string, Fact> {
-  const kb = getKB();
-  if (!kb) return new Map();
+  const fb = getFactBase();
+  if (!fb) return new Map();
 
-  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const ids = entityIds ?? fb.entities.map((e) => e.id);
   const result = new Map<string, Fact>();
 
   for (const entityId of ids) {
-    const fact = getKBLatest(entityId, propertyId, options);
+    const fact = getFactBaseLatest(entityId, propertyId, options);
     if (fact) result.set(entityId, fact);
   }
 
@@ -266,19 +266,19 @@ export function getKBFactsByProperty(
  * Optionally filtered to a subset of entity IDs.
  * By default, excludes expired facts (those with a validEnd in the past).
  */
-export function getKBAllFactsByProperty(
+export function getFactBaseAllFactsByProperty(
   propertyId: string,
   entityIds?: string[],
   options?: { includeExpired?: boolean },
 ): Map<string, Fact[]> {
-  const kb = getKB();
-  if (!kb) return new Map();
+  const fb = getFactBase();
+  if (!fb) return new Map();
 
-  const ids = entityIds ?? kb.entities.map((e) => e.id);
+  const ids = entityIds ?? fb.entities.map((e) => e.id);
   const result = new Map<string, Fact[]>();
 
   for (const entityId of ids) {
-    let facts = getKBFacts(entityId, propertyId);
+    let facts = getFactBaseFacts(entityId, propertyId);
     if (!options?.includeExpired) {
       facts = facts.filter((f) => !isFactExpired(f));
     }
@@ -291,12 +291,12 @@ export function getKBAllFactsByProperty(
 // ── Records access ────────────────────────────────────────────────
 
 /**
- * A single record entry from the KB records system.
+ * A single record entry from the FactBase records system.
  * Records are structured data items (grants, funding rounds, etc.)
- * stored per-entity, per-collection in kb-data.json.
+ * stored per-entity, per-collection in factbase-data.json.
  * Populated from PostgreSQL during build-data.
  */
-export interface KBRecordEntry {
+export interface FactBaseRecordEntry {
   key: string;
   schema: string;
   ownerEntityId: string;
@@ -309,19 +309,19 @@ export interface KBRecordEntry {
  * Get all records for an entity in a specific collection.
  * Returns an empty array if no records exist.
  *
- * The records field is added to kb-data.json by build-data.mjs (merged from PG).
+ * The records field is added to factbase-data.json by build-data.mjs (merged from PG).
  * It is NOT part of the SerializedKB TypeScript type (which only covers
  * entities/facts/properties/schemas), so we access it via type assertion.
  */
-export function getKBRecords(entityId: string, collection: string): KBRecordEntry[] {
-  const kb = getKB();
-  if (!kb) return [];
+export function getFactBaseRecords(entityId: string, collection: string): FactBaseRecordEntry[] {
+  const fb = getFactBase();
+  if (!fb) return [];
 
-  const key = resolveEntityKey(entityId, kb);
+  const key = resolveEntityKey(entityId, fb);
   // records is added dynamically by build-data.mjs, not in SerializedKB type
-  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
-  const records = "records" in kb
-    ? (kb as { records?: RecordsMap }).records
+  type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
+  const records = "records" in fb
+    ? (fb as { records?: RecordsMap }).records
     : undefined;
   if (!records) return [];
 
@@ -331,41 +331,41 @@ export function getKBRecords(entityId: string, collection: string): KBRecordEntr
 /**
  * Get all record collections for an entity.
  */
-export function getKBAllRecordCollections(entity: string): Record<string, KBRecordEntry[]> {
-  const kb = getKB();
-  if (!kb) return {};
+export function getFactBaseAllRecordCollections(entity: string): Record<string, FactBaseRecordEntry[]> {
+  const fb = getFactBase();
+  if (!fb) return {};
 
-  const key = resolveEntityKey(entity, kb);
-  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
-  const records = "records" in kb
-    ? (kb as { records?: RecordsMap }).records
+  const key = resolveEntityKey(entity, fb);
+  type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
+  const records = "records" in fb
+    ? (fb as { records?: RecordsMap }).records
     : undefined;
   if (!records) return {};
 
   return { ...(records[key] ?? {}) };
 }
 
-/** Module-level cache for getAllKBRecords results (KB data is static at build time). */
-const _allRecordsCache = new Map<string, KBRecordEntry[]>();
+/** Module-level cache for getAllFactBaseRecords results (FactBase data is static at build time). */
+const _allRecordsCache = new Map<string, FactBaseRecordEntry[]>();
 
 /**
  * Get all records across all entities for a specific collection.
  * Returns a flat array of all record entries.
  */
-export function getAllKBRecords(collection: string): KBRecordEntry[] {
+export function getAllFactBaseRecords(collection: string): FactBaseRecordEntry[] {
   const cached = _allRecordsCache.get(collection);
   if (cached) return cached;
 
-  const kb = getKB();
-  if (!kb) return [];
+  const fb = getFactBase();
+  if (!fb) return [];
 
-  type RecordsMap = Record<string, Record<string, KBRecordEntry[]>>;
-  const records = "records" in kb
-    ? (kb as { records?: RecordsMap }).records
+  type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
+  const records = "records" in fb
+    ? (fb as { records?: RecordsMap }).records
     : undefined;
   if (!records) return [];
 
-  const result: KBRecordEntry[] = [];
+  const result: FactBaseRecordEntry[] = [];
   for (const entityRecords of Object.values(records)) {
     const collectionRecords = entityRecords[collection];
     if (collectionRecords) {
@@ -380,43 +380,43 @@ export function getAllKBRecords(collection: string): KBRecordEntry[] {
  * Get all records across all entities for a specific collection name.
  * Returns a flat array of record entries (convenience alias).
  */
-export function getAllKBRecordsByCollection(collection: string): KBRecordEntry[] {
-  return getAllKBRecords(collection);
+export function getAllFactBaseRecordsByCollection(collection: string): FactBaseRecordEntry[] {
+  return getAllFactBaseRecords(collection);
 }
 
 /**
  * Get a record schema by ID.
  */
-export function getKBRecordSchema(schemaId: string): RecordSchema | undefined {
-  const kb = getKB();
-  if (!kb) return undefined;
-  return kb.recordSchemas?.find((s: RecordSchema) => s.id === schemaId);
+export function getFactBaseRecordSchema(schemaId: string): RecordSchema | undefined {
+  const fb = getFactBase();
+  if (!fb) return undefined;
+  return fb.recordSchemas?.find((s: RecordSchema) => s.id === schemaId);
 }
 
 /**
  * Get all record schemas.
  */
-export function getKBRecordSchemas(): RecordSchema[] {
-  const kb = getKB();
-  if (!kb) return [];
-  return kb.recordSchemas ?? [];
+export function getFactBaseRecordSchemas(): RecordSchema[] {
+  const fb = getFactBase();
+  if (!fb) return [];
+  return fb.recordSchemas ?? [];
 }
 
 /**
  * Find all records across all entities that reference the given entityId
  * via an explicit endpoint field. Optionally filter by collection name.
  */
-export function getKBRecordsReferencing(
+export function getFactBaseRecordsReferencing(
   entityId: string,
   collectionName?: string,
 ): RecordEntry[] {
-  const kb = getKB();
-  if (!kb || !kb.records || !kb.recordSchemas) return [];
+  const fb = getFactBase();
+  if (!fb || !fb.records || !fb.recordSchemas) return [];
 
-  const schemaMap = new Map(kb.recordSchemas.map((s: RecordSchema) => [s.id, s]));
+  const schemaMap = new Map(fb.recordSchemas.map((s: RecordSchema) => [s.id, s]));
   const results: RecordEntry[] = [];
 
-  for (const [, collections] of Object.entries(kb.records)) {
+  for (const [, collections] of Object.entries(fb.records)) {
     for (const [colName, entries] of Object.entries(collections)) {
       if (collectionName && colName !== collectionName) continue;
       for (const entry of entries) {
@@ -439,13 +439,13 @@ export function getKBRecordsReferencing(
 /**
  * Look up a single record entry by its key.
  */
-export function getKBRecordByKey(
+export function getFactBaseRecordByKey(
   recordKey: string,
 ): { entityId: string; collection: string; entry: RecordEntry } | undefined {
-  const kb = getKB();
-  if (!kb || !kb.records) return undefined;
+  const fb = getFactBase();
+  if (!fb || !fb.records) return undefined;
 
-  for (const [entityId, collections] of Object.entries(kb.records)) {
+  for (const [entityId, collections] of Object.entries(fb.records)) {
     for (const [collectionName, entries] of Object.entries(collections)) {
       for (const entry of entries) {
         if (entry.key === recordKey) {
@@ -461,13 +461,13 @@ export function getKBRecordByKey(
  * Get all record entries across all entities as a flat list.
  * Returns entries wrapped with their entityId and collection name.
  */
-export function getAllKBRecordEntries(): Array<{
+export function getAllFactBaseRecordEntries(): Array<{
   entityId: string;
   collection: string;
   entry: RecordEntry;
 }> {
-  const kb = getKB();
-  if (!kb || !kb.records) return [];
+  const fb = getFactBase();
+  if (!fb || !fb.records) return [];
 
   const results: Array<{
     entityId: string;
@@ -475,7 +475,7 @@ export function getAllKBRecordEntries(): Array<{
     entry: RecordEntry;
   }> = [];
 
-  for (const [entityId, collections] of Object.entries(kb.records)) {
+  for (const [entityId, collections] of Object.entries(fb.records)) {
     for (const [collectionName, entries] of Object.entries(collections)) {
       for (const entry of entries) {
         results.push({ entityId, collection: collectionName, entry });
@@ -489,22 +489,22 @@ export function getAllKBRecordEntries(): Array<{
 // ── Slug resolution (public) ─────────────────────────────────────
 
 /**
- * Resolve a YAML filename slug (e.g. "anthropic") to a KB entity ID.
+ * Resolve a YAML filename slug (e.g. "anthropic") to a FactBase entity ID.
  * Returns undefined if the slug is not in the mapping.
  */
-export function resolveKBSlug(slug: string): string | undefined {
-  const kb = getKB();
-  if (!kb?.slugToEntityId) return undefined;
-  return kb.slugToEntityId[slug];
+export function resolveFactBaseSlug(slug: string): string | undefined {
+  const fb = getFactBase();
+  if (!fb?.slugToEntityId) return undefined;
+  return fb.slugToEntityId[slug];
 }
 
 /**
  * Get the full slug→entityId mapping.
  * Useful for building static params or reverse lookups.
  */
-export function getKBSlugMap(): Record<string, string> {
-  const kb = getKB();
-  return kb?.slugToEntityId ?? {};
+export function getFactBaseSlugMap(): Record<string, string> {
+  const fb = getFactBase();
+  return fb?.slugToEntityId ?? {};
 }
 
 /**
@@ -513,9 +513,9 @@ export function getKBSlugMap(): Record<string, string> {
  * Used for URL redirect support when entity slugs change.
  */
 export function resolveSlugAlias(slug: string): string | undefined {
-  const kb = getKB();
-  if (!kb?.previousSlugToCurrentSlug) return undefined;
-  return kb.previousSlugToCurrentSlug[slug];
+  const fb = getFactBase();
+  if (!fb?.previousSlugToCurrentSlug) return undefined;
+  return fb.previousSlugToCurrentSlug[slug];
 }
 
 /** Lazy-initialized inverted index: entityId → slug. Built once on first call. */
@@ -525,9 +525,9 @@ let entityIdToSlugIndex: Map<string, string> | undefined;
  * Reverse lookup: find the YAML slug for a given entity ID.
  * Uses a lazy-built inverted index for O(1) lookups.
  */
-export function getKBEntitySlug(entityId: string): string | undefined {
+export function getFactBaseEntitySlug(entityId: string): string | undefined {
   if (!entityIdToSlugIndex) {
-    const map = getKBSlugMap();
+    const map = getFactBaseSlugMap();
     entityIdToSlugIndex = new Map();
     for (const [slug, id] of Object.entries(map)) {
       entityIdToSlugIndex.set(id, slug);
@@ -535,3 +535,58 @@ export function getKBEntitySlug(entityId: string): string | undefined {
   }
   return entityIdToSlugIndex.get(entityId);
 }
+
+// ── Backwards compatibility aliases ─────────────────────────────
+// These aliases allow consumers to migrate incrementally.
+// TODO: Remove after all call sites are updated.
+
+/** @deprecated Use getFactBase() */
+export const getKB = getFactBase;
+/** @deprecated Use getFactBaseFactById() */
+export const getKBFactById = getFactBaseFactById;
+/** @deprecated Use getFactBaseFacts() */
+export const getKBFacts = getFactBaseFacts;
+/** @deprecated Use getFactBaseLatest() */
+export const getKBLatest = getFactBaseLatest;
+/** @deprecated Use getFactBaseProperty() */
+export const getKBProperty = getFactBaseProperty;
+/** @deprecated Use getFactBaseEntity() */
+export const getKBEntity = getFactBaseEntity;
+/** @deprecated Use getFactBaseEntities() */
+export const getKBEntities = getFactBaseEntities;
+/** @deprecated Use getFactBaseProperties() */
+export const getKBProperties = getFactBaseProperties;
+/** @deprecated Use getFactBaseFactVerification() */
+export const getKBFactVerification = getFactBaseFactVerification;
+/** @deprecated Use getFactBaseFactsByProperty() */
+export const getKBFactsByProperty = getFactBaseFactsByProperty;
+/** @deprecated Use getFactBaseAllFactsByProperty() */
+export const getKBAllFactsByProperty = getFactBaseAllFactsByProperty;
+/** @deprecated Use getFactBaseRecords() */
+export const getKBRecords = getFactBaseRecords;
+/** @deprecated Use getFactBaseAllRecordCollections() */
+export const getKBAllRecordCollections = getFactBaseAllRecordCollections;
+/** @deprecated Use getAllFactBaseRecords() */
+export const getAllKBRecords = getAllFactBaseRecords;
+/** @deprecated Use getAllFactBaseRecordsByCollection() */
+export const getAllKBRecordsByCollection = getAllFactBaseRecordsByCollection;
+/** @deprecated Use getFactBaseRecordSchema() */
+export const getKBRecordSchema = getFactBaseRecordSchema;
+/** @deprecated Use getFactBaseRecordSchemas() */
+export const getKBRecordSchemas = getFactBaseRecordSchemas;
+/** @deprecated Use getFactBaseRecordsReferencing() */
+export const getKBRecordsReferencing = getFactBaseRecordsReferencing;
+/** @deprecated Use getFactBaseRecordByKey() */
+export const getKBRecordByKey = getFactBaseRecordByKey;
+/** @deprecated Use getAllFactBaseRecordEntries() */
+export const getAllKBRecordEntries = getAllFactBaseRecordEntries;
+/** @deprecated Use resolveFactBaseSlug() */
+export const resolveKBSlug = resolveFactBaseSlug;
+/** @deprecated Use getFactBaseSlugMap() */
+export const getKBSlugMap = getFactBaseSlugMap;
+/** @deprecated Use getFactBaseEntitySlug() */
+export const getKBEntitySlug = getFactBaseEntitySlug;
+/** @deprecated Use FactBaseVerdict */
+export type KBFactVerdict = FactBaseVerdict;
+/** @deprecated Use FactBaseRecordEntry */
+export type KBRecordEntry = FactBaseRecordEntry;

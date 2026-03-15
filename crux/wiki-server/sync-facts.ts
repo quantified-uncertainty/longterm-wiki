@@ -1,7 +1,7 @@
 /**
  * Wiki Server Facts Sync
  *
- * Reads all KB YAML facts from packages/kb/data/things/ and bulk-upserts
+ * Reads all KB YAML facts from packages/factbase/data/things/ and bulk-upserts
  * them to the wiki-server's /api/facts/sync endpoint.
  *
  * Reuses the shared batch sync infrastructure from sync-common.ts.
@@ -20,13 +20,13 @@ import { join } from "path";
 import { fileURLToPath } from "url";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
-import { loadKB } from "../../packages/kb/src/loader.ts";
-import type { Fact, FactValue, Property } from "../../packages/kb/src/types.ts";
+import { loadKB } from "../../packages/factbase/src/loader.ts";
+import type { Fact, FactValue, Property } from "../../packages/factbase/src/types.ts";
 import type { SyncFact } from "../../apps/wiki-server/src/api-types.ts";
 import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
-const KB_DATA_DIR = join(PROJECT_ROOT, "packages", "kb", "data");
+const KB_DATA_DIR = join(PROJECT_ROOT, "packages", "factbase", "data");
 
 // --- Configuration ---
 const DEFAULT_BATCH_SIZE = 500;

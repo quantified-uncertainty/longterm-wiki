@@ -5,7 +5,7 @@
  * with consistent handling of refs, ref-lists, and formatted values.
  */
 
-import type { Fact, Property } from "@longterm-wiki/kb";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue } from "./format";
 import { KBRefLink } from "./KBRefLink";
 

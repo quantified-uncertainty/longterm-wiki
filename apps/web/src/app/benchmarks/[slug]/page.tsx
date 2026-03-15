@@ -6,7 +6,7 @@ import {
   getBenchmarkSlugs,
   getBenchmarkResultsFromModels,
 } from "../benchmark-utils";
-import { resolveSlugAlias } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
 
 export function generateStaticParams() {
   return getBenchmarkSlugs().map((slug) => ({ slug }));

@@ -6,8 +6,8 @@ import {
   getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
-import type { KBRecordEntry } from "@/data/kb";
+} from "@/data/factbase";
+import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/database";
 import {
   titleCase,
@@ -161,7 +161,7 @@ export interface ProgramPageData {
   totalGranted: number;
 }
 
-export function loadProgramPageData(record: import("@/data/kb").KBRecordEntry): ProgramPageData {
+export function loadProgramPageData(record: import("@/data/factbase").KBRecordEntry): ProgramPageData {
   const program = parseFundingProgram(record);
   const funder = resolveEntityLink(program.ownerEntityId);
 

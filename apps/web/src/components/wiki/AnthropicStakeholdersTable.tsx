@@ -7,10 +7,10 @@
  * to the client.
  */
 
-import { getKBLatest, getKBRecords, getKBEntity } from "@data/kb";
+import { getKBLatest, getKBRecords, getKBEntity } from "@data/factbase";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
-import type { RecordEntry } from "@longterm-wiki/kb";
+import type { RecordEntry } from "@longterm-wiki/factbase";
 
 // ── EA Alignment (editorial estimates, not KB data) ─────────────────────────
 // These are subjective editorial assessments of how likely each stakeholder's

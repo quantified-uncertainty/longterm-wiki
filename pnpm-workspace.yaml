@@ -3,4 +3,4 @@ packages:
   - "apps/discord-bot"
   - "apps/wiki-server"
   - "apps/groundskeeper"
-  - "packages/kb"
+  - "packages/factbase"

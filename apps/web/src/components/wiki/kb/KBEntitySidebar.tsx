@@ -16,8 +16,8 @@
 
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { getKBEntity, getKBLatest, getKBProperties } from "@data/kb";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
 
@@ -34,7 +34,7 @@ interface KBEntitySidebarProps {
 /** Default properties to show for each entity type, in display order.
  *
  * Each list is derived from the schema's `required` + `recommended` properties
- * (in `packages/kb/data/schemas/<type>.yaml`), with `description` excluded
+ * (in `packages/factbase/data/schemas/<type>.yaml`), with `description` excluded
  * (it belongs in the page content, not the sidebar).
  */
 const DEFAULT_PROPERTIES: Record<string, string[]> = {

@@ -5,8 +5,8 @@ import {
   getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
-import type { KBRecordEntry } from "@/data/kb";
+} from "@/data/factbase";
+import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/database";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";

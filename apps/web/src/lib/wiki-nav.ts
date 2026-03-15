@@ -12,7 +12,7 @@
  */
 
 import { getEntityHref, getAllPages, getPageById } from "@/data";
-import { getKBEntities, getKBFacts } from "@/data/kb";
+import { getKBEntities, getKBFacts } from "@/data/factbase";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place

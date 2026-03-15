@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
-import { getKBEntitySlug } from "@/data/kb";
+import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/database";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";

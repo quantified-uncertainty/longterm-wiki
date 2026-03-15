@@ -12,8 +12,8 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerification } from "@data/kb";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerification } from "@data/factbase";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { KBFactValueDisplay } from "./KBFactValueDisplay";
 import { VerificationDot } from "./VerificationDot";

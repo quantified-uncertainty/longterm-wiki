@@ -12,7 +12,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const THINGS_DIR = "packages/kb/data/things";
+const THINGS_DIR = "packages/factbase/data/things";
 const ENTITIES_DIR = "data/entities";
 const apply = process.argv.includes("--apply");
 

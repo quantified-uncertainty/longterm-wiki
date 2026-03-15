@@ -5,7 +5,7 @@
  * The old→new mapping is printed for audit purposes.
  *
  * Usage:
- *   npx tsx packages/kb/scripts/normalize-ids.ts [--dry-run]
+ *   npx tsx packages/factbase/scripts/normalize-ids.ts [--dry-run]
  */
 
 import { readdir, readFile, writeFile } from "node:fs/promises";

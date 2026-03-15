@@ -8,7 +8,7 @@ import {
   getRelatedModels,
   isModelFamily,
 } from "../ai-model-utils";
-import { resolveSlugAlias } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
 import {
   DEVELOPER_COLORS,
   SAFETY_LEVEL_COLORS,

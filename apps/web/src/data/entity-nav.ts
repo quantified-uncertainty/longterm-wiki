@@ -4,7 +4,7 @@
 
 import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./database";
 import type { WithSource } from "./database";
-import { getKBEntitySlug } from "./kb";
+import { getKBEntitySlug } from "./factbase";
 
 // ============================================================================
 // DIRECTORY URL RESOLUTION

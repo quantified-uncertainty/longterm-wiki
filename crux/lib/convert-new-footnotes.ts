@@ -19,7 +19,7 @@ import { createCitationsBatch } from './wiki-server/references.ts';
 import { isServerAvailable } from './wiki-server/client.ts';
 import type { PageCitationInsert } from '../../apps/wiki-server/src/api-types.ts';
 import { getResourceByUrl } from './search/resource-lookup.ts';
-import { buildKBFactSourceMap, findKBFactByUrl } from './kb-fact-lookup.ts';
+import { buildKBFactSourceMap, findKBFactByUrl } from './factbase-fact-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Reference ID generation (shared with migrate-footnotes.ts)

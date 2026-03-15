@@ -3,7 +3,7 @@
 /**
  * KB Schema Validation — gate check for knowledge base data integrity.
  *
- * Loads the KB graph from packages/kb/data/ and runs the full validation suite.
+ * Loads the KB graph from packages/factbase/data/ and runs the full validation suite.
  * Exits non-zero if any error-severity issues are found.
  *
  * Usage:
@@ -12,7 +12,7 @@
  */
 
 import { join } from "path";
-import type { ValidationResult } from "../../packages/kb/src/types.ts";
+import type { ValidationResult } from "../../packages/factbase/src/types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 
 const verbose = process.argv.includes("--verbose");
@@ -79,13 +79,13 @@ function printSummaryTable(results: ValidationResult[]): void {
 async function main(): Promise<void> {
   // Dynamic import to avoid loading KB code when this validator is skipped
   const { loadKB } = await import(
-    join(PROJECT_ROOT, "packages/kb/src/loader.ts")
+    join(PROJECT_ROOT, "packages/factbase/src/loader.ts")
   );
   const { validate } = await import(
-    join(PROJECT_ROOT, "packages/kb/src/validate.ts")
+    join(PROJECT_ROOT, "packages/factbase/src/validate.ts")
   );
 
-  const dataDir = join(PROJECT_ROOT, "packages/kb/data");
+  const dataDir = join(PROJECT_ROOT, "packages/factbase/data");
   const { graph } = await loadKB(dataDir);
   const results: ValidationResult[] = validate(graph);
 

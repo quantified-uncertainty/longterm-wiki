@@ -12,23 +12,23 @@
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-import { formatFactValue } from '../../packages/kb/src/format.ts';
-import { validate } from '../../packages/kb/src/validate.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
-import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/kb/src/types.ts';
+import { formatFactValue } from '../../packages/factbase/src/format.ts';
+import { validate } from '../../packages/factbase/src/validate.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
+import type { Entity, Fact, RecordEntry, ValidationResult } from '../../packages/factbase/src/types.ts';
 import { commands as kbMigrateCommands } from './kb-migrate.ts';
 import { verifyCommand } from './kb-verify.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
-import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/kb-loader.ts';
-import type { LoadedKB } from '../lib/kb-loader.ts';
+import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/factbase-loader.ts';
+import type { LoadedKB } from '../lib/factbase-loader.ts';
 import {
   readEntityDocument,
   appendFact,
   writeEntityDocument,
   findEntityFilePath,
-} from '../lib/kb-writer.ts';
-import type { RawFactInput } from '../lib/kb-writer.ts';
+} from '../lib/factbase-writer.ts';
+import type { RawFactInput } from '../lib/factbase-writer.ts';
 
 interface KBCommandOptions extends BaseOptions {
   type?: string;

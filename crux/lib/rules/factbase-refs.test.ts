@@ -70,7 +70,7 @@ vi.mock('fs', () => ({
 }));
 
 // Import AFTER vi.mock so the mocked fs is used when the module initialises.
-import { kbfRefsRule, _resetCache } from './kbf-refs.ts';
+import { kbfRefsRule, _resetCache } from './factbase-refs.ts';
 
 beforeEach(() => {
   _resetCache();

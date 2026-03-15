@@ -11,7 +11,7 @@
  * 5. Renames `amount` → `raised` in funding-round collections
  * 6. Quotes date values that aren't already quoted
  *
- * Usage: npx tsx packages/kb/scripts/migrate-items-to-records.ts [--dry-run] [--entity=openai]
+ * Usage: npx tsx packages/factbase/scripts/migrate-items-to-records.ts [--dry-run] [--entity=openai]
  */
 
 import { readFileSync, writeFileSync } from "node:fs";

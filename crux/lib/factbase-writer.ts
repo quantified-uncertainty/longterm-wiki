@@ -10,8 +10,8 @@
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Document, parseDocument, isSeq, isMap } from 'yaml';
-import { generateId } from '../../packages/kb/src/ids.ts';
-import { CUSTOM_TAGS } from '../../packages/kb/src/loader.ts';
+import { generateId } from '../../packages/factbase/src/ids.ts';
+import { CUSTOM_TAGS } from '../../packages/factbase/src/loader.ts';
 
 // ── Public types ──────────────────────────────────────────────────────
 
@@ -109,7 +109,7 @@ export function writeEntityDocument(filepath: string, doc: Document): void {
  * Checks both single-file (things/<slug>.yaml) and directory (things/<dir>/entity.yaml) patterns.
  *
  * @param entitySlug - The slug (filename stem) for the entity
- * @param dataDir - The KB data directory (e.g., packages/kb/data)
+ * @param dataDir - The KB data directory (e.g., packages/factbase/data)
  * @returns Absolute file path, or null if not found
  */
 export function findEntityFilePath(entitySlug: string, dataDir: string): string | null {

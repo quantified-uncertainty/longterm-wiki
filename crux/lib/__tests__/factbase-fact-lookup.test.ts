@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { buildKBFactSourceMap, findKBFactByUrl } from "../kb-fact-lookup";
+import { buildKBFactSourceMap, findKBFactByUrl } from "../factbase-fact-lookup";
 
 // Mock fs.readFile to avoid reading real YAML files
 vi.mock("node:fs/promises", () => ({

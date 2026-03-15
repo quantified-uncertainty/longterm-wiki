@@ -9,8 +9,8 @@ import {
   getKBEntity,
   getKBProperty,
   getKBAllFactsByProperty,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import {
   formatKBFactValue,
   formatKBDate,

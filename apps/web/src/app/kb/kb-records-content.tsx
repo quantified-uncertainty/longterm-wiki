@@ -1,4 +1,4 @@
-import { getAllKBRecordEntries, getKBEntity } from "@/data/kb";
+import { getAllKBRecordEntries, getKBEntity } from "@/data/factbase";
 import { titleCase } from "@/components/wiki/kb/format";
 import { KBRecordsTable } from "./kb-records-table";
 
