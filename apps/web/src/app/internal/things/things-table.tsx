@@ -19,7 +19,7 @@ import { searchThings, fetchThingsPage, type ThingSearchRow } from "./actions";
 
 export type ThingRow = ThingSearchRow;
 
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 500;
 
 // ---------------------------------------------------------------------------
 // Helpers
