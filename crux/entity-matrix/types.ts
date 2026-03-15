@@ -59,10 +59,16 @@ export interface EntityTypeMeta {
   apiRouteFile?: string;
   /** YAML file name in data/entities/ (e.g., "organizations") */
   yamlFile?: string;
+  /** Full YAML path relative to project root (for data outside data/entities/) */
+  yamlPath?: string;
   /** Subdirectory in content/docs/ for MDX pages */
   contentDir?: string;
   /** DB table name in wiki-server schema */
   dbTable?: string;
+  /** Count data as another entity type (e.g., legislation → policy) */
+  countsAsType?: string;
+  /** Key in database.json for non-entity data (e.g., "publications") */
+  buildDataKey?: string;
 }
 
 // ============================================================================

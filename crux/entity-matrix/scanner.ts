@@ -245,21 +245,31 @@ function cell(raw: number | boolean | string | null, dimensionId: string, detail
 // --- Data Foundation ---
 
 function scanYamlEntityCount(meta: EntityTypeMeta): CellValue {
+  // Handle custom YAML path (outside data/entities/)
+  if (meta.yamlPath) {
+    const filePath = join(PROJECT_ROOT, meta.yamlPath);
+    const entities = parseYamlEntities(filePath);
+    return cell(entities.length, "yaml_entity_count", `${entities.length} in ${meta.yamlPath}`);
+  }
+
   if (!meta.yamlFile) return naCell("No YAML file mapped");
 
   const filePath = join(YAML_ENTITIES_DIR, `${meta.yamlFile}.yaml`);
   const entities = parseYamlEntities(filePath);
 
-  // Filter by type field matching this entity type
+  // Use countsAsType to look for a different entity type in the YAML
+  const typeToMatch = meta.countsAsType ?? meta.id;
+
+  // Filter by type field matching the target entity type
   const matching = entities.filter((e) => {
     const type = (e.type as string) || "";
-    return type === meta.id;
+    return type === typeToMatch;
   });
 
   // If the YAML file is single-type (same name as entity type), count all
-  const isSingleTypeFile = meta.yamlFile === meta.id ||
-    meta.yamlFile === meta.id + "s" ||
-    meta.yamlFile === meta.id.replace(/-/g, "");
+  const isSingleTypeFile = meta.yamlFile === typeToMatch ||
+    meta.yamlFile === typeToMatch + "s" ||
+    meta.yamlFile === typeToMatch.replace(/-/g, "");
   const count = matching.length > 0
     ? matching.length
     : isSingleTypeFile
@@ -270,10 +280,20 @@ function scanYamlEntityCount(meta: EntityTypeMeta): CellValue {
 
 function scanBuildEntityCount(meta: EntityTypeMeta): CellValue {
   const db = getDatabaseJson();
-  if (!db?.typedEntities) return naCell("database.json not available");
+  if (!db) return naCell("database.json not available");
 
+  // Handle custom data key (e.g., publications are in db.publications, not typedEntities)
+  if (meta.buildDataKey) {
+    const data = (db as Record<string, unknown>)[meta.buildDataKey];
+    const count = Array.isArray(data) ? data.length : 0;
+    return cell(count, "build_entity_count", `${count} in database.json.${meta.buildDataKey}`);
+  }
+
+  if (!db.typedEntities) return naCell("database.json not available");
+
+  const typeToMatch = meta.countsAsType ?? meta.id;
   const count = db.typedEntities.filter(
-    (e: { entityType: string }) => e.entityType === meta.id,
+    (e: { entityType: string }) => e.entityType === typeToMatch,
   ).length;
 
   return cell(count, "build_entity_count", `${count} entities in database.json`);
@@ -282,6 +302,12 @@ function scanBuildEntityCount(meta: EntityTypeMeta): CellValue {
 async function scanDbRecordCount(meta: EntityTypeMeta): Promise<CellValue> {
   const stats = await fetchDbStats();
   if (!stats) return naCell("Wiki-server unavailable");
+
+  // If countsAsType is set, look up as the aliased type
+  if (meta.countsAsType) {
+    const count = stats.entityCounts[meta.countsAsType] ?? 0;
+    return cell(count, "db_record_count", `${count} rows (as ${meta.countsAsType})`);
+  }
 
   // Canonical types → entities table (by entityType)
   if (meta.tier === "canonical") {
@@ -299,6 +325,9 @@ async function scanDbRecordCount(meta: EntityTypeMeta): Promise<CellValue> {
 }
 
 function scanKbFactCount(meta: EntityTypeMeta): CellValue {
+  // Publications don't have KB facts
+  if (meta.buildDataKey) return naCell("Not a KB entity type");
+
   if (!existsSync(KB_THINGS_DIR)) return naCell("KB things dir missing");
 
   const kbFiles = new Set(
@@ -309,12 +338,13 @@ function scanKbFactCount(meta: EntityTypeMeta): CellValue {
 
   // Get slugs from database.json (most accurate) or YAML
   const db = getDatabaseJson();
+  const typeToMatch = meta.countsAsType ?? meta.id;
   let slugs: Set<string>;
 
   if (db?.typedEntities) {
     slugs = new Set(
       db.typedEntities
-        .filter((e) => e.entityType === meta.id)
+        .filter((e) => e.entityType === typeToMatch)
         .map((e) => e.slug || e.id)
         .filter(Boolean),
     );
@@ -323,7 +353,7 @@ function scanKbFactCount(meta: EntityTypeMeta): CellValue {
     const entities = parseYamlEntities(filePath);
     slugs = new Set(
       entities
-        .filter((e) => (e.type as string) === meta.id)
+        .filter((e) => (e.type as string) === typeToMatch)
         .map((e) => e.slug as string)
         .filter(Boolean),
     );
@@ -350,10 +380,34 @@ function scanDbTableExists(meta: EntityTypeMeta): CellValue {
 
 function scanFieldCompleteness(meta: EntityTypeMeta): CellValue {
   const db = getDatabaseJson();
+
+  // For custom data sources (like publications), compute field completeness from that array
+  if (meta.buildDataKey) {
+    if (!db) return naCell("No database.json");
+    const data = (db as Record<string, unknown>)[meta.buildDataKey];
+    if (!Array.isArray(data) || data.length === 0) return naCell("No data");
+    const entities = data as Array<Record<string, unknown>>;
+    const fieldCounts: Record<string, number> = {};
+    for (const entity of entities) {
+      for (const [key, value] of Object.entries(entity)) {
+        if (key === "id") continue;
+        if (!fieldCounts[key]) fieldCounts[key] = 0;
+        if (value !== null && value !== undefined && value !== "" && !(Array.isArray(value) && value.length === 0)) {
+          fieldCounts[key]++;
+        }
+      }
+    }
+    const totalFields = Object.keys(fieldCounts).length;
+    if (totalFields === 0) return cell(0, "field_completeness");
+    const avgCompleteness = Object.values(fieldCounts).reduce((sum, c) => sum + c, 0) / (totalFields * entities.length) * 100;
+    return cell(Math.round(avgCompleteness), "field_completeness", `${totalFields} fields, ${entities.length} entities`);
+  }
+
   if (!db?.typedEntities) return naCell("No database.json");
 
+  const typeToMatch = meta.countsAsType ?? meta.id;
   const entities = db.typedEntities.filter(
-    (e) => e.entityType === meta.id,
+    (e) => e.entityType === typeToMatch,
   );
   if (entities.length === 0) return naCell("No entities of this type");
 
@@ -637,11 +691,14 @@ function scanProfileSections(meta: EntityTypeMeta): CellValue {
 }
 
 function scanWikiPageShell(meta: EntityTypeMeta): CellValue {
+  if (meta.buildDataKey) return naCell("Not an entity type");
+
   const db = getDatabaseJson();
   if (!db?.typedEntities) return naCell("No database.json");
 
+  const typeToMatch = meta.countsAsType ?? meta.id;
   const hasNumericId = db.typedEntities.some(
-    (e) => e.entityType === meta.id && e.numericId,
+    (e) => e.entityType === typeToMatch && e.numericId,
   );
   return cell(
     hasNumericId,
@@ -693,7 +750,12 @@ function scanInfobox(meta: EntityTypeMeta): CellValue {
 // --- Content ---
 
 function scanMdxPageCount(meta: EntityTypeMeta): CellValue {
+  // Publications don't have MDX pages
+  if (meta.buildDataKey) return naCell("Not an MDX entity type");
+
   const db = getDatabaseJson();
+  const typeToMatch = meta.countsAsType ?? meta.id;
+
   if (!db?.pages) {
     // Fallback: count MDX files in content directory
     if (meta.contentDir) {
@@ -707,7 +769,7 @@ function scanMdxPageCount(meta: EntityTypeMeta): CellValue {
   }
 
   // From database.json pages, match by entityType
-  const pages = db.pages.filter((p) => p.entityType === meta.id);
+  const pages = db.pages.filter((p) => p.entityType === typeToMatch);
   if (pages.length > 0) {
     return cell(pages.length, "mdx_page_count", `${pages.length} pages`);
   }
@@ -725,11 +787,13 @@ function scanMdxPageCount(meta: EntityTypeMeta): CellValue {
 }
 
 function scanAvgPageLength(meta: EntityTypeMeta): CellValue {
+  if (meta.buildDataKey) return naCell("Not an MDX entity type");
   const db = getDatabaseJson();
   if (!db?.pages) return naCell("No database.json");
 
+  const typeToMatch = meta.countsAsType ?? meta.id;
   const pages = db.pages.filter(
-    (p) => p.entityType === meta.id && p.wordCount,
+    (p) => p.entityType === typeToMatch && p.wordCount,
   );
   if (pages.length === 0) return naCell("No pages with word count");
 
@@ -740,10 +804,12 @@ function scanAvgPageLength(meta: EntityTypeMeta): CellValue {
 }
 
 function scanCitationDensity(meta: EntityTypeMeta): CellValue {
+  if (meta.buildDataKey) return naCell("Not an MDX entity type");
   const db = getDatabaseJson();
   if (!db?.pages) return naCell("No database.json");
 
-  const pages = db.pages.filter((p) => p.entityType === meta.id);
+  const typeToMatch = meta.countsAsType ?? meta.id;
+  const pages = db.pages.filter((p) => p.entityType === typeToMatch);
   if (pages.length === 0) return naCell("No pages of this type");
 
   const totalCitations = pages.reduce(
@@ -755,12 +821,14 @@ function scanCitationDensity(meta: EntityTypeMeta): CellValue {
 }
 
 function scanContentFreshness(meta: EntityTypeMeta): CellValue {
+  if (meta.buildDataKey) return naCell("Not an MDX entity type");
   const db = getDatabaseJson();
   if (!db?.pages) return naCell("No database.json");
 
+  const typeToMatch = meta.countsAsType ?? meta.id;
   const now = Date.now();
   const pages = db.pages.filter(
-    (p) => p.entityType === meta.id && p.lastUpdated,
+    (p) => p.entityType === typeToMatch && p.lastUpdated,
   );
   if (pages.length === 0) return naCell("No pages with dates");
 
@@ -800,10 +868,12 @@ function scanVerificationCoverage(_meta: EntityTypeMeta): CellValue {
 }
 
 function scanHallucinationScored(meta: EntityTypeMeta): CellValue {
+  if (meta.buildDataKey) return naCell("Not an MDX entity type");
   const db = getDatabaseJson();
   if (!db?.pages) return naCell("No database.json");
 
-  const pages = db.pages.filter((p) => p.entityType === meta.id);
+  const typeToMatch = meta.countsAsType ?? meta.id;
+  const pages = db.pages.filter((p) => p.entityType === typeToMatch);
   if (pages.length === 0) return naCell("No pages of this type");
 
   const scored = pages.filter((p) => {
@@ -988,19 +1058,32 @@ export async function scanMatrix(): Promise<MatrixSnapshot> {
 
     // Pick a sample entity that has an actual MDX page
     const db = getDatabaseJson();
-    const pageIds = new Set(
-      db?.pages
-        ?.filter((p) => p.entityType === entityType.id && p.numericId)
-        .map((p) => p.numericId) ?? [],
-    );
-    // Prefer an entity that has a page; fall back to any entity with a numericId
-    const sampleEntity = pageIds.size > 0
-      ? db?.typedEntities?.find(
-          (e) => e.entityType === entityType.id && pageIds.has(e.numericId),
-        )
-      : db?.typedEntities?.find(
-          (e) => e.entityType === entityType.id && e.numericId,
-        );
+    const sampleType = entityType.countsAsType ?? entityType.id;
+
+    let sampleEntity: typeof db extends null ? never : NonNullable<typeof db>["typedEntities"] extends Array<infer T> ? T | undefined : never = undefined;
+    let sampleSlug: string | undefined;
+
+    if (entityType.buildDataKey) {
+      // For non-entity data (like publications), use the first item's id
+      const data = db ? (db as Record<string, unknown>)[entityType.buildDataKey] : null;
+      if (Array.isArray(data) && data.length > 0) {
+        sampleSlug = (data[0] as Record<string, unknown>).id as string;
+      }
+    } else {
+      const pageIds = new Set(
+        db?.pages
+          ?.filter((p) => p.entityType === sampleType && p.numericId)
+          .map((p) => p.numericId) ?? [],
+      );
+      // Prefer an entity that has a page; fall back to any entity with a numericId
+      sampleEntity = pageIds.size > 0
+        ? db?.typedEntities?.find(
+            (e) => e.entityType === sampleType && pageIds.has(e.numericId),
+          )
+        : db?.typedEntities?.find(
+            (e) => e.entityType === sampleType && e.numericId,
+          );
+    }
 
     rows.push({
       entityType: entityType.id,
@@ -1010,7 +1093,7 @@ export async function scanMatrix(): Promise<MatrixSnapshot> {
       aggregateScore,
       groupScores,
       sampleEntityId: sampleEntity?.numericId,
-      sampleEntitySlug: sampleEntity?.slug || sampleEntity?.id,
+      sampleEntitySlug: sampleSlug ?? sampleEntity?.slug ?? sampleEntity?.id,
     });
   }
 

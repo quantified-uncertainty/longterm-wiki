@@ -220,18 +220,24 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
   }, [snapshot.dimensions, snapshot.dimensionGroups]);
 
   // Summary stats
-  const { totalDb, totalKb, totalWiki } = useMemo(() => {
-    let db = 0, kb = 0, wiki = 0;
+  const { totalDb, totalDbPrimary, totalKb, totalWiki, missingIndexCount } = useMemo(() => {
+    let db = 0, dbPrimary = 0, kb = 0, wiki = 0, missingIndex = 0;
     for (const row of snapshot.rows) {
       const dbCell = row.cells["db_record_count"];
       const kbCell = row.cells["kb_fact_count"];
       const mdxCell = row.cells["mdx_page_count"];
-      if (dbCell && typeof dbCell.raw === "number") db += dbCell.raw;
+      if (dbCell && typeof dbCell.raw === "number") {
+        db += dbCell.raw;
+        if (row.tier === "sub-entity") dbPrimary += dbCell.raw;
+      }
       if (kbCell && typeof kbCell.raw === "number") kb += kbCell.raw;
       if (mdxCell && typeof mdxCell.raw === "number") wiki += mdxCell.raw;
+      const meta = snapshot.entityTypes.find(t => t.id === row.entityType);
+      const hasContent = (typeof mdxCell?.raw === "number" && mdxCell.raw > 5) || (typeof kbCell?.raw === "number" && kbCell.raw > 5);
+      if (!meta?.directoryRoute && hasContent) missingIndex++;
     }
-    return { totalDb: db, totalKb: kb, totalWiki: wiki };
-  }, [snapshot.rows]);
+    return { totalDb: db, totalDbPrimary: dbPrimary, totalKb: kb, totalWiki: wiki, missingIndexCount: missingIndex };
+  }, [snapshot.rows, snapshot.entityTypes]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -267,7 +273,12 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
           </select>
         </div>
         <div style={{ color: "#6b7280", fontSize: "0.75rem" }}>
-          {totalDb.toLocaleString()} DB &middot; {totalKb.toLocaleString()} KB &middot; {totalWiki.toLocaleString()} wiki
+          {totalDbPrimary.toLocaleString()} DB &middot; {totalKb.toLocaleString()} KB &middot; {totalWiki.toLocaleString()} wiki
+          {missingIndexCount > 0 && (
+            <span style={{ color: "#f59e0b", marginLeft: "0.5rem" }} title={`${missingIndexCount} entity types have content but no directory/browse page`}>
+              ⚠ {missingIndexCount} without index
+            </span>
+          )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginLeft: "auto", fontSize: "0.75rem", color: "#6b7280" }}>
           <span style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
@@ -321,7 +332,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
             <tr className="bg-muted/30">
               <th className="sticky left-0 z-20 bg-muted/30 border-r" />
               <th className="border-r" />
-              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Postgres database records">
+              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Postgres records — bold = primary data source, italic = YAML mirror">
                 DB
               </th>
               <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Knowledge base entries">
@@ -477,10 +488,20 @@ function MatrixRow({
           {row.aggregateScore}
         </span>
       </td>
-      <td className="px-1 py-1.5 text-center" style={{ fontSize: "0.625rem" }}>
-        <span style={{ color: counts.db ? "#374151" : "#d1d5db" }}>
-          {counts.db ?? "—"}
-        </span>
+      <td className="px-1 py-1.5 text-center" style={{ fontSize: "0.625rem" }}
+        title={row.tier === "canonical" ? "YAML mirror — not independent data" : "Primary data source"}
+      >
+        {counts.db !== null ? (
+          row.tier === "canonical" ? (
+            <span style={{ color: "#d1d5db", fontStyle: "italic" }}>{counts.db || "—"}</span>
+          ) : (
+            <span style={{ color: counts.db ? "#374151" : "#d1d5db", fontWeight: counts.db ? 600 : 400 }}>
+              {counts.db}
+            </span>
+          )
+        ) : (
+          <span style={{ color: "#d1d5db" }}>—</span>
+        )}
       </td>
       <td className="px-1 py-1.5 text-center" style={{ fontSize: "0.625rem" }}>
         <span style={{ color: counts.kb ? "#374151" : "#d1d5db" }}>
@@ -502,41 +523,54 @@ function MatrixRow({
         )}
       </td>
       <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem", whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-flex", gap: "0.375rem" }}>
-          {entityMeta?.directoryRoute && (
-            <a
-              href={`/${entityMeta.directoryRoute}`}
-              style={{ color: "#2563eb", textDecoration: "none" }}
-              title={`Browse all ${row.label}s`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Index
-            </a>
-          )}
-          {row.sampleEntitySlug && entityMeta?.profileRoute && (
-            <a
-              href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
-              style={{ color: "#6b7280", textDecoration: "none" }}
-              title={`Profile: /${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              DB
-            </a>
-          )}
-          {row.sampleEntityId && (
-            <a
-              href={`/wiki/${row.sampleEntityId}`}
-              style={{ color: "#9ca3af", textDecoration: "none" }}
-              title={`Wiki: /wiki/${row.sampleEntityId}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Wiki
-            </a>
-          )}
-          {!entityMeta?.directoryRoute && !row.sampleEntityId && (
-            <span style={{ color: "#d1d5db" }}>—</span>
-          )}
-        </span>
+        {(() => {
+          const hasContent = (counts.wiki ?? 0) > 5 || (counts.kb ?? 0) > 5;
+          const noIndex = !entityMeta?.directoryRoute;
+          return (
+            <span style={{ display: "inline-flex", gap: "0.375rem", alignItems: "center" }}>
+              {entityMeta?.directoryRoute ? (
+                <a
+                  href={`/${entityMeta.directoryRoute}`}
+                  style={{ color: "#2563eb", textDecoration: "none" }}
+                  title={`Browse all ${row.label}s`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Index
+                </a>
+              ) : hasContent ? (
+                <span
+                  style={{ color: "#f59e0b", cursor: "default" }}
+                  title={`No directory page — ${counts.wiki ?? 0} wiki pages, ${counts.kb ?? 0} KB entries only browsable via /wiki`}
+                >
+                  ⚠
+                </span>
+              ) : null}
+              {row.sampleEntitySlug && entityMeta?.profileRoute && (
+                <a
+                  href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
+                  style={{ color: "#6b7280", textDecoration: "none" }}
+                  title={`Profile: /${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  DB
+                </a>
+              )}
+              {row.sampleEntityId && (
+                <a
+                  href={`/wiki/${row.sampleEntityId}`}
+                  style={{ color: "#9ca3af", textDecoration: "none" }}
+                  title={`Wiki: /wiki/${row.sampleEntityId}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Wiki
+                </a>
+              )}
+              {!entityMeta?.directoryRoute && !hasContent && !row.sampleEntityId && (
+                <span style={{ color: "#d1d5db" }}>—</span>
+              )}
+            </span>
+          );
+        })()}
       </td>
       {groupedDims.map(({ dims }) =>
         dims.map((dim, i) => {

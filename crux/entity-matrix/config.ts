@@ -608,6 +608,8 @@ export const ENTITY_TYPES: EntityTypeMeta[] = [
     directoryRoute: "publications",
     profileRoute: "publications",
     tableComponent: "publications-table",
+    yamlPath: "data/publications.yaml",
+    buildDataKey: "publications",
   },
   {
     id: "funding-round",
@@ -639,6 +641,8 @@ export const ENTITY_TYPES: EntityTypeMeta[] = [
     directoryRoute: "legislation",
     profileRoute: "legislation",
     tableComponent: "legislation-table",
+    countsAsType: "policy",
+    yamlFile: "responses",
   },
   {
     id: "personnel",
