@@ -23,7 +23,7 @@ import { buildSearchCondition, parseSort } from "./query-helpers.js";
 
 // ---- Constants ----
 
-const MAX_PAGE_SIZE = 200;
+const MAX_PAGE_SIZE = 500;
 
 // ---- Schemas (from shared api-types) ----
 
