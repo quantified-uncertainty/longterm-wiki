@@ -304,7 +304,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="px-2 py-2 text-center font-medium border-r" colSpan={3} style={{ minWidth: 100 }} title="DB records / KB entries / Wiki pages">
                 Counts
               </th>
-              <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 56 }} title="Links to directory and sample entity">
+              <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 90 }} title="Links to directory, DB profile, and wiki page">
                 Links
               </th>
               {groupedDims.map(({ group, dims }) => (
@@ -331,8 +331,8 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
                 Wiki
               </th>
               <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
-                <div>Dir /</div>
-                <div>Sample</div>
+                <div>Dir / DB</div>
+                <div>/ Wiki</div>
               </th>
               {groupedDims.map(({ dims }) =>
                 dims.map((dim, i) => (
@@ -488,9 +488,18 @@ function MatrixRow({
         </span>
       </td>
       <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem" }}>
-        <span style={{ color: counts.wiki ? "#374151" : "#d1d5db" }}>
-          {counts.wiki ?? "—"}
-        </span>
+        {counts.wiki ? (
+          <a
+            href={`/wiki?entity=${row.entityType}`}
+            style={{ color: "#2563eb", textDecoration: "none" }}
+            title={`Browse ${counts.wiki} ${row.label} wiki pages`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {counts.wiki}
+          </a>
+        ) : (
+          <span style={{ color: "#d1d5db" }}>—</span>
+        )}
       </td>
       <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem", whiteSpace: "nowrap" }}>
         <span style={{ display: "inline-flex", gap: "0.375rem" }}>
@@ -504,25 +513,26 @@ function MatrixRow({
               Index
             </a>
           )}
-          {row.sampleEntitySlug && entityMeta?.profileRoute ? (
+          {row.sampleEntitySlug && entityMeta?.profileRoute && (
             <a
               href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
               style={{ color: "#6b7280", textDecoration: "none" }}
-              title={`Sample: ${row.sampleEntitySlug}`}
+              title={`Profile: /${entityMeta.profileRoute}/${row.sampleEntitySlug}`}
               onClick={(e) => e.stopPropagation()}
             >
-              Ex
+              DB
             </a>
-          ) : row.sampleEntityId ? (
+          )}
+          {row.sampleEntityId && (
             <a
               href={`/wiki/${row.sampleEntityId}`}
-              style={{ color: "#6b7280", textDecoration: "none" }}
-              title={`Sample: ${row.sampleEntityId}`}
+              style={{ color: "#9ca3af", textDecoration: "none" }}
+              title={`Wiki: /wiki/${row.sampleEntityId}`}
               onClick={(e) => e.stopPropagation()}
             >
-              Ex
+              Wiki
             </a>
-          ) : null}
+          )}
           {!entityMeta?.directoryRoute && !row.sampleEntityId && (
             <span style={{ color: "#d1d5db" }}>—</span>
           )}
@@ -601,18 +611,19 @@ function ExpandedDetail({
           <span style={{ fontSize: "0.75rem", display: "inline-flex", gap: "0.5rem" }}>
             {entityMeta?.directoryRoute && (
               <a href={`/${entityMeta.directoryRoute}`} style={{ color: "#2563eb" }}>
-                Browse all
+                Index
               </a>
             )}
-            {row.sampleEntitySlug && entityMeta?.profileRoute ? (
+            {row.sampleEntitySlug && entityMeta?.profileRoute && (
               <a href={`/${entityMeta.profileRoute}/${row.sampleEntitySlug}`} style={{ color: "#6b7280" }}>
-                Example: {row.sampleEntitySlug}
+                DB: {row.sampleEntitySlug}
               </a>
-            ) : row.sampleEntityId ? (
-              <a href={`/wiki/${row.sampleEntityId}`} style={{ color: "#6b7280" }}>
-                Example: {row.sampleEntityId}
+            )}
+            {row.sampleEntityId && (
+              <a href={`/wiki/${row.sampleEntityId}`} style={{ color: "#9ca3af" }}>
+                Wiki: {row.sampleEntityId}
               </a>
-            ) : null}
+            )}
           </span>
         )}
       </div>

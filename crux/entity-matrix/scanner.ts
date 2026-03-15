@@ -184,7 +184,8 @@ function parseYamlEntities(filePath: string): YamlEntity[] {
 
 interface DatabaseJson {
   typedEntities?: Array<{
-    slug: string;
+    id: string;
+    slug?: string;
     entityType: string;
     numericId?: string;
     [key: string]: unknown;
@@ -314,7 +315,7 @@ function scanKbFactCount(meta: EntityTypeMeta): CellValue {
     slugs = new Set(
       db.typedEntities
         .filter((e) => e.entityType === meta.id)
-        .map((e) => e.slug)
+        .map((e) => e.slug || e.id)
         .filter(Boolean),
     );
   } else if (meta.yamlFile) {
@@ -1009,7 +1010,7 @@ export async function scanMatrix(): Promise<MatrixSnapshot> {
       aggregateScore,
       groupScores,
       sampleEntityId: sampleEntity?.numericId,
-      sampleEntitySlug: sampleEntity?.slug,
+      sampleEntitySlug: sampleEntity?.slug || sampleEntity?.id,
     });
   }
 
