@@ -223,7 +223,8 @@ export function OrganizationsTable({
     if (serverMode) {
       const serverField = SORT_KEY_TO_SERVER_FIELD[key];
       if (serverField) {
-        serverSetSort(serverField);
+        const { dir } = toggleSort(urlSort, key, ["name"]);
+        serverSetSort(serverField, dir);
       }
     } else {
       urlSetSort(toggleSort(urlSort, key, ["name"]));
@@ -294,14 +295,38 @@ export function OrganizationsTable({
     return applyClientFilters(enrichedServerData);
   }, [serverMode, enrichedServerData, applyClientFilters]);
 
+  // ── Client-only filter fallback ──
+  // When type/stat filters are active in server mode, the server doesn't know
+  // about orgType (it's not in PG). Fall back to filtering static rows so
+  // counts and pagination are accurate across all pages, not just the current one.
+  const hasClientFilters = typeFilter !== "all" || statFilter !== "all";
+  const useStaticFallback = serverMode && hasClientFilters;
+
+  const staticFiltered = useMemo(() => {
+    if (!useStaticFallback) return [];
+    let result = applyClientFilters(rows);
+    if (urlSearch.trim()) {
+      const q = urlSearch.toLowerCase();
+      result = result.filter((r) => r.searchText.includes(q));
+    }
+    result = [...result].sort((a, b) =>
+      compareOrgRows(a, b, urlSort.field as SortKey, urlSort.dir),
+    );
+    return result;
+  }, [useStaticFallback, rows, applyClientFilters, urlSearch, urlSort.field, urlSort.dir]);
+
+  const staticFilteredPages = Math.max(1, Math.ceil(staticFiltered.length / PAGE_SIZE));
+  const staticSafePage = Math.min(urlPage, staticFilteredPages - 1);
+  const staticPageRows = staticFiltered.slice(staticSafePage * PAGE_SIZE, (staticSafePage + 1) * PAGE_SIZE);
+
   // ── Unified display values ──
-  const displayRows = serverMode ? serverFiltered : localPageRows;
-  const currentPage = serverMode ? server.meta.page - 1 : localSafePage;
-  const totalPages = serverMode ? server.meta.pageCount : localTotalPages;
+  const displayRows = useStaticFallback ? staticPageRows : serverMode ? serverFiltered : localPageRows;
+  const currentPage = useStaticFallback ? staticSafePage : serverMode ? server.meta.page - 1 : localSafePage;
+  const totalPages = useStaticFallback ? staticFilteredPages : serverMode ? server.meta.pageCount : localTotalPages;
   const displayTotal = serverMode ? server.meta.total : rows.length;
-  const filteredTotal = serverMode ? serverFiltered.length : localFiltered.length;
-  const isLoading = serverMode ? server.isLoading : false;
-  const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
+  const filteredTotal = useStaticFallback ? staticFiltered.length : serverMode ? serverFiltered.length : localFiltered.length;
+  const isLoading = serverMode && !useStaticFallback ? server.isLoading : false;
+  const isInitialLoad = serverMode && !useStaticFallback && server.isLoading && server.data.length === 0;
 
   const handlePageChange = useCallback((p: number) => {
     if (serverMode) {

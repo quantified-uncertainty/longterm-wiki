@@ -199,7 +199,8 @@ export function PeopleTable({
       if (serverMode) {
         const serverField = SORT_KEY_TO_SERVER_FIELD[key];
         if (serverField) {
-          serverSetSort(serverField);
+          const { dir } = toggleSort(urlSort, key, ["name", "role", "employer"]);
+          serverSetSort(serverField, dir);
         }
       } else {
         urlSetSort(toggleSort(urlSort, key, ["name", "role", "employer"]));
