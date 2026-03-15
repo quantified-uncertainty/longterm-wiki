@@ -7,10 +7,12 @@ import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import type { SortDir } from "@/lib/sort-utils";
+import { toggleSort } from "@/lib/sort-utils";
 import { topicLabel } from "@/data/topic-labels";
 import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
-import type { PeopleSortKey, SortDir } from "./people-sort";
+import type { PeopleSortKey } from "./people-sort";
 
 export interface PersonRow {
   id: string;
@@ -125,6 +127,12 @@ export function PeopleTable({
     defaultSort: { field: "name", dir: "asc" },
     filters: ["affiliation", "topic"],
   });
+  const {
+    search: urlSearch, setSearch: urlSetSearch,
+    sort: urlSort, setSort: urlSetSort,
+    page: urlPage, setPage: urlSetPage,
+    setFilter: urlSetFilter,
+  } = url;
   const affiliationFilter = url.filters.affiliation ?? "all";
   const topicFilter = url.filters.topic ?? "all";
 
@@ -162,7 +170,7 @@ export function PeopleTable({
   }, [allRows, serverMode]);
 
   // ── Unified search handler ──
-  const search = serverMode ? server.search : url.search;
+  const search = serverMode ? server.search : urlSearch;
   const {
     setSearch: serverSetSearch,
     setSort: serverSetSort,
@@ -174,17 +182,17 @@ export function PeopleTable({
       if (serverMode) {
         serverSetSearch(value);
       } else {
-        url.setSearch(value);
+        urlSetSearch(value);
       }
     },
-    [serverMode, serverSetSearch, url],
+    [serverMode, serverSetSearch, urlSetSearch],
   );
 
   // ── Unified sort ──
   const sortKey: SortKey = serverMode
     ? (server.sort.field as SortKey)
-    : (url.sort.field as SortKey);
-  const sortDir: SortDir = serverMode ? server.sort.dir : url.sort.dir;
+    : (urlSort.field as SortKey);
+  const sortDir: SortDir = serverMode ? server.sort.dir : urlSort.dir;
 
   const handleSort = useCallback(
     (key: SortKey) => {
@@ -194,31 +202,24 @@ export function PeopleTable({
           serverSetSort(serverField);
         }
       } else {
-        const newDir =
-          url.sort.field === key
-            ? url.sort.dir === "asc"
-              ? "desc"
-              : "asc"
-            : key === "name" || key === "role" || key === "employer"
-              ? "asc"
-              : "desc";
-        url.setSort({ field: key, dir: newDir as "asc" | "desc" });
+        urlSetSort(toggleSort(urlSort, key, ["name", "role", "employer"]));
       }
     },
-    [serverMode, serverSetSort, url],
+    [serverMode, serverSetSort, urlSetSort, urlSort],
   );
 
+  const { filters: serverFilters, setFilter: serverSetFilter } = server;
   const handleAffiliationFilter = useCallback(
     (key: string) => {
       if (serverMode) {
         const newValue =
-          server.filters["affiliation"] === key ? undefined : key;
-        server.setFilter("affiliation", newValue);
+          serverFilters["affiliation"] === key ? undefined : key;
+        serverSetFilter("affiliation", newValue);
       } else {
-        url.setFilter("affiliation", key);
+        urlSetFilter("affiliation", key);
       }
     },
-    [serverMode, server, url],
+    [serverMode, serverFilters, serverSetFilter, urlSetFilter],
   );
 
   const handlePageChange = useCallback(
@@ -226,10 +227,10 @@ export function PeopleTable({
       if (serverMode) {
         serverSetPage(p + 1); // hook uses 1-indexed pages
       } else {
-        url.setPage(p);
+        urlSetPage(p);
       }
     },
-    [serverMode, serverSetPage, url],
+    [serverMode, serverSetPage, urlSetPage],
   );
 
   // ── Static-mode: filter, sort, paginate ──
@@ -246,8 +247,8 @@ export function PeopleTable({
       result = result.filter((r) => r.topics.includes(topicFilter));
     }
 
-    if (url.search.trim()) {
-      const q = url.search.toLowerCase();
+    if (urlSearch.trim()) {
+      const q = urlSearch.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
     }
 
@@ -255,19 +256,19 @@ export function PeopleTable({
       comparePersonRows(
         a,
         b,
-        url.sort.field as SortKey,
-        url.sort.dir,
+        urlSort.field as SortKey,
+        urlSort.dir,
       ),
     );
 
     return result;
-  }, [serverMode, allRows, affiliationFilter, topicFilter, url.search, url.sort]);
+  }, [serverMode, allRows, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
 
   const localTotalPages = Math.max(
     1,
     Math.ceil(localFiltered.length / PAGE_SIZE),
   );
-  const localSafePage = Math.min(url.page, localTotalPages - 1);
+  const localSafePage = Math.min(urlPage, localTotalPages - 1);
   const localPageRows = serverMode
     ? EMPTY_ROWS
     : localFiltered.slice(
@@ -285,7 +286,7 @@ export function PeopleTable({
   const isInitialLoad =
     serverMode && server.isLoading && server.data.length === 0;
   const activeAffiliation = serverMode
-    ? server.filters["affiliation"] ?? "all"
+    ? serverFilters["affiliation"] ?? "all"
     : affiliationFilter;
 
   // ── Status text ──
@@ -342,7 +343,7 @@ export function PeopleTable({
             <FilterChips
               items={topicChips}
               selected={topicFilter}
-              onSelect={(key) => url.setFilter("topic", key)}
+              onSelect={(key) => urlSetFilter("topic", key)}
               allLabel="All Topics"
             />
           </div>
@@ -573,15 +574,17 @@ export function PeopleTable({
       </div>
 
       {/* Pagination */}
-      <div className="mt-3">
-        <PaginationControls
-          page={currentPage}
-          pageCount={totalPages}
-          totalItems={filteredTotal}
-          pageSize={PAGE_SIZE}
-          onPageChange={handlePageChange}
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="mt-3">
+          <PaginationControls
+            page={currentPage}
+            pageCount={totalPages}
+            totalItems={filteredTotal}
+            pageSize={PAGE_SIZE}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

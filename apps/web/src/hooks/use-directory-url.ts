@@ -37,11 +37,13 @@ export interface UseDirectoryUrlResult {
  * - Search URL updates are debounced (300 ms) but the local state updates
  *   immediately for responsive UI.
  */
+const DEFAULT_SORT: DirectoryUrlSort = { field: "name", dir: "asc" };
+
 export function useDirectoryUrl(
   config: UseDirectoryUrlConfig = {},
 ): UseDirectoryUrlResult {
   const {
-    defaultSort = { field: "name", dir: "asc" },
+    defaultSort = DEFAULT_SORT,
     filters: filterNames = [],
   } = config;
 

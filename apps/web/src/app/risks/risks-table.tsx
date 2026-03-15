@@ -7,6 +7,7 @@ import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import type { SortDir } from "@/lib/sort-utils";
+import { toggleSort } from "@/lib/sort-utils";
 import {
   RISK_CATEGORY_LABELS,
   RISK_CATEGORY_COLORS,
@@ -34,9 +35,15 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     defaultSort: { field: "name", dir: "asc" },
     filters: ["category"],
   });
+  const {
+    search: urlSearch, setSearch: urlSetSearch,
+    sort: urlSort, setSort: urlSetSort,
+    page: urlPage, setPage: urlSetPage,
+    setFilter: urlSetFilter,
+  } = url;
   const categoryFilter = url.filters.category ?? "all";
-  const sortKey = url.sort.field as RiskSortKey;
-  const sortDir: SortDir = url.sort.dir;
+  const sortKey = urlSort.field as RiskSortKey;
+  const sortDir: SortDir = urlSort.dir;
 
   // Collect unique categories for filter
   const categories = useMemo(() => {
@@ -58,10 +65,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
   }, [rows]);
 
   const handleSort = (key: RiskSortKey) => {
-    const newDir = url.sort.field === key
-      ? (url.sort.dir === "asc" ? "desc" : "asc")
-      : (key === "name" ? "asc" : "desc");
-    url.setSort({ field: key, dir: newDir as "asc" | "desc" });
+    urlSetSort(toggleSort(urlSort, key, ["name"]));
   };
 
   const filtered = useMemo(() => {
@@ -71,8 +75,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       result = result.filter((r) => r.riskCategory === categoryFilter);
     }
 
-    if (url.search.trim()) {
-      const q = url.search.toLowerCase();
+    if (urlSearch.trim()) {
+      const q = urlSearch.toLowerCase();
       result = result.filter((r) => {
         const searchable = `${r.name} ${r.riskCategory ?? ""} ${r.severity ?? ""} ${r.likelihood ?? ""} ${r.timeHorizon ?? ""}`.toLowerCase();
         return searchable.includes(q);
@@ -84,10 +88,10 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     );
 
     return result;
-  }, [rows, url.search, categoryFilter, sortKey, sortDir]);
+  }, [rows, urlSearch, categoryFilter, sortKey, sortDir]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(url.page, pageCount - 1);
+  const safePage = Math.min(urlPage, pageCount - 1);
   const pageRows = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   return (
@@ -98,8 +102,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
           type="text"
           placeholder="Search risks..."
           aria-label="Search risks"
-          value={url.search}
-          onChange={(e) => url.setSearch(e.target.value)}
+          value={urlSearch}
+          onChange={(e) => urlSetSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
         />
         <FilterChips
@@ -109,7 +113,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
             count: categoryCounts[c] ?? 0,
           }))}
           selected={categoryFilter}
-          onSelect={(key) => url.setFilter("category", key)}
+          onSelect={(key) => urlSetFilter("category", key)}
           allCount={categoryCounts.all}
         />
       </div>
@@ -119,13 +123,15 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         <div className="text-xs text-muted-foreground">
           Showing {filtered.length} of {rows.length} risks
         </div>
-        <PaginationControls
-          page={safePage}
-          pageCount={pageCount}
-          totalItems={filtered.length}
-          pageSize={PAGE_SIZE}
-          onPageChange={url.setPage}
-        />
+        {pageCount > 1 && (
+          <PaginationControls
+            page={safePage}
+            pageCount={pageCount}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={urlSetPage}
+          />
+        )}
       </div>
 
       {/* Table */}
@@ -227,15 +233,17 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       )}
 
       {/* Bottom pagination */}
-      <div className="mt-3">
-        <PaginationControls
-          page={safePage}
-          pageCount={pageCount}
-          totalItems={filtered.length}
-          pageSize={PAGE_SIZE}
-          onPageChange={url.setPage}
-        />
-      </div>
+      {pageCount > 1 && (
+        <div className="mt-3">
+          <PaginationControls
+            page={safePage}
+            pageCount={pageCount}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={urlSetPage}
+          />
+        </div>
+      )}
     </div>
   );
 }
