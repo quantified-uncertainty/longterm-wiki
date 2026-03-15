@@ -115,6 +115,7 @@ import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
+import * as matrixCommands from './commands/matrix.ts';
 
 const domains = {
   validate: validateCommands,
@@ -168,6 +169,7 @@ const domains = {
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,
+  matrix: matrixCommands,
 };
 
 /**
@@ -262,6 +264,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   people           Person discovery and data tools (discover, create, link-resources, enrich)
   orgs             Organization data tools (enrich from Wikidata)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
+  matrix           Entity completeness matrix (scan infrastructure coverage)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
