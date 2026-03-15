@@ -282,7 +282,7 @@ export function getFundingConnectionsForPerson(
           ? `/organizations/${slug}`
           : slug && e.type === "person"
             ? `/people/${slug}`
-            : `/kb/entity/${id}`;
+            : `/factbase/entity/${id}`;
       return { name: e.name, href };
     }
     // Title-case the slug as fallback

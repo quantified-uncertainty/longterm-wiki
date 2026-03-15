@@ -44,14 +44,14 @@ import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 // Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
 import { EpicTracker } from "@/components/wiki/EpicTracker";
 
-// KB Data section content components (public structured data at /kb/)
-import { KBOverviewContent } from "@/app/kb/kb-overview-content";
-import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
-import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
-import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
-import { KBRecordsExplorerContent } from "@/app/kb/kb-records-content";
-import { KBResourcesContent } from "@/app/kb/kb-resources-content";
-import { KBPublicationsContent } from "@/app/kb/kb-publications-content";
+// Factbase section content components (public structured data at /factbase/)
+import { FBOverviewContent } from "@/app/factbase/factbase-overview-content";
+import { FBFactsExplorerContent } from "@/app/factbase/factbase-facts-content";
+import { FBPropertiesExplorerContent } from "@/app/factbase/factbase-properties-content";
+import { FBEntityCoverageContent } from "@/app/factbase/factbase-entities-content";
+import { FBRecordsExplorerContent } from "@/app/factbase/factbase-records-content";
+import { FBResourcesContent } from "@/app/factbase/factbase-resources-content";
+import { FBPublicationsContent } from "@/app/factbase/factbase-publications-content";
 
 // Sources section content component
 import { SourcesOverviewContent } from "@/app/sources/sources-overview-content";
@@ -209,14 +209,14 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Epic tracking
   EpicTracker,
 
-  // KB Data section components
-  KBOverviewContent,
-  KBFactsExplorerContent,
-  KBPropertiesExplorerContent,
-  KBEntityCoverageContent,
-  KBRecordsExplorerContent,
-  KBResourcesContent,
-  KBPublicationsContent,
+  // Factbase section components
+  FBOverviewContent,
+  FBFactsExplorerContent,
+  FBPropertiesExplorerContent,
+  FBEntityCoverageContent,
+  FBRecordsExplorerContent,
+  FBResourcesContent,
+  FBPublicationsContent,
 
   // Sources section
   SourcesOverviewContent,

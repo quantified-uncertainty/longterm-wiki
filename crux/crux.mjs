@@ -101,7 +101,7 @@ import * as agentSessionEventsCommands from './commands/agent-session-events.ts'
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
-import * as kbCommands from './commands/kb.ts';
+import * as factbaseCommands from './commands/factbase.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
@@ -154,7 +154,8 @@ const domains = {
   audits: auditsCommands,
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
-  kb: kbCommands,
+  factbase: factbaseCommands,
+  kb: factbaseCommands, // deprecated alias
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,

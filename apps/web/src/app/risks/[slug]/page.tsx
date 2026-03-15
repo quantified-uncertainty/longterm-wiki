@@ -127,7 +127,7 @@ export default async function RiskProfilePage({
             ? `/people/${entrySlug}`
             : kbEntity?.numericId
               ? `/wiki/${kbEntity.numericId}`
-              : `/kb/entity/${entry.id}`,
+              : `/factbase/entity/${entry.id}`,
     };
   });
 
@@ -198,7 +198,7 @@ export default async function RiskProfilePage({
             </Link>
           )}
           <Link
-            href={`/kb/entity/${entity.id}`}
+            href={`/factbase/entity/${entity.id}`}
             className="text-primary hover:text-primary/80 font-medium transition-colors"
           >
             KB data &rarr;
@@ -423,7 +423,7 @@ export default async function RiskProfilePage({
                 </Link>
               )}
               <Link
-                href={`/kb/entity/${entity.id}`}
+                href={`/factbase/entity/${entity.id}`}
                 className="text-xs text-primary hover:underline"
               >
                 View in KB explorer &rarr;

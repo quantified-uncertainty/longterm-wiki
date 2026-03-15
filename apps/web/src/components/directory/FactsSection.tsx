@@ -74,7 +74,7 @@ export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Pr
       const refSlug = getKBEntitySlug(v.value);
       const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
         : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
-        : `/kb/entity/${v.value}`;
+        : `/factbase/entity/${v.value}`;
       return (
         <Link href={href} className="text-primary hover:underline">
           {refEntity.name}
@@ -92,7 +92,7 @@ export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Pr
             const refSlug = getKBEntitySlug(refId);
             const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
               : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
-              : `/kb/entity/${refId}`;
+              : `/factbase/entity/${refId}`;
             return (
               <span key={refId}>
                 {i > 0 && ", "}
@@ -166,7 +166,7 @@ export function FactsPanel({
         ))}
       </div>
       <Link
-        href={`/kb/entity/${entityId}`}
+        href={`/factbase/entity/${entityId}`}
         className="block mt-2 text-xs text-primary hover:underline text-center"
       >
         View all facts in KB explorer &rarr;

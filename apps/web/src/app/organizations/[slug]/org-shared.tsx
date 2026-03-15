@@ -44,7 +44,7 @@ export function resolveRefName(
       const prefix = entity.type === "organization" ? "/organizations"
         : entity.type === "person" ? "/people"
         : null;
-      return { name: entity.name, href: prefix ? `${prefix}/${slug}` : `/kb/entity/${entityId}` };
+      return { name: entity.name, href: prefix ? `${prefix}/${slug}` : `/factbase/entity/${entityId}` };
     }
   }
 
@@ -60,7 +60,7 @@ export function resolveRecipient(recipientId: string): { name: string; href: str
     const slug = getKBEntitySlug(recipientId);
     const href = slug && entity.type === "organization" ? `/organizations/${slug}`
       : slug && entity.type === "person" ? `/people/${slug}`
-      : `/kb/entity/${recipientId}`;
+      : `/factbase/entity/${recipientId}`;
     return { name: entity.name, href };
   }
   // Fall back: titleCase the slug

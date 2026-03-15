@@ -11,7 +11,7 @@ export const NAV_LINKS = [
   { href: "/research-areas", label: "Research Areas" },
   { href: "/sources", label: "Sources" },
   { href: "/funding-programs", label: "Funding" },
-  { href: "/kb", label: "Data" },
+  { href: "/factbase", label: "Data" },
   { href: "/wiki/E755", label: "About" },
   { href: "/wiki/E779", label: "Internal" },
 ] as const;

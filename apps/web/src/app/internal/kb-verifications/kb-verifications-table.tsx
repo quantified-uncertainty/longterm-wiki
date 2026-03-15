@@ -381,7 +381,7 @@ export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
 
       try {
         const res = await fetch(
-          `/api/kb-verdict-detail?factId=${encodeURIComponent(factId)}`
+          `/api/factbase-verdict-detail?factId=${encodeURIComponent(factId)}`
         );
         if (!res.ok) {
           throw new Error(`Server returned ${res.status} ${res.statusText}`);

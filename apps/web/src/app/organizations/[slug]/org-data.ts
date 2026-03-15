@@ -1203,7 +1203,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         const leadSlug = getKBEntitySlug(leadEntityId!);
         divisionLeadResolved.set(d.key, {
           name: leadEntity.name,
-          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/kb/entity/${leadEntityId}`,
+          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/factbase/entity/${leadEntityId}`,
         });
       } else {
         divisionLeadResolved.set(d.key, { name: d.lead, href: null });

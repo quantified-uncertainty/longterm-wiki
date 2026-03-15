@@ -738,7 +738,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
             )}
           </span>
           <Link
-            href={`/kb/entity/${entityId}`}
+            href={`/factbase/entity/${entityId}`}
             className="ml-auto text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
           >
             View full profile &rarr;

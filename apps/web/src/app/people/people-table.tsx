@@ -519,7 +519,7 @@ export function PeopleTable({
                         </Link>
                       ) : row.employerId ? (
                         <Link
-                          href={`/kb/entity/${row.employerId}`}
+                          href={`/factbase/entity/${row.employerId}`}
                           className="text-foreground hover:text-primary transition-colors"
                         >
                           {row.employerName}

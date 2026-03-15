@@ -203,7 +203,7 @@ export default async function PersonProfilePage({
       value: employer.name,
       href: employer.slug
         ? `/organizations/${employer.slug}`
-        : `/kb/entity/${employer.id}`,
+        : `/factbase/entity/${employer.id}`,
     });
   }
   if (bornYearFact?.value.type === "number") {
@@ -326,7 +326,7 @@ export default async function PersonProfilePage({
               </Link>
             )}
             <Link
-              href={`/kb/entity/${entity.id}`}
+              href={`/factbase/entity/${entity.id}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               KB data &rarr;

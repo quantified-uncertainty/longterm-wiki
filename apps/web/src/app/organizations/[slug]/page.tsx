@@ -590,7 +590,7 @@ export default async function OrgProfilePage({
                   Wiki page &rarr;
                 </Link>
               )}
-              <Link href={`/kb/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
+              <Link href={`/factbase/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
                 KB data &rarr;
               </Link>
             </div>
