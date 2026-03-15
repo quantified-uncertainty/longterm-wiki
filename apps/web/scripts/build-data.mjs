@@ -1182,15 +1182,38 @@ async function fetchBenchmarkResults() {
   }
 
   const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
   try {
+    // Fetch the benchmarks table to build a PG id → entity slug mapping.
+    // PG benchmark_results.benchmark_id references benchmarks.id (a random string),
+    // but the frontend expects entity slugs (e.g., "mmlu", "swe-bench-verified").
+    const benchmarkIdToSlug = new Map();
+    try {
+      const bmFetchOpts = { headers, signal: AbortSignal.timeout(15_000) };
+      let bmOffset = 0;
+      while (true) {
+        const bmUrl = `${serverUrl}/api/benchmarks/all?limit=200&offset=${bmOffset}`;
+        const bmResp = await fetch(bmUrl, bmFetchOpts);
+        if (!bmResp.ok) break;
+        const bmData = await bmResp.json();
+        const bmItems = bmData.benchmarks || [];
+        for (const bm of bmItems) {
+          benchmarkIdToSlug.set(bm.id, bm.slug);
+        }
+        if (bmItems.length < 200) break;
+        bmOffset += 200;
+      }
+    } catch (err) {
+      console.log(`  benchmark-results: slug lookup failed (${err instanceof Error ? err.message : err})`);
+    }
+
+    const resultsFetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
     const pageSize = 200;
     let allItems = [];
     let offset = 0;
     while (true) {
       const url = `${serverUrl}/api/benchmark-results/all?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
+      const resp = await fetch(url, resultsFetchOpts);
       if (!resp.ok) {
         console.log(`  benchmark-results: skipped (HTTP ${resp.status})`);
         return {};
@@ -1202,12 +1225,15 @@ async function fetchBenchmarkResults() {
       offset += pageSize;
     }
 
-    // Group by modelId
+    // Group by modelId, resolving PG benchmarkId to entity slug
     const byModel = {};
+    let unresolvedCount = 0;
     for (const row of allItems) {
+      const slug = benchmarkIdToSlug.get(row.benchmarkId) || row.benchmarkId;
+      if (!benchmarkIdToSlug.has(row.benchmarkId)) unresolvedCount++;
       if (!byModel[row.modelId]) byModel[row.modelId] = [];
       byModel[row.modelId].push({
-        benchmarkId: row.benchmarkId,
+        benchmarkId: slug,
         score: row.score,
         unit: row.unit,
         date: row.date,
@@ -1217,7 +1243,7 @@ async function fetchBenchmarkResults() {
 
     const modelCount = Object.keys(byModel).length;
     if (allItems.length > 0) {
-      console.log(`  benchmark-results: ${allItems.length} results for ${modelCount} models fetched from PG`);
+      console.log(`  benchmark-results: ${allItems.length} results for ${modelCount} models fetched from PG (${benchmarkIdToSlug.size} benchmark slugs resolved${unresolvedCount > 0 ? `, ${unresolvedCount} unresolved` : ''})`);
     }
     return byModel;
   } catch (err) {
