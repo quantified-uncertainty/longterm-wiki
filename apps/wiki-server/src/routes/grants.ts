@@ -478,7 +478,7 @@ const grantsApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
 
   // ---- POST /delete-batch ----
   // Delete grants by ID (for deduplication). Also removes corresponding things.
@@ -496,9 +496,9 @@ const grantsApp = new Hono()
 
     logger.info({ count: ids.length }, "Deleting grants batch");
 
+    const { things } = await import("../schema.js");
     await db.transaction(async (tx) => {
       // Delete from things table first (FK-safe)
-      const { things } = await import("../schema.js");
       await tx
         .delete(things)
         .where(
