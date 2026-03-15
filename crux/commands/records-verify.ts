@@ -501,6 +501,14 @@ async function lookupThingId(recordType: RecordType, recordId: string): Promise<
     return null;
   }
 
+  // Warn if we hit the limit — results may be incomplete
+  if (response.data.things.length >= 1000) {
+    console.warn(
+      `[lookupThingId] Fetched 1000 items for ${recordType} — results may be truncated. ` +
+      `Consider implementing pagination if this entity type grows further.`,
+    );
+  }
+
   // Cache all results for future lookups
   for (const thing of response.data.things) {
     const key = `${recordType}:${thing.sourceId}`;
@@ -628,24 +636,45 @@ async function statsCommand(): Promise<CommandResult> {
 // ── Sync-things command ──────────────────────────────────────────────
 
 async function syncThingsCommand(): Promise<CommandResult> {
-  // Fetch all existing record verdicts
-  const response = await apiRequest<{
-    verdicts: Array<{
-      recordType: string;
-      recordId: string;
-      verdict: string;
-      confidence: number | null;
-      reasoning: string | null;
-      sourcesChecked: number | null;
-    }>;
-    total: number;
-  }>('GET', '/api/record-verifications/verdicts?limit=200');
+  // Fetch all existing record verdicts with pagination
+  const allVerdicts: Array<{
+    recordType: string;
+    recordId: string;
+    verdict: string;
+    confidence: number | null;
+    reasoning: string | null;
+    sourcesChecked: number | null;
+  }> = [];
 
-  if (!response.ok || !response.data) {
-    return { exitCode: 1, output: `Failed to fetch verdicts: ${response.error}` };
+  const PAGE_SIZE = 200;
+  let offset = 0;
+
+  while (true) {
+    const response = await apiRequest<{
+      verdicts: Array<{
+        recordType: string;
+        recordId: string;
+        verdict: string;
+        confidence: number | null;
+        reasoning: string | null;
+        sourcesChecked: number | null;
+      }>;
+      total: number;
+    }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+
+    if (!response.ok || !response.data) {
+      return { exitCode: 1, output: `Failed to fetch verdicts: ${response.error}` };
+    }
+
+    allVerdicts.push(...response.data.verdicts);
+
+    if (response.data.verdicts.length < PAGE_SIZE || allVerdicts.length >= response.data.total) {
+      break;
+    }
+    offset += PAGE_SIZE;
   }
 
-  const { verdicts } = response.data;
+  const verdicts = allVerdicts;
   if (verdicts.length === 0) {
     return { exitCode: 0, output: 'No record verdicts to sync.' };
   }

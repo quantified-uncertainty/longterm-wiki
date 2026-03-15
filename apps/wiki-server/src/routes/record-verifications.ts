@@ -403,7 +403,7 @@ const recordVerificationsApp = new Hono()
     // Sync verdict to the things table's denormalized columns
     const sourceTable = RECORD_TYPE_TO_SOURCE_TABLE[body.recordType];
     if (sourceTable) {
-      await db
+      const thingsSyncResult = await db
         .update(things)
         .set({
           verdict: body.verdict,
@@ -424,7 +424,12 @@ const recordVerificationsApp = new Hono()
               e instanceof Error ? e.message : String(e)
             }`,
           );
+          return { thingsSyncFailed: true } as const;
         });
+
+      if (thingsSyncResult && typeof thingsSyncResult === 'object' && 'thingsSyncFailed' in thingsSyncResult) {
+        return c.json({ ok: true, thingsSyncFailed: true }, 200);
+      }
     }
 
     return c.json({ ok: true }, 200);

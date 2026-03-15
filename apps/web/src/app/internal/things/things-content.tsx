@@ -235,7 +235,7 @@ export async function ThingsContent() {
 
   // Compute verdict stats
   const withVerdict = Object.entries(stats.byVerdict)
-    .filter(([v]) => v !== "unverified")
+    .filter(([v]) => v !== "unchecked")
     .reduce((sum, [, c]) => sum + c, 0);
 
   const wikiServerUrl = getWikiServerConfig()?.serverUrl || "";
