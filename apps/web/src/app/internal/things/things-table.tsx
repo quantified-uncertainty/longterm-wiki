@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search, ExternalLink } from "lucide-react";
+import { Search, ExternalLink, Loader2 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { searchThings, type ThingSearchRow } from "./actions";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -225,42 +225,87 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "title", desc: false },
   ]);
-  const [globalFilter, setGlobalFilter] = useState(
+  const [searchQuery, setSearchQuery] = useState(
     searchParams.get("q") || ""
   );
   const [selectedType, setSelectedType] = useState(
     typeFilter || searchParams.get("type") || ""
   );
 
+  // Server-side search state
+  const [serverResults, setServerResults] = useState<ThingRow[] | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedType) params.set("type", selectedType);
-    if (globalFilter) params.set("q", globalFilter);
+    if (searchQuery) params.set("q", searchQuery);
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
-  }, [selectedType, globalFilter, router]);
+  }, [selectedType, searchQuery, router]);
 
-  // Compute type counts
+  // Server-side search with debounce
+  const doServerSearch = useCallback(async (query: string, thingType: string) => {
+    if (query.length < 2) {
+      setServerResults(null);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const result = await searchThings(query, thingType || undefined);
+      if (result) {
+        // Server action resolves hrefs (entity pages, resource pages, sourceUrls)
+        setServerResults(result.results as ThingRow[]);
+      } else {
+        setServerResults([]);
+      }
+    } catch {
+      setServerResults(null);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounced search trigger
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    if (searchQuery.length >= 2) {
+      debounceTimer.current = setTimeout(() => {
+        doServerSearch(searchQuery, selectedType);
+      }, 300);
+    } else {
+      setServerResults(null);
+    }
+
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, [searchQuery, selectedType, doServerSearch]);
+
+  // Compute type counts from preloaded data
   const typeCounts: Record<string, number> = {};
   for (const row of data) {
     typeCounts[row.thingType] = (typeCounts[row.thingType] || 0) + 1;
   }
 
-  const filteredData = selectedType
-    ? data.filter((r) => r.thingType === selectedType)
-    : data;
+  // Use server results when searching, preloaded data otherwise
+  const isServerSearch = searchQuery.length >= 2;
+  const displayData = isServerSearch && serverResults ? serverResults : (
+    selectedType ? data.filter((r) => r.thingType === selectedType) : data
+  );
 
   const table = useReactTable({
-    data: filteredData,
+    data: displayData,
     columns,
     getRowId: (row) => row.id,
-    state: { sorting, globalFilter },
+    state: { sorting },
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   const visibleRows = table.getRowModel().rows.length;
@@ -273,12 +318,15 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search things..."
+            placeholder="Search all 12,000+ things..."
             aria-label="Search things"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border rounded-md bg-background"
           />
+          {isSearching && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+          )}
         </div>
 
         <select
@@ -300,7 +348,9 @@ function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
 
       {/* Count */}
       <p className="text-sm text-muted-foreground">
-        Showing {visibleRows} of {data.length} things
+        {isServerSearch
+          ? `${visibleRows} search result${visibleRows !== 1 ? "s" : ""} across all things`
+          : `Showing ${visibleRows} of ${data.length} things`}
       </p>
 
       {/* Table */}
