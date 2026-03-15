@@ -1,0 +1,20 @@
+thing:
+  id: rohin-shah
+  stableId: GAlcP90tvw
+  type: person
+  name: "Rohin Shah"
+  numericId: "E1297"
+
+facts:
+  - id: f_cvli2jAbQg
+    property: role
+    value: "Research Scientist"
+
+  - id: f_MYw0rJFjJQ
+    property: notable-for
+    value: "Research scientist at Google DeepMind working on AI alignment; creator of the Alignment Newsletter"
+
+  - id: f_58eMyTSywg
+    property: education
+    value: "PhD in Computer Science, UC Berkeley"
+

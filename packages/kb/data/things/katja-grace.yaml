@@ -1,0 +1,20 @@
+thing:
+  id: katja-grace
+  stableId: t2wkJarnWQ
+  type: person
+  name: "Katja Grace"
+  numericId: "E1294"
+
+facts:
+  - id: f_7hCiEcjMwA
+    property: role
+    value: "Founder"
+
+  - id: f_TJsbiNSvsg
+    property: notable-for
+    value: "Founder of AI Impacts; conducts research on AI timelines and forecasting; author of influential AI researcher surveys"
+
+  - id: f_hv6QB2ZWzg
+    property: website
+    value: "https://aiimpacts.org"
+

@@ -1,0 +1,28 @@
+thing:
+  id: jensen-huang
+  stableId: So79iNy2sQ
+  type: person
+  name: "Jensen Huang"
+  numericId: "E1292"
+
+facts:
+  - id: f_DramxKdLqw
+    property: employed-by
+    value: !ref UvpZCnW3wA
+
+  - id: f_eW0ePM2xXQ
+    property: role
+    value: "CEO"
+
+  - id: f_QNd3zfa3yw
+    property: born-year
+    value: 1963
+
+  - id: f_uWhqL9PqsQ
+    property: notable-for
+    value: "CEO and co-founder of NVIDIA; architect of the GPU computing revolution that enabled modern AI"
+
+  - id: f_3HyDX4rAcA
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Jensen_Huang"
+

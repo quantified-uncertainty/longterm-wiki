@@ -1,0 +1,28 @@
+thing:
+  id: mira-murati
+  stableId: yiBasS5uXQ
+  type: person
+  name: "Mira Murati"
+  numericId: "E1289"
+
+facts:
+  - id: f_kOWUqG4MeQ
+    property: role
+    value: "Founder"
+
+  - id: f_8Iej2b7LDw
+    property: born-year
+    value: 1988
+
+  - id: f_f3XKVPdewA
+    property: notable-for
+    value: "Former CTO of OpenAI; led development of ChatGPT, DALL-E, and GPT-4; now building a new AI company"
+
+  - id: f_ekVZn67U9A
+    property: education
+    value: "BS in Mechanical Engineering, Dartmouth College"
+
+  - id: f_vatTbYjtnQ
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Mira_Murati"
+

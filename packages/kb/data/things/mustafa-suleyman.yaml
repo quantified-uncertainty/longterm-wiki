@@ -1,0 +1,28 @@
+thing:
+  id: mustafa-suleyman
+  stableId: DBq1ddu8Mg
+  type: person
+  name: "Mustafa Suleyman"
+  numericId: "E1288"
+
+facts:
+  - id: f_Q7BZ7C7buA
+    property: employed-by
+    value: !ref OIY5gaPpBA
+
+  - id: f_9yY7JJzb0A
+    property: role
+    value: "CEO of Microsoft AI"
+
+  - id: f_yfpjzZXSJA
+    property: born-year
+    value: 1984
+
+  - id: f_65egajgbIQ
+    property: notable-for
+    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI; advocate for AI safety and governance"
+
+  - id: f_ufd9nJBdCA
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
+

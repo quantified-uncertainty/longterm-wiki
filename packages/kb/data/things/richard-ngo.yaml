@@ -1,0 +1,20 @@
+thing:
+  id: richard-ngo
+  stableId: FB9xXKFuqg
+  type: person
+  name: "Richard Ngo"
+  numericId: "E1298"
+
+facts:
+  - id: f_HjIWrNNPuQ
+    property: role
+    value: "AI Governance Researcher"
+
+  - id: f_b1ZhBzul2g
+    property: notable-for
+    value: "AI governance researcher; formerly at OpenAI and DeepMind; influential writer on AI alignment and x-risk"
+
+  - id: f_pSYvSFqMVA
+    property: education
+    value: "PhD candidate, University of Cambridge"
+

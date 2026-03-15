@@ -1,0 +1,20 @@
+thing:
+  id: sam-mccandlish
+  stableId: ENl8sgChDQ
+  type: person
+  name: "Sam McCandlish"
+  numericId: "E1259"
+
+facts:
+  - id: f_FiKueyUA8w
+    property: employed-by
+    value: !ref mK9pX3rQ7n
+
+  - id: f_lqn98ISIfg
+    property: role
+    value: "Co-founder"
+
+  - id: f_ZN4oC3AUWw
+    property: notable-for
+    value: "Co-founder of Anthropic; co-author of neural scaling laws research; formerly at OpenAI"
+
