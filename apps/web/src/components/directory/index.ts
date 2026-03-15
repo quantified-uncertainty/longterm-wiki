@@ -12,3 +12,7 @@ export {
   FACT_CATEGORIES,
 } from "./FactsSection";
 export { ProfileTabs, type ProfileTab } from "./ProfileTabs";
+export {
+  PaginationControls,
+  type PaginationControlsProps,
+} from "./PaginationControls";

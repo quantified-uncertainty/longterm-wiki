@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { PaginationControls } from "@/components/directory/PaginationControls";
 import type { SortDir } from "@/lib/sort-utils";
 import {
   RISK_CATEGORY_LABELS,
@@ -24,11 +25,14 @@ export interface RiskRow {
   timeHorizon: string | null;
 }
 
+const PAGE_SIZE = 50;
+
 export function RisksTable({ rows }: { rows: RiskRow[] }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<RiskSortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [page, setPage] = useState(0);
 
   // Collect unique categories for filter
   const categories = useMemo(() => {
@@ -56,6 +60,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       setSortKey(key);
       setSortDir(key === "name" ? "asc" : "desc");
     }
+    setPage(0);
   };
 
   const filtered = useMemo(() => {
@@ -80,6 +85,10 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     return result;
   }, [rows, search, categoryFilter, sortKey, sortDir]);
 
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageRows = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   return (
     <div>
       {/* Filters */}
@@ -89,12 +98,18 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
           placeholder="Search risks..."
           aria-label="Search risks"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
         />
         <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => setCategoryFilter("all")}
+            onClick={() => {
+              setCategoryFilter("all");
+              setPage(0);
+            }}
             aria-pressed={categoryFilter === "all"}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               categoryFilter === "all"
@@ -108,7 +123,10 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
           {categories.map((c) => (
             <button
               key={c}
-              onClick={() => setCategoryFilter(categoryFilter === c ? "all" : c)}
+              onClick={() => {
+                setCategoryFilter(categoryFilter === c ? "all" : c);
+                setPage(0);
+              }}
               aria-pressed={categoryFilter === c}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 categoryFilter === c
@@ -125,9 +143,18 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
         </div>
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">
-        Showing {filtered.length} of {rows.length} risks
+      {/* Results count + top pagination */}
+      <div className="flex flex-col gap-2 mb-3">
+        <div className="text-xs text-muted-foreground">
+          Showing {filtered.length} of {rows.length} risks
+        </div>
+        <PaginationControls
+          page={safePage}
+          pageCount={pageCount}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+        />
       </div>
 
       {/* Table */}
@@ -143,7 +170,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {filtered.map((row) => (
+            {pageRows.map((row) => (
               <tr
                 key={row.id}
                 className="hover:bg-muted/20 transition-colors"
@@ -227,6 +254,17 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
           No risks match your search.
         </div>
       )}
+
+      {/* Bottom pagination */}
+      <div className="mt-3">
+        <PaginationControls
+          page={safePage}
+          pageCount={pageCount}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }
