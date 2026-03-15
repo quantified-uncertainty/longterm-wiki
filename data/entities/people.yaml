@@ -1690,7 +1690,7 @@
 
 - id: luke-muehlhauser
   stableId: TclWePCJ7w
-  numericId: E1301
+  numericId: E1306
   type: person
   title: "Luke Muehlhauser"
   description: >
@@ -1707,7 +1707,7 @@
 
 - id: andrew-ng
   stableId: v13BF4zP2A
-  numericId: E1302
+  numericId: E1307
   type: person
   title: "Andrew Ng"
   description: >
