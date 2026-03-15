@@ -2,7 +2,6 @@ import {
   fetchDetailed,
   withApiFallback,
   type FetchResult,
-  getWikiServerConfig,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { ThingsTable, type ThingRow } from "./things-table";
@@ -49,36 +48,15 @@ interface DashboardData {
   total: number;
 }
 
-// ── Detail page URL mapping ──────────────────────────────────────────────
-// Maps thingType → URL prefix for types with dedicated detail pages.
+// ── Link resolution ─────────────────────────────────────────────────────
+// Only entities get reliable internal links (sourceId = entity slug).
+// Non-entity types have PG primary keys as sourceId, which don't match
+// the KB record keys that detail pages expect. For those, use sourceUrl.
 
-const THING_DETAIL_ROUTES: Record<string, string> = {
-  grant: "/grants",
-  resource: "/resources",
-  division: "/divisions",
-  "funding-program": "/funding-programs",
-  "funding-round": "/funding-rounds",
-  investment: "/investments",
-  benchmark: "/benchmarks",
-};
-
-/**
- * Resolve the best internal href for any thing type.
- * Priority: dedicated detail page > entity page > undefined
- */
-function resolveThingHref(
-  item: ThingsApiItem,
-  thingMap: Map<string, ThingsApiItem>,
-): string | undefined {
-  // Entities: use entity href resolution (handles directory pages, wiki pages)
+function resolveThingHref(item: ThingsApiItem): string | undefined {
+  // Entities: sourceId is the entity slug → getEntityHref resolves correctly
   if (item.thingType === "entity") {
     return getEntityHref(item.sourceId);
-  }
-
-  // Things with dedicated detail pages
-  const routePrefix = THING_DETAIL_ROUTES[item.thingType];
-  if (routePrefix && item.sourceId) {
-    return `${routePrefix}/${encodeURIComponent(item.sourceId)}`;
   }
 
   // Facts: link to the parent entity's page (sourceId format: "entityId:factId")
@@ -87,45 +65,37 @@ function resolveThingHref(
     try {
       return getEntityHref(entityId);
     } catch {
-      // Entity not in database.json — skip
+      // Entity not in database.json
     }
   }
 
-  // Benchmark results: link to parent benchmark's detail page
-  if (item.thingType === "benchmark-result" && item.parentThingId) {
-    const parent = thingMap.get(item.parentThingId);
-    if (parent?.thingType === "benchmark" && parent.sourceId) {
-      return `/benchmarks/${encodeURIComponent(parent.sourceId)}`;
-    }
+  // All other types: use sourceUrl as external link if available
+  if (item.sourceUrl) {
+    return item.sourceUrl;
   }
 
   return undefined;
 }
 
 /**
- * Resolve the parent entity href for a thing using the loaded things map.
+ * Resolve the parent entity for a thing using the loaded things map.
  * Walks the parent chain up to 3 levels to find the nearest entity ancestor.
- * For facts (which lack parentThingId), parses the entity ID from sourceId.
  */
 function resolveParentEntityHref(
   item: ThingsApiItem,
   thingMap: Map<string, ThingsApiItem>,
   depth = 0,
 ): { title: string; href: string } | undefined {
-  // Facts encode entity ID in sourceId: "entityId:factId"
+  // Facts: parse entity ID from sourceId ("entityId:factId")
   if (item.thingType === "fact" && !item.parentThingId && item.sourceId.includes(":")) {
     const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
-    // Find the entity thing in the loaded data
     for (const t of thingMap.values()) {
       if (t.thingType === "entity" && t.sourceId === entityId) {
         return { title: t.title, href: getEntityHref(t.sourceId) };
       }
     }
-    // Entity not in loaded data — try direct resolution
     try {
-      const href = getEntityHref(entityId);
-      // Use a readable title from the entity ID
-      return { title: entityId.replace(/-/g, " "), href };
+      return { title: entityId.replace(/-/g, " "), href: getEntityHref(entityId) };
     } catch {
       return undefined;
     }
@@ -137,11 +107,9 @@ function resolveParentEntityHref(
   if (!parent) return undefined;
 
   if (parent.thingType === "entity") {
-    const href = getEntityHref(parent.sourceId);
-    return { title: parent.title, href };
+    return { title: parent.title, href: getEntityHref(parent.sourceId) };
   }
 
-  // Walk up the chain (e.g., division-personnel -> division -> org entity)
   return resolveParentEntityHref(parent, thingMap, depth + 1);
 }
 
@@ -209,9 +177,9 @@ export async function ThingsContent() {
     thingMap.set(item.id, item);
   }
 
-  // Build rows with hrefs for all thing types
+  // Build rows with hrefs
   const rows: ThingRow[] = items.map((item) => {
-    const href = resolveThingHref(item, thingMap);
+    const href = resolveThingHref(item);
     const parentEntity = resolveParentEntityHref(item, thingMap);
 
     return {
@@ -237,8 +205,6 @@ export async function ThingsContent() {
   const withVerdict = Object.entries(stats.byVerdict)
     .filter(([v]) => v !== "unchecked")
     .reduce((sum, [, c]) => sum + c, 0);
-
-  const wikiServerUrl = getWikiServerConfig()?.serverUrl || "";
 
   return (
     <>
@@ -326,7 +292,7 @@ export async function ThingsContent() {
             ({total > items.length ? `showing ${items.length.toLocaleString()} of ${total.toLocaleString()}` : total.toLocaleString()})
           </span>
         </h2>
-        <ThingsTable data={rows} wikiServerUrl={wikiServerUrl} />
+        <ThingsTable data={rows} />
       </div>
     </>
   );

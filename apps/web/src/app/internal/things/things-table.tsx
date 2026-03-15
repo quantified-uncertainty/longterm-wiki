@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import type { ColumnDef, SortingState, ExpandedState } from "@tanstack/react-table";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search, ChevronRight, Loader2, ExternalLink } from "lucide-react";
-import { cn } from "@lib/utils";
+import { Search, ExternalLink } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
 
@@ -34,33 +32,15 @@ export interface ThingRow {
   numericId: string | null;
   verdict: string | null;
   verdictConfidence: number | null;
-  childrenCount?: number;
   href?: string;
 }
-
-interface ThingDetail {
-  children: ThingRow[];
-  childrenTotal: number;
-  verdict: {
-    verdict: string;
-    confidence: number | null;
-    reasoning: string | null;
-    sourcesChecked: number | null;
-    needsRecheck: boolean;
-  } | null;
-}
-
-type DetailCacheEntry =
-  | { status: "loading" }
-  | { status: "loaded"; data: ThingDetail }
-  | { status: "error"; message: string };
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function verdictBadge(verdict: string | null) {
-  if (!verdict) return <span className="text-muted-foreground text-xs">-</span>;
+  if (!verdict) return null;
   const colors: Record<string, string> = {
     confirmed: "bg-green-100 text-green-800",
     contradicted: "bg-red-100 text-red-800",
@@ -102,198 +82,11 @@ function thingTypeBadge(type: string) {
   );
 }
 
-function expandToggleColumn(): ColumnDef<ThingRow> {
-  return {
-    id: "expand",
-    size: 32,
-    header: () => null,
-    cell: ({ row }) => (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          row.toggleExpanded();
-        }}
-        className="p-1 rounded hover:bg-muted transition-colors"
-        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
-      >
-        <ChevronRight
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
-            row.getIsExpanded() && "rotate-90"
-          )}
-        />
-      </button>
-    ),
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Expanded Detail Component
-// ---------------------------------------------------------------------------
-
-function ThingExpandedDetail({
-  thingId,
-  parentThingId,
-  parentTitle,
-  sourceTable,
-  cache,
-  onLoad,
-}: {
-  thingId: string;
-  parentThingId: string | null;
-  parentTitle?: string;
-  sourceTable: string;
-  cache: Record<string, DetailCacheEntry>;
-  onLoad: (id: string) => void;
-}) {
-  const cached = cache[thingId];
-  useEffect(() => {
-    if (!cached) {
-      onLoad(thingId);
-    }
-  }, [thingId, cached, onLoad]);
-
-  if (!cached || cached.status === "loading") {
-    return (
-      <div className="p-4 bg-muted/30 flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading details...
-      </div>
-    );
-  }
-
-  if (cached.status === "error") {
-    return (
-      <div className="p-4 bg-muted/30 text-sm">
-        <span className="text-red-600">Failed to load details: {cached.message}</span>
-        <button
-          type="button"
-          onClick={() => onLoad(thingId)}
-          className="ml-2 text-xs text-blue-600 hover:underline"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  const { children, childrenTotal, verdict } = cached.data;
-  const sourceTableRoutes: Record<string, string> = {
-    entities: "/internal/entities",
-    grants: "/internal/grants",
-    personnel: "/internal/personnel",
-    divisions: "/internal/divisions",
-    resources: "/internal/resources",
-    funding_rounds: "/internal/funding-rounds",
-    investments: "/internal/investments",
-    equity_positions: "/internal/equity-positions",
-    benchmarks: "/internal/benchmarks",
-    benchmark_results: "/internal/benchmark-results",
-    funding_programs: "/internal/funding-programs",
-    division_personnel: "/internal/division-personnel",
-  };
-
-  return (
-    <div className="p-4 bg-muted/30 space-y-3 text-sm">
-      {/* Parent breadcrumb */}
-      {parentThingId && (
-        <div className="text-xs text-muted-foreground">
-          Parent: <span className="font-medium">{parentTitle || parentThingId}</span>
-        </div>
-      )}
-
-      {/* Verdict */}
-      {verdict && (
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium">Verdict:</span>
-          {verdictBadge(verdict.verdict)}
-          {verdict.confidence != null && (
-            <span className="text-xs text-muted-foreground">
-              ({(verdict.confidence * 100).toFixed(0)}% confidence)
-            </span>
-          )}
-          {verdict.sourcesChecked != null && verdict.sourcesChecked > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {verdict.sourcesChecked} sources checked
-            </span>
-          )}
-          {verdict.needsRecheck && (
-            <span className="text-xs text-orange-600 font-medium">needs recheck</span>
-          )}
-        </div>
-      )}
-
-      {/* Children */}
-      {childrenTotal > 0 ? (
-        <div>
-          <div className="text-xs font-medium mb-1">
-            Children ({childrenTotal})
-          </div>
-          <div className="border rounded-md overflow-hidden">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-2 py-1 text-left font-medium">Type</th>
-                  <th className="px-2 py-1 text-left font-medium">Title</th>
-                  <th className="px-2 py-1 text-left font-medium">Verdict</th>
-                </tr>
-              </thead>
-              <tbody>
-                {children.map((child) => (
-                  <tr key={child.id} className="border-t">
-                    <td className="px-2 py-1">{thingTypeBadge(child.thingType)}</td>
-                    <td className="px-2 py-1 max-w-[300px] truncate">{child.title}</td>
-                    <td className="px-2 py-1">{verdictBadge(child.verdict)}</td>
-                  </tr>
-                ))}
-                {childrenTotal > children.length && (
-                  <tr className="border-t">
-                    <td colSpan={3} className="px-2 py-1 text-muted-foreground italic">
-                      ...and {childrenTotal - children.length} more
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          {/* Verification rollup */}
-          {(() => {
-            const verified = children.filter((c) => c.verdict === "confirmed").length;
-            const loaded = children.length;
-            const pct = loaded > 0 ? ((verified / loaded) * 100).toFixed(0) : "0";
-            return (
-              <div className="text-xs text-muted-foreground mt-1">
-                {verified} of {loaded} loaded children verified ({pct}%)
-                {childrenTotal > loaded && ` — ${childrenTotal} total`}
-              </div>
-            );
-          })()}
-        </div>
-      ) : (
-        <div className="text-xs text-muted-foreground">No children</div>
-      )}
-
-      {/* Source link */}
-      {sourceTableRoutes[sourceTable] && (
-        <a
-          href={sourceTableRoutes[sourceTable]}
-          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline no-underline"
-        >
-          <ExternalLink className="h-3 w-3" />
-          View in {sourceTable} table
-        </a>
-      )}
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Columns
 // ---------------------------------------------------------------------------
 
 const columns: ColumnDef<ThingRow>[] = [
-  expandToggleColumn(),
   {
     accessorKey: "thingType",
     header: ({ column }) => (
@@ -409,98 +202,12 @@ const columns: ColumnDef<ThingRow>[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Server Search Fallback
-// ---------------------------------------------------------------------------
-
-function ServerSearchFallback({
-  query,
-  wikiServerUrl,
-}: {
-  query: string;
-  wikiServerUrl: string;
-}) {
-  const [results, setResults] = useState<ThingRow[] | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const doSearch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${wikiServerUrl}/api/things/search?q=${encodeURIComponent(query)}&limit=50`
-      );
-      if (!res.ok) throw new Error("Search failed");
-      const data = await res.json();
-      setResults(data.results ?? []);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, wikiServerUrl]);
-
-  if (results === null) {
-    return (
-      <div className="text-sm text-muted-foreground mt-2">
-        No matches in loaded data.{" "}
-        <button
-          type="button"
-          onClick={doSearch}
-          className="text-blue-600 hover:underline"
-          disabled={loading}
-        >
-          {loading ? "Searching..." : "Search all things on server"}
-        </button>
-      </div>
-    );
-  }
-
-  if (results.length === 0) {
-    return (
-      <div className="text-sm text-muted-foreground mt-2">
-        No results found on server either.
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-4">
-      <h3 className="text-sm font-medium mb-2">
-        Server search results ({results.length})
-      </h3>
-      <div className="border rounded-md overflow-hidden">
-        <table className="w-full text-xs">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="px-2 py-1 text-left font-medium">Type</th>
-              <th className="px-2 py-1 text-left font-medium">Title</th>
-              <th className="px-2 py-1 text-left font-medium">Verdict</th>
-              <th className="px-2 py-1 text-left font-medium">Source</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((r) => (
-              <tr key={r.id} className="border-t">
-                <td className="px-2 py-1">{thingTypeBadge(r.thingType)}</td>
-                <td className="px-2 py-1 max-w-[400px] truncate">{r.title}</td>
-                <td className="px-2 py-1">{verdictBadge(r.verdict)}</td>
-                <td className="px-2 py-1 text-muted-foreground">{r.sourceTable}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 interface ThingsTableProps {
   data: ThingRow[];
   typeFilter?: string;
-  wikiServerUrl: string;
 }
 
 export function ThingsTable(props: ThingsTableProps) {
@@ -511,7 +218,7 @@ export function ThingsTable(props: ThingsTableProps) {
   );
 }
 
-function ThingsTableInner({ data, typeFilter, wikiServerUrl }: ThingsTableProps) {
+function ThingsTableInner({ data, typeFilter }: ThingsTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -524,8 +231,6 @@ function ThingsTableInner({ data, typeFilter, wikiServerUrl }: ThingsTableProps)
   const [selectedType, setSelectedType] = useState(
     typeFilter || searchParams.get("type") || ""
   );
-  const [expanded, setExpanded] = useState<ExpandedState>({});
-  const [detailCache, setDetailCache] = useState<Record<string, DetailCacheEntry>>({});
 
   // Update URL when filters change
   useEffect(() => {
@@ -535,51 +240,6 @@ function ThingsTableInner({ data, typeFilter, wikiServerUrl }: ThingsTableProps)
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
   }, [selectedType, globalFilter, router]);
-
-  // Fetch detail for expanded row
-  const fetchDetail = useCallback(
-    async (thingId: string) => {
-      setDetailCache((prev) => ({
-        ...prev,
-        [thingId]: { status: "loading" },
-      }));
-
-      try {
-        const [childrenRes, verdictRes] = await Promise.all([
-          fetch(
-            `${wikiServerUrl}/api/things/children/${encodeURIComponent(thingId)}?limit=20&sort=title&order=asc`
-          ),
-          fetch(
-            `${wikiServerUrl}/api/things/verdicts/${encodeURIComponent(thingId)}`
-          ),
-        ]);
-
-        const childrenData = childrenRes.ok ? await childrenRes.json() : { things: [], total: 0 };
-        const verdictData = verdictRes.ok ? await verdictRes.json() : null;
-
-        setDetailCache((prev) => ({
-          ...prev,
-          [thingId]: {
-            status: "loaded",
-            data: {
-              children: childrenData.things ?? [],
-              childrenTotal: childrenData.total ?? 0,
-              verdict: verdictRes.ok ? verdictData : null,
-            },
-          },
-        }));
-      } catch (e) {
-        setDetailCache((prev) => ({
-          ...prev,
-          [thingId]: {
-            status: "error",
-            message: e instanceof Error ? e.message : "Unknown error",
-          },
-        }));
-      }
-    },
-    [wikiServerUrl]
-  );
 
   // Compute type counts
   const typeCounts: Record<string, number> = {};
@@ -595,19 +255,15 @@ function ThingsTableInner({ data, typeFilter, wikiServerUrl }: ThingsTableProps)
     data: filteredData,
     columns,
     getRowId: (row) => row.id,
-    state: { sorting, globalFilter, expanded },
+    state: { sorting, globalFilter },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
-    onExpandedChange: setExpanded,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
   });
 
   const visibleRows = table.getRowModel().rows.length;
-  const showServerFallback =
-    globalFilter.length >= 2 && visibleRows === 0;
 
   return (
     <div className="space-y-4">
@@ -648,30 +304,7 @@ function ThingsTableInner({ data, typeFilter, wikiServerUrl }: ThingsTableProps)
       </p>
 
       {/* Table */}
-      <DataTable
-        table={table}
-        renderExpandedRow={(row) => {
-          if (!row.getIsExpanded()) return null;
-          return (
-            <ThingExpandedDetail
-              thingId={row.original.id}
-              parentThingId={row.original.parentThingId}
-              parentTitle={row.original.parentTitle}
-              sourceTable={row.original.sourceTable}
-              cache={detailCache}
-              onLoad={fetchDetail}
-            />
-          );
-        }}
-      />
-
-      {/* Server search fallback */}
-      {showServerFallback && (
-        <ServerSearchFallback
-          query={globalFilter}
-          wikiServerUrl={wikiServerUrl}
-        />
-      )}
+      <DataTable table={table} />
     </div>
   );
 }
