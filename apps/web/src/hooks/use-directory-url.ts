@@ -47,6 +47,12 @@ export function useDirectoryUrl(
     filters: filterNames = [],
   } = config;
 
+  // Stabilize filterNames to avoid re-running effects when the caller passes
+  // a fresh array literal with the same contents on every render.
+  const filterNamesKey = filterNames.join(",");
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- stabilized by filterNamesKey
+  const stableFilterNames = useMemo(() => filterNames, [filterNamesKey]);
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -67,10 +73,12 @@ export function useDirectoryUrl(
 
     const pageParam = searchParams.get("page");
     const parsedPage = pageParam ? parseInt(pageParam, 10) : NaN;
-    const page = Number.isNaN(parsedPage) ? 0 : Math.max(0, parsedPage - 1);
+    const page = Number.isFinite(parsedPage) && parsedPage > 0
+      ? parsedPage - 1
+      : 0;
 
     const filters: Record<string, string> = {};
-    for (const name of filterNames) {
+    for (const name of stableFilterNames) {
       const val = searchParams.get(name);
       if (val) {
         filters[name] = val;
@@ -94,6 +102,61 @@ export function useDirectoryUrl(
   const [debouncedSearch, setDebouncedSearch] = useState(initialState.q);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ── Sync URL → state on popstate (back/forward navigation) ──
+  // Next.js updates searchParams when the user navigates with back/forward.
+  // We detect this by comparing against the previous searchParams string and
+  // re-read the URL into local state so the UI matches the URL.
+  const searchParamsKey = searchParams.toString();
+  const prevSearchParamsKey = useRef(searchParamsKey);
+  // Track whether a URL→state sync is in progress to suppress the state→URL effect
+  const isSyncingFromUrl = useRef(false);
+
+  useEffect(() => {
+    if (prevSearchParamsKey.current === searchParamsKey) return;
+    prevSearchParamsKey.current = searchParamsKey;
+
+    // Suppress the state→URL effect while we sync state from URL
+    isSyncingFromUrl.current = true;
+
+    const q = searchParams.get("q") ?? "";
+    setSearchRaw(q);
+    setDebouncedSearch(q);
+
+    const sortParam = searchParams.get("sort");
+    if (sortParam) {
+      const [field, dir] = sortParam.split(":");
+      if (field && (dir === "asc" || dir === "desc")) {
+        setSortState({ field, dir });
+      } else {
+        setSortState(defaultSort);
+      }
+    } else {
+      setSortState(defaultSort);
+    }
+
+    const pageParam = searchParams.get("page");
+    const parsedPage = pageParam ? parseInt(pageParam, 10) : NaN;
+    const urlPage = Number.isFinite(parsedPage) && parsedPage > 0
+      ? parsedPage - 1
+      : 0;
+    setPageState(urlPage);
+
+    const nextFilters: Record<string, string> = {};
+    for (const name of stableFilterNames) {
+      const val = searchParams.get(name);
+      if (val) {
+        nextFilters[name] = val;
+      }
+    }
+    setFiltersState(nextFilters);
+
+    // Re-enable state→URL sync after React processes the state updates.
+    // Use requestAnimationFrame to wait for the next render cycle.
+    requestAnimationFrame(() => {
+      isSyncingFromUrl.current = false;
+    });
+  }, [searchParamsKey, searchParams, defaultSort, stableFilterNames]);
+
   // ── Debounce search ──
 
   useEffect(() => {
@@ -115,6 +178,9 @@ export function useDirectoryUrl(
       isInitialRender.current = false;
       return;
     }
+
+    // Skip URL push when we're syncing state from a popstate URL change
+    if (isSyncingFromUrl.current) return;
 
     const params = new URLSearchParams();
 
