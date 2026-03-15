@@ -6,7 +6,7 @@
  *
  * Only renders when a verdict exists — unchecked records show nothing.
  */
-import type { RecordVerdict } from "@data/database";
+import type { RecordVerdict } from "@data/tablebase";
 
 // ── Verdict display config ───────────────────────────────────────────
 

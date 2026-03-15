@@ -2,8 +2,8 @@
  * Page coverage metrics and citation health data.
  */
 
-import { getDatabase, getPageById } from "./database";
-import type { ContentFormat } from "./database";
+import { getDatabase, getPageById } from "./tablebase";
+import type { ContentFormat } from "./tablebase";
 import type { ValidSubcategory } from "./valid-subcategories";
 
 export interface PageCoverageItem {

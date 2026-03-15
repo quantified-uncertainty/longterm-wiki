@@ -13,7 +13,7 @@ import {
   isOrganization,
   isPolicy,
   isAiModel,
-} from "./database";
+} from "./tablebase";
 import { getEntityHref } from "./entity-nav";
 import { resolveKBSlug } from "./factbase";
 

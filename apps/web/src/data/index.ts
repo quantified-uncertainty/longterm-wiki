@@ -15,7 +15,7 @@
  *  - explore.ts         — explore/browse items
  */
 
-export * from "./database";
+export * from "./tablebase";
 export * from "./entity-nav";
 export * from "./page-rankings";
 export * from "./page-changes";

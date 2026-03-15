@@ -385,7 +385,8 @@ export interface Page {
   recommendedScore?: number;
 }
 
-interface DatabaseShape {
+/** TableBase: typed relational records (Postgres/YAML entities). */
+interface TableBaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
@@ -553,17 +554,17 @@ function resolveIdWithoutRegistry(id: string): string {
 /** Union of fully-typed entities and generic (unknown-type) entities */
 export type AnyEntity = TypedEntity | GenericEntity;
 
-let _database: DatabaseShape | null = null;
+let _database: TableBaseShape | null = null;
 let _typedEntities: AnyEntity[] | null = null;
 
-export function getDatabase(): DatabaseShape {
+export function getTableBase(): TableBaseShape {
   if (_database) return _database;
 
   const dbPath = path.join(LOCAL_DATA_DIR, "database.json");
 
   try {
     const raw = fs.readFileSync(dbPath, "utf-8");
-    _database = JSON.parse(raw) as DatabaseShape;
+    _database = JSON.parse(raw) as TableBaseShape;
   } catch (err) {
     throw new Error(
       `Failed to load database from ${dbPath}: ${err instanceof Error ? err.message : err}. ` +
@@ -572,6 +573,9 @@ export function getDatabase(): DatabaseShape {
   }
   return _database;
 }
+
+/** @deprecated Use getTableBase() */
+export const getDatabase = getTableBase;
 
 /** Get all typed entities from the database */
 export function getTypedEntities(): AnyEntity[] {
@@ -963,7 +967,7 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 // RESEARCH AREAS
 // ============================================================================
 
-export type PGResearchArea = NonNullable<DatabaseShape["researchAreas"]>[number];
+export type PGResearchArea = NonNullable<TableBaseShape["researchAreas"]>[number];
 
 /** Get all enriched research areas from PG. Returns empty array if not available. */
 export function getResearchAreasFromPG(): PGResearchArea[] {

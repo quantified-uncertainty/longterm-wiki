@@ -7,7 +7,7 @@ import {
 } from "@/data/factbase";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/factbase";
-import { getTypedEntityById, getRecordVerdict } from "@/data/database";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";

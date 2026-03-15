@@ -2,8 +2,8 @@
  * Crux data lookups.
  */
 
-import { getDatabase } from "./database";
-import type { CruxData } from "./database";
+import { getDatabase } from "./tablebase";
+import type { CruxData } from "./tablebase";
 
 let _cruxIndex: Map<string, CruxData> | null = null;
 

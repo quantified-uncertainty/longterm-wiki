@@ -9,7 +9,7 @@ import {
   getKBRecords,
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
-import { getTypedEntityById } from "@/data/database";
+import { getTypedEntityById } from "@/data/tablebase";
 import {
   titleCase,
 } from "@/components/wiki/factbase/format";

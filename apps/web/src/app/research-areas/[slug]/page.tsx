@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResearchAreasFromPG } from "@/data/database";
+import { getResearchAreasFromPG } from "@/data/tablebase";
 import { CLUSTER_COLORS, STATUS_COLORS, formatCluster, formatFunding } from "../research-area-constants";
 
 function getAreaBySlug(slug: string) {
