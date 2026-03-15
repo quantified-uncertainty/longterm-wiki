@@ -2,8 +2,8 @@
  * Page update schedule and rankings data.
  */
 
-import { getDatabase, fetchFromWikiServer, withApiFallback } from "./database";
-import type { Page, WithSource } from "./database";
+import { getDatabase, fetchFromWikiServer, withApiFallback } from "./tablebase";
+import type { Page, WithSource } from "./tablebase";
 
 export interface UpdateScheduleItem {
   id: string;

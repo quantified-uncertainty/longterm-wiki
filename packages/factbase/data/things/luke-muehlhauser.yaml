@@ -1,0 +1,16 @@
+thing:
+  id: luke-muehlhauser
+  stableId: TclWePCJ7w
+  type: person
+  name: "Luke Muehlhauser"
+  numericId: "E1301"
+
+facts:
+  - id: f_oXdOBNJysw
+    property: role
+    value: "Independent Researcher"
+
+  - id: f_yFiXtoJMDg
+    property: notable-for
+    value: "Former Executive Director of MIRI; former GiveWell/Open Philanthropy researcher on AI risk"
+

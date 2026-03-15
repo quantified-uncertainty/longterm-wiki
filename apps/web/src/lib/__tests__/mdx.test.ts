@@ -10,7 +10,7 @@ vi.mock("next-mdx-remote/rsc", () => ({
 vi.mock("@/data", () => ({
   getIdRegistry: () => ({ byNumericId: {}, bySlug: {} }),
 }));
-vi.mock("@data/kb", () => ({
+vi.mock("@data/factbase", () => ({
   getKBFactById: () => undefined,
 }));
 

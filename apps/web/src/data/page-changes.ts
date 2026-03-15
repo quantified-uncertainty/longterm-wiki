@@ -2,7 +2,7 @@
  * Page change history: individual change items and session groupings.
  */
 
-import { getDatabase } from "./database";
+import { getDatabase } from "./tablebase";
 
 export interface PageChangeItem {
   pageId: string;

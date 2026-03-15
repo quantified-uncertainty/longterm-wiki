@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords } from "@/data/kb";
+import { getAllKBRecords } from "@/data/factbase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
@@ -10,7 +10,7 @@ import {
   titleCase,
   isUrl,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 import {
   parseFundingProgram,

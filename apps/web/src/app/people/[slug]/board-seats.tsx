@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatDateRange, fieldStr } from "@/lib/directory-utils";
-import { getKBEntitySlug } from "@/data/kb";
+import { getKBEntitySlug } from "@/data/factbase";
 import { CurrentBadge } from "@/components/directory";
 
 export interface BoardSeat {

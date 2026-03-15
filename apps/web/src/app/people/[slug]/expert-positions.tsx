@@ -1,4 +1,4 @@
-import type { ExpertPosition } from "@/data/database";
+import type { ExpertPosition } from "@/data/tablebase";
 import { topicLabel } from "@/data/topic-labels";
 import { safeHref } from "@/lib/directory-utils";
 

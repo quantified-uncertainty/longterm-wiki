@@ -2,7 +2,7 @@
  * Data-fetching and parsing logic for organization profile pages.
  * Extracted from page.tsx as a pure refactor — no behavioral changes.
  */
-import type { KBRecordEntry } from "@/data/kb";
+import type { KBRecordEntry } from "@/data/factbase";
 import {
   getKBLatest,
   getKBFacts,
@@ -14,8 +14,8 @@ import {
   getKBEntitySlug,
   getKBRecords,
   getAllKBRecords,
-} from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import {
   getTypedEntityById,
   getTypedEntities,
@@ -35,7 +35,7 @@ import {
   formatKBNumber,
   titleCase,
   sortKBRecords,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import { resolveRecipient } from "./org-shared";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
@@ -1203,7 +1203,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         const leadSlug = getKBEntitySlug(leadEntityId!);
         divisionLeadResolved.set(d.key, {
           name: leadEntity.name,
-          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/kb/entity/${leadEntityId}`,
+          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/factbase/entity/${leadEntityId}`,
         });
       } else {
         divisionLeadResolved.set(d.key, { name: d.lead, href: null });

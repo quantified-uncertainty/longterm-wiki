@@ -239,11 +239,11 @@ vi.mock("fs", async () => {
 describe("buildEntityMatcher — missing files", () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  it("handles missing kb-data.json gracefully", () => {
+  it("handles missing factbase-data.json gracefully", () => {
     const readMock = vi.mocked(fs.readFileSync);
     readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
-      if (pathStr.includes("kb-data.json")) {
+      if (pathStr.includes("factbase-data.json")) {
         const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
         err.code = "ENOENT";
         throw err;
@@ -258,7 +258,7 @@ describe("buildEntityMatcher — missing files", () => {
     const matcher = buildEntityMatcher();
 
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("kb-data.json not found")
+      expect.stringContaining("factbase-data.json not found")
     );
     expect(matcher.match("Nonexistent Org")).toBeNull();
     expect(matcher.allNames.size).toBe(0);
@@ -268,7 +268,7 @@ describe("buildEntityMatcher — missing files", () => {
     const readMock = vi.mocked(fs.readFileSync);
     readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
-      if (pathStr.includes("kb-data.json")) {
+      if (pathStr.includes("factbase-data.json")) {
         return JSON.stringify({ slugToEntityId: {}, entities: {} });
       }
       if (pathStr.includes("database.json")) {

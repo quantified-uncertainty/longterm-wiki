@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getAllPublications, getAllResources, getPagesForResource } from "@/data";
+import {
+  getAllPublications,
+  getAllResources,
+  getPagesForResource,
+  getResourceCredibility,
+  getResourcePublication,
+  getResourcesForPublication,
+} from "@/data";
 import { ProfileStatCard } from "@/components/directory";
+import { SourcesTabs } from "./sources-tabs";
+import type { ResourceRow } from "../resources/resources-table";
+import type { PublicationRow } from "../publications/publications-table";
 
 export const metadata: Metadata = {
   title: "Sources",
@@ -13,7 +22,45 @@ export default function SourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
 
-  // Compute resource-level stats
+  // Build resource rows for the table
+  const resourceRows: ResourceRow[] = resources.map((r) => {
+    const publication = getResourcePublication(r);
+    const credibility = getResourceCredibility(r);
+    const citingPages = getPagesForResource(r.id);
+    return {
+      id: r.id,
+      title: r.title,
+      url: r.url,
+      type: r.type,
+      publicationName: publication?.name ?? null,
+      credibility: credibility ?? null,
+      citingPageCount: citingPages.length,
+      tags: r.tags ?? [],
+      publishedDate: r.published_date ?? null,
+    };
+  });
+
+  // Build publication rows for the table
+  const publicationRows: PublicationRow[] = publications.map((pub) => {
+    const pubResources = getResourcesForPublication(pub.id);
+    const pageSet = new Set<string>();
+    for (const r of pubResources) {
+      for (const pageId of getPagesForResource(r.id)) {
+        pageSet.add(pageId);
+      }
+    }
+    return {
+      id: pub.id,
+      name: pub.name,
+      type: pub.type,
+      credibility: pub.credibility ?? null,
+      peerReviewed: pub.peer_reviewed ?? false,
+      resourceCount: pubResources.length,
+      pageCount: pageSet.size,
+    };
+  });
+
+  // Compute summary stats
   const peerReviewed = publications.filter((p) => p.peer_reviewed).length;
   const withSummary = resources.filter((r) => r.summary).length;
   const citedResources = resources.filter((r) => {
@@ -21,18 +68,9 @@ export default function SourcesPage() {
     return pages.length > 0;
   }).length;
 
-  // Resource type breakdown
-  const typeCounts = new Map<string, number>();
-  for (const r of resources) {
-    typeCounts.set(r.type, (typeCounts.get(r.type) || 0) + 1);
-  }
-  const topTypes = [...typeCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4);
-
   const stats = [
-    { label: "Resources", value: String(resources.length), href: "/resources" },
-    { label: "Publications", value: String(publications.length), href: "/publications" },
+    { label: "Resources", value: String(resources.length) },
+    { label: "Publications", value: String(publications.length) },
     { label: "Peer-Reviewed Venues", value: String(peerReviewed) },
     { label: "With Summaries", value: String(withSummary) },
     { label: "Cited by Pages", value: String(citedResources) },
@@ -58,57 +96,16 @@ export default function SourcesPage() {
             key={stat.label}
             label={stat.label}
             value={stat.value}
-            href={stat.href}
           />
         ))}
       </div>
 
-      {/* Resource type breakdown */}
-      {topTypes.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3">By Resource Type</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {topTypes.map(([type, count]) => (
-              <ProfileStatCard
-                key={type}
-                label={type.charAt(0).toUpperCase() + type.slice(1) + "s"}
-                value={String(count)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Sub-section cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link
-          href="/resources"
-          className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
-        >
-          <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
-            Resources
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {resources.length.toLocaleString()} external documents (papers,
-            articles, reports) indexed from citations across wiki pages.
-            Includes metadata, summaries, and credibility ratings.
-          </p>
-        </Link>
-
-        <Link
-          href="/publications"
-          className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
-        >
-          <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
-            Publications
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {publications.length} publication venues with credibility ratings
-            (1-5 scale). Maps domains to venues for automatic resource
-            credibility assignment.
-          </p>
-        </Link>
-      </div>
+      <SourcesTabs
+        resourceRows={resourceRows}
+        resourceCount={resources.length}
+        publicationRows={publicationRows}
+        publicationCount={publications.length}
+      />
     </div>
   );
 }

@@ -6,9 +6,9 @@ import {
   getKBEntity,
   resolveKBSlug,
   getKBSlugMap,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { getTypedEntities, isOrganization } from "@/data";
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 
 /**
  * Resolve a URL slug (e.g., "anthropic") to a KB organization entity.

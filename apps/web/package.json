@@ -15,7 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@longterm-wiki/kb": "workspace:*",
+    "@longterm-wiki/factbase": "workspace:*",
     "@dagrejs/dagre": "^1.1.8",
     "@quri/squiggle-components": "^0.10.0",
     "@quri/squiggle-lang": "^0.10.0",

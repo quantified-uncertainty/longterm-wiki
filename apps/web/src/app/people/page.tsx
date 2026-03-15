@@ -1,11 +1,11 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/kb";
-import type { Fact } from "@longterm-wiki/kb";
+import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 import { getExpertById, getPublicationsForPerson, getTypedEntities, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
-import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -112,6 +112,12 @@ async function loadFromApi(): Promise<{ rows: PersonRow[]; source: "api" | "loca
       source: "api",
     };
   }
+
+  // Log fallback reason to server console — not shown to users
+  const reason = !result.ok && result.error
+    ? `type=${result.error.type}${"message" in result.error ? `, message=${result.error.message}` : ""}`
+    : "unknown";
+  console.warn(`[people] Using local data (wiki-server unavailable: ${reason})`);
 
   return { rows: loadFromLocal(), source: "local" };
 }
@@ -300,7 +306,9 @@ export default async function PeoplePage() {
         </Link>
       </div>
 
-      <DataSourceBanner source={source} />
+      {source === "local" && (
+        <p className="text-[11px] text-muted-foreground/50 mb-2">Using local data</p>
+      )}
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-3 mb-8">
@@ -309,7 +317,9 @@ export default async function PeoplePage() {
         ))}
       </div>
 
-      <PeopleTable rows={rows} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <PeopleTable rows={rows} />
+      </Suspense>
     </div>
   );
 }

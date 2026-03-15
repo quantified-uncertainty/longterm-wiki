@@ -410,6 +410,35 @@ const grantsApp = new Hono()
     return c.json({ updated });
   })
 
+  // ---- GET /all-for-matching ----
+  // Returns lightweight grant data for research area matching.
+  .get("/all-for-matching", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        id: grants.id,
+        name: grants.name,
+        notes: grants.notes,
+        amount: grants.amount,
+        organizationId: grants.organizationId,
+        granteeId: grants.granteeId,
+      })
+      .from(grants);
+
+    return c.json({
+      grants: rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        notes: r.notes,
+        amount: r.amount != null ? Number(r.amount) : null,
+        organizationId: r.organizationId,
+        granteeId: r.granteeId,
+      })),
+      total: rows.length,
+    });
+  })
+
   // ---- POST /sync ----
   .post("/sync", async (c) => {
     const body = await parseJsonBody(c);

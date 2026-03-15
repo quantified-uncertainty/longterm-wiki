@@ -1,0 +1,192 @@
+/**
+ * FBF — Inline factbase fact component for wiki prose.
+ *
+ * Server component that renders a factbase fact value inline with a hover tooltip,
+ * mirroring the pattern of the old <F> component but backed by factbase data.
+ *
+ * Usage in MDX:
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" showDate />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2025-12" />
+ *   <FBF entity="mK9pX3rQ7n" property="revenue">$19 billion</FBF>
+ *
+ * The entity prop accepts factbase stableIds (preferred, e.g. "mK9pX3rQ7n") or
+ * legacy slugs (e.g. "anthropic") — both are resolved via the factbase data layer.
+ */
+
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { getKBFacts, getKBLatest, getKBProperty } from "@data/factbase";
+import type { Fact } from "@longterm-wiki/factbase";
+import {
+  formatKBFactValue,
+  formatKBDate,
+  isUrl,
+  shortDomain,
+} from "./factbase/format";
+import styles from "./tooltip.module.css";
+
+interface FBFProps {
+  /** KB entity identifier — stableId (e.g. "mK9pX3rQ7n") or legacy slug (e.g. "anthropic") */
+  entity: string;
+  /** KB property ID (like "revenue", "valuation") */
+  property: string;
+  /** Show asOf date inline after the value */
+  showDate?: boolean;
+  /** Get value at specific date instead of latest */
+  asOf?: string;
+  /** Custom display override (discouraged) */
+  children?: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * FBF — Inline factbase fact component.
+ *
+ * Renders the latest (or date-specific) fact value from the factbase data layer
+ * with a hover tooltip showing metadata (property name, value, date, source).
+ */
+export function FBF({
+  entity,
+  property,
+  showDate,
+  asOf,
+  children,
+  className,
+}: FBFProps) {
+  const prop = getKBProperty(property);
+
+  // Find the right fact: specific asOf or latest
+  let fact: Fact | undefined;
+  if (asOf) {
+    const facts = getKBFacts(entity, property);
+    fact = facts.find((f) => f.asOf === asOf);
+  } else {
+    fact = getKBLatest(entity, property);
+  }
+
+  // Error state: red badge for missing fact
+  if (!fact) {
+    return (
+      <span
+        className={cn(
+          "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
+          className,
+        )}
+        title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
+      >
+        {children || `[missing: ${entity}.${property}]`}
+      </span>
+    );
+  }
+
+  const formattedValue = formatKBFactValue(fact, prop?.unit, prop?.display);
+  const baseValue = children || formattedValue;
+
+  // Inline date display (only when not using children override)
+  const showDateInline = showDate && fact.asOf && !children;
+  const displayValue = showDateInline ? (
+    <>
+      {baseValue}{" "}
+      <span className="text-muted-foreground font-normal">
+        (as of {formatKBDate(fact.asOf!)})
+      </span>
+    </>
+  ) : (
+    baseValue
+  );
+
+  const propertyName = prop?.name ?? property;
+  const hasMetadata =
+    propertyName || fact.asOf || fact.source || fact.notes;
+
+  // No metadata: render plain value
+  if (!hasMetadata) {
+    return (
+      <span
+        className={cn("inline font-medium", className)}
+        data-kb-fact={`${entity}.${property}`}
+      >
+        {displayValue}
+      </span>
+    );
+  }
+
+  // Full render: value with hover tooltip
+  return (
+    <span className={styles.wrapper}>
+      <span
+        className={cn(
+          "inline border-b border-dotted border-muted-foreground/40 cursor-help",
+          className,
+        )}
+        data-kb-fact={`${entity}.${property}`}
+        tabIndex={0}
+      >
+        {displayValue}
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md opacity-0 invisible transition-opacity text-xs",
+        )}
+        role="tooltip"
+      >
+        {/* Property name (uppercase, muted) */}
+        <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+          {propertyName}
+        </span>
+
+        {/* Formatted value (bold) */}
+        <span className="block font-semibold text-foreground mb-1">
+          {formattedValue}
+        </span>
+
+        {/* As-of date */}
+        {fact.asOf && (
+          <span className="block text-muted-foreground">
+            As of: {formatKBDate(fact.asOf)}
+          </span>
+        )}
+
+        {/* Notes */}
+        {fact.notes && (
+          <span className="block text-muted-foreground mt-1">
+            {fact.notes}
+          </span>
+        )}
+
+        {/* Source (show domain only for URLs, truncated) */}
+        {fact.source && (
+          <span className="block text-muted-foreground mt-1 truncate">
+            {isUrl(fact.source) ? (
+              <>
+                Source:{" "}
+                <a
+                  href={fact.source}
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {shortDomain(fact.source)}
+                </a>
+              </>
+            ) : (
+              <>Source: {fact.source}</>
+            )}
+          </span>
+        )}
+
+        {/* Fact detail link */}
+        <span className="block mt-1.5">
+          <Link
+            href={`/kb/fact/${fact.id}`}
+            className="text-primary/70 hover:text-primary hover:underline font-mono text-[10px]"
+          >
+            {entity}.{property} →
+          </Link>
+        </span>
+      </span>
+    </span>
+  );
+}

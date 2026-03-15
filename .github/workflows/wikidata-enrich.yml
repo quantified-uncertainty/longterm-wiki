@@ -100,10 +100,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Only stage expected output files
-          git add -- 'packages/kb/data/things/*.yaml'
+          git add -- 'packages/factbase/data/things/*.yaml'
 
           # Warn about any other modifications
-          OTHER_CHANGES=$(git diff --name-only | grep -v '^packages/kb/data/things/' || true)
+          OTHER_CHANGES=$(git diff --name-only | grep -v '^packages/factbase/data/things/' || true)
           if [ -n "$OTHER_CHANGES" ]; then
             echo "::warning::Unexpected modifications detected (not staged): $OTHER_CHANGES"
           fi

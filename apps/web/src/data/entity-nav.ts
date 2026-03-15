@@ -2,9 +2,9 @@
  * Entity navigation: URL resolution, backlinks, and related graph.
  */
 
-import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./database";
-import type { WithSource } from "./database";
-import { getKBEntitySlug } from "./kb";
+import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./tablebase";
+import type { WithSource } from "./tablebase";
+import { getKBEntitySlug } from "./factbase";
 
 // ============================================================================
 // DIRECTORY URL RESOLUTION

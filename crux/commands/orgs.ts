@@ -11,16 +11,16 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { loadGraphFull, resolveEntity, KB_DATA_DIR } from '../lib/kb-loader.ts';
+import { loadGraphFull, resolveEntity, KB_DATA_DIR } from '../lib/factbase-loader.ts';
 import {
   readEntityDocument,
   appendFact,
   writeEntityDocument,
   findEntityFilePath,
-} from '../lib/kb-writer.ts';
-import type { RawFactInput } from '../lib/kb-writer.ts';
-import type { Entity, Fact } from '../../packages/kb/src/types.ts';
-import type { Graph } from '../../packages/kb/src/graph.ts';
+} from '../lib/factbase-writer.ts';
+import type { RawFactInput } from '../lib/factbase-writer.ts';
+import type { Entity, Fact } from '../../packages/factbase/src/types.ts';
+import type { Graph } from '../../packages/factbase/src/graph.ts';
 
 // ── Types ─────────────────────────────────────────────────────────
 

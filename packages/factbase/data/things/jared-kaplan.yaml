@@ -1,0 +1,24 @@
+thing:
+  id: jared-kaplan
+  stableId: x16GL4gP2A
+  type: person
+  name: "Jared Kaplan"
+  numericId: "E1239"
+
+facts:
+  - id: f_1f8OrwS6Gw
+    property: employed-by
+    value: !ref mK9pX3rQ7n
+
+  - id: f_cErwsdUACw
+    property: role
+    value: "Co-founder"
+
+  - id: f_clGvV7hzcA
+    property: notable-for
+    value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of neural scaling laws research"
+
+  - id: f_h7OOErJfYQ
+    property: education
+    value: "PhD in Physics, Stanford University"
+

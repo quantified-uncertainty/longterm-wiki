@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { convertNewFootnotes } from "../convert-new-footnotes";
 
 // Mock KB fact lookup
-vi.mock("../kb-fact-lookup", () => ({
+vi.mock("../factbase-fact-lookup", () => ({
   buildKBFactSourceMap: vi.fn(),
   findKBFactByUrl: vi.fn(),
 }));
@@ -22,8 +22,8 @@ vi.mock("../search/resource-lookup", () => ({
   getResourceByUrl: vi.fn().mockReturnValue(null),
 }));
 
-import { buildKBFactSourceMap, findKBFactByUrl } from "../kb-fact-lookup";
-import type { KBFactMatch } from "../kb-fact-lookup";
+import { buildKBFactSourceMap, findKBFactByUrl } from "../factbase-fact-lookup";
+import type { KBFactMatch } from "../factbase-fact-lookup";
 
 const mockBuildKBFactSourceMap = vi.mocked(buildKBFactSourceMap);
 const mockFindKBFactByUrl = vi.mocked(findKBFactByUrl);

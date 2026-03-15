@@ -21,7 +21,7 @@ import { preferEntityLinkRule } from './prefer-entitylink.ts';
 
 // Sidebar/structure rules
 import { sidebarIndexRule } from './sidebar-index.ts';
-import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
+import { kbSubcategoryCoverageRule } from './factbase-subcategory-coverage.ts';
 
 // File-level rules
 import { jsxInMdRule } from './jsx-in-md.ts';
@@ -93,7 +93,7 @@ import { noExecSyncRule } from './no-exec-sync.ts';
 
 // Data integrity checks
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
-import { kbfRefsRule } from './kbf-refs.ts';
+import { kbfRefsRule } from './factbase-refs.ts';
 
 // Deprecated component detection
 import { noDeprecatedComponentsRule } from './no-deprecated-components.ts';

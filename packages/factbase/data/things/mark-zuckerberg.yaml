@@ -1,0 +1,24 @@
+thing:
+  id: mark-zuckerberg
+  stableId: OxXXTxtbrA
+  type: person
+  name: "Mark Zuckerberg"
+  numericId: "E1293"
+
+facts:
+  - id: f_mTxD5bcYgw
+    property: role
+    value: "CEO"
+
+  - id: f_1TD2ftGDkg
+    property: born-year
+    value: 1984
+
+  - id: f_YbXRRr8Bcw
+    property: notable-for
+    value: "CEO of Meta; leads Meta AI and open-source Llama model development; advocate for open-source AI"
+
+  - id: f_RRcNwwrZzQ
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
+

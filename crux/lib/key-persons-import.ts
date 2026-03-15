@@ -1,7 +1,7 @@
 /**
  * Key Persons Import
  *
- * Extracts key-persons records from org YAML files in packages/kb/data/things/
+ * Extracts key-persons records from org YAML files in packages/factbase/data/things/
  * and syncs them to the wiki-server personnel PG table.
  *
  * The YAML key-persons entries use slugs for the `person` field (e.g., "dario-amodei"),
@@ -9,7 +9,7 @@
  * slugs to entity IDs during extraction using the KB graph.
  */
 
-import { loadGraphFull, type LoadedKB } from './kb-loader.ts';
+import { loadGraphFull, type LoadedKB } from './factbase-loader.ts';
 import { generateId } from './grant-import/id.ts';
 import { apiRequest, getServerUrl } from './wiki-server/client.ts';
 

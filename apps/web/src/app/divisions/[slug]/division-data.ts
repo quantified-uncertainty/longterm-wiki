@@ -7,12 +7,12 @@ import {
   getKBEntity,
   getKBEntitySlug,
   getKBRecords,
-} from "@/data/kb";
-import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById } from "@/data/database";
+} from "@/data/factbase";
+import type { KBRecordEntry } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import {
   titleCase,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -81,7 +81,7 @@ export function resolveEntityLink(entityId: string): { name: string; href: strin
       if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
       if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
     }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
+    return { name: entity.name, href: `/factbase/entity/${entityId}` };
   }
   return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
 }
@@ -352,7 +352,7 @@ export interface DivisionPageData {
   recipients: DivisionRecipient[];
 }
 
-export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry): DivisionPageData {
+export function loadDivisionPageData(record: import("@/data/factbase").KBRecordEntry): DivisionPageData {
   const division = parseDivision(record);
   const parent = resolveEntityLink(division.ownerEntityId);
 
@@ -379,7 +379,7 @@ export function loadDivisionPageData(record: import("@/data/kb").KBRecordEntry):
     .sort((a, b) => (b.totalBudget ?? 0) - (a.totalBudget ?? 0));
 
   // Find division personnel (check all alternate keys)
-  const personnelRecords: import("@/data/kb").KBRecordEntry[] = [];
+  const personnelRecords: import("@/data/factbase").KBRecordEntry[] = [];
   for (const key of allDivKeys) {
     personnelRecords.push(...getKBRecords(`__division__${key}`, "division-personnel"));
   }

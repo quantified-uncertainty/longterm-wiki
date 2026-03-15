@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { PaginationControls } from "@/components/directory/PaginationControls";
+import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import type { SortDir } from "@/lib/sort-utils";
+import { toggleSort } from "@/lib/sort-utils";
 import {
   RISK_CATEGORY_LABELS,
   RISK_CATEGORY_COLORS,
@@ -24,11 +28,22 @@ export interface RiskRow {
   timeHorizon: string | null;
 }
 
+const PAGE_SIZE = 50;
+
 export function RisksTable({ rows }: { rows: RiskRow[] }) {
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [sortKey, setSortKey] = useState<RiskSortKey>("name");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const url = useDirectoryUrl({
+    defaultSort: { field: "name", dir: "asc" },
+    filters: ["category"],
+  });
+  const {
+    search: urlSearch, setSearch: urlSetSearch,
+    sort: urlSort, setSort: urlSetSort,
+    page: urlPage, setPage: urlSetPage,
+    setFilter: urlSetFilter,
+  } = url;
+  const categoryFilter = url.filters.category ?? "all";
+  const sortKey = urlSort.field as RiskSortKey;
+  const sortDir: SortDir = urlSort.dir;
 
   // Collect unique categories for filter
   const categories = useMemo(() => {
@@ -50,12 +65,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
   }, [rows]);
 
   const handleSort = (key: RiskSortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir(key === "name" ? "asc" : "desc");
-    }
+    urlSetSort(toggleSort(urlSort, key, ["name"]));
   };
 
   const filtered = useMemo(() => {
@@ -65,8 +75,8 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       result = result.filter((r) => r.riskCategory === categoryFilter);
     }
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (urlSearch.trim()) {
+      const q = urlSearch.toLowerCase();
       result = result.filter((r) => {
         const searchable = `${r.name} ${r.riskCategory ?? ""} ${r.severity ?? ""} ${r.likelihood ?? ""} ${r.timeHorizon ?? ""}`.toLowerCase();
         return searchable.includes(q);
@@ -78,7 +88,11 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
     );
 
     return result;
-  }, [rows, search, categoryFilter, sortKey, sortDir]);
+  }, [rows, urlSearch, categoryFilter, sortKey, sortDir]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(urlPage, pageCount - 1);
+  const pageRows = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -88,46 +102,36 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
           type="text"
           placeholder="Search risks..."
           aria-label="Search risks"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={urlSearch}
+          onChange={(e) => urlSetSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
         />
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setCategoryFilter("all")}
-            aria-pressed={categoryFilter === "all"}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              categoryFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">{categoryCounts.all}</span>
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCategoryFilter(categoryFilter === c ? "all" : c)}
-              aria-pressed={categoryFilter === c}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                categoryFilter === c
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              {RISK_CATEGORY_LABELS[c] ?? c}
-              <span className="ml-1 text-[10px] opacity-60">
-                {categoryCounts[c] ?? 0}
-              </span>
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          items={categories.map((c) => ({
+            key: c,
+            label: RISK_CATEGORY_LABELS[c] ?? c,
+            count: categoryCounts[c] ?? 0,
+          }))}
+          selected={categoryFilter}
+          onSelect={(key) => urlSetFilter("category", key)}
+          allCount={categoryCounts.all}
+        />
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">
-        Showing {filtered.length} of {rows.length} risks
+      {/* Results count + top pagination */}
+      <div className="flex flex-col gap-2 mb-3">
+        <div className="text-xs text-muted-foreground">
+          Showing {filtered.length} of {rows.length} risks
+        </div>
+        {pageCount > 1 && (
+          <PaginationControls
+            page={safePage}
+            pageCount={pageCount}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={urlSetPage}
+          />
+        )}
       </div>
 
       {/* Table */}
@@ -143,7 +147,7 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {filtered.map((row) => (
+            {pageRows.map((row) => (
               <tr
                 key={row.id}
                 className="hover:bg-muted/20 transition-colors"
@@ -225,6 +229,19 @@ export function RisksTable({ rows }: { rows: RiskRow[] }) {
       {filtered.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           No risks match your search.
+        </div>
+      )}
+
+      {/* Bottom pagination */}
+      {pageCount > 1 && (
+        <div className="mt-3">
+          <PaginationControls
+            page={safePage}
+            pageCount={pageCount}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={urlSetPage}
+          />
         </div>
       )}
     </div>

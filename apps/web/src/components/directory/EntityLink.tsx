@@ -32,7 +32,7 @@ export function DirectoryEntityLink({
   }
   if (entity.slug) {
     return (
-      <Link href={`/kb/entity/${entity.id}`} className={linkClass}>
+      <Link href={`/factbase/entity/${entity.id}`} className={linkClass}>
         {label}
       </Link>
     );

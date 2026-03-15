@@ -141,17 +141,17 @@ Each entry has a stable key (e.g., `i_OVNz9C3XUA`) and typed fields validated ag
 
 The KB powers several MDX components used in wiki pages:
 
-### `<KBF>` \- Inline Fact Display
+### `<FBF>` \- Inline Fact Display
 
 Renders a single KB fact with a hover tooltip showing source, date, and notes:
 
 ```jsx
-<KBF entity="anthropic" property="valuation" />          {/* Auto-formatted: "$380.0B" */}
-<KBF entity="anthropic" property="revenue" showDate />   {/* "$19.0B (as of 2026-03)" */}
-<KBF entity="anthropic" property="valuation">$380B</KBF> {/* Custom display text */}
+<FBF entity="anthropic" property="valuation" />          {/* Auto-formatted: "$380.0B" */}
+<FBF entity="anthropic" property="revenue" showDate />   {/* "$19.0B (as of 2026-03)" */}
+<FBF entity="anthropic" property="valuation">$380B</FBF> {/* Custom display text */}
 ```
 
-### `<KBFactValue>` \- Block Fact Display
+### `<FBFactValue>` \- Block Fact Display
 
 Renders a fact value with more context, used in structured sections.
 
@@ -165,7 +165,7 @@ Derives a value from multiple facts at render time:
 
 ### KB Footnotes
 
-Facts referenced via `<KBF>` automatically generate footnote citations using the `[^kb-factId]` format. These appear in the page's footnote section with full source attribution.
+Facts referenced via `<FBF>` automatically generate footnote citations using the `[^kb-factId]` format. These appear in the page's footnote section with full source attribution.
 
 ### Entity Sidebar and Fact Tables
 
@@ -231,7 +231,7 @@ The wiki-server's PostgreSQL database stores **statements** (formerly called "cl
 | **Data types** | Typed (number, date, ref, range, etc.) | Free text with optional structured fields |
 | **Temporal** | `asOf` / `validEnd` | `valueDate` |
 | **Source tracking** | `source`, `sourceResource`, `sourceQuote` | `claim_sources` join table |
-| **Display** | `<KBF>`, `<Calc>`, tooltips | Statements table on entity pages |
+| **Display** | `<FBF>`, `<Calc>`, tooltips | Statements table on entity pages |
 | **Build dependency** | Yes (feeds database.json) | No (runtime queries) |
 
 KB facts are the **authoritative source** for structured data that appears across wiki pages. Statements provide a complementary view of what the prose says, useful for citation checking, hallucination detection, and verifying consistency between page text and canonical data.
@@ -247,8 +247,8 @@ KB facts are the **authoritative source** for structured data that appears acros
 | Inverse relationship computation | Working |
 | `!ref` and `!date` YAML tags with cross-validation | Working |
 | Currency support with USD equivalents | Working |
-| `\<KBF\>` inline fact display with tooltips | Working |
-| `\<KBFactValue\>` block display | Working |
+| `\<FBF\>` inline fact display with tooltips | Working |
+| `\<FBFactValue\>` block display | Working |
 | `\<Calc\>` computed values | Working |
 | KB footnotes integration | Working |
 | Entity sidebar and fact tables | Working |
@@ -261,7 +261,7 @@ Several areas are under consideration for extending the KB system:
 
 - **Broader entity coverage**: Expanding beyond the current 362 entities to cover more of the wiki's \~700 pages with structured facts
 - **Richer record collection types**: Adding more collection schemas (e.g., regulatory actions, benchmark results, governance events) to entity types beyond organization
-- **Temporal queries in components**: Enabling `\<KBF\>` to reference facts at specific dates (e.g., "Anthropic's revenue as of 2025-03") rather than always showing the latest
+- **Temporal queries in components**: Enabling `\<FBF\>` to reference facts at specific dates (e.g., "Anthropic's revenue as of 2025-03") rather than always showing the latest
 - **Cross-entity computed properties**: Supporting `\<Calc\>` expressions that aggregate across entities (e.g., total funding across all AI safety organizations)
 - **Statement-KB reconciliation**: Automated checks that verify page prose (statements) stays consistent with canonical KB facts, flagging contradictions for human review
 - **Property completeness tracking**: Dashboard showing which entity types have the best coverage and where data gaps exist

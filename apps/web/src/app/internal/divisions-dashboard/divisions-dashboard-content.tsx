@@ -7,7 +7,7 @@ import {
   type RpcDivisionRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { getKBEntity } from "@data/kb";
+import { getKBEntity } from "@data/factbase";
 import { DivisionsTable, type DivisionRow } from "./divisions-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────

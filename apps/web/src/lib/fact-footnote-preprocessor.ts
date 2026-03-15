@@ -12,7 +12,7 @@
  *           [^fact-f_i59sRXPSZw]: [Source](https://example.com) — *"Quote text"* (as of 2024-12)
  */
 
-import type { Fact } from "@longterm-wiki/kb";
+import type { Fact } from "@longterm-wiki/factbase";
 
 /**
  * Regex matching `[^fact:FACTID]` usage sites in MDX content.

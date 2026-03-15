@@ -2,7 +2,7 @@
  * Shared utilities for /people routes.
  *
  * Personnel data (key-persons, board-seats, career-history) is fetched
- * from PostgreSQL during build and merged into kb-data.json as KB records.
+ * from PostgreSQL during build and merged into factbase-data.json as KB records.
  *
  * Career data comes from the KB records layer (populated by build-data.mjs
  * from the wiki-server personnel table). Career-history records are keyed
@@ -15,7 +15,7 @@ import {
   getKBEntity,
   resolveKBSlug,
   type KBRecordEntry,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   resolveEntityBySlug,
   getEntitySlugs,
@@ -282,7 +282,7 @@ export function getFundingConnectionsForPerson(
           ? `/organizations/${slug}`
           : slug && e.type === "person"
             ? `/people/${slug}`
-            : `/kb/entity/${id}`;
+            : `/factbase/entity/${id}`;
       return { name: e.name, href };
     }
     // Title-case the slug as fallback

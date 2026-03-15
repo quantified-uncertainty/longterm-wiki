@@ -2,7 +2,7 @@
  * Hallucination risk stats and citation quote lookups.
  */
 
-import { getDatabase, getEntityBundle, resolveId, fetchFromWikiServer, withApiFallback } from "./database";
+import { getDatabase, getEntityBundle, resolveId, fetchFromWikiServer, withApiFallback } from "./tablebase";
 
 export interface RiskStats {
   total: number;

@@ -17,7 +17,7 @@ import {
   type ReferenceData,
   type RefMapEntry,
 } from "./reference-preprocessor";
-import { getKBFactById } from "@data/kb";
+import { getKBFactById } from "@data/factbase";
 import { preprocessFactFootnotes } from "./fact-footnote-preprocessor";
 
 const CONTENT_DIR = path.resolve(process.cwd(), "../../content/docs");

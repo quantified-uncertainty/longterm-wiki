@@ -352,7 +352,7 @@ const PARALLEL_STEPS: Step[] = [
     id: 'kb-schema',
     name: 'KB schema validation (required properties, ref integrity, data quality)',
     command: 'npx',
-    args: ['tsx', 'crux/validate/validate-kb-schema.ts'],
+    args: ['tsx', 'crux/validate/validate-factbase-schema.ts'],
     cwd: PROJECT_ROOT,
   },
   {

@@ -24,7 +24,7 @@
       "@wiki-server/api-types": ["../wiki-server/src/api-types.ts"],
       "@wiki-server/api-response-types": ["../wiki-server/src/api-response-types.ts"],
       "@wiki-server/facts-route": ["../wiki-server/src/routes/facts.ts"],
-      "@wiki-server/kb-verifications-route": ["../wiki-server/src/routes/kb-verifications.ts"],
+      "@wiki-server/factbase-verifications-route": ["../wiki-server/src/routes/factbase-verifications.ts"],
       "@wiki-server/grants-route": ["../wiki-server/src/routes/grants.ts"],
       "@wiki-server/divisions-route": ["../wiki-server/src/routes/divisions.ts"],
       "@wiki-server/funding-programs-route": ["../wiki-server/src/routes/funding-programs.ts"]

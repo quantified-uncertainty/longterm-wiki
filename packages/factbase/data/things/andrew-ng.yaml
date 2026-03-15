@@ -1,0 +1,32 @@
+thing:
+  id: andrew-ng
+  stableId: v13BF4zP2A
+  type: person
+  name: "Andrew Ng"
+  numericId: "E1307"
+
+facts:
+  - id: f_JQBegHV9Yg
+    property: role
+    value: "Founder"
+
+  - id: f_eOS7s8epzw
+    property: born-year
+    value: 1976
+
+  - id: f_Rg89IN7s7w
+    property: notable-for
+    value: "Founder of DeepLearning.AI and Coursera; former head of Google Brain and Baidu AI; leading AI educator"
+
+  - id: f_CUnXLL3M8Q
+    property: education
+    value: "PhD in Computer Science, UC Berkeley"
+
+  - id: f_r4CmuKqadQ
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Andrew_Ng"
+
+  - id: f_PomBL98jGQ
+    property: website
+    value: "https://www.andrewng.org"
+

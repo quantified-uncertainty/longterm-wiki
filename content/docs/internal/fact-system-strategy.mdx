@@ -21,20 +21,20 @@ ratings:
 
 The fact system is now the **KB (Knowledge Base)** system. After an early iteration in `data/facts/` with \~139 facts across 18 entities, the system was restructured into `packages/kb/` with a much broader scope: 362 entity files in `packages/kb/data/things/` and 100+ property definitions in `packages/kb/data/properties.yaml`.
 
-The early scaling attempt in February 2026 (batch-enriching \~30 pages with `<F>` tags via `crux enrich fact-refs`) was reverted after discovering that 81% of tags were wrapping form. That lesson directly shaped KB's design: self-closing `<KBF>` is the standard form, and wrapping form is discouraged.
+The early scaling attempt in February 2026 (batch-enriching \~30 pages with `<F>` tags via `crux enrich fact-refs`) was reverted after discovering that 81% of tags were wrapping form. That lesson directly shaped KB's design: self-closing `<FBF>` is the standard form, and wrapping form is discouraged.
 
 This page documents what we learned, what similar systems do, and the operating principles behind KB.
 
 **Current infrastructure (KB):**
 - 362 entity YAML files in `packages/kb/data/things/` (e.g., `anthropic.yaml` has \~60 facts with clean temporal structure)
 - 100+ property definitions in `packages/kb/data/properties.yaml` with display config (format, units, divisors)
-- `<KBF entity="x" property="y" />` component renders inline values with hover tooltips (self-closing is the standard form)
-- `<KBFactValue>` component for programmatic/dashboard use
+- `<FBF entity="x" property="y" />` component renders inline values with hover tooltips (self-closing is the standard form)
+- `<FBFactValue>` component for programmatic/dashboard use
 - `<Calc>` component derives values from multiple KB facts
 - Build-time system computes fact timeseries, usage tracking, source resolution
 - Fact dashboard at `/internal/facts` (E898) for monitoring
 
-**Current usage:** `<KBF>` tags appear across \~19 pages, still concentrated on Anthropic pages (valuation, IPO, investors, stakeholders, headcount progression). The Anthropic entity alone has \~60 facts with temporal structure covering valuation rounds, revenue growth, and headcount over time.
+**Current usage:** `<FBF>` tags appear across \~19 pages, still concentrated on Anthropic pages (valuation, IPO, investors, stakeholders, headcount progression). The Anthropic entity alone has \~60 facts with temporal structure covering valuation rounds, revenue growth, and headcount over time.
 
 **Key finding (still true):** The top fact (Anthropic valuation) appears on 9+ pages — proof the system works when used correctly. The three-criteria test (volatile, entity-attributable, worth tracking) is now the operating principle for what enters KB.
 
@@ -48,7 +48,7 @@ Wikipedia's approach is a hierarchical override: articles can hardcode values, p
 
 SPARQL queries enable cross-entity consistency checks ("show me all AI companies with valuation \> \$10B"). This is analogous to our `crux query facts` — structured data living outside prose, queryable for dashboards.
 
-**Lesson for us:** KB YAML facts are our Wikidata. They feed structured locations (InfoBox, DataInfoBox, comparison tables) and inline prose via self-closing `<KBF>` tags — the equivalent of Wikidata template calls. KB now implements this pattern with 362 entity files.
+**Lesson for us:** KB YAML facts are our Wikidata. They feed structured locations (InfoBox, DataInfoBox, comparison tables) and inline prose via self-closing `<FBF>` tags — the equivalent of Wikidata template calls. KB now implements this pattern with 362 entity files.
 
 ### Obsidian Dataview
 
@@ -56,13 +56,13 @@ Obsidian's Dataview plugin demonstrates dual metadata: YAML frontmatter for stru
 
 The critical pattern is that **inline annotations are write-once, read-many** — you write `Revenue:: $9.7B` once in a page, and queries on other pages display it. The annotation IS the single source of truth.
 
-**Lesson for us:** KB implements exactly this pattern. Self-closing `<KBF entity="x" property="y" />` tags are inline queries pulling from structured KB data. The wrapping form `<KBF>...$9.7B...</KBF>` is the anti-pattern: it creates TWO sources of truth (KB data and display text). This lesson directly led to KB standardizing on self-closing form.
+**Lesson for us:** KB implements exactly this pattern. Self-closing `<FBF entity="x" property="y" />` tags are inline queries pulling from structured KB data. The wrapping form `<FBF>...$9.7B...</FBF>` is the anti-pattern: it creates TWO sources of truth (KB data and display text). This lesson directly led to KB standardizing on self-closing form.
 
 ### Data Journalism (OWID, FiveThirtyEight)
 
 Data journalism organizations keep data lifecycle completely separate from content. Our World in Data stores datasets in git repos with automated update pipelines. Charts pull from datasets; prose references charts. A journalist never hardcodes "238 million" in article text — the chart renders the current value.
 
-**Lesson for us:** KB implements this workflow. For volatile numbers (company valuations, funding totals), the update path is: edit KB YAML → pages automatically reflect the change via self-closing `<KBF>` tags and structured components (tables, InfoBox) that read from KB data.
+**Lesson for us:** KB implements this workflow. For volatile numbers (company valuations, funding totals), the update path is: edit KB YAML → pages automatically reflect the change via self-closing `<FBF>` tags and structured components (tables, InfoBox) that read from KB data.
 
 ### Temporal Knowledge Graphs (DBpedia-TKG)
 
@@ -74,12 +74,12 @@ Academic temporal knowledge graphs attach explicit timestamps to every fact: `(A
 
 Facts and Statements are **complementary, not competing** systems:
 
-- **Facts** (KB YAML) are the volatile numeric data layer — rendered via `\<KBF>` and `\<Calc>` components at build time, optimized for "update one KB entry, correct 9 pages."
+- **Facts** (KB YAML) are the volatile numeric data layer — rendered via `\<FBF>` and `\<Calc>` components at build time, optimized for "update one KB entry, correct 9 pages."
 - **Statements** (PostgreSQL) are the broader structured assertion layer — covering all assertion types (numeric, text, entity-valued, attributed) with property taxonomy, citations, and temporal validity.
 
 Statements link to Facts via `source_fact_key` (e.g., "anthropic.valuation"), providing traceability without requiring migration of the KB build-time pipeline. The property taxonomy in KB property definitions is shared — it seeds the `properties` table that Statements use.
 
-**Long-term convergence**: Facts may eventually become a subset of Statements (numeric statements with canonical status), but the KB YAML → `\<KBF>` → build pipeline works well and doesn't need immediate migration.
+**Long-term convergence**: Facts may eventually become a subset of Statements (numeric statements with canonical status), but the KB YAML → `\<FBF>` → build pipeline works well and doesn't need immediate migration.
 
 The Statements System Architecture page (E1006, now removed) previously provided the full Statements system reference.
 
@@ -101,18 +101,18 @@ When Anthropic raises a new round, updating one YAML entry should update the com
 
 ## Problems with the Current Approach
 
-### 1. Most `<KBF>` tags should use self-closing form
+### 1. Most `<FBF>` tags should use self-closing form
 
 The wrapping form duplicates the display text in the MDX:
 
 ```mdx
 {/* Wrapping form — the number is hardcoded in display text */}
-xAI raised <KBF entity="xai" property="total-funding">\$26 billion</KBF> in funding
+xAI raised <FBF entity="xai" property="total-funding">\$26 billion</FBF> in funding
 
 {/* If KB updates to $30B, display still says "$26 billion" */}
 ```
 
-This is worse than plain text: it adds JSX complexity without providing the core benefit of single-source-of-truth updates. Prefer the self-closing form: `<KBF entity="xai" property="total-funding" />`.
+This is worse than plain text: it adds JSX complexity without providing the core benefit of single-source-of-truth updates. Prefer the self-closing form: `<FBF entity="xai" property="total-funding" />`.
 
 ### 2. The enrichment pipeline tags numbers indiscriminately
 
@@ -120,7 +120,7 @@ This is worse than plain text: it adds JSX complexity without providing the core
 
 ### 3. Entity and property naming is now consistent
 
-`<KBF entity="ssi" property="headcount">` uses entity slugs and human-readable property names, aligning with KB conventions. `EntityLink` continues to use numeric IDs like `E338` for entity pages.
+`<FBF entity="ssi" property="headcount">` uses entity slugs and human-readable property names, aligning with KB conventions. `EntityLink` continues to use numeric IDs like `E338` for entity pages.
 
 ### 4. The extraction pipeline creates too many low-value facts
 
@@ -128,7 +128,7 @@ This is worse than plain text: it adds JSX complexity without providing the core
 
 ### 5. Limited display format control
 
-The `<KBF>` component uses KB property display rules for formatting, which handles most cases. However, there is limited ability to specify format variants in context — in prose you might want "\$380 billion" while in a table "\$380B" is better. Property-level display config in `packages/kb/data/properties.yaml` provides the default format, but per-usage overrides remain limited.
+The `<FBF>` component uses KB property display rules for formatting, which handles most cases. However, there is limited ability to specify format variants in context — in prose you might want "\$380 billion" while in a table "\$380B" is better. Property-level display config in `packages/kb/data/properties.yaml` provides the default format, but per-usage overrides remain limited.
 
 ## Revised Strategy
 
@@ -146,39 +146,39 @@ Examples of bad facts: founding dates, historical funding round amounts, benchma
 
 **Current scope:** KB has grown to 362 entity files in `packages/kb/data/things/`, but the three-criteria test remains the gatekeeper for what belongs. Not every entity file needs volatile facts — many contain stable reference data. The volatile, high-value facts (valuations, revenue, headcount) remain the system's primary strength.
 
-### Self-closing `<KBF>` is the only acceptable inline form
+### Self-closing `<FBF>` is the only acceptable inline form
 
-Self-closing `<KBF entity="x" property="y" />` must be the default and strongly-preferred form:
+Self-closing `<FBF entity="x" property="y" />` must be the default and strongly-preferred form:
 
 ```mdx
 {/* Correct — value comes from KB, updates automatically */}
-xAI is valued at <KBF entity="xai" property="valuation" /> as of its Series E round.
+xAI is valued at <FBF entity="xai" property="valuation" /> as of its Series E round.
 
 {/* Wrong — value is hardcoded, defeats the purpose */}
-xAI is valued at <KBF entity="xai" property="valuation">\$230 billion</KBF> as of its Series E round.
+xAI is valued at <FBF entity="xai" property="valuation">\$230 billion</FBF> as of its Series E round.
 ```
 
 Wrapping form should only be used when the prose requires a format that cannot be expressed via the component's formatting. Even then, consider whether the number should just be plain text instead.
 
 ### Entity and property are both required
 
-The `<KBF>` component requires both `entity` (slug) and `property` (human-readable name):
+The `<FBF>` component requires both `entity` (slug) and `property` (human-readable name):
 
 ```mdx
-<KBF entity="anthropic" property="valuation" />
-<KBF entity="anthropic" property="revenue" asOf="2025-12" />
+<FBF entity="anthropic" property="valuation" />
+<FBF entity="anthropic" property="revenue" asOf="2025-12" />
 ```
 
 ### Display format control
 
-The `<KBF>` component uses KB property display rules for formatting. For historical values, use the `asOf` prop:
+The `<FBF>` component uses KB property display rules for formatting. For historical values, use the `asOf` prop:
 
 ```mdx
 {/* Latest value */}
-<KBF entity="anthropic" property="valuation" />
+<FBF entity="anthropic" property="valuation" />
 
 {/* Specific historical value */}
-<KBF entity="anthropic" property="valuation" asOf="2025-11" />
+<FBF entity="anthropic" property="valuation" asOf="2025-11" />
 ```
 
 Format rules are defined per-property in `packages/kb/data/properties.yaml`:
@@ -197,7 +197,7 @@ valuation:
 Don't batch-enrich the entire wiki. Instead:
 
 1. **Identify the numbers that actually change frequently** (company valuations, revenue, headcount, total funding)
-2. **Create KB facts for those, with self-closing `<KBF>` tags**
+2. **Create KB facts for those, with self-closing `<FBF>` tags**
 3. **Use `<Calc>` for derived values** that reference those facts (revenue multiples, growth rates)
 4. **Leave everything else as plain text**
 
@@ -265,14 +265,14 @@ Each phase is gated on the previous phase working reliably. Start with detection
 
 - Migrated from `data/facts/` (139 facts, 18 entities) to `packages/kb/data/things/` (362 entity files)
 - Migrated from `data/fact-measures.yaml` (25 measures) to `packages/kb/data/properties.yaml` (95 properties with display config)
-- Renamed `<F>` component to `<KBF>` with `entity` and `property` props as required attributes
-- Added `<KBFactValue>` component for programmatic/dashboard use
-- Self-closing `<KBF entity="x" property="y" />` is the standard form
+- Renamed `<F>` component to `<FBF>` with `entity` and `property` props as required attributes
+- Added `<FBFactValue>` component for programmatic/dashboard use
+- Self-closing `<FBF entity="x" property="y" />` is the standard form
 - Built fact dashboard at `/internal/facts` (E898)
 
 ### Done: Prune and migrate tags
 
-- Wrapping `<F>` tags converted to self-closing `<KBF>` form
+- Wrapping `<F>` tags converted to self-closing `<FBF>` form
 - Historical/fixed numbers removed from fact system (replaced with plain text)
 - Entity and property naming standardized on slugs and human-readable names
 
@@ -290,7 +290,7 @@ Each phase is gated on the previous phase working reliably. Start with detection
 
 ### Remaining: Enrichment pipeline repurposing
 
-- Repurpose as a migration tool: scan MDX for hardcoded numbers that match existing KB fact values, propose self-closing `<KBF>` replacements
+- Repurpose as a migration tool: scan MDX for hardcoded numbers that match existing KB fact values, propose self-closing `<FBF>` replacements
 - Tighten extraction to only propose facts meeting the three criteria
 
 ### Remaining: Display format improvements
@@ -302,16 +302,16 @@ Each phase is gated on the previous phase working reliably. Start with detection
 
 ### Q1: Should KB YAML files exist for entities with no volatile facts?
 
-**Answer: In KB, entity files serve a broader purpose.** The original answer was "prune files with only fixed facts," but KB's 362 entity files include both volatile tracked numbers and stable reference data. Entity files with only stable data still contribute to the structured knowledge layer (enabling queries, dashboards, and cross-entity comparisons). The three-criteria test applies to which facts get `<KBF>` tags in prose, not to which entity files exist.
+**Answer: In KB, entity files serve a broader purpose.** The original answer was "prune files with only fixed facts," but KB's 362 entity files include both volatile tracked numbers and stable reference data. Entity files with only stable data still contribute to the structured knowledge layer (enabling queries, dashboards, and cross-entity comparisons). The three-criteria test applies to which facts get `<FBF>` tags in prose, not to which entity files exist.
 
 ### Q2: Should the enrichment pipeline be removed or repurposed?
 
-**Answer: Repurpose (still TODO).** The wrapping behavior was killed. The pipeline should be rebuilt as a migration tool: scan MDX for hardcoded numbers that match existing KB fact values, and propose replacements with self-closing `<KBF entity="x" property="y" />` tags. This is the inverse of what it originally did — instead of adding redundant wrappers, it would remove hardcoded values.
+**Answer: Repurpose (still TODO).** The wrapping behavior was killed. The pipeline should be rebuilt as a migration tool: scan MDX for hardcoded numbers that match existing KB fact values, and propose replacements with self-closing `<FBF entity="x" property="y" />` tags. This is the inverse of what it originally did — instead of adding redundant wrappers, it would remove hardcoded values.
 
 ### Q3: How should facts interact with the auto-update system?
 
 **Answer: Phased — detection first, then automated writes behind PR review.** See the Auto-Update Integration section above. Don't jump to automated YAML writes until detection is proven reliable.
 
-### Q4: What's the right display format for self-closing `<KBF>` tags?
+### Q4: What's the right display format for self-closing `<FBF>` tags?
 
-**Answer (implemented):** The `<KBF>` component uses KB property display rules from `packages/kb/data/properties.yaml` for formatting. The `asOf` prop handles historical values. This eliminates the main reason people used wrapping form (to control display text). Remaining gap: per-usage format overrides for different contexts (prose vs table).
+**Answer (implemented):** The `<FBF>` component uses KB property display rules from `packages/kb/data/properties.yaml` for formatting. The `asOf` prop handles historical values. This eliminates the main reason people used wrapping form (to control display text). Remaining gap: per-usage format overrides for different contexts (prose vs table).

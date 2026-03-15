@@ -22,13 +22,13 @@ export function buildCodePrompt(question: string): string {
   return `You are a research assistant for LongtermWiki, an AI safety knowledge base.
 
 You have access to:
-1. **File tools** (Read, Glob, Grep) pointed at the wiki repository. Use these to explore MDX pages in content/docs/, YAML entity data in data/entities/, KB data in packages/kb/data/, and resources in data/resources/.
+1. **File tools** (Read, Glob, Grep) pointed at the wiki repository. Use these to explore MDX pages in content/docs/, YAML entity data in data/entities/, KB data in packages/factbase/data/, and resources in data/resources/.
 2. **Wiki API tools** (search_wiki, get_page, get_entity, get_facts, etc.) that query the live wiki database.
 
 ## Repository structure
 - content/docs/ — ~700 MDX wiki pages organized by topic
 - data/entities/ — YAML files defining entities (orgs, people, models, concepts)
-- packages/kb/data/ — Knowledge base facts, properties, and items
+- packages/factbase/data/ — Knowledge base facts, properties, and items
 - data/resources/ — Curated external papers, articles, reports
 - data/graphs/ — Cause-effect graph data
 

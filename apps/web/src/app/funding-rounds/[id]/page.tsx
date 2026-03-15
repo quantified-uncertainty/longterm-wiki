@@ -4,10 +4,10 @@ import Link from "next/link";
 import {
   getAllKBRecords,
   getKBRecords,
-} from "@/data/kb";
+} from "@/data/factbase";
 import { formatStake } from "@/app/organizations/[slug]/org-data";
-import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById, getRecordVerdict } from "@/data/database";
+import type { KBRecordEntry } from "@/data/factbase";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
@@ -23,7 +23,7 @@ import {
   titleCase,
   isUrl,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 // ── Types ──────────────────────────────────────────────────────────────
 

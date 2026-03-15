@@ -3,7 +3,7 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { getRecordVerdict } from "@data/database";
+import { getRecordVerdict } from "@data/tablebase";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord } from "./org-data";

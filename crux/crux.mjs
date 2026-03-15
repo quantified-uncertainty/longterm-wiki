@@ -49,6 +49,7 @@
  *   import-funding-programs Import curated funding programs
  *   people       Person discovery and data tools (discover, create, link-resources, enrich)
  *   orgs         Organization data tools (enrich from Wikidata)
+ *   research-areas Research area linking (link-grants, backfill-papers, discover-orgs, stats)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -101,7 +102,7 @@ import * as agentSessionEventsCommands from './commands/agent-session-events.ts'
 import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
-import * as kbCommands from './commands/kb.ts';
+import * as factbaseCommands from './commands/factbase.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
@@ -111,10 +112,12 @@ import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
+import * as researchAreasCommands from './commands/research-areas.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
+import * as matrixCommands from './commands/matrix.ts';
 
 const domains = {
   validate: validateCommands,
@@ -154,7 +157,8 @@ const domains = {
   audits: auditsCommands,
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
-  kb: kbCommands,
+  factbase: factbaseCommands,
+  kb: factbaseCommands, // deprecated alias
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
@@ -164,10 +168,12 @@ const domains = {
   'import-funding-programs': importFundingProgramsCommands,
   people: peopleCommands,
   orgs: orgsCommands,
+  'research-areas': researchAreasCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,
+  matrix: matrixCommands,
 };
 
 /**
@@ -261,7 +267,9 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, create, link-resources, enrich)
   orgs             Organization data tools (enrich from Wikidata)
+  research-areas   Research area linking (link-grants, backfill-papers, discover-orgs, stats)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
+  matrix           Entity completeness matrix (scan infrastructure coverage)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

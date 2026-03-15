@@ -5,9 +5,9 @@ import {
   getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
-import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById, getRecordVerdict } from "@/data/database";
+} from "@/data/factbase";
+import type { KBRecordEntry } from "@/data/factbase";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
@@ -17,7 +17,7 @@ import {
   titleCase,
   isUrl,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 import { STATUS_COLORS } from "../grants-constants";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ function resolveEntityLink(entityId: string): { name: string; href: string | nul
       if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
       if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
     }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
+    return { name: entity.name, href: `/factbase/entity/${entityId}` };
   }
   return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
 }

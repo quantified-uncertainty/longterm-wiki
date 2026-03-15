@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { PaginationControls } from "@/components/directory/PaginationControls";
 import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
 
 export interface AiModelRow {
@@ -43,6 +44,8 @@ type SortKey =
   | "gpqa"
   | "params";
 
+const PAGE_SIZE = 50;
+
 export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   const [search, setSearch] = useState("");
   const [developerFilter, setDeveloperFilter] = useState<string>("all");
@@ -50,6 +53,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   const [showOpenWeightOnly, setShowOpenWeightOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("releaseDate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(0);
 
   const developers = useMemo(() => {
     const map = new Map<string, string>();
@@ -80,6 +84,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       setSortKey(key);
       setSortDir(key === "name" || key === "developer" ? "asc" : "desc");
     }
+    setPage(0);
   };
 
   const filtered = useMemo(() => {
@@ -138,6 +143,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
     return result;
   }, [rows, search, developerFilter, showFamilies, showOpenWeightOnly, sortKey, sortDir]);
 
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageRows = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   return (
     <div>
       {/* Filters */}
@@ -148,12 +157,18 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             placeholder="Search models..."
             aria-label="Search models"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
           <div className="flex flex-wrap gap-1.5">
             <button
-              onClick={() => setDeveloperFilter("all")}
+              onClick={() => {
+                setDeveloperFilter("all");
+                setPage(0);
+              }}
               aria-pressed={developerFilter === "all"}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                 developerFilter === "all"
@@ -167,7 +182,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             {developers.map(([devId, devName]) => (
               <button
                 key={devId}
-                onClick={() => setDeveloperFilter(developerFilter === devId ? "all" : devId)}
+                onClick={() => {
+                  setDeveloperFilter(developerFilter === devId ? "all" : devId);
+                  setPage(0);
+                }}
                 aria-pressed={developerFilter === devId}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   developerFilter === devId
@@ -188,7 +206,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             <input
               type="checkbox"
               checked={showFamilies}
-              onChange={(e) => setShowFamilies(e.target.checked)}
+              onChange={(e) => {
+                setShowFamilies(e.target.checked);
+                setPage(0);
+              }}
               className="rounded"
             />
             Show families
@@ -197,7 +218,10 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             <input
               type="checkbox"
               checked={showOpenWeightOnly}
-              onChange={(e) => setShowOpenWeightOnly(e.target.checked)}
+              onChange={(e) => {
+                setShowOpenWeightOnly(e.target.checked);
+                setPage(0);
+              }}
               className="rounded"
             />
             Open weight only
@@ -205,8 +229,18 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground mb-3">
-        Showing {filtered.length} of {rows.length} models
+      {/* Results count + top pagination */}
+      <div className="flex flex-col gap-2 mb-3">
+        <div className="text-xs text-muted-foreground">
+          Showing {filtered.length} of {rows.length} models
+        </div>
+        <PaginationControls
+          page={safePage}
+          pageCount={pageCount}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+        />
       </div>
 
       {/* Table */}
@@ -228,7 +262,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {filtered.map((row) => (
+            {pageRows.map((row) => (
               <tr
                 key={row.id}
                 className={`hover:bg-muted/20 transition-colors ${row.isFamily ? "bg-muted/10" : ""}`}
@@ -352,6 +386,17 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           No models match your search.
         </div>
       )}
+
+      {/* Bottom pagination */}
+      <div className="mt-3">
+        <PaginationControls
+          page={safePage}
+          pageCount={pageCount}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }

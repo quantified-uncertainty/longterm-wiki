@@ -504,7 +504,7 @@ async function loadFromPostgres(
  * Errors are silently ignored — PostgreSQL is a durable secondary store,
  * not a hard dependency.
  */
-function saveToPostgres(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
+function saveToPostgres(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html', fetchMethod?: string): void {
   upsertCitationContent({
     url,
     fetchedAt: new Date().toISOString(),
@@ -513,6 +513,7 @@ function saveToPostgres(url: string, title: string, content: string, httpStatus:
     pageTitle: title || null,
     fullText: content,
     contentLength: content.length,
+    fetchMethod: fetchMethod ?? null,
   }).catch((e) => console.warn('[source-fetcher] PG write failed:', e.message));
 }
 
@@ -663,7 +664,7 @@ async function _fetchSourceCore(
     // Cache successful transcript fetches for cross-session reuse
     if (content.length > 0) {
       saveToMemoryCache(url, result.title, content, 200, 'transcript');
-      saveToPostgres(url, result.title, content, 200, 'transcript');
+      saveToPostgres(url, result.title, content, 200, 'transcript', 'youtube-transcript');
       sessionCacheSet(url, result);
     }
     return result;
@@ -680,6 +681,7 @@ async function _fetchSourceCore(
   let httpStatus = 0;
   let fetchError: string | null = null;
   let fetchedContentType: FetchedSourceContentType = 'html';
+  let fetchMethod: string = 'built-in';
 
   const firecrawlResult = await fetchWithFirecrawl(fetchUrl);
   if (firecrawlResult) {
@@ -688,6 +690,7 @@ async function _fetchSourceCore(
     httpStatus = 200;
     // Firecrawl returns markdown — treat as HTML-equivalent
     fetchedContentType = 'html';
+    fetchMethod = 'firecrawl';
   } else {
     const builtinResult = await fetchWithBuiltin(fetchUrl);
     // If Ar5iv failed with a 4xx error, retry with the original arxiv.org URL
@@ -734,7 +737,7 @@ async function _fetchSourceCore(
   // ---- 6. Persist to in-memory cache and PostgreSQL (durable source of truth) ----
   if (content.length > 0) {
     saveToMemoryCache(url, title, content, httpStatus, fetchedContentType);
-    saveToPostgres(url, title, content, httpStatus, fetchedContentType);
+    saveToPostgres(url, title, content, httpStatus, fetchedContentType, fetchMethod);
   }
 
   // ---- 7. Extract excerpts ----

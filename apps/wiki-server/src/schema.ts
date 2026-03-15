@@ -154,6 +154,8 @@ export const citationContent = pgTable(
     fullText: text("full_text"),
     contentLength: integer("content_length"),
     contentHash: text("content_hash"),
+    /** How the content was fetched: firecrawl, built-in, youtube-transcript, abstract */
+    fetchMethod: text("fetch_method"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -576,6 +578,8 @@ export const resources = pgTable(
     stableId: text("stable_id").unique(),
     fetchStatus: text("fetch_status"),
     lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    /** Wayback Machine archive URL for this resource */
+    archiveUrl: text("archive_url"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -1346,7 +1350,7 @@ export const pageCitations = pgTable(
  * Each row records one LLM check of a KB fact against a specific resource.
  * A fact can have multiple rows (one per resource checked).
  */
-export const kbFactResourceVerifications = pgTable(
+export const factbaseResourceVerifications = pgTable(
   "kb_fact_resource_verifications",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -1383,7 +1387,7 @@ export const kbFactResourceVerifications = pgTable(
  * Recomputed periodically from kb_fact_resource_verifications. Separates evidence
  * (per-resource checks) from conclusions (all-things-considered verdict).
  */
-export const kbFactVerdicts = pgTable(
+export const factbaseVerdicts = pgTable(
   "kb_fact_verdicts",
   {
     factId: text("fact_id").primaryKey(),
