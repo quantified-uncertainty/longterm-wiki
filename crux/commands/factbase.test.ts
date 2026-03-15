@@ -9,7 +9,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { commands, resolveEntityArg } from './kb.ts';
+import { commands, resolveEntityArg } from './factbase.ts';
 import { loadGraphFull } from '../lib/factbase-loader.ts';
 import {
   readEntityDocument,

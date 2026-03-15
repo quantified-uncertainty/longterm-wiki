@@ -24,7 +24,7 @@ import {
   mapFundingRound,
   mapInvestment,
   mapEquityPosition,
-} from './kb-migrate-records.ts';
+} from './factbase-migrate-records.ts';
 
 // ── Test helpers ────────────────────────────────────────────────────────
 

@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { commands } from './kb.ts';
+import { commands } from './factbase.ts';
 
 describe('crux kb verify --dry-run', () => {
   it('lists facts to verify for a specific entity', async () => {
