@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc } from "drizzle-orm";
+import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { logger } from "../logger.js";
@@ -478,6 +478,43 @@ const grantsApp = new Hono()
     });
 
     return c.json({ upserted });
+  });
+
+  // ---- POST /delete-batch ----
+  // Delete grants by ID (for deduplication). Also removes corresponding things.
+  .post("/delete-batch", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = z.object({
+      ids: z.array(z.string().min(1).max(20)).min(1).max(500),
+    }).safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { ids } = parsed.data;
+    const db = getDrizzleDb();
+
+    logger.info({ count: ids.length }, "Deleting grants batch");
+
+    await db.transaction(async (tx) => {
+      // Delete from things table first (FK-safe)
+      const { things } = await import("../schema.js");
+      await tx
+        .delete(things)
+        .where(
+          and(
+            eq(things.sourceTable, "grants"),
+            inArray(things.sourceId, ids),
+          ),
+        );
+
+      // Delete the grants
+      await tx
+        .delete(grants)
+        .where(inArray(grants.id, ids));
+    });
+
+    return c.json({ deleted: ids.length });
   });
 
 // ---- Exports ----
