@@ -88,6 +88,7 @@ longterm-wiki/
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 - **Wiki-server env switching**: Set `WIKI_SERVER_ENV=prod` to target the production wiki-server instead of localhost. This makes all `LONGTERMWIKI_*` env var lookups use the `PROD_` prefix (e.g., `PROD_LONGTERMWIKI_SERVER_URL`). Usage: `WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"`
 - **No new bash scripts**: Write new scripts/tools as TypeScript in `crux/`. Bash is only acceptable for git hooks (`.githooks/`), Claude Code hooks (`.claude/hooks/`), and CI glue where Node.js isn't available.
+- **Shell aliases cause hangs**: This user's shell aliases `cp` to `cp -i` (interactive). In subagents and automated contexts, interactive prompts hang forever. Always use `command cp` (not `cp`), `command mv` (not `mv`) to bypass aliases. Never use `-i` flags. Always set `timeout` on Bash tool calls in subagents (max 600000ms / 10 min).
 
 ## Detailed Guides (loaded automatically by Claude Code)
 
