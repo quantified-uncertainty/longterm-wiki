@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { PaginationControls } from "@/components/directory/PaginationControls";
+import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import type { SortDir } from "@/lib/sort-utils";
+import { toggleSort } from "@/lib/sort-utils";
 import { topicLabel } from "@/data/topic-labels";
 import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
-import type { PeopleSortKey, SortDir } from "./people-sort";
+import type { PeopleSortKey } from "./people-sort";
 
 export interface PersonRow {
   id: string;
@@ -117,20 +122,25 @@ export function PeopleTable({
     enabled: serverMode,
   });
 
-  // ── Static-mode state ──
-  const [localSearch, setLocalSearch] = useState("");
-  const [affiliationFilter, setAffiliationFilter] = useState<string>("all");
-  const [topicFilter, setTopicFilter] = useState<string>("all");
-  const [localSortKey, setLocalSortKey] = useState<SortKey>("name");
-  const [localSortDir, setLocalSortDir] = useState<SortDir>("asc");
-  const [localPage, setLocalPage] = useState(0);
+  // ── Local (static) state via URL-synced hook ──
+  const url = useDirectoryUrl({
+    defaultSort: { field: "name", dir: "asc" },
+    filters: ["affiliation", "topic"],
+  });
+  const {
+    search: urlSearch, setSearch: urlSetSearch,
+    sort: urlSort, setSort: urlSetSort,
+    page: urlPage, setPage: urlSetPage,
+    setFilter: urlSetFilter,
+  } = url;
+  const affiliationFilter = url.filters.affiliation ?? "all";
+  const topicFilter = url.filters.topic ?? "all";
 
   const allRows = staticRows ?? EMPTY_ROWS;
 
   // Collect top affiliations for filter (only those with 2+ people)
-  // In server mode, we still compute from static rows if available for the filter chips.
-  // If server mode and no static rows, affiliations will be empty (server filter uses text).
-  const affiliations = useMemo(() => {
+  // In server mode, affiliations will be empty (server filter uses text).
+  const affiliationChips = useMemo(() => {
     const dataSource = serverMode ? EMPTY_ROWS : allRows;
     const counts = new Map<string, number>();
     for (const r of dataSource) {
@@ -141,11 +151,12 @@ export function PeopleTable({
     return [...counts.entries()]
       .filter(([, count]) => count >= 2)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
+      .slice(0, 10)
+      .map(([name, count]) => ({ key: name, label: name, count }));
   }, [allRows, serverMode]);
 
   // Collect all topics (static mode only — topics not available from server)
-  const topicOptions = useMemo(() => {
+  const topicChips = useMemo(() => {
     if (serverMode) return [];
     const counts = new Map<string, number>();
     for (const r of allRows) {
@@ -153,59 +164,75 @@ export function PeopleTable({
         counts.set(t, (counts.get(t) ?? 0) + 1);
       }
     }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([slug, count]) => ({ key: slug, label: topicLabel(slug), count }));
   }, [allRows, serverMode]);
 
-  // ── Event handlers ──
+  // ── Unified search handler ──
+  const search = serverMode ? server.search : urlSearch;
+  const {
+    setSearch: serverSetSearch,
+    setSort: serverSetSort,
+    setPage: serverSetPage,
+  } = server;
 
-  const handleSearch = (value: string) => {
-    if (serverMode) {
-      server.setSearch(value);
-    } else {
-      setLocalSearch(value);
-      setLocalPage(0);
-    }
-  };
-
-  const handleSort = (key: SortKey) => {
-    if (serverMode) {
-      const serverField = SORT_KEY_TO_SERVER_FIELD[key];
-      if (serverField) {
-        server.setSort(serverField);
-      }
-    } else {
-      if (localSortKey === key) {
-        setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  const handleSearch = useCallback(
+    (value: string) => {
+      if (serverMode) {
+        serverSetSearch(value);
       } else {
-        setLocalSortKey(key);
-        setLocalSortDir(
-          key === "name" || key === "role" || key === "employer"
-            ? "asc"
-            : "desc",
-        );
+        urlSetSearch(value);
       }
-      setLocalPage(0);
-    }
-  };
+    },
+    [serverMode, serverSetSearch, urlSetSearch],
+  );
 
-  const handleAffiliationFilter = (name: string) => {
-    if (serverMode) {
-      const newValue =
-        server.filters["affiliation"] === name ? undefined : name;
-      server.setFilter("affiliation", newValue);
-    } else {
-      setAffiliationFilter(affiliationFilter === name ? "all" : name);
-      setLocalPage(0);
-    }
-  };
+  // ── Unified sort ──
+  const sortKey: SortKey = serverMode
+    ? (server.sort.field as SortKey)
+    : (urlSort.field as SortKey);
+  const sortDir: SortDir = serverMode ? server.sort.dir : urlSort.dir;
 
-  const handlePageChange = (p: number) => {
-    if (serverMode) {
-      server.setPage(p + 1); // hook uses 1-indexed pages
-    } else {
-      setLocalPage(p);
-    }
-  };
+  const handleSort = useCallback(
+    (key: SortKey) => {
+      if (serverMode) {
+        const serverField = SORT_KEY_TO_SERVER_FIELD[key];
+        if (serverField) {
+          const { dir } = toggleSort(urlSort, key, ["name", "role", "employer"]);
+          serverSetSort(serverField, dir);
+        }
+      } else {
+        urlSetSort(toggleSort(urlSort, key, ["name", "role", "employer"]));
+      }
+    },
+    [serverMode, serverSetSort, urlSetSort, urlSort],
+  );
+
+  const { filters: serverFilters, setFilter: serverSetFilter } = server;
+  const handleAffiliationFilter = useCallback(
+    (key: string) => {
+      if (serverMode) {
+        const newValue =
+          serverFilters["affiliation"] === key ? undefined : key;
+        serverSetFilter("affiliation", newValue);
+      } else {
+        urlSetFilter("affiliation", key);
+      }
+    },
+    [serverMode, serverFilters, serverSetFilter, urlSetFilter],
+  );
+
+  const handlePageChange = useCallback(
+    (p: number) => {
+      if (serverMode) {
+        serverSetPage(p + 1); // hook uses 1-indexed pages
+      } else {
+        urlSetPage(p);
+      }
+    },
+    [serverMode, serverSetPage, urlSetPage],
+  );
 
   // ── Static-mode: filter, sort, paginate ──
 
@@ -221,31 +248,28 @@ export function PeopleTable({
       result = result.filter((r) => r.topics.includes(topicFilter));
     }
 
-    if (localSearch.trim()) {
-      const q = localSearch.toLowerCase();
+    if (urlSearch.trim()) {
+      const q = urlSearch.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
     }
 
     result = [...result].sort((a, b) =>
-      comparePersonRows(a, b, localSortKey, localSortDir),
+      comparePersonRows(
+        a,
+        b,
+        urlSort.field as SortKey,
+        urlSort.dir,
+      ),
     );
 
     return result;
-  }, [
-    serverMode,
-    allRows,
-    affiliationFilter,
-    topicFilter,
-    localSearch,
-    localSortKey,
-    localSortDir,
-  ]);
+  }, [serverMode, allRows, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
 
   const localTotalPages = Math.max(
     1,
     Math.ceil(localFiltered.length / PAGE_SIZE),
   );
-  const localSafePage = Math.min(localPage, localTotalPages - 1);
+  const localSafePage = Math.min(urlPage, localTotalPages - 1);
   const localPageRows = serverMode
     ? EMPTY_ROWS
     : localFiltered.slice(
@@ -255,11 +279,6 @@ export function PeopleTable({
 
   // ── Unified interface ──
   const rows = serverMode ? server.data : localPageRows;
-  const search = serverMode ? server.search : localSearch;
-  const sortKey: SortKey = serverMode
-    ? (server.sort.field as SortKey)
-    : localSortKey;
-  const sortDir: SortDir = serverMode ? server.sort.dir : localSortDir;
   const currentPage = serverMode ? server.meta.page - 1 : localSafePage;
   const totalPages = serverMode ? server.meta.pageCount : localTotalPages;
   const displayTotal = serverMode ? server.meta.total : allRows.length;
@@ -268,7 +287,7 @@ export function PeopleTable({
   const isInitialLoad =
     serverMode && server.isLoading && server.data.length === 0;
   const activeAffiliation = serverMode
-    ? server.filters["affiliation"] ?? "all"
+    ? serverFilters["affiliation"] ?? "all"
     : affiliationFilter;
 
   // ── Status text ──
@@ -277,9 +296,10 @@ export function PeopleTable({
       if (isLoading) return "Loading...";
       return `${displayTotal} people`;
     }
-    const filterCount = filteredTotal === allRows.length
-      ? `${allRows.length} people`
-      : `${filteredTotal} of ${allRows.length} people`;
+    const filterCount =
+      filteredTotal === allRows.length
+        ? `${allRows.length} people`
+        : `${filteredTotal} of ${allRows.length} people`;
     return `Showing ${filterCount}`;
   })();
 
@@ -305,82 +325,28 @@ export function PeopleTable({
               Clear
             </button>
           )}
-          {!serverMode && affiliations.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                onClick={() => {
-                  setAffiliationFilter("all");
-                  setLocalPage(0);
-                }}
-                aria-pressed={affiliationFilter === "all"}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  activeAffiliation === "all"
-                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                All
-                <span className="ml-1 text-[10px] opacity-60">
-                  {allRows.length}
-                </span>
-              </button>
-              {affiliations.map(([name, count]) => (
-                <button
-                  key={name}
-                  onClick={() => handleAffiliationFilter(name)}
-                  aria-pressed={affiliationFilter === name}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                    activeAffiliation === name
-                      ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                      : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                  }`}
-                >
-                  {name}
-                  <span className="ml-1 text-[10px] opacity-60">{count}</span>
-                </button>
-              ))}
-            </div>
+          {!serverMode && affiliationChips.length > 0 && (
+            <FilterChips
+              items={affiliationChips}
+              selected={activeAffiliation}
+              onSelect={handleAffiliationFilter}
+              allCount={allRows.length}
+            />
           )}
         </div>
 
         {/* Topic filter (static mode only) */}
-        {!serverMode && topicOptions.length > 0 && (
+        {!serverMode && topicChips.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-muted-foreground font-medium mr-1">
               Topics:
             </span>
-            <button
-              onClick={() => {
-                setTopicFilter("all");
-                setLocalPage(0);
-              }}
-              aria-pressed={topicFilter === "all"}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                topicFilter === "all"
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All Topics
-            </button>
-            {topicOptions.map(([slug, count]) => (
-              <button
-                key={slug}
-                onClick={() => {
-                  setTopicFilter(topicFilter === slug ? "all" : slug);
-                  setLocalPage(0);
-                }}
-                aria-pressed={topicFilter === slug}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  topicFilter === slug
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                {topicLabel(slug)}
-                <span className="ml-1 text-[10px] opacity-60">{count}</span>
-              </button>
-            ))}
+            <FilterChips
+              items={topicChips}
+              selected={topicFilter}
+              onSelect={(key) => urlSetFilter("topic", key)}
+              allLabel="All Topics"
+            />
           </div>
         )}
       </div>
@@ -610,46 +576,14 @@ export function PeopleTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-          <span>
-            Page {currentPage + 1} of {totalPages}
-          </span>
-          <div className="flex gap-1">
-            <button
-              type="button"
-              disabled={currentPage === 0}
-              onClick={() => handlePageChange(0)}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              First
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === 0}
-              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Prev
-            </button>
-            <button
-              type="button"
-              disabled={currentPage >= totalPages - 1}
-              onClick={() =>
-                handlePageChange(Math.min(totalPages - 1, currentPage + 1))
-              }
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-            <button
-              type="button"
-              disabled={currentPage >= totalPages - 1}
-              onClick={() => handlePageChange(totalPages - 1)}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Last
-            </button>
-          </div>
+        <div className="mt-3">
+          <PaginationControls
+            page={currentPage}
+            pageCount={totalPages}
+            totalItems={filteredTotal}
+            pageSize={PAGE_SIZE}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
     </div>

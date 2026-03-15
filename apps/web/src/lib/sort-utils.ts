@@ -25,3 +25,23 @@ export function compareByValue<T>(
   }
   return ((va as number) - (vb as number)) * dir;
 }
+
+/**
+ * Compute the next sort state when a column header is clicked.
+ * If clicking the current sort column, flips direction.
+ * If clicking a new column, picks a default direction
+ * (asc for text-like columns, desc for numeric-like columns).
+ */
+export function toggleSort(
+  current: { field: string; dir: SortDir },
+  nextKey: string,
+  ascDefaultKeys: string[] = ["name"],
+): { field: string; dir: SortDir } {
+  if (current.field === nextKey) {
+    return { field: nextKey, dir: current.dir === "asc" ? "desc" : "asc" };
+  }
+  return {
+    field: nextKey,
+    dir: ascDefaultKeys.includes(nextKey) ? "asc" : "desc",
+  };
+}

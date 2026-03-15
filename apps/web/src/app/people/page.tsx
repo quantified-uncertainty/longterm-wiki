@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/kb";
 import type { Fact } from "@longterm-wiki/kb";
@@ -316,7 +317,9 @@ export default async function PeoplePage() {
         ))}
       </div>
 
-      <PeopleTable rows={rows} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <PeopleTable rows={rows} />
+      </Suspense>
     </div>
   );
 }

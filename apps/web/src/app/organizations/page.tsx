@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/kb";
 import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
@@ -311,12 +312,14 @@ export default async function OrganizationsPage() {
 
       <DataSourceBanner source={source} apiError={apiError} />
 
-      <OrganizationsTable
-        rows={data.rows}
-        stats={data.stats}
-        serverEnabled={data.serverEnabled}
-        orgTypeMap={data.orgTypeMap}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <OrganizationsTable
+          rows={data.rows}
+          stats={data.stats}
+          serverEnabled={data.serverEnabled}
+          orgTypeMap={data.orgTypeMap}
+        />
+      </Suspense>
     </div>
   );
 }

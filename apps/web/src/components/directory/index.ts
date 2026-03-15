@@ -16,3 +16,8 @@ export {
   PaginationControls,
   type PaginationControlsProps,
 } from "./PaginationControls";
+export {
+  FilterChips,
+  type FilterChipItem,
+  type FilterChipsProps,
+} from "./FilterChips";
