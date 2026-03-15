@@ -17,6 +17,7 @@
 
 import { buildEntityMatcher } from "../lib/grant-import/entity-matcher.ts";
 import { toSyncGrant, syncToServer } from "../lib/grant-import/sync.ts";
+import { apiRequest } from "../lib/wiki-server/client.ts";
 import {
   printMatchStats,
   printTopUnmatched,
@@ -98,7 +99,7 @@ async function cmdAnalyze(sourceFilter?: string) {
   }
 }
 
-async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = false) {
+async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = true) {
   const sources = filterSources(sourceFilter);
   const matcher = buildEntityMatcher();
 
@@ -113,7 +114,7 @@ async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = false) {
 
   console.log(`Total: ${allGrants.length} grants`);
 
-  // Cross-source deduplication (optional, behind --dedup flag)
+  // Cross-source deduplication (on by default, disable with --no-dedup)
   if (dedup && sources.length > 1) {
     const { deduplicated, removed } = deduplicateGrants(allGrants);
     if (removed > 0) {
@@ -154,8 +155,8 @@ async function analyzeCommand(_args: string[], options: Record<string, unknown>)
 async function syncCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const dryRun = !!options.dryRun || !!options["dry-run"];
   const sourceFilter = (options.source as string) || undefined;
-  const dedup = !!options.dedup;
-  await cmdSync(dryRun, sourceFilter, dedup);
+  const noDedup = !!options["no-dedup"] || !!options.noDedup;
+  await cmdSync(dryRun, sourceFilter, !noDedup);
   return { exitCode: 0 };
 }
 
@@ -168,10 +169,91 @@ async function downloadCommand(_args: string[], options: Record<string, unknown>
   return { exitCode: 0 };
 }
 
+async function dedupCommand(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options["dry-run"];
+  const sources = ALL_SOURCES;
+  const matcher = buildEntityMatcher();
+
+  // Re-import all grants from all sources (skip sources that fail)
+  let allGrants: RawGrant[] = [];
+  for (const src of sources) {
+    try {
+      await src.ensureData();
+      const grants = await src.parse(matcher);
+      console.log(`${src.name}: ${grants.length} grants`);
+      allGrants.push(...grants);
+    } catch (e) {
+      console.warn(`${src.name}: skipped (${e instanceof Error ? e.message : String(e)})`);
+    }
+  }
+  console.log(`Total from sources: ${allGrants.length} grants`);
+
+  // Run dedup to find which grants to keep
+  const { deduplicated, removed } = deduplicateGrants(allGrants);
+  console.log(`After dedup: ${deduplicated.length} (removed ${removed})`);
+
+  // Convert to sync grants to get deterministic IDs
+  const keepIds = new Set<string>();
+  for (const raw of deduplicated) {
+    const sync = toSyncGrant(raw, sourceUrlFor(raw.source));
+    keepIds.add(sync.id);
+  }
+
+  const allIds = new Set<string>();
+  for (const raw of allGrants) {
+    const sync = toSyncGrant(raw, sourceUrlFor(raw.source));
+    allIds.add(sync.id);
+  }
+
+  // IDs to delete = allIds - keepIds
+  const deleteIds = [...allIds].filter(id => !keepIds.has(id));
+  console.log(`\nGrants to delete: ${deleteIds.length}`);
+  console.log(`Grants to keep: ${keepIds.size}`);
+
+  if (deleteIds.length === 0) {
+    return { exitCode: 0, output: "No duplicates found." };
+  }
+
+  if (dryRun) {
+    console.log("\n(dry run — no deletions performed)");
+    console.log(`Would delete ${deleteIds.length} duplicate grant IDs`);
+    return { exitCode: 0 };
+  }
+
+  // Delete in batches of 500
+  const BATCH_SIZE = 500;
+  let totalDeleted = 0;
+  for (let i = 0; i < deleteIds.length; i += BATCH_SIZE) {
+    const batch = deleteIds.slice(i, i + BATCH_SIZE);
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(deleteIds.length / BATCH_SIZE);
+
+    console.log(`  Deleting batch ${batchNum}/${totalBatches}: ${batch.length} grants...`);
+
+    const result = await apiRequest<{ deleted: number }>(
+      "POST",
+      "/api/grants/delete-batch",
+      { ids: batch },
+    );
+
+    if (result.ok) {
+      totalDeleted += result.data.deleted;
+    } else {
+      console.error(`  ✗ Batch ${batchNum} failed:`, result.error);
+    }
+  }
+
+  return {
+    exitCode: 0,
+    output: `\nDeleted ${totalDeleted} duplicate grants. Run 'crux import-grants sync' to re-sync clean data.`,
+  };
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   download: downloadCommand,
+  dedup: dedupCommand,
   default: analyzeCommand,
 };
 
@@ -181,15 +263,16 @@ Import Grants — Import external grant databases into wiki-server Postgres
 
 Commands:
   analyze              Preview import stats and entity matching
-  sync                 Import grants to wiki-server Postgres
+  sync                 Import grants to wiki-server (dedup on by default)
   sync --dry-run       Show what would be synced without writing
+  dedup                Remove cross-source duplicates from the database
+  dedup --dry-run      Show what would be removed without deleting
   download             Just download data files
 
 Options:
   --source=<id>        Filter to a single source (default: all)
-  --dedup              Enable cross-source deduplication during sync
-                       (removes likely-duplicate grants across sources,
-                       keeping the most detailed version)
+  --no-dedup           Disable cross-source deduplication during sync
+  --dry-run            Preview without writing
 
 Sources:
   ${ALL_SOURCES.map(s => `- ${s.id} (${s.name})`).join("\n  ")}
