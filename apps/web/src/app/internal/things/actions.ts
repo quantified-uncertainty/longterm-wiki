@@ -8,6 +8,8 @@ export interface ThingSearchRow {
   thingType: string;
   title: string;
   parentThingId: string | null;
+  parentTitle?: string;
+  parentHref?: string;
   sourceTable: string;
   sourceId: string;
   entityType: string | null;
@@ -19,11 +21,42 @@ export interface ThingSearchRow {
   href?: string;
 }
 
+interface ApiThing {
+  id: string;
+  thingType: string;
+  title: string;
+  parentThingId: string | null;
+  sourceTable: string;
+  sourceId: string;
+  entityType: string | null;
+  description: string | null;
+  sourceUrl: string | null;
+  numericId: string | null;
+  verdict: string | null;
+  verdictConfidence: number | null;
+}
+
 interface SearchResponse {
-  results: ThingSearchRow[];
+  results: ApiThing[];
   query: string;
   total: number;
   searchMethod: "fts" | "ilike";
+}
+
+// Entity types that have directory pages
+const DIR_PREFIXES: Record<string, string> = {
+  organization: "/organizations",
+  person: "/people",
+  risk: "/risks",
+};
+
+function resolveEntityHref(sourceId: string, entityType: string | null): string {
+  let href = getEntityHref(sourceId);
+  if (href?.startsWith("/wiki/") && entityType) {
+    const prefix = DIR_PREFIXES[entityType];
+    if (prefix) href = `${prefix}/${sourceId}`;
+  }
+  return href;
 }
 
 export async function searchThings(
@@ -41,35 +74,59 @@ export async function searchThings(
 
   if (!data) return null;
 
-  // Resolve hrefs server-side (getEntityHref needs database.json)
-  const results = data.results.map((item) => {
+  // Collect unique parentThingIds to resolve parent titles
+  const parentIds = new Set<string>();
+  for (const item of data.results) {
+    if (item.parentThingId) parentIds.add(item.parentThingId);
+  }
+
+  // Batch-fetch parent things (they're usually entities)
+  const parentMap = new Map<string, { title: string; href?: string }>();
+  if (parentIds.size > 0) {
+    // Parents are often in the search results themselves
+    for (const item of data.results) {
+      if (parentIds.has(item.id)) {
+        let href: string | undefined;
+        if (item.thingType === "entity") {
+          try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
+        }
+        parentMap.set(item.id, { title: item.title, href });
+      }
+    }
+
+    // Fetch remaining parents not in search results
+    const missing = [...parentIds].filter((id) => !parentMap.has(id));
+    for (const id of missing.slice(0, 10)) {
+      const parent = await fetchFromWikiServer<ApiThing>(`/api/things/${encodeURIComponent(id)}`);
+      if (parent) {
+        let href: string | undefined;
+        if (parent.thingType === "entity") {
+          try { href = resolveEntityHref(parent.sourceId, parent.entityType); } catch { /* */ }
+        }
+        parentMap.set(id, { title: parent.title, href });
+      }
+    }
+  }
+
+  // Resolve hrefs and parents
+  const results: ThingSearchRow[] = data.results.map((item) => {
     let href: string | undefined;
     if (item.thingType === "entity") {
-      try {
-        href = getEntityHref(item.sourceId);
-        // getEntityHref may return /wiki/E{id} when getDirectoryHref fails
-        // due to KB slug mismatch. For organizations/people/risks, try
-        // the directory URL directly since sourceId = entity slug.
-        if (href?.startsWith("/wiki/") && item.entityType) {
-          const dirPrefixes: Record<string, string> = {
-            organization: "/organizations",
-            person: "/people",
-            risk: "/risks",
-          };
-          const prefix = dirPrefixes[item.entityType];
-          if (prefix) {
-            href = `${prefix}/${item.sourceId}`;
-          }
-        }
-      } catch (e) {
-        console.warn(`[things-search] getEntityHref failed for ${item.sourceId}:`, e instanceof Error ? e.message : String(e));
-      }
+      try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
     } else if (item.thingType === "resource" && item.sourceId) {
       href = `/resources/${encodeURIComponent(item.sourceId)}`;
     } else if (item.sourceUrl) {
       href = item.sourceUrl;
     }
-    return { ...item, href };
+
+    const parent = item.parentThingId ? parentMap.get(item.parentThingId) : undefined;
+
+    return {
+      ...item,
+      href,
+      parentTitle: parent?.title,
+      parentHref: parent?.href,
+    };
   });
 
   return { results, total: data.total };

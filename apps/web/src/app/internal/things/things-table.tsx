@@ -58,11 +58,25 @@ function verdictBadge(verdict: string | null) {
   );
 }
 
-function thingTypeBadge(type: string) {
+function thingTypeBadge(type: string, entityType: string | null) {
+  // For entities, show the specific entityType (organization, person, etc.)
+  const displayType = type === "entity" && entityType ? entityType : type;
+
   const colors: Record<string, string> = {
+    organization: "bg-blue-100 text-blue-800",
+    person: "bg-blue-100 text-blue-800",
+    risk: "bg-red-100 text-red-800",
+    approach: "bg-blue-100 text-blue-800",
+    analysis: "bg-blue-100 text-blue-800",
+    concept: "bg-blue-100 text-blue-800",
+    policy: "bg-blue-100 text-blue-800",
+    "ai-model": "bg-blue-100 text-blue-800",
+    "safety-agenda": "bg-blue-100 text-blue-800",
+    capability: "bg-blue-100 text-blue-800",
     entity: "bg-blue-100 text-blue-800",
     resource: "bg-purple-100 text-purple-800",
     grant: "bg-green-100 text-green-800",
+    fact: "bg-sky-100 text-sky-800",
     personnel: "bg-orange-100 text-orange-800",
     division: "bg-teal-100 text-teal-800",
     "funding-round": "bg-yellow-100 text-yellow-800",
@@ -75,9 +89,9 @@ function thingTypeBadge(type: string) {
   };
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[type] || "bg-gray-100 text-gray-600"}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[displayType] || "bg-gray-100 text-gray-600"}`}
     >
-      {type}
+      {displayType}
     </span>
   );
 }
@@ -94,7 +108,7 @@ const columns: ColumnDef<ThingRow>[] = [
         Type
       </SortableHeader>
     ),
-    cell: ({ row }) => thingTypeBadge(row.original.thingType),
+    cell: ({ row }) => thingTypeBadge(row.original.thingType, row.original.entityType),
     filterFn: "equalsString",
   },
   {
@@ -169,6 +183,42 @@ const columns: ColumnDef<ThingRow>[] = [
     },
   },
   {
+    id: "page",
+    header: "Page",
+    cell: ({ row }) => {
+      const thing = row.original;
+      if (!thing.href) return null;
+      const isExternal = thing.href.startsWith("http");
+      if (isExternal) {
+        try {
+          const domain = new URL(thing.href).hostname.replace("www.", "");
+          return (
+            <a
+              href={thing.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:underline no-underline inline-flex items-center gap-0.5"
+            >
+              {domain}
+              <ExternalLink className="h-2.5 w-2.5" />
+            </a>
+          );
+        } catch {
+          return null;
+        }
+      }
+      // Internal link — show the path
+      return (
+        <a
+          href={thing.href}
+          className="text-xs text-accent-foreground hover:underline no-underline"
+        >
+          {thing.href.length > 35 ? thing.href.slice(0, 32) + "..." : thing.href}
+        </a>
+      );
+    },
+  },
+  {
     accessorKey: "verdict",
     header: ({ column }) => (
       <SortableHeader column={column} title="Verdict">
@@ -189,15 +239,6 @@ const columns: ColumnDef<ThingRow>[] = [
         </div>
       );
     },
-  },
-  {
-    accessorKey: "sourceTable",
-    header: "Source",
-    cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {row.original.sourceTable}
-      </span>
-    ),
   },
 ];
 
