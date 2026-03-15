@@ -261,6 +261,9 @@ function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
       if (result) {
         setRows(result.rows);
         setPageTotal(result.total);
+        // Clamp page if it exceeds actual total
+        const maxPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+        if (page > maxPage) setCurrentPage(maxPage);
       }
     } catch (e) {
       if (id !== requestId.current) return;
