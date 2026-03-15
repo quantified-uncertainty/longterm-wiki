@@ -24,7 +24,7 @@ facts:
 
   - id: f_EgN1ilnrrA
     property: social-media
-    value: "@kaboretsky"
+    value: "@karpathy"
 
   - id: f_PPWIIFBj8w
     property: wikipedia-url

@@ -11,7 +11,6 @@
  *   WIKI_SERVER_ENV=prod npx tsx scripts/backfill-resource-summaries.ts --batch=10 --type=paper --dry-run
  */
 
-import 'dotenv/config';
 import { createClient, MODELS, callClaude, sleep, parseJsonResponse } from '../crux/lib/anthropic.ts';
 import { listResources, upsertResource } from '../crux/lib/wiki-server/resources.ts';
 import { fetchSource } from '../crux/lib/search/source-fetcher.ts';
@@ -203,4 +202,7 @@ async function main() {
   console.log(`  Failed:     ${failed}`);
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
