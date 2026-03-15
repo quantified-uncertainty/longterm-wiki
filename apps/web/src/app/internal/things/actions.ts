@@ -43,20 +43,54 @@ interface SearchResponse {
   searchMethod: "fts" | "ilike";
 }
 
-// Entity types that have directory pages
-const DIR_PREFIXES: Record<string, string> = {
+// Entity types that have directory pages (slug-based)
+const ENTITY_DIR_PREFIXES: Record<string, string> = {
   organization: "/organizations",
   person: "/people",
   risk: "/risks",
 };
 
+// Thing types that have dedicated detail pages.
+// sourceId = PG primary key = KB record key — these are the same value.
+const THING_DETAIL_ROUTES: Record<string, string> = {
+  grant: "/grants",
+  resource: "/resources",
+  division: "/divisions",
+  "funding-program": "/funding-programs",
+  "funding-round": "/funding-rounds",
+  investment: "/investments",
+  benchmark: "/benchmarks",
+};
+
 function resolveEntityHref(sourceId: string, entityType: string | null): string {
   let href = getEntityHref(sourceId);
   if (href?.startsWith("/wiki/") && entityType) {
-    const prefix = DIR_PREFIXES[entityType];
+    const prefix = ENTITY_DIR_PREFIXES[entityType];
     if (prefix) href = `${prefix}/${sourceId}`;
   }
   return href;
+}
+
+function resolveThingHref(item: ApiThing): string | undefined {
+  // Entities: directory or wiki page
+  if (item.thingType === "entity") {
+    try { return resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
+    return undefined;
+  }
+
+  // Types with dedicated detail pages
+  const prefix = THING_DETAIL_ROUTES[item.thingType];
+  if (prefix && item.sourceId) {
+    return `${prefix}/${encodeURIComponent(item.sourceId)}`;
+  }
+
+  // Facts: link to parent entity page
+  if (item.thingType === "fact" && item.sourceId.includes(":")) {
+    const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
+    try { return getEntityHref(entityId); } catch { /* */ }
+  }
+
+  return undefined;
 }
 
 // ── Paginated listing ────────────────────────────────────────────────────
@@ -98,11 +132,7 @@ export async function fetchThingsPage(
   // Check within the page first
   for (const item of data.things) {
     if (parentIds.has(item.id)) {
-      let href: string | undefined;
-      if (item.thingType === "entity") {
-        try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
-      }
-      parentMap.set(item.id, { title: item.title, href });
+      parentMap.set(item.id, { title: item.title, href: resolveThingHref(item) });
     }
   }
   // Fetch missing parents (max 10)
@@ -119,14 +149,7 @@ export async function fetchThingsPage(
   }
 
   const rows: ThingSearchRow[] = data.things.map((item) => {
-    let href: string | undefined;
-    if (item.thingType === "entity") {
-      try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
-    } else if (item.thingType === "resource" && item.sourceId) {
-      href = `/resources/${encodeURIComponent(item.sourceId)}`;
-    } else if (item.sourceUrl) {
-      href = item.sourceUrl;
-    }
+    const href = resolveThingHref(item);
     const parent = item.parentThingId ? parentMap.get(item.parentThingId) : undefined;
     return { ...item, href, parentTitle: parent?.title, parentHref: parent?.href };
   });
@@ -176,25 +199,14 @@ export async function searchThings(
     for (const id of missing.slice(0, 10)) {
       const parent = await fetchFromWikiServer<ApiThing>(`/api/things/${encodeURIComponent(id)}`);
       if (parent) {
-        let href: string | undefined;
-        if (parent.thingType === "entity") {
-          try { href = resolveEntityHref(parent.sourceId, parent.entityType); } catch { /* */ }
-        }
-        parentMap.set(id, { title: parent.title, href });
+        parentMap.set(id, { title: parent.title, href: resolveThingHref(parent) });
       }
     }
   }
 
   // Resolve hrefs and parents
   const results: ThingSearchRow[] = data.results.map((item) => {
-    let href: string | undefined;
-    if (item.thingType === "entity") {
-      try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
-    } else if (item.thingType === "resource" && item.sourceId) {
-      href = `/resources/${encodeURIComponent(item.sourceId)}`;
-    } else if (item.sourceUrl) {
-      href = item.sourceUrl;
-    }
+    const href = resolveThingHref(item);
 
     const parent = item.parentThingId ? parentMap.get(item.parentThingId) : undefined;
 
