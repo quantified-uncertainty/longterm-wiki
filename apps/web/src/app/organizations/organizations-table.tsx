@@ -3,6 +3,9 @@
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { PaginationControls } from "@/components/directory/PaginationControls";
+import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import type { SortDir } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
@@ -165,13 +168,13 @@ export function OrganizationsTable({
     enabled: serverMode,
   });
 
-  // ── Local (static) state ──
-  const [localSearch, setLocalSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [statFilter, setStatFilter] = useState<StatFilterKey>("all");
-  const [localSortKey, setLocalSortKey] = useState<SortKey>("revenue");
-  const [localSortDir, setLocalSortDir] = useState<SortDir>("desc");
-  const [localPage, setLocalPage] = useState(0);
+  // ── Local (static) state via URL-synced hook ──
+  const url = useDirectoryUrl({
+    defaultSort: { field: "revenue", dir: "desc" },
+    filters: ["type", "stat"],
+  });
+  const typeFilter = url.filters.type ?? "all";
+  const statFilter = (url.filters.stat ?? "all") as StatFilterKey;
 
   // Collect unique org types for filter (always from static rows)
   const orgTypes = useMemo(() => {
@@ -193,22 +196,21 @@ export function OrganizationsTable({
   }, [rows]);
 
   // ── Unified search handler ──
-  const search = serverMode ? server.search : localSearch;
+  const search = serverMode ? server.search : url.search;
   const { setSearch: serverSetSearch, setSort: serverSetSort, setPage: serverSetPage } = server;
   const handleSearch = useCallback((value: string) => {
     if (serverMode) {
       serverSetSearch(value);
     } else {
-      setLocalSearch(value);
-      setLocalPage(0);
+      url.setSearch(value);
     }
-  }, [serverMode, serverSetSearch]);
+  }, [serverMode, serverSetSearch, url]);
 
   // ── Unified sort ──
   const sortKey: SortKey = serverMode
     ? (server.sort.field as SortKey)
-    : localSortKey;
-  const sortDir: SortDir = serverMode ? server.sort.dir : localSortDir;
+    : (url.sort.field as SortKey);
+  const sortDir: SortDir = serverMode ? server.sort.dir : url.sort.dir;
 
   const handleSort = useCallback((key: SortKey) => {
     if (serverMode) {
@@ -217,15 +219,12 @@ export function OrganizationsTable({
         serverSetSort(serverField);
       }
     } else {
-      if (localSortKey === key) {
-        setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
-      } else {
-        setLocalSortKey(key);
-        setLocalSortDir(key === "name" ? "asc" : "desc");
-      }
-      setLocalPage(0);
+      const newDir = url.sort.field === key
+        ? (url.sort.dir === "asc" ? "desc" : "asc")
+        : (key === "name" ? "asc" : "desc");
+      url.setSort({ field: key, dir: newDir as "asc" | "desc" });
     }
-  }, [serverMode, serverSetSort, localSortKey]);
+  }, [serverMode, serverSetSort, url]);
 
   // ── Enrich server data with orgType from static map ──
   const enrichedServerData = useMemo(() => {
@@ -266,21 +265,21 @@ export function OrganizationsTable({
     if (serverMode) return [];
     let result = applyClientFilters(rows);
 
-    if (localSearch.trim()) {
-      const q = localSearch.toLowerCase();
+    if (url.search.trim()) {
+      const q = url.search.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
     }
 
     result = [...result].sort((a, b) =>
-      compareOrgRows(a, b, localSortKey, localSortDir),
+      compareOrgRows(a, b, url.sort.field as SortKey, url.sort.dir),
     );
 
     return result;
-  }, [serverMode, rows, localSearch, localSortKey, localSortDir, applyClientFilters]);
+  }, [serverMode, rows, url.search, url.sort, applyClientFilters]);
 
   // ── Pagination ──
   const localTotalPages = Math.max(1, Math.ceil(localFiltered.length / PAGE_SIZE));
-  const localSafePage = Math.min(localPage, localTotalPages - 1);
+  const localSafePage = Math.min(url.page, localTotalPages - 1);
   const localPageRows = serverMode
     ? []
     : localFiltered.slice(localSafePage * PAGE_SIZE, (localSafePage + 1) * PAGE_SIZE);
@@ -304,9 +303,9 @@ export function OrganizationsTable({
     if (serverMode) {
       serverSetPage(p + 1); // hook uses 1-indexed pages
     } else {
-      setLocalPage(p);
+      url.setPage(p);
     }
-  }, [serverMode, serverSetPage]);
+  }, [serverMode, serverSetPage, url]);
 
   /** Whether a column supports sorting in current mode */
   const isSortable = (key: SortKey) =>
@@ -333,7 +332,7 @@ export function OrganizationsTable({
             <button
               key={stat.key}
               type="button"
-              onClick={() => setStatFilter(statFilter === stat.key ? "all" : stat.key)}
+              onClick={() => url.setFilter("stat", statFilter === stat.key ? "all" : stat.key)}
               className={`rounded-xl border p-4 text-left transition-all ${
                 statFilter === stat.key
                   ? "border-primary/50 bg-primary/5 ring-2 ring-primary/20 shadow-sm"
@@ -361,37 +360,16 @@ export function OrganizationsTable({
           onChange={(e) => handleSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
         />
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setTypeFilter("all")}
-            aria-pressed={typeFilter === "all"}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              typeFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">{typeCounts.all}</span>
-          </button>
-          {orgTypes.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTypeFilter(typeFilter === t ? "all" : t)}
-              aria-pressed={typeFilter === t}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                typeFilter === t
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              {ORG_TYPE_LABELS[t] ?? t}
-              <span className="ml-1 text-[10px] opacity-60">
-                {typeCounts[t] ?? 0}
-              </span>
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          items={orgTypes.map((t) => ({
+            key: t,
+            label: ORG_TYPE_LABELS[t] ?? t,
+            count: typeCounts[t] ?? 0,
+          }))}
+          selected={typeFilter}
+          onSelect={(key) => url.setFilter("type", key)}
+          allCount={typeCounts.all}
+        />
       </div>
 
       {/* Results count */}
@@ -541,49 +519,15 @@ export function OrganizationsTable({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-          <span>
-            Page {currentPage + 1} of {totalPages}
-          </span>
-          <div className="flex gap-1">
-            <button
-              type="button"
-              disabled={currentPage === 0}
-              onClick={() => handlePageChange(0)}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              First
-            </button>
-            <button
-              type="button"
-              disabled={currentPage === 0}
-              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Prev
-            </button>
-            <button
-              type="button"
-              disabled={currentPage >= totalPages - 1}
-              onClick={() =>
-                handlePageChange(Math.min(totalPages - 1, currentPage + 1))
-              }
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-            <button
-              type="button"
-              disabled={currentPage >= totalPages - 1}
-              onClick={() => handlePageChange(totalPages - 1)}
-              className="px-2 py-1 rounded border border-border hover:bg-muted/50 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Last
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="mt-3">
+        <PaginationControls
+          page={currentPage}
+          pageCount={totalPages}
+          totalItems={filteredTotal}
+          pageSize={PAGE_SIZE}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 }
