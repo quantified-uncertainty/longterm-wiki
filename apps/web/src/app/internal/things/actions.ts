@@ -43,15 +43,19 @@ interface SearchResponse {
   searchMethod: "fts" | "ilike";
 }
 
-// Entity types that have directory pages (slug-based)
+// ── Link resolution ─────────────────────────────────────────────────────
+
+// Entity types with directory pages where sourceId = slug
 const ENTITY_DIR_PREFIXES: Record<string, string> = {
   organization: "/organizations",
   person: "/people",
   risk: "/risks",
+  benchmark: "/benchmarks",
+  "ai-model": "/ai-models",
+  policy: "/legislation",
 };
 
-// Thing types that have dedicated detail pages.
-// sourceId = PG primary key = KB record key — these are the same value.
+// Thing types with dedicated detail pages (sourceId = KB record key)
 const THING_DETAIL_ROUTES: Record<string, string> = {
   grant: "/grants",
   resource: "/resources",
@@ -62,19 +66,20 @@ const THING_DETAIL_ROUTES: Record<string, string> = {
   benchmark: "/benchmarks",
 };
 
-function resolveEntityHref(sourceId: string, entityType: string | null): string {
-  let href = getEntityHref(sourceId);
-  if (href?.startsWith("/wiki/") && entityType) {
-    const prefix = ENTITY_DIR_PREFIXES[entityType];
-    if (prefix) href = `${prefix}/${sourceId}`;
-  }
-  return href;
-}
-
 function resolveThingHref(item: ApiThing): string | undefined {
-  // Entities: directory or wiki page
   if (item.thingType === "entity") {
-    try { return resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
+    try {
+      let href = getEntityHref(item.sourceId);
+      // getEntityHref may fall back to /wiki/E{id} when KB slug lookup fails.
+      // For directory types, use the slug directly since sourceId = entity slug.
+      if (href?.startsWith("/wiki/") && item.entityType) {
+        const prefix = ENTITY_DIR_PREFIXES[item.entityType];
+        if (prefix) href = `${prefix}/${item.sourceId}`;
+      }
+      return href;
+    } catch {
+      // Entity not in database.json — fall through
+    }
     return undefined;
   }
 
@@ -84,13 +89,58 @@ function resolveThingHref(item: ApiThing): string | undefined {
     return `${prefix}/${encodeURIComponent(item.sourceId)}`;
   }
 
-  // Facts: link to parent entity page
+  // Facts: link to parent entity page (sourceId format: "entityId:factId")
   if (item.thingType === "fact" && item.sourceId.includes(":")) {
     const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
-    try { return getEntityHref(entityId); } catch { /* */ }
+    try {
+      return getEntityHref(entityId);
+    } catch {
+      // Entity not in database.json
+    }
   }
 
   return undefined;
+}
+
+// ── Parent resolution ───────────────────────────────────────────────────
+
+async function resolveParents(
+  items: ApiThing[],
+): Promise<Map<string, { title: string; href?: string }>> {
+  const parentIds = new Set<string>();
+  for (const item of items) {
+    if (item.parentThingId) parentIds.add(item.parentThingId);
+  }
+
+  const parentMap = new Map<string, { title: string; href?: string }>();
+  if (parentIds.size === 0) return parentMap;
+
+  // Check within the loaded items first
+  for (const item of items) {
+    if (parentIds.has(item.id)) {
+      parentMap.set(item.id, { title: item.title, href: resolveThingHref(item) });
+    }
+  }
+
+  // Fetch missing parents in parallel (max 10)
+  const missing = [...parentIds].filter((id) => !parentMap.has(id)).slice(0, 10);
+  if (missing.length > 0) {
+    const results = await Promise.all(
+      missing.map(async (id) => {
+        const parent = await fetchFromWikiServer<ApiThing>(
+          `/api/things/${encodeURIComponent(id)}`,
+        );
+        return { id, parent };
+      }),
+    );
+    for (const { id, parent } of results) {
+      if (parent) {
+        parentMap.set(id, { title: parent.title, href: resolveThingHref(parent) });
+      }
+    }
+  }
+
+  return parentMap;
 }
 
 // ── Paginated listing ────────────────────────────────────────────────────
@@ -122,31 +172,7 @@ export async function fetchThingsPage(
 
   if (!data) return null;
 
-  // Resolve parents
-  const parentIds = new Set<string>();
-  for (const item of data.things) {
-    if (item.parentThingId) parentIds.add(item.parentThingId);
-  }
-
-  const parentMap = new Map<string, { title: string; href?: string }>();
-  // Check within the page first
-  for (const item of data.things) {
-    if (parentIds.has(item.id)) {
-      parentMap.set(item.id, { title: item.title, href: resolveThingHref(item) });
-    }
-  }
-  // Fetch missing parents (max 10)
-  const missing = [...parentIds].filter((id) => !parentMap.has(id));
-  for (const id of missing.slice(0, 10)) {
-    const parent = await fetchFromWikiServer<ApiThing>(`/api/things/${encodeURIComponent(id)}`);
-    if (parent) {
-      let href: string | undefined;
-      if (parent.thingType === "entity") {
-        try { href = resolveEntityHref(parent.sourceId, parent.entityType); } catch { /* */ }
-      }
-      parentMap.set(id, { title: parent.title, href });
-    }
-  }
+  const parentMap = await resolveParents(data.things);
 
   const rows: ThingSearchRow[] = data.things.map((item) => {
     const href = resolveThingHref(item);
@@ -174,48 +200,12 @@ export async function searchThings(
 
   if (!data) return null;
 
-  // Collect unique parentThingIds to resolve parent titles
-  const parentIds = new Set<string>();
-  for (const item of data.results) {
-    if (item.parentThingId) parentIds.add(item.parentThingId);
-  }
+  const parentMap = await resolveParents(data.results);
 
-  // Batch-fetch parent things (they're usually entities)
-  const parentMap = new Map<string, { title: string; href?: string }>();
-  if (parentIds.size > 0) {
-    // Parents are often in the search results themselves
-    for (const item of data.results) {
-      if (parentIds.has(item.id)) {
-        let href: string | undefined;
-        if (item.thingType === "entity") {
-          try { href = resolveEntityHref(item.sourceId, item.entityType); } catch { /* */ }
-        }
-        parentMap.set(item.id, { title: item.title, href });
-      }
-    }
-
-    // Fetch remaining parents not in search results
-    const missing = [...parentIds].filter((id) => !parentMap.has(id));
-    for (const id of missing.slice(0, 10)) {
-      const parent = await fetchFromWikiServer<ApiThing>(`/api/things/${encodeURIComponent(id)}`);
-      if (parent) {
-        parentMap.set(id, { title: parent.title, href: resolveThingHref(parent) });
-      }
-    }
-  }
-
-  // Resolve hrefs and parents
   const results: ThingSearchRow[] = data.results.map((item) => {
     const href = resolveThingHref(item);
-
     const parent = item.parentThingId ? parentMap.get(item.parentThingId) : undefined;
-
-    return {
-      ...item,
-      href,
-      parentTitle: parent?.title,
-      parentHref: parent?.href,
-    };
+    return { ...item, href, parentTitle: parent?.title, parentHref: parent?.href };
   });
 
   return { results, total: data.total };

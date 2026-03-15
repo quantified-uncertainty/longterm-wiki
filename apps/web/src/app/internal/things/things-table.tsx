@@ -17,7 +17,7 @@ import { searchThings, fetchThingsPage, type ThingSearchRow } from "./actions";
 // Types
 // ---------------------------------------------------------------------------
 
-export type ThingRow = ThingSearchRow;
+type ThingRow = ThingSearchRow;
 
 const PAGE_SIZE = 500;
 
@@ -238,6 +238,8 @@ function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [mode, setMode] = useState<"browse" | "search">("browse");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Request counter to prevent stale responses from overwriting current data
+  const requestId = useRef(0);
 
   // Update URL
   useEffect(() => {
@@ -251,17 +253,20 @@ function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
 
   // Fetch page data
   const loadPage = useCallback(async (page: number, thingType: string) => {
+    const id = ++requestId.current;
     setIsLoading(true);
     try {
       const result = await fetchThingsPage(page, PAGE_SIZE, thingType || undefined);
+      if (id !== requestId.current) return; // Stale response
       if (result) {
         setRows(result.rows);
         setPageTotal(result.total);
       }
-    } catch {
-      // Keep existing data on error
+    } catch (e) {
+      if (id !== requestId.current) return;
+      console.warn("Failed to load things page:", e instanceof Error ? e.message : String(e));
     } finally {
-      setIsLoading(false);
+      if (id === requestId.current) setIsLoading(false);
     }
   }, []);
 
@@ -274,22 +279,21 @@ function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
 
   // Server-side search with debounce
   const doSearch = useCallback(async (query: string, thingType: string) => {
-    if (query.length < 2) {
-      setMode("browse");
-      return;
-    }
+    const id = ++requestId.current;
     setMode("search");
     setIsSearching(true);
     try {
       const result = await searchThings(query, thingType || undefined);
+      if (id !== requestId.current) return; // Stale response
       if (result) {
         setRows(result.results);
         setPageTotal(result.total);
       }
-    } catch {
-      // Keep existing data
+    } catch (e) {
+      if (id !== requestId.current) return;
+      console.warn("Things search failed:", e instanceof Error ? e.message : String(e));
     } finally {
-      setIsSearching(false);
+      if (id === requestId.current) setIsSearching(false);
     }
   }, []);
 
@@ -297,11 +301,12 @@ function ThingsTableInner({ total, typeCounts }: ThingsTableProps) {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     if (searchQuery.length >= 2) {
       debounceTimer.current = setTimeout(() => doSearch(searchQuery, selectedType), 300);
-    } else if (searchQuery.length === 0) {
+    } else if (searchQuery.length < 2 && mode === "search") {
+      // Clear search results and return to browse mode
       setMode("browse");
     }
     return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
-  }, [searchQuery, selectedType, doSearch]);
+  }, [searchQuery, selectedType, doSearch, mode]);
 
   // Reset page when type changes
   useEffect(() => { setCurrentPage(1); }, [selectedType]);

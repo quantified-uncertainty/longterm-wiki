@@ -5,7 +5,6 @@ import { getDrizzleDb } from "../db.js";
 import { recordVerifications, recordVerdicts, things } from "../schema.js";
 import {
   zv,
-  notFoundError,
   parseJsonBody,
   validationError,
   invalidJsonError,
