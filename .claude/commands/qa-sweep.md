@@ -123,7 +123,40 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 [Bullet list of areas checked and found clean]
 ```
 
-## Phase 4: Act on findings
+## Phase 4: Log results
+
+Post the compiled report as a comment on **GitHub issue #2400** (QA Sweep Log):
+
+```bash
+gh issue comment 2400 --body "$(cat <<'SWEEPEOF'
+## QA Sweep — [DATE] ([trigger: manual/loop])
+
+**Branch**: `[current branch]`
+
+### Scorecard
+| Check | Status | Count |
+|-------|--------|-------|
+| Duplicate numericIds | ✓/⚠/✗ | N |
+| ... | ... | ... |
+
+### P0 — Active bugs
+[numbered list]
+
+### P1 — Latent bugs
+[numbered list]
+
+### P2 — Code quality
+[numbered list]
+
+### Confirmed clean
+[bullet list]
+SWEEPEOF
+)"
+```
+
+This builds a running history on #2400 that an LLM can review later to spot trends.
+
+## Phase 5: Act on findings
 
 | Severity | Action |
 |----------|--------|
