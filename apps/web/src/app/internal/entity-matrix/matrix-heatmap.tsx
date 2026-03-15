@@ -306,7 +306,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
       </div>
 
       {/* Expanded Row Detail */}
-      {expandedRow && (
+      {expandedRow && rows.find((r) => r.entityType === expandedRow) && (
         <ExpandedDetail
           row={rows.find((r) => r.entityType === expandedRow)!}
           groupedDims={groupedDims}
