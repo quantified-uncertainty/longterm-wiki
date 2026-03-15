@@ -30,6 +30,7 @@ export function FilterChips({
   return (
     <div className="flex flex-wrap gap-1.5">
       <button
+        type="button"
         onClick={() => onSelect("all")}
         aria-pressed={selected === "all"}
         className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
@@ -45,6 +46,7 @@ export function FilterChips({
       </button>
       {items.map((item) => (
         <button
+          type="button"
           key={item.key}
           onClick={() => onSelect(selected === item.key ? "all" : item.key)}
           aria-pressed={selected === item.key}
