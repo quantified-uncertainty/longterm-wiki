@@ -5,7 +5,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'yaml';
-import { CUSTOM_TAGS } from '../../../packages/kb/src/loader.ts';
+import { CUSTOM_TAGS } from '../../../packages/factbase/src/loader.ts';
 import type { CommandOptions as BaseOptions } from '../../lib/command-types.ts';
 
 export type { BaseOptions };
@@ -170,7 +170,7 @@ export function loadAllEntityFiles(): EntityEntry[] {
 export function loadAllKbThings(): Array<{
   thing: { id: string; type: string; name?: string };
 }> {
-  const dir = path.join(ROOT, 'packages/kb/data/things');
+  const dir = path.join(ROOT, 'packages/factbase/data/things');
   if (!fs.existsSync(dir)) return [];
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml'));
   const things: Array<{ thing: { id: string; type: string; name?: string } }> =
@@ -377,7 +377,7 @@ export function discoverCandidates(): Map<string, PersonCandidate> {
         kb.thing.name || slugToName(kb.thing.id),
         {
           type: 'kb-thing',
-          context: `packages/kb/data/things/${kb.thing.id}.yaml`,
+          context: `packages/factbase/data/things/${kb.thing.id}.yaml`,
         },
       );
     }

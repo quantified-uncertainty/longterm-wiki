@@ -100,7 +100,7 @@ interface ValidationIssues {
 }
 
 /**
- * A KBF/KBFactValue reference found in MDX content.
+ * A FBF/FBFactValue (and legacy KBF/KBFactValue) reference found in MDX content.
  */
 interface KbfRef {
   component: string;
@@ -110,7 +110,7 @@ interface KbfRef {
 }
 
 /**
- * A broken KBF reference (entity or property not found in KB).
+ * A broken FBF/FBFactValue (or legacy KBF/KBFactValue) reference (entity or property not found in KB).
  */
 interface BrokenKbfRef {
   file: string;
@@ -123,7 +123,7 @@ interface BrokenKbfRef {
 
 // ── KB data loaders ────────────────────────────────────────────────────
 
-const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'kb', 'data');
+const KB_DATA_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data');
 
 /**
  * Load valid KB property IDs by parsing properties.yaml keys.
@@ -148,7 +148,7 @@ function loadKbPropertyIds(): Set<string> {
 
 /**
  * Load valid KB entity slugs from the filesystem.
- * An entity has KB data if `packages/kb/data/things/<slug>.yaml` exists.
+ * An entity has KB data if `packages/factbase/data/things/<slug>.yaml` exists.
  */
 function loadKbEntitySlugs(): Set<string> {
   try {
@@ -168,16 +168,17 @@ function loadKbEntitySlugs(): Set<string> {
 }
 
 /**
- * Parse all <KBF> and <KBFactValue> usages from MDX content.
+ * Parse all <FBF>/<FBFactValue> (and legacy <KBF>/<KBFactValue>) usages from MDX content.
  * Returns objects with entity + property attr values.
  */
 function findKbfRefs(content: string): KbfRef[] {
   const refs: KbfRef[] = [];
-  // Match the complete <KBF ...> or <KBFactValue ...> opening/self-closing tag.
-  // We match the full tag (group 0) and extract entity/property from the whole
-  // string — NOT from a captured group — to avoid the non-greedy group 2
-  // stopping after the first attribute and missing subsequent ones.
-  const tagRegex = /<(KBF|KBFactValue)\s[^>]*\/?>/g;
+  // Match the complete <KBF ...>, <KBFactValue ...>, <FBF ...>, or <FBFactValue ...>
+  // opening/self-closing tag. We match the full tag (group 0) and extract
+  // entity/property from the whole string — NOT from a captured group — to
+  // avoid the non-greedy group 2 stopping after the first attribute and
+  // missing subsequent ones.
+  const tagRegex = /<(KBF|KBFactValue|FBF|FBFactValue)\s[^>]*\/?>/g;
   let tagMatch: RegExpExecArray | null;
   while ((tagMatch = tagRegex.exec(content)) !== null) {
     const fullTag = tagMatch[0];
@@ -321,7 +322,7 @@ function findComponentRefs(content: string): ComponentRef[] {
 }
 
 /**
- * Shared helper: validate <KBF> / <KBFactValue> refs in one MDX file.
+ * Shared helper: validate <FBF>/<FBFactValue> (and legacy <KBF>/<KBFactValue>) refs in one MDX file.
  * Reports both unknown-entity AND unknown-property for the same ref (separate if blocks).
  */
 function validateKbfRefsInFile(
@@ -565,15 +566,15 @@ async function main(): Promise<void> {
   }
 
   if (issues.brokenKbfRefs.length > 0) {
-    console.log(`${c.yellow}${c.bold}Broken KBF References (${issues.brokenKbfRefs.length})${c.reset}`);
-    log.dim('<KBF> or <KBFactValue> referencing unknown entity or property — will show red badge at runtime');
+    console.log(`${c.yellow}${c.bold}Broken KBF/FBF References (${issues.brokenKbfRefs.length})${c.reset}`);
+    log.dim('<KBF>/<FBF> or <KBFactValue>/<FBFactValue> referencing unknown entity or property — will show red badge at runtime');
     console.log();
 
     for (const ref of issues.brokenKbfRefs) {
       console.log(`  ${c.yellow}${ref.file}:${ref.line}${c.reset}`);
       const desc = ref.reason === 'unknown-entity'
-        ? `entity "${ref.entity}" not found in packages/kb/data/things/`
-        : `property "${ref.property}" not found in packages/kb/data/properties.yaml`;
+        ? `entity "${ref.entity}" not found in packages/factbase/data/things/`
+        : `property "${ref.property}" not found in packages/factbase/data/properties.yaml`;
       console.log(`    <${ref.component} entity="${ref.entity}" property="${ref.property}" />`);
       log.dim(`    ${desc}`);
       console.log();
@@ -603,7 +604,7 @@ async function main(): Promise<void> {
   console.log(`  Files checked: ${files.length}`);
   console.log(`  ${c.red}Missing references: ${issues.missingRefs.length}${c.reset}`);
   console.log(`  ${c.yellow}No-data components: ${issues.noDataForComponent.length}${c.reset}`);
-  console.log(`  ${c.yellow}Broken KBF refs: ${issues.brokenKbfRefs.length}${c.reset}`);
+  console.log(`  ${c.yellow}Broken KBF/FBF refs: ${issues.brokenKbfRefs.length}${c.reset}`);
   console.log(`  ${c.yellow}Unused imports: ${issues.unusedImports.length}${c.reset}`);
 
   if (hasErrors) {

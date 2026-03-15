@@ -31,7 +31,7 @@ const WIKI_SERVER_ROUTES = join(
   "apps/wiki-server/src/routes",
 );
 const YAML_ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
-const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/kb/data/things");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
 const CONTENT_DIR = join(PROJECT_ROOT, "content/docs");
 
 // ============================================================================
@@ -325,10 +325,10 @@ async function scanDbRecordCount(meta: EntityTypeMeta): Promise<CellValue> {
 }
 
 function scanKbFactCount(meta: EntityTypeMeta): CellValue {
-  // Publications don't have KB facts
-  if (meta.buildDataKey) return naCell("Not a KB entity type");
+  // Publications don't have FactBase facts
+  if (meta.buildDataKey) return naCell("Not a FactBase entity type");
 
-  if (!existsSync(KB_THINGS_DIR)) return naCell("KB things dir missing");
+  if (!existsSync(KB_THINGS_DIR)) return naCell("FactBase things dir missing");
 
   const kbFiles = new Set(
     readdirSync(KB_THINGS_DIR)
@@ -367,7 +367,7 @@ function scanKbFactCount(meta: EntityTypeMeta): CellValue {
   return cell(
     matching.length,
     "kb_fact_count",
-    `${matching.length}/${slugs.size} entities have KB facts`,
+    `${matching.length}/${slugs.size} entities have FactBase facts`,
   );
 }
 

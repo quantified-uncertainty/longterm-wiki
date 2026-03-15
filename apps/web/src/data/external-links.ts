@@ -4,7 +4,7 @@
 
 import fs from "fs";
 import path from "path";
-import { DATA_DIR, loadYaml, resolveId } from "./database";
+import { DATA_DIR, loadYaml, resolveId } from "./tablebase";
 
 export interface ExternalLinksData {
   wikipedia?: string;

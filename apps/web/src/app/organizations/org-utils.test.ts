@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 
 // Mock the KB data layer
-vi.mock("@/data/kb", () => ({
+vi.mock("@/data/factbase", () => ({
   getKBEntity: vi.fn(() => undefined),
   getKBEntities: vi.fn(() => []),
   resolveKBSlug: vi.fn(() => undefined),
@@ -17,7 +17,7 @@ vi.mock("@/data", () => ({
 }));
 
 import { resolveOrgBySlug, getOrgSlugs } from "./org-utils";
-import { getKBEntity, getKBEntities, resolveKBSlug, getKBSlugMap } from "@/data/kb";
+import { getKBEntity, getKBEntities, resolveKBSlug, getKBSlugMap } from "@/data/factbase";
 import { getTypedEntities, isOrganization } from "@/data";
 
 // Typed mocks for convenience

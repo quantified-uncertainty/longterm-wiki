@@ -18,7 +18,7 @@ import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
 import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
-import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
+import { kbSubcategoryCoverageRule } from './factbase-subcategory-coverage.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';

@@ -1,7 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { resolveSlugAlias } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
 import {
   resolvePersonBySlug,
   getPersonSlugs,
@@ -13,7 +13,7 @@ import {
 import {
   getKBFacts,
   getKBLatest,
-} from "@/data/kb";
+} from "@/data/factbase";
 import {
   resolveEntityRef,
   formatAmount,
@@ -26,9 +26,9 @@ import {
   ProfileTabs,
   type ProfileTab,
 } from "@/components/directory";
-import { formatKBDate } from "@/components/wiki/kb/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getExpertById, getPublicationsForPerson, getTypedEntityById, isPerson } from "@/data";
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
 import { CareerHistory } from "./career-history";
@@ -203,7 +203,7 @@ export default async function PersonProfilePage({
       value: employer.name,
       href: employer.slug
         ? `/organizations/${employer.slug}`
-        : `/kb/entity/${employer.id}`,
+        : `/factbase/entity/${employer.id}`,
     });
   }
   if (bornYearFact?.value.type === "number") {
@@ -326,7 +326,7 @@ export default async function PersonProfilePage({
               </Link>
             )}
             <Link
-              href={`/kb/entity/${entity.id}`}
+              href={`/factbase/entity/${entity.id}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               KB data &rarr;

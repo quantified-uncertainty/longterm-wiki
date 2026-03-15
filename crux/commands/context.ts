@@ -43,7 +43,7 @@ import type {
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
-import { buildKbContextForPage } from '../lib/kb-context.ts';
+import { buildKbContextForPage } from '../lib/factbase-context.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -488,7 +488,7 @@ async function forEntity(
     bundle += factsBlock(factsResult.data.facts);
   }
 
-  // KB structured facts (from packages/kb/data/things/*.yaml)
+  // KB structured facts (from packages/factbase/data/things/*.yaml)
   const kbContext = await buildKbContextForPage(
     e.numericId ?? '',
     `${entityId}.mdx`,

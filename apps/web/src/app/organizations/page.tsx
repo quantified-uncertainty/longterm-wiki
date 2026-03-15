@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/kb";
+import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/factbase";
 import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
-import { formatKBFactValue } from "@/components/wiki/kb/format";
-import type { Fact, Property } from "@longterm-wiki/kb";
+import { formatKBFactValue } from "@/components/wiki/factbase/format";
+import type { Fact, Property } from "@longterm-wiki/factbase";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";

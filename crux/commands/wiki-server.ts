@@ -14,7 +14,7 @@ const SCRIPTS = {
   },
   'sync-facts': {
     script: 'wiki-server/sync-facts.ts',
-    description: 'Sync KB facts from packages/kb/data/ to wiki-server',
+    description: 'Sync KB facts from packages/factbase/data/ to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
   'sync-entities': {

@@ -126,13 +126,13 @@ Tracked changes from improve pipeline runs and manual editing sessions. Stored i
 
 ## Entity Facts
 
-Canonical facts defined for this entity in KB YAML files. Used by `<KBF>` components in the page content to render structured data inline. Scored for **person and organization pages only** (not concept, approach, risk, or analysis pages).
+Canonical facts defined for this entity in KB YAML files. Used by `<FBF>` components in the page content to render structured data inline. Scored for **person and organization pages only** (not concept, approach, risk, or analysis pages).
 
 Scoring: green = 5+ facts, amber = 1-4 facts, red = 0 facts.
 
 **Why it matters:** Canonical facts make entity data machine-readable and maintainable. Instead of burying numbers in prose (where they go stale), facts are defined once and updated in a single YAML file.
 
-**How to add:** Create or update the entity's entry in `packages/kb/data/things/` YAML files. Use `<KBF entity="slug" property="property-name" />` in the page content to render values.
+**How to add:** Create or update the entity's entry in `packages/kb/data/things/` YAML files. Use `<FBF entity="slug" property="property-name" />` in the page content to render values.
 
 **Anchor:** `entity-facts`
 

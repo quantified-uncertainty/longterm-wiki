@@ -58,10 +58,10 @@ async function main(): Promise<void> {
 
   // Dynamic import to avoid loading KB code eagerly
   const { loadKB } = await import(
-    join(PROJECT_ROOT, "packages/kb/src/loader.ts")
+    join(PROJECT_ROOT, "packages/factbase/src/loader.ts")
   );
 
-  const dataDir = join(PROJECT_ROOT, "packages/kb/data");
+  const dataDir = join(PROJECT_ROOT, "packages/factbase/data");
   const { graph, filenameMap } = await loadKB(dataDir);
 
   const entities = graph.getAllEntities();

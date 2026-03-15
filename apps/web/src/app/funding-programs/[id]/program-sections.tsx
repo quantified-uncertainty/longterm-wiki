@@ -7,7 +7,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import {
   formatKBDate,
   titleCase,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 import type { ParsedGrant } from "./program-data";
 

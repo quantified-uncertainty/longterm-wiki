@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResearchAreasFromPG, getEntityById } from "@/data/database";
+import { getResearchAreasFromPG, getEntityById } from "@/data/tablebase";
 import { getEntityHref } from "@/data/entity-nav";
 import {
   CLUSTER_COLORS,

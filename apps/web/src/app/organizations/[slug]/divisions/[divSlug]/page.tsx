@@ -6,7 +6,7 @@ import { safeHref } from "@/lib/directory-utils";
 import {
   titleCase,
   shortDomain,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 import {
   findDivision,

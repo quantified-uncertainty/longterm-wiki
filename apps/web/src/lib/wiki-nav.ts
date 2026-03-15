@@ -12,7 +12,7 @@
  */
 
 import { getEntityHref, getAllPages, getPageById } from "@/data";
-import { getKBEntities, getKBFacts } from "@/data/kb";
+import { getKBEntities, getKBFacts } from "@/data/factbase";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place
@@ -273,7 +273,7 @@ export function getInternalNav(): NavSection[] {
       title: "Citations",
       items: [
         { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
-        { label: "KB Fact Verifications", href: internalHref("kb-fact-verifications-dashboard") },
+        { label: "FactBase Verifications", href: internalHref("kb-fact-verifications-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },
@@ -349,7 +349,7 @@ export function getInternalNav(): NavSection[] {
  * Uses numeric entity IDs directly for stability (the slugs in the wiki-server
  * ID registry differ from the page-level slugs assigned by build-data).
  */
-export function getKBDataNav(): NavSection[] {
+export function getFactBaseNav(): NavSection[] {
   // Build top entities list sorted by structured fact count
   const entities = getKBEntities();
   const entityItems: { label: string; href: string; count: number }[] = [];
@@ -359,7 +359,7 @@ export function getKBDataNav(): NavSection[] {
     if (structured.length > 0) {
       entityItems.push({
         label: `${entity.name} (${structured.length})`,
-        href: `/kb/entity/${entity.id}`,
+        href: `/factbase/entity/${entity.id}`,
         count: structured.length,
       });
     }
@@ -368,7 +368,7 @@ export function getKBDataNav(): NavSection[] {
 
   return [
     {
-      title: "KB Data",
+      title: "FactBase",
       defaultOpen: true,
       items: [
         { label: "Overview", href: "/wiki/E1019" },
@@ -376,7 +376,6 @@ export function getKBDataNav(): NavSection[] {
         { label: "Properties", href: "/wiki/E1021" },
         { label: "Entity Coverage", href: "/wiki/E1022" },
         { label: "Records Explorer", href: "/wiki/E1026" },
-        // Resources (E1043) and Publications (E1044) moved to /sources/ section
       ],
     },
     {
@@ -389,11 +388,14 @@ export function getKBDataNav(): NavSection[] {
   ];
 }
 
+/** @deprecated Use getFactBaseNav() */
+export const getKBDataNav = getFactBaseNav;
+
 // ============================================================================
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "internal" | "about" | "kb-data" | "kb" | "section" | null;
+export type WikiSidebarType = "models" | "internal" | "about" | "factbase" | "kb" | "section" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -422,9 +424,9 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     return "internal";
   }
 
-  // KB Data section — public structured data pages at /kb/
-  if (entityPath.startsWith("/kb/") || entityPath === "/kb") {
-    return "kb-data";
+  // FactBase section — public structured data pages at /factbase/
+  if (entityPath.startsWith("/factbase/") || entityPath === "/factbase") {
+    return "factbase";
   }
 
   // Any knowledge-base subsection gets a sidebar (no hardcoded list needed)
@@ -492,8 +494,8 @@ export function getWikiNav(
       return getAboutNav();
     case "internal":
       return getInternalNav();
-    case "kb-data":
-      return getKBDataNav();
+    case "factbase":
+      return getFactBaseNav();
     case "kb": {
       const section = entityPath ? extractKbSection(entityPath) : null;
       return section ? getKbSectionNav(section) : [];

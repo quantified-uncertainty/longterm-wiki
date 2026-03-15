@@ -51,8 +51,8 @@ export function middleware(request: NextRequest) {
   if (segments[0] === "knowledge-base") {
     const url = request.nextUrl.clone();
     if (segments.length <= 1) {
-      // Root: /knowledge-base → /kb (canonical KB entry point)
-      url.pathname = "/kb";
+      // Root: /knowledge-base → /factbase (canonical FactBase entry point)
+      url.pathname = "/factbase";
       return NextResponse.redirect(url, 308);
     }
     const slug = segments[segments.length - 1];
@@ -64,6 +64,14 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url, 308);
     }
     url.pathname = `/wiki/${slug}`;
+    return NextResponse.redirect(url, 308);
+  }
+
+  // /kb/* → /factbase/* (renamed from KB to FactBase)
+  if (segments[0] === "kb") {
+    const url = request.nextUrl.clone();
+    const rest = segments.slice(1).join("/");
+    url.pathname = rest ? `/factbase/${rest}` : "/factbase";
     return NextResponse.redirect(url, 308);
   }
 
@@ -86,6 +94,8 @@ export const config = {
     "/browse/:path+",
     "/knowledge-base",
     "/knowledge-base/:path+",
+    "/kb",
+    "/kb/:path+",
     "/ai-transition-model",
     "/ai-transition-model/:path+",
     "/ai-transition-model-views",

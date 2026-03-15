@@ -2,11 +2,11 @@
  * Explore page data: items from entities, pages, and diagrams.
  */
 
-import { getDatabase, getTypedEntities, isRisk } from "./database";
-import type { ContentFormat, RawEntity, AnyEntity } from "./database";
+import { getDatabase, getTypedEntities, isRisk } from "./tablebase";
+import type { ContentFormat, RawEntity, AnyEntity } from "./tablebase";
 import { getEntityHref } from "./entity-nav";
-import { getKB } from "./kb";
-import type { SerializedKB } from "@longterm-wiki/kb";
+import { getKB } from "./factbase";
+import type { SerializedKB } from "@longterm-wiki/factbase";
 
 export interface ExploreItem {
   id: string;

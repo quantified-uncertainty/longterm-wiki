@@ -7,7 +7,7 @@ vi.mock("fs", () => ({
 
 import { readFileSync } from "fs";
 import { loadBenchmarks, loadBenchmarkResults } from "./sync-benchmarks.ts";
-import { contentHash } from "../../packages/kb/src/ids.ts";
+import { contentHash } from "../../packages/factbase/src/ids.ts";
 
 const mockReadFileSync = vi.mocked(readFileSync);
 

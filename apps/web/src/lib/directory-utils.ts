@@ -1,6 +1,6 @@
 /**
  * Shared utilities for entity directory and profile pages (/people, /organizations).
- * NOTE: This file imports server-only modules (@/data/kb). Do NOT import from client components.
+ * NOTE: This file imports server-only modules (@/data/factbase). Do NOT import from client components.
  * For client-safe formatting, import from @/lib/format-compact instead.
  */
 
@@ -10,9 +10,9 @@ import {
   getKBSlugMap,
   getKBEntities,
   resolveKBSlug,
-} from "@/data/kb";
-import { formatKBDate } from "@/components/wiki/kb/format";
-import type { Entity } from "@longterm-wiki/kb";
+} from "@/data/factbase";
+import { formatKBDate } from "@/components/wiki/factbase/format";
+import type { Entity } from "@longterm-wiki/factbase";
 import { getTypedEntities, isPerson, isRisk, isOrganization } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -21,7 +21,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 export { formatCompactCurrency, formatCompactNumber, safeHref } from "@/lib/format-compact";
 
 // Re-export from format.ts so server consumers don't need two imports
-export { isUrl, shortDomain, formatKBDate } from "@/components/wiki/kb/format";
+export { isUrl, shortDomain, formatKBDate } from "@/components/wiki/factbase/format";
 
 // ── Currency formatting (server-only, handles unknown input) ────
 

@@ -322,8 +322,8 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     entities.filter((e: EntityData) => e.type === 'person').map((e: EntityData) => e.id)
   );
 
-  // Build set of KB thing slugs from packages/kb/data/things/
-  const kbThingsDir = join(PROJECT_ROOT, 'packages/kb/data/things');
+  // Build set of KB thing slugs from packages/factbase/data/things/
+  const kbThingsDir = join(PROJECT_ROOT, 'packages/factbase/data/things');
   const kbThingSlugs = new Set<string>();
   if (existsSync(kbThingsDir)) {
     for (const file of readdirSync(kbThingsDir)) {
@@ -341,7 +341,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
       expertMismatches++;
     }
     if (!kbThingSlugs.has(expert.id)) {
-      console.log(`${colors.yellow}⚠️  Expert "${expert.id}" has no matching KB thing file at packages/kb/data/things/${expert.id}.yaml${colors.reset}`);
+      console.log(`${colors.yellow}⚠️  Expert "${expert.id}" has no matching KB thing file at packages/factbase/data/things/${expert.id}.yaml${colors.reset}`);
       warnings++;
       expertMismatches++;
     }

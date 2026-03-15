@@ -77,7 +77,7 @@ export function getHelp(): string {
   1. data/experts.yaml — expert entries not in people.yaml
   2. data/organizations.yaml — keyPeople references
   3. data/entities/*.yaml — relatedEntries with type: person
-  4. packages/kb/data/things/ — KB things with type: person
+  4. packages/factbase/data/things/ — KB things with type: person
   5. data/literature.yaml — paper authors
 
 \x1b[1mScoring:\x1b[0m

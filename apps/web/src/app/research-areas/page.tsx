@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getResearchAreasFromPG } from "@/data/database";
+import { getResearchAreasFromPG } from "@/data/tablebase";
 import { ResearchAreasTable, type ResearchAreaRow } from "./research-areas-table";
 
 export const metadata: Metadata = {

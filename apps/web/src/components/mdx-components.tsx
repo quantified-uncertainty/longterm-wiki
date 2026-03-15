@@ -2,7 +2,7 @@ import Image from "next/image";
 import { EntityLink, MultiEntityLinks } from "@/components/wiki/EntityLink";
 import { ResourceLink, R } from "@/components/wiki/ResourceLink";
 import { References } from "@/components/wiki/References";
-import { KBF } from "@/components/wiki/KBF";
+import { FBF } from "@/components/wiki/FBF";
 import { Calc } from "@/components/wiki/Calc";
 import { MermaidDiagram } from "@/components/wiki/MermaidDiagram";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
@@ -19,15 +19,15 @@ import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
-// KB (Knowledge Base) components — typed facts, properties, records
-import { KBFactTable } from "@/components/wiki/kb/KBFactTable";
-import { KBRecordTable } from "@/components/wiki/kb/KBRecordTable";
-import { KBFactValue } from "@/components/wiki/kb/KBFactValue";
-import { KBEntityFacts } from "@/components/wiki/kb/KBEntityFacts";
-import { KBRecordCollection } from "@/components/wiki/kb/KBRecordCollection";
-import { KBEntitySidebar } from "@/components/wiki/kb/KBEntitySidebar";
-import { KBRefLink } from "@/components/wiki/kb/KBRefLink";
-import { KBCompareTable } from "@/components/wiki/kb/KBCompareTable";
+// FactBase components — typed facts, properties, records
+import { FBFactTable } from "@/components/wiki/factbase/FBFactTable";
+import { FBRecordTable } from "@/components/wiki/factbase/FBRecordTable";
+import { FBFactValue } from "@/components/wiki/factbase/FBFactValue";
+import { FBEntityFacts } from "@/components/wiki/factbase/FBEntityFacts";
+import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
+import { FBEntitySidebar } from "@/components/wiki/factbase/FBEntitySidebar";
+import { FBRefLink } from "@/components/wiki/factbase/FBRefLink";
+import { FBCompareTable } from "@/components/wiki/factbase/FBCompareTable";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -44,14 +44,14 @@ import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 // Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
 import { EpicTracker } from "@/components/wiki/EpicTracker";
 
-// KB Data section content components (public structured data at /kb/)
-import { KBOverviewContent } from "@/app/kb/kb-overview-content";
-import { KBFactsExplorerContent } from "@/app/kb/kb-facts-content";
-import { KBPropertiesExplorerContent } from "@/app/kb/kb-properties-content";
-import { KBEntityCoverageContent } from "@/app/kb/kb-entities-content";
-import { KBRecordsExplorerContent } from "@/app/kb/kb-records-content";
-import { KBResourcesContent } from "@/app/kb/kb-resources-content";
-import { KBPublicationsContent } from "@/app/kb/kb-publications-content";
+// Factbase section content components (public structured data at /factbase/)
+import { FBOverviewContent } from "@/app/factbase/factbase-overview-content";
+import { FBFactsExplorerContent } from "@/app/factbase/factbase-facts-content";
+import { FBPropertiesExplorerContent } from "@/app/factbase/factbase-properties-content";
+import { FBEntityCoverageContent } from "@/app/factbase/factbase-entities-content";
+import { FBRecordsExplorerContent } from "@/app/factbase/factbase-records-content";
+import { FBResourcesContent } from "@/app/factbase/factbase-resources-content";
+import { FBPublicationsContent } from "@/app/factbase/factbase-publications-content";
 
 // Sources section content component
 import { SourcesOverviewContent } from "@/app/sources/sources-overview-content";
@@ -76,7 +76,7 @@ import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
-import { KbVerificationsContent } from "@/app/internal/kb-verifications/kb-verifications-content";
+import { FactBaseVerificationsContent } from "@/app/internal/factbase-verifications/factbase-verifications-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
@@ -151,7 +151,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ResourceLink,
   R,
   References,
-  KBF,
+  FBF,
+  KBF: FBF, // backwards compat alias
   Calc,
   DataInfoBox,
   Backlinks,
@@ -187,27 +188,36 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Anthropic-specific table
   AnthropicStakeholdersTable,
 
-  // KB (Knowledge Base) — typed facts, record collections, entity data
-  KBFactTable,
-  KBRecordTable,
-  KBFactValue,
-  KBEntityFacts,
-  KBRecordCollection,
-  KBEntitySidebar,
-  KBRefLink,
-  KBCompareTable,
+  // FactBase — typed facts, record collections, entity data
+  FBFactTable,
+  FBRecordTable,
+  FBFactValue,
+  FBEntityFacts,
+  FBRecordCollection,
+  FBEntitySidebar,
+  FBRefLink,
+  FBCompareTable,
+  // Backwards compat aliases (remove after all MDX migrated)
+  KBFactTable: FBFactTable,
+  KBRecordTable: FBRecordTable,
+  KBFactValue: FBFactValue,
+  KBEntityFacts: FBEntityFacts,
+  KBRecordCollection: FBRecordCollection,
+  KBEntitySidebar: FBEntitySidebar,
+  KBRefLink: FBRefLink,
+  KBCompareTable: FBCompareTable,
 
   // Epic tracking
   EpicTracker,
 
-  // KB Data section components
-  KBOverviewContent,
-  KBFactsExplorerContent,
-  KBPropertiesExplorerContent,
-  KBEntityCoverageContent,
-  KBRecordsExplorerContent,
-  KBResourcesContent,
-  KBPublicationsContent,
+  // Factbase section components
+  FBOverviewContent,
+  FBFactsExplorerContent,
+  FBPropertiesExplorerContent,
+  FBEntityCoverageContent,
+  FBRecordsExplorerContent,
+  FBResourcesContent,
+  FBPublicationsContent,
 
   // Sources section
   SourcesOverviewContent,
@@ -232,7 +242,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
-  KbVerificationsContent,
+  FactBaseVerificationsContent,
+  KbVerificationsContent: FactBaseVerificationsContent, // backwards compat alias
   GrantsDashboardContent,
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,

@@ -13,7 +13,7 @@ import {
 
 /**
  * Generate a random 10-char alphanumeric stable ID.
- * Same algorithm as packages/kb/src/ids.ts — duplicated here to avoid
+ * Same algorithm as packages/factbase/src/ids.ts — duplicated here to avoid
  * cross-package dependencies in the wiki-server build.
  */
 function generateStableId(): string {

@@ -70,15 +70,15 @@ export const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = loadGranteeOverr
 export function buildEntityMatcher(): EntityMatcher {
   const nameMap = new Map<string, EntityMatch>();
 
-  // Load KB data from kb-data.json (database.json strips the kb field)
+  // Load FactBase data from factbase-data.json (database.json strips the kb field)
   let kbData: { slugToEntityId?: Record<string, string>; entities?: Record<string, { name?: string; aliases?: string[] }> } = {};
-  const kbDataPath = resolve("apps/web/src/data/kb-data.json");
+  const kbDataPath = resolve("apps/web/src/data/factbase-data.json");
   try {
     kbData = JSON.parse(readFileSync(kbDataPath, "utf8"));
   } catch (e: unknown) {
     if (e instanceof Error && "code" in e && (e as NodeJS.ErrnoException).code === "ENOENT") {
       console.warn(
-        `kb-data.json not found — run 'pnpm build-data:content' first. Entity matching will be limited to manual overrides.`
+        `factbase-data.json not found — run 'pnpm build-data:content' first. Entity matching will be limited to manual overrides.`
       );
     } else {
       throw e;

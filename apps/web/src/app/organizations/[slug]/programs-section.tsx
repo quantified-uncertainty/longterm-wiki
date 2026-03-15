@@ -3,9 +3,9 @@
  * Extracted from page.tsx as a pure refactor — no visual changes.
  */
 import Link from "next/link";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { getRecordVerdict } from "@data/database";
+import { getRecordVerdict } from "@data/tablebase";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";

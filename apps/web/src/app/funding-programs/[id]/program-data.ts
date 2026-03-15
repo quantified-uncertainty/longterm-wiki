@@ -6,12 +6,12 @@ import {
   getAllKBRecords,
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
-import type { KBRecordEntry } from "@/data/kb";
-import { getTypedEntityById } from "@/data/database";
+} from "@/data/factbase";
+import type { KBRecordEntry } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import {
   titleCase,
-} from "@/components/wiki/kb/format";
+} from "@/components/wiki/factbase/format";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -57,7 +57,7 @@ export function resolveEntityLink(entityId: string): { name: string; href: strin
       if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
       if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
     }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
+    return { name: entity.name, href: `/factbase/entity/${entityId}` };
   }
   return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
 }
@@ -161,7 +161,7 @@ export interface ProgramPageData {
   totalGranted: number;
 }
 
-export function loadProgramPageData(record: import("@/data/kb").KBRecordEntry): ProgramPageData {
+export function loadProgramPageData(record: import("@/data/factbase").KBRecordEntry): ProgramPageData {
   const program = parseFundingProgram(record);
   const funder = resolveEntityLink(program.ownerEntityId);
 

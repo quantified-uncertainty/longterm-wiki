@@ -62,7 +62,7 @@ interface CoeffGivingYaml {
 export async function seedDivisions() {
   const yamlPath = path.resolve(
     __dirname,
-    "../../../packages/kb/data/things/coefficient-giving.yaml"
+    "../../../packages/factbase/data/things/coefficient-giving.yaml"
   );
   const raw = fs.readFileSync(yamlPath, "utf8");
   const data = yaml.load(raw) as CoeffGivingYaml;
@@ -70,7 +70,7 @@ export async function seedDivisions() {
   const programs = data?.records?.["funding-programs"];
   if (!programs) {
     throw new Error(
-      "packages/kb/data/things/coefficient-giving.yaml missing records.funding-programs section"
+      "packages/factbase/data/things/coefficient-giving.yaml missing records.funding-programs section"
     );
   }
 

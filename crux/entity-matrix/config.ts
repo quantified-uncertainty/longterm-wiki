@@ -93,9 +93,9 @@ export const DIMENSIONS: DimensionDef[] = [
   },
   {
     id: "kb_fact_count",
-    label: "KB Facts",
+    label: "FactBase",
     group: "data-foundation",
-    description: "Count of KB fact files in packages/kb/data/things/",
+    description: "Count of FactBase fact files in packages/factbase/data/things/",
     detection: "filesystem",
     valueType: "count",
     importance: 5,

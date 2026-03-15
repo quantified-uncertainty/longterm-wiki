@@ -7,15 +7,15 @@ import {
   getLikelihoodDisplay,
   getTimeframeDisplay,
 } from "@/app/risks/risk-utils";
-import { resolveSlugAlias } from "@/data/kb";
-import { getKBEntity, getKBEntitySlug } from "@/data/kb";
+import { resolveSlugAlias } from "@/data/factbase";
+import { getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getTypedEntityById, isRisk } from "@/data";
 import { getEntityWikiHref, safeHref } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
   Breadcrumbs,
 } from "@/components/directory";
-import { titleCase } from "@/components/wiki/kb/format";
+import { titleCase } from "@/components/wiki/factbase/format";
 import {
   RISK_CATEGORY_COLORS,
   RISK_CATEGORY_LABELS,
@@ -27,7 +27,7 @@ export function generateStaticParams() {
   return getRiskSlugs().map((slug) => ({ slug }));
 }
 
-import type { Entity } from "@longterm-wiki/kb";
+import type { Entity } from "@longterm-wiki/factbase";
 
 /** Resolve a slug to a risk entity (KB-first, typed entity fallback). */
 function resolveRiskEntity(slug: string): Entity | undefined {
@@ -127,7 +127,7 @@ export default async function RiskProfilePage({
             ? `/people/${entrySlug}`
             : kbEntity?.numericId
               ? `/wiki/${kbEntity.numericId}`
-              : `/kb/entity/${entry.id}`,
+              : `/factbase/entity/${entry.id}`,
     };
   });
 
@@ -198,7 +198,7 @@ export default async function RiskProfilePage({
             </Link>
           )}
           <Link
-            href={`/kb/entity/${entity.id}`}
+            href={`/factbase/entity/${entity.id}`}
             className="text-primary hover:text-primary/80 font-medium transition-colors"
           >
             KB data &rarr;
@@ -423,7 +423,7 @@ export default async function RiskProfilePage({
                 </Link>
               )}
               <Link
-                href={`/kb/entity/${entity.id}`}
+                href={`/factbase/entity/${entity.id}`}
                 className="text-xs text-primary hover:underline"
               >
                 View in KB explorer &rarr;

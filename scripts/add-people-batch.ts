@@ -3,7 +3,7 @@
  * Usage: npx tsx scripts/add-people-batch.ts
  *
  * Generates:
- * - packages/kb/data/things/{slug}.yaml for each person
+ * - packages/factbase/data/things/{slug}.yaml for each person
  * - Appends to data/entities/people.yaml
  * - Allocates numeric IDs via crux
  */
@@ -50,7 +50,7 @@ const ORG_STABLE_IDS: Record<string, string> = {};
 
 function lookupOrgStableId(slug: string): string | undefined {
   if (ORG_STABLE_IDS[slug]) return ORG_STABLE_IDS[slug];
-  const path = resolve(ROOT, `packages/kb/data/things/${slug}.yaml`);
+  const path = resolve(ROOT, `packages/factbase/data/things/${slug}.yaml`);
   if (!existsSync(path)) return undefined;
   const content = readFileSync(path, "utf-8");
   const match = content.match(/stableId:\s*(\S+)/);
@@ -296,7 +296,7 @@ const PEOPLE: PersonData[] = [
 ];
 
 async function main() {
-  const kbThingsDir = resolve(ROOT, "packages/kb/data/things");
+  const kbThingsDir = resolve(ROOT, "packages/factbase/data/things");
   const entitiesFile = resolve(ROOT, "data/entities/people.yaml");
 
   let entityAppendBlock = "\n";

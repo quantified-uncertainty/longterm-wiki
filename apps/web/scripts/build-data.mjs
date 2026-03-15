@@ -2080,18 +2080,18 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Load KB (knowledge base graph) from packages/kb
-  const kbDataDir = join(REPO_ROOT, 'packages', 'kb', 'data');
-  if (existsSync(kbDataDir)) {
-    const { loadKB, serialize } = await import('../../../packages/kb/src/index.ts');
-    const { graph, filenameMap } = await loadKB(kbDataDir);
+  // Load FactBase (structured facts graph) from packages/factbase
+  const factbaseDataDir = join(REPO_ROOT, 'packages', 'factbase', 'data');
+  if (existsSync(factbaseDataDir)) {
+    const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
+    const { graph, filenameMap } = await loadKB(factbaseDataDir);
     const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
     const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
     console.log(`  kb: ${entityCount} entities, ${factCount} fact groups`);
   } else {
-    console.warn('  kb: skipped (data directory not found at packages/kb/data)');
+    console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }
 
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
@@ -2577,13 +2577,13 @@ async function main() {
   writeFileSync(OUTPUT_FILE, JSON.stringify(databaseForOutput, null, 2));
   console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, KB split out, typedEntities only)`);
 
-  // Write KB data to a separate file (loaded independently by kb.ts)
-  const KB_OUTPUT_FILE = join(OUTPUT_DIR, 'kb-data.json');
+  // Write FactBase data to a separate file (loaded independently by factbase.ts)
+  const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
   if (_kbData) {
-    writeFileSync(KB_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
-    console.log(`✓ Written: ${KB_OUTPUT_FILE} (KB entities, facts, records, schemas)`);
+    writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
+    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase entities, facts, records, schemas)`);
   } else {
-    console.warn('⚠ KB data not available — kb-data.json not written');
+    console.warn('⚠ FactBase data not available — factbase-data.json not written');
   }
 
   // Also write individual JSON files for selective imports

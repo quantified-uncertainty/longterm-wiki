@@ -1,4 +1,4 @@
-import type { PersonPublicationEntry } from "@/data/database";
+import type { PersonPublicationEntry } from "@/data/tablebase";
 import { safeHref } from "@/lib/directory-utils";
 
 export function PublicationsSection({

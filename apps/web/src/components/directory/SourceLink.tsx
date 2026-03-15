@@ -1,4 +1,4 @@
-import { isUrl, shortDomain } from "@/components/wiki/kb/format";
+import { isUrl, shortDomain } from "@/components/wiki/factbase/format";
 
 /**
  * External source link that shows a short domain name.

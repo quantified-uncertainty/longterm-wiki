@@ -273,7 +273,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
           </select>
         </div>
         <div style={{ color: "#6b7280", fontSize: "0.75rem" }}>
-          {totalDbPrimary.toLocaleString()} DB &middot; {totalKb.toLocaleString()} KB &middot; {totalWiki.toLocaleString()} wiki
+          {totalDbPrimary.toLocaleString()} TableBase &middot; {totalKb.toLocaleString()} FactBase &middot; {totalWiki.toLocaleString()} WikiBase
           {missingIndexCount > 0 && (
             <span style={{ color: "#f59e0b", marginLeft: "0.5rem" }} title={`${missingIndexCount} entity types have content but no directory/browse page`}>
               ⚠ {missingIndexCount} without index
@@ -312,7 +312,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 40 }}>
                 Score
               </th>
-              <th className="px-2 py-2 text-center font-medium border-r" colSpan={3} style={{ minWidth: 100 }} title="DB records / KB entries / Wiki pages">
+              <th className="px-2 py-2 text-center font-medium border-r" colSpan={3} style={{ minWidth: 100 }} title="TableBase / FactBase / WikiBase">
                 Counts
               </th>
               <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 90 }} title="Links to directory, DB profile, and wiki page">
@@ -333,13 +333,13 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="sticky left-0 z-20 bg-muted/30 border-r" />
               <th className="border-r" />
               <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Postgres records — bold = primary data source, italic = YAML mirror">
-                DB
+                TB
               </th>
-              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="Knowledge base entries">
-                KB
+              <th className="px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="FactBase entries">
+                FB
               </th>
-              <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="MDX wiki pages">
-                Wiki
+              <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }} title="WikiBase pages">
+                WB
               </th>
               <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
                 <div>Dir / DB</div>
@@ -540,7 +540,7 @@ function MatrixRow({
               ) : hasContent ? (
                 <span
                   style={{ color: "#f59e0b", cursor: "default" }}
-                  title={`No directory page — ${counts.wiki ?? 0} wiki pages, ${counts.kb ?? 0} KB entries only browsable via /wiki`}
+                  title={`No directory page — ${counts.wiki ?? 0} wiki pages, ${counts.kb ?? 0} FactBase entries only browsable via /wiki`}
                 >
                   ⚠
                 </span>
@@ -636,7 +636,7 @@ function ExpandedDetail({
           <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
             {counts.db !== null && `${counts.db} DB`}
             {counts.db !== null && counts.kb !== null && " · "}
-            {counts.kb !== null && `${counts.kb} KB`}
+            {counts.kb !== null && `${counts.kb} FactBase`}
             {(counts.db !== null || counts.kb !== null) && counts.wiki !== null && " · "}
             {counts.wiki !== null && `${counts.wiki} wiki`}
           </span>

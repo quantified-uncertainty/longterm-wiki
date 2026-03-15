@@ -147,7 +147,7 @@ export function dataSourceLabel(source: DataSource): string {
 
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
-import type { KbVerificationsRoute } from "@wiki-server/kb-verifications-route";
+import type { FactbaseVerificationsRoute } from "@wiki-server/factbase-verifications-route";
 import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
@@ -194,7 +194,7 @@ export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':
 // Hono RPC client — KB Verifications API
 // ============================================================================
 
-type KbVerificationsClient = ReturnType<typeof hc<KbVerificationsRoute>>;
+type KbVerificationsClient = ReturnType<typeof hc<FactbaseVerificationsRoute>>;
 
 /** Inferred response type for GET /api/kb-verifications/stats */
 export type RpcKbStatsResult = InferResponseType<KbVerificationsClient['stats']['$get'], 200>;

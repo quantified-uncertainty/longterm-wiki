@@ -6,8 +6,8 @@ import Link from "next/link";
 import {
   getKBEntity,
   getKBEntitySlug,
-} from "@/data/kb";
-import { titleCase } from "@/components/wiki/kb/format";
+} from "@/data/factbase";
+import { titleCase } from "@/components/wiki/factbase/format";
 
 /**
  * Resolve a KB entity ID to a display name and optional href.
@@ -21,7 +21,7 @@ export function resolveEntityLink(entityId: string): { name: string; href: strin
       if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
       if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
     }
-    return { name: entity.name, href: `/kb/entity/${entityId}` };
+    return { name: entity.name, href: `/factbase/entity/${entityId}` };
   }
   return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
 }
