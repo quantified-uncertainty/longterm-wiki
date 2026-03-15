@@ -76,7 +76,7 @@ import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
-import { KbVerificationsContent } from "@/app/internal/kb-verifications/kb-verifications-content";
+import { FactBaseVerificationsContent } from "@/app/internal/factbase-verifications/factbase-verifications-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
@@ -242,7 +242,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
-  KbVerificationsContent,
+  FactBaseVerificationsContent,
+  KbVerificationsContent: FactBaseVerificationsContent, // backwards compat alias
   GrantsDashboardContent,
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,

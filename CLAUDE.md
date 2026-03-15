@@ -71,7 +71,7 @@ The site has structured directory pages for browsing entities by type. Before cr
 
 | Directory | Entity Type | Route | Description |
 |-----------|------------|-------|-------------|
-| Organizations | `organization` | `/organizations` | Companies, labs, nonprofits with KB facts, funding, people |
+| Organizations | `organization` | `/organizations` | Companies, labs, nonprofits with FactBase facts, funding, people |
 | People | `person` | `/people` | Researchers, executives with roles, affiliations, publications |
 | Risks | `risk` | `/risks` | AI safety risks with severity, likelihood, timeframe |
 | AI Models | `ai-model` | `/ai-models` | Models with benchmarks, pricing, safety levels |

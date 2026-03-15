@@ -15,7 +15,7 @@ import {
 import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import type { VerdictRow, VerdictDetailResult } from "./kb-verifications-content";
+import type { VerdictRow, VerdictDetailResult } from "./factbase-verifications-content";
 
 // ── Verdict badge ─────────────────────────────────────────────────────────────
 
@@ -314,7 +314,7 @@ function ExpandedVerificationDetail({
 
 // ── Table component ───────────────────────────────────────────────────────────
 
-export function KbVerificationsTable({ data }: { data: VerdictRow[] }) {
+export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
   const [filterVerdict, setFilterVerdict] = useState<string>("all");
   const [detailCache, setDetailCache] = useState<DetailCache>({});
 

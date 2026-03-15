@@ -108,11 +108,12 @@ export function loadPropertyIds(): Set<string> | null {
 // ── Regex patterns ───────────────────────────────────────────────────────────
 
 /**
- * Match <KBF ...> or <KBF ... /> with entity and property attributes in either
- * order. Uses [^>]+ so it naturally spans newlines (newlines are not '>'),
- * enabling multiline MDX components to be validated correctly.
+ * Match <KBF ...> / <FBF ...> or <KBF ... /> / <FBF ... /> with entity and
+ * property attributes in either order. Uses [^>]+ so it naturally spans
+ * newlines (newlines are not '>'), enabling multiline MDX components to be
+ * validated correctly.
  */
-const KBF_TAG_RE = /<KBF\s+([^>]+?)>/g;
+const KBF_TAG_RE = /<(?:KBF|FBF)\s+([^>]+?)>/g;
 const ENTITY_ATTR_RE = /entity=["']([^"']+)["']/;
 const PROPERTY_ATTR_RE = /property=["']([^"']+)["']/;
 

@@ -7,7 +7,7 @@ import {
   type RpcKbVerdictDetailResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { KbVerificationsTable } from "./kb-verifications-table";
+import { FactBaseVerificationsTable } from "./factbase-verifications-table";
 
 // Re-export the RPC-inferred types for the table component
 export type VerdictRow = RpcKbVerdictRow;
@@ -70,7 +70,7 @@ const BAR_COLORS: Record<string, string> = {
 
 // ── Main content component ────────────────────────────────────────────────────
 
-export async function KbVerificationsContent() {
+export async function FactBaseVerificationsContent() {
   const [statsResult, verdictsResult] = await Promise.all([
     loadStats(),
     loadVerdicts(),
@@ -87,7 +87,7 @@ export async function KbVerificationsContent() {
     return (
       <>
         <p className="text-muted-foreground">
-          KB Fact Verification dashboard requires a connection to the
+          FactBase Verification dashboard requires a connection to the
           wiki-server. No local fallback is available for this data.
         </p>
         <DataSourceBanner source="local" apiError={apiError} />
@@ -105,7 +105,7 @@ export async function KbVerificationsContent() {
   return (
     <>
       <p className="text-muted-foreground text-sm leading-relaxed">
-        Verification status for KB facts checked against external resources.{" "}
+        Verification status for FactBase facts checked against external resources.{" "}
         <span className="font-medium text-foreground">
           {stats.total_facts}
         </span>{" "}
@@ -184,7 +184,7 @@ export async function KbVerificationsContent() {
       )}
 
       {/* Interactive table */}
-      <KbVerificationsTable data={verdicts} />
+      <FactBaseVerificationsTable data={verdicts} />
 
       <DataSourceBanner source="api" />
       <p className="text-xs text-muted-foreground mt-1">

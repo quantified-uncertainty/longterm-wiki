@@ -53,7 +53,7 @@ pnpm crux query search "<topic>"
 
 For entities that DO exist, check which ones have thin coverage:
 - Entities with no wiki page or a very short page
-- Entities with no KB facts (check `packages/kb/data/things/`)
+- Entities with no FactBase facts (check `packages/factbase/data/things/`)
 - Entities with pages but poor quality scores
 
 ### 2c. Relationship Gaps
@@ -80,7 +80,7 @@ Check for important recent developments (last 6 months) that aren't reflected:
 ### Coverage Summary
 - Total entities: [N] across [N] types
 - Entities with wiki pages: [N] / [N]
-- Entities with KB facts: [list]
+- Entities with FactBase facts: [list]
 - Entities with no content: [count]
 
 ### Critical Gaps (Priority 1)

@@ -66,7 +66,7 @@ export async function buildKBFactSourceMap(
     // Other errors are logged as warnings but don't break the pipeline.
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       console.warn(
-        `[kb-fact-lookup] Failed to load KB facts for "${entityId}": ${
+        `[factbase-fact-lookup] Failed to load KB facts for "${entityId}": ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

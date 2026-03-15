@@ -129,7 +129,7 @@ function migrateFile(
     // 1. Migrate entity="slug" attributes in KB components
     // Matches: <KBF entity="...", <KBFactTable entity="...", <KBRecordTable entity="...", etc.
     text = text.replace(
-      /(<(?:KBF|KBFactTable|KBRecordTable|KBFactValue|KBRecordCollection)\s[^>]*entity=")([^"]+)(")/g,
+      /(<(?:KBF|KBFactTable|KBRecordTable|KBFactValue|KBRecordCollection|FBF|FBFactTable|FBRecordTable|FBFactValue|FBRecordCollection)\s[^>]*entity=")([^"]+)(")/g,
       (full, prefix, entityVal, suffix) => {
         // Skip if already a stableId (exists in the known stableId set)
         if (stableIds.has(entityVal)) return full;

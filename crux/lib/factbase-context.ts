@@ -78,7 +78,7 @@ export async function buildKbContextForPage(
     graph = await getGraph();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[kb-context] Failed to load KB graph: ${msg} — skipping KB context`);
+    console.warn(`[factbase-context] Failed to load KB graph: ${msg} — skipping KB context`);
     return null;
   }
 

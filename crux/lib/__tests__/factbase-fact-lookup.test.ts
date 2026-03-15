@@ -106,7 +106,7 @@ facts:
     const map = await buildKBFactSourceMap("test-entity");
     expect(map.size).toBe(0);
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[kb-fact-lookup]"),
+      expect.stringContaining("[factbase-fact-lookup]"),
     );
     consoleSpy.mockRestore();
   });
