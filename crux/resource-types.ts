@@ -24,6 +24,8 @@ export interface Resource {
   doi?: string;
   date?: string;
   stable_id?: string;
+  /** Wayback Machine archive URL */
+  archive_url?: string;
   // YAML-era fields (kept for PG sync compatibility)
   local_filename?: string;
   credibility_override?: number;

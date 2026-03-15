@@ -154,6 +154,8 @@ export const citationContent = pgTable(
     fullText: text("full_text"),
     contentLength: integer("content_length"),
     contentHash: text("content_hash"),
+    /** How the content was fetched: firecrawl, built-in, youtube-transcript, abstract */
+    fetchMethod: text("fetch_method"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -576,6 +578,8 @@ export const resources = pgTable(
     stableId: text("stable_id").unique(),
     fetchStatus: text("fetch_status"),
     lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    /** Wayback Machine archive URL for this resource */
+    archiveUrl: text("archive_url"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
