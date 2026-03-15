@@ -1,0 +1,24 @@
+thing:
+  id: david-krueger
+  stableId: ATFBoSnuqA
+  type: person
+  name: "David Krueger"
+  numericId: "E1304"
+
+facts:
+  - id: f_uOJo5hO7uQ
+    property: role
+    value: "Assistant Professor"
+
+  - id: f_hzaOwUZKsQ
+    property: notable-for
+    value: "Cambridge professor researching AI alignment and safety; work on deceptive alignment and goal misgeneralization"
+
+  - id: f_t6THqERYOg
+    property: education
+    value: "PhD in Computer Science, University of Montreal"
+
+  - id: f_eywAH1NAxg
+    property: website
+    value: "https://www.davidscottkrueger.com"
+

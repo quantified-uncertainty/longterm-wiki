@@ -198,6 +198,16 @@ export function parseJsonResponse(text: string): unknown {
   }
   cleaned = cleaned.trim();
 
-  return JSON.parse(cleaned);
+  // Try direct parse first
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Extract the first JSON object or array from the text
+    const objMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (objMatch) return JSON.parse(objMatch[0]);
+    const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+    if (arrMatch) return JSON.parse(arrMatch[0]);
+    throw new Error(`No JSON object found in response: ${cleaned.slice(0, 100)}`);
+  }
 }
 

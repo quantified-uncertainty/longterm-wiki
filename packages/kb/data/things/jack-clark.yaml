@@ -1,0 +1,24 @@
+thing:
+  id: jack-clark
+  stableId: YqSmRNVRAg
+  type: person
+  name: "Jack Clark"
+  numericId: "E1248"
+
+facts:
+  - id: f_5QqO5k4Svg
+    property: employed-by
+    value: !ref mK9pX3rQ7n
+
+  - id: f_L3xtvNteFQ
+    property: role
+    value: "Co-founder"
+
+  - id: f_utfXyxaqTw
+    property: born-year
+    value: 1988
+
+  - id: f_y6ELYGnAGQ
+    property: notable-for
+    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy advocate"
+

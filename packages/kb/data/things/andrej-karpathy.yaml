@@ -1,0 +1,32 @@
+thing:
+  id: andrej-karpathy
+  stableId: Q9eaz6joHA
+  type: person
+  name: "Andrej Karpathy"
+  numericId: "E1287"
+
+facts:
+  - id: f_H65pau0BGg
+    property: role
+    value: "Founder"
+
+  - id: f_ovejtkoBgA
+    property: born-year
+    value: 1986
+
+  - id: f_JOFyWsItEQ
+    property: notable-for
+    value: "Former Director of AI at Tesla, former OpenAI researcher; founded Eureka Labs; influential AI educator and researcher"
+
+  - id: f_v81HDaRKqg
+    property: education
+    value: "PhD in Computer Science, Stanford University"
+
+  - id: f_EgN1ilnrrA
+    property: social-media
+    value: "@karpathy"
+
+  - id: f_PPWIIFBj8w
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Andrej_Karpathy"
+

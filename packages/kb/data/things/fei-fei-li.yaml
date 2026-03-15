@@ -1,0 +1,28 @@
+thing:
+  id: fei-fei-li
+  stableId: QzcX3bShmQ
+  type: person
+  name: "Fei-Fei Li"
+  numericId: "E1303"
+
+facts:
+  - id: f_RObNpFN8Eg
+    property: role
+    value: "Professor and Co-Director, Stanford HAI"
+
+  - id: f_Tz7Zi9bQUw
+    property: born-year
+    value: 1976
+
+  - id: f_QB41VrylJQ
+    property: notable-for
+    value: "Stanford professor; creator of ImageNet; co-director of Stanford Human-Centered AI Institute (HAI)"
+
+  - id: f_6jSJH4dKkg
+    property: education
+    value: "PhD in Electrical Engineering, Caltech"
+
+  - id: f_JTMGj07W7Q
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
+

@@ -1,0 +1,28 @@
+thing:
+  id: timnit-gebru
+  stableId: xVdjAKxCSQ
+  type: person
+  name: "Timnit Gebru"
+  numericId: "E1305"
+
+facts:
+  - id: f_M0qzQXcHlg
+    property: role
+    value: "Founder and Executive Director"
+
+  - id: f_uTUXxLBdtA
+    property: born-year
+    value: 1983
+
+  - id: f_3NUOYZSdQw
+    property: notable-for
+    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI team; AI ethics and fairness researcher"
+
+  - id: f_hfbDHNUaWg
+    property: education
+    value: "PhD in Computer Science, Stanford University"
+
+  - id: f_seF7GHtJYg
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Timnit_Gebru"
+

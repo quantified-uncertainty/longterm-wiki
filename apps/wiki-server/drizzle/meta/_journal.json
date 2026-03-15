@@ -645,6 +645,13 @@
       "when": 1776499200000,
       "tag": "0091_create_research_areas",
       "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1776585600000,
+      "tag": "0092_add_archive_url_and_fetch_method",
+      "breakpoints": true
     }
   ]
 }

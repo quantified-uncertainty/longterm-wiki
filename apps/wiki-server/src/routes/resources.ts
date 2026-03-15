@@ -55,6 +55,7 @@ interface ResourceSearchRow {
   stable_id: string | null;
   fetch_status: string | null;
   last_fetched_at: string | null;
+  archive_url: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -136,6 +137,7 @@ function resourceValues(d: ResourceInput) {
     fetchedAt: d.fetchedAt ? new Date(d.fetchedAt) : null,
     contentHash: d.contentHash ?? null,
     stableId: d.stableId ?? null,
+    archiveUrl: d.archiveUrl ?? null,
   };
 }
 
@@ -173,6 +175,7 @@ async function upsertResource(
         contentHash: sql`COALESCE(${vals.contentHash}, ${resources.contentHash})`,
         // stableId is generate-once: preserve existing, only set if row didn't have one
         stableId: sql`COALESCE(${resources.stableId}, ${vals.stableId})`,
+        archiveUrl: sql`COALESCE(${vals.archiveUrl}, ${resources.archiveUrl})`,
         updatedAt: sql`now()`,
       },
     })
@@ -238,6 +241,7 @@ function formatResource(r: typeof resources.$inferSelect) {
     stableId: r.stableId,
     fetchStatus: r.fetchStatus,
     lastFetchedAt: r.lastFetchedAt,
+    archiveUrl: r.archiveUrl,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -372,7 +376,7 @@ const resourcesApp = new Hono()
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
           fetched_at, content_hash, stable_id,
-          fetch_status, last_fetched_at,
+          fetch_status, last_fetched_at, archive_url,
           created_at, updated_at,
           ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
         FROM resources
@@ -404,6 +408,7 @@ const resourcesApp = new Hono()
         stableId: r.stable_id,
         fetchStatus: r.fetch_status,
         lastFetchedAt: r.last_fetched_at,
+        archiveUrl: r.archive_url,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),
