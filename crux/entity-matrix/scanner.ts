@@ -212,6 +212,17 @@ function scanYamlEntityCount(meta: EntityTypeMeta): CellValue {
   return cell(count, "yaml_entity_count", `${count} in ${meta.yamlFile}.yaml`);
 }
 
+function scanBuildEntityCount(meta: EntityTypeMeta): CellValue {
+  const db = getDatabaseJson();
+  if (!db?.typedEntities) return naCell("database.json not available");
+
+  const count = db.typedEntities.filter(
+    (e: { entityType: string }) => e.entityType === meta.id,
+  ).length;
+
+  return cell(count, "build_entity_count", `${count} entities in database.json`);
+}
+
 function scanKbFactCount(meta: EntityTypeMeta): CellValue {
   if (!existsSync(KB_THINGS_DIR)) return naCell("KB things dir missing");
 
@@ -777,6 +788,7 @@ function scanGateChecks(meta: EntityTypeMeta): CellValue {
 const SCANNERS: Record<string, DimensionScanner> = {
   // Data Foundation
   yaml_entity_count: scanYamlEntityCount,
+  build_entity_count: scanBuildEntityCount,
   kb_fact_count: scanKbFactCount,
   db_table_exists: scanDbTableExists,
   field_completeness: scanFieldCompleteness,
@@ -864,8 +876,16 @@ export function scanMatrix(): MatrixSnapshot {
         totalWeight += dim.importance;
       }
     }
-    const aggregateScore =
-      totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+    // Apply coverage penalty: if <50% of dimensions are applicable,
+    // penalize the score proportionally. This prevents entities with
+    // very few applicable dimensions from scoring artificially high.
+    const totalPossibleWeight = DIMENSIONS.reduce((s, d) => s + d.importance, 0);
+    const coverageRatio = totalWeight / totalPossibleWeight;
+    const coveragePenalty = coverageRatio < 0.5
+      ? 0.6 + (coverageRatio / 0.5) * 0.4  // Scale from 0.6 to 1.0
+      : 1.0;
+    const rawScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
+    const aggregateScore = Math.round(rawScore * coveragePenalty);
 
     // Compute group scores
     const groupScores: Record<string, number> = {};

@@ -74,6 +74,15 @@ export const DIMENSIONS: DimensionDef[] = [
     importance: 7,
   },
   {
+    id: "build_entity_count",
+    label: "Build Entities",
+    group: "data-foundation",
+    description: "Count of entities in database.json (YAML + MDX-derived)",
+    detection: "build-data",
+    valueType: "count",
+    importance: 7,
+  },
+  {
     id: "kb_fact_count",
     label: "KB Facts",
     group: "data-foundation",
@@ -646,9 +655,9 @@ export function scoreCount(
   return 100;
 }
 
-/** Score a boolean value (true = 100, false = 0). */
+/** Score a boolean value (true = 80, false = 0). Existence is necessary but not sufficient. */
 export function scoreBoolean(value: boolean): number {
-  return value ? 100 : 0;
+  return value ? 80 : 0;
 }
 
 /** Score a percentage directly (0-100). */
@@ -672,9 +681,11 @@ export function scoreDimension(dimensionId: string, raw: unknown): number {
   switch (dimensionId) {
     // Data Foundation
     case "yaml_entity_count":
-      return scoreCount(raw as number, { yellow: 5, green: 20 });
+      return scoreCount(raw as number, { yellow: 10, green: 50 });
+    case "build_entity_count":
+      return scoreCount(raw as number, { yellow: 10, green: 50 });
     case "kb_fact_count":
-      return scoreCount(raw as number, { yellow: 5, green: 15 });
+      return scoreCount(raw as number, { yellow: 10, green: 30 });
     case "db_table_exists":
       return scoreBoolean(raw as boolean);
     case "field_completeness":
@@ -712,24 +723,25 @@ export function scoreDimension(dimensionId: string, raw: unknown): number {
     case "profile_route":
       return scoreBoolean(raw as boolean);
     case "profile_sections":
-      return scoreCount(raw as number, { yellow: 2, green: 5 });
+      return scoreCount(raw as number, { yellow: 3, green: 8 });
     case "wiki_page_shell":
     case "infobox":
       return scoreBoolean(raw as boolean);
 
     // Content
     case "mdx_page_count":
-      return scoreCount(raw as number, { yellow: 5, green: 20 });
+      return scoreCount(raw as number, { yellow: 10, green: 40 });
     case "avg_page_length":
-      return scoreCount(raw as number, { yellow: 300, green: 800 });
+      return scoreCount(raw as number, { yellow: 500, green: 1500 });
     case "citation_density":
-      return scoreCount(raw as number, { yellow: 2, green: 5 });
+      return scoreCount(raw as number, { yellow: 3, green: 8 });
     case "content_freshness":
       // Lower is better: days since edit
       if ((raw as number) <= 0) return 0;
-      if ((raw as number) <= 90) return 100;
-      if ((raw as number) <= 365) return 50;
-      return 20;
+      if ((raw as number) <= 30) return 100;
+      if ((raw as number) <= 90) return 70;
+      if ((raw as number) <= 180) return 40;
+      return 15;
 
     // Quality
     case "verification_tables":
