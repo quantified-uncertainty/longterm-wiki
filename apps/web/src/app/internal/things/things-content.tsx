@@ -53,10 +53,24 @@ interface DashboardData {
 // Non-entity types have PG primary keys as sourceId, which don't match
 // the KB record keys that detail pages expect. For those, use sourceUrl.
 
+// Types where sourceId matches the detail page URL param.
+// Resources: sourceId = PG hash ID, resolveResource() looks up by hash ID ✓
+// Other types (grants, divisions, etc.): sourceId = PG stableId, but detail
+// pages use KB record keys — these DON'T match, so we can't link to them.
+const TYPES_WITH_DETAIL_PAGES: Record<string, string> = {
+  resource: "/resources",
+};
+
 function resolveThingHref(item: ThingsApiItem): string | undefined {
   // Entities: sourceId is the entity slug → getEntityHref resolves correctly
   if (item.thingType === "entity") {
     return getEntityHref(item.sourceId);
+  }
+
+  // Types with working detail page links
+  const routePrefix = TYPES_WITH_DETAIL_PAGES[item.thingType];
+  if (routePrefix && item.sourceId) {
+    return `${routePrefix}/${encodeURIComponent(item.sourceId)}`;
   }
 
   // Facts: link to the parent entity's page (sourceId format: "entityId:factId")
@@ -69,7 +83,7 @@ function resolveThingHref(item: ThingsApiItem): string | undefined {
     }
   }
 
-  // All other types: use sourceUrl as external link if available
+  // Remaining types: use sourceUrl as external link if available
   if (item.sourceUrl) {
     return item.sourceUrl;
   }
