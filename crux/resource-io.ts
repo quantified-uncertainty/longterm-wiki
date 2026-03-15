@@ -40,6 +40,7 @@ interface SyncResource {
   contentHash: string | null;
   stableId: string | null;
   citedBy: string[] | null;
+  archiveUrl: string | null;
 }
 
 const SNAPSHOT_FILE = join(DATA_DIR, 'resources-snapshot.json');
@@ -85,6 +86,7 @@ interface PGResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  archiveUrl: string | null;
 }
 
 interface PGResourcesResponse {
@@ -117,6 +119,7 @@ function pgRowToResource(row: PGResourceRow, citedBy?: string[]): Resource {
     credibility_override: row.credibilityOverride ?? undefined,
     fetched_at: row.fetchedAt ?? undefined,
     content_hash: row.contentHash ?? undefined,
+    archive_url: row.archiveUrl ?? undefined,
   };
 }
 
@@ -221,6 +224,7 @@ function resourceToSyncPayload(r: Resource): SyncResource {
     // their value. The server-side COALESCE preserves existing stableIds.
     stableId: r.stable_id ?? generateId(),
     citedBy: r.cited_by ?? null,
+    archiveUrl: r.archive_url ?? null,
   };
 }
 

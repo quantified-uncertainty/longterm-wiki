@@ -2732,6 +2732,23 @@ async function main() {
   }
 
   // ==========================================================================
+  // Entity Completeness Matrix
+  // ==========================================================================
+  if (CONTENT_ONLY) {
+    console.log('Entity matrix: skipped (content-only scope)');
+  } else {
+    console.log('\nGenerating entity completeness matrix...');
+    const matrixResult = spawnSync('node', [
+      '--import', 'tsx/esm', '--no-warnings',
+      '../../crux/entity-matrix/generate.ts',
+    ], { encoding: 'utf-8', cwd: process.cwd() });
+    if (matrixResult.stdout) process.stdout.write(matrixResult.stdout);
+    if (matrixResult.status !== 0) {
+      console.warn('⚠ Entity matrix generation failed:', matrixResult.stderr?.slice(0, 200));
+    }
+  }
+
+  // ==========================================================================
   // Zod Schema Validation
   // ==========================================================================
   console.log('\n--- Zod Schema Validation ---');

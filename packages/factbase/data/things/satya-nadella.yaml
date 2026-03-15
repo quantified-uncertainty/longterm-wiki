@@ -1,0 +1,32 @@
+thing:
+  id: satya-nadella
+  stableId: 1L16qpyk5A
+  type: person
+  name: "Satya Nadella"
+  numericId: "E1290"
+
+facts:
+  - id: f_pBjLkYCEHw
+    property: employed-by
+    value: !ref OIY5gaPpBA
+
+  - id: f_bm8oddkoLA
+    property: role
+    value: "CEO"
+
+  - id: f_pKjP4VMnsg
+    property: born-year
+    value: 1967
+
+  - id: f_ogkKZjCfQg
+    property: notable-for
+    value: "CEO of Microsoft; led Microsoft's multi-billion dollar investment in OpenAI; shaped enterprise AI strategy"
+
+  - id: f_O4q4Gx1XHQ
+    property: education
+    value: "MS in Computer Science, University of Wisconsin-Milwaukee; MBA, University of Chicago"
+
+  - id: f_ZwHcneamiw
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Satya_Nadella"
+

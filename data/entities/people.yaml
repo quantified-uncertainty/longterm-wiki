@@ -1413,3 +1413,361 @@
     - title: White House Executive Order on AI
       url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
   lastUpdated: 2026-03
+
+- id: andrej-karpathy
+  stableId: Q9eaz6joHA
+  numericId: E1287
+  type: person
+  title: "Andrej Karpathy"
+  description: >
+    Andrej Karpathy is a computer scientist and AI researcher known for his work on deep learning and
+    computer vision. He was a founding member of OpenAI and later served as Senior Director of AI at
+    Tesla, leading the Autopilot computer vision team. He returned briefly to OpenAI in 2023 before
+    founding Eureka Labs, an AI education company. His educational content on neural networks has been
+    widely influential in the field.
+  customFields:
+    - label: Role
+      value: "Founder"
+  tags:
+    - ai
+
+- id: mustafa-suleyman
+  stableId: DBq1ddu8Mg
+  numericId: E1288
+  type: person
+  title: "Mustafa Suleyman"
+  description: >
+    Mustafa Suleyman co-founded DeepMind in 2010 and served as its head of Applied AI until 2019. He
+    later founded Inflection AI, which built the Pi conversational AI. In 2024, he joined Microsoft as
+    CEO of Microsoft AI, bringing most of the Inflection team. He is the author of 'The Coming Wave' on
+    AI risks and governance.
+  customFields:
+    - label: Role
+      value: "CEO of Microsoft AI"
+  tags:
+    - ai
+
+- id: jack-clark
+  stableId: YqSmRNVRAg
+  numericId: E1248
+  type: person
+  title: "Jack Clark"
+  description: >
+    Jack Clark is a co-founder of Anthropic and a prominent voice in AI policy. Before Anthropic, he
+    served as Policy Director at OpenAI. He writes the widely-read Import AI newsletter covering
+    developments in artificial intelligence. He has been influential in shaping discourse around AI
+    governance and safety policy.
+  customFields:
+    - label: Role
+      value: "Co-founder"
+  tags:
+    - ai
+
+- id: sam-mccandlish
+  stableId: ENl8sgChDQ
+  numericId: E1259
+  type: person
+  title: "Sam McCandlish"
+  description: >
+    Sam McCandlish is a co-founder of Anthropic. He is known for his foundational research on neural
+    scaling laws, co-authoring influential papers that demonstrated predictable relationships between
+    model size, data, and performance. Before Anthropic, he was a researcher at OpenAI.
+  customFields:
+    - label: Role
+      value: "Co-founder"
+  tags:
+    - ai
+
+- id: jared-kaplan
+  stableId: x16GL4gP2A
+  numericId: E1239
+  type: person
+  title: "Jared Kaplan"
+  description: >
+    Jared Kaplan is a co-founder of Anthropic and a professor of physics at Johns Hopkins University. He
+    is a co-author of the influential neural scaling laws papers that established predictable
+    relationships between compute, data, model size, and AI performance. His physics background brought
+    a rigorous quantitative approach to understanding deep learning.
+  customFields:
+    - label: Role
+      value: "Co-founder"
+  tags:
+    - ai
+
+- id: mira-murati
+  stableId: yiBasS5uXQ
+  numericId: E1289
+  type: person
+  title: "Mira Murati"
+  description: >
+    Mira Murati served as Chief Technology Officer at OpenAI from 2022 to 2024, overseeing the
+    development and launch of ChatGPT, DALL-E, and GPT-4. She briefly served as interim CEO during the
+    November 2023 leadership crisis. She departed OpenAI in September 2024 and is building a new AI
+    venture.
+  customFields:
+    - label: Role
+      value: "Founder"
+  tags:
+    - ai
+
+- id: satya-nadella
+  stableId: 1L16qpyk5A
+  numericId: E1290
+  type: person
+  title: "Satya Nadella"
+  description: >
+    Satya Nadella has been CEO of Microsoft since 2014. Under his leadership, Microsoft invested over
+    $13 billion in OpenAI and integrated AI across its product suite through Copilot. He played a
+    central role in the November 2023 OpenAI board crisis and has been a major force in shaping the
+    commercial AI landscape.
+  customFields:
+    - label: Role
+      value: "CEO"
+  tags:
+    - ai
+
+- id: sundar-pichai
+  stableId: APUqKVNaAA
+  numericId: E1291
+  type: person
+  title: "Sundar Pichai"
+  description: >
+    Sundar Pichai serves as CEO of both Google and its parent company Alphabet. He oversees Google
+    DeepMind and the development of the Gemini family of AI models. He has been a prominent voice on AI
+    governance, calling for regulation while pushing Google's AI capabilities forward.
+  customFields:
+    - label: Role
+      value: "CEO"
+  tags:
+    - ai
+
+- id: jensen-huang
+  stableId: So79iNy2sQ
+  numericId: E1292
+  type: person
+  title: "Jensen Huang"
+  description: >
+    Jensen Huang co-founded NVIDIA in 1993 and has served as its CEO since. Under his leadership,
+    NVIDIA's GPUs became the dominant hardware platform for training large AI models. NVIDIA's market
+    capitalization grew to over $3 trillion as AI compute demand surged. The company's hardware
+    dominance gives it significant influence over the pace and direction of AI development.
+  customFields:
+    - label: Role
+      value: "CEO"
+  tags:
+    - ai
+
+- id: mark-zuckerberg
+  stableId: OxXXTxtbrA
+  numericId: E1293
+  type: person
+  title: "Mark Zuckerberg"
+  description: >
+    Mark Zuckerberg is the founder and CEO of Meta Platforms. He has positioned Meta as a major AI
+    player through its open-source Llama model series and significant investments in AI research. His
+    advocacy for open-source AI models and open compute stands in contrast to the closed approaches of
+    OpenAI and Anthropic, making him a central figure in debates about AI openness and safety.
+  customFields:
+    - label: Role
+      value: "CEO"
+  tags:
+    - ai
+
+- id: katja-grace
+  stableId: t2wkJarnWQ
+  numericId: E1294
+  type: person
+  title: "Katja Grace"
+  description: >
+    Katja Grace is the founder of AI Impacts, a research organization that investigates questions about
+    the future of AI. She is known for conducting large-scale surveys of AI researchers about their
+    timeline predictions and for systematic analysis of arguments about AI risk and AI progress.
+  website: https://aiimpacts.org
+  customFields:
+    - label: Role
+      value: "Founder"
+  tags:
+    - ai
+
+- id: allan-dafoe
+  stableId: uNNO9uwEoA
+  numericId: E1295
+  type: person
+  title: "Allan Dafoe"
+  description: >
+    Allan Dafoe is VP of AI Policy at Google DeepMind and the founder of the Centre for the Governance
+    of AI (GovAI) at Oxford University. His research focuses on the governance challenges posed by
+    advanced AI systems, including international coordination, compute governance, and the strategic
+    dynamics of AI development.
+  customFields:
+    - label: Role
+      value: "VP of AI Policy"
+  tags:
+    - ai
+
+- id: victoria-krakovna
+  stableId: utxQdymSEg
+  numericId: E1296
+  type: person
+  title: "Victoria Krakovna"
+  description: >
+    Victoria Krakovna is a research scientist at Google DeepMind focused on AI safety, particularly
+    specification gaming and side effects avoidance. She is a co-founder of the Future of Life Institute
+    (FLI) and maintains a widely-referenced collection of examples of specification gaming in AI
+    systems.
+  website: https://vkrakovna.wordpress.com
+  customFields:
+    - label: Role
+      value: "Research Scientist"
+  tags:
+    - ai
+
+- id: rohin-shah
+  stableId: GAlcP90tvw
+  numericId: E1297
+  type: person
+  title: "Rohin Shah"
+  description: >
+    Rohin Shah is a research scientist at Google DeepMind working on AI alignment. He previously wrote
+    the influential Alignment Newsletter summarizing AI safety research. His work focuses on reward
+    learning, value alignment, and understanding the alignment problem from both technical and
+    conceptual perspectives.
+  customFields:
+    - label: Role
+      value: "Research Scientist"
+  tags:
+    - ai
+
+- id: richard-ngo
+  stableId: FB9xXKFuqg
+  numericId: E1298
+  type: person
+  title: "Richard Ngo"
+  description: >
+    Richard Ngo is an AI governance researcher who has worked at both OpenAI and Google DeepMind. He has
+    written influential essays on AI alignment, the case for AI risk, and AGI safety. He is known for
+    his clear, accessible writing on technical AI safety topics and his engagement with the broader AI
+    safety discourse.
+  customFields:
+    - label: Role
+      value: "AI Governance Researcher"
+  tags:
+    - ai
+
+- id: jacob-steinhardt
+  stableId: C20cHdGiHQ
+  numericId: E1299
+  type: person
+  title: "Jacob Steinhardt"
+  description: >
+    Jacob Steinhardt is an assistant professor of statistics at UC Berkeley. His research focuses on
+    making machine learning systems more reliable and safe, including work on distribution shift,
+    adversarial robustness, and AI forecasting. He runs forecasting contests on AI capabilities that
+    have been influential in calibrating expectations about AI progress.
+  website: https://jsteinhardt.stat.berkeley.edu
+  customFields:
+    - label: Role
+      value: "Assistant Professor"
+  tags:
+    - ai
+
+- id: scott-alexander
+  stableId: ykTqvdkiLQ
+  numericId: E1308
+  type: person
+  title: "Scott Alexander"
+  description: >
+    Scott Alexander is a psychiatrist and writer behind Astral Codex Ten (ACT), one of the most
+    widely-read blogs in the rationalist and effective altruism communities. His writing on AI risk,
+    prediction markets, and related topics has been influential in shaping discourse around AI safety.
+    He also runs ACX Grants, funding small projects in EA and rationality.
+  website: https://www.astralcodexten.com
+  customFields:
+    - label: Role
+      value: "Writer"
+  tags:
+    - ai
+
+- id: luke-muehlhauser
+  stableId: TclWePCJ7w
+  numericId: E1306
+  type: person
+  title: "Luke Muehlhauser"
+  description: >
+    Luke Muehlhauser served as Executive Director of the Machine Intelligence Research Institute (MIRI)
+    from 2012 to 2015, during a period of significant growth. He subsequently joined GiveWell and Open
+    Philanthropy, where he researched AI risk and helped shape Open Philanthropy's AI safety grantmaking
+    strategy. His writings on AI timelines and existential risk have been influential in the effective
+    altruism community.
+  customFields:
+    - label: Role
+      value: "Independent Researcher"
+  tags:
+    - ai
+
+- id: andrew-ng
+  stableId: v13BF4zP2A
+  numericId: E1307
+  type: person
+  title: "Andrew Ng"
+  description: >
+    Andrew Ng is one of the most prominent figures in AI education and research. He co-founded Google
+    Brain, served as Chief Scientist at Baidu, and co-founded Coursera. His online courses have taught
+    millions of people machine learning. He has been vocal about AI policy, generally advocating against
+    heavy-handed regulation while supporting safety measures.
+  website: https://www.andrewng.org
+  customFields:
+    - label: Role
+      value: "Founder"
+  tags:
+    - ai
+
+- id: fei-fei-li
+  stableId: QzcX3bShmQ
+  numericId: E1303
+  type: person
+  title: "Fei-Fei Li"
+  description: >
+    Fei-Fei Li is the Sequoia Professor of Computer Science at Stanford University and co-director of
+    the Stanford Human-Centered AI Institute (HAI). She created ImageNet, the large-scale visual
+    recognition dataset that catalyzed the deep learning revolution. She has been a leading voice on
+    human-centered AI development and served as Google Cloud's Chief Scientist of AI/ML.
+  customFields:
+    - label: Role
+      value: "Professor and Co-Director, Stanford HAI"
+  tags:
+    - ai
+
+- id: david-krueger
+  stableId: ATFBoSnuqA
+  numericId: E1304
+  type: person
+  title: "David Krueger"
+  description: >
+    David Krueger is an assistant professor at the University of Cambridge working on AI alignment and
+    safety. His research focuses on understanding and mitigating risks from advanced AI, including work
+    on goal misgeneralization, deceptive alignment, and the theoretical foundations of AI safety. He has
+    been active in organizing AI safety research community events.
+  website: https://www.davidscottkrueger.com
+  customFields:
+    - label: Role
+      value: "Assistant Professor"
+  tags:
+    - ai
+
+- id: timnit-gebru
+  stableId: xVdjAKxCSQ
+  numericId: E1305
+  type: person
+  title: "Timnit Gebru"
+  description: >
+    Timnit Gebru is the founder and executive director of the Distributed AI Research Institute (DAIR).
+    She previously co-led Google's Ethical AI team until her departure in 2020 amid controversy over a
+    paper on large language model risks. Her research on algorithmic bias, data documentation, and AI
+    ethics has been highly influential in shaping discussions about AI fairness and accountability.
+  customFields:
+    - label: Role
+      value: "Founder and Executive Director"
+  tags:
+    - ai
+

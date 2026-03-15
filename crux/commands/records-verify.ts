@@ -469,6 +469,83 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
   }
 }
 
+/** Maps record type to things source_table name */
+const RECORD_TYPE_TO_SOURCE_TABLE: Record<string, string> = {
+  grant: 'grants',
+  personnel: 'personnel',
+  division: 'divisions',
+  'funding-program': 'funding_programs',
+  'funding-round': 'funding_rounds',
+  investment: 'investments',
+  'equity-position': 'equity_positions',
+};
+
+/** Cache of (sourceTable, sourceId) → thingId for verdict sync */
+const thingIdCache = new Map<string, string | null>();
+
+async function lookupThingId(recordType: RecordType, recordId: string): Promise<string | null> {
+  const cacheKey = `${recordType}:${recordId}`;
+  if (thingIdCache.has(cacheKey)) return thingIdCache.get(cacheKey) ?? null;
+
+  const sourceTable = RECORD_TYPE_TO_SOURCE_TABLE[recordType];
+  if (!sourceTable) return null;
+
+  // Use the things list API with type filter, then find by source match
+  const response = await apiRequest<{ things: Array<{ id: string; sourceTable: string; sourceId: string }> }>(
+    'GET',
+    `/api/things?thing_type=${encodeURIComponent(recordType)}&limit=1000&sort=title&order=asc`,
+  );
+
+  if (!response.ok || !response.data) {
+    thingIdCache.set(cacheKey, null);
+    return null;
+  }
+
+  // Warn if we hit the limit — results may be incomplete
+  if (response.data.things.length >= 1000) {
+    console.warn(
+      `[lookupThingId] Fetched 1000 items for ${recordType} — results may be truncated. ` +
+      `Consider implementing pagination if this entity type grows further.`,
+    );
+  }
+
+  // Cache all results for future lookups
+  for (const thing of response.data.things) {
+    const key = `${recordType}:${thing.sourceId}`;
+    thingIdCache.set(key, thing.id);
+  }
+
+  return thingIdCache.get(cacheKey) ?? null;
+}
+
+async function syncVerdictToThings(
+  recordType: RecordType,
+  recordId: string,
+  verdict: VerificationVerdict,
+  confidence: number,
+  reasoning: string,
+  sourcesChecked: number,
+): Promise<void> {
+  const thingId = await lookupThingId(recordType, recordId);
+  if (!thingId) return;
+
+  const response = await apiRequest<{ thingId: string }>(
+    'POST',
+    '/api/things/verdicts',
+    {
+      thingId,
+      verdict,
+      confidence,
+      reasoning,
+      sourcesChecked,
+    },
+  );
+
+  if (!response.ok) {
+    console.warn(`[verify] Failed to sync verdict to things for ${recordType}/${recordId}: ${response.error}`);
+  }
+}
+
 async function storeAggregateVerdict(
   recordType: RecordType,
   recordId: string,
@@ -495,6 +572,12 @@ async function storeAggregateVerdict(
   if (!response.ok) {
     console.warn(`[verify] Failed to store verdict for ${recordType}/${recordId}: ${response.error}`);
   }
+
+  // Also sync to the things table so verdicts appear on the Things dashboard
+  await syncVerdictToThings(recordType, recordId, verdict, confidence, reasoning, sourcesChecked)
+    .catch((e: unknown) => {
+      console.warn(`[verify] Things sync failed: ${e instanceof Error ? e.message : String(e)}`);
+    });
 }
 
 // ── Stats command ────────────────────────────────────────────────────
@@ -550,6 +633,92 @@ async function statsCommand(): Promise<CommandResult> {
   return { exitCode: 0, output: lines.join('\n') };
 }
 
+// ── Sync-things command ──────────────────────────────────────────────
+
+async function syncThingsCommand(): Promise<CommandResult> {
+  // Fetch all existing record verdicts with pagination
+  const allVerdicts: Array<{
+    recordType: string;
+    recordId: string;
+    verdict: string;
+    confidence: number | null;
+    reasoning: string | null;
+    sourcesChecked: number | null;
+  }> = [];
+
+  const PAGE_SIZE = 200;
+  let offset = 0;
+
+  while (true) {
+    const response = await apiRequest<{
+      verdicts: Array<{
+        recordType: string;
+        recordId: string;
+        verdict: string;
+        confidence: number | null;
+        reasoning: string | null;
+        sourcesChecked: number | null;
+      }>;
+      total: number;
+    }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+
+    if (!response.ok || !response.data) {
+      return { exitCode: 1, output: `Failed to fetch verdicts: ${response.error}` };
+    }
+
+    allVerdicts.push(...response.data.verdicts);
+
+    if (response.data.verdicts.length < PAGE_SIZE || allVerdicts.length >= response.data.total) {
+      break;
+    }
+    offset += PAGE_SIZE;
+  }
+
+  const verdicts = allVerdicts;
+  if (verdicts.length === 0) {
+    return { exitCode: 0, output: 'No record verdicts to sync.' };
+  }
+
+  console.log(`Syncing ${verdicts.length} verdict(s) to things table...`);
+
+  let synced = 0;
+  let failed = 0;
+
+  for (const v of verdicts) {
+    const recordType = v.recordType as RecordType;
+    const thingId = await lookupThingId(recordType, v.recordId);
+    if (!thingId) {
+      failed++;
+      continue;
+    }
+
+    const result = await apiRequest<{ thingId: string }>(
+      'POST',
+      '/api/things/verdicts',
+      {
+        thingId,
+        verdict: v.verdict,
+        confidence: v.confidence ?? undefined,
+        reasoning: v.reasoning ?? undefined,
+        sourcesChecked: v.sourcesChecked ?? 0,
+      },
+    );
+
+    if (result.ok) {
+      synced++;
+      console.log(`  synced ${v.recordType}/${v.recordId} → ${thingId} (${v.verdict})`);
+    } else {
+      failed++;
+      console.warn(`  failed ${v.recordType}/${v.recordId}: ${result.error}`);
+    }
+  }
+
+  return {
+    exitCode: 0,
+    output: `\nSynced ${synced} verdict(s) to things table. ${failed} failed/skipped.`,
+  };
+}
+
 // ── Main command ─────────────────────────────────────────────────────
 
 export async function recordsVerifyCommand(
@@ -561,6 +730,11 @@ export async function recordsVerifyCommand(
   // Stats subcommand
   if (subcommand === 'stats') {
     return statsCommand();
+  }
+
+  // Sync-things subcommand
+  if (subcommand === 'sync-things') {
+    return syncThingsCommand();
   }
 
   const isDryRun = options['dry-run'] || options.dryRun;
@@ -804,6 +978,7 @@ Record Verification — verify structured data against source URLs
 Usage:
   crux verify <type>              Verify all records of a type with source URLs
   crux verify stats               Show verification coverage report
+  crux verify sync-things         Sync existing verdicts to the Things dashboard
   crux verify grants              Verify all grants
   crux verify personnel           Verify all personnel records
   crux verify divisions           Verify all divisions
@@ -825,5 +1000,6 @@ Examples:
   crux verify stats                        Show verification coverage
   crux verify grants --limit=5             Verify 5 grants
   crux verify --dry-run                    Preview all record types
+  crux verify sync-things                  Push all verdicts to Things dashboard
 `;
 }

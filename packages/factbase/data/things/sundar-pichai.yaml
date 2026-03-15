@@ -1,0 +1,28 @@
+thing:
+  id: sundar-pichai
+  stableId: APUqKVNaAA
+  type: person
+  name: "Sundar Pichai"
+  numericId: "E1291"
+
+facts:
+  - id: f_jlUhiO2JNg
+    property: role
+    value: "CEO"
+
+  - id: f_6X5fU4J1hQ
+    property: born-year
+    value: 1972
+
+  - id: f_F6CMdX41GQ
+    property: notable-for
+    value: "CEO of Google and Alphabet; oversees Google DeepMind and Gemini AI development"
+
+  - id: f_TXjPh03EzA
+    property: education
+    value: "MS in Engineering, Stanford University; MBA, Wharton School"
+
+  - id: f_wDkX9vRf2A
+    property: wikipedia-url
+    value: "https://en.wikipedia.org/wiki/Sundar_Pichai"
+

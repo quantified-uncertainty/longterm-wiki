@@ -1,6 +1,6 @@
 /**
  * Shared utilities for entity directory and profile pages (/people, /organizations).
- * NOTE: This file imports server-only modules (@/data/kb). Do NOT import from client components.
+ * NOTE: This file imports server-only modules (@/data/factbase). Do NOT import from client components.
  * For client-safe formatting, import from @/lib/format-compact instead.
  */
 

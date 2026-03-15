@@ -220,6 +220,8 @@ export const UpsertCitationContentSchema = z.object({
   fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional(),
   contentLength: z.number().int().nullable().optional(),
   contentHash: z.string().max(64).nullable().optional(),
+  /** How content was fetched: firecrawl, built-in, youtube-transcript, abstract */
+  fetchMethod: z.string().max(50).nullable().optional(),
 });
 export type UpsertCitationContent = z.infer<typeof UpsertCitationContentSchema>;
 
@@ -236,6 +238,7 @@ export interface CitationContentRow {
   fullText: string | null;
   contentLength: number | null;
   contentHash: string | null;
+  fetchMethod: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -565,6 +568,8 @@ export const UpsertResourceSchema = z.object({
   contentHash: z.string().max(200).nullable().optional(),
   stableId: z.string().max(20).nullable().optional(),
   citedBy: z.array(z.string().min(1).max(200)).max(500).nullable().optional(),
+  /** Wayback Machine archive URL */
+  archiveUrl: z.string().url().max(2000).nullable().optional(),
 });
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 
@@ -598,6 +603,7 @@ export interface ResourceRow {
   contentHash: string | null;
   fetchStatus: "ok" | "dead" | "paywall" | "error" | null;
   lastFetchedAt: string | null;
+  archiveUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,8 +1,65 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResearchAreasFromPG } from "@/data/tablebase";
-import { CLUSTER_COLORS, STATUS_COLORS, formatCluster, formatFunding } from "../research-area-constants";
+import { getResearchAreasFromPG, getEntityById } from "@/data/tablebase";
+import { getEntityHref } from "@/data/entity-nav";
+import {
+  CLUSTER_COLORS,
+  STATUS_COLORS,
+  formatCluster,
+  formatFunding,
+} from "../research-area-constants";
+import { fetchFromWikiServer } from "@/lib/wiki-server";
+
+// ---------------------------------------------------------------------------
+// Types for the enriched detail response from wiki-server
+// ---------------------------------------------------------------------------
+
+interface AreaDetailGrant {
+  id: string;
+  name: string;
+  amount: number | null;
+  date: string | null;
+  organizationId: string;
+  granteeId: string | null;
+  confidence: number | null;
+}
+
+interface AreaDetailFundingByOrg {
+  organizationId: string;
+  grantCount: number;
+  totalAmount: string;
+}
+
+interface AreaDetailPaper {
+  id: number;
+  resourceId: string | null;
+  title: string;
+  url: string | null;
+  authors: string | null;
+  publishedDate: string | null;
+  citationCount: number | null;
+  isSeminal: boolean;
+  sortOrder: number;
+  notes: string | null;
+}
+
+interface AreaDetailOrg {
+  organizationId: string;
+  role: string;
+  notes: string | null;
+}
+
+interface AreaDetailResponse {
+  grants: AreaDetailGrant[];
+  fundingByOrg: AreaDetailFundingByOrg[];
+  papers: AreaDetailPaper[];
+  organizations: AreaDetailOrg[];
+}
+
+// ---------------------------------------------------------------------------
+// Data helpers
+// ---------------------------------------------------------------------------
 
 function getAreaBySlug(slug: string) {
   return getResearchAreasFromPG().find((a) => a.id === slug) ?? null;
@@ -11,6 +68,23 @@ function getAreaBySlug(slug: string) {
 function getAllSlugs(): string[] {
   return getResearchAreasFromPG().map((a) => a.id);
 }
+
+function resolveEntityName(id: string): string {
+  const entity = getEntityById(id);
+  return entity?.title ?? id;
+}
+
+function resolveEntityLink(id: string): { name: string; href: string | null } {
+  const entity = getEntityById(id);
+  return {
+    name: entity?.title ?? id,
+    href: entity ? getEntityHref(id) : null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Static generation
+// ---------------------------------------------------------------------------
 
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
@@ -29,6 +103,10 @@ export async function generateMetadata({
   };
 }
 
+// ---------------------------------------------------------------------------
+// Page component
+// ---------------------------------------------------------------------------
+
 export default async function ResearchAreaDetailPage({
   params,
 }: {
@@ -38,12 +116,23 @@ export default async function ResearchAreaDetailPage({
   const area = getAreaBySlug(slug);
   if (!area) return notFound();
 
-  // Find child areas
+  // Find child areas from build-time data
   const allAreas = getResearchAreasFromPG();
   const children = allAreas.filter((a) => a.parentAreaId === area.id);
   const parent = area.parentAreaId
     ? allAreas.find((a) => a.id === area.parentAreaId)
     : null;
+
+  // Fetch rich detail from wiki-server (ISR, 5 min revalidation)
+  const detail = await fetchFromWikiServer<AreaDetailResponse>(
+    `/api/research-areas/${slug}`,
+    { revalidate: 300 }
+  );
+
+  const grants = detail?.grants ?? [];
+  const fundingByOrg = detail?.fundingByOrg ?? [];
+  const papers = detail?.papers ?? [];
+  const organizations = detail?.organizations ?? [];
 
   const stats = [
     { label: "Organizations", value: String(area.orgCount) },
@@ -120,7 +209,9 @@ export default async function ResearchAreaDetailPage({
 
       {/* Stat cards */}
       {stats.length > 0 && (
-        <div className={`grid grid-cols-2 gap-3 mb-8 ${stats.length >= 4 ? "sm:grid-cols-4" : stats.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+        <div
+          className={`grid grid-cols-2 gap-3 mb-8 ${stats.length >= 4 ? "sm:grid-cols-4" : stats.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+        >
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -183,6 +274,224 @@ export default async function ResearchAreaDetailPage({
         </div>
       )}
 
+      {/* Organizations */}
+      {organizations.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Organizations
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {organizations.length}
+            </span>
+          </h2>
+          <div className="border border-border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                  <th className="py-2.5 px-3 text-left font-medium">
+                    Organization
+                  </th>
+                  <th className="py-2.5 px-3 text-left font-medium">Role</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {organizations.map((org) => {
+                  const resolved = resolveEntityLink(org.organizationId);
+                  return (
+                    <tr
+                      key={org.organizationId}
+                      className="hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="py-2.5 px-3">
+                        {resolved.href ? (
+                          <Link
+                            href={resolved.href}
+                            className="font-medium hover:text-primary transition-colors"
+                          >
+                            {resolved.name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{resolved.name}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground capitalize">
+                        {org.role}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Grants */}
+      {grants.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Grants
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {area.grantCount > grants.length
+                ? `Top ${grants.length} of ${area.grantCount}`
+                : grants.length}
+            </span>
+          </h2>
+          <div className="border border-border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                  <th className="py-2.5 px-3 text-left font-medium">Name</th>
+                  <th className="py-2.5 px-3 text-left font-medium">
+                    Recipient
+                  </th>
+                  <th className="py-2.5 px-3 text-right font-medium">
+                    Amount
+                  </th>
+                  <th className="py-2.5 px-3 text-left font-medium">Funder</th>
+                  <th className="py-2.5 px-3 text-left font-medium">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {grants.map((grant) => {
+                  const funder = resolveEntityName(grant.organizationId);
+                  const grantee = grant.granteeId
+                    ? resolveEntityName(grant.granteeId)
+                    : null;
+                  return (
+                    <tr
+                      key={grant.id}
+                      className="hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="py-2.5 px-3 max-w-[20rem]">
+                        <span className="line-clamp-1">{grant.name}</span>
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        {grantee ?? "-"}
+                      </td>
+                      <td className="py-2.5 px-3 text-right tabular-nums">
+                        {grant.amount
+                          ? formatFunding(String(grant.amount))
+                          : "-"}
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        {funder}
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        {grant.date ?? "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Funding by Funder */}
+      {fundingByOrg.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Funding by Funder
+          </h2>
+          <div className="border border-border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                  <th className="py-2.5 px-3 text-left font-medium">Funder</th>
+                  <th className="py-2.5 px-3 text-right font-medium">
+                    Grants
+                  </th>
+                  <th className="py-2.5 px-3 text-right font-medium">
+                    Total Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {fundingByOrg.map((f) => {
+                  const resolved = resolveEntityLink(f.organizationId);
+                  return (
+                    <tr
+                      key={f.organizationId}
+                      className="hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="py-2.5 px-3">
+                        {resolved.href ? (
+                          <Link
+                            href={resolved.href}
+                            className="font-medium hover:text-primary transition-colors"
+                          >
+                            {resolved.name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{resolved.name}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-right tabular-nums">
+                        {f.grantCount}
+                      </td>
+                      <td className="py-2.5 px-3 text-right tabular-nums">
+                        {formatFunding(f.totalAmount)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Key Papers / Resources */}
+      {papers.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Key Papers &amp; Resources
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {papers.length}
+            </span>
+          </h2>
+          <div className="space-y-2">
+            {papers.map((paper) => (
+              <div
+                key={paper.id}
+                className="px-4 py-3 rounded-lg border border-border/60 bg-card"
+              >
+                <div className="flex items-start gap-2">
+                  {paper.isSeminal && (
+                    <span className="mt-0.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                      SEMINAL
+                    </span>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    {paper.url ? (
+                      <a
+                        href={paper.url}
+                        className="font-medium text-sm hover:text-primary transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {paper.title}
+                      </a>
+                    ) : (
+                      <span className="font-medium text-sm">{paper.title}</span>
+                    )}
+                    <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+                      {paper.authors && <span>{paper.authors}</span>}
+                      {paper.publishedDate && <span>{paper.publishedDate}</span>}
+                      {paper.citationCount != null &&
+                        paper.citationCount > 0 && (
+                          <span>{paper.citationCount} citations</span>
+                        )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Child areas */}
       {children.length > 0 && (
         <section className="mb-8">
@@ -199,7 +508,9 @@ export default async function ResearchAreaDetailPage({
                   <th className="py-2.5 px-3 text-left font-medium">Name</th>
                   <th className="py-2.5 px-3 text-left font-medium">Status</th>
                   <th className="py-2.5 px-3 text-right font-medium">Orgs</th>
-                  <th className="py-2.5 px-3 text-right font-medium">Papers</th>
+                  <th className="py-2.5 px-3 text-right font-medium">
+                    Papers
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">

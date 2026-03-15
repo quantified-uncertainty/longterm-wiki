@@ -609,6 +609,7 @@ const citationsApp = new Hono()
       fullText: d.fullText ?? null,
       contentLength: d.contentLength ?? null,
       contentHash: d.contentHash ?? null,
+      fetchMethod: d.fetchMethod ?? null,
     };
 
     await db

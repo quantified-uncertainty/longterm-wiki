@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isRisk } from "@/data";
 import { titleCase } from "@/components/wiki/factbase/format";
@@ -66,7 +67,9 @@ export default function RisksPage() {
         ))}
       </div>
 
-      <RisksTable rows={rows} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <RisksTable rows={rows} />
+      </Suspense>
     </div>
   );
 }

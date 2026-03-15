@@ -1,0 +1,28 @@
+thing:
+  id: jacob-steinhardt
+  stableId: C20cHdGiHQ
+  type: person
+  name: "Jacob Steinhardt"
+  numericId: "E1299"
+
+facts:
+  - id: f_3RwfPS8yPQ
+    property: role
+    value: "Assistant Professor"
+
+  - id: f_lBbGuQqwmg
+    property: born-year
+    value: 1989
+
+  - id: f_r8MSWiNrLQ
+    property: notable-for
+    value: "UC Berkeley professor working on AI safety and robustness; leads the Steinhardt Group; runs AI forecasting contests"
+
+  - id: f_TtoXYolaog
+    property: education
+    value: "PhD in Computer Science, Stanford University"
+
+  - id: f_VzmoBlD3AA
+    property: website
+    value: "https://jsteinhardt.stat.berkeley.edu"
+

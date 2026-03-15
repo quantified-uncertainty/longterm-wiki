@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { getEntityById, getEntityHref, getPageById } from "@data";
+import { getEntityById, getEntityHref, getPageById, getDirectoryHref } from "@data";
 import { getEntityTypeIcon } from "./EntityTypeIcon";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
@@ -49,6 +49,8 @@ export function EntityLink({
   const page = getPageById(id);
 
   const href = getEntityHref(id, entity?.type);
+  // Check if a reachable page exists (either a directory page or a wiki page with MDX content)
+  const hasReachablePage = !!getDirectoryHref(id) || !!page;
 
   const displayLabel = children || label || entity?.title || formatIdAsTitle(id);
   const IconComponent = showIcon && entity ? getEntityTypeIcon(entity.type) : null;
@@ -59,6 +61,22 @@ export function EntityLink({
   const summary = page?.llmSummary || page?.description || entity?.description;
   const entityType = entity?.type;
   const TypeIconComponent = entity ? getEntityTypeIcon(entity.type) : null;
+
+  // If no reachable page exists, render as plain styled text (no link)
+  if (!hasReachablePage) {
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 px-2 py-0.5 bg-muted/50 rounded text-sm text-muted-foreground",
+          className
+        )}
+        title={entity?.title || formatIdAsTitle(id)}
+      >
+        {IconComponent && <IconComponent className="w-3 h-3" />}
+        <span>{displayLabel}</span>
+      </span>
+    );
+  }
 
   if (summary || entityType) {
     return (

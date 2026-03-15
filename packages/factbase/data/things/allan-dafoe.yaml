@@ -1,0 +1,20 @@
+thing:
+  id: allan-dafoe
+  stableId: uNNO9uwEoA
+  type: person
+  name: "Allan Dafoe"
+  numericId: "E1295"
+
+facts:
+  - id: f_6datGmST5Q
+    property: role
+    value: "VP of AI Policy"
+
+  - id: f_xXooK78TVw
+    property: notable-for
+    value: "VP of AI Policy at Google DeepMind; founder of the Centre for the Governance of AI (GovAI); leading AI governance researcher"
+
+  - id: f_NPUNFvYj4A
+    property: education
+    value: "PhD in Political Science, Yale University"
+

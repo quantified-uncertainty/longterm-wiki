@@ -522,6 +522,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       fullText: null,
       contentLength,
       contentHash,
+      fetchMethod: null,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
