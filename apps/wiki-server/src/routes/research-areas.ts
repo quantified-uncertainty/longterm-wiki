@@ -17,9 +17,6 @@ import {
   researchAreaRisks,
   grantResearchAreas,
   grants,
-  resourceCitations,
-  resources,
-  wikiPages,
 } from "../schema.js";
 
 // ---- Constants ----
@@ -620,13 +617,16 @@ const researchAreasApp = new Hono()
         r.id,
         COALESCE(r.title, 'Untitled'),
         r.url,
-        CASE WHEN r.authors IS NOT NULL THEN r.authors::text END,
+        CASE WHEN r.authors IS NOT NULL
+          THEN array_to_string(ARRAY(SELECT jsonb_array_elements_text(r.authors)), ', ')
+        END,
         r.published_date::text,
         0
       FROM research_areas ra
       JOIN wiki_pages wp ON ra.numeric_id = wp.numeric_id AND ra.numeric_id IS NOT NULL
       JOIN resource_citations rc ON rc.page_id_old = wp.id
       JOIN resources r ON rc.resource_id = r.id
+      WHERE r.url IS NOT NULL
       ON CONFLICT (research_area_id, url) WHERE url IS NOT NULL DO NOTHING
     `);
 

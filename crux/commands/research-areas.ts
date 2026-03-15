@@ -119,7 +119,7 @@ async function linkGrants(dryRun: boolean): Promise<void> {
   console.log("Matching grants to research areas...");
   const allLinks: GrantLink[] = [];
   let matchedGrants = 0;
-  let unmatchedGrants = 0;
+  const unmatchedGrantsList: GrantForMatching[] = [];
   const areaCounts = new Map<string, { count: number; totalFunding: number }>();
 
   for (const grant of allGrants) {
@@ -145,18 +145,19 @@ async function linkGrants(dryRun: boolean): Promise<void> {
         areaCounts.set(match.researchAreaId, existing);
       }
     } else {
-      unmatchedGrants++;
+      unmatchedGrantsList.push(grant);
     }
   }
 
   // 3. Print summary
   console.log("\n=== Matching Results ===");
   console.log(`  Grants matched:    ${matchedGrants}`);
-  console.log(`  Grants unmatched:  ${unmatchedGrants}`);
+  console.log(`  Grants unmatched:  ${unmatchedGrantsList.length}`);
   console.log(`  Total links:       ${allLinks.length}`);
-  console.log(
-    `  Coverage:          ${((matchedGrants / allGrants.length) * 100).toFixed(1)}%\n`
-  );
+  const coveragePct = allGrants.length > 0
+    ? ((matchedGrants / allGrants.length) * 100).toFixed(1)
+    : "0.0";
+  console.log(`  Coverage:          ${coveragePct}%\n`);
 
   // Show per-area breakdown
   const sorted = [...areaCounts.entries()].sort((a, b) => b[1].count - a[1].count);
@@ -171,17 +172,13 @@ async function linkGrants(dryRun: boolean): Promise<void> {
   console.log("");
 
   // Show sample of unmatched grants (top 10 by amount)
-  const unmatched = allGrants
-    .filter(
-      (g) =>
-        matchResearchAreas({ name: g.name, description: g.notes }).length === 0
-    )
+  const unmatchedSample = unmatchedGrantsList
     .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
     .slice(0, 10);
 
-  if (unmatched.length > 0) {
+  if (unmatchedSample.length > 0) {
     console.log("Top 10 unmatched grants (by amount):");
-    for (const g of unmatched) {
+    for (const g of unmatchedSample) {
       const amt = g.amount ? `$${(g.amount / 1_000_000).toFixed(2)}M` : "N/A";
       console.log(`  ${amt.padStart(10)}  ${g.name.slice(0, 80)}`);
     }
@@ -423,7 +420,7 @@ async function discoverOrgs(dryRun: boolean): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Phase 5: Stats Command
+// Stats Command
 // ---------------------------------------------------------------------------
 
 async function showStats(): Promise<void> {
