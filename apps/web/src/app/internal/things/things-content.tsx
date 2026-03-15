@@ -64,15 +64,14 @@ const THING_DETAIL_ROUTES: Record<string, string> = {
 
 /**
  * Resolve the best internal href for any thing type.
- * Priority: dedicated detail page > entity page > sourceUrl > undefined
+ * Priority: dedicated detail page > entity page > undefined
  */
-function resolveThingHref(item: ThingsApiItem): string | undefined {
+function resolveThingHref(
+  item: ThingsApiItem,
+  thingMap: Map<string, ThingsApiItem>,
+): string | undefined {
   // Entities: use entity href resolution (handles directory pages, wiki pages)
   if (item.thingType === "entity") {
-    if (item.numericId) {
-      // Try directory href first via getEntityHref (which prefers directory URLs)
-      return getEntityHref(item.sourceId);
-    }
     return getEntityHref(item.sourceId);
   }
 
@@ -92,10 +91,12 @@ function resolveThingHref(item: ThingsApiItem): string | undefined {
     }
   }
 
-  // Benchmark results: link to parent benchmark
-  if (item.thingType === "benchmark-result" && item.sourceId) {
-    // sourceId is the benchmark_result PG ID; the title contains "model on benchmark: score"
-    // Try extracting benchmark ID from parentThingId later (handled in row building)
+  // Benchmark results: link to parent benchmark's detail page
+  if (item.thingType === "benchmark-result" && item.parentThingId) {
+    const parent = thingMap.get(item.parentThingId);
+    if (parent?.thingType === "benchmark" && parent.sourceId) {
+      return `/benchmarks/${encodeURIComponent(parent.sourceId)}`;
+    }
   }
 
   return undefined;
@@ -104,12 +105,32 @@ function resolveThingHref(item: ThingsApiItem): string | undefined {
 /**
  * Resolve the parent entity href for a thing using the loaded things map.
  * Walks the parent chain up to 3 levels to find the nearest entity ancestor.
+ * For facts (which lack parentThingId), parses the entity ID from sourceId.
  */
 function resolveParentEntityHref(
   item: ThingsApiItem,
   thingMap: Map<string, ThingsApiItem>,
   depth = 0,
 ): { title: string; href: string } | undefined {
+  // Facts encode entity ID in sourceId: "entityId:factId"
+  if (item.thingType === "fact" && !item.parentThingId && item.sourceId.includes(":")) {
+    const entityId = decodeURIComponent(item.sourceId.split(":")[0]);
+    // Find the entity thing in the loaded data
+    for (const t of thingMap.values()) {
+      if (t.thingType === "entity" && t.sourceId === entityId) {
+        return { title: t.title, href: getEntityHref(t.sourceId) };
+      }
+    }
+    // Entity not in loaded data — try direct resolution
+    try {
+      const href = getEntityHref(entityId);
+      // Use a readable title from the entity ID
+      return { title: entityId.replace(/-/g, " "), href };
+    } catch {
+      return undefined;
+    }
+  }
+
   if (depth > 3 || !item.parentThingId) return undefined;
 
   const parent = thingMap.get(item.parentThingId);
@@ -190,7 +211,7 @@ export async function ThingsContent() {
 
   // Build rows with hrefs for all thing types
   const rows: ThingRow[] = items.map((item) => {
-    const href = resolveThingHref(item);
+    const href = resolveThingHref(item, thingMap);
     const parentEntity = resolveParentEntityHref(item, thingMap);
 
     return {

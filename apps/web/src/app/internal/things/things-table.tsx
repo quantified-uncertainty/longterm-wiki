@@ -323,7 +323,7 @@ const columns: ColumnDef<ThingRow>[] = [
         return (
           <a
             href={thing.href}
-            className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[400px] truncate block inline-flex items-center gap-1"
+            className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[400px] truncate inline-flex items-center gap-1"
             title={thing.title}
             {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           >
