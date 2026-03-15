@@ -17,6 +17,9 @@ import {
   researchAreaRisks,
   grantResearchAreas,
   grants,
+  resourceCitations,
+  resources,
+  wikiPages,
 } from "../schema.js";
 
 // ---- Constants ----
@@ -88,6 +91,16 @@ const SyncPaperSchema = z.object({
       notes: z.string().max(2000).nullable().optional(),
     })
   ).min(1).max(500),
+});
+
+const SyncGrantLinkSchema = z.object({
+  items: z.array(
+    z.object({
+      grantId: z.string().min(1).max(10),
+      researchAreaId: z.string().min(1).max(200),
+      confidence: z.number().min(0).max(1).optional().default(0.5),
+    })
+  ).min(1).max(2000),
 });
 
 const SyncRiskLinkSchema = z.object({
@@ -278,7 +291,7 @@ const researchAreasApp = new Hono()
     }
 
     // Fetch related data in parallel
-    const [orgs, papers, risks, children] = await Promise.all([
+    const [orgs, papers, risks, children, topGrants, fundingByOrg] = await Promise.all([
       db
         .select()
         .from(researchAreaOrganizations)
@@ -296,6 +309,34 @@ const researchAreasApp = new Hono()
         .select()
         .from(researchAreas)
         .where(eq(researchAreas.parentAreaId, id)),
+      // Top grants by amount (up to 50)
+      db
+        .select({
+          id: grants.id,
+          name: grants.name,
+          amount: grants.amount,
+          date: grants.date,
+          organizationId: grants.organizationId,
+          granteeId: grants.granteeId,
+          confidence: grantResearchAreas.confidence,
+        })
+        .from(grantResearchAreas)
+        .innerJoin(grants, eq(grantResearchAreas.grantId, grants.id))
+        .where(eq(grantResearchAreas.researchAreaId, id))
+        .orderBy(sql`${grants.amount}::numeric DESC NULLS LAST`)
+        .limit(50),
+      // Funding breakdown by funder org
+      db
+        .select({
+          organizationId: grants.organizationId,
+          grantCount: count(),
+          totalAmount: sql<string>`COALESCE(SUM(${grants.amount}::numeric), 0)`,
+        })
+        .from(grantResearchAreas)
+        .innerJoin(grants, eq(grantResearchAreas.grantId, grants.id))
+        .where(eq(grantResearchAreas.researchAreaId, id))
+        .groupBy(grants.organizationId)
+        .orderBy(sql`COALESCE(SUM(${grants.amount}::numeric), 0) DESC`),
     ]);
 
     return c.json({
@@ -324,6 +365,20 @@ const researchAreasApp = new Hono()
         notes: r.notes,
       })),
       children: children.map(formatRow),
+      grants: topGrants.map((g) => ({
+        id: g.id,
+        name: g.name,
+        amount: g.amount != null ? Number(g.amount) : null,
+        date: g.date,
+        organizationId: g.organizationId,
+        granteeId: g.granteeId,
+        confidence: g.confidence,
+      })),
+      fundingByOrg: fundingByOrg.map((f) => ({
+        organizationId: f.organizationId,
+        grantCount: f.grantCount,
+        totalAmount: f.totalAmount,
+      })),
     });
   })
 
@@ -497,6 +552,85 @@ const researchAreasApp = new Hono()
       }
     });
 
+    return c.json({ inserted });
+  })
+
+  // ---- POST /sync-grant-links ----
+  .post("/sync-grant-links", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = SyncGrantLinkSchema.safeParse(body);
+    if (!parsed.success) {
+      return validationError(
+        c,
+        parsed.error.issues.map((i) => i.message).join(", ")
+      );
+    }
+
+    const db = getDrizzleDb();
+
+    // Bulk upsert using VALUES pattern
+    const { items } = parsed.data;
+    const now = new Date();
+    let upserted = 0;
+
+    // Process in chunks to avoid too-large SQL statements
+    const CHUNK_SIZE = 500;
+    for (let i = 0; i < items.length; i += CHUNK_SIZE) {
+      const chunk = items.slice(i, i + CHUNK_SIZE);
+      await db.transaction(async (tx) => {
+        for (const item of chunk) {
+          await tx
+            .insert(grantResearchAreas)
+            .values({
+              grantId: item.grantId,
+              researchAreaId: item.researchAreaId,
+              confidence: item.confidence,
+              createdAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [
+                grantResearchAreas.grantId,
+                grantResearchAreas.researchAreaId,
+              ],
+              set: {
+                confidence: item.confidence,
+              },
+            });
+          upserted++;
+        }
+      });
+    }
+
+    return c.json({ upserted });
+  })
+
+  // ---- POST /backfill-papers-from-citations ----
+  // Backfills research_area_papers from resource citations on wiki pages
+  // linked to research areas via numeric_id.
+  .post("/backfill-papers-from-citations", async (c) => {
+    const db = getDrizzleDb();
+
+    // Use raw SQL for the complex join + insert
+    const result = await db.execute(sql`
+      INSERT INTO research_area_papers (research_area_id, resource_id, title, url, authors, published_date, sort_order)
+      SELECT
+        ra.id,
+        r.id,
+        COALESCE(r.title, 'Untitled'),
+        r.url,
+        CASE WHEN r.authors IS NOT NULL THEN r.authors::text END,
+        r.published_date::text,
+        0
+      FROM research_areas ra
+      JOIN wiki_pages wp ON ra.numeric_id = wp.numeric_id AND ra.numeric_id IS NOT NULL
+      JOIN resource_citations rc ON rc.page_id_old = wp.id
+      JOIN resources r ON rc.resource_id = r.id
+      ON CONFLICT (research_area_id, url) WHERE url IS NOT NULL DO NOTHING
+    `);
+
+    const inserted = "rowCount" in result ? Number(result.rowCount) : 0;
     return c.json({ inserted });
   })
 
