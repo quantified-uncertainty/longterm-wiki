@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function EntityMatrixPage() {
-  redirect("/wiki/E1303");
+  redirect("/wiki/E1309");
 }
