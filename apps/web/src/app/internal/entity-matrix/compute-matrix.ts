@@ -43,6 +43,14 @@ export interface CellValue {
   details?: string;
 }
 
+export interface EntityTypeMeta {
+  id: string;
+  label: string;
+  tier: string;
+  directoryRoute?: string;
+  profileRoute?: string;
+}
+
 export interface EntityTypeRow {
   entityType: string;
   label: string;
@@ -50,11 +58,12 @@ export interface EntityTypeRow {
   cells: Record<string, CellValue>;
   aggregateScore: number;
   groupScores: Record<string, number>;
+  sampleEntityId?: string;
 }
 
 export interface MatrixSnapshot {
   generatedAt: string;
-  entityTypes: Array<{ id: string; label: string; tier: string }>;
+  entityTypes: EntityTypeMeta[];
   dimensions: DimensionDef[];
   dimensionGroups: DimensionGroupMeta[];
   rows: EntityTypeRow[];

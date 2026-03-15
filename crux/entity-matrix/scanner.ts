@@ -910,6 +910,12 @@ export function scanMatrix(): MatrixSnapshot {
       }
     }
 
+    // Pick a sample entity for quick navigation
+    const db = getDatabaseJson();
+    const sampleEntity = db?.typedEntities?.find(
+      (e) => e.entityType === entityType.id && e.numericId,
+    );
+
     rows.push({
       entityType: entityType.id,
       label: entityType.label,
@@ -917,6 +923,7 @@ export function scanMatrix(): MatrixSnapshot {
       cells,
       aggregateScore,
       groupScores,
+      sampleEntityId: sampleEntity?.numericId,
     });
   }
 

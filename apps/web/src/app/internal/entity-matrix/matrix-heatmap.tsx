@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import type {
   MatrixSnapshot,
   EntityTypeRow,
+  EntityTypeMeta,
   CellValue,
   DimensionDef,
   DimensionGroupMeta,
@@ -184,6 +185,11 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
     [snapshot.dimensions],
   );
 
+  const entityMetaMap = useMemo(
+    () => new Map(snapshot.entityTypes.map((et) => [et.id, et])),
+    [snapshot.entityTypes],
+  );
+
   const rows = useMemo(() => {
     let filtered = snapshot.rows;
     if (filterTier !== "all") {
@@ -302,6 +308,9 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 48 }} title="YAML entities / MDX pages">
                 Count
               </th>
+              <th className="px-2 py-2 text-center font-medium border-r" style={{ minWidth: 56 }} title="Links to directory and sample entity">
+                Links
+              </th>
               {groupedDims.map(({ group, dims }) => (
                 <th
                   key={group.id}
@@ -319,6 +328,10 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
                 <div>Entities</div>
                 <div>/Pages</div>
+              </th>
+              <th className="border-r px-1 py-1 text-center font-normal text-[9px] leading-tight" style={{ color: "#6b7280" }}>
+                <div>Dir /</div>
+                <div>Sample</div>
               </th>
               {groupedDims.map(({ dims }) =>
                 dims.map((dim, i) => (
@@ -342,6 +355,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <MatrixRow
                 key={row.entityType}
                 row={row}
+                entityMeta={entityMetaMap.get(row.entityType)}
                 groupedDims={groupedDims}
                 dimMap={dimMap}
                 expanded={expandedRow === row.entityType}
@@ -369,6 +383,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
               <td className="px-2 py-2 text-center border-r border-t" style={{ fontSize: "0.625rem", color: "#6b7280" }}>
                 {totalYaml} / {totalMdx}
               </td>
+              <td className="px-2 py-2 border-r border-t" />
               {groupedDims.map(({ dims }) =>
                 dims.map((dim, i) => {
                   const avg = snapshot.dimensionAverages[dim.id] ?? 0;
@@ -399,6 +414,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
       {expandedRow && rows.find((r) => r.entityType === expandedRow) && (
         <ExpandedDetail
           row={rows.find((r) => r.entityType === expandedRow)!}
+          entityMeta={entityMetaMap.get(expandedRow)}
           groupedDims={groupedDims}
           dimMap={dimMap}
         />
@@ -413,6 +429,7 @@ export function MatrixHeatmap({ snapshot }: MatrixHeatmapProps) {
 
 function MatrixRow({
   row,
+  entityMeta,
   groupedDims,
   dimMap,
   expanded,
@@ -421,6 +438,7 @@ function MatrixRow({
   onHideTooltip,
 }: {
   row: EntityTypeRow;
+  entityMeta?: EntityTypeMeta;
   groupedDims: { group: DimensionGroupMeta; dims: DimensionDef[] }[];
   dimMap: Map<string, DimensionDef>;
   expanded: boolean;
@@ -467,6 +485,33 @@ function MatrixRow({
           <span style={{ color: "#d1d5db" }}>—</span>
         )}
       </td>
+      <td className="px-1 py-1.5 text-center border-r" style={{ fontSize: "0.625rem", whiteSpace: "nowrap" }}>
+        <span style={{ display: "inline-flex", gap: "0.375rem" }}>
+          {entityMeta?.directoryRoute && (
+            <a
+              href={`/${entityMeta.directoryRoute}`}
+              style={{ color: "#2563eb", textDecoration: "none" }}
+              title={`Browse all ${row.label}s`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              All
+            </a>
+          )}
+          {row.sampleEntityId && (
+            <a
+              href={`/wiki/${row.sampleEntityId}`}
+              style={{ color: "#6b7280", textDecoration: "none" }}
+              title={`Sample ${row.label}: ${row.sampleEntityId}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {row.sampleEntityId}
+            </a>
+          )}
+          {!entityMeta?.directoryRoute && !row.sampleEntityId && (
+            <span style={{ color: "#d1d5db" }}>—</span>
+          )}
+        </span>
+      </td>
       {groupedDims.map(({ dims }) =>
         dims.map((dim, i) => {
           const cell = row.cells[dim.id];
@@ -502,10 +547,12 @@ function MatrixRow({
 
 function ExpandedDetail({
   row,
+  entityMeta,
   groupedDims,
   dimMap,
 }: {
   row: EntityTypeRow;
+  entityMeta?: EntityTypeMeta;
   groupedDims: { group: DimensionGroupMeta; dims: DimensionDef[] }[];
   dimMap: Map<string, DimensionDef>;
 }) {
@@ -513,7 +560,7 @@ function ExpandedDetail({
 
   return (
     <div className="border rounded-lg p-4 bg-muted/10">
-      <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.75rem" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
         <h3 className="font-semibold text-sm" style={{ margin: 0 }}>
           {row.label}
           {row.tier === "sub-entity" && (
@@ -530,6 +577,20 @@ function ExpandedDetail({
             {counts.entities !== null && `${counts.entities} entities`}
             {counts.entities !== null && counts.pages !== null && " · "}
             {counts.pages !== null && `${counts.pages} pages`}
+          </span>
+        )}
+        {(entityMeta?.directoryRoute || row.sampleEntityId) && (
+          <span style={{ fontSize: "0.75rem", display: "inline-flex", gap: "0.5rem" }}>
+            {entityMeta?.directoryRoute && (
+              <a href={`/${entityMeta.directoryRoute}`} style={{ color: "#2563eb" }}>
+                Browse all
+              </a>
+            )}
+            {row.sampleEntityId && (
+              <a href={`/wiki/${row.sampleEntityId}`} style={{ color: "#6b7280" }}>
+                Sample: {row.sampleEntityId}
+              </a>
+            )}
           </span>
         )}
       </div>
