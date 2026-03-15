@@ -61,10 +61,24 @@ const TYPES_WITH_DETAIL_PAGES: Record<string, string> = {
   resource: "/resources",
 };
 
+// Entity types that have directory pages where sourceId = slug works directly
+const ENTITY_DIR_PREFIXES: Record<string, string> = {
+  organization: "/organizations",
+  person: "/people",
+  risk: "/risks",
+};
+
 function resolveThingHref(item: ThingsApiItem): string | undefined {
-  // Entities: sourceId is the entity slug → getEntityHref resolves correctly
+  // Entities: try getEntityHref first, fall back to directory URL
   if (item.thingType === "entity") {
-    return getEntityHref(item.sourceId);
+    let href = getEntityHref(item.sourceId);
+    // getEntityHref may return /wiki/E{id} when KB slug lookup fails.
+    // For known directory types, use the slug directly.
+    if (href?.startsWith("/wiki/") && item.entityType) {
+      const prefix = ENTITY_DIR_PREFIXES[item.entityType];
+      if (prefix) href = `${prefix}/${item.sourceId}`;
+    }
+    return href;
   }
 
   // Types with working detail page links

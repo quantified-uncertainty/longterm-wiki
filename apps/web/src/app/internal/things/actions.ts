@@ -45,7 +45,25 @@ export async function searchThings(
   const results = data.results.map((item) => {
     let href: string | undefined;
     if (item.thingType === "entity") {
-      try { href = getEntityHref(item.sourceId); } catch { /* not in db */ }
+      try {
+        href = getEntityHref(item.sourceId);
+        // getEntityHref may return /wiki/E{id} when getDirectoryHref fails
+        // due to KB slug mismatch. For organizations/people/risks, try
+        // the directory URL directly since sourceId = entity slug.
+        if (href?.startsWith("/wiki/") && item.entityType) {
+          const dirPrefixes: Record<string, string> = {
+            organization: "/organizations",
+            person: "/people",
+            risk: "/risks",
+          };
+          const prefix = dirPrefixes[item.entityType];
+          if (prefix) {
+            href = `${prefix}/${item.sourceId}`;
+          }
+        }
+      } catch (e) {
+        console.warn(`[things-search] getEntityHref failed for ${item.sourceId}:`, e instanceof Error ? e.message : String(e));
+      }
     } else if (item.thingType === "resource" && item.sourceId) {
       href = `/resources/${encodeURIComponent(item.sourceId)}`;
     } else if (item.sourceUrl) {
