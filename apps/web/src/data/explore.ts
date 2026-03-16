@@ -67,7 +67,11 @@ function getKBCounts(entityId: string, kb: SerializedKB | undefined): { factCoun
   const facts = kb.facts[entityId] ?? [];
   const factCount = facts.filter((f) => f.propertyId !== "description").length;
 
-  const collections = kb.records?.[entityId] ?? {};
+  // records is added to factbase-data.json at build time by build-data.mjs (merged from PG).
+  // It is NOT part of the SerializedKB TypeScript type, so we access it via type assertion.
+  type RecordsMap = Record<string, Record<string, Array<unknown>>>;
+  const records = "records" in kb ? (kb as { records?: RecordsMap }).records : undefined;
+  const collections = records?.[entityId] ?? {};
   const itemCount = Object.values(collections).reduce(
     (sum, entries) => sum + entries.length,
     0,

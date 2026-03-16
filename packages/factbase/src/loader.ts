@@ -693,7 +693,17 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
     sources: Record<string, string>;
   }[] = [];
   for (const { parsed } of entityFiles) {
-    const rawFile = parsed as EntityFile & { _sources?: Record<string, unknown> };
+    const rawFile = parsed as EntityFile & { _sources?: Record<string, unknown>; records?: unknown };
+    // Warn on legacy records: blocks — records have been migrated to PostgreSQL.
+    // TODO: Remove the "records:" section from each YAML file to silence this warning.
+    // Tracked in: https://github.com/quantified-uncertainty/longterm-wiki/issues
+    if (rawFile.records !== undefined) {
+      const thingId = (rawFile.thing as { id?: string; slug?: string })?.id ?? (rawFile.thing as { id?: string; slug?: string })?.slug ?? "unknown";
+      console.warn(
+        `[kb/loader] Entity "${thingId}" has a legacy "records:" block that is ignored. ` +
+        `Records are now served from PostgreSQL. Remove the "records:" section from the YAML file.`
+      );
+    }
     // Extract and strip _sources before treating as entity data; filter non-string values
     const rawSources = rawFile._sources ?? {};
     const sources: Record<string, string> = {};

@@ -125,7 +125,7 @@ describe("graph", () => {
     it("returns facts from multiple entities", () => {
       const roleMap = graph.getByProperty("role");
       // People with role facts (count varies as entities are added)
-      expect(roleMap.size).toBe(68);
+      expect(roleMap.size).toBeGreaterThanOrEqual(68);
       expect(roleMap.has(graph.getEntity(idOf("dario-amodei"))!.id)).toBe(true);
       expect(roleMap.has(graph.getEntity(idOf("jan-leike"))!.id)).toBe(true);
       expect(roleMap.has(graph.getEntity(idOf("sam-altman"))!.id)).toBe(true);

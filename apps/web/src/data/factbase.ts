@@ -419,8 +419,10 @@ export interface FactBaseRecordSchema {
 export function getFactBaseRecordSchema(schemaId: string): FactBaseRecordSchema | undefined {
   const fb = getFactBase();
   if (!fb) return undefined;
-  // Access via type assertion since recordSchemas is no longer in SerializedKB type
-  const schemas = (fb as Record<string, unknown>).recordSchemas as FactBaseRecordSchema[] | undefined;
+  // recordSchemas is not in SerializedKB type; access via type assertion
+  const schemas = "recordSchemas" in fb
+    ? (fb as { recordSchemas?: FactBaseRecordSchema[] }).recordSchemas
+    : undefined;
   return schemas?.find((s) => s.id === schemaId);
 }
 
@@ -430,7 +432,10 @@ export function getFactBaseRecordSchema(schemaId: string): FactBaseRecordSchema 
 export function getFactBaseRecordSchemas(): FactBaseRecordSchema[] {
   const fb = getFactBase();
   if (!fb) return [];
-  const schemas = (fb as Record<string, unknown>).recordSchemas as FactBaseRecordSchema[] | undefined;
+  // recordSchemas is not in SerializedKB type; access via type assertion
+  const schemas = "recordSchemas" in fb
+    ? (fb as { recordSchemas?: FactBaseRecordSchema[] }).recordSchemas
+    : undefined;
   return schemas ?? [];
 }
 

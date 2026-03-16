@@ -87,7 +87,52 @@ async function main(): Promise<void> {
 
   // Note: Records have been migrated to PostgreSQL and are no longer loaded
   // into the KB graph. Record entity-ref validation is now handled by the
-  // wiki-server integrity checks. This validator only checks fact refs.
+  // wiki-server integrity checks. This validator checks fact refs.
+
+  // ── Scan fact refs ───────────────────────────────────────────────
+
+  for (const entity of entities) {
+    const facts = graph.getFacts(entity.id);
+    for (const fact of facts) {
+      const refValues: string[] = [];
+      if (fact.value.type === "ref") {
+        refValues.push(fact.value.value);
+      } else if (fact.value.type === "refs") {
+        refValues.push(...fact.value.value);
+      }
+      if (refValues.length === 0) continue;
+
+      // Use propertyId as the collection name for grouping
+      const collection = fact.propertyId;
+      if (!statsByCollection.has(collection)) {
+        statsByCollection.set(collection, {
+          totalRecords: 0,
+          totalLinks: 0,
+          validLinks: 0,
+          orphanedLinks: 0,
+          orphanedRefs: [],
+        });
+      }
+      const stats = statsByCollection.get(collection)!;
+      stats.totalRecords++;
+      stats.totalLinks += refValues.length;
+      for (const refValue of refValues) {
+        if (isValidEntityRef(refValue)) {
+          stats.validLinks++;
+        } else {
+          stats.orphanedLinks++;
+          stats.orphanedRefs.push({
+            recordKey: fact.id,
+            schemaId: collection,
+            ownerEntityId: entity.id,
+            fieldName: fact.propertyId,
+            refValue,
+            allowsDisplayName: false,
+          });
+        }
+      }
+    }
+  }
 
   // ── Report ──────────────────────────────────────────────────────
 
