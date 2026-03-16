@@ -350,6 +350,145 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   };
 }
 
+async function prepareCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { runFullScan } = await import('../tablebase/scanner.ts');
+  const { rankTasks } = await import('../tablebase/task-ranker.ts');
+
+  const taskTypes = options.taskType
+    ? [options.taskType as TaskType].filter(t => TASK_TYPES.includes(t as TaskType))
+    : undefined;
+
+  // Get the next task (or a specific one)
+  const taskId = args.find(a => !a.startsWith('--'));
+  let task;
+  if (taskId) {
+    const { findTaskById } = await import('../tablebase/loop.ts');
+    task = await findTaskById(taskId);
+    if (!task) return { exitCode: 1, output: `Task not found: ${taskId}` };
+  } else {
+    const scan = await runFullScan();
+    const tasks = rankTasks(scan, { taskTypes, limit: 1 });
+    if (tasks.length === 0) return { exitCode: 0, output: 'NO_TASKS' };
+    task = tasks[0];
+  }
+
+  // Get existing records
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  let existingPath: string;
+  let existingKey: string;
+  switch (task.table) {
+    case 'personnel':
+      existingPath = `/api/personnel/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
+      existingKey = 'personnel';
+      break;
+    case 'grants':
+      existingPath = `/api/grants/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
+      existingKey = 'grants';
+      break;
+    case 'funding_rounds':
+      existingPath = `/api/funding-rounds/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
+      existingKey = 'fundingRounds';
+      break;
+    case 'investments':
+      existingPath = `/api/investments/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
+      existingKey = 'investments';
+      break;
+    case 'benchmark_results':
+      existingPath = `/api/benchmark-results/by-model/${encodeURIComponent(task.entityId)}?limit=50`;
+      existingKey = 'benchmarkResults';
+      break;
+    default:
+      existingPath = ''; existingKey = '';
+  }
+
+  let existingRecords: unknown[] = [];
+  if (existingPath) {
+    const r = await apiRequest<Record<string, unknown>>('GET', existingPath);
+    if (r.ok) existingRecords = (r.data[existingKey] as unknown[]) || [];
+  }
+
+  // Build search queries by task type
+  const name = task.entityName;
+  let searchQueries: string[];
+  let submitTable: string;
+  let recordFields: string;
+
+  switch (task.taskType) {
+    case 'personnel-enrichment':
+      searchQueries = [
+        `"${name}" leadership team CEO executive director founders`,
+        `"${name}" board of directors key personnel`,
+      ];
+      submitTable = 'personnel';
+      recordFields = `personId, organizationId ("${task.entityId}"), role, roleType (key-person|board|career), startDate, endDate, isFounder, source (REQUIRED)`;
+      break;
+    case 'funding-round-research':
+      searchQueries = [
+        `"${name}" funding round series raised valuation`,
+        `"${name}" investors funding 2024 2025`,
+      ];
+      submitTable = 'funding-rounds';
+      recordFields = `companyId ("${task.entityId}"), name (round name), date, raised (USD number), valuation, leadInvestor, instrument, source (REQUIRED)`;
+      break;
+    case 'investment-linking':
+      searchQueries = [
+        `"${name}" investment portfolio companies`,
+        `"${name}" invested funding`,
+      ];
+      submitTable = 'investments';
+      recordFields = `companyId, investorId, roundName, date, amount, role (lead|participant), source (REQUIRED)`;
+      break;
+    case 'benchmark-result-fill':
+      searchQueries = [
+        `"${name}" benchmark results MMLU HumanEval scores`,
+        `"${name}" performance evaluation 2024 2025`,
+      ];
+      submitTable = 'benchmark-results';
+      recordFields = `benchmarkId, modelId ("${task.entityId}"), score, unit, date, sourceUrl (REQUIRED)`;
+      break;
+    default:
+      searchQueries = [`"${name}" data`];
+      submitTable = task.table;
+      recordFields = 'varies by table';
+  }
+
+  const output = `## Task: ${task.taskType}
+**Entity**: ${task.entityName} (ID: ${task.entityId})
+**Table**: ${submitTable}
+**Task ID**: ${task.id}
+**Existing records**: ${existingRecords.length}
+
+### Search queries
+${searchQueries.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+### Record fields
+${recordFields}
+
+### Commands to use
+\`\`\`bash
+# Resolve a person/entity name to their ID:
+pnpm crux tablebase resolve "Person Name" --ci
+
+# If NOT_FOUND, create the entity first:
+pnpm crux tablebase create-entity "Person Name" --type=person --ci
+
+# Submit records (pipe JSON array):
+cat <<'RECORDS' | pnpm crux tablebase submit --table=${submitTable}
+[{"personId":"<ID>","organizationId":"${task.entityId}","role":"<ROLE>","roleType":"key-person","source":"<URL>"}]
+RECORDS
+
+# When done:
+pnpm crux tablebase mark-done ${task.id}
+\`\`\`
+${existingRecords.length > 0 ? `\n### Existing records\n\`\`\`json\n${JSON.stringify(existingRecords.slice(0, 5), null, 2)}\n\`\`\`\n` : ''}`;
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify({ task, existingRecords, searchQueries, submitTable, recordFields }) };
+  }
+
+  return { exitCode: 0, output };
+}
+
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
@@ -406,6 +545,7 @@ export const commands = {
   submit: submitCommand,
   existing: existingCommand,
   'create-entity': createEntityCommand,
+  prepare: prepareCommand,
   default: scanCommand,
 };
 
