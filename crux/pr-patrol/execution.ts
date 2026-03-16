@@ -269,7 +269,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
 export function spawnClaude(
   prompt: string,
   config: PatrolConfig,
-  opts?: { cwd?: string },
+  opts?: { cwd?: string; extraEnv?: Record<string, string> },
 ): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean; timedOut: boolean }> {
   return new Promise((resolve, reject) => {
     const args = [
@@ -283,7 +283,7 @@ export function spawnClaude(
     if (config.skipPerms) args.push('--dangerously-skip-permissions');
 
     // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions
-    const env = { ...process.env };
+    const env = { ...process.env, ...opts?.extraEnv };
     delete env.CLAUDECODE;
 
     const child = spawn('claude', args, {

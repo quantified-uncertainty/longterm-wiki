@@ -74,6 +74,27 @@ export interface ParallelConfig extends PatrolConfig {
 
 const LOCK_FILE_NAME = '.pr-patrol-lock';
 
+/** Parse a .env file and return key-value pairs. */
+function loadDotEnv(dir: string): Record<string, string> {
+  const envFile = join(dir, '.env');
+  if (!existsSync(envFile)) return {};
+  const vars: Record<string, string> = {};
+  for (const line of readFileSync(envFile, 'utf-8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    let val = trimmed.slice(eqIdx + 1).trim();
+    // Strip surrounding quotes
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    vars[key] = val;
+  }
+  return vars;
+}
+
 // ── Slot discovery ───────────────────────────────────────────────────────────
 
 /** Resolve the `lw/` parent directory from PROJECT_ROOT. */
@@ -488,12 +509,14 @@ async function fixPrInSlot(
       .catch((e: unknown) => log(`${prefix} Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
 
     // Build prompt and spawn Claude
+    // Load slot's .env so Claude has API keys (parent process may not have them)
+    const slotEnv = loadDotEnv(slot.dir);
     const prompt = buildPrompt(pr, config.repo);
     const result = await spawnClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: slot.dir });
+    }, { cwd: slot.dir, extraEnv: slotEnv });
 
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
