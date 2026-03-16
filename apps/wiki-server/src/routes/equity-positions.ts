@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  parseRange,
 } from "./utils.js";
 import { upsertThingsInTx } from "./thing-sync.js";
 
@@ -52,6 +53,8 @@ function formatRow(r: typeof equityPositions.$inferSelect) {
     companyId: r.companyId,
     holderId: r.holderId,
     stake: r.stake,
+    stakeLow: r.stakeLow != null ? Number(r.stakeLow) : null,
+    stakeHigh: r.stakeHigh != null ? Number(r.stakeHigh) : null,
     source: r.source,
     notes: r.notes,
     asOf: r.asOf,
@@ -182,16 +185,21 @@ const equityPositionsApp = new Hono()
     let upserted = 0;
 
     await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        companyId: item.companyId,
-        holderId: item.holderId,
-        stake: item.stake ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-        asOf: item.asOf ?? null,
-        validEnd: item.validEnd ?? null,
-      }));
+      const allVals = items.map((item) => {
+        const stakeRange = parseRange(item.stake);
+        return {
+          id: item.id,
+          companyId: item.companyId,
+          holderId: item.holderId,
+          stake: item.stake ?? null,
+          stakeLow: stakeRange.low,
+          stakeHigh: stakeRange.high,
+          source: item.source ?? null,
+          notes: item.notes ?? null,
+          asOf: item.asOf ?? null,
+          validEnd: item.validEnd ?? null,
+        };
+      });
 
       await tx
         .insert(equityPositions)
@@ -202,6 +210,8 @@ const equityPositionsApp = new Hono()
             companyId: sql`excluded.company_id`,
             holderId: sql`excluded.holder_id`,
             stake: sql`excluded.stake`,
+            stakeLow: sql`excluded.stake_low`,
+            stakeHigh: sql`excluded.stake_high`,
             source: sql`excluded.source`,
             notes: sql`excluded.notes`,
             asOf: sql`excluded.as_of`,

@@ -1546,7 +1546,11 @@ export const fundingRounds = pgTable(
     name: text("name").notNull(), // round name (e.g., "Series A", "Founding")
     date: text("date"), // YYYY or YYYY-MM
     raised: numeric("raised"), // capital raised (USD)
+    raisedLow: numeric("raised_low"), // parsed low bound of raised
+    raisedHigh: numeric("raised_high"), // parsed high bound of raised
     valuation: numeric("valuation"), // post-money valuation (USD)
+    valuationLow: numeric("valuation_low"), // parsed low bound of valuation
+    valuationHigh: numeric("valuation_high"), // parsed high bound of valuation
     instrument: text("instrument"), // equity, convertible-note, strategic-partnership, founding
     leadInvestor: text("lead_investor"), // legacy: entity ID or display name (kept for migration compat)
     /** FK to entities.stable_id for the lead investor. Null when unresolved. */
@@ -1605,7 +1609,11 @@ export const investments = pgTable(
     roundName: text("round_name"), // name of the funding round
     date: text("date"), // YYYY or YYYY-MM
     amount: numeric("amount"), // capital contributed (USD)
+    amountLow: numeric("amount_low"), // parsed low bound of amount
+    amountHigh: numeric("amount_high"), // parsed high bound of amount
     stakeAcquired: text("stake_acquired"), // pre-dilution stake (single or range as JSON string)
+    stakeLow: numeric("stake_low"), // parsed low bound of stake_acquired
+    stakeHigh: numeric("stake_high"), // parsed high bound of stake_acquired
     instrument: text("instrument"), // equity, convertible-note, etc.
     role: text("role"), // lead | participant | founder
     conditions: text("conditions"), // investment conditions
@@ -1657,6 +1665,8 @@ export const equityPositions = pgTable(
     /** Display name fallback when holder doesn't have an entity. */
     holderDisplayName: text("holder_display_name"),
     stake: text("stake"), // current post-dilution equity stake (single or range as JSON string)
+    stakeLow: numeric("stake_low"), // parsed low bound of stake
+    stakeHigh: numeric("stake_high"), // parsed high bound of stake
     source: text("source"), // URL to source
     notes: text("notes"),
     asOf: text("as_of"), // when this position was valid from (YYYY or YYYY-MM)
