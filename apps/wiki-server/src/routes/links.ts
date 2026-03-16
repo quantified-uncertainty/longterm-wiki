@@ -9,6 +9,22 @@ import {
 import { SyncLinksBatchSchema } from "../api-types.js";
 import { resolvePageIntId } from "./page-id-helpers.js";
 
+// ---- Error helpers ----
+
+/**
+ * Check if a caught error is a PostgreSQL "undefined_table" error (42P01).
+ * This is the proper way to detect a missing materialized view or table,
+ * rather than fragile string matching on the error message.
+ */
+function isUndefinedTableError(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "code" in err &&
+    (err as { code: string }).code === "42P01"
+  );
+}
+
 // ---- Constants ----
 
 const MAX_RELATED = 25;
@@ -320,8 +336,8 @@ const linksApp = new Hono()
     } catch (err: unknown) {
       // MV doesn't exist yet — fall back to live CTE query.
       // This happens before the migration runs or if the MV was dropped.
-      const errMsg = err instanceof Error ? err.message : String(err);
-      if (!errMsg.includes("wikibase_related_graph")) throw err;
+      // PG error code 42P01 = undefined_table.
+      if (!isUndefinedTableError(err)) throw err;
 
       results = await rawDb<RelatedDbRow[]>`
       WITH bidirectional_links AS (
@@ -519,30 +535,30 @@ const linksApp = new Hono()
   .post("/refresh-graph", async (c) => {
     const rawDb = getDb();
 
+    // Try CONCURRENTLY first (zero-downtime, requires unique index + populated MV).
+    // Fall back to non-concurrent on first run, then gracefully handle missing MV.
     try {
       await rawDb`REFRESH MATERIALIZED VIEW CONCURRENTLY wikibase_related_graph`;
       return c.json({ refreshed: true });
     } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-
-      // CONCURRENTLY requires a unique index and populated MV.
-      // Fall back to non-concurrent refresh on first run or if index is missing.
-      if (errMsg.includes("CONCURRENTLY") || errMsg.includes("has not been populated")) {
-        try {
-          await rawDb`REFRESH MATERIALIZED VIEW wikibase_related_graph`;
-          return c.json({ refreshed: true });
-        } catch (innerErr: unknown) {
-          const innerMsg = innerErr instanceof Error ? innerErr.message : String(innerErr);
-          // MV doesn't exist yet — migration hasn't run
-          if (innerMsg.includes("wikibase_related_graph")) {
-            return c.json({ refreshed: false, reason: "materialized view does not exist yet" });
-          }
-          throw innerErr;
-        }
+      // MV doesn't exist (42P01) — migration hasn't run yet
+      if (isUndefinedTableError(err)) {
+        return c.json({ refreshed: false, reason: "materialized view does not exist yet" });
       }
 
-      // MV doesn't exist yet — migration hasn't run
-      if (errMsg.includes("wikibase_related_graph")) {
+      // CONCURRENTLY fails if MV is unpopulated or index is missing — retry without it
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (!errMsg.includes("CONCURRENTLY") && !errMsg.includes("has not been populated")) {
+        throw err;
+      }
+    }
+
+    // Non-concurrent fallback (takes a brief lock but works on first refresh)
+    try {
+      await rawDb`REFRESH MATERIALIZED VIEW wikibase_related_graph`;
+      return c.json({ refreshed: true });
+    } catch (err: unknown) {
+      if (isUndefinedTableError(err)) {
         return c.json({ refreshed: false, reason: "materialized view does not exist yet" });
       }
       throw err;

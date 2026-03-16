@@ -31,6 +31,9 @@ let nextId: number;
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 
+/** When true, MV queries throw a PG 42P01 error to simulate the MV not existing. */
+let simulateMvMissing = false;
+
 function getIntIdForSlug(slug: string): number {
   if (!slugIntIdMap.has(slug)) {
     slugIntIdMap.set(slug, nextSlugIntId++);
@@ -56,6 +59,7 @@ function resetStores() {
   nextId = 1;
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
+  simulateMvMissing = false;
 }
 
 function linkKey(sourceId: string, targetId: string, linkType: string) {
@@ -200,11 +204,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- REFRESH MATERIALIZED VIEW (refresh-graph endpoint) ---
   if (q.includes("refresh materialized view")) {
+    if (simulateMvMissing) {
+      const err = new Error('relation "wikibase_related_graph" does not exist');
+      (err as unknown as Record<string, string>).code = "42P01";
+      throw err;
+    }
     return [];
   }
 
   // --- wikibase_related_graph MV query (related endpoint, MV path) ---
   if (q.includes("wikibase_related_graph")) {
+    if (simulateMvMissing) {
+      const err = new Error('relation "wikibase_related_graph" does not exist');
+      (err as unknown as Record<string, string>).code = "42P01";
+      throw err;
+    }
     // MV query params: entityIntId appears 6 times, then MIN_SCORE, then limit*3
     const entityIntId = params[0] as number;
     const entitySlug = getSlugForIntId(entityIntId);
@@ -272,7 +286,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- page_links: bidirectional links CTE (related endpoint, fallback) ---
   if (q.includes("bidirectional_links") || q.includes("aggregated")) {
-    // Phase 4b: params are [entityIntId, entityIntId, entityId(text), MIN_SCORE, limit*3]
+    // Params: [entityIntId, entityIntId, entityIntId, MIN_SCORE, limit*3]
     const entityIntId = params[0] as number;
     const entitySlug = getSlugForIntId(entityIntId);
     const minScore = params[3] as number;
@@ -784,6 +798,51 @@ describe("Links API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.refreshed).toBe(true);
+    });
+
+    it("returns refreshed=false when MV does not exist", async () => {
+      simulateMvMissing = true;
+      const res = await app.request("/api/links/refresh-graph", {
+        method: "POST",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.refreshed).toBe(false);
+      expect(body.reason).toContain("does not exist");
+    });
+  });
+
+  // ---- Related (CTE fallback) ----
+
+  describe("GET /api/links/related/:id (CTE fallback)", () => {
+    it("falls back to CTE query when MV does not exist", async () => {
+      await seedPage(app, "alpha", "Alpha", {
+        entityType: "organization",
+        quality: 50,
+        readerImportance: 50,
+      });
+      await seedPage(app, "beta", "Beta", {
+        entityType: "concept",
+        quality: 50,
+        readerImportance: 50,
+      });
+
+      await syncLinks(app, [
+        {
+          sourceId: "alpha",
+          targetId: "beta",
+          linkType: "yaml_related",
+          weight: 10,
+        },
+      ]);
+
+      simulateMvMissing = true;
+      const res = await app.request("/api/links/related/alpha");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.entityId).toBe("alpha");
+      expect(body.related.length).toBeGreaterThan(0);
+      expect(body.related.some((r: RelatedItem) => r.id === "beta")).toBe(true);
     });
   });
 
