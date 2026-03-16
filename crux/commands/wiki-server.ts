@@ -43,9 +43,9 @@ const SCRIPTS = {
     description: 'Sync data/auto-update/runs/*.yaml to wiki-server',
     passthrough: ['dryRun', 'dry-run'],
   },
-  'sync-benchmarks': {
-    script: 'wiki-server/sync-benchmarks.ts',
-    description: 'Sync benchmark definitions + model scores to wiki-server',
+  'sync-assessments': {
+    script: 'wiki-server/sync-assessments.ts',
+    description: 'Sync page assessments (quality, importance, ratings) to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
   'snapshot-resources': {
