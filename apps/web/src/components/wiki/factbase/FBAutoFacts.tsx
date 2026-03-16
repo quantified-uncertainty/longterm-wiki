@@ -18,7 +18,8 @@ import {
   getKBRecordSchema,
   isFactExpired,
 } from "@data/factbase";
-import type { Fact, Property, RecordEntry, RecordSchema, FieldDef } from "@longterm-wiki/factbase";
+import type { Fact, Property, FieldDef } from "@longterm-wiki/factbase";
+import type { FactBaseRecordEntry, FactBaseRecordSchema } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/factbase/format";
 import { FBFactValueDisplay } from "@components/wiki/factbase/FBFactValueDisplay";
 import { FBCellValue } from "@components/wiki/factbase/FBCellValue";
@@ -159,7 +160,7 @@ function sortFactsByAsOf(items: FactWithProperty[]): FactWithProperty[] {
 }
 
 /** Safely extract a string field from a record entry. */
-function field(item: RecordEntry, key: string): string | undefined {
+function field(item: FactBaseRecordEntry, key: string): string | undefined {
   const v = item.fields[key];
   if (v == null) return undefined;
   if (typeof v === "string") return v;
@@ -170,8 +171,8 @@ function field(item: RecordEntry, key: string): string | undefined {
 /** Resolve which columns to show for a collection, including explicit endpoints. */
 function resolveRecordColumns(
   collectionName: string,
-  items: RecordEntry[],
-  schema?: RecordSchema,
+  items: FactBaseRecordEntry[],
+  schema?: FactBaseRecordSchema,
 ): string[] {
   const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
   const fieldDefs = schema?.fields;
@@ -294,7 +295,7 @@ function StatCard({
 }
 
 /** Person card for key-persons collection. */
-function PersonCard({ item }: { item: RecordEntry }) {
+function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
   const name = personEntity?.name ?? field(item, "display_name") ?? titleCase(item.key);
@@ -346,7 +347,7 @@ function PersonCard({ item }: { item: RecordEntry }) {
 }
 
 /** Funding round row for timeline display. */
-function FundingRoundRow({ item }: { item: RecordEntry }) {
+function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const date = field(item, "date");
   const raised = item.fields.raised;
@@ -402,7 +403,7 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
 }
 
 /** Product card. */
-function ProductCard({ item }: { item: RecordEntry }) {
+function ProductCard({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const launched = field(item, "launched");
   const description = field(item, "description");
@@ -440,7 +441,7 @@ function ProductCard({ item }: { item: RecordEntry }) {
 }
 
 /** Model release row. */
-function ModelReleaseRow({ item }: { item: RecordEntry }) {
+function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const released = field(item, "released");
   const description = field(item, "description");
@@ -585,7 +586,7 @@ function RecordCollectionSection({
   items,
 }: {
   collectionName: string;
-  items: RecordEntry[];
+  items: FactBaseRecordEntry[];
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;

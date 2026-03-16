@@ -23,7 +23,7 @@
 import fs from "fs";
 import path from "path";
 import { getDatabase } from "@data";
-import type { Fact, Property, Entity, RecordEntry, RecordSchema } from "@longterm-wiki/factbase";
+import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
@@ -396,106 +396,87 @@ export function getAllFactBaseRecordsByCollection(collection: string): FactBaseR
 }
 
 /**
- * Get a record schema by ID.
+ * Get all unique record collection names present in factbase-data.json.
+ * Derived dynamically from the data so new collections are picked up automatically.
  */
-export function getFactBaseRecordSchema(schemaId: string): RecordSchema | undefined {
+export function getFactBaseRecordCollectionNames(): string[] {
+  const fb = getFactBase();
+  if (!fb) return [];
+
+  type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
+  const records = "records" in fb
+    ? (fb as { records?: RecordsMap }).records
+    : undefined;
+  if (!records) return [];
+
+  const names = new Set<string>();
+  for (const entityRecords of Object.values(records)) {
+    for (const collectionName of Object.keys(entityRecords)) {
+      names.add(collectionName);
+    }
+  }
+  return Array.from(names);
+}
+
+/**
+ * Record schema shape as previously loaded from KB YAML.
+ * Record schemas are no longer part of the KB package (records migrated to PG),
+ * but this type is kept for backward compatibility with components that
+ * access the recordSchemas field in factbase-data.json.
+ */
+export interface FactBaseRecordSchema {
+  id: string;
+  name: string;
+  description?: string;
+  collectionName?: string;
+  endpoints: Record<string, {
+    types: string[];
+    implicit?: boolean;
+    required?: boolean;
+    allowDisplayName?: boolean;
+  }>;
+  fields: Record<string, {
+    type: string;
+    required?: boolean;
+    unit?: string;
+    description?: string;
+  }>;
+  temporal?: boolean;
+}
+
+/**
+ * Get a record schema by ID.
+ * Note: Record schemas are no longer part of the KB serialization.
+ * This returns undefined unless recordSchemas was injected into factbase-data.json
+ * by build-data.mjs from another source.
+ */
+export function getFactBaseRecordSchema(schemaId: string): FactBaseRecordSchema | undefined {
   const fb = getFactBase();
   if (!fb) return undefined;
-  return fb.recordSchemas?.find((s: RecordSchema) => s.id === schemaId);
+  // recordSchemas is not in SerializedKB type; access via type assertion
+  const schemas = "recordSchemas" in fb
+    ? (fb as { recordSchemas?: FactBaseRecordSchema[] }).recordSchemas
+    : undefined;
+  return schemas?.find((s) => s.id === schemaId);
 }
 
 /**
  * Get all record schemas.
+ * Note: Record schemas were removed from KB serialization when records migrated
+ * to PostgreSQL. build-data.mjs does not currently write recordSchemas into
+ * factbase-data.json, so this returns [] unless a future build step adds them.
+ * Callers handle the empty case gracefully.
  */
-export function getFactBaseRecordSchemas(): RecordSchema[] {
+export function getFactBaseRecordSchemas(): FactBaseRecordSchema[] {
   const fb = getFactBase();
   if (!fb) return [];
-  return fb.recordSchemas ?? [];
+  // recordSchemas is not in SerializedKB type; access via type assertion
+  const schemas = "recordSchemas" in fb
+    ? (fb as { recordSchemas?: FactBaseRecordSchema[] }).recordSchemas
+    : undefined;
+  return schemas ?? [];
 }
 
-/**
- * Find all records across all entities that reference the given entityId
- * via an explicit endpoint field. Optionally filter by collection name.
- */
-export function getFactBaseRecordsReferencing(
-  entityId: string,
-  collectionName?: string,
-): RecordEntry[] {
-  const fb = getFactBase();
-  if (!fb || !fb.records || !fb.recordSchemas) return [];
-
-  const schemaMap = new Map(fb.recordSchemas.map((s: RecordSchema) => [s.id, s]));
-  const results: RecordEntry[] = [];
-
-  for (const [, collections] of Object.entries(fb.records)) {
-    for (const [colName, entries] of Object.entries(collections)) {
-      if (collectionName && colName !== collectionName) continue;
-      for (const entry of entries) {
-        const schema = schemaMap.get(entry.schema);
-        if (!schema) continue;
-        for (const [endpointName, endpointDef] of Object.entries(schema.endpoints)) {
-          if (endpointDef.implicit) continue;
-          if (entry.fields[endpointName] === entityId) {
-            results.push(entry);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  return results;
-}
-
-/**
- * Look up a single record entry by its key.
- */
-export function getFactBaseRecordByKey(
-  recordKey: string,
-): { entityId: string; collection: string; entry: RecordEntry } | undefined {
-  const fb = getFactBase();
-  if (!fb || !fb.records) return undefined;
-
-  for (const [entityId, collections] of Object.entries(fb.records)) {
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      for (const entry of entries) {
-        if (entry.key === recordKey) {
-          return { entityId, collection: collectionName, entry };
-        }
-      }
-    }
-  }
-  return undefined;
-}
-
-/**
- * Get all record entries across all entities as a flat list.
- * Returns entries wrapped with their entityId and collection name.
- */
-export function getAllFactBaseRecordEntries(): Array<{
-  entityId: string;
-  collection: string;
-  entry: RecordEntry;
-}> {
-  const fb = getFactBase();
-  if (!fb || !fb.records) return [];
-
-  const results: Array<{
-    entityId: string;
-    collection: string;
-    entry: RecordEntry;
-  }> = [];
-
-  for (const [entityId, collections] of Object.entries(fb.records)) {
-    for (const [collectionName, entries] of Object.entries(collections)) {
-      for (const entry of entries) {
-        results.push({ entityId, collection: collectionName, entry });
-      }
-    }
-  }
-
-  return results;
-}
 
 // ── Slug resolution (public) ─────────────────────────────────────
 
@@ -585,12 +566,6 @@ export const getAllKBRecordsByCollection = getAllFactBaseRecordsByCollection;
 export const getKBRecordSchema = getFactBaseRecordSchema;
 /** @deprecated Use getFactBaseRecordSchemas() */
 export const getKBRecordSchemas = getFactBaseRecordSchemas;
-/** @deprecated Use getFactBaseRecordsReferencing() */
-export const getKBRecordsReferencing = getFactBaseRecordsReferencing;
-/** @deprecated Use getFactBaseRecordByKey() */
-export const getKBRecordByKey = getFactBaseRecordByKey;
-/** @deprecated Use getAllFactBaseRecordEntries() */
-export const getAllKBRecordEntries = getAllFactBaseRecordEntries;
 /** @deprecated Use resolveFactBaseSlug() */
 export const resolveKBSlug = resolveFactBaseSlug;
 /** @deprecated Use getFactBaseSlugMap() */

@@ -25,8 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBRecords, getKBRecordSchema } from "@data/factbase";
-import type { RecordEntry } from "@longterm-wiki/factbase";
+import { getKBRecords, getKBRecordSchema, type FactBaseRecordEntry } from "@data/factbase";
 import { titleCase, sortKBRecords } from "./format";
 import { FBCellValue } from "./FBCellValue";
 
@@ -56,7 +55,7 @@ const HIDDEN_BY_DEFAULT = new Set(["source", "notes", "key-publication", "key_pu
 
 /** Determine columns to display. Includes explicit endpoints (member, pledger, etc.) as ref columns. */
 function resolveColumns(
-  items: RecordEntry[],
+  items: FactBaseRecordEntry[],
   fieldDefs: Record<string, unknown> | undefined,
   endpointDefs: Record<string, { implicit?: boolean }> | undefined,
   columns?: string[],

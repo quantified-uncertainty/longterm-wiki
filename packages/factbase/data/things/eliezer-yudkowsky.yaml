@@ -52,13 +52,3 @@ facts:
   - id: f_tcr35bkwp1
     property: website
     value: "https://www.yudkowsky.net"
-
-records:
-  career-history:
-    i_eY1zA2bC3d:
-      organization: miri
-      title: "Founder & Senior Research Fellow"
-      start: "2000"
-      source: https://intelligence.org/about/
-      notes: "Founded MIRI (originally Singularity Institute for Artificial Intelligence) in 2000; has been its primary intellectual leader for 25+ years"
-

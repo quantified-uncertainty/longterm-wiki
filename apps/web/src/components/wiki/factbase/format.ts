@@ -7,7 +7,8 @@
 
 import { formatValue as smartFormatValue } from "@lib/format-value";
 import { CURRENCIES } from "@longterm-wiki/factbase/currencies";
-import type { Fact, FieldDef, RecordEntry, PropertyDisplay } from "@longterm-wiki/factbase";
+import type { Fact, FieldDef, PropertyDisplay } from "@longterm-wiki/factbase";
+import type { FactBaseRecordEntry } from "@data/factbase";
 
 // ── Date formatting ────────────────────────────────────────────────
 
@@ -185,10 +186,10 @@ export function formatKBCellValue(
 
 /** Sort record collection entries by a field value, ascending or descending. */
 export function sortKBRecords(
-  items: RecordEntry[],
+  items: FactBaseRecordEntry[],
   sortBy: string,
   ascending: boolean,
-): RecordEntry[] {
+): FactBaseRecordEntry[] {
   return [...items].sort((a, b) => {
     const va = a.fields[sortBy];
     const vb = b.fields[sortBy];

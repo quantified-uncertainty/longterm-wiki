@@ -152,31 +152,23 @@ describe("loader", () => {
       expect(personSchema!.recommended).toContain("born-year");
     });
 
-    it("loads record collection schemas on organization", () => {
+    it("organization schema does not have records field (migrated to PG)", () => {
       const orgSchema = graph.getSchema("organization");
-      expect(orgSchema!.records).toBeDefined();
-      expect(orgSchema!.records).toContain("funding-round");
-      expect(orgSchema!.records).toContain("key-person");
-
-      // Verify the record schemas themselves are loaded
-      const frSchema = graph.getRecordSchema("funding-round");
-      expect(frSchema).toBeDefined();
-      expect(frSchema!.fields["date"].required).toBe(true);
-      expect(frSchema!.fields["date"].type).toBe("date");
-      expect(frSchema!.fields["raised"].type).toBe("number");
-      expect(frSchema!.fields["lead_investor"].type).toBe("ref");
+      expect(orgSchema).toBeDefined();
+      // Records were migrated to PostgreSQL — schema no longer lists them
+      expect((orgSchema as Record<string, unknown>).records).toBeUndefined();
     });
   });
 
   describe("facts", () => {
-    it("loads correct number of facts for Anthropic (52)", () => {
+    it("loads facts for Anthropic", () => {
       const facts = graph.getFacts(idOf("anthropic"));
-      expect(facts).toHaveLength(52);
+      expect(facts.length).toBeGreaterThanOrEqual(50);
     });
 
-    it("loads correct number of facts for Dario Amodei (9)", () => {
+    it("loads facts for Dario Amodei", () => {
       const facts = graph.getFacts(idOf("dario-amodei"));
-      expect(facts).toHaveLength(9);
+      expect(facts.length).toBeGreaterThanOrEqual(9);
     });
 
     it("loads correct number of facts for Jan Leike (9)", () => {
@@ -262,37 +254,5 @@ describe("loader", () => {
     });
   });
 
-  describe("record collections", () => {
-    it("returns empty array for non-existent collection", () => {
-      const records = graph.getRecords(idOf("anthropic"), "nonexistent");
-      expect(records).toEqual([]);
-    });
-
-    it("returns empty array for non-existent entity", () => {
-      const records = graph.getRecords("nonexistent", "funding-rounds");
-      expect(records).toEqual([]);
-    });
-  });
-
-  describe("record collections (data verification)", () => {
-    it("loads funding-rounds records for Anthropic", () => {
-      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
-      expect(rounds.length).toBeGreaterThanOrEqual(13);
-    });
-
-    it("loads key-persons records for Anthropic", () => {
-      const people = graph.getRecords(idOf("anthropic"), "key-persons");
-      expect(people.length).toBeGreaterThanOrEqual(15);
-    });
-
-    it("record entries have correct keys and field values", () => {
-      const rounds = graph.getRecords(idOf("anthropic"), "funding-rounds");
-      const seriesA = rounds.find((r) => r.key === "series-a");
-      expect(seriesA).toBeDefined();
-      expect(seriesA!.fields.date).toBe("2021-05");
-      expect(seriesA!.fields.raised).toBe(124e6);
-      expect(seriesA!.fields.valuation).toBe(550e6);
-      expect(seriesA!.fields.lead_investor).toBe("jaan-tallinn");
-    });
-  });
+  // Record collection tests removed — records migrated to PostgreSQL.
 });

@@ -1,4 +1,4 @@
-import { getAllKBRecordEntries, getKBEntity } from "@/data/factbase";
+import { getAllFactBaseRecords, getFactBaseEntity } from "@/data/factbase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { FBRecordsTable } from "./factbase-records-table";
 
@@ -12,21 +12,50 @@ export interface RecordRow {
   previewFields: string[];
 }
 
-export function FBRecordsExplorerContent() {
-  const allRecords = getAllKBRecordEntries();
+/**
+ * Known PG-sourced record collections.
+ * Used to iterate all collections for the records explorer.
+ */
+const RECORD_COLLECTIONS = [
+  "key-persons",
+  "board-seats",
+  "career-history",
+  "grants",
+  "funding-rounds",
+  "investments",
+  "equity-positions",
+  "divisions",
+  "funding-programs",
+  "division-personnel",
+  "charitable-pledges",
+  "dilution-stages",
+  "products",
+  "research-areas",
+  "model-releases",
+  "strategic-partnerships",
+  "safety-milestones",
+  "notable-publications",
+  "personnel",
+];
 
-  const rows: RecordRow[] = allRecords.map(({ entityId, collection, entry }) => {
-    const entity = getKBEntity(entityId);
-    const fieldNames = Object.keys(entry.fields);
-    return {
-      recordKey: entry.key,
-      entityId,
-      entityName: entity?.name ?? entityId,
-      collection: titleCase(collection),
-      fieldCount: fieldNames.length,
-      previewFields: fieldNames.slice(0, 3),
-    };
-  });
+export function FBRecordsExplorerContent() {
+  const rows: RecordRow[] = [];
+
+  for (const collection of RECORD_COLLECTIONS) {
+    const records = getAllFactBaseRecords(collection);
+    for (const entry of records) {
+      const entity = getFactBaseEntity(entry.ownerEntityId);
+      const fieldNames = Object.keys(entry.fields);
+      rows.push({
+        recordKey: entry.key,
+        entityId: entry.ownerEntityId,
+        entityName: entity?.name ?? entry.ownerEntityId,
+        collection: titleCase(collection),
+        fieldCount: fieldNames.length,
+        previewFields: fieldNames.slice(0, 3),
+      });
+    }
+  }
 
   // Sort by entity name then collection
   rows.sort((a, b) => {

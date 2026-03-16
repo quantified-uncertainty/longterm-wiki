@@ -20,8 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBRecords, getKBRecordSchema } from "@data/factbase";
-import type { RecordEntry } from "@longterm-wiki/factbase";
+import { getKBRecords, getKBRecordSchema, type FactBaseRecordEntry } from "@data/factbase";
 import { titleCase } from "./format";
 import { FBCellValue } from "./FBCellValue";
 
@@ -37,7 +36,7 @@ interface FBRecordTableProps {
 }
 
 /** Determine columns: use provided columns, or derive from all entries. */
-function resolveColumns(items: RecordEntry[], columns?: string[]): string[] {
+function resolveColumns(items: FactBaseRecordEntry[], columns?: string[]): string[] {
   if (columns && columns.length > 0) return columns;
 
   // Collect all unique field names across all entries, preserving insertion order
