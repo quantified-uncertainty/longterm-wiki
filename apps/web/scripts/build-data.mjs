@@ -41,6 +41,7 @@ import { parseFootnoteSources } from '../../../crux/lib/footnote-parser.ts';
 import { buildIdRegistry, extendIdRegistryWithPages } from './lib/id-registry.mjs';
 import { computePageRankings, computeRecommendedScores, buildUpdateSchedule } from './lib/page-rankings.mjs';
 import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucination-risk-build.mjs';
+import { syncCoverage, syncSchedule, syncRankings, syncSimilarity } from './lib/build-metrics-client.mjs';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -2673,6 +2674,89 @@ async function main() {
   database.updateSchedule = updateScheduleItems;
   const overdue = updateScheduleItems.filter(i => i.daysUntilDue < 0).length;
   console.log(`  updateSchedule: ${updateScheduleItems.length} pages tracked, ${overdue} overdue`);
+
+  // =========================================================================
+  // SYNC BUILD METRICS TO PG — coverage, rankings, schedule, similarity
+  // Fire-and-forget: build continues even if wiki-server is unreachable.
+  // =========================================================================
+  if (CONTENT_ONLY) {
+    console.log('  buildMetricsSync: skipped (content-only scope)');
+  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
+    console.log('  Syncing build metrics to wiki-server...');
+
+    // 1. Coverage
+    const coverageItems = pages
+      .filter(p => p.coverage)
+      .map(p => ({
+        pageId: p.id,
+        passing: p.coverage.passing,
+        total: p.coverage.total,
+        items: p.coverage.items,
+      }));
+    const coverageResult = await syncCoverage(coverageItems);
+    if (coverageResult.ok) {
+      console.log(`  coverageSync: updated ${coverageResult.data.updated} pages`);
+    } else {
+      console.log(`  coverageSync: skipped (${coverageResult.message || 'server unavailable'})`);
+    }
+
+    // 2. Rankings
+    const rankingItems = pages
+      .filter(p => p.readerRank != null || p.researchRank != null || p.recommendedScore != null)
+      .map(p => ({
+        pageId: p.id,
+        readerRank: p.readerRank ?? null,
+        researchRank: p.researchRank ?? null,
+        recommendedScore: p.recommendedScore ?? null,
+      }));
+    const rankingsResult = await syncRankings(rankingItems);
+    if (rankingsResult.ok) {
+      console.log(`  rankingsSync: updated ${rankingsResult.data.updated} pages`);
+    } else {
+      console.log(`  rankingsSync: skipped (${rankingsResult.message || 'server unavailable'})`);
+    }
+
+    // 3. Update schedule
+    const scheduleItems = updateScheduleItems.map(item => ({
+      pageId: item.id,
+      updateFrequency: item.updateFrequency,
+      daysSinceUpdate: item.daysSinceUpdate,
+      daysUntilDue: item.daysUntilDue,
+      staleness: item.staleness,
+      priority: item.priority,
+    }));
+    if (scheduleItems.length > 0) {
+      const scheduleResult = await syncSchedule(scheduleItems);
+      if (scheduleResult.ok) {
+        console.log(`  scheduleSync: updated ${scheduleResult.data.updated} pages`);
+      } else {
+        console.log(`  scheduleSync: skipped (${scheduleResult.message || 'server unavailable'})`);
+      }
+    }
+
+    // 4. Similarity (from redundancy data)
+    const similarityPairs = [];
+    for (const page of pages) {
+      if (!page.redundancy?.similarPages) continue;
+      for (let rank = 0; rank < page.redundancy.similarPages.length; rank++) {
+        const sp = page.redundancy.similarPages[rank];
+        similarityPairs.push({
+          pageId: page.id,
+          similarPageId: sp.id,
+          similarity: sp.similarity,
+          rank: rank + 1,
+        });
+      }
+    }
+    if (similarityPairs.length > 0) {
+      const similarityResult = await syncSimilarity(similarityPairs);
+      if (similarityResult.ok) {
+        console.log(`  similaritySync: upserted ${similarityResult.data.upserted} pairs`);
+      } else {
+        console.log(`  similaritySync: skipped (${similarityResult.message || 'server unavailable'})`);
+      }
+    }
+  }
 
   database.pages = pages;
 

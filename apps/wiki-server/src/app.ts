@@ -55,6 +55,7 @@ import { groundskeeperRunsRoute } from "./routes/operational/groundskeeper-runs.
 import { githubIssuesRoute } from "./routes/operational/github-issues.js";
 import { githubPullsRoute } from "./routes/operational/github-pulls.js";
 import { monitoringRoute } from "./routes/operational/monitoring.js";
+import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
 
 let requestCounter = 0;
 
@@ -181,6 +182,7 @@ export function createApp() {
   app.route("/api/things", thingsRoute);
   app.route("/api/research-areas", researchAreasRoute);
 
+
   // Agent & session tracking (operational)
   app.route("/api/sessions", sessionsRoute);
   app.route("/api/agent-sessions", agentSessionsRoute);
@@ -198,6 +200,7 @@ export function createApp() {
   app.route("/api/github/pulls", githubPullsRoute);
   app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
   app.route("/api/monitoring", monitoringRoute);
+  app.route("/api/build-metrics", buildMetricsRoute);
 
   return app;
 }

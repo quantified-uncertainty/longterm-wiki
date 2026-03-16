@@ -187,6 +187,25 @@ export {
   getArtifactStats,
 } from './artifacts.ts';
 
+// Build Metrics
+export {
+  syncCoverage,
+  syncSchedule,
+  syncRankings,
+  syncSimilarity,
+} from './build-metrics.ts';
+export type {
+  CoverageItem,
+  ScheduleItem,
+  RankingItem,
+  SimilarityPair,
+  SyncCoverageResult,
+  SyncScheduleResult,
+  SyncRankingsResult,
+  SyncSimilarityResult,
+  BuildMetricsStatsResult,
+} from './build-metrics.ts';
+
 // Entity IDs
 export {
   allocateId,

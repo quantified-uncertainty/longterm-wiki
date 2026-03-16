@@ -687,6 +687,13 @@
       "when": 1777017600000,
       "tag": "0097_create_related_graph_mv",
       "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1777104000000,
+      "tag": "0098_build_metrics_tables",
+      "breakpoints": true
     }
   ]
 }
