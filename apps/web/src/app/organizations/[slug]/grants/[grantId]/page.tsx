@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -124,6 +124,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const record = allGrants.find((r) => r.key === grantId);
   if (!record) return { title: "Grant Not Found" };
 
+  // Validate grant belongs to this org
+  const funderSlug = getKBEntitySlug(record.ownerEntityId);
+  if (funderSlug !== slug) return { title: "Grant Not Found" };
+
   const grant = parseGrant(record);
   const org = resolveOrgBySlug(slug);
   const orgName = org?.name ?? slug;
@@ -153,7 +157,6 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
   if (funderSlug !== slug) {
     // Grant exists but belongs to a different org — redirect
     if (funderSlug) {
-      const { redirect } = await import("next/navigation");
       redirect(`/organizations/${funderSlug}/grants/${grantId}`);
     }
     notFound();
