@@ -586,6 +586,51 @@ function cleanTitle(title: string, orgName: string): string {
   return t.trim();
 }
 
+/**
+ * Extract a publication date from common URL patterns.
+ * Returns an ISO date string (YYYY-MM-DD) or null.
+ * Only recognizes years in 2000-2030 to avoid false positives from version numbers.
+ */
+export function extractDateFromUrl(url: string): string | null {
+  try {
+    const urlPath = new URL(url).pathname;
+    const fullDate = urlPath.match(
+      /(?:^|\/)(\d{4})[-/](\d{2})[-/](\d{2})(?:\/|$|-)/
+    );
+    if (fullDate) {
+      const [, y, m, d] = fullDate;
+      const year = Number(y);
+      const month = Number(m);
+      const day = Number(d);
+      if (
+        year >= 2000 &&
+        year <= 2030 &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31
+      ) {
+        return `${y}-${m}-${d}`;
+      }
+      // Full date pattern matched but values were invalid — don't fall through
+      // to partial date which would incorrectly truncate (e.g. 2024/03/32 → 2024-03-01)
+      return null;
+    }
+    const partialDate = urlPath.match(/(?:^|\/)(\d{4})\/(\d{2})(?:\/|$)/);
+    if (partialDate) {
+      const [, y, m] = partialDate;
+      const year = Number(y);
+      const month = Number(m);
+      if (year >= 2000 && year <= 2030 && month >= 1 && month <= 12) {
+        return `${y}-${m}-01`;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Derive a human-readable title from a URL path when the DB title is junk. */
 function titleFromUrl(url: string): string | null {
   try {
@@ -642,7 +687,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     publicationName: publication?.name ?? null,
     credibility: credibility ?? null,
     citingPageCount: citingPages.length,
-    publishedDate: r.published_date ?? null,
+    publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
     authors: (r.authors ?? []).map(resolveAuthor),
   };
 }

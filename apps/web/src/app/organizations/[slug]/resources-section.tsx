@@ -47,17 +47,29 @@ function computeColumnVisibility(
   const withDate = resources.filter((r) => r.publishedDate).length;
   const withPub = resources.filter((r) => r.publicationName).length;
   const withCred = resources.filter((r) => r.credibility != null).length;
+  const showPublication = alwaysShow?.publication || withPub / total >= 0.15;
   return {
     showDate: alwaysShow?.date || withDate / total >= 0.2,
-    showPublication: alwaysShow?.publication || withPub / total >= 0.15,
+    showPublication,
     showCredibility: alwaysShow?.credibility || withCred / total >= 0.15,
+    showSource: !showPublication,
   };
+}
+
+/** Extract bare domain from a URL, stripping www. prefix. */
+function extractDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
 }
 
 function makeColumns(opts: {
   showDate: boolean;
   showPublication: boolean;
   showCredibility: boolean;
+  showSource: boolean;
 }): ColumnDef<OrgResourceRow>[] {
   const cols: ColumnDef<OrgResourceRow>[] = [
     {
@@ -112,6 +124,26 @@ function makeColumns(opts: {
       },
     },
   ];
+
+  if (opts.showSource) {
+    cols.push({
+      id: "source",
+      accessorFn: (row) => extractDomain(row.url),
+      header: ({ column }) => (
+        <SortableHeader column={column}>Source</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const domain = extractDomain(row.original.url);
+        if (!domain) return <span className="text-muted-foreground/40 text-xs">-</span>;
+        return (
+          <span className="text-xs text-muted-foreground max-w-[140px] truncate block" title={domain}>
+            {domain}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    });
+  }
 
   if (opts.showPublication) {
     cols.push({

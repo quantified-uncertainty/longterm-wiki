@@ -367,6 +367,10 @@ const resourcesApp = new Hono()
         );
       });
     } catch (err) {
+      logger.error(
+        { err, resourceIds: items.map((r) => r.id), itemCount: items.length },
+        "resources batch upsert failed",
+      );
       return dbError(c, "resources batch upsert", err, { itemCount: items.length });
     }
 
