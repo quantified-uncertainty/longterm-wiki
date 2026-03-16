@@ -2,7 +2,7 @@ import {
   getKBEntities,
   getKBProperties,
   getKBFacts,
-  getKBRecords,
+  getKBAllRecordCollections,
 } from "@/data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { FBEntitiesTable } from "./factbase-entities-table";
@@ -40,20 +40,11 @@ export function FBEntityCoverageContent() {
         ? Math.round((factsWithSource / structuredFacts.length) * 100)
         : 0;
 
-    // Count records across all collections
+    // Count records across all collections (dynamic, not hardcoded)
+    const allCollections = getKBAllRecordCollections(entity.id);
     let itemCount = 0;
-    const commonCollections = [
-      "funding-rounds",
-      "key-persons",
-      "products",
-      "model-releases",
-      "board-seats",
-      "strategic-partnerships",
-      "safety-milestones",
-      "research-areas",
-    ];
-    for (const collection of commonCollections) {
-      itemCount += getKBRecords(entity.id, collection).length;
+    for (const entries of Object.values(allCollections)) {
+      itemCount += entries.length;
     }
 
     const propertyNames = [...propertyIds]
