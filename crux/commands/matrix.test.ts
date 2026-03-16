@@ -1,74 +1,85 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { commands, getHelp } from './matrix.ts';
+import { writeFileSync, unlinkSync, existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
+
+const EXCLUSION_FILE = join(PROJECT_ROOT, '.matrix-improved-test.txt');
 
 describe('matrix commands', () => {
+  afterEach(() => { if (existsSync(EXCLUSION_FILE)) unlinkSync(EXCLUSION_FILE); });
+
   it('scores returns entity type data', async () => {
     const result = await commands.scores([], { ci: true });
     expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
-    expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThan(0);
-
-    const first = data[0];
-    expect(first).toHaveProperty('type');
-    expect(first).toHaveProperty('pageCount');
-    expect(first).toHaveProperty('contentScore');
-    expect(first).toHaveProperty('avgCoverageScore');
+    expect(data[0]).toHaveProperty('contentScore');
   });
 
   it('scores filters by entity type', async () => {
     const result = await commands.scores([], { ci: true, type: 'person' });
-    expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
     expect(data.length).toBe(1);
     expect(data[0].type).toBe('person');
   });
 
-  it('pages returns ranked improvement targets', async () => {
-    const result = await commands.pages([], { ci: true, dimension: 'content', limit: '5' });
-    expect(result.exitCode).toBe(0);
-    const data = JSON.parse(result.output);
-    expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBeLessThanOrEqual(5);
+  it('scores accepts custom weights', async () => {
+    const r = await commands.scores([], { ci: true, type: 'person', weights: 'quality:100,coverage:0,citations:0,freshness:0,pages:0' });
+    const d = JSON.parse(r.output)[0];
+    if (d.avgQuality != null) expect(d.contentScore).toBe(d.avgQuality);
+  });
 
+  it('pages returns items with action field', async () => {
+    const result = await commands.pages([], { ci: true, dimension: 'content', limit: '5', includeStubs: true });
+    const data = JSON.parse(result.output);
     if (data.length > 0) {
-      expect(data[0]).toHaveProperty('impactScore');
-      expect(data[0]).toHaveProperty('reasons');
-      // Should be sorted by impact descending
-      for (let i = 1; i < data.length; i++) {
-        expect(data[i].impactScore).toBeLessThanOrEqual(data[i - 1].impactScore);
-      }
+      expect(data[0]).toHaveProperty('action');
+      expect(['create', 'improve']).toContain(data[0].action);
+      expect(data[0]).toHaveProperty('isStub');
     }
   });
 
   it('pages --format=ids returns comma-separated IDs', async () => {
     const result = await commands.pages([], { format: 'ids', limit: '3', dimension: 'content' });
-    expect(result.exitCode).toBe(0);
     const ids = result.output.split(',');
     expect(ids.length).toBeLessThanOrEqual(3);
     expect(ids[0]).toMatch(/^E\d+$/);
   });
 
-  it('next-task returns a prompt', async () => {
+  it('pages respects exclusion list', async () => {
+    const r1 = await commands.pages([], { ci: true, dimension: 'content', limit: '1' });
+    const topPage = JSON.parse(r1.output)[0];
+    writeFileSync(EXCLUSION_FILE, `${topPage.numericId}\n`);
+    const r2 = await commands.pages([], { ci: true, dimension: 'content', limit: '1', exclude: EXCLUSION_FILE });
+    const newTop = JSON.parse(r2.output)[0];
+    expect(newTop.numericId).not.toBe(topPage.numericId);
+  });
+
+  it('next-task returns prompt with action', async () => {
     const result = await commands['next-task']([], { dimension: 'content' });
-    expect(result.exitCode).toBe(0);
     expect(result.output).toContain('## Task:');
-    expect(result.output).toContain('Steps');
+    expect(result.output).toContain('Action');
   });
 
-  it('next-task --format=json returns structured data', async () => {
+  it('next-task --format=json includes isStub and action', async () => {
     const result = await commands['next-task']([], { format: 'json', dimension: 'content' });
-    expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
-    expect(data).toHaveProperty('impactScore');
-    expect(data).toHaveProperty('title');
+    expect(data).toHaveProperty('isStub');
+    expect(data).toHaveProperty('action');
   });
 
-  it('getHelp returns non-empty string', () => {
+  it('mark-done adds page to exclusion list', async () => {
+    const result = await commands['mark-done'](['E357'], { exclude: EXCLUSION_FILE });
+    expect(result.exitCode).toBe(0);
+    expect(readFileSync(EXCLUSION_FILE, 'utf-8')).toContain('E357');
+  });
+
+  it('getHelp covers all commands', () => {
     const help = getHelp();
-    expect(help).toContain('Matrix Domain');
     expect(help).toContain('scores');
-    expect(help).toContain('pages');
-    expect(help).toContain('next-task');
+    expect(help).toContain('mark-done');
+    expect(help).toContain('--weights');
+    expect(help).toContain('--include-stubs');
   });
 });

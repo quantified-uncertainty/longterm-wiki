@@ -99,3 +99,4 @@ crux/evals/results/
 .envrc
 
 # Design docs — committed for review. Gitignore removed intentionally.
+.matrix-improved.txt
