@@ -32,9 +32,6 @@ export interface InfoBoxProps {
   image?: string;
   website?: string;
   importance?: number;
-  tractability?: number;
-  neglectedness?: number;
-  uncertainty?: number;
   founded?: string;
   location?: string;
   headcount?: string;
@@ -170,9 +167,6 @@ export function InfoBox({
   image,
   website,
   importance,
-  tractability,
-  neglectedness,
-  uncertainty,
   founded,
   location,
   headcount,
@@ -297,7 +291,6 @@ export function InfoBox({
   );
 
   const sortedTypes = groupedEntries ? Object.keys(groupedEntries) : [];
-  const hasITN = tractability !== undefined || neglectedness !== undefined || uncertainty !== undefined;
 
   // External links entries
   const extLinkEntries = externalLinks
@@ -534,26 +527,6 @@ export function InfoBox({
         </div>
       )}
 
-      {/* ITN Framework */}
-      {hasITN && (
-        <div className="px-4 py-3 border-t border-border">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Prioritization</div>
-          <div className="py-2">
-            {tractability !== undefined && (
-              <div className="flex py-1.5 border-b border-border last:border-b-0">
-                <span className="flex-shrink-0 w-[100px] text-muted-foreground font-medium pr-2">Tractability</span>
-                <span className="flex-1 text-foreground font-semibold">{tractability}</span>
-              </div>
-            )}
-            {neglectedness !== undefined && (
-              <div className="flex py-1.5 border-b border-border last:border-b-0">
-                <span className="flex-shrink-0 w-[100px] text-muted-foreground font-medium pr-2">Neglectedness</span>
-                <span className="flex-1 text-foreground font-semibold">{neglectedness}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
       {/* Article Metrics */}
       {(formattedWordCount || backlinkCount) && (
         <div className="px-4 py-2 border-t border-border">
