@@ -293,6 +293,63 @@ async function existingCommand(args: string[], options: CommandOptions): Promise
   return { exitCode: 0, output: JSON.stringify(records, null, 2) };
 }
 
+async function createEntityCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const nameArgs = args.filter(a => !a.startsWith('--'));
+  const name = nameArgs.join(' ');
+  if (!name) {
+    return { exitCode: 1, output: 'Usage: crux tablebase create-entity "Person Name" --type=person' };
+  }
+
+  const entityType = (options.type as string) || 'person';
+
+  // Generate slug from name
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  // Check if entity already exists
+  const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
+  const matcher = buildEntityMatcher();
+  const existing = matcher.match(name);
+  if (existing) {
+    const result = { created: false, existing: true, stableId: existing.stableId, slug: existing.slug, name: existing.name };
+    return {
+      exitCode: 0,
+      output: options.ci ? JSON.stringify(result) : `Already exists: ${existing.stableId}\t${existing.slug}\t${existing.name}`,
+    };
+  }
+
+  // Allocate numeric ID
+  const { allocateId } = await import('../lib/wiki-server/ids.ts');
+  const idResult = await allocateId(slug, `${entityType}: ${name}`);
+  if (!idResult.ok) {
+    return { exitCode: 1, output: `ID allocation failed: ${idResult.message}` };
+  }
+  const { numericId, stableId } = idResult.data;
+
+  // Sync entity to wiki-server
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const description = (options.description as string) || undefined;
+  const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
+    entities: [{
+      id: slug,
+      numericId,
+      stableId,
+      entityType,
+      title: name,
+      ...(description && { description }),
+    }],
+  });
+
+  if (!syncResult.ok) {
+    return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
+  }
+
+  const result = { created: true, stableId, numericId, slug, name, entityType };
+  return {
+    exitCode: 0,
+    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId} (${numericId})`,
+  };
+}
+
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
@@ -348,6 +405,7 @@ export const commands = {
   resolve: resolveCommand,
   submit: submitCommand,
   existing: existingCommand,
+  'create-entity': createEntityCommand,
   default: scanCommand,
 };
 
@@ -362,9 +420,10 @@ Commands:
   improve     Run LLM agent for one task (uses ANTHROPIC_API_KEY)
   mark-done   Mark a task as completed (excluded from future picks)
   loop        Autonomous multi-task enrichment loop (uses ANTHROPIC_API_KEY)
-  resolve     Resolve entity name to stableId (for Claude Code skill)
-  submit      Submit records to a table (for Claude Code skill)
-  existing    Query existing records for an entity (for Claude Code skill)
+  resolve       Resolve entity name to stableId (for Claude Code skill)
+  create-entity Create a new entity (person, org, etc.) with allocated ID
+  submit        Submit records to a table (for Claude Code skill)
+  existing      Query existing records for an entity (for Claude Code skill)
 
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing

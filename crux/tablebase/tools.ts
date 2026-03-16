@@ -84,6 +84,19 @@ export function getToolDefinitions() {
           required: ['table', 'records'],
         },
       },
+      {
+        name: 'create_entity',
+        description: 'Create a new entity (person, organization, benchmark, etc.) in the database. Use this when resolve_entity returns NOT_FOUND for a person or org you need to reference. Returns the new entity\'s stableId.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Full display name (e.g., "Alexander Berger")' },
+            entityType: { type: 'string', enum: ['person', 'organization', 'benchmark', 'ai-model'], description: 'Entity type' },
+            description: { type: 'string', description: 'Brief one-sentence description' },
+          },
+          required: ['name', 'entityType'],
+        },
+      },
     ],
     // Anthropic server tool for web search — must use the versioned type tag
     serverTools: [
@@ -188,7 +201,58 @@ function handleResolveEntity(input: Record<string, unknown>): string {
     });
   }
 
-  return JSON.stringify({ found: false, query: name, suggestion: 'Entity not found in database. Check spelling or try alternative names.' });
+  return JSON.stringify({ found: false, query: name, suggestion: 'Entity not found. Use create_entity to create it, or try alternative names.' });
+}
+
+async function handleCreateEntity(input: Record<string, unknown>): Promise<string> {
+  const name = input.name as string;
+  const entityType = (input.entityType as string) || 'person';
+  const description = input.description as string | undefined;
+
+  // Generate slug
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  // Check if already exists
+  const matcher = getEntityMatcher();
+  const existing = matcher.match(name);
+  if (existing) {
+    return JSON.stringify({ created: false, existing: true, stableId: existing.stableId, name: existing.name });
+  }
+
+  // Allocate ID
+  const { allocateId } = await import('../lib/wiki-server/ids.ts');
+  const idResult = await allocateId(slug, `${entityType}: ${name}`);
+  if (!idResult.ok) {
+    return `Error allocating ID: ${idResult.message}`;
+  }
+
+  // Sync entity
+  const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
+    entities: [{
+      id: slug,
+      numericId: idResult.data.numericId,
+      stableId: idResult.data.stableId,
+      entityType,
+      title: name,
+      ...(description && { description }),
+    }],
+  });
+
+  if (!syncResult.ok) {
+    return `Error creating entity: ${syncResult.message}`;
+  }
+
+  // Update the cached matcher so subsequent resolve calls find this entity
+  _entityMatcher = null; // Force re-build on next resolve
+
+  return JSON.stringify({
+    created: true,
+    stableId: idResult.data.stableId,
+    numericId: idResult.data.numericId,
+    slug,
+    name,
+    entityType,
+  });
 }
 
 async function handleSubmitRecords(
@@ -304,6 +368,9 @@ export function buildToolHandlers(
     query_entities: handleQueryEntities,
     query_existing_records: handleQueryExistingRecords,
     resolve_entity: async (input) => handleResolveEntity(input),
+    create_entity: async (input) => dryRun
+      ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
+      : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
   };
 }

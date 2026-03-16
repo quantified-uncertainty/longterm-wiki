@@ -11,6 +11,7 @@ const SHARED_RULES = `
 - Every record you submit MUST include a "source" field with a URL where you found the information.
 - Do NOT fabricate data — only submit facts confirmed by web search results.
 - Use the resolve_entity tool to find entity IDs before submitting records with entity references.
+- **If resolve_entity returns NOT_FOUND**, use create_entity to create the entity first, then use the returned stableId in your record. This is the expected workflow — most people won't exist yet.
 - Use query_existing_records to see what data already exists before adding new records.
 - If you cannot find reliable data, say so — do not guess or make up records.
 `;

@@ -66,7 +66,17 @@ pnpm crux tablebase resolve "Dario Amodei" --ci
 # Output: {"found":true,"stableId":"111","slug":"dario-amodei","name":"Dario Amodei"}
 ```
 
-If `NOT_FOUND`, the person/entity is not in the database. **Skip records for unresolved entities** — do not fabricate IDs.
+If `NOT_FOUND`, **create the entity** before submitting records that reference it:
+
+```bash
+pnpm crux tablebase create-entity "Alexander Berger" --type=person
+# Output: ✓ Created person "Alexander Berger" → KxJ7mNpQaB (E1042)
+
+pnpm crux tablebase create-entity "Alexander Berger" --type=person --ci
+# Output: {"created":true,"stableId":"KxJ7mNpQaB","numericId":"E1042","slug":"alexander-berger","name":"Alexander Berger","entityType":"person"}
+```
+
+If the entity already exists, the command returns the existing ID (idempotent). Use the returned `stableId` as the `personId` or `investorId` in your records.
 
 ## Phase 4: Build and submit records
 
