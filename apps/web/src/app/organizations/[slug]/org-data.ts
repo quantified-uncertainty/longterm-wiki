@@ -45,13 +45,18 @@ export type NumericOrRange = number | [number, number];
 
 /** Parse a value that may be a single number or a 2-element array range. */
 export function parseNumericOrRange(value: unknown): NumericOrRange | null {
-  if (typeof value === "number") return value;
+  if (typeof value === "number" && isFinite(value)) return value;
   if (
     Array.isArray(value) &&
     value.length === 2 &&
-    value.every((v) => typeof v === "number")
+    value.every((v) => typeof v === "number" && isFinite(v))
   ) {
     return [value[0], value[1]] as [number, number];
+  }
+  // Handle numeric strings (e.g., "50000" from YAML)
+  if (typeof value === "string") {
+    const num = Number(value);
+    if (isFinite(num)) return num;
   }
   return null;
 }
@@ -59,8 +64,11 @@ export function parseNumericOrRange(value: unknown): NumericOrRange | null {
 /** Get a single numeric value from NumericOrRange (midpoint for ranges). */
 export function numericValue(v: NumericOrRange | null): number {
   if (v == null) return 0;
-  if (Array.isArray(v)) return (v[0] + v[1]) / 2;
-  return v;
+  if (Array.isArray(v)) {
+    const mid = (v[0] + v[1]) / 2;
+    return isNaN(mid) ? 0 : mid;
+  }
+  return isNaN(v) ? 0 : v;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -184,12 +192,12 @@ export function formatAmount(value: unknown): string | null {
   if (
     Array.isArray(value) &&
     value.length === 2 &&
-    value.every((v) => typeof v === "number")
+    value.every((v) => typeof v === "number" && !isNaN(v))
   ) {
     return `${formatKBNumber(value[0], "USD")}\u2013${formatKBNumber(value[1], "USD")}`;
   }
   const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
+  if (isNaN(num) || !isFinite(num)) return null;
   return formatKBNumber(num, "USD");
 }
 
@@ -1067,7 +1075,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        leadInvestorName: resolved.name,
+        leadInvestorName: resolved.name || titleCase(parsed.leadInvestor ?? "") || "Unknown Investor",
         leadInvestorHref: resolved.href,
       };
     })
@@ -1088,7 +1096,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        investorName: resolved.name,
+        investorName: resolved.name || titleCase(parsed.investorId ?? "") || "Unknown Investor",
         investorHref: resolved.href,
       };
     })
@@ -1104,7 +1112,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        holderName: resolved.name,
+        holderName: resolved.name || titleCase(parsed.holderId ?? "") || "Unknown Holder",
         holderHref: resolved.href,
       };
     })

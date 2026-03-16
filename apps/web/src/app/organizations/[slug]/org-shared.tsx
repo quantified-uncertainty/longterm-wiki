@@ -63,10 +63,15 @@ export function resolveRecipient(recipientId: string): { name: string; href: str
     const href = slug && entity.type === "organization" ? `/organizations/${slug}`
       : slug && entity.type === "person" ? `/people/${slug}`
       : `/factbase/entity/${recipientId}`;
-    return { name: entity.name, href };
+    // Guard against empty entity name — fall back to titleCased recipientId
+    const name = entity.name?.trim()
+      ? entity.name
+      : titleCase(recipientId.replace(/-/g, " ")) || "Unknown";
+    return { name, href };
   }
-  // Fall back: titleCase the slug
-  return { name: titleCase(recipientId.replace(/-/g, " ")), href: null };
+  // Fall back: titleCase the slug, or "Unknown" as last resort
+  const fallbackName = titleCase(recipientId.replace(/-/g, " "));
+  return { name: fallbackName || "Unknown", href: null };
 }
 
 // ── Subcomponents ─────────────────────────────────────────────────────

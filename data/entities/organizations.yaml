@@ -21,12 +21,6 @@
       relationship: research
     - id: openai
       type: organization
-    - id: interpretability
-      type: safety-agenda
-      relationship: research
-    - id: scalable-oversight
-      type: safety-agenda
-      relationship: research
     - id: deceptive-alignment
       type: risk
       relationship: addresses
@@ -42,41 +36,11 @@
     - id: claude
       type: ai-model
       relationship: composed-of
-    - id: constitutional-ai
-      type: concept
-      relationship: research
-    - id: rsp
-      type: policy
-      relationship: related
     - id: sleeper-agents
       type: concept
       relationship: research
-    - id: anthropic-core-views
-      type: concept
-      relationship: related
-    - id: long-term-benefit-trust
-      type: concept
-      relationship: related
     - id: deepmind
       type: organization
-    - id: anthropic-government-standoff
-      type: event
-      relationship: related
-    - id: anthropic-valuation
-      type: analysis
-      relationship: related
-    - id: anthropic-stakeholders
-      type: analysis
-      relationship: related
-    - id: anthropic-investors
-      type: analysis
-      relationship: related
-    - id: anthropic-ipo
-      type: analysis
-      relationship: related
-    - id: anthropic-impact
-      type: analysis
-      relationship: related
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com
@@ -135,9 +99,6 @@
       type: organization
     - id: anthropic
       type: organization
-    - id: scalable-oversight
-      type: safety-agenda
-      relationship: research
     - id: reward-hacking
       type: risk
       relationship: addresses
@@ -211,12 +172,6 @@
       relationship: research
     - id: anthropic
       type: organization
-    - id: interpretability
-      type: safety-agenda
-      relationship: research
-    - id: scalable-oversight
-      type: safety-agenda
-      relationship: research
     - id: racing-dynamics
       type: risk
       relationship: affects
@@ -368,9 +323,7 @@
     - id: uk-aisi
       type: organization
     - id: situational-awareness
-      type: risk
-    - id: capability-evaluations
-      type: safety-agenda
+      type: capability
   sources:
     - title: Apollo Research Website
       url: https://www.apolloresearch.ai
@@ -410,7 +363,7 @@
   website: https://safe.ai
   relatedEntries:
     - id: existential-risk
-      type: risk
+      type: concept
     - id: power-seeking
       type: risk
     - id: anthropic
@@ -443,8 +396,6 @@
   relatedEntries:
     - id: connor-leahy
       type: person
-    - id: interpretability
-      type: safety-agenda
     - id: anthropic
       type: organization
     - id: redwood-research
@@ -490,12 +441,8 @@
   relatedEntries:
     - id: dan-hendrycks
       type: person
-    - id: adversarial-robustness
-      type: safety-agenda
     - id: natural-abstractions
       type: concept
-    - id: benchmarking
-      type: safety-agenda
     - id: metr
       type: organization
     - id: apollo-research
@@ -536,8 +483,6 @@
   title: GovAI
   website: https://governance.ai
   relatedEntries:
-    - id: compute-governance
-      type: policy
     - id: deepmind
       type: organization
   sources:
@@ -629,8 +574,6 @@
   relatedEntries:
     - id: paul-christiano
       type: person
-    - id: scalable-oversight
-      type: safety-agenda
     - id: deceptive-alignment
       type: risk
     - id: sandbagging
@@ -687,8 +630,6 @@
   title: Epoch AI
   website: https://epochai.org
   relatedEntries:
-    - id: compute-governance
-      type: policy
     - id: transformative-ai
       type: concept
     - id: scaling-laws
@@ -751,8 +692,6 @@
       type: risk
     - id: sharp-left-turn
       type: risk
-    - id: compute-governance
-      type: policy
     - id: arc
       type: organization
   sources:
@@ -866,10 +805,6 @@
       type: organization
     - id: apollo-research
       type: organization
-    - id: compute-governance
-      type: policy
-    - id: us-executive-order
-      type: policy
     - id: anthropic
       type: organization
     - id: openai
@@ -921,8 +856,6 @@
       type: organization
     - id: uk-aisi
       type: organization
-    - id: ai-safety-institutes
-      type: policy
   sources:
     - title: Japan AISI Website
       url: https://aisi.go.jp/en/
@@ -952,8 +885,6 @@
       type: organization
     - id: uk-aisi
       type: organization
-    - id: ai-safety-institutes
-      type: policy
   sources:
     - title: Singapore AISI Website
       url: https://aisi.gov.sg/
@@ -980,8 +911,6 @@
       type: organization
     - id: uk-aisi
       type: organization
-    - id: ai-safety-institutes
-      type: policy
   sources:
     - title: Canadian AI Safety Institute
       url: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
@@ -1003,14 +932,10 @@
     The European Commission's dedicated office for AI governance, established in February 2024. Responsible for
     enforcing the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI policy.
   relatedEntries:
-    - id: eu-ai-act
-      type: policy
     - id: uk-aisi
       type: organization
     - id: us-aisi
       type: organization
-    - id: ai-safety-institutes
-      type: policy
   sources:
     - title: EU AI Office
       url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
@@ -1032,8 +957,6 @@
   relatedEntries:
     - id: metr
       type: organization
-    - id: capability-evaluations
-      type: concept
   tags:
     - evaluations
     - ai-safety
@@ -1088,8 +1011,6 @@
       type: organization
     - id: sam-altman
       type: person
-    - id: long-term-benefit-trust
-      type: organization
     - id: anthropic
       type: organization
     - id: giving-pledge
@@ -1239,8 +1160,6 @@
       type: organization
     - id: connor-leahy
       type: person
-    - id: eu-ai-act
-      type: concept
   lastUpdated: 2026-02
 
 - id: frontier-model-forum
@@ -1370,8 +1289,6 @@
       type: organization
     - id: deepmind
       type: organization
-    - id: interpretability
-      type: safety-agenda
   lastUpdated: 2026-02
 
 
@@ -1380,6 +1297,7 @@
   stableId: 9k7drw6Qpg
   numericId: E509
   type: organization
+  orgType: generic
   title: 1Day Sooner
   website: https://www.1daysooner.org/
   description: >-
@@ -1535,6 +1453,7 @@
   stableId: l5K9ZdbXww
   numericId: E518
   type: organization
+  orgType: generic
   summaryPage: community-building-overview
   title: Center for Applied Rationality
   website: https://rationality.org
@@ -1891,6 +1810,7 @@
   stableId: 4804DX6Zbg
   numericId: E540
   type: organization
+  orgType: startup
   summaryPage: safety-orgs-overview
   title: Lightning Rod Labs
   website: https://www.lightningrod.ai/
@@ -2187,10 +2107,6 @@
   title: Redwood Research
   website: https://redwoodresearch.org
   relatedEntries:
-    - id: interpretability
-      type: safety-agenda
-    - id: ai-control
-      type: safety-agenda
     - id: scheming
       type: risk
     - id: sandbagging

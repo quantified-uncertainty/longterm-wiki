@@ -247,7 +247,13 @@ export default async function OrgProfilePage({
         field(person, "display_name") ??
         personEntity?.name ??
         titleCase(personRef ?? person.key);
-      peopleByName.set(name, {
+      // Use entity ID as the dedup key when available; fall back to name.
+      // This prevents two different people with the same display name from
+      // silently overwriting each other.
+      const dedupKey = personEntityId ?? name;
+      const existingByName = !personEntityId ? peopleByName.get(name) : undefined;
+      const finalKey = existingByName ? `${name}__${person.key}` : dedupKey;
+      peopleByName.set(finalKey, {
         name,
         title: field(person, "title"),
         slug: personRef,
@@ -260,16 +266,35 @@ export default async function OrgProfilePage({
       });
     }
 
-    // Merge board members — if already present, just add board flag
+    // Merge board members — if already present, just add board flag.
+    // Try to match by entity ID first, then fall back to name match.
     for (const bm of data.boardMembers) {
-      const existing = peopleByName.get(bm.personName);
-      if (existing) {
+      const bmSlug = bm.personHref?.replace(/^\/(people|organizations)\//, "");
+      const bmEntityId = bmSlug ? resolveKBSlug(bmSlug) : undefined;
+
+      // Look up by entity ID first (most reliable), then by name
+      let existingKey: string | undefined;
+      if (bmEntityId && peopleByName.has(bmEntityId)) {
+        existingKey = bmEntityId;
+      } else {
+        // Scan values for a name match
+        for (const [key, val] of peopleByName) {
+          if (val.name === bm.personName) {
+            existingKey = key;
+            break;
+          }
+        }
+      }
+
+      if (existingKey) {
+        const existing = peopleByName.get(existingKey)!;
         existing.isBoard = true;
       } else {
-        peopleByName.set(bm.personName, {
+        const bmKey = bmEntityId ?? bm.personName;
+        peopleByName.set(bmKey, {
           name: bm.personName,
           title: bm.role ?? "Board Member",
-          slug: bm.personHref?.replace(/^\/(people|organizations)\//, ""),
+          slug: bmSlug,
           entityType: bm.personHref?.startsWith("/people") ? "person" : undefined,
           isFounder: false,
           isBoard: true,
@@ -327,6 +352,7 @@ export default async function OrgProfilePage({
     const fundingCount =
       data.sortedRounds.length +
       meaningfulInvestments.length +
+      meaningfulEquity.length +
       data.sortedPartnerships.length +
       data.grantsMade.length +
       data.grantsReceived.length;
@@ -534,7 +560,7 @@ export default async function OrgProfilePage({
     .toUpperCase();
 
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
+    <div className="max-w-[70rem] mx-auto px-6 py-8 overflow-x-hidden">
       <Breadcrumbs
         items={[
           { label: "Organizations", href: "/organizations" },

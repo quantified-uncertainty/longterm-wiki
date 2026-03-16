@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
  * GET /api/people?limit=50&offset=0&q=...&sort=...&affiliation=...
@@ -7,8 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
  * /api/people endpoint. Supports search, sort, and affiliation filter.
  */
 export async function GET(request: NextRequest) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
+  const config = getWikiServerConfig();
+  if (!config) {
     return NextResponse.json(
       { error: "Wiki server not configured" },
       { status: 503 },
@@ -16,17 +17,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const headers: Record<string, string> = {};
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
     // Forward all query params to the wiki-server
     const { searchParams } = request.nextUrl;
-    const url = `${serverUrl}/api/people?${searchParams.toString()}`;
+    const url = `${config.serverUrl}/api/people?${searchParams.toString()}`;
     const res = await fetch(url, {
-      headers,
+      headers: config.headers,
       signal: AbortSignal.timeout(5000),
     });
 
