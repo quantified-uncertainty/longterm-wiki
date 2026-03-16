@@ -44,21 +44,3 @@ facts:
     validEnd: "2022"
     source: https://www.eleuther.ai/
     notes: "Co-founded EleutherAI, an open-source AI research collective; developed GPT-NeoX and GPT-J"
-
-records:
-  career-history:
-    i_cL1zA2bC3d:
-      organization: "EleutherAI"
-      title: "Co-founder"
-      start: "2020"
-      end: "2022"
-      source: https://www.eleuther.ai/
-      notes: "Co-founded open-source AI research collective; developed GPT-NeoX-20B and GPT-J-6B; started as a Discord community replicating GPT-3"
-
-    i_cL4eF5gH6i:
-      organization: conjecture
-      title: "CEO & Co-founder"
-      start: "2022-03"
-      source: https://www.conjecture.dev/
-      notes: "Founded Conjecture to work on AI alignment; shifted from capabilities to safety; prominent public advocate for AI risk"
-

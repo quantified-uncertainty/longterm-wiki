@@ -75,28 +75,3 @@ facts:
     asOf: 2024-02
     source: https://www.nist.gov/people/paul-christiano
     notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in 2024"
-
-records:
-  career-history:
-    i_pC1zA2bC3d:
-      organization: openai
-      title: "Research Scientist"
-      start: "2017"
-      end: "2021-10"
-      source: https://paulfchristiano.com/
-      notes: "Led alignment research; key contributor to RLHF methodology; developed debate and iterated amplification approaches"
-
-    i_pC4eF5gH6i:
-      organization: arc
-      title: "Founder & President"
-      start: "2021-10"
-      source: https://alignment.org/
-      notes: "Founded ARC to work on alignment theory and evals; stepped back from daily operations in 2023 due to brain injury sustained in an accident"
-
-    i_pC7jK8lM9n:
-      organization: us-aisi
-      title: "Head of AI Safety"
-      start: "2024-02"
-      source: https://www.nist.gov/people/paul-christiano
-      notes: "Joined the U.S. AI Safety Institute (under NIST) to lead safety research"
-

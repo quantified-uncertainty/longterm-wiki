@@ -44,37 +44,3 @@ facts:
     value: https://www.conjecture.org
     source: https://www.wikidata.org/wiki/Q130712629
     notes: From Wikidata Q130712629
-
-records:
-  key-persons:
-    connor-leahy:
-      person: connor-leahy
-      title: "CEO & Co-founder"
-      start: "2022-03"
-      is_founder: true
-      source: https://www.conjecture.dev/
-      notes: "Previously co-founded EleutherAI; prominent AI safety advocate and
-        public commentator"
-
-    sid-black:
-      person: sid-black
-      title: "Co-founder"
-      start: "2022-03"
-      is_founder: true
-      notes: "Previously co-founded EleutherAI"
-
-    gabriel-alfour:
-      person: gabriel-alfour
-      title: "Co-founder"
-      start: "2022-03"
-      is_founder: true
-      notes: "Co-founded Conjecture with Connor Leahy and Sid Black"
-
-  research-areas:
-    cognitive-emulation-coem:
-      name: Cognitive Emulation (CoEm)
-      description: "Approach to building AI systems that emulate human cognitive
-        processes rather than optimizing black-box objectives"
-      started: "2022-03"
-      notes: "Core research thesis; aims to build interpretable AI by design rather
-        than post-hoc"
