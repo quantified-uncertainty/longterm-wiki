@@ -1266,6 +1266,31 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     }
   }
 
+  // ── Division key members (match personnel to divisions by title keywords) ──
+  const divisionMembers = new Map<string, Array<{ name: string; href: string | null; role: string | null }>>();
+  for (const d of divisions) {
+    const members: Array<{ name: string; href: string | null; role: string | null }> = [];
+    const divNameLower = d.name.toLowerCase();
+    // Build matching keywords from division name/key
+    const divKeyLower = d.key.toLowerCase().replace(/-/g, " ");
+    for (const p of personnel) {
+      // Skip the lead — they're already shown separately
+      const resolvedLeadSlug = d.lead?.toLowerCase();
+      if (resolvedLeadSlug && p.personId?.toLowerCase() === resolvedLeadSlug) continue;
+      if (!p.role) continue;
+      // Skip people who have ended their tenure
+      if (p.endDate) continue;
+      const roleLower = p.role.toLowerCase();
+      // Match if role mentions the division name or key
+      if (roleLower.includes(divNameLower) || roleLower.includes(divKeyLower)) {
+        members.push({ name: p.personName, href: p.personHref, role: p.role });
+      }
+    }
+    if (members.length > 0) {
+      divisionMembers.set(d.key, members);
+    }
+  }
+
   // ── Division spending stats ──
   // Compute total grant spending per division via: division → funding programs → grants.
   // Uses ALL alternate keys (from merged duplicates) to match funding programs.
@@ -1360,6 +1385,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     keyPublications,
     modelBenchmarks,
     divisionLeadResolved,
+    divisionMembers,
     divisionSpending,
     chartData,
     dilutionStages,

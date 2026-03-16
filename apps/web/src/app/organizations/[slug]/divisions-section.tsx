@@ -10,6 +10,7 @@ import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
+type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
 
 const DIVISION_TYPE_LABELS: Record<string, string> = {
   fund: "Fund",
@@ -40,9 +41,11 @@ const DIVISION_ACCENT_BORDER: Record<string, string> = {
 export function DivisionsOverview({
   divisions,
   leadResolved,
+  members,
 }: {
   divisions: ParsedDivisionRecord[];
   leadResolved?: LeadMap;
+  members?: MembersMap;
 }) {
   if (divisions.length === 0) return null;
 
@@ -55,7 +58,7 @@ export function DivisionsOverview({
       <SectionHeader title="Divisions" count={divisions.length} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {active.map((d) => (
-          <DivisionCard key={d.key} division={d} leadResolved={leadResolved} />
+          <DivisionCard key={d.key} division={d} leadResolved={leadResolved} members={members} />
         ))}
       </div>
       {inactive.length > 0 && (
@@ -65,7 +68,7 @@ export function DivisionsOverview({
           </summary>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2 opacity-60">
             {inactive.map((d) => (
-              <DivisionCard key={d.key} division={d} leadResolved={leadResolved} />
+              <DivisionCard key={d.key} division={d} leadResolved={leadResolved} members={members} />
             ))}
           </div>
         </details>
@@ -77,12 +80,16 @@ export function DivisionsOverview({
 function DivisionCard({
   division: d,
   leadResolved,
+  members,
 }: {
   division: ParsedDivisionRecord;
   leadResolved?: LeadMap;
+  members?: MembersMap;
 }) {
   const resolvedLead = leadResolved?.get(d.key);
   const leadDisplay = resolvedLead?.name ?? d.lead;
+  const leadHref = resolvedLead?.href ?? null;
+  const divMembers = members?.get(d.key) ?? [];
   const accentBorder = DIVISION_ACCENT_BORDER[d.divisionType] ?? "border-l-gray-300 dark:border-l-gray-600";
 
   const inner = (
@@ -103,19 +110,54 @@ function DivisionCard({
           </svg>
         )}
       </div>
-      <div className="flex items-center gap-2 mt-0.5">
+      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
         <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
           {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
         </span>
         {leadDisplay && (
           <>
             <span className="text-muted-foreground/30">&middot;</span>
-            <span className="text-xs text-muted-foreground truncate">
-              {leadDisplay}
-            </span>
+            {leadHref ? (
+              <Link
+                href={leadHref}
+                className="text-xs text-primary hover:underline truncate"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {leadDisplay}
+              </Link>
+            ) : (
+              <span className="text-xs text-muted-foreground truncate">
+                {leadDisplay}
+              </span>
+            )}
           </>
         )}
       </div>
+      {divMembers.length > 0 && (
+        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+          {divMembers.slice(0, 3).map((m, i) => (
+            <span key={i} className="text-[10px] text-muted-foreground/60">
+              {i > 0 && <span className="mr-1">&middot;</span>}
+              {m.href ? (
+                <Link
+                  href={m.href}
+                  className="hover:text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {m.name}
+                </Link>
+              ) : (
+                m.name
+              )}
+            </span>
+          ))}
+          {divMembers.length > 3 && (
+            <span className="text-[10px] text-muted-foreground/40">
+              +{divMembers.length - 3} more
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -136,10 +178,12 @@ export function DivisionsSection({
   divisions,
   leadResolved,
   spending,
+  members,
 }: {
   divisions: ParsedDivisionRecord[];
   leadResolved?: LeadMap;
   spending?: SpendingMap;
+  members?: MembersMap;
 }) {
   if (divisions.length === 0) return null;
 
@@ -150,6 +194,7 @@ export function DivisionsSection({
   const grouped = [...departments, ...teams, ...other];
 
   const hasSpending = spending && spending.size > 0;
+  const hasMembers = members && members.size > 0;
 
   return (
     <section>
@@ -161,6 +206,9 @@ export function DivisionsSection({
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Name</th>
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Type</th>
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Lead</th>
+              {hasMembers && (
+                <th scope="col" className="text-left py-2.5 px-3 font-medium">Key Members</th>
+              )}
               {hasSpending && (
                 <th scope="col" className="text-right py-2.5 px-3 font-medium">Total Spending</th>
               )}
@@ -175,6 +223,7 @@ export function DivisionsSection({
             {grouped.map((d) => {
               const resolvedLead = leadResolved?.get(d.key);
               const stats = spending?.get(d.key);
+              const divMembers = members?.get(d.key) ?? [];
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
@@ -229,6 +278,30 @@ export function DivisionsSection({
                       d.lead ?? ""
                     )}
                   </td>
+                  {hasMembers && (
+                    <td className="py-2.5 px-3 text-xs text-muted-foreground">
+                      {divMembers.length > 0 ? (
+                        <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                          {divMembers.slice(0, 3).map((m, i) => (
+                            <span key={i}>
+                              {m.href ? (
+                                <Link href={m.href} className="text-primary hover:underline">
+                                  {m.name}
+                                </Link>
+                              ) : (
+                                m.name
+                              )}
+                            </span>
+                          ))}
+                          {divMembers.length > 3 && (
+                            <span className="text-muted-foreground/50">
+                              +{divMembers.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      ) : null}
+                    </td>
+                  )}
                   {hasSpending && (
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap text-xs">
                       {stats && stats.totalAmount > 0 && (
