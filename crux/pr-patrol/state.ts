@@ -248,3 +248,28 @@ export function getPersistedClaimedPr(): number | null {
 export function setPersistedClaimedPr(prNum: number | null): void {
   writeFileSync(CLAIMED_PR_FILE, prNum != null ? String(prNum) : '');
 }
+
+// ── Parallel patrol state ───────────────────────────────────────────────────
+
+export const PARALLEL_STATE_FILE = join(CACHE_DIR, 'parallel-state.json');
+
+export interface ParallelState {
+  lastCycleAt: string;
+  slotsUsed: number[];
+  dispatched: number;
+  fixed: number;
+  errors: number;
+}
+
+export function getParallelState(): ParallelState | null {
+  if (!existsSync(PARALLEL_STATE_FILE)) return null;
+  try {
+    return JSON.parse(readFileSync(PARALLEL_STATE_FILE, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+export function setParallelState(state: ParallelState): void {
+  writeFileSync(PARALLEL_STATE_FILE, JSON.stringify(state, null, 2));
+}

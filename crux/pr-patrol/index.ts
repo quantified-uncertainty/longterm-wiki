@@ -69,7 +69,7 @@ export { checkMainBranch } from './execution.ts';
 // Daemon-specific exports
 export { computeBudget } from './scoring.ts';
 export { looksLikeNoOp, looksLikeMainRootCause, type FixPrResult } from './execution.ts';
-export { JSONL_FILE, REFLECTION_FILE } from './state.ts';
+export { JSONL_FILE, REFLECTION_FILE, PARALLEL_STATE_FILE, getParallelState } from './state.ts';
 
 // ── Internal imports (daemon-wrapped versions for the daemon loop) ──────────
 
