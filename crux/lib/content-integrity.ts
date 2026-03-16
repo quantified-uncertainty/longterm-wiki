@@ -34,6 +34,27 @@ export function findFootnoteRefs(body: string): Set<number> {
   return refs;
 }
 
+
+/**
+ * Count all unique footnote references (both numeric [^1] and named [^mixtral]).
+ * Used by metrics/grading code where we need a total citation count,
+ * not just numeric IDs for orphan detection.
+ */
+export function countAllFootnoteRefs(body: string): number {
+  const refs = new Set<string>();
+  // Match both numeric [^1] and named [^mixtral] footnote references
+  const pattern = /\[\^([\w-]+)\]/g;
+  for (const line of body.split('\n')) {
+    // Skip definition lines (both numeric and named)
+    if (/^\[\^[\w-]+\]:/.test(line.trim())) continue;
+    pattern.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(line)) !== null) {
+      refs.add(match[1]);
+    }
+  }
+  return refs.size;
+}
 /**
  * Find footnote definition numbers [^N]: at the start of lines.
  */

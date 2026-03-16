@@ -142,6 +142,23 @@ describe('countFootnoteRefs', () => {
     const content = 'A[^1] B[^2] C[^3] D[^4] E[^5] F[^6] G[^7] H[^8] I[^9] J[^10]';
     expect(countFootnoteRefs(content)).toBe(10);
   });
+
+  it('counts named footnotes like [^mixtral]', () => {
+    const content = 'MoE claim[^mixtral] and GPT-4[^gpt4-rumors] and Switch[^switch].';
+    expect(countFootnoteRefs(content)).toBe(3);
+  });
+
+  it('counts mixed named and numeric footnotes', () => {
+    const content = 'Claim[^1] and[^mixtral] and[^2].';
+    expect(countFootnoteRefs(content)).toBe(3);
+  });
+
+  it('skips named footnote definitions', () => {
+    const content = `Text[^mixtral] here.
+
+[^mixtral]: This is the definition.`;
+    expect(countFootnoteRefs(content)).toBe(1);
+  });
 });
 
 describe('suggestQuality', () => {

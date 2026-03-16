@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   findFootnoteRefs,
+  countAllFootnoteRefs,
   findFootnoteDefs,
   detectOrphanedFootnotes,
   detectDuplicateFootnoteDefs,
@@ -10,6 +11,49 @@ import {
   assessContentIntegrity,
   isPlausibleArxivPrefix,
 } from './content-integrity.ts';
+
+// ---------------------------------------------------------------------------
+// countAllFootnoteRefs (named + numeric)
+// ---------------------------------------------------------------------------
+
+describe('countAllFootnoteRefs', () => {
+  it('counts named footnotes', () => {
+    const body = 'Claim[^mixtral] and another[^gpt4].';
+    expect(countAllFootnoteRefs(body)).toBe(2);
+  });
+
+  it('counts numeric footnotes', () => {
+    const body = 'Claim[^1] and another[^2] and repeated[^1].';
+    expect(countAllFootnoteRefs(body)).toBe(2); // deduped
+  });
+
+  it('counts mixed named and numeric footnotes', () => {
+    const body = 'Claim[^1] and[^mixtral] and[^2] and[^gpt4].';
+    expect(countAllFootnoteRefs(body)).toBe(4);
+  });
+
+  it('excludes named definition lines', () => {
+    const body = `Claim[^mixtral] here.
+
+[^mixtral]: This is the definition with [^gpt4] inside it.`;
+    // Only [^mixtral] from body, not [^gpt4] from definition line
+    expect(countAllFootnoteRefs(body)).toBe(1);
+  });
+
+  it('returns 0 for no footnotes', () => {
+    expect(countAllFootnoteRefs('No footnotes here.')).toBe(0);
+  });
+
+  it('handles hyphenated footnote names', () => {
+    const body = 'Claim[^gpt-4-rumors] and[^deep-seek].';
+    expect(countAllFootnoteRefs(body)).toBe(2);
+  });
+
+  it('deduplicates repeated references', () => {
+    const body = 'First[^mixtral] and second[^mixtral] and third[^mixtral].';
+    expect(countAllFootnoteRefs(body)).toBe(1);
+  });
+});
 
 // ---------------------------------------------------------------------------
 // findFootnoteRefs
