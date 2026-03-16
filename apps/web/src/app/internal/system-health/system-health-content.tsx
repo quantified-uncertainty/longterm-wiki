@@ -1021,7 +1021,17 @@ function BrokenEntityLinksSection({ data }: { data: BrokenEntityLinksData | null
   );
 }
 
-function AgentActivitySection({ activity }: { activity: NonNullable<ExtendedHealthData["agentActivity"]> }) {
+function AgentActivitySection({ activity }: { activity: ExtendedHealthData["agentActivity"] | undefined }) {
+  if (!activity) {
+    return (
+      <>
+        <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Agent activity data unavailable
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
