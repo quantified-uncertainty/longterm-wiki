@@ -150,10 +150,10 @@ export function EntitiesContent() {
         <span className="font-medium text-foreground">{withImportance}</span>{" "}
         have importance scores,{" "}
         <span className="font-medium text-foreground">{withCoverage}</span>{" "}
-        have coverage data. Use{" "}
-        <strong>preset buttons</strong> to switch between views (Overview,
-        Entities, Importance, Quality, Coverage, Citations, Updates, Priority)
-        or toggle individual columns.
+        have coverage data. Use <strong>preset buttons</strong> to switch views.
+        The <strong>Overview</strong> preset defaults to pages with content; use{" "}
+        <strong>Content Authoring</strong> to focus on coverage gaps, stale
+        content, and citation problems.
       </p>
       <EntitiesDataTable entities={rows} />
     </>

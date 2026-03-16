@@ -833,6 +833,8 @@ interface Preset {
   description: string;
   columns: string[];
   defaultSort: SortingState;
+  /** Optional filter overrides applied when this preset is selected */
+  filters?: { pageFilter?: string };
 }
 
 const PRESETS: Record<string, Preset> = {
@@ -841,6 +843,14 @@ const PRESETS: Record<string, Preset> = {
     description: "Key quality, risk, and status metrics for pages with content",
     columns: ["title", "entityType", "quality", "readerImportance", "coverageScore", "riskLevel", "lastUpdated", "wordCount", "category"],
     defaultSort: [{ id: "quality", desc: true }],
+    filters: { pageFilter: "with" },
+  },
+  authoring: {
+    label: "Content Authoring",
+    description: "Content gaps, stale pages, low coverage, citation problems — focus on what to improve next",
+    columns: ["title", "quality", "coverageScore", "riskLevel", "riskScore", "citationTotal", "citationAvgScore", "lastUpdated", "updateFrequency", "unconvertedLinkCount", "wordCount"],
+    defaultSort: [{ id: "quality", desc: false }],
+    filters: { pageFilter: "with" },
   },
   entities: {
     label: "Entities",
@@ -913,7 +923,7 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
   const [activePreset, setActivePreset] = useState<string>("overview");
   const [showColumnPicker, setShowColumnPicker] = useState(false);
   const [typeFilter, setTypeFilter] = useState<string>("");
-  const [pageFilter, setPageFilter] = useState<string>("");
+  const [pageFilter, setPageFilter] = useState<string>(PRESETS.overview.filters?.pageFilter ?? "");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
 
   const types = useMemo(() => {
@@ -943,6 +953,9 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
     setColumnVisibility(presetToVisibility(preset.columns));
     setSorting(preset.defaultSort);
     setActivePreset(key);
+    // Apply filter overrides — reset to "" if the preset doesn't specify
+    setPageFilter(preset.filters?.pageFilter ?? "");
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
   }, []);
 
   const table = useReactTable({
