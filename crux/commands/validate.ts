@@ -136,6 +136,11 @@ const SCRIPTS = {
     description: 'Audit directory page data for display issues',
     passthrough: ['ci', 'verbose', 'type'],
   },
+  'cross-entity': {
+    script: 'validate/cross-entity-consistency.ts',
+    description: 'Cross-entity consistency (bidirectional refs, affiliation coherence)',
+    passthrough: ['ci', 'verbose', 'type'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
