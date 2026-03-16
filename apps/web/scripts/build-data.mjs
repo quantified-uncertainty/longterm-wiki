@@ -86,6 +86,73 @@ const DATA_FILES = [
   { key: 'peopleResources', file: 'people-resources.yaml' },
 ];
 
+/**
+ * Scan MDX files for <EntityLink id="..."> references and check each against
+ * the entity registry. Returns a summary of broken and unreachable links.
+ *
+ * @param {Map<string, string>} numericIdToSlug - Maps numeric IDs (E42) to slugs
+ * @param {object} pathRegistry - Maps slugs to URL paths
+ */
+/**
+ * Scan MDX files for <EntityLink id="..."> references and check each against
+ * the entity registry. Returns a summary of broken and unreachable links.
+ * EntityLink ids can be numeric (E42) or slug-based (geoffrey-hinton).
+ *
+ * @param {object} numericIdToSlug - Maps numeric IDs (E42) to slugs
+ * @param {object} slugToNumericId - Maps slugs to numeric IDs (E42)
+ * @param {object} pathRegistry - Maps slugs to URL paths
+ */
+function scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry) {
+  const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
+  const knownNumericIds = new Set(Object.keys(numericIdToSlug));
+  const knownSlugs = new Set(Object.keys(slugToNumericId));
+  const reachableSlugs = new Set(Object.keys(pathRegistry));
+  const broken = [];
+  const unreachable = [];
+
+  const mdxFiles = [];
+  function walk(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith('.mdx')) mdxFiles.push(full);
+    }
+  }
+  walk(CONTENT_DIR);
+
+  for (const filePath of mdxFiles) {
+    const content = readFileSync(filePath, 'utf-8');
+    entityLinkRegex.lastIndex = 0;
+    let match;
+    while ((match = entityLinkRegex.exec(content)) !== null) {
+      const id = match[1];
+      const pageId = relative(CONTENT_DIR, filePath).replace(/\.mdx$/, '');
+
+      // Resolve to slug: id can be numeric (E42) or slug-based
+      let slug;
+      if (knownNumericIds.has(id)) {
+        slug = numericIdToSlug[id];
+      } else if (knownSlugs.has(id)) {
+        slug = id;
+      } else {
+        broken.push({ pageId, entityId: id, reason: 'not_found' });
+        continue;
+      }
+
+      if (slug && !reachableSlugs.has(slug)) {
+        unreachable.push({ pageId, entityId: id, reason: 'no_page' });
+      }
+    }
+  }
+
+  return {
+    checkedAt: new Date().toISOString(),
+    totalBroken: broken.length,
+    totalUnreachable: unreachable.length,
+    sample: [...broken, ...unreachable].slice(0, 20),
+  };
+}
+
 function loadYaml(filename) {
   const filepath = join(DATA_DIR, filename);
   if (!existsSync(filepath)) {
@@ -2934,6 +3001,14 @@ async function main() {
       console.error('⚠️  Link health generation failed:', linkValidation.stderr);
     }
   }
+
+  // ==========================================================================
+  // Broken EntityLink scan
+  // ==========================================================================
+  console.log('\nScanning for broken EntityLink references...');
+  const brokenLinksResult = scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry);
+  writeFileSync(join(OUTPUT_DIR, 'broken-entity-links.json'), JSON.stringify(brokenLinksResult, null, 2));
+  console.log(`✓ EntityLink scan: ${brokenLinksResult.totalBroken} broken, ${brokenLinksResult.totalUnreachable} unreachable`);
 
   // Print summary stats
   console.log('\n--- Summary ---');
