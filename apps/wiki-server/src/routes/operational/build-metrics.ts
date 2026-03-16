@@ -25,12 +25,22 @@ const logger = rootLogger.child({ component: "build-metrics" });
 // Schemas
 // ---------------------------------------------------------------------------
 
-const CoverageItemSchema = z.object({
-  pageId: z.string().min(1),
-  passing: z.number().int().min(0),
-  total: z.number().int().min(0),
-  items: z.record(z.string(), z.enum(["green", "amber", "red"])),
-});
+const CoverageItemSchema = z
+  .object({
+    pageId: z.string().min(1),
+    passing: z.number().int().min(0),
+    total: z.number().int().min(0),
+    items: z.record(z.string(), z.enum(["green", "amber", "red"])),
+  })
+  .superRefine((v, ctx) => {
+    if (v.passing > v.total) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["passing"],
+        message: "passing cannot exceed total",
+      });
+    }
+  });
 
 const SyncCoverageSchema = z.object({
   coverage: z.array(CoverageItemSchema).min(1).max(2000),
@@ -64,7 +74,7 @@ const SimilarityPairSchema = z.object({
   pageId: z.string().min(1),
   similarPageId: z.string().min(1),
   similarity: z.number().int().min(0).max(100),
-  rank: z.number().int().min(1).max(10),
+  rank: z.number().int().min(1).max(5),
 });
 
 const SyncSimilaritySchema = z.object({
