@@ -197,6 +197,9 @@ async function runAgentViaCli(
       '--print',
       '--dangerously-skip-permissions',
       '--output-format', 'json',
+      // Override system prompt to prevent CLAUDE.md from interfering with
+      // the transformation task. The prompt already contains all context.
+      '--system-prompt', 'You are a text transformation tool for a wiki content pipeline. Output ONLY the requested content — no explanations, no preamble, no markdown code fences. Start your response with the first character of the requested output.',
       '--model', cliModel,
       '--max-budget-usd', budgetUsd,
     ];
