@@ -269,7 +269,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   orgs             Organization data tools (enrich from Wikidata)
   research-areas   Research area linking (link-grants, backfill-papers, discover-orgs, stats)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
-  matrix           Entity completeness matrix (scan infrastructure coverage)
+  matrix           Entity matrix analysis and improvement targeting
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

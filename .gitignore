@@ -93,9 +93,8 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
-# Agent workspace slot files (per-slot, never committed)
-.agent-slot
-.agent-task
-.envrc
+# Matrix score snapshots (local analysis, not source code)
+.matrix-snapshots/
 
 # Design docs — committed for review. Gitignore removed intentionally.
+.matrix-improved.txt
