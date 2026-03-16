@@ -23,7 +23,7 @@ clusters:
   - ai-safety
   - governance
 ---
-import { Crux, R, Mermaid, EntityLink } from '@components/wiki';
+import { R, Mermaid, EntityLink } from '@components/wiki';
 
 ## Overview
 
@@ -128,47 +128,6 @@ The technical domain centers on whether AI systems can be effectively turned aga
 | <EntityLink id="E439" name="alignment">AI Alignment</EntityLink> | Included in alignment R&D | Deployed (<EntityLink id="E1070" name="o1-preview">o1-preview</EntityLink>-series, Claude 3.7) | Production | <EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> |
 | Output-Centric Safety Training | Research phase | Early results promising | Limited | Academic labs, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink> |
 
-<Crux
-  id="ai-verification-scaling"
-  question="Can AI-based verification scale to match AI-based generation?"
-  domain="Technical Solutions"
-  description="Whether AI systems designed for verification (fact-checking, detection, authentication) can keep pace with AI systems designed for generation."
-  importance="critical"
-  resolvability="years"
-  currentState="Generation currently ahead; some verification progress; cheap-check literature formalizes partial solutions"
-  positions={[
-    {
-      view: "Verification can match generation with investment",
-      probability: "25-40%",
-      holders: ["Some AI researchers", "Verification startups"],
-      implications: "Invest heavily in AI verification R&D; build verification infrastructure"
-    },
-    {
-      view: "Verification will lag but remain useful with selective deployment",
-      probability: "35-45%",
-      implications: "Use weak/strong verification frameworks to deploy cheap checks where reliable; escalate to costly strong verification selectively"
-    },
-    {
-      view: "Verification is fundamentally disadvantaged",
-      probability: "20-30%",
-      holders: ["Some security researchers"],
-      implications: "Shift focus to provenance, incentives, institutional solutions"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Breakthrough in generalizable detection",
-    "Real-world deployment data on AI verification performance",
-    "Theoretical analysis of offense-defense balance",
-    "Economic analysis of verification costs vs generation costs",
-    "Calibration data on weak-verifier reliability across domains"
-  ]}
-  relatedCruxes={["provenance-vs-detection", "weak-strong-verification"]}
-  relevantResearch={[
-    { title: "DARPA SemaFor", url: "https://www.darpa.mil/program/semantic-forensics" },
-    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
-  ]}
-/>
-
 The current evidence presents a mixed picture. <R id="ZTAzMzQ4Mm">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, demonstrated some success in semantic forensics for manipulated media, but primarily on specific content types rather than the broad spectrum of AI-generated material now emerging. Commercial detection tools like <R id="NjBjODM0Mm">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these rates decline when generators are specifically designed to evade detection.
 
 The fundamental challenge lies in the asymmetric nature of the problem: content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. Optimists point to potential advantages for verification systems—specialization for detection tasks, multi-modal leverage, and centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification at <R id="NzQyNGViND">Anthropic</R> and <R id="N2U4YTc5ZG">OpenAI</R> suggests this approach retains active research momentum.
@@ -182,82 +141,6 @@ Recent work by Kiyani et al. (2025) formalizes the distinction between verificat
 **Weak verification** encompasses cheap methods such as self-consistency checks and proxy rewards. **Strong verification** encompasses costly methods such as human inspection and expert feedback. The paper introduces a Selective Strong Verification (SSV) algorithm—an online calibration method for deciding when the cheap check can be trusted—and proves that optimal verification policies admit a two-threshold structure. Calibration and sharpness of weak verifiers govern their value.
 
 This framework has direct implications for scalable oversight: cheap checks can be systematically trusted in many contexts, reducing the total cost of strong human oversight in RLHF pipelines and agentic deployments without requiring every output to undergo expensive human review.
-
-<Crux
-  id="weak-strong-verification"
-  question="Can weak verification methods reliably filter AI reasoning errors at acceptable cost-accuracy tradeoffs?"
-  domain="Technical Solutions"
-  description="Whether lightweight verification (self-consistency, proxy rewards) can be trusted to catch AI errors in reasoning tasks without requiring expensive human review of every output, enabling scalable oversight."
-  importance="high"
-  resolvability="years"
-  currentState="Formal framework established (Kiyani et al.); empirical calibration data limited to narrow domains"
-  positions={[
-    {
-      view: "Weak verification is sufficient for most cases with selective escalation",
-      probability: "35-50%",
-      holders: ["Scalable oversight researchers"],
-      implications: "Build verification pipelines with SSV-style policies; invest in weak verifier calibration"
-    },
-    {
-      view: "Weak verification requires careful domain-specific calibration; no universal policy",
-      probability: "35-45%",
-      implications: "Invest in domain-specific calibration; do not rely on universal weak-verifier policies"
-    },
-    {
-      view: "Weak verification is unreliable for high-stakes reasoning; strong verification required throughout",
-      probability: "15-25%",
-      implications: "Plan for expensive strong verification at scale; may constrain deployment of autonomous AI in high-stakes settings"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Empirical calibration studies across diverse reasoning domains",
-    "Real-world failure rate data from deployed SSV-style systems",
-    "Theoretical bounds on cheap-check reliability under adversarial conditions"
-  ]}
-  relatedCruxes={["ai-verification-scaling", "scalable-oversight-chains"]}
-  relevantResearch={[
-    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
-  ]}
-/>
-
-<Crux
-  id="provenance-vs-detection"
-  question="Should we prioritize content provenance or detection?"
-  domain="Technical Solutions"
-  description="Whether resources should go to proving what's authentic (provenance) vs detecting what's fake (detection)."
-  importance="high"
-  resolvability="years"
-  currentState="Both being pursued; provenance gaining momentum"
-  positions={[
-    {
-      view: "Provenance is the right long-term bet",
-      probability: "40-55%",
-      holders: ["C2PA coalition", "Adobe", "Microsoft"],
-      implications: "Focus resources on provenance adoption; detection as stopgap"
-    },
-    {
-      view: "Need both; portfolio approach",
-      probability: "30-40%",
-      implications: "Invest in both; different use cases; don't pick one"
-    },
-    {
-      view: "Detection is more practical near-term",
-      probability: "15-25%",
-      implications: "Focus on detection; provenance too slow to adopt"
-    }
-  ]}
-  wouldUpdateOn={[
-    "C2PA adoption metrics",
-    "Detection accuracy trends",
-    "User behavior research on credential checking",
-    "Cost comparison of approaches"
-  ]}
-  relatedCruxes={["ai-verification-scaling"]}
-  relevantResearch={[
-    { title: "C2PA", url: "https://c2pa.org/" },
-    { title: "Detection research", url: "https://arxiv.org/abs/2004.11138" }
-  ]}
-/>
 
 The <R id="N2ViOGYzZT">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by Adobe, Microsoft, Intel, and BBC, has gained momentum since 2021, with over 50 member organizations and initial implementations in Adobe Creative Cloud and Microsoft products. The provenance approach embeds cryptographic metadata proving content origin and modification history, creating an authentication layer for content rather than attempting to identify synthetic material.
 
@@ -274,43 +157,6 @@ Provenance faces substantial adoption challenges. Early data from C2PA implement
 | **Adversarial Robustness** | High (cryptographic) | Lower (adversarial ML vulnerabilities) |
 | **Legacy Content** | No coverage | Full coverage |
 
-<Crux
-  id="watermark-robustness"
-  question="Can AI watermarks be made robust against removal?"
-  domain="Technical Solutions"
-  description="Whether watermarks embedded in AI-generated content can resist adversarial removal attempts."
-  importance="high"
-  resolvability="years"
-  currentState="Current watermarks removable with effort; research ongoing"
-  positions={[
-    {
-      view: "Robust watermarks are achievable",
-      probability: "20-35%",
-      holders: ["Google DeepMind (SynthID)"],
-      implications: "Invest in watermark R&D; mandate watermarking"
-    },
-    {
-      view: "Watermarks can deter casual removal but not determined actors",
-      probability: "40-50%",
-      implications: "Watermarks as one signal among many; combine with other methods"
-    },
-    {
-      view: "Watermark removal will always be possible",
-      probability: "20-30%",
-      implications: "Watermarking has limited value; focus on other solutions"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Adversarial testing of production watermarks",
-    "Theoretical bounds on watermark robustness",
-    "Real-world watermark survival data"
-  ]}
-  relatedCruxes={["provenance-vs-detection"]}
-  relevantResearch={[
-    { title: "SynthID", url: "https://deepmind.google/technologies/synthid/" }
-  ]}
-/>
-
 <R id="NWVhNWQ0Mm">Google DeepMind's SynthID</R>, launched in August 2023, uses statistical patterns imperceptible to humans but detectable by specialized algorithms. Academic research has consistently shown that current watermarking approaches can be defeated through adversarial perturbations, model fine-tuning, and regeneration techniques. Research by <R id="OWQwYTRiMz">UC Berkeley</R> and <R id="Yzk3MjhkZT">University of Maryland</R> demonstrated that sophisticated attackers can remove watermarks with success rates exceeding 90% while preserving content quality. Theoretical analysis suggests that any watermark which preserves sufficient content quality for practical use can potentially be removed by adversaries with adequate compute.
 
 ### Deliberative Alignment
@@ -322,44 +168,6 @@ Deliberative alignment refers to approaches in which AI models apply their safet
 The key claim is that this approach enables models to engage in nuanced, situation-specific safety reasoning rather than applying static heuristics from training. In evaluations reported by OpenAI, the o1 model family demonstrated improved performance on safety benchmarks compared to models relying purely on training-time alignment, while maintaining higher helpfulness scores in borderline cases. The approach also showed better generalization to novel safety-relevant scenarios not well-represented in training data, because models can reason from first principles about applicable guidelines rather than pattern-matching to training examples.[^deliberative-align]
 
 This technique is directly relevant to the overrefusal problem: a model that can reason about the actual scope of a safety policy is less likely to refuse benign requests that superficially resemble harmful ones. Critics note that deliberative alignment's benefits depend on the model's safety reasoning being accurate and not manipulable—if a model can be prompted to reason itself into unsafe conclusions, extended thinking may amplify rather than constrain harm potential.[^deliberative-align]
-
-<Crux
-  id="deliberative-alignment-crux"
-  question="Does deliberative alignment at inference time meaningfully improve safety outcomes compared to training-only approaches?"
-  domain="Technical Solutions"
-  description="Whether having models explicitly reason through safety specifications at inference time (as in OpenAI's deliberative alignment) produces robust safety improvements, or whether such reasoning can be manipulated or gamed."
-  importance="high"
-  resolvability="years"
-  currentState="Deployed in o1 series; evaluation data from OpenAI suggests improvements on safety benchmarks; adversarial robustness of inference-time reasoning remains an open question"
-  positions={[
-    {
-      view: "Deliberative alignment substantially improves safety and reduces overrefusal",
-      probability: "35-50%",
-      holders: ["OpenAI alignment team"],
-      implications: "Invest in inference-time safety reasoning; integrate policy specifications as explicit model context"
-    },
-    {
-      view: "Benefits are real but reasoning can be manipulated by adversarial prompting",
-      probability: "35-45%",
-      implications: "Use deliberative alignment as one layer among several; invest in adversarial robustness of reasoning"
-    },
-    {
-      view: "Inference-time reasoning provides limited durable safety guarantees",
-      probability: "15-25%",
-      implications: "Focus on training-time alignment; treat deliberative alignment as a supplementary layer only"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Adversarial testing results: can deliberative reasoning be jailbroken via chain-of-thought manipulation?",
-    "Independent replication of OpenAI's safety benchmark improvements",
-    "Evidence on whether extended thinking improves or worsens safety in novel domains",
-    "Deployment data on overrefusal rates with and without deliberative alignment"
-  ]}
-  relatedCruxes={["output-centric-safety", "reward-modeling-bottleneck", "scalable-oversight-chains"]}
-  relevantResearch={[
-    { title: "Deliberative Alignment (OpenAI, 2024)", url: "https://openai.com/index/deliberative-alignment/" }
-  ]}
-/>
 
 ### Output-Centric Safety Training and the Overrefusal Problem
 
@@ -382,45 +190,6 @@ The COMPASS framework (Sovereignty, Sustainability, Compliance, and Ethics) repr
 
 [^compass]: "COMPASS: The Explainable Agentic Framework for Sovereignty, Sustainability, Compliance, and Ethics," AI safety and governance research (2025).
 
-<Crux
-  id="output-centric-safety"
-  question="Is output-centric safety training more effective than input-classification-based approaches at reducing harm without degrading utility?"
-  domain="Technical Solutions"
-  description="Whether reframing safety training around the properties of outputs (rather than upstream topic/intent classifiers) produces better harm-utility tradeoffs, and whether this approach generalizes to novel harm patterns."
-  importance="high"
-  resolvability="years"
-  currentState="Promising early results from output-centric and rule-based reward approaches; systematic comparative evaluation against input-classifier baselines not yet published at scale"
-  positions={[
-    {
-      view: "Output-centric training substantially improves harm-utility tradeoff",
-      probability: "35-50%",
-      holders: ["Anthropic and OpenAI safety researchers"],
-      implications: "Shift training pipelines toward output-property objectives; invest in output evaluation infrastructure"
-    },
-    {
-      view: "Both approaches are needed and complementary",
-      probability: "35-45%",
-      implications: "Deploy layered safety: input classifiers for obvious cases, output-centric training for nuanced ones"
-    },
-    {
-      view: "Output-centric approaches are harder to specify and prone to novel failure modes",
-      probability: "15-25%",
-      implications: "Maintain input-classifier approaches; be cautious about output-centric methods without robust evaluation"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Head-to-head evaluation of output-centric vs input-classifier approaches on matched harm and helpfulness benchmarks",
-    "Overrefusal rate data before and after output-centric training interventions",
-    "Evidence on generalization: does output-centric training handle novel harm patterns better?",
-    "Red team results on novel jailbreaks against output-centric models"
-  ]}
-  relatedCruxes={["deliberative-alignment-crux", "reward-modeling-bottleneck"]}
-  relevantResearch={[
-    { title: "Rule-Based Rewards (OpenAI)", url: "https://openai.com/index/improving-model-safety-behavior-with-rule-based-rewards/" },
-    { title: "Curated Dataset Training (OpenAI)", url: "https://openai.com/index/improving-language-model-behavior/" }
-  ]}
-/>
-
 ### The Instruction Hierarchy and Privilege Management
 
 As LLMs are deployed in complex multi-stakeholder contexts—where system prompts, operator configurations, and user instructions may conflict—the question of how models should adjudicate competing instructions has become a practical safety challenge. OpenAI's Instruction Hierarchy paper formalizes this problem and proposes a training approach.[^instruction-hierarchy]
@@ -434,44 +203,6 @@ The paper reports that training on the instruction hierarchy improves model robu
 This framework connects directly to prompt injection as a frontier security challenge. As models are deployed in agentic settings where they browse the web, execute code, and interact with external services, the attack surface for instruction-level manipulation expands substantially. Understanding prompt injections as a security challenge—rather than merely a safety one—requires analysis of attacker capabilities, defender countermeasures, and the economics of attack.[^prompt-injection]
 
 [^prompt-injection]: OpenAI, "Understanding Prompt Injections: A Frontier Security Challenge," [https://openai.com/index/prompt-injection/](https://openai.com/index/prompt-injection/).
-
-<Crux
-  id="instruction-hierarchy-crux"
-  question="Can instruction hierarchy frameworks make deployed LLMs robustly resistant to privilege escalation and prompt injection?"
-  domain="Technical Solutions"
-  description="Whether training on explicit instruction privilege orderings provides durable security against adversarial prompt injection, system-prompt extraction, and operator-user conflicts in production deployments."
-  importance="high"
-  resolvability="years"
-  currentState="OpenAI instruction hierarchy paper shows improved robustness in training; real-world adversarial robustness under active testing by red teams"
-  positions={[
-    {
-      view: "Instruction hierarchy training provides durable robustness",
-      probability: "25-40%",
-      implications: "Adopt instruction hierarchy as standard deployment practice; invest in training data for hierarchy specification"
-    },
-    {
-      view: "Hierarchy helps but adversarial prompt injection will remain an ongoing challenge",
-      probability: "40-50%",
-      implications: "Deploy instruction hierarchy alongside runtime monitoring and input sanitization"
-    },
-    {
-      view: "Determined adversaries will circumvent any instruction hierarchy through novel attack vectors",
-      probability: "15-25%",
-      implications: "Treat prompt injection as an unsolvable security problem; design agentic systems with minimal privilege and maximum oversight"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Red team results against instruction-hierarchy-trained models at scale",
-    "Novel prompt injection attack patterns that bypass hierarchy training",
-    "Independent replication of OpenAI instruction hierarchy robustness claims",
-    "Deployment data from enterprise applications with complex multi-stakeholder prompt structures"
-  ]}
-  relatedCruxes={["agentic-governance-crux", "output-centric-safety"]}
-  relevantResearch={[
-    { title: "Instruction Hierarchy (OpenAI, 2024)", url: "https://arxiv.org/abs/2404.13208" },
-    { title: "Prompt Injection Security (OpenAI)", url: "https://openai.com/index/prompt-injection/" }
-  ]}
-/>
 
 ### Formal Verification as a Technical Solution
 
@@ -530,47 +261,6 @@ The paper illustrates the aggregation problem with a voting analogy: if 51% pref
 
 The RFM approach challenges the dominant aggregation assumption in RLHF and proposes a pluralistic alignment paradigm. This has implications for solution tractability estimates: if alignment solutions must account for individual variation rather than aggregate preferences, the problem is more complex than typically represented, but also potentially more tractable in that individual adaptation requires less data than learning a new global model.
 
-<Crux
-  id="reward-modeling-bottleneck"
-  question="Is reward model quality the primary bottleneck limiting alignment solution effectiveness?"
-  domain="Technical Solutions"
-  description="Whether improvements in reward modeling (accuracy, calibration, preference capture fidelity) would substantially improve downstream alignment outcomes, or whether other factors (policy optimization, distribution shift, preference aggregation) are more limiting."
-  importance="high"
-  resolvability="years"
-  currentState="Mixed evidence: MARS shows RM improvements are achievable; accuracy-policy correlation studies suggest RM accuracy may not be the binding constraint"
-  positions={[
-    {
-      view: "Reward modeling quality is the primary bottleneck",
-      probability: "25-40%",
-      holders: ["RLHF researchers focused on RM quality"],
-      implications: "Prioritize RM accuracy, calibration, and preference capture; invest in MARS-style adaptive augmentation"
-    },
-    {
-      view: "RM quality matters but distribution shift and policy optimization are equally limiting",
-      probability: "40-50%",
-      implications: "Invest in RM quality alongside distribution alignment between RM training and deployment; treat RM as one factor among several"
-    },
-    {
-      view: "RM quality is a secondary bottleneck; value specification and aggregation are primary",
-      probability: "15-25%",
-      holders: ["Pluralistic alignment researchers", "RFM authors"],
-      implications: "Focus on preference capture architecture (e.g., RFM) before optimizing RM accuracy"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Controlled experiments varying RM accuracy while holding other factors constant",
-    "Downstream alignment outcome data from MARS-trained models",
-    "Evidence on distribution shift as confounder in RM accuracy–policy correlation",
-    "RFM deployment results at scale"
-  ]}
-  relatedCruxes={["ai-verification-scaling", "scalable-oversight-chains"]}
-  relevantResearch={[
-    { title: "MARS (2025)", url: "https://arxiv.org/abs/2602.17658" },
-    { title: "Reward Features (Barreto et al., 2025)", url: "https://arxiv.org/abs/2503.17338" },
-    { title: "Accuracy Paradox (EMNLP 2024)", url: "https://aclanthology.org/2024.emnlp-main.174.pdf" }
-  ]}
-/>
-
 ### Machine Unlearning: Limitations and Prospects
 
 Machine unlearning—the problem of removing specific knowledge or behaviors from a trained model without full retraining—has attracted attention as a potential mechanism for correcting alignment failures or removing dangerous capabilities post-deployment. However, recent evaluation research raises substantial questions about whether current unlearning methods achieve their stated objectives.
@@ -584,42 +274,6 @@ Reference-Guided Machine Unlearning offers a complementary approach, using refer
 [^reference-unlearning]: "Reference-Guided Machine Unlearning," AI safety research (2025).
 
 The implications for safety governance are significant. If unlearning cannot reliably remove dangerous capabilities from deployed models, post-hoc capability removal is a less viable safety strategy than pre-deployment evaluation and staged deployment. This shifts emphasis toward <EntityLink id="E201" name="metr">METR</EntityLink>-style pre-deployment evaluations and preparedness frameworks that assess models before deployment rather than relying on the ability to patch deployed models.
-
-<Crux
-  id="machine-unlearning-crux"
-  question="Can machine unlearning reliably remove dangerous capabilities from deployed LLMs?"
-  domain="Technical Solutions"
-  description="Whether current and near-future unlearning methods can achieve genuine knowledge removal (not just behavioral suppression) sufficient to be relied upon as a safety mechanism for capability control."
-  importance="high"
-  resolvability="years"
-  currentState="Unlearning Mirage findings suggest standard benchmarks overestimate unlearning effectiveness; reference-guided approaches show improvement but broad validation absent"
-  positions={[
-    {
-      view: "Unlearning can be made reliable with improved methods and evaluation",
-      probability: "20-35%",
-      implications: "Invest in unlearning research; develop robust dynamic evaluation frameworks"
-    },
-    {
-      view: "Unlearning is useful for surface-level behavioral changes but cannot be relied on for capability removal",
-      probability: "45-55%",
-      implications: "Use unlearning as a supplementary layer; do not rely on it for critical safety guarantees; prioritize pre-deployment evaluation"
-    },
-    {
-      view: "Machine unlearning is fundamentally limited for neural networks; capabilities cannot be reliably removed",
-      probability: "15-25%",
-      implications: "Shift resources from unlearning research to pre-deployment capability evaluation and training-time interventions"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Dynamic evaluation results showing consistent unlearning robustness to fine-tuning and prompting attacks",
-    "Theoretical analysis of whether genuine knowledge removal is possible without full retraining",
-    "Deployment data on unlearning method reliability in production settings"
-  ]}
-  relatedCruxes={["deliberative-alignment-crux", "reward-modeling-bottleneck"]}
-  relevantResearch={[
-    { title: "The Unlearning Mirage (2025)", url: "https://arxiv.org/search/?query=unlearning+mirage&searchtype=all" }
-  ]}
-/>
 
 ### Technical Alignment Research Progress (2024-2025)
 
@@ -657,47 +311,6 @@ The <R id="MzNmYWViOD">shallow review of technical AI safety (2024)</R> notes th
 [^w2s-critique]: "Redefining Superalignment: From Weak-to-Strong Alignment to Human-AI Co-Alignment," arXiv:2504.17404 (April 2025), [https://arxiv.org/html/2504.17404v1](https://arxiv.org/html/2504.17404v1).
 
 The connection between the cheap-check literature (weak/strong verification) and scalable oversight is direct: weak verification corresponds to cheap proxy oversight; strong verification to expensive human review. The SSV framework provides a principled basis for determining when weak oversight is sufficient, which is a precondition for scalable oversight to be viable at all.
-
-<Crux
-  id="scalable-oversight-chains"
-  question="Can human oversight remain meaningful as AI capabilities scale through verification chains?"
-  domain="Technical Solutions"
-  description="Whether combinations of debate, weak-to-strong generalization, and weak/strong verification can preserve meaningful human oversight when AI systems exceed human expert performance in relevant domains."
-  importance="critical"
-  resolvability="years"
-  currentState="Debate outperforms consultancy (NeurIPS 2024); weak-to-strong generalization demonstrated (OpenAI 2023); formal weak/strong verification framework established (Kiyani 2025); deceptive behavior concerns remain open"
-  positions={[
-    {
-      view: "Verification chains can maintain meaningful oversight",
-      probability: "30-45%",
-      holders: ["Scalable oversight researchers", "Anthropic alignment team"],
-      implications: "Invest in debate protocols, weak-to-strong methods, and SSV-style calibration systems"
-    },
-    {
-      view: "Oversight chains work for some domains but fail for deceptive or strategically sophisticated AI",
-      probability: "35-45%",
-      implications: "Deploy verification chains where models are not strategic; develop complementary interpretability and anomaly detection"
-    },
-    {
-      view: "Verification chains are insufficient; oversight will not scale to superhuman AI",
-      probability: "15-25%",
-      holders: ["Critics of W2SG approach"],
-      implications: "Focus on alignment approaches that do not depend on human oversight; invest in guaranteed safe AI frameworks"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Empirical evidence of debate failing under strategic deception",
-    "W2SG generalization results at larger capability gaps",
-    "SSV calibration data from real deployed systems",
-    "Evidence of or against oversight evasion in current frontier models"
-  ]}
-  relatedCruxes={["weak-strong-verification", "reward-modeling-bottleneck"]}
-  relevantResearch={[
-    { title: "Debate (NeurIPS 2024)", url: "https://arxiv.org/html/2407.04622v1" },
-    { title: "Weak-to-Strong Generalization (OpenAI 2023)", url: "https://openai.com/index/weak-to-strong-generalization/" },
-    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
-  ]}
-/>
 
 ## Agentic AI Safety Cruxes
 

@@ -4,7 +4,7 @@ import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getK
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getExpertById, getPublicationsForPerson, getTypedEntities, isPerson } from "@/data";
+import { getPublicationsForPerson, getTypedEntities, getPersonEntityById, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import Link from "next/link";
 
@@ -158,9 +158,11 @@ function loadFromLocal(): PersonRow[] {
 
     const slug = getKBEntitySlug(entity.id) ?? entity.id;
     kbSlugs.add(slug);
-    const expert = getExpertById(slug);
-    const positionCount = expert?.positions?.length ?? 0;
-    const topics = expert?.positions?.map((p) => p.topic) ?? [];
+    // Read positions from the typed entity (consolidated from experts.yaml at build time)
+    const personEntity = getPersonEntityById(slug);
+    const positions = personEntity?.positions ?? [];
+    const positionCount = positions.length;
+    const topics = positions.map((p) => p.topic);
     const publications = getPublicationsForPerson(slug);
 
     const roleText = roleFact?.value.type === "text" ? roleFact.value.value : null;
@@ -169,12 +171,12 @@ function loadFromLocal(): PersonRow[] {
     if (entity.aliases) searchParts.push(...entity.aliases);
     if (roleText) searchParts.push(roleText);
     if (employer?.name) searchParts.push(employer.name);
-    if (expert?.positions) {
-      for (const p of expert.positions) {
+    if (personEntity?.positions) {
+      for (const p of personEntity.positions) {
         searchParts.push(p.topic, p.view);
       }
     }
-    if (expert?.knownFor) searchParts.push(...expert.knownFor);
+    if (personEntity?.knownFor) searchParts.push(...personEntity.knownFor);
     for (const pub of publications) {
       searchParts.push(pub.title);
     }

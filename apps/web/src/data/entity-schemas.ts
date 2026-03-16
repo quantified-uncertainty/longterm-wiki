@@ -92,11 +92,26 @@ const RiskFactorEntitySchema = BaseEntity.extend({
   entityType: z.literal("risk-factor"),
 });
 
+export const ExpertPositionSchema = z.object({
+  topic: z.string(),
+  view: z.string(),
+  estimate: z.string().optional(),
+  confidence: z.string().optional(),
+  date: z.string().optional(),
+  source: z.string().optional(),
+  sourceUrl: z.string().optional(),
+});
+
+export type ExpertPosition = z.infer<typeof ExpertPositionSchema>;
+
 const PersonEntitySchema = BaseEntity.extend({
   entityType: z.literal("person"),
   role: z.string().optional(),
   affiliation: z.string().optional(),
+  /** Raw entity ID of the affiliated organization (for linking) */
+  affiliationId: z.string().optional(),
   knownFor: z.array(z.string()).default([]),
+  positions: z.array(ExpertPositionSchema).default([]),
 });
 
 const OrganizationEntitySchema = BaseEntity.extend({

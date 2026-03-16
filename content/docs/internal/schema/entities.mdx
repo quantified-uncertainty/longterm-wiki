@@ -203,33 +203,6 @@ Defined in `data/estimates.yaml`. Aggregated expert estimates on key variables.
 
 ---
 
-## Crux (Key Uncertainty)
-
-Defined in `data/cruxes.yaml`. Disagreements and uncertainties that drive different conclusions.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| **id** | `string` | Yes | e.g., `alignment-difficulty` |
-| **question** | `string` | Yes | The key question |
-| domain | `string` | No | `Technical`, `Governance`, etc. |
-| description | `string` | No | Context |
-| **importance** | `Importance` | Yes | `low` \| `medium` \| `high` \| `critical` |
-| resolvability | `string` | No | `soon` \| `years` \| `decades` \| `never` |
-| currentState | `string` | No | Current state of evidence |
-| **positions** | `CruxPosition[]` | Yes | Different views on this crux |
-| wouldUpdateOn | `string[]` | No | Evidence that would change positions |
-| relatedCruxes | `string[]` | No | Crux ID references |
-| relevantResearch | `{ title, url? }[]` | No | Key papers |
-
-### CruxPosition
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| **view** | `string` | Yes | The position |
-| probability | `string` | No | e.g., `40-60%` |
-| holders | `string[]` | No | Expert IDs or org names |
-| implications | `string` | No | What follows from this view |
-
 ---
 
 ## Risk
