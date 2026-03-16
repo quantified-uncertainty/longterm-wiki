@@ -325,3 +325,124 @@ describe("titleFromUrl", () => {
     expect(titleFromUrl("not-a-url")).toBe(null);
   });
 });
+
+// ── extractDateFromUrl (mirrors org-data.ts) ──
+
+function extractDateFromUrl(url: string): string | null {
+  try {
+    const path = new URL(url).pathname;
+    const fullDate = path.match(
+      /(?:^|\/)(\d{4})[-/](\d{2})[-/](\d{2})(?:\/|$|-)/
+    );
+    if (fullDate) {
+      const [, y, m, d] = fullDate;
+      const year = Number(y);
+      const month = Number(m);
+      const day = Number(d);
+      if (
+        year >= 2000 &&
+        year <= 2030 &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31
+      ) {
+        return `${y}-${m}-${d}`;
+      }
+      return null;
+    }
+    const partialDate = path.match(/(?:^|\/)(\d{4})\/(\d{2})(?:\/|$)/);
+    if (partialDate) {
+      const [, y, m] = partialDate;
+      const year = Number(y);
+      const month = Number(m);
+      if (year >= 2000 && year <= 2030 && month >= 1 && month <= 12) {
+        return `${y}-${m}-01`;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+describe("extractDateFromUrl", () => {
+  it("extracts YYYY/MM/DD dates", () => {
+    expect(
+      extractDateFromUrl("https://example.com/blog/2024/03/15/article-title")
+    ).toBe("2024-03-15");
+  });
+
+  it("extracts YYYY-MM-DD dates from slugs", () => {
+    expect(
+      extractDateFromUrl("https://example.com/2024-03-15-article-title")
+    ).toBe("2024-03-15");
+  });
+
+  it("extracts YYYY/MM partial dates", () => {
+    expect(
+      extractDateFromUrl("https://example.com/blog/2024/03/article")
+    ).toBe("2024-03-01");
+  });
+
+  it("extracts dates from nested paths", () => {
+    expect(
+      extractDateFromUrl(
+        "https://example.com/news/2023/11/05/big-announcement"
+      )
+    ).toBe("2023-11-05");
+  });
+
+  it("rejects years outside 2000-2030", () => {
+    expect(extractDateFromUrl("https://example.com/1999/12/01/old")).toBe(null);
+    expect(extractDateFromUrl("https://example.com/2031/01/01/future")).toBe(
+      null
+    );
+  });
+
+  it("rejects invalid months", () => {
+    expect(
+      extractDateFromUrl("https://example.com/2024/13/01/bad-month")
+    ).toBe(null);
+    expect(
+      extractDateFromUrl("https://example.com/2024/00/01/bad-month")
+    ).toBe(null);
+  });
+
+  it("rejects invalid days", () => {
+    expect(
+      extractDateFromUrl("https://example.com/2024/03/32/bad-day")
+    ).toBe(null);
+    expect(
+      extractDateFromUrl("https://example.com/2024/03/00/bad-day")
+    ).toBe(null);
+  });
+
+  it("returns null for URLs without dates", () => {
+    expect(extractDateFromUrl("https://example.com/about")).toBe(null);
+    expect(
+      extractDateFromUrl("https://anthropic.com/research/claude-3-model-card")
+    ).toBe(null);
+  });
+
+  it("returns null for version-number-like paths", () => {
+    expect(extractDateFromUrl("https://example.com/api/v2/endpoint")).toBe(
+      null
+    );
+  });
+
+  it("returns null for invalid URLs", () => {
+    expect(extractDateFromUrl("not-a-url")).toBe(null);
+  });
+
+  it("handles real-world news URLs", () => {
+    expect(
+      extractDateFromUrl(
+        "https://www.reuters.com/technology/2024/01/23/openai-safety"
+      )
+    ).toBe("2024-01-23");
+    expect(
+      extractDateFromUrl("https://techcrunch.com/2023/07/article-slug")
+    ).toBe("2023-07-01");
+  });
+});
