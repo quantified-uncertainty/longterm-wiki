@@ -385,6 +385,29 @@ export function getAllFactBaseRecordsByCollection(collection: string): FactBaseR
 }
 
 /**
+ * Get all unique record collection names present in factbase-data.json.
+ * Derived dynamically from the data so new collections are picked up automatically.
+ */
+export function getFactBaseRecordCollectionNames(): string[] {
+  const fb = getFactBase();
+  if (!fb) return [];
+
+  type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
+  const records = "records" in fb
+    ? (fb as { records?: RecordsMap }).records
+    : undefined;
+  if (!records) return [];
+
+  const names = new Set<string>();
+  for (const entityRecords of Object.values(records)) {
+    for (const collectionName of Object.keys(entityRecords)) {
+      names.add(collectionName);
+    }
+  }
+  return Array.from(names);
+}
+
+/**
  * Record schema shape as previously loaded from KB YAML.
  * Record schemas are no longer part of the KB package (records migrated to PG),
  * but this type is kept for backward compatibility with components that

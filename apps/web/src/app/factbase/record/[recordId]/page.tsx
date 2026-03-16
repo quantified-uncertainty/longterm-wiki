@@ -9,6 +9,7 @@ import {
   getFactBaseRecords,
   getFactBaseRecordSchema,
   getAllFactBaseRecords,
+  getFactBaseRecordCollectionNames,
   type FactBaseRecordEntry,
 } from "@/data/factbase";
 import {
@@ -24,27 +25,15 @@ import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-share
 // These are internal KB record detail pages with low traffic.
 
 /**
- * Known PG-sourced record collections for record-by-key lookup.
- */
-const RECORD_COLLECTIONS = [
-  "key-persons", "board-seats", "career-history", "grants",
-  "funding-rounds", "investments", "equity-positions", "divisions",
-  "funding-programs", "division-personnel", "charitable-pledges",
-  "dilution-stages", "products", "research-areas", "model-releases",
-  "strategic-partnerships", "safety-milestones", "notable-publications",
-  "personnel",
-];
-
-/**
  * Find a record entry by key across all collections.
- * Replaces the removed getFactBaseRecordByKey function.
+ * Uses dynamically-derived collection names so new collections are picked up automatically.
  */
 function findRecordByKey(recordKey: string): {
   entityId: string;
   collection: string;
   entry: FactBaseRecordEntry;
 } | undefined {
-  for (const collection of RECORD_COLLECTIONS) {
+  for (const collection of getFactBaseRecordCollectionNames()) {
     const records = getAllFactBaseRecords(collection);
     for (const entry of records) {
       if (entry.key === recordKey) {
