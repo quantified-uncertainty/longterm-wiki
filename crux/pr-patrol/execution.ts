@@ -269,7 +269,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
 export function spawnClaude(
   prompt: string,
   config: PatrolConfig,
-  opts?: { cwd?: string },
+  opts?: { cwd?: string; extraEnv?: Record<string, string> },
 ): Promise<{ exitCode: number; output: string; hitMaxTurns: boolean; timedOut: boolean }> {
   return new Promise((resolve, reject) => {
     const args = [
@@ -282,9 +282,11 @@ export function spawnClaude(
     ];
     if (config.skipPerms) args.push('--dangerously-skip-permissions');
 
-    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions
+    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions,
+    // unless the caller explicitly passes it in extraEnv (parallel patrol needs it for auth).
     const env = { ...process.env };
     delete env.CLAUDECODE;
+    if (opts?.extraEnv) Object.assign(env, opts.extraEnv);
 
     const child = spawn('claude', args, {
       cwd: opts?.cwd,
