@@ -575,11 +575,11 @@ function mergeEntityFiles(
   for (const { name, parsed } of files) {
     const file = parsed as Record<string, unknown>;
 
-    // Warn on legacy records: blocks in child files — records have been migrated to PostgreSQL.
+    // Fail loudly on legacy records: blocks — records have been migrated to PostgreSQL.
     if (file.records !== undefined) {
-      console.warn(
-        `[kb/loader] Per-entity directory "${dirName}": file "${name}" has a legacy "records:" block that is ignored. ` +
-        `Records are now served from PostgreSQL. Remove the "records:" section from the YAML file.`
+      throw new Error(
+        `[kb/loader] Per-entity directory "${dirName}": file "${name}" has a "records:" block. ` +
+        `Records are served from PostgreSQL — remove the "records:" section from the YAML file.`
       );
     }
 
@@ -655,8 +655,8 @@ export interface LoadResult {
  *   Pass 2: Load facts (resolves !ref tags using the index)
  *
  * Note: Records (grants, funding rounds, investments, etc.) are now served
- * exclusively from PostgreSQL via build-data.mjs. YAML record sections in
- * thing files are ignored by this loader.
+ * exclusively from PostgreSQL via build-data.mjs. Any YAML "records:" section
+ * in a thing file causes a loud error — records must be removed from YAML.
  */
 export async function loadKB(dataDir: string): Promise<LoadResult> {
   const graph = new Graph();
