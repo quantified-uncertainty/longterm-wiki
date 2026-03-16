@@ -32,6 +32,7 @@ import type { AutoUpdateNewsRoute } from './routes/operational/auto-update-news.
 import type { GroundskeeperRunsRoute } from './routes/operational/groundskeeper-runs.js';
 import type { MonitoringRoute } from './routes/operational/monitoring.js';
 import type { GithubPullsRoute } from './routes/operational/github-pulls.js';
+import type { BuildMetricsRoute } from './routes/operational/build-metrics.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)
@@ -54,6 +55,7 @@ type PagesRpc = ReturnType<typeof hc<PagesRoute>>;
 type GroundskeeperRunsRpc = ReturnType<typeof hc<GroundskeeperRunsRoute>>;
 type MonitoringRpc = ReturnType<typeof hc<MonitoringRoute>>;
 type GithubPullsRpc = ReturnType<typeof hc<GithubPullsRoute>>;
+type BuildMetricsRpc = ReturnType<typeof hc<BuildMetricsRoute>>;
 
 // ---------------------------------------------------------------------------
 // Citations
@@ -289,4 +291,11 @@ export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'
 
 /** A single open PR entry. */
 export type OpenPRRow = GithubPullsResult['pulls'][number];
+
+// ---------------------------------------------------------------------------
+// Build Metrics
+// ---------------------------------------------------------------------------
+
+/** Build metrics stats response. */
+export type BuildMetricsStatsResult = InferResponseType<BuildMetricsRpc['stats']['$get'], 200>;
 

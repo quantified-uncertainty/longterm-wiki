@@ -133,6 +133,19 @@ export const wikiPages = pgTable(
     wordCount: integer("word_count"),
     lastUpdated: text("last_updated"),
     contentFormat: text("content_format"),
+    // Build metrics: coverage
+    coveragePassing: integer("coverage_passing"),
+    coverageTotal: integer("coverage_total"),
+    coverageItems: jsonb("coverage_items").$type<Record<string, 'green' | 'amber' | 'red'>>(),
+    // Build metrics: update schedule
+    updateFrequency: integer("update_frequency"),
+    daysSinceUpdate: integer("days_since_update"),
+    daysUntilDue: integer("days_until_due"),
+    staleness: real("staleness"),
+    updatePriority: real("update_priority"),
+    // Build metrics: rankings
+    readerRank: integer("reader_rank"),
+    researchRank: integer("research_rank"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -2265,6 +2278,35 @@ export const grantResearchAreas = pgTable(
   (table) => [
     primaryKey({ columns: [table.grantId, table.researchAreaId] }),
     index("idx_gra_area").on(table.researchAreaId),
+  ]
+);
+
+/**
+ * Wikibase page similarity — top-N most similar pages per page.
+ *
+ * Built from content redundancy analysis in build-data.mjs.
+ * Each row stores one similarity pair (page → similar page) with rank 1-5.
+ * Replaced in full on each build sync.
+ *
+ * See GitHub issue #2434 (epic #2428).
+ */
+export const wikibasePageSimilarity = pgTable(
+  "wikibase_page_similarity",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    // pageIdInt mirrors wiki_pages.integer_id but has no FK — integer_id was added
+    // via manual migration (phase4a), not Drizzle, so a FK here would break fresh-DB migrations.
+    pageIdInt: integer("page_id_int"),
+    similarPageIdInt: integer("similar_page_id_int"),
+    similarity: integer("similarity").notNull(), // 0-100 percentage
+    rank: integer("rank").notNull(), // 1-5
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_wps_page_id").on(table.pageIdInt),
+    uniqueIndex("idx_wps_page_rank").on(table.pageIdInt, table.rank),
   ]
 );
 
