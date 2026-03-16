@@ -1,8 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTypedEntities, isApproach } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
-import { getWikiHref } from "@/data/entity-nav";
+import { ApproachesTable, type ApproachRow } from "./approaches-table";
 
 export const metadata: Metadata = {
   title: "Approaches",
@@ -13,13 +13,21 @@ export const metadata: Metadata = {
 export default function ApproachesPage() {
   const approaches = getTypedEntities().filter(isApproach);
 
-  const uniqueTagCount = new Set(approaches.flatMap((a) => a.tags ?? [])).size;
+  const rows: ApproachRow[] = approaches.map((a) => ({
+    id: a.id,
+    title: a.title,
+    description: a.description ?? null,
+    tags: a.tags ?? [],
+    numericId: a.numericId ?? null,
+  }));
+
+  const uniqueTagCount = new Set(rows.flatMap((r) => r.tags)).size;
 
   const stats = [
-    { label: "Approaches", value: String(approaches.length) },
+    { label: "Approaches", value: String(rows.length) },
     {
       label: "With Description",
-      value: String(approaches.filter((a) => a.description).length),
+      value: String(rows.filter((r) => r.description).length),
     },
     { label: "Unique Tags", value: String(uniqueTagCount) },
   ];
@@ -47,49 +55,9 @@ export default function ApproachesPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {approaches
-          .sort((a, b) => a.title.localeCompare(b.title))
-          .map((approach) => {
-            const wikiHref = getWikiHref(approach.id);
-            return (
-              <div
-                key={approach.id}
-                className="rounded-xl border border-border/60 bg-card p-4 hover:bg-muted/20 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <Link
-                    href={`/approaches/${approach.id}`}
-                    className="font-semibold text-sm hover:text-primary transition-colors line-clamp-1"
-                  >
-                    {approach.title}
-                  </Link>
-                </div>
-                {approach.description && (
-                  <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
-                    {approach.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-3 text-xs">
-                  {approach.tags.length > 0 && (
-                    <span className="text-muted-foreground">
-                      {approach.tags.slice(0, 3).join(", ")}
-                      {approach.tags.length > 3 && " ..."}
-                    </span>
-                  )}
-                  {wikiHref && (
-                    <Link
-                      href={wikiHref}
-                      className="text-primary hover:underline ml-auto"
-                    >
-                      Wiki &rarr;
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ApproachesTable rows={rows} />
+      </Suspense>
     </div>
   );
 }
