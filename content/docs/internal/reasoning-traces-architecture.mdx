@@ -1,24 +1,15 @@
 ---
 numericId: E903
 title: "Reasoning Traces: Making Every Claim's Derivation Auditable"
-description: "Architecture for storing reasoning traces that connect source material to wiki claims, covering data models, verification pipelines, and audit workflows."
+description: Architecture for storing reasoning traces that connect source material to wiki claims, covering data models, verification pipelines, and audit workflows.
 sidebar:
   order: 41
 subcategory: architecture
-quality: 50
-readerImportance: 90
-researchImportance: 85
-lastEdited: "2026-03-09"
+lastEdited: 2026-03-09
 createdAt: 2026-02-26
 evergreen: false
 llmSummary: "Design document for reasoning traces — structured records of how each claim was derived from source material, what inference was involved, and how it can be re-verified. Proposes a tiered trace model (minimal for direct assertions, structured for derived claims, full for high-stakes claims) and integration with the existing claims pipeline. Motivated by the observation that storing verdicts without reasoning makes verification unauditable: a 'verified' claim with no trace is an assertion of authority, not transparency."
-ratings:
-  novelty: 8
-  rigor: 6
-  actionability: 7
-  completeness: 6
 ---
-
 <Aside type="caution" title="Status: Design Proposal — Partially Superseded">
 This document was written in February 2026 when the Postgres claims system was the primary direction for structured data. Since then, the **KB package** (`packages/kb/`) has become the authoritative source for structured entity facts, and the Postgres statements system has been archived (March 2026). The reasoning trace concepts here remain valuable but would need to be adapted to work with KB facts rather than (or in addition to) Postgres claims. The related documents listed at the bottom have been removed.
 </Aside>

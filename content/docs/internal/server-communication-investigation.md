@@ -1,14 +1,11 @@
 ---
 numericId: E890
-title: "Server Communication Investigation"
-description: "Evaluation of wiki-server client/server architecture — pain points, framework options (Hono RPC, ts-rest, oRPC), and pragmatic improvement plan for type-safe API communication."
+title: Server Communication Investigation
+description: Evaluation of wiki-server client/server architecture — pain points, framework options (Hono RPC, ts-rest, oRPC), and pragmatic improvement plan for type-safe API communication.
 subcategory: architecture
-readerImportance: 15
-researchImportance: 20
-lastEdited: "2026-02-24"
+lastEdited: 2026-02-24
 evergreen: false
 ---
-
 # Server Communication Investigation
 
 **Date:** 2026-02-24
