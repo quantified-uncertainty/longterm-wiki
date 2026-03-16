@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   normalizeGranteeName,
+  normalizeTitle,
   extractYearMonth,
   amountsMatch,
   dedupeKey,
@@ -181,38 +182,105 @@ describe("amountsMatch", () => {
   });
 });
 
+describe("normalizeTitle", () => {
+  it("returns null for short titles", () => {
+    expect(normalizeTitle("Grant")).toBeNull();
+    expect(normalizeTitle("")).toBeNull();
+    expect(normalizeTitle(null)).toBeNull();
+  });
+
+  it("returns null for generic titles", () => {
+    expect(normalizeTitle("General Support for Operations")).toBeNull();
+    expect(normalizeTitle("General operating support grant")).toBeNull();
+    expect(normalizeTitle("Unrestricted support for research")).toBeNull();
+  });
+
+  it("normalizes descriptive titles", () => {
+    const result = normalizeTitle("AI Safety Research on Mechanistic Interpretability");
+    expect(result).toBe("ai safety research on mechanistic interpretability");
+  });
+
+  it("strips common grant prefixes", () => {
+    const result = normalizeTitle('Grant to "support research on value alignment in AI systems"');
+    expect(result).not.toBeNull();
+    expect(result).not.toMatch(/^grant to/);
+  });
+
+  it("strips punctuation", () => {
+    const result = normalizeTitle("FAR.AI — General Research (2023) Support");
+    expect(result).not.toBeNull();
+    expect(result).not.toContain(".");
+    expect(result).not.toContain("(");
+  });
+});
+
 describe("dedupeKeys", () => {
   it("returns both floor and ceil bucket keys for non-round amounts", () => {
     const grant = makeGrant({ granteeName: "Acme", amount: 104999, date: "2024-06-15" });
     const keys = dedupeKeys(grant);
-    expect(keys).toHaveLength(2);
-    // floor(104999/10000) = 10, ceil(104999/10000) = 11
+    // Name-based keys: floor + ceil
     expect(keys).toContain("acme|10|2024-06");
     expect(keys).toContain("acme|11|2024-06");
   });
 
-  it("returns single key for exact multiples of 10000", () => {
+  it("returns name-based key for exact multiples of 10000", () => {
     const grant = makeGrant({ granteeName: "Acme", amount: 100000, date: "2024-06-15" });
     const keys = dedupeKeys(grant);
-    expect(keys).toHaveLength(1);
+    expect(keys).toContain("acme|10|2024-06");
   });
 
-  it("returns single key for null amount", () => {
+  it("includes null bucket for null amount", () => {
     const grant = makeGrant({ granteeName: "Acme", amount: null, date: "2024-06-15" });
     const keys = dedupeKeys(grant);
-    expect(keys).toHaveLength(1);
-    expect(keys[0]).toContain("null");
+    expect(keys.some(k => k.includes("null"))).toBe(true);
   });
 
   it("generates overlapping keys for amounts at bucket boundaries", () => {
-    // $104,999 and $105,001 should share at least one bucket key
     const grant1 = makeGrant({ granteeName: "Acme", amount: 104999, date: "2024-06-15" });
     const grant2 = makeGrant({ granteeName: "Acme", amount: 105001, date: "2024-06-15" });
     const keys1 = dedupeKeys(grant1);
     const keys2 = dedupeKeys(grant2);
-    // grant1: floor=10, ceil=11; grant2: floor=10, ceil=11
     const overlap = keys1.filter(k => keys2.includes(k));
     expect(overlap.length).toBeGreaterThan(0);
+  });
+
+  it("includes entity-based keys when granteeId is set", () => {
+    const grant = makeGrant({
+      granteeName: "MIRI",
+      granteeId: "entity-abc",
+      amount: 500000,
+      date: "2024-03-15",
+    });
+    const keys = dedupeKeys(grant);
+    expect(keys.some(k => k.startsWith("entity:entity-abc|"))).toBe(true);
+  });
+
+  it("does not include entity-based keys when granteeId is null", () => {
+    const grant = makeGrant({ granteeName: "Unknown Org", granteeId: null, amount: 100000, date: "2024-01-15" });
+    const keys = dedupeKeys(grant);
+    expect(keys.every(k => !k.startsWith("entity:"))).toBe(true);
+  });
+
+  it("includes title-based keys for descriptive grant names", () => {
+    const grant = makeGrant({
+      granteeName: "MIRI",
+      name: "AI Safety Research on Mechanistic Interpretability",
+      amount: 500000,
+      date: "2024-03-15",
+    });
+    const keys = dedupeKeys(grant);
+    expect(keys.some(k => k.startsWith("title:"))).toBe(true);
+  });
+
+  it("does not include title-based keys for generic grant names", () => {
+    const grant = makeGrant({
+      granteeName: "MIRI",
+      name: "General Support",
+      amount: 500000,
+      date: "2024-03-15",
+    });
+    const keys = dedupeKeys(grant);
+    expect(keys.every(k => !k.startsWith("title:"))).toBe(true);
   });
 });
 
@@ -386,6 +454,79 @@ describe("detectDuplicates", () => {
 
     const groups = detectDuplicates(grants);
     expect(groups.length).toBe(1);
+  });
+
+  it("detects duplicates via entity-based matching when names differ", () => {
+    // MIRI vs "Machine Intelligence Research Institute" — same entity, different names
+    const grants = [
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "MIRI",
+        granteeId: "entity-miri",
+        amount: 500000,
+        date: "2024-03-15",
+      }),
+      makeGrant({
+        source: "coefficient-giving",
+        granteeName: "Machine Intelligence Research Institute",
+        granteeId: "entity-miri",
+        amount: 500000,
+        date: "2024-03-20",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(1);
+    expect(groups[0].grants.length).toBe(2);
+  });
+
+  it("detects duplicates via title-based matching when names differ", () => {
+    // Different grantee names, no entity match, but same descriptive title
+    const grants = [
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "CFAR",
+        granteeId: null,
+        name: "Research on improving rational decision-making workshops for alignment researchers",
+        amount: 200000,
+        date: "2024-06-15",
+      }),
+      makeGrant({
+        source: "sff",
+        granteeName: "Center for Applied Rationality",
+        granteeId: null,
+        name: "Research on improving rational decision-making workshops for alignment researchers",
+        amount: 200000,
+        date: "2024-06-20",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(1);
+    expect(groups[0].grants.length).toBe(2);
+  });
+
+  it("does NOT falsely match different orgs via generic titles", () => {
+    // "General Support" is generic — should NOT match across different grantees
+    const grants = [
+      makeGrant({
+        source: "ea-funds",
+        granteeName: "Org A",
+        name: "General Support",
+        amount: 200000,
+        date: "2024-06-15",
+      }),
+      makeGrant({
+        source: "sff",
+        granteeName: "Org B",
+        name: "General Support",
+        amount: 200000,
+        date: "2024-06-20",
+      }),
+    ];
+
+    const groups = detectDuplicates(grants);
+    expect(groups.length).toBe(0);
   });
 
   it("does NOT falsely match orgs with different type words (Center vs Institute)", () => {

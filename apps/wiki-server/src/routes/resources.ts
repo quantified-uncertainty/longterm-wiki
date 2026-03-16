@@ -141,6 +141,22 @@ function resourceValues(d: ResourceInput) {
   };
 }
 
+/** Build a COALESCE expression for a jsonb column that correctly handles JS
+ *  arrays. Drizzle's `sql` template sends JS arrays as PG array parameters,
+ *  which can't be cast to jsonb. We pre-serialize to JSON text so the
+ *  `::jsonb` cast receives valid JSON. Null passes through to preserve
+ *  existing values via COALESCE. */
+function jsonbCoalesce(
+  incoming: unknown[] | null,
+  existing: unknown,
+) {
+  if (incoming == null) {
+    return sql`COALESCE(null::jsonb, ${existing})`;
+  }
+  const jsonText = JSON.stringify(incoming);
+  return sql`COALESCE(${jsonText}::jsonb, ${existing})`;
+}
+
 async function upsertResource(
   db: DbClient,
   d: ResourceInput,
@@ -164,11 +180,11 @@ async function upsertResource(
         summary: sql`COALESCE(${vals.summary}, ${resources.summary})`,
         review: sql`COALESCE(${vals.review}, ${resources.review})`,
         abstract: sql`COALESCE(${vals.abstract}, ${resources.abstract})`,
-        keyPoints: sql`COALESCE(${vals.keyPoints}::jsonb, ${resources.keyPoints})`,
+        keyPoints: jsonbCoalesce(vals.keyPoints, resources.keyPoints),
         publicationId: sql`COALESCE(${vals.publicationId}, ${resources.publicationId})`,
-        authors: sql`COALESCE(${vals.authors}::jsonb, ${resources.authors})`,
+        authors: jsonbCoalesce(vals.authors, resources.authors),
         publishedDate: sql`COALESCE(${vals.publishedDate}, ${resources.publishedDate})`,
-        tags: sql`COALESCE(${vals.tags}::jsonb, ${resources.tags})`,
+        tags: jsonbCoalesce(vals.tags, resources.tags),
         localFilename: sql`COALESCE(${vals.localFilename}, ${resources.localFilename})`,
         credibilityOverride: sql`COALESCE(${vals.credibilityOverride}, ${resources.credibilityOverride})`,
         fetchedAt: sql`COALESCE(${vals.fetchedAt}, ${resources.fetchedAt})`,

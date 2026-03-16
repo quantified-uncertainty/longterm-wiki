@@ -35,6 +35,7 @@ export interface ParsedFundingProgram {
 export interface ParsedGrant {
   key: string;
   ownerEntityId: string;
+  funderSlug: string | null;
   name: string;
   recipientId: string | null;
   recipientName: string;
@@ -91,9 +92,12 @@ export function parseGrant(record: KBRecordEntry): ParsedGrant {
     ? resolveEntityLink(recipientId)
     : { name: "", href: null };
 
+  const funderSlug = getKBEntitySlug(record.ownerEntityId) ?? null;
+
   return {
     key: record.key,
     ownerEntityId: record.ownerEntityId,
+    funderSlug,
     name: (f.name as string) ?? record.key,
     recipientId,
     recipientName: recipient.name,

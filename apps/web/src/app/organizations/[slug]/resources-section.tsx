@@ -39,15 +39,18 @@ const TYPE_COLORS: Record<string, string> = {
 const DEFAULT_COLOR = "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
 /** Compute which optional columns have enough data to be worth showing. */
-function computeColumnVisibility(resources: OrgResourceRow[]) {
+function computeColumnVisibility(
+  resources: OrgResourceRow[],
+  alwaysShow?: { date?: boolean; publication?: boolean; credibility?: boolean },
+) {
   const total = resources.length || 1;
   const withDate = resources.filter((r) => r.publishedDate).length;
   const withPub = resources.filter((r) => r.publicationName).length;
   const withCred = resources.filter((r) => r.credibility != null).length;
   return {
-    showDate: withDate / total >= 0.2,
-    showPublication: withPub / total >= 0.15,
-    showCredibility: withCred / total >= 0.15,
+    showDate: alwaysShow?.date || withDate / total >= 0.2,
+    showPublication: alwaysShow?.publication || withPub / total >= 0.15,
+    showCredibility: alwaysShow?.credibility || withCred / total >= 0.15,
   };
 }
 
@@ -209,10 +212,12 @@ export function OrgResourcesSection({
   resources,
   title,
   emptyMessage,
+  alwaysShowColumns,
 }: {
   resources: OrgResourceRow[];
   title: string;
   emptyMessage: string;
+  alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
 }) {
   if (resources.length === 0) {
     return (
@@ -225,7 +230,7 @@ export function OrgResourcesSection({
 
   return (
     <section>
-      <OrgResourcesTable resources={resources} title={title} />
+      <OrgResourcesTable resources={resources} title={title} alwaysShowColumns={alwaysShowColumns} />
     </section>
   );
 }
@@ -233,11 +238,13 @@ export function OrgResourcesSection({
 function OrgResourcesTable({
   resources,
   title,
+  alwaysShowColumns,
 }: {
   resources: OrgResourceRow[];
   title: string;
+  alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
 }) {
-  const colVis = useMemo(() => computeColumnVisibility(resources), [resources]);
+  const colVis = useMemo(() => computeColumnVisibility(resources, alwaysShowColumns), [resources, alwaysShowColumns]);
   const columns = useMemo(() => makeColumns(colVis), [colVis]);
 
   const [sorting, setSorting] = useState<SortingState>(

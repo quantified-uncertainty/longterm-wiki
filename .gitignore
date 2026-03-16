@@ -93,4 +93,8 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
+# Matrix score snapshots (local analysis, not source code)
+.matrix-snapshots/
+
 # Design docs — committed for review. Gitignore removed intentionally.
+.matrix-improved.txt

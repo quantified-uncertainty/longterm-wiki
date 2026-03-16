@@ -355,12 +355,14 @@ export default async function OrgProfilePage({
               grants={data.grantsMade}
               direction="given"
               entityId={entity.id}
+              orgSlug={slug}
             />
           )}
           {data.grantsReceived.length > 0 && (
             <GrantsSection
               grants={data.grantsReceived}
               direction="received"
+              orgSlug={slug}
             />
           )}
 
@@ -470,6 +472,7 @@ export default async function OrgProfilePage({
           resources={data.resourceAnnouncements}
           title="News & Announcements"
           emptyMessage=""
+          alwaysShowColumns={{ date: true }}
         />
       ),
     });
@@ -486,6 +489,7 @@ export default async function OrgProfilePage({
           resources={data.resourcesAboutOrg}
           title="External Coverage & References"
           emptyMessage=""
+          alwaysShowColumns={{ date: true, publication: true }}
         />
       ),
     });

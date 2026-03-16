@@ -52,7 +52,9 @@ export function GrantsAwardedSection({
               <tr key={g.key} className="hover:bg-muted/20 transition-colors">
                 <td className="py-2 px-3">
                   <Link
-                    href={`/grants/${g.key}`}
+                    href={g.funderSlug
+                      ? `/organizations/${g.funderSlug}/grants/${g.key}`
+                      : `/grants/${g.key}`}
                     className="font-medium text-foreground text-xs hover:text-primary transition-colors"
                   >
                     {g.name}
