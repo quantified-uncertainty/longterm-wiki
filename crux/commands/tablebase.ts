@@ -23,11 +23,15 @@ interface CommandOptions extends BaseOptions {
   format?: string;
   ci?: boolean;
   dryRun?: boolean;
+  fix?: boolean;
   max?: string;
   budget?: string;
   taskType?: string;
   entityType?: string;
   table?: string;
+  type?: string;
+  description?: string;
+  recordsFile?: string;
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -383,6 +387,111 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   }
 }
 
+async function verifyCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
+  const matcher = buildEntityMatcher();
+
+  // Fetch all personnel records
+  const allPersonnel: Array<Record<string, unknown>> = [];
+  let offset = 0;
+  while (true) {
+    const r = await apiRequest<{ personnel: Array<Record<string, unknown>>; total: number }>('GET', `/api/personnel/all?limit=200&offset=${offset}`);
+    if (!r.ok) break;
+    allPersonnel.push(...r.data.personnel);
+    if (allPersonnel.length >= r.data.total) break;
+    offset += 200;
+  }
+
+  const issues: string[] = [];
+  let slugPersonIds = 0;
+  let unresolvedPersonIds = 0;
+  let missingSource = 0;
+  let duplicates = 0;
+
+  const seen = new Set<string>();
+
+  for (const rec of allPersonnel) {
+    const pid = rec.personId as string;
+    const oid = rec.organizationId as string;
+    const role = rec.role as string;
+
+    // Check for slug-based personIds (should be stableIds)
+    // StableIds are 10-char alphanumeric without hyphens, so hyphens indicate a slug
+    if (pid && pid.includes('-')) {
+      // Try local matcher first, then wiki-server entity lookup
+      const match = matcher.match(pid);
+      if (match) {
+        issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${match.stableId}"`);
+        slugPersonIds++;
+        if (options.fix) {
+          const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
+            items: [{ ...rec, personId: match.stableId }],
+          });
+          if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
+        }
+      } else {
+        // Check wiki-server directly (entity may exist but not in local database.json)
+        const entityR = await apiRequest<{ id: string; stableId: string | null }>('GET', `/api/entities/${encodeURIComponent(pid)}`);
+        if (entityR.ok && entityR.data.stableId) {
+          issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${entityR.data.stableId}" (via server)`);
+          slugPersonIds++;
+          if (options.fix) {
+            const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
+              items: [{ ...rec, personId: entityR.data.stableId }],
+            });
+            if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
+          }
+        } else {
+          issues.push(`UNRESOLVED_PERSON_ID: Record ${rec.id} has personId="${pid}" which doesn't resolve`);
+          unresolvedPersonIds++;
+        }
+      }
+    }
+
+    // Check for missing source
+    if (!rec.source) {
+      issues.push(`MISSING_SOURCE: Record ${rec.id} (${pid} at ${oid}) has no source URL`);
+      missingSource++;
+    }
+
+    // Check for duplicates
+    const key = `${pid}|${oid}|${role}`;
+    if (seen.has(key)) {
+      issues.push(`DUPLICATE: Record ${rec.id} duplicates personId=${pid}, org=${oid}, role=${role}`);
+      duplicates++;
+    }
+    seen.add(key);
+  }
+
+  const summary = [
+    `\x1b[1mTableBase Data Quality Report\x1b[0m`,
+    `Total personnel records: ${allPersonnel.length}`,
+    '',
+    `Slug-based personIds (need normalization): ${slugPersonIds}`,
+    `Unresolved personIds: ${unresolvedPersonIds}`,
+    `Missing source URLs: ${missingSource}`,
+    `Duplicate records: ${duplicates}`,
+    '',
+  ];
+
+  if (issues.length === 0) {
+    summary.push('\x1b[32m✓ No issues found\x1b[0m');
+  } else {
+    summary.push(`\x1b[33m${issues.length} issue(s) found:\x1b[0m`);
+    for (const issue of issues.slice(0, 20)) {
+      summary.push(`  ${issue}`);
+    }
+    if (issues.length > 20) summary.push(`  ... and ${issues.length - 20} more`);
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify({ total: allPersonnel.length, slugPersonIds, unresolvedPersonIds, missingSource, duplicates, issues }) };
+  }
+
+  return { exitCode: issues.length > 0 ? 1 : 0, output: summary.join('\n') };
+}
+
 async function prepareCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const { runFullScan } = await import('../tablebase/scanner.ts');
   const { rankTasks } = await import('../tablebase/task-ranker.ts');
@@ -702,6 +811,7 @@ export const commands = {
   'create-entity': createEntityCommand,
   'ensure-entities': ensureEntitiesCommand,
   'fetch-page': fetchPageCommand,
+  verify: verifyCommand,
   prepare: prepareCommand,
   default: scanCommand,
 };

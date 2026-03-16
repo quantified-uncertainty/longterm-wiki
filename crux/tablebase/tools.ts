@@ -273,6 +273,25 @@ async function handleSubmitRecords(
     return `Error: ${missingSource.length} record(s) missing "source" or "sourceUrl" field. Every record must have a source URL.`;
   }
 
+  // Normalize entity reference fields — resolve slugs to stableIds
+  // This catches cases where the LLM uses a slug instead of the stableId
+  const entityFields = ['personId', 'organizationId', 'investorId', 'companyId', 'benchmarkId', 'modelId', 'granteeId'];
+  const matcher = getEntityMatcher();
+  for (const record of records) {
+    for (const field of entityFields) {
+      const val = record[field] as string | undefined;
+      if (!val) continue;
+      // If it looks like a slug (contains hyphens), try to resolve it to a stableId.
+      // StableIds are 10-char alphanumeric (no hyphens), so any value with hyphens is likely a slug.
+      if (val.includes('-')) {
+        const match = matcher.match(val);
+        if (match) {
+          record[field] = match.stableId;
+        }
+      }
+    }
+  }
+
   // Generate IDs for new records
   for (const record of records) {
     if (!record.id) {
