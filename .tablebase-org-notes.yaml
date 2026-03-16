@@ -1,0 +1,170 @@
+# TableBase Organization Research Notes
+# Notes from enrichment runs — helps future sessions know where to find data.
+# Format: entityId → notes about team page URLs, data sources, quirks.
+
+# Anthropic (A4XoubikkQ) — stableId for the Anthropic entity used by DeepMind records
+# Note: A4XoubikkQ is actually Google DeepMind's ID. Anthropic records were written
+# to the correct org but some early API mode records used wrong entity.
+
+google-deepmind:
+  entityId: A4XoubikkQ
+  teamPage: null  # No public team page. Board at /company (JS-rendered, needs Playwright fetch-page).
+  notes: |
+    WebFetch on anthropic.com/company returns board only (Dario, Daniela, Yasmin Razavi, Jay Kreps, Reed Hastings, Chris Liddell).
+    Playwright fetch-page works for the same page. No staff directory — researchers found via WebSearch + Wikipedia.
+
+anthropic:
+  entityId: A4XoubikkQ  # Same ID issue — check this
+  notes: |
+    Board visible at anthropic.com/company (JS-rendered). No public staff directory.
+    Key researchers found via WebSearch. Many co-founders are in the DB already.
+
+openai:
+  entityId: "265"
+  notes: |
+    Personnel added to main OpenAI entity. Board/exec team found via WebSearch.
+    Many executives not in entity DB — had to create them.
+
+openai-foundation:
+  entityId: GQuPhNkZbg
+  notes: |
+    Board formed October 28, 2025. All board members from openai.com/our-structure.
+    Sam Altman co-founded OpenAI in 2015.
+
+open-philanthropy:
+  entityId: "263"
+  teamPage: https://coefficientgiving.org/about-us/team
+  notes: |
+    Renamed to Coefficient Giving in November 2025. openphilanthropy.org redirects to coefficientgiving.org.
+    Team page has 140+ people with exact roles and departments. Extremely rich data source.
+    Only Holden Karnofsky and Dustin Moskovitz were in the DB — most staff need entity creation.
+
+redwood-research:
+  entityId: "289"
+  teamPage: https://www.redwoodresearch.org/team
+  notes: |
+    Team page lists Buck Shlegeris (CEO), Ryan Greenblatt (Chief Scientist),
+    and board (Buck, Nate Thomas, Ammon Bartram). Technical staff names visible but no titles.
+
+80000-hours:
+  entityId: hvg9ecR3nA
+  teamPage: https://80000hours.org/about/meet-the-team/
+  notes: |
+    Excellent team page — 51 staff + 5 board + 5 advisors with exact titles.
+    Founded 2011 by Benjamin Todd and Will MacAskill. Current CEO is Niel Bowerman.
+    Note: We only submitted the 2 founders. Could go much deeper.
+
+apollo-research:
+  entityId: pKeaWwP6sQ
+  teamPage: https://www.apolloresearch.ai/team  # Note: /about returns 404, /team works
+  notes: |
+    24 people with roles. CEO Marius Hobbhahn, COO Chris Akin.
+    Technical staff listed as "Member of Technical Staff" without specific titles.
+
+epoch-ai:
+  entityId: cBPkzcVBBQ
+  teamPage: https://epoch.ai/team  # Note: epochai.org redirects to epoch.ai
+  notes: |
+    26 people with roles. Founded 2022 by Jaime Sevilla.
+    Has board: Tom Davidson, Ajeya Cotra, Jaime Sevilla, María de la Lama.
+
+rethink-priorities:
+  entityId: t0p43V5oLA
+  teamPage: https://rethinkpriorities.org/team
+  notes: |
+    42 people with roles across departments. CEO Marcus A. Davis, Co-founder Peter Wildeford.
+    8 board members listed. Departments: Animal Welfare, GHD, Surveys, Worldview, Operations, Comms.
+
+center-for-ai-safety:
+  entityId: y4bieqSeag
+  teamPage: https://www.safe.ai/about
+  notes: |
+    Only 3 leadership visible on about page (Dan Hendrycks, Oliver Zhang, Josue Estrada).
+    Team organized into functional divisions but no individual names for staff.
+    Note: There's a duplicate entity (oa9A0OV0RX) — marked done, skip it.
+
+miri:
+  entityId: puAffUjWSS
+  teamPage: null  # No team page found
+  notes: |
+    No public team page. Data from WebSearch + Wikipedia.
+    API mode agent found 11 people including co-founders (Eliezer Yudkowsky) and created 8 new person entities.
+
+ai-impacts:
+  entityId: TdbypiKyCw
+  teamPage: https://aiimpacts.org/about  # /team returns 404
+  notes: |
+    About page lists Katja Grace as lead researcher + co-founder (since 2014).
+    Also lists many past contributors (Paul Christiano, Daniel Kokotajlo, etc.).
+
+1day-sooner:
+  entityId: 9k7drw6Qpg
+  teamPage: https://www.1daysooner.org/about/our-team/
+  notes: |
+    Founded by Josh Morrison (President) and Sophie Rose in 2020.
+    Board: Dan Wikler, Madeleine Thompson, Stanley Plotkin.
+
+against-malaria-foundation:
+  entityId: c5rNf1vl2A
+  notes: |
+    Founded 2005 by Rob Mather (CEO). Lean team of 13.
+    8 trustees but names not easily found via search.
+
+ai-futures-project:
+  entityId: KDYvrwkgtw
+  teamPage: https://www.aifutures.org/about
+  notes: |
+    Founded 2025 by Daniel Kokotajlo. Core team: Eli Lifland, Thomas Larsen, Romeo Dean, Lauren Mangla.
+    Jonas Vollmer is COO. Made the AI 2027 scenario forecasting project.
+
+palisade-research:
+  entityId: sgEt2BpyOg
+  teamPage: https://palisaderesearch.org/about  # /team doesn't exist
+  notes: |
+    Founded 2023 by Jeffrey Ladish. 8 leadership + 10 staff on about page.
+    Focus on AI security risks. No specific joining dates on site.
+
+metr:
+  entityId: "239"
+  teamPage: https://metr.org/about#our-team  # /team redirects here
+  notes: |
+    35+ people. Beth Barnes (Founder & CEO). Board includes Adam Gleave, Yoshua Bengio.
+    Good role categorization: Technical Staff, Operations, Policy, Advisors.
+    Ajeya Cotra already in DB as entity 22.
+
+far-ai:
+  entityId: "150"
+  teamPage: https://far.ai/about  # "View full team" link for more
+  notes: |
+    15 people shown, only founders have titles. Adam Gleave and Karl Berzins are co-founders.
+    Adam Gleave also on METR board.
+
+goodfire:
+  entityId: "175"
+  teamPage: https://www.goodfire.ai/about  # /company also works
+  notes: |
+    34 people but only PhD/no-title distinction. Founded June 2024 by Eric Ho (CEO),
+    Dan Balsam (CTO), Thomas McGrath (Chief Scientist). Lee Sharkey and Dan Braun
+    joined from Apollo Research. $50M Series A from Anthropic + Menlo Ventures.
+
+cfar:
+  entityId: "63"
+  teamPage: null  # /about/staff and /about/team both 404
+  notes: |
+    No working team page. Data from Wikipedia.
+    Founded 2012 by Julia Galef, Anna Salamon, Michael Smith, Andrew Critch.
+    Anna Salamon president since 2021. Timothy Telleen-Lawton is Executive Director.
+
+seldon-lab:
+  entityId: "320"
+  teamPage: null  # seldonlab.com has info but no /team page
+  notes: |
+    AI security startup accelerator. Co-founded by Esben Kran, Finn Metz, Nick Fitz, Eric Ries.
+    Runs 3-month programs in SF. Info from Crunchbase + seldonlab.com.
+
+elicit:
+  entityId: 2VexoROapg
+  teamPage: https://elicit.com/team  # exists but WebFetch 404'd, may need Playwright
+  notes: |
+    Spun out of Ought (nonprofit) as PBC in 2023. Founded by Andreas Stuhlmüller (CEO)
+    and Jungwon Byun (COO). elicit.com/about returns 404, /team exists but may be JS-rendered.
