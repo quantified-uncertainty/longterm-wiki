@@ -96,6 +96,7 @@ export function escapeIlike(s: string): string {
  */
 export function parseRange(value: unknown): { low: string | null; high: string | null } {
   if (value == null) return { low: null, high: null };
+  if (typeof value === "string" && value.trim() === "") return { low: null, high: null };
 
   // Already an array (e.g., from JSON parse)
   if (Array.isArray(value) && value.length === 2) {

@@ -895,6 +895,18 @@ describe('parseRangeBounds', () => {
       high: 2_000_000_000,
     });
   });
+
+  it('returns nulls for empty string (not 0)', () => {
+    expect(parseRangeBounds('')).toEqual({ low: null, high: null });
+  });
+
+  it('returns nulls for whitespace-only string', () => {
+    expect(parseRangeBounds('  ')).toEqual({ low: null, high: null });
+  });
+
+  it('returns nulls for non-numeric strings like "~7%"', () => {
+    expect(parseRangeBounds('~7%')).toEqual({ low: null, high: null });
+  });
 });
 
 // ── Low/high fields in mapping functions ────────────────────────────────

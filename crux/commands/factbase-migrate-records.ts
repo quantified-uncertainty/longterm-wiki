@@ -333,6 +333,7 @@ export function parseNumericOrRange(value: unknown): number | null {
  */
 export function parseRangeBounds(value: unknown): { low: number | null; high: number | null } {
   if (value == null) return { low: null, high: null };
+  if (typeof value === "string" && value.trim() === "") return { low: null, high: null };
   if (Array.isArray(value) && value.length === 2) {
     const lo = Number(value[0]);
     const hi = Number(value[1]);

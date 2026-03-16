@@ -44,12 +44,14 @@ SET
   stake_low = CASE
     WHEN stake_acquired IS NULL THEN NULL
     WHEN stake_acquired LIKE '[%' THEN (stake_acquired::jsonb ->> 0)::numeric
-    ELSE stake_acquired::numeric
+    WHEN stake_acquired ~ '^-?[0-9]+\.?[0-9]*([eE][+-]?[0-9]+)?$' THEN stake_acquired::numeric
+    ELSE NULL
   END,
   stake_high = CASE
     WHEN stake_acquired IS NULL THEN NULL
     WHEN stake_acquired LIKE '[%' THEN (stake_acquired::jsonb ->> 1)::numeric
-    ELSE stake_acquired::numeric
+    WHEN stake_acquired ~ '^-?[0-9]+\.?[0-9]*([eE][+-]?[0-9]+)?$' THEN stake_acquired::numeric
+    ELSE NULL
   END
 WHERE stake_acquired IS NOT NULL AND stake_low IS NULL;
 
@@ -64,11 +66,13 @@ SET
   stake_low = CASE
     WHEN stake IS NULL THEN NULL
     WHEN stake LIKE '[%' THEN (stake::jsonb ->> 0)::numeric
-    ELSE stake::numeric
+    WHEN stake ~ '^-?[0-9]+\.?[0-9]*([eE][+-]?[0-9]+)?$' THEN stake::numeric
+    ELSE NULL
   END,
   stake_high = CASE
     WHEN stake IS NULL THEN NULL
     WHEN stake LIKE '[%' THEN (stake::jsonb ->> 1)::numeric
-    ELSE stake::numeric
+    WHEN stake ~ '^-?[0-9]+\.?[0-9]*([eE][+-]?[0-9]+)?$' THEN stake::numeric
+    ELSE NULL
   END
 WHERE stake IS NOT NULL AND stake_low IS NULL;
