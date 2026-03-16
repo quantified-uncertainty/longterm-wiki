@@ -73,7 +73,6 @@ The site has structured directory pages for browsing entities by type. Before cr
 |-----------|------------|-------|-------------|
 | Organizations | `organization` | `/organizations` | Companies, labs, nonprofits with FactBase facts, funding, people |
 | People | `person` | `/people` | Researchers, executives with roles, affiliations, publications |
-| Risks | `risk` | `/risks` | AI safety risks with severity, likelihood, timeframe |
 | AI Models | `ai-model` | `/ai-models` | Models with benchmarks, pricing, safety levels |
 | Benchmarks | `benchmark` | `/benchmarks` | Evaluation benchmarks with scores across models |
 | Legislation | `policy` | `/legislation` | Laws, regulations, executive orders with provisions, stakeholders, votes |
@@ -85,7 +84,7 @@ The site has structured directory pages for browsing entities by type. Before cr
 | Investments | — | `/investments` | Investment records |
 | Funding Rounds | — | `/funding-rounds` | Company funding rounds |
 
-Entity types without directories (too abstract or sparse for tables): `approach` (70), `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5), `event` (1).
+Entity types without directories (too abstract or sparse for tables): `risk`, `approach` (70), `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5), `event` (1).
 
 Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
 

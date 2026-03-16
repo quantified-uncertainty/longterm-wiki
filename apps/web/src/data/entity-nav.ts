@@ -14,7 +14,6 @@ import { getKBEntitySlug } from "./factbase";
 const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
   person: "/people",
   organization: "/organizations",
-  risk: "/risks",
   benchmark: "/benchmarks",
   "ai-model": "/ai-models",
   policy: "/legislation",
@@ -57,7 +56,7 @@ export function getEntityPath(id: string): string | null {
 
 /**
  * Get the canonical wiki href for an entity (always /wiki/E<id>).
- * For directory-backed entity types (people, organizations, risks),
+ * For directory-backed entity types (people, organizations),
  * this returns the directory URL instead when a slug is available.
  */
 export function getEntityHref(id: string, _type?: string): string {
