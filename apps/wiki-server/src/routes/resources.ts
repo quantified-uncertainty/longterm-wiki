@@ -289,8 +289,16 @@ const resourcesApp = new Hono()
       }
     }
 
-    const result = await upsertResource(db, parsed.data);
-    return c.json(result, 201);
+    try {
+      const result = await upsertResource(db, parsed.data);
+      return c.json(result, 201);
+    } catch (err) {
+      logger.error(
+        { err, resourceId: parsed.data.id },
+        "single resource upsert failed",
+      );
+      return dbError(c, "resource upsert", err, { resourceId: parsed.data.id });
+    }
   })
 
   // ---- POST /batch (upsert multiple resources) ----
