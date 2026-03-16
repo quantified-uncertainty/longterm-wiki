@@ -350,6 +350,39 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   };
 }
 
+async function fetchPageCommand(args: string[], _options: CommandOptions): Promise<CommandResult> {
+  const url = args.find(a => !a.startsWith('--'));
+  if (!url) {
+    return { exitCode: 1, output: 'Usage: crux tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
+  }
+
+  const { execSync } = await import('child_process');
+  // Use node with the global playwright module to extract rendered text
+  const script = `
+    const { chromium } = require('playwright');
+    (async () => {
+      const browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage();
+      await page.goto(${JSON.stringify(url)}, { waitUntil: 'networkidle', timeout: 20000 });
+      const text = await page.innerText('body');
+      process.stdout.write(text);
+      await browser.close();
+    })().catch(e => { process.stderr.write(e.message); process.exit(1); });
+  `.trim();
+
+  try {
+    const output = execSync(`node -e "${script.replace(/"/g, '\\"')}"`, {
+      timeout: 30000,
+      maxBuffer: 10 * 1024 * 1024,
+      env: { ...process.env, NODE_PATH: '/opt/homebrew/lib/node_modules' },
+    });
+    return { exitCode: 0, output: output.toString() };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { exitCode: 1, output: `Playwright fetch failed: ${msg}\nIs Playwright installed? Run: npm i -g playwright` };
+  }
+}
+
 async function prepareCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const { runFullScan } = await import('../tablebase/scanner.ts');
   const { rankTasks } = await import('../tablebase/task-ranker.ts');
@@ -459,6 +492,21 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
     teamPageUrls.push(`${base}/team`, `${base}/about`, `${base}/about/meet-the-team`, `${base}/about-us/team`, `${base}/people`);
   }
 
+  // Fetch divisions for this entity (if personnel task)
+  let divisionsInfo = '';
+  if (task.taskType === 'personnel-enrichment') {
+    const divResult = await apiRequest<{ divisions: Array<{ name: string; lead: string | null; divisionType: string; status: string }> }>(
+      'GET', `/api/divisions/by-org/${encodeURIComponent(task.entityId)}?limit=50`,
+    );
+    if (divResult.ok && divResult.data.divisions.length > 0) {
+      const divs = divResult.data.divisions.filter(d => d.status === 'active' || !d.status);
+      if (divs.length > 0) {
+        const divLines = divs.map(d => `- ${d.name}${d.lead ? ` (lead: ${d.lead})` : ''} [${d.divisionType}]`);
+        divisionsInfo = `\n\n### Known divisions\nThis org has ${divs.length} known division(s). Look for team leads and key researchers in each:\n${divLines.join('\n')}`;
+      }
+    }
+  }
+
   const output = `## Task: ${task.taskType}
 **Entity**: ${task.entityName} (ID: ${task.entityId})
 **Table**: ${submitTable}
@@ -492,7 +540,7 @@ RECORDS
 # When done:
 pnpm crux tablebase mark-done ${task.id}
 \`\`\`
-${existingRecords.length > 0 ? `\n### Existing records\n\`\`\`json\n${JSON.stringify(existingRecords.slice(0, 5), null, 2)}\n\`\`\`\n` : ''}`;
+${existingRecords.length > 0 ? `\n### Existing records\n\`\`\`json\n${JSON.stringify(existingRecords.slice(0, 5), null, 2)}\n\`\`\`\n` : ''}${divisionsInfo}`;
 
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify({ task, existingRecords, searchQueries, submitTable, recordFields }) };
@@ -653,6 +701,7 @@ export const commands = {
   existing: existingCommand,
   'create-entity': createEntityCommand,
   'ensure-entities': ensureEntitiesCommand,
+  'fetch-page': fetchPageCommand,
   prepare: prepareCommand,
   default: scanCommand,
 };

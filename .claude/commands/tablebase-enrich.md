@@ -24,9 +24,17 @@ Follow the **research strategy** from the prepare output:
 
 1. **Try the team page first** (if URLs are provided). Use WebFetch with the prompt: "List ALL team members with their full names and roles/titles." Try each URL until one works — team pages often yield 10-50+ people in one call.
 
-2. **Fall back to WebSearch** if the team page doesn't work (404, JS-rendered, no team page). Use the suggested search queries. Also try `"<org name>" site:linkedin.com/company` for additional context.
+2. **If WebFetch returns empty/404**, the page may be JS-rendered. Use Playwright:
+   ```bash
+   pnpm crux tablebase fetch-page "https://example.com/team"
+   ```
+   This renders the page with a real browser and returns the text content.
 
-3. **For key leadership only found via search**, use WebFetch on Wikipedia or official about pages to cross-reference roles and dates.
+3. **Fall back to WebSearch** if team pages don't work. Use the suggested search queries. Also try `"<org name>" site:linkedin.com/company` for additional context.
+
+4. **If divisions are listed**, look specifically for team leads of each division — these are high-priority personnel targets.
+
+5. **For notable researchers** at large orgs (Anthropic, DeepMind, etc.), search for specific people by name to find roles, start dates, and publications. Researchers with many papers or media mentions are higher priority.
 
 ### Step 3: Resolve or create entities
 
