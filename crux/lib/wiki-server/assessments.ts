@@ -3,26 +3,21 @@
  *
  * Client library for the /api/assessments endpoint.
  * Uses apiRequest() for test mock compatibility.
+ * Response types inferred from server route via Hono RPC.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { PageAssessment } from '../../../apps/wiki-server/src/api-types.ts';
+import type { hc, InferResponseType } from 'hono/client';
+import type { AssessmentsRoute } from '../../../apps/wiki-server/src/routes/assessments.ts';
 
 // ---------------------------------------------------------------------------
-// Types (inferred from server route)
+// Types (inferred from server route via Hono RPC)
 // ---------------------------------------------------------------------------
 
-export interface AssessmentBatchResult {
-  inserted: number;
-  skipped: number;
-}
-
-export interface AssessmentSingleResult {
-  id: number;
-  assessor: string;
-  assessedAt: string;
-  pageId: string;
-}
+type RpcClient = ReturnType<typeof hc<AssessmentsRoute>>;
+export type AssessmentBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
+export type AssessmentSingleResult = InferResponseType<RpcClient['index']['$post'], 201>;
 
 // ---------------------------------------------------------------------------
 // API functions
