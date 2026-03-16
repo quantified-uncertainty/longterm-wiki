@@ -20,7 +20,13 @@ If output is `NO_TASKS`, stop. Otherwise, read the task details, search queries,
 
 ### Step 2: Research
 
-Run the **suggested search queries** from the prepare output using WebSearch. Look for names, roles, dates, amounts — whatever the task type requires.
+Follow the **research strategy** from the prepare output:
+
+1. **Try the team page first** (if URLs are provided). Use WebFetch with the prompt: "List ALL team members with their full names and roles/titles." Try each URL until one works — team pages often yield 10-50+ people in one call.
+
+2. **Fall back to WebSearch** if the team page doesn't work (404, JS-rendered, no team page). Use the suggested search queries. Also try `"<org name>" site:linkedin.com/company` for additional context.
+
+3. **For key leadership only found via search**, use WebFetch on Wikipedia or official about pages to cross-reference roles and dates.
 
 ### Step 3: Resolve or create entities
 

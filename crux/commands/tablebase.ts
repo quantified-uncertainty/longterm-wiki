@@ -452,13 +452,25 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
       recordFields = 'varies by table';
   }
 
+  // Build team page URLs to try
+  const teamPageUrls: string[] = [];
+  if (task.website) {
+    const base = task.website.replace(/\/$/, '');
+    teamPageUrls.push(`${base}/team`, `${base}/about`, `${base}/about/meet-the-team`, `${base}/about-us/team`, `${base}/people`);
+  }
+
   const output = `## Task: ${task.taskType}
 **Entity**: ${task.entityName} (ID: ${task.entityId})
 **Table**: ${submitTable}
 **Task ID**: ${task.id}
-**Existing records**: ${existingRecords.length}
+**Existing records**: ${existingRecords.length}${task.website ? `\n**Website**: ${task.website}` : ''}
 
-### Search queries
+### Research strategy
+${teamPageUrls.length > 0 ? `**Step 1 — Try team page** (WebFetch — most data per call):
+${teamPageUrls.map(u => `- ${u}`).join('\n')}
+Prompt: "List ALL team members with their full names and roles/titles."
+
+**Step 2 — Web search** (if team page fails or for additional context):` : '**Web search:**'}
 ${searchQueries.map((q, i) => `${i + 1}. ${q}`).join('\n')}
 
 ### Record fields

@@ -6,8 +6,46 @@
  * benchmark results).
  */
 
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { TableProfile, TableScanResult, ScanSummary } from './types.ts';
+
+// ---------------------------------------------------------------------------
+// Entity importance from database.json (page rankings)
+// ---------------------------------------------------------------------------
+
+interface PageData {
+  id: string;
+  numericId?: string;
+  readerImportance?: number | null;
+}
+
+let _importanceMap: Map<string, number> | null = null;
+
+function getImportanceMap(): Map<string, number> {
+  if (_importanceMap) return _importanceMap;
+  _importanceMap = new Map();
+  const dbPath = join(PROJECT_ROOT, 'apps/web/src/data/database.json');
+  if (!existsSync(dbPath)) return _importanceMap;
+  try {
+    const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
+    for (const page of (db.pages || []) as PageData[]) {
+      if (page.readerImportance != null) {
+        _importanceMap.set(page.id, page.readerImportance);
+        if (page.numericId) _importanceMap.set(page.numericId, page.readerImportance);
+      }
+    }
+  } catch {
+    // Non-critical — importance is optional
+  }
+  return _importanceMap;
+}
+
+function lookupImportance(entitySlugOrId: string): number | undefined {
+  return getImportanceMap().get(entitySlugOrId);
+}
 
 // ---------------------------------------------------------------------------
 // API response shapes (minimal — just what we need for scanning)
@@ -20,6 +58,7 @@ interface EntityListResponse {
     stableId?: string;
     entityType: string;
     title: string;
+    website?: string;
   }>;
   total: number;
 }
@@ -232,6 +271,8 @@ async function scanPersonnelCompleteness(): Promise<TableScanResult> {
       totalRecords: count,
       completenessPercent: completeness,
       missingFields: missing,
+      website: entity.website,
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
     };
   });
 
@@ -276,6 +317,8 @@ async function scanFundingRoundsCompleteness(): Promise<TableScanResult> {
       totalRecords: count,
       completenessPercent: completeness,
       missingFields: missing,
+      website: entity.website,
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
     };
   });
 
@@ -319,6 +362,8 @@ async function scanInvestmentsCompleteness(): Promise<TableScanResult> {
       totalRecords: count,
       completenessPercent: completeness,
       missingFields: missing,
+      website: entity.website,
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
     };
   });
 
@@ -364,6 +409,8 @@ async function scanBenchmarkResultsCompleteness(): Promise<TableScanResult> {
       totalRecords: count,
       completenessPercent: completeness,
       missingFields: missing,
+      website: entity.website,
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
     };
   });
 
