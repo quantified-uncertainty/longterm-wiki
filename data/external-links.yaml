@@ -973,9 +973,6 @@
   links:
     eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-risk
     eightyK: https://80000hours.org/problem-profiles/catastrophic-ai-misuse/
-- pageId: rsp
-  links:
-    lesswrong: https://www.lesswrong.com/tag/responsible-scaling-policies
 - pageId: s-risk
   links:
     eaForum: https://forum.effectivealtruism.org/topics/s-risk

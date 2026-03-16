@@ -43,20 +43,6 @@
     - ai-safety
     - governance
   lastUpdated: 2026-03
-- id: responsible-scaling-policies
-  stableId: Gone2rYYpD
-  numericId: E252
-  type: policy
-  summaryPage: governance-overview
-  title: Responsible Scaling Policies
-  description: >-
-    Industry self-regulation frameworks establishing capability thresholds that
-    trigger safety evaluations before further scaling. Pioneered by Anthropic's
-    RSP and adopted in various forms by major AI labs.
-  clusters:
-    - ai-safety
-    - governance
-  lastUpdated: 2026-03
 - id: california-sb1047
   stableId: XcGTez1oFw
   numericId: E48
