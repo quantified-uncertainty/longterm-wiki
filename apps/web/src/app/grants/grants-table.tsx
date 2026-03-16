@@ -240,7 +240,9 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <Link
-                    href={`/grants/${row.recordKey}`}
+                    href={row.organizationSlug
+                      ? `/organizations/${row.organizationSlug}/grants/${row.recordKey}`
+                      : `/grants/${row.recordKey}`}
                     className="font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {row.name}

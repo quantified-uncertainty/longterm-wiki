@@ -355,12 +355,14 @@ export default async function OrgProfilePage({
               grants={data.grantsMade}
               direction="given"
               entityId={entity.id}
+              orgSlug={slug}
             />
           )}
           {data.grantsReceived.length > 0 && (
             <GrantsSection
               grants={data.grantsReceived}
               direction="received"
+              orgSlug={slug}
             />
           )}
 

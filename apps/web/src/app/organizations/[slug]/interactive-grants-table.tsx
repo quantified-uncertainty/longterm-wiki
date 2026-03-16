@@ -20,6 +20,8 @@ export interface GrantRow {
   programName: string | null;
   divisionName: string | null;
   notes: string | null;
+  /** Link to grant detail page (e.g. /organizations/org-slug/grants/grant-key) */
+  grantHref: string | null;
   // For grants received:
   funderName?: string;
   funderHref?: string | null;
@@ -47,7 +49,7 @@ function formatSlug(slug: string): string {
     .join(" ");
 }
 
-function serverGrantToRow(g: ServerGrant): GrantRow {
+function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
   return {
     key: g.id,
     name: g.name,
@@ -61,18 +63,17 @@ function serverGrantToRow(g: ServerGrant): GrantRow {
     programName: g.programId ? formatSlug(g.programId) : null,
     divisionName: null,
     notes: g.notes,
+    grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
   };
 }
 
-// Module-level transform — stable reference, no re-renders
-function transformGrantsResponse(json: unknown): {
-  rows: GrantRow[];
-  total: number;
-} {
-  const data = json as { grants?: ServerGrant[]; total?: number };
-  return {
-    rows: (data.grants ?? []).map(serverGrantToRow),
-    total: data.total ?? 0,
+function makeTransform(orgSlug?: string) {
+  return (json: unknown): { rows: GrantRow[]; total: number } => {
+    const data = json as { grants?: ServerGrant[]; total?: number };
+    return {
+      rows: (data.grants ?? []).map((g) => serverGrantToRow(g, orgSlug)),
+      total: data.total ?? 0,
+    };
   };
 }
 
@@ -167,6 +168,7 @@ export function InteractiveGrantsTable({
   grants: staticGrants,
   totalCount: staticTotalCount,
   entityId,
+  orgSlug,
   mode = "given",
 }: {
   grants?: GrantRow[];
@@ -174,6 +176,8 @@ export function InteractiveGrantsTable({
   totalCount?: number;
   /** When provided, enables server-side search/sort/pagination */
   entityId?: string;
+  /** Organization slug for constructing grant detail links */
+  orgSlug?: string;
   mode?: "given" | "received";
 }) {
   const serverMode = !!entityId;
@@ -183,7 +187,7 @@ export function InteractiveGrantsTable({
     endpoint: `/api/grants/by-entity/${entityId ?? ""}`,
     defaultPageSize: PAGE_SIZE,
     defaultSort: { field: "amount", dir: "desc" },
-    transform: transformGrantsResponse,
+    transform: makeTransform(orgSlug),
     enabled: serverMode,
   });
 
@@ -589,7 +593,16 @@ function CellContent({
     case "name":
       return (
         <span>
-          <span className="font-medium text-foreground">{grant.name}</span>
+          {grant.grantHref ? (
+            <Link
+              href={grant.grantHref}
+              className="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {grant.name}
+            </Link>
+          ) : (
+            <span className="font-medium text-foreground">{grant.name}</span>
+          )}
           {grant.source && (
             <a
               href={grant.source}

@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     "@quri/squiggle-components",
     "@quri/squiggle-lang",
     "@quri/ui",
+    "@longterm-wiki/factbase",
   ],
   // Allow more time for static page generation in resource-constrained
   // environments (CI, cloud dev). Dashboard pages embedded via MDX make
