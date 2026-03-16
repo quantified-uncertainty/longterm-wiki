@@ -298,6 +298,33 @@ const RELATED_SECTION_PATTERNS = [
 ];
 
 /**
+ * Clean up garbled EntityLink tags produced by the improve LLM.
+ * Fixes: duplicated attributes (name="x" name="x" name="x") and
+ * removes `name` attributes entirely (they're optional and the
+ * enrichment phase doesn't use them).
+ */
+export function cleanEntityLinks(content: string): string {
+  // Fix duplicated attributes: <EntityLink id="E1100" name="mmlu" name="mmlu" name="mmlu">
+  // Normalize to just id and optional single name.
+  return content.replace(
+    /<EntityLink\s+([^>]*?)>/g,
+    (_match, attrs: string) => {
+      // Parse unique attributes, keeping only the first occurrence of each key
+      const seen = new Map<string, string>();
+      const attrRe = /(\w+)="([^"]*)"/g;
+      let m: RegExpExecArray | null;
+      while ((m = attrRe.exec(attrs)) !== null) {
+        if (!seen.has(m[1])) {
+          seen.set(m[1], m[2]);
+        }
+      }
+      const parts = Array.from(seen.entries()).map(([k, v]) => `${k}="${v}"`);
+      return `<EntityLink ${parts.join(' ')}>`;
+    },
+  );
+}
+
+/**
  * Remove manual "Related Pages" / "See Also" / "Related Content" sections.
  * These are now rendered automatically by the RelatedPages React component.
  */
