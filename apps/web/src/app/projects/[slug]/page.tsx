@@ -422,7 +422,7 @@ export default async function ProjectDetailPage({
                 </Link>
               )}
               <Link
-                href={`/kb/entity/${entity.id}`}
+                href={`/factbase/entity/${entity.id}`}
                 className="text-xs text-primary hover:underline"
               >
                 KB data &rarr;
