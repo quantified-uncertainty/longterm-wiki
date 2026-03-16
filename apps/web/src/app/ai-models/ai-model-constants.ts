@@ -35,7 +35,7 @@ export const SAFETY_LEVEL_COLORS: Record<string, string> = {
  * Values >= 10,000 are shown with K/M suffix (e.g., "128K", "1M").
  */
 export function formatContext(tokens: number): string {
-  if (tokens >= 1_000_000) return `${tokens / 1_000_000}M`;
-  if (tokens >= 10_000) return `${tokens / 1_000}K`;
+  if (tokens >= 1_000_000) return `${Math.round(tokens / 1_000_000)}M`;
+  if (tokens >= 10_000) return `${Math.round(tokens / 1_000)}K`;
   return tokens.toLocaleString("en-US");
 }
