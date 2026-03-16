@@ -304,6 +304,7 @@ Examples:
       citationAuditModel: (opts['citation-audit-model'] as string) || undefined,
       saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
       gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
+      apiDirect: opts['api-direct'] === true ? true : undefined,
     });
   }
 }
