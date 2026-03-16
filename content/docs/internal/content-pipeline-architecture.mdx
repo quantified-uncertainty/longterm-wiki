@@ -1,24 +1,15 @@
 ---
 numericId: E895
 title: "Content Pipeline Architecture: Faster Page Creation"
-description: "Design document analyzing options for reducing the time it takes an AI agent to create and publish a wiki page — from the current 15-30 minutes down to seconds"
+description: Design document analyzing options for reducing the time it takes an AI agent to create and publish a wiki page — from the current 15-30 minutes down to seconds
 sidebar:
   order: 36
 subcategory: architecture
-quality: 50
-readerImportance: 80
-researchImportance: 75
-lastEdited: "2026-03-09"
+lastEdited: 2026-03-09
 createdAt: 2026-02-25
 evergreen: false
 llmSummary: "Architecture document analyzing why adding a wiki page takes 15-30 minutes and evaluating six options to reduce that latency: full database migration, git repo split, hybrid draft-in-DB, ISR with webhooks, lightweight write path, and incremental builds. Recommends a phased approach starting with quick build optimizations, then a draft/preview system, then ISR. Includes detailed red-teaming of each option."
-ratings:
-  novelty: 6
-  rigor: 7
-  actionability: 8
-  completeness: 7
 ---
-
 ## The Problem
 
 Adding a single page to the wiki currently takes an AI agent 15-30 minutes end-to-end. Compare this to a POST request to a database, which takes about 20 seconds.

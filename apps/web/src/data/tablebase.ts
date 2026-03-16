@@ -243,9 +243,6 @@ export interface Page {
   researchImportance: number | null;
   tacticalValue: number | null;
   contentFormat: ContentFormat;
-  tractability: number | null;
-  neglectedness: number | null;
-  uncertainty: number | null;
   causalLevel: string | null;
   lastUpdated: string | null;
   dateCreated?: string | null;

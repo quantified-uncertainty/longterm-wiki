@@ -1,21 +1,13 @@
 ---
 numericId: E726
-title: "Common Writing Principles"
-description: "Cross-cutting writing standards that apply to all content types. Covers epistemic honesty, language neutrality, and analytical tone."
+title: Common Writing Principles
+description: Cross-cutting writing standards that apply to all content types. Covers epistemic honesty, language neutrality, and analytical tone.
 sidebar:
   order: 9
 subcategory: style-guides
-quality: 0
-readerImportance: 73.5
-researchImportance: 71
-lastEdited: "2026-02-17"
+lastEdited: 2026-02-17
 update_frequency: 90
 llmSummary: "Shared writing principles referenced by all domain-specific style guides. Three pillars: epistemic honesty (hedge uncertain claims, use ranges, source confidence levels), language neutrality (avoid insider jargon, describe things by what they are), and analytical tone (present tradeoffs rather than prescribe). Includes concrete word substitution tables and anti-patterns."
-ratings:
-  novelty: 3
-  rigor: 5
-  actionability: 7
-  completeness: 6
 ---
 import {EntityLink} from '@components/wiki';
 

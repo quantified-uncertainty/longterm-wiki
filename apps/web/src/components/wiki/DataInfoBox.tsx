@@ -37,9 +37,6 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
           relatedTopics={data.relatedTopics}
           relatedEntries={data.relatedEntries}
           importance={pageData?.readerImportance ?? undefined}
-          tractability={pageData?.tractability ?? undefined}
-          neglectedness={pageData?.neglectedness ?? undefined}
-          uncertainty={pageData?.uncertainty ?? undefined}
           description={description}
           externalLinks={externalLinks}
           clusters={clusters}

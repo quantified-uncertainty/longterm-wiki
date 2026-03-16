@@ -64,31 +64,13 @@ const frontmatterSchema = z.object({
   // Custom LongtermWiki fields
   pageType: z.enum(['content', 'stub', 'documentation']).optional(),
   contentFormat: z.enum(['article', 'table', 'diagram', 'index', 'dashboard']).optional(),
-  quality: z.number().min(0).max(100).optional(),
-  readerImportance: z.number().min(0).max(100).optional(),
-  researchImportance: z.number().min(0).max(100).optional(),
-  tacticalValue: z.number().min(0).max(100).optional(),
-  tractability: z.number().min(0).max(100).optional(),
-  neglectedness: z.number().min(0).max(100).optional(),
-  uncertainty: z.number().min(0).max(100).optional(),
+  // Scoring fields (quality, ratings, importance) are now sourced from PG assessments.
+  // They are no longer stored in frontmatter — see epic #2428.
   llmSummary: z.string().optional(),
   lastEdited: z.string().optional(),
   todo: z.string().optional(),
   todos: z.array(z.string()).min(1).optional(),
   seeAlso: z.string().optional(),
-  ratings: z.object({
-    novelty: z.number().min(0).max(10).optional(),
-    rigor: z.number().min(0).max(10).optional(),
-    actionability: z.number().min(0).max(10).optional(),
-    completeness: z.number().min(0).max(10).optional(),
-    focus: z.number().min(0).max(10).optional(),
-    concreteness: z.number().min(0).max(10).optional(),
-    objectivity: z.number().min(0).max(10).optional(),
-    changeability: z.number().min(0).max(100).optional(),
-    xriskImpact: z.number().min(0).max(100).optional(),
-    trajectoryImpact: z.number().min(0).max(100).optional(),
-    uncertainty: z.number().min(0).max(100).optional(),
-  }).optional(),
   // metrics (wordCount, citations, tables, diagrams) are computed at build time
   // by crux/lib/metrics-extractor.ts — not stored in frontmatter.
   balanceFlags: z.array(z.string()).optional(),

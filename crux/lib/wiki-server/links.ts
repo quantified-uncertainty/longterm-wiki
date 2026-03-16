@@ -25,6 +25,7 @@ export type PageLinkItem = z.input<typeof PageLinkSchema>;
 type RpcClient = ReturnType<typeof hc<LinksRoute>>;
 
 export type SyncLinksResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+export type RefreshGraphResult = InferResponseType<RpcClient['refresh-graph']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -68,5 +69,17 @@ export async function syncPageLinks(
   }
 
   return { ok: true, data: { upserted: totalUpserted } };
+}
+
+/**
+ * Refresh the wikibase_related_graph materialized view.
+ * Should be called after syncPageLinks() completes to update the precomputed
+ * related-page rankings.
+ */
+export async function refreshRelatedGraph(): Promise<ApiResult<RefreshGraphResult>> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
+
+  return batchedRequest<RefreshGraphResult>('POST', '/api/links/refresh-graph', {});
 }
 

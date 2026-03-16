@@ -1,26 +1,16 @@
 ---
 numericId: E21
-title: "Alignment Robustness Trajectory"
-description: "This model analyzes how alignment robustness changes with capability scaling. It estimates current techniques maintain 50-65% robustness at GPT-4 level but projects degradation to 15-30% at 100x capability, with critical thresholds around 10x-30x current capability."
+title: Alignment Robustness Trajectory
+description: This model analyzes how alignment robustness changes with capability scaling. It estimates current techniques maintain 50-65% robustness at GPT-4 level but projects degradation to 15-30% at 100x capability, with critical thresholds around 10x-30x current capability.
 sidebar:
   order: 38
 subcategory: safety-models
-quality: 64
-readerImportance: 86.5
-researchImportance: 63.5
-tacticalValue: 62
-lastEdited: "2026-02-23"
+lastEdited: 2026-02-23
 update_frequency: 90
-llmSummary: "This model estimates alignment robustness degrades from 50-65% at GPT-4 level to 15-30% at 100x capability, with a critical 'alignment valley' at 10-30x where systems are dangerous but can't help solve alignment. Empirical evidence from jailbreak research (96-100% success rates with adaptive attacks), sleeper agent studies, and OOD robustness benchmarks grounds these estimates. Prioritizes scalable oversight, interpretability, and deception detection research deployable within 2-5 years before entering the critical zone."
-ratings:
-  focus: 8.5
-  novelty: 6
-  rigor: 6.5
-  concreteness: 7.5
-  actionability: 7
+llmSummary: This model estimates alignment robustness degrades from 50-65% at GPT-4 level to 15-30% at 100x capability, with a critical 'alignment valley' at 10-30x where systems are dangerous but can't help solve alignment. Empirical evidence from jailbreak research (96-100% success rates with adaptive attacks), sleeper agent studies, and OOD robustness benchmarks grounds these estimates. Prioritizes scalable oversight, interpretability, and deception detection research deployable within 2-5 years before entering the critical zone.
 clusters:
-  - "ai-safety"
-  - "governance"
+  - ai-safety
+  - governance
 ---
 import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 

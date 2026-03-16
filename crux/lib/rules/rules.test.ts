@@ -633,23 +633,23 @@ describe('component-imports rule', () => {
 
 describe('frontmatter-schema rule', () => {
   it('valid frontmatter passes', () => {
-    const raw = '---\ntitle: Good Page\ndescription: A valid page\nquality: 50\n---\nContent';
+    const raw = '---\ntitle: Good Page\ndescription: A valid page\n---\nContent';
     const content = mockContent('Content', {
       raw,
-      frontmatter: { title: 'Good Page', description: 'A valid page', quality: 50 },
+      frontmatter: { title: 'Good Page', description: 'A valid page' },
     });
     const issues = check(frontmatterSchemaRule, content);
     expect(issues.length).toBe(0);
   });
 
-  it('detects invalid quality value (out of range)', () => {
-    const raw = '---\ntitle: Test\nquality: 200\n---\nContent';
+  it('detects unrecognized field (quality removed from schema)', () => {
+    const raw = '---\ntitle: Test\nquality: 50\n---\nContent';
     const content = mockContent('Content', {
       raw,
-      frontmatter: { title: 'Test', quality: 200 },
+      frontmatter: { title: 'Test', quality: 50 },
     });
     const issues = check(frontmatterSchemaRule, content);
-    expect(issues.some((i: any) => i.message.includes('quality'))).toBe(true);
+    expect(issues.length).toBeGreaterThan(0);
   });
 
   it('detects missing title', () => {
