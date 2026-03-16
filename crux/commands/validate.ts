@@ -136,6 +136,11 @@ const SCRIPTS = {
     description: 'Audit directory page data for display issues',
     passthrough: ['ci', 'verbose', 'type'],
   },
+  'cross-entity': {
+    script: 'validate/cross-entity-consistency.ts',
+    description: 'Cross-entity consistency (person<->org, model<->org, bidirectional refs)',
+    passthrough: ['ci', 'verbose', 'type'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
@@ -186,5 +191,7 @@ Examples:
   crux validate all --skip=mermaid,style  Skip specific checks
   crux validate directory-pages            Audit directory page data quality
   crux validate directory-pages --type=person  Check one entity type
+  crux validate cross-entity              Cross-entity consistency check
+  crux validate cross-entity --type=person  Check one relationship type
 `;
 }
