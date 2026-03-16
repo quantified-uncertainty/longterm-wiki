@@ -7,6 +7,7 @@ import {
   getKBProperty,
   getKBEntity,
   getKBEntitySlug,
+  isFactExpired,
 } from "@/data/factbase";
 import {
   formatKBFactValue,
@@ -27,11 +28,12 @@ export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-/** Group facts by property, taking only the latest per property. */
+/** Group facts by property, taking only the latest non-expired per property. */
 export function getLatestFactsByProperty(facts: Fact[]): Map<string, Fact> {
   const latest = new Map<string, Fact>();
   for (const fact of facts) {
     if (fact.propertyId === "description") continue;
+    if (isFactExpired(fact)) continue;
     if (!latest.has(fact.propertyId)) {
       latest.set(fact.propertyId, fact);
     }
