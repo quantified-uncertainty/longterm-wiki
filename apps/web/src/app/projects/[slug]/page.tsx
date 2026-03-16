@@ -10,8 +10,8 @@ import {
   getKBFacts,
   getKBEntity,
   getKBProperty,
-} from "@/data/kb";
-import { formatKBDate } from "@/components/wiki/kb/format";
+} from "@/data/factbase";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 
 function safeHostname(url: string): string {
   try {
