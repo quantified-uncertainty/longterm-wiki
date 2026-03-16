@@ -25,7 +25,7 @@ const SERVER_MODE_THRESHOLD = 200;
 const MAX_RENDERED_ROWS = 5000;
 
 /** Convert a ParsedGrantRecord to a serializable GrantRow for the client. */
-function toGrantRow(g: ParsedGrantRecord): GrantRow {
+function toGrantRow(g: ParsedGrantRecord, orgSlug?: string): GrantRow {
   return {
     key: g.key,
     name: g.name,
@@ -42,6 +42,7 @@ function toGrantRow(g: ParsedGrantRecord): GrantRow {
     programName: null,
     divisionName: null,
     notes: null,
+    grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.key}` : null,
   };
 }
 
@@ -50,11 +51,14 @@ export function GrantsSection({
   grants,
   direction,
   entityId,
+  orgSlug,
 }: {
   grants: ParsedGrantRecord[] | ReceivedGrant[];
   direction: "given" | "received";
   /** Entity stable ID (e.g. "ULjDXpSLCI") — enables server-side pagination for large "given" datasets. */
   entityId?: string;
+  /** Organization slug for constructing grant detail links (e.g. "80000-hours"). */
+  orgSlug?: string;
 }) {
   if (grants.length === 0) return null;
 
@@ -71,15 +75,15 @@ export function GrantsSection({
   const useServerMode =
     direction === "given" && entityId && grants.length >= SERVER_MODE_THRESHOLD;
 
-  // Build rows — received grants include funder info
+  // Build rows — received grants use the funder's slug for grant detail links
   const rows: GrantRow[] =
     direction === "received"
       ? (grants as ReceivedGrant[]).slice(0, MAX_RENDERED_ROWS).map((g) => ({
-          ...toGrantRow(g),
+          ...toGrantRow(g, g.funderSlug ?? undefined),
           funderName: g.funderName,
           funderHref: g.funderHref,
         }))
-      : grants.slice(0, MAX_RENDERED_ROWS).map(toGrantRow);
+      : grants.slice(0, MAX_RENDERED_ROWS).map((g) => toGrantRow(g, orgSlug));
 
   return (
     <section>
@@ -93,6 +97,7 @@ export function GrantsSection({
       {useServerMode ? (
         <InteractiveGrantsTable
           entityId={entityId}
+          orgSlug={orgSlug}
           mode={direction}
         />
       ) : (

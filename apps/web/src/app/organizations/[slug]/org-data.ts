@@ -103,6 +103,7 @@ export type ParsedGrantRecord = {
 export type ReceivedGrant = ParsedGrantRecord & {
   funderName: string;
   funderHref: string | null;
+  funderSlug: string | null;
 };
 
 export type ParsedDivisionRecord = ReturnType<typeof parseDivisionRecord>;
@@ -936,6 +937,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         ...parsed,
         funderName: funderEntity?.name ?? r.ownerEntityId,
         funderHref: funderSlug ? `/organizations/${funderSlug}` : null,
+        funderSlug: funderSlug ?? null,
       };
     })
     .sort((a, b) => numericValue(b.amount) - numericValue(a.amount));
