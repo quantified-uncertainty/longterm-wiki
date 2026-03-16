@@ -63,7 +63,11 @@ export function FundingHistorySection({
 
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
-                  <td className="py-2 px-3 font-medium">{name}</td>
+                  <td className="py-2 px-3 font-medium">
+                    <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
+                      {name}
+                    </Link>
+                  </td>
                   <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : "\u2014"}
                   </td>
@@ -142,7 +146,15 @@ export function InvestorParticipationSection({
                       <span className="font-medium">{investorName}</span>
                     )}
                   </td>
-                  <td className="py-1.5 px-3 text-muted-foreground">{roundName ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}</td>
+                  <td className="py-1.5 px-3 text-muted-foreground">
+                    {roundName ? (
+                      <Link href={`/investments/${inv.key}`} className="text-muted-foreground hover:text-primary transition-colors">
+                        {roundName}
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground/40">{"\u2014"}</span>
+                    )}
+                  </td>
                   <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
                     {amount != null ? formatAmount(amount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
