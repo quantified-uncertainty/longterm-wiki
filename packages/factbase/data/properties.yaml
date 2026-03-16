@@ -139,10 +139,10 @@ properties:
 
   founded-by:
     name: Founded By
-    description: "Person(s) who founded this organization"
+    description: "Person(s) or organization(s) that created this entity"
     dataType: refs
     category: people
-    appliesTo: [organization]
+    appliesTo: [organization, project]
     inverseId: founder-of
     inverseName: Founded
 
@@ -191,10 +191,10 @@ properties:
 
   founded-date:
     name: Founded Date
-    description: "Date the organization was incorporated or officially founded"
+    description: "Date the entity was incorporated, officially founded, or launched"
     dataType: date
     category: organization
-    appliesTo: [organization, funder]
+    appliesTo: [organization, funder, project]
 
   born-year:
     name: Birth Year

@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntityById, isOrganization } from "@/data";
+import { getTypedEntityById, getTypedEntities, isOrganization, isProject } from "@/data";
 import {
   getKBLatest,
   getKBProperty,
@@ -544,6 +544,87 @@ export default async function OrgProfilePage({
       count: policyPositions.length,
       content: (
         <PolicyPositionsSection positions={policyPositions} />
+      ),
+    });
+  }
+
+  // ── Projects tab: projects founded by this org ──
+  // Match by entity.id (stableId like "Khej79OA8g") or slug ("quri")
+  const orgIdSet = new Set([entity.id, slug]);
+  const resolvedSlugId = resolveKBSlug(slug);
+  if (resolvedSlugId) orgIdSet.add(resolvedSlugId);
+
+  const orgProjects = getTypedEntities()
+    .filter(isProject)
+    .filter((p) => {
+      const foundedBy = getKBLatest(p.id, "founded-by");
+      if (foundedBy?.value.type === "refs") {
+        return foundedBy.value.value.some((ref) => orgIdSet.has(ref));
+      }
+      return orgIdSet.has(p.organization ?? "");
+    });
+
+  if (orgProjects.length > 0) {
+    tabs.push({
+      id: "projects",
+      label: "Projects",
+      count: orgProjects.length,
+      content: (
+        <section>
+          <SectionHeader title="Projects" count={orgProjects.length} />
+          <div className="border border-border/60 rounded-xl overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                  <th className="text-left py-2 px-3 font-medium">Project</th>
+                  <th className="text-left py-2 px-3 font-medium">Description</th>
+                  <th className="text-center py-2 px-3 font-medium">Status</th>
+                  <th className="text-center py-2 px-3 font-medium">Links</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {orgProjects.map((p) => {
+                  const websiteFact = getKBLatest(p.id, "website");
+                  const pUrl = (websiteFact?.value.type === "text" ? websiteFact.value.value : null) ?? p.projectUrl ?? p.website;
+                  const pStatus = p.projectStatus ?? p.status;
+                  return (
+                    <tr key={p.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="py-2.5 px-3 font-medium">
+                        <Link href={`/projects/${p.id}`} className="text-foreground hover:text-primary transition-colors">
+                          {p.title}
+                        </Link>
+                      </td>
+                      <td className="py-2.5 px-3 text-xs text-muted-foreground max-w-[320px]">
+                        {p.description && <span className="line-clamp-2">{p.description}</span>}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {pStatus && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize bg-muted text-muted-foreground">
+                            {pStatus}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {pUrl && (
+                            <a href={pUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline">
+                              website
+                            </a>
+                          )}
+                          {p.numericId && (
+                            <Link href={`/wiki/${p.numericId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
+                              wiki
+                            </Link>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
       ),
     });
   }
