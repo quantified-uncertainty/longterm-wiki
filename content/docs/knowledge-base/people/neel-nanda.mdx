@@ -1,22 +1,40 @@
 ---
 numericId: E214
 title: Neel Nanda
-description: DeepMind alignment researcher, mechanistic interpretability expert
+description: Senior Research Scientist and Mechanistic Interpretability Team Lead at Google DeepMind; creator of TransformerLens; co-author of 'A Mathematical Framework for Transformer Circuits'; researcher on grokking, induction heads, and sparse autoencoders
 sidebar:
   order: 13
 subcategory: safety-researchers
-lastEdited: 2026-02-17
-llmSummary: Overview of Neel Nanda's contributions to mechanistic interpretability, including the TransformerLens library and research on transformer circuits. Covers his educational content and role in making interpretability research more accessible to newcomers in the field.
+lastEdited: 2026-03-16
+llmSummary: Comprehensive biographical profile of Neel Nanda covering his role as DeepMind's mechanistic interpretability team lead, key contributions (TransformerLens, Gemma Scope, grokking paper), and his evolving views on interpretability's limitations and strategic pivot toward applied safety problems. Notably includes his 2025 admission that some high-profile mech interp results were 'wrong or significantly weaker than originally claimed' and that the 'most ambitious vision of the field is probably dead.'
 clusters:
   - ai-safety
 ---
 import {DataInfoBox, EntityLink} from '@components/wiki';
 
+## Quick Assessment
 
+| Aspect | Assessment |
+|--------|-----------|
+| **Primary Role** | Senior Research Scientist and Mechanistic Interpretability Team Lead, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> (2023–present) |
+| **Key Contributions** | Creator of TransformerLens (∼3,100 GitHub stars, 112+ contributors); co-author of "A Mathematical Framework for Transformer Circuits" (2021); lead on Gemma Scope (400+ open sparse autoencoders); ICLR 2023 Spotlight for grokking paper |
+| **Key Publications** | "A Mathematical Framework for Transformer Circuits" (2021); "Progress Measures for <EntityLink id="E1064" name="grok">Grok</EntityLink>king via Mechanistic Interpretability" (ICLR 2023 Spotlight); "Towards Principled Evaluations of <EntityLink id="E480" name="sparse-autoencoders">Sparse Autoencoders (SAEs)</EntityLink>" (ICLR 2025); "SAEBench" (ICML 2025) |
+| **Institutional Affiliation** | <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>; previously <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> (2021–2022) |
+| **Influence on AI Safety** | Builds open-source tooling and training curricula for <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink>; has mentored approximately 50 junior researchers, with 7 subsequently placed at major AI companies; named to MIT Technology Review Innovators Under 35 (2025) |
+
+## Overview
+
+<EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink> is a Senior Research Scientist and Mechanistic Interpretability Team Lead at <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, where he leads research into reverse-engineering neural networks to understand how they implement algorithms. He studied Mathematics at Trinity College, Cambridge (2017–2020), then worked at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> as a language model interpretability researcher under <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> (2021–2022), before joining DeepMind's mechanistic interpretability team in 2023.[^oo-profile][^oo-about]
+
+He is the creator of TransformerLens, an open-source library that has become a widely used tool in the interpretability research community, and a co-author of "A Mathematical Framework for Transformer Circuits," an influential Anthropic paper introducing a mathematical vocabulary for analyzing transformer behavior. His team at DeepMind produced Gemma Scope, a collection of over 400 openly released sparse autoencoders for Gemma 2 models.[^oo-gemma-scope] As of 2025, Nanda had accrued over 13,000 citations on Google Scholar, an h-index of 31, and had co-authored papers appearing at NeurIPS, ICLR, and ICML.[^oo-scholar][^oo-semantic]
+
+Nanda has also been active in training the next generation of interpretability researchers, having mentored approximately 50 junior researchers through programs including SERI MATS, with 15 co-authored papers published at top ML venues and 7 mentees subsequently placed at major AI companies.[^oo-mats]
 
 ## Background
 
-<EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink> is a <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> researcher at <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> who focuses on reverse-engineering neural networks to understand how they implement algorithms. He studied Mathematics at Trinity College, Cambridge, and previously worked at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> before joining DeepMind's alignment team.
+<EntityLink id="E214" name="neel-nanda">Neel Nanda</EntityLink> studied Mathematics at Trinity College, Cambridge from 2017 to 2020.[^oo-profile] Following graduation, he joined <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> in 2021 as a researcher in the interpretability team, working under Chris Olah on language model interpretability.[^oo-about] He left Anthropic in 2022 and did a period of independent mechanistic interpretability research before joining Google DeepMind's mechanistic interpretability team in 2023.[^oo-profile][^oo-about]
+
+At DeepMind, Nanda joined expecting to be an individual contributor. When the prior team lead stepped down, he took on the role of team lead despite having no prior management experience.[^oo-linkedin][^oo-80k-career] As of 2025, he holds the title of Senior Research Scientist and Mechanistic Interpretability Team Lead.[^oo-scholar][^oo-linkedin]
 
 Nanda maintains an active presence in the AI alignment research community through <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink> and the Alignment Forum, where he publishes tutorials and research updates.
 
@@ -24,35 +42,68 @@ Nanda maintains an active presence in the AI alignment research community throug
 
 ### TransformerLens Library
 
-Nanda created TransformerLens, an open-source Python library for <EntityLink id="E174" name="interpretability">interpretability</EntityLink> research on transformer models.[^rc-8d4f] The library provides:
+Nanda created TransformerLens, an open-source Python library for <EntityLink id="E174" name="interpretability">interpretability</EntityLink> research on transformer models.[^rc-8d4f] The library was originally created in 2022 and is now maintained by a broader contributor community under the TransformerLensOrg GitHub organization, with Bryce Meyer as a key maintainer.[^oo-github]
+
+As of 2025, the repository has approximately 3,100 GitHub stars, 513 forks, and 112 contributors, with 796 closed pull requests.[^oo-github] The library provides:
 - Programmatic access to model activations at each layer
 - Hook functions for intervention experiments
-- Integration with pretrained models from Hugging Face
+- Support for loading 50+ open-source language models from Hugging Face
 - Visualization utilities for attention patterns
 
-The library is hosted on GitHub and documented at transformerlensorg.github.io/TransformerLens.[^rc-d2b5]
+The library is formally cited as: Nanda, N. & Bloom, J. (2022). TransformerLens.[^oo-github] A companion CircuitsVis repository provides additional visualization tools and has accrued 297 stars and 40 forks.[^oo-tl-docs] Version 2.0 removed Hooked SAE functionality, which was migrated to the separate SAELens library.[^oo-github]
+
+Alternative interpretability libraries exist (e.g., baukit, pyvene, nnsight), though TransformerLens's hook-based API and extensive model support have made it a common choice for circuit-analysis research.
 
 ### Transformer Circuits Research
 
-Nanda co-authored "A Mathematical Framework for Transformer Circuits" (2021), which analyzed how transformer language models implement interpretable algorithms.[^rc-f19d] The research:
+Nanda is a co-author of "A Mathematical Framework for Transformer Circuits" (2021), published by the Anthropic interpretability team.[^rc-f19d] The paper lists Nelson Elhage, Neel Nanda, and Catherine Olsson as core research contributors, with additional contributors including Tom Henighan, Nicholas Joseph, Ben Mann, and others; Chris Olah handled correspondence.[^oo-circuits-paper] Nanda has described it as "the coolest paper I've ever had the privilege of working on" and "the most awesome paper I've been involved in."[^oo-circuits-walkthrough]
+
+The research:
+- Introduced a mathematically equivalent framework for understanding transformer operations
 - Identified "induction heads" as circuits that enable in-context learning
 - Demonstrated that attention mechanisms compose to perform multi-step reasoning
+- Showed that induction heads only develop in models with at least two attention layers
 - Provided mathematical descriptions of how models track positional and semantic information
 
 The paper built on earlier work from <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>'s interpretability team examining circuits in vision models.
 
+### Grokking and Modular Arithmetic
+
+Nanda co-authored "Progress Measures for Grokking via Mechanistic Interpretability" (January 2023, with Lawrence Chan, Tom Lieberum, Jess Smith, and Jacob Steinhardt), which received an ICLR 2023 Spotlight designation.[^oo-grokking] The paper investigates the "grokking" phenomenon—a delayed generalization observed in small transformers trained on modular arithmetic—and fully reverse-engineers the algorithm learned, using discrete Fourier transforms and trigonometric identities.[^oo-grokking]
+
 ### Additional Research Areas
 
 Nanda has published work on:
-- **Indirect Object Identification**: Analyzing how language models parse syntactic relationships in sentences
-- **Grokking**: Studying the phase transitions that occur when models suddenly generalize during training
-- **Modular addition circuits**: Reverse-engineering the algorithms small transformers learn for arithmetic tasks
+- **Indirect Object Identification**: The paper "Interpretability in the Wild" (from <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>, with Kevin Wang, Arthur Conmy, and Alexandre Variengien) reverse-engineers a 26-head circuit in GPT-2 Small for identifying indirect objects in sentences (e.g., predicting "Mary" in "After John and Mary went to the shops, John gave a bottle of milk to ___"). Nanda hosted a multi-part walkthrough of this paper with its authors and used it extensively as a case study in his research agenda posts.[^oo-iiw]
+- **Sparse Autoencoders (SAEs)**: Nanda's DeepMind team has produced a series of SAE papers including Gated SAEs (NeurIPS 2024, led by Sen Rajamanoharan)[^oo-mit-tr-deepmind], JumpReLU SAEs[^oo-mit-tr-deepmind], and SAEBench (ICML 2025)[^oo-dblp], as well as "Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control" (ICLR 2025)[^oo-dblp].
+- **Gemma Scope**: A collection of over 400 freely available open SAEs for Gemma 2 9B and Gemma 2 2B, authored with Tom Lieberum, Sen Rajamanoharan, Arthur Conmy, Lewis Smith, Nic Sonnerat, Vikrant Varma, Janos Kramar, and others.[^oo-gemma-scope] The goal was to enable the broader safety research community to explore model internals using open-source models and tools.
+
+### Publication Record
+
+As of 2025, Nanda's Google Scholar profile lists over 13,000 total citations and identifies him as Mechanistic Interpretability Team Lead at Google DeepMind.[^oo-scholar] His Semantic Scholar profile lists 62 publications, an h-index of 31, and 7,759 total citations including 880 highly influential citations.[^oo-semantic] Peer-reviewed venues where his work has appeared include:
+
+| Venue | Year | Paper |
+|-------|------|-------|
+| ICLR (Spotlight) | 2023 | Progress Measures for Grokking via Mechanistic Interpretability |
+| ICML | 2023 | A Toy Model of Universality |
+| NeurIPS | 2024 | Gated SAEs (led by Sen Rajamanoharan) |
+| ICLR | 2025 | Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control |
+| ICLR | 2025 | Do I Know This Entity? Knowledge Awareness and Hallucinations in Language Models |
+| ICML | 2025 | SAEBench: A Comprehensive Benchmark for Sparse Autoencoders in Language Model Interpretability |
+| ICML | 2025 | Learning Multi-Level Features with Matryoshka Sparse Autoencoders |
+| ICML | 2025 | Are Sparse Autoencoders Useful? A Case Study in Sparse Probing |
+
+Sources: [DBLP](https://dblp.org/pid/285/6389.html)[^oo-dblp], [Semantic Scholar](https://www.semanticscholar.org/author/Neel-Nanda/2051128902)[^oo-semantic]
 
 ## Educational Content
 
-Nanda publishes interpretability tutorials and explanations on his blog at neelnanda.io and through video content. His "200 Concrete Open Problems in Mechanistic Interpretability" post outlines research directions for the field.[^rc-e79d]
+Nanda publishes interpretability tutorials and explanations on his blog at [neelnanda.io](https://www.neelnanda.io) and through video content. His "200 Concrete Open Problems in Mechanistic Interpretability" sequence, published on the Alignment Forum from December 28, 2022 through January 19, 2023, outlines research directions for the field.[^rc-e79d][^oo-200problems] The sequence covers topics including: Concrete Steps to Get Started, The Case for Analysing Toy Language Models, Looking for Circuits in the Wild, Interpreting Algorithmic Problems, Exploring Polysemanticity and Superposition, Analysing Training Dynamics, Techniques Tooling and Automation, Image Model Interpretability, Interpreting Reinforcement Learning, and Studying Learned Features in Language Models.[^oo-200problems] A Manifold Markets prediction market tracking progress on these problems resolved at 14% solved by 2025.[^oo-manifold]
 
-He has written guides for newcomers to interpretability research, including walkthroughs of TransformerLens usage and explanations of foundational papers. These materials are distributed as blog posts, Jupyter notebooks, and video tutorials.
+Nanda has written guides for newcomers to interpretability research, including walkthroughs of TransformerLens usage and explanations of foundational papers. These materials are distributed as blog posts, Jupyter notebooks, and video tutorials.
+
+His materials have been incorporated into the ARENA (<EntityLink id="E1155" name="arena-alignment">Alignment Research Engineer Accelerator</EntityLink>) curriculum, a 4–5 week ML bootcamp focused on AI safety. The interpretability chapter of ARENA is largely based on Nanda's open-source material; during ARENA 2.0, 6 of 15 participants in Nanda's SERI MATS cohort rated ARENA content among their top 3 most helpful resources.[^oo-arena-impact] ARENA has continued to run annually (ARENA 7.0 ran January–February 2026), citing the work of Nanda and the Google DeepMind Interpretability Team in its interpretability curriculum.[^oo-arena-7]
+
+Through the SERI MATS mentorship program, Nanda has mentored approximately 50 junior researchers over roughly three years, supervised 30+ MATS papers, and co-authored 15 papers published at top ML venues. As of his 2024 MATS applications post, 7 mentees had gone on to work at major AI companies.[^oo-mats]
 
 ## Research Approach
 
@@ -62,22 +113,28 @@ Nanda's work emphasizes:
 - **Open-source tooling**: Building software infrastructure to enable interpretability experiments
 - **Reproducible examples**: Providing code and notebooks that others can run and modify
 
-His stated view is that understanding neural network internals is necessary for evaluating AI safety properties, though he acknowledges that current interpretability techniques may not directly transfer to more capable future systems.[^rc-e3df]
+His stated view is that understanding neural network internals is necessary for evaluating AI safety properties, though he acknowledges that current interpretability techniques may not directly transfer to more capable future systems.[^rc-e3df] Since approximately mid-2024, Nanda has described a strategic shift: his team's focus has moved from basic science (ambitious reverse-engineering of circuits) toward applying interpretability skills to real-world safety problems such as model monitoring.[^oo-pragmatic] He has stated that the team "does not particularly care" whether it is called the "Mechanistic Interpretability Team"—the priority is applying available skills to the most impactful safety problems.[^oo-pragmatic]
 
 ## Perspectives on Interpretability and Alignment
 
-In posts and presentations, Nanda has outlined reasons why <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research may contribute to AI alignment:
+In posts and presentations, Nanda has outlined reasons why <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research may contribute to AI alignment. He attributes four potential applications to interpretability:
 
 1. **Failure diagnosis**: Identifying the mechanisms behind unexpected model behaviors
 2. **Capability evaluation**: Determining what tasks models can perform by examining their internal algorithms
 3. **Deception detection**: Searching for representations that indicate models are optimizing for objectives different from their training signal
 4. **Verification**: Checking whether specific safety properties hold in a model's learned algorithms
 
-He notes that these applications remain speculative and that the field is in early stages of developing techniques that scale to frontier models.[^rc-57af]
+He notes that these applications remain speculative and that the field is in early stages of developing techniques that scale to frontier models.[^rc-57af] Researchers have raised specific questions about whether circuit-level analysis scales to deception detection in practice; a LessWrong critique notes that "when researchers claim to identify a subnetwork performing a specific task, we should be very cautious — it's easy to find circuits in networks that do arbitrary things without doing anything more impressive than performance-guided network compression."[^oo-eis-critique] Nanda engaged with that critique and is thanked in the post for correcting a mistake in an earlier draft.[^oo-eis-critique]
+
+Nanda stated in 2025 that there have been "very exciting, widely popularized results from mechanistic interpretability that subsequent research has shown are either wrong or significantly weaker than originally claimed," and that the most ambitious vision of the field is "probably dead"—he no longer sees a path to deeply and reliably understanding what AI systems are thinking before competitive pressures push deployment of superhuman AI.[^oo-80k-part1] He now describes interpretability as functioning like "model biology"—a tool for determining whether a model's behavior warrants concern—and advocates for a "Swiss cheese" approach of layering multiple safeguards rather than relying on any single alignment technique.[^oo-80k-part1]
+
+On <EntityLink id="E16" name="ai-timelines">AI Timelines</EntityLink>, Nanda has stated a deliberate policy of not publicly disclosing his p(doom) or specific timeline estimates, citing concern that prominent researchers' views cause others to anchor without examining whether interpretability expertise translates to timeline expertise.[^oo-80k-career] He has said he considers AGI arriving in the next 10–20 years, sooner, or later as all plausible scenarios, and argues that safety work should proceed as though all are realistic.[^oo-80k-career]
 
 ## Current Work
 
-At <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, Nanda works on the alignment team. His stated focus areas include scaling interpretability techniques to larger models and exploring automated methods for circuit discovery.
+At <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, Nanda holds the title of Senior Research Scientist and Mechanistic Interpretability Team Lead.[^oo-linkedin][^oo-scholar] Team outputs during his tenure include Gemma Scope (400+ open-weight SAEs released July 2024)[^oo-gemma-scope], Gated SAEs (NeurIPS 2024)[^oo-mit-tr-deepmind], JumpReLU SAEs[^oo-mit-tr-deepmind], and SAEBench (ICML 2025)[^oo-dblp]. Recent papers from the team also include "Chain-of-Thought Reasoning In The Wild Is Not Always Faithful" and "Learning Multi-Level Features with Matryoshka Sparse Autoencoders" (both 2025).[^oo-dblp]
+
+In 2025, Nanda was named to MIT Technology Review's Innovators Under 35 list for his mechanistic interpretability research and work to build the field.[^oo-mit-tr-innovator]
 
 ## Limitations and Open Questions
 
@@ -86,11 +143,46 @@ Nanda has identified challenges for mechanistic interpretability research:[^rc-4
 - Many discovered circuits are descriptive rather than predictive, explaining behavior post-hoc without enabling intervention
 - It remains unclear whether interpretability of current models will provide insights applicable to future AI systems with different architectures or training methods
 
-Critical perspectives on interpretability research more broadly include questions about whether understanding model internals is tractable for highly capable systems, and whether interpretability work should be prioritized relative to other alignment approaches like <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink> or <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>.
+External critiques of the broader research program include the concern that circuits identified through activation-based methods may not correspond to causally meaningful computational units, and that the dominant focus on circuits-style interpretability narrows the field's approach to model verification and <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink> detection.[^oo-eis-critique] Nanda himself has acknowledged that some earlier high-profile results in the field were "wrong or significantly weaker than originally claimed."[^oo-80k-part1]
 
-## Resources
+Questions about whether interpretability should be prioritized relative to other <EntityLink id="E439" name="alignment">AI Alignment</EntityLink> such as <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink> or <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> remain open; Nanda argues for treating these as complementary rather than competing.[^oo-80k-part1]
 
-- **Personal website**: neelnanda.io (blog posts and tutorials)
-- **TransformerLens documentation**: transformerlensorg.github.io/TransformerLens
-- **GitHub**: github.com/neelnanda-io (code repositories)
-- **LessWrong posts**: lesswrong.com/users/neel-nanda-1 (research updates and explanations)
+## External Links
+
+- [neelnanda.io](https://www.neelnanda.io) — personal website, blog posts, and tutorials
+- [TransformerLens GitHub](https://github.com/TransformerLensOrg/TransformerLens) — library source code and documentation
+- [200 Concrete Open Problems in Mechanistic Interpretability](https://www.alignmentforum.org/s/yivyHaCAmMJ3CqSyj) — Alignment Forum sequence (December 2022–January 2023)
+- [Google Scholar profile](https://scholar.google.com/citations?user=GLnX3MkAAAAJ&hl=en) — full publication list
+- [LessWrong posts](https://www.lesswrong.com/users/neel-nanda-1) — research updates and explanations
+
+[^rc-8d4f]: TransformerLensOrg/TransformerLens, GitHub. https://github.com/TransformerLensOrg/TransformerLens
+
+[^rc-f19d]: Elhage, Nanda, Olsson et al. "A Mathematical Framework for Transformer Circuits." Transformer Circuits Thread, December 22, 2021. https://transformer-circuits.pub/2021/framework/index.html
+[^rc-e79d]: Neel Nanda. "200 Concrete Open Problems in Mechanistic Interpretability." AI Alignment Forum sequence, December 28, 2022 – January 19, 2023. https://www.alignmentforum.org/s/yivyHaCAmMJ3CqSyj
+[^rc-e3df]: Neel Nanda. "A Pragmatic Vision for Interpretability." LessWrong, 2024. https://www.lesswrong.com/posts/StENzDcD3kpfGJssR/a-pragmatic-vision-for-interpretability
+[^rc-57af]: Neel Nanda. "200 Concrete Open Problems in Mechanistic Interpretability." AI Alignment Forum sequence. https://www.alignmentforum.org/s/yivyHaCAmMJ3CqSyj
+[^rc-4642]: Neel Nanda, 80,000 Hours Podcast Part 1. "Neel Nanda on the Race to Read AI Minds." October 14, 2025. https://80000hours.org/podcast/episodes/neel-nanda-mechanistic-interpretability/
+[^oo-profile]: Neel Nanda, OpenReview Profile. https://openreview.net/profile?id=~Neel_Nanda1
+[^oo-about]: Neel Nanda. "About." neelnanda.io. https://www.neelnanda.io/about
+[^oo-scholar]: Neel Nanda, Google Scholar. https://scholar.google.com/citations?user=GLnX3MkAAAAJ&hl=en
+[^oo-semantic]: Neel Nanda, Semantic Scholar. https://www.semanticscholar.org/author/Neel-Nanda/2051128902
+[^oo-linkedin]: Neel Nanda, LinkedIn. https://uk.linkedin.com/in/neel-nanda%F0%9F%94%B8-993580151
+[^oo-github]: TransformerLensOrg/TransformerLens, GitHub. https://github.com/TransformerLensOrg/TransformerLens
+[^oo-tl-docs]: TransformerLens Official Documentation. https://transformerlensorg.github.io/TransformerLens/
+[^oo-circuits-paper]: Elhage, Nanda, Olsson et al. "A Mathematical Framework for Transformer Circuits." December 22, 2021. https://transformer-circuits.pub/2021/framework/index.html
+[^oo-circuits-walkthrough]: Neel Nanda. "A Walkthrough of A Mathematical Framework for Transformer Circuits." LessWrong, October 14, 2022. https://www.lesswrong.com/posts/hBtjpY2wAASEpZXgN/a-walkthrough-of-a-mathematical-framework-for-transformer
+[^oo-grokking]: Nanda, Chan, Lieberum, Smith, Steinhardt. "Progress Measures for Grokking via Mechanistic Interpretability." arXiv:2301.05217, January 2023. https://arxiv.org/abs/2301.05217
+[^oo-iiw]: Neel Nanda. "A Walkthrough of Interpretability in the Wild (w/ authors Kevin Wang, Arthur Conmy & Alexandre Variengien)." LessWrong, 2022. https://www.lesswrong.com/posts/DZk6mRo9vhCXN9Rfn/a-walkthrough-of-interpretability-in-the-wild-w-authors
+[^oo-gemma-scope]: Google DeepMind. "Gemma Scope: Helping the Safety Community Shed Light on the Inner Workings of Language Models." DeepMind Blog, July 2024. https://deepmind.google/discover/blog/gemma-scope-helping-the-safety-community-shed-light-on-the-inner-workings-of-language-models/
+[^oo-dblp]: Neel Nanda, DBLP. https://dblp.org/pid/285/6389.html
+[^oo-mats]: Neel Nanda. "MATS Applications." neelnanda.io, 2024. https://www.neelnanda.io/blog/mats-apps-9
+[^oo-arena-impact]: ARENA team. "ARENA 2.0 - Impact Report." EA Forum, September 26, 2023. https://forum.effectivealtruism.org/posts/C7DbrkCpSe4AdcMek/arena-2-0-impact-report
+[^oo-arena-7]: ARENA team. "ARENA 7.0 - Call for Applicants." EA Forum, September 30, 2025. https://forum.effectivealtruism.org/posts/MDw6QDyrLP3kpehd2/arena-7-0-call-for-applicants
+[^oo-200problems]: Neel Nanda. "200 Concrete Open Problems in Mechanistic Interpretability." AI Alignment Forum sequence, December 28, 2022 – January 19, 2023. https://www.alignmentforum.org/s/yivyHaCAmMJ3CqSyj
+[^oo-manifold]: Manifold Markets. "By 2025, Percent of 200 Concrete Open Problems Solved?" https://manifold.markets/duck_master/by-2025-percent-of-200-concrete-ope
+[^oo-pragmatic]: Neel Nanda. "A Pragmatic Vision for Interpretability." LessWrong, 2024. https://www.lesswrong.com/posts/StENzDcD3kpfGJssR/a-pragmatic-vision-for-interpretability
+[^oo-80k-part1]: Rob Wiblin / 80,000 Hours. "Neel Nanda on the Race to Read AI Minds (Part 1)." 80,000 Hours Podcast, October 14, 2025. https://80000hours.org/podcast/episodes/neel-nanda-mechanistic-interpretability/
+[^oo-80k-career]: Rob Wiblin / 80,000 Hours. "Neel Nanda on leading a Google DeepMind team at 26 (Part 2)." 80,000 Hours Podcast, October 21, 2025. https://80000hours.org/podcast/episodes/neel-nanda-career-advice-frontier-ai-companies/
+[^oo-eis-critique]: LessWrong. "EIS VI: Critiques of Mechanistic Interpretability Work in AI Safety." https://www.lesswrong.com/posts/wt7HXaCWzuKQipqz3/eis-vi-critiques-of-mechanistic-interpretability-work-in-ai
+[^oo-mit-tr-innovator]: MIT Technology Review. "Neel Nanda." Innovators Under 35, 2025. https://www.technologyreview.com/innovator/neel-nanda/
+[^oo-mit-tr-deepmind]: MIT Technology Review. "Google DeepMind Has a New Way to Look Inside an AI's 'Mind'." November 14, 2024. https://www.technologyreview.com/2024/11/14/1106871/google-deepmind-has-a-new-way-to-look-inside-an-ais-mind/
