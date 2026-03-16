@@ -129,33 +129,33 @@ export function createApp() {
   // API routes — all require a valid API key
   app.use("/api/*", validateApiKey());
 
-  // Mount route handlers
+  // ── Route mounting ───────────────────────────────────────────────────
+  // Routes are grouped by which data layer ("Base") they primarily serve.
+  // See content/docs/internal/data-architecture.mdx for the Three Bases guide.
+
+  // TableBase routes — YAML entity/resource catalog
   app.route("/api/ids", idsRoute);
-  app.route("/api/citations", citationsRoute);
-  app.route("/api/pages", pagesRoute);
-  app.route("/api/edit-logs", editLogsRoute);
-  app.route("/api/auto-update-runs", autoUpdateRunsRoute);
-  app.route("/api/hallucination-risk", hallucinationRiskRoute);
-  app.route("/api/sessions", sessionsRoute);
+  app.route("/api/entities", entitiesRoute);
   app.route("/api/resources", resourcesRoute);
   app.route("/api/summaries", summariesRoute);
   app.route("/api/links", linksRoute);
-  app.route("/api/auto-update-news", autoUpdateNewsRoute);
-  app.route("/api/entities", entitiesRoute);
-  app.route("/api/facts", factsRoute);
-  app.route("/api/agent-sessions", agentSessionsRoute);
-  app.route("/api/active-agents", activeAgentsRoute);
-  app.route("/api/agent-session-events", agentSessionEventsRoute);
-  app.route("/api/jobs", jobsRoute);
-  app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);
-  app.route("/api/integrity", integrityRoute);
-  app.route("/api/references", referencesRoute);
-  app.route("/api/github/issues", githubIssuesRoute);
-  app.route("/api/github/pulls", githubPullsRoute);
-  app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
-  app.route("/api/monitoring", monitoringRoute);
+
+  // FactBase routes — structured facts and verification
+  app.route("/api/facts", factsRoute);
   app.route("/api/kb-verifications", factbaseVerificationsRoute); // API path kept for backwards compat
+
+  // WikiBase routes — prose content and page metadata
+  app.route("/api/pages", pagesRoute);
+  app.route("/api/edit-logs", editLogsRoute);
+  app.route("/api/references", referencesRoute);
+
+  // Citation & verification system (operational, not part of a Base)
+  app.route("/api/citations", citationsRoute);
+  app.route("/api/hallucination-risk", hallucinationRiskRoute);
+  app.route("/api/integrity", integrityRoute);
+
+  // Financial data routes (operational — personnel, grants, funding)
   app.route("/api/personnel", personnelRoute);
   app.route("/api/people", peopleRoute);
   app.route("/api/grants", grantsRoute);
@@ -168,9 +168,29 @@ export function createApp() {
   app.route("/api/benchmarks", benchmarksRoute);
   app.route("/api/benchmark-results", benchmarkResultsRoute);
   app.route("/api/record-verifications", recordVerificationsRoute);
+  app.route("/api/assessments", assessmentsRoute);
+
+  // Cross-Base: unified things index
   app.route("/api/things", thingsRoute);
   app.route("/api/research-areas", researchAreasRoute);
-  app.route("/api/assessments", assessmentsRoute);
+
+  // Agent & session tracking (operational)
+  app.route("/api/sessions", sessionsRoute);
+  app.route("/api/agent-sessions", agentSessionsRoute);
+  app.route("/api/active-agents", activeAgentsRoute);
+  app.route("/api/agent-session-events", agentSessionEventsRoute);
+
+  // Auto-update system (operational)
+  app.route("/api/auto-update-runs", autoUpdateRunsRoute);
+  app.route("/api/auto-update-news", autoUpdateNewsRoute);
+
+  // Infrastructure & monitoring (operational)
+  app.route("/api/jobs", jobsRoute);
+  app.route("/api/artifacts", artifactsRoute);
+  app.route("/api/github/issues", githubIssuesRoute);
+  app.route("/api/github/pulls", githubPullsRoute);
+  app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
+  app.route("/api/monitoring", monitoringRoute);
 
   return app;
 }

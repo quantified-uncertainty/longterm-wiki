@@ -1,5 +1,16 @@
 /**
- * FactBase data access layer.
+ * FactBase — Structured facts data access layer.
+ *
+ * This module is the "FactBase" layer of the wiki's Three Bases architecture:
+ *   - **TableBase** (tablebase.ts): Typed relational records (entities, resources).
+ *   - **FactBase** (this file): Structured triples with temporal data, provenance,
+ *     and cross-entity references. Source of truth: YAML files in
+ *     packages/factbase/data/things/ (NOT the PG `facts` table, which is a read mirror).
+ *   - **WikiBase**: Long-form prose MDX articles (content/docs/).
+ *
+ * Naming note: The "things" directory in packages/factbase/data/things/ contains
+ * FactBase entity YAML files. This is NOT related to the PG `things` table, which
+ * is a cross-base universal index. See content/docs/internal/data-architecture.mdx.
  *
  * Reads factbase-data.json (populated by build-data.mjs) — a dedicated file
  * split out from database.json for faster incremental builds and smaller

@@ -20,3 +20,4 @@
 - **crux/ import direction**: `lib → authoring`, never `authoring → lib`.
 - **SQLite knowledge.db retired**: All data access migrated to PostgreSQL wiki-server (completed Feb 2026).
 - **Statements/Claims system retired**: The entire statements and claims system was deleted in PR #1908 (March 2026). DB tables archived with `_archived_` prefix. FactBase YAML is now the sole structured facts system.
+- **Three Bases naming**: PG `entities` = TableBase (YAML catalog). PG `facts` = FactBase mirror. PG `things` = cross-base universal index (NOT a FactBase concept). `packages/factbase/data/things/` = FactBase entity YAML (NOT the PG things table). Full guide: `content/docs/internal/data-architecture.mdx`.
