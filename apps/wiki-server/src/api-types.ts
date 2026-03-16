@@ -1092,3 +1092,43 @@ export const UpdateIncidentSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
   githubIssueNumber: z.number().int().positive().optional(),
 });
+
+// ---------------------------------------------------------------------------
+// Page Assessments
+// ---------------------------------------------------------------------------
+
+export const VALID_ASSESSORS = [
+  "structural",
+  "llm-grading",
+  "editorial",
+  "frontmatter-sync",
+] as const;
+
+export type Assessor = (typeof VALID_ASSESSORS)[number];
+
+export const PageAssessmentSchema = z.object({
+  pageId: PageIdSchema,
+  assessor: z.enum(VALID_ASSESSORS),
+  method: z.string().max(200).nullable().optional(),
+  model: z.string().max(200).nullable().optional(),
+  quality: z.number().int().min(0).max(100).nullable().optional(),
+  readerImportance: z.number().min(0).max(100).nullable().optional(),
+  researchImportance: z.number().min(0).max(100).nullable().optional(),
+  tacticalValue: z.number().min(0).max(100).nullable().optional(),
+  ratingFocus: z.number().min(0).max(10).nullable().optional(),
+  ratingNovelty: z.number().min(0).max(10).nullable().optional(),
+  ratingRigor: z.number().min(0).max(10).nullable().optional(),
+  ratingCompleteness: z.number().min(0).max(10).nullable().optional(),
+  ratingConcreteness: z.number().min(0).max(10).nullable().optional(),
+  ratingActionability: z.number().min(0).max(10).nullable().optional(),
+  ratingObjectivity: z.number().min(0).max(10).nullable().optional(),
+  structuralScore: z.number().int().min(0).max(15).nullable().optional(),
+  wordCount: z.number().int().min(0).nullable().optional(),
+  note: z.string().max(5000).nullable().optional(),
+  assessedAt: z.string().datetime().optional(),
+});
+export type PageAssessment = z.infer<typeof PageAssessmentSchema>;
+
+export const PageAssessmentBatchSchema = z.object({
+  items: z.array(PageAssessmentSchema).min(1).max(MAX_BATCH_SIZE),
+});

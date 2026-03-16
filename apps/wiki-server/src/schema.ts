@@ -2226,3 +2226,50 @@ export const grantResearchAreas = pgTable(
     index("idx_gra_area").on(table.researchAreaId),
   ]
 );
+
+/**
+ * Wikibase page assessments — temporal scoring events for wiki pages.
+ *
+ * Each row is a single assessment of a page by a specific assessor at a point in time.
+ * Multiple assessors can score the same page (structural, llm-grading, editorial,
+ * frontmatter-sync), and assessments accumulate over time for history tracking.
+ *
+ * See GitHub issue #2429 (epic #2428).
+ */
+export const wikibasePageAssessments = pgTable(
+  "wikibase_page_assessments",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    // pageIdInt mirrors wiki_pages.integer_id but has no FK — integer_id was added
+    // via manual migration (phase4a), not Drizzle, so a FK here would break fresh-DB migrations.
+    pageIdInt: integer("page_id_int"),
+    assessor: text("assessor").notNull(), // 'structural' | 'llm-grading' | 'editorial' | 'frontmatter-sync'
+    method: text("method"), // 'metrics-extractor-v1' | 'crux-grade-sonnet' | 'frontmatter-manual'
+    model: text("model"), // LLM model used (NULL for structural/editorial)
+    quality: integer("quality"), // 0-100
+    readerImportance: real("reader_importance"), // 0-100
+    researchImportance: real("research_importance"), // 0-100
+    tacticalValue: real("tactical_value"), // 0-100
+    ratingFocus: real("rating_focus"), // 0-10
+    ratingNovelty: real("rating_novelty"),
+    ratingRigor: real("rating_rigor"),
+    ratingCompleteness: real("rating_completeness"),
+    ratingConcreteness: real("rating_concreteness"),
+    ratingActionability: real("rating_actionability"),
+    ratingObjectivity: real("rating_objectivity"),
+    structuralScore: integer("structural_score"), // 0-15 raw (structural assessor only)
+    wordCount: integer("word_count"),
+    note: text("note"),
+    assessedAt: timestamp("assessed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_wpa_page_assessor_time").on(table.pageIdInt, table.assessor, table.assessedAt),
+    index("idx_wpa_page_time").on(table.pageIdInt, table.assessedAt),
+    index("idx_wpa_assessor").on(table.assessor),
+  ]
+);
