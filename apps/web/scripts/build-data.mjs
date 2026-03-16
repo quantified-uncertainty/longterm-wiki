@@ -581,14 +581,8 @@ function extractPrNumber(prUrl) {
   return m ? parseInt(m[1], 10) : undefined;
 }
 
-/**
- * Return the later of two YYYY-MM-DD date strings (null-safe).
- */
-function maxDate(a, b) {
-  if (!a) return b;
-  if (!b) return a;
-  return a > b ? a : b;
-}
+// maxDate was removed — see lastUpdated fallback chain comment in buildPagesRegistry.
+// dateCreated already uses a fallback chain (resolveDateCreated in git-date-utils.mjs).
 
 /**
  * Build git-based date maps for all content files.
@@ -1899,13 +1893,17 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           causalLevel: fm.causalLevel || null,
-          lastUpdated: maxDate(
-            editLogDates.get(isIndexFile ? null : id) || null,
-            maxDate(
-              gitModifiedMap.get(relative(REPO_ROOT, fullPath)) || null,
-              maxDate(toDateString(fm.lastUpdated), toDateString(fm.lastEdited))
-            )
-          ),
+          // Use a fallback chain instead of maxDate to avoid metadata-only
+          // git commits (e.g. bulk frontmatter reformatting) from overriding
+          // the actual content change date with today's date.
+          // Priority: frontmatter lastEdited (set by content editing tools)
+          //   → frontmatter lastUpdated (legacy) → edit log date (wiki-server)
+          //   → git modified date (last resort, includes metadata commits).
+          lastUpdated: toDateString(fm.lastEdited)
+            || toDateString(fm.lastUpdated)
+            || editLogDates.get(isIndexFile ? null : id)
+            || gitModifiedMap.get(relative(REPO_ROOT, fullPath))
+            || null,
           // Derive creation date: prefer explicit frontmatter, then non-bulk git
           // first-commit, then earliest edit log from wiki-server, then legacy
           // frontmatter. Bulk-import git dates are already filtered out of
