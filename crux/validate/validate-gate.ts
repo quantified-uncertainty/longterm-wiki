@@ -158,6 +158,7 @@ interface Step {
   args: string[];
   cwd: string;
   advisory?: boolean; // if true, failure is reported but doesn't block
+  emitOutputInCi?: boolean; // print captured output in CI even on success
 }
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
@@ -376,6 +377,7 @@ const PARALLEL_STEPS: Step[] = [
     // in entity directory pages. Informational for now — can be promoted to
     // blocking once all existing issues are resolved.
     advisory: true,
+    emitOutputInCi: true,
   },
 ];
 
@@ -395,6 +397,7 @@ interface StepResult {
   duration: number;
   exitCode: number | null;
   advisory?: boolean;
+  emitOutputInCi?: boolean;
   capturedOutput: string;
 }
 
@@ -432,7 +435,9 @@ function runStep(step: Step, buffer = false): Promise<StepResult> {
     child.on('close', (code: number | null) => {
       // In CI mode, dump captured output when a step fails so errors are
       // visible in workflow logs (otherwise they're silently discarded).
-      if (CI_MODE && code !== 0 && capturedOutput) {
+      // Also emit for advisory steps with emitOutputInCi=true so findings
+      // are visible even when the step exits 0.
+      if (CI_MODE && (code !== 0 || step.emitOutputInCi) && capturedOutput) {
         process.stdout.write(capturedOutput);
       }
       resolve({
@@ -443,6 +448,7 @@ function runStep(step: Step, buffer = false): Promise<StepResult> {
         exitCode: code,
         capturedOutput,
         advisory: step.advisory,
+        emitOutputInCi: step.emitOutputInCi,
       });
     });
 
@@ -461,6 +467,7 @@ function runStep(step: Step, buffer = false): Promise<StepResult> {
         exitCode: 1,
         capturedOutput,
         advisory: step.advisory,
+        emitOutputInCi: step.emitOutputInCi,
       });
     });
   });
@@ -506,7 +513,7 @@ async function runParallel(steps: Step[]): Promise<StepResult[]> {
         process.stdout.write(result.capturedOutput);
       }
       console.log();
-    } else if (!result.passed && result.capturedOutput) {
+    } else if ((!result.passed || result.emitOutputInCi) && result.capturedOutput) {
       process.stdout.write(result.capturedOutput);
     }
   }
