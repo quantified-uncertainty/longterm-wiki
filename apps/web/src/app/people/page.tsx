@@ -49,6 +49,25 @@ interface DirectoryResult {
 
 const PERSON_MEASURES = ["role", "employed-by", "born-year", "net-worth"];
 
+/**
+ * Count career history entries from local FactBase data.
+ *
+ * The personnel table in PG may be empty (career sync not yet run), so we
+ * fall back to local FactBase data: career-history records + employed-by facts.
+ * We take the max of records and facts to avoid double-counting while still
+ * capturing data from either source.
+ */
+function getLocalCareerCount(entityId: string): number {
+  // Career-history KB records (structured entries with org/title/dates)
+  const careerRecords = getKBRecords(entityId, "career-history");
+
+  // employed-by facts (including expired ones — career history includes past positions)
+  const employedByFacts = getKBFacts(entityId, "employed-by");
+
+  // Use max of the two sources: they often overlap but either may have entries the other lacks
+  return Math.max(careerRecords.length, employedByFacts.length);
+}
+
 function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
   const role = e.facts["role"];
   const bornYear = e.facts["born-year"];
@@ -61,6 +80,15 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
   const knownFor = meta.knownFor as string[] | undefined;
   const publicationCount = (meta.publicationCount as number) ?? 0;
   const topics = expertPositions?.map((p) => p.topic) ?? [];
+
+  // Career history: use API count if available, otherwise fall back to local FactBase data.
+  // The PG personnel table may not have career entries synced yet, so we supplement
+  // with local data (employed-by facts + career-history records from YAML).
+  const apiCareerCount = e.counts.careerHistory;
+  const entityId = e.stableId ?? e.id;
+  const careerHistoryCount = apiCareerCount > 0
+    ? apiCareerCount
+    : getLocalCareerCount(entityId);
 
   // Build search text from all available API data
   const searchParts: string[] = [e.title];
@@ -76,7 +104,7 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
   }
 
   return {
-    id: e.stableId ?? e.id,
+    id: entityId,
     slug: e.id,
     name: e.title,
     numericId: e.numericId ?? null,
@@ -94,7 +122,7 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
     positionCount: expertPositions?.length ?? 0,
     topics,
     publicationCount,
-    careerHistoryCount: e.counts.careerHistory,
+    careerHistoryCount,
 
     searchText: searchParts.join(" ").toLowerCase(),
   };
