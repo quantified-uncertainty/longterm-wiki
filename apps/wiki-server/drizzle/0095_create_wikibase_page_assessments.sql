@@ -1,6 +1,6 @@
 CREATE TABLE wikibase_page_assessments (
   id            BIGSERIAL PRIMARY KEY,
-  page_id_int   INTEGER REFERENCES wiki_pages(integer_id),
+  page_id_int   INTEGER,  -- references wiki_pages(integer_id); no FK because integer_id is added by manual migration (Phase 4a)
   assessor      TEXT NOT NULL,
   method        TEXT,
   model         TEXT,

@@ -2240,7 +2240,9 @@ export const wikibasePageAssessments = pgTable(
   "wikibase_page_assessments",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
+    // pageIdInt mirrors wiki_pages.integer_id but has no FK — integer_id was added
+    // via manual migration (phase4a), not Drizzle, so a FK here would break fresh-DB migrations.
+    pageIdInt: integer("page_id_int"),
     assessor: text("assessor").notNull(), // 'structural' | 'llm-grading' | 'editorial' | 'frontmatter-sync'
     method: text("method"), // 'metrics-extractor-v1' | 'crux-grade-sonnet' | 'frontmatter-manual'
     model: text("model"), // LLM model used (NULL for structural/editorial)
