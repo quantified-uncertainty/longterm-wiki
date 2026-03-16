@@ -1170,6 +1170,113 @@ async function mergePGRecordsIntoKB(kb) {
 }
 
 /**
+ * Build a ratings object from a PG assessment, falling back to frontmatter ratings
+ * for any missing dimensions.
+ */
+/** Map from frontmatter rating name → PG assessment column name. */
+const RATING_FIELD_MAP = {
+  focus: 'ratingFocus',
+  novelty: 'ratingNovelty',
+  rigor: 'ratingRigor',
+  completeness: 'ratingCompleteness',
+  concreteness: 'ratingConcreteness',
+  actionability: 'ratingActionability',
+  objectivity: 'ratingObjectivity',
+};
+
+function buildRatingsFromAssessment(assessment, fmRatings) {
+  const ratings = {};
+  let hasAny = false;
+
+  for (const [shortName, pgName] of Object.entries(RATING_FIELD_MAP)) {
+    const val = assessment[pgName] ?? (fmRatings ? fmRatings[shortName] : null) ?? null;
+    if (val != null) {
+      ratings[shortName] = val;
+      hasAny = true;
+    }
+  }
+
+  return hasAny ? ratings : (fmRatings || null);
+}
+
+/**
+ * Fetch latest page assessments from wiki-server PG tables.
+ * Returns a Map<pageSlug, coalesced assessment> where scores are merged
+ * across assessors (llm-grading > frontmatter-sync > structural for quality).
+ * Falls back to empty map if wiki-server is unavailable.
+ */
+async function fetchAssessments() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  assessments: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return new Map();
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    // Paginate through all latest assessments (one per page per assessor)
+    const allRows = [];
+    let offset = 0;
+    const pageSize = 1000;
+    while (true) {
+      const url = `${serverUrl}/api/assessments/latest?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) });
+      if (!resp.ok) {
+        console.log(`  assessments: skipped (HTTP ${resp.status})`);
+        return new Map();
+      }
+      const data = await resp.json();
+      const items = data.assessments || [];
+      allRows.push(...items);
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    // Coalesce: for each page, pick the best value per dimension across assessors.
+    // Priority: llm-grading > editorial > frontmatter-sync > structural
+    const ASSESSOR_PRIORITY = { 'llm-grading': 3, 'editorial': 2, 'frontmatter-sync': 1, 'structural': 0 };
+    const COALESCE_FIELDS = [
+      'quality', 'readerImportance', 'researchImportance', 'tacticalValue',
+      'ratingFocus', 'ratingNovelty', 'ratingRigor', 'ratingCompleteness',
+      'ratingConcreteness', 'ratingActionability', 'ratingObjectivity',
+      'structuralScore', 'wordCount',
+    ];
+
+    const byPage = new Map();       // pageId → coalesced assessment values
+    const priorities = new Map();    // pageId → { [field]: priority }
+
+    for (const row of allRows) {
+      const pageId = row.pageId;
+      if (!pageId) continue;
+
+      if (!byPage.has(pageId)) {
+        byPage.set(pageId, {});
+        priorities.set(pageId, {});
+      }
+      const entry = byPage.get(pageId);
+      const fieldPriorities = priorities.get(pageId);
+      const priority = ASSESSOR_PRIORITY[row.assessor] ?? -1;
+
+      for (const field of COALESCE_FIELDS) {
+        if (row[field] != null && priority >= (fieldPriorities[field] ?? -1)) {
+          entry[field] = row[field];
+          fieldPriorities[field] = priority;
+        }
+      }
+    }
+
+    if (byPage.size > 0) {
+      console.log(`  assessments: ${allRows.length} rows coalesced into ${byPage.size} pages from PG`);
+    }
+    return byPage;
+  } catch (err) {
+    console.log(`  assessments: skipped (${err instanceof Error ? err.message : err})`);
+    return new Map();
+  }
+}
+
+/**
  * Fetch benchmark results from wiki-server PG tables.
  * Returns a map of modelId → array of { benchmarkId, score, unit }.
  * Falls back to empty object if wiki-server is unavailable.
@@ -1738,7 +1845,7 @@ function extractFrontmatter(content) {
  * Extracts frontmatter including quality, lastUpdated, title, etc.
  * Also detects unconverted links (markdown links with matching resources)
  */
-function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates) {
+function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates, assessmentMap = new Map()) {
   const { gitCreatedMap = new Map(), gitModifiedMap = new Map() } = gitDateMaps || {};
   const earliestDates = earliestEditLogDates || new Map();
   const pages = [];
@@ -1776,6 +1883,9 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
         // Count already converted links (<R> components)
         const convertedLinkCount = countConvertedLinks(content);
 
+        // PG assessment (preferred over frontmatter when available)
+        const assessment = assessmentMap.get(effectiveId);
+
         pages.push({
           id: effectiveId,
           numericId: fm.numericId || null,
@@ -1783,10 +1893,10 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           path: urlPath,
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
-          quality: currentQuality,
-          readerImportance: fm.readerImportance != null ? Number(fm.readerImportance) : null,
-          researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
-          tacticalValue: fm.tacticalValue != null ? Number(fm.tacticalValue) : null,
+          quality: assessment?.quality ?? currentQuality,
+          readerImportance: assessment?.readerImportance ?? (fm.readerImportance != null ? Number(fm.readerImportance) : null),
+          researchImportance: assessment?.researchImportance ?? (fm.researchImportance != null ? Number(fm.researchImportance) : null),
+          tacticalValue: assessment?.tacticalValue ?? (fm.tacticalValue != null ? Number(fm.tacticalValue) : null),
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)
@@ -1808,8 +1918,8 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
           description: fm.description || null,
-          // Extract ratings for model pages
-          ratings: fm.ratings || null,
+          // Extract ratings — prefer PG assessment if available, fall back to frontmatter
+          ratings: assessment ? buildRatingsFromAssessment(assessment, fm.ratings) : (fm.ratings || null),
           // Extract category from path (prefer subdirectory, fallback to top-level dir)
           category: urlPrefix.split('/').filter(Boolean)[1] || urlPrefix.split('/').filter(Boolean)[0] || 'other',
           // Subcategory from frontmatter (set by flatten-content migration)
@@ -2129,16 +2239,19 @@ async function main() {
     }
   }
 
-  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts)
+  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments)
+  let assessmentMap = new Map();
   if (!CONTENT_ONLY) {
-    const [benchmarkResults, researchAreasData, recordVerdicts] = await Promise.all([
+    const [benchmarkResults, researchAreasData, recordVerdicts, assessments] = await Promise.all([
       fetchBenchmarkResults(),
       fetchResearchAreas(),
       fetchRecordVerdicts(),
+      fetchAssessments(),
     ]);
     database.benchmarkResults = benchmarkResults;
     database.researchAreas = researchAreasData;
     database.recordVerdicts = recordVerdicts;
+    assessmentMap = assessments;
   }
 
   // Build URL → resource map for unconverted link detection
@@ -2165,7 +2278,7 @@ async function main() {
   database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle);
 
   // Build pages registry with frontmatter data (quality, etc.)
-  const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates);
+  const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates, assessmentMap);
 
   // =========================================================================
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
