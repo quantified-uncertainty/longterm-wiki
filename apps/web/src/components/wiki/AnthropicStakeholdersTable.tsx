@@ -117,7 +117,13 @@ export async function AnthropicStakeholdersTable() {
   const pledgeRecords = getKBRecords("anthropic", "charitable-pledges");
   const investmentRecords = getKBRecords("anthropic", "investments");
   if (equityRecords.length === 0) {
-    throw new Error("Missing KB equity-positions records for anthropic");
+    // Equity-positions data has been migrated to PostgreSQL but not yet populated.
+    // Return a graceful empty state while the data migration is in progress.
+    return (
+      <p className="text-sm text-gray-500 italic">
+        Stakeholder data is being migrated and will be available soon.
+      </p>
+    );
   }
 
   // Index investments by investor join key (entity slug or displayName)
