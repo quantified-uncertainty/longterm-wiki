@@ -164,7 +164,7 @@ function buildMonitoringDispatch(scenario: MonitoringScenario = {}): SqlDispatch
 async function createMonitoringApp(dispatch: SqlDispatcher) {
   vi.resetModules();
   vi.doMock("../db.js", () => mockDbModule(dispatch));
-  const { monitoringRoute } = await import("../routes/monitoring.js");
+  const { monitoringRoute } = await import("../routes/operational/monitoring.js");
   const app = new Hono().route("/api/monitoring", monitoringRoute);
   return app;
 }

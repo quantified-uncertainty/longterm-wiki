@@ -9,7 +9,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { EditLogEntry } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { EditLogsRoute } from '../../../apps/wiki-server/src/routes/edit-logs.ts';
+import type { EditLogsRoute } from '../../../apps/wiki-server/src/routes/wikibase/edit-logs.ts';
 
 // ---------------------------------------------------------------------------
 // RPC type inference — response shapes derived from the server route

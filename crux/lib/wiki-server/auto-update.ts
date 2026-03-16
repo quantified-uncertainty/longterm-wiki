@@ -8,8 +8,8 @@
 import { apiRequest, getServerUrl, type ApiResult } from './client.ts';
 import type { z } from 'zod';
 import type { hc, InferResponseType } from 'hono/client';
-import type { AutoUpdateRunsRoute } from '../../../apps/wiki-server/src/routes/auto-update-runs.ts';
-import type { AutoUpdateNewsRoute } from '../../../apps/wiki-server/src/routes/auto-update-news.ts';
+import type { AutoUpdateRunsRoute } from '../../../apps/wiki-server/src/routes/operational/auto-update-runs.ts';
+import type { AutoUpdateNewsRoute } from '../../../apps/wiki-server/src/routes/operational/auto-update-news.ts';
 import type {
   AutoUpdateResult,
   RecordAutoUpdateRun,

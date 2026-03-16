@@ -1,0 +1,336 @@
+import { Hono } from "hono";
+import { z } from "zod";
+import { eq, count, sql, desc, inArray } from "drizzle-orm";
+import { getDrizzleDb } from "../../db.js";
+import { autoUpdateRuns, autoUpdateResults, wikiPages } from "../../schema.js";
+import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow, paginationQuery } from "../shared/utils.js";
+import { logger } from "../../logger.js";
+import { resolvePageIntIds } from "../shared/page-id-helpers.js";
+
+// ---- Constants ----
+
+const MAX_BATCH_SIZE = 100;
+const MAX_PAGE_SIZE = 200;
+
+const VALID_TRIGGERS = ["scheduled", "manual"] as const;
+const VALID_STATUSES = ["success", "failed", "skipped"] as const;
+
+// ---- Schemas ----
+
+const ResultSchema = z.object({
+  pageId: z.string().min(1).max(200),
+  status: z.enum(VALID_STATUSES),
+  tier: z.string().max(50).nullable().optional(),
+  durationMs: z.number().int().min(0).nullable().optional(),
+  errorMessage: z.string().max(5000).nullable().optional(),
+});
+
+const RecordRunSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().nullable().optional(),
+  trigger: z.enum(VALID_TRIGGERS),
+  budgetLimit: z.number().min(0).nullable().optional(),
+  budgetSpent: z.number().min(0).nullable().optional(),
+  sourcesChecked: z.number().int().min(0).nullable().optional(),
+  sourcesFailed: z.number().int().min(0).nullable().optional(),
+  itemsFetched: z.number().int().min(0).nullable().optional(),
+  itemsRelevant: z.number().int().min(0).nullable().optional(),
+  pagesPlanned: z.number().int().min(0).nullable().optional(),
+  pagesUpdated: z.number().int().min(0).nullable().optional(),
+  pagesFailed: z.number().int().min(0).nullable().optional(),
+  pagesSkipped: z.number().int().min(0).nullable().optional(),
+  newPagesCreated: z.array(z.string()).optional(),
+  results: z.array(ResultSchema).max(MAX_BATCH_SIZE).optional(),
+});
+
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 50 });
+
+// ---- Helpers ----
+
+/** Result row shape after JOIN with wiki_pages to recover slug. */
+type ResultWithSlug = {
+  runId: number | bigint;
+  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
+  status: string;
+  tier: string | null;
+  durationMs: number | null;
+  errorMessage: string | null;
+};
+
+/** Map a run row + its result rows to the API response shape. */
+function formatRunEntry(
+  r: typeof autoUpdateRuns.$inferSelect,
+  results: ResultWithSlug[]
+) {
+  return {
+    id: r.id,
+    date: r.date,
+    startedAt: r.startedAt,
+    completedAt: r.completedAt,
+    trigger: r.trigger,
+    budgetLimit: r.budgetLimit,
+    budgetSpent: r.budgetSpent,
+    sourcesChecked: r.sourcesChecked,
+    sourcesFailed: r.sourcesFailed,
+    itemsFetched: r.itemsFetched,
+    itemsRelevant: r.itemsRelevant,
+    pagesPlanned: r.pagesPlanned,
+    pagesUpdated: r.pagesUpdated,
+    pagesFailed: r.pagesFailed,
+    pagesSkipped: r.pagesSkipped,
+    newPagesCreated: r.newPagesCreated
+      ? (() => {
+          try {
+            return JSON.parse(r.newPagesCreated) as string[];
+          } catch (err) {
+            // Legacy format: comma-separated string from old seed script
+            logger.warn({ err: err instanceof Error ? err.message : String(err) }, "JSON parse failed for newPagesCreated, falling back to CSV");
+            return r.newPagesCreated.split(",").map(s => s.trim()).filter(Boolean);
+          }
+        })()
+      : [],
+    results: results
+      .filter((entry) => entry.pageSlug != null) // skip rows with no recoverable slug
+      .map((entry) => ({
+        pageId: entry.pageSlug!,
+        status: entry.status,
+        tier: entry.tier,
+        durationMs: entry.durationMs,
+        errorMessage: entry.errorMessage,
+      })),
+    createdAt: r.createdAt,
+  };
+}
+
+
+// ---- Route ----
+
+const autoUpdateRunsApp = new Hono()
+  // ---- POST / (record a complete run with results) ----
+  .post("/", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = RecordRunSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const d = parsed.data;
+    const db = getDrizzleDb();
+
+    // Use a Drizzle transaction to ensure atomicity of run + results insert.
+    // ON CONFLICT DO NOTHING makes this idempotent: re-syncing the same run
+    // (e.g., from YAML files) returns the existing record rather than duplicating it.
+    const result = await db.transaction(async (tx) => {
+      const runRow = await tx
+        .insert(autoUpdateRuns)
+        .values({
+          date: d.date,
+          startedAt: new Date(d.startedAt),
+          completedAt: d.completedAt ? new Date(d.completedAt) : null,
+          trigger: d.trigger,
+          budgetLimit: d.budgetLimit ?? null,
+          budgetSpent: d.budgetSpent ?? null,
+          sourcesChecked: d.sourcesChecked ?? null,
+          sourcesFailed: d.sourcesFailed ?? null,
+          itemsFetched: d.itemsFetched ?? null,
+          itemsRelevant: d.itemsRelevant ?? null,
+          pagesPlanned: d.pagesPlanned ?? null,
+          pagesUpdated: d.pagesUpdated ?? null,
+          pagesFailed: d.pagesFailed ?? null,
+          pagesSkipped: d.pagesSkipped ?? null,
+          newPagesCreated: d.newPagesCreated?.length
+            ? JSON.stringify(d.newPagesCreated)
+            : null,
+        })
+        .onConflictDoNothing({ target: autoUpdateRuns.startedAt }) // idempotent: skip duplicate startedAt
+        .returning({
+          id: autoUpdateRuns.id,
+          date: autoUpdateRuns.date,
+          startedAt: autoUpdateRuns.startedAt,
+          createdAt: autoUpdateRuns.createdAt,
+        });
+
+      // If conflict (duplicate startedAt), fetch the existing run's id
+      if (runRow.length === 0) {
+        const existing = await tx
+          .select({
+            id: autoUpdateRuns.id,
+            date: autoUpdateRuns.date,
+            startedAt: autoUpdateRuns.startedAt,
+            createdAt: autoUpdateRuns.createdAt,
+          })
+          .from(autoUpdateRuns)
+          .where(eq(autoUpdateRuns.startedAt, new Date(d.startedAt)))
+          .limit(1);
+        const run = firstOrThrow(existing, "auto-update run lookup after conflict");
+        return { ...run, resultsInserted: 0 };
+      }
+
+      const run = runRow[0];
+      let resultsInserted = 0;
+
+      if (d.results && d.results.length > 0) {
+        // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
+        const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
+        const intIdMap = await resolvePageIntIds(tx, resultPageIds);
+
+        await tx.insert(autoUpdateResults).values(
+          d.results.map((r) => ({
+            runId: run.id,
+            pageIdInt: intIdMap.get(r.pageId) ?? null,
+            status: r.status,
+            tier: r.tier ?? null,
+            durationMs: r.durationMs ?? null,
+            errorMessage: r.errorMessage ?? null,
+          }))
+        );
+        resultsInserted = d.results.length;
+      }
+
+      return { ...run, resultsInserted };
+    });
+
+    return c.json(result, 201);
+  })
+
+  // ---- GET /all (paginated list of runs) ----
+  .get("/all", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(autoUpdateRuns)
+      .orderBy(desc(autoUpdateRuns.startedAt))
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db
+      .select({ count: count() })
+      .from(autoUpdateRuns);
+    const total = countResult[0].count;
+
+    // Fetch all results for the page of runs in a single query.
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
+    const runIds = rows.map((r) => r.id);
+    const resultsByRun = new Map<number, ResultWithSlug[]>();
+
+    if (runIds.length > 0) {
+      const allResults = await db
+        .select({
+          runId: autoUpdateResults.runId,
+          pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+          status: autoUpdateResults.status,
+          tier: autoUpdateResults.tier,
+          durationMs: autoUpdateResults.durationMs,
+          errorMessage: autoUpdateResults.errorMessage,
+        })
+        .from(autoUpdateResults)
+        .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
+        .where(inArray(autoUpdateResults.runId, runIds));
+
+      for (const result of allResults) {
+        const rid = Number(result.runId);
+        const existing = resultsByRun.get(rid) || [];
+        existing.push(result);
+        resultsByRun.set(rid, existing);
+      }
+    }
+
+    const entries = rows.map((r) =>
+      formatRunEntry(r, resultsByRun.get(r.id) || [])
+    );
+
+    return c.json({ entries, total, limit, offset });
+  })
+
+  // ---- GET /stats (aggregate statistics) ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const totalResult = await db
+      .select({ count: count() })
+      .from(autoUpdateRuns);
+    const totalRuns = totalResult[0].count;
+
+    const budgetResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.budgetSpent}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalBudgetSpent = Number(budgetResult[0].total);
+
+    const updatedResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesUpdated}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalPagesUpdated = Number(updatedResult[0].total);
+
+    const failedResult = await db
+      .select({
+        total: sql<number>`coalesce(sum(${autoUpdateRuns.pagesFailed}), 0)`,
+      })
+      .from(autoUpdateRuns);
+    const totalPagesFailed = Number(failedResult[0].total);
+
+    const byTrigger = await db
+      .select({
+        trigger: autoUpdateRuns.trigger,
+        count: count(),
+      })
+      .from(autoUpdateRuns)
+      .groupBy(autoUpdateRuns.trigger);
+
+    return c.json({
+      totalRuns,
+      totalBudgetSpent,
+      totalPagesUpdated,
+      totalPagesFailed,
+      byTrigger: Object.fromEntries(
+        byTrigger.map((r) => [r.trigger, r.count])
+      ),
+    });
+  })
+
+  // ---- GET /:id (single run with results) ----
+  .get("/:id", async (c) => {
+    const id = parseInt(c.req.param("id"), 10);
+    if (isNaN(id)) return validationError(c, "id must be a number");
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(autoUpdateRuns)
+      .where(eq(autoUpdateRuns.id, id));
+
+    if (rows.length === 0) {
+      return notFoundError(c, "Run not found");
+    }
+
+    const r = rows[0];
+    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    const results = await db
+      .select({
+        runId: autoUpdateResults.runId,
+        pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+        status: autoUpdateResults.status,
+        tier: autoUpdateResults.tier,
+        durationMs: autoUpdateResults.durationMs,
+        errorMessage: autoUpdateResults.errorMessage,
+      })
+      .from(autoUpdateResults)
+      .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
+      .where(eq(autoUpdateResults.runId, r.id));
+
+    return c.json(formatRunEntry(r, results));
+  });
+
+export const autoUpdateRunsRoute = autoUpdateRunsApp;
+export type AutoUpdateRunsRoute = typeof autoUpdateRunsApp;

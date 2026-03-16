@@ -263,7 +263,7 @@ let app: Hono;
 beforeEach(async () => {
   resetStores();
   const { recordVerificationsRoute } = await import(
-    "../routes/record-verifications.js"
+    "../routes/tablebase/record-verifications.js"
   );
   app = new Hono().route(
     "/api/record-verifications",

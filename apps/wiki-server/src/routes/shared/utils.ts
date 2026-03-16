@@ -1,0 +1,153 @@
+import type { Context } from "hono";
+import { validator } from "hono/validator";
+import { z } from "zod";
+import { logger as rootLogger } from "../../logger.js";
+
+const logger = rootLogger.child({ component: "db" });
+
+/**
+ * Create a PaginationQuery schema with configurable limits.
+ * Each route can call this with its own defaults while sharing the base shape.
+ */
+export function paginationQuery(opts?: {
+  maxLimit?: number;
+  defaultLimit?: number;
+}) {
+  const { maxLimit = 200, defaultLimit = 50 } = opts ?? {};
+  return z.object({
+    limit: z.coerce.number().int().min(1).max(maxLimit).default(defaultLimit),
+    offset: z.coerce.number().int().min(0).default(0),
+  });
+}
+
+/**
+ * Zod refine check: rejects arrays with duplicate `id` values.
+ * Use with `.refine(noDuplicateIds, { message: "Duplicate id values in items array" })`.
+ */
+export function noDuplicateIds(items: { id: string }[]) {
+  return new Set(items.map((i) => i.id)).size === items.length;
+}
+
+/** Standard error codes for 400 responses. */
+export const VALIDATION_ERROR = "validation_error" as const;
+export const INVALID_JSON_ERROR = "invalid_json" as const;
+
+/** Safely parse JSON body, returning null on parse failure. */
+export function parseJsonBody(c: Context) {
+  return c.req.json().catch(() => null);
+}
+
+/** Return a 400 validation error response. */
+export function validationError(c: Context, message: string) {
+  return c.json({ error: VALIDATION_ERROR, message }, 400);
+}
+
+/** Return a 400 invalid JSON error response. */
+export function invalidJsonError(c: Context) {
+  return c.json(
+    { error: INVALID_JSON_ERROR, message: "Request body must be valid JSON" },
+    400
+  );
+}
+
+/** Return a 404 not found error response. */
+export function notFoundError(c: Context, message: string) {
+  return c.json({ error: "not_found", message }, 404);
+}
+
+/** Return a 500 database error response, logging the underlying error. */
+export function dbError(
+  c: Context,
+  operation: string,
+  err: unknown,
+  context?: Record<string, unknown>
+) {
+  logger.error({
+    operation,
+    ...(context ?? {}),
+    err: err instanceof Error ? err.message : String(err),
+  }, `${operation} failed`);
+  return c.json({ error: "database_error", message: `${operation} failed` }, 500);
+}
+
+/** Extract the first row from a query result, throwing if empty. */
+export function firstOrThrow<T>(rows: T[], context: string): T {
+  if (rows.length === 0) {
+    throw new Error(`Expected at least one row (${context})`);
+  }
+  return rows[0];
+}
+
+/** Escape SQL ILIKE/LIKE wildcard metacharacters: %, _, and \ */
+export function escapeIlike(s: string): string {
+  return s.replace(/[%_\\]/g, "\\$&");
+}
+
+/**
+ * Parse a value that may be a scalar number, a JSON array range [low, high],
+ * or a plain numeric string into { low, high } numeric bounds.
+ *
+ * - Plain number (42 or "42") → { low: "42", high: "42" }
+ * - JSON array string "[0.07, 0.15]" → { low: "0.07", high: "0.15" }
+ * - Array [0.07, 0.15] → { low: "0.07", high: "0.15" }
+ * - null/undefined/unparseable → { low: null, high: null }
+ *
+ * Returns strings suitable for NUMERIC column insertion via Drizzle.
+ */
+export function parseRange(value: unknown): { low: string | null; high: string | null } {
+  if (value == null) return { low: null, high: null };
+  if (typeof value === "string" && value.trim() === "") return { low: null, high: null };
+
+  // Already an array (e.g., from JSON parse)
+  if (Array.isArray(value) && value.length === 2) {
+    const lo = Number(value[0]);
+    const hi = Number(value[1]);
+    if (!isNaN(lo) && !isNaN(hi)) {
+      return { low: String(lo), high: String(hi) };
+    }
+    return { low: null, high: null };
+  }
+
+  // String that looks like a JSON array
+  if (typeof value === "string" && value.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.length === 2) {
+        const lo = Number(parsed[0]);
+        const hi = Number(parsed[1]);
+        if (!isNaN(lo) && !isNaN(hi)) {
+          return { low: String(lo), high: String(hi) };
+        }
+      }
+    } catch {
+      // Not valid JSON, fall through
+    }
+    return { low: null, high: null };
+  }
+
+  // Plain number or numeric string
+  const n = Number(value);
+  if (!isNaN(n)) {
+    const s = String(n);
+    return { low: s, high: s };
+  }
+
+  return { low: null, high: null };
+}
+
+/**
+ * Zod validator helper for Hono query params.
+ * Uses Hono's built-in validator to preserve RPC type inference in method-chained routes.
+ */
+export function zv<T extends z.ZodType>(target: "query", schema: T) {
+  return validator(target, (value, c) => {
+    const result = schema.safeParse(value);
+    if (!result.success) {
+      return c.json(
+        { error: VALIDATION_ERROR, message: result.error.message },
+        400
+      );
+    }
+    return result.data as z.infer<T>;
+  });
+}

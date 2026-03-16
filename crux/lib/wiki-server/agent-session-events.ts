@@ -10,7 +10,7 @@
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { AgentSessionEventsRoute } from '../../../apps/wiki-server/src/routes/agent-session-events.ts';
+import type { AgentSessionEventsRoute } from '../../../apps/wiki-server/src/routes/operational/agent-session-events.ts';
 import type { CreateAgentEvent } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------

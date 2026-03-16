@@ -7,7 +7,7 @@
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/citations.ts';
+import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/wikibase/citations.ts';
 import type {
   UpsertCitationQuote,
   AccuracyVerdict as AccuracyVerdictType,

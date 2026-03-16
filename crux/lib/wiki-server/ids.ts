@@ -9,7 +9,7 @@
  */
 
 import type { hc, InferResponseType } from 'hono/client';
-import type { IdsRoute } from '../../../apps/wiki-server/src/routes/ids.ts';
+import type { IdsRoute } from '../../../apps/wiki-server/src/routes/tablebase/ids.ts';
 import { apiRequest, getServerUrl, type ApiResult } from './client.ts';
 
 // ---------------------------------------------------------------------------
@@ -31,7 +31,7 @@ export type IdListResult = InferResponseType<RpcClient['index']['$get'], 200>;
 // Constants
 // ---------------------------------------------------------------------------
 
-/** Must match server-side limit in apps/wiki-server/src/routes/ids.ts */
+/** Must match server-side limit in apps/wiki-server/src/routes/tablebase/ids.ts */
 const BATCH_CHUNK_SIZE = 50;
 
 // ---------------------------------------------------------------------------

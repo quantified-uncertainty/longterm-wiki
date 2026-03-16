@@ -14,24 +14,24 @@
 
 import type { hc, InferResponseType } from 'hono/client';
 
-// Route type imports
-import type { CitationsRoute } from './routes/citations.js';
-import type { SessionsRoute } from './routes/sessions.js';
-import type { AgentSessionsRoute } from './routes/agent-sessions.js';
-import type { ActiveAgentsRoute } from './routes/active-agents.js';
-import type { AgentSessionEventsRoute } from './routes/agent-session-events.js';
-import type { ArtifactsRoute } from './routes/artifacts.js';
-import type { AutoUpdateRunsRoute } from './routes/auto-update-runs.js';
-import type { AutoUpdateNewsRoute } from './routes/auto-update-news.js';
-import type { LinksRoute } from './routes/links.js';
-import type { HallucinationRiskRoute } from './routes/hallucination-risk.js';
-import type { ExploreRoute } from './routes/explore.js';
-import type { FactsRoute } from './routes/facts.js';
-import type { EntitiesRoute } from './routes/entities.js';
-import type { PagesRoute } from './routes/pages.js';
-import type { GroundskeeperRunsRoute } from './routes/groundskeeper-runs.js';
-import type { MonitoringRoute } from './routes/monitoring.js';
-import type { GithubPullsRoute } from './routes/github-pulls.js';
+// Route type imports — organized by Three Bases
+import type { CitationsRoute } from './routes/wikibase/citations.js';
+import type { LinksRoute } from './routes/wikibase/links.js';
+import type { HallucinationRiskRoute } from './routes/wikibase/hallucination-risk.js';
+import type { ExploreRoute } from './routes/wikibase/explore.js';
+import type { PagesRoute } from './routes/wikibase/pages.js';
+import type { FactsRoute } from './routes/factbase/facts.js';
+import type { EntitiesRoute } from './routes/tablebase/entities.js';
+import type { SessionsRoute } from './routes/operational/sessions.js';
+import type { AgentSessionsRoute } from './routes/operational/agent-sessions.js';
+import type { ActiveAgentsRoute } from './routes/operational/active-agents.js';
+import type { AgentSessionEventsRoute } from './routes/operational/agent-session-events.js';
+import type { ArtifactsRoute } from './routes/operational/artifacts.js';
+import type { AutoUpdateRunsRoute } from './routes/operational/auto-update-runs.js';
+import type { AutoUpdateNewsRoute } from './routes/operational/auto-update-news.js';
+import type { GroundskeeperRunsRoute } from './routes/operational/groundskeeper-runs.js';
+import type { MonitoringRoute } from './routes/operational/monitoring.js';
+import type { GithubPullsRoute } from './routes/operational/github-pulls.js';
 
 // ---------------------------------------------------------------------------
 // RPC client phantom types (compile-time only)

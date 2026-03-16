@@ -8,7 +8,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { UpsertSummary } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { SummariesRoute } from '../../../apps/wiki-server/src/routes/summaries.ts';
+import type { SummariesRoute } from '../../../apps/wiki-server/src/routes/wikibase/summaries.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)

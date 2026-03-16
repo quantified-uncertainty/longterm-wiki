@@ -11,7 +11,7 @@ import type {
   PageCitationInsert,
 } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { ReferencesRoute } from '../../../apps/wiki-server/src/routes/references.ts';
+import type { ReferencesRoute } from '../../../apps/wiki-server/src/routes/wikibase/references.ts';
 
 // ---------------------------------------------------------------------------
 // Inferred response types from Hono RPC
