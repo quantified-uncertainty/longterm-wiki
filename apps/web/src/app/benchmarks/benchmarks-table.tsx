@@ -189,7 +189,7 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
 
                 {/* Category */}
                 <td className="py-2.5 px-3">
-                  {row.category && (
+                  {row.category ? (
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                         CATEGORY_COLORS[row.category] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
@@ -197,27 +197,29 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
                     >
                       {row.category.charAt(0).toUpperCase() + row.category.slice(1)}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
 
                 {/* Models Count */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
-                  {row.modelsCount > 0 ? row.modelsCount : ""}
+                  {row.modelsCount > 0 ? row.modelsCount : <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Scoring */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
-                  {row.scoringMethod ?? ""}
+                  {row.scoringMethod ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Introduced */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
-                  {row.introducedDate ?? ""}
+                  {row.introducedDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Maintainer */}
                 <td className="py-2.5 px-3 text-muted-foreground">
-                  {row.maintainer ?? ""}
+                  {row.maintainer ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
               </tr>
             ))}
