@@ -84,6 +84,57 @@ export function escapeIlike(s: string): string {
 }
 
 /**
+ * Parse a value that may be a scalar number, a JSON array range [low, high],
+ * or a plain numeric string into { low, high } numeric bounds.
+ *
+ * - Plain number (42 or "42") → { low: "42", high: "42" }
+ * - JSON array string "[0.07, 0.15]" → { low: "0.07", high: "0.15" }
+ * - Array [0.07, 0.15] → { low: "0.07", high: "0.15" }
+ * - null/undefined/unparseable → { low: null, high: null }
+ *
+ * Returns strings suitable for NUMERIC column insertion via Drizzle.
+ */
+export function parseRange(value: unknown): { low: string | null; high: string | null } {
+  if (value == null) return { low: null, high: null };
+
+  // Already an array (e.g., from JSON parse)
+  if (Array.isArray(value) && value.length === 2) {
+    const lo = Number(value[0]);
+    const hi = Number(value[1]);
+    if (!isNaN(lo) && !isNaN(hi)) {
+      return { low: String(lo), high: String(hi) };
+    }
+    return { low: null, high: null };
+  }
+
+  // String that looks like a JSON array
+  if (typeof value === "string" && value.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.length === 2) {
+        const lo = Number(parsed[0]);
+        const hi = Number(parsed[1]);
+        if (!isNaN(lo) && !isNaN(hi)) {
+          return { low: String(lo), high: String(hi) };
+        }
+      }
+    } catch {
+      // Not valid JSON, fall through
+    }
+    return { low: null, high: null };
+  }
+
+  // Plain number or numeric string
+  const n = Number(value);
+  if (!isNaN(n)) {
+    const s = String(n);
+    return { low: s, high: s };
+  }
+
+  return { low: null, high: null };
+}
+
+/**
  * Zod validator helper for Hono query params.
  * Uses Hono's built-in validator to preserve RPC type inference in method-chained routes.
  */

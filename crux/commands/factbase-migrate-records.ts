@@ -117,7 +117,11 @@ interface FundingRoundRow {
   name: string;
   date: string | null;
   raised: number | null;
+  raisedLow: number | null;
+  raisedHigh: number | null;
   valuation: number | null;
+  valuationLow: number | null;
+  valuationHigh: number | null;
   instrument: string | null;
   leadInvestor: string | null;
   source: string | null;
@@ -131,7 +135,11 @@ interface InvestmentRow {
   roundName: string | null;
   date: string | null;
   amount: number | null;
+  amountLow: number | null;
+  amountHigh: number | null;
   stakeAcquired: string | null;
+  stakeLow: number | null;
+  stakeHigh: number | null;
   instrument: string | null;
   role: string | null;
   conditions: string | null;
@@ -144,6 +152,8 @@ interface EquityPositionRow {
   companyId: string;
   holderId: string;
   stake: string | null;
+  stakeLow: number | null;
+  stakeHigh: number | null;
   source: string | null;
   notes: string | null;
   asOf: string | null;
@@ -278,6 +288,8 @@ export function mapFundingRound(
   ownerEntityId: string,
 ): FundingRoundRow {
   const f = record.fields;
+  const raisedBounds = parseRangeBounds(f.raised);
+  const valuationBounds = parseRangeBounds(f.valuation);
 
   return {
     id: fundingRoundId(record.ownerEntityId, record.key),
@@ -285,7 +297,11 @@ export function mapFundingRound(
     name: String(f.name ?? record.key),
     date: f.date != null ? String(f.date) : null,
     raised: f.raised != null ? Number(f.raised) : null,
+    raisedLow: raisedBounds.low,
+    raisedHigh: raisedBounds.high,
     valuation: f.valuation != null ? Number(f.valuation) : null,
+    valuationLow: valuationBounds.low,
+    valuationHigh: valuationBounds.high,
     instrument: f.instrument != null ? String(f.instrument) : null,
     leadInvestor: f.lead_investor != null ? resolveEntityId(graph, String(f.lead_investor)) : null,
     source: f.source != null ? String(f.source) : null,
@@ -307,6 +323,41 @@ export function parseNumericOrRange(value: unknown): number | null {
   return isNaN(n) ? null : n;
 }
 
+/**
+ * Parse a value that may be a scalar number or an array range [min, max]
+ * into { low, high } bounds.
+ *
+ * - Scalar 42 → { low: 42, high: 42 }
+ * - Array [0.07, 0.15] → { low: 0.07, high: 0.15 }
+ * - null/undefined → { low: null, high: null }
+ */
+export function parseRangeBounds(value: unknown): { low: number | null; high: number | null } {
+  if (value == null) return { low: null, high: null };
+  if (Array.isArray(value) && value.length === 2) {
+    const lo = Number(value[0]);
+    const hi = Number(value[1]);
+    if (!isNaN(lo) && !isNaN(hi)) return { low: lo, high: hi };
+    return { low: null, high: null };
+  }
+  // String that looks like a JSON array
+  if (typeof value === "string" && value.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.length === 2) {
+        const lo = Number(parsed[0]);
+        const hi = Number(parsed[1]);
+        if (!isNaN(lo) && !isNaN(hi)) return { low: lo, high: hi };
+      }
+    } catch {
+      // Not valid JSON, fall through
+    }
+    return { low: null, high: null };
+  }
+  const n = Number(value);
+  if (!isNaN(n)) return { low: n, high: n };
+  return { low: null, high: null };
+}
+
 export function mapInvestment(
   record: RecordEntry,
   graph: Graph,
@@ -316,6 +367,8 @@ export function mapInvestment(
   const investorId = f.investor
     ? resolveEntityId(graph, String(f.investor))
     : record.displayName ?? record.key;
+  const amountBounds = parseRangeBounds(f.amount);
+  const stakeBounds = parseRangeBounds(f.stake_acquired);
 
   return {
     id: investmentId(record.ownerEntityId, record.key),
@@ -324,7 +377,11 @@ export function mapInvestment(
     roundName: f.round_name != null ? String(f.round_name) : null,
     date: f.date != null ? String(f.date) : null,
     amount: parseNumericOrRange(f.amount),
+    amountLow: amountBounds.low,
+    amountHigh: amountBounds.high,
     stakeAcquired: serializeStakeValue(f.stake_acquired),
+    stakeLow: stakeBounds.low,
+    stakeHigh: stakeBounds.high,
     instrument: f.instrument != null ? String(f.instrument) : null,
     role: f.role != null ? String(f.role) : null,
     conditions: f.conditions != null ? String(f.conditions) : null,
@@ -342,12 +399,15 @@ export function mapEquityPosition(
   const holderId = f.holder
     ? resolveEntityId(graph, String(f.holder))
     : record.displayName ?? record.key;
+  const stakeBounds = parseRangeBounds(f.stake);
 
   return {
     id: equityPositionId(record.ownerEntityId, record.key),
     companyId: ownerEntityId,
     holderId,
     stake: serializeStakeValue(f.stake),
+    stakeLow: stakeBounds.low,
+    stakeHigh: stakeBounds.high,
     source: f.source != null ? String(f.source) : null,
     notes: f.notes != null ? String(f.notes) : null,
     asOf: record.asOf ?? null,

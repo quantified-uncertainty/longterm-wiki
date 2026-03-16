@@ -17,6 +17,7 @@ import {
   resolveEntityId,
   serializeStakeValue,
   parseNumericOrRange,
+  parseRangeBounds,
   mapKeyPerson,
   mapBoardSeat,
   mapCareerHistory,
@@ -846,5 +847,183 @@ describe('edge cases', () => {
     const row = mapGrant(record, graph, 'owner');
     expect(row.id).toHaveLength(10);
     expect(row.name).toBe('');
+  });
+});
+
+// ── parseRangeBounds ────────────────────────────────────────────────────
+
+describe('parseRangeBounds', () => {
+  it('returns nulls for null', () => {
+    expect(parseRangeBounds(null)).toEqual({ low: null, high: null });
+  });
+
+  it('returns nulls for undefined', () => {
+    expect(parseRangeBounds(undefined)).toEqual({ low: null, high: null });
+  });
+
+  it('parses a plain number as low = high', () => {
+    expect(parseRangeBounds(42)).toEqual({ low: 42, high: 42 });
+  });
+
+  it('parses a numeric string as low = high', () => {
+    expect(parseRangeBounds('2500000')).toEqual({ low: 2500000, high: 2500000 });
+  });
+
+  it('parses a two-element array into low/high', () => {
+    expect(parseRangeBounds([0.07, 0.15])).toEqual({ low: 0.07, high: 0.15 });
+  });
+
+  it('parses a JSON array string into low/high', () => {
+    expect(parseRangeBounds('[0.07, 0.15]')).toEqual({ low: 0.07, high: 0.15 });
+  });
+
+  it('returns nulls for non-numeric string', () => {
+    expect(parseRangeBounds('not-a-number')).toEqual({ low: null, high: null });
+  });
+
+  it('returns nulls for non-numeric array', () => {
+    expect(parseRangeBounds(['abc', 'def'])).toEqual({ low: null, high: null });
+  });
+
+  it('handles zero correctly', () => {
+    expect(parseRangeBounds(0)).toEqual({ low: 0, high: 0 });
+  });
+
+  it('handles large numbers', () => {
+    expect(parseRangeBounds([1_000_000_000, 2_000_000_000])).toEqual({
+      low: 1_000_000_000,
+      high: 2_000_000_000,
+    });
+  });
+});
+
+// ── Low/high fields in mapping functions ────────────────────────────────
+
+describe('range columns in mapFundingRound', () => {
+  const graph = makeGraph([ANTHROPIC, SEQUOIA]);
+
+  it('populates raisedLow/raisedHigh for scalar raised', () => {
+    const record = makeRecord({
+      key: 'series-a',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: { name: 'Series A', raised: 100_000_000, valuation: 500_000_000 },
+    });
+
+    const row = mapFundingRound(record, graph, 'mK9pX3rQ7n');
+    expect(row.raisedLow).toBe(100_000_000);
+    expect(row.raisedHigh).toBe(100_000_000);
+    expect(row.valuationLow).toBe(500_000_000);
+    expect(row.valuationHigh).toBe(500_000_000);
+  });
+
+  it('sets low/high to null when raised/valuation are null', () => {
+    const record = makeRecord({
+      key: 'seed',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: { name: 'Seed' },
+    });
+
+    const row = mapFundingRound(record, graph, 'mK9pX3rQ7n');
+    expect(row.raisedLow).toBeNull();
+    expect(row.raisedHigh).toBeNull();
+    expect(row.valuationLow).toBeNull();
+    expect(row.valuationHigh).toBeNull();
+  });
+});
+
+describe('range columns in mapInvestment', () => {
+  const graph = makeGraph([ANTHROPIC, SEQUOIA]);
+
+  it('populates stakeLow/stakeHigh for array stake_acquired', () => {
+    const record = makeRecord({
+      key: 'range-stake',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        investor: 'sEq01a2b3c',
+        stake_acquired: [0.07, 0.15],
+      },
+    });
+
+    const row = mapInvestment(record, graph, 'mK9pX3rQ7n');
+    expect(row.stakeLow).toBe(0.07);
+    expect(row.stakeHigh).toBe(0.15);
+  });
+
+  it('populates amountLow/amountHigh for scalar amount', () => {
+    const record = makeRecord({
+      key: 'scalar-inv',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        investor: 'sEq01a2b3c',
+        amount: 500_000_000,
+      },
+    });
+
+    const row = mapInvestment(record, graph, 'mK9pX3rQ7n');
+    expect(row.amountLow).toBe(500_000_000);
+    expect(row.amountHigh).toBe(500_000_000);
+  });
+
+  it('populates amountLow/amountHigh for range amount', () => {
+    const record = makeRecord({
+      key: 'range-inv',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        investor: 'sEq01a2b3c',
+        amount: [100_000_000, 200_000_000],
+      },
+    });
+
+    const row = mapInvestment(record, graph, 'mK9pX3rQ7n');
+    expect(row.amountLow).toBe(100_000_000);
+    expect(row.amountHigh).toBe(200_000_000);
+  });
+});
+
+describe('range columns in mapEquityPosition', () => {
+  const graph = makeGraph([ANTHROPIC, SEQUOIA]);
+
+  it('populates stakeLow/stakeHigh for array stake', () => {
+    const record = makeRecord({
+      key: 'range-equity',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        holder: 'sEq01a2b3c',
+        stake: [0.10, 0.20],
+      },
+    });
+
+    const row = mapEquityPosition(record, graph, 'mK9pX3rQ7n');
+    expect(row.stakeLow).toBe(0.10);
+    expect(row.stakeHigh).toBe(0.20);
+  });
+
+  it('populates stakeLow/stakeHigh for scalar stake', () => {
+    const record = makeRecord({
+      key: 'scalar-equity',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        holder: 'sEq01a2b3c',
+        stake: 0.15,
+      },
+    });
+
+    const row = mapEquityPosition(record, graph, 'mK9pX3rQ7n');
+    expect(row.stakeLow).toBe(0.15);
+    expect(row.stakeHigh).toBe(0.15);
+  });
+
+  it('sets stakeLow/stakeHigh to null when stake is null', () => {
+    const record = makeRecord({
+      key: 'null-equity',
+      ownerEntityId: 'mK9pX3rQ7n',
+      fields: {
+        holder: 'sEq01a2b3c',
+      },
+    });
+
+    const row = mapEquityPosition(record, graph, 'mK9pX3rQ7n');
+    expect(row.stakeLow).toBeNull();
+    expect(row.stakeHigh).toBeNull();
   });
 });
