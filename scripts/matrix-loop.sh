@@ -21,6 +21,7 @@
 #   - Each iteration is one page, one commit
 #   - Validation gate must pass before commit
 #   - Errors in one iteration don't stop the loop (logged and skipped)
+#   - Internal pages are auto-skipped (not counted toward iterations)
 #   - Total cost depends on tier × iterations ($2-3/page polish, $5-8 standard, $15-25 deep)
 
 set -euo pipefail
@@ -55,9 +56,13 @@ fi
 SUCCEEDED=0
 FAILED=0
 SKIPPED=0
+MAX_TOTAL_ATTEMPTS=50  # Safety limit to prevent infinite loops
 
-for i in $(seq 1 "$MAX_ITERATIONS"); do
-  echo -e "${BOLD}━━━ Iteration $i/$MAX_ITERATIONS ━━━${RESET}"
+ATTEMPT=0
+while [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ] && [ "$ATTEMPT" -lt "$MAX_TOTAL_ATTEMPTS" ]; do
+  ATTEMPT=$((ATTEMPT + 1))
+
+  echo -e "${BOLD}━━━ Iteration $((SUCCEEDED + 1))/$MAX_ITERATIONS (attempt $ATTEMPT) ━━━${RESET}"
 
   # Get next task
   TASK_JSON=$(pnpm --silent crux matrix next-task --dimension="$DIMENSION" --format=json 2>/dev/null)
@@ -88,7 +93,8 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
   if pnpm crux content improve "$PAGE_SLUG" --tier="$TIER" --apply --skip-session-log 2>&1; then
     echo -e "${GREEN}✓ Content improved${RESET}"
   else
-    echo -e "${YELLOW}⚠ Content improve failed for $PAGE_ID, skipping${RESET}"
+    echo -e "${YELLOW}⚠ Content improve failed for $PAGE_SLUG ($PAGE_ID), skipping${RESET}"
+    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
     FAILED=$((FAILED + 1))
     continue
   fi
@@ -103,8 +109,9 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
   if pnpm crux validate gate --fix 2>&1; then
     echo -e "${GREEN}✓ Gate passed${RESET}"
   else
-    echo -e "${YELLOW}⚠ Gate failed for $PAGE_ID, reverting and skipping${RESET}"
+    echo -e "${YELLOW}⚠ Gate failed for $PAGE_SLUG ($PAGE_ID), reverting and skipping${RESET}"
     git checkout -- . 2>/dev/null || true
+    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
     FAILED=$((FAILED + 1))
     continue
   fi
@@ -114,6 +121,7 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
   CHANGES=$(git diff --cached --stat | tail -1)
   if [ -z "$CHANGES" ]; then
     echo -e "${DIM}No changes to commit, skipping${RESET}"
+    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
     SKIPPED=$((SKIPPED + 1))
     continue
   fi
@@ -122,7 +130,6 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
 Improve ${PAGE_TITLE} (${PAGE_ID}) via matrix loop
 
 Tier: ${TIER} | Dimension: ${DIMENSION} | Impact: ${IMPACT}
-Iteration ${i}/${MAX_ITERATIONS} of matrix content loop.
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 EOF
@@ -136,7 +143,7 @@ EOF
   SUCCEEDED=$((SUCCEEDED + 1))
 
   # Rebuild data for next iteration (so scores are fresh)
-  if [ "$i" -lt "$MAX_ITERATIONS" ]; then
+  if [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ]; then
     echo -e "${DIM}Rebuilding data for next iteration...${RESET}"
     pnpm build-data:content 2>&1 | tail -1 || true
   fi
@@ -146,4 +153,4 @@ done
 
 echo -e "${BOLD}━━━ Loop Complete ━━━${RESET}"
 echo -e "Succeeded: ${GREEN}$SUCCEEDED${RESET} | Failed: ${RED}$FAILED${RESET} | Skipped: ${DIM}$SKIPPED${RESET}"
-echo -e "Total iterations: $((SUCCEEDED + FAILED + SKIPPED))/$MAX_ITERATIONS"
+echo -e "Total attempts: $ATTEMPT"
