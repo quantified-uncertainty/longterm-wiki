@@ -5,12 +5,13 @@
  * and run LLM agents with web search to fill gaps.
  *
  * Usage:
- *   crux tablebase scan       Show per-table completeness scores
- *   crux tablebase gaps       Ranked list of missing data
- *   crux tablebase next-task  Single highest-impact task (JSON)
- *   crux tablebase improve    Run LLM agent for one task
- *   crux tablebase mark-done  Exclude from future picks
- *   crux tablebase loop       Autonomous multi-task loop
+ *   crux tablebase scan           Show per-table completeness scores
+ *   crux tablebase gaps           Ranked list of missing data
+ *   crux tablebase next-task      Single highest-impact task (JSON)
+ *   crux tablebase improve        Run LLM agent for one task
+ *   crux tablebase mark-done      Exclude from future picks
+ *   crux tablebase loop           Autonomous multi-task loop
+ *   crux tablebase sync-careers   Sync FactBase career data to personnel table
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -807,6 +808,100 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
   };
 }
 
+// ---------------------------------------------------------------------------
+// sync-careers: Extract career data from FactBase and upsert to personnel table
+// ---------------------------------------------------------------------------
+
+const PERSONNEL_SYNC_BATCH_SIZE = 200;
+
+async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { extractAllCareers } = await import('../lib/career-import/extract.ts');
+  const { apiRequest, getServerUrl } = await import('../lib/wiki-server/client.ts');
+
+  const dryRun = !!options.dryRun;
+  const serverUrl = getServerUrl();
+
+  console.log('Extracting career data from FactBase...');
+  const { entries, stats } = extractAllCareers();
+
+  console.log(`\nExtraction stats:`);
+  console.log(`  From KB records:    ${stats.fromRecords}`);
+  console.log(`  From KB facts:      ${stats.fromFacts}`);
+  console.log(`  From experts.yaml:  ${stats.fromExperts}`);
+  console.log(`  Before dedup:       ${stats.totalBeforeDedup}`);
+  console.log(`  After dedup:        ${stats.totalAfterDedup}`);
+  console.log(`  Unique persons:     ${stats.uniquePersons}`);
+  console.log(`  Unique orgs:        ${stats.uniqueOrgs}`);
+
+  if (entries.length === 0) {
+    return { exitCode: 0, output: 'No career entries to sync.' };
+  }
+
+  if (dryRun) {
+    console.log(`\n(dry run -- no data written)`);
+    for (const e of entries.slice(0, 20)) {
+      console.log(`  ${e.id}  ${e.personId} -> ${e.organizationId}  "${e.role}"  [${e.origin}]`);
+    }
+    if (entries.length > 20) {
+      console.log(`  ... and ${entries.length - 20} more`);
+    }
+    return { exitCode: 0, output: `\nDry run: ${entries.length} career entries would be synced.` };
+  }
+
+  if (!serverUrl) {
+    return {
+      exitCode: 1,
+      output: 'wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod.',
+    };
+  }
+
+  // Convert CareerEntry -> personnel sync format (roleType = "career")
+  const syncItems = entries.map((e) => ({
+    id: e.id,
+    personId: e.personId,
+    organizationId: e.organizationId,
+    role: e.role,
+    roleType: 'career' as const,
+    startDate: e.startDate,
+    endDate: e.endDate,
+    isFounder: e.isFounder,
+    source: e.source,
+    notes: e.notes,
+  }));
+
+  // Send in batches (server accepts max 500 per request)
+  let totalUpserted = 0;
+  const batches = Math.ceil(syncItems.length / PERSONNEL_SYNC_BATCH_SIZE);
+
+  console.log(`\nSyncing ${syncItems.length} career entries to ${serverUrl} in ${batches} batch(es)...`);
+
+  for (let i = 0; i < syncItems.length; i += PERSONNEL_SYNC_BATCH_SIZE) {
+    const batch = syncItems.slice(i, i + PERSONNEL_SYNC_BATCH_SIZE);
+    const batchNum = Math.floor(i / PERSONNEL_SYNC_BATCH_SIZE) + 1;
+
+    const result = await apiRequest<{ upserted: number }>(
+      'POST',
+      '/api/personnel/sync',
+      { items: batch },
+    );
+
+    if (result.ok) {
+      totalUpserted += result.data.upserted;
+      console.log(`  Batch ${batchNum}/${batches}: upserted ${result.data.upserted} records`);
+    } else {
+      return {
+        exitCode: 1,
+        output: `Batch ${batchNum} failed: ${result.message}`,
+      };
+    }
+  }
+
+  return {
+    exitCode: 0,
+    output: `\nSynced ${totalUpserted} career entries to personnel table.`,
+  };
+}
+
 export const commands = {
   scan: scanCommand,
   gaps: gapsCommand,
@@ -822,6 +917,7 @@ export const commands = {
   'fetch-page': fetchPageCommand,
   verify: verifyCommand,
   prepare: prepareCommand,
+  'sync-careers': syncCareersCommand,
   default: scanCommand,
 };
 
@@ -830,16 +926,17 @@ export function getHelp(): string {
 TableBase Domain — Structured data enrichment via LLM agents
 
 Commands:
-  scan        Show per-table completeness scores
-  gaps        Ranked list of missing data (enrichment targets)
-  next-task   Output the single highest-impact task
-  improve     Run LLM agent for one task (uses ANTHROPIC_API_KEY)
-  mark-done   Mark a task as completed (excluded from future picks)
-  loop        Autonomous multi-task enrichment loop (uses ANTHROPIC_API_KEY)
-  resolve       Resolve entity name to stableId (for Claude Code skill)
-  create-entity Create a new entity (person, org, etc.) with allocated ID
-  submit        Submit records to a table (for Claude Code skill)
-  existing      Query existing records for an entity (for Claude Code skill)
+  scan           Show per-table completeness scores
+  gaps           Ranked list of missing data (enrichment targets)
+  next-task      Output the single highest-impact task
+  improve        Run LLM agent to enrich data for one task
+  mark-done      Mark a task as completed (excluded from future picks)
+  loop           Autonomous multi-task enrichment loop
+  resolve        Resolve entity name to stableId (for Claude Code skill)
+  create-entity  Create a new entity (person, org, etc.) with allocated ID
+  submit         Submit records to a table (for Claude Code skill)
+  existing       Query existing records for an entity (for Claude Code skill)
+  sync-careers   Sync FactBase career data to the personnel table
 
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing
@@ -865,15 +962,18 @@ Task Types:
   benchmark-result-fill      Add benchmark scores for AI models
 
 Examples:
-  crux tablebase scan                                 # Overview of all tables
-  crux tablebase gaps --top=10                        # Top 10 enrichment targets
-  crux tablebase next-task --format=json              # JSON for scripting
-  crux tablebase improve abc123def --dry-run          # API mode: test run
-  crux tablebase loop --max=3 --budget=10             # API mode: 3-task loop
-  crux tablebase resolve "OpenAI"                     # Resolve name → stableId
-  crux tablebase resolve "OpenAI" --ci                # JSON output
+  crux tablebase scan                                   # Overview of all tables
+  crux tablebase gaps --top=10                          # Top 10 enrichment targets
+  crux tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
+  crux tablebase next-task --format=json                # JSON for scripting
+  crux tablebase improve abc123def --dry-run            # Test run without writing
+  crux tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
+  crux tablebase resolve "OpenAI"                       # Resolve name → stableId
+  crux tablebase resolve "OpenAI" --ci                  # JSON output
   crux tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tablebase submit --table=personnel  # Submit records via pipe
-  crux tablebase mark-done abc123def                  # Exclude from future runs
+  crux tablebase mark-done abc123def                    # Exclude from future runs
+  crux tablebase sync-careers                           # Populate personnel table from FactBase
+  crux tablebase sync-careers --dry-run                 # Preview extraction without writing
 `;
 }
