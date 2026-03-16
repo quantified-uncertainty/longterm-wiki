@@ -19,6 +19,16 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
+// ============================================================================
+// TableBase — Entity catalog tables
+//
+// These tables mirror the YAML entity/resource catalog (data/entities/,
+// data/resources/). YAML files remain authoritative; PG tables are
+// queryable read mirrors for the API.
+//
+// See: content/docs/internal/data-architecture.mdx for the full naming guide.
+// ============================================================================
+
 export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
 
 export const entityIds = pgTable("entity_ids", {
@@ -86,6 +96,13 @@ export const citationQuotes = pgTable(
   ]
 );
 
+// ============================================================================
+// WikiBase — Prose content tables
+//
+// These tables mirror the MDX wiki pages (content/docs/). MDX files remain
+// authoritative; PG is a queryable mirror for full-text search and metadata.
+// ============================================================================
+
 export const wikiPages = pgTable(
   "wiki_pages",
   {
@@ -116,6 +133,19 @@ export const wikiPages = pgTable(
     wordCount: integer("word_count"),
     lastUpdated: text("last_updated"),
     contentFormat: text("content_format"),
+    // Build metrics: coverage
+    coveragePassing: integer("coverage_passing"),
+    coverageTotal: integer("coverage_total"),
+    coverageItems: jsonb("coverage_items").$type<Record<string, 'green' | 'amber' | 'red'>>(),
+    // Build metrics: update schedule
+    updateFrequency: integer("update_frequency"),
+    daysSinceUpdate: integer("days_since_update"),
+    daysUntilDue: integer("days_until_due"),
+    staleness: real("staleness"),
+    updatePriority: real("update_priority"),
+    // Build metrics: rankings
+    readerRank: integer("reader_rank"),
+    researchRank: integer("research_rank"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -139,6 +169,13 @@ export const wikiPages = pgTable(
     // GIN index on search_vector is created in migration SQL
   ]
 );
+
+// ============================================================================
+// Operational — Citation & verification tables
+//
+// These tables are not part of any Base. They track citation verification,
+// fetched source content, accuracy scoring, and hallucination risk.
+// ============================================================================
 
 export const citationContent = pgTable(
   "citation_content",
@@ -619,12 +656,18 @@ export const resourceCitations = pgTable(
   ]
 );
 
+// ── TableBase: Entity catalog (continued) ─────────────────────────────
+
 /**
- * Entities — read mirror of data/entities/*.yaml files.
+ * Entities — read mirror of data/entities/*.yaml files (TableBase).
  *
  * Stores the full entity metadata (type, title, description, tags, etc.)
  * synced from the YAML source files during build. YAML stays authoritative;
  * this table is a queryable read mirror for the API.
+ *
+ * Naming note: "entities" in this table refers to YAML catalog entries
+ * (orgs, people, risks, concepts). This is distinct from FactBase "entities"
+ * which have their own 10-char IDs in packages/factbase/data/things/.
  */
 export const entities = pgTable(
   "entities",
@@ -667,12 +710,18 @@ export const entities = pgTable(
   ]
 );
 
+// ── FactBase: Structured facts mirror ─────────────────────────────────
+
 /**
- * Facts — read mirror of data/facts/*.yaml files.
+ * Facts — read mirror of FactBase YAML (packages/factbase/data/things/).
  *
  * Stores individual facts tied to entities, including timeseries data
- * (grouped by measure). YAML stays authoritative; this table is a queryable
- * read mirror for the API.
+ * (grouped by measure). FactBase YAML stays authoritative; this table is
+ * a queryable read mirror for the API.
+ *
+ * Naming note: "facts" in this table are FactBase structured triples. This
+ * is distinct from the legacy data/facts/*.yaml system (which is deprecated
+ * for entities covered by FactBase). See data-system-authority.mdx.
  */
 export const facts = pgTable(
   "facts",
@@ -1936,10 +1985,15 @@ export const recordVerdicts = pgTable(
   ]
 );
 
-// ── Unified Things Table ───────────────────────────────────────────────
+// ── Cross-Base: Unified Things Table ──────────────────────────────────
 //
 // Every identifiable item in the system gets a single row here. Enables
 // cross-domain queries, unified verification status, and a single browse UI.
+//
+// NAMING NOTE: This PG `things` table is a cross-base universal index.
+// It is NOT related to the FactBase "things" directory
+// (packages/factbase/data/things/) which contains FactBase entity YAML files.
+// The name collision is a known confusion — see data-architecture.mdx.
 
 export const VALID_THING_TYPES = [
   "entity",
@@ -2224,6 +2278,35 @@ export const grantResearchAreas = pgTable(
   (table) => [
     primaryKey({ columns: [table.grantId, table.researchAreaId] }),
     index("idx_gra_area").on(table.researchAreaId),
+  ]
+);
+
+/**
+ * Wikibase page similarity — top-N most similar pages per page.
+ *
+ * Built from content redundancy analysis in build-data.mjs.
+ * Each row stores one similarity pair (page → similar page) with rank 1-5.
+ * Replaced in full on each build sync.
+ *
+ * See GitHub issue #2434 (epic #2428).
+ */
+export const wikibasePageSimilarity = pgTable(
+  "wikibase_page_similarity",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    // pageIdInt mirrors wiki_pages.integer_id but has no FK — integer_id was added
+    // via manual migration (phase4a), not Drizzle, so a FK here would break fresh-DB migrations.
+    pageIdInt: integer("page_id_int"),
+    similarPageIdInt: integer("similar_page_id_int"),
+    similarity: integer("similarity").notNull(), // 0-100 percentage
+    rank: integer("rank").notNull(), // 1-5
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_wps_page_id").on(table.pageIdInt),
+    uniqueIndex("idx_wps_page_rank").on(table.pageIdInt, table.rank),
   ]
 );
 

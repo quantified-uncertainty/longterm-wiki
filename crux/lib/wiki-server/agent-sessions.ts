@@ -8,7 +8,7 @@
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { AgentSessionsRoute } from '../../../apps/wiki-server/src/routes/agent-sessions.ts';
+import type { AgentSessionsRoute } from '../../../apps/wiki-server/src/routes/operational/agent-sessions.ts';
 import type {
   CreateAgentSession,
   UpdateAgentSession,

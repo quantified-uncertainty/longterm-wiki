@@ -35,11 +35,12 @@ describe("extractAllCareers", () => {
     expect(ids1).toEqual(ids2);
   });
 
-  it("deduplicates entries across sources", () => {
+  it("deduplication does not increase entry count", () => {
     const result = extractAllCareers();
 
-    // KB records should dominate — verify dedup removed some
-    expect(result.stats.totalBeforeDedup).toBeGreaterThan(
+    // Dedup should never increase the count (no duplicates introduced)
+    // kb-record origin was removed when records migrated to PostgreSQL
+    expect(result.stats.totalBeforeDedup).toBeGreaterThanOrEqual(
       result.stats.totalAfterDedup,
     );
   });

@@ -5,10 +5,12 @@ import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getKBDataNav } from "@/lib/wiki-nav";
 import {
-  getKBEntity,
-  getKBRecords,
-  getKBRecordByKey,
-  getKBRecordSchema,
+  getFactBaseEntity,
+  getFactBaseRecords,
+  getFactBaseRecordSchema,
+  getAllFactBaseRecords,
+  getFactBaseRecordCollectionNames,
+  type FactBaseRecordEntry,
 } from "@/data/factbase";
 import {
   formatKBCellValue,
@@ -21,6 +23,26 @@ import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-share
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~351 pages saved).
 // These are internal KB record detail pages with low traffic.
+
+/**
+ * Find a record entry by key across all collections.
+ * Uses dynamically-derived collection names so new collections are picked up automatically.
+ */
+function findRecordByKey(recordKey: string): {
+  entityId: string;
+  collection: string;
+  entry: FactBaseRecordEntry;
+} | undefined {
+  for (const collection of getFactBaseRecordCollectionNames()) {
+    const records = getAllFactBaseRecords(collection);
+    for (const entry of records) {
+      if (entry.key === recordKey) {
+        return { entityId: entry.ownerEntityId, collection, entry };
+      }
+    }
+  }
+  return undefined;
+}
 
 // ── Metadata ─────────────────────────────────────────────────────────
 
@@ -40,20 +62,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function RecordDetailPage({ params }: PageProps) {
   const { recordId } = await params;
-  const result = getKBRecordByKey(recordId);
+  const result = findRecordByKey(recordId);
   if (!result) notFound();
 
   const { entityId, collection, entry } = result;
-  const entity = getKBEntity(entityId);
+  const entity = getFactBaseEntity(entityId);
   const entityName = entity?.name ?? entityId;
 
   // Get schema for field definitions and endpoint info
-  const recordSchema = getKBRecordSchema(entry.schema);
+  const recordSchema = getFactBaseRecordSchema(entry.schema);
   const fieldDefs = recordSchema?.fields;
   const endpointDefs = recordSchema?.endpoints;
 
   // Get sibling records in the same collection
-  const siblingRecords = getKBRecords(entityId, collection);
+  const siblingRecords = getFactBaseRecords(entityId, collection);
 
   const content = (
     <div>
@@ -147,7 +169,7 @@ export default async function RecordDetailPage({ params }: PageProps) {
             fieldDef?.type === "ref" &&
             typeof fieldValue === "string"
           ) {
-            const refEntity = getKBEntity(fieldValue);
+            const refEntity = getFactBaseEntity(fieldValue);
             return (
               <KVRow key={fieldName} label={titleCase(fieldName)}>
                 <Link
@@ -245,7 +267,7 @@ export default async function RecordDetailPage({ params }: PageProps) {
                           const cellVal = sibling.fields[col];
 
                           if (colDef?.type === "ref" && typeof cellVal === "string") {
-                            const refEnt = getKBEntity(cellVal);
+                            const refEnt = getFactBaseEntity(cellVal);
                             return (
                               <td key={col} className="px-3 py-1.5">
                                 <Link href={`/factbase/entity/${cellVal}`} className="text-primary hover:underline">

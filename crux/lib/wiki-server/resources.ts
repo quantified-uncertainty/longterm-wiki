@@ -8,7 +8,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { UpsertResource, UpdateResourceFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { ResourcesRoute } from '../../../apps/wiki-server/src/routes/resources.ts';
+import type { ResourcesRoute } from '../../../apps/wiki-server/src/routes/wikibase/resources.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)

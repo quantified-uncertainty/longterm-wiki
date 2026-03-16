@@ -69,9 +69,31 @@ export interface ParallelConfig extends PatrolConfig {
   maxSlots: number;
   slotRange: [number, number]; // inclusive [min, max]
   reserveSlots: number;
+  abandonThreshold: number;
 }
 
 const LOCK_FILE_NAME = '.pr-patrol-lock';
+
+/** Parse a .env file and return key-value pairs. */
+function loadDotEnv(dir: string): Record<string, string> {
+  const envFile = join(dir, '.env');
+  if (!existsSync(envFile)) return {};
+  const vars: Record<string, string> = {};
+  for (const line of readFileSync(envFile, 'utf-8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    let val = trimmed.slice(eqIdx + 1).trim();
+    // Strip surrounding quotes
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    vars[key] = val;
+  }
+  return vars;
+}
 
 // ── Slot discovery ───────────────────────────────────────────────────────────
 
@@ -487,12 +509,18 @@ async function fixPrInSlot(
       .catch((e: unknown) => log(`${prefix} Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
 
     // Build prompt and spawn Claude
+    // Preserve CLAUDECODE so Claude CLI uses parent session's auth.
+    // Also load slot's .env as fallback for API keys.
+    const slotEnv = loadDotEnv(slot.dir);
+    if (process.env.CLAUDECODE) {
+      slotEnv.CLAUDECODE = process.env.CLAUDECODE;
+    }
     const prompt = buildPrompt(pr, config.repo);
     const result = await spawnClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: slot.dir });
+    }, { cwd: slot.dir, extraEnv: slotEnv });
 
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
@@ -512,7 +540,7 @@ async function fixPrInSlot(
     } else if (classified.outcome === 'timeout') {
       log(`${prefix} ${cl.red}Timeout${cl.reset} (${elapsedS}s)`);
       const currentFailCount = getFailCount(pr.number);
-      if (currentFailCount >= 2) {
+      if (currentFailCount >= config.abandonThreshold) {
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(currentFailCount, pr.issues))
           .catch((e: unknown) => log(`${prefix} Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       } else {
@@ -522,14 +550,14 @@ async function fixPrInSlot(
     } else if (classified.outcome === 'max-turns') {
       log(`${prefix} ${cl.yellow}Max turns${cl.reset} (${elapsedS}s)`);
       const currentFailCount = getFailCount(pr.number);
-      if (currentFailCount >= 2) {
+      if (currentFailCount >= config.abandonThreshold) {
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(currentFailCount, pr.issues))
           .catch((e: unknown) => log(`${prefix} Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       }
     } else {
       log(`${prefix} ${cl.red}Error${cl.reset}: ${classified.reason} (${elapsedS}s)`);
       const currentFailCount = getFailCount(pr.number);
-      if (currentFailCount >= 2) {
+      if (currentFailCount >= config.abandonThreshold) {
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(currentFailCount, pr.issues))
           .catch((e: unknown) => log(`${prefix} Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       }
@@ -679,10 +707,10 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
     return { dispatched: 0, results: [] };
   }
 
-  // Filter cooldowns and abandoned
+  // Filter cooldowns and abandoned (parallel uses higher threshold than serial)
   const eligible = detected.filter((pr) => {
-    if (isAbandoned(pr.number)) {
-      log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned)${cl.reset}`);
+    if (getFailCount(pr.number) >= config.abandonThreshold) {
+      log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — ${getFailCount(pr.number)} failures, threshold ${config.abandonThreshold})${cl.reset}`);
       return false;
     }
     if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
@@ -955,5 +983,10 @@ export function buildParallelConfig(
       : typeof options.reserveSlots === 'string'
         ? parseInt(options.reserveSlots, 10) || 2
         : 2,
+    abandonThreshold: typeof options.abandonThreshold === 'number'
+      ? options.abandonThreshold
+      : typeof options.abandonThreshold === 'string'
+        ? parseInt(options.abandonThreshold, 10) || 4
+        : 4,
   };
 }

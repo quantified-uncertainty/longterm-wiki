@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { postJson } from "./test-utils.js";
-import { parseCostCents, parseDurationMinutes } from "../routes/sessions.js";
+import { parseCostCents, parseDurationMinutes } from "../routes/operational/sessions.js";
 
 // ---- In-memory stores simulating the sessions + session_pages tables ----
 

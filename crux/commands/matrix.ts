@@ -253,7 +253,11 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
   const dimension = (options.dimension as string) || 'content';
   const format = (options.format as string) || 'prompt';
   const excludeIds = loadExclusionList(options.exclude as string | undefined);
-  const impacts = computePageImpact(pages, dimension, { excludeIds });
+  const includeStubs = !!options.includeStubs;
+  let impacts = computePageImpact(pages, dimension, { excludeIds, includeStubs });
+  impacts = impacts.filter(p =>
+    options.type ? p.entityType === options.type : p.entityType !== 'internal'
+  );
   if (impacts.length === 0) {
     return format === 'json'
       ? { exitCode: 0, output: JSON.stringify({ task: null, message: 'NO_TASKS' }) }
@@ -333,7 +337,9 @@ Examples:
   crux matrix scores --weights=quality:50,coverage:50  # Custom weights
   crux matrix pages --include-stubs              # Show stub pages too
   crux matrix pages --format=ids --limit=10      # IDs for batch piping
-  crux matrix next-task                          # Prompt for next task
+  crux matrix next-task                          # Prompt for next improve task
+  crux matrix next-task --include-stubs          # Include stub pages (create tasks)
+  crux matrix next-task --type=person            # Only person pages
   crux matrix mark-done E357                     # Exclude from future picks
 `;
 }

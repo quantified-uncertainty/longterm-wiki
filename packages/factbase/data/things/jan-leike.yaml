@@ -67,29 +67,3 @@ facts:
     validEnd: 2024-05
     source: https://openai.com/blog/introducing-superalignment
     notes: "Co-led OpenAI Superalignment team with Ilya Sutskever; resigned May 2024 citing insufficient safety resources"
-
-records:
-  career-history:
-    i_jL1zA2bC3d:
-      organization: deepmind
-      title: "Research Scientist"
-      start: "2017"
-      end: "2021"
-      source: https://jan.leike.name/
-      notes: "Worked on reinforcement learning theory and agent alignment"
-
-    i_jL4eF5gH6i:
-      organization: openai
-      title: "Alignment Team Lead; then Co-lead of Superalignment"
-      start: "2021"
-      end: "2024-05"
-      source: https://openai.com/blog/introducing-superalignment
-      notes: "Led alignment research; co-led Superalignment team from July 2023; resigned publicly citing safety concerns and insufficient compute allocation"
-
-    i_jL7jK8lM9n:
-      organization: anthropic
-      title: "Head of Alignment Science"
-      start: "2024-05"
-      source: https://anthropic.com/news/jan-leike-joins-anthropic
-      notes: "Joined Anthropic same month he left OpenAI; leads scalable oversight and alignment research"
-

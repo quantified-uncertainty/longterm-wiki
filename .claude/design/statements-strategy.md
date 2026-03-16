@@ -157,7 +157,7 @@ Do the full ontology draft exercise for OpenAI (244 statements, 76% unclassified
 |---|----------|--------|------|-------|
 | 1 | Statement model vs tables for funding rounds | Open | | Need Experiment 1, 4 |
 | 2 | Where do model releases live? (parent vs individual entity) | Decided: individual | 2026-03-06 | Each model entity gets its own release-date |
-| 3 | RSP version history: Anthropic entity or RSP entity? | Decided: RSP entity (E252) | 2026-03-06 | Anthropic keeps "published RSP" fact only |
+| 3 | RSP version history: Anthropic entity or RSP entity? | Decided: RSP entity (E461) | 2026-03-06 | Anthropic keeps "published RSP" fact only; E252 shell removed |
 | 4 | Property naming convention (-count vs -size) | Open | | Propose standardizing on -count |
 | 5 | LTBT board tracking | Open | | Need to decide if this is a statement or a table |
 | 6 | Qualifier system for linking related statements | Open | | Could solve funding round join problem |

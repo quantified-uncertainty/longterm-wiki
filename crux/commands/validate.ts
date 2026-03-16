@@ -131,6 +131,11 @@ const SCRIPTS = {
     description: 'Check entity reference integrity across KB records',
     passthrough: ['ci', 'verbose', 'threshold'],
   },
+  'directory-pages': {
+    script: 'validate/validate-directory-pages.ts',
+    description: 'Audit directory page data for display issues',
+    passthrough: ['ci', 'verbose', 'type'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
@@ -179,5 +184,7 @@ Examples:
   crux validate entity-refs              Check KB record entity references
   crux validate entity-refs --threshold=90  Fail if link rate < 90%
   crux validate all --skip=mermaid,style  Skip specific checks
+  crux validate directory-pages            Audit directory page data quality
+  crux validate directory-pages --type=person  Check one entity type
 `;
 }

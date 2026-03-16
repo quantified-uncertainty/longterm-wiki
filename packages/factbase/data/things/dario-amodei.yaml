@@ -73,37 +73,3 @@ facts:
     validEnd: "2016"
     source: https://en.wikipedia.org/wiki/Dario_Amodei
     notes: "Researcher at Baidu's AI lab under Andrew Ng; worked on speech recognition"
-
-records:
-  career-history:
-    i_dA1fG2hI3j:
-      organization: "D. E. Shaw Research"
-      title: "Research Scientist"
-      start: "2011"
-      end: "2014"
-      source: https://en.wikipedia.org/wiki/Dario_Amodei
-      notes: "Computational biology and molecular dynamics simulations"
-
-    i_dA4kL5mN6o:
-      organization: "Baidu AI Lab"
-      title: "Research Scientist"
-      start: "2014"
-      end: "2016"
-      source: https://en.wikipedia.org/wiki/Dario_Amodei
-      notes: "Worked on deep learning for speech recognition under Andrew Ng"
-
-    i_dA7pQ8rS9t:
-      organization: openai
-      title: "VP of Research"
-      start: "2016"
-      end: "2021-01"
-      source: https://en.wikipedia.org/wiki/Dario_Amodei
-      notes: "Led GPT-2 and GPT-3 research; grew increasingly concerned about safety culture; departed with six colleagues to found Anthropic"
-
-    i_dAuV1wX2y:
-      organization: anthropic
-      title: "CEO & Co-founder"
-      start: "2021-01"
-      source: https://anthropic.com/company
-      notes: "Co-founded Anthropic with sister Daniela and five other former OpenAI researchers"
-

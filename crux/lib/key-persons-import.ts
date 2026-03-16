@@ -1,15 +1,14 @@
 /**
  * Key Persons Import
  *
- * Extracts key-persons records from org YAML files in packages/factbase/data/things/
- * and syncs them to the wiki-server personnel PG table.
+ * Previously extracted key-persons records from org YAML files in packages/factbase/data/things/
+ * and synced them to the wiki-server personnel PG table.
  *
- * The YAML key-persons entries use slugs for the `person` field (e.g., "dario-amodei"),
- * while PG stores canonical entity IDs (10-char hashes). This module resolves
- * slugs to entity IDs during extraction using the KB graph.
+ * DEPRECATED: Records have been migrated from KB YAML to PostgreSQL.
+ * The extractKeyPersons() function now returns empty results.
+ * Key persons data should be read from the wiki-server /api/personnel endpoint.
  */
 
-import { loadGraphFull, type LoadedKB } from './factbase-loader.ts';
 import { generateId } from './grant-import/id.ts';
 import { apiRequest, getServerUrl } from './wiki-server/client.ts';
 
@@ -53,60 +52,22 @@ export interface ExtractedKeyPerson {
 /**
  * Extract all key-persons records from the KB graph.
  * Resolves person slugs to entity IDs using the graph's filename map.
+ *
+ * @deprecated Records (including key-persons) have been migrated from KB YAML
+ * to PostgreSQL. Use the wiki-server /api/personnel endpoint instead.
  */
 export async function extractKeyPersons(): Promise<{
   records: ExtractedKeyPerson[];
   unresolved: Array<{ orgSlug: string; personSlug: string; yamlKey: string }>;
 }> {
-  const kb = await loadGraphFull();
-  const { graph, filenameMap, idByFilename } = kb;
-
-  const records: ExtractedKeyPerson[] = [];
-  const unresolved: Array<{ orgSlug: string; personSlug: string; yamlKey: string }> = [];
-
-  // Scan all entities for key-persons collections
-  for (const entity of graph.getAllEntities()) {
-    const keyPersonEntries = graph.getRecords(entity.id, 'key-persons');
-    if (keyPersonEntries.length === 0) continue;
-
-    const orgSlug = filenameMap.get(entity.id) ?? entity.id;
-
-    for (const entry of keyPersonEntries) {
-      const personSlug = typeof entry.fields.person === 'string'
-        ? entry.fields.person
-        : String(entry.fields.person ?? '');
-
-      // Resolve slug to entity ID via filename map
-      let personEntityId: string | null = null;
-      // If the value is already a valid entity ID, use it directly
-      if (graph.getEntity(personSlug)) {
-        personEntityId = personSlug;
-      } else {
-        // Resolve as a slug/filename
-        personEntityId = idByFilename.get(personSlug) ?? null;
-      }
-
-      if (!personEntityId) {
-        unresolved.push({ orgSlug, personSlug, yamlKey: entry.key });
-      }
-
-      records.push({
-        yamlKey: entry.key,
-        orgSlug,
-        orgEntityId: entity.id,
-        personSlug,
-        personEntityId,
-        title: String(entry.fields.title ?? ''),
-        startDate: entry.fields.start ? String(entry.fields.start) : null,
-        endDate: entry.fields.end ? String(entry.fields.end) : null,
-        isFounder: entry.fields.is_founder === true,
-        source: entry.fields.source ? String(entry.fields.source) : null,
-        notes: entry.fields.notes ? String(entry.fields.notes) : null,
-      });
-    }
-  }
-
-  return { records, unresolved };
+  // DEPRECATED: Records (including key-persons) have been migrated from KB YAML
+  // to PostgreSQL. graph.getRecords() no longer exists. Key persons data should
+  // now be read directly from the wiki-server personnel table instead.
+  console.warn(
+    '[key-persons-import] extractKeyPersons() is deprecated — records are now in PG, not KB YAML. ' +
+    'Use the wiki-server /api/personnel endpoint instead.',
+  );
+  return { records: [], unresolved: [] };
 }
 
 // ── Conversion to sync items ─────────────────────────────────────────

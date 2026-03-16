@@ -55,20 +55,3 @@ facts:
   - id: f_ytjh35xr0n
     property: google-scholar
     value: "https://scholar.google.com/citations?user=2oy3OXYAAAAJ"
-
-records:
-  career-history:
-    i_sR1zA2bC3d:
-      organization: "UC Berkeley"
-      title: "Professor of Computer Science"
-      start: "1986"
-      source: https://people.eecs.berkeley.edu/~russell/
-      notes: "Smith-Zadeh Professor in Engineering; has been at Berkeley for nearly 40 years"
-
-    i_sR4eF5gH6i:
-      organization: "Center for Human-Compatible AI (CHAI)"
-      title: "Founder & Director"
-      start: "2016"
-      source: https://humancompatible.ai/
-      notes: "Founded CHAI at UC Berkeley with Open Philanthropy funding; research on value alignment and cooperative inverse reinforcement learning"
-

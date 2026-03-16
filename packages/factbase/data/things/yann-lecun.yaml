@@ -69,36 +69,3 @@ facts:
     asOf: "2003"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
     notes: "At New York University's Courant Institute; founded the NYU Center for Data Science"
-
-records:
-  career-history:
-    i_yL1zA2bC3d:
-      organization: "University of Toronto"
-      title: "Postdoctoral Researcher"
-      start: "1987"
-      end: "1988"
-      source: https://en.wikipedia.org/wiki/Yann_LeCun
-      notes: "Postdoc with Geoffrey Hinton"
-
-    i_yL4eF5gH6i:
-      organization: "AT&T Bell Laboratories"
-      title: "Research Scientist"
-      start: "1988"
-      end: "2003"
-      source: https://en.wikipedia.org/wiki/Yann_LeCun
-      notes: "Developed convolutional neural networks (LeNet) for handwritten check reading; deployed commercially at banks"
-
-    i_yL7jK8lM9n:
-      organization: "New York University"
-      title: "Silver Professor of Computer Science, Courant Institute"
-      start: "2003"
-      source: https://en.wikipedia.org/wiki/Yann_LeCun
-      notes: "Founded the NYU Center for Data Science in 2013; continues to hold this position alongside Meta role"
-
-    i_yLoP1qR2s:
-      organization: meta-ai
-      title: "Founding Director, FAIR; then Chief AI Scientist"
-      start: "2013-12"
-      source: https://ai.meta.com/people/yann-lecun/
-      notes: "Founded Facebook AI Research (FAIR) in 2013; became Chief AI Scientist at Meta"
-

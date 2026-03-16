@@ -14,37 +14,17 @@ import {
 } from './key-persons-import.ts';
 
 describe('extractKeyPersons', () => {
-  it('extracts records from KB YAML files', async () => {
+  it('returns empty results (deprecated — records are now in PG)', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { records, unresolved } = await extractKeyPersons();
 
-    // Should find at least some records (there are ~50 across 11 org files)
-    expect(records.length).toBeGreaterThan(10);
-
-    // Should have records from multiple organizations
-    const orgs = new Set(records.map((r) => r.orgSlug));
-    expect(orgs.size).toBeGreaterThan(3);
-  });
-
-  it('resolves known person slugs to entity IDs', async () => {
-    const { records } = await extractKeyPersons();
-
-    // Find a well-known person (Dario Amodei at Anthropic)
-    const dario = records.find(
-      (r) => r.orgSlug === 'anthropic' && r.personSlug === 'dario-amodei',
+    expect(records).toEqual([]);
+    expect(unresolved).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('deprecated'),
     );
-    expect(dario).toBeDefined();
-    expect(dario!.personEntityId).toBeTruthy();
-    expect(dario!.personEntityId!.length).toBe(10);
-    expect(dario!.title).toBe('CEO');
-    expect(dario!.isFounder).toBe(true);
-  });
 
-  it('includes start/end dates from YAML', async () => {
-    const { records } = await extractKeyPersons();
-
-    // Find someone with a start date
-    const withStart = records.filter((r) => r.startDate !== null);
-    expect(withStart.length).toBeGreaterThan(0);
+    warnSpy.mockRestore();
   });
 });
 

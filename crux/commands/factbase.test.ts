@@ -52,7 +52,7 @@ describe('crux kb list', () => {
 });
 
 describe('crux kb show', () => {
-  it('shows entity details with facts and items', async () => {
+  it('shows entity details with facts', async () => {
     const result = await commands.show(['anthropic'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
@@ -60,9 +60,7 @@ describe('crux kb show', () => {
     expect(result.output).toContain('organization');
     expect(result.output).toContain('Facts');
     expect(result.output).toContain('Revenue');
-    expect(result.output).toContain('Records');
-    expect(result.output).toContain('funding-rounds');
-    expect(result.output).toContain('key-persons');
+    // Records (funding-rounds, key-persons) are now served from PostgreSQL, not shown in CLI output
   }, 30_000);
 
   it('formats financial values with proper units', async () => {
@@ -87,11 +85,12 @@ describe('crux kb show', () => {
     expect(result.output).not.toContain('1,983');
   }, 30_000);
 
-  it('resolves refs in key-people items', async () => {
+  it('resolves refs in Employs facts', async () => {
     const result = await commands.show(['anthropic'], {});
     expect(result.exitCode).toBe(0);
+    // Employs facts resolve person refs to names
     expect(result.output).toContain('Dario Amodei');
-    expect(result.output).toContain('CEO');
+    // CEO title was in key-persons records which are now served from PostgreSQL, not shown in CLI output
   }, 30_000);
 
   it('returns error for non-existent entity', async () => {

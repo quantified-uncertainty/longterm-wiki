@@ -1,0 +1,205 @@
+---
+numericId: E1334
+title: "Data Architecture: Three Bases and Naming Guide"
+description: "Explains the wiki's three data layers (TableBase, FactBase, WikiBase), how they map to PG tables, and clarifies naming confusions around entities, things, and facts."
+subcategory: architecture
+lastEdited: "2026-03-16"
+update_frequency: 90
+---
+import { Mermaid } from '@components/wiki';
+
+This document is the canonical naming reference for the wiki's data architecture. It explains the three conceptual data layers ("Bases"), maps each PostgreSQL table to its Base, and clarifies common naming confusions.
+
+---
+
+## The Three Bases
+
+The wiki organizes data into three conceptual layers:
+
+| Base | What it stores | Primary source of truth | Key access module |
+|------|---------------|------------------------|-------------------|
+| **TableBase** | Typed relational records — entities, resources, publications, experts, organizations | YAML files in `data/entities/`, `data/resources/` | `apps/web/src/data/tablebase.ts` |
+| **FactBase** | Structured triples with temporal data and provenance — facts about entities | YAML files in `packages/factbase/data/things/` | `apps/web/src/data/factbase.ts` |
+| **WikiBase** | Long-form prose MDX articles — the actual wiki pages readers see | MDX files in `content/docs/` | `Page` interface in `tablebase.ts` |
+
+<Mermaid chart={`
+flowchart TB
+    subgraph Sources["Source of Truth"]
+        YAML["data/entities/*.yaml\ndata/resources/*.yaml"]
+        FB_YAML["packages/factbase/data/things/*.yaml"]
+        MDX["content/docs/**/*.mdx"]
+    end
+    subgraph Build["Build Pipeline"]
+        BD["build-data.mjs"]
+    end
+    subgraph Artifacts["Build Artifacts"]
+        DB_JSON["database.json\n(TableBase + WikiBase)"]
+        FB_JSON["factbase-data.json\n(FactBase)"]
+    end
+    subgraph PG["PostgreSQL (wiki-server)"]
+        direction TB
+        TB_PG["TableBase tables\n(entities, resources,\nentity_ids, summaries)"]
+        FB_PG["FactBase mirror\n(facts table)"]
+        WB_PG["WikiBase mirror\n(wiki_pages)"]
+        UNI["Cross-Base index\n(things table)"]
+        OPS["Operational tables\n(sessions, jobs,\ncitation_quotes, etc.)"]
+    end
+    YAML --> BD
+    FB_YAML --> BD
+    MDX --> BD
+    BD --> DB_JSON
+    BD --> FB_JSON
+    BD --> TB_PG
+    BD --> FB_PG
+    BD --> WB_PG
+    BD --> UNI
+`} />
+
+---
+
+## PG Tables Grouped by Base
+
+### TableBase tables (entity catalog)
+
+These tables mirror the YAML entity/resource catalog. YAML files remain authoritative; these PG tables are queryable read mirrors for the API.
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `entities` | `entities` | Read mirror of `data/entities/*.yaml`. One row per entity (org, person, risk, etc.). |
+| `entity_ids` | `entityIds` | Central ID registry. Maps numeric IDs (E42) to slugs. Sequence-allocated. |
+| `resources` | `resources` | Read mirror of `data/resources/*.yaml`. Papers, blog posts, reports. |
+| `summaries` | `summaries` | LLM-generated entity summaries. One per entity, keyed by `entities.stable_id`. |
+| `page_links` | `pageLinks` | Directional knowledge graph between entities/pages. |
+| `resource_citations` | `resourceCitations` | Many-to-many join: which resources are cited on which pages. |
+
+### FactBase tables (structured facts)
+
+These tables mirror data from the FactBase YAML package. The YAML in `packages/factbase/data/things/` is the source of truth.
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `facts` | `facts` | Read mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. |
+| `properties` | `properties` | Controlled vocabulary for fact property types (valuation, headcount, ceo, etc.). |
+| `factbase_resource_verifications` | `factbaseResourceVerifications` | Per-source verification checks for FactBase facts. |
+| `factbase_verdicts` | `factbaseVerdicts` | Aggregate fact-level verdicts derived from verification evidence. |
+
+### WikiBase tables (prose content)
+
+These tables mirror the MDX wiki pages.
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `wiki_pages` | `wikiPages` | Mirror of ≈700 MDX pages. Full-text searchable. Dual-ID: text `id` (legacy) + `integer_id` (Phase 4a). |
+| `edit_logs` | `editLogs` | Per-page edit history with tool/agency attribution. |
+| `page_improve_runs` | `pageImproveRuns` | Records of AI-driven page improvement runs. |
+
+### Cross-Base index (the `things` table)
+
+The `things` table is a **cross-base universal index**, not a FactBase concept. Every identifiable item in the system (entity, fact, grant, resource, personnel record, division, etc.) gets a single row. This enables:
+
+- Cross-domain search (search everything in one query)
+- Unified verification status across all record types
+- A single browse UI for all data
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `things` | `things` | Universal index. `thing_type` indicates domain (entity, fact, grant, etc.). `source_table` + `source_id` point back to the originating record. |
+| `thing_resource_verifications` | `thingResourceVerifications` | Per-source verification checks keyed by `things.id`. |
+| `thing_verdicts` | `thingVerdicts` | Aggregate verdicts for things. |
+
+### Operational tables
+
+These tables are not part of any Base. They track system operations, CI/CD, and agent activity.
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `citation_quotes` | `citationQuotes` | Per-footnote citation verification data. |
+| `citation_content` | `citationContent` | Cached fetched HTML/text from source URLs. |
+| `citation_accuracy_snapshots` | `citationAccuracySnapshots` | Page-level citation health aggregations. |
+| `hallucination_risk_snapshots` | `hallucinationRiskSnapshots` | Per-page hallucination risk scores. |
+| `page_citations` | `pageCitations` | Non-claim footnote citations. |
+| `sessions` | `sessions` | Legacy session log (being superseded by `agent_sessions`). |
+| `session_pages` | `sessionPages` | Pages modified per session. |
+| `agent_sessions` | `agentSessions` | Full agent session lifecycle. |
+| `agent_session_pages` | `agentSessionPages` | Pages modified per agent session. |
+| `agent_session_events` | `agentSessionEvents` | Agent audit trail. |
+| `active_agents` | `activeAgents` | Live agent coordination with heartbeat. |
+| `auto_update_runs` | `autoUpdateRuns` | Auto-update pipeline run history. |
+| `auto_update_results` | `autoUpdateResults` | Per-page results from auto-update runs. |
+| `auto_update_news_items` | `autoUpdateNewsItems` | Discovered news items from RSS feeds. |
+| `jobs` | `jobs` | Background task queue. |
+| `groundskeeper_runs` | `groundskeeperRuns` | Maintenance daemon execution history. |
+| `service_health_incidents` | `serviceHealthIncidents` | Infrastructure incident tracking. |
+| `personnel` | `personnel` | Personnel records (person-to-org role assignments). |
+| `grants` | `grants` | Grant records. |
+| `funding_rounds` | `fundingRounds` | Company funding round data. |
+| `investments` | `investments` | Investment records. |
+| `equity_positions` | `equityPositions` | Equity ownership snapshots. |
+| `divisions` | `divisions` | Organizational sub-units. |
+| `division_personnel` | `divisionPersonnel` | Division staff assignments. |
+| `funding_programs` | `fundingPrograms` | Open funding opportunities. |
+| `benchmarks` | `benchmarks` | Evaluation benchmark definitions. |
+| `benchmark_results` | `benchmarkResults` | Model scores on benchmarks. |
+| `record_verifications` | `recordVerifications` | Per-source checks for financial records. |
+| `record_verdicts` | `recordVerdicts` | Aggregate verdicts for financial records. |
+| `research_areas` | `researchAreas` | Research area taxonomy. |
+
+---
+
+## Naming Confusions (and How to Read Them)
+
+### "Entity" means different things in different contexts
+
+| Context | What "entity" means | Example |
+|---------|-------------------|---------|
+| `data/entities/*.yaml` | A YAML catalog entry describing a real-world thing (org, person, risk, concept) | `data/entities/organizations.yaml` has an entry for Anthropic |
+| `entities` PG table | A read mirror of those same YAML entries | `SELECT * FROM entities WHERE id = 'anthropic'` |
+| FactBase `Entity` type | A FactBase thing — an entity in the structured facts system with its own ID scheme | `packages/factbase/data/things/anthropic.yaml` has `id: mK9pX3rQ7n` |
+| `factbase.ts` `getFactBaseEntity()` | Returns a FactBase entity by its FactBase ID or YAML slug | Returns the FactBase entity object |
+
+**Key distinction**: The YAML/PG `entities` table uses slug-based IDs (e.g., `anthropic`), while FactBase entities have their own 10-character alphanumeric IDs (e.g., `mK9pX3rQ7n`). The `factbase-data.json` file includes a `slugToEntityId` mapping to bridge between them.
+
+### "Things" means different things in different contexts
+
+| Context | What "things" means | Example |
+|---------|-------------------|---------|
+| `packages/factbase/data/things/` | FactBase entity YAML files — one file per entity with facts, properties, and metadata | `packages/factbase/data/things/anthropic.yaml` |
+| `things` PG table | A **cross-base universal index** that indexes items from ALL domains | A row with `thing_type='entity'` and `source_table='entities'` |
+
+**Key distinction**: The FactBase "things" directory (`packages/factbase/data/things/`) contains YAML data files that define entities and their facts. The PG `things` table is a completely separate concept — it is a universal search/browse index that contains rows pointing to entities, facts, grants, resources, personnel, and other record types. They share a name but serve unrelated purposes.
+
+### "Facts" means different things in different contexts
+
+| Context | What "facts" means | Example |
+|---------|-------------------|---------|
+| `packages/factbase/data/things/*.yaml` facts | Structured triples in the FactBase YAML package (the source of truth) | `property: revenue`, `value: 6000000000`, `asOf: 2025-01` |
+| `facts` PG table | A read mirror of FactBase YAML facts in PostgreSQL | Rows synced from YAML during build |
+| `data/facts/*.yaml` (legacy) | The old YAML facts system — deprecated for entities that have FactBase entries | Powers legacy `\<F\>` and `\<Calc\>` components |
+| `tablebase.ts` `Fact` interface | A legacy bridge type kept for backward compatibility | Used by calc-engine and a few old components |
+
+**Key distinction**: The authoritative source for structured facts is the FactBase YAML (`packages/factbase/data/things/`). The PG `facts` table is a read mirror for API queries. The old `data/facts/*.yaml` system is deprecated for FactBase-covered entities (see <EntityLink id="E1018">Data System Authority Rules</EntityLink>).
+
+---
+
+## Code Module Map
+
+| Module | Base | Role |
+|--------|------|------|
+| `apps/web/src/data/tablebase.ts` | TableBase | Loads `database.json`, provides entity/resource/page lookups |
+| `apps/web/src/data/factbase.ts` | FactBase | Loads `factbase-data.json`, provides fact/property/record lookups |
+| `apps/web/scripts/build-data.mjs` | All | Transforms YAML + MDX into JSON build artifacts and syncs to PG |
+| `packages/factbase/` | FactBase | Core FactBase package — serialization, types, YAML loading |
+| `apps/wiki-server/src/schema.ts` | All | Drizzle ORM schema defining all PG tables |
+| `apps/wiki-server/src/routes/entities.ts` | TableBase | API for YAML entity data |
+| `apps/wiki-server/src/routes/facts.ts` | FactBase | API for FactBase fact data |
+| `apps/wiki-server/src/routes/pages.ts` | WikiBase | API for wiki page metadata and search |
+| `apps/wiki-server/src/routes/things.ts` | Cross-Base | API for the universal things index |
+
+---
+
+## Related Documents
+
+- <EntityLink id="E734">System Architecture</EntityLink> — High-level technical overview
+- <EntityLink id="E1054">DB Schema Overview</EntityLink> — Full ER diagrams and migration history
+- <EntityLink id="E1018">Data System Authority Rules</EntityLink> — Which data system is authoritative for each entity
+- <EntityLink id="E886">Fact System Strategy</EntityLink> — Strategy for the old YAML facts system

@@ -6,48 +6,56 @@ import {
   rateLimitMiddleware,
   createDefaultRateLimiters,
 } from "./rate-limit.js";
-import { healthRoute } from "./routes/health.js";
-import { idsRoute } from "./routes/ids.js";
-import { citationsRoute } from "./routes/citations.js";
-import { pagesRoute } from "./routes/pages.js";
-import { editLogsRoute } from "./routes/edit-logs.js";
-import { autoUpdateRunsRoute } from "./routes/auto-update-runs.js";
-import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
-import { sessionsRoute } from "./routes/sessions.js";
-import { resourcesRoute } from "./routes/resources.js";
-import { summariesRoute } from "./routes/summaries.js";
-import { linksRoute } from "./routes/links.js";
-import { autoUpdateNewsRoute } from "./routes/auto-update-news.js";
-import { entitiesRoute } from "./routes/entities.js";
-import { factsRoute } from "./routes/facts.js";
-import { agentSessionsRoute } from "./routes/agent-sessions.js";
-import { activeAgentsRoute } from "./routes/active-agents.js";
-import { agentSessionEventsRoute } from "./routes/agent-session-events.js";
-import { jobsRoute } from "./routes/jobs.js";
-import { artifactsRoute } from "./routes/artifacts.js";
-import { exploreRoute } from "./routes/explore.js";
-import { integrityRoute } from "./routes/integrity.js";
-import { referencesRoute } from "./routes/references.js";
-import { githubIssuesRoute } from "./routes/github-issues.js";
-import { groundskeeperRunsRoute } from "./routes/groundskeeper-runs.js";
-import { monitoringRoute } from "./routes/monitoring.js";
-import { githubPullsRoute } from "./routes/github-pulls.js";
-import { factbaseVerificationsRoute } from "./routes/factbase-verifications.js";
-import { personnelRoute } from "./routes/personnel.js";
-import { peopleRoute } from "./routes/people.js";
-import { grantsRoute } from "./routes/grants.js";
-import { fundingRoundsRoute } from "./routes/funding-rounds.js";
-import { investmentsRoute } from "./routes/investments.js";
-import { equityPositionsRoute } from "./routes/equity-positions.js";
-import { divisionsRoute } from "./routes/divisions.js";
-import { divisionPersonnelRoute } from "./routes/division-personnel.js";
-import { fundingProgramsRoute } from "./routes/funding-programs.js";
-import { benchmarksRoute } from "./routes/benchmarks.js";
-import { benchmarkResultsRoute } from "./routes/benchmark-results.js";
-import { recordVerificationsRoute } from "./routes/record-verifications.js";
-import { thingsRoute } from "./routes/things.js";
-import { researchAreasRoute } from "./routes/research-areas.js";
-import { assessmentsRoute } from "./routes/assessments.js";
+// TableBase routes — typed relational entity records
+import { entitiesRoute } from "./routes/tablebase/entities.js";
+import { idsRoute } from "./routes/tablebase/ids.js";
+import { personnelRoute } from "./routes/tablebase/personnel.js";
+import { peopleRoute } from "./routes/tablebase/people.js";
+import { grantsRoute } from "./routes/tablebase/grants.js";
+import { divisionsRoute } from "./routes/tablebase/divisions.js";
+import { divisionPersonnelRoute } from "./routes/tablebase/division-personnel.js";
+import { investmentsRoute } from "./routes/tablebase/investments.js";
+import { fundingRoundsRoute } from "./routes/tablebase/funding-rounds.js";
+import { equityPositionsRoute } from "./routes/tablebase/equity-positions.js";
+import { fundingProgramsRoute } from "./routes/tablebase/funding-programs.js";
+import { benchmarksRoute } from "./routes/tablebase/benchmarks.js";
+import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
+import { recordVerificationsRoute } from "./routes/tablebase/record-verifications.js";
+import { thingsRoute } from "./routes/tablebase/things.js";
+import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
+
+// FactBase routes — structured triples with temporal data
+import { factsRoute } from "./routes/factbase/facts.js";
+import { factbaseVerificationsRoute } from "./routes/factbase/factbase-verifications.js";
+
+// WikiBase routes — long-form prose, citations, references
+import { pagesRoute } from "./routes/wikibase/pages.js";
+import { linksRoute } from "./routes/wikibase/links.js";
+import { citationsRoute } from "./routes/wikibase/citations.js";
+import { resourcesRoute } from "./routes/wikibase/resources.js";
+import { hallucinationRiskRoute } from "./routes/wikibase/hallucination-risk.js";
+import { assessmentsRoute } from "./routes/wikibase/assessments.js";
+import { exploreRoute } from "./routes/wikibase/explore.js";
+import { editLogsRoute } from "./routes/wikibase/edit-logs.js";
+import { summariesRoute } from "./routes/wikibase/summaries.js";
+import { referencesRoute } from "./routes/wikibase/references.js";
+
+// Operational routes — sessions, agents, jobs, monitoring, infra
+import { healthRoute } from "./routes/operational/health.js";
+import { sessionsRoute } from "./routes/operational/sessions.js";
+import { agentSessionsRoute } from "./routes/operational/agent-sessions.js";
+import { activeAgentsRoute } from "./routes/operational/active-agents.js";
+import { agentSessionEventsRoute } from "./routes/operational/agent-session-events.js";
+import { jobsRoute } from "./routes/operational/jobs.js";
+import { artifactsRoute } from "./routes/operational/artifacts.js";
+import { integrityRoute } from "./routes/operational/integrity.js";
+import { autoUpdateRunsRoute } from "./routes/operational/auto-update-runs.js";
+import { autoUpdateNewsRoute } from "./routes/operational/auto-update-news.js";
+import { groundskeeperRunsRoute } from "./routes/operational/groundskeeper-runs.js";
+import { githubIssuesRoute } from "./routes/operational/github-issues.js";
+import { githubPullsRoute } from "./routes/operational/github-pulls.js";
+import { monitoringRoute } from "./routes/operational/monitoring.js";
+import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
 
 let requestCounter = 0;
 
@@ -129,33 +137,33 @@ export function createApp() {
   // API routes — all require a valid API key
   app.use("/api/*", validateApiKey());
 
-  // Mount route handlers
+  // ── Route mounting ───────────────────────────────────────────────────
+  // Routes are grouped by which data layer ("Base") they primarily serve.
+  // See content/docs/internal/data-architecture.mdx for the Three Bases guide.
+
+  // TableBase routes — YAML entity/resource catalog
   app.route("/api/ids", idsRoute);
-  app.route("/api/citations", citationsRoute);
-  app.route("/api/pages", pagesRoute);
-  app.route("/api/edit-logs", editLogsRoute);
-  app.route("/api/auto-update-runs", autoUpdateRunsRoute);
-  app.route("/api/hallucination-risk", hallucinationRiskRoute);
-  app.route("/api/sessions", sessionsRoute);
+  app.route("/api/entities", entitiesRoute);
   app.route("/api/resources", resourcesRoute);
   app.route("/api/summaries", summariesRoute);
   app.route("/api/links", linksRoute);
-  app.route("/api/auto-update-news", autoUpdateNewsRoute);
-  app.route("/api/entities", entitiesRoute);
-  app.route("/api/facts", factsRoute);
-  app.route("/api/agent-sessions", agentSessionsRoute);
-  app.route("/api/active-agents", activeAgentsRoute);
-  app.route("/api/agent-session-events", agentSessionEventsRoute);
-  app.route("/api/jobs", jobsRoute);
-  app.route("/api/artifacts", artifactsRoute);
   app.route("/api/explore", exploreRoute);
-  app.route("/api/integrity", integrityRoute);
-  app.route("/api/references", referencesRoute);
-  app.route("/api/github/issues", githubIssuesRoute);
-  app.route("/api/github/pulls", githubPullsRoute);
-  app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
-  app.route("/api/monitoring", monitoringRoute);
+
+  // FactBase routes — structured facts and verification
+  app.route("/api/facts", factsRoute);
   app.route("/api/kb-verifications", factbaseVerificationsRoute); // API path kept for backwards compat
+
+  // WikiBase routes — prose content and page metadata
+  app.route("/api/pages", pagesRoute);
+  app.route("/api/edit-logs", editLogsRoute);
+  app.route("/api/references", referencesRoute);
+
+  // Citation & verification system (operational, not part of a Base)
+  app.route("/api/citations", citationsRoute);
+  app.route("/api/hallucination-risk", hallucinationRiskRoute);
+  app.route("/api/integrity", integrityRoute);
+
+  // Financial data routes (operational — personnel, grants, funding)
   app.route("/api/personnel", personnelRoute);
   app.route("/api/people", peopleRoute);
   app.route("/api/grants", grantsRoute);
@@ -168,9 +176,31 @@ export function createApp() {
   app.route("/api/benchmarks", benchmarksRoute);
   app.route("/api/benchmark-results", benchmarkResultsRoute);
   app.route("/api/record-verifications", recordVerificationsRoute);
+  app.route("/api/assessments", assessmentsRoute);
+
+  // Cross-Base: unified things index
   app.route("/api/things", thingsRoute);
   app.route("/api/research-areas", researchAreasRoute);
-  app.route("/api/assessments", assessmentsRoute);
+
+
+  // Agent & session tracking (operational)
+  app.route("/api/sessions", sessionsRoute);
+  app.route("/api/agent-sessions", agentSessionsRoute);
+  app.route("/api/active-agents", activeAgentsRoute);
+  app.route("/api/agent-session-events", agentSessionEventsRoute);
+
+  // Auto-update system (operational)
+  app.route("/api/auto-update-runs", autoUpdateRunsRoute);
+  app.route("/api/auto-update-news", autoUpdateNewsRoute);
+
+  // Infrastructure & monitoring (operational)
+  app.route("/api/jobs", jobsRoute);
+  app.route("/api/artifacts", artifactsRoute);
+  app.route("/api/github/issues", githubIssuesRoute);
+  app.route("/api/github/pulls", githubPullsRoute);
+  app.route("/api/groundskeeper-runs", groundskeeperRunsRoute);
+  app.route("/api/monitoring", monitoringRoute);
+  app.route("/api/build-metrics", buildMetricsRoute);
 
   return app;
 }

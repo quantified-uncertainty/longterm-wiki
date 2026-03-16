@@ -1,0 +1,1319 @@
+import { Hono } from "hono";
+import { z } from "zod";
+import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
+import { getDrizzleDb, getDb } from "../../db.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../../schema.js";
+import { checkRefsExist } from "../shared/ref-check.js";
+import {
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+  notFoundError,
+  firstOrThrow,
+  dbError,
+  paginationQuery,
+} from "../shared/utils.js";
+import {
+  UpsertCitationQuoteSchema,
+  UpsertCitationQuoteBatchSchema,
+  MarkAccuracySchema as SharedMarkAccuracySchema,
+  MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
+  UpsertCitationContentSchema,
+  CITATION_CONTENT_PREVIEW_MAX,
+} from "../../api-types.js";
+import { logger } from "../../logger.js";
+import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
+
+// ---- Constants ----
+
+const BROKEN_SCORE_THRESHOLD = 0.5;
+const MAX_PAGE_SIZE = 5000;
+
+// ---- Deprecation helper (#1310) ----
+// Citation_quotes write endpoints are deprecated. Use claims + claim_sources instead.
+// These endpoints will be removed when the citation_quotes table is dropped (#1311).
+function deprecationWarning(endpoint: string): void {
+  logger.warn({ endpoint }, "Deprecated endpoint — use claims API instead. Will be removed in #1311.");
+}
+
+// ---- Schemas (from shared api-types) ----
+
+const UpsertQuoteSchema = UpsertCitationQuoteSchema;
+type UpsertQuoteData = z.infer<typeof UpsertQuoteSchema>;
+
+const UpsertBatchSchema = UpsertCitationQuoteBatchSchema;
+
+const MarkVerifiedSchema = z.object({
+  pageId: z.string().min(1).max(200),
+  footnote: z.number().int().min(0),
+  method: z.string().min(1).max(200),
+  score: z.number().min(0).max(1),
+});
+
+const MarkAccuracySchema = SharedMarkAccuracySchema;
+const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
+
+const UpsertContentSchema = UpsertCitationContentSchema;
+
+const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
+
+// ---- Helpers ----
+
+/** Build the values object for a citation quote upsert. */
+function quoteValues(d: UpsertQuoteData, pageIdInt?: number | null) {
+  return {
+    pageId: d.pageId,
+    pageIdInt: pageIdInt ?? null, // Phase 4a dual-write
+    footnote: d.footnote,
+    url: d.url ?? null,
+    resourceId: d.resourceId ?? null,
+    claimText: d.claimText,
+    claimContext: d.claimContext ?? null,
+    sourceQuote: d.sourceQuote ?? null,
+    sourceLocation: d.sourceLocation ?? null,
+    quoteVerified: d.quoteVerified ?? false,
+    verificationMethod: d.verificationMethod ?? null,
+    verificationScore: d.verificationScore ?? null,
+    sourceTitle: d.sourceTitle ?? null,
+    sourceType: d.sourceType ?? null,
+    extractionModel: d.extractionModel ?? null,
+  };
+}
+
+/** Shared upsert for single and batch quote operations. */
+function upsertQuote(
+  db: ReturnType<typeof getDrizzleDb> | Parameters<Parameters<ReturnType<typeof getDrizzleDb>["transaction"]>[0]>[0],
+  d: UpsertQuoteData,
+  pageIdInt?: number | null
+) {
+  const vals = quoteValues(d, pageIdInt);
+  return db
+    .insert(citationQuotes)
+    .values(vals)
+    .onConflictDoUpdate({
+      target: [citationQuotes.pageId, citationQuotes.footnote],
+      set: { ...vals, updatedAt: sql`now()` },
+    })
+    .returning({
+      id: citationQuotes.id,
+      pageId: citationQuotes.pageId,
+      footnote: citationQuotes.footnote,
+      createdAt: citationQuotes.createdAt,
+      updatedAt: citationQuotes.updatedAt,
+    });
+}
+
+/**
+ * Compute per-page citation health from a set of quote rows.
+ * Shared between the /health/:pageId endpoint and batch aggregations.
+ */
+function computePageHealth(
+  pageId: string,
+  rows: Array<{
+    sourceQuote: string | null;
+    quoteVerified: boolean;
+    verificationScore: number | null;
+    accuracyVerdict: string | null;
+    accuracyScore: number | null;
+  }>
+) {
+  let withQuotes = 0;
+  let verified = 0;
+  let accuracyChecked = 0;
+  let accurate = 0;
+  let inaccurate = 0;
+  let unsupported = 0;
+  let minorIssues = 0;
+  let notVerifiable = 0;
+  let scoreSum = 0;
+  let scoreCount = 0;
+
+  for (const q of rows) {
+    if (q.sourceQuote != null) withQuotes++;
+    if (q.quoteVerified) verified++;
+    if (q.verificationScore != null) {
+      scoreSum += q.verificationScore;
+      scoreCount++;
+    }
+    if (q.accuracyVerdict != null) {
+      accuracyChecked++;
+      switch (q.accuracyVerdict) {
+        case "accurate": accurate++; break;
+        case "inaccurate": inaccurate++; break;
+        case "unsupported": unsupported++; break;
+        case "minor_issues": minorIssues++; break;
+        case "not_verifiable": notVerifiable++; break;
+      }
+    }
+  }
+
+  return {
+    pageId,
+    total: rows.length,
+    withQuotes,
+    verified,
+    accuracyChecked,
+    accurate,
+    inaccurate,
+    unsupported,
+    minorIssues,
+    notVerifiable,
+    avgScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
+  };
+}
+
+const citationsApp = new Hono()
+  // ---- GET /health/:pageId ----
+  // Per-page citation health summary — used by the Next.js frontend.
+  .get("/health/:pageId", async (c) => {
+    const pageId = c.req.param("pageId");
+    const db = getDrizzleDb();
+
+    // Phase 4b: resolve slug to integer and query by page_id_int
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json(computePageHealth(pageId, []));
+
+    const rows = await db
+      .select({
+        sourceQuote: citationQuotes.sourceQuote,
+        quoteVerified: citationQuotes.quoteVerified,
+        verificationScore: citationQuotes.verificationScore,
+        accuracyVerdict: citationQuotes.accuracyVerdict,
+        accuracyScore: citationQuotes.accuracyScore,
+      })
+      .from(citationQuotes)
+      .where(eq(citationQuotes.pageIdInt, intId));
+
+    return c.json(computePageHealth(pageId, rows));
+  })
+
+  // ---- POST /quotes/upsert ---- [DEPRECATED: use POST /api/claims + POST /api/claims/:id/sources]
+  .post("/quotes/upsert", async (c) => {
+    deprecationWarning("POST /quotes/upsert");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = UpsertQuoteSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+
+    // Validate page reference
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+    if (missingPages.length > 0) {
+      return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
+    }
+
+    // Validate resource reference (optional)
+    if (parsed.data.resourceId) {
+      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+      if (missingRes.length > 0) {
+        return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
+      }
+    }
+
+    // Phase 4a: resolve page slug to integer ID for dual-write
+    const singlePageIdInt = await resolvePageIntId(db, parsed.data.pageId);
+    const rows = await upsertQuote(db, parsed.data, singlePageIdInt);
+
+    const row = firstOrThrow(rows, "citation quote upsert");
+    return c.json({
+      id: row.id,
+      pageId: row.pageId,
+      footnote: row.footnote,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }, 200);
+  })
+
+  // ---- POST /quotes/upsert-batch ---- [DEPRECATED: use POST /api/claims/batch]
+  .post("/quotes/upsert-batch", async (c) => {
+    deprecationWarning("POST /quotes/upsert-batch");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = UpsertBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+
+    // Validate page references
+    const pageIds = [...new Set(items.map((d) => d.pageId))];
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+    if (missingPages.length > 0) {
+      return validationError(
+        c,
+        `Referenced pages not found: ${missingPages.join(", ")}`
+      );
+    }
+
+    // Validate resource references (optional field)
+    const resourceIds = [
+      ...new Set(items.map((d) => d.resourceId).filter((r): r is string => r != null)),
+    ];
+    if (resourceIds.length > 0) {
+      const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+      if (missingResources.length > 0) {
+        return validationError(
+          c,
+          `Referenced resources not found: ${missingResources.join(", ")}`
+        );
+      }
+    }
+
+    let results;
+    try {
+      results = await db.transaction(async (tx) => {
+        // Phase 4a: resolve page slugs to integer IDs for dual-write (inside tx for consistency)
+        const batchIntIdMap = await resolvePageIntIds(tx, pageIds);
+        return await tx
+          .insert(citationQuotes)
+          .values(items.map((d) => quoteValues(d, batchIntIdMap.get(d.pageId) ?? null)))
+          .onConflictDoUpdate({
+            target: [citationQuotes.pageId, citationQuotes.footnote],
+            set: {
+              pageIdInt: sql`excluded.page_id_int`,
+              url: sql`excluded.url`,
+              resourceId: sql`excluded.resource_id`,
+              claimText: sql`excluded.claim_text`,
+              claimContext: sql`excluded.claim_context`,
+              sourceQuote: sql`excluded.source_quote`,
+              sourceLocation: sql`excluded.source_location`,
+              quoteVerified: sql`excluded.quote_verified`,
+              verificationMethod: sql`excluded.verification_method`,
+              verificationScore: sql`excluded.verification_score`,
+              sourceTitle: sql`excluded.source_title`,
+              sourceType: sql`excluded.source_type`,
+              extractionModel: sql`excluded.extraction_model`,
+              updatedAt: sql`now()`,
+            },
+          })
+          .returning({
+            id: citationQuotes.id,
+            pageId: citationQuotes.pageId,
+            footnote: citationQuotes.footnote,
+          });
+      });
+    } catch (err) {
+      return dbError(c, "citation quotes upsert-batch", err, { itemCount: items.length });
+    }
+
+    return c.json({ results });
+  })
+
+  // ---- GET /quotes?page_id=X ----
+  .get("/quotes", async (c) => {
+    const pageId = c.req.query("page_id");
+    if (!pageId) return validationError(c, "page_id query parameter is required");
+
+    const limitParam = c.req.query("limit");
+    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500) : 100;
+
+    const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ quotes: [] });
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(eq(citationQuotes.pageIdInt, intId))
+      .orderBy(asc(citationQuotes.footnote))
+      .limit(limit);
+
+    return c.json({ quotes: rows });
+  })
+
+  // ---- GET /quotes/all (paginated) ----
+  .get("/quotes/all", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db.select({ count: count() }).from(citationQuotes);
+    const total = countResult[0].count;
+
+    return c.json({ quotes: rows, total, limit, offset });
+  })
+
+  // ---- POST /quotes/mark-verified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
+  .post("/quotes/mark-verified", async (c) => {
+    deprecationWarning("POST /quotes/mark-verified");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = MarkVerifiedSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { pageId, footnote, method, score } = parsed.data;
+    const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+
+    const rows = await db
+      .update(citationQuotes)
+      .set({
+        quoteVerified: true,
+        verificationMethod: method,
+        verificationScore: score,
+        verifiedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .returning({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+      });
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ updated: true, pageId, footnote });
+  })
+
+  // ---- POST /quotes/mark-unverified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
+  .post("/quotes/mark-unverified", async (c) => {
+    deprecationWarning("POST /quotes/mark-unverified");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = MarkVerifiedSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { pageId, footnote, method, score } = parsed.data;
+    const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+
+    const rows = await db
+      .update(citationQuotes)
+      .set({
+        quoteVerified: false,
+        verificationMethod: method,
+        verificationScore: score,
+        updatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .returning({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+      });
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ updated: true, pageId, footnote });
+  })
+
+  // ---- POST /quotes/mark-accuracy ---- [DEPRECATED: update claims.claimVerdict instead]
+  .post("/quotes/mark-accuracy", async (c) => {
+    deprecationWarning("POST /quotes/mark-accuracy");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = MarkAccuracySchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = parsed.data;
+    const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+
+    const rows = await db
+      .update(citationQuotes)
+      .set({
+        accuracyVerdict: verdict,
+        accuracyScore: score,
+        accuracyIssues: issues ?? null,
+        accuracySupportingQuotes: supportingQuotes ?? null,
+        verificationDifficulty: verificationDifficulty ?? null,
+        accuracyCheckedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      })
+      .where(
+        and(
+          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .returning({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+      });
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ updated: true, pageId, footnote, verdict });
+  })
+
+  // ---- GET /stats ----
+  .get("/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db.select({
+      totalQuotes: count(),
+      withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null then 1 end)`,
+      verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
+      unverified: sql<number>`count(case when ${citationQuotes.quoteVerified} = false or ${citationQuotes.quoteVerified} is null then 1 end)`,
+      totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
+      averageScore: avg(citationQuotes.verificationScore),
+    }).from(citationQuotes);
+
+    const r = rows[0];
+    return c.json({
+      totalQuotes: r.totalQuotes,
+      withQuotes: Number(r.withQuotes),
+      verified: Number(r.verified),
+      unverified: Number(r.unverified),
+      totalPages: Number(r.totalPages),
+      averageScore: r.averageScore != null ? Number(r.averageScore) : null,
+    });
+  })
+
+  // ---- GET /page-stats ----
+  .get("/page-stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db.select({
+      pageId: citationQuotes.pageId,
+      total: count(),
+      withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null then 1 end)`,
+      verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
+      avgScore: avg(citationQuotes.verificationScore),
+      accuracyChecked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+    })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.pageId)
+      .orderBy(asc(citationQuotes.pageId));
+
+    return c.json({
+      pages: rows.map((r) => ({
+        pageId: r.pageId,
+        total: r.total,
+        withQuotes: Number(r.withQuotes),
+        verified: Number(r.verified),
+        avgScore: r.avgScore != null ? Number(r.avgScore) : null,
+        accuracyChecked: Number(r.accuracyChecked),
+        accurate: Number(r.accurate),
+        inaccurate: Number(r.inaccurate),
+      })),
+    });
+  })
+
+  // ---- GET /accuracy-summary ----
+  .get("/accuracy-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db.select({
+      pageId: citationQuotes.pageId,
+      checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+    })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.pageId)
+      .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`)
+      .orderBy(asc(citationQuotes.pageId));
+
+    return c.json({
+      pages: rows.map((r) => ({
+        pageId: r.pageId,
+        checked: Number(r.checked),
+        accurate: Number(r.accurate),
+        inaccurate: Number(r.inaccurate),
+        unsupported: Number(r.unsupported),
+      })),
+    });
+  })
+
+  // ---- GET /broken ----
+  .get("/broken", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+        url: citationQuotes.url,
+        claimText: citationQuotes.claimText,
+        verificationScore: citationQuotes.verificationScore,
+      })
+      .from(citationQuotes)
+      .where(
+        and(
+          eq(citationQuotes.quoteVerified, true),
+          isNotNull(citationQuotes.verificationScore),
+          lt(citationQuotes.verificationScore, BROKEN_SCORE_THRESHOLD)
+        )
+      )
+      .orderBy(
+        asc(citationQuotes.verificationScore),
+        asc(citationQuotes.pageId),
+        asc(citationQuotes.footnote)
+      );
+
+    return c.json({ broken: rows });
+  })
+
+  // ---- POST /content/upsert ----
+  // BREAKING CHANGE (PR #476): This endpoint no longer accepts `pageId` or
+  // `footnote` fields. Citation content is now keyed by URL only. External
+  // scripts that previously sent pageId/footnote need updating.
+  .post("/content/upsert", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = UpsertContentSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const d = parsed.data;
+    const db = getDrizzleDb();
+
+    const vals = {
+      url: d.url,
+      resourceId: d.resourceId ?? null,
+      fetchedAt: new Date(d.fetchedAt),
+      httpStatus: d.httpStatus ?? null,
+      contentType: d.contentType ?? null,
+      pageTitle: d.pageTitle ?? null,
+      fullTextPreview: d.fullTextPreview ?? (d.fullText ? d.fullText.slice(0, CITATION_CONTENT_PREVIEW_MAX) : null),
+      fullText: d.fullText ?? null,
+      contentLength: d.contentLength ?? null,
+      contentHash: d.contentHash ?? null,
+      fetchMethod: d.fetchMethod ?? null,
+    };
+
+    await db
+      .insert(citationContent)
+      .values(vals)
+      .onConflictDoUpdate({
+        target: citationContent.url,
+        set: { ...vals, updatedAt: sql`now()` },
+      });
+
+    return c.json({ url: d.url });
+  })
+
+  // ---- POST /quotes/mark-accuracy-batch ---- [DEPRECATED: batch update claims.claimVerdict instead]
+  .post("/quotes/mark-accuracy-batch", async (c) => {
+    deprecationWarning("POST /quotes/mark-accuracy-batch");
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = MarkAccuracyBatchSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { items } = parsed.data;
+    const db = getDrizzleDb();
+    // Phase 4b: resolve all page slugs to integer IDs upfront
+    const uniquePageIds = [...new Set(items.map((d) => d.pageId))];
+    const intIdMap = await resolvePageIntIds(db, uniquePageIds);
+    const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
+
+    try {
+      await db.transaction(async (tx) => {
+        for (const d of items) {
+          const intId = intIdMap.get(d.pageId);
+          if (intId == null) continue; // page absent from entity_ids, row cannot exist
+          const rows = await tx
+            .update(citationQuotes)
+            .set({
+              accuracyVerdict: d.verdict,
+              accuracyScore: d.score,
+              accuracyIssues: d.issues ?? null,
+              accuracySupportingQuotes: d.supportingQuotes ?? null,
+              verificationDifficulty: d.verificationDifficulty ?? null,
+              accuracyCheckedAt: sql`now()`,
+              updatedAt: sql`now()`,
+            })
+            .where(
+              and(
+                eq(citationQuotes.pageIdInt, intId),
+                eq(citationQuotes.footnote, d.footnote)
+              )
+            )
+            .returning({
+              pageId: citationQuotes.pageId,
+              footnote: citationQuotes.footnote,
+            });
+
+          if (rows.length > 0) {
+            results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
+          }
+        }
+      });
+    } catch (err) {
+      return dbError(c, "citation quotes mark-accuracy-batch", err, { itemCount: items.length });
+    }
+
+    return c.json({ updated: results.length, results });
+  })
+
+  // ---- POST /accuracy-snapshot ----
+  .post("/accuracy-snapshot", async (c) => {
+    const db = getDrizzleDb();
+
+    // Compute per-page accuracy stats from current citation_quotes data
+    const pageStats = await db.select({
+      pageId: citationQuotes.pageId,
+      totalCitations: count(),
+      checkedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurateCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      minorIssuesCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      inaccurateCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupportedCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      notVerifiableCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'not_verifiable' then 1 end)`,
+      averageScore: avg(citationQuotes.accuracyScore),
+    })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.pageId)
+      .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`);
+
+    // Insert snapshots for all pages with accuracy data
+    let inserted: Array<{ id: number }> = [];
+    if (pageStats.length > 0) {
+      // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
+      const snapPageIds = pageStats.map((ps) => ps.pageId);
+      const snapIntIdMap = await resolvePageIntIds(db, snapPageIds);
+
+      inserted = await db
+        .insert(citationAccuracySnapshots)
+        .values(
+          pageStats.map((ps) => ({
+            pageIdInt: snapIntIdMap.get(ps.pageId) ?? null,
+            totalCitations: ps.totalCitations,
+            checkedCitations: Number(ps.checkedCitations),
+            accurateCount: Number(ps.accurateCount),
+            minorIssuesCount: Number(ps.minorIssuesCount),
+            inaccurateCount: Number(ps.inaccurateCount),
+            unsupportedCount: Number(ps.unsupportedCount),
+            notVerifiableCount: Number(ps.notVerifiableCount),
+            averageScore: ps.averageScore != null ? Number(ps.averageScore) : null,
+          }))
+        )
+        .returning({
+          id: citationAccuracySnapshots.id,
+        });
+    }
+
+    return c.json({
+      snapshotCount: inserted.length,
+      // slugs from pageStats (page_id_old no longer written; can't read back from DB)
+      pages: pageStats.map((ps) => ps.pageId),
+    }, 201);
+  })
+
+  // ---- GET /accuracy-trends?page_id=X&limit=N ----
+  .get("/accuracy-trends", async (c) => {
+    const pageId = c.req.query("page_id");
+    const limitStr = c.req.query("limit");
+    const limit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || 50, 1), 500) : 50;
+
+    const db = getDrizzleDb();
+
+    if (pageId) {
+      // Trends for a specific page
+      const intId = await resolvePageIntId(db, pageId);
+      if (intId === null) return c.json({ pageId, snapshots: [] });
+
+      const rows = await db
+        .select()
+        .from(citationAccuracySnapshots)
+        .where(eq(citationAccuracySnapshots.pageIdInt, intId))
+        .orderBy(desc(citationAccuracySnapshots.snapshotAt))
+        .limit(limit);
+
+      return c.json({ pageId, snapshots: rows });
+    }
+
+    // Global trends: aggregate all snapshots by timestamp
+    const rows = await db
+      .select({
+        snapshotAt: citationAccuracySnapshots.snapshotAt,
+        totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageIdInt})`,
+        totalCitations: sql<number>`sum(${citationAccuracySnapshots.totalCitations})`,
+        checkedCitations: sql<number>`sum(${citationAccuracySnapshots.checkedCitations})`,
+        accurateCount: sql<number>`sum(${citationAccuracySnapshots.accurateCount})`,
+        minorIssuesCount: sql<number>`sum(${citationAccuracySnapshots.minorIssuesCount})`,
+        inaccurateCount: sql<number>`sum(${citationAccuracySnapshots.inaccurateCount})`,
+        unsupportedCount: sql<number>`sum(${citationAccuracySnapshots.unsupportedCount})`,
+        notVerifiableCount: sql<number>`sum(${citationAccuracySnapshots.notVerifiableCount})`,
+        averageScore: avg(citationAccuracySnapshots.averageScore),
+      })
+      .from(citationAccuracySnapshots)
+      .groupBy(citationAccuracySnapshots.snapshotAt)
+      .orderBy(desc(citationAccuracySnapshots.snapshotAt))
+      .limit(limit);
+
+    return c.json({
+      snapshots: rows.map((r) => ({
+        ...r,
+        totalPages: Number(r.totalPages),
+        totalCitations: Number(r.totalCitations),
+        checkedCitations: Number(r.checkedCitations),
+        accurateCount: Number(r.accurateCount),
+        minorIssuesCount: Number(r.minorIssuesCount),
+        inaccurateCount: Number(r.inaccurateCount),
+        unsupportedCount: Number(r.unsupportedCount),
+        notVerifiableCount: Number(r.notVerifiableCount),
+        averageScore: r.averageScore != null ? Number(r.averageScore) : null,
+      })),
+    });
+  })
+
+  // ---- GET /accuracy-dashboard ----
+  .get("/accuracy-dashboard", async (c) => {
+    const db = getDrizzleDb();
+
+    // Get all quotes with accuracy data
+    const allQuotes = await db
+      .select()
+      .from(citationQuotes)
+      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote));
+
+    // Compute summary stats
+    let checkedCount = 0;
+    let accurateCount = 0;
+    let inaccurateCount = 0;
+    let unsupportedCount = 0;
+    let minorIssueCount = 0;
+    let scoreSum = 0;
+    let scoreCount = 0;
+
+    const verdictDist: Record<string, number> = {};
+    const difficultyDist: Record<string, number> = {};
+
+    // Page aggregation
+    const pageMap = new Map<string, {
+      total: number; checked: number; accurate: number;
+      inaccurate: number; unsupported: number; minorIssues: number;
+      scoreSum: number; scoreCount: number;
+    }>();
+
+    // Domain aggregation
+    const domainMap = new Map<string, {
+      total: number; checked: number; accurate: number;
+      inaccurate: number; unsupported: number; minorIssues: number;
+    }>();
+
+    // Flagged citations
+    const flagged: Array<{
+      pageId: string; footnote: number; claimText: string;
+      sourceTitle: string | null; url: string | null;
+      verdict: string; score: number | null;
+      issues: string | null; difficulty: string | null;
+      checkedAt: string | null;
+    }> = [];
+
+    for (const q of allQuotes) {
+      const pageId = q.pageId;
+      const verdict = q.accuracyVerdict;
+      const score = q.accuracyScore;
+      const difficulty = q.verificationDifficulty;
+      const url = q.url;
+
+      // Extract domain
+      let domain: string | null = null;
+      if (url) {
+        try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* invalid URL — safe to ignore */ }
+      }
+
+      // Page aggregation
+      if (!pageMap.has(pageId)) {
+        pageMap.set(pageId, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
+      }
+      const page = pageMap.get(pageId)!;
+      page.total++;
+
+      // Domain aggregation
+      if (domain) {
+        if (!domainMap.has(domain)) {
+          domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0 });
+        }
+        const d = domainMap.get(domain)!;
+        d.total++;
+      }
+
+      if (verdict) {
+        checkedCount++;
+        page.checked++;
+        verdictDist[verdict] = (verdictDist[verdict] || 0) + 1;
+
+        if (domain) domainMap.get(domain)!.checked++;
+
+        if (score !== null) {
+          scoreSum += score;
+          scoreCount++;
+          page.scoreSum += score;
+          page.scoreCount++;
+        }
+
+        if (difficulty) {
+          difficultyDist[difficulty] = (difficultyDist[difficulty] || 0) + 1;
+        }
+
+        if (verdict === 'accurate') {
+          accurateCount++; page.accurate++;
+          if (domain) domainMap.get(domain)!.accurate++;
+        } else if (verdict === 'inaccurate') {
+          inaccurateCount++; page.inaccurate++;
+          if (domain) domainMap.get(domain)!.inaccurate++;
+        } else if (verdict === 'unsupported') {
+          unsupportedCount++; page.unsupported++;
+          if (domain) domainMap.get(domain)!.unsupported++;
+        } else if (verdict === 'minor_issues') {
+          minorIssueCount++; page.minorIssues++;
+          if (domain) domainMap.get(domain)!.minorIssues++;
+        }
+
+        // Flag problematic citations
+        if (verdict === 'inaccurate' || verdict === 'unsupported') {
+          const claimText = q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText;
+          flagged.push({
+            pageId, footnote: q.footnote, claimText,
+            sourceTitle: q.sourceTitle, url,
+            verdict, score,
+            issues: q.accuracyIssues,
+            difficulty,
+            checkedAt: q.accuracyCheckedAt?.toISOString() ?? null,
+          });
+        }
+      }
+    }
+
+    // Build page summaries
+    const pages = Array.from(pageMap.entries()).map(([pageId, p]) => ({
+      pageId,
+      totalCitations: p.total,
+      checked: p.checked,
+      accurate: p.accurate,
+      inaccurate: p.inaccurate,
+      unsupported: p.unsupported,
+      minorIssues: p.minorIssues,
+      accuracyRate: p.checked > 0 ? Math.round(((p.accurate + p.minorIssues) / p.checked) * 100) / 100 : null,
+      avgScore: p.scoreCount > 0 ? Math.round((p.scoreSum / p.scoreCount) * 100) / 100 : null,
+    }));
+    pages.sort((a, b) => {
+      const aInacc = a.checked > 0 ? (a.inaccurate + a.unsupported) / a.checked : 0;
+      const bInacc = b.checked > 0 ? (b.inaccurate + b.unsupported) / b.checked : 0;
+      if (bInacc !== aInacc) return bInacc - aInacc;
+      return b.totalCitations - a.totalCitations;
+    });
+
+    // Build domain summaries
+    const MIN_DOMAIN_CITATIONS = 2;
+    const domainAnalysis = Array.from(domainMap.entries())
+      .filter(([, d]) => d.total >= MIN_DOMAIN_CITATIONS)
+      .map(([domain, d]) => ({
+        domain,
+        totalCitations: d.total,
+        checked: d.checked,
+        accurate: d.accurate,
+        inaccurate: d.inaccurate,
+        unsupported: d.unsupported,
+        minorIssues: d.minorIssues,
+        inaccuracyRate: d.checked > 0 ? Math.round(((d.inaccurate + d.unsupported) / d.checked) * 100) / 100 : null,
+      }));
+    domainAnalysis.sort((a, b) => {
+      const aRate = a.inaccuracyRate ?? 0;
+      const bRate = b.inaccuracyRate ?? 0;
+      if (bRate !== aRate) return bRate - aRate;
+      return b.totalCitations - a.totalCitations;
+    });
+
+    // Sort flagged by score (worst first)
+    flagged.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
+
+    return c.json({
+      exportedAt: new Date().toISOString(),
+      summary: {
+        totalCitations: allQuotes.length,
+        checkedCitations: checkedCount,
+        accurateCitations: accurateCount,
+        inaccurateCitations: inaccurateCount,
+        unsupportedCitations: unsupportedCount,
+        minorIssueCitations: minorIssueCount,
+        uncheckedCitations: allQuotes.length - checkedCount,
+        averageScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
+      },
+      verdictDistribution: verdictDist,
+      difficultyDistribution: difficultyDist,
+      pages,
+      flaggedCitations: flagged,
+      domainAnalysis,
+    });
+  })
+
+  // ---- GET /content?url=X ----
+  .get("/content", async (c) => {
+    const url = c.req.query("url");
+    if (!url) return validationError(c, "url query parameter is required");
+
+    const db = getDrizzleDb();
+    const rows = await db
+      .select()
+      .from(citationContent)
+      .where(eq(citationContent.url, url));
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No content for url: ${url}`);
+    }
+
+    return c.json(rows[0]);
+  })
+
+  // ---- GET /content/list (paginated, metadata only — no full_text) ----
+  .get("/content/list", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset } = parsed.data;
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        url: citationContent.url,
+        fetchedAt: citationContent.fetchedAt,
+        httpStatus: citationContent.httpStatus,
+        contentType: citationContent.contentType,
+        pageTitle: citationContent.pageTitle,
+        contentLength: citationContent.contentLength,
+        contentHash: citationContent.contentHash,
+        hasFullText: sql<boolean>`(${citationContent.fullText} IS NOT NULL)`,
+        hasPreview: sql<boolean>`(${citationContent.fullTextPreview} IS NOT NULL)`,
+        createdAt: citationContent.createdAt,
+        updatedAt: citationContent.updatedAt,
+      })
+      .from(citationContent)
+      .orderBy(desc(citationContent.fetchedAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Single aggregate query — avoids 3 separate round-trips and is consistent
+    const aggregates = await db.select({
+      total: count(),
+      withFullText: sql<number>`count(case when ${citationContent.fullText} is not null then 1 end)`,
+      withPreview: sql<number>`count(case when ${citationContent.fullTextPreview} is not null then 1 end)`,
+    }).from(citationContent);
+
+    return c.json({
+      entries: rows,
+      total: aggregates[0].total,
+      withFullText: Number(aggregates[0].withFullText),
+      withPreview: Number(aggregates[0].withPreview),
+      limit,
+      offset,
+    });
+  })
+
+  // ---- GET /content/stats ----
+  .get("/content/stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db.select({
+      total: count(),
+      withFullText: sql<number>`count(case when ${citationContent.fullText} is not null then 1 end)`,
+      withPreview: sql<number>`count(case when ${citationContent.fullTextPreview} is not null then 1 end)`,
+      okCount: sql<number>`count(case when ${citationContent.httpStatus} = 200 then 1 end)`,
+      deadCount: sql<number>`count(case when ${citationContent.httpStatus} >= 400 then 1 end)`,
+      avgContentLength: avg(citationContent.contentLength),
+    }).from(citationContent);
+
+    const r = rows[0];
+    return c.json({
+      total: r.total,
+      withFullText: Number(r.withFullText),
+      withPreview: Number(r.withPreview),
+      coverage: r.total > 0 ? Math.round((Number(r.withFullText) / r.total) * 100) : 0,
+      okCount: Number(r.okCount),
+      deadCount: Number(r.deadCount),
+      avgContentLength: r.avgContentLength != null ? Math.round(Number(r.avgContentLength)) : null,
+    });
+  })
+
+  // ---- POST /content/link-resources ----
+  // Batch-links citation_content rows to their matching resources by URL.
+  // This bridges the gap between fetched content (URL-keyed) and curated resources (ID-keyed).
+  .post("/content/link-resources", async (c) => {
+    const db = getDrizzleDb();
+
+    // Find all citation_content rows that have no resource_id
+    // and match a resource by URL.
+    let result;
+    try {
+      result = await db.execute(sql`
+      UPDATE citation_content cc
+      SET resource_id = r.id
+      FROM resources r
+      WHERE cc.url = r.url
+        AND cc.resource_id IS NULL
+    `);
+    } catch (err) {
+      return dbError(c, "citation content link-resources", err);
+    }
+
+    const linked = Number((result as any).count ?? 0);
+    return c.json({ linked });
+  })
+
+  // ---- GET /quotes-by-url?url=X ----
+  // Returns all citation quotes across all pages for a given source URL.
+  // Used by resource pages to show cross-page citations.
+  .get("/quotes-by-url", async (c) => {
+    const url = c.req.query("url");
+    if (!url) return validationError(c, "url query parameter is required");
+
+    const limitParam = c.req.query("limit");
+    const limit = limitParam
+      ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
+      : 100;
+
+    const db = getDrizzleDb();
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(eq(citationQuotes.url, url))
+      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
+      .limit(limit);
+
+    // Also get aggregate stats
+    const stats = await db
+      .select({
+        totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
+        totalQuotes: count(),
+        verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
+        accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+        inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+        unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+        minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      })
+      .from(citationQuotes)
+      .where(eq(citationQuotes.url, url));
+
+    const s = stats[0];
+    return c.json({
+      quotes: rows,
+      stats: {
+        totalPages: Number(s.totalPages),
+        totalQuotes: s.totalQuotes,
+        verified: Number(s.verified),
+        accurate: Number(s.accurate),
+        inaccurate: Number(s.inaccurate),
+        unsupported: Number(s.unsupported),
+        minorIssues: Number(s.minorIssues),
+      },
+    });
+  })
+
+  // ---- PATCH /quotes/:id/link-claim ---- [REMOVED: claims tables archived by migration 0065]
+  .patch("/quotes/:id/link-claim", async (c) => {
+    return c.json(
+      { error: "Claim linking is no longer supported. The claims tables were archived by migration 0065." },
+      410,
+    );
+  })
+
+  // ---- POST /quotes/link-claims-batch ---- [REMOVED: claims tables archived by migration 0065]
+  .post("/quotes/link-claims-batch", async (c) => {
+    return c.json(
+      { error: "Claim linking is no longer supported. The claims tables were archived by migration 0065." },
+      410,
+    );
+  })
+
+  // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
+  // Backward propagation from claims → citation_quotes is no longer needed
+  // since claims is now the single source of truth for verification data.
+
+  // ---- GET /source-type-stats ----
+  .get("/source-type-stats", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        sourceType: sql<string>`coalesce(${citationQuotes.sourceType}, 'unknown')`,
+        count: count(),
+        withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null and ${citationQuotes.sourceQuote} != '' then 1 end)`,
+      })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.sourceType)
+      .orderBy(desc(count()));
+
+    return c.json({
+      stats: rows.map((r) => ({
+        sourceType: r.sourceType,
+        count: r.count,
+        withQuotes: Number(r.withQuotes),
+      })),
+    });
+  })
+
+  // ---- GET /pages-with-quotes ----
+  .get("/pages-with-quotes", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select({
+        pageId: citationQuotes.pageId,
+        quoteCount: count(),
+      })
+      .from(citationQuotes)
+      .where(
+        and(
+          isNotNull(citationQuotes.sourceQuote),
+          sql`${citationQuotes.sourceQuote} != ''`
+        )
+      )
+      .groupBy(citationQuotes.pageId)
+      .orderBy(desc(count()));
+
+    return c.json({
+      pages: rows.map((r) => ({
+        pageId: r.pageId,
+        quoteCount: r.quoteCount,
+      })),
+    });
+  })
+
+  // ---- GET /unverified ----
+  .get("/unverified", async (c) => {
+    const limitParam = c.req.query("limit");
+    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), MAX_PAGE_SIZE) : 100;
+
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(
+        and(
+          isNotNull(citationQuotes.sourceQuote),
+          sql`${citationQuotes.sourceQuote} != ''`,
+          eq(citationQuotes.quoteVerified, false)
+        )
+      )
+      .orderBy(asc(citationQuotes.createdAt))
+      .limit(limit);
+
+    return c.json({ quotes: rows });
+  })
+
+  // ---- GET /quotes/:pageId/:footnote ----
+  .get("/quotes/:pageId/:footnote", async (c) => {
+    const pageId = c.req.param("pageId");
+    const footnoteStr = c.req.param("footnote");
+    const footnote = parseInt(footnoteStr, 10);
+    if (isNaN(footnote)) return validationError(c, "footnote must be a number");
+
+    const db = getDrizzleDb();
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+
+    const rows = await db
+      .select()
+      .from(citationQuotes)
+      .where(
+        and(
+          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.footnote, footnote)
+        )
+      )
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    return c.json({ quote: rows[0] });
+  })
+
+  // ---- DELETE /accuracy-snapshots/cleanup (retention: keep latest N snapshots per page) ----
+  .delete("/accuracy-snapshots/cleanup", async (c) => {
+    const keepStr = c.req.query("keep");
+    const dryRunStr = c.req.query("dry_run");
+
+    const keep = keepStr ? Math.min(Math.max(parseInt(keepStr, 10) || 30, 1), 1000) : 30;
+    const dryRun = dryRunStr === "true" || dryRunStr === "1";
+
+    const rawDb = getDb();
+
+    if (dryRun) {
+      const result = await rawDb`
+        SELECT count(*)::int AS count
+        FROM citation_accuracy_snapshots cas
+        WHERE id NOT IN (
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (
+              -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id_int, -1) ORDER BY snapshot_at DESC
+            ) AS rn
+            FROM citation_accuracy_snapshots
+          ) ranked
+          WHERE rn <= ${keep}
+        )
+      `;
+      const wouldDelete = result[0]?.count ?? 0;
+
+      const totalResult = await rawDb`
+        SELECT count(*)::int AS total FROM citation_accuracy_snapshots
+      `;
+      const total = totalResult[0]?.total ?? 0;
+
+      return c.json({
+        dryRun: true,
+        keep,
+        totalSnapshots: total,
+        wouldDelete,
+        wouldRetain: total - wouldDelete,
+      });
+    }
+
+    logger.info({ keep }, "Deleting old citation accuracy snapshots");
+    const result = await rawDb`
+      DELETE FROM citation_accuracy_snapshots
+      WHERE id NOT IN (
+        SELECT id FROM (
+          SELECT id, ROW_NUMBER() OVER (
+            -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
+            PARTITION BY COALESCE(page_id_int, -1) ORDER BY snapshot_at DESC
+          ) AS rn
+          FROM citation_accuracy_snapshots
+        ) ranked
+        WHERE rn <= ${keep}
+      )
+    `;
+
+    return c.json({ deleted: result.count, keep });
+  });
+
+export const citationsRoute = citationsApp;
+export type CitationsRoute = typeof citationsApp;

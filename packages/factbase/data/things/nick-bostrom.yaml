@@ -55,22 +55,3 @@ facts:
   - id: f_ikrzfocsqt
     property: google-scholar
     value: "https://scholar.google.com/citations?user=gk5PjEkAAAAJ"
-
-records:
-  career-history:
-    i_nB1zA2bC3d:
-      organization: "Yale University"
-      title: "Postdoctoral Fellow"
-      start: "2000"
-      end: "2003"
-      source: https://en.wikipedia.org/wiki/Nick_Bostrom
-      notes: "Taught at Yale's Department of Philosophy"
-
-    i_nB4eF5gH6i:
-      organization: "University of Oxford"
-      title: "Professor of Philosophy; Founding Director, Future of Humanity Institute"
-      start: "2005"
-      end: "2024"
-      source: https://en.wikipedia.org/wiki/Nick_Bostrom
-      notes: "Founded FHI in 2005; FHI closed in April 2024 due to administrative conflicts with the Faculty of Philosophy"
-

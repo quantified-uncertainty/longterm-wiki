@@ -10,7 +10,7 @@
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { ActiveAgentsRoute } from '../../../apps/wiki-server/src/routes/active-agents.ts';
+import type { ActiveAgentsRoute } from '../../../apps/wiki-server/src/routes/operational/active-agents.ts';
 import type {
   RegisterAgent,
   UpdateAgent,

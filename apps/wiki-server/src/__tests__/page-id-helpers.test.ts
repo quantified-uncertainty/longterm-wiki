@@ -61,7 +61,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { resolvePageIntId, resolvePageIntIds, allocateAndResolvePageIntIds } =
-  await import("../routes/page-id-helpers.js");
+  await import("../routes/shared/page-id-helpers.js");
 const { getDrizzleDb } = await import("../db.js");
 
 describe("page-id-helpers", () => {
