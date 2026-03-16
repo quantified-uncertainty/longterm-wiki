@@ -18,7 +18,7 @@ import {
   startHeartbeat, withRetry, type ToolHandler, isOpenRouterMode, streamLlmCall,
 } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
-import { shouldUseApiDirect } from '../../lib/claude-cli.ts';
+import { shouldUseApiDirect, isClaudeCliAvailable } from '../../lib/claude-cli.ts';
 import type { RunAgentOptions } from './types.ts';
 import { ROOT, SCRY_PUBLIC_KEY, log } from './utils.ts';
 
@@ -37,9 +37,26 @@ export { startHeartbeat };
 // Track which mode we're using (set by pipeline.ts)
 let _useApiDirect: boolean | null = null;
 
-/** Set whether to use API-direct mode. Called once at pipeline start. */
+/**
+ * Set whether to use API-direct mode. Called once at pipeline start.
+ *
+ * Unlike shouldUseApiDirect() which blocks CLI mode inside Claude Code
+ * sessions (CLAUDECODE=1), here we WANT CLI mode even inside sessions —
+ * the spawn itself deletes CLAUDECODE from the child env. We only fall
+ * back to API-direct if explicitly requested or if `claude` binary is
+ * unavailable.
+ */
 export function setApiDirectMode(explicit?: boolean): void {
-  _useApiDirect = shouldUseApiDirect(explicit);
+  if (explicit === true) {
+    _useApiDirect = true;
+  } else if (explicit === false) {
+    _useApiDirect = false;
+  } else {
+    // Auto-detect: try CLI if the binary exists (ignore CLAUDECODE — the
+    // spawn itself deletes it from the child env). Only fall back to API
+    // if `claude` binary is truly unavailable.
+    _useApiDirect = !isClaudeCliAvailable();
+  }
   log('api', _useApiDirect
     ? 'Using API-direct mode (Anthropic SDK — billed via ANTHROPIC_API_KEY)'
     : 'Using CLI mode (claude subprocess — billed via Claude Code subscription)');
@@ -168,14 +185,18 @@ async function runAgentViaCli(
   const budgetUsd = cliModel === 'haiku' ? '0.50' : '3.00';
 
   return new Promise((resolve, reject) => {
-    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
+    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session.
+    // Unset ANTHROPIC_API_KEY so the CLI uses the subscription (OAuth) instead
+    // of the API key — this is the whole point of CLI mode.
     const env = { ...process.env };
     delete env.CLAUDECODE;
+    delete env.ANTHROPIC_API_KEY;
 
     const args = [
       '-p',
       '--print',
       '--dangerously-skip-permissions',
+      '--output-format', 'json',
       '--model', cliModel,
       '--max-budget-usd', budgetUsd,
     ];
@@ -204,7 +225,10 @@ async function runAgentViaCli(
 
     let stderr = '';
     claude.stderr.on('data', (data: Buffer) => {
-      stderr += data.toString();
+      const chunk = data.toString();
+      stderr += chunk;
+      // Stream stderr for visibility during long runs
+      process.stderr.write(chunk);
     });
 
     claude.on('error', (err: Error) => {
@@ -215,9 +239,20 @@ async function runAgentViaCli(
     claude.on('close', (code: number | null) => {
       clearTimeout(timeout);
       if (code === 0 && stdout.trim()) {
-        resolve(stdout.trim());
+        // Parse JSON output format to extract the result text
+        try {
+          const parsed = JSON.parse(stdout.trim());
+          if (parsed.result) {
+            resolve(parsed.result);
+          } else {
+            // Fallback: use raw stdout if no result field
+            resolve(stdout.trim());
+          }
+        } catch {
+          // Not JSON — use raw output (shouldn't happen with --output-format json)
+          resolve(stdout.trim());
+        }
       } else if (code === 0) {
-        // Empty output — likely a budget or tool issue
         reject(new Error(`Claude CLI returned empty output${stderr ? `\nstderr: ${stderr.slice(-1000)}` : ''}`));
       } else {
         reject(new Error(`Claude CLI exited with code ${code}${stderr ? `\nstderr: ${stderr.slice(-1000)}` : ''}`));
