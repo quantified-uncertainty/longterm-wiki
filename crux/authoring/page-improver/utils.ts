@@ -298,6 +298,34 @@ const RELATED_SECTION_PATTERNS = [
 ];
 
 /**
+ * Clean up garbled EntityLink tags produced by the improve LLM.
+ * Fixes: duplicated attributes (name="x" name="x" name="x"),
+ * removes `name` attributes entirely (they're optional and the
+ * enrichment phase doesn't use them), and handles self-closing tags.
+ */
+export function cleanEntityLinks(content: string): string {
+  // Match both regular and self-closing EntityLink tags
+  return content.replace(
+    /<EntityLink\s+([^>]*?)(\s*\/)?>/g,
+    (_match, attrs: string, selfClose?: string) => {
+      // Parse unique attributes, keeping only the first occurrence of each key,
+      // and skipping `name` attributes (not needed, frequently duplicated by LLM)
+      const seen = new Map<string, string>();
+      const attrRe = /([\w-]+)="([^"]*)"/g;
+      let m: RegExpExecArray | null;
+      while ((m = attrRe.exec(attrs)) !== null) {
+        if (m[1] !== 'name' && !seen.has(m[1])) {
+          seen.set(m[1], m[2]);
+        }
+      }
+      const parts = Array.from(seen.entries()).map(([k, v]) => `${k}="${v}"`);
+      const closing = selfClose ? ' />' : '>';
+      return `<EntityLink ${parts.join(' ')}${closing}`;
+    },
+  );
+}
+
+/**
  * Remove manual "Related Pages" / "See Also" / "Related Content" sections.
  * These are now rendered automatically by the RelatedPages React component.
  */

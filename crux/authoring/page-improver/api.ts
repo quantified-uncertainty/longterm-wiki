@@ -1,17 +1,24 @@
 /**
  * LLM/API layer for the page-improver pipeline.
  *
- * Thin wrapper around the shared LLM abstraction (crux/lib/llm.ts),
- * adding page-improver-specific tool handlers (web search, SCRY, file read).
+ * Two execution paths:
+ *   1. CLI mode (default): spawns `claude -p --print` subprocess, billed via
+ *      Claude Code subscription. Web search handled by Claude's native tool.
+ *   2. API-direct mode: calls Anthropic SDK directly, billed via ANTHROPIC_API_KEY.
+ *      Used when --api-direct is set, or inside a Claude Code SDK session.
+ *
+ * The CLI path was added to avoid $5-8/page API costs during batch loops.
  */
 
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
 import {
   createLlmClient, runLlmAgent, streamingCreate, extractText,
   startHeartbeat, withRetry, type ToolHandler, isOpenRouterMode, streamLlmCall,
 } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
+import { shouldUseApiDirect, isClaudeCliAvailable } from '../../lib/claude-cli.ts';
 import type { RunAgentOptions } from './types.ts';
 import { ROOT, SCRY_PUBLIC_KEY, log } from './utils.ts';
 
@@ -26,6 +33,41 @@ function getClient() {
 // ── Re-export for pipeline.ts ────────────────────────────────────────────────
 
 export { startHeartbeat };
+
+// Track which mode we're using (set by pipeline.ts)
+let _useApiDirect: boolean | null = null;
+
+/**
+ * Set whether to use API-direct mode. Called once at pipeline start.
+ *
+ * Unlike shouldUseApiDirect() which blocks CLI mode inside Claude Code
+ * sessions (CLAUDECODE=1), here we WANT CLI mode even inside sessions —
+ * the spawn itself deletes CLAUDECODE from the child env. We only fall
+ * back to API-direct if explicitly requested or if `claude` binary is
+ * unavailable.
+ */
+export function setApiDirectMode(explicit?: boolean): void {
+  if (explicit === true) {
+    _useApiDirect = true;
+  } else if (explicit === false) {
+    _useApiDirect = false;
+  } else {
+    // Auto-detect: try CLI if the binary exists (ignore CLAUDECODE — the
+    // spawn itself deletes it from the child env). Only fall back to API
+    // if `claude` binary is truly unavailable.
+    _useApiDirect = !isClaudeCliAvailable();
+  }
+  log('api', _useApiDirect
+    ? 'Using API-direct mode (Anthropic SDK — billed via ANTHROPIC_API_KEY)'
+    : 'Using CLI mode (claude subprocess — billed via Claude Code subscription)');
+}
+
+function isApiDirect(): boolean {
+  if (_useApiDirect === null) {
+    _useApiDirect = shouldUseApiDirect();
+  }
+  return _useApiDirect;
+}
 
 // ── Tool implementations ─────────────────────────────────────────────────────
 
@@ -106,10 +148,135 @@ function buildToolHandlers(): Record<string, ToolHandler> {
   };
 }
 
+// ── CLI-based agent execution ────────────────────────────────────────────────
+
+const CLI_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
+/**
+ * Run a prompt through the Claude CLI subprocess.
+ * Bills via Claude Code subscription, not ANTHROPIC_API_KEY.
+ *
+ * Uses --allowedTools WebSearch for phases that need web access.
+ */
+async function runAgentViaCli(
+  prompt: string,
+  options: RunAgentOptions = {},
+): Promise<string> {
+  const {
+    model = MODELS.sonnet,
+    tools = [],
+  } = options;
+
+  // Map SDK model IDs to CLI model names
+  const cliModel = model.includes('haiku') ? 'haiku'
+    : model.includes('opus') ? 'opus'
+    : 'sonnet';
+
+  // Determine which tools to allow. If the phase declared web_search/scry_search
+  // tools, enable WebSearch in the CLI.
+  const hasWebTools = tools.some(t =>
+    'name' in t && (t.name === 'web_search' || t.name === 'scry_search'),
+  );
+  const allowedTools = hasWebTools
+    ? 'WebSearch,WebFetch'
+    : '';
+
+  // Budget per phase call (generous but bounded)
+  const budgetUsd = cliModel === 'haiku' ? '0.50' : '3.00';
+
+  return new Promise((resolve, reject) => {
+    // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session.
+    // Unset ANTHROPIC_API_KEY so the CLI uses the subscription (OAuth) instead
+    // of the API key — this is the whole point of CLI mode.
+    const env = { ...process.env };
+    delete env.CLAUDECODE;
+    delete env.ANTHROPIC_API_KEY;
+
+    const args = [
+      '-p',
+      '--print',
+      '--dangerously-skip-permissions',
+      '--output-format', 'json',
+      // Override system prompt to prevent CLAUDE.md from interfering with
+      // the transformation task. The prompt already contains all context.
+      '--system-prompt', 'You are a text transformation tool for a wiki content pipeline. Output ONLY the requested content — no explanations, no preamble, no markdown code fences. Start your response with the first character of the requested output.',
+      '--model', cliModel,
+      '--max-budget-usd', budgetUsd,
+    ];
+    if (allowedTools) {
+      args.push('--allowedTools', allowedTools);
+    }
+
+    const claude = spawn('claude', args, {
+      cwd: ROOT,
+      env,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    const timeout = setTimeout(() => {
+      claude.kill();
+      reject(new Error(`CLI agent timed out after ${CLI_TIMEOUT_MS / 1000}s`));
+    }, CLI_TIMEOUT_MS);
+
+    claude.stdin.write(prompt);
+    claude.stdin.end();
+
+    let stdout = '';
+    claude.stdout.on('data', (data: Buffer) => {
+      stdout += data.toString();
+    });
+
+    let stderr = '';
+    claude.stderr.on('data', (data: Buffer) => {
+      const chunk = data.toString();
+      stderr += chunk;
+      // Stream stderr for visibility during long runs
+      process.stderr.write(chunk);
+    });
+
+    claude.on('error', (err: Error) => {
+      clearTimeout(timeout);
+      reject(new Error(`Failed to spawn claude subprocess: ${err.message}`));
+    });
+
+    claude.on('close', (code: number | null) => {
+      clearTimeout(timeout);
+      if (code === 0 && stdout.trim()) {
+        // Parse JSON output format to extract the result text
+        try {
+          const parsed = JSON.parse(stdout.trim());
+          if (parsed.result) {
+            resolve(parsed.result);
+          } else {
+            // Fallback: use raw stdout if no result field
+            resolve(stdout.trim());
+          }
+        } catch {
+          // Not JSON — use raw output (shouldn't happen with --output-format json)
+          resolve(stdout.trim());
+        }
+      } else if (code === 0) {
+        reject(new Error(`Claude CLI returned empty output${stderr ? `\nstderr: ${stderr.slice(-1000)}` : ''}`));
+      } else {
+        reject(new Error(`Claude CLI exited with code ${code}${stderr ? `\nstderr: ${stderr.slice(-1000)}` : ''}`));
+      }
+    });
+  });
+}
+
 // ── Agent execution ──────────────────────────────────────────────────────────
 
-/** Run Claude with tools (streaming + retry + heartbeat). */
+/**
+ * Run Claude with the appropriate backend.
+ * - CLI mode (default): spawns `claude` subprocess, billed via subscription.
+ * - API-direct mode: uses Anthropic SDK, billed via ANTHROPIC_API_KEY.
+ */
 export async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<string> {
+  if (!isApiDirect()) {
+    return runAgentViaCli(prompt, options);
+  }
+
+  // API-direct path (original behavior)
   const {
     model = MODELS.sonnet,
     maxTokens = 16000,

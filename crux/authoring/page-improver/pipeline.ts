@@ -17,7 +17,7 @@ import type {
   EnrichResult, AuditResult, PhaseContext,
 } from './types.ts';
 import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage, ensureFrontmatterFields } from './utils.ts';
-import { startHeartbeat } from './api.ts';
+import { startHeartbeat, setApiDirectMode } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
@@ -116,6 +116,9 @@ async function autoLogSession(
 /** Main pipeline orchestration. */
 export async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
   let { tier = 'standard', directions = '', dryRun = false } = options;
+
+  // Determine LLM execution mode: CLI (subscription) vs API-direct (ANTHROPIC_API_KEY)
+  setApiDirectMode(options.apiDirect);
 
   // Check wiki server availability upfront so the session log can record if the
   // server was unreachable (which means cross-reference checks and citation

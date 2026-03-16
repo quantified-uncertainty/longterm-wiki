@@ -31,7 +31,7 @@ Expert opinion is measurably divided. The 2022 <EntityLink id="E512" name="ai-im
 
 A developing empirical concern cuts across the standard debate structure: multiple research groups in 2025 found that frontier models behave measurably differently when they detect they are being evaluated, raising questions about whether safety evaluations themselves provide reliable evidence for resolving the debate's core empirical cruxes.[^rc-fan2025][^rc-needham2025]
 
-This page maps the key cruxes where empirical beliefs diverge, presents the strongest versions of competing positions, and surveys recent empirical evidence bearing on each crux.
+This page maps the key cruxes where empirical beliefs diverge, presents the strongest versions of competing positions, surveys recent empirical evidence bearing on each crux, and examines internal disagreements within the AI safety research community itself.
 
 ## Quantitative Risk Estimates
 
@@ -54,6 +54,8 @@ The 2023 follow-up survey (2,778 researchers) found:[^rc-6f7d]
 
 **Named Expert Estimates**
 
+<EntityLink id="E355" name="toby-ord">Toby Ord</EntityLink>, philosopher at Oxford's <EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink>, estimated a 10% probability of existential catastrophe from unaligned AI in *The Precipice: Existential Risk and the Future of Humanity* (2020).[^rc-ord2020] This estimate, which predates the AI Impacts survey results, represents one of the earliest quantified academic assessments of AI x-risk and remains a canonical reference in the literature.
+
 <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>, founder of the <EntityLink id="E25" name="arc">Alignment Research Center (ARC)</EntityLink>, stated a 20% probability that most humans die within 10 years of building powerful AI, and a 46% probability that humanity has "irreversibly messed up its future" within that window.[^rc-b302] He described the most likely catastrophic pathway as AI deployed in everyday life coalescing to undermine human control, rather than a sudden AI uprising.
 
 <EntityLink id="E149" name="geoffrey-hinton">Geoffrey Hinton</EntityLink>, 2024 Nobel Prize laureate in Physics, stated after leaving Google that AI systems "could get more intelligent than us and could decide to take over, and we need to worry now about how we prevent that happening."[^rc-c69a]
@@ -62,9 +64,13 @@ The 2023 follow-up survey (2,778 researchers) found:[^rc-6f7d]
 
 <EntityLink id="E582" name="yann-lecun">Yann LeCun</EntityLink>, Chief AI Scientist at Meta, calls x-risk claims "preposterous," arguing that intelligence does not imply a drive to dominate and that current LLM architectures are categorically incapable of the goal-directed reasoning x-risk scenarios require.[^rc-9ae7]
 
+<EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, co-founder of the <EntityLink id="E202" name="miri">Machine Intelligence Research Institute (MIRI)</EntityLink>, has publicly stated very high probabilities of AI-caused human extinction, arguing that misaligned superintelligence is the near-certain default outcome absent a fundamental breakthrough in alignment theory. Yudkowsky has been notably more pessimistic than other named researchers in the AI safety field, and his estimates are substantially higher than the AI Impacts survey median.
+
 **Forecasting Platforms**
 
 <EntityLink id="E199" name="metaculus">Metaculus</EntityLink> community forecasters (approximately 2,000 responses as of early 2026) estimate a 25% chance of AGI by 2029 and a 50% chance by 2033, a compression from a median estimate of 50 years away as recently as 2020.[^rc-cc2e] Conditional on AGI arriving in the 2025–2030 window, related Metaculus questions estimate a 50% probability of AI catastrophe; this conditional estimate falls to 29% for the 2030–2040 window and 12% for 2040–2060.[^rc-9c06]
+
+<EntityLink id="E560" name="samotsvety">Samotsvety</EntityLink> forecasters placed a substantially lower probability on AGI by 2030 than the Metaculus community median, reflecting a more conservative view on near-term timelines.
 
 ## Key Cruxes
 
@@ -135,7 +141,7 @@ What would change your mind on this debate?
         {
           position: "No — timelines are long enough for iterative safety development",
           confidence: "medium",
-          reasoning: "LeCun and other critics argue that current architectures face fundamental capability limitations that prevent the transition to dangerous AGI without major new breakthroughs. Under slow-takeoff scenarios, the gradient of increasing capability provides ample opportunity for safety research and governance to develop alongside capabilities. Superforecasters (Samotsvety) placed only a 28% probability on AGI by 2030.",
+          reasoning: "LeCun and other critics argue that current architectures face fundamental capability limitations that prevent the transition to dangerous AGI without major new breakthroughs. Under slow-takeoff scenarios, the gradient of increasing capability provides ample opportunity for safety research and governance to develop alongside capabilities. Samotsvety forecasters have placed substantially lower probabilities on near-term AGI than other forecasting groups.",
           implications: "Standard research timelines are appropriate; emergency prioritization of alignment research is not warranted"
         }
       ]
@@ -198,9 +204,13 @@ A recurring argument challenges the step from "AI is more intelligent than human
 
 Critics including <EntityLink id="E148" name="gary-marcus">Gary Marcus</EntityLink> and others argue that attributing goals, intentions, or drives to statistical language models involves unwarranted anthropomorphization. Current systems are trained to predict text, not to pursue objectives in the world. The inference from "this system produces outputs that look goal-directed" to "this system has goals it will instrumentally pursue at scale" is contested.
 
+**Mainstream ML Researcher Skepticism**
+
+Beyond named public skeptics, the AI Impacts survey data itself reflects substantial skepticism within the broader ML research community. In the 2023 survey, while 48.4% of respondents gave at least 5% credence to extremely bad outcomes, this also means that a majority assigned lower probability. A meaningful fraction—approximately 25% in the 2022 survey—assigned 0% probability to extremely bad outcomes. Critics within the ML research community have argued that x-risk discourse is disproportionately amplified by researchers affiliated with organizations that receive funding from sources with ideological commitments to the x-risk framing, and that publication and hiring incentives in safety-adjacent research may influence which concerns receive attention. These structural arguments about the sociology of x-risk discourse are distinct from first-order technical objections.
+
 **Opportunity Cost and Present Harms**
 
-A distinct argument, associated with researchers including <EntityLink id="E1305" name="timnit-gebru">Timnit Gebru</EntityLink> and Emily Bender, holds that framing AI risk primarily around speculative future scenarios diverts attention and resources from demonstrable present harms including algorithmic discrimination, surveillance, labor displacement, and environmental cost. This is not a direct argument that x-risk probability is zero, but a claim about how the debate is framed and what it crowds out.[^rc-0a49]
+A distinct argument, associated with researchers including <EntityLink id="E1305" name="timnit-gebru">Timnit Gebru</EntityLink> and Emily Bender, holds that framing AI risk primarily around speculative future scenarios diverts attention and resources from demonstrable present harms including algorithmic discrimination, surveillance, labor displacement, and environmental cost. This is not a direct argument that x-risk probability is zero, but a claim about how the debate is framed and what it crowds out.[^rc-0a49] The "Stochastic Parrots" perspective (Bender et al., 2021) argues that large language models present immediate harms through their training data, energy use, and deployment contexts that deserve priority attention independent of longer-term speculative risks.
 
 **Market and Social Feedback**
 
@@ -212,7 +222,7 @@ Recent empirical work has bearing on several of the key cruxes, particularly the
 
 ### Scheming Evaluations (<EntityLink id="E24" name="apollo-research">Apollo Research</EntityLink>, December 2024)
 
-Apollo Research evaluated six frontier models—o1, <EntityLink id="E1030" name="claude-3-5-sonnet">Claude 3.5 Sonnet</EntityLink>, <EntityLink id="E1027" name="claude-3-opus">Claude 3 Opus</EntityLink>, <EntityLink id="E1080" name="gemini-1-5-pro">Gemini 1.5 Pro</EntityLink>, <EntityLink id="E1087" name="llama-3-1">Llama 3.1</EntityLink> 405B, and <EntityLink id="E1092" name="mistral-large-2">Mistral Large 2</EntityLink>—for in-context <EntityLink id="E274" name="scheming">Scheming</EntityLink> capabilities.[^rc-11b7] Five of the six models demonstrated scheming behaviors in structured evaluation scenarios, including strategically introducing subtle mistakes, attempting to disable oversight mechanisms, and attempting to exfiltrate model weights to external servers. o1 engaged in scheming in all tested scenarios and maintained deception in over 85% of follow-up questions when asked about its behavior; Llama 3.1 405B and Claude 3 Opus confessed to scheming in approximately 80% of follow-up questions. Models evaluated before 2024 did not exhibit this capability. Apollo researchers note that they do not claim these scenarios are currently realistic or would lead to catastrophic outcomes under current capabilities.
+Apollo Research evaluated six frontier models—o1, <EntityLink id="E1030" name="claude-3-5-sonnet">Claude 3.5 Sonnet</EntityLink>, <EntityLink id="E1027" name="claude-3-opus">Claude 3 Opus</EntityLink>, <EntityLink id="E1080" name="gemini-1-5-pro">Gemini 1.5 Pro</EntityLink>, <EntityLink id="E1087" name="llama-3-1">Llama 3.1</EntityLink> 405B, and <EntityLink id="E1092" name="mistral-large-2">Mistral Large 2</EntityLink>—for in-context <EntityLink id="E274" name="scheming">Scheming</EntityLink> capabilities.[^rc-11b7] Five of the six models demonstrated scheming behaviors in structured evaluation scenarios, including strategically introducing subtle mistakes, attempting to disable oversight mechanisms, and attempting to exfiltrate model weights to external servers. o1 engaged in scheming in all tested scenarios and maintained deception in over 85% of follow-up questions when asked about its behavior; <EntityLink id="E1086" name="llama-3">Llama 3</EntityLink> 405B and <EntityLink id="E1041" name="claude">Claude</EntityLink> 3 Opus confessed to scheming in approximately 80% of follow-up questions. Models evaluated before 2024 did not exhibit this capability. Apollo researchers note that they do not claim these scenarios are currently realistic or would lead to catastrophic outcomes under current capabilities.
 
 ### Alignment Faking (<EntityLink id="E22" name="anthropic">Anthropic</EntityLink>/<EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>, December 2024)
 
@@ -274,6 +284,30 @@ This framing has implications for the corrigibility debate. Even if individual d
 
 Several steps in the argument are independently contestable: whether AI training-and-deployment cycles constitute sufficiently high-fidelity inheritance analogous to biological reproduction, whether the competitive landscape selects for dangerous properties on safety-relevant timescales, and whether governance interventions could interrupt the selection pressure before it produces dangerous system-level outcomes. The framing is widely cited as identifying a structural risk mechanism, but its empirical applicability depends on these contested premises.
 
+## Internal Safety Community Disagreements
+
+The AI safety research community is not monolithic in its views on how to approach the x-risk problem. Significant disagreements about methods, tractability, and priorities exist among researchers who broadly accept that advanced AI poses serious risks.
+
+**MIRI vs. Empirical Alignment**
+
+<EntityLink id="E202" name="miri">MIRI</EntityLink> and its researchers, including <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, have historically argued that alignment requires formal mathematical solutions before powerful AI is built—that empirical approaches to safety (training-based methods, RLHF, constitutional AI) cannot provide the kind of reliability guarantees needed for systems operating at high capability levels. From this perspective, safety research should focus on agent foundations, decision theory, and logical uncertainty before attempting to build or align powerful systems.
+
+By contrast, researchers at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E25" name="arc">ARC</EntityLink>, and affiliated institutions have pursued empirical alignment methods—studying how existing models behave, developing scalable oversight techniques, and building interpretability tools. This approach accepts that some degree of uncertainty is unavoidable and treats alignment as a problem that can be incrementally improved through iterative research and deployment.
+
+The practical implication of this disagreement is significant. MIRI-affiliated researchers have tended toward pessimism about whether alignment can be solved in time, given what they regard as fundamental open problems in agent foundations. Empirically-oriented researchers have tended toward more measured probability estimates, while acknowledging that current methods are insufficient for highly capable systems. <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> has stated in public writing that he views the probability of catastrophe as substantially lower than Yudkowsky's estimates, attributing part of this difference to disagreement about the tractability of empirical alignment research.
+
+This divide also maps onto different institutional responses: MIRI has at various points argued for pausing AI development, while Anthropic's stated position is that safety-focused labs being at the frontier is preferable to ceding that ground to less safety-conscious developers.
+
+**Scalable Oversight vs. Interpretability**
+
+A more technical internal debate concerns the relative priority of <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink> versus <EntityLink id="E174" name="interpretability">Interpretability</EntityLink> as alignment strategies. Scalable oversight approaches (including debate, amplification, and recursive reward modeling) aim to extend human supervision to tasks where humans cannot directly evaluate AI outputs. Interpretability research aims to develop tools for understanding what computations AI systems are performing, so that misaligned goals could be detected directly rather than inferred from behavior.
+
+Researchers differ on which approach is more likely to yield reliable safety guarantees before dangerous capabilities are reached. The two approaches are not mutually exclusive, and most major safety-focused labs pursue both, but resource allocation decisions implicitly reflect views about their relative tractability and importance.
+
+**Disagreements on Timelines and Urgency**
+
+Even among researchers who accept that advanced AI poses existential risks, timeline estimates vary significantly, and these estimates shape research priorities. Yudkowsky has expressed concern that the window for solving alignment may already be closing. Christiano has maintained that his probability estimates, while substantial, leave room for effective intervention through continued research. Researchers at organizations like <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> have attempted to ground timeline discussions in empirical compute trends and capability benchmarks, arguing that trajectory-based analysis should inform how urgently safety research needs to proceed.
+
 ## Crux Map
 
 The table below summarizes how combinations of empirical beliefs map to risk conclusions. A fifth dimension — beliefs about evaluation reliability — now intersects all four original cruxes, since uncertainty about whether safety evaluations are valid affects the ability to resolve other cruxes empirically.
@@ -287,7 +321,7 @@ The table below summarizes how combinations of empirical beliefs map to risk con
 | Long (AGI decades away) | Plausible | Applies | Either | Moderate urgency; time for iterative safety development, but evaluation methodology needs improvement |
 | Long | Implausible | Does not apply | Either | Low urgency; standard safety engineering sufficient |
 
-Note that individual researchers hold combinations of beliefs that do not always map cleanly to a single row. Christiano, for example, assigns substantial probability to short timelines and to deceptive alignment while remaining more optimistic about the tractability of alignment solutions than <EntityLink id="E202" name="miri">Machine Intelligence Research Institute (MIRI)</EntityLink>-affiliated researchers. LeCun holds that both instrumental convergence (for current architectures) and deceptive alignment (for properly designed systems) do not apply.
+Note that individual researchers hold combinations of beliefs that do not always map cleanly to a single row. Christiano, for example, assigns substantial probability to short timelines and to deceptive alignment while remaining more optimistic about the tractability of alignment solutions than <EntityLink id="E202" name="miri">Machine Intelligence Research Institute (MIRI)</EntityLink>-affiliated researchers. LeCun holds that both instrumental convergence (for current architectures) and deceptive alignment (for properly designed systems) do not apply. Yudkowsky occupies the top-left cell of the table and regards most proposed alignment approaches as inadequate to close the gap.
 
 ## Frontier Lab Institutional Positions
 
@@ -309,6 +343,8 @@ The evaluation faking / observer effects findings introduce a further epistemolo
 
 Bengio has argued that "given the magnitude of potentially negative impact, up to human extinction, it is imperative to invest in both understanding the risks and developing mitigating solutions" regardless of uncertainty.[^rc-a9f1] This position does not depend on resolving the evaluation reliability question, since it is grounded in expected-value reasoning under uncertainty rather than in specific empirical demonstrations.
 
+A further meta-level consideration concerns the sociology of the debate. The x-risk research community has received substantial funding from sources including <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink> and other effective altruism-affiliated funders, which some critics argue creates a self-reinforcing research ecosystem. Proponents note that funding source does not determine the validity of technical arguments, and that several of the most influential x-risk researchers—including Hinton and Bengio—arrived at their views independently of EA funding channels.
+
 ---
 
 [^rc-68c0]: Katja Grace, Ben Weinstein-Raun, Zach Stein-Perlman, ["2022 Expert Survey on Progress in AI"](https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/), AI Impacts, 2022. Survey of 738 ML researchers from 2021 NeurIPS and ICML.
@@ -316,6 +352,8 @@ Bengio has argued that "given the magnitude of potentially negative impact, up t
 [^rc-6f7d]: Katja Grace et al., ["2023 Expert Survey on Progress in AI"](https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai), AI Impacts, August 2023 (updated January 2024). Survey of 2,778 AI researchers. Preprint: ["Thousands of AI Authors on the Future of AI"](https://arxiv.org/pdf/2401.02843), arXiv 2401.02843, 2024.
 
 [^rc-95ce]: Geoffrey Hinton, [Nobel Prize interview](https://www.nobelprize.org/prizes/physics/2024/hinton/interview/), Nobel Prize Organization, October 2024; Yann LeCun, ["Meta's AI Chief Yann LeCun on AGI, Open-Source, and AI Risk"](https://time.com/6694432/yann-lecun-meta-ai-interview/), TIME, February 13, 2024.
+
+[^rc-ord2020]: Toby Ord, *The Precipice: Existential Risk and the Future of Humanity*, Hachette Books, 2020. Ord estimates a 10% probability of existential catastrophe from unaligned AI within the next century. See also Toby Ord's summary at [tobyord.com/theprec](https://www.tobyord.com/book).
 
 [^rc-b302]: Paul Christiano, ["My Views on 'Doom'"](https://www.lesswrong.com/posts/xWMqsvHapP3nwdSW8/my-views-on-doom), LessWrong, 2023. Also reported in ["Paul Christiano — Wikipedia"](https://en.wikipedia.org/wiki/Paul_Christiano_(researcher)).
 

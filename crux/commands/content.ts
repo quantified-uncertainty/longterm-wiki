@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis', 'api-direct'],
     positional: true,
   },
   iterate: {

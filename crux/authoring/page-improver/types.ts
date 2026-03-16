@@ -152,6 +152,12 @@ export interface PipelineOptions {
    * Default: false (backward compatible).
    */
   gapAnalysis?: boolean;
+  /**
+   * When true, use Anthropic SDK directly instead of Claude CLI subprocess.
+   * Default: auto-detected (CLI when available, API-direct as fallback).
+   * CLI mode bills via Claude Code subscription; API-direct bills via ANTHROPIC_API_KEY.
+   */
+  apiDirect?: boolean;
 }
 
 // Re-export AuditResult so callers importing from types.ts get it too
