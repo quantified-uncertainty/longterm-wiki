@@ -93,4 +93,9 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
+# Agent workspace slot files (per-slot, never committed)
+.agent-slot
+.agent-task
+.envrc
+
 # Design docs — committed for review. Gitignore removed intentionally.
