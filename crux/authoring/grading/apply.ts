@@ -18,7 +18,7 @@ import { recordAssessment } from '../../lib/wiki-server/assessments.ts';
  * Tries PLAIN string type first (clean output), then falls back to
  * QUOTE_DOUBLE if round-trip validation fails (e.g. llmSummary with colons).
  */
-function safeStringifyFm(obj: Record<string, unknown>): string {
+export function safeStringifyFm(obj: Record<string, unknown>): string {
   const plainYaml = stringifyYaml(obj, {
     defaultStringType: 'PLAIN',
     defaultKeyType: 'PLAIN',

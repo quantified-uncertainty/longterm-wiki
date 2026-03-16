@@ -1173,16 +1173,25 @@ async function mergePGRecordsIntoKB(kb) {
  * Build a ratings object from a PG assessment, falling back to frontmatter ratings
  * for any missing dimensions.
  */
+/** Map from frontmatter rating name → PG assessment column name. */
+const RATING_FIELD_MAP = {
+  focus: 'ratingFocus',
+  novelty: 'ratingNovelty',
+  rigor: 'ratingRigor',
+  completeness: 'ratingCompleteness',
+  concreteness: 'ratingConcreteness',
+  actionability: 'ratingActionability',
+  objectivity: 'ratingObjectivity',
+};
+
 function buildRatingsFromAssessment(assessment, fmRatings) {
   const ratings = {};
-  const fields = ['focus', 'novelty', 'rigor', 'completeness', 'concreteness', 'actionability', 'objectivity'];
-  const pgFields = ['ratingFocus', 'ratingNovelty', 'ratingRigor', 'ratingCompleteness', 'ratingConcreteness', 'ratingActionability', 'ratingObjectivity'];
-
   let hasAny = false;
-  for (let i = 0; i < fields.length; i++) {
-    const val = assessment[pgFields[i]] ?? (fmRatings ? fmRatings[fields[i]] : null) ?? null;
+
+  for (const [shortName, pgName] of Object.entries(RATING_FIELD_MAP)) {
+    const val = assessment[pgName] ?? (fmRatings ? fmRatings[shortName] : null) ?? null;
     if (val != null) {
-      ratings[fields[i]] = val;
+      ratings[shortName] = val;
       hasAny = true;
     }
   }
@@ -1225,42 +1234,36 @@ async function fetchAssessments() {
     }
 
     // Coalesce: for each page, pick the best value per dimension across assessors.
-    // Priority: llm-grading > frontmatter-sync > structural
+    // Priority: llm-grading > editorial > frontmatter-sync > structural
     const ASSESSOR_PRIORITY = { 'llm-grading': 3, 'editorial': 2, 'frontmatter-sync': 1, 'structural': 0 };
-    const byPage = new Map();
+    const COALESCE_FIELDS = [
+      'quality', 'readerImportance', 'researchImportance', 'tacticalValue',
+      'ratingFocus', 'ratingNovelty', 'ratingRigor', 'ratingCompleteness',
+      'ratingConcreteness', 'ratingActionability', 'ratingObjectivity',
+      'structuralScore', 'wordCount',
+    ];
+
+    const byPage = new Map();       // pageId → coalesced assessment values
+    const priorities = new Map();    // pageId → { [field]: priority }
 
     for (const row of allRows) {
       const pageId = row.pageId;
       if (!pageId) continue;
 
       if (!byPage.has(pageId)) {
-        byPage.set(pageId, { _priorities: {} });
+        byPage.set(pageId, {});
+        priorities.set(pageId, {});
       }
       const entry = byPage.get(pageId);
+      const fieldPriorities = priorities.get(pageId);
       const priority = ASSESSOR_PRIORITY[row.assessor] ?? -1;
 
-      // For each dimension, keep the highest-priority assessor's value
-      const fields = [
-        'quality', 'readerImportance', 'researchImportance', 'tacticalValue',
-        'ratingFocus', 'ratingNovelty', 'ratingRigor', 'ratingCompleteness',
-        'ratingConcreteness', 'ratingActionability', 'ratingObjectivity',
-        'structuralScore', 'wordCount',
-      ];
-
-      for (const field of fields) {
-        if (row[field] != null) {
-          const existingPriority = entry._priorities[field] ?? -1;
-          if (priority >= existingPriority) {
-            entry[field] = row[field];
-            entry._priorities[field] = priority;
-          }
+      for (const field of COALESCE_FIELDS) {
+        if (row[field] != null && priority >= (fieldPriorities[field] ?? -1)) {
+          entry[field] = row[field];
+          fieldPriorities[field] = priority;
         }
       }
-    }
-
-    // Clean up internal priority tracking
-    for (const entry of byPage.values()) {
-      delete entry._priorities;
     }
 
     if (byPage.size > 0) {

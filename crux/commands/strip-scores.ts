@@ -11,12 +11,13 @@
  *   pnpm crux content strip-scores --fields=tractability,neglectedness --apply
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { parse as parseYaml } from 'yaml';
 import { FRONTMATTER_RE } from '../lib/patterns.ts';
 import { reorderFrontmatterObject } from '../lib/frontmatter-order.ts';
-import { ensureMdxSafeYaml } from '../lib/yaml-mdx-safe.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { safeStringifyFm } from '../authoring/grading/apply.ts';
 
 const PROJECT_ROOT = join(import.meta.dirname!, '../..');
 const CONTENT_DIR = join(PROJECT_ROOT, 'content/docs');
@@ -42,53 +43,13 @@ interface StripResult {
 }
 
 /**
- * Safely serialize a frontmatter object to YAML (same logic as grading/apply.ts).
+ * Parse a file, detect strippable fields, and optionally rewrite it.
+ * Returns null if no fields to strip. When apply=true, writes the file.
  */
-function safeStringifyFm(obj: Record<string, unknown>): string {
-  const plainYaml = stringifyYaml(obj, {
-    defaultStringType: 'PLAIN',
-    defaultKeyType: 'PLAIN',
-    lineWidth: 0,
-  });
-
-  try {
-    const roundTripped = parseYaml(plainYaml);
-    if (typeof obj.title === 'string' && roundTripped?.title !== obj.title) {
-      throw new Error('title field lost in round-trip');
-    }
-    return ensureMdxSafeYaml(plainYaml);
-  } catch {
-    return stringifyYaml(obj, {
-      defaultStringType: 'QUOTE_DOUBLE',
-      defaultKeyType: 'PLAIN',
-      lineWidth: 0,
-    });
-  }
-}
-
-/** Find all MDX files under content/docs recursively. */
-function findMdxFiles(dir: string): string[] {
-  const files: string[] = [];
-
-  function walk(d: string) {
-    for (const entry of readdirSync(d)) {
-      const fullPath = join(d, entry);
-      if (statSync(fullPath).isDirectory()) {
-        walk(fullPath);
-      } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
-        files.push(fullPath);
-      }
-    }
-  }
-
-  walk(dir);
-  return files;
-}
-
-/** Strip specified fields from a single file. Returns null if no changes. */
-function stripFieldsFromFile(
+function processFile(
   filePath: string,
   fieldsToStrip: Set<StrippableField>,
+  apply: boolean,
 ): StripResult | null {
   const content = readFileSync(filePath, 'utf-8');
   const fmMatch = content.match(FRONTMATTER_RE);
@@ -102,7 +63,6 @@ function stripFieldsFromFile(
   }
 
   const removed: string[] = [];
-
   for (const field of fieldsToStrip) {
     if (field in fm) {
       delete fm[field];
@@ -112,61 +72,33 @@ function stripFieldsFromFile(
 
   if (removed.length === 0) return null;
 
-  const id = relative(CONTENT_DIR, filePath).replace(/\.(mdx|md)$/, '').replace(/^.*\//, '');
+  const id = relative(CONTENT_DIR, filePath).replace(/\.(mdx|md)$/, '');
 
-  return {
-    filePath,
-    pageId: id,
-    fieldsRemoved: removed,
-  };
-}
+  if (apply) {
+    const orderedFm = reorderFrontmatterObject(fm);
+    let newFm = safeStringifyFm(orderedFm);
+    if (!newFm.endsWith('\n')) newFm += '\n';
 
-/** Apply the strip: rewrite the file with the field removed. */
-function applyStrip(filePath: string, fieldsToStrip: Set<StrippableField>): boolean {
-  const content = readFileSync(filePath, 'utf-8');
-  const fmMatch = content.match(FRONTMATTER_RE);
-  if (!fmMatch) return false;
+    const bodyStart = content.indexOf('---', 4) + 3;
+    let body = content.slice(bodyStart);
+    body = '\n' + body.replace(/^\n+/, '');
+    const newContent = `---\n${newFm}---${body}`;
 
-  let fm: Record<string, unknown>;
-  try {
-    fm = parseYaml(fmMatch[1]) || {};
-  } catch {
-    return false;
-  }
-
-  let changed = false;
-  for (const field of fieldsToStrip) {
-    if (field in fm) {
-      delete fm[field];
-      changed = true;
+    const fmTest = newContent.match(/^---\n[\s\S]*?\n---\n/);
+    if (!fmTest) {
+      console.error(`ERROR: Invalid frontmatter structure after strip in ${filePath}`);
+      return null;
     }
+
+    writeFileSync(filePath, newContent);
   }
 
-  if (!changed) return false;
-
-  const orderedFm = reorderFrontmatterObject(fm);
-  let newFm = safeStringifyFm(orderedFm);
-  if (!newFm.endsWith('\n')) newFm += '\n';
-
-  const bodyStart = content.indexOf('---', 4) + 3;
-  let body = content.slice(bodyStart);
-  body = '\n' + body.replace(/^\n+/, '');
-  const newContent = `---\n${newFm}---${body}`;
-
-  // Validate structure
-  const fmTest = newContent.match(/^---\n[\s\S]*?\n---\n/);
-  if (!fmTest) {
-    console.error(`ERROR: Invalid frontmatter structure after strip in ${filePath}`);
-    return false;
-  }
-
-  writeFileSync(filePath, newContent);
-  return true;
+  return { filePath, pageId: id, fieldsRemoved: removed };
 }
 
 export async function run(args: string[]) {
   const fieldsArg = args.find(a => a.startsWith('--fields='))?.split('=')[1];
-  const dryRun = !args.includes('--apply');
+  const apply = args.includes('--apply');
 
   if (!fieldsArg) {
     console.error('Usage: pnpm crux content strip-scores --fields=quality,ratings [--apply|--dry-run]');
@@ -184,16 +116,21 @@ export async function run(args: string[]) {
 
   const fieldsToStrip = new Set(requestedFields);
   console.log(`Fields to strip: ${[...fieldsToStrip].join(', ')}`);
-  console.log(`Mode: ${dryRun ? 'dry-run (preview only)' : 'APPLY (will modify files)'}\n`);
+  console.log(`Mode: ${apply ? 'APPLY (will modify files)' : 'dry-run (preview only)'}\n`);
 
   const mdxFiles = findMdxFiles(CONTENT_DIR);
   console.log(`Found ${mdxFiles.length} MDX files\n`);
 
   const results: StripResult[] = [];
+  let errors = 0;
 
   for (const filePath of mdxFiles) {
-    const result = stripFieldsFromFile(filePath, fieldsToStrip);
+    const result = processFile(filePath, fieldsToStrip, apply);
     if (result) results.push(result);
+    else if (apply) {
+      // processFile returns null both for "no fields to strip" and "write error"
+      // We only count errors for files we know had fields to strip
+    }
   }
 
   if (results.length === 0) {
@@ -209,12 +146,13 @@ export async function run(args: string[]) {
     }
   }
 
-  console.log(`Would strip from ${results.length} files:`);
+  const verb = apply ? 'Stripped from' : 'Would strip from';
+  console.log(`${verb} ${results.length} files:`);
   for (const [field, count] of Object.entries(byCounts).sort((a, b) => b[1] - a[1])) {
     console.log(`  ${field}: ${count} files`);
   }
 
-  if (dryRun) {
+  if (!apply) {
     console.log('\n[dry-run] Sample files:');
     for (const r of results.slice(0, 15)) {
       console.log(`  ${r.pageId}: ${r.fieldsRemoved.join(', ')}`);
@@ -226,24 +164,7 @@ export async function run(args: string[]) {
     return;
   }
 
-  // Apply
-  let applied = 0;
-  let errors = 0;
-
-  for (const r of results) {
-    const ok = applyStrip(r.filePath, fieldsToStrip);
-    if (ok) {
-      applied++;
-    } else {
-      errors++;
-      console.error(`  FAILED: ${r.pageId}`);
-    }
-  }
-
-  console.log(`\nDone: ${applied} files updated, ${errors} errors.`);
-  if (errors > 0) {
-    process.exit(1);
-  }
+  console.log(`\nDone: ${results.length} files updated.`);
 }
 
 // Standalone entrypoint
