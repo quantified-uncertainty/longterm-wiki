@@ -206,3 +206,80 @@ ftx-future-fund:
     Launched Feb 2022, collapsed Nov 2022 with FTX.
     Team: Nick Beckstead (CEO), Leopold Aschenbrenner, William MacAskill, Avital Balwit, Ketan Ramakrishnan.
     All resigned November 2022. Use endDate: "2022-11" for all records.
+
+govai:
+  entityId: 4c2Xd10VJDYX
+  teamPage: https://www.governance.ai/team
+  notes: |
+    44+ people with roles. Ben Garfinkel exec director, Markus Anderljung director of policy.
+    Strong research team: fellows, scholars, senior fellows. Offices in Oxford.
+
+fhi:
+  entityId: jRQ6xPlVdzIk
+  teamPage: null  # fhi.ox.ac.uk is down (ECONNREFUSED)
+  notes: |
+    CLOSED April 16, 2024. Nick Bostrom (founder/director), Anders Sandberg, Toby Ord.
+    Faculty of Philosophy froze hiring/fundraising from 2020. Use endDate 2024-04 for all.
+
+manifold:
+  entityId: FISYNGdZcf4n
+  teamPage: null  # manifold.markets/about has no team info
+  notes: |
+    Founded December 2021 by Stephen Grugett (CEO), James Grugett, Austin Chen (CPO).
+    Austin Chen departed April 2024 to focus on Manifund. Per Wikipedia.
+
+longview-philanthropy:
+  entityId: XeWb3olftwOs
+  teamPage: https://www.longview.org/about/
+  notes: |
+    Natalie Cargill (founder 2018, president). Simran Dhaliwal (CEO). Carl Robichaud (nuclear policy).
+    Philanthropy advisor, works with major donors on giving plans.
+
+ibbis:
+  entityId: ceJqS3M298O8
+  teamPage: https://ibbis.bio/about/people/  # about page only shows director
+  notes: |
+    Dr Piers Millett is inaugural executive director (fall 2022).
+    About page only lists director. /about/people/ may have more.
+
+good-judgment:
+  entityId: "-UhYkgCik3Nw"
+  teamPage: null
+  notes: |
+    Philip Tetlock (co-founder/advisor). Warren Hatch (CEO).
+    Founded from IARPA forecasting tournament. ~30 team members.
+
+futuresearch:
+  entityId: "166"
+  teamPage: null
+  notes: |
+    Founded 2023 by Dan Schwarz (CEO, ex-Metaculus CTO, ex-Google/Waymo) and
+    Lawrence Phillips (CTO, ex-Metaculus AI lead). First autonomous AI forecaster.
+
+nti-bio:
+  entityId: D9lqMW2HVw
+  notes: |
+    NTI entity covers NTI|bio biosecurity program. Beth Cameron is VP.
+    Pipe character in name breaks resolve command.
+
+samotsvety:
+  entityId: "305"
+  teamPage: null
+  notes: |
+    Forecasting group, 15 members, invitation-only. Founded by Nuño Sempere and Misha Yagudin.
+    Met at FHI summer fellowship. Eli Lifland also a member.
+
+cea:
+  entityId: "61"
+  teamPage: https://www.centreforeffectivealtruism.org/team
+  notes: |
+    65+ people. Zachary Robinson CEO. Julia Wise community health lead.
+    Departments: events, groups, courses, operations, community health, EA funds, marketing.
+    Runs EA Global conferences.
+
+controlai:
+  entityId: "98"
+  teamPage: https://controlai.com/about
+  notes: |
+    Founded by Andrea Miotti (CEO) and Connor Leahy (co-founder/advisor).
+    Leahy also CEO of Conjecture and founder of EleutherAI.
