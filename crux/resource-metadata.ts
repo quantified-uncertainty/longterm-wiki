@@ -87,6 +87,7 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
 
   const allIds = Array.from(idToResource.keys());
   let updated = 0;
+  const updatedResources: Resource[] = [];
 
   for (let i = 0; i < allIds.length; i += 20) {
     const batchIds = allIds.slice(i, i + 20);
@@ -99,6 +100,7 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
         if (meta.published) resource.published_date = meta.published;
         if (meta.abstract && !resource.abstract) resource.abstract = meta.abstract;
         updated++;
+        updatedResources.push(resource);
         if (verbose) console.log(`   ✓ ${resource.title}`);
       }
       if (i + 20 < allIds.length) await sleep(3000);
@@ -111,7 +113,7 @@ export async function extractArxivMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} papers`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    await saveResources(resources);
+    await saveResources(updatedResources);
     console.log('   Saved resources to PG');
   }
   return updated;
@@ -177,6 +179,7 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
   }
 
   let updated = 0;
+  const updatedResources: Resource[] = [];
   for (const r of toProcess) {
     const slug = extractForumSlug(r.url);
     const isEA = r.url.includes('forum.effectivealtruism.org');
@@ -186,6 +189,7 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
         r.authors = meta.authors;
         if (meta.published) r.published_date = meta.published;
         updated++;
+        updatedResources.push(r);
         if (verbose) console.log(`   ✓ ${r.title}`);
       }
       await sleep(200);
@@ -198,7 +202,7 @@ export async function extractForumMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} posts`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    await saveResources(resources);
+    await saveResources(updatedResources);
     console.log('   Saved resources to PG');
   }
   return updated;
@@ -255,6 +259,7 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
 
   let updated = 0;
   let failed = 0;
+  const updatedResources: Resource[] = [];
 
   for (const r of toProcess) {
     // Try DOI first
@@ -278,6 +283,7 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
         if (meta.published) r.published_date = meta.published;
         if (meta.abstract && !r.abstract) r.abstract = meta.abstract;
         updated++;
+        updatedResources.push(r);
         if (verbose) console.log(`   ✓ ${r.title}`);
       } else {
         failed++;
@@ -293,7 +299,7 @@ export async function extractScholarMetadata(opts: ParsedOpts): Promise<number> 
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} resources (${failed} failed/no data)`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    await saveResources(resources);
+    await saveResources(updatedResources);
     console.log('   Saved resources to PG');
   }
   return updated;
@@ -353,11 +359,51 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
 
   const firecrawl = new (FirecrawlApp as new (opts: { apiKey: string }) => { batchScrape: (urls: string[], opts: unknown) => Promise<{ data?: Array<{ metadata?: Record<string, unknown> }> }>; scrapeUrl: (url: string, opts: unknown) => Promise<{ metadata?: Record<string, unknown> }> })({ apiKey: FIRECRAWL_KEY });
   let updated = 0;
+  const updatedResources: Resource[] = [];
 
   // Build URL to resource map
   const urlToResource = new Map<string, Resource>();
   for (const r of toProcess) {
     urlToResource.set(r.url, r);
+  }
+
+  /** Apply metadata from a scrape result to the matching resource. */
+  function applyMetadata(metadata: Record<string, unknown>, matchUrl?: string): void {
+    const r = urlToResource.get(matchUrl || (metadata.sourceURL as string) || (metadata.url as string));
+    if (!r) return;
+
+    const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
+    let authors: string[] | null = null;
+    for (const field of authorFields) {
+      const value = metadata[field];
+      if (value) {
+        if (Array.isArray(value)) {
+          authors = value.filter((a): a is string => a && typeof a === 'string');
+        } else if (typeof value === 'string') {
+          authors = value.includes(',') ? value.split(',').map(a => a.trim()) : [value];
+        }
+        if (authors?.length && authors.length > 0) break;
+      }
+    }
+
+    const articleMeta = metadata.article as Record<string, unknown> | undefined;
+    const publishedDate = (metadata.publishedTime as string) || (metadata.datePublished as string) || (articleMeta?.publishedTime as string | undefined);
+
+    let changed = false;
+    if (authors?.length && authors.length > 0) {
+      r.authors = authors;
+      changed = true;
+      if (verbose) console.log(`   ✓ ${r.title} (authors: ${authors.join(', ')})`);
+    }
+    if (publishedDate) {
+      r.published_date = publishedDate.split('T')[0];
+      changed = true;
+      if (verbose && !authors?.length) console.log(`   ✓ ${r.title} (date: ${publishedDate})`);
+    }
+    if (changed) {
+      updated++;
+      updatedResources.push(r);
+    }
   }
 
   // Use batch scraping for efficiency
@@ -371,40 +417,8 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
       timeout: 300000, // 5 min timeout
     });
 
-    // Process results
     for (const result of results.data || []) {
-      const metadata = (result.metadata || {}) as Record<string, unknown>;
-      const r = urlToResource.get((metadata.sourceURL as string) || (metadata.url as string));
-      if (!r) continue;
-
-      // Extract authors from various metadata fields
-      const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
-      let authors: string[] | null = null;
-      for (const field of authorFields) {
-        const value = metadata[field];
-        if (value) {
-          if (Array.isArray(value)) {
-            authors = value.filter((a): a is string => a && typeof a === 'string');
-          } else if (typeof value === 'string') {
-            authors = value.includes(',') ? value.split(',').map(a => a.trim()) : [value];
-          }
-          if (authors?.length && authors.length > 0) break;
-        }
-      }
-
-      const articleMeta = metadata.article as Record<string, unknown> | undefined;
-      const publishedDate = (metadata.publishedTime as string) || (metadata.datePublished as string) || (articleMeta?.publishedTime as string | undefined);
-
-      if (authors?.length && authors.length > 0) {
-        r.authors = authors;
-        updated++;
-        if (verbose) console.log(`   ✓ ${r.title} (authors: ${authors.join(', ')})`);
-      }
-      if (publishedDate) {
-        r.published_date = publishedDate.split('T')[0];
-        if (!authors?.length) updated++;
-        if (verbose && !authors?.length) console.log(`   ✓ ${r.title} (date: ${publishedDate})`);
-      }
+      applyMetadata((result.metadata || {}) as Record<string, unknown>);
     }
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
@@ -414,34 +428,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
     for (const r of toProcess) {
       try {
         const result = await firecrawl.scrapeUrl(r.url, { formats: ['markdown'] });
-        const metadata = (result.metadata || {}) as Record<string, unknown>;
-
-        const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
-        let authors: string[] | null = null;
-        for (const field of authorFields) {
-          const value = metadata[field];
-          if (value) {
-            if (Array.isArray(value)) {
-              authors = value.filter((a): a is string => a && typeof a === 'string');
-            } else if (typeof value === 'string') {
-              authors = value.includes(',') ? value.split(',').map(a => a.trim()) : [value];
-            }
-            if (authors?.length && authors.length > 0) break;
-          }
-        }
-
-        const articleMeta = metadata.article as Record<string, unknown> | undefined;
-        const publishedDate = (metadata.publishedTime as string) || (metadata.datePublished as string) || (articleMeta?.publishedTime as string | undefined);
-
-        if (authors?.length && authors.length > 0) {
-          r.authors = authors;
-          updated++;
-        }
-        if (publishedDate) {
-          r.published_date = publishedDate.split('T')[0];
-          if (!authors?.length) updated++;
-        }
-
+        applyMetadata((result.metadata || {}) as Record<string, unknown>, r.url);
         await sleep(7000);
       } catch (e: unknown) {
         const innerError = e instanceof Error ? e : new Error(String(e));
@@ -453,7 +440,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
   if (!opts._skipSave) console.log(`   ✅ Updated ${updated} resources`);
 
   if (!dryRun && updated > 0 && !opts._skipSave) {
-    await saveResources(resources);
+    await saveResources(updatedResources);
     console.log('   Saved resources to PG');
   }
   return updated;
@@ -534,6 +521,12 @@ export async function cmdMetadata(opts: ParsedOpts): Promise<void> {
     console.log('🚀 Running all extractors in parallel...\n');
 
     const resources = await loadResourcesPGFirst();
+    // Snapshot IDs before extraction so we can detect which resources were mutated
+    const originalHashes = new Map<string, string>();
+    for (const r of resources) {
+      originalHashes.set(r.id, `${r.authors?.join(',')}|${r.published_date}|${r.abstract}`);
+    }
+
     const sharedOpts: ParsedOpts = { ...opts, _resources: resources, _skipSave: true };
 
     const results = await Promise.allSettled([
@@ -553,10 +546,14 @@ export async function cmdMetadata(opts: ParsedOpts): Promise<void> {
       }
     });
 
-    // Save once at the end
+    // Save only the resources that were actually mutated
     if (totalUpdated > 0 && !opts['dry-run']) {
-      await saveResources(resources);
-      console.log('\n📁 Saved resources to PG');
+      const mutated = resources.filter(r => {
+        const orig = originalHashes.get(r.id);
+        return orig !== `${r.authors?.join(',')}|${r.published_date}|${r.abstract}`;
+      });
+      await saveResources(mutated);
+      console.log(`\n📁 Saved ${mutated.length} updated resources to PG`);
     }
   } else {
     // Sequential execution
