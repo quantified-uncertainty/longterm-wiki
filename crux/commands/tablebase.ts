@@ -131,6 +131,168 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
   };
 }
 
+async function resolveCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const name = args.filter(a => !a.startsWith('--')).join(' ');
+  if (!name) {
+    return { exitCode: 1, output: 'Usage: crux tablebase resolve <entity name>' };
+  }
+
+  const { buildEntityMatcher, matchGrantee } = await import('../lib/grant-import/entity-matcher.ts');
+  const matcher = buildEntityMatcher();
+
+  // Try direct match
+  const match = matcher.match(name);
+  if (match) {
+    const result = { found: true, stableId: match.stableId, slug: match.slug, name: match.name };
+    return { exitCode: 0, output: options.ci ? JSON.stringify(result) : `${match.stableId}\t${match.slug}\t${match.name}` };
+  }
+
+  // Try grantee normalization
+  const granteeMatch = matchGrantee(name, matcher);
+  if (granteeMatch) {
+    const m = matcher.match(granteeMatch);
+    const result = { found: true, stableId: granteeMatch, slug: m?.slug || '', name: m?.name || name };
+    return { exitCode: 0, output: options.ci ? JSON.stringify(result) : `${granteeMatch}\t${m?.slug || ''}\t${m?.name || name}` };
+  }
+
+  const result = { found: false, query: name };
+  return { exitCode: 1, output: options.ci ? JSON.stringify(result) : `NOT_FOUND: "${name}"` };
+}
+
+async function submitCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const table = options.table as string;
+  if (!table) {
+    return { exitCode: 1, output: 'Usage: crux tablebase submit --table=<table> --records-file=<path>\n       echo \'[...]\' | crux tablebase submit --table=<table>' };
+  }
+
+  const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'];
+  if (!validTables.includes(table)) {
+    return { exitCode: 1, output: `Invalid table: ${table}. Valid: ${validTables.join(', ')}` };
+  }
+
+  // Read records from --records-file or stdin
+  let recordsJson: string;
+  const recordsFile = options.recordsFile as string;
+  if (recordsFile) {
+    const { readFileSync } = await import('fs');
+    recordsJson = readFileSync(recordsFile, 'utf-8');
+  } else {
+    // Read from stdin (piped input)
+    const chunks: Buffer[] = [];
+    const stdin = process.stdin;
+    if (stdin.isTTY) {
+      return { exitCode: 1, output: 'No --records-file and no piped stdin. Provide records via file or pipe.' };
+    }
+    for await (const chunk of stdin) {
+      chunks.push(chunk as Buffer);
+    }
+    recordsJson = Buffer.concat(chunks).toString('utf-8');
+  }
+
+  let records: Array<Record<string, unknown>>;
+  try {
+    records = JSON.parse(recordsJson);
+    if (!Array.isArray(records)) {
+      return { exitCode: 1, output: 'Records must be a JSON array' };
+    }
+  } catch (e: unknown) {
+    return { exitCode: 1, output: `Invalid JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+
+  if (records.length === 0) {
+    return { exitCode: 0, output: 'No records to submit.' };
+  }
+
+  // Generate IDs for records missing them
+  const { generateId } = await import('../lib/grant-import/id.ts');
+  for (const record of records) {
+    if (!record.id) {
+      record.id = generateId(`${table}:${JSON.stringify(record)}:${Date.now()}`);
+    }
+  }
+
+  // Submit to wiki-server
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const dryRun = !!options.dryRun;
+
+  if (dryRun) {
+    return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
+  }
+
+  let apiPath: string;
+  let method: 'POST' | 'PATCH' = 'POST';
+  switch (table) {
+    case 'personnel': apiPath = '/api/personnel/sync'; break;
+    case 'grants': apiPath = '/api/grants/batch-update-grantee'; method = 'PATCH'; break;
+    case 'funding-rounds': apiPath = '/api/funding-rounds/sync'; break;
+    case 'investments': apiPath = '/api/investments/sync'; break;
+    case 'benchmark-results': apiPath = '/api/benchmark-results/sync'; break;
+    default: return { exitCode: 1, output: `Unknown table: ${table}` };
+  }
+
+  const result = await apiRequest<{ upserted?: number; updated?: number }>(
+    method, apiPath, { items: records },
+  );
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Submit failed: ${result.message}` };
+  }
+
+  const count = result.data.upserted ?? result.data.updated ?? records.length;
+  return {
+    exitCode: 0,
+    output: options.ci
+      ? JSON.stringify({ submitted: count, table })
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}`,
+  };
+}
+
+async function existingCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const table = options.table as string;
+  const entityId = args.find(a => !a.startsWith('--'));
+
+  if (!table || !entityId) {
+    return { exitCode: 1, output: 'Usage: crux tablebase existing <entityId> --table=<table>' };
+  }
+
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+
+  let path: string;
+  let resultKey: string;
+  switch (table) {
+    case 'personnel':
+      path = `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=200`;
+      resultKey = 'personnel';
+      break;
+    case 'grants':
+      path = `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=200`;
+      resultKey = 'grants';
+      break;
+    case 'funding-rounds':
+      path = `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=200`;
+      resultKey = 'fundingRounds';
+      break;
+    case 'investments':
+      path = `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=200`;
+      resultKey = 'investments';
+      break;
+    case 'benchmark-results':
+      path = `/api/benchmark-results/by-model/${encodeURIComponent(entityId)}?limit=200`;
+      resultKey = 'benchmarkResults';
+      break;
+    default:
+      return { exitCode: 1, output: `Invalid table: ${table}` };
+  }
+
+  const result = await apiRequest<Record<string, unknown>>('GET', path);
+  if (!result.ok) {
+    return { exitCode: 1, output: `Query failed: ${result.message}` };
+  }
+
+  const records = result.data[resultKey] as Array<Record<string, unknown>>;
+  return { exitCode: 0, output: JSON.stringify(records, null, 2) };
+}
+
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
@@ -183,6 +345,9 @@ export const commands = {
   improve: improveCommand,
   'mark-done': markDoneCommand,
   loop: loopCommand,
+  resolve: resolveCommand,
+  submit: submitCommand,
+  existing: existingCommand,
   default: scanCommand,
 };
 
@@ -194,20 +359,28 @@ Commands:
   scan        Show per-table completeness scores
   gaps        Ranked list of missing data (enrichment targets)
   next-task   Output the single highest-impact task
-  improve     Run LLM agent to enrich data for one task
+  improve     Run LLM agent for one task (uses ANTHROPIC_API_KEY)
   mark-done   Mark a task as completed (excluded from future picks)
-  loop        Autonomous multi-task enrichment loop
+  loop        Autonomous multi-task enrichment loop (uses ANTHROPIC_API_KEY)
+  resolve     Resolve entity name to stableId (for Claude Code skill)
+  submit      Submit records to a table (for Claude Code skill)
+  existing    Query existing records for an entity (for Claude Code skill)
 
 Options:
-  --table=<name>        Filter scan to specific table
-  --top=N, --limit=N    Number of gaps to show (default: 20)
-  --task-type=<type>    Filter by task type (personnel-enrichment, grant-grantee-backfill, etc.)
-  --entity-type=<type>  Filter by entity type (organization, ai-model)
-  --format=prompt|json  Output format for next-task
-  --dry-run             Run agent without writing to database
-  --max=N               Max tasks for loop (default: 5)
-  --budget=N            Budget limit in USD for loop (default: 30)
-  --ci                  JSON output
+  --table=<name>            Filter scan to specific table; required for submit/existing
+  --top=N, --limit=N        Number of gaps to show (default: 20)
+  --task-type=<type>        Filter by task type
+  --entity-type=<type>      Filter by entity type (organization, ai-model)
+  --format=prompt|json      Output format for next-task
+  --dry-run                 Run agent without writing to database
+  --max=N                   Max tasks for loop (default: 5)
+  --budget=N                Budget limit in USD for loop (default: 30)
+  --records-file=<path>     JSON file for submit command
+  --ci                      JSON output
+
+Modes:
+  API mode:          crux tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:
   grant-grantee-backfill     Link grants to grantee entities
@@ -219,10 +392,13 @@ Task Types:
 Examples:
   crux tablebase scan                                 # Overview of all tables
   crux tablebase gaps --top=10                        # Top 10 enrichment targets
-  crux tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
   crux tablebase next-task --format=json              # JSON for scripting
-  crux tablebase improve abc123def --dry-run          # Test run without writing
-  crux tablebase loop --max=3 --budget=10             # 3-task loop with $10 cap
+  crux tablebase improve abc123def --dry-run          # API mode: test run
+  crux tablebase loop --max=3 --budget=10             # API mode: 3-task loop
+  crux tablebase resolve "OpenAI"                     # Resolve name → stableId
+  crux tablebase resolve "OpenAI" --ci                # JSON output
+  crux tablebase existing A4XoubikkQ --table=personnel  # Show existing records
+  echo '[{...}]' | crux tablebase submit --table=personnel  # Submit records via pipe
   crux tablebase mark-done abc123def                  # Exclude from future runs
 `;
 }
