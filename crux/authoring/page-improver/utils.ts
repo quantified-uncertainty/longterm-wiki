@@ -299,27 +299,28 @@ const RELATED_SECTION_PATTERNS = [
 
 /**
  * Clean up garbled EntityLink tags produced by the improve LLM.
- * Fixes: duplicated attributes (name="x" name="x" name="x") and
+ * Fixes: duplicated attributes (name="x" name="x" name="x"),
  * removes `name` attributes entirely (they're optional and the
- * enrichment phase doesn't use them).
+ * enrichment phase doesn't use them), and handles self-closing tags.
  */
 export function cleanEntityLinks(content: string): string {
-  // Fix duplicated attributes: <EntityLink id="E1100" name="mmlu" name="mmlu" name="mmlu">
-  // Normalize to just id and optional single name.
+  // Match both regular and self-closing EntityLink tags
   return content.replace(
-    /<EntityLink\s+([^>]*?)>/g,
-    (_match, attrs: string) => {
-      // Parse unique attributes, keeping only the first occurrence of each key
+    /<EntityLink\s+([^>]*?)(\s*\/)?>/g,
+    (_match, attrs: string, selfClose?: string) => {
+      // Parse unique attributes, keeping only the first occurrence of each key,
+      // and skipping `name` attributes (not needed, frequently duplicated by LLM)
       const seen = new Map<string, string>();
-      const attrRe = /(\w+)="([^"]*)"/g;
+      const attrRe = /([\w-]+)="([^"]*)"/g;
       let m: RegExpExecArray | null;
       while ((m = attrRe.exec(attrs)) !== null) {
-        if (!seen.has(m[1])) {
+        if (m[1] !== 'name' && !seen.has(m[1])) {
           seen.set(m[1], m[2]);
         }
       }
       const parts = Array.from(seen.entries()).map(([k, v]) => `${k}="${v}"`);
-      return `<EntityLink ${parts.join(' ')}>`;
+      const closing = selfClose ? ' />' : '>';
+      return `<EntityLink ${parts.join(' ')}${closing}`;
     },
   );
 }

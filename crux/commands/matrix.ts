@@ -255,7 +255,9 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
   const excludeIds = loadExclusionList(options.exclude as string | undefined);
   const includeStubs = !!options.includeStubs;
   let impacts = computePageImpact(pages, dimension, { excludeIds, includeStubs });
-  if (options.type) impacts = impacts.filter(p => p.entityType === options.type);
+  impacts = impacts.filter(p =>
+    options.type ? p.entityType === options.type : p.entityType !== 'internal'
+  );
   if (impacts.length === 0) {
     return format === 'json'
       ? { exitCode: 0, output: JSON.stringify({ task: null, message: 'NO_TASKS' }) }

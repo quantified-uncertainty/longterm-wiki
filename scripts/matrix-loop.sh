@@ -94,7 +94,6 @@ while [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ] && [ "$ATTEMPT" -lt "$MAX_TOTAL_ATT
     echo -e "${GREEN}✓ Content improved${RESET}"
   else
     echo -e "${YELLOW}⚠ Content improve failed for $PAGE_SLUG ($PAGE_ID), skipping${RESET}"
-    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
     FAILED=$((FAILED + 1))
     continue
   fi
@@ -111,7 +110,6 @@ while [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ] && [ "$ATTEMPT" -lt "$MAX_TOTAL_ATT
   else
     echo -e "${YELLOW}⚠ Gate failed for $PAGE_SLUG ($PAGE_ID), reverting and skipping${RESET}"
     git checkout -- . 2>/dev/null || true
-    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
     FAILED=$((FAILED + 1))
     continue
   fi
