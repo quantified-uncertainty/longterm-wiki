@@ -92,7 +92,7 @@ const RiskFactorEntitySchema = BaseEntity.extend({
   entityType: z.literal("risk-factor"),
 });
 
-const ExpertPositionSchema = z.object({
+export const ExpertPositionSchema = z.object({
   topic: z.string(),
   view: z.string(),
   estimate: z.string().optional(),
@@ -100,8 +100,9 @@ const ExpertPositionSchema = z.object({
   date: z.string().optional(),
   source: z.string().optional(),
   sourceUrl: z.string().optional(),
-  notes: z.string().optional(),
 });
+
+export type ExpertPosition = z.infer<typeof ExpertPositionSchema>;
 
 const PersonEntitySchema = BaseEntity.extend({
   entityType: z.literal("person"),

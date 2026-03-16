@@ -16,6 +16,7 @@ import {
   TypedEntitySchema,
   type TypedEntity,
   type GenericEntity,
+  type PersonEntity,
   isRisk,
   isPerson,
   isOrganization,
@@ -218,15 +219,6 @@ export interface LiteratureData {
   categories: LiteratureCategory[];
 }
 
-export interface ExpertPosition {
-  topic: string;
-  view: string;
-  estimate?: string;
-  confidence?: string;
-  source?: string;
-  sourceUrl?: string;
-  date?: string;
-}
 
 
 export interface Organization {
@@ -587,7 +579,7 @@ export function getTypedEntities(): AnyEntity[] {
 // TYPES (re-exported for consumers)
 // ============================================================================
 
-export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity } from "./entity-schemas";
+export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity, ExpertPosition } from "./entity-schemas";
 export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
@@ -709,6 +701,12 @@ function pageIndex() {
 /** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {
   return typedEntityIndex().get(resolveId(id));
+}
+
+/** Get a person entity by ID, or null if not found / not a person */
+export function getPersonEntityById(id: string): PersonEntity | null {
+  const entity = getTypedEntityById(id);
+  return entity && isPerson(entity) ? entity : null;
 }
 
 /** @deprecated Use getTypedEntityById for new code */

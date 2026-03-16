@@ -4,7 +4,7 @@ import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getK
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getPublicationsForPerson, getTypedEntities, getTypedEntityById, isPerson } from "@/data";
+import { getPublicationsForPerson, getTypedEntities, getPersonEntityById, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import Link from "next/link";
 
@@ -159,10 +159,10 @@ function loadFromLocal(): PersonRow[] {
     const slug = getKBEntitySlug(entity.id) ?? entity.id;
     kbSlugs.add(slug);
     // Read positions from the typed entity (consolidated from experts.yaml at build time)
-    const typedEntity = getTypedEntityById(slug);
-    const personEntity = typedEntity && isPerson(typedEntity) ? typedEntity : null;
-    const positionCount = personEntity?.positions?.length ?? 0;
-    const topics = personEntity?.positions?.map((p) => p.topic) ?? [];
+    const personEntity = getPersonEntityById(slug);
+    const positions = personEntity?.positions ?? [];
+    const positionCount = positions.length;
+    const topics = positions.map((p) => p.topic);
     const publications = getPublicationsForPerson(slug);
 
     const roleText = roleFact?.value.type === "text" ? roleFact.value.value : null;

@@ -27,7 +27,7 @@ import {
   type ProfileTab,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { getPublicationsForPerson, getTypedEntityById, isPerson } from "@/data";
+import { getPublicationsForPerson, getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
@@ -131,8 +131,8 @@ export default async function PersonProfilePage({
   };
 
   // Expert positions from typed entity (consolidated from experts.yaml at build time)
-  const typedEntity = getTypedEntityById(slug);
-  const positions = (typedEntity && isPerson(typedEntity)) ? typedEntity.positions : [];
+  const personEntity = getPersonEntityById(slug);
+  const positions = personEntity?.positions ?? [];
 
   // Publications linked to this person
   const publications = getPublicationsForPerson(slug);
