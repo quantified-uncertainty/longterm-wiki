@@ -10,7 +10,7 @@
 import { getKBLatest, getKBRecords, getKBEntity } from "@data/factbase";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
-import type { RecordEntry } from "@longterm-wiki/factbase";
+import type { FactBaseRecordEntry } from "@data/factbase";
 
 // ── EA Alignment (editorial estimates, not KB data) ─────────────────────────
 // These are subjective editorial assessments of how likely each stakeholder's
@@ -40,7 +40,7 @@ function parseRange(field: unknown): [number, number] | null {
 }
 
 /** Get a display name for a record's endpoint field. */
-function resolveRecordName(record: RecordEntry, endpointField: string): string {
+function resolveRecordName(record: FactBaseRecordEntry, endpointField: string): string {
   if (record.displayName) return record.displayName;
   const slug = record.fields[endpointField] as string;
   if (!slug) return record.key;
@@ -49,7 +49,7 @@ function resolveRecordName(record: RecordEntry, endpointField: string): string {
 }
 
 /** Get a join key for matching records across collections. Uses slug or displayName. */
-function getRecordJoinKey(record: RecordEntry, endpointField: string): string {
+function getRecordJoinKey(record: FactBaseRecordEntry, endpointField: string): string {
   return (record.fields[endpointField] as string) || record.displayName || record.key;
 }
 

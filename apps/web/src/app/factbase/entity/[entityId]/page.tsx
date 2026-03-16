@@ -11,7 +11,8 @@ import {
   getKBLatest,
 } from "@/data/factbase";
 import { getEntityHref } from "@/data";
-import type { Fact, Property, RecordEntry } from "@longterm-wiki/factbase";
+import type { Fact, Property } from "@longterm-wiki/factbase";
+import type { FactBaseRecordEntry } from "@/data/factbase";
 import {
   formatKBFactValue,
   formatKBDate,
@@ -172,7 +173,7 @@ const HERO_STAT_PROPERTIES: Record<string, string[]> = {
 };
 
 /** Sort record entries by a date field, newest first. */
-function sortByDateField(items: RecordEntry[], fieldName: string): RecordEntry[] {
+function sortByDateField(items: FactBaseRecordEntry[], fieldName: string): FactBaseRecordEntry[] {
   return [...items].sort((a, b) => {
     const dateA = a.fields[fieldName] ? String(a.fields[fieldName]) : "";
     const dateB = b.fields[fieldName] ? String(b.fields[fieldName]) : "";
@@ -264,14 +265,14 @@ function StatCard({ entityId, propertyId }: { entityId: string; propertyId: stri
 }
 
 /** Safely get a string field from a record, or undefined. */
-function field(item: RecordEntry, key: string): string | undefined {
+function field(item: FactBaseRecordEntry, key: string): string | undefined {
   const v = item.fields[key];
   if (v == null) return undefined;
   return String(v);
 }
 
 /** Person card for key-persons collection. */
-function PersonCard({ item }: { item: RecordEntry }) {
+function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
   const name = personEntity?.name ?? item.displayName ?? titleCase(item.key);
@@ -317,7 +318,7 @@ function PersonCard({ item }: { item: RecordEntry }) {
 }
 
 /** Funding round row for timeline display. */
-function FundingRoundRow({ item }: { item: RecordEntry }) {
+function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const date = field(item, "date");
   const raised = item.fields.raised;
@@ -382,7 +383,7 @@ function FundingRoundRow({ item }: { item: RecordEntry }) {
 }
 
 /** Product card. */
-function ProductCard({ item }: { item: RecordEntry }) {
+function ProductCard({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const launched = field(item, "launched");
   const description = field(item, "description");
@@ -407,7 +408,7 @@ function ProductCard({ item }: { item: RecordEntry }) {
 }
 
 /** Model release row. */
-function ModelReleaseRow({ item }: { item: RecordEntry }) {
+function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
   const name = field(item, "name") ?? titleCase(item.key);
   const released = field(item, "released");
   const description = field(item, "description");
@@ -567,7 +568,7 @@ function GenericCollectionTable({
   items,
 }: {
   collectionName: string;
-  items: RecordEntry[];
+  items: FactBaseRecordEntry[];
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;

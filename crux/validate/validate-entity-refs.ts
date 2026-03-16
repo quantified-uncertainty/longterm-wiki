@@ -66,7 +66,6 @@ async function main(): Promise<void> {
 
   const entities = graph.getAllEntities();
   const entityIdSet = new Set(entities.map((e: { id: string }) => e.id));
-  const recordSchemas = graph.getAllRecordSchemas();
 
   // Build slug→entityId lookup from filenameMap (entity ID → YAML slug)
   // so we can also resolve slug-based references
@@ -83,99 +82,12 @@ async function main(): Promise<void> {
     return entityIdSet.has(refStr) || slugToEntityId.has(refStr);
   }
 
-  // Build schema lookup
-  const schemaMap = new Map(
-    recordSchemas.map((s: { id: string }) => [s.id, s])
-  );
-
   // Stats per collection
   const statsByCollection = new Map<string, CollectionStats>();
 
-  function getStats(collection: string): CollectionStats {
-    if (!statsByCollection.has(collection)) {
-      statsByCollection.set(collection, {
-        totalRecords: 0,
-        totalLinks: 0,
-        validLinks: 0,
-        orphanedLinks: 0,
-        orphanedRefs: [],
-      });
-    }
-    return statsByCollection.get(collection)!;
-  }
-
-  // Iterate all entities and their record collections
-  for (const entity of entities) {
-    const collectionNames = graph.getRecordCollectionNames(entity.id);
-
-    for (const collectionName of collectionNames) {
-      const entries = graph.getRecords(entity.id, collectionName);
-
-      for (const entry of entries) {
-        const schema = schemaMap.get(entry.schema);
-        if (!schema) continue;
-
-        const stats = getStats(entry.schema);
-        stats.totalRecords++;
-
-        // Check explicit (non-implicit) endpoint fields
-        for (const [endpointName, endpointDef] of Object.entries(
-          schema.endpoints
-        )) {
-          if (endpointDef.implicit) continue;
-
-          const refValue = entry.fields[endpointName];
-          if (refValue === undefined || refValue === null) continue;
-
-          // If this endpoint allows display_name, the value might be a
-          // human-readable name rather than an entity reference. We still
-          // check against the entity index, but mark it as
-          // allowsDisplayName so it shows as a softer warning.
-          const refStr = String(refValue);
-          stats.totalLinks++;
-
-          if (isValidEntityRef(refStr)) {
-            stats.validLinks++;
-          } else {
-            stats.orphanedLinks++;
-            stats.orphanedRefs.push({
-              recordKey: entry.key,
-              schemaId: entry.schema,
-              ownerEntityId: entry.ownerEntityId,
-              fieldName: endpointName,
-              refValue: refStr,
-              allowsDisplayName: !!endpointDef.allowDisplayName,
-            });
-          }
-        }
-
-        // Check fields with type=ref in the schema definition
-        for (const [fieldName, fieldDef] of Object.entries(schema.fields)) {
-          if (fieldDef.type !== "ref") continue;
-
-          const refValue = entry.fields[fieldName];
-          if (refValue === undefined || refValue === null) continue;
-
-          const refStr = String(refValue);
-          stats.totalLinks++;
-
-          if (isValidEntityRef(refStr)) {
-            stats.validLinks++;
-          } else {
-            stats.orphanedLinks++;
-            stats.orphanedRefs.push({
-              recordKey: entry.key,
-              schemaId: entry.schema,
-              ownerEntityId: entry.ownerEntityId,
-              fieldName,
-              refValue: refStr,
-              allowsDisplayName: false,
-            });
-          }
-        }
-      }
-    }
-  }
+  // Note: Records have been migrated to PostgreSQL and are no longer loaded
+  // into the KB graph. Record entity-ref validation is now handled by the
+  // wiki-server integrity checks. This validator only checks fact refs.
 
   // ── Report ──────────────────────────────────────────────────────
 
@@ -190,7 +102,7 @@ async function main(): Promise<void> {
       `\n${c.bold}${c.blue}Entity Reference Integrity Check${c.reset}\n`
     );
     console.log(`Entities in graph: ${entities.length}`);
-    console.log(`Record schemas: ${recordSchemas.length}\n`);
+    console.log(`Note: Records migrated to PG — record ref checks skipped.\n`);
   }
 
   // Table header
