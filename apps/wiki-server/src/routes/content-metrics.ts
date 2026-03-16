@@ -41,6 +41,7 @@ const contentMetricsApp = new Hono()
       let updated = 0;
 
       await rawDb.begin(async (txRaw) => {
+        // Known workaround: postgres.js transaction typing requires double-cast
         const tx = txRaw as unknown as SqlQuery;
         await tx`SELECT pg_advisory_xact_lock(${CONTENT_METRICS_SYNC_LOCK})`;
 
@@ -112,6 +113,7 @@ const contentMetricsApp = new Hono()
       let upserted = 0;
 
       await rawDb.begin(async (txRaw) => {
+        // Known workaround: postgres.js transaction typing requires double-cast
         const tx = txRaw as unknown as SqlQuery;
         await tx`SELECT pg_advisory_xact_lock(${SIMILARITY_SYNC_LOCK})`;
 

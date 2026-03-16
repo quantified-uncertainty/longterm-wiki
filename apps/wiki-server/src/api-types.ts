@@ -910,7 +910,7 @@ export const SyncContentMetricsPageSchema = z.object({
   // Coverage
   coveragePassing: z.number().int().min(0).nullable().optional(),
   coverageTotal: z.number().int().min(0).nullable().optional(),
-  coverageItems: z.record(z.string(), z.string()).nullable().optional(),
+  coverageItems: z.record(z.string(), z.enum(['green', 'amber', 'red'])).nullable().optional(),
   // Update schedule
   updateFrequency: z.number().int().min(0).nullable().optional(),
   daysSinceUpdate: z.number().int().min(0).nullable().optional(),
@@ -939,7 +939,7 @@ export const SyncSimilarityItemSchema = z.object({
 export type SyncSimilarityItem = z.infer<typeof SyncSimilarityItemSchema>;
 
 export const SyncSimilarityBatchSchema = z.object({
-  items: z.array(SyncSimilarityItemSchema).min(1).max(2000),
+  items: z.array(SyncSimilarityItemSchema).min(1).max(10000),
   replace: z.boolean().default(false),
 });
 

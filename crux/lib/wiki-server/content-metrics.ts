@@ -36,7 +36,6 @@ export type { SyncContentMetricsPage, SyncSimilarityItem };
 // ---------------------------------------------------------------------------
 
 const METRICS_BATCH_SIZE = 200;
-const SIMILARITY_BATCH_SIZE = 2000;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -74,8 +73,10 @@ export async function syncContentMetrics(
 }
 
 /**
- * Sync page similarity data. Replaces all existing similarity data on first batch.
- * Splits into batches of 2000.
+ * Sync page similarity data. Sends all items in a single request with replace: true
+ * so the server handles DELETE + INSERT atomically in one transaction.
+ * This prevents partial data loss that could occur with multi-batch sync
+ * (where batch 1 deletes all data but batch 2 fails, leaving the table incomplete).
  */
 export async function syncSimilarity(
   items: SyncSimilarityItem[],
@@ -83,25 +84,18 @@ export async function syncSimilarity(
   const serverUrl = getServerUrl();
   if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
 
-  let totalUpserted = 0;
+  // Send all items in a single request so the server can do DELETE + INSERT
+  // atomically within one transaction. The server batches internally (500 at a time).
+  const result = await batchedRequest<SyncSimilarityResult>(
+    'POST',
+    '/api/content-metrics/similarity/sync',
+    { items, replace: true },
+  );
 
-  for (let i = 0; i < items.length; i += SIMILARITY_BATCH_SIZE) {
-    const batch = items.slice(i, i + SIMILARITY_BATCH_SIZE);
-    const isFirst = i === 0;
-
-    const result = await batchedRequest<SyncSimilarityResult>(
-      'POST',
-      '/api/content-metrics/similarity/sync',
-      { items: batch, replace: isFirst },
-    );
-
-    if (!result.ok) {
-      console.warn(`  WARNING: Similarity sync batch failed: ${result.message}`);
-      return result;
-    }
-
-    totalUpserted += result.data.upserted;
+  if (!result.ok) {
+    console.warn(`  WARNING: Similarity sync failed: ${result.message}`);
+    return result;
   }
 
-  return { ok: true, data: { upserted: totalUpserted } };
+  return { ok: true, data: { upserted: result.data.upserted } };
 }

@@ -2429,28 +2429,34 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('  similaritySync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    const similarityItems = [];
-    for (const page of pages) {
-      if (!page.redundancy?.similarPages) continue;
-      for (const sp of page.redundancy.similarPages) {
-        similarityItems.push({
-          pageId: page.id,
-          similarPageId: sp.id,
-          similarity: sp.similarity,
-        });
+    try {
+      const similarityItems = [];
+      for (const page of pages) {
+        if (!page.redundancy?.similarPages) continue;
+        for (const sp of page.redundancy.similarPages) {
+          similarityItems.push({
+            pageId: page.id,
+            similarPageId: sp.id,
+            similarity: sp.similarity,
+          });
+        }
       }
-    }
-    if (similarityItems.length > 0) {
-      console.log(`  similarityItems: ${similarityItems.length} pairs collected for server sync`);
-      const simResult = await syncSimilarity(similarityItems);
-      if (simResult.ok) {
-        console.log(`  similaritySync: synced ${simResult.data.upserted} pairs to wiki server`);
+      if (similarityItems.length > 0) {
+        console.log(`  similarityItems: ${similarityItems.length} pairs collected for server sync`);
+        const simResult = await syncSimilarity(similarityItems);
+        if (simResult.ok) {
+          console.log(`  similaritySync: synced ${simResult.data.upserted} pairs to wiki server`);
+        } else {
+          console.log(`  similaritySync: skipped (${simResult.message || 'server unavailable or error'})`);
+        }
       } else {
-        console.log(`  similaritySync: skipped (${simResult.message || 'server unavailable or error'})`);
+        console.log('  similaritySync: no similarity pairs to sync');
       }
-    } else {
-      console.log('  similaritySync: no similarity pairs to sync');
+    } catch (e) {
+      console.warn('  similaritySync: sync failed (non-blocking):', e?.message || e);
     }
+  } else {
+    console.log('  similaritySync: skipped (no LONGTERMWIKI_SERVER_URL)');
   }
 
   // =========================================================================
@@ -2593,43 +2599,49 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('  contentMetricsSync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    // Build a schedule lookup for efficient joining
-    const scheduleByPageId = new Map();
-    for (const item of updateScheduleItems) {
-      scheduleByPageId.set(item.id, item);
-    }
+    try {
+      // Build a schedule lookup for efficient joining
+      const scheduleByPageId = new Map();
+      for (const item of updateScheduleItems) {
+        scheduleByPageId.set(item.id, item);
+      }
 
-    const metricsPayload = pages.map(page => {
-      const schedule = scheduleByPageId.get(page.id);
-      return {
-        pageId: page.id,
-        // Coverage
-        coveragePassing: page.coverage?.passing ?? null,
-        coverageTotal: page.coverage?.total ?? null,
-        coverageItems: page.coverage?.items ?? null,
-        // Update schedule
-        updateFrequency: schedule?.updateFrequency ?? (page.updateFrequency || null),
-        daysSinceUpdate: schedule?.daysSinceUpdate ?? null,
-        daysUntilDue: schedule?.daysUntilDue ?? null,
-        staleness: schedule?.staleness ?? null,
-        updatePriority: schedule?.priority ?? null,
-        // Structural metrics
-        sectionCount: page.metrics?.sectionCount ?? null,
-        tableCount: page.metrics?.tableCount ?? null,
-        diagramCount: page.metrics?.diagramCount ?? null,
-        footnoteCount: page.metrics?.footnoteCount ?? null,
-        internalLinks: page.metrics?.internalLinks ?? null,
-        externalLinks: page.metrics?.externalLinks ?? null,
-      };
-    });
+      const metricsPayload = pages.map(page => {
+        const schedule = scheduleByPageId.get(page.id);
+        return {
+          pageId: page.id,
+          // Coverage
+          coveragePassing: page.coverage?.passing ?? null,
+          coverageTotal: page.coverage?.total ?? null,
+          coverageItems: page.coverage?.items ?? null,
+          // Update schedule
+          updateFrequency: schedule?.updateFrequency ?? (page.updateFrequency || null),
+          daysSinceUpdate: schedule?.daysSinceUpdate ?? null,
+          daysUntilDue: schedule?.daysUntilDue ?? null,
+          staleness: schedule?.staleness ?? null,
+          updatePriority: schedule?.priority ?? null,
+          // Structural metrics
+          sectionCount: page.metrics?.sectionCount ?? null,
+          tableCount: page.metrics?.tableCount ?? null,
+          diagramCount: page.metrics?.diagramCount ?? null,
+          footnoteCount: page.metrics?.footnoteCount ?? null,
+          internalLinks: page.metrics?.internalLinks ?? null,
+          externalLinks: page.metrics?.externalLinks ?? null,
+        };
+      });
 
-    console.log(`  contentMetrics: ${metricsPayload.length} pages prepared for server sync`);
-    const metricsResult = await syncContentMetrics(metricsPayload);
-    if (metricsResult.ok) {
-      console.log(`  contentMetricsSync: updated ${metricsResult.data.updated} pages on wiki server`);
-    } else {
-      console.log(`  contentMetricsSync: skipped (${metricsResult.message || 'server unavailable or error'})`);
+      console.log(`  contentMetrics: ${metricsPayload.length} pages prepared for server sync`);
+      const metricsResult = await syncContentMetrics(metricsPayload);
+      if (metricsResult.ok) {
+        console.log(`  contentMetricsSync: updated ${metricsResult.data.updated} pages on wiki server`);
+      } else {
+        console.log(`  contentMetricsSync: skipped (${metricsResult.message || 'server unavailable or error'})`);
+      }
+    } catch (e) {
+      console.warn('  contentMetricsSync: sync failed (non-blocking):', e?.message || e);
     }
+  } else {
+    console.log('  contentMetricsSync: skipped (no LONGTERMWIKI_SERVER_URL)');
   }
 
   database.pages = pages;
