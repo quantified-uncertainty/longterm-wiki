@@ -9,7 +9,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { PageAssessment } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { AssessmentsRoute } from '../../../apps/wiki-server/src/routes/assessments.ts';
+import type { AssessmentsRoute } from '../../../apps/wiki-server/src/routes/wikibase/assessments.ts';
 
 // ---------------------------------------------------------------------------
 // Types (inferred from server route via Hono RPC)

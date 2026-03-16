@@ -7,7 +7,7 @@
 
 import type { z } from 'zod';
 import type { hc, InferResponseType } from 'hono/client';
-import type { LinksRoute } from '../../../apps/wiki-server/src/routes/links.ts';
+import type { LinksRoute } from '../../../apps/wiki-server/src/routes/wikibase/links.ts';
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
 import type { PageLinkSchema } from '../../../apps/wiki-server/src/api-types.ts';
 

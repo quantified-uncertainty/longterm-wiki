@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseSort, paginationMeta } from "../routes/query-helpers.js";
+import { parseSort, paginationMeta } from "../routes/shared/query-helpers.js";
 
 describe("parseSort", () => {
   const allowed = ["amount", "date", "name"] as const;

@@ -370,7 +370,7 @@ vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 const { clearMatViewCache } = await import(
-  "../routes/hallucination-risk.js"
+  "../routes/wikibase/hallucination-risk.js"
 );
 
 // ---- Tests ----

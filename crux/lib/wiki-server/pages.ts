@@ -10,9 +10,9 @@
 
 import type { hc, InferResponseType } from 'hono/client';
 import { apiRequest, type ApiResult } from './client.ts';
-import type { PagesRoute } from '../../../apps/wiki-server/src/routes/pages.ts';
-import type { LinksRoute } from '../../../apps/wiki-server/src/routes/links.ts';
-import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/citations.ts';
+import type { PagesRoute } from '../../../apps/wiki-server/src/routes/wikibase/pages.ts';
+import type { LinksRoute } from '../../../apps/wiki-server/src/routes/wikibase/links.ts';
+import type { CitationsRoute } from '../../../apps/wiki-server/src/routes/wikibase/citations.ts';
 
 // ---------------------------------------------------------------------------
 // RPC type inference (compile-time only — no runtime cost)

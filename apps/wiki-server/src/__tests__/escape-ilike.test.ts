@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { escapeIlike } from "../routes/utils.js";
+import { escapeIlike } from "../routes/shared/utils.js";
 
 describe("escapeIlike", () => {
   it("passes normal string through unchanged", () => {

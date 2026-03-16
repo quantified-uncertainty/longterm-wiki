@@ -11,7 +11,7 @@
 
 import type { hc, InferResponseType } from 'hono/client';
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type { FactsRoute } from '../../../apps/wiki-server/src/routes/facts.ts';
+import type { FactsRoute } from '../../../apps/wiki-server/src/routes/factbase/facts.ts';
 import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------

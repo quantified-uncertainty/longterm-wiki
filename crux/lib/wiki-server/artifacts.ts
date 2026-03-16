@@ -8,7 +8,7 @@
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { ArtifactsRoute } from '../../../apps/wiki-server/src/routes/artifacts.ts';
+import type { ArtifactsRoute } from '../../../apps/wiki-server/src/routes/operational/artifacts.ts';
 import type { SaveArtifacts } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------

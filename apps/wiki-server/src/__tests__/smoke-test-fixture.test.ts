@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SyncPageSchema, SyncBatchSchema } from "../routes/pages.js";
+import { SyncPageSchema, SyncBatchSchema } from "../routes/wikibase/pages.js";
 
 /**
  * This fixture mirrors the JSON body hardcoded in

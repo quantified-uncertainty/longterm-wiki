@@ -247,7 +247,7 @@ let app: Hono;
 beforeEach(async () => {
   resetStores();
   const { factbaseVerificationsRoute } = await import(
-    "../routes/factbase-verifications.js"
+    "../routes/factbase/factbase-verifications.js"
   );
   app = new Hono().route("/api/kb-verifications", factbaseVerificationsRoute);
 });

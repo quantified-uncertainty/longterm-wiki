@@ -7,7 +7,7 @@
 
 import type { z } from 'zod';
 import type { hc, InferResponseType } from 'hono/client';
-import type { SessionsRoute } from '../../../apps/wiki-server/src/routes/sessions.ts';
+import type { SessionsRoute } from '../../../apps/wiki-server/src/routes/operational/sessions.ts';
 import { apiRequest, type ApiResult } from './client.ts';
 import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-types.ts';
 

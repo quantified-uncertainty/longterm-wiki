@@ -11,7 +11,7 @@
 
 import type { hc, InferResponseType } from 'hono/client';
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type { EntitiesRoute } from '../../../apps/wiki-server/src/routes/entities.ts';
+import type { EntitiesRoute } from '../../../apps/wiki-server/src/routes/tablebase/entities.ts';
 import type { SyncEntity } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------

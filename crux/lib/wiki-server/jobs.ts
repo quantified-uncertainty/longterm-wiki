@@ -8,7 +8,7 @@
 
 import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
-import type { JobsRoute } from '../../../apps/wiki-server/src/routes/jobs.ts';
+import type { JobsRoute } from '../../../apps/wiki-server/src/routes/operational/jobs.ts';
 import type {
   CreateJobInput,
   ClaimJob,
