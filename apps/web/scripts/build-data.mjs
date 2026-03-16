@@ -1874,7 +1874,6 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
         // Extract structural metrics (format-aware scoring)
         const contentFormat = fm.contentFormat || 'article';
         const metrics = extractMetrics(content, fullPath, contentFormat);
-        const currentQuality = fm.quality != null ? Number(fm.quality) : null;
 
         // Find unconverted links (markdown links that have matching resources)
         const unconvertedLinks = urlToResource ? findUnconvertedLinks(content, urlToResource) : [];
@@ -1882,7 +1881,7 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
         // Count already converted links (<R> components)
         const convertedLinkCount = countConvertedLinks(content);
 
-        // PG assessment (preferred over frontmatter when available)
+        // Scoring fields are sourced exclusively from PG assessments (epic #2428)
         const assessment = assessmentMap.get(effectiveId);
 
         pages.push({
@@ -1892,16 +1891,12 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           path: urlPath,
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
-          quality: assessment?.quality ?? currentQuality,
-          readerImportance: assessment?.readerImportance ?? (fm.readerImportance != null ? Number(fm.readerImportance) : null),
-          researchImportance: assessment?.researchImportance ?? (fm.researchImportance != null ? Number(fm.researchImportance) : null),
-          tacticalValue: assessment?.tacticalValue ?? (fm.tacticalValue != null ? Number(fm.tacticalValue) : null),
+          quality: assessment?.quality ?? null,
+          readerImportance: assessment?.readerImportance ?? null,
+          researchImportance: assessment?.researchImportance ?? null,
+          tacticalValue: assessment?.tacticalValue ?? null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
-          // ITN framework fields (0-100 scale)
-          tractability: fm.tractability != null ? Number(fm.tractability) : null,
-          neglectedness: fm.neglectedness != null ? Number(fm.neglectedness) : null,
-          uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
           lastUpdated: maxDate(
             editLogDates.get(isIndexFile ? null : id) || null,
@@ -1917,8 +1912,8 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
           description: fm.description || null,
-          // Extract ratings — prefer PG assessment if available, fall back to frontmatter
-          ratings: assessment ? buildRatingsFromAssessment(assessment, fm.ratings) : (fm.ratings || null),
+          // Ratings sourced from PG assessments
+          ratings: assessment ? buildRatingsFromAssessment(assessment, null) : null,
           // Extract category from path (prefer subdirectory, fallback to top-level dir)
           category: urlPrefix.split('/').filter(Boolean)[1] || urlPrefix.split('/').filter(Boolean)[0] || 'other',
           // Subcategory from frontmatter (set by flatten-content migration)

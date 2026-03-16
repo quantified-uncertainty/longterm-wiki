@@ -1,23 +1,16 @@
 ---
 numericId: E501
-title: "State-Space Models / Mamba"
-description: "Analysis of Mamba and other state-space model architectures as alternatives to transformers. SSMs achieve 5x higher inference throughput with linear O(n) complexity versus quadratic O(n^2) attention."
+title: State-Space Models / Mamba
+description: Analysis of Mamba and other state-space model architectures as alternatives to transformers. SSMs achieve 5x higher inference throughput with linear O(n) complexity versus quadratic O(n^2) attention.
 sidebar:
-  label: "SSM/Mamba"
+  label: SSM/Mamba
   order: 7
 subcategory: architectures
-quality: 54
-readerImportance: 34
-researchImportance: 66
-lastEdited: "2026-01-28"
+lastEdited: 2026-01-28
 update_frequency: 45
 llmSummary: "Comprehensive analysis of state-space models (SSMs) like Mamba as transformer alternatives, documenting that Mamba-3B matches Transformer-6B perplexity with 5x throughput but lags on in-context learning (MMLU: 46.3% vs 51.2% at 8B scale). Hybrid architectures combining 43% SSM + 7% attention outperform pure transformers (+1.3 points) while maintaining efficiency gains, with estimated 45% probability of hybrids becoming dominant vs 35% for pure transformers."
-ratings:
-  novelty: 4.2
-  rigor: 6.8
-  actionability: 3.5
-  completeness: 7.1
-clusters: ["ai-safety"]
+clusters:
+  - ai-safety
 ---
 import { Mermaid } from '@components/wiki';
 

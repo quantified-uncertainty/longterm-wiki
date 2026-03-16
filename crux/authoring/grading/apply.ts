@@ -1,7 +1,8 @@
 /**
  * Frontmatter application — writes grading results back to MDX source files.
  *
- * Handles YAML serialization, structural validation, and safe file writes.
+ * Scoring fields (quality, ratings, importance) are written only to PG
+ * assessments — not to frontmatter. Only llmSummary is written to frontmatter.
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -29,8 +30,8 @@ export function safeStringifyFm(obj: Record<string, unknown>): string {
   try {
     const roundTripped = parseYaml(plainYaml);
     // Verify key fields survived the round-trip
-    if (typeof obj.quality === 'number' && roundTripped?.quality !== obj.quality) {
-      throw new Error('quality field lost in round-trip');
+    if (typeof obj.title === 'string' && roundTripped?.title !== obj.title) {
+      throw new Error('title field lost in round-trip');
     }
     // Ensure \$ in plain YAML values are double-quoted for MDX safety.
     // Without this, remark-mdx-frontmatter converts \$ to invalid JS escapes.
@@ -68,27 +69,27 @@ export function applyGradesToFile(
     return false;
   }
 
-  fm.readerImportance = grades.readerImportance;
-  if (grades.tacticalValue != null) {
-    fm.tacticalValue = grades.tacticalValue;
-  }
-  fm.quality = derivedQuality;
+  // Scoring fields (quality, ratings, importance) are written to PG only — not frontmatter.
+  // Remove any stale scoring fields that might still be in the file.
+  delete fm.quality;
+  delete fm.readerImportance;
+  delete fm.researchImportance;
+  delete fm.tacticalValue;
+  delete fm.ratings;
+  delete fm.tractability;
+  delete fm.neglectedness;
+
+  // llmSummary is still written to frontmatter (used by build-data for page descriptions)
   if (grades.llmSummary) {
     fm.llmSummary = grades.llmSummary;
-  }
-  if (grades.ratings) {
-    fm.ratings = grades.ratings;
   }
   // Metrics are computed at build time — not stored in frontmatter.
   delete fm.metrics;
 
   if (fm.lastEdited instanceof Date) {
-    // lastEdited is deprecated; convert Date objects to strings for backward compat
     fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
   }
 
-  // Reorder keys to canonical order before serialization so newly-added
-  // fields (e.g. tacticalValue) land in the correct position.
   const orderedFm = reorderFrontmatterObject(fm);
 
   let newFm: string = safeStringifyFm(orderedFm);
@@ -120,7 +121,7 @@ export function applyGradesToFile(
 
   writeFileSync(page.filePath, newContent);
 
-  // Fire-and-forget: also record assessment to wiki-server (best-effort telemetry)
+  // Record assessment to PG (best-effort telemetry)
   recordAssessment({
     pageId: page.id,
     assessor: 'llm-grading',

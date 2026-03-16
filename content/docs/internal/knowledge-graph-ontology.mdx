@@ -1,24 +1,15 @@
 ---
 numericId: E894
 title: "Knowledge Graph Ontology: Design & Implementation Status"
-description: "Design document for the wiki's knowledge graph property ontology, tracking what was proposed versus what the KB system now implements — including typed properties, entity schemas, temporal facts, source attribution, and inverse relationships"
+description: Design document for the wiki's knowledge graph property ontology, tracking what was proposed versus what the KB system now implements — including typed properties, entity schemas, temporal facts, source attribution, and inverse relationships
 sidebar:
   order: 37
 subcategory: architecture
-quality: 45
-readerImportance: 85
-researchImportance: 80
-lastEdited: "2026-03-09"
+lastEdited: 2026-03-09
 createdAt: 2026-02-25
 evergreen: false
 llmSummary: "Architecture document for the wiki's knowledge graph property ontology, updated to reflect the KB system's implementation. The KB system (packages/kb/) now realizes most of what was proposed: 100+ typed properties in properties.yaml, 19 entity type schemas, 360+ entity files with structured facts, temporal support, source attribution, and inverse relationship computation. Includes a Kalshi worked example showing how prose decomposes into structured claims, and tracks which design proposals remain aspirational (confidence taxonomies, claim-level verification)."
-ratings:
-  novelty: 7
-  rigor: 6
-  actionability: 8
-  completeness: 7
 ---
-
 ## Motivation
 
 This document was originally written (February 2025) when the wiki had two disconnected data layers: a small set of numeric facts in `data/facts/*.yaml` and thousands of unstructured prose claims across \~700 MDX pages. It proposed a property ontology to bridge those layers.

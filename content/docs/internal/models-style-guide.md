@@ -1,20 +1,12 @@
 ---
 numericId: E736
-title: "Models Style Guide"
-description: "Style guide for writing model and analysis pages"
+title: Models Style Guide
+description: Style guide for writing model and analysis pages
 subcategory: style-guides
-pageType: "documentation"
-quality: 38
-readerImportance: 45
-researchImportance: 70.5
-lastEdited: "2026-02-17"
+pageType: documentation
+lastEdited: 2026-02-17
 update_frequency: 90
 llmSummary: "Internal style guide prescribing dense, quantified content structure for model pages: minimum 800 words, 2+ tables (4x3+), 1+ Mermaid diagram, mathematical formulations, and <30% bullets. Requires specific sections (overview, framework, quantitative analysis, cases, limitations) with probability ranges and scenario weighting throughout."
-ratings:
-  novelty: 2
-  rigor: 4
-  actionability: 5
-  completeness: 7
 ---
 import {EntityLink} from '@components/wiki';
 
