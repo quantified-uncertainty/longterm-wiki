@@ -10,14 +10,14 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, getDrizzleDb, type SqlQuery } from "../db.js";
+import { getDb, getDrizzleDb, type SqlQuery } from "../../db.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-} from "./utils.js";
-import { resolvePageIntIds } from "./page-id-helpers.js";
-import { logger as rootLogger } from "../logger.js";
+} from "../shared/utils.js";
+import { resolvePageIntIds } from "../shared/page-id-helpers.js";
+import { logger as rootLogger } from "../../logger.js";
 
 const logger = rootLogger.child({ component: "build-metrics" });
 

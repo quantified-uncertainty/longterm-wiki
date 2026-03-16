@@ -210,7 +210,7 @@ beforeEach(async () => {
   }
 
   const { buildMetricsRoute } = await import(
-    "../routes/build-metrics.js"
+    "../routes/operational/build-metrics.js"
   );
   app = new Hono();
   app.route("/api/build-metrics", buildMetricsRoute);

@@ -11,7 +11,7 @@
  */
 
 import type { hc, InferResponseType } from 'hono/client';
-import type { BuildMetricsRoute } from '../../../apps/wiki-server/src/routes/build-metrics.ts';
+import type { BuildMetricsRoute } from '../../../apps/wiki-server/src/routes/operational/build-metrics.ts';
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
 
 // ---------------------------------------------------------------------------
