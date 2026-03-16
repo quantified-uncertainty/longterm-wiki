@@ -1425,8 +1425,22 @@ export const personnel = pgTable(
   "personnel",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    personId: text("person_id").notNull(), // entity ID or display name
-    organizationId: text("organization_id").notNull(), // entity ID or free text (career-history)
+    personId: text("person_id").notNull(), // legacy: entity ID or display name (kept for migration compat)
+    organizationId: text("organization_id").notNull(), // legacy: entity ID or free text (kept for migration compat)
+    /** FK to entities.stable_id for the person. Null when unresolved. */
+    personEntityId: text("person_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when person doesn't have an entity. */
+    personDisplayName: text("person_display_name"),
+    /** FK to entities.stable_id for the organization. Null when unresolved. */
+    orgEntityId: text("org_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when org doesn't have an entity. */
+    orgDisplayName: text("org_display_name"),
     role: text("role").notNull(), // job title or board role
     roleType: text("role_type").notNull(), // 'key-person' | 'board' | 'career'
     startDate: text("start_date"), // YYYY or YYYY-MM (flexible KB date format)
@@ -1449,6 +1463,8 @@ export const personnel = pgTable(
   (table) => [
     index("idx_personnel_person").on(table.personId),
     index("idx_personnel_org").on(table.organizationId),
+    index("idx_personnel_person_entity").on(table.personEntityId),
+    index("idx_personnel_org_entity").on(table.orgEntityId),
     index("idx_personnel_role_type").on(table.roleType),
   ]
 );
@@ -1462,8 +1478,22 @@ export const grants = pgTable(
   "grants",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    organizationId: text("organization_id").notNull(), // grantor entity ID
-    granteeId: text("grantee_id"), // the recipient entity (nullable — many grants don't specify)
+    organizationId: text("organization_id").notNull(), // legacy: grantor entity ID (kept for migration compat)
+    granteeId: text("grantee_id"), // legacy: recipient entity (kept for migration compat)
+    /** FK to entities.stable_id for the grantor organization. Null when unresolved. */
+    orgEntityId: text("org_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when grantor org doesn't have an entity. */
+    orgDisplayName: text("org_display_name"),
+    /** FK to entities.stable_id for the grantee. Null when unresolved. */
+    granteeEntityId: text("grantee_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when grantee doesn't have an entity. */
+    granteeDisplayName: text("grantee_display_name"),
     name: text("name").notNull(), // program or grant name
     amount: numeric("amount"), // funding amount (NUMERIC for precise financial data; Drizzle returns string)
     currency: text("currency").notNull().default("USD"),
@@ -1486,6 +1516,8 @@ export const grants = pgTable(
   (table) => [
     index("idx_grants_org").on(table.organizationId),
     index("idx_grants_grantee").on(table.granteeId),
+    index("idx_grants_org_entity").on(table.orgEntityId),
+    index("idx_grants_grantee_entity").on(table.granteeEntityId),
     index("idx_grants_status").on(table.status),
     index("idx_grants_program").on(table.programId),
   ]
@@ -1503,13 +1535,27 @@ export const fundingRounds = pgTable(
   "funding_rounds",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    companyId: text("company_id").notNull(), // entity ID of the company
+    companyId: text("company_id").notNull(), // legacy: entity ID of the company (kept for migration compat)
+    /** FK to entities.stable_id for the company. Null when unresolved. */
+    companyEntityId: text("company_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when company doesn't have an entity. */
+    companyDisplayName: text("company_display_name"),
     name: text("name").notNull(), // round name (e.g., "Series A", "Founding")
     date: text("date"), // YYYY or YYYY-MM
     raised: numeric("raised"), // capital raised (USD)
     valuation: numeric("valuation"), // post-money valuation (USD)
     instrument: text("instrument"), // equity, convertible-note, strategic-partnership, founding
-    leadInvestor: text("lead_investor"), // entity ID or display name
+    leadInvestor: text("lead_investor"), // legacy: entity ID or display name (kept for migration compat)
+    /** FK to entities.stable_id for the lead investor. Null when unresolved. */
+    leadInvestorEntityId: text("lead_investor_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when lead investor doesn't have an entity. */
+    leadInvestorDisplayName: text("lead_investor_display_name"),
     source: text("source"), // URL to announcement
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -1524,6 +1570,8 @@ export const fundingRounds = pgTable(
   },
   (table) => [
     index("idx_fr_company").on(table.companyId),
+    index("idx_fr_company_entity").on(table.companyEntityId),
+    index("idx_fr_lead_investor_entity").on(table.leadInvestorEntityId),
     index("idx_fr_date").on(table.date),
   ]
 );
@@ -1538,8 +1586,22 @@ export const investments = pgTable(
   "investments",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    companyId: text("company_id").notNull(), // entity ID of the company
-    investorId: text("investor_id").notNull(), // entity ID or display name
+    companyId: text("company_id").notNull(), // legacy: entity ID of the company (kept for migration compat)
+    investorId: text("investor_id").notNull(), // legacy: entity ID or display name (kept for migration compat)
+    /** FK to entities.stable_id for the company. Null when unresolved. */
+    companyEntityId: text("company_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when company doesn't have an entity. */
+    companyDisplayName: text("company_display_name"),
+    /** FK to entities.stable_id for the investor. Null when unresolved. */
+    investorEntityId: text("investor_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when investor doesn't have an entity. */
+    investorDisplayName: text("investor_display_name"),
     roundName: text("round_name"), // name of the funding round
     date: text("date"), // YYYY or YYYY-MM
     amount: numeric("amount"), // capital contributed (USD)
@@ -1562,6 +1624,8 @@ export const investments = pgTable(
   (table) => [
     index("idx_inv_company").on(table.companyId),
     index("idx_inv_investor").on(table.investorId),
+    index("idx_inv_company_entity").on(table.companyEntityId),
+    index("idx_inv_investor_entity").on(table.investorEntityId),
     index("idx_inv_date").on(table.date),
   ]
 );
@@ -1576,8 +1640,22 @@ export const equityPositions = pgTable(
   "equity_positions",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    companyId: text("company_id").notNull(), // entity ID of the company
-    holderId: text("holder_id").notNull(), // entity ID or display name
+    companyId: text("company_id").notNull(), // legacy: entity ID of the company (kept for migration compat)
+    holderId: text("holder_id").notNull(), // legacy: entity ID or display name (kept for migration compat)
+    /** FK to entities.stable_id for the company. Null when unresolved. */
+    companyEntityId: text("company_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when company doesn't have an entity. */
+    companyDisplayName: text("company_display_name"),
+    /** FK to entities.stable_id for the holder. Null when unresolved. */
+    holderEntityId: text("holder_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when holder doesn't have an entity. */
+    holderDisplayName: text("holder_display_name"),
     stake: text("stake"), // current post-dilution equity stake (single or range as JSON string)
     source: text("source"), // URL to source
     notes: text("notes"),
@@ -1596,6 +1674,8 @@ export const equityPositions = pgTable(
   (table) => [
     index("idx_ep_company").on(table.companyId),
     index("idx_ep_holder").on(table.holderId),
+    index("idx_ep_company_entity").on(table.companyEntityId),
+    index("idx_ep_holder_entity").on(table.holderEntityId),
   ]
 );
 
