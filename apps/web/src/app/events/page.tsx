@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTypedEntities, isEvent } from "@/data";
-import { ProfileStatCard } from "@/components/directory";
 import { getWikiHref } from "@/data/entity-nav";
 
 export const metadata: Metadata = {
@@ -12,14 +11,7 @@ export const metadata: Metadata = {
 
 export default function EventsPage() {
   const events = getTypedEntities().filter(isEvent);
-
-  const stats = [
-    { label: "Events", value: String(events.length) },
-    {
-      label: "With Description",
-      value: String(events.filter((e) => e.description).length),
-    },
-  ];
+  const isSparse = events.length < 5;
 
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
@@ -30,17 +22,20 @@ export default function EventsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {stats.map((stat) => (
-          <ProfileStatCard
-            key={stat.label}
-            label={stat.label}
-            value={stat.value}
-          />
-        ))}
-      </div>
+      {isSparse && (
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-4 py-3 mb-8 text-sm text-muted-foreground">
+          This directory is being populated. Currently tracking{" "}
+          {events.length} {events.length === 1 ? "event" : "events"}.
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        className={
+          isSparse
+            ? "grid grid-cols-1 gap-4 max-w-xl"
+            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      >
         {events
           .sort((a, b) => a.title.localeCompare(b.title))
           .map((event) => {
