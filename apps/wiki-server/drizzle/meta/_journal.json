@@ -666,6 +666,13 @@
       "when": 1776758400000,
       "tag": "0094_add_financial_range_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1776844800000,
+      "tag": "0095_create_wikibase_page_assessments",
+      "breakpoints": true
     }
   ]
 }
