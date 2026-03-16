@@ -82,7 +82,7 @@ describe("formatAmount", () => {
     expect(result).toContain("\u2013");
   });
 
-  it("returns the string representation for non-numeric strings", () => {
-    expect(formatAmount("unknown")).toBe("unknown");
+  it("returns null for non-numeric strings", () => {
+    expect(formatAmount("unknown")).toBeNull();
   });
 });

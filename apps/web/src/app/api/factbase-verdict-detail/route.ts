@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
  * GET /api/factbase-verdict-detail?factId=...
@@ -33,8 +34,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
+  const config = getWikiServerConfig();
+  if (!config) {
     return NextResponse.json(
       { error: "Wiki server not configured" },
       { status: 503 },
@@ -42,15 +43,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const headers: Record<string, string> = {};
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
-    const url = `${serverUrl}/api/kb-verifications/verdicts/${encodeURIComponent(factId)}`;
+    const url = `${config.serverUrl}/api/kb-verifications/verdicts/${encodeURIComponent(factId)}`;
     const res = await fetch(url, {
-      headers,
+      headers: config.headers,
       signal: AbortSignal.timeout(10000),
     });
 

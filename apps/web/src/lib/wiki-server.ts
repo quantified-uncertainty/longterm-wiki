@@ -76,6 +76,31 @@ export async function fetchFromWikiServer<T>(
 }
 
 /**
+ * Environment prefix for wiki-server env vars.
+ *
+ * Set `WIKI_SERVER_ENV=prod` to read from `PROD_LONGTERMWIKI_*` env vars
+ * instead of the default `LONGTERMWIKI_*`. Mirrors the same logic in
+ * `crux/lib/wiki-server/client.ts`.
+ */
+function getEnvPrefix(): string {
+  const env = process.env.WIKI_SERVER_ENV;
+  if (env === "prod" || env === "production") return "PROD_";
+  return "";
+}
+
+/** Returns the wiki-server base URL, respecting WIKI_SERVER_ENV prefix. */
+export function getWikiServerUrl(): string {
+  const prefix = getEnvPrefix();
+  return process.env[`${prefix}LONGTERMWIKI_SERVER_URL`] || "";
+}
+
+/** Returns the wiki-server API key, respecting WIKI_SERVER_ENV prefix. */
+export function getWikiServerApiKey(): string {
+  const prefix = getEnvPrefix();
+  return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`] || "";
+}
+
+/**
  * Returns the wiki-server URL and auth headers.
  * Used by internal dashboards and claims pages that need live data.
  * Returns null if the server URL is not configured.
@@ -88,11 +113,11 @@ export function getWikiServerConfig(): {
   serverUrl: string;
   headers: Record<string, string>;
 } | null {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getWikiServerUrl();
   if (!serverUrl) return null;
 
   const headers: Record<string, string> = {};
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const apiKey = getWikiServerApiKey();
   if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
 
   return { serverUrl, headers };
