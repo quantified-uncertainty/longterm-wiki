@@ -52,7 +52,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
         {/* Top nav bar */}
         <header className="sticky top-0 z-40 border-b border-border bg-card">
-          <div className="flex items-center max-w-full overflow-hidden">
+          <div className="flex items-center max-w-full">
             <Link href="/" className="w-64 shrink-0 px-4 py-3 text-lg font-bold no-underline text-foreground max-md:w-auto">
               Longterm Wiki
             </Link>
