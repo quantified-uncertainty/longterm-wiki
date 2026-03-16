@@ -449,6 +449,15 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
       }
     }
 
+    // Check for missing dates + no confirmation note
+    if (!rec.startDate && !rec.endDate) {
+      const notes = (rec.notes as string) || '';
+      const hasConfirmation = /confirmed|as of|per |appointed|joined|listed/i.test(notes);
+      if (!hasConfirmation) {
+        issues.push(`NO_DATE_INFO: Record ${rec.id} (${pid} at ${oid}, role: ${role}) has no dates and no confirmation note`);
+      }
+    }
+
     // Check for missing source
     if (!rec.source) {
       issues.push(`MISSING_SOURCE: Record ${rec.id} (${pid} at ${oid}) has no source URL`);

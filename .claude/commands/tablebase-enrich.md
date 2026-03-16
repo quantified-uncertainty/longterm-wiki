@@ -53,6 +53,15 @@ pnpm crux tablebase resolve "Person Name" --ci
 pnpm crux tablebase create-entity "Person Name" --type=person --ci
 ```
 
+### Step 3b: Research dates
+
+For each person, try to find when they started their role:
+- Search `"[person name]" joined "[org name]"` or `"[person name]" appointed "[org name]"`
+- Check Wikipedia for founding/appointment dates
+- Board announcements usually have exact dates
+
+If you can't find a start date, that's OK — be honest in the notes field.
+
 ### Step 4: Submit records
 
 Pipe a JSON array of records using the template from Step 1:
@@ -60,12 +69,15 @@ Pipe a JSON array of records using the template from Step 1:
 ```bash
 cat <<'RECORDS' | pnpm crux tablebase submit --table=<table>
 [
-  {"personId":"<stableId>","organizationId":"<entityId>","role":"CEO","roleType":"key-person","source":"https://..."}
+  {"personId":"<stableId>","organizationId":"<entityId>","role":"CEO","roleType":"key-person","startDate":"2021","source":"https://...","notes":"Confirmed on team page as of 2026-03-16."}
 ]
 RECORDS
 ```
 
-Every record **must** have a `source` URL.
+Every record **must** have:
+- A `source` URL
+- A `notes` field stating when the info was confirmed (e.g., "Confirmed on team page as of 2026-03-16" or "Per Wikipedia, appointed October 2025")
+- A `startDate` if findable — search specifically for this. If unknown, leave it out but note "Start date unknown" in notes.
 
 ### Step 5: Mark done and continue
 
