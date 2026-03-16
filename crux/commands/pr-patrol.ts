@@ -41,6 +41,7 @@ import {
 } from '../pr-patrol/format.ts';
 import { runWatchLoop } from '../pr-patrol/watch.ts';
 import { runBranchAgent, buildBranchAgentConfig } from '../pr-patrol/branch-agent.ts';
+import { buildParallelConfig, runParallelDaemon } from '../pr-patrol/parallel.ts';
 import { parseRequiredInt } from '../lib/cli.ts';
 
 async function run(
@@ -168,6 +169,15 @@ async function branchAgent(
   return { output: '', exitCode: 0 };
 }
 
+async function parallel(
+  args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const config = buildParallelConfig(args, options);
+  await runParallelDaemon(config);
+  return { output: '', exitCode: 0 };
+}
+
 async function mergeStatus(
   _args: string[],
   options: CommandOptions,
@@ -199,6 +209,7 @@ async function mergeStatus(
 export const commands = {
   run,
   once,
+  parallel,
   status,
   history,
   stats,
@@ -215,6 +226,7 @@ PR Patrol Domain — Continuous PR maintenance daemon
 Commands:
   run (default)    Run the PR patrol daemon (continuous)
   once             Single check cycle, then exit
+  parallel         Parallel patrol: dispatch fixes to agent slots concurrently
   branch-agent     Per-PR persistent agent (Phase 1): dedicate full attention to one PR
   status           Show recent patrol activity (colorized, filterable)
   history          Browse full log with time ranges and filters
@@ -239,6 +251,28 @@ Branch Agent Options:
   --ci-timeout=N       Max seconds to wait for CI (default: 900 = 15 min)
   --ci-poll=N          CI poll interval in seconds (default: 30)
   --dry-run            Show what would be done, don't fix
+  --skip-perms         Add --dangerously-skip-permissions to Claude CLI
+
+Parallel Patrol (dispatch fixes to agent slots concurrently):
+  crux pr-patrol parallel                    Continuous daemon
+  crux pr-patrol parallel --once             Single cycle
+  crux pr-patrol parallel --max-slots=5      Limit concurrency (default: 5)
+  crux pr-patrol parallel --slot-range=2-10  Restrict slot range (default: 2-15)
+  crux pr-patrol parallel --reserve-slots=2  Keep N slots free for manual use (default: 2)
+  crux pr-patrol parallel --dry-run          Preview dispatch plan
+
+  Uses lw/a2-a15 agent slots as isolated clones for parallel PR fixes.
+  Shares cooldowns, failure tracking, and claim labels with the serial daemon.
+  Slots with .agent-task files or non-main branches are automatically skipped.
+
+Parallel Options:
+  --max-slots=N        Max concurrent fixes (default: 5)
+  --slot-range=M-N     Slot range to use (default: 2-15)
+  --reserve-slots=N    Keep N slots free for manual use (default: 2)
+  --once               Single cycle, then exit
+  --dry-run            Preview dispatch plan without fixing
+  --interval=N         Seconds between cycles (default: 300)
+  --model=MODEL        Claude model (default: sonnet)
   --skip-perms         Add --dangerously-skip-permissions to Claude CLI
 
 Status Options:
@@ -296,5 +330,8 @@ Examples:
   crux pr-patrol stats --since=30d              Monthly performance stats
   crux pr-patrol explain                        How PR Patrol works
   crux pr-patrol merge-status                   Show merge-eligible PRs
+  crux pr-patrol parallel --once --dry-run     Preview parallel dispatch plan
+  crux pr-patrol parallel --once --max-slots=3 Run single cycle with 3 slots
+  crux pr-patrol parallel                       Continuous parallel daemon
 `.trim();
 }
