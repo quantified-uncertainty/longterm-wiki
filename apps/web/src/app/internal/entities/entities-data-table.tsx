@@ -54,6 +54,8 @@ export interface UnifiedEntityRow {
   // Hallucination risk
   riskLevel: "low" | "medium" | "high" | null;
   riskScore: number | null;
+  // Priority (NBA)
+  priorityScore: number | null;
   // Ratings (1-10)
   novelty: number | null;
   rigor: number | null;
@@ -324,6 +326,7 @@ const COLUMN_LABELS: Record<string, string> = {
   // Risk
   riskLevel: "Hallucination Risk",
   riskScore: "Risk Score",
+  priorityScore: "Priority (NBA)",
   // Ratings
   novelty: "Novelty",
   rigor: "Rigor",
@@ -561,6 +564,19 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
       if (v == null) return <Dash />;
       const color = v >= 70 ? "text-red-500" : v >= 40 ? "text-amber-500" : "text-emerald-500";
       return <span className={`text-xs tabular-nums font-medium ${color}`}>{Math.round(v)}</span>;
+    },
+  },
+
+  // --- Priority (NBA) ---
+  {
+    accessorKey: "priorityScore",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Next Best Action priority: importance * qualityDeficit * staleness * riskFactor">NBA</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.priorityScore;
+      if (v == null) return <Dash />;
+      const color = v >= 0.8 ? "text-red-500" : v >= 0.4 ? "text-amber-500" : v >= 0.15 ? "text-blue-500" : "text-emerald-500";
+      return <span className={`text-xs tabular-nums font-bold ${color}`}>{v.toFixed(2)}</span>;
     },
   },
 
@@ -861,6 +877,12 @@ const PRESETS: Record<string, Preset> = {
     description: "Freshness and update scheduling",
     columns: ["title", "lastUpdated", "updateFrequency", "quality", "readerImportance", "riskLevel", "wordCount", "category"],
     defaultSort: [{ id: "lastUpdated", desc: false }],
+  },
+  priority: {
+    label: "Priority",
+    description: "Next Best Action score: importance x quality deficit x staleness x risk",
+    columns: ["title", "priorityScore", "quality", "readerImportance", "researchImportance", "riskLevel", "lastUpdated", "wordCount", "entityType"],
+    defaultSort: [{ id: "priorityScore", desc: true }],
   },
   all: {
     label: "All",

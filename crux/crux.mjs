@@ -119,6 +119,7 @@ import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
+import * as pagesCommands from './commands/pages.ts';
 
 const domains = {
   validate: validateCommands,
@@ -176,6 +177,7 @@ const domains = {
   'qa-sweep': qaSweepCommands,
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
+  pages: pagesCommands,
 };
 
 /**
@@ -273,6 +275,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
   matrix           Entity matrix analysis and improvement targeting
   tablebase        Structured data enrichment via LLM agents (scan, gaps, improve, loop)
+  pages            Page prioritization (next-action: NBA scoring for editorial attention)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
