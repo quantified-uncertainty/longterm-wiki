@@ -78,7 +78,9 @@ const mockDatabase = {
       title: "Dr. Test",
       role: "Researcher",
       affiliation: "Test Org",
+      affiliationId: "org-1",
       knownFor: [],
+      positions: [],
       tags: [],
       clusters: [],
       relatedEntries: [],
@@ -141,14 +143,6 @@ const mockDatabase = {
       credibility: 5,
       peer_reviewed: true,
       domains: ["science"],
-    },
-  ],
-  experts: [
-    {
-      id: "researcher-1",
-      name: "Dr. Test",
-      affiliation: "org-1",
-      role: "Researcher",
     },
   ],
   organizations: [

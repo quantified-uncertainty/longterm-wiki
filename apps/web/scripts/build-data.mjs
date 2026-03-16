@@ -2597,10 +2597,11 @@ async function main() {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // Write combined JSON (strip raw entities and KB data — only typedEntities needed at runtime)
-  const { entities: _rawEntities, kb: _kbData, ...databaseForOutput } = database;
+  // Write combined JSON (strip raw entities, KB data, and experts — only typedEntities needed at runtime)
+  // Experts data is now consolidated into typedEntities (person entities include positions).
+  const { entities: _rawEntities, kb: _kbData, experts: _experts, ...databaseForOutput } = database;
   writeFileSync(OUTPUT_FILE, JSON.stringify(databaseForOutput, null, 2));
-  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, KB split out, typedEntities only)`);
+  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, KB split out, experts consolidated, typedEntities only)`);
 
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');

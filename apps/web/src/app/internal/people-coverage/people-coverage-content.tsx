@@ -1,7 +1,6 @@
 import {
   getTypedEntities,
   isPerson,
-  getAllExperts,
   getAllPages,
   getIdRegistry,
 } from "@/data";
@@ -24,21 +23,16 @@ export function PeopleCoverageContent() {
   const allEntities = getTypedEntities();
   const people = allEntities.filter(isPerson);
 
-  // 2. Build expert index for positions lookup
-  const experts = getAllExperts();
-  const expertById = new Map(experts.map((e) => [e.id, e]));
-
-  // 3. Build page ID set
+  // 2. Build page ID set
   const pages = getAllPages();
   const pageIdSet = new Set(pages.map((p) => p.id));
 
-  // 4. Build slug → numericId mapping
+  // 3. Build slug → numericId mapping
   const idRegistry = getIdRegistry();
 
-  // 5. Build rows
+  // 4. Build rows
   const rows: PersonCoverageRow[] = people.map((person) => {
     const kbFacts = getKBFacts(person.id);
-    const expert = expertById.get(person.id);
 
     // KB fact property checks
     const hasRole = kbFacts.some((f) => f.propertyId === "role");
@@ -51,9 +45,8 @@ export function PeopleCoverageContent() {
     const hasEmployerFallback =
       hasEmployer || !!person.affiliation;
 
-    // Expert positions
-    const hasExpertPositions =
-      (expert?.positions && expert.positions.length > 0) || false;
+    // Expert positions (now on the typed person entity)
+    const hasExpertPositions = person.positions.length > 0;
 
     // Wiki page
     const hasWikiPage = personHasPage(person.id, pageIdSet, idRegistry.bySlug);

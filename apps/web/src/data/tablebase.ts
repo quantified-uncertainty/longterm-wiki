@@ -369,7 +369,6 @@ interface TableBaseShape {
   resources: Resource[];
   publications: Publication[];
   literature?: LiteratureData;
-  experts: Expert[];
   organizations: Organization[];
   prItems: Record<string, unknown>[];
   backlinks: Record<string, BacklinkEntry[]>;
@@ -649,7 +648,6 @@ let _typedEntityIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
-let _expertIndex: Map<string, Expert> | null = null;
 let _orgIndex: Map<string, Organization> | null = null;
 let _pageIndex: Map<string, Page> | null = null;
 
@@ -695,14 +693,6 @@ function publicationIndex() {
     );
   }
   return _publicationIndex;
-}
-
-function expertIndex() {
-  if (!_expertIndex) {
-    const db = getDatabase();
-    _expertIndex = new Map((db.experts || []).map((e) => [e.id, e]));
-  }
-  return _expertIndex;
 }
 
 function orgIndex() {
@@ -838,14 +828,6 @@ export function getPublicationsForPerson(
     (pr) => pr.personId === personId,
   );
   return entry?.publications ?? [];
-}
-
-export function getExpertById(id: string): Expert | undefined {
-  return expertIndex().get(id);
-}
-
-export function getAllExperts(): Expert[] {
-  return getDatabase().experts ?? [];
 }
 
 export function getOrganizationById(id: string): Organization | undefined {
