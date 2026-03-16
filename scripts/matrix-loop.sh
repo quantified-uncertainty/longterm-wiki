@@ -67,15 +67,25 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
     break
   fi
 
+  PAGE_SLUG=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.id)})")
   PAGE_ID=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.numericId)})")
   PAGE_TITLE=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.title)})")
   IMPACT=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.impactScore)})")
+  ENTITY_TYPE=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.entityType)})")
 
-  echo -e "${BLUE}Page: ${PAGE_TITLE} (${PAGE_ID}) — impact: ${IMPACT}${RESET}"
+  # Skip internal pages — they're wiki documentation, not user-facing content
+  if [ "$ENTITY_TYPE" = "internal" ]; then
+    echo -e "${DIM}Skipping internal page: ${PAGE_TITLE} (${PAGE_ID})${RESET}"
+    pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
+    SKIPPED=$((SKIPPED + 1))
+    continue
+  fi
 
-  # Run content improve
+  echo -e "${BLUE}Page: ${PAGE_TITLE} (${PAGE_SLUG} / ${PAGE_ID}) — impact: ${IMPACT}${RESET}"
+
+  # Run content improve (uses slug, not numericId)
   echo -e "${DIM}Running content improve --tier=$TIER...${RESET}"
-  if pnpm crux content improve "$PAGE_ID" --tier="$TIER" --apply --skip-session-log 2>&1; then
+  if pnpm crux content improve "$PAGE_SLUG" --tier="$TIER" --apply --skip-session-log 2>&1; then
     echo -e "${GREEN}✓ Content improved${RESET}"
   else
     echo -e "${YELLOW}⚠ Content improve failed for $PAGE_ID, skipping${RESET}"
@@ -119,6 +129,10 @@ EOF
   )" --quiet
 
   echo -e "${GREEN}✓ Committed${RESET}"
+
+  # Mark page as done so it's excluded from future picks
+  pnpm --silent crux matrix mark-done "$PAGE_ID" 2>/dev/null || true
+
   SUCCEEDED=$((SUCCEEDED + 1))
 
   # Rebuild data for next iteration (so scores are fresh)
