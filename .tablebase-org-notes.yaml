@@ -283,3 +283,55 @@ controlai:
   notes: |
     Founded by Andrea Miotti (CEO) and Connor Leahy (co-founder/advisor).
     Leahy also CEO of Conjecture and founder of EleutherAI.
+
+arc:
+  entityId: QsXVXtQ0zE
+  teamPage: https://www.alignment.org/team/
+  notes: |
+    19 people listed. Paul Christiano founded ARC in 2021, now at NIST.
+    Jacob Hilton is current president. ARC Evals spun out as METR (Beth Barnes).
+    Board: Jacob Hilton, Buck Shlegeris, Ben Hoskin.
+
+council-on-strategic-risks:
+  entityId: "102"
+  teamPage: null  # councilonstrategicrisks.org/about/team/ returns 404
+  notes: |
+    Mallory Stewart became CEO January 2026 (replacing Christine Parthemore).
+    Previously focused on arms control at State Dept. Per CSR announcement.
+
+arb-research:
+  entityId: "36"
+  teamPage: null  # arb.group/about returns 404
+  notes: |
+    Founded 2022 by Patrick Fechtmeyer and Junwei Ye. Based in Miami.
+    Consulting: forecasting, ML, policy. From arbresearch.com.
+
+quri:
+  entityId: Khej79OA8g
+  teamPage: null  # quantifieduncertainty.org/about has info but no team page
+  notes: |
+    Founded 2019 by Ozzie Gooen. Small team. Main project: Squiggle.
+    Previously created Guesstimate (2016). Nuño Sempere contributed.
+
+cser:
+  entityId: Qns43S795w
+  teamPage: https://www.cser.ac.uk/people/team/  # Returns 403 forbidden
+  notes: |
+    Team page blocked (403). Data from Wikipedia.
+    Co-founded 2012 by Martin Rees, Huw Price, Jaan Tallinn at Cambridge.
+    Seán Ó hÉigeartaigh founding exec director (2013+).
+
+fri:
+  entityId: KslhqGaeJw
+  teamPage: https://forecastingresearch.org/team
+  notes: |
+    18+ staff + board + advisors. Philip Tetlock (president/chief scientist).
+    Josh Rosenberg CEO. Ezra Karger director of research. Good team page.
+
+conjecture:
+  entityId: "93"
+  teamPage: null  # conjecture.dev/about is JS-rendered, WebFetch returned empty
+  notes: |
+    Founded March 2022 by Connor Leahy, Sid Black, Gabriel Alfour.
+    Born out of EleutherAI. London HQ. Alignment research startup.
+    Use fetch-page for the team page (JS-rendered).
