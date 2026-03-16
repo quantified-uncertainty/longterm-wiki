@@ -58,6 +58,21 @@ const DirectoryQuery = z.object({
 
 // ---- Helpers ----
 
+/**
+ * Build a parameterized SQL value list for use with `IN (...)`.
+ *
+ * Drizzle's `sql` tag expands JS arrays as value-lists `($1,$2,...)` which is
+ * a row constructor — valid for `IN` but **not** for PostgreSQL `ANY()` (which
+ * expects an array type). Use `IN (${sqlInList(arr)})` instead of
+ * `= ANY(${arr})` in raw `db.execute()` queries.
+ */
+function sqlInList(values: string[]) {
+  return sql.join(
+    values.map((v) => sql`${v}`),
+    sql`, `,
+  );
+}
+
 function formatEntity(e: typeof entities.$inferSelect) {
   return {
     id: e.id,
@@ -324,8 +339,8 @@ const entitiesApp = new Hono()
             f.format,
             f.format_divisor AS "formatDivisor"
           FROM facts f
-          WHERE f.entity_id = ANY(${stableIds})
-            AND f.measure = ANY(${measureList})
+          WHERE f.entity_id IN (${sqlInList(stableIds)})
+            AND f.measure IN (${sqlInList(measureList)})
           ORDER BY f.entity_id, f.measure, f.as_of DESC NULLS LAST
         `);
       }
@@ -389,7 +404,7 @@ const entitiesApp = new Hono()
       const personnelCounts = await db.execute<PersonnelCountRow>(sql`
         SELECT person_id AS "personId", COUNT(*)::int AS cnt
         FROM personnel
-        WHERE person_id = ANY(${stableIds})
+        WHERE person_id IN (${sqlInList(stableIds)})
           AND role_type = 'career'
         GROUP BY person_id
       `);
@@ -406,7 +421,7 @@ const entitiesApp = new Hono()
       const grantsGiven = await db.execute<GrantCountRow>(sql`
         SELECT organization_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE organization_id = ANY(${stableIds})
+        WHERE organization_id IN (${sqlInList(stableIds)})
         GROUP BY organization_id
       `);
       for (const r of grantsGiven) {
@@ -416,7 +431,7 @@ const entitiesApp = new Hono()
       const grantsReceived = await db.execute<GrantCountRow>(sql`
         SELECT grantee_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE grantee_id = ANY(${stableIds})
+        WHERE grantee_id IN (${sqlInList(stableIds)})
         GROUP BY grantee_id
       `);
       for (const r of grantsReceived) {
