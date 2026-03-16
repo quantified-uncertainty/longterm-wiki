@@ -657,7 +657,21 @@
       "idx": 93,
       "version": "7",
       "when": 1776672000000,
-      "tag": "0093_index_entity_metadata",
+      "tag": "0093_org_tables_entity_fk_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1776758400000,
+      "tag": "0094_add_financial_range_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1776844800000,
+      "tag": "0095_index_entity_metadata",
       "breakpoints": true
     }
   ]

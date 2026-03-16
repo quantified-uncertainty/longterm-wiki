@@ -83,8 +83,10 @@ The site has structured directory pages for browsing entities by type. Before cr
 | Publications | — | `/publications` | Research papers and publications |
 | Investments | — | `/investments` | Investment records |
 | Funding Rounds | — | `/funding-rounds` | Company funding rounds |
+| Approaches | `approach` | `/approaches` | Safety approaches, techniques, and strategies |
+| Events | `event` | `/events` | Notable AI safety events |
 
-Entity types without directories (too abstract or sparse for tables): `risk`, `approach` (70), `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5), `event` (1).
+Entity types without directories (too abstract or sparse for tables): `risk`, `concept` (34), `capability` (25), `analysis` (108), `crux` (18), `safety-agenda` (8), `historical` (5).
 
 Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
 

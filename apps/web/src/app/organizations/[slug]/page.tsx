@@ -205,7 +205,7 @@ export default async function OrgProfilePage({
 
       {/* Divisions overview */}
       {data.divisions.length > 0 && (
-        <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
+        <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} members={data.divisionMembers} />
       )}
 
       {/* Related Orgs */}
@@ -529,7 +529,7 @@ export default async function OrgProfilePage({
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
-          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} members={data.divisionMembers} />
         </div>
       ),
     });

@@ -399,6 +399,8 @@ export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
 export type ResearchAreaEntity = z.infer<typeof ResearchAreaEntitySchema>;
+export type ApproachEntity = z.infer<typeof ApproachEntitySchema>;
+export type EventEntity = z.infer<typeof EventEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -435,5 +437,13 @@ export function isProject(e: TypedEntity | GenericEntity): e is ProjectEntity {
 
 export function isResearchArea(e: TypedEntity | GenericEntity): e is ResearchAreaEntity {
   return e.entityType === "research-area";
+}
+
+export function isApproach(e: TypedEntity | GenericEntity): e is ApproachEntity {
+  return e.entityType === "approach";
+}
+
+export function isEvent(e: TypedEntity | GenericEntity): e is EventEntity {
+  return e.entityType === "event";
 }
 

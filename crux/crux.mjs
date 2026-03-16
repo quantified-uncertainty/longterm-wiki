@@ -118,6 +118,7 @@ import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-i
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as matrixCommands from './commands/matrix.ts';
+import * as tablebaseCommands from './commands/tablebase.ts';
 
 const domains = {
   validate: validateCommands,
@@ -174,6 +175,7 @@ const domains = {
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,
   matrix: matrixCommands,
+  tablebase: tablebaseCommands,
 };
 
 /**
@@ -270,6 +272,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   research-areas   Research area linking (link-grants, backfill-papers, discover-orgs, stats)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
   matrix           Entity matrix analysis and improvement targeting
+  tablebase        Structured data enrichment via LLM agents (scan, gaps, improve, loop)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
