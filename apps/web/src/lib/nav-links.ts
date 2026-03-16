@@ -30,7 +30,6 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: "Research",
     items: [
-      { href: "/risks", label: "Risks" },
       { href: "/research-areas", label: "Research Areas" },
       { href: "/benchmarks", label: "Benchmarks" },
     ],
