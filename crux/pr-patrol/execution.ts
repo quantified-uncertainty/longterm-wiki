@@ -282,9 +282,11 @@ export function spawnClaude(
     ];
     if (config.skipPerms) args.push('--dangerously-skip-permissions');
 
-    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions
-    const env = { ...process.env, ...opts?.extraEnv };
+    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions,
+    // unless the caller explicitly passes it in extraEnv (parallel patrol needs it for auth).
+    const env = { ...process.env };
     delete env.CLAUDECODE;
+    if (opts?.extraEnv) Object.assign(env, opts.extraEnv);
 
     const child = spawn('claude', args, {
       cwd: opts?.cwd,
