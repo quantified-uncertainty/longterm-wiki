@@ -31,6 +31,10 @@ const SERVICES = [
   "github-actions",
 ] as const;
 
+// Expected migration count — update this when adding new drizzle migrations.
+// Read from apps/wiki-server/drizzle/meta/_journal.json entries length.
+const EXPECTED_MIGRATION_COUNT = 98;
+
 // ── Typed row interfaces for raw SQL results ────────────────────────────
 interface DbCountsRow {
   pages: number;
@@ -56,6 +60,19 @@ interface ActiveAgentRow {
   started_at: string | null;
   completed_at: string | null;
   model: string | null;
+}
+
+interface MigrationRow {
+  id: number;
+  hash: string;
+  created_at: number;
+}
+
+interface AgentActivityRow {
+  active_now: number;
+  sessions_this_week: number;
+  prs_this_week: number;
+  completed_this_week: number;
 }
 
 const monitoringApp = new Hono()
@@ -350,6 +367,10 @@ const monitoringApp = new Hono()
       integrityResult,
       autoUpdateResult,
       recentSessionsResult,
+      migrationsResult,
+      deploysResult,
+      agentActivityResult,
+      apiKeysResult,
     ] = await Promise.all([
       // 1. GitHub CI status for main branch
       fetchCiStatus().catch((err) => {
@@ -380,6 +401,30 @@ const monitoringApp = new Hono()
         logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch recent sessions");
         return [];
       }),
+
+      // 6. Migration status
+      fetchMigrationStatus(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch migration status");
+        return null;
+      }),
+
+      // 7. Deploy history
+      fetchDeployHistory().catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch deploy history");
+        return null;
+      }),
+
+      // 8. Agent activity summary
+      fetchAgentActivity(rawDb).catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch agent activity");
+        return { activeNow: 0, sessionsThisWeek: 0, prsThisWeek: 0, completedThisWeek: 0, completionRate: null as number | null };
+      }),
+
+      // 9. API key health
+      fetchApiKeyHealth().catch((err) => {
+        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch API key health");
+        return null;
+      }),
     ]);
 
     return c.json({
@@ -388,6 +433,10 @@ const monitoringApp = new Hono()
       integrity: integrityResult,
       autoUpdate: autoUpdateResult,
       recentSessions: recentSessionsResult,
+      migrations: migrationsResult,
+      deploys: deploysResult,
+      agentActivity: agentActivityResult,
+      apiKeys: apiKeysResult,
     });
   });
 
@@ -584,6 +633,172 @@ async function fetchRecentSessions(rawDb: ReturnType<typeof getDb>) {
     completedAt: r.completed_at ? String(r.completed_at) : null,
     model: (r.model as ActiveAgentRow["model"]) ?? null,
   }));
+}
+
+// ---- Migration status ----
+
+async function fetchMigrationStatus(rawDb: ReturnType<typeof getDb>) {
+  const [countResult, recentResult] = await Promise.all([
+    rawDb`SELECT count(*)::int AS total FROM drizzle.__drizzle_migrations`,
+    rawDb`
+      SELECT id, hash, created_at
+      FROM drizzle.__drizzle_migrations
+      ORDER BY id DESC
+      LIMIT 10
+    `,
+  ]);
+
+  const appliedCount = (countResult[0] as { total: number }).total;
+  const recent = recentResult.map((r) => ({
+    id: r.id as MigrationRow["id"],
+    hash: r.hash as MigrationRow["hash"],
+    createdAt: String(r.created_at),
+  }));
+
+  return {
+    appliedCount,
+    expectedCount: EXPECTED_MIGRATION_COUNT,
+    inSync: appliedCount >= EXPECTED_MIGRATION_COUNT,
+    recent,
+  };
+}
+
+// ---- Deploy history ----
+
+async function fetchDeployHistory() {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return null;
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/wiki-server-docker.yml/runs?per_page=10&status=completed`,
+    {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+      signal: AbortSignal.timeout(8000),
+    }
+  );
+  if (!resp.ok) return null;
+
+  const data = (await resp.json()) as {
+    workflow_runs: Array<{
+      id: number;
+      status: string;
+      conclusion: string | null;
+      created_at: string;
+      updated_at: string;
+      head_sha: string;
+      run_number: number;
+    }>;
+  };
+
+  return {
+    recent: data.workflow_runs.map((run) => {
+      const createdMs = new Date(run.created_at).getTime();
+      const updatedMs = new Date(run.updated_at).getTime();
+      const durationSeconds =
+        createdMs && updatedMs ? Math.round((updatedMs - createdMs) / 1000) : null;
+
+      return {
+        id: run.id,
+        status: run.status,
+        conclusion: run.conclusion ?? "unknown",
+        createdAt: run.created_at,
+        headSha: run.head_sha.slice(0, 8),
+        runNumber: run.run_number,
+        durationSeconds,
+      };
+    }),
+  };
+}
+
+// ---- Agent activity summary ----
+
+async function fetchAgentActivity(rawDb: ReturnType<typeof getDb>) {
+  const result = await rawDb`
+    SELECT
+      count(*) FILTER (WHERE status = 'active' AND heartbeat_at >= now() - interval '15 minutes')::int AS active_now,
+      count(*) FILTER (WHERE started_at >= now() - interval '7 days')::int AS sessions_this_week,
+      count(*) FILTER (WHERE started_at >= now() - interval '7 days' AND pr_number IS NOT NULL)::int AS prs_this_week,
+      count(*) FILTER (WHERE started_at >= now() - interval '7 days' AND status = 'completed')::int AS completed_this_week
+    FROM active_agents
+  `;
+
+  const row = result[0] as AgentActivityRow;
+  const completionRate =
+    row.sessions_this_week > 0
+      ? Math.round((row.completed_this_week / row.sessions_this_week) * 100)
+      : null;
+
+  return {
+    activeNow: row.active_now,
+    sessionsThisWeek: row.sessions_this_week,
+    prsThisWeek: row.prs_this_week,
+    completedThisWeek: row.completed_this_week,
+    completionRate,
+  };
+}
+
+// ---- API key health ----
+
+async function fetchApiKeyHealth() {
+  const checkKey = async (
+    name: string,
+    envVar: string,
+    testFn: (key: string) => Promise<boolean>
+  ): Promise<{ configured: boolean; healthy: boolean }> => {
+    const key = process.env[envVar];
+    if (!key) return { configured: false, healthy: false };
+    try {
+      const healthy = await testFn(key);
+      return { configured: true, healthy };
+    } catch {
+      return { configured: true, healthy: false };
+    }
+  };
+
+  const [github, anthropic, openrouter] = await Promise.all([
+    // GitHub — reuse CI status logic: if GITHUB_TOKEN exists and can hit the API
+    checkKey("github", "GITHUB_TOKEN", async (token) => {
+      const resp = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}`,
+        {
+          headers: {
+            Authorization: `token ${token}`,
+            Accept: "application/vnd.github+json",
+          },
+          signal: AbortSignal.timeout(5000),
+        }
+      );
+      return resp.ok;
+    }),
+
+    // Anthropic
+    checkKey("anthropic", "ANTHROPIC_API_KEY", async (key) => {
+      const resp = await fetch("https://api.anthropic.com/v1/models", {
+        headers: {
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+      return resp.ok;
+    }),
+
+    // OpenRouter
+    checkKey("openrouter", "OPENROUTER_API_KEY", async (key) => {
+      const resp = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: {
+          Authorization: `Bearer ${key}`,
+        },
+        signal: AbortSignal.timeout(5000),
+      });
+      return resp.ok;
+    }),
+  ]);
+
+  return { github, anthropic, openrouter };
 }
 
 export const monitoringRoute = monitoringApp;
