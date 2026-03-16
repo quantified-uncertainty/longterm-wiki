@@ -8,6 +8,8 @@ thing:
     - DeepMind
     - DeepMind Technologies
     - Google DeepMind
+  previousSlugs:
+    - google-deepmind
 
 facts:
   - id: f_mEKUPPFYRg
