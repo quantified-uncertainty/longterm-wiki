@@ -31,6 +31,9 @@ let nextId: number;
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 
+/** When true, MV queries throw a PG 42P01 error to simulate the MV not existing. */
+let simulateMvMissing = false;
+
 function getIntIdForSlug(slug: string): number {
   if (!slugIntIdMap.has(slug)) {
     slugIntIdMap.set(slug, nextSlugIntId++);
@@ -56,6 +59,7 @@ function resetStores() {
   nextId = 1;
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
+  simulateMvMissing = false;
 }
 
 function linkKey(sourceId: string, targetId: string, linkType: string) {
@@ -198,9 +202,91 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- page_links: bidirectional links CTE (related endpoint) ---
+  // --- REFRESH MATERIALIZED VIEW (refresh-graph endpoint) ---
+  if (q.includes("refresh materialized view")) {
+    if (simulateMvMissing) {
+      const err = new Error('relation "wikibase_related_graph" does not exist');
+      (err as unknown as Record<string, string>).code = "42P01";
+      throw err;
+    }
+    return [];
+  }
+
+  // --- wikibase_related_graph MV query (related endpoint, MV path) ---
+  if (q.includes("wikibase_related_graph")) {
+    if (simulateMvMissing) {
+      const err = new Error('relation "wikibase_related_graph" does not exist');
+      (err as unknown as Record<string, string>).code = "42P01";
+      throw err;
+    }
+    // MV query params: entityIntId appears 6 times, then MIN_SCORE, then limit*3
+    const entityIntId = params[0] as number;
+    const entitySlug = getSlugForIntId(entityIntId);
+    const minScore = params[6] as number;
+    const limit = (params[7] as number) || 75;
+
+    // Gather bidirectional links (same logic as CTE fallback)
+    const neighborScores = new Map<string, number>();
+    const neighborRelationship = new Map<string, string | null>();
+    const neighborIsReverse = new Map<string, boolean>();
+
+    for (const row of linksStore.values()) {
+      let neighborId: string | null = null;
+      let isReverse = false;
+      if (row.source_id_int === entityIntId) {
+        neighborId = row.target_id;
+        isReverse = false;
+      } else if (row.target_id_int === entityIntId) {
+        neighborId = row.source_id;
+        isReverse = true;
+      }
+      if (!neighborId || neighborId === entitySlug) continue;
+
+      neighborScores.set(
+        neighborId,
+        (neighborScores.get(neighborId) || 0) + row.weight
+      );
+      if (
+        row.link_type === "yaml_related" &&
+        row.relationship &&
+        !neighborRelationship.has(neighborId)
+      ) {
+        neighborRelationship.set(neighborId, row.relationship);
+        neighborIsReverse.set(neighborId, isReverse);
+      }
+    }
+
+    const results: Record<string, unknown>[] = [];
+    for (const [neighborId, rawScore] of neighborScores) {
+      const page = pagesStore.get(neighborId);
+      const q2 = page?.quality ?? 5;
+      const imp = page?.reader_importance ?? 50;
+      const score = rawScore * (1.0 + q2 / 40.0 + imp / 400.0);
+      if (score < minScore) continue;
+
+      results.push({
+        related_id: getIntIdForSlug(neighborId),
+        total_score: rawScore,
+        id: neighborId,
+        title: page?.title || null,
+        entity_type: page?.entity_type || null,
+        quality: page?.quality ?? null,
+        reader_importance: page?.reader_importance ?? null,
+        relationship: neighborRelationship.get(neighborId) || null,
+        relationship_is_reverse: neighborIsReverse.get(neighborId) ?? null,
+        score,
+      });
+    }
+
+    results.sort(
+      (a, b) => (b.score as number) - (a.score as number)
+    );
+    return results.slice(0, limit);
+  }
+
+  // --- page_links: bidirectional links CTE (related endpoint, fallback) ---
   if (q.includes("bidirectional_links") || q.includes("aggregated")) {
-    // Phase 4b: params are [entityIntId, entityIntId, entityId(text), MIN_SCORE, limit*3]
+    // Params: [entityIntId, entityIntId, entityIntId, MIN_SCORE, limit*3]
     const entityIntId = params[0] as number;
     const entitySlug = getSlugForIntId(entityIntId);
     const minScore = params[3] as number;
@@ -699,6 +785,64 @@ describe("Links API", () => {
       expect(body.edges[0].source).toBe("anthropic");
       expect(body.edges[0].target).toBe("ai-safety");
       expect(body.edges[0].relationship).toBe("supports");
+    });
+  });
+
+  // ---- Refresh Graph ----
+
+  describe("POST /api/links/refresh-graph", () => {
+    it("refreshes the materialized view", async () => {
+      const res = await app.request("/api/links/refresh-graph", {
+        method: "POST",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.refreshed).toBe(true);
+    });
+
+    it("returns refreshed=false when MV does not exist", async () => {
+      simulateMvMissing = true;
+      const res = await app.request("/api/links/refresh-graph", {
+        method: "POST",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.refreshed).toBe(false);
+      expect(body.reason).toContain("does not exist");
+    });
+  });
+
+  // ---- Related (CTE fallback) ----
+
+  describe("GET /api/links/related/:id (CTE fallback)", () => {
+    it("falls back to CTE query when MV does not exist", async () => {
+      await seedPage(app, "alpha", "Alpha", {
+        entityType: "organization",
+        quality: 50,
+        readerImportance: 50,
+      });
+      await seedPage(app, "beta", "Beta", {
+        entityType: "concept",
+        quality: 50,
+        readerImportance: 50,
+      });
+
+      await syncLinks(app, [
+        {
+          sourceId: "alpha",
+          targetId: "beta",
+          linkType: "yaml_related",
+          weight: 10,
+        },
+      ]);
+
+      simulateMvMissing = true;
+      const res = await app.request("/api/links/related/alpha");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.entityId).toBe("alpha");
+      expect(body.related.length).toBeGreaterThan(0);
+      expect(body.related.some((r: RelatedItem) => r.id === "beta")).toBe(true);
     });
   });
 

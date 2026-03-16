@@ -24,7 +24,7 @@ import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
-import { syncPageLinks } from './lib/links-client.mjs';
+import { syncPageLinks, refreshRelatedGraph } from './lib/links-client.mjs';
 import { filterBulkImportDates } from './lib/git-date-utils.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
@@ -2526,6 +2526,13 @@ async function main() {
     const linkResult = await syncPageLinks(linkSignals);
     if (linkResult.ok) {
       console.log(`  linkSync: synced ${linkResult.data.upserted} links to wiki server`);
+      // Refresh the materialized view after link sync completes
+      const refreshResult = await refreshRelatedGraph();
+      if (refreshResult.ok) {
+        console.log(`  relatedGraphRefresh: materialized view refreshed`);
+      } else {
+        console.log(`  relatedGraphRefresh: skipped (${refreshResult.message || 'server unavailable or error'})`);
+      }
     } else {
       console.log(`  linkSync: skipped (${linkResult.message || 'server unavailable or error'})`);
     }

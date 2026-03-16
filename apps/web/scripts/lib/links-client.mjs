@@ -5,4 +5,4 @@
  * to the wiki-server. Gracefully skips if server is unavailable.
  */
 
-export { syncPageLinks } from '../../../../crux/lib/wiki-server-client.ts';
+export { syncPageLinks, refreshRelatedGraph } from '../../../../crux/lib/wiki-server-client.ts';
