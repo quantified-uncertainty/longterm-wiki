@@ -30,11 +30,13 @@ export type BuildMetricsStatsResult = InferResponseType<RpcClient['stats']['$get
 // Types — input
 // ---------------------------------------------------------------------------
 
+export type CoverageStatus = 'green' | 'amber' | 'red';
+
 export interface CoverageItem {
   pageId: string;
   passing: number;
   total: number;
-  items: Record<string, string>;
+  items: Record<string, CoverageStatus>;
 }
 
 export interface ScheduleItem {
@@ -66,6 +68,54 @@ export interface SimilarityPair {
 
 const BATCH_SIZE = 1000;
 
+/**
+ * Similarity data uses a larger batch because the server-side replace: true
+ * pattern (DELETE + INSERT) must complete atomically within a single HTTP call.
+ * Splitting across calls would risk partial data loss if a later batch fails.
+ * Server accepts up to 5000 pairs, so 5000 here ensures all data fits in one call
+ * for the expected ~3500 pairs (~700 pages x 5 similar each).
+ */
+const SIMILARITY_BATCH_SIZE = 5000;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Generic batched sync for endpoints that return { updated: number }.
+ * Handles URL check, batching, and error aggregation.
+ */
+async function syncBatched<TResult extends { updated: number }>(
+  items: unknown[],
+  batchSize: number,
+  path: string,
+  wrapBatch: (batch: unknown[]) => unknown,
+  label: string,
+): Promise<ApiResult<TResult>> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
+
+  let totalUpdated = 0;
+
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const result = await batchedRequest<TResult>(
+      'POST',
+      path,
+      wrapBatch(batch),
+    );
+
+    if (!result.ok) {
+      console.warn(`  WARNING: ${label} sync batch failed: ${result.message}`);
+      return result;
+    }
+
+    totalUpdated += result.data.updated;
+  }
+
+  return { ok: true, data: { updated: totalUpdated } as TResult };
+}
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -77,28 +127,12 @@ const BATCH_SIZE = 1000;
 export async function syncCoverage(
   items: CoverageItem[],
 ): Promise<ApiResult<SyncCoverageResult>> {
-  const serverUrl = getServerUrl();
-  if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
-
-  let totalUpdated = 0;
-
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const batch = items.slice(i, i + BATCH_SIZE);
-    const result = await batchedRequest<SyncCoverageResult>(
-      'POST',
-      '/api/build-metrics/coverage',
-      { coverage: batch },
-    );
-
-    if (!result.ok) {
-      console.warn(`  WARNING: Coverage sync batch failed: ${result.message}`);
-      return result;
-    }
-
-    totalUpdated += result.data.updated;
-  }
-
-  return { ok: true, data: { updated: totalUpdated } };
+  return syncBatched<SyncCoverageResult>(
+    items, BATCH_SIZE,
+    '/api/build-metrics/coverage',
+    (batch) => ({ coverage: batch }),
+    'Coverage',
+  );
 }
 
 /**
@@ -108,28 +142,12 @@ export async function syncCoverage(
 export async function syncSchedule(
   items: ScheduleItem[],
 ): Promise<ApiResult<SyncScheduleResult>> {
-  const serverUrl = getServerUrl();
-  if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
-
-  let totalUpdated = 0;
-
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const batch = items.slice(i, i + BATCH_SIZE);
-    const result = await batchedRequest<SyncScheduleResult>(
-      'POST',
-      '/api/build-metrics/schedule',
-      { items: batch },
-    );
-
-    if (!result.ok) {
-      console.warn(`  WARNING: Schedule sync batch failed: ${result.message}`);
-      return result;
-    }
-
-    totalUpdated += result.data.updated;
-  }
-
-  return { ok: true, data: { updated: totalUpdated } };
+  return syncBatched<SyncScheduleResult>(
+    items, BATCH_SIZE,
+    '/api/build-metrics/schedule',
+    (batch) => ({ items: batch }),
+    'Schedule',
+  );
 }
 
 /**
@@ -139,33 +157,18 @@ export async function syncSchedule(
 export async function syncRankings(
   items: RankingItem[],
 ): Promise<ApiResult<SyncRankingsResult>> {
-  const serverUrl = getServerUrl();
-  if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
-
-  let totalUpdated = 0;
-
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const batch = items.slice(i, i + BATCH_SIZE);
-    const result = await batchedRequest<SyncRankingsResult>(
-      'POST',
-      '/api/build-metrics/rankings',
-      { rankings: batch },
-    );
-
-    if (!result.ok) {
-      console.warn(`  WARNING: Rankings sync batch failed: ${result.message}`);
-      return result;
-    }
-
-    totalUpdated += result.data.updated;
-  }
-
-  return { ok: true, data: { updated: totalUpdated } };
+  return syncBatched<SyncRankingsResult>(
+    items, BATCH_SIZE,
+    '/api/build-metrics/rankings',
+    (batch) => ({ rankings: batch }),
+    'Rankings',
+  );
 }
 
 /**
  * Sync page similarity data to wiki-server.
- * First batch replaces all existing data, subsequent batches append.
+ * Sends all data in a single request with replace: true to avoid partial-delete risk.
+ * The server accepts up to 5000 pairs per call, which covers the expected ~3500 pairs.
  * When pairs is empty, sends a replace=true request to clear existing rows.
  */
 export async function syncSimilarity(
@@ -185,8 +188,8 @@ export async function syncSimilarity(
 
   let totalUpserted = 0;
 
-  for (let i = 0; i < pairs.length; i += BATCH_SIZE) {
-    const batch = pairs.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < pairs.length; i += SIMILARITY_BATCH_SIZE) {
+    const batch = pairs.slice(i, i + SIMILARITY_BATCH_SIZE);
     const isFirst = i === 0;
 
     const result = await batchedRequest<SyncSimilarityResult>(

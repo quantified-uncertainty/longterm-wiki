@@ -81,6 +81,54 @@ const SCHEDULE_SYNC_LOCK = 7_294_811;
 const RANKINGS_SYNC_LOCK = 7_294_812;
 const SIMILARITY_SYNC_LOCK = 7_294_813;
 
+/** SQL batch size for jsonb_to_recordset operations within a transaction. */
+const SQL_BATCH_SIZE = 500;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Run a batched UPDATE on wiki_pages within a transaction with an advisory lock.
+ *
+ * Extracts the shared pattern from coverage/schedule/rankings endpoints:
+ * resolve slugs → begin tx → lock → batch update → return count.
+ */
+async function batchedPageUpdate<T extends { pageId: string }>(
+  items: T[],
+  lockKey: number,
+  mapItem: (item: T, intId: number) => Record<string, unknown>,
+  buildSql: (tx: SqlQuery, valuesJson: string) => ReturnType<SqlQuery>,
+  label: string,
+): Promise<number> {
+  const db = getDrizzleDb();
+  const slugs = items.map((item) => item.pageId);
+  const intIdMap = await resolvePageIntIds(db, slugs);
+
+  const rawDb = getDb();
+  let updated = 0;
+
+  await rawDb.begin(async (txRaw) => {
+    const tx = txRaw as unknown as SqlQuery;
+    await tx`SELECT pg_advisory_xact_lock(${lockKey})`;
+
+    for (let i = 0; i < items.length; i += SQL_BATCH_SIZE) {
+      const batch = items.slice(i, i + SQL_BATCH_SIZE);
+      const values = batch
+        .filter((item) => intIdMap.has(item.pageId))
+        .map((item) => mapItem(item, intIdMap.get(item.pageId)!));
+
+      if (values.length === 0) continue;
+
+      await buildSql(tx, JSON.stringify(values));
+      updated += values.length;
+    }
+  });
+
+  logger.info({ updated, total: items.length }, `${label} synced`);
+  return updated;
+}
+
 // ---------------------------------------------------------------------------
 // Route
 // ---------------------------------------------------------------------------
@@ -95,49 +143,28 @@ const buildMetricsApp = new Hono()
     const parsed = SyncCoverageSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { coverage } = parsed.data;
-    const db = getDrizzleDb();
+    const updated = await batchedPageUpdate(
+      parsed.data.coverage,
+      COVERAGE_SYNC_LOCK,
+      (item, intId) => ({
+        intId,
+        passing: item.passing,
+        total: item.total,
+        items: JSON.stringify(item.items),
+      }),
+      (tx, json) => tx`
+        UPDATE wiki_pages wp
+        SET coverage_passing = v.passing,
+            coverage_total = v.total,
+            coverage_items = v.items::jsonb,
+            updated_at = now()
+        FROM jsonb_to_recordset(${json}::jsonb)
+          AS v("intId" int, passing int, total int, items text)
+        WHERE wp.integer_id = v."intId"
+      `,
+      "Coverage metrics",
+    );
 
-    // Resolve page slugs to integer IDs
-    const slugs = coverage.map((item) => item.pageId);
-    const intIdMap = await resolvePageIntIds(db, slugs);
-
-    const rawDb = getDb();
-    let updated = 0;
-
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
-      await tx`SELECT pg_advisory_xact_lock(${COVERAGE_SYNC_LOCK})`;
-
-      for (let i = 0; i < coverage.length; i += 500) {
-        const batch = coverage.slice(i, i + 500);
-        const values = batch
-          .filter((item) => intIdMap.has(item.pageId))
-          .map((item) => ({
-            intId: intIdMap.get(item.pageId)!,
-            passing: item.passing,
-            total: item.total,
-            items: JSON.stringify(item.items),
-          }));
-
-        if (values.length === 0) continue;
-
-        await tx`
-          UPDATE wiki_pages wp
-          SET coverage_passing = v.passing,
-              coverage_total = v.total,
-              coverage_items = v.items::jsonb,
-              updated_at = now()
-          FROM jsonb_to_recordset(${JSON.stringify(values)}::jsonb)
-            AS v("intId" int, passing int, total int, items text)
-          WHERE wp.integer_id = v."intId"
-        `;
-
-        updated += values.length;
-      }
-    });
-
-    logger.info({ updated, total: coverage.length }, "Coverage metrics synced");
     return c.json({ updated });
   })
 
@@ -149,52 +176,32 @@ const buildMetricsApp = new Hono()
     const parsed = SyncScheduleSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+    const updated = await batchedPageUpdate(
+      parsed.data.items,
+      SCHEDULE_SYNC_LOCK,
+      (item, intId) => ({
+        intId,
+        updateFrequency: item.updateFrequency,
+        daysSinceUpdate: item.daysSinceUpdate,
+        daysUntilDue: item.daysUntilDue,
+        staleness: item.staleness,
+        priority: item.priority,
+      }),
+      (tx, json) => tx`
+        UPDATE wiki_pages wp
+        SET update_frequency = v."updateFrequency",
+            days_since_update = v."daysSinceUpdate",
+            days_until_due = v."daysUntilDue",
+            staleness = v.staleness,
+            update_priority = v.priority,
+            updated_at = now()
+        FROM jsonb_to_recordset(${json}::jsonb)
+          AS v("intId" int, "updateFrequency" int, "daysSinceUpdate" int, "daysUntilDue" int, staleness real, priority real)
+        WHERE wp.integer_id = v."intId"
+      `,
+      "Schedule metrics",
+    );
 
-    const slugs = items.map((item) => item.pageId);
-    const intIdMap = await resolvePageIntIds(db, slugs);
-
-    const rawDb = getDb();
-    let updated = 0;
-
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
-      await tx`SELECT pg_advisory_xact_lock(${SCHEDULE_SYNC_LOCK})`;
-
-      for (let i = 0; i < items.length; i += 500) {
-        const batch = items.slice(i, i + 500);
-        const values = batch
-          .filter((item) => intIdMap.has(item.pageId))
-          .map((item) => ({
-            intId: intIdMap.get(item.pageId)!,
-            updateFrequency: item.updateFrequency,
-            daysSinceUpdate: item.daysSinceUpdate,
-            daysUntilDue: item.daysUntilDue,
-            staleness: item.staleness,
-            priority: item.priority,
-          }));
-
-        if (values.length === 0) continue;
-
-        await tx`
-          UPDATE wiki_pages wp
-          SET update_frequency = v."updateFrequency",
-              days_since_update = v."daysSinceUpdate",
-              days_until_due = v."daysUntilDue",
-              staleness = v.staleness,
-              update_priority = v.priority,
-              updated_at = now()
-          FROM jsonb_to_recordset(${JSON.stringify(values)}::jsonb)
-            AS v("intId" int, "updateFrequency" int, "daysSinceUpdate" int, "daysUntilDue" int, staleness real, priority real)
-          WHERE wp.integer_id = v."intId"
-        `;
-
-        updated += values.length;
-      }
-    });
-
-    logger.info({ updated, total: items.length }, "Schedule metrics synced");
     return c.json({ updated });
   })
 
@@ -206,48 +213,28 @@ const buildMetricsApp = new Hono()
     const parsed = SyncRankingsSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { rankings } = parsed.data;
-    const db = getDrizzleDb();
+    const updated = await batchedPageUpdate(
+      parsed.data.rankings,
+      RANKINGS_SYNC_LOCK,
+      (item, intId) => ({
+        intId,
+        readerRank: item.readerRank,
+        researchRank: item.researchRank,
+        recommendedScore: item.recommendedScore,
+      }),
+      (tx, json) => tx`
+        UPDATE wiki_pages wp
+        SET reader_rank = v."readerRank",
+            research_rank = v."researchRank",
+            recommended_score = v."recommendedScore",
+            updated_at = now()
+        FROM jsonb_to_recordset(${json}::jsonb)
+          AS v("intId" int, "readerRank" int, "researchRank" int, "recommendedScore" real)
+        WHERE wp.integer_id = v."intId"
+      `,
+      "Rankings",
+    );
 
-    const slugs = rankings.map((item) => item.pageId);
-    const intIdMap = await resolvePageIntIds(db, slugs);
-
-    const rawDb = getDb();
-    let updated = 0;
-
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
-      await tx`SELECT pg_advisory_xact_lock(${RANKINGS_SYNC_LOCK})`;
-
-      for (let i = 0; i < rankings.length; i += 500) {
-        const batch = rankings.slice(i, i + 500);
-        const values = batch
-          .filter((item) => intIdMap.has(item.pageId))
-          .map((item) => ({
-            intId: intIdMap.get(item.pageId)!,
-            readerRank: item.readerRank,
-            researchRank: item.researchRank,
-            recommendedScore: item.recommendedScore,
-          }));
-
-        if (values.length === 0) continue;
-
-        await tx`
-          UPDATE wiki_pages wp
-          SET reader_rank = v."readerRank",
-              research_rank = v."researchRank",
-              recommended_score = v."recommendedScore",
-              updated_at = now()
-          FROM jsonb_to_recordset(${JSON.stringify(values)}::jsonb)
-            AS v("intId" int, "readerRank" int, "researchRank" int, "recommendedScore" real)
-          WHERE wp.integer_id = v."intId"
-        `;
-
-        updated += values.length;
-      }
-    });
-
-    logger.info({ updated, total: rankings.length }, "Rankings synced");
     return c.json({ updated });
   })
 
@@ -281,8 +268,8 @@ const buildMetricsApp = new Hono()
         await tx`DELETE FROM wikibase_page_similarity`;
       }
 
-      for (let i = 0; i < pairs.length; i += 500) {
-        const batch = pairs.slice(i, i + 500);
+      for (let i = 0; i < pairs.length; i += SQL_BATCH_SIZE) {
+        const batch = pairs.slice(i, i + SQL_BATCH_SIZE);
         const values = batch
           .filter(
             (p) => intIdMap.has(p.pageId) && intIdMap.has(p.similarPageId)

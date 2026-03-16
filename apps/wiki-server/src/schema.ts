@@ -136,7 +136,7 @@ export const wikiPages = pgTable(
     // Build metrics: coverage
     coveragePassing: integer("coverage_passing"),
     coverageTotal: integer("coverage_total"),
-    coverageItems: jsonb("coverage_items").$type<Record<string, string>>(),
+    coverageItems: jsonb("coverage_items").$type<Record<string, 'green' | 'amber' | 'red'>>(),
     // Build metrics: update schedule
     updateFrequency: integer("update_frequency"),
     daysSinceUpdate: integer("days_since_update"),

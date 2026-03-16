@@ -195,6 +195,7 @@ export {
   syncSimilarity,
 } from './build-metrics.ts';
 export type {
+  CoverageStatus,
   CoverageItem,
   ScheduleItem,
   RankingItem,
