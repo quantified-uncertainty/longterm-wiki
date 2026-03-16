@@ -335,3 +335,33 @@ conjecture:
     Founded March 2022 by Connor Leahy, Sid Black, Gabriel Alfour.
     Born out of EleutherAI. London HQ. Alignment research startup.
     Use fetch-page for the team page (JS-rendered).
+
+us-ai-safety-institute:
+  entityId: "363"
+  notes: |
+    Elizabeth Kelly (director, Feb 2024), Paul Christiano (head of AI safety, Aug 2024),
+    Elham Tabassi (CTO, Feb 2024). Founded under Commerce Secretary Raimondo.
+    Note: Elizabeth Kelly left for Anthropic per LinkedIn (late 2025?). Verify current status.
+
+uk-ai-safety-institute:
+  entityId: "361"
+  notes: |
+    Renamed to AI Security Institute February 2025. Ian Hogarth (chair, June 2023),
+    Jade Leung (CTO, 2023), Adam Beaumont (director). aisi.gov.uk is the current URL.
+
+cset:
+  entityId: lvsDuyzPcg
+  notes: |
+    Helen Toner interim exec director. Jason Matheny founded CSET, now at RAND.
+    Georgetown University based. Key AI policy think tank.
+
+policy-people-notes: |
+  Key AI policy figures created as person entities:
+  - Scott Wiener (HLc6VrCh5w) - CA senator, SB 1047/SB 53 author
+  - Gavin Newsom (tDwxa07Urw) - CA governor, vetoed SB 1047
+  - Chuck Schumer (ZuTRR3Q8qg) - US senator, AI Insight Forums
+  - Gina Raimondo (HQwJqusFhw) - Commerce Secretary, created US AISI
+  - Margrethe Vestager (lSLuPzY3vQ) - EU VP, led EU AI Act
+  - Thierry Breton (e7Uzh4eUIA) - EU Commissioner, co-led EU AI Act
+  - Jason Matheny (U3llWAe1dg) - RAND CEO, founded CSET, ran IARPA
+  - Jade Leung (Fud5QhdJjg) - UK AISI CTO, PM Starmer's AI adviser
