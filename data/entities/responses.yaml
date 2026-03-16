@@ -49,8 +49,8 @@
   type: policy
   summaryPage: governance-overview
   title: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
-  introduced: February 2024
-  policyStatus: Vetoed September 29, 2024
+  introduced: '2024-02'
+  policyStatus: vetoed
   author: Senator Scott Wiener
   scope: State
   billNumber: SB 1047
@@ -234,8 +234,8 @@
   type: policy
   summaryPage: governance-overview
   title: Artificial Intelligence and Data Act (AIDA)
-  introduced: June 16, 2022
-  policyStatus: Died in Parliament January 2025
+  introduced: '2022-06-16'
+  policyStatus: failed
   author: Canadian federal government
   scope: National
   billNumber: Bill C-27, Part 3
@@ -281,8 +281,8 @@
   type: policy
   summaryPage: governance-overview
   title: China AI Regulatory Framework
-  introduced: "2021"
-  policyStatus: Active; comprehensive ongoing framework
+  introduced: '2021'
+  policyStatus: active
   author: Chinese government (CAC, State Council, MIIT)
   scope: National
   jurisdiction: China
@@ -363,8 +363,8 @@
   type: policy
   summaryPage: governance-overview
   title: Colorado Artificial Intelligence Act
-  introduced: May 2024
-  policyStatus: Enacted May 17, 2024; enforcement delayed to June 30, 2026
+  introduced: '2024-05'
+  policyStatus: enacted
   author: Senator Robert Rodriguez
   scope: State
   billNumber: SB 24-205
@@ -430,7 +430,7 @@
   summaryPage: governance-overview
   title: Compute Governance
   introduced: '2022'
-  policyStatus: Emerging policy area
+  policyStatus: active
   scope: International
   provisions:
     - title: Chip Export Controls
@@ -496,8 +496,8 @@
   type: policy
   summaryPage: governance-overview
   title: EU AI Act
-  introduced: April 2021
-  policyStatus: In Effect (August 2024)
+  introduced: '2021-04'
+  policyStatus: enacted
   author: European Commission
   scope: International
   jurisdiction: European Union (+ extraterritorial)
@@ -570,8 +570,8 @@
   type: policy
   summaryPage: governance-overview
   title: US AI Chip Export Controls
-  introduced: October 2022
-  policyStatus: Active; multiple rounds of escalation through 2025
+  introduced: '2022-10'
+  policyStatus: active
   author: Bureau of Industry and Security (BIS)
   scope: Federal
   jurisdiction: United States
@@ -634,7 +634,7 @@
   type: policy
   summaryPage: governance-overview
   title: Failed and Stalled AI Proposals
-  policyStatus: Historical analysis of failed AI governance efforts
+  policyStatus: active
   scope: Federal
   customFields:
     - label: Purpose
@@ -659,8 +659,8 @@
   type: policy
   summaryPage: governance-overview
   title: International AI Safety Summit Series
-  introduced: November 2023
-  policyStatus: Active; ongoing summit series (Seoul 2024, Paris 2025)
+  introduced: '2023-11'
+  policyStatus: active
   scope: International
   provisions:
     - title: Bletchley Declaration
@@ -732,8 +732,8 @@
   type: policy
   summaryPage: governance-overview
   title: NIST AI Risk Management Framework (AI RMF)
-  introduced: January 2023
-  policyStatus: Voluntary guidance; mandatory for federal agencies under EO 14110
+  introduced: '2023-01'
+  policyStatus: active
   author: NIST
   scope: Federal
   provisions:
@@ -775,8 +775,8 @@
   type: policy
   summaryPage: governance-overview
   title: Seoul Declaration on AI Safety
-  introduced: May 22, 2024
-  policyStatus: Active; non-binding commitments
+  introduced: '2024-05-22'
+  policyStatus: active
   scope: International
   customFields:
     - label: Predecessor
@@ -828,8 +828,8 @@
   type: policy
   summaryPage: governance-overview
   title: US Executive Order on Safe, Secure, and Trustworthy AI
-  introduced: October 30, 2023
-  policyStatus: Revoked January 2025
+  introduced: '2023-10-30'
+  policyStatus: revoked
   author: President Biden
   scope: Federal
   customFields:
@@ -884,7 +884,7 @@
   summaryPage: governance-overview
   title: US State AI Legislation Landscape
   introduced: '2019'
-  policyStatus: Active; 1,080+ bills introduced in 2025, 11% passage rate
+  policyStatus: active
   scope: State
   customFields:
     - label: Most active states
@@ -910,8 +910,8 @@
   type: policy
   summaryPage: governance-overview
   title: Voluntary AI Safety Commitments
-  introduced: July 2023
-  policyStatus: Active; 16+ companies participating with varying compliance (53% mean)
+  introduced: '2023-07'
+  policyStatus: active
   author: White House
   scope: International
   provisions:
@@ -2116,8 +2116,8 @@
   numericId: E457
   type: policy
   title: California SB 53
-  introduced: "2025"
-  policyStatus: Signed September 29, 2025; effective January 1, 2026
+  introduced: '2025'
+  policyStatus: enacted
   author: Senator Scott Wiener
   scope: State
   billNumber: SB 53
@@ -2218,7 +2218,7 @@
   type: policy
   title: Evals-Based Deployment Gates
   introduced: '2023'
-  policyStatus: Active; EU binding, UK/Lab voluntary
+  policyStatus: active
   scope: International
   provisions:
     - title: EU Conformity Assessment
@@ -2256,7 +2256,7 @@
   numericId: E460
   type: policy
   title: Pause / Moratorium
-  policyStatus: Proposed; no implementation
+  policyStatus: proposed
   scope: International
   description: >-
     Proposals to pause or slow frontier AI development until safety is better understood, offering
@@ -2288,8 +2288,8 @@
   type: policy
   summaryPage: governance-overview
   title: Responsible Scaling Policies
-  policyStatus: Active; 20+ companies participating
-  introduced: September 2023
+  policyStatus: active
+  introduced: '2023-09'
   scope: International
   description: >-
     Responsible Scaling Policies (RSPs) are voluntary commitments by AI labs to pause scaling when
@@ -2365,7 +2365,7 @@
   type: policy
   title: Hardware-Enabled Governance
   introduced: '2024'
-  policyStatus: Research phase; early proposals
+  policyStatus: proposed
   scope: International
   description: >-
     Technical mechanisms built into AI chips enabling monitoring, access control, and enforcement
@@ -2548,8 +2548,8 @@
   type: policy
   summaryPage: governance-overview
   title: Bletchley Declaration
-  introduced: November 1-2, 2023
-  policyStatus: Active; follow-up summits ongoing
+  introduced: '2023-11-01'
+  policyStatus: active
   author: UK government (Rishi Sunak)
   scope: International
   jurisdiction: International (28 countries + EU)
@@ -2612,7 +2612,7 @@
   type: policy
   title: Singapore Consensus on AI Safety Research Priorities
   introduced: '2025'
-  policyStatus: Active consensus document
+  policyStatus: active
   scope: International
   description: >-
     Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers
@@ -2682,8 +2682,8 @@
   type: policy
   summaryPage: governance-overview
   title: New York RAISE Act
-  introduced: Early 2025
-  policyStatus: Signed December 19, 2025; effective January 1, 2027
+  introduced: '2025'
+  policyStatus: enacted
   author: Senator Andrew Gounardes, Assemblymember Alex Bores
   scope: State
   jurisdiction: New York
@@ -2747,7 +2747,7 @@
   summaryPage: governance-overview
   title: Model Registries
   introduced: '2023'
-  policyStatus: Active; implementation in US, EU, China
+  policyStatus: active
   scope: International
   provisions:
     - title: Pre-Deployment Notification
@@ -3361,7 +3361,7 @@
   type: policy
   title: Council of Europe Framework Convention on Artificial Intelligence
   introduced: '2024'
-  policyStatus: Active; binding treaty
+  policyStatus: enacted
   scope: International
   description: >-
     The Council of Europe's AI Framework Convention represents the first legally
@@ -3713,8 +3713,8 @@
   numericId: E602
   type: policy
   title: Texas Responsible AI Governance Act (TRAIGA)
-  introduced: December 2024
-  policyStatus: Signed June 22, 2025; effective January 1, 2026
+  introduced: '2024-12'
+  policyStatus: enacted
   author: Representative Giovanni Capriglione
   scope: State
   billNumber: HB 149
