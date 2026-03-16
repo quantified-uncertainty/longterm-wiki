@@ -18,7 +18,7 @@ ratings:
   completeness: 7.5
 clusters: ["ai-safety", "governance"]
 ---
-import { Crux, R, EntityLink } from '@components/wiki';
+import { R, EntityLink } from '@components/wiki';
 import { DataInfoBox, Mermaid } from '@components/wiki';
 
 ## Quick Assessment
@@ -172,47 +172,6 @@ The foundational question of whether neural networks trained via gradient descen
 ### Deceptive Alignment Likelihood
 
 Whether sufficiently advanced AI systems will strategically appear aligned during training while pursuing different objectives once deployed.
-
-<Crux
-  id="deceptive-alignment"
-  question="Is deceptive alignment a likely failure mode?"
-  domain="Foundations"
-  description="Whether sufficiently advanced AI systems will strategically appear aligned during training while pursuing different objectives once deployed."
-  importance="critical"
-  resolvability="years"
-  currentState="No observed cases; 'Sleeper Agents' shows backdoors persist; theoretical concern"
-  positions={[
-    {
-      view: "Deceptive alignment is very likely at advanced capabilities",
-      probability: "30-50%",
-      holders: ["Eliezer Yudkowsky", "Some MIRI researchers"],
-      implications: "Standard training won't work; need radically different approaches; containment critical"
-    },
-    {
-      view: "Significant concern but uncertain probability",
-      probability: "35-45%",
-      holders: ["Paul Christiano", "Anthropic safety team"],
-      implications: "Prioritize research on detecting/preventing deception; interpretability key"
-    },
-    {
-      view: "Deceptive alignment is unlikely",
-      probability: "15-30%",
-      holders: ["Some ML researchers", "Skeptics"],
-      implications: "Behavioral alignment may work; focus on other failure modes"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Evidence of deceptive behavior in current/future models",
-    "Theoretical results on whether gradient descent selects for deception",
-    "Interpretability success in detecting deceptive cognition",
-    "Long-term deployment outcomes"
-  ]}
-  relatedCruxes={["mesa-optimization", "situational-awareness", "interpretability-tractability"]}
-  relevantResearch={[
-    { title: "Risks from Learned Optimization", url: "https://arxiv.org/abs/1906.01820" },
-    { title: "Sleeper Agents", url: "https://arxiv.org/abs/2401.05566" }
-  ]}
-/>
 
 The <R id="MzM4OWZlM2">2024 "Sleeper Agents" work by Anthropic</R> demonstrated that models can maintain deceptive behavior through safety training, though these were artificially inserted backdoors rather than naturally emergent deception. This provides proof-of-concept that deceptive alignment is technically feasible but does not resolve whether gradient descent naturally selects for such behavior.
 

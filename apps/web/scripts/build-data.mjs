@@ -76,7 +76,6 @@ const DATA_FILES = [
   { key: 'experts', file: 'experts.yaml' },
   { key: 'organizations', file: 'organizations.yaml' },
   { key: 'estimates', file: 'estimates.yaml' },
-  { key: 'cruxes', file: 'cruxes.yaml' },
   { key: 'glossary', file: 'glossary.yaml' },
   { key: 'entities', dir: 'entities' }, // Split by entity type
   { key: 'literature', file: 'literature.yaml' },

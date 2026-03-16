@@ -100,29 +100,6 @@ export interface RelatedGraphEntry {
   label?: string;
 }
 
-export interface CruxPosition {
-  view: string;
-  probability?: string;
-  holders?: string[];
-  implications?: string;
-}
-
-export interface CruxData {
-  id: string;
-  question: string;
-  domain?: string;
-  description?: string;
-  importance?: string;
-  resolvability?: string;
-  currentState?: string;
-  positions?: CruxPosition[];
-  wouldUpdateOn?: string[];
-  relatedCruxes?: string[];
-  relevantResearch?: Array<{ title: string; url?: string }>;
-  timeframe?: string;
-  summary?: string;
-}
-
 export interface BacklinkEntry {
   id: string;
   type: string;
@@ -394,7 +371,6 @@ interface TableBaseShape {
   literature?: LiteratureData;
   experts: Expert[];
   organizations: Organization[];
-  cruxes: CruxData[];
   prItems: Record<string, unknown>[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;

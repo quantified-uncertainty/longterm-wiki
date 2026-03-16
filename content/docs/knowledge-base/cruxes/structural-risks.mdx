@@ -18,8 +18,7 @@ ratings:
   completeness: 7.1
 clusters: ["ai-safety", "governance"]
 ---
-import { Crux, Mermaid, R, EntityLink } from '@components/wiki';
-
+import { Mermaid, R, EntityLink } from '@components/wiki';
 
 ## Quick Assessment
 
@@ -35,7 +34,6 @@ import { Crux, Mermaid, R, EntityLink } from '@components/wiki';
 
 ---
 
-
 ## Key Links
 
 | Source | Link |
@@ -44,7 +42,6 @@ import { Crux, Mermaid, R, EntityLink } from '@components/wiki';
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Structural_integrity_and_failure) |
 | <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/6bpW2kyeKaBtuJuEk/why-i-hate-the-accident-vs-misuse-ai-x-risk-dichotomy-quick) |
 | EA Forum | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/pqGnC4sAjzzZHoqXY/cruxes-for-nuclear-risk-reduction-efforts-a-proposal) |
-
 
 ## What Are Structural Risk Cruxes?
 
@@ -89,44 +86,6 @@ This decision tree illustrates how positions on foundational cruxes cascade into
 
 ## Foundational Cruxes
 
-<Crux
-  id="structural-distinct"
-  question="Are structural risks genuinely distinct from accident/misuse risks?"
-  domain="Foundations"
-  description="Whether 'structural risks' names real phenomena that require separate analysis, or is just a different level of abstraction on the same underlying risks."
-  importance="critical"
-  resolvability="years"
-  currentState="Debated; no consensus on category boundaries"
-  positions={[
-    {
-      view: "Structural risks are genuinely distinct",
-      probability: "40-55%",
-      holders: ["GovAI", "Some longtermists"],
-      implications: "Need structural interventions (governance, coordination); technical safety alone insufficient"
-    },
-    {
-      view: "Useful framing but substantially overlapping",
-      probability: "30-40%",
-      implications: "Use structural lens for some problems; don't treat as separate research agenda"
-    },
-    {
-      view: "Mostly aggregation of other risks; not a useful category",
-      probability: "15-25%",
-      holders: ["Some AI safety researchers"],
-      implications: "Focus on technical safety and misuse prevention; structural framing obscures more than clarifies"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Theoretical analysis of category boundaries",
-    "Cases where structural vs individual framing leads to different interventions",
-    "Evidence that structural dynamics have independent causal power"
-  ]}
-  relatedCruxes={["racing-inevitable", "coordination-possible"]}
-  relevantResearch={[
-    { title: "AI Governance Research Agenda", url: "https://www.fhi.ox.ac.uk/wp-content/uploads/GovAI-Agenda.pdf" }
-  ]}
-/>
-
 This foundational crux shapes the entire field's approach to AI safety prioritization. Those who view structural risks as genuinely distinct argue that AI's effects on power concentration, institutional stability, and human agency operate through different causal mechanisms than individual system failures. They point to examples like algorithmic bias in hiring creating systematic inequality, or AI-enabled surveillance transforming state-citizen relationships—phenomena that emerge from the aggregate deployment of AI systems rather than specific malfunctions. This position suggests structural interventions like governance frameworks, coordination mechanisms, and institutional reforms are necessary complements to technical safety work.
 
 Alternatively, researchers who view structural risks as primarily an aggregation of individual risks argue that focusing on preventing accidents and misuse will naturally address structural concerns. They contend that "structural risk" often conflates correlation with causation, attributing to AI what may simply reflect broader technological and social trends. This perspective suggests that the structural framing may obscure more concrete intervention points and dilute resources from proven technical safety approaches.
@@ -147,47 +106,6 @@ Recent research provides quantitative evidence on AI's power-concentrating effec
 
 In July 2024, the DOJ, FTC, UK CMA, and European Commission released a <R id="MjY4YTExYT">joint statement</R> specifying three competition concerns: concentrated control of key inputs (chips, compute, talent), incumbent digital firms extending power into AI markets, and arrangements among key players reducing competition.
 
-<Crux
-  id="ai-concentrating"
-  question="Does AI concentrate power more than previous technologies?"
-  domain="Foundations"
-  description="Whether AI is qualitatively different in its power-concentrating effects, or is following historical patterns of technological change."
-  importance="critical"
-  resolvability="years"
-  currentState="Unclear; AI is early-stage; historical comparisons contested"
-  positions={[
-    {
-      view: "AI is qualitatively different in concentration effects",
-      probability: "35-50%",
-      holders: ["Some AI governance researchers", "AI Now Institute"],
-      implications: "Urgent need for antitrust, redistribution, democratic governance of AI"
-    },
-    {
-      view: "AI continues historical pattern; not qualitatively new",
-      probability: "30-40%",
-      holders: ["Some economists", "Tech optimists"],
-      implications: "Apply existing regulatory frameworks; don't overreact to AI-specific concentration"
-    },
-    {
-      view: "AI may actually distribute power (open source, democratization)",
-      probability: "15-25%",
-      holders: ["Some open source advocates"],
-      implications: "Support open development; concentration concerns are overstated"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Empirical data on AI industry concentration trends",
-    "Historical analysis of technology and power concentration",
-    "Evidence on open source AI capability vs closed labs",
-    "Data on AI's effects on labor market concentration"
-  ]}
-  relatedCruxes={["structural-distinct", "winner-take-all"]}
-  relevantResearch={[
-    { title: "AI Now: Concentration and Power", url: "https://ainowinstitute.org/" },
-    { title: "CSET: AI and Market Concentration", url: "https://cset.georgetown.edu/" }
-  ]}
-/>
-
 Evidence for AI's distinctive power-concentrating effects includes its scalability without proportional resource increases, network effects where data advantages compound, and first-mover advantages in setting industry standards. Current AI development shows extreme concentration among a handful of companies with the computational resources for frontier model training—a pattern that may be more pronounced than previous technologies. The transformative nature of general intelligence could amplify these effects beyond historical precedent.
 
 However, historical analysis reveals that many transformative technologies initially appeared to concentrate power dramatically before competitive forces and regulatory responses distributed benefits more widely. The printing press, telegraph, and internet all raised similar concerns about information control and market concentration. Some economists argue that AI follows familiar patterns of innovation diffusion, where initial concentration gives way to broader adoption as costs decrease and capabilities standardize.
@@ -196,133 +114,13 @@ However, historical analysis reveals that many transformative technologies initi
 
 ## Competition and Coordination Cruxes
 
-<Crux
-  id="racing-inevitable"
-  question="Are AI racing dynamics inevitable given competitive pressures?"
-  domain="Competition & Coordination"
-  description="Whether competitive pressures (commercial, geopolitical) make unsafe racing dynamics unavoidable, or if coordination can prevent races."
-  importance="critical"
-  resolvability="years"
-  currentState="Racing dynamics visible; some voluntary coordination attempts"
-  positions={[
-    {
-      view: "Racing is largely inevitable; coordination will fail",
-      probability: "30-45%",
-      holders: ["Some game theorists", "Realists"],
-      implications: "Focus on making racing safer; assume coordination fails; technical solutions paramount"
-    },
-    {
-      view: "Racing can be managed with the right mechanisms",
-      probability: "35-45%",
-      holders: ["GovAI", "Some policy researchers"],
-      implications: "Invest heavily in coordination mechanisms; compute governance; international agreements"
-    },
-    {
-      view: "Racing dynamics are overstated; labs can coordinate",
-      probability: "15-25%",
-      holders: ["Some industry observers"],
-      implications: "Support voluntary coordination; racing narrative may be self-fulfilling"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Success or failure of lab coordination (RSPs, etc.)",
-    "International coordination outcomes",
-    "Evidence from other domains on coordination under competitive pressure",
-    "Game-theoretic analysis with realistic assumptions"
-  ]}
-  relatedCruxes={["coordination-possible", "international-coordination"]}
-  relevantResearch={[
-    { title: "Racing to the Precipice", url: "https://nickbostrom.com/papers/racing.pdf" },
-    { title: "Debunking AI Arms Race Theory", url: "https://tnsr.org/2021/06/debunking-the-ai-arms-race-theory/" }
-  ]}
-/>
-
 Current evidence shows clear competitive pressures driving rapid AI development with limited safety coordination. Major labs regularly announce accelerated timelines and capability breakthroughs in apparent response to competitors. The hundreds of billions invested in AI development, combined with first-mover advantages in key markets, creates strong incentives to prioritize speed over safety measures. Geopolitically, the framing of AI as a national security priority further intensifies racing dynamics between the US and China.
 
 Those who believe racing can be managed point to successful coordination in other high-stakes domains, including nuclear weapons control, climate agreements, and financial regulation. They argue that shared recognition of catastrophic risks can overcome competitive pressures when appropriate mechanisms exist. Recent initiatives like responsible scaling policies (RSPs) and voluntary commitments on frontier AI safety represent early attempts at such coordination. However, skeptics note that these voluntary measures lack enforcement mechanisms and may not hold under severe competitive pressure.
 
-<Crux
-  id="coordination-possible"
-  question="Can meaningful AI coordination be achieved without external enforcement?"
-  domain="Competition & Coordination"
-  description="Whether voluntary coordination among AI developers can work, or if binding regulation/enforcement is required."
-  importance="high"
-  resolvability="years"
-  currentState="Voluntary commitments exist (RSPs); limited enforcement; competitive pressures strong"
-  positions={[
-    {
-      view: "Voluntary coordination can work with right incentives",
-      probability: "20-35%",
-      holders: ["Some lab leadership"],
-      implications: "Support voluntary standards; build trust; avoid heavy regulation that might backfire"
-    },
-    {
-      view: "Coordination requires external enforcement",
-      probability: "40-55%",
-      holders: ["Most governance researchers"],
-      implications: "Focus on regulation, auditing, liability; don't rely on voluntary commitments"
-    },
-    {
-      view: "Neither voluntary nor regulatory coordination will work",
-      probability: "15-25%",
-      implications: "Focus on technical solutions; prepare for uncoordinated development; defensive measures"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Track record of RSPs and voluntary commitments",
-    "Regulatory enforcement attempts and outcomes",
-    "Evidence of labs defecting from commitments under pressure",
-    "Successful coordination in analogous domains"
-  ]}
-  relatedCruxes={["racing-inevitable", "international-coordination"]}
-  relevantResearch={[
-    { title: "Anthropic RSP", url: "https://www.anthropic.com/rsp" },
-    { title: "GovAI Research", url: "https://www.governance.ai/" }
-  ]}
-/>
-
 Early evidence on voluntary coordination shows mixed results. Anthropic, OpenAI, and other major labs have adopted responsible scaling policies and participated in safety commitments, demonstrating some willingness to coordinate. However, these commitments remain largely aspirational, with limited transparency about implementation and no binding enforcement mechanisms. The recent acceleration in capability announcements and deployment timelines suggests competitive pressures may be overwhelming voluntary restraint.
 
 Industry observers note that successful voluntary coordination often requires repeated interaction, shared norms, and credible monitoring—conditions that may be difficult to maintain in a rapidly evolving field with high stakes. Financial sector coordination during crises provides some positive precedents, but typically involved regulatory backstops and shared crisis recognition. The challenge for AI coordination is achieving cooperation before crises demonstrate the need for restraint.
-
-<Crux
-  id="international-coordination"
-  question="Can US-China AI coordination succeed despite geopolitical competition?"
-  domain="Competition & Coordination"
-  description="Whether major AI powers can coordinate on safety/governance despite strategic rivalry."
-  importance="critical"
-  resolvability="years"
-  currentState="Very limited coordination; competition dominant; some backchannel communication"
-  positions={[
-    {
-      view: "Meaningful coordination is achievable",
-      probability: "15-30%",
-      holders: ["Some diplomats", "Track II participants"],
-      implications: "Invest heavily in diplomatic channels; find areas of shared interest; build on bio/nuclear precedent"
-    },
-    {
-      view: "Narrow coordination on specific risks possible",
-      probability: "35-50%",
-      implications: "Focus on achievable goals (bioweapons prevention, accident hotlines); don't expect comprehensive regime"
-    },
-    {
-      view: "Great power competition precludes coordination",
-      probability: "25-40%",
-      holders: ["Realists", "Some national security analysts"],
-      implications: "Focus on domestic/allied governance; defensive measures; prepare for fragmented development"
-    }
-  ]}
-  wouldUpdateOn={[
-    "US-China AI dialogue outcomes",
-    "Coordination success on specific risks",
-    "Broader geopolitical relationship changes",
-    "Precedents from other technology domains"
-  ]}
-  relatedCruxes={["racing-inevitable", "coordination-possible"]}
-  relevantResearch={[
-    { title: "RAND: AI and Great Power Competition", url: "https://www.rand.org/" }
-  ]}
-/>
 
 The current US-China relationship on AI combines strategic competition with limited cooperation on specific issues. While broader technology export controls and investment restrictions reflect deep mistrust, both countries have participated in international AI governance forums and expressed concern about catastrophic risks. The November 2023 Biden-Xi summit produced modest commitments to AI risk dialogue, though follow-through remains limited.
 
@@ -346,85 +144,9 @@ Despite these diplomatic milestones, fundamental tensions persist. The US ties A
 
 ## Power and Lock-in Cruxes
 
-<Crux
-  id="winner-take-all"
-  question="Will AI development produce winner-take-all dynamics?"
-  domain="Power Dynamics"
-  description="Whether AI advantages compound to produce extreme concentration, or if competition will persist."
-  importance="high"
-  resolvability="years"
-  currentState="Some concentration visible; unclear if winner-take-all"
-  positions={[
-    {
-      view: "Winner-take-all is likely in frontier AI",
-      probability: "30-45%",
-      holders: ["Some AI researchers", "Critics of Big Tech"],
-      implications: "Urgent antitrust action needed; support for alternatives; public AI development"
-    },
-    {
-      view: "Oligopoly more likely than monopoly",
-      probability: "35-45%",
-      implications: "Manage concentration but don't expect single winner; focus on maintaining competition"
-    },
-    {
-      view: "Competition will persist; open source prevents lock-in",
-      probability: "20-30%",
-      holders: ["Open source advocates"],
-      implications: "Support open development; market will self-correct; concentration fears overstated"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Frontier AI market structure evolution",
-    "Open source capability vs closed labs over time",
-    "Evidence on returns to scale in AI",
-    "Regulatory intervention effects"
-  ]}
-  relatedCruxes={["ai-concentrating", "lock-in-reversible"]}
-/>
-
 Current evidence shows significant concentration in frontier AI capabilities among a small number of well-resourced companies, driven by advantages in computing resources, data access, and talent acquisition. The enormous costs of training state-of-the-art models—potentially reaching hundreds of millions or billions of dollars—create substantial barriers to entry. Network effects and data advantages may further compound these inequalities, as successful AI systems generate user data that improves performance.
 
 However, the trajectory toward winner-take-all outcomes remains uncertain. Open-source AI development has produced capable models like Llama and others that approach frontier performance at lower costs. Regulatory intervention could limit concentration through antitrust enforcement or mandatory sharing requirements. Historical precedent suggests that even technologies with strong network effects often settle into competitive oligopolies rather than pure monopolies.
-
-<Crux
-  id="lock-in-reversible"
-  question="Would AI-enabled lock-in be reversible?"
-  domain="Power Dynamics"
-  description="Whether structures/values locked in via AI could later be changed, or if lock-in would be permanent."
-  importance="high"
-  resolvability="decades"
-  currentState="Speculative; no lock-in has occurred yet"
-  positions={[
-    {
-      view: "AI lock-in would be effectively permanent",
-      probability: "20-35%",
-      holders: ["Some longtermists", "Ord/MacAskill"],
-      implications: "Preventing lock-in is extremely high priority; current values matter enormously"
-    },
-    {
-      view: "Lock-in would be very hard but not impossible to reverse",
-      probability: "35-45%",
-      implications: "Lock-in prevention important but not absolute; build reversibility into systems"
-    },
-    {
-      view: "Lock-in is unlikely; systems are more fragile than we think",
-      probability: "25-35%",
-      holders: ["Some historians"],
-      implications: "Don't overweight lock-in concerns; focus on nearer-term risks"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Historical analysis of technological lock-in",
-    "Analysis of AI's effect on change difficulty",
-    "Evidence on value evolution in stable systems",
-    "Theoretical analysis of lock-in mechanisms"
-  ]}
-  relatedCruxes={["winner-take-all", "values-crystallization"]}
-  relevantResearch={[
-    { title: "The Precipice", url: "https://theprecipice.com/" },
-    { title: "What We Owe the Future", url: "https://whatweowethefuture.com/" }
-  ]}
-/>
 
 The permanence of potential AI-enabled lock-in depends on several factors that remain highly uncertain. Advanced AI systems could theoretically enable unprecedented surveillance and control capabilities, making coordination for change extremely difficult. If AI development concentrated among a small number of actors, they might gain sufficient leverage to preserve favorable arrangements indefinitely. The speed and scale of AI deployment could create path dependencies that become increasingly difficult to reverse.
 
@@ -444,40 +166,6 @@ Recent research has identified specific mechanisms through which AI could enable
 
 The <R id="NzA5MjJhYz">Forethought Foundation's analysis</R> notes that AGI could make it "technologically feasible to perfectly preserve nuanced specifications of a wide variety of values or goals far into the future"—potentially for "millions, and plausibly trillions, of years." The <R id="ZWNlM2E1Yj">World Economic Forum's 2024 white paper on AI Value Alignment</R> explores how to guide AI systems toward shared human values while preserving adaptability.
 
-<Crux
-  id="values-crystallization"
-  question="Is there a risk of premature values crystallization?"
-  domain="Power Dynamics"
-  description="Whether AI could lock in current values before humanity has developed sufficient moral wisdom."
-  importance="medium"
-  resolvability="decades"
-  currentState="Theoretical concern; no near-term crystallization mechanism"
-  positions={[
-    {
-      view: "Premature crystallization is a serious risk",
-      probability: "25-40%",
-      holders: ["Ord", "MacAskill"],
-      implications: "Prioritize moral uncertainty; avoid embedding specific values; build for value evolution"
-    },
-    {
-      view: "Values will continue evolving regardless of AI",
-      probability: "35-45%",
-      implications: "Less urgent; focus on present values; trust future adaptation"
-    },
-    {
-      view: "Can't avoid embedding values; should embed best current ones",
-      probability: "20-30%",
-      implications: "Focus on getting values right now; crystallization may be unavoidable"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Analysis of how AI might crystallize values",
-    "Historical study of value evolution mechanisms",
-    "Research on moral progress drivers"
-  ]}
-  relatedCruxes={["lock-in-reversible"]}
-/>
-
 Concerns about premature values crystallization reflect the observation that AI systems necessarily embed particular values and assumptions in their design and training. If these systems become sufficiently powerful and widespread, they might entrench current moral frameworks before humanity has time to develop greater moral wisdom through experience and reflection. Historical examples of moral progress—such as expanding circles of moral consideration or evolving concepts of justice—suggest that continued value evolution is important for human flourishing.
 
 Critics argue that values crystallization concerns may be overblown, pointing to the continued evolution of values even in stable societies with established institutions. They note that AI systems can be updated and retrained as values evolve, and that competitive pressures may favor systems aligned with evolving social preferences. The challenge lies in distinguishing between values that should be preserved and those that should remain open to evolution.
@@ -485,46 +173,6 @@ Critics argue that values crystallization concerns may be overblown, pointing to
 ---
 
 ## Human Agency Cruxes
-
-<Crux
-  id="agency-atrophy"
-  question="Will AI assistance cause human agency/capability atrophy?"
-  domain="Human Agency"
-  description="Whether humans will lose critical skills and decision-making capacity through AI dependency."
-  importance="high"
-  resolvability="years"
-  currentState="Early evidence from automation; AI assistance much newer"
-  positions={[
-    {
-      view: "Significant atrophy is likely without countermeasures",
-      probability: "40-55%",
-      holders: ["Nicholas Carr", "Some human factors researchers"],
-      implications: "Mandate skill maintenance; design AI to preserve human capability; accept efficiency loss"
-    },
-    {
-      view: "Some atrophy; critical skills can be preserved",
-      probability: "30-40%",
-      implications: "Identify and protect critical skills; let others atrophy; targeted intervention"
-    },
-    {
-      view: "New skills emerge; net positive transformation",
-      probability: "15-25%",
-      holders: ["Tech optimists"],
-      implications: "Focus on developing new skills; don't fight inevitable transitions"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Longitudinal studies on AI use and skill retention",
-    "Evidence from domains with long AI assistance history",
-    "Successful skill preservation programs",
-    "Analysis of what skills are actually needed"
-  ]}
-  relatedCruxes={["oversight-possible"]}
-  relevantResearch={[
-    { title: "The Glass Cage (Carr)", url: "https://www.nicholascarr.com/" },
-    { title: "FAA Human Factors", url: "https://www.faa.gov/about/initiatives/maintenance_hf" }
-  ]}
-/>
 
 Evidence from aviation automation provides concerning precedents for skill atrophy concerns. Pilots who rely heavily on autopilot systems show measurable deterioration in manual flying skills, contributing to accidents when automation fails and human intervention is required. Similar patterns appear in navigation (GPS dependency), calculation (calculator reliance), and memory (smartphone externalization). The concern is that widespread AI assistance could create systemic vulnerability if humans lose capacity for independent judgment and action.
 
@@ -541,45 +189,6 @@ However, automation also demonstrates that humans can maintain critical skills t
 
 A 2024 paper titled "<R id="NTliNmI3YT">The Paradox of Augmentation: A Theoretical Model of AI-Induced Skill Atrophy</R>" directly addresses the concern that skills erode as humans rely on AI augmentation. Research published in *New Biotechnology* (2025) by <R id="NmZiN2FhMj">Holzinger et al.</R> examines challenges of human oversight in complex AI systems, noting that "as AI systems grow increasingly complex, opaque, and autonomous, ensuring responsible use becomes a formidable challenge."
 
-<Crux
-  id="oversight-possible"
-  question="Can meaningful human oversight of advanced AI be maintained?"
-  domain="Human Agency"
-  description="Whether humans can maintain genuine oversight as AI systems become more capable and complex."
-  importance="critical"
-  resolvability="years"
-  currentState="Current oversight limited; scaling unclear"
-  positions={[
-    {
-      view: "Meaningful oversight is achievable with investment",
-      probability: "30-45%",
-      holders: ["Anthropic", "Some AI safety researchers"],
-      implications: "Invest heavily in interpretability, evaluation, oversight tools"
-    },
-    {
-      view: "Oversight will become increasingly formal/shallow",
-      probability: "35-45%",
-      implications: "Design for robustness to shallow oversight; accept limitations; build redundancy"
-    },
-    {
-      view: "Genuine oversight of advanced AI is not possible",
-      probability: "15-25%",
-      holders: ["Some AI pessimists"],
-      implications: "Don't build systems that require human oversight; fundamentally different approach needed"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Progress in interpretability research",
-    "Evidence on human ability to oversee complex systems",
-    "Development of oversight tools and their effectiveness",
-    "Empirical studies on oversight quality as systems scale"
-  ]}
-  relatedCruxes={["agency-atrophy"]}
-  relevantResearch={[
-    { title: "Anthropic interpretability research", url: "https://www.anthropic.com/" }
-  ]}
-/>
-
 Current human oversight of AI systems often resembles "security theater"—superficial review procedures that provide reassurance without meaningful control. Large language models operate as black boxes even to their creators, making genuine oversight extremely challenging. As systems become more capable and operate faster than human cognition, maintaining meaningful human involvement becomes increasingly difficult.
 
 Research in interpretability and AI evaluation offers some hope for maintaining oversight through better tools and methodologies. Techniques like mechanistic interpretability, constitutional AI, and automated evaluation could potentially scale human oversight capabilities. However, this requires significant investment and may lag behind capability development. The fundamental challenge is that truly advanced AI systems may operate in ways that exceed human comprehension, making oversight qualitatively different from previous technologies.
@@ -587,42 +196,6 @@ Research in interpretability and AI evaluation offers some hope for maintaining 
 ---
 
 ## Systemic Dynamics Cruxes
-
-<Crux
-  id="adaptation-speed"
-  question="Can social/institutional adaptation keep pace with AI change?"
-  domain="Systemic Dynamics"
-  description="Whether human institutions can adapt quickly enough to manage AI-driven changes."
-  importance="high"
-  resolvability="years"
-  currentState="AI changing faster than regulation; some adaptation occurring"
-  positions={[
-    {
-      view: "Adaptation will fall dangerously behind",
-      probability: "35-50%",
-      holders: ["Many AI governance researchers"],
-      implications: "Need to slow AI; build adaptive institutions; prepare for governance gaps"
-    },
-    {
-      view: "Adaptation will lag but manage",
-      probability: "35-45%",
-      implications: "Focus on building adaptability; accept some lag; don't panic"
-    },
-    {
-      view: "Institutions can adapt adequately",
-      probability: "15-25%",
-      holders: ["Some optimists"],
-      implications: "Trust existing institutions; incremental reform sufficient"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Speed of regulatory adaptation vs AI development",
-    "Historical comparison to other fast-changing technologies",
-    "Evidence on institutional flexibility",
-    "Success of adaptive governance experiments"
-  ]}
-  relatedCruxes={["flash-dynamics"]}
-/>
 
 The current pace of AI development clearly outpaces institutional adaptation. Regulatory frameworks lag years behind technological capabilities, with agencies struggling to understand systems that evolve monthly. Traditional policy-making processes involving extensive consultation, analysis, and legislative approval are poorly suited to rapidly changing technologies. The result is a governance gap where powerful AI systems operate with minimal oversight or accountability.
 
@@ -644,41 +217,6 @@ Key 2024-2025 developments include:
 - 2024: UN established High-Level Advisory Body on AI
 - 2024: Seoul Summit produced voluntary <R id="ZTFjZmUzZm">Frontier AI Safety Commitments</R> from 16 major AI companies
 - 2024: Federal AI Risk Management Act mandated NIST AI Risk Management Framework for US agencies
-
-<Crux
-  id="flash-dynamics"
-  question="Do AI interaction speeds create fundamentally new risks?"
-  domain="Systemic Dynamics"
-  description="Whether AI systems interacting faster than human reaction time creates qualitatively new dangers."
-  importance="medium"
-  resolvability="years"
-  currentState="Some fast AI interactions (trading); broader dynamics unclear"
-  positions={[
-    {
-      view: "Speed creates qualitatively new systemic risks",
-      probability: "30-45%",
-      holders: ["Some financial stability researchers"],
-      implications: "Build circuit breakers; require human checkpoints; slow down critical systems"
-    },
-    {
-      view: "Speed is a factor but manageable",
-      probability: "35-45%",
-      implications: "Design for fast failure recovery; accept some speed; targeted interventions"
-    },
-    {
-      view: "Speed concerns are overstated",
-      probability: "20-30%",
-      implications: "Don't sacrifice capability for speed limits; focus on other risks"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Analysis of flash crash dynamics",
-    "Evidence from high-speed AI system interactions",
-    "Research on human oversight of fast systems",
-    "Incidents involving AI speed"
-  ]}
-  relatedCruxes={["adaptation-speed", "oversight-possible"]}
-/>
 
 Financial markets provide clear examples of how AI speed can create systemic risks. Flash crashes driven by algorithmic trading have caused market disruptions within milliseconds, too fast for human intervention. These events demonstrate how AI systems interacting at superhuman speeds can create cascading failures that exceed traditional risk management capabilities.
 
