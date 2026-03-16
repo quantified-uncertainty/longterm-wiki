@@ -92,15 +92,26 @@ function DivisionCard({
   const divMembers = members?.get(d.key) ?? [];
   const accentBorder = DIVISION_ACCENT_BORDER[d.divisionType] ?? "border-l-gray-300 dark:border-l-gray-600";
 
-  const inner = (
+  const divHref = getDivisionHref(d);
+
+  return (
     <div
-      className={`border border-border/50 border-l-[3px] ${accentBorder} rounded-md px-3 py-2 hover:bg-muted/40 hover:border-border transition-all group/card`}
+      className={`relative border border-border/50 border-l-[3px] ${accentBorder} rounded-md px-3 py-2 hover:bg-muted/40 hover:border-border transition-all group/card`}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium text-[13px] text-foreground truncate leading-tight">
-          {d.name}
+          {divHref ? (
+            <Link
+              href={divHref}
+              className="after:absolute after:inset-0"
+            >
+              {d.name}
+            </Link>
+          ) : (
+            d.name
+          )}
         </span>
-        {getDivisionHref(d) && (
+        {divHref && (
           <svg
             aria-hidden="true"
             className="shrink-0 w-3.5 h-3.5 text-muted-foreground/30 group-hover/card:text-muted-foreground/60 transition-colors"
@@ -120,8 +131,7 @@ function DivisionCard({
             {leadHref ? (
               <Link
                 href={leadHref}
-                className="text-xs text-primary hover:underline truncate"
-                onClick={(e) => e.stopPropagation()}
+                className="relative z-10 text-xs text-primary hover:underline truncate"
               >
                 {leadDisplay}
               </Link>
@@ -141,8 +151,7 @@ function DivisionCard({
               {m.href ? (
                 <Link
                   href={m.href}
-                  className="hover:text-primary hover:underline"
-                  onClick={(e) => e.stopPropagation()}
+                  className="relative z-10 hover:text-primary hover:underline"
                 >
                   {m.name}
                 </Link>
@@ -159,15 +168,6 @@ function DivisionCard({
         </div>
       )}
     </div>
-  );
-
-  const divHref = getDivisionHref(d);
-  return divHref ? (
-    <Link href={divHref} className="block">
-      {inner}
-    </Link>
-  ) : (
-    <div>{inner}</div>
   );
 }
 
