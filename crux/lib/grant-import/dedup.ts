@@ -76,30 +76,87 @@ export function amountsMatch(a: number | null, b: number | null, tolerance = 0.0
 }
 
 /**
+ * Generate amount bucket strings for a grant amount.
+ * Returns both floor and ceil bucket keys for amounts near bucket boundaries.
+ */
+function amountBuckets(amount: number | null): string[] {
+  if (amount === null) return ["null"];
+  const floorBucket = Math.floor(amount / 10000);
+  const ceilBucket = Math.ceil(amount / 10000);
+  if (floorBucket === ceilBucket) return [String(floorBucket)];
+  return [String(floorBucket), String(ceilBucket)];
+}
+
+/**
+ * Normalize a grant title for fuzzy matching.
+ * Returns null for generic titles that would cause false-positive matches
+ * (e.g., "General Support" could match unrelated orgs).
+ */
+export function normalizeTitle(title: string | null | undefined): string | null {
+  if (!title || title.length < 20) return null;
+
+  let normalized = title.toLowerCase().trim();
+  // Strip common generic prefixes
+  normalized = normalized.replace(/^grant\s+(to\s+)?("support\s+)?/i, "");
+  normalized = normalized.replace(/[.,\-'"()]/g, "");
+  normalized = normalized.replace(/\s+/g, " ").trim();
+
+  // Filter out generic titles that would cause false-positive cross-org matches
+  const GENERIC_TITLES = [
+    "general support",
+    "general operating support",
+    "unrestricted support",
+  ];
+  if (GENERIC_TITLES.some(g => normalized.startsWith(g))) return null;
+
+  // Must be long enough after normalization to be meaningful
+  if (normalized.length < 15) return null;
+  return normalized;
+}
+
+/**
  * Generate fuzzy dedup keys from a grant.
  * Returns both floor and ceil bucket keys so that amounts near bucket
  * boundaries (e.g., $104,999 and $105,001) are always compared.
+ *
+ * Generates three types of keys:
+ * 1. Name-based: normalizedGranteeName|amountBucket|yearMonth (original)
+ * 2. Entity-based: entity:granteeId|amountBucket|yearMonth (when entity matched)
+ * 3. Title-based: title:normalizedTitle|amountBucket|yearMonth (for descriptive titles)
+ *
+ * The union-find algorithm in detectDuplicates() merges groups that share any key,
+ * so a grant matched by entity key will be grouped with one matched by name key.
  */
 export function dedupeKeys(grant: RawGrant): string[] {
   const name = normalizeGranteeName(grant.granteeName);
   const ym = extractYearMonth(grant.date);
+  const buckets = amountBuckets(grant.amount);
 
-  if (grant.amount === null) {
-    return [`${name}|null|${ym}`];
+  const keys: string[] = [];
+
+  // 1. Name-based keys (original strategy)
+  for (const b of buckets) {
+    keys.push(`${name}|${b}|${ym}`);
   }
 
-  const floorBucket = Math.floor(grant.amount / 10000);
-  const ceilBucket = Math.ceil(grant.amount / 10000);
-
-  if (floorBucket === ceilBucket) {
-    // Amount is an exact multiple of 10,000 — only one bucket needed
-    return [`${name}|${floorBucket}|${ym}`];
+  // 2. Entity-based keys — catches cross-source duplicates where the same org
+  // has different display names (e.g., "MIRI" vs "Machine Intelligence Research Institute")
+  if (grant.granteeId) {
+    for (const b of buckets) {
+      keys.push(`entity:${grant.granteeId}|${b}|${ym}`);
+    }
   }
 
-  return [
-    `${name}|${floorBucket}|${ym}`,
-    `${name}|${ceilBucket}|${ym}`,
-  ];
+  // 3. Title-based keys — catches duplicates with different grantee names but
+  // identical descriptive grant titles (filtered to exclude generic titles)
+  const normTitle = normalizeTitle(grant.name);
+  if (normTitle) {
+    for (const b of buckets) {
+      keys.push(`title:${normTitle}|${b}|${ym}`);
+    }
+  }
+
+  return keys;
 }
 
 /**
