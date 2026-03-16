@@ -47,8 +47,11 @@ function resolveRecipient(recipientId: string): {
     }
     return { name: entity.name, slug, href, wikiPageId };
   }
-  // Not a known entity — return the raw ID as the display name
-  return { name: recipientId, slug: null, href: null, wikiPageId: null };
+  // Not a known entity — convert slug to readable title case
+  const displayName = recipientId
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return { name: displayName, slug: null, href: null, wikiPageId: null };
 }
 
 export default function GrantsPage() {
