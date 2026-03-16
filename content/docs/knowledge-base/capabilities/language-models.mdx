@@ -9,9 +9,9 @@ quality: 60
 readerImportance: 94
 researchImportance: 76.5
 tacticalValue: 74
-lastEdited: "2026-03-15"
+lastEdited: "2026-03-16"
 update_frequency: 21
-llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed \\$1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, key technical breakthroughs in vision-language learning (CLIP), text-to-image generation (DALL-E), embeddings as a distinct capability class, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, and growing autonomous agent capabilities."
+llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed \\$1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, key technical breakthroughs in vision-language learning (CLIP), text-to-image generation (DALL-E), embeddings as a distinct capability class, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, and growing autonomous agent capabilities. Also covers MoE architecture optimization, continual learning challenges, knowledge editing, bias and fairness evaluation across gender and political dimensions, layer-wise mechanistic interpretability distinguishing recall from reasoning, and multimodal continual learning."
 ratings:
   novelty: 4.5
   rigor: 6.5
@@ -46,7 +46,7 @@ import {DataInfoBox, R, EntityLink, Mermaid, F} from '@components/wiki';
 
 <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> (LLMs) are transformer-based neural networks trained on vast text corpora using next-token prediction. Despite their deceptively simple training objective, LLMs exhibit sophisticated <EntityLink id="E117" name="emergent-capabilities">emergent capabilities</EntityLink> including reasoning, coding, scientific analysis, and complex task execution. These models have transformed abstract AI safety discussions into concrete, immediate concerns while providing the clearest path toward artificial general intelligence.
 
-The core insight underlying LLMs is that training a model to predict the next word in a sequence—a task achievable without labeled data—produces internal representations useful for a wide range of downstream tasks. This approach was explored in early unsupervised pretraining work from OpenAI in 2018. OpenAI's GPT-2 (2019) then demonstrated coherent multi-paragraph generation at scale, showing that larger models trained on more data produced qualitatively stronger outputs. An earlier indicator that such models form interpretable internal structure was the discovery of an "unsupervised sentiment neuron" in 2017, which emerged without any sentiment-specific supervision.
+The core insight underlying LLMs is that training a model to predict the next word in a sequence—a task achievable without labeled data—produces internal representations useful for a wide range of downstream tasks. This approach was explored in early unsupervised pretraining work from <EntityLink id="E218" name="openai">OpenAI</EntityLink> in 2018. OpenAI's GPT-2 (2019) then demonstrated coherent multi-paragraph generation at scale, showing that larger models trained on more data produced qualitatively stronger outputs. An earlier indicator that such models form interpretable internal structure was the discovery of an "unsupervised sentiment neuron" in 2017, which emerged without any sentiment-specific supervision.
 
 A foundational development alongside raw scale was learning to align model outputs to human preferences. The GPT-2 paper itself acknowledged concerns about potential misuse of fluent generation, leading OpenAI to initially withhold the full 1.5B-parameter model and conduct a staged release to study harms before broader deployment. Subsequent work on instruction-following alignment—culminating in InstructGPT—demonstrated that fine-tuning with human feedback could substantially improve model usefulness and reduce harmful outputs without proportional increases in model size. The complementary technique of <EntityLink id="E259" name="rlhf">RLHF</EntityLink> applied to summarization tasks, and later to instruction-following, established the training paradigm that underlies most current aligned frontier models.
 
@@ -164,6 +164,8 @@ The o1 and o3 model families introduced a new paradigm: **inference-time compute
 
 This shift has implications for AI safety: inference-time scaling allows models to "think longer" on hard problems, potentially achieving strong performance on specific tasks while maintaining manageable training costs. According to some sources, o1 is approximately 6x more expensive and 30x slower than GPT-4o per query. The Stanford AI Index 2025 cites the <EntityLink id="E1249" name="re-bench">RE-Bench</EntityLink> evaluation finding that in short time-horizon settings (2-hour budget), top AI systems score 4x higher than human experts, but as the time budget increases to 32 hours, human performance surpasses AI by roughly 2 to 1.
 
+Research on inference efficiency has produced complementary approaches. Work on **efficient reasoning with balanced thinking** explores how models can allocate inference-time compute more selectively—spending more tokens on genuinely hard sub-problems and fewer on straightforward ones—rather than applying uniform extended chain-of-thought across all queries. Similarly, **speculative decoding** with online learning (research on "evolving drafts") allows draft models to adapt to target model distributions during deployment, reducing latency while preserving output quality. Cross-family speculative prefill techniques use small draft models from different model families to compress long-context inputs without fine-tuning, enabling long-context inference at reduced cost.
+
 ### Emergent Capability Thresholds
 
 | Capability | Emergence Scale | Evidence | Safety Relevance |
@@ -180,6 +182,12 @@ Research documented in a 2025 emergent abilities survey finds that emergent abil
 According to the Stanford AI Index 2025, benchmark performance improved substantially in a single year: scores rose by 18.8, 48.9, and 67.3 percentage points on MMMU, GPQA, and SWE-bench respectively. The gap between leading US and Chinese models also narrowed—from 17.5 to 0.3 percentage points on MMLU—over the same period.
 
 **Safety implication:** As AI systems gain autonomous reasoning capabilities, they also develop behaviors relevant to safety evaluation, including goal persistence, strategic planning, and the capacity for <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink>. OpenAI's o3-mini reportedly became the first AI model to receive a "Medium risk" classification for Model Autonomy under internal capability evaluation frameworks.
+
+### Depth Dynamics and Linear Scaling Structure
+
+Recent mechanistic work finds that as language models scale, low-order linear dynamics emerge in the depth dimension: the sequence of layer-wise representations can be approximated by low-dimensional linear trajectories, with most representational change concentrated in early and late layers. This "low-order linear depth dynamics" phenomenon suggests that scaling does not uniformly distribute representational work across depth, but instead concentrates it at certain layers—an observation with implications for understanding where capabilities reside and how to intervene on model behavior.
+
+Related analysis of expert selection patterns in Mixture-of-Experts (MoE) models finds that which experts are activated for a given input reveals nearly as much about the input's semantics as the text itself, suggesting that routing decisions encode substantial semantic information. This has implications for both interpretability (expert routing as a window into model representations) and efficiency (routing-based inference optimization).
 
 ## Key Technical Breakthroughs (2023–2025)
 
@@ -279,6 +287,8 @@ The technical foundations were elaborated in [Text and Code Embeddings by Contra
 The development of embedding APIs intersected with the growth of retrieval-augmented generation (RAG) architectures, in which an LLM's parametric knowledge is supplemented by retrieved documents identified through embedding similarity search. RAG systems using OpenAI embeddings became a standard deployment pattern for enterprise applications requiring up-to-date or domain-specific knowledge.
 
 The interaction between embedding quality and RAG system factuality is direct: higher-quality embeddings retrieve more relevant documents, reducing the probability that the LLM generates unsupported claims to fill knowledge gaps. However, as the FACTS Grounding benchmark documents, even RAG systems with high-quality retrieval can produce outputs that misrepresent or hallucinate details from retrieved documents—suggesting that embedding quality is necessary but not sufficient for factual accuracy.
+
+Research on in-context knowledge updates finds that retrieval-augmented models exhibit systematic **retrieval bias under multiple knowledge updates**: when a model's context contains several updates to the same entity or fact, retrieval attention tends to favor earlier or more prominent context positions over later ones, causing the model to sometimes apply outdated retrieved information even when more recent information is present in context. This positional bias is distinct from simple hallucination and requires targeted evaluation methodology to detect.
 
 ### Safety Implications of Embeddings
 
@@ -380,143 +390,142 @@ A significant limitation is that RLHF-trained models can exhibit <EntityLink id=
 
 **Multilingual alignment gap:** A consistent finding across alignment research is that safety training applied primarily in English does not reliably transfer to other languages. [Align Once, Benefit Multilingually (2025)](https://arxiv.org/abs/2502.07833) proposes methods to enforce multilingual consistency in safety alignment by training on cross-lingual consistency losses. Related work on [Helpful to a Fault (2025)](https://arxiv.org/abs/2502.09933) measures illicit assistance rates across 40+ languages in multi-turn interactions, finding that multilingual agents provide more potentially harmful assistance than English-only evaluations would suggest, particularly in low-resource languages where safety fine-tuning data is sparse.
 
-## Evaluation Methodology and Benchmarks
+### Alignment from User Interactions
 
-### Factuality Benchmarking
+A complementary approach to RLHF and constitutional AI involves learning alignment signals directly from user interaction data rather than from curated preference annotations. Work on **aligning language models from user interactions** explores how implicit feedback signals—such as conversation continuations, follow-up queries, and editing patterns—can be used to infer user preferences and refine model behavior without requiring explicit preference labels. This approach is particularly relevant for deployment-time adaptation, where models can be updated based on real interaction patterns rather than synthetic preference datasets. It raises corresponding safety questions: interactions from adversarial or manipulative users could introduce undesirable behavioral shifts if interaction-based alignment is applied without filtering.
 
-A growing area of evaluation research focuses on measuring LLM factuality rigorously and across diverse task types. Two related but distinct benchmarks from Google DeepMind address different aspects of this problem:
+### Group Relative Policy Optimization and Recommendation Alignment
 
-- **[FACTS Grounding](https://arxiv.org/abs/2501.03200)**: Introduced to measure whether long-form generated text is supported by provided source documents. It distinguishes between claims grounded in retrieved context and claims introduced without basis—directly relevant to retrieval-augmented generation (RAG) systems where the model has access to retrieved context but may still generate unsupported claims.
-- **[FACTS Benchmark Suite](https://arxiv.org/abs/2502.07833)**: A broader systematic evaluation that decomposes factuality failures by error type across diverse task categories, enabling more fine-grained analysis of where and how models generate false information.
+A variant of policy optimization applied to recommendation systems uses **Group Relative Policy Optimization (GRPO)** to align language model-generated recommendations with consistency requirements across user groups. Work on information-consistent LLM recommendations via GRPO addresses the finding that standard RLHF-trained models produce recommendations that are inconsistent across similar users—recommending different items to demographically similar users in ways that reflect training data biases rather than principled personalization. GRPO frames consistency as a group-level constraint within the RL objective, penalizing policies that produce high variance across equivalent user contexts.
 
-The distinction between these two benchmarks matters for practitioners: FACTS Grounding tests faithfulness to provided context, while the FACTS Benchmark Suite tests factual accuracy more broadly, including against parametric knowledge.
+### Reinforcement Learning for Code Generation
 
-### AI Psychometrics
+Work on **EvolveCoder** applies reinforcement learning to code generation by using adversarial test case generation to provide richer feedback signals than standard pass/fail unit tests. The approach generates adversarial test cases that probe edge cases and boundary conditions, using these as verifiers during RL training. This addresses a known limitation of HumanEval-style evaluation: models can achieve high pass rates on standard test suites by exploiting common patterns without generalizing to edge cases. Adversarial verification during training yields more robust code generation with better generalization to held-out test conditions.
 
-[AI Psychometrics: Evaluating the Psychological Reasoning of Large Language Models with Psychometric Validities](https://arxiv.org/abs/2502.12002) applies psychometric methodology—originally developed for measuring human cognitive and psychological attributes—to evaluate LLMs. The paper distinguishes between tests of maximal performance (what can the model do when trying its best?) and tests of typical performance (what does the model actually do in naturalistic settings?), arguing that most LLM benchmarks measure only the former.
+Similarly, work on **multiple-choice question design for reinforcement learning with verifiable rewards (RLVR)** finds that the design of distractors—incorrect answer choices—substantially affects the quality of reasoning elicited by RL training. Carefully designed distractors that target specific reasoning errors produce stronger RL training signals than randomly selected wrong answers, enabling more efficient RLVR with smaller datasets.
 
-Key findings relevant to safety:
-- Models show substantial divergence between their maximum capability and their typical behavior on the same tasks, suggesting benchmark scores may overstate practical reliability
-- Psychometric validity concepts—including construct validity, convergent validity, and discriminant validity—provide a principled framework for evaluating whether LLM benchmarks actually measure the constructs they claim to measure
-- Standard LLM benchmarks often lack discriminant validity: scores on ostensibly different benchmarks correlate highly, suggesting they may be measuring a common underlying factor rather than distinct capabilities
+### Test-Time RL Alignment and Benchmark Artifacts
 
-### Jailbreak Scaling Analysis
+Research on **test-time RL alignment** finds that applying RL fine-tuning specifically to improve performance on benchmark tasks exposes artifacts related to task familiarity in the base model. When models are fine-tuned at test time to improve on specific benchmarks, the gains are larger for tasks whose format and domain closely match the model's pretraining distribution, and smaller for genuinely novel reasoning tasks. This suggests that benchmark-measured improvements from RL alignment may partially reflect exploitation of familiar patterns rather than generalizable capability improvements—a concern for evaluating whether RL-aligned models are safer in novel deployment contexts.
 
-[Systematic Scaling Analysis of Jailbreak Attacks in Large Language Models](https://arxiv.org/abs/2502.11564) examines how jailbreak attack success rates change as both attacker and defender scale. Key findings:
+## Mechanistic Interpretability
 
-- Attack success rates do not consistently decrease as model size increases; some attack categories become *more* effective against larger models
-- Automated jailbreak generation scales approximately as efficiently as model capability, suggesting the safety-capability gap may not close automatically with scale
-- The paper identifies attack categories that are particularly resistant to safety fine-tuning, including multi-turn attacks that gradually shift model behavior across a conversation
+### Layer-Wise Recall vs. Reasoning
 
-This work is relevant to understanding whether responsible scaling policies based on capability thresholds can adequately capture safety improvements, or whether adversarial robustness requires additional targeted evaluation.
+Research on **disentangling recall and reasoning in transformer models through layer-wise attention and activation analysis** provides evidence that these two cognitive functions are partially localized to different layers and attention head types. Specifically:
 
-### SemBench and Universal Semantic Evaluation
+- Factual recall—retrieving stored associations between entities and attributes—tends to be mediated by mid-layer attention heads that implement a lookup-like operation over key-value associations in the residual stream
+- Relational reasoning—combining multiple pieces of retrieved information through multi-step inference—engages later layers and broader attention patterns that aggregate across positions
+- The two functions can be partially dissociated: interventions (such as activation patching) that disrupt mid-layer recall heads impair factual retrieval without proportionally impairing multi-step reasoning, and vice versa
 
-[SemBench: A Universal Semantic Framework for LLM Evaluation](https://arxiv.org/abs/2502.09821) proposes a framework for evaluating whether LLMs understand meaning in a semantically consistent way, rather than relying on surface form matches. The benchmark tests whether models can recognize paraphrases, semantic equivalences, and entailments across diverse phrasings—capturing a form of understanding that standard task-specific benchmarks may miss.
+This layer-wise dissociation has implications for interpretability methodology: analyses that focus only on attention patterns at a single layer may misattribute recall to reasoning or vice versa, and interventions targeting specific safety-relevant behaviors should account for which layers implement those behaviors.
 
-### CLASP: Defense Against Hidden State Poisoning
+### Activation Steering and Cross-Layer Consistency
 
-[CLASP: Defending Hybrid Large Language Models Against Hidden State Poisoning Attacks](https://arxiv.org/abs/2502.10178) addresses a specific attack surface in LLM deployment: adversarial manipulation of model hidden states through carefully crafted inputs. CLASP proposes detection and defense mechanisms for scenarios where an attacker can influence the model's internal representations, which is particularly relevant for hybrid deployment architectures where models process inputs from multiple sources with varying trust levels.
+Work on **global evolutionary steering** refines activation steering—the technique of adding learned directions to model activations to modify behavior—by enforcing cross-layer consistency in the steering vectors applied. Standard activation steering applies a single direction vector at one layer; cross-layer consistency methods extend this by finding steering vectors that produce coherent behavioral changes across multiple layers simultaneously, using evolutionary search to optimize for consistency.
 
-## Gemini 2.0 and the Agentic Era
+The key finding is that inconsistent cross-layer steering can produce fragile or incoherent behavioral changes that do not generalize to held-out prompts, while consistent cross-layer steering produces more robust and transferable behavioral modifications. This has implications for safety applications of activation steering, such as suppressing unsafe behaviors: interventions that are inconsistent across layers may appear effective on evaluation sets while failing on inputs that activate the behavior through different layer pathways.
 
-Google DeepMind's [Gemini 2.0](https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024/) launch in December 2024 marked an explicit strategic pivot from general-purpose language models toward <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> systems capable of multi-step autonomous task execution. The announcement positioned Gemini 2.0 as "our new AI model for the agentic era," signaling that agentic capabilities had become a primary design goal rather than an emergent side effect.
+### Language Models as Injective Functions
 
-### Gemini 2.0 Flash
+A theoretical result establishes that **language models with certain architectural properties are injective**—that is, distinct input sequences map to distinct output distributions. This injectivity implies a form of invertibility: in principle, given a model's output distribution, one could recover the input sequence that produced it. The implications for safety include:
 
-[Gemini 2.0 Flash](https://blog.google/technology/google-deepmind/gemini-2-flash-experimental/) was the first production-ready model in the 2.0 family, made available to all users in February 2025. Key technical features:
+- Membership inference attacks on language models may be more powerful than previously recognized, because injectivity implies that model outputs carry information about inputs
+- Watermarking and attribution schemes for LLM-generated text may be more tractable than assumed, because injectivity supports recovery of the generating input from output characteristics
+- Privacy guarantees for models trained on sensitive data require more careful analysis in light of potential invertibility
 
-| Capability | Description | Agentic Relevance |
-|------------|-------------|-------------------|
-| Native image generation | Generates images directly without a separate model | Enables single-model multimodal task completion |
-| Native audio output | Generates audio responses directly | Supports voice-based agentic interactions |
-| Computer use | Can interact with web browsers and desktop applications | Direct environment manipulation |
-| Real-time API | Low-latency streaming for interactive applications | Enables responsive agentic loops |
-| Tool use | Structured function calling across multiple APIs | Multi-system orchestration |
+The result applies under specific conditions on model architecture and vocabulary size; the practical extent to which frontier models satisfy these conditions is an open empirical question.
 
-The native multimodal generation capabilities in Gemini 2.0 Flash—where the model generates images and audio as part of a unified response rather than calling separate specialized models—represented a design shift with implications for agentic deployment. Prior systems required orchestration layers to coordinate between specialized text, image, and audio models; native generation simplified the architecture for agentic pipelines.
+### Gemma Scope 2 and Sparse Autoencoders
 
-From a safety perspective, Gemini 2.0's agentic positioning raised concerns that required explicit treatment in Google DeepMind's safety documentation:
-- Computer use capabilities enable the model to take actions in the real world (browsing, form submission, application interaction) with limited reversibility
-- Multi-step task execution increases the potential for errors to compound before human review
-- Real-time audio interaction reduces the latency available for content filtering
+Google DeepMind's [Gemma Scope 2](https://deepmind.google/research/publications/gemma-scope-2/) extends the Gemma Scope sparse autoencoder suite—a set of interpretability tools built on the Gemma open-weight model family—with improved training methodology and coverage of additional model components including attention layers and the embedding space. Gemma Scope 2 provides researchers with pre-trained sparse autoencoders that decompose model activations into interpretable features, enabling analysis of which features are active during specific model behaviors.
 
-Google's [Gemini 2.0 is now available to everyone](https://blog.google/products/gemini/gemini-model-updates-february-2025/) post described safety testing specific to agentic use cases, including evaluations of whether the model would take irreversible actions without appropriate confirmation and whether it would resist prompt injection attacks from adversarial content in browsed web pages.
+The sparse autoencoder approach builds on the superposition hypothesis: transformer hidden layers represent more features than dimensions by using superimposed representations that can be disentangled with sparsity-inducing decomposition methods. Gemma Scope 2's contribution includes improved feature quality and broader architectural coverage compared to the original Gemma Scope release, making it a more complete toolkit for mechanistic interpretability research on an accessible open-weight model family.
 
-### Significance for the Gemini 2.5 Family
+## Architecture Advances: Mixture-of-Experts
 
-Gemini 2.0's agentic infrastructure—particularly the real-time API, native multimodal generation, and computer use capabilities—provided the foundation on which Gemini 2.5 Pro and Flash were built. The 2.5 series added chain-of-thought reasoning (the "thinking models" capability) and extended context to 1 million tokens, but the agentic deployment architecture established with 2.0 remained substantially intact. This lineage is relevant for understanding why Gemini 2.5 models are frequently benchmarked on agentic tasks (<EntityLink id="E1253" name="webarena">WebArena</EntityLink>, SWE-bench) rather than purely on question-answering or generation metrics.
+### MoE Fundamentals and the Llama 4 Design
 
-## Major 2025 Model Releases
+Mixture-of-Experts (MoE) architectures replace dense feed-forward layers with a collection of "expert" sub-networks, activating only a subset of experts for each token during inference. This allows total parameter counts to grow substantially while keeping per-token compute roughly constant. Llama 4's adoption of MoE for its natively multimodal open-weight models brought this architecture into widespread open deployment.
 
-### GPT-5 and the GPT-5 Family
+Key properties of MoE relevant to safety and capability research:
 
-[GPT-5](https://openai.com/index/introducing-gpt-5/), released in May 2025, represents <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s integration of reasoning and general capability into a single unified model, replacing the separate GPT-4o and o1 product lines. According to the [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/), GPT-5 achieves the highest scores to date on GPQA Diamond, SWE-bench Verified, and MMLU among OpenAI models at the time of release.
+| Property | Description | Implication |
+|----------|-------------|-------------|
+| Sparse activation | Only K-of-N experts activated per token | Reduces inference FLOPs relative to parameter count |
+| Expert specialization | Experts tend to specialize by domain or token type | May concentrate dangerous knowledge in specific experts |
+| Routing interpretability | Expert selection patterns carry semantic information | Expert routing as interpretability signal |
+| Load balancing | Training requires auxiliary losses to avoid expert collapse | Auxiliary losses can interact with alignment training |
 
-Key developments in the GPT-5 family:
+### Reducing MoE Redundancy
 
-- **GPT-5.1**: Released for developers in mid-2025, optimized for conversational applications and described as "smarter, more conversational" with improved instruction-following. [Cursor](https://openai.com/index/how-cursor-uses-gpt-5/) and [Tolan](https://openai.com/index/how-tolan-builds-voice-first-ai-with-gpt-5-1/) reported substantial gains in their agentic pipelines.
-- **GPT-5.2**: A subsequent release in late 2025 adding deeper thinking modes, reportedly achieving 93.2% on GPQA Diamond and 90.5% on ARC.
-- **GPT-5.3-Codex-Spark**: Positioned as a coding-specialized variant within the GPT-5.x family, targeting agentic software development workflows.
-- **gpt-oss-120b and gpt-oss-20b**: Open-weight models released by OpenAI, with model cards published for both sizes. These represent a shift toward open-weight strategy alongside closed frontier models.
-- **GPT Realtime API**: Extended with real-time audio dialog capabilities, building on the GPT-4o voice capabilities introduced in [Hello GPT-4o (2024)](https://openai.com/index/hello-gpt-4o/).
+Work on **LightMoE** addresses a known inefficiency in trained MoE models: many experts learn highly similar representations, contributing redundant computation without adding representational capacity. LightMoE identifies redundant expert pairs through representational similarity analysis and replaces them with single consolidated experts, reducing model size and inference cost while preserving performance. This post-training compression technique is complementary to architecture-level MoE design and is applicable to already-trained models without retraining from scratch.
 
-The [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/) documents safety evaluations including assessments of CBRN uplift risk, cyberoffense capabilities, and persuasion. An [Addendum on Sensitive Conversations](https://openai.com/index/gpt-5-system-card-sensitive-conversations/) addresses handling of mental health, self-harm, and politically contentious topics, noting both improvements in refusal precision and remaining cases where the model provides responses that require strengthening.
+The expert redundancy finding also reinforces the observation that expert selection in MoE models reveals nearly as much semantic information as the token text itself: experts that encode similar semantic content tend to be routed similarly, making routing patterns a relatively low-noise signal about input semantics.
 
-### gpt-oss and the Open-Weight Strategy
+### Expert Pyramid Tuning
 
-The [gpt-oss](https://openai.com/index/introducing-gpt-oss/) model family—comprising gpt-oss-20b and gpt-oss-120b—represents OpenAI's entry into the open-weight model space. This was a notable strategic shift for an organization that had previously released only API-accessible models. The [gpt-oss model card](https://openai.com/index/gpt-oss-model-card/) documents intended use cases, known limitations, and safety evaluations for both parameter sizes.
+**Expert Pyramid Tuning** proposes a parameter-efficient fine-tuning approach for MoE models that allocates trainable parameters in proportion to each expert's importance for the target task, forming a pyramid-shaped parameter budget (more parameters for high-importance experts, fewer for low-importance ones). This contrasts with uniform LoRA-style approaches that apply the same parameter budget to all model components. Task-specific importance is estimated from activation statistics on task data before fine-tuning, allowing the budget allocation to be informed by actual expert utilization patterns.
 
-A companion release was [gpt-oss-safeguard](https://openai.com/index/introducing-gpt-oss-safeguard/), a smaller model designed specifically for content safety classification, with a [technical report](https://openai.com/index/gpt-oss-safeguard-technical-report/) providing detailed evaluation methodology. gpt-oss-safeguard is intended to be deployable locally alongside gpt-oss models, enabling operators to run safety classification without API dependency—a design choice that addresses privacy and latency constraints in enterprise deployment but also raises questions about whether safety models deployed without oversight updates will remain effective as threat landscapes evolve.
+## Continual Learning in LLMs
 
-Key safety implications of OpenAI's open-weight release:
-- Open weights enable mechanistic interpretability research that would otherwise require API-level access
-- Fine-tuning safety guardrails out of open-weight models remains tractable for technically sophisticated users, a concern acknowledged in the gpt-oss model card
-- Governance frameworks targeting API access do not apply to locally deployed open-weight models
+### The Catastrophic Forgetting Problem
 
-In August 2025, OpenAI published ["Estimating Worst-Case Frontier Risks of Open-Weight LLMs"](https://openai.com/index/estimating-worst-case-frontier-risks-of-open-weight-llms/) ([arXiv:2508.03153](https://arxiv.org/abs/2508.03153)), which introduced a **malicious fine-tuning (MFT)** methodology to estimate the worst-case risk of open-weight releases. Researchers attempted to elicit maximum capabilities from gpt-oss by fine-tuning it in agentic environments for biorisk (web-browsing threat creation tasks) and cybersecurity (capture-the-flag challenges). The key finding: MFT gpt-oss underperformed <EntityLink id="E1074" name="o3">o3</EntityLink>, a closed-weight model rated below OpenAI's "Preparedness High" threshold for both risk categories. The study concluded that gpt-oss may marginally increase biological capabilities over existing open-weight models but does not substantially advance the frontier of dangerous capabilities. This represents the first systematic attempt by a major lab to quantify worst-case open-weight risk prior to release.
+Deploying LLMs in production requires updating model knowledge over time—incorporating new facts, correcting errors, and adapting to new domains—without degrading performance on previously learned capabilities. This challenge, broadly termed **continual learning**, intersects with several safety-relevant concerns:
 
-### Economic Impacts Research
+- **Knowledge staleness**: Models with outdated parametric knowledge may generate plausible but incorrect information about recent events
+- **Selective forgetting**: Fine-tuning for safety may inadvertently degrade performance on benign capabilities, or vice versa
+- **Cumulative drift**: Iterative fine-tuning over many update cycles can cause slow drift in model behavior that is difficult to detect incrementally
 
-OpenAI's economic impacts research program, described in [Economic Impacts Research at OpenAI](https://openai.com/index/economic-impacts/), examines how LLM deployment affects labor markets, productivity, and economic distribution. Key themes from this research:
+Research surveying **continual learning methods for large language models** identifies three main approaches: (1) **regularization-based methods** that add penalties to prevent large weight changes from previous training; (2) **replay-based methods** that mix previous training data into fine-tuning batches; and (3) **architecture-based methods** that add new parameters for new knowledge while freezing existing ones. Each approach involves different trade-offs between plasticity (ability to learn new information) and stability (retention of existing knowledge).
 
-- LLMs disproportionately affect tasks involving information processing, writing, and analysis—including tasks previously considered high-skill
-- Productivity effects are heterogeneous: users who effectively leverage LLM assistance show large gains; those who do not may face competitive disadvantage
-- The research acknowledges uncertainty about whether productivity gains translate to wage increases or are captured primarily by firms and shareholders
-- Studies of LLM adoption in specific domains (customer service, software development, medical documentation) show consistent task completion speed improvements but variable effects on output quality
+### Multimodal Continual Learning
 
-This research is relevant to the <EntityLink id="E108" name="economic-disruption">economic disruption</EntityLink> risk dimension because it provides empirical grounding for displacement and productivity claims that are often made without supporting data.
+**Multimodal continual learning** in the context of multimodal large language models (MLLMs) faces additional challenges beyond those in text-only settings. When models are updated across multiple deployment scenarios—each with different distributions of image-text pairs, task types, and domains—the standard catastrophic forgetting problem is compounded by cross-modal interference: updates that improve vision-language alignment in one scenario can degrade it in others.
 
-### Gemini 2.5 Family
+Work on multimodal continual learning from multi-scenario perspectives proposes scenario-aware replay strategies that maintain a compact memory of representative examples from previous scenarios, using importance sampling to prioritize examples that are most at risk of being forgotten under the current update. The approach tracks both text and vision encoder stability, applying targeted regularization to the encoder components most affected by each update.
 
-[Google DeepMind](https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/)'s Gemini 2.5 family, released across March–June 2025, introduced several models:
+## Knowledge Editing
 
-| Model | Key Feature | Context Window | Primary Use Case |
-|-------|-------------|----------------|------------------|
-| <EntityLink id="E1083" name="gemini-2-5-pro">Gemini 2.5 Pro</EntityLink> | Highest capability, coding-focused | 1M tokens | Complex reasoning, coding |
-| <EntityLink id="E1084" name="gemini-2-5-flash">Gemini 2.5 Flash</EntityLink> | Speed-optimized frontier | 1M tokens | Scaled production use |
-| Gemini 2.5 Flash-Lite | Cost/latency optimized | 1M tokens | High-volume inference |
+### Motivation and Approaches
 
-[Gemini 2.5: Our Most Intelligent AI Model](https://blog.google/technology/google-deepmind/gemini-2-5-pro-latest/) describes the Pro variant as achieving leading performance on coding benchmarks including <EntityLink id="E1238" name="livecodebench">LiveCodeBench</EntityLink> and outperforming GPT-4o on MMLU at release. [Gemini 2.5 Flash-Lite](https://blog.google/technology/google-deepmind/gemini-2-5-flash-lite/) was made production-ready in June 2025 with a focus on throughput-sensitive applications.
+**Knowledge editing** addresses the problem of updating specific factual knowledge in an LLM's parameters without full retraining. Unlike continual learning, which focuses on updating across broad domains, knowledge editing targets precise, localized changes: replacing outdated facts (e.g., updating who holds a particular office), correcting errors, or removing sensitive information.
 
-The 2.5 family also introduced native **thinking models**—models that produce explicit chain-of-thought reasoning before answering—across both Pro and Flash tiers. Advanced audio dialog and generation capabilities were extended across the Gemini 2.5 family. A [Deep Think](https://blog.google/products/gemini/deep-think/) mode was made available in the Gemini app, enabling users to access extended reasoning capabilities for complex problems.
+Current knowledge editing approaches fall into several categories:
 
-### Gemini 3.x Family
+| Approach | Mechanism | Strengths | Limitations |
+|----------|-----------|-----------|-------------|
+| Fine-tuning based | Gradient descent on target facts | Simple; compatible with any architecture | Risk of forgetting; slow for many edits |
+| Locate-and-edit (ROME, MEMIT) | Identifies and directly modifies factual storage weights | Fast; targeted | May disrupt related knowledge |
+| Meta-learning based | Learns to edit via bi-level optimization | Generalizes across edit types | Higher training cost |
+| In-context editing | Provides updated facts in context without weight changes | No weight modification required | Limited to context window; not persistent |
 
-Google DeepMind extended its model family into the Gemini 3.x generation in 2025, continuing the differentiation between flagship and efficiency-optimized variants:
+### MetaKE: Meta-Learning Aligned Knowledge Editing
 
-- **Gemini 3 Flash**: Described as "frontier intelligence built for speed," positioned for latency-sensitive applications requiring strong reasoning at lower inference cost
-- **Gemini 3.1 Flash-Lite**: Designed for intelligence at scale, targeting high-volume API deployment scenarios
-- **Gemini 3.1 Pro**: Positioned for complex tasks requiring the highest reasoning quality in the 3.x family
+**MetaKE** proposes a meta-learning framework for knowledge editing that uses bi-level optimization to align the knowledge editing process with the model's internal knowledge representations. The outer optimization learns an editing strategy that generalizes across fact types; the inner optimization applies the strategy to specific edits. The bi-level structure allows MetaKE to account for interactions between edited facts and related knowledge that single-level editing methods miss.
 
-These releases extended the architecture and capability patterns established with Gemini 2.5, with each tier maintaining differentiation between throughput-optimized and capability-optimized variants.
+A key finding from MetaKE is that naive knowledge editing often introduces inconsistencies—editing one fact without updating related facts that should co-vary with it—and that meta-learning can partially address this by training the editing strategy on datasets that include such co-variation patterns. This consistency problem is directly relevant to safety: editing a model to remove one form of dangerous knowledge while leaving related knowledge intact may create an inconsistent knowledge state that partially restores the dangerous capability through inference from remaining knowledge.
 
-### Gemma 3 and Open-Weight Models
+### Structural Knowledge Unlearning
 
-Google's [Gemma 3](https://blog.google/technology/developers/gemma-3/) family, released in 2025, provides open-weight models ranging from 1B to 27B parameters optimized for single-accelerator deployment. The [Gemma 3 270M](https://blog.google/technology/developers/gemma-3-270m/) variant targets edge and mobile deployment. [Gemma 3n](https://blog.google/technology/developers/gemma-3n-developer-guide/) introduced a mobile-first architecture with selective parameter activation for on-device inference.
+**GONE** (structural knowledge unlearning via neighborhood-expanded distribution shaping) addresses the problem of removing specific knowledge from a trained model more completely than standard fine-tuning-based unlearning. GONE identifies the "knowledge neighborhood"—the set of related facts and reasoning patterns that co-activate with the target knowledge—and shapes the model's output distribution to be inconsistent with the entire neighborhood, not just the directly targeted fact.
 
-[MedGemma](https://blog.google/technology/health/medgemma-google-health-ai/), released in mid-2025, provides open health-specific models demonstrating LLM application in clinical reasoning. A reported application of the Gemma model family was in computational biology research: according to Google's documentation, a Gemma-based model contributed to identifying a new potential cancer therapy pathway, illustrating how open-weight LLMs can accelerate domain-specific scientific investigation. [T5Gemma](https://blog.google/technology/developers/t5gemma/) introduced encoder-decoder variants of the Gemma architecture, enabling use cases where separate encoding and decoding is beneficial (e.g., retrieval-augmented generation, classification tasks).
+The motivation is that standard unlearning methods that only target the specific fact to be forgotten leave the model's knowledge neighborhood intact, allowing the model to partially reconstruct the forgotten fact through inference from related knowledge. Neighborhood-expanded distribution shaping is designed to make such reconstruction more difficult, though the completeness of unlearning remains difficult to verify empirically.
 
-[DolphinGemma](https://blog.google/technology/developers/dolphin-gemma/) applied Gemma-based models to the analysis of dolphin communication, using LLM architectures trained on dolphin vocalizations as part of a project to decode non-human animal communication patterns—an example of the breadth of scientific applications that open-weight LLMs enable.
+**LLM unlearning with LLM beliefs** takes a complementary approach: it uses the model's own internal uncertainty estimates (its "beliefs" about a fact) to guide unlearning, focusing gradient updates on facts the model is confident about. This reduces the collateral damage to related knowledge that arises when unlearning updates are applied uniformly regardless of the model's confidence.
 
-[Gemma Scope 2](https://deepmind.google/research/publications/gemma-scope-2/) (described in detail in the Mechanistic Interpret
+## Bias and Fairness Evaluation
+
+### Gender Bias
+
+Research on **whether LLMs have a gender (entropy) bias** examines whether LLMs systematically assign lower entropy—more confident, less diverse—probability distributions to text describing one gender versus another. The hypothesis is that if training data contains more stereotyped or formulaic text about one gender, the model will learn to predict such text with higher confidence, manifesting as lower entropy in gender-relevant contexts.
+
+Findings across multiple models suggest that gender entropy bias is present and measurable, though its magnitude varies by task and language domain. The bias is more pronounced in occupational and agentic contexts (describing what a person does or decides) than in descriptive contexts (physical or demographic description). This has implications for applications where LLMs generate text about people—biographical writing, automated job descriptions, performance evaluations—where lower-entropy (more stereotyped) outputs for one gender can reinforce occupational segregation.
+
+### Political Bias
+
+Research on **whether LLMs can infer political alignment from online conversations** finds that frontier LLMs can assign political orientation labels to text samples from online political discussions with above-chance accuracy, even when the text contains no explicit political markers. This capability has dual implications: it can be used for automated political profiling (a privacy and manipulation risk), and it provides evidence that LLMs have internalized associations between language patterns and political identity that may affect output generation.
+
+Work on **sectarian preference evaluation** (SectEval) extends political bias analysis to sectarian dimensions—religious, regional, and cultural group affiliations—finding that LLMs exhibit latent preferences for certain sectarian positions when generating text on contested topics within religious or cultural communities. These preferences often reflect the distribution of English-language internet text, which overrepresents particular religious traditions and cultural perspectives.
+
+Research on **political evasion detection** examines whether LLMs can identify when responses to politically sensitive questions are deliberately evasive—avoiding commitment to a position while appearing to engage with the question. This capability is relevant both for evaluating political neutrality in LLM deployments and for detecting evasive behavior in automated political
