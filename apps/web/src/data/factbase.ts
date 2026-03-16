@@ -428,6 +428,10 @@ export function getFactBaseRecordSchema(schemaId: string): FactBaseRecordSchema 
 
 /**
  * Get all record schemas.
+ * Note: Record schemas were removed from KB serialization when records migrated
+ * to PostgreSQL. build-data.mjs does not currently write recordSchemas into
+ * factbase-data.json, so this returns [] unless a future build step adds them.
+ * Callers handle the empty case gracefully.
  */
 export function getFactBaseRecordSchemas(): FactBaseRecordSchema[] {
   const fb = getFactBase();

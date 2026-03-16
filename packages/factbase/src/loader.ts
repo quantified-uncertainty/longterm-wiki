@@ -575,6 +575,14 @@ function mergeEntityFiles(
   for (const { name, parsed } of files) {
     const file = parsed as Record<string, unknown>;
 
+    // Warn on legacy records: blocks in child files — records have been migrated to PostgreSQL.
+    if (file.records !== undefined) {
+      console.warn(
+        `[kb/loader] Per-entity directory "${dirName}": file "${name}" has a legacy "records:" block that is ignored. ` +
+        `Records are now served from PostgreSQL. Remove the "records:" section from the YAML file.`
+      );
+    }
+
     // Check for thing: block
     if (file.thing !== undefined) {
       if (mainFile) {

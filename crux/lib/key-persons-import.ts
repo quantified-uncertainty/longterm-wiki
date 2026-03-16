@@ -52,6 +52,9 @@ export interface ExtractedKeyPerson {
 /**
  * Extract all key-persons records from the KB graph.
  * Resolves person slugs to entity IDs using the graph's filename map.
+ *
+ * @deprecated Records (including key-persons) have been migrated from KB YAML
+ * to PostgreSQL. Use the wiki-server /api/personnel endpoint instead.
  */
 export async function extractKeyPersons(): Promise<{
   records: ExtractedKeyPerson[];
