@@ -150,9 +150,9 @@ flowchart LR
 
 | Crux Category | Examples | Tracked In |
 |---------------|----------|------------|
-| **Technical** | P(deceptive alignment), interpretability tractability, mesa-optimization risk | `cruxes.yaml` |
+| **Technical** | P(deceptive alignment), interpretability tractability, mesa-optimization risk | Entity data |
 | **Timeline** | Years to transformative AI, takeoff speed, capability jumps | `estimates.yaml` |
-| **Governance** | Coordination tractability, warning shot likelihood, regulatory capacity | `cruxes.yaml` |
+| **Governance** | Coordination tractability, warning shot likelihood, regulatory capacity | Entity data |
 | **Value** | Weight on near-term vs. long-term, risk tolerance, discount rates | `experts.yaml` positions |
 
 Expert positions on cruxes are tracked in structured YAML databases, enabling:
@@ -241,7 +241,6 @@ Structured YAML databases enable data-aware components:
 |----------|----------|------|---------------|
 | `experts.yaml` | AI safety researchers with positions on cruxes | ≈30 entries | `<DataInfoBox expertId="paul-christiano" />` |
 | `organizations.yaml` | Labs, research orgs, funders | ≈15 entries | `<DataInfoBox orgId="anthropic" />` |
-| `cruxes.yaml` | Key uncertainties with expert positions | ≈50 entries | `<DataCrux dataId="deceptive-alignment-likelihood" />` |
 | `estimates.yaml` | Probability distributions for key variables | ≈35 entries | `<DataEstimateBox dataId="p-doom" />` |
 | `external-links.yaml` | Curated external resources with metadata | ≈200 entries | `<R id="hash">Link text</R>` |
 

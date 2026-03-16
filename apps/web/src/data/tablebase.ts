@@ -228,15 +228,6 @@ export interface ExpertPosition {
   date?: string;
 }
 
-export interface Expert {
-  id: string;
-  name: string;
-  affiliation?: string;
-  role?: string;
-  website?: string;
-  knownFor?: string[];
-  positions?: ExpertPosition[];
-}
 
 export interface Organization {
   id: string;
