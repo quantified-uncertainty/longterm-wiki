@@ -470,6 +470,7 @@ export default async function OrgProfilePage({
           resources={data.resourceAnnouncements}
           title="News & Announcements"
           emptyMessage=""
+          alwaysShowColumns={{ date: true }}
         />
       ),
     });
@@ -486,6 +487,7 @@ export default async function OrgProfilePage({
           resources={data.resourcesAboutOrg}
           title="External Coverage & References"
           emptyMessage=""
+          alwaysShowColumns={{ date: true, publication: true }}
         />
       ),
     });
