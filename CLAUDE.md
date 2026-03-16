@@ -105,6 +105,10 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 3. Next.js app reads `database.json` and `factbase-data.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
+## Implementation Quality
+
+- **Thorough over fast.** Robust implementations that handle edge cases beat quick ones that only cover the happy path. See `.claude/rules/implementation-quality.md`.
+
 ## Key Conventions
 
 - **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
@@ -137,4 +141,5 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/database-migrations.md` — Migration patterns and deploy flow
 - `.claude/rules/wiki-server-rpc-migration.md` — Hono RPC migration guide
 - `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
+- `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system
