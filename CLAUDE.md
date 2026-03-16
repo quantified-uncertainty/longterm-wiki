@@ -90,6 +90,8 @@ Entity types without directories (too abstract or sparse for tables): `risk`, `c
 
 Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
 
+**YAML entities vs PG-primary tables**: Strongly prefer PG-primary tables for new features with dedicated UI/directory pages and structured relational data (the grants, investments, funding-rounds, benchmarks, divisions pattern). YAML entities (`data/entities/`) are for lightweight catalog entries that mainly serve as link targets or wiki page metadata. If the data has numeric fields to aggregate, many-to-many relationships, or its own directory page — use PG.
+
 ## Data Layer Terminology — Three Bases
 
 | Name | What it is | Key files |
