@@ -501,6 +501,101 @@ ${existingRecords.length > 0 ? `\n### Existing records\n\`\`\`json\n${JSON.strin
   return { exitCode: 0, output };
 }
 
+async function ensureEntitiesCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  // Read JSON array of names from stdin
+  const chunks: Buffer[] = [];
+  const stdin = process.stdin;
+  if (stdin.isTTY) {
+    return { exitCode: 1, output: 'Usage: echo \'["Name 1","Name 2"]\' | crux tablebase ensure-entities --type=person' };
+  }
+  for await (const chunk of stdin) {
+    chunks.push(chunk as Buffer);
+  }
+  const inputJson = Buffer.concat(chunks).toString('utf-8');
+
+  let names: string[];
+  try {
+    names = JSON.parse(inputJson);
+    if (!Array.isArray(names)) {
+      return { exitCode: 1, output: 'Input must be a JSON array of name strings' };
+    }
+  } catch (e: unknown) {
+    return { exitCode: 1, output: `Invalid JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+
+  if (names.length === 0) {
+    return { exitCode: 0, output: '[]' };
+  }
+
+  const entityType = (options.type as string) || 'person';
+  const dryRun = !!options.dryRun;
+
+  const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
+  const { allocateId } = await import('../lib/wiki-server/ids.ts');
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const matcher = buildEntityMatcher();
+
+  const results: Array<{ name: string; stableId: string; created: boolean }> = [];
+  const toCreate: Array<{ slug: string; name: string; numericId: string; stableId: string }> = [];
+
+  for (const name of names) {
+    if (typeof name !== 'string' || !name.trim()) continue;
+    const trimmed = name.trim();
+
+    // Check existing
+    const match = matcher.match(trimmed);
+    if (match) {
+      results.push({ name: trimmed, stableId: match.stableId, created: false });
+      continue;
+    }
+
+    // Allocate ID
+    const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    if (dryRun) {
+      results.push({ name: trimmed, stableId: `(dry-run:${slug})`, created: true });
+      continue;
+    }
+
+    const idResult = await allocateId(slug, `${entityType}: ${trimmed}`);
+    if (!idResult.ok) {
+      console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
+      continue;
+    }
+    toCreate.push({ slug, name: trimmed, numericId: idResult.data.numericId, stableId: idResult.data.stableId });
+    results.push({ name: trimmed, stableId: idResult.data.stableId, created: true });
+  }
+
+  // Batch sync all new entities
+  if (toCreate.length > 0 && !dryRun) {
+    const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
+      entities: toCreate.map(e => ({
+        id: e.slug,
+        numericId: e.numericId,
+        stableId: e.stableId,
+        entityType,
+        title: e.name,
+      })),
+    });
+    if (!syncResult.ok) {
+      return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
+    }
+  }
+
+  const created = results.filter(r => r.created).length;
+  const existing = results.filter(r => !r.created).length;
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(results) };
+  }
+
+  const lines = results.map(r =>
+    `${r.created ? '\x1b[33m+\x1b[0m' : '\x1b[32m✓\x1b[0m'} ${r.stableId}\t${r.name}`
+  );
+  lines.push('', `${created} created, ${existing} already existed`);
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
@@ -557,6 +652,7 @@ export const commands = {
   submit: submitCommand,
   existing: existingCommand,
   'create-entity': createEntityCommand,
+  'ensure-entities': ensureEntitiesCommand,
   prepare: prepareCommand,
   default: scanCommand,
 };

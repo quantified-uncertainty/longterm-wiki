@@ -30,19 +30,20 @@ Follow the **research strategy** from the prepare output:
 
 ### Step 3: Resolve or create entities
 
-For each person/org/benchmark found in research:
+Collect all person names found in research into a JSON array and run:
 
+```bash
+echo '["Jaime Sevilla","Ben Cottier","David Owen"]' | pnpm crux tablebase ensure-entities --type=person --ci
+```
+
+This resolves existing entities and creates new ones in a single batch call. Output is a JSON array of `{name, stableId, created}` — use each `stableId` in your records.
+
+For a single entity, you can also use:
 ```bash
 pnpm crux tablebase resolve "Person Name" --ci
-```
-
-If `"found":false`, create the entity:
-
-```bash
+# If not found:
 pnpm crux tablebase create-entity "Person Name" --type=person --ci
 ```
-
-Use the returned `stableId` in your records.
 
 ### Step 4: Submit records
 
