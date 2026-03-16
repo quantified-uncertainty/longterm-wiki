@@ -13,13 +13,7 @@ export const metadata: Metadata = {
 export default function ApproachesPage() {
   const approaches = getTypedEntities().filter(isApproach);
 
-  // Collect all unique tags for display
-  const tagCounts = new Map<string, number>();
-  for (const a of approaches) {
-    for (const tag of a.tags) {
-      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-    }
-  }
+  const uniqueTagCount = new Set(approaches.flatMap((a) => a.tags ?? [])).size;
 
   const stats = [
     { label: "Approaches", value: String(approaches.length) },
@@ -27,7 +21,7 @@ export default function ApproachesPage() {
       label: "With Description",
       value: String(approaches.filter((a) => a.description).length),
     },
-    { label: "Unique Tags", value: String(tagCounts.size) },
+    { label: "Unique Tags", value: String(uniqueTagCount) },
   ];
 
   return (

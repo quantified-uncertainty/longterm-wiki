@@ -125,6 +125,26 @@ export default async function ApproachDetailPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
         <div className="space-y-8">
+          {/* Custom fields */}
+          {entity.customFields.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-4">Details</h2>
+              <div className="space-y-3">
+                {entity.customFields.map((field) => (
+                  <div
+                    key={field.label}
+                    className="px-4 py-3 rounded-lg border border-border/60 bg-card"
+                  >
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {field.label}
+                    </span>
+                    <p className="text-sm mt-0.5">{field.value}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Related entities */}
           {relatedEntities.length > 0 && (
             <section>
