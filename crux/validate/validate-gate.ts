@@ -366,6 +366,17 @@ const PARALLEL_STEPS: Step[] = [
     // coverage improves, this can be promoted to blocking.
     advisory: true,
   },
+  {
+    id: 'directory-pages',
+    name: 'Directory page data quality (advisory)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'directory-pages'],
+    cwd: PROJECT_ROOT,
+    // Advisory: reports sparse directories, missing fields, and display issues
+    // in entity directory pages. Informational for now — can be promoted to
+    // blocking once all existing issues are resolved.
+    advisory: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
