@@ -509,8 +509,12 @@ async function fixPrInSlot(
       .catch((e: unknown) => log(`${prefix} Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
 
     // Build prompt and spawn Claude
-    // Load slot's .env so Claude has API keys (parent process may not have them)
+    // Preserve CLAUDECODE so Claude CLI uses parent session's auth.
+    // Also load slot's .env as fallback for API keys.
     const slotEnv = loadDotEnv(slot.dir);
+    if (process.env.CLAUDECODE) {
+      slotEnv.CLAUDECODE = process.env.CLAUDECODE;
+    }
     const prompt = buildPrompt(pr, config.repo);
     const result = await spawnClaude(prompt, {
       ...config,
