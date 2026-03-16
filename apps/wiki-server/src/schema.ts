@@ -116,6 +116,23 @@ export const wikiPages = pgTable(
     wordCount: integer("word_count"),
     lastUpdated: text("last_updated"),
     contentFormat: text("content_format"),
+    // Coverage metrics (from build-data.mjs computePageCoverage)
+    coveragePassing: integer("coverage_passing"),
+    coverageTotal: integer("coverage_total"),
+    coverageItems: jsonb("coverage_items").$type<Record<string, string>>(),
+    // Update schedule metrics (from build-data.mjs buildUpdateSchedule)
+    updateFrequency: integer("update_frequency"),
+    daysSinceUpdate: integer("days_since_update"),
+    daysUntilDue: integer("days_until_due"),
+    staleness: real("staleness"),
+    updatePriority: real("update_priority"),
+    // Structural metrics (from build-data.mjs extractMetrics)
+    sectionCount: integer("section_count"),
+    tableCount: integer("table_count"),
+    diagramCount: integer("diagram_count"),
+    footnoteCount: integer("footnote_count"),
+    internalLinks: integer("internal_links"),
+    externalLinks: integer("external_links"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -137,6 +154,29 @@ export const wikiPages = pgTable(
     index("idx_wp_reader_importance").on(table.readerImportance),
     index("idx_wp_recommended_score").on(table.recommendedScore),
     // GIN index on search_vector is created in migration SQL
+  ]
+);
+
+export const wikibasePageSimilarity = pgTable(
+  "wikibase_page_similarity",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
+    similarPageId: text("similar_page_id")
+      .notNull()
+      .references(() => wikiPages.id, { onDelete: "cascade" }),
+    similarity: real("similarity").notNull(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_page_similarity_pair").on(table.pageId, table.similarPageId),
+    index("idx_page_similarity_page_id").on(table.pageId),
+    index("idx_page_similarity_similar_page_id").on(table.similarPageId),
+    index("idx_page_similarity_similarity").on(table.similarity),
   ]
 );
 

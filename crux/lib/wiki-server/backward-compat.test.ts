@@ -86,6 +86,11 @@ describe('wiki-server-client barrel exports', () => {
     expect(typeof client.getFactStats).toBe('function');
   });
 
+  it('exports content metrics functions', () => {
+    expect(typeof client.syncContentMetrics).toBe('function');
+    expect(typeof client.syncSimilarity).toBe('function');
+  });
+
   it('exports page query functions', () => {
     expect(typeof client.searchPages).toBe('function');
     expect(typeof client.getPage).toBe('function');
@@ -129,6 +134,26 @@ describe('wiki-server-client barrel exports', () => {
     it('recordRiskSnapshots returns ApiResult error on unavailable', async () => {
       const result = await client.recordRiskSnapshots([
         { pageId: 'test', score: 50, level: 'medium', factors: [] },
+      ]);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('unavailable');
+      }
+    });
+
+    it('syncContentMetrics returns ApiResult error on unavailable', async () => {
+      const result = await client.syncContentMetrics([
+        { pageId: 'test', coveragePassing: 5, coverageTotal: 10 },
+      ]);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('unavailable');
+      }
+    });
+
+    it('syncSimilarity returns ApiResult error on unavailable', async () => {
+      const result = await client.syncSimilarity([
+        { pageId: 'a', similarPageId: 'b', similarity: 50 },
       ]);
       expect(result.ok).toBe(false);
       if (!result.ok) {

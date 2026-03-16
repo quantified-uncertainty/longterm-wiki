@@ -47,6 +47,7 @@ import { benchmarkResultsRoute } from "./routes/benchmark-results.js";
 import { recordVerificationsRoute } from "./routes/record-verifications.js";
 import { thingsRoute } from "./routes/things.js";
 import { researchAreasRoute } from "./routes/research-areas.js";
+import { contentMetricsRoute } from "./routes/content-metrics.js";
 
 let requestCounter = 0;
 
@@ -132,6 +133,7 @@ export function createApp() {
   app.route("/api/ids", idsRoute);
   app.route("/api/citations", citationsRoute);
   app.route("/api/pages", pagesRoute);
+  app.route("/api/content-metrics", contentMetricsRoute);
   app.route("/api/edit-logs", editLogsRoute);
   app.route("/api/auto-update-runs", autoUpdateRunsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);

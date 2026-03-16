@@ -187,6 +187,19 @@ export {
   getArtifactStats,
 } from './artifacts.ts';
 
+// Content Metrics
+export {
+  syncContentMetrics,
+  syncSimilarity,
+} from './content-metrics.ts';
+export type {
+  SyncContentMetricsPage,
+  SyncSimilarityItem,
+  SyncMetricsResult,
+  SyncSimilarityResult,
+  ContentMetricsStatsResult,
+} from './content-metrics.ts';
+
 // Entity IDs
 export {
   allocateId,

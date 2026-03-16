@@ -902,6 +902,48 @@ export const SyncPagesBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Content Metrics (coverage, schedule, structural, similarity)
+// ---------------------------------------------------------------------------
+
+export const SyncContentMetricsPageSchema = z.object({
+  pageId: z.string().min(1).max(300),
+  // Coverage
+  coveragePassing: z.number().int().min(0).nullable().optional(),
+  coverageTotal: z.number().int().min(0).nullable().optional(),
+  coverageItems: z.record(z.string(), z.string()).nullable().optional(),
+  // Update schedule
+  updateFrequency: z.number().int().min(0).nullable().optional(),
+  daysSinceUpdate: z.number().int().min(0).nullable().optional(),
+  daysUntilDue: z.number().int().nullable().optional(),
+  staleness: z.number().min(0).nullable().optional(),
+  updatePriority: z.number().min(0).nullable().optional(),
+  // Structural metrics
+  sectionCount: z.number().int().min(0).nullable().optional(),
+  tableCount: z.number().int().min(0).nullable().optional(),
+  diagramCount: z.number().int().min(0).nullable().optional(),
+  footnoteCount: z.number().int().min(0).nullable().optional(),
+  internalLinks: z.number().int().min(0).nullable().optional(),
+  externalLinks: z.number().int().min(0).nullable().optional(),
+});
+export type SyncContentMetricsPage = z.infer<typeof SyncContentMetricsPageSchema>;
+
+export const SyncContentMetricsBatchSchema = z.object({
+  pages: z.array(SyncContentMetricsPageSchema).min(1).max(200),
+});
+
+export const SyncSimilarityItemSchema = z.object({
+  pageId: z.string().min(1).max(300),
+  similarPageId: z.string().min(1).max(300),
+  similarity: z.number().min(0).max(100),
+});
+export type SyncSimilarityItem = z.infer<typeof SyncSimilarityItemSchema>;
+
+export const SyncSimilarityBatchSchema = z.object({
+  items: z.array(SyncSimilarityItemSchema).min(1).max(2000),
+  replace: z.boolean().default(false),
+});
+
+// ---------------------------------------------------------------------------
 // Agent Sessions
 // ---------------------------------------------------------------------------
 
