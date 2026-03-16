@@ -10,3 +10,20 @@ facts:
     value: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_aVr6xH9cNd
+    property: website
+    value: https://www.forecastbench.org
+    asOf: 2026-03
+
+  - id: f_bWs7yJ0dPe
+    property: founded-date
+    value: "2024-09"
+    notes: Public leaderboard launched September 2024
+    source: https://forecastbench.org
+
+  - id: f_cXt8zK1eFf
+    property: founded-by
+    value:
+      - fri
+    notes: Created by Forecasting Research Institute (FRI), led by Ezra Karger and Philip Tetlock

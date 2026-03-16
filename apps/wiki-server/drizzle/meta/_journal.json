@@ -652,6 +652,34 @@
       "when": 1776585600000,
       "tag": "0092_add_archive_url_and_fetch_method",
       "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1776672000000,
+      "tag": "0093_org_tables_entity_fk_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1776758400000,
+      "tag": "0094_add_financial_range_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1776844800000,
+      "tag": "0095_create_wikibase_page_assessments",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1776931200000,
+      "tag": "0096_index_entity_metadata",
+      "breakpoints": true
     }
   ]
 }

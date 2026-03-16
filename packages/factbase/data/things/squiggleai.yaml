@@ -10,3 +10,20 @@ facts:
     value: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_gBx2DO5jJk
+    property: website
+    value: https://squigglehub.org
+    asOf: 2026-03
+    notes: Integrated into Squiggle Hub platform
+
+  - id: f_hCy3EP6kKl
+    property: founded-date
+    value: "2024"
+    notes: Launched 2024; uses Claude Sonnet for model generation
+
+  - id: f_iDz4FQ7lLm
+    property: founded-by
+    value:
+      - quri
+    notes: Created at QURI by Ozzie Gooen

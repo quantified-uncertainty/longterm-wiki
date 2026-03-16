@@ -10,6 +10,7 @@ import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import { ensureMdxSafeYaml } from '../../lib/yaml-mdx-safe.ts';
 import type { PageInfo, GradeResult, Metrics } from './types.ts';
+import { recordAssessment } from '../../lib/wiki-server/assessments.ts';
 
 /**
  * Safely serialize a frontmatter object to YAML.
@@ -17,7 +18,7 @@ import type { PageInfo, GradeResult, Metrics } from './types.ts';
  * Tries PLAIN string type first (clean output), then falls back to
  * QUOTE_DOUBLE if round-trip validation fails (e.g. llmSummary with colons).
  */
-function safeStringifyFm(obj: Record<string, unknown>): string {
+export function safeStringifyFm(obj: Record<string, unknown>): string {
   const plainYaml = stringifyYaml(obj, {
     defaultStringType: 'PLAIN',
     defaultKeyType: 'PLAIN',
@@ -118,5 +119,27 @@ export function applyGradesToFile(
   }
 
   writeFileSync(page.filePath, newContent);
+
+  // Fire-and-forget: also record assessment to wiki-server (best-effort telemetry)
+  recordAssessment({
+    pageId: page.id,
+    assessor: 'llm-grading',
+    method: 'crux-grade-sonnet',
+    quality: derivedQuality,
+    readerImportance: grades.readerImportance,
+    tacticalValue: grades.tacticalValue ?? null,
+    ratingFocus: grades.ratings?.focus ?? null,
+    ratingNovelty: grades.ratings?.novelty ?? null,
+    ratingRigor: grades.ratings?.rigor ?? null,
+    ratingCompleteness: grades.ratings?.completeness ?? null,
+    ratingConcreteness: grades.ratings?.concreteness ?? null,
+    ratingActionability: grades.ratings?.actionability ?? null,
+    ratingObjectivity: grades.ratings?.objectivity ?? null,
+    wordCount: metrics.wordCount,
+    note: `Quality graded: ${derivedQuality}`,
+  }).catch((e: unknown) =>
+    console.warn(`Assessment write failed for ${page.id}: ${e instanceof Error ? e.message : String(e)}`)
+  );
+
   return true;
 }

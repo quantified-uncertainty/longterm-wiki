@@ -61,6 +61,11 @@ const SCRIPTS: Record<string, ScriptConfig> = {
     passthrough: ['type', 'entity', 'minScore', 'limit', 'apply', 'json', 'ci', 'help'],
     positional: true,
   },
+  'strip-scores': {
+    script: 'commands/strip-scores.ts',
+    description: 'Strip scoring fields from MDX frontmatter (assessment migration)',
+    passthrough: ['fields', 'apply', 'dry-run'],
+  },
 };
 
 export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = buildCommands(SCRIPTS);

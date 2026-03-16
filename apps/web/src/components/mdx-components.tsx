@@ -90,8 +90,6 @@ import { Section } from "@/components/wiki/Section";
 import { KeyQuestions } from "@/components/wiki/KeyQuestions";
 import { KeyPeople } from "@/components/wiki/KeyPeople";
 import { DisagreementMap } from "@/components/wiki/DisagreementMap";
-import { Crux } from "@/components/wiki/Crux";
-import { CruxList } from "@/components/wiki/CruxList";
 
 // Ported stub components — medium priority
 import { Tags } from "@/components/wiki/Tags";
@@ -118,7 +116,7 @@ function Stub({ children }: { children?: React.ReactNode }) {
 
 // Legacy component names still referenced in MDX content, rendered as stubs.
 // Dead stubs removed: Code, Steps, Icon, FileTree
-// Ported stubs removed: Badge, Crux, CruxList, DisagreementMap,
+// Ported stubs removed: Badge, DisagreementMap,
 //   FactorRelationshipDiagram, ImpactList, KeyPeople,
 //   KeyQuestions, ModelsList, Section, TabItem, Tabs, Tags
 const stubNames = [
@@ -270,8 +268,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KeyQuestions,
   KeyPeople,
   DisagreementMap,
-  Crux,
-  CruxList,
 
   // Ported stub components — medium priority
   Tags,

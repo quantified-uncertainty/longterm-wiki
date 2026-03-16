@@ -11,3 +11,19 @@ facts:
       sampling.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_sQg8wLm3Rk
+    property: website
+    value: https://www.squiggle-language.com
+    asOf: 2026-03
+
+  - id: f_tNp4xY7vKa
+    property: founded-date
+    value: "2020"
+    notes: First release circa 2020; major v0.10.0 rewrite released Jan 2025
+
+  - id: f_uRq5zW8bLc
+    property: founded-by
+    value:
+      - quri
+    notes: Created by QURI (Quantified Uncertainty Research Institute)

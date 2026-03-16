@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  parseRange,
 } from "./utils.js";
 import { upsertThingsInTx } from "./thing-sync.js";
 
@@ -55,7 +56,11 @@ function formatRow(r: typeof fundingRounds.$inferSelect) {
     name: r.name,
     date: r.date,
     raised: r.raised != null ? Number(r.raised) : null,
+    raisedLow: r.raisedLow != null ? Number(r.raisedLow) : null,
+    raisedHigh: r.raisedHigh != null ? Number(r.raisedHigh) : null,
     valuation: r.valuation != null ? Number(r.valuation) : null,
+    valuationLow: r.valuationLow != null ? Number(r.valuationLow) : null,
+    valuationHigh: r.valuationHigh != null ? Number(r.valuationHigh) : null,
     instrument: r.instrument,
     leadInvestor: r.leadInvestor,
     source: r.source,
@@ -157,18 +162,26 @@ const fundingRoundsApp = new Hono()
     let upserted = 0;
 
     await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        companyId: item.companyId,
-        name: item.name,
-        date: item.date ?? null,
-        raised: item.raised != null ? String(item.raised) : null,
-        valuation: item.valuation != null ? String(item.valuation) : null,
-        instrument: item.instrument ?? null,
-        leadInvestor: item.leadInvestor ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
+      const allVals = items.map((item) => {
+        const raisedRange = parseRange(item.raised);
+        const valuationRange = parseRange(item.valuation);
+        return {
+          id: item.id,
+          companyId: item.companyId,
+          name: item.name,
+          date: item.date ?? null,
+          raised: item.raised != null ? String(item.raised) : null,
+          raisedLow: raisedRange.low,
+          raisedHigh: raisedRange.high,
+          valuation: item.valuation != null ? String(item.valuation) : null,
+          valuationLow: valuationRange.low,
+          valuationHigh: valuationRange.high,
+          instrument: item.instrument ?? null,
+          leadInvestor: item.leadInvestor ?? null,
+          source: item.source ?? null,
+          notes: item.notes ?? null,
+        };
+      });
 
       await tx
         .insert(fundingRounds)
@@ -180,7 +193,11 @@ const fundingRoundsApp = new Hono()
             name: sql`excluded.name`,
             date: sql`excluded.date`,
             raised: sql`excluded.raised`,
+            raisedLow: sql`excluded.raised_low`,
+            raisedHigh: sql`excluded.raised_high`,
             valuation: sql`excluded.valuation`,
+            valuationLow: sql`excluded.valuation_low`,
+            valuationHigh: sql`excluded.valuation_high`,
             instrument: sql`excluded.instrument`,
             leadInvestor: sql`excluded.lead_investor`,
             source: sql`excluded.source`,

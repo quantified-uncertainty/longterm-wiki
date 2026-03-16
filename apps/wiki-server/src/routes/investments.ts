@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  parseRange,
 } from "./utils.js";
 import { upsertThingsInTx } from "./thing-sync.js";
 
@@ -58,7 +59,11 @@ function formatRow(r: typeof investments.$inferSelect) {
     roundName: r.roundName,
     date: r.date,
     amount: r.amount != null ? Number(r.amount) : null,
+    amountLow: r.amountLow != null ? Number(r.amountLow) : null,
+    amountHigh: r.amountHigh != null ? Number(r.amountHigh) : null,
     stakeAcquired: r.stakeAcquired,
+    stakeLow: r.stakeLow != null ? Number(r.stakeLow) : null,
+    stakeHigh: r.stakeHigh != null ? Number(r.stakeHigh) : null,
     instrument: r.instrument,
     role: r.role,
     conditions: r.conditions,
@@ -192,20 +197,28 @@ const investmentsApp = new Hono()
     let upserted = 0;
 
     await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        companyId: item.companyId,
-        investorId: item.investorId,
-        roundName: item.roundName ?? null,
-        date: item.date ?? null,
-        amount: item.amount != null ? String(item.amount) : null,
-        stakeAcquired: item.stakeAcquired ?? null,
-        instrument: item.instrument ?? null,
-        role: item.role ?? null,
-        conditions: item.conditions ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
+      const allVals = items.map((item) => {
+        const amountRange = parseRange(item.amount);
+        const stakeRange = parseRange(item.stakeAcquired);
+        return {
+          id: item.id,
+          companyId: item.companyId,
+          investorId: item.investorId,
+          roundName: item.roundName ?? null,
+          date: item.date ?? null,
+          amount: item.amount != null ? String(item.amount) : null,
+          amountLow: amountRange.low,
+          amountHigh: amountRange.high,
+          stakeAcquired: item.stakeAcquired ?? null,
+          stakeLow: stakeRange.low,
+          stakeHigh: stakeRange.high,
+          instrument: item.instrument ?? null,
+          role: item.role ?? null,
+          conditions: item.conditions ?? null,
+          source: item.source ?? null,
+          notes: item.notes ?? null,
+        };
+      });
 
       await tx
         .insert(investments)
@@ -218,7 +231,11 @@ const investmentsApp = new Hono()
             roundName: sql`excluded.round_name`,
             date: sql`excluded.date`,
             amount: sql`excluded.amount`,
+            amountLow: sql`excluded.amount_low`,
+            amountHigh: sql`excluded.amount_high`,
             stakeAcquired: sql`excluded.stake_acquired`,
+            stakeLow: sql`excluded.stake_low`,
+            stakeHigh: sql`excluded.stake_high`,
             instrument: sql`excluded.instrument`,
             role: sql`excluded.role`,
             conditions: sql`excluded.conditions`,

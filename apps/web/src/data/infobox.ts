@@ -7,7 +7,6 @@ import {
   getTypedEntities,
   getTypedEntityById,
   getPageById,
-  getExpertById,
   isRisk,
   isPerson,
   isOrganization,
@@ -123,12 +122,11 @@ export function getEntityInfoBoxData(entityId: string) {
     role = entity.role;
     knownFor = entity.knownFor?.join(", ");
 
-    // Resolve affiliation to org slug for linking
-    const expert = getExpertById(entity.id);
-    if (expert?.affiliation) {
-      const orgEntity = getTypedEntityById(expert.affiliation);
+    // Resolve affiliation to org slug for linking (affiliationId is on the typed entity)
+    if (entity.affiliationId) {
+      const orgEntity = getTypedEntityById(entity.affiliationId);
       if (orgEntity && orgEntity.entityType === "organization") {
-        affiliationId = expert.affiliation;
+        affiliationId = entity.affiliationId;
       }
     }
 

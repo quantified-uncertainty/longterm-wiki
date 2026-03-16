@@ -92,11 +92,26 @@ const RiskFactorEntitySchema = BaseEntity.extend({
   entityType: z.literal("risk-factor"),
 });
 
+export const ExpertPositionSchema = z.object({
+  topic: z.string(),
+  view: z.string(),
+  estimate: z.string().optional(),
+  confidence: z.string().optional(),
+  date: z.string().optional(),
+  source: z.string().optional(),
+  sourceUrl: z.string().optional(),
+});
+
+export type ExpertPosition = z.infer<typeof ExpertPositionSchema>;
+
 const PersonEntitySchema = BaseEntity.extend({
   entityType: z.literal("person"),
   role: z.string().optional(),
   affiliation: z.string().optional(),
+  /** Raw entity ID of the affiliated organization (for linking) */
+  affiliationId: z.string().optional(),
   knownFor: z.array(z.string()).default([]),
+  positions: z.array(ExpertPositionSchema).default([]),
 });
 
 const OrganizationEntitySchema = BaseEntity.extend({
@@ -384,6 +399,8 @@ export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
 export type ResearchAreaEntity = z.infer<typeof ResearchAreaEntitySchema>;
+export type ApproachEntity = z.infer<typeof ApproachEntitySchema>;
+export type EventEntity = z.infer<typeof EventEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
@@ -420,5 +437,13 @@ export function isProject(e: TypedEntity | GenericEntity): e is ProjectEntity {
 
 export function isResearchArea(e: TypedEntity | GenericEntity): e is ResearchAreaEntity {
   return e.entityType === "research-area";
+}
+
+export function isApproach(e: TypedEntity | GenericEntity): e is ApproachEntity {
+  return e.entityType === "approach";
+}
+
+export function isEvent(e: TypedEntity | GenericEntity): e is EventEntity {
+  return e.entityType === "event";
 }
 

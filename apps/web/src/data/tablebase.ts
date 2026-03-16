@@ -16,6 +16,7 @@ import {
   TypedEntitySchema,
   type TypedEntity,
   type GenericEntity,
+  type PersonEntity,
   isRisk,
   isPerson,
   isOrganization,
@@ -98,29 +99,6 @@ export interface RelatedGraphEntry {
   title: string;
   score: number;
   label?: string;
-}
-
-export interface CruxPosition {
-  view: string;
-  probability?: string;
-  holders?: string[];
-  implications?: string;
-}
-
-export interface CruxData {
-  id: string;
-  question: string;
-  domain?: string;
-  description?: string;
-  importance?: string;
-  resolvability?: string;
-  currentState?: string;
-  positions?: CruxPosition[];
-  wouldUpdateOn?: string[];
-  relatedCruxes?: string[];
-  relevantResearch?: Array<{ title: string; url?: string }>;
-  timeframe?: string;
-  summary?: string;
 }
 
 export interface BacklinkEntry {
@@ -241,25 +219,7 @@ export interface LiteratureData {
   categories: LiteratureCategory[];
 }
 
-export interface ExpertPosition {
-  topic: string;
-  view: string;
-  estimate?: string;
-  confidence?: string;
-  source?: string;
-  sourceUrl?: string;
-  date?: string;
-}
 
-export interface Expert {
-  id: string;
-  name: string;
-  affiliation?: string;
-  role?: string;
-  website?: string;
-  knownFor?: string[];
-  positions?: ExpertPosition[];
-}
 
 export interface Organization {
   id: string;
@@ -392,9 +352,7 @@ interface TableBaseShape {
   resources: Resource[];
   publications: Publication[];
   literature?: LiteratureData;
-  experts: Expert[];
   organizations: Organization[];
-  cruxes: CruxData[];
   prItems: Record<string, unknown>[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
@@ -621,8 +579,8 @@ export function getTypedEntities(): AnyEntity[] {
 // TYPES (re-exported for consumers)
 // ============================================================================
 
-export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity } from "./entity-schemas";
-export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject } from "./entity-schemas";
+export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity, ApproachEntity, EventEntity, ExpertPosition } from "./entity-schemas";
+export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject, isApproach, isEvent } from "./entity-schemas";
 
 /** @deprecated Use TypedEntity instead */
 interface Entity {
@@ -673,7 +631,6 @@ let _typedEntityIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
-let _expertIndex: Map<string, Expert> | null = null;
 let _orgIndex: Map<string, Organization> | null = null;
 let _pageIndex: Map<string, Page> | null = null;
 
@@ -721,14 +678,6 @@ function publicationIndex() {
   return _publicationIndex;
 }
 
-function expertIndex() {
-  if (!_expertIndex) {
-    const db = getDatabase();
-    _expertIndex = new Map((db.experts || []).map((e) => [e.id, e]));
-  }
-  return _expertIndex;
-}
-
 function orgIndex() {
   if (!_orgIndex) {
     const db = getDatabase();
@@ -752,6 +701,12 @@ function pageIndex() {
 /** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {
   return typedEntityIndex().get(resolveId(id));
+}
+
+/** Get a person entity by ID, or null if not found / not a person */
+export function getPersonEntityById(id: string): PersonEntity | null {
+  const entity = getTypedEntityById(id);
+  return entity && isPerson(entity) ? entity : null;
 }
 
 /** @deprecated Use getTypedEntityById for new code */
@@ -862,14 +817,6 @@ export function getPublicationsForPerson(
     (pr) => pr.personId === personId,
   );
   return entry?.publications ?? [];
-}
-
-export function getExpertById(id: string): Expert | undefined {
-  return expertIndex().get(id);
-}
-
-export function getAllExperts(): Expert[] {
-  return getDatabase().experts ?? [];
 }
 
 export function getOrganizationById(id: string): Organization | undefined {

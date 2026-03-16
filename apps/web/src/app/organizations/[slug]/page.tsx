@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntityById, isOrganization } from "@/data";
+import { getTypedEntityById, getTypedEntities, isOrganization, isProject } from "@/data";
 import {
   getKBLatest,
   getKBProperty,
@@ -205,7 +205,7 @@ export default async function OrgProfilePage({
 
       {/* Divisions overview */}
       {data.divisions.length > 0 && (
-        <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} />
+        <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} members={data.divisionMembers} />
       )}
 
       {/* Related Orgs */}
@@ -247,7 +247,13 @@ export default async function OrgProfilePage({
         field(person, "display_name") ??
         personEntity?.name ??
         titleCase(personRef ?? person.key);
-      peopleByName.set(name, {
+      // Use entity ID as the dedup key when available; fall back to name.
+      // This prevents two different people with the same display name from
+      // silently overwriting each other.
+      const dedupKey = personEntityId ?? name;
+      const existingByName = !personEntityId ? peopleByName.get(name) : undefined;
+      const finalKey = existingByName ? `${name}__${person.key}` : dedupKey;
+      peopleByName.set(finalKey, {
         name,
         title: field(person, "title"),
         slug: personRef,
@@ -260,16 +266,35 @@ export default async function OrgProfilePage({
       });
     }
 
-    // Merge board members — if already present, just add board flag
+    // Merge board members — if already present, just add board flag.
+    // Try to match by entity ID first, then fall back to name match.
     for (const bm of data.boardMembers) {
-      const existing = peopleByName.get(bm.personName);
-      if (existing) {
+      const bmSlug = bm.personHref?.replace(/^\/(people|organizations)\//, "");
+      const bmEntityId = bmSlug ? resolveKBSlug(bmSlug) : undefined;
+
+      // Look up by entity ID first (most reliable), then by name
+      let existingKey: string | undefined;
+      if (bmEntityId && peopleByName.has(bmEntityId)) {
+        existingKey = bmEntityId;
+      } else {
+        // Scan values for a name match
+        for (const [key, val] of peopleByName) {
+          if (val.name === bm.personName) {
+            existingKey = key;
+            break;
+          }
+        }
+      }
+
+      if (existingKey) {
+        const existing = peopleByName.get(existingKey)!;
         existing.isBoard = true;
       } else {
-        peopleByName.set(bm.personName, {
+        const bmKey = bmEntityId ?? bm.personName;
+        peopleByName.set(bmKey, {
           name: bm.personName,
           title: bm.role ?? "Board Member",
-          slug: bm.personHref?.replace(/^\/(people|organizations)\//, ""),
+          slug: bmSlug,
           entityType: bm.personHref?.startsWith("/people") ? "person" : undefined,
           isFounder: false,
           isBoard: true,
@@ -327,6 +352,7 @@ export default async function OrgProfilePage({
     const fundingCount =
       data.sortedRounds.length +
       meaningfulInvestments.length +
+      meaningfulEquity.length +
       data.sortedPartnerships.length +
       data.grantsMade.length +
       data.grantsReceived.length;
@@ -503,7 +529,7 @@ export default async function OrgProfilePage({
       count: data.divisions.length,
       content: (
         <div className="space-y-8">
-          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} />
+          <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} members={data.divisionMembers} />
         </div>
       ),
     });
@@ -522,6 +548,87 @@ export default async function OrgProfilePage({
     });
   }
 
+  // ── Projects tab: projects founded by this org ──
+  // Match by entity.id (stableId like "Khej79OA8g") or slug ("quri")
+  const orgIdSet = new Set([entity.id, slug]);
+  const resolvedSlugId = resolveKBSlug(slug);
+  if (resolvedSlugId) orgIdSet.add(resolvedSlugId);
+
+  const orgProjects = getTypedEntities()
+    .filter(isProject)
+    .filter((p) => {
+      const foundedBy = getKBLatest(p.id, "founded-by");
+      if (foundedBy?.value.type === "refs") {
+        return foundedBy.value.value.some((ref) => orgIdSet.has(ref));
+      }
+      return orgIdSet.has(p.organization ?? "");
+    });
+
+  if (orgProjects.length > 0) {
+    tabs.push({
+      id: "projects",
+      label: "Projects",
+      count: orgProjects.length,
+      content: (
+        <section>
+          <SectionHeader title="Projects" count={orgProjects.length} />
+          <div className="border border-border/60 rounded-xl overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                  <th className="text-left py-2 px-3 font-medium">Project</th>
+                  <th className="text-left py-2 px-3 font-medium">Description</th>
+                  <th className="text-center py-2 px-3 font-medium">Status</th>
+                  <th className="text-center py-2 px-3 font-medium">Links</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {orgProjects.map((p) => {
+                  const websiteFact = getKBLatest(p.id, "website");
+                  const pUrl = (websiteFact?.value.type === "text" ? websiteFact.value.value : null) ?? p.projectUrl ?? p.website;
+                  const pStatus = p.projectStatus ?? p.status;
+                  return (
+                    <tr key={p.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="py-2.5 px-3 font-medium">
+                        <Link href={`/projects/${p.id}`} className="text-foreground hover:text-primary transition-colors">
+                          {p.title}
+                        </Link>
+                      </td>
+                      <td className="py-2.5 px-3 text-xs text-muted-foreground max-w-[320px]">
+                        {p.description && <span className="line-clamp-2">{p.description}</span>}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {pStatus && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize bg-muted text-muted-foreground">
+                            {pStatus}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {pUrl && (
+                            <a href={pUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline">
+                              website
+                            </a>
+                          )}
+                          {p.numericId && (
+                            <Link href={`/wiki/${p.numericId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
+                              wiki
+                            </Link>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ),
+    });
+  }
+
   // ── Initials for avatar (skip stop words like "and", "the", "of", "for") ──
   const STOP_WORDS = new Set(["and", "the", "of", "for", "in", "on", "at"]);
   const initials = entity.name
@@ -534,7 +641,7 @@ export default async function OrgProfilePage({
     .toUpperCase();
 
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
+    <div className="max-w-[70rem] mx-auto px-6 py-8 overflow-x-hidden">
       <Breadcrumbs
         items={[
           { label: "Organizations", href: "/organizations" },

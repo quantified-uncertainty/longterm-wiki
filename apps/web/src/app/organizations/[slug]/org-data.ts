@@ -45,13 +45,18 @@ export type NumericOrRange = number | [number, number];
 
 /** Parse a value that may be a single number or a 2-element array range. */
 export function parseNumericOrRange(value: unknown): NumericOrRange | null {
-  if (typeof value === "number") return value;
+  if (typeof value === "number" && isFinite(value)) return value;
   if (
     Array.isArray(value) &&
     value.length === 2 &&
-    value.every((v) => typeof v === "number")
+    value.every((v) => typeof v === "number" && isFinite(v))
   ) {
     return [value[0], value[1]] as [number, number];
+  }
+  // Handle numeric strings (e.g., "50000" from YAML)
+  if (typeof value === "string") {
+    const num = Number(value);
+    if (isFinite(num)) return num;
   }
   return null;
 }
@@ -59,8 +64,11 @@ export function parseNumericOrRange(value: unknown): NumericOrRange | null {
 /** Get a single numeric value from NumericOrRange (midpoint for ranges). */
 export function numericValue(v: NumericOrRange | null): number {
   if (v == null) return 0;
-  if (Array.isArray(v)) return (v[0] + v[1]) / 2;
-  return v;
+  if (Array.isArray(v)) {
+    const mid = (v[0] + v[1]) / 2;
+    return isNaN(mid) ? 0 : mid;
+  }
+  return isNaN(v) ? 0 : v;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -184,12 +192,12 @@ export function formatAmount(value: unknown): string | null {
   if (
     Array.isArray(value) &&
     value.length === 2 &&
-    value.every((v) => typeof v === "number")
+    value.every((v) => typeof v === "number" && !isNaN(v))
   ) {
     return `${formatKBNumber(value[0], "USD")}\u2013${formatKBNumber(value[1], "USD")}`;
   }
   const num = typeof value === "number" ? value : Number(value);
-  if (isNaN(num)) return String(value);
+  if (isNaN(num) || !isFinite(num)) return null;
   return formatKBNumber(num, "USD");
 }
 
@@ -587,6 +595,51 @@ function cleanTitle(title: string, orgName: string): string {
   return t.trim();
 }
 
+/**
+ * Extract a publication date from common URL patterns.
+ * Returns an ISO date string (YYYY-MM-DD) or null.
+ * Only recognizes years in 2000-2030 to avoid false positives from version numbers.
+ */
+export function extractDateFromUrl(url: string): string | null {
+  try {
+    const urlPath = new URL(url).pathname;
+    const fullDate = urlPath.match(
+      /(?:^|\/)(\d{4})[-/](\d{2})[-/](\d{2})(?:\/|$|-)/
+    );
+    if (fullDate) {
+      const [, y, m, d] = fullDate;
+      const year = Number(y);
+      const month = Number(m);
+      const day = Number(d);
+      if (
+        year >= 2000 &&
+        year <= 2030 &&
+        month >= 1 &&
+        month <= 12 &&
+        day >= 1 &&
+        day <= 31
+      ) {
+        return `${y}-${m}-${d}`;
+      }
+      // Full date pattern matched but values were invalid — don't fall through
+      // to partial date which would incorrectly truncate (e.g. 2024/03/32 → 2024-03-01)
+      return null;
+    }
+    const partialDate = urlPath.match(/(?:^|\/)(\d{4})\/(\d{2})(?:\/|$)/);
+    if (partialDate) {
+      const [, y, m] = partialDate;
+      const year = Number(y);
+      const month = Number(m);
+      if (year >= 2000 && year <= 2030 && month >= 1 && month <= 12) {
+        return `${y}-${m}-01`;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Derive a human-readable title from a URL path when the DB title is junk. */
 function titleFromUrl(url: string): string | null {
   try {
@@ -643,7 +696,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     publicationName: publication?.name ?? null,
     credibility: credibility ?? null,
     citingPageCount: citingPages.length,
-    publishedDate: r.published_date ?? null,
+    publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
     authors: (r.authors ?? []).map(resolveAuthor),
   };
 }
@@ -1022,7 +1075,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        leadInvestorName: resolved.name,
+        leadInvestorName: resolved.name || titleCase(parsed.leadInvestor ?? "") || "Unknown Investor",
         leadInvestorHref: resolved.href,
       };
     })
@@ -1043,7 +1096,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        investorName: resolved.name,
+        investorName: resolved.name || titleCase(parsed.investorId ?? "") || "Unknown Investor",
         investorHref: resolved.href,
       };
     })
@@ -1059,7 +1112,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        holderName: resolved.name,
+        holderName: resolved.name || titleCase(parsed.holderId ?? "") || "Unknown Holder",
         holderHref: resolved.href,
       };
     })
@@ -1213,6 +1266,31 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     }
   }
 
+  // ── Division key members (match personnel to divisions by title keywords) ──
+  const divisionMembers = new Map<string, Array<{ name: string; href: string | null; role: string | null }>>();
+  for (const d of divisions) {
+    const members: Array<{ name: string; href: string | null; role: string | null }> = [];
+    const divNameLower = d.name.toLowerCase();
+    // Build matching keywords from division name/key
+    const divKeyLower = d.key.toLowerCase().replace(/-/g, " ");
+    for (const p of personnel) {
+      // Skip the lead — they're already shown separately
+      const resolvedLeadSlug = d.lead?.toLowerCase();
+      if (resolvedLeadSlug && p.personId?.toLowerCase() === resolvedLeadSlug) continue;
+      if (!p.role) continue;
+      // Skip people who have ended their tenure
+      if (p.endDate) continue;
+      const roleLower = p.role.toLowerCase();
+      // Match if role mentions the division name or key
+      if (roleLower.includes(divNameLower) || roleLower.includes(divKeyLower)) {
+        members.push({ name: p.personName, href: p.personHref, role: p.role });
+      }
+    }
+    if (members.length > 0) {
+      divisionMembers.set(d.key, members);
+    }
+  }
+
   // ── Division spending stats ──
   // Compute total grant spending per division via: division → funding programs → grants.
   // Uses ALL alternate keys (from merged duplicates) to match funding programs.
@@ -1307,6 +1385,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     keyPublications,
     modelBenchmarks,
     divisionLeadResolved,
+    divisionMembers,
     divisionSpending,
     chartData,
     dilutionStages,

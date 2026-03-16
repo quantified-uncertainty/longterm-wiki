@@ -27,27 +27,25 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
 
   return (
     <Tabs defaultValue={visibleTabs[0].id}>
-      <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0">
+      <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0 overflow-x-auto">
         {visibleTabs.map((tab) => (
           <TabsTrigger
             key={tab.id}
             value={tab.id}
-            className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            aria-label={tab.count != null && tab.count > 0 ? `${tab.label} (${tab.count})` : tab.label}
           >
             {tab.label}
             {tab.count != null && tab.count > 0 && (
-              <>
-                <span className="sr-only"> ({tab.count})</span>
-                <span aria-hidden="true" className="ml-1.5 text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                  {tab.count}
-                </span>
-              </>
+              <span className="ml-1.5 text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {tab.count}
+              </span>
             )}
           </TabsTrigger>
         ))}
       </TabsList>
       {visibleTabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className="mt-6">
+        <TabsContent key={tab.id} value={tab.id} className="mt-6 min-w-0">
           {tab.content}
         </TabsContent>
       ))}
