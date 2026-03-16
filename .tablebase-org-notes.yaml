@@ -168,3 +168,41 @@ elicit:
   notes: |
     Spun out of Ought (nonprofit) as PBC in 2023. Founded by Andreas Stuhlmüller (CEO)
     and Jungwon Byun (COO). elicit.com/about returns 404, /team exists but may be JS-rendered.
+
+future-of-life-institute:
+  entityId: d9sWZtyVwg
+  teamPage: https://futureoflife.org/team/
+  notes: |
+    32+ people with roles across Policy, Futures, Comms, Operations departments.
+    Founded by Max Tegmark (chair) and Anthony Aguirre (CEO). Board includes Jaan Tallinn, Victoria Krakovna.
+
+cltr:
+  entityId: "64"
+  teamPage: https://www.longtermresilience.org/team
+  notes: |
+    19 staff + 5 board + 5 advisory. Founded by Angus Mercer.
+    Departments: biosecurity policy, AI policy, risk management, strategic partnerships.
+    Jess Whittlestone is senior AI policy adviser.
+
+chai:
+  entityId: zMfgJqiEPQ
+  teamPage: https://humancompatible.ai/people
+  notes: |
+    Very rich page — faculty, staff, researchers, fellows, affiliates.
+    Stuart Russell founder/director. Mark Nitzberg executive director.
+    Many affiliates are UC Berkeley professors. Andrew Critch is a research scientist here too.
+
+hewlett-foundation:
+  entityId: "185"
+  teamPage: null  # Large foundation, no simple team page
+  notes: |
+    Amber Miller became president June 2024 (succeeding Larry Kramer, 2012-2023).
+    Foundation funds AI safety/cybersecurity work. Not an AI org itself.
+
+ftx-future-fund:
+  entityId: "164"
+  teamPage: null  # Defunct
+  notes: |
+    Launched Feb 2022, collapsed Nov 2022 with FTX.
+    Team: Nick Beckstead (CEO), Leopold Aschenbrenner, William MacAskill, Avital Balwit, Ketan Ramakrishnan.
+    All resigned November 2022. Use endDate: "2022-11" for all records.
