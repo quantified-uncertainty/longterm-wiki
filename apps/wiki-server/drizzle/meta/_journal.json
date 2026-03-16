@@ -652,6 +652,13 @@
       "when": 1776585600000,
       "tag": "0092_add_archive_url_and_fetch_method",
       "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1776672000000,
+      "tag": "0093_org_tables_entity_fk_columns",
+      "breakpoints": true
     }
   ]
 }
