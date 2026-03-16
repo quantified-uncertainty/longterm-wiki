@@ -521,14 +521,19 @@ export default async function OrgProfilePage({
   }
 
   // ── Projects tab: projects founded by this org ──
+  // Match by entity.id (stableId like "Khej79OA8g") or slug ("quri")
+  const orgIdSet = new Set([entity.id, slug]);
+  const resolvedSlugId = resolveKBSlug(slug);
+  if (resolvedSlugId) orgIdSet.add(resolvedSlugId);
+
   const orgProjects = getTypedEntities()
     .filter(isProject)
     .filter((p) => {
       const foundedBy = getKBLatest(p.id, "founded-by");
       if (foundedBy?.value.type === "refs") {
-        return foundedBy.value.value.includes(entity.id);
+        return foundedBy.value.value.some((ref) => orgIdSet.has(ref));
       }
-      return p.organization === entity.id;
+      return orgIdSet.has(p.organization ?? "");
     });
 
   if (orgProjects.length > 0) {
