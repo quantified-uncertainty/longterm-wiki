@@ -11,3 +11,14 @@ facts:
       adversarial collaboration.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_jEA5GR8mMn
+    property: founded-date
+    value: "2022"
+    notes: Ran in 2022 with 169 participants across superforecasters and domain experts
+
+  - id: f_kFB6HS9nNo
+    property: founded-by
+    value:
+      - fri
+    notes: Organized by Forecasting Research Institute (FRI) under Philip Tetlock

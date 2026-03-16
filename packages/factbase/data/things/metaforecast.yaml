@@ -10,3 +10,19 @@ facts:
     value: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_dYu9AL2gGh
+    property: website
+    value: https://metaforecast.org
+    asOf: 2026-03
+
+  - id: f_eZv0BM3hHi
+    property: founded-date
+    value: "2021"
+    notes: Launched 2021 by Nuno Sempere at QURI
+
+  - id: f_fAw1CN4iIj
+    property: founded-by
+    value:
+      - quri
+    notes: Created at QURI by Nuno Sempere with Ozzie Gooen
