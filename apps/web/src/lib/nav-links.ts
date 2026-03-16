@@ -25,12 +25,14 @@ export const NAV_ITEMS: NavItem[] = [
       { href: "/people", label: "People" },
       { href: "/ai-models", label: "AI Models" },
       { href: "/projects", label: "Projects" },
+      { href: "/events", label: "Events" },
     ],
   },
   {
     label: "Research",
     items: [
       { href: "/research-areas", label: "Research Areas" },
+      { href: "/approaches", label: "Approaches" },
       { href: "/benchmarks", label: "Benchmarks" },
     ],
   },
