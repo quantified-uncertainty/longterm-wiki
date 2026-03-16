@@ -85,10 +85,10 @@ export function getToolDefinitions() {
         },
       },
     ],
-    // Anthropic server tool for web search
+    // Anthropic server tool for web search — must use the versioned type tag
     serverTools: [
       {
-        type: 'web_search' as const,
+        type: 'web_search_20250305' as const,
         name: 'web_search',
         max_uses: 20,
       },
