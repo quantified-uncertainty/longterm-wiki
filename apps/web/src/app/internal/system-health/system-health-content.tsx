@@ -127,7 +127,7 @@ interface ExtendedHealthData {
     prsThisWeek: number;
     completedThisWeek: number;
     completionRate: number | null;
-  };
+  } | null;
   apiKeys: {
     github: { configured: boolean; healthy: boolean };
     anthropic: { configured: boolean; healthy: boolean };
@@ -1021,7 +1021,7 @@ function BrokenEntityLinksSection({ data }: { data: BrokenEntityLinksData | null
   );
 }
 
-function AgentActivitySection({ activity }: { activity: ExtendedHealthData["agentActivity"] }) {
+function AgentActivitySection({ activity }: { activity: NonNullable<ExtendedHealthData["agentActivity"]> }) {
   return (
     <>
       <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
@@ -1234,7 +1234,7 @@ export async function SystemHealthContent() {
       )}
 
       {/* Agent Activity Summary */}
-      {extended ? (
+      {extended?.agentActivity ? (
         <AgentActivitySection activity={extended.agentActivity} />
       ) : extendedError ? (
         <SectionUnavailable title="Agent Activity (last 7 days)" error={extendedError} />
