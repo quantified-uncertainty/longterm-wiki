@@ -67,8 +67,13 @@ export function applyGradesToFile(
     return false;
   }
 
-  fm.readerImportance = grades.readerImportance;
-  if (grades.tacticalValue != null) {
+  // Only set readerImportance/tacticalValue if not already present — preserve
+  // human-set values across re-grades. These are editorial judgments, not
+  // computed metrics, so LLM-derived values should only fill gaps.
+  if (fm.readerImportance == null && grades.readerImportance != null) {
+    fm.readerImportance = grades.readerImportance;
+  }
+  if (fm.tacticalValue == null && grades.tacticalValue != null) {
     fm.tacticalValue = grades.tacticalValue;
   }
   fm.quality = derivedQuality;
