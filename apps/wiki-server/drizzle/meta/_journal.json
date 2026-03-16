@@ -680,6 +680,13 @@
       "when": 1776931200000,
       "tag": "0096_index_entity_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1777017600000,
+      "tag": "0097_create_related_graph_mv",
+      "breakpoints": true
     }
   ]
 }

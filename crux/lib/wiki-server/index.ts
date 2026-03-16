@@ -111,7 +111,7 @@ export {
 } from './summaries.ts';
 
 // Page Links
-export { syncPageLinks } from './links.ts';
+export { syncPageLinks, refreshRelatedGraph } from './links.ts';
 
 // Pages
 export {

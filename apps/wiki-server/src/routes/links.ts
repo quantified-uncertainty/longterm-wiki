@@ -88,6 +88,20 @@ interface RelatedDbRow {
   score: string;
 }
 
+/** Row from the wikibase_related_graph materialized view joined with wiki_pages + page_links. */
+interface RelatedMvDbRow {
+  related_id: number;
+  total_score: number;
+  id: string;
+  title: string | null;
+  entity_type: string | null;
+  quality: number | null;
+  reader_importance: number | null;
+  relationship: string | null;
+  relationship_is_reverse: boolean | null;
+  score: string;
+}
+
 interface GraphEdgeDbRow {
   source_id: string;
   target_id: string;
@@ -248,65 +262,118 @@ const linksApp = new Hono()
       return c.json({ entityId, related: [], total: 0 });
     }
 
-    // Compute related pages by aggregating all link signals bidirectionally.
-    // For each neighbor, sum the weights of all link types connecting them.
-    // Apply quality boost: 1 + quality/40 + reader_importance/400 (max ~1.45x).
-    // Relationship labels come from yaml_related links.
-    const results = await rawDb<RelatedDbRow[]>`
-    WITH bidirectional_links AS (
-      -- Forward links: entityId is source (is_reverse = false)
-      SELECT target_id_int AS neighbor_int_id, link_type, relationship, weight, false AS is_reverse
-      FROM page_links
-      WHERE source_id_int = ${entityIntId}
-      UNION ALL
-      -- Reverse links: entityId is target (is_reverse = true)
-      SELECT source_id_int AS neighbor_int_id, link_type, relationship, weight, true AS is_reverse
-      FROM page_links
-      WHERE target_id_int = ${entityIntId}
-    ),
-    aggregated AS (
+    // Try the materialized view first (fast path).
+    // Falls back to the live CTE query if the MV doesn't exist yet.
+    let results: RelatedDbRow[];
+    try {
+      const mvResults = await rawDb<RelatedMvDbRow[]>`
       SELECT
-        bl.neighbor_int_id,
-        SUM(bl.weight) AS raw_score,
-        -- Pick the first non-null relationship label (from yaml_related)
-        (SELECT bl2.relationship
-         FROM bidirectional_links bl2
-         WHERE bl2.neighbor_int_id = bl.neighbor_int_id
-           AND bl2.relationship IS NOT NULL
-           AND bl2.link_type = 'yaml_related'
+        rg.related_id,
+        rg.total_score,
+        wp.id AS id,
+        wp.title,
+        wp.entity_type,
+        wp.quality,
+        wp.reader_importance,
+        -- Relationship label from the yaml_related link between these two entities
+        (SELECT pl2.relationship
+         FROM page_links pl2
+         WHERE ((pl2.source_id_int = ${entityIntId} AND pl2.target_id_int = rg.related_id)
+             OR (pl2.source_id_int = rg.related_id AND pl2.target_id_int = ${entityIntId}))
+           AND pl2.relationship IS NOT NULL
+           AND pl2.link_type = 'yaml_related'
          LIMIT 1
         ) AS relationship,
-        -- Track direction of the yaml_related link for label inversion
-        (SELECT bl2.is_reverse
-         FROM bidirectional_links bl2
-         WHERE bl2.neighbor_int_id = bl.neighbor_int_id
-           AND bl2.relationship IS NOT NULL
-           AND bl2.link_type = 'yaml_related'
+        -- Track direction for label inversion
+        (SELECT pl2.source_id_int != ${entityIntId}
+         FROM page_links pl2
+         WHERE ((pl2.source_id_int = ${entityIntId} AND pl2.target_id_int = rg.related_id)
+             OR (pl2.source_id_int = rg.related_id AND pl2.target_id_int = ${entityIntId}))
+           AND pl2.relationship IS NOT NULL
+           AND pl2.link_type = 'yaml_related'
          LIMIT 1
-        ) AS relationship_is_reverse
-      FROM bidirectional_links bl
-      WHERE bl.neighbor_int_id != ${entityIntId}
-      GROUP BY bl.neighbor_int_id
-    )
-    SELECT
-      wp.id AS id,
-      a.raw_score,
-      a.relationship,
-      a.relationship_is_reverse,
-      wp.title,
-      wp.entity_type,
-      wp.quality,
-      wp.reader_importance,
-      -- Apply quality boost: unrated pages get defaults (q=5, imp=50)
-      a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
-                         + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
-    FROM aggregated a
-    LEFT JOIN wiki_pages wp ON wp.integer_id = a.neighbor_int_id
-    WHERE a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
-                             + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
-    ORDER BY score DESC
-    LIMIT ${limit * 3}
-  `;
+        ) AS relationship_is_reverse,
+        -- Apply quality boost: unrated pages get defaults (q=5, imp=50)
+        rg.total_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
+                              + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
+      FROM wikibase_related_graph rg
+      LEFT JOIN wiki_pages wp ON wp.integer_id = rg.related_id
+      WHERE rg.entity_id = ${entityIntId}
+        AND rg.total_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
+                                  + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
+      ORDER BY score DESC
+      LIMIT ${limit * 3}
+    `;
+
+      // Map MV results to the same shape as the CTE query
+      results = mvResults.map((r) => ({
+        id: r.id,
+        raw_score: r.total_score,
+        relationship: r.relationship,
+        relationship_is_reverse: r.relationship_is_reverse,
+        title: r.title,
+        entity_type: r.entity_type,
+        quality: r.quality,
+        reader_importance: r.reader_importance,
+        score: String(r.score),
+      }));
+    } catch (err: unknown) {
+      // MV doesn't exist yet — fall back to live CTE query.
+      // This happens before the migration runs or if the MV was dropped.
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (!errMsg.includes("wikibase_related_graph")) throw err;
+
+      results = await rawDb<RelatedDbRow[]>`
+      WITH bidirectional_links AS (
+        SELECT target_id_int AS neighbor_int_id, link_type, relationship, weight, false AS is_reverse
+        FROM page_links
+        WHERE source_id_int = ${entityIntId}
+        UNION ALL
+        SELECT source_id_int AS neighbor_int_id, link_type, relationship, weight, true AS is_reverse
+        FROM page_links
+        WHERE target_id_int = ${entityIntId}
+      ),
+      aggregated AS (
+        SELECT
+          bl.neighbor_int_id,
+          SUM(bl.weight) AS raw_score,
+          (SELECT bl2.relationship
+           FROM bidirectional_links bl2
+           WHERE bl2.neighbor_int_id = bl.neighbor_int_id
+             AND bl2.relationship IS NOT NULL
+             AND bl2.link_type = 'yaml_related'
+           LIMIT 1
+          ) AS relationship,
+          (SELECT bl2.is_reverse
+           FROM bidirectional_links bl2
+           WHERE bl2.neighbor_int_id = bl.neighbor_int_id
+             AND bl2.relationship IS NOT NULL
+             AND bl2.link_type = 'yaml_related'
+           LIMIT 1
+          ) AS relationship_is_reverse
+        FROM bidirectional_links bl
+        WHERE bl.neighbor_int_id != ${entityIntId}
+        GROUP BY bl.neighbor_int_id
+      )
+      SELECT
+        wp.id AS id,
+        a.raw_score,
+        a.relationship,
+        a.relationship_is_reverse,
+        wp.title,
+        wp.entity_type,
+        wp.quality,
+        wp.reader_importance,
+        a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
+                           + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
+      FROM aggregated a
+      LEFT JOIN wiki_pages wp ON wp.integer_id = a.neighbor_int_id
+      WHERE a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
+                               + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
+      ORDER BY score DESC
+      LIMIT ${limit * 3}
+    `;
+    }
 
     // Type-diverse selection: guarantee MIN_PER_TYPE from each entity type,
     // then fill remaining slots with highest-scoring entries.
@@ -445,6 +512,41 @@ const linksApp = new Hono()
         avgWeight: parseFloat(s.avg_weight),
       })),
     });
+  })
+
+  // ---- POST /refresh-graph ----
+
+  .post("/refresh-graph", async (c) => {
+    const rawDb = getDb();
+
+    try {
+      await rawDb`REFRESH MATERIALIZED VIEW CONCURRENTLY wikibase_related_graph`;
+      return c.json({ refreshed: true });
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+
+      // CONCURRENTLY requires a unique index and populated MV.
+      // Fall back to non-concurrent refresh on first run or if index is missing.
+      if (errMsg.includes("CONCURRENTLY") || errMsg.includes("has not been populated")) {
+        try {
+          await rawDb`REFRESH MATERIALIZED VIEW wikibase_related_graph`;
+          return c.json({ refreshed: true });
+        } catch (innerErr: unknown) {
+          const innerMsg = innerErr instanceof Error ? innerErr.message : String(innerErr);
+          // MV doesn't exist yet — migration hasn't run
+          if (innerMsg.includes("wikibase_related_graph")) {
+            return c.json({ refreshed: false, reason: "materialized view does not exist yet" });
+          }
+          throw innerErr;
+        }
+      }
+
+      // MV doesn't exist yet — migration hasn't run
+      if (errMsg.includes("wikibase_related_graph")) {
+        return c.json({ refreshed: false, reason: "materialized view does not exist yet" });
+      }
+      throw err;
+    }
   });
 
 // ---- Helpers ----
