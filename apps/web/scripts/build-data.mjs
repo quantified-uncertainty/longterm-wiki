@@ -2748,13 +2748,11 @@ async function main() {
         });
       }
     }
-    if (similarityPairs.length > 0) {
-      const similarityResult = await syncSimilarity(similarityPairs);
-      if (similarityResult.ok) {
-        console.log(`  similaritySync: upserted ${similarityResult.data.upserted} pairs`);
-      } else {
-        console.log(`  similaritySync: skipped (${similarityResult.message || 'server unavailable'})`);
-      }
+    const similarityResult = await syncSimilarity(similarityPairs);
+    if (similarityResult.ok) {
+      console.log(`  similaritySync: upserted ${similarityResult.data.upserted} pairs`);
+    } else {
+      console.log(`  similaritySync: skipped (${similarityResult.message || 'server unavailable'})`);
     }
   }
 

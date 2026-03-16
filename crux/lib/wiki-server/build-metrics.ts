@@ -166,12 +166,22 @@ export async function syncRankings(
 /**
  * Sync page similarity data to wiki-server.
  * First batch replaces all existing data, subsequent batches append.
+ * When pairs is empty, sends a replace=true request to clear existing rows.
  */
 export async function syncSimilarity(
   pairs: SimilarityPair[],
 ): Promise<ApiResult<SyncSimilarityResult>> {
   const serverUrl = getServerUrl();
   if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
+
+  // Empty array: still send a replace=true request to clear stale rows in the DB
+  if (pairs.length === 0) {
+    return batchedRequest<SyncSimilarityResult>(
+      'POST',
+      '/api/build-metrics/similarity',
+      { pairs: [], replace: true },
+    );
+  }
 
   let totalUpserted = 0;
 

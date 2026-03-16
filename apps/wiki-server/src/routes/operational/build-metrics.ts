@@ -68,7 +68,7 @@ const SimilarityPairSchema = z.object({
 });
 
 const SyncSimilaritySchema = z.object({
-  pairs: z.array(SimilarityPairSchema).min(1).max(5000),
+  pairs: z.array(SimilarityPairSchema).min(0).max(5000),
   replace: z.boolean().default(false),
 });
 

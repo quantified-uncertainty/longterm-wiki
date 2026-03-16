@@ -321,6 +321,30 @@ describe("POST /api/build-metrics/similarity", () => {
     expect(similarityStore).toHaveLength(1);
     expect(similarityStore[0].similarity).toBe(60);
   });
+
+  it("clears all rows when pairs is empty and replace=true", async () => {
+    // Pre-populate similarity store
+    const seedRes = await postJson(app, "/api/build-metrics/similarity", {
+      pairs: [
+        { pageId: "page-alpha", similarPageId: "page-beta", similarity: 45, rank: 1 },
+        { pageId: "page-alpha", similarPageId: "page-gamma", similarity: 30, rank: 2 },
+      ],
+      replace: false,
+    });
+    expect(seedRes.status).toBe(200);
+    expect(similarityStore).toHaveLength(2);
+
+    // Send empty replace — should clear the table
+    const res = await postJson(app, "/api/build-metrics/similarity", {
+      pairs: [],
+      replace: true,
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.upserted).toBe(0);
+    expect(similarityStore).toHaveLength(0);
+  });
 });
 
 describe("GET /api/build-metrics/stats", () => {
