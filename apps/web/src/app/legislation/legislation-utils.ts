@@ -14,7 +14,11 @@ import { getEntityHref, getWikiHref } from "@/data/entity-nav";
  */
 let _cached: PolicyEntity[] | null = null;
 export function getPolicyEntities(): PolicyEntity[] {
-  if (!_cached) _cached = getTypedEntities().filter(isPolicy);
+  if (!_cached) {
+    _cached = getTypedEntities()
+      .filter(isPolicy)
+      .filter((e) => !e.deprecated);
+  }
   return _cached;
 }
 

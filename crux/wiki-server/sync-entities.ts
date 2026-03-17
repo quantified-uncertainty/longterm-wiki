@@ -21,9 +21,9 @@ import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
+import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server/client.ts";
 import { resolveEntityType } from "../lib/hallucination-risk.ts";
-import { waitForHealthy, batchSync } from "./sync-common.ts";
+import { waitForHealthy, batchSync, fetchWithRetry } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
@@ -408,6 +408,59 @@ export async function syncEntities(
   return { upserted: result.count, errors: result.errors };
 }
 
+/**
+ * Prune stale entity records from PG that are no longer in the YAML source.
+ * Groups entities by type and calls the /api/entities/prune endpoint for each type.
+ * Exported for testing.
+ */
+export async function pruneEntities(
+  serverUrl: string,
+  items: SyncEntity[],
+): Promise<{ deleted: number; ids: string[] }> {
+  // Group canonical IDs by entity type
+  const idsByType = new Map<string, string[]>();
+  for (const e of items) {
+    const ids = idsByType.get(e.entityType) ?? [];
+    ids.push(e.id);
+    idsByType.set(e.entityType, ids);
+  }
+
+  let totalDeleted = 0;
+  const allDeletedIds: string[] = [];
+
+  for (const [entityType, keepIds] of idsByType) {
+    try {
+      const res = await fetchWithRetry(
+        `${serverUrl}/api/entities/prune`,
+        {
+          method: "POST",
+          headers: buildHeaders(),
+          body: JSON.stringify({ entityType, keepIds }),
+        },
+      );
+
+      if (!res.ok) {
+        const body = await res.text();
+        console.warn(`  Prune ${entityType}: HTTP ${res.status} — ${body}`);
+        continue;
+      }
+
+      const result = (await res.json()) as { deleted: number; ids: string[] };
+      if (result.deleted > 0) {
+        console.log(`  Prune ${entityType}: removed ${result.deleted} stale records: ${result.ids.join(", ")}`);
+        totalDeleted += result.deleted;
+        allDeletedIds.push(...result.ids);
+      }
+    } catch (err) {
+      console.warn(
+        `  Prune ${entityType}: failed — ${err instanceof Error ? err.message : err}`
+      );
+    }
+  }
+
+  return { deleted: totalDeleted, ids: allDeletedIds };
+}
+
 // --- CLI ---
 
 async function main() {
@@ -506,6 +559,18 @@ async function main() {
   if (result.errors > 0) {
     console.log(`  Errors:  ${result.errors}`);
     process.exit(1);
+  }
+
+  // Prune stale entities (those in PG but no longer in YAML source)
+  const skipPrune = args["skip-prune"] === true;
+  if (!skipPrune) {
+    console.log("\nPruning stale entities...");
+    const pruneResult = await pruneEntities(serverUrl, sortedPayloads);
+    if (pruneResult.deleted > 0) {
+      console.log(`  Pruned: ${pruneResult.deleted} stale records`);
+    } else {
+      console.log("  No stale entities to prune");
+    }
   }
 }
 
