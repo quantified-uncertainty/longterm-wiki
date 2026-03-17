@@ -37,8 +37,8 @@ export interface OrgRow {
 
   foundedDate: string | null;
 
-  /** Number of tracked people (from employed-by facts) */
-  peopleCount: number;
+  /** Number of tracked people (from employed-by facts). Null when unknown (API mode). */
+  peopleCount: number | null;
   /** Completeness score 1-4 based on available data */
   completionScore: number;
 
@@ -142,7 +142,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       totalFunding: null,
       totalFundingNum: org.totalFundingNum,
       foundedDate: org.foundedDate,
-      peopleCount: 0,
+      peopleCount: null, // Not available from API
       completionScore: computeCompletionScore(org),
       searchText: "",
     })),
@@ -486,7 +486,11 @@ export function OrganizationsTable({
                 <th className="py-2.5 px-3 font-medium text-left">Type</th>
               )}
               {visibleColumns.has("completionScore") && (
-                <SortHeader label="Data" sortKey="completionScore" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+                isSortable("completionScore") ? (
+                  <SortHeader label="Data" sortKey="completionScore" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+                ) : (
+                  <th className="py-2.5 px-3 font-medium text-center">Data</th>
+                )
               )}
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Valuation" sortKey="valuation" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -494,7 +498,11 @@ export function OrganizationsTable({
               <SortHeader label="Total Funding" sortKey="totalFunding" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Founded" sortKey="founded" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               {visibleColumns.has("peopleCount") && (
-                <SortHeader label="People" sortKey="peopleCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+                isSortable("peopleCount") ? (
+                  <SortHeader label="People" sortKey="peopleCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+                ) : (
+                  <th className="py-2.5 px-3 font-medium text-right">People</th>
+                )
               )}
             </tr>
           </thead>
@@ -553,8 +561,8 @@ export function OrganizationsTable({
 
                     {/* Completion Score */}
                     {visibleColumns.has("completionScore") && (
-                      <td className="py-2.5 px-3 text-center" title={`Completeness: ${row.completionScore}/4`}>
-                        <CompletionDots score={row.completionScore} />
+                      <td className="py-2.5 px-3 text-center">
+                        <CompletionDots score={row.completionScore} ariaLabel={`Completeness: ${row.completionScore}/4`} />
                       </td>
                     )}
 
@@ -611,7 +619,7 @@ export function OrganizationsTable({
                     {/* People Count */}
                     {visibleColumns.has("peopleCount") && (
                       <td className="py-2.5 px-3 text-right tabular-nums">
-                        {row.peopleCount > 0 ? (
+                        {row.peopleCount != null && row.peopleCount > 0 ? (
                           <span>{row.peopleCount}</span>
                         ) : (
                           <span className="text-muted-foreground/40">{"\u2014"}</span>
@@ -656,12 +664,13 @@ export function OrganizationsTable({
 }
 
 /** Renders 1-4 filled/empty dots for data completeness. */
-function CompletionDots({ score }: { score: number }) {
+function CompletionDots({ score, ariaLabel }: { score: number; ariaLabel: string }) {
   return (
-    <span className="inline-flex gap-0.5">
+    <span className="inline-flex gap-0.5" role="img" aria-label={ariaLabel}>
       {[1, 2, 3, 4].map((i) => (
         <span
           key={i}
+          aria-hidden="true"
           className={`inline-block w-1.5 h-1.5 rounded-full ${
             i <= score
               ? "bg-primary/70"

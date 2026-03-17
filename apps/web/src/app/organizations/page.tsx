@@ -178,7 +178,7 @@ async function loadFromApi(
 
       foundedDate: org.foundedDate,
 
-      peopleCount: 0, // Not available from API
+      peopleCount: null, // Not available from API
       completionScore: computeCompletionScore(org),
 
       searchText: searchParts.join(" ").toLowerCase(),

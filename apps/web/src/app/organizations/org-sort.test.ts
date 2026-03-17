@@ -22,7 +22,7 @@ function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
     totalFunding: null,
     totalFundingNum: null,
     foundedDate: null,
-    peopleCount: 0,
+    peopleCount: null,
     completionScore: 1,
     searchText: "",
     ...overrides,
@@ -172,6 +172,34 @@ describe("compareOrgRows", () => {
       expect(compareOrgRows(noType, withType, "orgType", "asc")).toBeLessThan(
         0,
       );
+    });
+  });
+
+  describe("peopleCount sorting", () => {
+    it("sorts by peopleCount ascending", () => {
+      const low = makeRow({ name: "A", peopleCount: 5 });
+      const high = makeRow({ name: "B", peopleCount: 50 });
+      expect(compareOrgRows(low, high, "peopleCount", "asc")).toBeLessThan(0);
+    });
+
+    it("puts null peopleCount last in ascending order", () => {
+      const withCount = makeRow({ name: "A", peopleCount: 5 });
+      const noCount = makeRow({ name: "B", peopleCount: null });
+      expect(compareOrgRows(withCount, noCount, "peopleCount", "asc")).toBeLessThan(0);
+    });
+  });
+
+  describe("completionScore sorting", () => {
+    it("sorts by completionScore descending", () => {
+      const low = makeRow({ name: "A", completionScore: 1 });
+      const high = makeRow({ name: "B", completionScore: 4 });
+      expect(compareOrgRows(low, high, "completionScore", "desc")).toBeGreaterThan(0);
+    });
+
+    it("sorts by completionScore ascending", () => {
+      const low = makeRow({ name: "A", completionScore: 1 });
+      const high = makeRow({ name: "B", completionScore: 4 });
+      expect(compareOrgRows(low, high, "completionScore", "asc")).toBeLessThan(0);
     });
   });
 
