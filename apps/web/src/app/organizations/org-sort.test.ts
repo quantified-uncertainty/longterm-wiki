@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { OrgRow } from "./organizations-table";
 import { getOrgSortValue, compareOrgRows } from "./org-sort";
+import { computeCompletionScore } from "./org-constants";
 
 function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
   return {
@@ -233,5 +234,39 @@ describe("compareOrgRows", () => {
         "OpenAI",
       ]);
     });
+  });
+});
+
+describe("computeCompletionScore", () => {
+  it("returns 1 for name-only org (no financial data)", () => {
+    expect(computeCompletionScore({})).toBe(1);
+    expect(computeCompletionScore({ revenueNum: null, headcount: null })).toBe(1);
+  });
+
+  it("returns 2 for any single financial metric", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9 })).toBe(2);
+    expect(computeCompletionScore({ headcount: 100 })).toBe(2);
+    expect(computeCompletionScore({ totalFundingNum: 5e6 })).toBe(2);
+    expect(computeCompletionScore({ valuationNum: 10e9 })).toBe(2);
+  });
+
+  it("returns 3 for 2+ metrics plus founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, headcount: 100, foundedDate: "2020" })).toBe(3);
+    expect(computeCompletionScore({ valuationNum: 10e9, totalFundingNum: 5e6, foundedDate: "2015-01-01" })).toBe(3);
+  });
+
+  it("returns 2 (not 3) for 2 metrics without founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, headcount: 100 })).toBe(2);
+  });
+
+  it("returns 4 for 3+ financial metrics", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, valuationNum: 10e9, headcount: 100 })).toBe(4);
+    expect(computeCompletionScore({
+      revenueNum: 1e9, valuationNum: 10e9, headcount: 100, totalFundingNum: 5e6,
+    })).toBe(4);
+  });
+
+  it("returns 4 for 3+ metrics even without founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, valuationNum: 10e9, headcount: 100 })).toBe(4);
   });
 });
