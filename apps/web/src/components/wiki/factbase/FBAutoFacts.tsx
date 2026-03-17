@@ -75,6 +75,12 @@ const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   organization: ["revenue", "valuation", "headcount", "total-funding", "founded-date"],
   person: ["employed-by", "role", "born-year"],
   "ai-model": ["developed-by", "parameter-count", "context-window", "model-release-date"],
+  policy: [
+    "compute-threshold",
+    "cost-threshold",
+    "employee-letter-signatories",
+    "companion-bills-signed",
+  ],
 };
 
 /** Collections that get dedicated visual renderers. */
