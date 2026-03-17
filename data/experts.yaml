@@ -881,7 +881,6 @@
 
 - id: sundar-pichai
   name: Sundar Pichai
-  affiliation: deepmind
   role: CEO, Google & Alphabet
 
 - id: jensen-huang
@@ -901,8 +900,8 @@
 
 - id: allan-dafoe
   name: Allan Dafoe
-  affiliation: deepmind
-  role: VP of AI Policy
+  affiliation: govai
+  role: Founding Director, GovAI
 
 - id: victoria-krakovna
   name: Victoria Krakovna
