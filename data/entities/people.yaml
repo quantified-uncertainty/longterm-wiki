@@ -2102,3 +2102,57 @@
     - title: Kathleen Finlinson Personal Site
       url: https://k-finn.github.io/
   lastUpdated: 2026-03
+
+- id: scott-wiener
+  stableId: HLc6VrCh5w
+  wikiId: E1471
+  type: person
+  title: Scott Wiener
+  description: >
+    Scott Wiener is a California State Senator representing District 11 (San Francisco). He is the
+    author of SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act,
+    which was the most significant AI safety legislation attempted in the United States. After SB 1047
+    was vetoed by Governor Newsom in September 2024, Wiener authored SB 53, a scaled-back transparency
+    bill that was signed into law in September 2025. He has become one of the most prominent state-level
+    legislators working on AI governance.
+  customFields:
+    - label: Role
+      value: "California State Senator (D-San Francisco, District 11)"
+    - label: Known For
+      value: "SB 1047, SB 53, AI safety legislation"
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+    - id: california-sb53
+      type: policy
+  tags:
+    - ai-governance
+    - california
+    - legislation
+
+- id: gavin-newsom
+  stableId: tDwxa07Urw
+  wikiId: E1472
+  type: person
+  title: Gavin Newsom
+  description: >
+    Gavin Newsom is the Governor of California. He vetoed SB 1047 on September 29, 2024, citing concerns
+    about size-based rather than risk-based regulation, while simultaneously signing 18 other AI bills.
+    He convened an expert panel including Fei-Fei Li and Tino Cuéllar to develop alternative regulatory
+    approaches, which ultimately informed SB 53. He later signed SB 53 in September 2025, adopting a
+    transparency-first approach to frontier AI governance.
+  customFields:
+    - label: Role
+      value: "Governor of California"
+    - label: Known For
+      value: "SB 1047 veto, signing 18 AI bills, SB 53"
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+    - id: california-sb53
+      type: policy
+  tags:
+    - california
+    - governance
+    - ai-policy
+

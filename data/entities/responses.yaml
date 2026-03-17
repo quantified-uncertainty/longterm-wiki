@@ -75,19 +75,35 @@
     models in benign contexts would be over-regulated. He preferred federal regulation and signed 18
     other narrower AI bills simultaneously.
   votes:
-    - chamber: Senate Committee
-      date: April 2024
+    - chamber: Senate Judiciary Committee
+      date: April 30, 2024
+      result: Passed
+      ayes: 8
+      noes: 3
+    - chamber: Senate Appropriations Committee
+      date: May 16, 2024
       result: Passed
     - chamber: Senate Floor
       date: May 21, 2024
       result: Passed
       ayes: 32
       noes: 1
+    - chamber: Assembly Privacy & Consumer Protection Committee
+      date: June 18, 2024
+      result: Passed
+    - chamber: Assembly Appropriations Committee
+      date: August 15, 2024
+      result: Passed
     - chamber: Assembly Floor
       date: August 28, 2024
       result: Passed
       ayes: 45
       noes: 11
+    - chamber: Senate Floor (Concurrence)
+      date: August 29, 2024
+      result: Passed
+      ayes: 29
+      noes: 9
   provisions:
     - title: Safety Testing
       description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment
@@ -157,9 +173,11 @@
       position: oppose
       reason: Strongly opposed; concerned about open-source implications and compliance burden
     - name: Y Combinator
+      entityId: y-combinator
       position: oppose
       reason: Concerned about startup ecosystem impact and compliance costs
     - name: Andreessen Horowitz
+      entityId: andreessen-horowitz
       position: oppose
       reason: Opposed on innovation and competition grounds
     - name: Yann LeCun
@@ -167,24 +185,59 @@
       position: oppose
       reason: Turing Award winner opposing the regulatory approach
     - name: Andrew Ng
+      entityId: andrew-ng
       position: oppose
       reason: Stanford professor and Google Brain co-founder opposing the bill
     - name: Fei-Fei Li
+      entityId: fei-fei-li
       position: oppose
       reason: Stanford professor; later appointed by Newsom to expert panel on alternative approach
+    - name: Max Tegmark
+      entityId: max-tegmark
+      position: support
+      reason: MIT professor and FLI co-founder; advocated for frontier AI regulation
+    - name: Dan Hendrycks
+      entityId: dan-hendrycks
+      position: support
+      reason: CAIS director; key organizer of AI safety research support for the bill
+    - name: Nancy Pelosi
+      position: oppose
+      reason: Led California Congressional Democrats opposing the bill; signed August 2024 letter urging veto
+      source: https://www.politico.com/news/2024/08/22/pelosi-california-ai-regulation-00175510
+    - name: 113+ AI Company Employees
+      position: support
+      reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill
   keyPoliticians:
     - name: Senator Scott Wiener
+      entityId: scott-wiener
       role: Primary Author / Sponsor
     - name: Governor Gavin Newsom
+      entityId: gavin-newsom
       role: Vetoed the bill
+    - name: Senator Richard Roth
+      role: Co-author
+    - name: Senator Susan Rubio
+      role: Co-author
+    - name: Senator Henry Stern
+      role: Co-author
   amendments:
-    - date: April 2024
-      description: Narrowed scope to truly frontier models (>10^26 FLOP or >$100M training cost)
-    - date: June 2024
-      description: Added safe harbors and affirmative defenses for compliant developers; reduced liability provisions
-    - date: August 2024
-      description: Removed Frontier Model Division and criminal penalties; clarified open-source exemptions
+    - date: March 20, 2024
+      description: Initial committee amendments; defined covered model thresholds (>10^26 FLOP or >$100M training cost)
+    - date: April 8, 2024
+      description: Refined definitions and exemptions; clarified academic research and open-source carve-outs
+    - date: April 16, 2024
+      description: Adjusted enforcement provisions; refined scope of Attorney General authority
+    - date: April 30, 2024
+      description: Senate Judiciary Committee amendments; narrowed hazardous capability definitions
+    - date: June 20, 2024
+      description: Added safe harbors and affirmative defenses for compliant developers; reduced liability from strict to negligence standard
+    - date: July 3, 2024
+      description: Clarified compute cluster reporting requirements and fine-tuning thresholds
+    - date: August 19, 2024
+      description: Major revision removing Frontier Model Division and criminal penalties; replaced with AG enforcement model
       author: Senator Wiener
+    - date: August 22, 2024
+      description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined whistleblower protections
   customFields:
     - label: Introduced
       value: February 2024
@@ -209,6 +262,16 @@
       type: policy
     - id: california-sb53
       type: policy
+    - id: anthropic
+      type: organization
+    - id: cais
+      type: organization
+    - id: fli
+      type: organization
+    - id: scott-wiener
+      type: person
+    - id: gavin-newsom
+      type: person
   sources:
     - title: SB 1047 Bill Text (Final Amended Version)
       url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1047
@@ -240,7 +303,7 @@
     - thresholds
     - california
     - political-strategy
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: canada-aida
   stableId: pxSyZBoBpA
   wikiId: E49
