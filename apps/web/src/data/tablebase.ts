@@ -79,6 +79,7 @@ export interface Fact {
 /** Raw entity shape as stored in database.json (before transformation) */
 export interface RawEntity {
   id: string;
+  stableId?: string;
   type: string;
   title: string;
   description?: string;
