@@ -231,6 +231,74 @@
       position: support
       reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill (Sep 9, 2024)
       source: https://sfstandard.com/2024/09/09/ai-workers-support-wiener-bill/
+    - name: Encode Justice
+      entityId: encode-justice
+      position: support
+      reason: Youth-led AI accountability organization; co-source of SB 1047
+    - name: Imbue
+      entityId: imbue
+      position: support
+      reason: AI safety-focused company supporting frontier AI regulation
+    - name: Gladstone AI
+      entityId: gladstone-ai
+      position: support
+      reason: AI safety advisory firm; authors of RAND-commissioned report on catastrophic AI risks
+    - name: Nonlinear
+      entityId: nonlinear
+      position: support
+      reason: EA-adjacent AI safety organization supporting the bill
+    - name: Economic Security Project Action
+      entityId: economic-security-project
+      position: support
+      reason: Economic policy organization; co-source of SB 1047
+    - name: Apart Research
+      entityId: apart-research
+      position: support
+      reason: AI safety research organization supporting frontier AI regulation
+    - name: Elicit
+      entityId: elicit
+      position: support
+      reason: AI research assistant tool supporting AI safety regulation
+    - name: Panoplia Labs
+      entityId: panoplia-labs
+      position: support
+      reason: AI safety research lab supporting the bill
+    - name: Kira Center
+      entityId: kira-center
+      position: support
+      reason: Center for AI Risks and Impacts supporting frontier AI regulation
+    - name: Redwood Research
+      entityId: redwood-research
+      position: support
+      reason: AI safety research organization supporting the bill
+    - name: FAR AI
+      entityId: far-ai
+      position: support
+      reason: AI safety research organization supporting the bill
+    - name: Foresight Institute
+      entityId: foresight-institute
+      position: support
+      reason: Research organization focused on beneficial emerging technologies; supported the bill
+    - name: Chamber of Progress
+      entityId: chamber-of-progress
+      position: oppose
+      reason: Tech industry coalition opposing the bill
+    - name: TechNet
+      entityId: technet
+      position: oppose
+      reason: Bipartisan network of technology CEOs opposing the bill
+    - name: Consumer Technology Association
+      entityId: consumer-technology-association
+      position: oppose
+      reason: Trade association representing consumer technology industry; opposed the bill
+    - name: R Street Institute
+      entityId: r-street-institute
+      position: oppose
+      reason: Free-market think tank opposing the bill's regulatory approach
+    - name: Competitive Enterprise Institute
+      entityId: competitive-enterprise-institute
+      position: oppose
+      reason: Free-market policy organization opposing the bill
   keyPoliticians:
     - name: Senator Scott Wiener
       entityId: scott-wiener

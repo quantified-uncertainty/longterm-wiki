@@ -453,6 +453,8 @@
       type: organization
     - id: apollo-research
       type: organization
+    - id: california-sb1047
+      type: policy
   sources:
     - title: FAR AI Website
       url: https://far.ai
@@ -1604,6 +1606,9 @@
     and automates literature reviews, founded by AI alignment researchers from
     Ought and funded by Open Philanthropy ($31M total). The platform achieved
     90%+ extraction accuracy and claims 80% time savings for systematic reviews, though independent validation of these claims is limited.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
   clusters:
     - ai-safety
     - community
@@ -2138,6 +2143,8 @@
       type: organization
     - id: miri
       type: organization
+    - id: california-sb1047
+      type: policy
   sources:
     - title: Redwood Research Website
       url: https://redwoodresearch.org
@@ -3280,6 +3287,9 @@
   description: >-
     AI safety research organization running hackathons, fellowships, and
     collaborative research projects.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
   tags:
     - ai-safety
     - alignment
@@ -4211,6 +4221,9 @@
   website: https://foresight.org
   description: >-
     Research organization focused on beneficial use of emerging technologies.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
   tags:
     - existential-risk
     - research
@@ -4975,4 +4988,209 @@
   tags:
     - philanthropy
     - effective-altruism
+  lastUpdated: 2026-03
+
+- id: encode-justice
+  stableId: etCe7rcH1g
+  wikiId: E1932
+  type: organization
+  orgType: safety-org
+  title: Encode Justice
+  website: https://encodejustice.org
+  description: >-
+    Youth-led AI accountability organization. Co-source of California SB 1047.
+    Supported California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-governance
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: imbue
+  stableId: hCtMHcUWaw
+  wikiId: E1933
+  type: organization
+  orgType: startup
+  title: Imbue
+  website: https://imbue.com
+  description: >-
+    AI safety-focused company building AI agents with robust reasoning.
+    Supported California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-safety
+    - ai-agents
+  lastUpdated: 2026-03
+
+- id: gladstone-ai
+  stableId: HkfUxsbBLQ
+  wikiId: E1934
+  type: organization
+  orgType: startup
+  title: Gladstone AI
+  website: https://www.gladstone.ai
+  description: >-
+    AI safety advisory firm. Authors of RAND-commissioned report on catastrophic
+    AI risks. Supported California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: nonlinear
+  stableId: PfIAYFXC9Q
+  wikiId: E1935
+  type: organization
+  orgType: safety-org
+  title: Nonlinear
+  website: https://www.nonlinear.org
+  description: >-
+    EA-adjacent AI safety organization focused on field-building. Supported
+    California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-safety
+    - ea
+  lastUpdated: 2026-03
+
+- id: economic-security-project
+  stableId: 2ecnsQqcRg
+  wikiId: E1936
+  type: organization
+  orgType: generic
+  title: Economic Security Project
+  website: https://www.economicsecurityproject.org
+  description: >-
+    Economic policy organization. Co-source of California SB 1047. Supported
+    California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - policy
+    - economic-policy
+  lastUpdated: 2026-03
+
+- id: panoplia-labs
+  stableId: NY4i2W6IVA
+  wikiId: E1937
+  type: organization
+  orgType: startup
+  title: Panoplia Labs
+  description: >-
+    AI safety research lab. Supported California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: kira-center
+  stableId: oMgy3kQqOg
+  wikiId: E1938
+  type: organization
+  orgType: safety-org
+  title: Kira Center
+  description: >-
+    Center for AI Risks and Impacts. Supported California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: chamber-of-progress
+  stableId: IEav94hygQ
+  wikiId: E1939
+  type: organization
+  orgType: generic
+  title: Chamber of Progress
+  website: https://progresschamber.org
+  description: >-
+    Tech industry coalition. Opposed California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: technet
+  stableId: 0PNw6yTH0g
+  wikiId: E1940
+  type: organization
+  orgType: generic
+  title: TechNet
+  website: https://www.technet.org
+  description: >-
+    Bipartisan network of technology CEOs and senior executives. Opposed
+    California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: consumer-technology-association
+  stableId: b89p7duRrQ
+  wikiId: E1941
+  type: organization
+  orgType: generic
+  title: Consumer Technology Association
+  website: https://www.cta.tech
+  description: >-
+    Trade association representing the consumer technology industry. Opposed
+    California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: r-street-institute
+  stableId: yfAYuNTKxQ
+  wikiId: E1942
+  type: organization
+  orgType: generic
+  title: R Street Institute
+  website: https://www.rstreet.org
+  description: >-
+    Free-market think tank. Opposed California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - policy
+    - free-market
+  lastUpdated: 2026-03
+
+- id: competitive-enterprise-institute
+  stableId: Le8eSvx8EQ
+  wikiId: E1943
+  type: organization
+  orgType: generic
+  title: Competitive Enterprise Institute
+  website: https://cei.org
+  description: >-
+    Free-market policy organization. Opposed California SB 1047.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - policy
+    - free-market
   lastUpdated: 2026-03
