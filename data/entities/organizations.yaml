@@ -108,6 +108,8 @@
     - id: concentration-of-power
       type: risk
       relationship: affects
+    - id: california-sb1047
+      type: policy
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -1989,6 +1991,9 @@
     - ai-safety
     - community
     - governance
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
   lastUpdated: 2026-02
 - id: microsoft
   stableId: OIY5gaPpBA

@@ -952,6 +952,8 @@
       type: organization
     - id: openai
       type: organization
+    - id: california-sb1047
+      type: policy
   tags:
     - entrepreneur
     - ai-labs
