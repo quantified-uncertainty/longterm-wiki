@@ -118,6 +118,7 @@
   scoringMethod: percentage
   higherIsBetter: true
   introducedDate: "2025-01"
+  maintainer: "Terminal-Bench"
   sources:
     - title: "Terminal-Bench"
       url: "https://github.com/terminal-bench/terminal-bench"
@@ -132,6 +133,7 @@
   scoringMethod: percentage
   higherIsBetter: true
   introducedDate: "2025-06"
+  maintainer: "Terminal-Bench"
 
 - id: artificial-analysis-intelligence-index
   stableId: dEzoE9HQTg
@@ -156,6 +158,8 @@
   scoringMethod: percentage
   higherIsBetter: true
   introducedDate: "2024-04"
+  maintainer: "CMU / HKU"
+  website: "https://os-world.github.io"
   sources:
     - title: "OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments"
       url: "https://arxiv.org/abs/2404.07972"
