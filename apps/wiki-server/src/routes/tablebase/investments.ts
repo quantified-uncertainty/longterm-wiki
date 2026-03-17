@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { investments } from "../../schema.js";
+import { investments, entities } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -15,6 +16,9 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -51,27 +55,56 @@ const SyncInvestmentsBatchSchema = z.object({
 
 // ---- Helpers ----
 
-function formatRow(r: typeof investments.$inferSelect) {
+const investorEntity = alias(entities, "investor_entity");
+const companyEntity = alias(entities, "company_entity");
+
+/** Selection shape for investments + joined entity titles. */
+const joinedSelect = {
+  investments: investments,
+  investorTitle: investorEntity.title,
+  companyTitle: companyEntity.title,
+};
+
+interface JoinedRow {
+  investments: typeof investments.$inferSelect;
+  investorTitle: string | null;
+  companyTitle: string | null;
+}
+
+function cleanId(id: string): string | null {
+  if (STABLE_ID_PATTERN.test(id)) return null;
+  return id;
+}
+
+function formatRow(r: JoinedRow) {
+  const inv = r.investments;
   return {
-    id: r.id,
-    companyId: r.companyId,
-    investorId: r.investorId,
-    roundName: r.roundName,
-    date: r.date,
-    amount: r.amount != null ? Number(r.amount) : null,
-    amountLow: r.amountLow != null ? Number(r.amountLow) : null,
-    amountHigh: r.amountHigh != null ? Number(r.amountHigh) : null,
-    stakeAcquired: r.stakeAcquired,
-    stakeLow: r.stakeLow != null ? Number(r.stakeLow) : null,
-    stakeHigh: r.stakeHigh != null ? Number(r.stakeHigh) : null,
-    instrument: r.instrument,
-    role: r.role,
-    conditions: r.conditions,
-    source: r.source,
-    notes: r.notes,
-    syncedAt: r.syncedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    id: inv.id,
+    companyId: inv.companyId,
+    investorId: inv.investorId,
+    roundName: inv.roundName,
+    date: inv.date,
+    amount: inv.amount != null ? Number(inv.amount) : null,
+    amountLow: inv.amountLow != null ? Number(inv.amountLow) : null,
+    amountHigh: inv.amountHigh != null ? Number(inv.amountHigh) : null,
+    stakeAcquired: inv.stakeAcquired,
+    stakeLow: inv.stakeLow != null ? Number(inv.stakeLow) : null,
+    stakeHigh: inv.stakeHigh != null ? Number(inv.stakeHigh) : null,
+    instrument: inv.instrument,
+    role: inv.role,
+    conditions: inv.conditions,
+    source: inv.source,
+    notes: inv.notes,
+    investorEntityId: inv.investorEntityId,
+    investorDisplayName: inv.investorDisplayName,
+    companyEntityId: inv.companyEntityId,
+    companyDisplayName: inv.companyDisplayName,
+    // Resolved names — prefer entity title, then display name, then cleaned raw ID
+    investorResolvedName: r.investorTitle ?? inv.investorDisplayName ?? cleanId(inv.investorId),
+    companyResolvedName: r.companyTitle ?? inv.companyDisplayName ?? cleanId(inv.companyId),
+    syncedAt: inv.syncedAt,
+    createdAt: inv.createdAt,
+    updatedAt: inv.updatedAt,
   };
 }
 
@@ -106,8 +139,10 @@ const investmentsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(investments)
+      .leftJoin(investorEntity, eq(investments.investorEntityId, investorEntity.stableId))
+      .leftJoin(companyEntity, eq(investments.companyEntityId, companyEntity.stableId))
       .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
       .offset(offset);
@@ -132,8 +167,10 @@ const investmentsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(investments)
+      .leftJoin(investorEntity, eq(investments.investorEntityId, investorEntity.stableId))
+      .leftJoin(companyEntity, eq(investments.companyEntityId, companyEntity.stableId))
       .where(eq(investments.companyId, entityId))
       .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
@@ -161,8 +198,10 @@ const investmentsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(investments)
+      .leftJoin(investorEntity, eq(investments.investorEntityId, investorEntity.stableId))
+      .leftJoin(companyEntity, eq(investments.companyEntityId, companyEntity.stableId))
       .where(eq(investments.investorId, investorId))
       .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)

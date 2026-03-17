@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, desc, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { equityPositions } from "../../schema.js";
+import { equityPositions, entities } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -15,6 +16,9 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -47,21 +51,50 @@ const SyncEquityPositionsBatchSchema = z.object({
 
 // ---- Helpers ----
 
-function formatRow(r: typeof equityPositions.$inferSelect) {
+const holderEntity = alias(entities, "holder_entity");
+const companyEntity = alias(entities, "company_entity");
+
+/** Selection shape for equity_positions + joined entity titles. */
+const joinedSelect = {
+  equityPositions: equityPositions,
+  holderTitle: holderEntity.title,
+  companyTitle: companyEntity.title,
+};
+
+interface JoinedRow {
+  equityPositions: typeof equityPositions.$inferSelect;
+  holderTitle: string | null;
+  companyTitle: string | null;
+}
+
+function cleanId(id: string): string | null {
+  if (STABLE_ID_PATTERN.test(id)) return null;
+  return id;
+}
+
+function formatRow(r: JoinedRow) {
+  const ep = r.equityPositions;
   return {
-    id: r.id,
-    companyId: r.companyId,
-    holderId: r.holderId,
-    stake: r.stake,
-    stakeLow: r.stakeLow != null ? Number(r.stakeLow) : null,
-    stakeHigh: r.stakeHigh != null ? Number(r.stakeHigh) : null,
-    source: r.source,
-    notes: r.notes,
-    asOf: r.asOf,
-    validEnd: r.validEnd,
-    syncedAt: r.syncedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    id: ep.id,
+    companyId: ep.companyId,
+    holderId: ep.holderId,
+    stake: ep.stake,
+    stakeLow: ep.stakeLow != null ? Number(ep.stakeLow) : null,
+    stakeHigh: ep.stakeHigh != null ? Number(ep.stakeHigh) : null,
+    source: ep.source,
+    notes: ep.notes,
+    asOf: ep.asOf,
+    validEnd: ep.validEnd,
+    holderEntityId: ep.holderEntityId,
+    holderDisplayName: ep.holderDisplayName,
+    companyEntityId: ep.companyEntityId,
+    companyDisplayName: ep.companyDisplayName,
+    // Resolved names — prefer entity title, then display name, then cleaned raw ID
+    holderResolvedName: r.holderTitle ?? ep.holderDisplayName ?? cleanId(ep.holderId),
+    companyResolvedName: r.companyTitle ?? ep.companyDisplayName ?? cleanId(ep.companyId),
+    syncedAt: ep.syncedAt,
+    createdAt: ep.createdAt,
+    updatedAt: ep.updatedAt,
   };
 }
 
@@ -94,8 +127,10 @@ const equityPositionsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(equityPositions)
+      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
       .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
       .limit(limit)
       .offset(offset);
@@ -120,8 +155,10 @@ const equityPositionsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(equityPositions)
+      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
       .where(eq(equityPositions.companyId, entityId))
       .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
       .limit(limit)
@@ -149,8 +186,10 @@ const equityPositionsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(equityPositions)
+      .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
+      .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
       .where(eq(equityPositions.holderId, holderId))
       .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
       .limit(limit)

@@ -36,7 +36,7 @@ import {
   titleCase,
   sortKBRecords,
 } from "@/components/wiki/factbase/format";
-import { resolveRecipient } from "./org-shared";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
 
@@ -323,7 +323,7 @@ export function computeStakeValue(
 export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
   const f = record.fields;
   const recipientId = (f.recipient as string) ?? null;
-  const resolved = recipientId ? resolveRecipient(recipientId) : { name: "", href: null };
+  const resolved = recipientId ? resolveEntityName(recipientId, record.displayName) : { name: "", href: null };
   return {
     key: record.key,
     name: (f.name as string) ?? record.key,
@@ -1125,7 +1125,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parsePersonnelRecord(r);
       const resolved = parsed.personId
-        ? resolveRecipient(parsed.personId)
+        ? resolveEntityName(parsed.personId, r.displayName)
         : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
       return {
         ...parsed,
@@ -1148,7 +1148,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseFundingRoundRecord(r);
       const resolved = parsed.leadInvestor
-        ? resolveRecipient(parsed.leadInvestor)
+        ? resolveEntityName(parsed.leadInvestor, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1169,7 +1169,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseInvestmentRecord(r);
       const resolved = parsed.investorId
-        ? resolveRecipient(parsed.investorId)
+        ? resolveEntityName(parsed.investorId, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1185,7 +1185,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseEquityPositionRecord(r);
       const resolved = parsed.holderId
-        ? resolveRecipient(parsed.holderId)
+        ? resolveEntityName(parsed.holderId, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1205,7 +1205,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseBoardSeatRecord(r);
       const resolved = parsed.personId
-        ? resolveRecipient(parsed.personId)
+        ? resolveEntityName(parsed.personId, r.displayName)
         : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
       return {
         ...parsed,
@@ -1292,11 +1292,11 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
     for (const ref of foundedByFact.value.value) {
       const refStr = String(ref);
-      const resolved = resolveRecipient(refStr);
+      const resolved = resolveEntityName(refStr);
       founders.push(resolved);
     }
   } else if (foundedByFact?.value.type === "ref") {
-    const resolved = resolveRecipient(foundedByFact.value.value);
+    const resolved = resolveEntityName(foundedByFact.value.value);
     founders.push(resolved);
   }
 

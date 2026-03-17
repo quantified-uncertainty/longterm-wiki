@@ -722,6 +722,13 @@
       "when": 1777449600000,
       "tag": "0102_rename_llm_summary_to_summary",
       "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1777536000000,
+      "tag": "0103_fix_personnel_names",
+      "breakpoints": true
     }
   ]
 }

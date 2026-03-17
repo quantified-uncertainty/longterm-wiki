@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords } from "@/data/factbase";
+import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -23,32 +24,23 @@ const CEA_SLUG_ALIAS = "cea";
 
 /**
  * Resolve an entity identifier to a display name, slug, and wiki page ID.
- * Handles both entity IDs (stableIds) and plain-text names gracefully.
+ * Uses the shared resolveEntityName for name/href, enriches with slug + wikiPageId.
  */
-function resolveRecipient(recipientId: string): {
+function resolveGrantRecipient(
+  recipientId: string,
+  displayName?: string | null,
+): {
   name: string;
   slug: string | null;
   href: string | null;
   wikiPageId: string | null;
 } {
-  const entity = getTypedEntityById(recipientId);
-  if (entity) {
-    const slug = entity.id; // entity.id is the slug in TableBase
-    const wikiPageId = entity.wikiId ?? null;
-    // Build type-aware href: /organizations/ for orgs, /people/ for people
-    let href: string | null = null;
-    if (entity.entityType === "person") {
-      href = `/people/${slug}`;
-    } else {
-      href = `/organizations/${slug}`;
-    }
-    return { name: entity.title, slug, href, wikiPageId };
-  }
-  // Not a known entity — convert slug to readable title case
-  const displayName = recipientId
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-  return { name: displayName, slug: null, href: null, wikiPageId: null };
+  const resolved = resolveEntityName(recipientId, displayName);
+  const entity = getKBEntity(recipientId);
+  const slug = entity ? (getKBEntitySlug(recipientId) ?? null) : null;
+  const typedEntity = entity ? getTypedEntityById(recipientId) : null;
+  const wikiPageId = typedEntity?.wikiId ?? null;
+  return { name: resolved.name, slug, href: resolved.href, wikiPageId };
 }
 
 export default function GrantsPage() {
@@ -73,7 +65,7 @@ export default function GrantsPage() {
         : null;
 
     // Resolve recipient to display name and link info
-    const resolved = recipientId ? resolveRecipient(recipientId) : null;
+    const resolved = recipientId ? resolveGrantRecipient(recipientId, record.displayName) : null;
 
     return {
       compositeKey: `${orgId}-${record.key}`,

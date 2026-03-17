@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc } from "drizzle-orm";
+import { eq, and, or, count, sql, desc, isNull, like } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { personnel } from "../../schema.js";
+import { personnel, entities } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -15,6 +16,9 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 
 const MAX_PAGE_SIZE = 200;
 const VALID_ROLE_TYPES = ["key-person", "board", "career"] as const;
+
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -58,23 +62,58 @@ const SyncPersonnelBatchSchema = z.object({
 
 // ---- Helpers ----
 
-function formatRow(r: typeof personnel.$inferSelect) {
+const personEntity = alias(entities, "person_entity");
+const orgEntity = alias(entities, "org_entity");
+
+/** Selection shape for personnel + joined entity titles. */
+const joinedSelect = {
+  personnel: personnel,
+  personTitle: personEntity.title,
+  orgTitle: orgEntity.title,
+};
+
+interface JoinedRow {
+  personnel: typeof personnel.$inferSelect;
+  personTitle: string | null;
+  orgTitle: string | null;
+}
+
+function cleanPersonId(pid: string): string | null {
+  if (pid.startsWith("new:")) return pid.slice(4).trim();
+  if (STABLE_ID_PATTERN.test(pid)) return null;
+  return pid;
+}
+
+function cleanOrgId(oid: string): string | null {
+  if (STABLE_ID_PATTERN.test(oid)) return null;
+  return oid;
+}
+
+function formatRow(r: JoinedRow) {
+  const p = r.personnel;
   return {
-    id: r.id,
-    personId: r.personId,
-    organizationId: r.organizationId,
-    role: r.role,
-    roleType: r.roleType,
-    startDate: r.startDate,
-    endDate: r.endDate,
-    isFounder: r.isFounder,
-    appointedBy: r.appointedBy,
-    background: r.background,
-    source: r.source,
-    notes: r.notes,
-    syncedAt: r.syncedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    id: p.id,
+    personId: p.personId,
+    organizationId: p.organizationId,
+    role: p.role,
+    roleType: p.roleType,
+    startDate: p.startDate,
+    endDate: p.endDate,
+    isFounder: p.isFounder,
+    appointedBy: p.appointedBy,
+    background: p.background,
+    source: p.source,
+    notes: p.notes,
+    personEntityId: p.personEntityId,
+    personDisplayName: p.personDisplayName,
+    orgEntityId: p.orgEntityId,
+    orgDisplayName: p.orgDisplayName,
+    // Resolved names — the key fix:
+    personResolvedName: r.personTitle ?? p.personDisplayName ?? cleanPersonId(p.personId),
+    orgResolvedName: r.orgTitle ?? p.orgDisplayName ?? cleanOrgId(p.organizationId),
+    syncedAt: p.syncedAt,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
   };
 }
 
@@ -115,8 +154,10 @@ const personnelApp = new Hono()
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(personnel)
+      .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+      .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -147,8 +188,10 @@ const personnelApp = new Hono()
     const whereClause = and(...conditions);
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(personnel)
+      .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+      .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -176,8 +219,10 @@ const personnelApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(personnel)
+      .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+      .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -195,6 +240,60 @@ const personnelApp = new Hono()
       total,
       limit,
       offset,
+    });
+  })
+
+  // ---- GET /broken ----
+  .get("/broken", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select(joinedSelect)
+      .from(personnel)
+      .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+      .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .where(
+        or(
+          isNull(personnel.personEntityId),
+          like(personnel.personId, "new:%"),
+        )
+      )
+      .orderBy(personnel.organizationId, personnel.personId);
+
+    const classified = rows.map((r) => {
+      const p = r.personnel;
+      let issueType: string;
+      if (p.personId.startsWith("new:")) {
+        issueType = "new-prefix";
+      } else if (STABLE_ID_PATTERN.test(p.personId)) {
+        issueType = "unresolved-stableId";
+      } else if (!p.personEntityId) {
+        issueType = "no-entity-match";
+      } else {
+        issueType = "dangling-fk";
+      }
+
+      return {
+        id: p.id,
+        personId: p.personId,
+        organizationId: p.organizationId,
+        role: p.role,
+        personEntityId: p.personEntityId,
+        personDisplayName: p.personDisplayName,
+        personResolvedName: r.personTitle ?? p.personDisplayName ?? cleanPersonId(p.personId),
+        issueType,
+      };
+    });
+
+    return c.json({
+      total: classified.length,
+      byIssueType: {
+        "new-prefix": classified.filter((r) => r.issueType === "new-prefix").length,
+        "unresolved-stableId": classified.filter((r) => r.issueType === "unresolved-stableId").length,
+        "no-entity-match": classified.filter((r) => r.issueType === "no-entity-match").length,
+        "dangling-fk": classified.filter((r) => r.issueType === "dangling-fk").length,
+      },
+      records: classified,
     });
   })
 
@@ -249,17 +348,89 @@ const personnelApp = new Hono()
           },
         });
 
-      // Dual-write to things table
+      // Post-sync: resolve entity FKs for newly synced rows
+      const syncedIds = items.map((i) => i.id);
+      await tx.execute(sql`
+        UPDATE personnel p SET person_entity_id = e.stable_id
+        FROM entities e
+        WHERE (e.stable_id = p.person_id OR e.id = p.person_id)
+          AND e.entity_type = 'person'
+          AND p.person_entity_id IS NULL
+          AND p.person_id NOT LIKE 'new:%'
+          AND p.id = ANY(${syncedIds})
+      `);
+      await tx.execute(sql`
+        UPDATE personnel p SET org_entity_id = e.stable_id
+        FROM entities e
+        WHERE (e.stable_id = p.organization_id OR e.id = p.organization_id)
+          AND e.entity_type = 'organization'
+          AND p.org_entity_id IS NULL
+          AND p.id = ANY(${syncedIds})
+      `);
+      // Backfill display names for new: prefix and unresolved personIds
+      await tx.execute(sql`
+        UPDATE personnel SET
+          person_display_name = trim(substring(person_id FROM 5))
+        WHERE person_id LIKE 'new:%'
+          AND person_display_name IS NULL
+          AND id = ANY(${syncedIds})
+      `);
+      await tx.execute(sql`
+        UPDATE personnel SET
+          person_display_name = person_id
+        WHERE person_entity_id IS NULL
+          AND person_display_name IS NULL
+          AND person_id !~ '^[A-Za-z0-9]{10}$'
+          AND id = ANY(${syncedIds})
+      `);
+
+      // Dual-write to things table with resolved names
+      const resolvedItems = await tx
+        .select({
+          id: personnel.id,
+          personId: personnel.personId,
+          personDisplayName: personnel.personDisplayName,
+          personEntityId: personnel.personEntityId,
+          role: personnel.role,
+          organizationId: personnel.organizationId,
+          source: personnel.source,
+        })
+        .from(personnel)
+        .where(sql`${personnel.id} = ANY(${syncedIds})`);
+
+      // Build a map of stableId -> title for resolved person entities
+      const resolvedPersonIds = resolvedItems
+        .filter((r) => r.personEntityId)
+        .map((r) => r.personEntityId!);
+      let personTitleMap = new Map<string, string>();
+      if (resolvedPersonIds.length > 0) {
+        const personEntities = await tx
+          .select({ stableId: entities.stableId, title: entities.title })
+          .from(entities)
+          .where(sql`${entities.stableId} = ANY(${resolvedPersonIds})`);
+        personTitleMap = new Map(
+          personEntities
+            .filter((e) => e.stableId)
+            .map((e) => [e.stableId!, e.title])
+        );
+      }
+
       await upsertThingsInTx(
         tx,
-        items.map((p) => ({
-          id: p.id,
-          thingType: "personnel" as const,
-          title: `${p.personId} — ${p.role} at ${p.organizationId}`,
-          sourceTable: "personnel",
-          sourceId: p.id,
-          sourceUrl: p.source,
-        }))
+        resolvedItems.map((p) => {
+          const personName = (p.personEntityId ? personTitleMap.get(p.personEntityId) : null)
+            ?? p.personDisplayName
+            ?? cleanPersonId(p.personId)
+            ?? p.personId;
+          return {
+            id: p.id,
+            thingType: "personnel" as const,
+            title: `${personName} — ${p.role} at ${p.organizationId}`,
+            sourceTable: "personnel",
+            sourceId: p.id,
+            sourceUrl: p.source,
+          };
+        })
       );
 
       upserted = allVals.length;

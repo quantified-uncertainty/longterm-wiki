@@ -8,7 +8,7 @@ import {
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
-import { resolveEntityLink } from "@/lib/record-detail-ui";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -47,8 +47,10 @@ export interface ParsedGrant {
 
 // ── Resolution helpers ─────────────────────────────────────────────────
 
-// Re-export the shared resolveEntityLink (with TableBase fallback for stableIds and numeric IDs)
-export { resolveEntityLink };
+/** @deprecated Use resolveEntityName from @/lib/resolve-entity-name */
+export function resolveEntityLink(entityId: string, displayName?: string | null): { name: string; href: string | null } {
+  return resolveEntityName(entityId, displayName);
+}
 
 // ── Record parsers ────────────────────────────────────────────────────
 

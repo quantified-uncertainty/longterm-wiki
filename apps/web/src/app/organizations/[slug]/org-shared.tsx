@@ -6,18 +6,14 @@ import Link from "next/link";
 import type { KBRecordEntry } from "@/data/factbase";
 import {
   formatKBDate,
-  titleCase,
   shortDomain,
   isUrl,
 } from "@/components/wiki/factbase/format";
-import {
-  resolveKBSlug,
-} from "@/data/factbase";
-import { getTypedEntityById } from "@/data/tablebase";
 import { safeHref } from "@/lib/format-compact";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
-// Re-export so existing consumers of { safeHref } from "./org-shared" keep working.
-export { safeHref };
+// Re-export so existing consumers keep working.
+export { safeHref, resolveEntityName };
 
 // ── Formatting helpers ────────────────────────────────────────────────
 
@@ -28,66 +24,19 @@ export function field(item: KBRecordEntry, key: string): string | undefined {
   return String(v);
 }
 
-// ── Entity ref resolver helper ────────────────────────────────────────
+// ── Entity ref resolver helpers (delegate to shared resolver) ─────────
 
+/** @deprecated Use resolveEntityName directly */
 export function resolveRefName(
   slugOrId: string | undefined,
   displayName: string | undefined,
 ): { name: string; href: string | null } {
-  if (!slugOrId && !displayName) return { name: "Unknown", href: null };
-
-  if (slugOrId) {
-    // Try TableBase first (handles slugs, E-numbers, and 10-char stableIds)
-    const directEntity = getTypedEntityById(slugOrId);
-    if (directEntity) {
-      const slug = directEntity.id; // entity.id is the slug in TableBase
-      const prefix = directEntity.entityType === "organization" ? "/organizations"
-        : directEntity.entityType === "person" ? "/people"
-        : null;
-      return {
-        name: directEntity.title,
-        href: prefix ? `${prefix}/${slug}` : (directEntity.wikiId ? `/wiki/${directEntity.wikiId}` : null),
-      };
-    }
-    // Fallback: try resolving as a FactBase slug
-    const resolvedId = resolveKBSlug(slugOrId);
-    if (resolvedId) {
-      const entity = getTypedEntityById(resolvedId);
-      if (entity) {
-        const slug = entity.id;
-        const prefix = entity.entityType === "organization" ? "/organizations"
-          : entity.entityType === "person" ? "/people"
-          : null;
-        return {
-          name: entity.title,
-          href: prefix ? `${prefix}/${slug}` : (entity.wikiId ? `/wiki/${entity.wikiId}` : null),
-        };
-      }
-    }
-  }
-
-  // Fall back to display name or humanized slug
-  const fallbackName = displayName ?? (slugOrId ? titleCase(slugOrId) : "Unknown");
-  return { name: fallbackName, href: null };
+  return resolveEntityName(slugOrId, displayName);
 }
 
-/** Resolve a recipient slug/ID to a display name and optional href. */
+/** @deprecated Use resolveEntityName directly */
 export function resolveRecipient(recipientId: string): { name: string; href: string | null } {
-  const entity = getTypedEntityById(recipientId);
-  if (entity) {
-    const slug = entity.id; // entity.id is the slug in TableBase
-    const href = entity.entityType === "organization" ? `/organizations/${slug}`
-      : entity.entityType === "person" ? `/people/${slug}`
-      : entity.wikiId ? `/wiki/${entity.wikiId}` : null;
-    // Guard against empty entity title — fall back to titleCased recipientId
-    const name = entity.title?.trim()
-      ? entity.title
-      : titleCase(recipientId.replace(/-/g, " ")) || "Unknown";
-    return { name, href };
-  }
-  // Fall back: titleCase the slug, or "Unknown" as last resort
-  const fallbackName = titleCase(recipientId.replace(/-/g, " "));
-  return { name: fallbackName || "Unknown", href: null };
+  return resolveEntityName(recipientId);
 }
 
 // ── Subcomponents ─────────────────────────────────────────────────────
