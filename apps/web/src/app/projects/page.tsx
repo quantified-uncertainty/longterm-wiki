@@ -71,11 +71,20 @@ function apiEntityToRow(e: DirectoryEntity): ProjectRow {
     e.website ??
     null;
 
-  // Org: from resolved ref of "founded-by" fact
-  const orgName = foundedBy?.name ?? null;
-  const orgHref = foundedBy?.entityId
+  // Org: from resolved ref of "founded-by" fact, then YAML organization field
+  let orgName = foundedBy?.name ?? null;
+  let orgHref = foundedBy?.entityId
     ? getEntityHref(foundedBy.entityId)
     : null;
+
+  // Fallback: use the organization field from entity metadata (YAML)
+  if (!orgName && meta.organization) {
+    const orgId = meta.organization as string;
+    // The directory API includes resolvedRefs for fact-based refs but not YAML fields,
+    // so we use the orgId as a display name fallback and link to the entity page
+    orgName = orgId;
+    orgHref = getEntityHref(orgId);
+  }
 
   return {
     id: e.id,
@@ -113,13 +122,22 @@ function loadFromLocal(): ProjectsPageData {
   const projects = getTypedEntities().filter(isProject);
 
   const rows: ProjectRow[] = projects.map((p) => {
-    // Resolve org from founded-by KB fact
+    // Resolve org from founded-by KB fact, then YAML organization field
     let orgName: string | null = null;
     let orgHref: string | null = null;
     const foundedBy = getKBLatest(p.id, "founded-by");
     if (foundedBy?.value.type === "refs" && foundedBy.value.value.length > 0) {
       const orgRef = foundedBy.value.value[0];
       const orgEntity = getTypedEntityById(orgRef);
+      if (orgEntity) {
+        orgName = orgEntity.title;
+        orgHref = getEntityHref(orgEntity.id);
+      }
+    }
+
+    // Fallback: use the organization field from entity YAML
+    if (!orgName && p.organization) {
+      const orgEntity = getTypedEntityById(p.organization);
       if (orgEntity) {
         orgName = orgEntity.title;
         orgHref = getEntityHref(orgEntity.id);
