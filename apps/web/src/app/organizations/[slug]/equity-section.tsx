@@ -1,14 +1,15 @@
 /**
  * Equity Positions section for organization profile pages.
- * Shows holder, category, stake %, estimated value, and notes.
+ * Shows holder, category, stake %, estimated value, pledge %, and notes.
  * Value is computed from stake × latest valuation when available.
+ * Pledge % is joined from charitable-pledges KB records by holder ID.
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
 import { VerificationBadge } from "@/components/directory/VerificationBadge";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
-import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, NumericOrRange } from "./org-data";
+import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
 import { formatStake, deriveEquityCategory, computeStakeValue, numericValue } from "./org-data";
 
 // ── Category badge colors ────────────────────────────────────────────
@@ -41,6 +42,17 @@ function formatValueRange(value: NumericOrRange | null): string {
   return formatCompactCurrency(value);
 }
 
+/** Format a pledge fraction as percentage, supporting single values and ranges. */
+function formatPledge(pledge: NumericOrRange | null): string {
+  if (pledge == null) return "\u2014";
+  if (Array.isArray(pledge)) {
+    const low = (pledge[0] * 100).toFixed(0);
+    const high = (pledge[1] * 100).toFixed(0);
+    return `${low}%\u2013${high}%`;
+  }
+  return `${(pledge * 100).toFixed(0)}%`;
+}
+
 // ── Component ────────────────────────────────────────────────────────
 
 export function EquityPositionsSection({
@@ -48,11 +60,13 @@ export function EquityPositionsSection({
   investments,
   latestValuation,
   valuationLabel,
+  charitablePledges,
 }: {
   positions: ParsedEquityPositionRecord[];
   investments?: ParsedInvestmentRecord[];
   latestValuation?: number | null;
   valuationLabel?: string;
+  charitablePledges?: ParsedCharitablePledgeRecord[];
 }) {
   if (positions.length === 0) return null;
 
@@ -70,7 +84,15 @@ export function EquityPositionsSection({
     }
   }
 
-  // Enrich positions with category and value
+  // Build pledge index: pledgerId → pledge record
+  const pledgeByHolder = new Map<string, ParsedCharitablePledgeRecord>();
+  if (charitablePledges) {
+    for (const p of charitablePledges) {
+      if (p.pledgerId) pledgeByHolder.set(p.pledgerId, p);
+    }
+  }
+
+  // Enrich positions with category, value, and pledge
   const enriched = positions.map((pos) => {
     const holderInvestments = pos.holderId
       ? (investmentsByHolder.get(pos.holderId) ?? [])
@@ -81,7 +103,8 @@ export function EquityPositionsSection({
     const value = hasValuation
       ? computeStakeValue(pos.stake, latestValuation)
       : null;
-    return { ...pos, category, value };
+    const pledge = pos.holderId ? (pledgeByHolder.get(pos.holderId)?.pledge ?? null) : null;
+    return { ...pos, category, value, pledge };
   });
 
   // Compute totals
@@ -89,6 +112,7 @@ export function EquityPositionsSection({
   const totalValueMid = hasValuation ? totalStakeMid * latestValuation : null;
 
   const hasCategories = enriched.some((p) => p.category != null);
+  const hasPledges = enriched.some((p) => p.pledge != null);
   const hasNotes = enriched.some((p) => p.notes);
 
   const valLabel = valuationLabel ?? (hasValuation ? formatCompactCurrency(latestValuation) : null);
@@ -109,6 +133,9 @@ export function EquityPositionsSection({
                 <th scope="col" className="text-right py-2 px-3 font-medium whitespace-nowrap">
                   Value at {valLabel}
                 </th>
+              )}
+              {hasPledges && (
+                <th scope="col" className="text-right py-2 px-3 font-medium">Pledge %</th>
               )}
               {hasNotes && (
                 <th scope="col" className="text-left py-2 px-3 font-medium hidden lg:table-cell">Notes</th>
@@ -157,6 +184,15 @@ export function EquityPositionsSection({
                       <span className="font-semibold">{formatValueRange(pos.value)}</span>
                     </td>
                   )}
+                  {hasPledges && (
+                    <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                      {pos.pledge != null ? (
+                        <span className="font-semibold">{formatPledge(pos.pledge)}</span>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+                  )}
                   {hasNotes && (
                     <td className="py-2 px-3 text-muted-foreground text-xs max-w-[250px] truncate hidden lg:table-cell">
                       {pos.notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
@@ -182,6 +218,7 @@ export function EquityPositionsSection({
                     {totalValueMid != null ? formatCompactCurrency(totalValueMid) : "\u2014"}
                   </td>
                 )}
+                {hasPledges && <td />}
                 {hasNotes && <td className="hidden lg:table-cell" />}
               </tr>
             </tfoot>

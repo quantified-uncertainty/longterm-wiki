@@ -374,6 +374,7 @@ export default async function OrgProfilePage({
               positions={meaningfulEquity}
               investments={data.investmentsReceived}
               latestValuation={data.chartData.latestValuation}
+              charitablePledges={data.charitablePledges}
             />
           )}
 

@@ -148,6 +148,7 @@ export const CURATED_COLLECTIONS = new Set([
   "personnel",
   "grants",
   "equity-positions",
+  "charitable-pledges",
   "dilution-stages",
 ]);
 
@@ -471,6 +472,19 @@ export function parseEquityPositionRecord(record: KBRecordEntry) {
     asOf: "asOf" in record ? (record as { asOf?: string }).asOf : undefined,
   };
 }
+
+export function parseCharitablePledgeRecord(record: KBRecordEntry) {
+  const f = record.fields;
+  return {
+    key: record.key,
+    pledgerId: (f.pledger as string) ?? null,
+    pledge: parseNumericOrRange(f.pledge),
+    source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+  };
+}
+
+export type ParsedCharitablePledgeRecord = ReturnType<typeof parseCharitablePledgeRecord>;
 
 export function parseBoardSeatRecord(record: KBRecordEntry): Omit<BoardMember, "personName" | "personHref"> {
   const f = record.fields;
@@ -1168,6 +1182,10 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     })
     .sort((a, b) => numericValue(b.stake) - numericValue(a.stake));
 
+  // ── Charitable Pledges ──
+  const pledgeRecords = getKBRecords(entity.id, "charitable-pledges");
+  const charitablePledges = pledgeRecords.map((r) => parseCharitablePledgeRecord(r));
+
   // ── Board of Directors ──
   const boardSeatRecords = allCollections["board-seats"] ?? [];
   const boardMembers: BoardMember[] = boardSeatRecords
@@ -1418,6 +1436,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     fundingRounds,
     investmentsReceived,
     equityPositions,
+    charitablePledges,
     boardMembers,
     relatedOrgs,
     foundedDateStr,
