@@ -224,19 +224,12 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
   }
 
-  let apiPath: string;
-  let method: 'POST' | 'PATCH' = 'POST';
-  switch (table) {
-    case 'personnel': apiPath = '/api/personnel/sync'; break;
-    case 'grants': apiPath = '/api/grants/batch-update-grantee'; method = 'PATCH'; break;
-    case 'funding-rounds': apiPath = '/api/funding-rounds/sync'; break;
-    case 'investments': apiPath = '/api/investments/sync'; break;
-    case 'benchmark-results': apiPath = '/api/benchmark-results/sync'; break;
-    default: return { exitCode: 1, output: `Unknown table: ${table}` };
-  }
+  const { getTableConfig } = await import('../tablebase/table-registry.ts');
+  const tableConfig = getTableConfig(table);
+  if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
 
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    method, apiPath, { items: records },
+    tableConfig.syncMethod, tableConfig.syncPath, { [tableConfig.syncBodyKey]: records },
   );
 
   if (!result.ok) {
@@ -262,39 +255,16 @@ async function existingCommand(args: string[], options: CommandOptions): Promise
 
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
 
-  let path: string;
-  let resultKey: string;
-  switch (table) {
-    case 'personnel':
-      path = `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'personnel';
-      break;
-    case 'grants':
-      path = `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'grants';
-      break;
-    case 'funding-rounds':
-      path = `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'fundingRounds';
-      break;
-    case 'investments':
-      path = `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'investments';
-      break;
-    case 'benchmark-results':
-      path = `/api/benchmark-results/by-model/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'benchmarkResults';
-      break;
-    default:
-      return { exitCode: 1, output: `Invalid table: ${table}` };
-  }
+  const { getTableConfig } = await import('../tablebase/table-registry.ts');
+  const tableConfig = getTableConfig(table);
+  if (!tableConfig) return { exitCode: 1, output: `Invalid table: ${table}` };
 
-  const result = await apiRequest<Record<string, unknown>>('GET', path);
+  const result = await apiRequest<Record<string, unknown>>('GET', `${tableConfig.fetchByEntityPath(entityId)}?limit=200`);
   if (!result.ok) {
     return { exitCode: 1, output: `Query failed: ${result.message}` };
   }
 
-  const records = result.data[resultKey] as Array<Record<string, unknown>>;
+  const records = result.data[tableConfig.resultKey] as Array<Record<string, unknown>>;
   return { exitCode: 0, output: JSON.stringify(records, null, 2) };
 }
 
@@ -619,37 +589,13 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
 
   // Get existing records
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
-  let existingPath: string;
-  let existingKey: string;
-  switch (task.table) {
-    case 'personnel':
-      existingPath = `/api/personnel/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'personnel';
-      break;
-    case 'grants':
-      existingPath = `/api/grants/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'grants';
-      break;
-    case 'funding_rounds':
-      existingPath = `/api/funding-rounds/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'fundingRounds';
-      break;
-    case 'investments':
-      existingPath = `/api/investments/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'investments';
-      break;
-    case 'benchmark_results':
-      existingPath = `/api/benchmark-results/by-model/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'benchmarkResults';
-      break;
-    default:
-      existingPath = ''; existingKey = '';
-  }
+  const { getTableConfig: getTC } = await import('../tablebase/table-registry.ts');
+  const taskTableConfig = getTC(task.table);
 
   let existingRecords: unknown[] = [];
-  if (existingPath) {
-    const r = await apiRequest<Record<string, unknown>>('GET', existingPath);
-    if (r.ok) existingRecords = (r.data[existingKey] as unknown[]) || [];
+  if (taskTableConfig) {
+    const r = await apiRequest<Record<string, unknown>>('GET', `${taskTableConfig.fetchByEntityPath(task.entityId)}?limit=50`);
+    if (r.ok) existingRecords = (r.data[taskTableConfig.resultKey] as unknown[]) || [];
   }
 
   // Build search queries by task type

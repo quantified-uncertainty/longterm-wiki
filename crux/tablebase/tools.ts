@@ -10,6 +10,7 @@ import { apiRequest } from '../lib/wiki-server/client.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
+import { getTableConfig } from './table-registry.ts';
 import type { EnrichmentTask, TaskType } from './types.ts';
 import {
   dedupPersonnel,
@@ -146,36 +147,12 @@ async function handleQueryExistingRecords(input: Record<string, unknown>): Promi
   const table = input.table as string;
   const entityId = input.entityId as string;
 
-  let path: string;
-  let resultKey: string;
-  switch (table) {
-    case 'personnel':
-      path = `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'personnel';
-      break;
-    case 'grants':
-      path = `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'grants';
-      break;
-    case 'funding-rounds':
-      path = `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'fundingRounds';
-      break;
-    case 'investments':
-      path = `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'investments';
-      break;
-    case 'benchmark-results':
-      path = `/api/benchmark-results/by-model/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'benchmarkResults';
-      break;
-    default:
-      return `Error: Unknown table "${table}"`;
-  }
+  const config = getTableConfig(table);
+  if (!config) return `Error: Unknown table "${table}"`;
 
-  const result = await apiRequest<Record<string, unknown>>('GET', path);
+  const result = await apiRequest<Record<string, unknown>>('GET', `${config.fetchByEntityPath(entityId)}?limit=100`);
   if (!result.ok) return `Error: ${result.message}`;
-  const records = result.data[resultKey];
+  const records = result.data[config.resultKey];
   return JSON.stringify(records);
 }
 
@@ -326,40 +303,13 @@ async function handleSubmitRecords(
     return `[DRY RUN] Would submit ${deduped.length} records to ${table} (${records.length - deduped.length} duplicates filtered):\n${JSON.stringify(deduped, null, 2)}`;
   }
 
-  // Map table name to API path
-  let apiPath: string;
-  let bodyKey: string;
-  switch (table) {
-    case 'personnel':
-      apiPath = '/api/personnel/sync';
-      bodyKey = 'items';
-      break;
-    case 'grants':
-      apiPath = '/api/grants/batch-update-grantee';
-      bodyKey = 'items';
-      break;
-    case 'funding-rounds':
-      apiPath = '/api/funding-rounds/sync';
-      bodyKey = 'items';
-      break;
-    case 'investments':
-      apiPath = '/api/investments/sync';
-      bodyKey = 'items';
-      break;
-    case 'benchmark-results':
-      apiPath = '/api/benchmark-results/sync';
-      bodyKey = 'items';
-      break;
-    default:
-      return `Error: Unknown table "${table}"`;
-  }
+  const syncConfig = getTableConfig(table);
+  if (!syncConfig) return `Error: Unknown table "${table}"`;
 
-  // For grant grantee backfill, use PATCH endpoint
-  const method = table === 'grants' ? 'PATCH' as const : 'POST' as const;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    method,
-    apiPath,
-    { [bodyKey]: deduped },
+    syncConfig.syncMethod,
+    syncConfig.syncPath,
+    { [syncConfig.syncBodyKey]: deduped },
   );
 
   if (!result.ok) {
