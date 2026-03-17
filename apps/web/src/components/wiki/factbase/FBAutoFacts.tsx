@@ -81,8 +81,6 @@ const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   policy: [
     "compute-threshold",
     "cost-threshold",
-    "employee-letter-signatories",
-    "companion-bills-signed",
   ],
 };
 

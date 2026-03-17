@@ -174,12 +174,12 @@
     - name: OpenAI
       entityId: openai
       position: oppose
-      reason: Initially opposed; argued it would stifle innovation and drive development out of California
+      reason: Initially opposed; argued it would stifle innovation and drive development out of California (opposition letter Aug 20, 2024)
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
     - name: Anthropic
       entityId: anthropic
       position: mixed
-      reason: "Called final version 'benefits likely outweigh costs' but remained uncertain about approach"
+      reason: "Initial opposition Jul 25, 2024; revised to 'benefits likely outweigh costs' Aug 21, 2024 after amendments"
       source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
     - name: Google DeepMind
       entityId: deepmind
@@ -208,7 +208,7 @@
     - name: Fei-Fei Li
       entityId: fei-fei-li
       position: oppose
-      reason: Stanford professor; later appointed by Newsom to expert panel on alternative approach
+      reason: Stanford professor; Fortune open letter opposing SB 1047 (Aug 10, 2024); later appointed by Newsom to expert panel on alternative approach
     - name: Max Tegmark
       entityId: max-tegmark
       position: support
@@ -279,6 +279,20 @@
       value: August 29, 2024
     - label: Vetoed
       value: September 29, 2024
+    - label: Compute Threshold
+      value: 10^26 FLOP
+    - label: Cost Threshold
+      value: $100M
+    - label: Employee Letter Signatories
+      value: "113"
+    - label: Companion Bills Signed
+      value: "18"
+    - label: Total Amendments
+      value: "10"
+    - label: Days to Veto
+      value: "235"
+    - label: a16z Lobbying (Apr-Jun 2024)
+      value: $39,750
   relatedEntries:
     - id: us-executive-order
       type: policy
