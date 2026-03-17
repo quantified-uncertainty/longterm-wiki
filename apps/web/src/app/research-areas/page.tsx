@@ -5,7 +5,7 @@ import { ResearchAreasTable, type ResearchAreaRow } from "./research-areas-table
 export const metadata: Metadata = {
   title: "Research Areas",
   description:
-    "Directory of AI safety research areas — fields, techniques, and programs with key papers, organizations, and grant funding.",
+    "Directory of AI safety research areas — fields, techniques, and programs organized by cluster and status.",
 };
 
 export default function ResearchAreasPage() {
@@ -25,11 +25,6 @@ export default function ResearchAreasPage() {
     cluster: a.cluster ?? null,
     parentAreaId: a.parentAreaId ?? null,
     firstProposedYear: a.firstProposedYear ?? null,
-    orgCount: a.orgCount ?? 0,
-    paperCount: a.paperCount ?? 0,
-    grantCount: a.grantCount ?? 0,
-    totalFunding: a.totalFunding ?? "0",
-    riskCount: a.riskCount ?? 0,
   }));
 
   // Summary stats
@@ -52,8 +47,8 @@ export default function ResearchAreasPage() {
           Research Areas
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
-          AI safety research fields, techniques, and programs — with key papers,
-          active organizations, and grant funding data.
+          AI safety research fields, techniques, and programs — organized by
+          cluster and status.
         </p>
       </div>
 

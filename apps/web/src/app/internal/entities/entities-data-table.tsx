@@ -54,6 +54,8 @@ export interface UnifiedEntityRow {
   // Hallucination risk
   riskLevel: "low" | "medium" | "high" | null;
   riskScore: number | null;
+  // Priority (NBA)
+  priorityScore: number | null;
   // Ratings (1-10)
   novelty: number | null;
   rigor: number | null;
@@ -324,6 +326,7 @@ const COLUMN_LABELS: Record<string, string> = {
   // Risk
   riskLevel: "Hallucination Risk",
   riskScore: "Risk Score",
+  priorityScore: "Priority (NBA)",
   // Ratings
   novelty: "Novelty",
   rigor: "Rigor",
@@ -561,6 +564,19 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
       if (v == null) return <Dash />;
       const color = v >= 70 ? "text-red-500" : v >= 40 ? "text-amber-500" : "text-emerald-500";
       return <span className={`text-xs tabular-nums font-medium ${color}`}>{Math.round(v)}</span>;
+    },
+  },
+
+  // --- Priority (NBA) ---
+  {
+    accessorKey: "priorityScore",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Next Best Action priority: importance * qualityDeficit * staleness * riskFactor">NBA</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.priorityScore;
+      if (v == null) return <Dash />;
+      const color = v >= 0.8 ? "text-red-500" : v >= 0.4 ? "text-amber-500" : v >= 0.15 ? "text-blue-500" : "text-emerald-500";
+      return <span className={`text-xs tabular-nums font-bold ${color}`}>{v.toFixed(2)}</span>;
     },
   },
 
@@ -817,6 +833,8 @@ interface Preset {
   description: string;
   columns: string[];
   defaultSort: SortingState;
+  /** Optional filter overrides applied when this preset is selected */
+  filters?: { pageFilter?: string };
 }
 
 const PRESETS: Record<string, Preset> = {
@@ -825,6 +843,14 @@ const PRESETS: Record<string, Preset> = {
     description: "Key quality, risk, and status metrics for pages with content",
     columns: ["title", "entityType", "quality", "readerImportance", "coverageScore", "riskLevel", "lastUpdated", "wordCount", "category"],
     defaultSort: [{ id: "quality", desc: true }],
+    filters: { pageFilter: "with" },
+  },
+  authoring: {
+    label: "Content Authoring",
+    description: "Content gaps, stale pages, low coverage, citation problems — focus on what to improve next",
+    columns: ["title", "quality", "coverageScore", "riskLevel", "riskScore", "citationTotal", "citationAvgScore", "lastUpdated", "updateFrequency", "unconvertedLinkCount", "wordCount"],
+    defaultSort: [{ id: "quality", desc: false }],
+    filters: { pageFilter: "with" },
   },
   entities: {
     label: "Entities",
@@ -862,6 +888,12 @@ const PRESETS: Record<string, Preset> = {
     columns: ["title", "lastUpdated", "updateFrequency", "quality", "readerImportance", "riskLevel", "wordCount", "category"],
     defaultSort: [{ id: "lastUpdated", desc: false }],
   },
+  priority: {
+    label: "Priority",
+    description: "Next Best Action score: importance x quality deficit x staleness x risk",
+    columns: ["title", "priorityScore", "quality", "readerImportance", "researchImportance", "riskLevel", "lastUpdated", "wordCount", "entityType"],
+    defaultSort: [{ id: "priorityScore", desc: true }],
+  },
   all: {
     label: "All",
     description: "Every available column",
@@ -891,7 +923,7 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
   const [activePreset, setActivePreset] = useState<string>("overview");
   const [showColumnPicker, setShowColumnPicker] = useState(false);
   const [typeFilter, setTypeFilter] = useState<string>("");
-  const [pageFilter, setPageFilter] = useState<string>("");
+  const [pageFilter, setPageFilter] = useState<string>(PRESETS.overview.filters?.pageFilter ?? "");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
 
   const types = useMemo(() => {
@@ -921,6 +953,9 @@ export function EntitiesDataTable({ entities }: { entities: UnifiedEntityRow[] }
     setColumnVisibility(presetToVisibility(preset.columns));
     setSorting(preset.defaultSort);
     setActivePreset(key);
+    // Apply filter overrides — reset to "" if the preset doesn't specify
+    setPageFilter(preset.filters?.pageFilter ?? "");
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
   }, []);
 
   const table = useReactTable({

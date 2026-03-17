@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import {
   fetchDetailed,
   withApiFallback,
@@ -5,6 +7,7 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { GITHUB_REPO } from "@lib/site-config";
 import { SystemHealthTable } from "./system-health-table";
 import { OpenPRsTable, type OpenPRDisplayRow } from "./open-prs-table";
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -72,7 +75,6 @@ interface ExtendedHealthData {
     status: string;
     breakdown: {
       facts: number;
-      claims: number;
       summaries: number;
       citations: number;
       editLogs: number;
@@ -101,6 +103,46 @@ interface ExtendedHealthData {
     startedAt: string | null;
     completedAt: string | null;
     model: string | null;
+  }>;
+  migrations: {
+    appliedCount: number;
+    expectedCount: number;
+    inSync: boolean;
+    recent: Array<{ id: number; hash: string; createdAt: string }>;
+  } | null;
+  deploys: {
+    recent: Array<{
+      id: number;
+      status: string;
+      conclusion: string;
+      createdAt: string;
+      headSha: string;
+      runNumber: number;
+      durationSeconds: number | null;
+    }>;
+  } | null;
+  agentActivity: {
+    activeNow: number;
+    sessionsThisWeek: number;
+    prsThisWeek: number;
+    completedThisWeek: number;
+    completionRate: number | null;
+  } | null;
+  apiKeys: {
+    github: { configured: boolean; healthy: boolean };
+    anthropic: { configured: boolean; healthy: boolean };
+    openrouter: { configured: boolean; healthy: boolean };
+  } | null;
+}
+
+interface BrokenEntityLinksData {
+  checkedAt: string;
+  totalBroken: number;
+  totalUnreachable: number;
+  sample: Array<{
+    pageId: string;
+    entityId: string;
+    reason: "not_found" | "no_page";
   }>;
 }
 
@@ -391,7 +433,7 @@ function GroundskeeperSection({
 }: {
   tasks: ExtendedHealthData["groundskeeperTasks"];
 }) {
-  if (tasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     return (
       <>
         <SectionHeader>Groundskeeper Tasks (last 24h)</SectionHeader>
@@ -509,6 +551,17 @@ function IntegritySection({
 }: {
   integrity: ExtendedHealthData["integrity"];
 }) {
+  if (!integrity) {
+    return (
+      <>
+        <SectionHeader>Data Integrity</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Integrity data unavailable
+        </div>
+      </>
+    );
+  }
+
   const isClean = integrity.status === "clean";
   const isError = integrity.status === "error";
 
@@ -560,6 +613,17 @@ function AutoUpdateSection({
 }: {
   autoUpdate: ExtendedHealthData["autoUpdate"];
 }) {
+  if (!autoUpdate) {
+    return (
+      <>
+        <SectionHeader>Auto-Update System</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Auto-update data unavailable
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SectionHeader>Auto-Update System</SectionHeader>
@@ -639,8 +703,6 @@ function AutoUpdateSection({
     </>
   );
 }
-
-const GITHUB_REPO = "quantified-uncertainty/longterm-wiki";
 
 function CurrentDeploymentSection() {
   const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "";
@@ -739,6 +801,296 @@ function CurrentDeploymentSection() {
   );
 }
 
+// ── New section components ────────────────────────────────────────────────
+
+function ApiKeyHealthSection({ apiKeys }: { apiKeys: ExtendedHealthData["apiKeys"] }) {
+  if (!apiKeys) {
+    return (
+      <>
+        <SectionHeader>API Key Health</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          API key health check unavailable
+        </div>
+      </>
+    );
+  }
+
+  const keys = [
+    { name: "GitHub", ...apiKeys.github },
+    { name: "Anthropic", ...apiKeys.anthropic },
+    { name: "OpenRouter", ...apiKeys.openrouter },
+  ];
+
+  return (
+    <>
+      <SectionHeader>API Key Health</SectionHeader>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {keys.map((key) => {
+          const bg = !key.configured
+            ? "bg-muted"
+            : key.healthy
+              ? "bg-green-500/15"
+              : "bg-red-500/15";
+          const text = !key.configured
+            ? "text-muted-foreground"
+            : key.healthy
+              ? "text-green-600"
+              : "text-red-500";
+          const label = !key.configured
+            ? "not configured"
+            : key.healthy
+              ? "OK"
+              : "unreachable";
+          return (
+            <span
+              key={key.name}
+              className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ${bg} ${text}`}
+            >
+              {key.name}: {label}
+            </span>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function MigrationStatusSection({ migrations }: { migrations: ExtendedHealthData["migrations"] }) {
+  if (!migrations) {
+    return (
+      <>
+        <SectionHeader>Migration Status</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Migration status unavailable
+        </div>
+      </>
+    );
+  }
+
+  const statusColor = migrations.inSync ? "text-green-600" : "text-yellow-600";
+  const statusBg = migrations.inSync ? "bg-green-500/10" : "bg-yellow-500/10";
+
+  return (
+    <>
+      <SectionHeader>Migration Status</SectionHeader>
+      <div className={`rounded-lg border border-border/60 p-4 mb-4 ${statusBg}`}>
+        <div className="flex items-center justify-between">
+          <span className={`text-sm font-semibold ${statusColor}`}>
+            {migrations.appliedCount}/{migrations.expectedCount} migrations applied
+          </span>
+          {!migrations.inSync && (
+            <span className="text-xs text-yellow-600 font-medium">
+              {migrations.expectedCount - migrations.appliedCount} pending
+            </span>
+          )}
+        </div>
+      </div>
+      {migrations.recent.length > 0 && (
+        <details className="mb-6">
+          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground mb-2">
+            Recent migrations ({Math.min(migrations.recent.length, 5)})
+          </summary>
+          <div className="space-y-1 pl-2">
+            {migrations.recent.slice(0, 5).map((m) => (
+              <div key={m.id} className="text-xs text-muted-foreground flex items-center gap-2">
+                <span className="font-mono">{m.hash.slice(0, 12)}</span>
+                <span suppressHydrationWarning>{formatRelativeTime(m.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+    </>
+  );
+}
+
+function DeployHistorySection({ deploys }: { deploys: ExtendedHealthData["deploys"] }) {
+  if (!deploys) {
+    return (
+      <>
+        <SectionHeader>Deploy History</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Deploy history unavailable (GITHUB_TOKEN not configured on server)
+        </div>
+      </>
+    );
+  }
+
+  if (deploys.recent.length === 0) {
+    return (
+      <>
+        <SectionHeader>Deploy History</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          No recent deploys found
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SectionHeader>Deploy History</SectionHeader>
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/60">
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 pr-4">Run</th>
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">Status</th>
+              <th className="text-left text-xs text-muted-foreground font-medium py-2 px-3">Commit</th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 px-3">Duration</th>
+              <th className="text-right text-xs text-muted-foreground font-medium py-2 pl-3">When</th>
+            </tr>
+          </thead>
+          <tbody>
+            {deploys.recent.map((deploy) => {
+              const isSuccess = deploy.conclusion === "success";
+              const isFailed = deploy.conclusion === "failure";
+              const conclusionColor = isFailed
+                ? "text-red-500"
+                : isSuccess
+                  ? "text-green-600"
+                  : "text-yellow-600";
+              const rowBg = isFailed ? "bg-red-500/5" : "";
+              const durationStr = deploy.durationSeconds !== null
+                ? deploy.durationSeconds > 60
+                  ? `${Math.floor(deploy.durationSeconds / 60)}m ${deploy.durationSeconds % 60}s`
+                  : `${deploy.durationSeconds}s`
+                : "-";
+              return (
+                <tr key={deploy.id} className={`border-b border-border/30 ${rowBg}`}>
+                  <td className="py-2 pr-4 text-xs font-mono">#{deploy.runNumber}</td>
+                  <td className={`py-2 px-3 text-xs font-medium ${conclusionColor}`}>
+                    {deploy.conclusion}
+                  </td>
+                  <td className="py-2 px-3 text-xs font-mono">
+                    <a
+                      href={`https://github.com/${GITHUB_REPO}/commit/${deploy.headSha}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {deploy.headSha.slice(0, 8)}
+                    </a>
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums text-muted-foreground text-xs">
+                    {durationStr}
+                  </td>
+                  <td className="py-2 pl-3 text-right text-xs text-muted-foreground" suppressHydrationWarning>
+                    {formatRelativeTime(deploy.createdAt)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function BrokenEntityLinksSection({ data }: { data: BrokenEntityLinksData | null }) {
+  if (!data) {
+    return (
+      <>
+        <SectionHeader>EntityLink Integrity</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          EntityLink scan data not available (run build-data first)
+        </div>
+      </>
+    );
+  }
+
+  const total = data.totalBroken + data.totalUnreachable;
+  const isClean = total === 0;
+  const statusBg = isClean ? "bg-green-500/10" : "bg-yellow-500/10";
+  const statusColor = isClean ? "text-green-600" : "text-yellow-600";
+
+  return (
+    <>
+      <SectionHeader>EntityLink Integrity</SectionHeader>
+      <div className={`rounded-lg border border-border/60 p-4 mb-6 ${statusBg}`}>
+        <span className={`text-sm font-semibold ${statusColor}`}>
+          {isClean
+            ? "No broken EntityLinks"
+            : `${data.totalBroken} broken, ${data.totalUnreachable} unreachable`}
+        </span>
+        {data.sample.length > 0 && (
+          <details className="mt-2">
+            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+              Show details ({data.sample.length})
+            </summary>
+            <div className="mt-2 space-y-1">
+              {data.sample.map((item, i) => (
+                <div key={i} className="text-xs text-muted-foreground">
+                  <span className="font-mono">{item.pageId}</span>
+                  {" \u2192 "}
+                  <span className={`font-medium ${item.reason === "not_found" ? "text-red-500" : "text-yellow-600"}`}>
+                    {item.entityId}
+                  </span>
+                  <span className="ml-1">({item.reason === "not_found" ? "entity not found" : "no page"})</span>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+        <p className="text-xs text-muted-foreground mt-2" suppressHydrationWarning>
+          Checked at build time: {formatRelativeTime(data.checkedAt)}
+        </p>
+      </div>
+    </>
+  );
+}
+
+function AgentActivitySection({ activity }: { activity: ExtendedHealthData["agentActivity"] | undefined }) {
+  // Defensive null check — during CI prerendering the API may return
+  // extended data without agentActivity (e.g. server version mismatch).
+  if (!activity) {
+    return (
+      <>
+        <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Agent activity data unavailable
+        </div>
+      </>
+    );
+  }
+
+
+  return (
+    <>
+      <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <StatCard
+          label="Active Now"
+          value={activity.activeNow ?? 0}
+          colorClass={(activity.activeNow ?? 0) > 0 ? "text-green-600" : ""}
+        />
+        <StatCard
+          label="Sessions (7d)"
+          value={activity.sessionsThisWeek ?? 0}
+        />
+        <StatCard
+          label="PRs Created (7d)"
+          value={activity.prsThisWeek ?? 0}
+        />
+        <StatCard
+          label="Completion Rate (7d)"
+          value={activity.completionRate != null ? `${activity.completionRate}%` : null}
+          colorClass={
+            activity.completionRate != null
+              ? activity.completionRate >= 80
+                ? "text-green-600"
+                : activity.completionRate >= 50
+                  ? "text-yellow-600"
+                  : "text-red-500"
+              : ""
+          }
+        />
+      </div>
+    </>
+  );
+}
+
 function formatRelativeTime(isoString: string): string {
   const now = Date.now();
   const then = new Date(isoString).getTime();
@@ -784,6 +1136,15 @@ export async function SystemHealthContent() {
         : pullsApiError.type
     : pullsData?.error ?? null;
   const openPRs: OpenPRDisplayRow[] = pullsData?.pulls ?? [];
+
+  // Load broken EntityLinks data from build-time scan
+  let brokenEntityLinks: BrokenEntityLinksData | null = null;
+  try {
+    const brokenLinksPath = join(process.cwd(), "src/data/broken-entity-links.json");
+    brokenEntityLinks = JSON.parse(readFileSync(brokenLinksPath, "utf-8"));
+  } catch {
+    // Build-time data not available — section will show fallback
+  }
 
   const { overall, checkedAt, services: rawServices, recentIncidents } =
     data;
@@ -835,8 +1196,29 @@ export async function SystemHealthContent() {
         </div>
       )}
 
+      {/* API Key Health */}
+      {extended ? (
+        <ApiKeyHealthSection apiKeys={extended.apiKeys} />
+      ) : extendedError ? (
+        <SectionUnavailable title="API Key Health" error={extendedError} />
+      ) : null}
+
       {/* Current deployment */}
       <CurrentDeploymentSection />
+
+      {/* Migration Status */}
+      {extended ? (
+        <MigrationStatusSection migrations={extended.migrations} />
+      ) : extendedError ? (
+        <SectionUnavailable title="Migration Status" error={extendedError} />
+      ) : null}
+
+      {/* Deploy History */}
+      {extended ? (
+        <DeployHistorySection deploys={extended.deploys} />
+      ) : extendedError ? (
+        <SectionUnavailable title="Deploy History" error={extendedError} />
+      ) : null}
 
       {/* CI Pipeline Status */}
       {extended ? (
@@ -851,6 +1233,9 @@ export async function SystemHealthContent() {
       ) : extendedError ? (
         <SectionUnavailable title="Data Integrity" error={extendedError} />
       ) : null}
+
+      {/* Broken EntityLinks */}
+      <BrokenEntityLinksSection data={brokenEntityLinks} />
 
       {/* Open Pull Requests */}
       {pullsError ? (
@@ -879,6 +1264,13 @@ export async function SystemHealthContent() {
           )}
         </>
       )}
+
+      {/* Agent Activity Summary */}
+      {extended ? (
+        <AgentActivitySection activity={extended.agentActivity} />
+      ) : extendedError ? (
+        <SectionUnavailable title="Agent Activity (last 7 days)" error={extendedError} />
+      ) : null}
 
       {/* Recent incidents */}
       <SectionHeader>Recent incidents (last 24h)</SectionHeader>

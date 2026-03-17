@@ -1,8 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTypedEntities, isEvent } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
-import { getWikiHref } from "@/data/entity-nav";
+import { EventsTable, type EventRow } from "./events-table";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -12,13 +12,29 @@ export const metadata: Metadata = {
 
 export default function EventsPage() {
   const events = getTypedEntities().filter(isEvent);
+  const isSparse = events.length < 5;
+
+  const rows: EventRow[] = events.map((e) => {
+    const statusField = e.customFields.find((f) => f.label === "Status");
+    return {
+      id: e.id,
+      title: e.title,
+      description: e.description ?? null,
+      status: statusField?.value ?? null,
+      tags: e.tags ?? [],
+      numericId: e.numericId ?? null,
+    };
+  });
+
+  const uniqueTagCount = new Set(rows.flatMap((r) => r.tags)).size;
 
   const stats = [
-    { label: "Events", value: String(events.length) },
+    { label: "Events", value: String(rows.length) },
     {
       label: "With Description",
-      value: String(events.filter((e) => e.description).length),
+      value: String(rows.filter((r) => r.description).length),
     },
+    { label: "Unique Tags", value: String(uniqueTagCount) },
   ];
 
   return (
@@ -30,7 +46,14 @@ export default function EventsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      {isSparse && (
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-4 py-3 mb-8 text-sm text-muted-foreground">
+          This directory is being populated. Currently tracking{" "}
+          {events.length} {events.length === 1 ? "event" : "events"}.
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
         {stats.map((stat) => (
           <ProfileStatCard
             key={stat.label}
@@ -40,67 +63,9 @@ export default function EventsPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {events
-          .sort((a, b) => a.title.localeCompare(b.title))
-          .map((event) => {
-            const wikiHref = getWikiHref(event.id);
-            // Extract key fields from customFields
-            const statusField = event.customFields.find(
-              (f) => f.label === "Status",
-            );
-            const triggerField = event.customFields.find(
-              (f) => f.label === "Trigger Event",
-            );
-            return (
-              <div
-                key={event.id}
-                className="rounded-xl border border-border/60 bg-card p-4 hover:bg-muted/20 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <Link
-                    href={`/events/${event.id}`}
-                    className="font-semibold text-sm hover:text-primary transition-colors line-clamp-2"
-                  >
-                    {event.title}
-                  </Link>
-                  {statusField && (
-                    <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                      {statusField.value}
-                    </span>
-                  )}
-                </div>
-                {event.description && (
-                  <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
-                    {event.description}
-                  </p>
-                )}
-                {triggerField && (
-                  <p className="text-xs text-muted-foreground mb-2">
-                    <span className="font-medium">Trigger:</span>{" "}
-                    {triggerField.value}
-                  </p>
-                )}
-                <div className="flex items-center gap-3 text-xs">
-                  {event.tags.length > 0 && (
-                    <span className="text-muted-foreground">
-                      {event.tags.slice(0, 3).join(", ")}
-                      {event.tags.length > 3 && " ..."}
-                    </span>
-                  )}
-                  {wikiHref && (
-                    <Link
-                      href={wikiHref}
-                      className="text-primary hover:underline ml-auto"
-                    >
-                      Wiki &rarr;
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <EventsTable rows={rows} />
+      </Suspense>
     </div>
   );
 }

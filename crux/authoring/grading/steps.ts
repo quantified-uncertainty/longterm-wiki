@@ -15,6 +15,7 @@ import { readFileSync } from 'fs';
 import { stripFrontmatter } from '../../lib/patterns.ts';
 import { ValidationEngine, ContentFile } from '../../lib/validation/validation-engine.ts';
 import { countFootnoteRefs } from '../../lib/metrics-extractor.ts';
+import { countAllFootnoteRefs } from '../../lib/content-integrity.ts';
 import {
   insiderJargonRule,
   falseCertaintyRule,
@@ -71,7 +72,12 @@ export function computeMetrics(content: string): Metrics {
   const proseWords = withoutComponents.split(/\s+/).filter(w => w.length > 0).length;
 
   const rComponents = (withoutFm.match(/<R\s+id=/g) || []).length;
-  const citations = rComponents + countFootnoteRefs(withoutFm);
+  // Count both numeric [^1] and named [^mixtral] footnotes
+  const footnoteRefs = countAllFootnoteRefs(withoutFm);
+  // Count external markdown links as evidence sources
+  const externalLinks = (withoutFm.match(/\]\(https?:\/\/[^)]+\)/g) || []).length;
+  // Citations = R components + all footnote refs + external links
+  const citations = rComponents + footnoteRefs + externalLinks;
 
   const tables = (withoutFm.match(/\|[-:]+\|/g) || []).length;
 
@@ -234,7 +240,18 @@ export async function gradePage(client: Anthropic, page: PageInfo, warningsSumma
  * - reference: rigor, completeness weighted 1.5x
  * - explainer: completeness, rigor weighted 1.5x
  *
- * Formula: weightedAvg x 8 + min(8, words/600) + min(7, citations x 0.35)
+ * Formula:
+ *   weightedAvg x 10 + min(8, words/600) + min(7, citations x 0.35)
+ *     + min(3, tables x 0.3) + min(2, diagrams x 1.0)
+ *
+ * The base multiplier is 10 (was 8) to expand the scoring range for
+ * well-rated content. The LLM prompt instructs harsh scoring (3-5 typical),
+ * so the previous multiplier of 8 created a ceiling around 55 for good pages.
+ * With 10, a page scoring 5/10 across all dimensions gets a base of 50,
+ * and a page scoring 7/10 ("exceptional") reaches 70.
+ *
+ * Structural bonuses for tables and diagrams reward well-structured
+ * technical content that was previously unrecognized.
  */
 export function computeQuality(ratings: Ratings, metrics: Metrics, frontmatter: Frontmatter = {}, relativePath: string = ''): number {
   const contentType = detectContentType(frontmatter, relativePath);
@@ -263,11 +280,14 @@ export function computeQuality(ratings: Ratings, metrics: Metrics, frontmatter: 
     actionability * weights.actionability + objectivity * weights.objectivity;
 
   const weightedAvg: number = weightedSum / totalWeight;
-  const baseScore: number = weightedAvg * 8;
+  const baseScore: number = weightedAvg * 10;
   const lengthScore: number = Math.min(8, metrics.wordCount / 600);
   const evidenceScore: number = Math.min(7, metrics.citations * 0.35);
+  // Structural bonuses: tables (max 3) and diagrams (max 2)
+  const tableScore: number = Math.min(3, metrics.tables * 0.3);
+  const diagramScore: number = Math.min(2, metrics.diagrams * 1.0);
 
-  let quality: number = baseScore + lengthScore + evidenceScore;
+  let quality: number = baseScore + lengthScore + evidenceScore + tableScore + diagramScore;
 
   if (frontmatter.pageType === 'stub') {
     quality = Math.min(quality, 35);
@@ -276,5 +296,6 @@ export function computeQuality(ratings: Ratings, metrics: Metrics, frontmatter: 
     quality = Math.min(quality, 40);
   }
 
-  return Math.round(Math.max(0, quality));
+  // Clamp to 0-100
+  return Math.round(Math.max(0, Math.min(100, quality)));
 }

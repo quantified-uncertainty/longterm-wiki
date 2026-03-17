@@ -15,6 +15,9 @@
 - **Array spread overflow**: `array.push(...largeArray)` causes "Maximum call stack size exceeded" when `largeArray` has >65k elements. Use a for-of loop instead.
 - **Vercel ignoreCommand exit codes are counterintuitive**: Exit 0 = **skip** build, exit 1 = **proceed** with build. The command answers "should I ignore?", so 0 (success/yes) means skip. This has been incorrectly inverted multiple times. See `apps/web/vercel.json`.
 
+## Feedback
+- [PG-primary for new features](feedback_pg_primary_for_new_features.md) — strongly prefer PG tables over YAML for new features with dedicated UI/directory pages
+
 ## Architecture Notes
 - **SCRY_PUBLIC_KEY** is defined in `crux/lib/api-keys.ts`. All consumers import from there (consolidated Feb 2026).
 - **crux/ import direction**: `lib → authoring`, never `authoring → lib`.

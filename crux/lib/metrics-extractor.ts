@@ -15,7 +15,7 @@ import {
   type VisualCounts,
 } from './visual-detection.ts';
 import { stripFrontmatter } from './patterns.ts';
-import { findFootnoteRefs } from './content-integrity.ts';
+import { countAllFootnoteRefs } from './content-integrity.ts';
 
 export type { VisualCounts } from './visual-detection.ts';
 export { countVisuals, countDiagrams, countTables } from './visual-detection.ts';
@@ -166,11 +166,15 @@ export function countExternalLinks(content: string): number {
 }
 
 /**
- * Count unique GFM footnote references [^N] (excluding definitions).
- * Delegates to findFootnoteRefs() from content-integrity.ts (DRY, issue #417).
+ * Count unique footnote references (both numeric [^1] and named [^mixtral]).
+ * Delegates to countAllFootnoteRefs() from content-integrity.ts.
+ *
+ * Previously only counted numeric footnotes via findFootnoteRefs(), which
+ * systematically undercounted citations on pages using named footnotes
+ * (175 files affected). See quality-scoring-recalibration.
  */
 export function countFootnoteRefs(content: string): number {
-  return findFootnoteRefs(content).size;
+  return countAllFootnoteRefs(content);
 }
 
 /**

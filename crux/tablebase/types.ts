@@ -31,6 +31,10 @@ export interface TableProfile {
   completenessPercent: number;
   /** Specific fields that are missing or incomplete */
   missingFields: string[];
+  /** Entity website URL (for team page scraping) */
+  website?: string;
+  /** Reader importance score 0-100 from page rankings */
+  entityImportance?: number;
 }
 
 /** A ranked enrichment task to be executed by an LLM agent */
@@ -45,6 +49,8 @@ export interface EnrichmentTask {
   impactScore: number;
   reasons: string[];
   existingRecordCount: number;
+  /** Entity website URL (for team page scraping) */
+  website?: string;
 }
 
 /** Result of running an LLM agent on a single enrichment task */

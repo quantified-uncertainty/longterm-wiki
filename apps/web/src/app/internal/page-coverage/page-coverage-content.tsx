@@ -1,32 +1,25 @@
-import { getPageCoverageItems } from "@/data";
-import { CoverageTable } from "./coverage-table";
+import Link from "next/link";
 
 export function PageCoverageContent() {
-  const items = getPageCoverageItems();
-
-  const withQuality = items.filter((i) => i.quality != null).length;
-  const avgQuality =
-    withQuality > 0
-      ? Math.round(
-          items.reduce((sum, i) => sum + (i.quality ?? 0), 0) / withQuality
-        )
-      : 0;
-  const highRisk = items.filter((i) => i.riskLevel === "high").length;
-
   return (
-    <>
-      <p className="text-muted-foreground text-sm leading-relaxed">
-        Admin overview of {items.length} wiki pages. Use{" "}
-        <strong>preset buttons</strong> to switch between views (overview,
-        coverage, quality, citations, updates) or toggle individual columns.
-        Hover column headers for descriptions.
+    <div className="rounded-lg border border-border bg-muted/50 p-6 space-y-3">
+      <p className="text-sm font-medium text-foreground">
+        This dashboard has been merged into the Entities dashboard.
       </p>
-      <p className="text-muted-foreground text-xs">
-        {withQuality} rated (avg quality {avgQuality}),{" "}
-        <span className="text-red-500 font-medium">{highRisk}</span> high
-        hallucination risk.
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        The Entities dashboard (E908) now includes all the columns and presets
+        that were previously here, plus entity metadata, importance rankings,
+        type/page filters, and pagination. Use the{" "}
+        <strong>Overview</strong> preset (filtered to pages with content) for the
+        same view, or the <strong>Content Authoring</strong> preset for a
+        focused view on coverage gaps, stale content, and citation problems.
       </p>
-      <CoverageTable data={items} />
-    </>
+      <Link
+        href="/wiki/E908"
+        className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors no-underline"
+      >
+        Go to Entities Dashboard
+      </Link>
+    </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CLUSTER_COLORS, STATUS_COLORS, formatCluster, formatFunding } from "./research-area-constants";
+import { CLUSTER_COLORS, STATUS_COLORS, formatCluster } from "./research-area-constants";
 
 export interface ResearchAreaRow {
   id: string;
@@ -15,21 +15,16 @@ export interface ResearchAreaRow {
   cluster: string | null;
   parentAreaId: string | null;
   firstProposedYear: number | null;
-  orgCount: number;
-  paperCount: number;
-  grantCount: number;
-  totalFunding: string;
-  riskCount: number;
 }
 
-type SortKey = "title" | "cluster" | "status" | "orgCount" | "paperCount" | "grantCount" | "totalFunding" | "firstProposedYear";
+type SortKey = "title" | "cluster" | "status" | "firstProposedYear";
 
 export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
   const [search, setSearch] = useState("");
   const [clusterFilter, setClusterFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("grantCount");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortKey, setSortKey] = useState<SortKey>("title");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   const clusters = useMemo(() => {
     const set = new Set<string>();
@@ -69,10 +64,6 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
             case "title": return row.title.toLowerCase();
             case "cluster": return row.cluster ?? "";
             case "status": return row.status;
-            case "orgCount": return row.orgCount;
-            case "paperCount": return row.paperCount;
-            case "grantCount": return row.grantCount;
-            case "totalFunding": return parseFloat(row.totalFunding);
             case "firstProposedYear": return row.firstProposedYear ?? 0;
           }
         };
@@ -154,17 +145,13 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
               <SortHeader label="Name" sortKey="title" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
               <SortHeader label="Cluster" sortKey="cluster" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
               <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortHeader label="Orgs" sortKey="orgCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="Papers" sortKey="paperCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="Grants" sortKey="grantCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="Funding" sortKey="totalFunding" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Since" sortKey="firstProposedYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
+                <td colSpan={4} className="px-3 py-12 text-center text-muted-foreground">
                   No research areas match your filters.
                 </td>
               </tr>
@@ -205,10 +192,6 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.orgCount ?? "-"}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.paperCount ?? "-"}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{row.grantCount ?? "-"}</td>
-                <td className="px-3 py-2.5 text-right tabular-nums">{formatFunding(row.totalFunding)}</td>
                 <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
                   {row.firstProposedYear ?? "-"}
                 </td>

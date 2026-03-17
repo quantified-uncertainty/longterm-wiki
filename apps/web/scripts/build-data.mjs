@@ -86,6 +86,61 @@ const DATA_FILES = [
   { key: 'peopleResources', file: 'people-resources.yaml' },
 ];
 
+/**
+ * Scan MDX files for <EntityLink id="..."> references and check each against
+ * the entity registry. EntityLink ids can be numeric (E42) or slug-based.
+ */
+function scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry) {
+  const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
+  const knownNumericIds = new Set(Object.keys(numericIdToSlug));
+  const knownSlugs = new Set(Object.keys(slugToNumericId));
+  const reachableSlugs = new Set(Object.keys(pathRegistry));
+  const broken = [];
+  const unreachable = [];
+
+  const mdxFiles = [];
+  function walk(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith('.mdx')) mdxFiles.push(full);
+    }
+  }
+  walk(CONTENT_DIR);
+
+  for (const filePath of mdxFiles) {
+    const content = readFileSync(filePath, 'utf-8');
+    entityLinkRegex.lastIndex = 0;
+    let match;
+    while ((match = entityLinkRegex.exec(content)) !== null) {
+      const id = match[1];
+      const pageId = relative(CONTENT_DIR, filePath).replace(/\.mdx$/, '');
+
+      // Resolve to slug: id can be numeric (E42) or slug-based
+      let slug;
+      if (knownNumericIds.has(id)) {
+        slug = numericIdToSlug[id];
+      } else if (knownSlugs.has(id)) {
+        slug = id;
+      } else {
+        broken.push({ pageId, entityId: id, reason: 'not_found' });
+        continue;
+      }
+
+      if (slug && !reachableSlugs.has(slug)) {
+        unreachable.push({ pageId, entityId: id, reason: 'no_page' });
+      }
+    }
+  }
+
+  return {
+    checkedAt: new Date().toISOString(),
+    totalBroken: broken.length,
+    totalUnreachable: unreachable.length,
+    sample: [...broken, ...unreachable].slice(0, 20),
+  };
+}
+
 function loadYaml(filename) {
   const filepath = join(DATA_DIR, filename);
   if (!existsSync(filepath)) {
@@ -581,14 +636,8 @@ function extractPrNumber(prUrl) {
   return m ? parseInt(m[1], 10) : undefined;
 }
 
-/**
- * Return the later of two YYYY-MM-DD date strings (null-safe).
- */
-function maxDate(a, b) {
-  if (!a) return b;
-  if (!b) return a;
-  return a > b ? a : b;
-}
+// maxDate was removed — see lastUpdated fallback chain comment in buildPagesRegistry.
+// dateCreated already uses a fallback chain (resolveDateCreated in git-date-utils.mjs).
 
 /**
  * Build git-based date maps for all content files.
@@ -1899,13 +1948,17 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           causalLevel: fm.causalLevel || null,
-          lastUpdated: maxDate(
-            editLogDates.get(isIndexFile ? null : id) || null,
-            maxDate(
-              gitModifiedMap.get(relative(REPO_ROOT, fullPath)) || null,
-              maxDate(toDateString(fm.lastUpdated), toDateString(fm.lastEdited))
-            )
-          ),
+          // Use a fallback chain instead of maxDate to avoid metadata-only
+          // git commits (e.g. bulk frontmatter reformatting) from overriding
+          // the actual content change date with today's date.
+          // Priority: frontmatter lastEdited (set by content editing tools)
+          //   → frontmatter lastUpdated (legacy) → edit log date (wiki-server)
+          //   → git modified date (last resort, includes metadata commits).
+          lastUpdated: toDateString(fm.lastEdited)
+            || toDateString(fm.lastUpdated)
+            || editLogDates.get(isIndexFile ? null : id)
+            || gitModifiedMap.get(relative(REPO_ROOT, fullPath))
+            || null,
           // Derive creation date: prefer explicit frontmatter, then non-bulk git
           // first-commit, then earliest edit log from wiki-server, then legacy
           // frontmatter. Bulk-import git dates are already filtered out of
@@ -2934,6 +2987,14 @@ async function main() {
       console.error('⚠️  Link health generation failed:', linkValidation.stderr);
     }
   }
+
+  // ==========================================================================
+  // Broken EntityLink scan
+  // ==========================================================================
+  console.log('\nScanning for broken EntityLink references...');
+  const brokenLinksResult = scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry);
+  writeFileSync(join(OUTPUT_DIR, 'broken-entity-links.json'), JSON.stringify(brokenLinksResult, null, 2));
+  console.log(`✓ EntityLink scan: ${brokenLinksResult.totalBroken} broken, ${brokenLinksResult.totalUnreachable} unreachable`);
 
   // Print summary stats
   console.log('\n--- Summary ---');

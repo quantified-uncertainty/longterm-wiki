@@ -90,6 +90,8 @@ Entity types without directories (too abstract or sparse for tables): `risk`, `c
 
 Adding a new directory requires: schema in `entity-schemas.ts`, transform in `entity-transform.mjs`, route in `entity-nav.ts`, and App Router pages.
 
+**YAML entities vs PG-primary tables**: Strongly prefer PG-primary tables for new features with dedicated UI/directory pages and structured relational data (the grants, investments, funding-rounds, benchmarks, divisions pattern). YAML entities (`data/entities/`) are for lightweight catalog entries that mainly serve as link targets or wiki page metadata. If the data has numeric fields to aggregate, many-to-many relationships, or its own directory page — use PG.
+
 ## Data Layer Terminology — Three Bases
 
 | Name | What it is | Key files |
@@ -111,6 +113,10 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json` + `factbase-data.json`
 3. Next.js app reads `database.json` and `factbase-data.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
+
+## Implementation Quality
+
+- **Thorough over fast.** Robust implementations that handle edge cases beat quick ones that only cover the happy path. See `.claude/rules/implementation-quality.md`.
 
 ## Key Conventions
 
@@ -144,4 +150,5 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/database-migrations.md` — Migration patterns and deploy flow
 - `.claude/rules/wiki-server-rpc-migration.md` — Hono RPC migration guide
 - `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
+- `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system

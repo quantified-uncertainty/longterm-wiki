@@ -228,6 +228,33 @@
     Pursuing superintelligence with safety as the core goal.
 
 # =============================================================================
+# ADDITIONAL ACADEMIC / OTHER
+# =============================================================================
+
+- id: george-mason-university
+  name: George Mason University
+  type: academic
+  founded: "1972"
+  headquarters: Fairfax, VA
+  website: https://www.gmu.edu
+  description: >
+    Public research university in Virginia. Home to the economics department
+    where Robin Hanson is Associate Professor.
+
+- id: situational-awareness-lp
+  name: Situational Awareness LP
+  type: other
+  founded: "2024"
+  headquarters: San Francisco, CA
+  website: https://situationalawarenesslp.com/
+  description: >
+    AI-focused hedge fund founded by Leopold Aschenbrenner in 2024.
+    Manages public equities in semiconductors, energy infrastructure,
+    and data centers.
+  keyPeople:
+    - leopold-aschenbrenner
+
+# =============================================================================
 # FUNDERS
 # =============================================================================
 

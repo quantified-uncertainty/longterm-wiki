@@ -34,12 +34,12 @@ All dashboards **must** use the MDX wiki page pattern (Pattern A). Do not create
 6. **Create table component** (if needed): `<name>-table.tsx` — client component with `"use client"` and `DataTable`
 7. **Add sidebar entry** in `apps/web/src/lib/wiki-nav.ts` using `internalHref("<slug>-dashboard")`
 
-Follow existing patterns in `apps/web/src/app/internal/page-coverage/` (Pattern A reference implementation).
+Follow existing patterns in `apps/web/src/app/internal/entities/` (Pattern A reference implementation).
 
 ## Existing dashboards
 
 All dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect).
 
-**Dashboards:** Pages (E899), Entities (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Auto-Update Runs (E914), Auto-Update News (E915), Active Agents (E925), Groundskeeper Runs (E926), System Health (E927).
+**Dashboards:** Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Auto-Update Runs (E914), Auto-Update News (E915), Active Agents (E925), Groundskeeper Runs (E926), System Health (E927). *(E899 deprecated — merged into E908.)*
 
 **Citations:** Fact Dashboard (E898), Resources, Citation Accuracy (E917), Citation Content (E918), Hallucination Risk (E919), Hallucination Evals (E920).
