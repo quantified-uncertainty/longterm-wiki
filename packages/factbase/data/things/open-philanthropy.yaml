@@ -3,7 +3,7 @@ thing:
   stableId: NifCYhN75w
   type: organization
   name: Open Philanthropy
-  numericId: E552
+  wikiId: E552
 facts:
   - id: f_n7p8kOo2Tw
     property: description

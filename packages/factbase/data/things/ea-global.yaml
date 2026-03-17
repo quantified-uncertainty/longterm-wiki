@@ -3,7 +3,7 @@ thing:
   stableId: k4IPgRP98A
   type: organization
   name: EA Global
-  numericId: E525
+  wikiId: E525
 facts:
   - id: f_tsumVdflJQ
     property: description

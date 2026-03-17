@@ -3,7 +3,7 @@ thing:
   stableId: ymixRXGD3A
   type: capability
   name: Long-Horizon Autonomous Tasks
-  numericId: E192
+  wikiId: E192
 facts:
   - id: f_Locc5AX46A
     property: description

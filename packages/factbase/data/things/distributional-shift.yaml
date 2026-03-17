@@ -3,7 +3,7 @@ thing:
   stableId: qYk1BOLgqA
   type: risk
   name: AI Distributional Shift
-  numericId: E105
+  wikiId: E105
 facts:
   - id: f_2v4muuXRSw
     property: description

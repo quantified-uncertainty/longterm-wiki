@@ -3,7 +3,7 @@ thing:
   stableId: SFFrl4Pmag
   type: risk
   name: Epistemic Learned Helplessness
-  numericId: E187
+  wikiId: E187
 facts:
   - id: f_3bMLSsOEyQ
     property: description

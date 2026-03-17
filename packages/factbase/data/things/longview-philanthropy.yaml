@@ -3,7 +3,7 @@ thing:
   stableId: gV4U3qi2QA
   type: organization
   name: Longview Philanthropy
-  numericId: E542
+  wikiId: E542
 facts:
   - id: f_wP669aJGyw
     property: description

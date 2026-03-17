@@ -3,7 +3,7 @@ thing:
   stableId: 7c6UC46TWQ
   type: risk
   name: Cyberweapons Risk
-  numericId: E86
+  wikiId: E86
 facts:
   - id: f_s7WTlCy2rQ
     property: description

@@ -192,7 +192,7 @@ describe("wiki-nav sidebar hrefs", () => {
   function resolves(href: string): boolean {
     if (!href.startsWith("/wiki/")) return true; // other routes OK
     const id = href.replace(/^\/wiki\//, "");
-    if (/^E\d+$/.test(id)) return true; // numeric IDs always resolve (assumed valid)
+    if (/^E\d+$/.test(id)) return true; // wiki IDs always resolve (assumed valid)
     // Check slug in idRegistry (bySlug) or pathRegistry
     return id in idRegistry || id in pathRegistry;
   }

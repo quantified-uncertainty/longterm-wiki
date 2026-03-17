@@ -3,7 +3,7 @@ thing:
   stableId: xNAFtHP1RA
   type: approach
   name: Preference Optimization Methods
-  numericId: E454
+  wikiId: E454
 facts:
   - id: f_yhcrk3jNOg
     property: description

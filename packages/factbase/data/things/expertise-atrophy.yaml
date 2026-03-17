@@ -3,7 +3,7 @@ thing:
   stableId: ks0lqvZqUg
   type: risk
   name: AI-Induced Expertise Atrophy
-  numericId: E133
+  wikiId: E133
 facts:
   - id: f_12usfHLpZw
     property: description

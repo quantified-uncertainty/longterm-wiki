@@ -3,7 +3,7 @@ thing:
   stableId: gS4YxcslRg
   type: analysis
   name: Frontier Lab Cost Structure
-  numericId: E703
+  wikiId: E703
 facts:
   - id: f_RKfchz0Jcw
     property: description

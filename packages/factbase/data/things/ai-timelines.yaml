@@ -3,7 +3,7 @@ thing:
   stableId: URCXiRsX0w
   type: concept
   name: AI Timelines
-  numericId: E16
+  wikiId: E16
 facts:
   - id: f_r67VKzhNYg
     property: description

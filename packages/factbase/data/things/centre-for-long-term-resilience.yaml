@@ -3,7 +3,7 @@ thing:
   stableId: yfUBQLMfgw
   type: organization
   name: Centre for Long-Term Resilience
-  numericId: E429
+  wikiId: E429
 facts:
   - id: f_HDafGrfwfg
     property: description

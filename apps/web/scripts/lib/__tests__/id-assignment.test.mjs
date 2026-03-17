@@ -2,7 +2,7 @@
  * Tests for ID assignment utilities (id-assignment.mjs)
  *
  * Tests the core pure functions used by assign-ids.mjs and build-data.mjs
- * to compute numeric ID maps and determine which entities/pages need IDs.
+ * to compute wiki ID maps and determine which entities/pages need IDs.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -14,54 +14,54 @@ import { buildIdMaps, filterEligiblePages } from '../id-assignment.mjs';
 
 describe('buildIdMaps', () => {
   it('returns empty maps for empty entity array', () => {
-    const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps([]);
-    expect(numericIdToSlug).toEqual({});
-    expect(slugToNumericId).toEqual({});
+    const { wikiIdToSlug, slugToWikiId, conflicts } = buildIdMaps([]);
+    expect(wikiIdToSlug).toEqual({});
+    expect(slugToWikiId).toEqual({});
     expect(conflicts).toHaveLength(0);
   });
 
-  it('skips entities without numericId', () => {
+  it('skips entities without wikiId', () => {
     const entities = [
       { id: 'anthropic' },
       { id: 'openai' },
     ];
-    const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps(entities);
-    expect(Object.keys(numericIdToSlug)).toHaveLength(0);
-    expect(Object.keys(slugToNumericId)).toHaveLength(0);
+    const { wikiIdToSlug, slugToWikiId, conflicts } = buildIdMaps(entities);
+    expect(Object.keys(wikiIdToSlug)).toHaveLength(0);
+    expect(Object.keys(slugToWikiId)).toHaveLength(0);
     expect(conflicts).toHaveLength(0);
   });
 
-  it('builds correct maps from entities with numericIds', () => {
+  it('builds correct maps from entities with wikiIds', () => {
     const entities = [
-      { id: 'anthropic', numericId: 'E1' },
-      { id: 'openai', numericId: 'E2' },
-      { id: 'deepmind', numericId: 'E5' },
+      { id: 'anthropic', wikiId: 'E1' },
+      { id: 'openai', wikiId: 'E2' },
+      { id: 'deepmind', wikiId: 'E5' },
     ];
-    const { numericIdToSlug, slugToNumericId } = buildIdMaps(entities);
+    const { wikiIdToSlug, slugToWikiId } = buildIdMaps(entities);
 
-    expect(numericIdToSlug).toEqual({ E1: 'anthropic', E2: 'openai', E5: 'deepmind' });
-    expect(slugToNumericId).toEqual({ anthropic: 'E1', openai: 'E2', deepmind: 'E5' });
+    expect(wikiIdToSlug).toEqual({ E1: 'anthropic', E2: 'openai', E5: 'deepmind' });
+    expect(slugToWikiId).toEqual({ anthropic: 'E1', openai: 'E2', deepmind: 'E5' });
   });
 
-  it('handles mix of entities with and without numericIds', () => {
+  it('handles mix of entities with and without wikiIds', () => {
     const entities = [
-      { id: 'anthropic', numericId: 'E1' },
-      { id: 'openai' },                     // no numericId
-      { id: 'deepmind', numericId: 'E3' },
+      { id: 'anthropic', wikiId: 'E1' },
+      { id: 'openai' },                     // no wikiId
+      { id: 'deepmind', wikiId: 'E3' },
     ];
-    const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps(entities);
+    const { wikiIdToSlug, slugToWikiId, conflicts } = buildIdMaps(entities);
 
-    expect(Object.keys(numericIdToSlug)).toHaveLength(2);
-    expect(slugToNumericId['anthropic']).toBe('E1');
-    expect(slugToNumericId['openai']).toBeUndefined();
-    expect(slugToNumericId['deepmind']).toBe('E3');
+    expect(Object.keys(wikiIdToSlug)).toHaveLength(2);
+    expect(slugToWikiId['anthropic']).toBe('E1');
+    expect(slugToWikiId['openai']).toBeUndefined();
+    expect(slugToWikiId['deepmind']).toBe('E3');
     expect(conflicts).toHaveLength(0);
   });
 
-  it('detects conflict when two entities claim the same numericId', () => {
+  it('detects conflict when two entities claim the same wikiId', () => {
     const entities = [
-      { id: 'anthropic', numericId: 'E1' },
-      { id: 'openai', numericId: 'E1' },   // duplicate!
+      { id: 'anthropic', wikiId: 'E1' },
+      { id: 'openai', wikiId: 'E1' },   // duplicate!
     ];
     const { conflicts } = buildIdMaps(entities);
 
@@ -71,10 +71,10 @@ describe('buildIdMaps', () => {
     expect(conflicts[0]).toContain('openai');
   });
 
-  it('does not conflict when same entity appears twice (same id and numericId)', () => {
+  it('does not conflict when same entity appears twice (same id and wikiId)', () => {
     const entities = [
-      { id: 'anthropic', numericId: 'E1' },
-      { id: 'anthropic', numericId: 'E1' }, // duplicate entry, same data
+      { id: 'anthropic', wikiId: 'E1' },
+      { id: 'anthropic', wikiId: 'E1' }, // duplicate entry, same data
     ];
     const { conflicts } = buildIdMaps(entities);
     // Same entity — no conflict
@@ -83,10 +83,10 @@ describe('buildIdMaps', () => {
 
   it('detects multiple independent conflicts', () => {
     const entities = [
-      { id: 'a', numericId: 'E1' },
-      { id: 'b', numericId: 'E1' },  // conflict #1
-      { id: 'c', numericId: 'E2' },
-      { id: 'd', numericId: 'E2' },  // conflict #2
+      { id: 'a', wikiId: 'E1' },
+      { id: 'b', wikiId: 'E1' },  // conflict #1
+      { id: 'c', wikiId: 'E2' },
+      { id: 'd', wikiId: 'E2' },  // conflict #2
     ];
     const { conflicts } = buildIdMaps(entities);
     expect(conflicts).toHaveLength(2);
@@ -94,27 +94,27 @@ describe('buildIdMaps', () => {
 
   it('keeps first entity when conflict — second entity is NOT added to maps', () => {
     const entities = [
-      { id: 'original', numericId: 'E1' },
-      { id: 'interloper', numericId: 'E1' },
+      { id: 'original', wikiId: 'E1' },
+      { id: 'interloper', wikiId: 'E1' },
     ];
-    const { numericIdToSlug, slugToNumericId } = buildIdMaps(entities);
+    const { wikiIdToSlug, slugToWikiId } = buildIdMaps(entities);
 
     // First entity wins
-    expect(numericIdToSlug['E1']).toBe('original');
-    expect(slugToNumericId['original']).toBe('E1');
+    expect(wikiIdToSlug['E1']).toBe('original');
+    expect(slugToWikiId['original']).toBe('E1');
     // Interloper is not added
-    expect(slugToNumericId['interloper']).toBeUndefined();
+    expect(slugToWikiId['interloper']).toBeUndefined();
   });
 
-  it('handles numericId: null/undefined gracefully', () => {
+  it('handles wikiId: null/undefined gracefully', () => {
     const entities = [
-      { id: 'a', numericId: null },
-      { id: 'b', numericId: undefined },
-      { id: 'c', numericId: 'E1' },
+      { id: 'a', wikiId: null },
+      { id: 'b', wikiId: undefined },
+      { id: 'c', wikiId: 'E1' },
     ];
-    const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps(entities);
-    expect(Object.keys(numericIdToSlug)).toHaveLength(1);
-    expect(numericIdToSlug['E1']).toBe('c');
+    const { wikiIdToSlug, slugToWikiId, conflicts } = buildIdMaps(entities);
+    expect(Object.keys(wikiIdToSlug)).toHaveLength(1);
+    expect(wikiIdToSlug['E1']).toBe('c');
     expect(conflicts).toHaveLength(0);
   });
 });

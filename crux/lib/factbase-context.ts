@@ -66,7 +66,7 @@ function formatFactLine(fact: Fact, graph: Graph): string {
  *
  * Returns null if no KB entity is found for this page.
  *
- * @param pageId - The wiki page numeric ID, e.g. "E22"
+ * @param pageId - The wiki page wiki ID, e.g. "E22"
  * @param pagePath - Optional: the wiki page path (used as slug fallback)
  */
 export async function buildKbContextForPage(

@@ -3,7 +3,7 @@ thing:
   stableId: gmRaYb1fgg
   type: concept
   name: Provable / Guaranteed Safe AI
-  numericId: E402
+  wikiId: E402
 facts:
   - id: f_dToAVhIc2A
     property: description

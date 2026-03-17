@@ -3,7 +3,7 @@ thing:
   stableId: fACyX00cnQ
   type: organization
   name: Lionheart Ventures
-  numericId: E541
+  wikiId: E541
 facts:
   - id: f_amwoW75Tjg
     property: description

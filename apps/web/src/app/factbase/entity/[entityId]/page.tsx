@@ -722,8 +722,8 @@ export default async function KBEntityPage({
   );
   const totalCollections = Object.keys(itemCollections).length;
 
-  const wikiHref = entity.numericId
-    ? `/wiki/${entity.numericId}`
+  const wikiHref = entity.wikiId
+    ? `/wiki/${entity.wikiId}`
     : getEntityHref(entityId);
 
   // Hero stat properties for this entity type
@@ -908,10 +908,10 @@ export default async function KBEntityPage({
                       <td className="py-1.5 px-3 font-mono">{entity.stableId}</td>
                     </tr>
                   )}
-                  {entity.numericId && (
+                  {entity.wikiId && (
                     <tr>
-                      <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Numeric ID</td>
-                      <td className="py-1.5 px-3 font-mono">{entity.numericId}</td>
+                      <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Wiki ID</td>
+                      <td className="py-1.5 px-3 font-mono">{entity.wikiId}</td>
                     </tr>
                   )}
                   <tr>

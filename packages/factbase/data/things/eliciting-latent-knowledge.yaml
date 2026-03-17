@@ -3,7 +3,7 @@ thing:
   stableId: GJOgOYunnw
   type: approach
   name: Eliciting Latent Knowledge (ELK)
-  numericId: E481
+  wikiId: E481
 facts:
   - id: f_YsTxWeOzSQ
     property: description

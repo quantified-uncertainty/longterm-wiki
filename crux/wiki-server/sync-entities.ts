@@ -38,7 +38,7 @@ const DEFAULT_BATCH_SIZE = 100;
 
 interface YamlEntity {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   type: string;
   title: string;
   description?: string;
@@ -66,7 +66,7 @@ interface YamlEntity {
 export interface SyncEntity {
   id: string;
   stableId: string | null;
-  numericId: string | null;
+  wikiId: string | null;
   entityType: string;
   title: string;
   description: string | null;
@@ -118,7 +118,7 @@ interface PeopleResourceEntry {
 
 /** Fields that are part of the base entity schema (not metadata). */
 const BASE_FIELDS = new Set([
-  "id", "numericId", "stableId", "type", "title", "description", "website",
+  "id", "wikiId", "stableId", "type", "title", "description", "website",
   "tags", "clusters", "status", "lastUpdated", "customFields",
   "relatedEntries", "sources",
 ]);
@@ -234,7 +234,7 @@ export function transformEntity(e: YamlEntity): SyncEntity {
   return {
     id: e.id,
     stableId: e.stableId ?? null,
-    numericId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
     entityType: resolveEntityType(e.type) ?? e.type,
     title: e.title,
     description: e.description ?? null,
@@ -294,7 +294,7 @@ export function loadEntityYamls(
 /**
  * Load KB-only entities from packages/factbase/data/things/*.yaml.
  * Only returns entities NOT already present in the entityIds set.
- * KB YAML structure: { thing: { id, stableId, type, name, numericId, aliases } }
+ * KB YAML structure: { thing: { id, stableId, type, name, wikiId, aliases } }
  */
 export function loadKBOnlyEntities(
   existingIds: Set<string>,
@@ -311,7 +311,7 @@ export function loadKBOnlyEntities(
   for (const file of files) {
     try {
       const raw = readFileSync(join(dir, file), "utf-8");
-      const parsed = parseYaml(raw) as { thing?: { id?: string; stableId?: string; type?: string; name?: string; numericId?: string } };
+      const parsed = parseYaml(raw) as { thing?: { id?: string; stableId?: string; type?: string; name?: string; wikiId?: string } };
       const thing = parsed?.thing;
       if (!thing?.id || !thing?.type || !thing?.name) continue;
       if (existingIds.has(thing.id)) continue; // Already in entity YAML
@@ -319,7 +319,7 @@ export function loadKBOnlyEntities(
       entities.push({
         id: thing.id,
         stableId: thing.stableId,
-        numericId: thing.numericId,
+        wikiId: thing.wikiId,
         type: thing.type,
         title: thing.name,
       });

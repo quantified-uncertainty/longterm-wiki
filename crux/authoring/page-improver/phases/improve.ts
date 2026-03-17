@@ -9,7 +9,7 @@ import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
 import { buildKbContextForPage } from '../../../lib/factbase-context.ts';
-import { convertSlugsToNumericIds } from '../../creator/deployment.ts';
+import { convertSlugsToWikiIds } from '../../creator/deployment.ts';
 import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
@@ -154,7 +154,7 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   improvedContent = cleanEntityLinks(improvedContent);
   improvedContent = stripRelatedPagesSections(improvedContent);
 
-  const { content: convertedContent, converted: slugsConverted } = convertSlugsToNumericIds(improvedContent, ROOT);
+  const { content: convertedContent, converted: slugsConverted } = convertSlugsToWikiIds(improvedContent, ROOT);
   if (slugsConverted > 0) {
     log('improve', `  Converted ${slugsConverted} remaining slug-based EntityLink ID(s) to E## format`);
     improvedContent = convertedContent;

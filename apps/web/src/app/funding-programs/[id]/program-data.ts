@@ -203,7 +203,7 @@ export function loadProgramPageData(record: import("@/data/factbase").KBRecordEn
 
   // Funder wiki page link
   const funderTypedEntity = getTypedEntityById(program.ownerEntityId);
-  const funderWikiPageId = funderTypedEntity?.numericId ?? null;
+  const funderWikiPageId = funderTypedEntity?.wikiId ?? null;
 
   return {
     program,

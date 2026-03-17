@@ -111,7 +111,7 @@ const kbVerificationsApp = new Hono()
     }
 
     // Filter by entity_id via the joined facts table.
-    // Resolve slug/numericId to stableId since facts.entity_id stores stableIds.
+    // Resolve slug/wikiId to stableId since facts.entity_id stores stableIds.
     if (entity_id) {
       const resolved = await (async () => {
         const rows = await db
@@ -121,7 +121,7 @@ const kbVerificationsApp = new Hono()
             or(
               eq(entities.stableId, entity_id),
               eq(entities.id, entity_id),
-              eq(entities.numericId, entity_id),
+              eq(entities.wikiId, entity_id),
             )
           )
           .limit(1);

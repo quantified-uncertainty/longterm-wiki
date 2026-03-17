@@ -5,7 +5,7 @@ thing:
   name: Marc Andreessen
   aliases:
     - "Marc Andreessen (AI Investor)"
-  numericId: E432
+  wikiId: E432
 facts:
   - id: f_TthTvMe4kQ
     property: description

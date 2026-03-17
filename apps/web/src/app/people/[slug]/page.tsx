@@ -55,8 +55,8 @@ function resolvePersonEntity(slug: string): Entity | undefined {
       stableId: slug,
       type: "person",
       name: typedEntity.title,
-      numericId: typedEntity.numericId,
-      wikiPageId: typedEntity.numericId,
+      wikiId: typedEntity.wikiId,
+      wikiPageId: typedEntity.wikiId,
     };
   }
   return undefined;

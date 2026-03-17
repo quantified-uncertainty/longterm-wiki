@@ -694,6 +694,13 @@
       "when": 1777104000000,
       "tag": "0098_build_metrics_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1777190400000,
+      "tag": "0099_rename_numeric_id_to_wiki_id",
+      "breakpoints": true
     }
   ]
 }

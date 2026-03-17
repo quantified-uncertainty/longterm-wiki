@@ -3,7 +3,7 @@ thing:
   stableId: 5maTNr0PGA
   type: capability
   name: Situational Awareness
-  numericId: E282
+  wikiId: E282
 facts:
   - id: f_of328Ypg9A
     property: description

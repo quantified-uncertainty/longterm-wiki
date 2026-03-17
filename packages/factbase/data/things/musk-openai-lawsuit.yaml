@@ -3,7 +3,7 @@ thing:
   stableId: RQsF3N9BQA
   type: event
   name: Musk v. OpenAI Lawsuit
-  numericId: E408
+  wikiId: E408
 facts:
   - id: f_F0wQ8h3QbA
     property: description

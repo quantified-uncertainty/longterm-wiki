@@ -322,13 +322,13 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     };
   }
 
-  // Allocate numeric ID
+  // Allocate wiki ID
   const { allocateId } = await import('../lib/wiki-server/ids.ts');
   const idResult = await allocateId(slug, `${entityType}: ${name}`);
   if (!idResult.ok) {
     return { exitCode: 1, output: `ID allocation failed: ${idResult.message}` };
   }
-  const { numericId, stableId } = idResult.data;
+  const { wikiId, stableId } = idResult.data;
 
   // Sync entity to wiki-server
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
@@ -336,7 +336,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      numericId,
+      wikiId,
       stableId,
       entityType,
       title: name,
@@ -348,10 +348,10 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
   }
 
-  const result = { created: true, stableId, numericId, slug, name, entityType };
+  const result = { created: true, stableId, wikiId, slug, name, entityType };
   return {
     exitCode: 0,
-    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId} (${numericId})`,
+    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId} (${wikiId})`,
   };
 }
 
@@ -703,7 +703,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   const matcher = buildEntityMatcher();
 
   const results: Array<{ name: string; stableId: string; created: boolean }> = [];
-  const toCreate: Array<{ slug: string; name: string; numericId: string; stableId: string }> = [];
+  const toCreate: Array<{ slug: string; name: string; wikiId: string; stableId: string }> = [];
 
   for (const name of names) {
     if (typeof name !== 'string' || !name.trim()) continue;
@@ -729,8 +729,8 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
       console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
       continue;
     }
-    toCreate.push({ slug, name: trimmed, numericId: idResult.data.numericId, stableId: idResult.data.stableId });
-    results.push({ name: trimmed, stableId: idResult.data.stableId, created: true });
+    toCreate.push({ slug, name: trimmed, wikiId: idResult.data.wikiId, stableId: idResult.data.stableId! });
+    results.push({ name: trimmed, stableId: idResult.data.stableId!, created: true });
   }
 
   // Batch sync all new entities
@@ -738,7 +738,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
     const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
       entities: toCreate.map(e => ({
         id: e.slug,
-        numericId: e.numericId,
+        wikiId: e.wikiId,
         stableId: e.stableId,
         entityType,
         title: e.name,

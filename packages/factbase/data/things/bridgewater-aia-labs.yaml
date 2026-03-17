@@ -3,7 +3,7 @@ thing:
   stableId: 19XMJpUWqQ
   type: organization
   name: Bridgewater AIA Labs
-  numericId: E516
+  wikiId: E516
 facts:
   - id: f_ixBGJlJwLw
     property: description

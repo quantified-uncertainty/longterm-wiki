@@ -3,7 +3,7 @@ thing:
   stableId: WxrOEBPBpA
   type: project
   name: Longterm Wiki
-  numericId: E384
+  wikiId: E384
 facts:
   - id: f_hg6wIUFYqQ
     property: description

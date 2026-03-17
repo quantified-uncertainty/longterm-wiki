@@ -3,7 +3,7 @@ thing:
   stableId: yevJm2XDsQ
   type: organization
   name: FTX
-  numericId: E856
+  wikiId: E856
 facts:
   - id: f_kdFqCc8h7g
     property: description

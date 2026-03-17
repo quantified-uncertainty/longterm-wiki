@@ -76,14 +76,14 @@ describe("id-client", () => {
         status: 201,
         json: () =>
           Promise.resolve({
-            numericId: "E886",
+            wikiId: "E886",
             slug: "test-slug",
             created: true,
             createdAt: "2026-01-01T00:00:00Z",
           }),
       });
       const result = await allocateId("test-slug");
-      expect(result).toEqual({ numericId: "E886", created: true });
+      expect(result).toEqual({ wikiId: "E886", created: true });
     });
 
     it("returns parsed response on 200 (existing ID)", async () => {
@@ -93,14 +93,14 @@ describe("id-client", () => {
         status: 200,
         json: () =>
           Promise.resolve({
-            numericId: "E42",
+            wikiId: "E42",
             slug: "existing-slug",
             created: false,
             createdAt: "2025-06-01T00:00:00Z",
           }),
       });
       const result = await allocateId("existing-slug");
-      expect(result).toEqual({ numericId: "E42", created: false });
+      expect(result).toEqual({ wikiId: "E42", created: false });
     });
 
     it("returns null on network error", async () => {
@@ -126,7 +126,7 @@ describe("id-client", () => {
         status: 201,
         json: () =>
           Promise.resolve({
-            numericId: "E886",
+            wikiId: "E886",
             slug: "test",
             created: true,
           }),
@@ -146,8 +146,8 @@ describe("id-client", () => {
     it("returns results array on success", async () => {
       process.env.LONGTERMWIKI_SERVER_URL = "http://localhost:3100";
       const mockResults = [
-        { numericId: "E886", slug: "a", created: true },
-        { numericId: "E887", slug: "b", created: true },
+        { wikiId: "E886", slug: "a", created: true },
+        { wikiId: "E887", slug: "b", created: true },
       ];
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -165,15 +165,15 @@ describe("id-client", () => {
   });
 
   describe("allocateIds", () => {
-    it("returns a Map of slug → numericId", async () => {
+    it("returns a Map of slug → wikiId", async () => {
       process.env.LONGTERMWIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () =>
           Promise.resolve({
             results: [
-              { numericId: "E100", slug: "alpha", created: true },
-              { numericId: "E101", slug: "beta", created: true },
+              { wikiId: "E100", slug: "alpha", created: true },
+              { wikiId: "E101", slug: "beta", created: true },
             ],
           }),
       });
@@ -199,7 +199,7 @@ describe("id-client", () => {
         callCount++;
         const body = JSON.parse(opts.body);
         const results = body.items.map((item, idx) => ({
-          numericId: `E${callCount * 100 + idx}`,
+          wikiId: `E${callCount * 100 + idx}`,
           slug: item.slug,
           created: true,
         }));
@@ -247,7 +247,7 @@ describe("id-client", () => {
         }
         const body = JSON.parse(opts.body);
         const results = body.items.map((item, idx) => ({
-          numericId: `E${idx}`,
+          wikiId: `E${idx}`,
           slug: item.slug,
           created: true,
         }));
@@ -264,7 +264,7 @@ describe("id-client", () => {
         json: () =>
           Promise.resolve({
             // Only returns result for "alpha", omits "beta"
-            results: [{ numericId: "E100", slug: "alpha", created: true }],
+            results: [{ wikiId: "E100", slug: "alpha", created: true }],
           }),
       });
       await expect(allocateIds(["alpha", "beta"])).rejects.toThrow(

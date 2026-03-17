@@ -3,7 +3,7 @@ thing:
   stableId: licWPlOJMg
   type: person
   name: Nick Beckstead
-  numericId: E861
+  wikiId: E861
 facts:
   - id: f_NwIcIbqfqQ
     property: description

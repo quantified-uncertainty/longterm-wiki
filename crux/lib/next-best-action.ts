@@ -17,7 +17,7 @@
 
 export interface NextBestActionScore {
   id: string;
-  numericId: string;
+  wikiId: string;
   title: string;
   entityType: string | null;
   priority: number;
@@ -39,7 +39,7 @@ export interface NextBestActionScore {
 
 export interface PageInput {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   title: string;
   entityType?: string | null;
   quality: number | null;
@@ -102,7 +102,7 @@ export function computeNBA(page: PageInput): NextBestActionScore {
 
   return {
     id: page.id,
-    numericId: page.numericId ?? page.id,
+    wikiId: page.wikiId ?? page.id,
     title: page.title,
     entityType: page.entityType ?? null,
     priority: Math.round(priority * 1000) / 1000,

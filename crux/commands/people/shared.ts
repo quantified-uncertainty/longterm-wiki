@@ -76,7 +76,7 @@ export interface DataSource {
 
 export interface EntityEntry {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   type: string;
   title?: string;
   relatedEntries?: Array<{ id: string; type: string; relationship?: string }>;
@@ -127,7 +127,7 @@ export interface LiteratureCategory {
 export interface PersonEntity {
   id: string;
   title: string;
-  numericId?: string;
+  wikiId?: string;
 }
 
 export interface PersonResourceMatch {

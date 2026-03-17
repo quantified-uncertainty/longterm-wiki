@@ -3,7 +3,7 @@ thing:
   stableId: 9hPhtQ9AXw
   type: organization
   name: Samotsvety
-  numericId: E560
+  wikiId: E560
 facts:
   - id: f_M2EOKVGeLg
     property: description

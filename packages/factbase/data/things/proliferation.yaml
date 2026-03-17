@@ -3,7 +3,7 @@ thing:
   stableId: Pr5xmThNfA
   type: risk
   name: AI Proliferation
-  numericId: E232
+  wikiId: E232
 facts:
   - id: f_E7cjB2LW9w
     property: description

@@ -187,11 +187,11 @@ interface DatabaseJson {
     id: string;
     slug?: string;
     entityType: string;
-    numericId?: string;
+    wikiId?: string;
     [key: string]: unknown;
   }>;
   pages?: Array<{
-    numericId?: string;
+    wikiId?: string;
     title?: string;
     entityType?: string;
     wordCount?: number;
@@ -697,13 +697,13 @@ function scanWikiPageShell(meta: EntityTypeMeta): CellValue {
   if (!db?.typedEntities) return naCell("No database.json");
 
   const typeToMatch = meta.countsAsType ?? meta.id;
-  const hasNumericId = db.typedEntities.some(
-    (e) => e.entityType === typeToMatch && e.numericId,
+  const hasWikiId = db.typedEntities.some(
+    (e) => e.entityType === typeToMatch && e.wikiId,
   );
   return cell(
-    hasNumericId,
+    hasWikiId,
     "wiki_page_shell",
-    hasNumericId ? "Entities have numeric IDs" : "No numeric IDs",
+    hasWikiId ? "Entities have wiki IDs" : "No wiki IDs",
   );
 }
 
@@ -1072,16 +1072,16 @@ export async function scanMatrix(): Promise<MatrixSnapshot> {
     } else {
       const pageIds = new Set(
         db?.pages
-          ?.filter((p) => p.entityType === sampleType && p.numericId)
-          .map((p) => p.numericId) ?? [],
+          ?.filter((p) => p.entityType === sampleType && p.wikiId)
+          .map((p) => p.wikiId) ?? [],
       );
-      // Prefer an entity that has a page; fall back to any entity with a numericId
+      // Prefer an entity that has a page; fall back to any entity with a wikiId
       sampleEntity = pageIds.size > 0
         ? db?.typedEntities?.find(
-            (e) => e.entityType === sampleType && pageIds.has(e.numericId),
+            (e) => e.entityType === sampleType && pageIds.has(e.wikiId),
           )
         : db?.typedEntities?.find(
-            (e) => e.entityType === sampleType && e.numericId,
+            (e) => e.entityType === sampleType && e.wikiId,
           );
     }
 
@@ -1092,7 +1092,7 @@ export async function scanMatrix(): Promise<MatrixSnapshot> {
       cells,
       aggregateScore,
       groupScores,
-      sampleEntityId: sampleEntity?.numericId,
+      sampleEntityId: sampleEntity?.wikiId,
       sampleEntitySlug: sampleSlug ?? sampleEntity?.slug ?? sampleEntity?.id,
     });
   }

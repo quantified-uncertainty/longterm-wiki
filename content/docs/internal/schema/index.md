@@ -1,5 +1,5 @@
 ---
-numericId: E781
+wikiId: E781
 title: Schema Documentation
 description: "Complete reference for the data schema powering Longterm Wiki — entity types, relationships, data flow, and validation"
 sidebar:
@@ -56,7 +56,7 @@ Every entity has two identifiers:
 | **Slug** | `deceptive-alignment` | Human-readable, used in YAML |
 | **Numeric** | `E42` | Stable canonical URL (`/wiki/E42/`), never changes |
 
-Each entity stores its `numericId` directly in its source file (YAML `numericId:` field or MDX frontmatter). New IDs are allocated atomically via the wiki server (`apps/wiki-server/`).
+Each entity stores its `wikiId` directly in its source file (YAML `wikiId:` field or MDX frontmatter). New IDs are allocated atomically via the wiki server (`apps/wiki-server/`).
 
 ### Entity Types (24 canonical + aliases)
 

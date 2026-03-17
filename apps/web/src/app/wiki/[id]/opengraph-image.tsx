@@ -1,13 +1,13 @@
 import { ImageResponse } from "next/og";
 import { getEntityById, getPageById } from "@/data";
-import { numericIdToSlug } from "@/lib/mdx";
+import { wikiIdToSlug } from "@/lib/mdx";
 
 export const runtime = "nodejs";
 export const alt = "Longterm Wiki";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-function isNumericId(id: string): boolean {
+function isWikiId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
@@ -15,8 +15,8 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   const { id } = await params;
 
   let slug: string | null;
-  if (isNumericId(id)) {
-    slug = numericIdToSlug(id.toUpperCase());
+  if (isWikiId(id)) {
+    slug = wikiIdToSlug(id.toUpperCase());
   } else {
     slug = id;
   }

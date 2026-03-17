@@ -39,7 +39,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
       const row: Record<string, unknown> = {
         id,
-        numeric_id: params[o + 1],
+        wiki_id: params[o + 1],
         stable_id: params[o + 2],
         entity_type: params[o + 3],
         title: params[o + 4],
@@ -88,7 +88,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- entities: SELECT with WHERE + OR (get by id, numeric_id, or stable_id) ---
+  // --- entities: SELECT with WHERE + OR (get by id, wiki_id, or stable_id) ---
   if (
     q.includes('"entities"') &&
     q.includes("where") &&
@@ -96,11 +96,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("count(*)")
   ) {
     const id = params[0] as string;
-    const numericId = params[1] as string;
+    const wikiId = params[1] as string;
     const stableId = params[2] as string;
     const results: Record<string, unknown>[] = [];
     for (const row of entitiesStore.values()) {
-      if (row.id === id || row.numeric_id === numericId || row.stable_id === stableId) {
+      if (row.id === id || row.wiki_id === wikiId || row.stable_id === stableId) {
         results.push(row);
       }
     }
@@ -194,7 +194,7 @@ function seedEntity(
         id,
         title,
         entityType: opts.entityType ?? "organization",
-        numericId: opts.numericId ?? `E${Math.floor(Math.random() * 1000)}`,
+        wikiId: opts.wikiId ?? `E${Math.floor(Math.random() * 1000)}`,
         description: opts.description ?? `Description of ${title}`,
         ...opts,
       },
@@ -223,14 +223,14 @@ describe("Entities API", () => {
             id: "anthropic",
             title: "Anthropic",
             entityType: "organization",
-            numericId: "E22",
+            wikiId: "E22",
             description: "AI safety company",
           },
           {
             id: "openai",
             title: "OpenAI",
             entityType: "organization",
-            numericId: "E43",
+            wikiId: "E43",
             description: "AI research lab",
           },
         ],
@@ -296,7 +296,7 @@ describe("Entities API", () => {
   describe("GET /api/entities/:id", () => {
     it("returns entity by slug", async () => {
       await seedEntity(app, "anthropic", "Anthropic", {
-        numericId: "E22",
+        wikiId: "E22",
         description: "AI safety company",
       });
 
@@ -305,11 +305,11 @@ describe("Entities API", () => {
       const body = await res.json();
       expect(body.id).toBe("anthropic");
       expect(body.title).toBe("Anthropic");
-      expect(body.numericId).toBe("E22");
+      expect(body.wikiId).toBe("E22");
     });
 
-    it("returns entity by numeric ID", async () => {
-      await seedEntity(app, "anthropic", "Anthropic", { numericId: "E22" });
+    it("returns entity by wiki ID", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", { wikiId: "E22" });
 
       const res = await app.request("/api/entities/E22");
       expect(res.status).toBe(200);

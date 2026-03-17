@@ -3,7 +3,7 @@ thing:
   stableId: 73qTEkYyWA
   type: research-area
   name: Interpretability
-  numericId: E174
+  wikiId: E174
 facts:
   - id: f_XWURN27JKA
     property: description

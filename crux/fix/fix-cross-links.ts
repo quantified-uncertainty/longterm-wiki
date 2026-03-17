@@ -31,18 +31,18 @@ import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPathRegistry, loadOrganizations, loadExperts, loadIdRegistry } from '../lib/content-types.ts';
 import { logBulkFixes } from '../lib/session/edit-log.ts';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { ENTITY_LINK_RE, WIKI_ID_RE } from '../lib/patterns.ts';
 
 // Cached numeric-ID → slug mapping for deduplication
-let _numericIdToSlug: Record<string, string> | null = null;
-function getNumericIdToSlug(): Record<string, string> {
-  if (_numericIdToSlug) return _numericIdToSlug;
+let _wikiIdToSlug: Record<string, string> | null = null;
+function getWikiIdToSlug(): Record<string, string> {
+  if (_wikiIdToSlug) return _wikiIdToSlug;
   try {
-    _numericIdToSlug = loadIdRegistry().byNumericId;
+    _wikiIdToSlug = loadIdRegistry().byWikiId;
   } catch {
-    _numericIdToSlug = {};
+    _wikiIdToSlug = {};
   }
-  return _numericIdToSlug;
+  return _wikiIdToSlug;
 }
 
 const args: string[] = process.argv.slice(2);
@@ -462,14 +462,14 @@ function processFile(filePath: string, entities: Map<string, EntityEntry>, pageE
   let offset = 0;
 
   // Find existing EntityLinks to avoid duplicates
-  // Resolve numeric IDs (E42) to slugs so dedup works against entity.id (always a slug)
+  // Resolve wiki IDs (E42) to slugs so dedup works against entity.id (always a slug)
   const existingLinks = new Set<string>();
-  const numericIdMap = getNumericIdToSlug();
+  const wikiIdMap = getWikiIdToSlug();
   for (const linkMatch of content.matchAll(ENTITY_LINK_RE)) {
     const rawId = linkMatch[1];
     existingLinks.add(rawId);
-    if (NUMERIC_ID_RE.test(rawId)) {
-      const slug = numericIdMap[rawId.toUpperCase()];
+    if (WIKI_ID_RE.test(rawId)) {
+      const slug = wikiIdMap[rawId.toUpperCase()];
       if (slug) existingLinks.add(slug);
     }
   }

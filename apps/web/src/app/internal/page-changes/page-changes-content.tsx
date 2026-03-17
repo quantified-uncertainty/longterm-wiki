@@ -41,7 +41,7 @@ async function loadSessionsFromApi() {
         title: p.title,
         path: p.path,
         category: p.category,
-        numericId: idRegistry?.bySlug[p.id] || p.id,
+        wikiId: idRegistry?.bySlug[p.id] || p.id,
       },
     ])
   );
@@ -72,7 +72,7 @@ async function loadSessionsFromApi() {
             pageId,
             pageTitle: meta?.title || pageId,
             pagePath: meta?.path || `/wiki/${pageId}`,
-            numericId: meta?.numericId || pageId,
+            wikiId: meta?.wikiId || pageId,
             category: meta?.category || "unknown",
           };
         }),

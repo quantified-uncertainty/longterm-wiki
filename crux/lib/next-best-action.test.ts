@@ -4,7 +4,7 @@ import { computeNBA, computeNBABatch, type PageInput } from './next-best-action.
 function makePage(overrides: Partial<PageInput> = {}): PageInput {
   return {
     id: 'test-page',
-    numericId: 'E1',
+    wikiId: 'E1',
     title: 'Test Page',
     entityType: 'concept',
     quality: 50,

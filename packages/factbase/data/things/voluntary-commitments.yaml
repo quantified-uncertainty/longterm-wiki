@@ -3,7 +3,7 @@ thing:
   stableId: ZXvLxl4RMw
   type: policy
   name: Voluntary AI Safety Commitments
-  numericId: E369
+  wikiId: E369
 facts:
   - id: f_q1qmuJUkxA
     property: description

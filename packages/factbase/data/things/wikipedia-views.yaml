@@ -3,7 +3,7 @@ thing:
   stableId: SCwLOSwuiQ
   type: project
   name: Wikipedia Views
-  numericId: E390
+  wikiId: E390
 facts:
   - id: f_2XQoeTnrxA
     property: description

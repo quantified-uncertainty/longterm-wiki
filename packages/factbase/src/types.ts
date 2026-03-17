@@ -38,7 +38,7 @@ export interface Entity {
   /** @deprecated Use `id` instead. Alias kept for backward compat during migration. */
   stableId: string;
   /** @deprecated Use `wikiPageId` instead. Alias kept for backward compat during migration. */
-  numericId?: string;
+  wikiId?: string;
 }
 
 // ── Fact ────────────────────────────────────────────────────────────
@@ -152,7 +152,7 @@ export interface EntityFile {
     /** Former slugs for URL redirects (when a YAML file is renamed). */
     previousSlugs?: string[];
     /** Old format: wiki page ID. */
-    numericId?: string;
+    wikiId?: string;
     /** New format: wiki page ID. */
     wikiPageId?: string;
   };

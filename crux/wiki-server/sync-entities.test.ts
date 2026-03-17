@@ -7,7 +7,7 @@ function makeEntity(id: string, overrides: Partial<SyncEntity> = {}): SyncEntity
   return {
     id,
     stableId: null,
-    numericId: null,
+    wikiId: null,
     entityType: "organization",
     title: `Entity ${id}`,
     description: null,
@@ -35,7 +35,7 @@ describe("transformEntity", () => {
     expect(result).toEqual({
       id: "anthropic",
       stableId: null,
-      numericId: null,
+      wikiId: null,
       entityType: "organization",
       title: "Anthropic",
       description: null,
@@ -54,7 +54,7 @@ describe("transformEntity", () => {
   it("transforms a fully-populated YAML entity", () => {
     const result = transformEntity({
       id: "anthropic",
-      numericId: "E22",
+      wikiId: "E22",
       type: "organization",
       title: "Anthropic",
       description: "AI safety company",
@@ -69,7 +69,7 @@ describe("transformEntity", () => {
     });
 
     expect(result.id).toBe("anthropic");
-    expect(result.numericId).toBe("E22");
+    expect(result.wikiId).toBe("E22");
     expect(result.entityType).toBe("organization");
     expect(result.title).toBe("Anthropic");
     expect(result.description).toBe("AI safety company");
@@ -164,7 +164,7 @@ describe("transformEntity", () => {
     });
 
     expect(result.stableId).toBeNull();
-    expect(result.numericId).toBeNull();
+    expect(result.wikiId).toBeNull();
     expect(result.description).toBeNull();
     expect(result.website).toBeNull();
     expect(result.tags).toBeNull();

@@ -16,7 +16,7 @@ type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
 /** Row shape from the main explore data query (both FTS and trigram paths). */
 interface ExploreDataRow {
   id: string;
-  numeric_id: string | null;
+  wiki_id: string | null;
   title: string;
   entity_type: string | null;
   content_format: string | null;
@@ -135,11 +135,11 @@ function deriveType(
   return "concept";
 }
 
-/** Base conditions shared by all queries (excludes stubs, schema, and pages without numeric IDs). */
+/** Base conditions shared by all queries (excludes stubs, schema, and pages without wiki IDs). */
 const BASE_CONDITIONS = `
   (wp.word_count > 0 OR wp.content_format IN ('table', 'diagram'))
   AND wp.category != 'schema'
-  AND wp.numeric_id IS NOT NULL
+  AND wp.wiki_id IS NOT NULL
 `;
 
 /** The derived type expression used for grouping and filtering. */
@@ -219,7 +219,7 @@ const SORT_COLUMNS: Record<string, string> = {
   researchImportance: "wp.research_importance",
   tacticalValue: "wp.tactical_value",
   recentlyEdited: "wp.last_updated",
-  recentlyCreated: "CAST(SUBSTRING(wp.numeric_id FROM 2) AS INTEGER)",
+  recentlyCreated: "CAST(SUBSTRING(wp.wiki_id FROM 2) AS INTEGER)",
   wordCount: "wp.word_count",
   title: "wp.title",
 };
@@ -288,7 +288,7 @@ const exploreApp = new Hono()
 
     const dataQuery = `
       SELECT
-        wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
+        wp.id, wp.wiki_id, wp.title, wp.entity_type, wp.content_format,
         wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
         wp.tags AS page_tags, wp.clusters AS page_clusters,
         wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
@@ -386,7 +386,7 @@ const exploreApp = new Hono()
 
       const trigramQuery = `
         SELECT
-          wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
+          wp.id, wp.wiki_id, wp.title, wp.entity_type, wp.content_format,
           wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
           wp.tags AS page_tags, wp.clusters AS page_clusters,
           wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
@@ -425,8 +425,8 @@ const exploreApp = new Hono()
 
       return {
         id: r.id,
-        // Safe non-null assertion: BASE_CONDITIONS includes `AND wp.numeric_id IS NOT NULL`
-        numericId: r.numeric_id!,
+        // Safe non-null assertion: BASE_CONDITIONS includes `AND wp.wiki_id IS NOT NULL`
+        wikiId: r.wiki_id!,
         title: r.title,
         type: deriveType(r.content_format, r.entity_type, r.category),
         description: r.description || null,

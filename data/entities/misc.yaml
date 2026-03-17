@@ -3,7 +3,7 @@
 
 - id: anthropic-government-standoff
   stableId: 27ay7L0VtY
-  numericId: E924
+  wikiId: E924
   type: event
   title: Anthropic-Pentagon Standoff (2026)
   customFields:
@@ -57,7 +57,7 @@
 
 - id: effectiveness-assessment
   stableId: zkLy1cxn9Q
-  numericId: E113
+  wikiId: E113
   type: analysis
   title: AI Policy Effectiveness
   customFields:
@@ -78,7 +78,7 @@
   lastUpdated: 2025-12
 - id: openai-foundation-governance
   stableId: Hk7IvggnEA
-  numericId: E404
+  wikiId: E404
   type: analysis
   title: OpenAI Foundation Governance Paradox
   description: >-
@@ -109,7 +109,7 @@
 
 - id: anthropic-valuation
   stableId: HrokCBSmBA
-  numericId: E405
+  wikiId: E405
   type: analysis
   title: Anthropic Valuation Analysis
   description: >-
@@ -139,7 +139,7 @@
 
 - id: anthropic-stakeholders
   stableId: P43tBraTCQ
-  numericId: E815
+  wikiId: E815
   type: table
   title: Anthropic Stakeholders
   description: >-
@@ -177,7 +177,7 @@
 
 - id: anthropic-investors
   stableId: sKOD0uMVGg
-  numericId: E406
+  wikiId: E406
   type: analysis
   title: Anthropic (Funder)
   description: >-
@@ -210,7 +210,7 @@
 
 - id: long-term-benefit-trust
   stableId: eNJ3h95yWw
-  numericId: E407
+  wikiId: E407
   type: analysis
   title: Long-Term Benefit Trust (Anthropic)
   description: >-
@@ -241,7 +241,7 @@
 
 - id: musk-openai-lawsuit
   stableId: RQsF3N9BQA
-  numericId: E408
+  wikiId: E408
   type: analysis
   title: Musk v. OpenAI Lawsuit
   description: >-
@@ -272,7 +272,7 @@
 
 - id: anthropic-ipo
   stableId: hPZbflFceQ
-  numericId: E409
+  wikiId: E409
   type: analysis
   title: Anthropic IPO
   description: >-
@@ -303,7 +303,7 @@
 
 - id: elon-musk-philanthropy
   stableId: aw8anZDbCg
-  numericId: E410
+  wikiId: E410
   type: analysis
   title: Elon Musk (Funder)
   description: >-
@@ -335,7 +335,7 @@
 
 - id: anthropic-pledge-enforcement
   stableId: 3ljdV7I37g
-  numericId: E411
+  wikiId: E411
   type: analysis
   title: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
   description: >-
@@ -369,7 +369,7 @@
 
 - id: anthropic-pre-ipo-daf-transfers
   stableId: 1DjpqfXwjA
-  numericId: E412
+  wikiId: E412
   type: analysis
   title: Anthropic Pre-IPO DAF Transfers
   description: >-
@@ -404,7 +404,7 @@
 
 - id: anthropic-impact
   stableId: FARt52IXiw
-  numericId: E413
+  wikiId: E413
   type: analysis
   title: Anthropic Impact Assessment Model
   description: >-
@@ -436,7 +436,7 @@
 
 - id: capability-alignment-race
   stableId: CWaxxnWsDg
-  numericId: E414
+  wikiId: E414
   type: analysis
   title: Capability-Alignment Race Model
   description: >-
@@ -469,7 +469,7 @@
 
 - id: short-timeline-policy-implications
   stableId: MmXWq74Dsg
-  numericId: E415
+  wikiId: E415
   type: analysis
   title: Short AI Timeline Policy Implications
   description: >-
@@ -500,7 +500,7 @@
 
 - id: technical-pathways
   stableId: 0PWgAZVUwA
-  numericId: E416
+  wikiId: E416
   type: analysis
   title: AI Safety Technical Pathway Decomposition
   description: >-
@@ -531,7 +531,7 @@
 
 - id: feedback-loops
   stableId: 2FJMAcGv5A
-  numericId: E417
+  wikiId: E417
   type: analysis
   title: AI Risk Feedback Loop & Cascade Model
   description: >-
@@ -559,7 +559,7 @@
 
 - id: multi-actor-landscape
   stableId: w9q6Ircp5w
-  numericId: E418
+  wikiId: E418
   type: analysis
   title: AI Safety Multi-Actor Strategic Landscape
   description: >-
@@ -588,7 +588,7 @@
 
 - id: model-organisms-of-misalignment
   stableId: OCU2M1tUnA
-  numericId: E419
+  wikiId: E419
   type: analysis
   title: Model Organisms of Misalignment
   description: >-
@@ -620,7 +620,7 @@
 
 - id: ea-biosecurity-scope
   stableId: Vg0FPAOTbw
-  numericId: E420
+  wikiId: E420
   type: analysis
   title: Is EA Biosecurity Work Limited to Restricting LLM Biological Use?
   description: >-

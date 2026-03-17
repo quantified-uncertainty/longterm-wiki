@@ -189,7 +189,7 @@ const dispatch: SqlDispatcher = (query, params) => {
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
     // Allocating on first use mirrors production where all page slugs have entity_ids.
     // Phase C verified zero NULLs, so every slug encountered here will have an ID.
-    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
+    return params.map((p) => ({ wiki_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- TRUNCATE ----

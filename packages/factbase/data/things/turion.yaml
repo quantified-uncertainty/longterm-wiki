@@ -3,7 +3,7 @@ thing:
   stableId: wixiIVSZdg
   type: organization
   name: Turion
-  numericId: E571
+  wikiId: E571
 facts:
   - id: f_t6iCdIf3ow
     property: description

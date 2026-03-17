@@ -11,7 +11,7 @@ const SMOKE_TEST_BODY = {
   pages: [
     {
       id: "__smoke-test__",
-      numericId: null,
+      wikiId: null,
       title: "Smoke Test",
       description: null,
       llmSummary: null,

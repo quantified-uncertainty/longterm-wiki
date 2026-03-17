@@ -3,7 +3,7 @@ thing:
   stableId: wPEnPRTQVQ
   type: approach
   name: Refusal Training
-  numericId: E456
+  wikiId: E456
 facts:
   - id: f_vVwMulR1nw
     property: description

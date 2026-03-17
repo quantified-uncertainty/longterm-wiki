@@ -1,5 +1,5 @@
 /**
- * ID Assignment Utilities — pure functions for numeric ID management
+ * ID Assignment Utilities — pure functions for wiki ID management
  *
  * Extracted from assign-ids.mjs so the core algorithms can be unit-tested
  * independently of filesystem I/O.
@@ -10,37 +10,37 @@
  */
 
 /**
- * Build numericId↔slug lookup maps from an array of entities.
+ * Build wikiId↔slug lookup maps from an array of entities.
  *
- * Entities without a numericId field are skipped — they will need IDs assigned.
- * Entities with the same numericId as another entity are reported as conflicts.
+ * Entities without a wikiId field are skipped — they will need IDs assigned.
+ * Entities with the same wikiId as another entity are reported as conflicts.
  *
- * @param {Array<{id: string, numericId?: string}>} entities
- * @returns {{ numericIdToSlug: Object, slugToNumericId: Object, conflicts: string[] }}
+ * @param {Array<{id: string, wikiId?: string}>} entities
+ * @returns {{ wikiIdToSlug: Object, slugToWikiId: Object, conflicts: string[] }}
  */
 export function buildIdMaps(entities) {
-  const numericIdToSlug = {};
-  const slugToNumericId = {};
+  const wikiIdToSlug = {};
+  const slugToWikiId = {};
   const conflicts = [];
 
   for (const entity of entities) {
-    if (!entity.numericId) continue;
+    if (!entity.wikiId) continue;
 
-    if (numericIdToSlug[entity.numericId] && numericIdToSlug[entity.numericId] !== entity.id) {
+    if (wikiIdToSlug[entity.wikiId] && wikiIdToSlug[entity.wikiId] !== entity.id) {
       conflicts.push(
-        `${entity.numericId} claimed by both "${numericIdToSlug[entity.numericId]}" and "${entity.id}"`
+        `${entity.wikiId} claimed by both "${wikiIdToSlug[entity.wikiId]}" and "${entity.id}"`
       );
     } else {
-      numericIdToSlug[entity.numericId] = entity.id;
-      slugToNumericId[entity.id] = entity.numericId;
+      wikiIdToSlug[entity.wikiId] = entity.id;
+      slugToWikiId[entity.id] = entity.wikiId;
     }
   }
 
-  return { numericIdToSlug, slugToNumericId, conflicts };
+  return { wikiIdToSlug, slugToWikiId, conflicts };
 }
 
 /**
- * Filter a pages array to only those eligible for numeric ID assignment.
+ * Filter a pages array to only those eligible for wiki ID assignment.
  *
  * A page is eligible if:
  *   - It does NOT already have an entity with the same ID (entityIds)

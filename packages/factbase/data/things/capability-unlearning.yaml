@@ -3,7 +3,7 @@ thing:
   stableId: PUhEWjLnnQ
   type: approach
   name: Capability Unlearning / Removal
-  numericId: E453
+  wikiId: E453
 facts:
   - id: f_r1hWNp2xOA
     property: description

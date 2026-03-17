@@ -62,7 +62,7 @@ export function EntitiesContent() {
     return {
       // Entity core
       id: e.id,
-      numericId: e.numericId ?? null,
+      wikiId: e.wikiId ?? null,
       entityType: e.entityType,
       title: e.title,
       description: e.description ?? null,

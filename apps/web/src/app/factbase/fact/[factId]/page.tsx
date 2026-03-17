@@ -116,8 +116,8 @@ export default async function FactDetailPage({ params }: PageProps) {
     fact.dollarYear
   );
 
-  const entityHref = entity?.numericId
-    ? `/wiki/${entity.numericId}`
+  const entityHref = entity?.wikiId
+    ? `/wiki/${entity.wikiId}`
     : getEntityHref(fact.subjectId);
 
   const content = (

@@ -3,7 +3,7 @@ thing:
   stableId: CUdfyx5Nkg
   type: approach
   name: Sparse Autoencoders (SAEs)
-  numericId: E480
+  wikiId: E480
 facts:
   - id: f_NDpEN3h91g
     property: description

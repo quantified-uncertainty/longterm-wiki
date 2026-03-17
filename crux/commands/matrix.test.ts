@@ -50,10 +50,10 @@ describe('matrix commands', () => {
   it('pages respects exclusion list', async () => {
     const r1 = await commands.pages([], { ci: true, dimension: 'content', limit: '1' });
     const topPage = JSON.parse(r1.output)[0];
-    writeFileSync(EXCLUSION_FILE, `${topPage.numericId}\n`);
+    writeFileSync(EXCLUSION_FILE, `${topPage.wikiId}\n`);
     const r2 = await commands.pages([], { ci: true, dimension: 'content', limit: '1', exclude: EXCLUSION_FILE });
     const newTop = JSON.parse(r2.output)[0];
-    expect(newTop.numericId).not.toBe(topPage.numericId);
+    expect(newTop.wikiId).not.toBe(topPage.wikiId);
   });
 
   it('next-task returns prompt with action', async () => {

@@ -97,7 +97,7 @@ function formatThing(t: typeof things.$inferSelect) {
     entityType: t.entityType,
     description: t.description,
     sourceUrl: t.sourceUrl,
-    numericId: t.numericId,
+    wikiId: t.wikiId,
     verdict: t.verdict,
     verdictConfidence: t.verdictConfidence,
     verdictAt: t.verdictAt,
@@ -607,7 +607,7 @@ const thingsApp = new Hono()
       entityType: z.string().max(100).optional(),
       description: z.string().max(10000).optional(),
       sourceUrl: z.string().max(2048).optional(),
-      numericId: z.string().max(20).optional(),
+      wikiId: z.string().max(20).optional(),
     });
 
     const SyncBatchSchema = z.object({
@@ -647,7 +647,7 @@ const thingsApp = new Hono()
         entityType: item.entityType ?? null,
         description: item.description ?? null,
         sourceUrl: item.sourceUrl ?? null,
-        numericId: item.numericId ?? null,
+        wikiId: item.wikiId ?? null,
       }));
 
       await tx
@@ -665,7 +665,7 @@ const thingsApp = new Hono()
             entityType: sql`excluded.entity_type`,
             description: sql`excluded.description`,
             sourceUrl: sql`excluded.source_url`,
-            numericId: sql`excluded.numeric_id`,
+            wikiId: sql`excluded.wiki_id`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },

@@ -3,7 +3,7 @@ thing:
   stableId: woL5lkqLpg
   type: organization
   name: Pause AI
-  numericId: E553
+  wikiId: E553
 facts:
   - id: f_rk8dJa89eA
     property: description

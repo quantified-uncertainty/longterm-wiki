@@ -1074,7 +1074,7 @@ describe('prefer-entitylink rule', () => {
         'miri': 'E100',
         'deceptive-alignment': 'E200',
       },
-      byNumericId: {
+      byWikiId: {
         'E300': 'community-notes-for-everything',
         'E100': 'miri',
         'E200': 'deceptive-alignment',
@@ -1206,7 +1206,7 @@ describe('entitylink-ids rule', () => {
         'nick-bostrom': 'E140',
         'miri': 'E100',
       },
-      byNumericId: {
+      byWikiId: {
         'E42': 'anthropic',
         'E140': 'nick-bostrom',
         'E100': 'miri',
@@ -1224,7 +1224,7 @@ describe('entitylink-ids rule', () => {
     },
   };
 
-  it('errors when slug ID used instead of numeric ID, with auto-fix to numeric+name', () => {
+  it('errors when slug ID used instead of wiki ID, with auto-fix to numeric+name', () => {
     const content = mockContent(
       '<EntityLink id="anthropic">Anthropic</EntityLink>',
     );
@@ -1237,7 +1237,7 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
   });
 
-  it('passes for numeric ID with correct name', () => {
+  it('passes for wiki ID with correct name', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="anthropic">Anthropic</EntityLink>',
     );
@@ -1245,7 +1245,7 @@ describe('entitylink-ids rule', () => {
     expect(issues.length).toBe(0);
   });
 
-  it('errors when numeric ID has wrong name (hallucination catch)', () => {
+  it('errors when wiki ID has wrong name (hallucination catch)', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="miri">MIRI</EntityLink>',
     );
@@ -1259,7 +1259,7 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('name="anthropic"');
   });
 
-  it('warns when numeric ID used without name, with auto-fix to add name', () => {
+  it('warns when wiki ID used without name, with auto-fix to add name', () => {
     const content = mockContent(
       '<EntityLink id="E140">Nick Bostrom</EntityLink>',
     );
@@ -1272,14 +1272,14 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('id="E140" name="nick-bostrom"');
   });
 
-  it('warns for unregistered numeric ID', () => {
+  it('warns for unregistered wiki ID', () => {
     const content = mockContent(
       '<EntityLink id="E9999">Unknown</EntityLink>',
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
-    expect(issues[0].message).toContain('not a registered numeric ID');
+    expect(issues[0].message).toContain('not a registered wiki ID');
   });
 
   it('warns for slug ID that does not resolve', () => {

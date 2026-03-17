@@ -3,7 +3,7 @@ thing:
   stableId: lZRKSfs5wg
   type: organization
   name: Blueprint Biosecurity
-  numericId: E515
+  wikiId: E515
 facts:
   - id: f_KviVbST13g
     property: description

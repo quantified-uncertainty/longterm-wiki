@@ -3,7 +3,7 @@ thing:
   stableId: l5K9ZdbXww
   type: organization
   name: Center for Applied Rationality
-  numericId: E518
+  wikiId: E518
 facts:
   - id: f_xxqgtpab8Q
     property: description

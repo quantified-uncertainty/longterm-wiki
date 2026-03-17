@@ -3,7 +3,7 @@ thing:
   stableId: OCU2M1tUnA
   type: analysis
   name: Model Organisms of Misalignment
-  numericId: E419
+  wikiId: E419
 facts:
   - id: f_YcvAhgeliQ
     property: description

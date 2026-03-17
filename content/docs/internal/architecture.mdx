@@ -1,5 +1,5 @@
 ---
-numericId: E734
+wikiId: E734
 title: System Architecture
 description: Technical architecture of the Longterm Wiki — data pipeline, clever design patterns, and the ideas that make it work
 sidebar:
@@ -106,7 +106,7 @@ The output uses **type-diverse selection**: at least 2 entries from each entity 
 
 **Directional relationship labels** ("mitigates", "caused by") are preserved through an inverse-label mapping table, so both directions of a relationship get meaningful labels.
 
-### 2. Stable Numeric ID System
+### 2. Stable Wiki ID System
 
 **Location**: `app/scripts/build-data.mjs` (lines 704-776)
 
@@ -192,7 +192,7 @@ Each Rule has:
 - Optional `fix()`: returns corrected content (declarative `FixSpec` with `oldText`/`newText`)
 - `scope`: `'file'` (runs per file) or `'global'` (runs once on all files)
 
-Fixes are applied in bulk and logged to edit-logs. Four rules are **CI-blocking** (`comparison-operators`, `dollar-signs`, `frontmatter-schema`, `numeric-id-integrity`); the rest are advisory.
+Fixes are applied in bulk and logged to edit-logs. Four rules are **CI-blocking** (`comparison-operators`, `dollar-signs`, `frontmatter-schema`, `wiki-id-integrity`); the rest are advisory.
 
 ### 9. YAML-First MDX Generation
 

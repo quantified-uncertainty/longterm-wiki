@@ -3,7 +3,7 @@ thing:
   stableId: cBPkzcVBBQ
   type: organization
   name: Epoch AI
-  numericId: E125
+  wikiId: E125
 facts:
   - id: f_jhTXlLe1eA
     property: description

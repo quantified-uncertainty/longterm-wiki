@@ -17,7 +17,7 @@ export interface OrgRow {
   id: string;
   slug: string | null;
   name: string;
-  numericId: string | null;
+  wikiId: string | null;
   orgType: string | null;
   wikiPageId: string | null;
 
@@ -87,7 +87,7 @@ export interface OrgStatDef {
 
 interface ServerOrg {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   title: string;
   description: string | null;
@@ -123,9 +123,9 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       id: org.id,
       slug: org.id,
       name: org.title,
-      numericId: org.numericId,
+      wikiId: org.wikiId,
       orgType: null, // Will be enriched client-side from orgTypeMap
-      wikiPageId: org.numericId,
+      wikiPageId: org.wikiId,
       revenue: null,
       revenueNum: org.revenueNum,
       revenueDate: org.revenueDate,

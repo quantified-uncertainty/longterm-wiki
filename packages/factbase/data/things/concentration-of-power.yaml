@@ -3,7 +3,7 @@ thing:
   stableId: KpMBQkdQ5g
   type: risk
   name: AI-Driven Concentration of Power
-  numericId: E68
+  wikiId: E68
 facts:
   - id: f_mhXrl9Pvag
     property: description

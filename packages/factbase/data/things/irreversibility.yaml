@@ -3,7 +3,7 @@ thing:
   stableId: 7e3rvE5YgA
   type: risk
   name: AI-Induced Irreversibility
-  numericId: E179
+  wikiId: E179
 facts:
   - id: f_QOKTa1CZNQ
     property: description

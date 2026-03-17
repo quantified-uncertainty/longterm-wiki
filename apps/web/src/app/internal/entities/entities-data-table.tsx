@@ -25,7 +25,7 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 export interface UnifiedEntityRow {
   // Entity core
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   entityType: string;
   title: string;
   description: string | null;
@@ -299,7 +299,7 @@ function DateCell({ date }: { date: string | null }) {
 const COLUMN_LABELS: Record<string, string> = {
   // Entity core
   id: "Entity ID",
-  numericId: "Numeric ID",
+  wikiId: "Wiki ID",
   entityType: "Type",
   title: "Title",
   description: "Description",
@@ -384,11 +384,11 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "numericId",
+    accessorKey: "wikiId",
     header: ({ column }) => <SortableHeader column={column} title="Numeric entity ID (e.g. E42)">EID</SortableHeader>,
     cell: ({ row }) => (
       <span className="font-mono text-xs text-muted-foreground">
-        {row.original.numericId || "-"}
+        {row.original.wikiId || "-"}
       </span>
     ),
     sortUndefined: "last",
@@ -855,7 +855,7 @@ const PRESETS: Record<string, Preset> = {
   entities: {
     label: "Entities",
     description: "All entities with metadata (ID, type, status, tags, related count)",
-    columns: ["title", "id", "numericId", "entityType", "status", "tags", "relatedCount", "hasPage", "lastUpdated"],
+    columns: ["title", "id", "wikiId", "entityType", "status", "tags", "relatedCount", "hasPage", "lastUpdated"],
     defaultSort: [{ id: "title", desc: false }],
   },
   importance: {

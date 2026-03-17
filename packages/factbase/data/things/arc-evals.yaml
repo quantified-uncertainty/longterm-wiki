@@ -3,7 +3,7 @@ thing:
   stableId: myeSKJXTMA
   type: organization
   name: ARC Evaluations
-  numericId: E26
+  wikiId: E26
 facts:
   - id: f_YcQuGsd98A
     property: description

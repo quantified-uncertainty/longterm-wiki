@@ -3,7 +3,7 @@ thing:
   stableId: wAglEMR2mg
   type: risk
   name: Bioweapons Risk
-  numericId: E42
+  wikiId: E42
 facts:
   - id: f_2zQSbAvwPw
     property: description

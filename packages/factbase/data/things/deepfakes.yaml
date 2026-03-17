@@ -3,7 +3,7 @@ thing:
   stableId: MUGUxfl2YA
   type: risk
   name: Deepfakes
-  numericId: E96
+  wikiId: E96
 facts:
   - id: f_2VKxH9KJOg
     property: description

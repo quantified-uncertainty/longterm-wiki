@@ -3,7 +3,7 @@ thing:
   stableId: aX0jkoaekQ
   type: organization
   name: UK AI Safety Institute
-  numericId: E364
+  wikiId: E364
 facts:
   - id: f_S2fTBH9xxw
     property: description

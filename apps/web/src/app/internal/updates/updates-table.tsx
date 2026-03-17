@@ -44,7 +44,7 @@ const columns: ColumnDef<UpdateScheduleItem>[] = [
     ),
     cell: ({ row }) => (
       <Link
-        href={`/wiki/${row.original.numericId}`}
+        href={`/wiki/${row.original.wikiId}`}
         className="text-sm font-medium text-accent-foreground hover:underline no-underline"
       >
         {row.original.title}

@@ -3,7 +3,7 @@ thing:
   stableId: pg7Ym4EQ9A
   type: organization
   name: Leading the Future super PAC
-  numericId: E422
+  wikiId: E422
 facts:
   - id: f_QHeg4m6Knw
     property: description

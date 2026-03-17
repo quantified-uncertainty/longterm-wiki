@@ -26,7 +26,7 @@
  */
 export const FRONTMATTER_FIELD_ORDER: string[] = [
   // --- Group 1: Identity ---
-  'numericId',
+  'wikiId',
   'title',
   'description',
 

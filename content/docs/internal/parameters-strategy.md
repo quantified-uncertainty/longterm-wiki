@@ -1,5 +1,5 @@
 ---
-numericId: E740
+wikiId: E740
 title: Parameters Strategy
 description: Strategy for AI transition model parameters
 subcategory: research

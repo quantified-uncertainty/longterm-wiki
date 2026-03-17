@@ -3,7 +3,7 @@ thing:
   stableId: d9sWZtyVwg
   type: organization
   name: Future of Life Institute (FLI)
-  numericId: E528
+  wikiId: E528
 facts:
   - id: f_5Tcn7xbvGQ
     property: description

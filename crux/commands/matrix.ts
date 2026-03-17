@@ -27,7 +27,7 @@ interface CommandOptions extends BaseOptions {
 }
 
 interface PageEntry {
-  id: string; numericId?: string; title: string; entityType?: string;
+  id: string; wikiId?: string; title: string; entityType?: string;
   quality: number | null; readerImportance: number | null; wordCount?: number;
   lastUpdated: string | null;
   coverage?: { passing: number; total: number; items: Record<string, string> };
@@ -121,7 +121,7 @@ function computeEntityTypeStats(pages: PageEntry[], weights?: ScoreWeights): Ent
 }
 
 interface PageImpact {
-  id: string; numericId: string; title: string; entityType: string;
+  id: string; wikiId: string; title: string; entityType: string;
   quality: number; coveragePct: number; wordCount: number; daysSinceUpdate: number;
   importance: number; impactScore: number; reasons: string[];
   isStub: boolean; action: 'create' | 'improve';
@@ -137,7 +137,7 @@ function computePageImpact(pages: PageEntry[], dimension: string,
   for (const p of pages) {
     if (!p.entityType) continue;
     if (p.subcategory === 'dashboards' || p.contentFormat === 'dashboard' || p.contentFormat === 'index') continue;
-    if (excludeIds.has(p.id) || excludeIds.has(p.numericId || '')) continue;
+    if (excludeIds.has(p.id) || excludeIds.has(p.wikiId || '')) continue;
     const wc = p.wordCount || 0;
     const isStub = wc < STUB_THRESHOLD;
     if (!includeStubs && isStub) continue;
@@ -178,7 +178,7 @@ function computePageImpact(pages: PageEntry[], dimension: string,
     else if (importance > 30) impactScore = Math.round(impactScore * 1.1);
 
     if (impactScore > 0) {
-      results.push({ id: p.id, numericId: p.numericId || p.id, title: p.title,
+      results.push({ id: p.id, wikiId: p.wikiId || p.id, title: p.title,
         entityType: p.entityType, quality, coveragePct, wordCount: wc, daysSinceUpdate: days,
         importance, impactScore, reasons, isStub, action: isStub ? 'create' : 'improve' });
     }
@@ -230,7 +230,7 @@ async function pagesCommand(_args: string[], options: CommandOptions): Promise<C
   if (threshold !== undefined) impacts = impacts.filter(p => p.quality < threshold || p.coveragePct < threshold);
   const limited = impacts.slice(0, limit);
   if (options.ci) return { exitCode: 0, output: JSON.stringify(limited, null, 2) };
-  if (options.format === 'ids') return { exitCode: 0, output: limited.map(p => p.numericId).join(',') };
+  if (options.format === 'ids') return { exitCode: 0, output: limited.map(p => p.wikiId).join(',') };
   const stubCount = impacts.filter(p => p.isStub).length;
   const lines: string[] = [
     `\x1b[1mTop ${limited.length} pages for improvement (dimension: ${dimension})\x1b[0m`,
@@ -242,7 +242,7 @@ async function pagesCommand(_args: string[], options: CommandOptions): Promise<C
   limited.forEach((p, i) => {
     const title = p.title.length > 35 ? p.title.slice(0, 32) + '...' : p.title;
     const ac = p.action === 'create' ? '\x1b[33m' : '\x1b[32m';
-    lines.push(`${String(i + 1).padStart(3)} ${p.numericId.padEnd(8)} ${ac}${p.action.padEnd(8)}\x1b[0m ${title.padEnd(36)} ${p.entityType.padEnd(16)} ${String(p.quality).padStart(3)} ${(p.coveragePct + '%').padStart(4)} ${String(p.impactScore).padStart(6)} ${p.reasons.join(', ')}`);
+    lines.push(`${String(i + 1).padStart(3)} ${p.wikiId.padEnd(8)} ${ac}${p.action.padEnd(8)}\x1b[0m ${title.padEnd(36)} ${p.entityType.padEnd(16)} ${String(p.quality).padStart(3)} ${(p.coveragePct + '%').padStart(4)} ${String(p.impactScore).padStart(6)} ${p.reasons.join(', ')}`);
   });
   lines.push('', `\x1b[2mOptions: --dimension --type --limit --min-words --include-stubs --exclude=file --format=ids --ci\x1b[0m`);
   return { exitCode: 0, output: lines.join('\n') };
@@ -268,8 +268,8 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
   const isCreate = top.action === 'create';
   const cmd = isCreate
     ? `pnpm crux content create "${top.title}" --tier=standard`
-    : `pnpm crux content improve ${top.numericId} --tier=standard --apply`;
-  return { exitCode: 0, output: `## Task: ${isCreate ? 'Create' : 'Improve'} "${top.title}" (${top.numericId})
+    : `pnpm crux content improve ${top.wikiId} --tier=standard --apply`;
+  return { exitCode: 0, output: `## Task: ${isCreate ? 'Create' : 'Improve'} "${top.title}" (${top.wikiId})
 
 **Action**: \`${top.action}\`${top.isStub ? ' (stub — needs full content creation)' : ''}
 **Entity type**: ${top.entityType}
@@ -287,7 +287,7 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
 2. Run \`${cmd}\`
 3. Run \`pnpm crux fix escaping && pnpm crux fix markdown\`
 4. Run \`pnpm crux validate gate --fix\`
-5. Run \`pnpm crux matrix mark-done ${top.numericId}\`
+5. Run \`pnpm crux matrix mark-done ${top.wikiId}\`
 6. Commit changes
 7. Open PR via \`/agent-session-ready-PR\`` };
 }

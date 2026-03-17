@@ -3,7 +3,7 @@ thing:
   stableId: UvpZCnW3wA
   type: organization
   name: NVIDIA
-  numericId: E693
+  wikiId: E693
 facts:
   - id: f_V7wquvAqSQ
     property: description

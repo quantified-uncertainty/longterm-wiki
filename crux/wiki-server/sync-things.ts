@@ -49,7 +49,7 @@ interface ThingRecord {
   entityType?: string;
   description?: string;
   sourceUrl?: string;
-  numericId?: string;
+  wikiId?: string;
 }
 
 // ---- Data loaders ----
@@ -63,7 +63,7 @@ function loadEntities(): ThingRecord[] {
     const content = readFileSync(join(dir, file), "utf-8");
     const entries = parseYaml(content) as Array<{
       id: string;
-      numericId?: string;
+      wikiId?: string;
       stableId?: string;
       type: string;
       title: string;
@@ -83,7 +83,7 @@ function loadEntities(): ThingRecord[] {
         entityType: resolveEntityType(e.type),
         description: e.description,
         sourceUrl: e.website,
-        numericId: e.numericId,
+        wikiId: e.wikiId,
       });
     }
   }

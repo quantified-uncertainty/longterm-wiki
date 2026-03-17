@@ -183,7 +183,7 @@ const linksApp = new Hono()
         await tx`
         INSERT INTO page_links (link_type, relationship, weight, source_id_int, target_id_int)
         SELECT t."linkType", t.relationship, t.weight,
-               ei_src.numeric_id, ei_tgt.numeric_id
+               ei_src.wiki_id, ei_tgt.wiki_id
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
         AS t("sourceId" text, "targetId" text, "linkType" text, relationship text, weight real)
         JOIN entity_ids ei_src ON ei_src.slug = t."sourceId"

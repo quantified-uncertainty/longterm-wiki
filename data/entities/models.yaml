@@ -3,7 +3,7 @@
 
 - id: lock-in-mechanisms
   stableId: epowDRwG3Q
-  numericId: E190
+  wikiId: E190
   type: analysis
   title: Lock-in Mechanisms Model
   maturity: Growing
@@ -22,7 +22,7 @@
   lastUpdated: 2025-12
 - id: ai-risk-portfolio-analysis
   stableId: d7FSglxSLA
-  numericId: E12
+  wikiId: E12
   type: analysis
   title: AI Risk Portfolio Analysis
   description: >-
@@ -51,7 +51,7 @@
   lastUpdated: 2025-12
 - id: worldview-intervention-mapping
   stableId: UgWUqHaGkg
-  numericId: E377
+  wikiId: E377
   type: analysis
   title: Worldview-Intervention Mapping
   description: >-
@@ -80,7 +80,7 @@
   lastUpdated: 2025-12
 - id: intervention-timing-windows
   stableId: 0CW5Kkda3Q
-  numericId: E178
+  wikiId: E178
   type: analysis
   title: Intervention Timing Windows
   description: >-
@@ -112,7 +112,7 @@
   lastUpdated: 2025-12
 - id: deceptive-alignment-decomposition
   stableId: MKmyyGR3CA
-  numericId: E94
+  wikiId: E94
   type: analysis
   title: Deceptive Alignment Decomposition Model
   description: >-
@@ -147,7 +147,7 @@
   lastUpdated: 2025-12
 - id: carlsmith-six-premises
   stableId: Z3twlLAzJg
-  numericId: E54
+  wikiId: E54
   type: analysis
   title: Carlsmith's Six-Premise Argument
   maturity: Growing
@@ -180,7 +180,7 @@
   lastUpdated: 2026-01
 - id: mesa-optimization-analysis
   stableId: Lcmst8htvA
-  numericId: E198
+  wikiId: E198
   type: analysis
   title: Mesa-Optimization Risk Analysis
   description: >-
@@ -211,7 +211,7 @@
   lastUpdated: 2025-12
 - id: goal-misgeneralization-probability
   stableId: 0B9cBkX7ZA
-  numericId: E152
+  wikiId: E152
   type: analysis
   title: Goal Misgeneralization Probability Model
   description: >-
@@ -242,7 +242,7 @@
   lastUpdated: 2025-12
 - id: reward-hacking-taxonomy
   stableId: IcYXjd5ppg
-  numericId: E254
+  wikiId: E254
   type: analysis
   title: Reward Hacking Taxonomy and Severity Model
   description: Comprehensive taxonomy of reward hacking failure modes with severity estimates and mitigation analysis
@@ -274,7 +274,7 @@
   lastUpdated: 2025-12
 - id: power-seeking-conditions
   stableId: NdUO6rBKQQ
-  numericId: E227
+  wikiId: E227
   type: analysis
   title: Power-Seeking Emergence Conditions Model
   description: >-
@@ -305,7 +305,7 @@
   lastUpdated: 2025-12
 - id: instrumental-convergence-framework
   stableId: wazgXYQpcA
-  numericId: E169
+  wikiId: E169
   type: analysis
   title: Instrumental Convergence Framework
   description: >-
@@ -339,7 +339,7 @@
   lastUpdated: 2025-12
 - id: scheming-likelihood-model
   stableId: jcOv2Lt2Pg
-  numericId: E275
+  wikiId: E275
   type: analysis
   title: Scheming Likelihood Assessment
   description: >-
@@ -373,7 +373,7 @@
   lastUpdated: 2025-12
 - id: corrigibility-failure-pathways
   stableId: qio7uy0JtQ
-  numericId: E81
+  wikiId: E81
   type: analysis
   title: Corrigibility Failure Pathways
   description: >-
@@ -407,7 +407,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-attack-chain
   stableId: 0qPdSu9SKw
-  numericId: E44
+  wikiId: E44
   type: analysis
   title: Bioweapons Attack Chain Model
   description: >-
@@ -430,7 +430,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-ai-uplift
   stableId: pEq3UrfPCQ
-  numericId: E43
+  wikiId: E43
   type: analysis
   title: AI Uplift Assessment Model
   description: >-
@@ -454,7 +454,7 @@
   lastUpdated: 2025-12
 - id: bioweapons-timeline
   stableId: 8Zg8YYt0zg
-  numericId: E45
+  wikiId: E45
   type: analysis
   title: AI-Bioweapons Timeline Model
   description: >-
@@ -477,7 +477,7 @@
   lastUpdated: 2025-12
 - id: racing-dynamics-impact
   stableId: QVDRWo8fEA
-  numericId: E240
+  wikiId: E240
   type: analysis
   title: Racing Dynamics Impact Model
   description: >-
@@ -503,7 +503,7 @@
   lastUpdated: 2025-12
 - id: multipolar-trap-dynamics
   stableId: SvvBqKEDuw
-  numericId: E210
+  wikiId: E210
   type: analysis
   title: Multipolar Trap Dynamics Model
   description: >-
@@ -529,7 +529,7 @@
   lastUpdated: 2025-12
 - id: flash-dynamics-threshold
   stableId: k9iTirUKxA
-  numericId: E143
+  wikiId: E143
   type: analysis
   title: Flash Dynamics Threshold Model
   description: >-
@@ -555,7 +555,7 @@
   lastUpdated: 2025-12
 - id: expertise-atrophy-progression
   stableId: ibAQzaf8cw
-  numericId: E135
+  wikiId: E135
   type: analysis
   title: Expertise Atrophy Progression Model
   description: >-
@@ -581,7 +581,7 @@
   lastUpdated: 2025-12
 - id: economic-disruption-impact
   stableId: oRxeVV5ueQ
-  numericId: E109
+  wikiId: E109
   type: analysis
   title: Economic Disruption Impact Model
   description: >-
@@ -607,7 +607,7 @@
   lastUpdated: 2025-12
 - id: proliferation-risk-model
   stableId: yEMy2noJAw
-  numericId: E234
+  wikiId: E234
   type: analysis
   title: AI Proliferation Risk Model
   description: >-
@@ -633,7 +633,7 @@
   lastUpdated: 2025-12
 - id: winner-take-all-concentration
   stableId: Ja9HeRlQ2A
-  numericId: E375
+  wikiId: E375
   type: analysis
   title: Winner-Take-All Concentration Model
   description: >-
@@ -659,7 +659,7 @@
   lastUpdated: 2025-12
 - id: cyberweapons-offense-defense
   stableId: WOetrROtMg
-  numericId: E88
+  wikiId: E88
   type: analysis
   title: Cyber Offense-Defense Balance Model
   description: >-
@@ -682,7 +682,7 @@
   lastUpdated: 2025-12
 - id: cyberweapons-attack-automation
   stableId: mjeuoeivPQ
-  numericId: E87
+  wikiId: E87
   type: analysis
   title: Autonomous Cyber Attack Timeline
   description: >-
@@ -705,7 +705,7 @@
   lastUpdated: 2025-12
 - id: autonomous-weapons-escalation
   stableId: Wijcceep4A
-  numericId: E36
+  wikiId: E36
   type: analysis
   title: Autonomous Weapons Escalation Model
   description: >-
@@ -728,7 +728,7 @@
   lastUpdated: 2025-12
 - id: autonomous-weapons-proliferation
   stableId: RZUPCH5Ebw
-  numericId: E37
+  wikiId: E37
   type: analysis
   title: LAWS Proliferation Model
   description: >-
@@ -751,7 +751,7 @@
   lastUpdated: 2025-12
 - id: disinformation-detection-race
   stableId: APP8lU9rZw
-  numericId: E103
+  wikiId: E103
   type: analysis
   title: Disinformation Detection Arms Race Model
   description: >-
@@ -774,7 +774,7 @@
   lastUpdated: 2025-12
 - id: disinformation-electoral-impact
   stableId: u54BJHByGQ
-  numericId: E104
+  wikiId: E104
   type: analysis
   title: Electoral Impact Assessment Model
   description: >-
@@ -797,7 +797,7 @@
   lastUpdated: 2025-12
 - id: surveillance-authoritarian-stability
   stableId: KyxBxMfyRQ
-  numericId: E293
+  wikiId: E293
   type: analysis
   title: AI Surveillance and Regime Durability Model
   description: >-
@@ -820,7 +820,7 @@
   lastUpdated: 2025-12
 - id: surveillance-chilling-effects
   stableId: Ttw7hiCesQ
-  numericId: E294
+  wikiId: E294
   type: analysis
   title: Surveillance Chilling Effects Model
   description: >-
@@ -843,7 +843,7 @@
   lastUpdated: 2025-12
 - id: deepfakes-authentication-crisis
   stableId: XfrF0JHNVA
-  numericId: E97
+  wikiId: E97
   type: analysis
   title: Deepfakes Authentication Crisis Model
   description: >-
@@ -866,7 +866,7 @@
   lastUpdated: 2025-12
 - id: trust-cascade-model
   stableId: lamh6ngDlg
-  numericId: E361
+  wikiId: E361
   type: analysis
   title: Trust Cascade Failure Model
   description: >-
@@ -898,7 +898,7 @@
   lastUpdated: 2025-12
 - id: sycophancy-feedback-loop
   stableId: d6a4HCk56g
-  numericId: E296
+  wikiId: E296
   type: analysis
   title: Sycophancy Feedback Loop Model
   description: >-
@@ -930,7 +930,7 @@
   lastUpdated: 2025-12
 - id: authentication-collapse-timeline
   stableId: 3kBPMjJp0g
-  numericId: E28
+  wikiId: E28
   type: analysis
   title: Authentication Collapse Timeline Model
   description: >-
@@ -963,7 +963,7 @@
   lastUpdated: 2025-12
 - id: expertise-atrophy-cascade
   stableId: DMO60ZuKrQ
-  numericId: E134
+  wikiId: E134
   type: analysis
   title: Expertise Atrophy Cascade Model
   description: >-
@@ -995,7 +995,7 @@
   lastUpdated: 2025-12
 - id: epistemic-collapse-threshold
   stableId: sJIrF5heiw
-  numericId: E120
+  wikiId: E120
   type: analysis
   title: Epistemic Collapse Threshold Model
   description: >-
@@ -1030,7 +1030,7 @@
   lastUpdated: 2025-12
 - id: reality-fragmentation-network
   stableId: 8wJrhEdLCg
-  numericId: E245
+  wikiId: E245
   type: analysis
   title: Reality Fragmentation Network Model
   description: >-
@@ -1062,7 +1062,7 @@
   lastUpdated: 2025-12
 - id: racing-dynamics-model
   stableId: NtsllJqplA
-  numericId: E241
+  wikiId: E241
   type: analysis
   title: Racing Dynamics Game Theory Model
   description: >-
@@ -1096,7 +1096,7 @@
   lastUpdated: 2025-12
 - id: multipolar-trap-model
   stableId: YZgsibpCwA
-  numericId: E211
+  wikiId: E211
   type: analysis
   title: Multipolar Trap Coordination Model
   description: >-
@@ -1128,7 +1128,7 @@
   lastUpdated: 2025-12
 - id: winner-take-all-model
   stableId: myzUWCr6VA
-  numericId: E376
+  wikiId: E376
   type: analysis
   title: Winner-Take-All Market Dynamics Model
   description: >-
@@ -1160,7 +1160,7 @@
   lastUpdated: 2025-12
 - id: concentration-of-power-model
   stableId: XDZHNdSQbQ
-  numericId: E69
+  wikiId: E69
   type: analysis
   title: Concentration of Power Systems Model
   description: >-
@@ -1195,7 +1195,7 @@
   lastUpdated: 2025-12
 - id: lock-in-model
   stableId: AhDYUZ66ug
-  numericId: E191
+  wikiId: E191
   type: analysis
   title: Lock-in Irreversibility Model
   description: >-
@@ -1230,7 +1230,7 @@
   lastUpdated: 2025-12
 - id: economic-disruption-model
   stableId: nKTwnY9sPA
-  numericId: E110
+  wikiId: E110
   type: analysis
   title: Economic Disruption Structural Model
   description: >-
@@ -1265,7 +1265,7 @@
   lastUpdated: 2025-12
 - id: proliferation-model
   stableId: q5uKjtki0g
-  numericId: E233
+  wikiId: E233
   type: analysis
   title: AI Capability Proliferation Model
   description: >-
@@ -1297,7 +1297,7 @@
   lastUpdated: 2025-12
 - id: risk-activation-timeline
   stableId: JHK2wwThGA
-  numericId: E255
+  wikiId: E255
   type: analysis
   title: AI Risk Activation Timeline Model
   description: >-
@@ -1328,7 +1328,7 @@
   lastUpdated: 2025-12
 - id: capability-threshold-model
   stableId: xQzokzppDA
-  numericId: E53
+  wikiId: E53
   type: analysis
   title: AI Capability Threshold Model
   description: >-
@@ -1359,7 +1359,7 @@
   lastUpdated: 2025-12
 - id: warning-signs-model
   stableId: QkcqOBokBg
-  numericId: E370
+  wikiId: E370
   type: analysis
   title: AI Risk Warning Signs Model
   description: >-
@@ -1390,7 +1390,7 @@
   lastUpdated: 2025-12
 - id: authoritarian-tools-diffusion
   stableId: l32EVOKntw
-  numericId: E31
+  wikiId: E31
   type: analysis
   title: Authoritarian Tools Diffusion Model
   description: >-
@@ -1419,7 +1419,7 @@
   lastUpdated: 2025-12
 - id: consensus-manufacturing-dynamics
   stableId: 9D54u1rKpg
-  numericId: E73
+  wikiId: E73
   type: analysis
   title: Consensus Manufacturing Dynamics Model
   description: >-
@@ -1447,7 +1447,7 @@
   lastUpdated: 2025-12
 - id: irreversibility-threshold
   stableId: bU7sfLZe7w
-  numericId: E180
+  wikiId: E180
   type: analysis
   title: Irreversibility Threshold Model
   description: >-
@@ -1475,7 +1475,7 @@
   lastUpdated: 2025-12
 - id: preference-manipulation-drift
   stableId: XagMpWehYA
-  numericId: E231
+  wikiId: E231
   type: analysis
   title: Preference Manipulation Drift Model
   description: >-
@@ -1503,7 +1503,7 @@
   lastUpdated: 2025-12
 - id: trust-erosion-dynamics
   stableId: J8dlHFvzTw
-  numericId: E363
+  wikiId: E363
   type: analysis
   title: Trust Erosion Dynamics Model
   description: >-
@@ -1531,7 +1531,7 @@
   lastUpdated: 2025-12
 - id: automation-bias-cascade
   stableId: a1IIADlAZg
-  numericId: E33
+  wikiId: E33
   type: analysis
   title: Automation Bias Cascade Model
   description: >-
@@ -1559,7 +1559,7 @@
   lastUpdated: 2025-12
 - id: cyber-psychosis-cascade
   stableId: 4ezmKLmFhA
-  numericId: E84
+  wikiId: E84
   type: analysis
   title: Cyber Psychosis Cascade Model
   description: >-
@@ -1586,7 +1586,7 @@
   lastUpdated: 2025-12
 - id: fraud-sophistication-curve
   stableId: DX8WGn3LlQ
-  numericId: E146
+  wikiId: E146
   type: analysis
   title: Fraud Sophistication Curve Model
   description: >-
@@ -1613,7 +1613,7 @@
   lastUpdated: 2025-12
 - id: intervention-effectiveness-matrix
   stableId: llilzxbUQw
-  numericId: E177
+  wikiId: E177
   type: analysis
   title: AI Safety Intervention Effectiveness Matrix
   description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
@@ -1631,7 +1631,7 @@
   lastUpdated: 2025-12
 - id: lab-incentives-model
   stableId: nsm5rm03FQ
-  numericId: E185
+  wikiId: E185
   type: analysis
   title: AI Lab Incentives Model
   description: >-
@@ -1658,7 +1658,7 @@
   lastUpdated: 2025-12
 - id: risk-interaction-matrix
   stableId: 823U6CJUOg
-  numericId: E257
+  wikiId: E257
   type: analysis
   title: AI Risk Interaction Matrix
   description: >-
@@ -1678,7 +1678,7 @@
   lastUpdated: 2025-12
 - id: safety-research-value
   stableId: CSqf1iH5Xw
-  numericId: E267
+  wikiId: E267
   type: analysis
   title: AI Safety Research Value Model
   description: >-
@@ -1698,7 +1698,7 @@
   lastUpdated: 2025-12
 - id: capabilities-to-safety-pipeline
   stableId: JnL68gw6lA
-  numericId: E51
+  wikiId: E51
   type: analysis
   title: Capabilities-to-Safety Pipeline Model
   description: >-
@@ -1722,7 +1722,7 @@
   lastUpdated: 2025-12
 - id: compounding-risks-analysis
   stableId: uvscr74oPw
-  numericId: E63
+  wikiId: E63
   type: analysis
   title: AI Compounding Risks Analysis Model
   description: >-
@@ -1749,7 +1749,7 @@
   lastUpdated: 2025-12
 - id: defense-in-depth-model
   stableId: dHoK3QPRQg
-  numericId: E99
+  wikiId: E99
   type: analysis
   title: AI Safety Defense in Depth Model
   description: >-
@@ -1769,7 +1769,7 @@
   lastUpdated: 2025-12
 - id: institutional-adaptation-speed
   stableId: cJxSLAJRSg
-  numericId: E165
+  wikiId: E165
   type: analysis
   title: Institutional AI Adaptation Speed Model
   description: >-
@@ -1793,7 +1793,7 @@
   lastUpdated: 2025-12
 - id: international-coordination-game
   stableId: OSiOU528CA
-  numericId: E172
+  wikiId: E172
   type: analysis
   title: International AI Coordination Game Model
   description: >-
@@ -1820,7 +1820,7 @@
   lastUpdated: 2025-12
 - id: media-policy-feedback-loop
   stableId: 9tyR64KDlw
-  numericId: E196
+  wikiId: E196
   type: analysis
   title: AI Media-Policy Feedback Loop Model
   description: >-
@@ -1840,7 +1840,7 @@
   lastUpdated: 2025-12
 - id: post-incident-recovery
   stableId: 5kJp7aLMUQ
-  numericId: E225
+  wikiId: E225
   type: analysis
   title: Post-AI-Incident Recovery Model
   description: >-
@@ -1860,7 +1860,7 @@
   lastUpdated: 2025-12
 - id: public-opinion-evolution
   stableId: qvUQw1CLBw
-  numericId: E237
+  wikiId: E237
   type: analysis
   title: Public Opinion on AI Evolution Model
   description: >-
@@ -1884,7 +1884,7 @@
   lastUpdated: 2025-12
 - id: risk-cascade-pathways
   stableId: Xa9TwOcnZA
-  numericId: E256
+  wikiId: E256
   type: analysis
   title: AI Risk Cascade Pathways Model
   description: >-
@@ -1911,7 +1911,7 @@
   lastUpdated: 2025-12
 - id: risk-interaction-network
   stableId: yqx0nbJ4zg
-  numericId: E258
+  wikiId: E258
   type: analysis
   title: AI Risk Interaction Network Model
   description: >-
@@ -1938,7 +1938,7 @@
   lastUpdated: 2025-12
 - id: safety-capability-tradeoff
   stableId: CBUwMaOpbA
-  numericId: E262
+  wikiId: E262
   type: analysis
   title: Safety-Capability Tradeoff Model
   description: >-
@@ -1962,7 +1962,7 @@
   lastUpdated: 2025-12
 - id: ai-acceleration-tradeoff
   stableId: NtQacqwT4g
-  numericId: E687
+  wikiId: E687
   type: analysis
   title: AI Acceleration Tradeoff Model
   description: >-
@@ -1997,7 +1997,7 @@
   lastUpdated: 2026-02
 - id: safety-research-allocation
   stableId: MaBOd5PgBw
-  numericId: E266
+  wikiId: E266
   type: analysis
   title: AI Safety Research Allocation Model
   description: >-
@@ -2024,7 +2024,7 @@
   lastUpdated: 2025-12
 - id: safety-researcher-gap
   stableId: D7MbTQckMQ
-  numericId: E268
+  wikiId: E268
   type: analysis
   title: AI Safety Researcher Gap Model
   description: >-
@@ -2048,7 +2048,7 @@
   lastUpdated: 2025-12
 - id: whistleblower-dynamics
   stableId: cHepLtIzfQ
-  numericId: E371
+  wikiId: E371
   type: analysis
   title: AI Lab Whistleblower Dynamics Model
   description: >-
@@ -2072,7 +2072,7 @@
   lastUpdated: 2025-12
 - id: parameter-interaction-network
   stableId: lHRv5iV8ug
-  numericId: E219
+  wikiId: E219
   type: analysis
   title: AI Risk Parameter Interaction Network Model
   description: >-
@@ -2100,7 +2100,7 @@
   lastUpdated: 2025-12
 - id: safety-culture-equilibrium
   stableId: xpUxCPa7cg
-  numericId: E263
+  wikiId: E263
   type: analysis
   title: AI Safety Culture Equilibrium Model
   description: >-
@@ -2130,7 +2130,7 @@
   lastUpdated: 2025-12
 - id: regulatory-capacity-threshold
   stableId: TLN24mU2AQ
-  numericId: E250
+  wikiId: E250
   type: analysis
   title: AI Regulatory Capacity Threshold Model
   description: >-
@@ -2155,7 +2155,7 @@
   lastUpdated: 2025-12
 - id: alignment-robustness-trajectory
   stableId: HkMkzccGYw
-  numericId: E21
+  wikiId: E21
   type: analysis
   title: Alignment Robustness Trajectory Model
   description: >-
@@ -2184,7 +2184,7 @@
 
 - id: projecting-compute-spending
   stableId: cF7VgLKSpg
-  numericId: E680
+  wikiId: E680
   type: analysis
   title: Projecting Compute Spending
   description: >-
@@ -2216,7 +2216,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: longtermwiki-impact
   stableId: 98cbLvwRhQ
-  numericId: E507
+  wikiId: E507
   type: analysis
   title: LongtermWiki Impact Model
   description: >-
@@ -2231,7 +2231,7 @@
   lastUpdated: 2026-02
 - id: societal-response
   stableId: FB6XvHMrkw
-  numericId: E508
+  wikiId: E508
   type: analysis
   title: "Societal Response & Adaptation Model"
   description: >-
@@ -2246,7 +2246,7 @@
   lastUpdated: 2026-02
 - id: pre-tai-capital-deployment
   stableId: oeNG1pEkeg
-  numericId: E706
+  wikiId: E706
   type: analysis
   title: "Pre-TAI Capital Deployment: $100B-$300B+ Spending Analysis"
   description: >-
@@ -2282,7 +2282,7 @@
   lastUpdated: 2026-02
 - id: ai-megaproject-infrastructure
   stableId: p2g2NDKtPQ
-  numericId: E707
+  wikiId: E707
   type: analysis
   title: "AI Megaproject Infrastructure"
   description: >-
@@ -2309,7 +2309,7 @@
   lastUpdated: 2026-02
 - id: safety-spending-at-scale
   stableId: 0aYHpbKEqw
-  numericId: E708
+  wikiId: E708
   type: analysis
   title: "Safety Spending at Scale"
   description: >-
@@ -2339,7 +2339,7 @@
   lastUpdated: 2026-02
 - id: frontier-lab-cost-structure
   stableId: gS4YxcslRg
-  numericId: E703
+  wikiId: E703
   type: analysis
   title: "Frontier Lab Cost Structure"
   description: >-
@@ -2367,7 +2367,7 @@
   lastUpdated: 2026-02
 - id: ai-talent-market-dynamics
   stableId: ENKjvkrc2g
-  numericId: E704
+  wikiId: E704
   type: analysis
   title: "AI Talent Market Dynamics"
   description: >-
@@ -2396,7 +2396,7 @@
   lastUpdated: 2026-02
 - id: planning-for-frontier-lab-scaling
   stableId: CaNCZXKbig
-  numericId: E705
+  wikiId: E705
   type: analysis
   title: "Planning for Frontier Lab Scaling"
   description: >-
@@ -2426,7 +2426,7 @@
   lastUpdated: 2026-02
 - id: longtermist-value-comparisons
   stableId: oltA1qTldg
-  numericId: E887
+  wikiId: E887
   type: analysis
   title: Relative Longtermist Value Comparisons
   description: >-
@@ -2447,7 +2447,7 @@
   lastUpdated: 2026-02
 - id: ai-compute-scaling-metrics
   stableId: 0tG3lUmFrg
-  numericId: E907
+  wikiId: E907
   type: analysis
   title: AI Compute Scaling Metrics
   description: >-

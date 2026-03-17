@@ -3,7 +3,7 @@ thing:
   stableId: 8f8b67vbgw
   type: policy
   name: US Government Authority Over Commercial AI Infrastructure
-  numericId: E688
+  wikiId: E688
 facts:
   - id: f_O6vGSNCGtw
     property: description

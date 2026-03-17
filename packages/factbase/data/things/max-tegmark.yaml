@@ -3,7 +3,7 @@ thing:
   stableId: 3KjUCZCV8w
   type: person
   name: Max Tegmark
-  numericId: E433
+  wikiId: E433
 facts:
   - id: f_oLpabpFPtg
     property: description

@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  getAllNumericIds,
-  numericIdToSlug,
-  slugToNumericId,
+  getAllWikiIds,
+  wikiIdToSlug,
+  slugToWikiId,
 } from "@/lib/mdx";
 import {
   getPageById,
@@ -17,7 +17,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-function isNumericId(id: string): boolean {
+function isWikiId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
@@ -60,14 +60,14 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const { id } = await params;
 
   let slug: string | null;
-  let numericId: string | null;
+  let wikiId: string | null;
 
-  if (isNumericId(id)) {
-    numericId = id.toUpperCase();
-    slug = numericIdToSlug(numericId);
+  if (isWikiId(id)) {
+    wikiId = id.toUpperCase();
+    slug = wikiIdToSlug(wikiId);
   } else {
     slug = id;
-    numericId = slugToNumericId(id);
+    wikiId = slugToWikiId(id);
   }
 
   if (!slug) notFound();
@@ -97,10 +97,10 @@ export default async function WikiInfoPage({ params }: PageProps) {
               )}
             </div>
           </div>
-          {numericId && (
+          {wikiId && (
             <div className="shrink-0 flex flex-col items-end gap-1">
               <span className="font-mono text-2xl font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg select-all">
-                {numericId}
+                {wikiId}
               </span>
               <span className="text-[10px] text-gray-400 uppercase tracking-wide">Entity ID (EID)</span>
             </div>
@@ -109,7 +109,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
 
         <div className="flex flex-wrap gap-4 text-sm mt-3">
           <Link
-            href={`/wiki/${numericId || slug}`}
+            href={`/wiki/${wikiId || slug}`}
             className="text-blue-600 hover:underline"
           >
             &larr; Back to page

@@ -195,10 +195,10 @@ export default async function ResearchAreaDetailPage({
             {area.description}
           </p>
         )}
-        {area.numericId && (
+        {area.wikiId && (
           <div className="mt-3 text-sm">
             <Link
-              href={`/wiki/${area.numericId}`}
+              href={`/wiki/${area.wikiId}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Wiki page &rarr;

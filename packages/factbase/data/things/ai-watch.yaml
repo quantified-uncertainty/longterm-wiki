@@ -3,7 +3,7 @@ thing:
   stableId: gDdFdUktjA
   type: project
   name: AI Watch
-  numericId: E386
+  wikiId: E386
 facts:
   - id: f_vcpkgpw53g
     property: description

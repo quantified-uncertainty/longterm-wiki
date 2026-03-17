@@ -1,65 +1,65 @@
 /**
- * Numeric ID Integrity Validation Rule (global scope)
+ * Wiki ID Integrity Validation Rule (global scope)
  *
- * Cross-file checks for numericId fields in MDX frontmatter:
+ * Cross-file checks for wikiId fields in MDX frontmatter:
  * 1. Format: must match /^E\d+$/ (e.g. "E123")
- * 2. Uniqueness: no two pages may claim the same numericId
- * 3. Entity conflict: page numericId must not collide with a YAML entity's numericId
+ * 2. Uniqueness: no two pages may claim the same wikiId
+ * 3. Entity conflict: page wikiId must not collide with a YAML entity's wikiId
  */
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
-import { NUMERIC_ID_RE } from '../patterns.ts';
+import { WIKI_ID_RE } from '../patterns.ts';
 
-export const numericIdIntegrityRule = {
-  id: 'numeric-id-integrity',
-  name: 'Numeric ID Integrity',
-  description: 'Detect duplicate, malformed, or conflicting numericId values across all pages',
+export const wikiIdIntegrityRule = {
+  id: 'wiki-id-integrity',
+  name: 'Wiki ID Integrity',
+  description: 'Detect duplicate, malformed, or conflicting wikiId values across all pages',
   scope: 'global' as const,
 
   check(files: ContentFile | ContentFile[], engine: ValidationEngine): Issue[] {
     const contentFiles = Array.isArray(files) ? files : [files];
     const issues: Issue[] = [];
 
-    // Map: numericId → first file that claimed it
+    // Map: wikiId → first file that claimed it
     const seen = new Map<string, { file: string; slug: string }>();
 
     // Load the entity ID registry to detect entity conflicts
-    const entityRegistry = engine.idRegistry?.byNumericId || {};
+    const entityRegistry = engine.idRegistry?.byWikiId || {};
 
     for (const cf of contentFiles) {
-      const numericId = cf.frontmatter.numericId as string | undefined;
-      if (!numericId) continue;
+      const wikiId = cf.frontmatter.wikiId as string | undefined;
+      if (!wikiId) continue;
 
       // 1. Format check
-      if (!NUMERIC_ID_RE.test(numericId)) {
+      if (!WIKI_ID_RE.test(wikiId)) {
         issues.push(new Issue({
-          rule: 'numeric-id-integrity',
+          rule: 'wiki-id-integrity',
           file: cf.path,
           line: 1,
-          message: `numericId "${numericId}" has invalid format — must match E followed by digits (e.g. "E710")`,
+          message: `wikiId "${wikiId}" has invalid format — must match E followed by digits (e.g. "E710")`,
           severity: Severity.ERROR,
         }));
         continue;
       }
 
       // 2. Cross-page uniqueness
-      const prev = seen.get(numericId);
+      const prev = seen.get(wikiId);
       if (prev) {
         issues.push(new Issue({
-          rule: 'numeric-id-integrity',
+          rule: 'wiki-id-integrity',
           file: cf.path,
           line: 1,
-          message: `numericId ${numericId} is also claimed by "${prev.slug}" — each page must have a unique numericId`,
+          message: `wikiId ${wikiId} is also claimed by "${prev.slug}" — each page must have a unique wikiId`,
           severity: Severity.ERROR,
         }));
       } else {
-        seen.set(numericId, { file: cf.path, slug: cf.slug });
+        seen.set(wikiId, { file: cf.path, slug: cf.slug });
       }
 
-      // 3. Entity conflict: if the id-registry maps this numericId to a different slug
+      // 3. Entity conflict: if the id-registry maps this wikiId to a different slug
       // Skip legitimate aliases where an entity renders at a differently-named page
       // (e.g. entity "tmc-epistemics" → page "epistemics")
-      const entitySlug = entityRegistry[numericId];
+      const entitySlug = entityRegistry[wikiId];
       const pageSlug = cf.slug.split('/').pop() || cf.slug;
       if (entitySlug && entitySlug !== pageSlug) {
         // Check if entity slug contains the page slug (e.g. "tmc-epistemics" → "epistemics")
@@ -69,10 +69,10 @@ export const numericIdIntegrityRule = {
         const isIndexEntity = entitySlug.startsWith('__index__');
         if (!isAlias && !isIndexEntity) {
           issues.push(new Issue({
-            rule: 'numeric-id-integrity',
+            rule: 'wiki-id-integrity',
             file: cf.path,
             line: 1,
-            message: `numericId ${numericId} conflicts with YAML entity "${entitySlug}" — assign a new numericId to this page`,
+            message: `wikiId ${wikiId} conflicts with YAML entity "${entitySlug}" — assign a new wikiId to this page`,
             severity: Severity.ERROR,
           }));
         }

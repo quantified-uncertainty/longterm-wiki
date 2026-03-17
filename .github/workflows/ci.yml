@@ -101,8 +101,8 @@ jobs:
       - name: Frontmatter schema validation (blocking)
         run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
 
-      - name: Numeric ID integrity (blocking)
-        run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
+      - name: Wiki ID integrity (blocking)
+        run: pnpm crux validate unified --rules=wiki-id-integrity --errors-only
 
       - name: TypeScript type checks (parallel)
         run: |

@@ -3,7 +3,7 @@ thing:
   stableId: iCNSRgyFAA
   type: policy
   name: Evals-Based Deployment Gates
-  numericId: E459
+  wikiId: E459
 facts:
   - id: f_j9Qn65qT0g
     property: description

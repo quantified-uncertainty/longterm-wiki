@@ -3,7 +3,7 @@ thing:
   stableId: X2gSvrOang
   type: policy
   name: Bletchley Declaration
-  numericId: E469
+  wikiId: E469
 facts:
   - id: f_8JK2xkHdiA
     property: description

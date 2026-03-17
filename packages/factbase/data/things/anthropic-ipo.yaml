@@ -3,7 +3,7 @@ thing:
   stableId: hPZbflFceQ
   type: event
   name: Anthropic IPO
-  numericId: E409
+  wikiId: E409
 facts:
   - id: f_zvqYiIzJRw
     property: description

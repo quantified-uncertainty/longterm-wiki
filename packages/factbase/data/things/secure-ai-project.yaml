@@ -3,7 +3,7 @@ thing:
   stableId: Mj1xuvdboQ
   type: organization
   name: Secure AI Project
-  numericId: E562
+  wikiId: E562
 facts:
   - id: f_rgLTjTXrhA
     property: description

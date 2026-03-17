@@ -3,7 +3,7 @@ thing:
   stableId: lD6bPNfEEg
   type: risk
   name: AI-Induced Cyber Psychosis
-  numericId: E83
+  wikiId: E83
 facts:
   - id: f_ShaH1A9hAg
     property: description

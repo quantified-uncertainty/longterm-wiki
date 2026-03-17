@@ -3,7 +3,7 @@ thing:
   stableId: pxSyZBoBpA
   type: policy
   name: Artificial Intelligence and Data Act (AIDA)
-  numericId: E49
+  wikiId: E49
 facts:
   - id: f_qXoS1mSjrA
     property: description

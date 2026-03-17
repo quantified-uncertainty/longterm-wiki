@@ -118,7 +118,7 @@ const SCRIPTS = {
   },
   'id-server-sync': {
     script: 'validate/validate-id-server-sync.ts',
-    description: 'Verify local numericIds match wiki-server allocations',
+    description: 'Verify local wikiIds match wiki-server allocations',
     passthrough: ['ci'],
   },
   'hallucination-risk': {

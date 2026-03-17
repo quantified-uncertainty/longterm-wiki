@@ -38,7 +38,7 @@ import { EntitiesContent } from "@/app/internal/entities/entities-content";
 const mockEntities = [
   {
     id: "openai",
-    numericId: "E1",
+    wikiId: "E1",
     entityType: "organization",
     title: "OpenAI",
     description: "AI research laboratory",
@@ -49,7 +49,7 @@ const mockEntities = [
   },
   {
     id: "anthropic",
-    numericId: "E2",
+    wikiId: "E2",
     entityType: "organization",
     title: "Anthropic",
     description: null,
@@ -60,7 +60,7 @@ const mockEntities = [
   },
   {
     id: "existential-risk",
-    numericId: null,
+    wikiId: null,
     entityType: "concept",
     title: "Existential Risk",
     description: "Risks that threaten human extinction",

@@ -3,7 +3,7 @@ thing:
   stableId: rSE7kY5k4Q
   type: research-area
   name: RLHF
-  numericId: E259
+  wikiId: E259
 facts:
   - id: f_0AG1TrBdcQ
     property: description

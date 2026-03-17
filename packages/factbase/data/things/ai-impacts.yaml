@@ -3,7 +3,7 @@ thing:
   stableId: TdbypiKyCw
   type: organization
   name: AI Impacts
-  numericId: E512
+  wikiId: E512
 facts:
   - id: f_KeADXc2nlQ
     property: description

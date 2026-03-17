@@ -3,7 +3,7 @@ thing:
   stableId: i1qSgjAj5A
   type: policy
   name: Responsible Scaling Policies
-  numericId: E461
+  wikiId: E461
 facts:
   - id: f_l3IjlPutCQ
     property: description

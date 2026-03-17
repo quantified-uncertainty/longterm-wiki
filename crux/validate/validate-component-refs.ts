@@ -209,10 +209,10 @@ function loadEntities(): Set<string> {
       ids.add(e.id);
     }
 
-    // Numeric IDs (E###) from idRegistry — EntityLinks may reference either form
+    // Wiki IDs (E###) from idRegistry — EntityLinks may reference either form
     const reg = (database as Record<string, unknown>).idRegistry as
-      { byNumericId?: Record<string, string> } | undefined;
-    for (const eid of Object.keys(reg?.byNumericId ?? {})) {
+      { byWikiId?: Record<string, string> } | undefined;
+    for (const eid of Object.keys(reg?.byWikiId ?? {})) {
       ids.add(eid);
     }
 

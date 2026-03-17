@@ -17,7 +17,7 @@ The improve pipeline includes a **semantic diff safety check** (`crux/lib/semant
 
 Run `pnpm crux fix escaping` and `pnpm crux fix markdown`, then verify with `pnpm crux validate gate --fix`.
 
-**Six checks are CI-blocking:** comparison-operators, dollar-signs, schema, frontmatter-schema, numeric-id-integrity, prefer-entitylink. All are included in the gate.
+**Six checks are CI-blocking:** comparison-operators, dollar-signs, schema, frontmatter-schema, wiki-id-integrity, prefer-entitylink. All are included in the gate.
 
 ## Self-review checklist (before committing any page)
 

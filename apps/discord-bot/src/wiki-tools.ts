@@ -37,9 +37,9 @@ const searchTool = tool(
 
 const getPageTool = tool(
   "get_page",
-  "Get the full content of a wiki page by its slug ID (e.g. 'scheming') or numeric ID (e.g. 'E42'). Returns the page title, description, and full plaintext content.",
+  "Get the full content of a wiki page by its slug ID (e.g. 'scheming') or wiki ID (e.g. 'E42'). Returns the page title, description, and full plaintext content.",
   {
-    id: z.string().describe("Page slug (e.g. 'scheming') or numeric ID (e.g. 'E42')"),
+    id: z.string().describe("Page slug (e.g. 'scheming') or wiki ID (e.g. 'E42')"),
   },
   async (args) => {
     const page = await getPage(args.id);

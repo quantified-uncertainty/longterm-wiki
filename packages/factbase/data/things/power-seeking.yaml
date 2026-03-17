@@ -3,7 +3,7 @@ thing:
   stableId: hwDgNNDsDQ
   type: risk
   name: Power-Seeking AI
-  numericId: E226
+  wikiId: E226
 facts:
   - id: f_BiCTuqGAvA
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: fFVOuFZCRf
   type: organization
   name: "Manifund"
-  numericId: E547
+  wikiId: E547
 
 facts:
   - id: f_9cmhuAHFrA

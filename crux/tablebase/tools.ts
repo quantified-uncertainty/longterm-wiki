@@ -129,7 +129,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
   if (entityType) params.set('entityType', entityType);
 
   const result = await apiRequest<{
-    results: Array<{ id: string; numericId?: string; stableId?: string; entityType: string; title: string }>;
+    results: Array<{ id: string; wikiId?: string; stableId?: string; entityType: string; title: string }>;
   }>('GET', `/api/entities/search?${params.toString()}`);
 
   if (!result.ok) return `Error: ${result.message}`;
@@ -230,7 +230,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      numericId: idResult.data.numericId,
+      wikiId: idResult.data.wikiId,
       stableId: idResult.data.stableId,
       entityType,
       title: name,
@@ -248,7 +248,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   return JSON.stringify({
     created: true,
     stableId: idResult.data.stableId,
-    numericId: idResult.data.numericId,
+    wikiId: idResult.data.wikiId,
     slug,
     name,
     entityType,

@@ -51,7 +51,7 @@ export function getCustomField(
  * Get the wiki page href for a policy entity.
  */
 export function getPolicyWikiHref(entity: PolicyEntity): string | null {
-  if (!entity.numericId) return null;
+  if (!entity.wikiId) return null;
   return getWikiHref(entity.id);
 }
 

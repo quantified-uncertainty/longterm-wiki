@@ -166,7 +166,7 @@ const mockDatabase = {
     "internal-doc": "/internal/architecture",
   },
   idRegistry: {
-    byNumericId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table", E6: "internal-doc" },
+    byWikiId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table", E6: "internal-doc" },
     bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5", "internal-doc": "E6" },
   },
   pages: [
@@ -240,7 +240,7 @@ const mockDatabase = {
   updateSchedule: [
     {
       id: "internal-doc",
-      numericId: "E6",
+      wikiId: "E6",
       title: "Architecture Docs",
       quality: 0,
       readerImportance: null,
@@ -339,7 +339,7 @@ describe("Data Layer", () => {
       expect(getEntityHref("test-entity")).toBe("/wiki/E1");
     });
 
-    it("falls back to slug when no numeric ID", async () => {
+    it("falls back to slug when no wiki ID", async () => {
       const { getEntityHref } = await import("../../data/index");
       expect(getEntityHref("unknown-slug")).toBe("/wiki/unknown-slug");
     });

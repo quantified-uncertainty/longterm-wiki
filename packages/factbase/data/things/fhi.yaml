@@ -3,7 +3,7 @@ thing:
   stableId: Zmw9nfUYWA
   type: organization
   name: Future of Humanity Institute
-  numericId: E140
+  wikiId: E140
 facts:
   - id: f_FsaYQdKRwQ
     property: description

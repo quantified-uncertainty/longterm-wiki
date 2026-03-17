@@ -3,7 +3,7 @@ thing:
   stableId: KDYvrwkgtw
   type: organization
   name: AI Futures Project
-  numericId: E511
+  wikiId: E511
 facts:
   - id: f_4Wa5ItAEjw
     property: description

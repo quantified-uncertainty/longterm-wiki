@@ -3,7 +3,7 @@ thing:
   stableId: Ko9DCNV87A
   type: ai-model
   name: Claude 3 Opus
-  numericId: E1027
+  wikiId: E1027
 facts:
   - id: f_nMKfXJ65ww
     property: description

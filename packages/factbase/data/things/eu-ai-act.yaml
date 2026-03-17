@@ -3,7 +3,7 @@ thing:
   stableId: La8s84s3zg
   type: policy
   name: EU AI Act
-  numericId: E127
+  wikiId: E127
 facts:
   - id: f_HyDGn7aMpA
     property: description

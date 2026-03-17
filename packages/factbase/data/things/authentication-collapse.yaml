@@ -3,7 +3,7 @@ thing:
   stableId: GvV1xPNXRw
   type: risk
   name: Authentication Collapse
-  numericId: E27
+  wikiId: E27
 facts:
   - id: f_LTye2fgagQ
     property: description

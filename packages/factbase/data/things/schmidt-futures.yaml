@@ -3,7 +3,7 @@ thing:
   stableId: h6ntSGk8fg
   type: organization
   name: Schmidt Futures
-  numericId: E561
+  wikiId: E561
 facts:
   - id: f_gvxwABjqxA
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: r8rKW3KkSg
   type: policy
   name: Model Registries
-  numericId: E472
+  wikiId: E472
 facts:
   - id: f_4nBs8OUkgA
     property: description

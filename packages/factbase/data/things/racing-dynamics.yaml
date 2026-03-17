@@ -3,7 +3,7 @@ thing:
   stableId: SUZgWeZLNA
   type: risk
   name: AI Development Racing Dynamics
-  numericId: E239
+  wikiId: E239
 facts:
   - id: f_OU9bCFdx1g
     property: description

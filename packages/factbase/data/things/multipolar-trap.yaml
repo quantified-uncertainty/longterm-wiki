@@ -3,7 +3,7 @@ thing:
   stableId: FAvAr2lvzg
   type: risk
   name: Multipolar Trap (AI Development)
-  numericId: E209
+  wikiId: E209
 facts:
   - id: f_iCxLlqxUZw
     property: description

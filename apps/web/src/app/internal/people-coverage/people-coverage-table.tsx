@@ -15,7 +15,7 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 
 export interface PersonCoverageRow {
   id: string;
-  numericId: string;
+  wikiId: string;
   name: string;
   hasRole: boolean;
   hasEmployer: boolean;
@@ -72,11 +72,11 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
       </SortableHeader>
     ),
     cell: ({ row }) => {
-      const { numericId, name, hasWikiPage } = row.original;
-      if (hasWikiPage && numericId) {
+      const { wikiId, name, hasWikiPage } = row.original;
+      if (hasWikiPage && wikiId) {
         return (
           <Link
-            href={`/wiki/${numericId}`}
+            href={`/wiki/${wikiId}`}
             className="text-sm font-medium text-accent-foreground hover:underline no-underline max-w-[200px] truncate block"
           >
             {name}

@@ -3,7 +3,7 @@ thing:
   stableId: fYyAxYlHDQ
   type: organization
   name: US AI Safety Institute
-  numericId: E365
+  wikiId: E365
 facts:
   - id: f_LiIWWhTjAw
     property: description

@@ -5,7 +5,7 @@ thing:
   name: Philip Tetlock
   aliases:
     - "Philip Tetlock (Forecasting Pioneer)"
-  numericId: E434
+  wikiId: E434
 facts:
   - id: f_gv0LsY9KoQ
     property: description

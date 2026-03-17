@@ -3,7 +3,7 @@ thing:
   stableId: G1XyCr76gw
   type: event
   name: Mainstream Era
-  numericId: E195
+  wikiId: E195
 facts:
   - id: f_9VJuL1eVGQ
     property: description

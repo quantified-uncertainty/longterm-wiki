@@ -3,7 +3,7 @@ thing:
   stableId: BU00lGYGAw
   type: policy
   name: Compute Monitoring
-  numericId: E464
+  wikiId: E464
 facts:
   - id: f_VRiRPzsLew
     property: description

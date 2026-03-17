@@ -3,7 +3,7 @@ thing:
   stableId: dpTZOF78vg
   type: capability
   name: Scientific Research Capabilities
-  numericId: E277
+  wikiId: E277
 facts:
   - id: f_2euF7FnoMg
     property: description

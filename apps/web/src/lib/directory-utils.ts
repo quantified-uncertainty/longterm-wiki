@@ -66,7 +66,7 @@ export function resolveEntityRef(ref: unknown): ResolvedEntity | null {
 
 /** Get the wiki page href for an entity, or null if no wiki page. */
 export function getEntityWikiHref(entity: Entity): string | null {
-  if (entity.numericId) return `/wiki/${entity.numericId}`;
+  if (entity.wikiId) return `/wiki/${entity.wikiId}`;
   if (entity.wikiPageId) return `/wiki/${entity.wikiPageId}`;
   return null;
 }

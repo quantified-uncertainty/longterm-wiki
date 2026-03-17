@@ -3,7 +3,7 @@ thing:
   stableId: SDvbPMOcQw
   type: approach
   name: Cooperative IRL (CIRL)
-  numericId: E586
+  wikiId: E586
 facts:
   - id: f_tujcJhsezg
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: 0J0pDyhVtQ
   type: risk
   name: AI-Powered Deanonymization
-  numericId: E699
+  wikiId: E699
 facts:
   - id: f_k9d1jSji5g
     property: description

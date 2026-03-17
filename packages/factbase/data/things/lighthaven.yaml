@@ -3,7 +3,7 @@ thing:
   stableId: 7E2ylGl7Ug
   type: organization
   name: Lighthaven (Event Venue)
-  numericId: E539
+  wikiId: E539
 facts:
   - id: f_VOFvbODcSA
     property: description

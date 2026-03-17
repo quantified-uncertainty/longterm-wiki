@@ -3,7 +3,7 @@ thing:
   stableId: ILx7EzDqXQ
   type: person
   name: Gary Marcus
-  numericId: E148
+  wikiId: E148
 facts:
   - id: f_zftBN1DOUQ
     property: description

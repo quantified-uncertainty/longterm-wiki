@@ -3,7 +3,7 @@ thing:
   stableId: aKZsmUeuWg
   type: organization
   name: Giving What We Can
-  numericId: E863
+  wikiId: E863
 facts:
   - id: f_us5lFmzYgw
     property: description

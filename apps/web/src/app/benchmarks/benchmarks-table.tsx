@@ -8,7 +8,7 @@ import { SortHeader } from "@/components/directory/SortHeader";
 export interface BenchmarkRow {
   id: string;
   title: string;
-  numericId: string | null;
+  wikiId: string | null;
   category: string | null;
   scoringMethod: string | null;
   higherIsBetter: boolean;

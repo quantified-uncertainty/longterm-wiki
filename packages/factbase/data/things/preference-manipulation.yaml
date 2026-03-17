@@ -3,7 +3,7 @@ thing:
   stableId: eM6SuO5nUw
   type: risk
   name: AI Preference Manipulation
-  numericId: E230
+  wikiId: E230
 facts:
   - id: f_FS4q0V070w
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: nAjP2vwwSw
   type: project
   name: Squiggle
-  numericId: E286
+  wikiId: E286
 facts:
   - id: f_voCxsWhgvg
     property: description

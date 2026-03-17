@@ -490,7 +490,7 @@ async function forEntity(
 
   // KB structured facts (from packages/factbase/data/things/*.yaml)
   const kbContext = await buildKbContextForPage(
-    e.numericId ?? '',
+    e.wikiId ?? '',
     `${entityId}.mdx`,
   ).catch((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err);

@@ -109,7 +109,7 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 ### Wiki Conventions
 - Use GFM footnotes for prose citations: [^1], [^2], etc. (numbered footnotes will be auto-converted to DB-driven [^rc-XXXX] format by the pipeline)
 - Use inline links in tables: [Source Name](url)
-- EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
+- EntityLinks use **wiki IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
 - Use \`<KBF entity="entity" property="property" />\` for canonical KB fact values (auto-renders with hover tooltip showing source/date)
@@ -119,7 +119,7 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 
 ### Entity Lookup Table
 
-Use the numeric IDs below when writing EntityLinks. The format is: E## = slug → "Display Name"
+Use the wiki IDs below when writing EntityLinks. The format is: E## = slug → "Display Name"
 ONLY use IDs from this table. If an entity is not listed here, use plain text instead.
 
 \`\`\`

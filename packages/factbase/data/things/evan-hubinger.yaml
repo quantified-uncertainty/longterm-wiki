@@ -3,7 +3,7 @@ thing:
   stableId: XnqqKHiNmw
   type: person
   name: Evan Hubinger
-  numericId: E129
+  wikiId: E129
 facts:
   - id: f_ENQaaYa3Gw
     property: description

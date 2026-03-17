@@ -3,7 +3,7 @@ thing:
   stableId: JqMTO0YVEA
   type: risk
   name: Scheming
-  numericId: E274
+  wikiId: E274
 facts:
   - id: f_pj2Z1ayzcg
     property: description

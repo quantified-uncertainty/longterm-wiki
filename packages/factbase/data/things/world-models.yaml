@@ -3,7 +3,7 @@ thing:
   stableId: vQugEFw5nA
   type: capability
   name: World Models + Planning
-  numericId: E503
+  wikiId: E503
 facts:
   - id: f_4UF1k5qJvQ
     property: description

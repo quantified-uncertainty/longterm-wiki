@@ -3,7 +3,7 @@ thing:
   stableId: yycfp6INgw
   type: approach
   name: Sandboxing / Containment
-  numericId: E485
+  wikiId: E485
 facts:
   - id: f_U2tsvZnb7Q
     property: description

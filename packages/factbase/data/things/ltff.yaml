@@ -3,7 +3,7 @@ thing:
   stableId: yA12C1KcjQ
   type: organization
   name: Long-Term Future Fund (LTFF)
-  numericId: E543
+  wikiId: E543
 facts:
   - id: f_i8pz77hbpw
     property: description

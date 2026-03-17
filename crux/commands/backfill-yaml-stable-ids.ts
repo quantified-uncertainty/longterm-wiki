@@ -3,7 +3,7 @@
  *
  * For each entity in data/entities/*.yaml that lacks a stableId:
  *   1. Checks packages/factbase/data/things/{slug}.yaml for an existing stableId
- *   2. If none, generates a new random 10-char alphanumeric ID
+ *   2. If none, generates a new random 10-char alphawiki ID
  *   3. Inserts the stableId line right after the `id:` line in the YAML
  *
  * Uses string manipulation (not parse+stringify) to preserve existing formatting.
@@ -230,7 +230,7 @@ Backfill stableIds into Entity YAML Files
 Reads entity YAML files from data/entities/*.yaml and inserts a stableId
 field for any entity that doesn't have one. StableIds are sourced from
 KB thing files (packages/factbase/data/things/*.yaml) when available, otherwise
-a new random 10-char alphanumeric ID is generated.
+a new random 10-char alphawiki ID is generated.
 
 Usage:
   crux backfill-yaml-stable-ids run              Run the backfill

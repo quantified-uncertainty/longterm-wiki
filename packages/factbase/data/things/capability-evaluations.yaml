@@ -3,7 +3,7 @@ thing:
   stableId: CD9w0PDxvg
   type: concept
   name: Capability Evaluations
-  numericId: E52
+  wikiId: E52
 facts:
   - id: f_39oSmzz3cw
     property: description

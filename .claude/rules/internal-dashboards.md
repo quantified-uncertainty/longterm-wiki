@@ -20,7 +20,7 @@ All dashboards **must** use the MDX wiki page pattern (Pattern A). Do not create
 3. **Create MDX stub**: `content/docs/internal/<slug>-dashboard.mdx`
    ```yaml
    ---
-   numericId: E<id>
+   wikiId: E<id>
    title: "<Title>"
    description: "<Description>"
    subcategory: dashboards          # or citations

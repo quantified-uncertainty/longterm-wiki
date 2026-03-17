@@ -46,7 +46,7 @@ const HEALTH_CHECK_RETRIES = 5;
 
 interface PageData {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   title: string;
   description?: string;
   llmSummary?: string;
@@ -74,7 +74,7 @@ interface PageData {
 
 interface SyncPage {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   title: string;
   description: string | null;
   llmSummary: string | null;
@@ -99,10 +99,10 @@ interface SyncPage {
   contentFormat: string | null;
 }
 
-function loadContent(numericId: string | undefined): string | null {
-  if (!numericId) return null;
+function loadContent(wikiId: string | undefined): string | null {
+  if (!wikiId) return null;
 
-  const txtPath = join(WIKI_DIR, `${numericId}.txt`);
+  const txtPath = join(WIKI_DIR, `${wikiId}.txt`);
   if (!existsSync(txtPath)) return null;
 
   try {
@@ -113,11 +113,11 @@ function loadContent(numericId: string | undefined): string | null {
 }
 
 function transformPage(page: PageData): SyncPage {
-  const content = loadContent(page.numericId);
+  const content = loadContent(page.wikiId);
 
   return {
     id: page.id,
-    numericId: page.numericId ?? null,
+    wikiId: page.wikiId ?? null,
     title: page.title,
     description: page.description ?? null,
     llmSummary: page.llmSummary ?? null,
@@ -230,24 +230,24 @@ async function main() {
     readFileSync(PAGES_JSON_PATH, "utf-8")
   );
 
-  // Enrich pages with numericIds from database.json's idRegistry.
-  // pages.json only stores numericId when it's explicitly set in MDX frontmatter,
+  // Enrich pages with wikiIds from database.json's idRegistry.
+  // pages.json only stores wikiId when it's explicitly set in MDX frontmatter,
   // but the idRegistry (built by build-data.mjs from the entity_ids server table)
-  // has IDs for all pages. Without this, most pages sync with NULL numeric_id
-  // and the explore endpoint's `numeric_id IS NOT NULL` filter hides them.
+  // has IDs for all pages. Without this, most pages sync with NULL wiki_id
+  // and the explore endpoint's `wiki_id IS NOT NULL` filter hides them.
   if (existsSync(DATABASE_JSON_PATH)) {
     try {
       const dbJson = JSON.parse(readFileSync(DATABASE_JSON_PATH, "utf-8"));
       const bySlug: Record<string, string> = dbJson?.idRegistry?.bySlug ?? {};
       let enriched = 0;
       for (const page of rawPages) {
-        if (!page.numericId && bySlug[page.id]) {
-          page.numericId = bySlug[page.id];
+        if (!page.wikiId && bySlug[page.id]) {
+          page.wikiId = bySlug[page.id];
           enriched++;
         }
       }
       if (enriched > 0) {
-        console.log(`  Enriched ${enriched} pages with numericId from idRegistry`);
+        console.log(`  Enriched ${enriched} pages with wikiId from idRegistry`);
       }
     } catch (err) {
       console.warn(
@@ -281,7 +281,7 @@ async function main() {
   if (dryRun) {
     console.log("\n[dry-run] Would sync these pages:");
     for (const p of syncPayloads.slice(0, 10)) {
-      console.log(`  ${p.id} (${p.numericId}) — ${p.title}`);
+      console.log(`  ${p.id} (${p.wikiId}) — ${p.title}`);
     }
     if (syncPayloads.length > 10) {
       console.log(`  ... and ${syncPayloads.length - 10} more`);

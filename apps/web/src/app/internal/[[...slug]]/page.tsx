@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getInternalPageFrontmatter, getAllInternalSlugs, isMdxError } from "@/lib/mdx";
-import { slugToNumericId } from "@/lib/mdx";
+import { slugToWikiId } from "@/lib/mdx";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -19,12 +19,12 @@ function resolveEntitySlug(slugParts: string[]): string {
   const basename = slugParts[slugParts.length - 1];
 
   // Try the basename first (most internal pages use just their filename as slug)
-  const numId = slugToNumericId(basename);
+  const numId = slugToWikiId(basename);
   if (numId) return basename;
 
   // Try __index__ pattern for directory indexes (e.g., ["reports"] → "__index__/internal/reports")
   const indexSlug = `__index__/internal/${slugParts.join("/")}`;
-  const indexNumId = slugToNumericId(indexSlug);
+  const indexNumId = slugToWikiId(indexSlug);
   if (indexNumId) return indexSlug;
 
   return basename;
@@ -49,22 +49,22 @@ export default async function InternalPage({ params }: PageProps) {
   const { slug } = await params;
   const slugParts = slug || [];
 
-  // Resolve to entity slug and look up numeric ID for redirect
+  // Resolve to entity slug and look up wiki ID for redirect
   const entitySlug = resolveEntitySlug(slugParts);
-  const numericId = slugToNumericId(entitySlug);
+  const wikiId = slugToWikiId(entitySlug);
 
-  if (numericId) {
-    redirect(`/wiki/${numericId}`);
+  if (wikiId) {
+    redirect(`/wiki/${wikiId}`);
   }
 
-  // No numeric ID found — check if frontmatter has one directly
+  // No wiki ID found — check if frontmatter has one directly
   const slugPath = slugParts.join("/");
   const frontmatter = getInternalPageFrontmatter(slugPath);
-  if (frontmatter?.numericId) {
-    redirect(`/wiki/${frontmatter.numericId}`);
+  if (frontmatter?.wikiId) {
+    redirect(`/wiki/${frontmatter.wikiId}`);
   }
 
-  // Fallback: page has no numeric ID, render not found
+  // Fallback: page has no wiki ID, render not found
   // (React dashboard pages have their own dedicated routes and won't hit this catch-all)
   notFound();
 }

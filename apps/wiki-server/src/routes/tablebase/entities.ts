@@ -76,7 +76,7 @@ function sqlInList(values: string[]) {
 function formatEntity(e: typeof entities.$inferSelect) {
   return {
     id: e.id,
-    numericId: e.numericId,
+    wikiId: e.wikiId,
     stableId: e.stableId,
     entityType: e.entityType,
     title: e.title,
@@ -228,7 +228,7 @@ const entitiesApp = new Hono()
     // Data query with lateral fact subqueries
     interface OrgRow {
       id: string;
-      numericId: string | null;
+      wikiId: string | null;
       stableId: string | null;
       title: string;
       description: string | null;
@@ -246,7 +246,7 @@ const entitiesApp = new Hono()
     const rows: OrgRow[] = await db
       .select({
         id: entities.id,
-        numericId: entities.numericId,
+        wikiId: entities.wikiId,
         stableId: entities.stableId,
         title: entities.title,
         description: entities.description,
@@ -269,7 +269,7 @@ const entitiesApp = new Hono()
     return c.json({
       organizations: rows.map((r) => ({
         id: r.id,
-        numericId: r.numericId,
+        wikiId: r.wikiId,
         stableId: r.stableId,
         title: r.title,
         description: r.description,
@@ -481,7 +481,7 @@ const entitiesApp = new Hono()
 
       return {
         id: e.id,
-        numericId: e.numericId,
+        wikiId: e.wikiId,
         stableId: e.stableId,
         entityType: e.entityType,
         title: e.title,
@@ -506,11 +506,11 @@ const entitiesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Look up by slug, numeric ID, or stable ID
+    // Look up by slug, wiki ID, or stable ID
     const rows = await db
       .select()
       .from(entities)
-      .where(or(eq(entities.id, id), eq(entities.numericId, id), eq(entities.stableId, id)));
+      .where(or(eq(entities.id, id), eq(entities.wikiId, id), eq(entities.stableId, id)));
 
     if (rows.length === 0) {
       return notFoundError(c, `No entity found for id: ${id}`);
@@ -541,7 +541,7 @@ const entitiesApp = new Hono()
     const rows = await db
       .select({
         id: entities.id,
-        numericId: entities.numericId,
+        wikiId: entities.wikiId,
         stableId: entities.stableId,
         entityType: entities.entityType,
         title: entities.title,
@@ -604,7 +604,7 @@ const entitiesApp = new Hono()
     await db.transaction(async (tx) => {
       const allVals = items.map((e) => ({
         id: e.id,
-        numericId: e.numericId ?? null,
+        wikiId: e.wikiId ?? null,
         stableId: e.stableId ?? null,
         entityType: e.entityType,
         title: e.title,
@@ -626,7 +626,7 @@ const entitiesApp = new Hono()
         .onConflictDoUpdate({
           target: entities.id,
           set: {
-            numericId: sql`excluded.numeric_id`,
+            wikiId: sql`excluded.wiki_id`,
             // Use incoming stableId when provided; fall back to existing.
             stableId: sql`COALESCE(excluded.stable_id, "entities"."stable_id")`,
             entityType: sql`excluded.entity_type`,
@@ -657,7 +657,7 @@ const entitiesApp = new Hono()
           sourceId: e.id,
           entityType: e.entityType,
           description: e.description,
-          numericId: e.numericId,
+          wikiId: e.wikiId,
           sourceUrl: e.website,
         }))
       );
