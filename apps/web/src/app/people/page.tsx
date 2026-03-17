@@ -243,7 +243,7 @@ function loadFromLocal(): PersonRow[] {
       positionCount,
       topics,
       publicationCount: publications.length,
-      careerHistoryCount: careerHistory.length,
+      careerHistoryCount: getLocalCareerCount(entity.id),
       searchText: searchParts.join(" ").toLowerCase(),
     };
   });

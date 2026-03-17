@@ -636,7 +636,29 @@ function extractPrNumber(prUrl) {
   return m ? parseInt(m[1], 10) : undefined;
 }
 
-// maxDate was removed — see lastUpdated fallback chain comment in buildPagesRegistry.
+/**
+ * Resolve the last-updated date for a page using a priority fallback chain.
+ *
+ * Priority:
+ *   1. frontmatter `lastEdited` (set by content editing tools)
+ *   2. frontmatter `lastUpdated` (legacy field)
+ *   3. edit log date from wiki-server
+ *   4. git modified date (last resort — includes metadata-only commits)
+ *
+ * @param {object} fm           - parsed frontmatter object
+ * @param {string|null} editLogDate - date string from wiki-server edit logs
+ * @param {string|null} gitDate     - date string from git modified map
+ * @returns {string|null}
+ */
+function resolveLastUpdated(fm, editLogDate, gitDate) {
+  return toDateString(fm.lastEdited)
+    || toDateString(fm.lastUpdated)
+    || editLogDate
+    || gitDate
+    || null;
+}
+
+// maxDate was removed — see resolveLastUpdated above.
 // dateCreated already uses a fallback chain (resolveDateCreated in git-date-utils.mjs).
 
 /**
@@ -1948,17 +1970,12 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           causalLevel: fm.causalLevel || null,
-          // Use a fallback chain instead of maxDate to avoid metadata-only
-          // git commits (e.g. bulk frontmatter reformatting) from overriding
-          // the actual content change date with today's date.
-          // Priority: frontmatter lastEdited (set by content editing tools)
-          //   → frontmatter lastUpdated (legacy) → edit log date (wiki-server)
-          //   → git modified date (last resort, includes metadata commits).
-          lastUpdated: toDateString(fm.lastEdited)
-            || toDateString(fm.lastUpdated)
-            || editLogDates.get(isIndexFile ? null : id)
-            || gitModifiedMap.get(relative(REPO_ROOT, fullPath))
-            || null,
+          // Fallback chain — see resolveLastUpdated() for priority order.
+          lastUpdated: resolveLastUpdated(
+            fm,
+            editLogDates.get(isIndexFile ? null : id),
+            gitModifiedMap.get(relative(REPO_ROOT, fullPath)),
+          ),
           // Derive creation date: prefer explicit frontmatter, then non-bulk git
           // first-commit, then earliest edit log from wiki-server, then legacy
           // frontmatter. Bulk-import git dates are already filtered out of
