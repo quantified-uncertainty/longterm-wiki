@@ -1,0 +1,375 @@
+# TableBase Organization Research Notes
+# Notes from enrichment runs — helps future sessions know where to find data.
+# Format: entityId → notes about team page URLs, data sources, quirks.
+
+# Anthropic (A4XoubikkQ) — stableId for the Anthropic entity used by DeepMind records
+# Note: A4XoubikkQ is actually Google DeepMind's ID. Anthropic records were written
+# to the correct org but some early API mode records used wrong entity.
+
+google-deepmind:
+  entityId: A4XoubikkQ
+  teamPage: null  # No public team page. Board at /company (JS-rendered, needs Playwright fetch-page).
+  notes: |
+    WebFetch on anthropic.com/company returns board only (Dario, Daniela, Yasmin Razavi, Jay Kreps, Reed Hastings, Chris Liddell).
+    Playwright fetch-page works for the same page. No staff directory — researchers found via WebSearch + Wikipedia.
+
+anthropic:
+  entityId: A4XoubikkQ  # Same ID issue — check this
+  notes: |
+    Board visible at anthropic.com/company (JS-rendered). No public staff directory.
+    Key researchers found via WebSearch. Many co-founders are in the DB already.
+
+openai:
+  entityId: "265"
+  notes: |
+    Personnel added to main OpenAI entity. Board/exec team found via WebSearch.
+    Many executives not in entity DB — had to create them.
+
+openai-foundation:
+  entityId: GQuPhNkZbg
+  notes: |
+    Board formed October 28, 2025. All board members from openai.com/our-structure.
+    Sam Altman co-founded OpenAI in 2015.
+
+open-philanthropy:
+  entityId: "263"
+  teamPage: https://coefficientgiving.org/about-us/team
+  notes: |
+    Renamed to Coefficient Giving in November 2025. openphilanthropy.org redirects to coefficientgiving.org.
+    Team page has 140+ people with exact roles and departments. Extremely rich data source.
+    Only Holden Karnofsky and Dustin Moskovitz were in the DB — most staff need entity creation.
+
+redwood-research:
+  entityId: "289"
+  teamPage: https://www.redwoodresearch.org/team
+  notes: |
+    Team page lists Buck Shlegeris (CEO), Ryan Greenblatt (Chief Scientist),
+    and board (Buck, Nate Thomas, Ammon Bartram). Technical staff names visible but no titles.
+
+80000-hours:
+  entityId: hvg9ecR3nA
+  teamPage: https://80000hours.org/about/meet-the-team/
+  notes: |
+    Excellent team page — 51 staff + 5 board + 5 advisors with exact titles.
+    Founded 2011 by Benjamin Todd and Will MacAskill. Current CEO is Niel Bowerman.
+    Note: We only submitted the 2 founders. Could go much deeper.
+
+apollo-research:
+  entityId: pKeaWwP6sQ
+  teamPage: https://www.apolloresearch.ai/team  # Note: /about returns 404, /team works
+  notes: |
+    24 people with roles. CEO Marius Hobbhahn, COO Chris Akin.
+    Technical staff listed as "Member of Technical Staff" without specific titles.
+
+epoch-ai:
+  entityId: cBPkzcVBBQ
+  teamPage: https://epoch.ai/team  # Note: epochai.org redirects to epoch.ai
+  notes: |
+    26 people with roles. Founded 2022 by Jaime Sevilla.
+    Has board: Tom Davidson, Ajeya Cotra, Jaime Sevilla, María de la Lama.
+
+rethink-priorities:
+  entityId: t0p43V5oLA
+  teamPage: https://rethinkpriorities.org/team
+  notes: |
+    42 people with roles across departments. CEO Marcus A. Davis, Co-founder Peter Wildeford.
+    8 board members listed. Departments: Animal Welfare, GHD, Surveys, Worldview, Operations, Comms.
+
+center-for-ai-safety:
+  entityId: y4bieqSeag
+  teamPage: https://www.safe.ai/about
+  notes: |
+    Only 3 leadership visible on about page (Dan Hendrycks, Oliver Zhang, Josue Estrada).
+    Team organized into functional divisions but no individual names for staff.
+    Note: There's a duplicate entity (oa9A0OV0RX) — marked done, skip it.
+
+miri:
+  entityId: puAffUjWSS
+  teamPage: null  # No team page found
+  notes: |
+    No public team page. Data from WebSearch + Wikipedia.
+    API mode agent found 11 people including co-founders (Eliezer Yudkowsky) and created 8 new person entities.
+
+ai-impacts:
+  entityId: TdbypiKyCw
+  teamPage: https://aiimpacts.org/about  # /team returns 404
+  notes: |
+    About page lists Katja Grace as lead researcher + co-founder (since 2014).
+    Also lists many past contributors (Paul Christiano, Daniel Kokotajlo, etc.).
+
+1day-sooner:
+  entityId: 9k7drw6Qpg
+  teamPage: https://www.1daysooner.org/about/our-team/
+  notes: |
+    Founded by Josh Morrison (President) and Sophie Rose in 2020.
+    Board: Dan Wikler, Madeleine Thompson, Stanley Plotkin.
+
+against-malaria-foundation:
+  entityId: c5rNf1vl2A
+  notes: |
+    Founded 2005 by Rob Mather (CEO). Lean team of 13.
+    8 trustees but names not easily found via search.
+
+ai-futures-project:
+  entityId: KDYvrwkgtw
+  teamPage: https://www.aifutures.org/about
+  notes: |
+    Founded 2025 by Daniel Kokotajlo. Core team: Eli Lifland, Thomas Larsen, Romeo Dean, Lauren Mangla.
+    Jonas Vollmer is COO. Made the AI 2027 scenario forecasting project.
+
+palisade-research:
+  entityId: sgEt2BpyOg
+  teamPage: https://palisaderesearch.org/about  # /team doesn't exist
+  notes: |
+    Founded 2023 by Jeffrey Ladish. 8 leadership + 10 staff on about page.
+    Focus on AI security risks. No specific joining dates on site.
+
+metr:
+  entityId: "239"
+  teamPage: https://metr.org/about#our-team  # /team redirects here
+  notes: |
+    35+ people. Beth Barnes (Founder & CEO). Board includes Adam Gleave, Yoshua Bengio.
+    Good role categorization: Technical Staff, Operations, Policy, Advisors.
+    Ajeya Cotra already in DB as entity 22.
+
+far-ai:
+  entityId: "150"
+  teamPage: https://far.ai/about  # "View full team" link for more
+  notes: |
+    15 people shown, only founders have titles. Adam Gleave and Karl Berzins are co-founders.
+    Adam Gleave also on METR board.
+
+goodfire:
+  entityId: "175"
+  teamPage: https://www.goodfire.ai/about  # /company also works
+  notes: |
+    34 people but only PhD/no-title distinction. Founded June 2024 by Eric Ho (CEO),
+    Dan Balsam (CTO), Thomas McGrath (Chief Scientist). Lee Sharkey and Dan Braun
+    joined from Apollo Research. $50M Series A from Anthropic + Menlo Ventures.
+
+cfar:
+  entityId: "63"
+  teamPage: null  # /about/staff and /about/team both 404
+  notes: |
+    No working team page. Data from Wikipedia.
+    Founded 2012 by Julia Galef, Anna Salamon, Michael Smith, Andrew Critch.
+    Anna Salamon president since 2021. Timothy Telleen-Lawton is Executive Director.
+
+seldon-lab:
+  entityId: "320"
+  teamPage: null  # seldonlab.com has info but no /team page
+  notes: |
+    AI security startup accelerator. Co-founded by Esben Kran, Finn Metz, Nick Fitz, Eric Ries.
+    Runs 3-month programs in SF. Info from Crunchbase + seldonlab.com.
+
+elicit:
+  entityId: 2VexoROapg
+  teamPage: https://elicit.com/team  # exists but WebFetch 404'd, may need Playwright
+  notes: |
+    Spun out of Ought (nonprofit) as PBC in 2023. Founded by Andreas Stuhlmüller (CEO)
+    and Jungwon Byun (COO). elicit.com/about returns 404, /team exists but may be JS-rendered.
+
+future-of-life-institute:
+  entityId: d9sWZtyVwg
+  teamPage: https://futureoflife.org/team/
+  notes: |
+    32+ people with roles across Policy, Futures, Comms, Operations departments.
+    Founded by Max Tegmark (chair) and Anthony Aguirre (CEO). Board includes Jaan Tallinn, Victoria Krakovna.
+
+cltr:
+  entityId: "64"
+  teamPage: https://www.longtermresilience.org/team
+  notes: |
+    19 staff + 5 board + 5 advisory. Founded by Angus Mercer.
+    Departments: biosecurity policy, AI policy, risk management, strategic partnerships.
+    Jess Whittlestone is senior AI policy adviser.
+
+chai:
+  entityId: zMfgJqiEPQ
+  teamPage: https://humancompatible.ai/people
+  notes: |
+    Very rich page — faculty, staff, researchers, fellows, affiliates.
+    Stuart Russell founder/director. Mark Nitzberg executive director.
+    Many affiliates are UC Berkeley professors. Andrew Critch is a research scientist here too.
+
+hewlett-foundation:
+  entityId: "185"
+  teamPage: null  # Large foundation, no simple team page
+  notes: |
+    Amber Miller became president June 2024 (succeeding Larry Kramer, 2012-2023).
+    Foundation funds AI safety/cybersecurity work. Not an AI org itself.
+
+ftx-future-fund:
+  entityId: "164"
+  teamPage: null  # Defunct
+  notes: |
+    Launched Feb 2022, collapsed Nov 2022 with FTX.
+    Team: Nick Beckstead (CEO), Leopold Aschenbrenner, William MacAskill, Avital Balwit, Ketan Ramakrishnan.
+    All resigned November 2022. Use endDate: "2022-11" for all records.
+
+govai:
+  entityId: 4c2Xd10VJDYX
+  teamPage: https://www.governance.ai/team
+  notes: |
+    44+ people with roles. Ben Garfinkel exec director, Markus Anderljung director of policy.
+    Strong research team: fellows, scholars, senior fellows. Offices in Oxford.
+
+fhi:
+  entityId: jRQ6xPlVdzIk
+  teamPage: null  # fhi.ox.ac.uk is down (ECONNREFUSED)
+  notes: |
+    CLOSED April 16, 2024. Nick Bostrom (founder/director), Anders Sandberg, Toby Ord.
+    Faculty of Philosophy froze hiring/fundraising from 2020. Use endDate 2024-04 for all.
+
+manifold:
+  entityId: FISYNGdZcf4n
+  teamPage: null  # manifold.markets/about has no team info
+  notes: |
+    Founded December 2021 by Stephen Grugett (CEO), James Grugett, Austin Chen (CPO).
+    Austin Chen departed April 2024 to focus on Manifund. Per Wikipedia.
+
+longview-philanthropy:
+  entityId: XeWb3olftwOs
+  teamPage: https://www.longview.org/about/
+  notes: |
+    Natalie Cargill (founder 2018, president). Simran Dhaliwal (CEO). Carl Robichaud (nuclear policy).
+    Philanthropy advisor, works with major donors on giving plans.
+
+ibbis:
+  entityId: ceJqS3M298O8
+  teamPage: https://ibbis.bio/about/people/  # about page only shows director
+  notes: |
+    Dr Piers Millett is inaugural executive director (fall 2022).
+    About page only lists director. /about/people/ may have more.
+
+good-judgment:
+  entityId: "-UhYkgCik3Nw"
+  teamPage: null
+  notes: |
+    Philip Tetlock (co-founder/advisor). Warren Hatch (CEO).
+    Founded from IARPA forecasting tournament. ~30 team members.
+
+futuresearch:
+  entityId: "166"
+  teamPage: null
+  notes: |
+    Founded 2023 by Dan Schwarz (CEO, ex-Metaculus CTO, ex-Google/Waymo) and
+    Lawrence Phillips (CTO, ex-Metaculus AI lead). First autonomous AI forecaster.
+
+nti-bio:
+  entityId: D9lqMW2HVw
+  notes: |
+    NTI entity covers NTI|bio biosecurity program. Beth Cameron is VP.
+    Pipe character in name breaks resolve command.
+
+samotsvety:
+  entityId: "305"
+  teamPage: null
+  notes: |
+    Forecasting group, 15 members, invitation-only. Founded by Nuño Sempere and Misha Yagudin.
+    Met at FHI summer fellowship. Eli Lifland also a member.
+
+cea:
+  entityId: "61"
+  teamPage: https://www.centreforeffectivealtruism.org/team
+  notes: |
+    65+ people. Zachary Robinson CEO. Julia Wise community health lead.
+    Departments: events, groups, courses, operations, community health, EA funds, marketing.
+    Runs EA Global conferences.
+
+controlai:
+  entityId: "98"
+  teamPage: https://controlai.com/about
+  notes: |
+    Founded by Andrea Miotti (CEO) and Connor Leahy (co-founder/advisor).
+    Leahy also CEO of Conjecture and founder of EleutherAI.
+
+arc:
+  entityId: QsXVXtQ0zE
+  teamPage: https://www.alignment.org/team/
+  notes: |
+    19 people listed. Paul Christiano founded ARC in 2021, now at NIST.
+    Jacob Hilton is current president. ARC Evals spun out as METR (Beth Barnes).
+    Board: Jacob Hilton, Buck Shlegeris, Ben Hoskin.
+
+council-on-strategic-risks:
+  entityId: "102"
+  teamPage: null  # councilonstrategicrisks.org/about/team/ returns 404
+  notes: |
+    Mallory Stewart became CEO January 2026 (replacing Christine Parthemore).
+    Previously focused on arms control at State Dept. Per CSR announcement.
+
+arb-research:
+  entityId: "36"
+  teamPage: null  # arb.group/about returns 404
+  notes: |
+    Founded 2022 by Patrick Fechtmeyer and Junwei Ye. Based in Miami.
+    Consulting: forecasting, ML, policy. From arbresearch.com.
+
+quri:
+  entityId: Khej79OA8g
+  teamPage: null  # quantifieduncertainty.org/about has info but no team page
+  notes: |
+    Founded 2019 by Ozzie Gooen. Small team. Main project: Squiggle.
+    Previously created Guesstimate (2016). Nuño Sempere contributed.
+
+cser:
+  entityId: Qns43S795w
+  teamPage: https://www.cser.ac.uk/people/team/  # Returns 403 forbidden
+  notes: |
+    Team page blocked (403). Data from Wikipedia.
+    Co-founded 2012 by Martin Rees, Huw Price, Jaan Tallinn at Cambridge.
+    Seán Ó hÉigeartaigh founding exec director (2013+).
+
+fri:
+  entityId: KslhqGaeJw
+  teamPage: https://forecastingresearch.org/team
+  notes: |
+    18+ staff + board + advisors. Philip Tetlock (president/chief scientist).
+    Josh Rosenberg CEO. Ezra Karger director of research. Good team page.
+
+conjecture:
+  entityId: "93"
+  teamPage: null  # conjecture.dev/about is JS-rendered, WebFetch returned empty
+  notes: |
+    Founded March 2022 by Connor Leahy, Sid Black, Gabriel Alfour.
+    Born out of EleutherAI. London HQ. Alignment research startup.
+    Use fetch-page for the team page (JS-rendered).
+
+us-ai-safety-institute:
+  entityId: "363"
+  notes: |
+    Elizabeth Kelly (director, Feb 2024), Paul Christiano (head of AI safety, Aug 2024),
+    Elham Tabassi (CTO, Feb 2024). Founded under Commerce Secretary Raimondo.
+    Note: Elizabeth Kelly left for Anthropic per LinkedIn (late 2025?). Verify current status.
+
+uk-ai-safety-institute:
+  entityId: "361"
+  notes: |
+    Renamed to AI Security Institute February 2025. Ian Hogarth (chair, June 2023),
+    Jade Leung (CTO, 2023), Adam Beaumont (director). aisi.gov.uk is the current URL.
+
+cset:
+  entityId: lvsDuyzPcg
+  notes: |
+    Helen Toner interim exec director. Jason Matheny founded CSET, now at RAND.
+    Georgetown University based. Key AI policy think tank.
+
+policy-people-notes: |
+  Key AI policy figures created as person entities:
+  - Scott Wiener (HLc6VrCh5w) - CA senator, SB 1047/SB 53 author
+  - Gavin Newsom (tDwxa07Urw) - CA governor, vetoed SB 1047
+  - Chuck Schumer (ZuTRR3Q8qg) - US senator, AI Insight Forums
+  - Gina Raimondo (HQwJqusFhw) - Commerce Secretary, created US AISI
+  - Margrethe Vestager (lSLuPzY3vQ) - EU VP, led EU AI Act
+  - Thierry Breton (e7Uzh4eUIA) - EU Commissioner, co-led EU AI Act
+  - Jason Matheny (U3llWAe1dg) - RAND CEO, founded CSET, ran IARPA
+  - Jade Leung (Fud5QhdJjg) - UK AISI CTO, PM Starmer's AI adviser
+
+# --- Batch entity creation from resource authors ---
+# Date: 2026-03-16
+# Created ~456 person entities from authors appearing in 2+ wiki resources.
+# Total person entities now: 642 (up from ~70 original).
+# These are minimal entities (name + type only) — need enrichment with
+# descriptions, org affiliations, and publication links.
+# Source: /api/resources/all → extract authors → frequency rank → ensure-entities

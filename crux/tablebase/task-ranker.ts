@@ -62,7 +62,11 @@ function profileToTask(profile: TableProfile): EnrichmentTask | null {
   if (gap <= 0) return null;
 
   const weight = TASK_TYPE_WEIGHTS[taskType];
-  const impactScore = Math.round(gap * weight);
+  // Importance multiplier: entities with readerImportance > 50 get boosted,
+  // those without importance data get a neutral 1.0x
+  const importance = profile.entityImportance ?? 25;
+  const importanceMultiplier = 0.5 + (importance / 100); // range: 0.5x - 1.5x
+  const impactScore = Math.round(gap * weight * importanceMultiplier);
 
   return {
     id: makeTaskId(taskType, profile.entityId),
@@ -74,6 +78,7 @@ function profileToTask(profile: TableProfile): EnrichmentTask | null {
     impactScore,
     reasons: profile.missingFields.length > 0 ? profile.missingFields : [`${gap}% incomplete`],
     existingRecordCount: profile.totalRecords,
+    website: profile.website,
   };
 }
 
