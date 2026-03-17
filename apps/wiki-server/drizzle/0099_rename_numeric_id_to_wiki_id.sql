@@ -1,10 +1,16 @@
 -- Rename numeric_id → wiki_id across all tables.
 -- This is a metadata-only operation (no data movement), safe for large tables.
+-- All consumers (TypeScript types, Drizzle schema, queries) updated in the same PR.
 
+-- squawk:ignore-next-line renaming-column
 ALTER TABLE entity_ids RENAME COLUMN numeric_id TO wiki_id;
+-- squawk:ignore-next-line renaming-column
 ALTER TABLE wiki_pages RENAME COLUMN numeric_id TO wiki_id;
+-- squawk:ignore-next-line renaming-column
 ALTER TABLE entities RENAME COLUMN numeric_id TO wiki_id;
+-- squawk:ignore-next-line renaming-column
 ALTER TABLE things RENAME COLUMN numeric_id TO wiki_id;
+-- squawk:ignore-next-line renaming-column
 ALTER TABLE research_areas RENAME COLUMN numeric_id TO wiki_id;
 
 -- Rename indexes to match
