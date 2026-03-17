@@ -373,3 +373,13 @@ policy-people-notes: |
 # These are minimal entities (name + type only) — need enrichment with
 # descriptions, org affiliations, and publication links.
 # Source: /api/resources/all → extract authors → frequency rank → ensure-entities
+
+# --- Bulk description enrichment ---
+# Date: 2026-03-16
+# Added auto-generated descriptions to 456 person entities by matching
+# to their publications in the resources database.
+# Format: "AI safety researcher and author of N publications tracked in
+# the Longterm Wiki resource database, including: [top 3 titles]."
+# Also added publicationCount to entity metadata.
+# Coverage: 532/642 (83%) now have descriptions. 110 still bare
+# (politicians, operations staff created during personnel enrichment).
