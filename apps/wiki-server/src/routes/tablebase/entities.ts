@@ -6,9 +6,7 @@ import { getDrizzleDb } from "../../db.js";
 import { entities, facts } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   paginationQuery,
   escapeIlike,
@@ -153,11 +151,8 @@ const entitiesApp = new Hono()
 
   // ---- GET /search?q=...&limit=20 ----
 
-  .get("/search", async (c) => {
-    const parsed = SearchQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { q, limit } = parsed.data;
+  .get("/search", zv("query", SearchQuery), async (c) => {
+    const { q, limit } = c.req.valid("query");
     const db = getDrizzleDb();
     const pattern = `%${escapeIlike(q)}%`;
 
@@ -585,11 +580,8 @@ const entitiesApp = new Hono()
 
   // ---- GET / (paginated listing) ----
 
-  .get("/", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset, entityType } = parsed.data;
+  .get("/", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset, entityType } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions = [];
@@ -632,14 +624,8 @@ const entitiesApp = new Hono()
 
   // ---- POST /sync ----
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { entities: items } = parsed.data;
+  .post("/sync", zv("json", SyncBatchSchema), async (c) => {
+    const { entities: items } = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate relatedEntries references: check that referenced entity IDs exist

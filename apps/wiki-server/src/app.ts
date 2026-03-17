@@ -116,6 +116,12 @@ export function createApp() {
   // message so authenticated callers get actionable diagnostics.
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
+      // Hono's built-in JSON validator throws HTTPException(400) with a
+      // plain-text body when the request body is malformed JSON.  Convert
+      // it to a structured JSON response so clients always get JSON back.
+      if (err.status === 400 && err.message.includes("Malformed JSON")) {
+        return c.json({ error: "invalid_json", message: err.message }, 400);
+      }
       return err.getResponse();
     }
     logger.error({ err, path: c.req.path }, "Unhandled error");
