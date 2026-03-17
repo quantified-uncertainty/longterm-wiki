@@ -254,10 +254,10 @@ export async function AnthropicStakeholdersTable() {
     stakeholders = FALLBACK_STAKEHOLDERS;
 
     // Build entity previews from the hardcoded links
-    const numericIdPattern = /^\/wiki\/(E\d+)$/;
+    const wikiIdPattern = /^\/wiki\/(E\d+)$/;
     for (const s of stakeholders) {
       if (!s.link) continue;
-      const match = s.link.match(numericIdPattern);
+      const match = s.link.match(wikiIdPattern);
       if (!match) continue;
       const numId = match[1];
       const slug = wikiIdToSlug(numId);

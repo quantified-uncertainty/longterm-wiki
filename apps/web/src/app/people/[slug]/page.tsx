@@ -87,8 +87,8 @@ async function resolvePersonFromServer(slug: string): Promise<Entity | undefined
       stableId: data.stableId || data.id,
       type: "person",
       name: data.title,
-      numericId: data.numericId,
-      wikiPageId: data.numericId,
+      wikiId: data.wikiId,
+      wikiPageId: data.wikiId,
     };
   } catch {
     return undefined;
