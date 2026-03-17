@@ -18,7 +18,6 @@ export interface LegislationRow {
   scope: string | null;
   description: string | null;
   tags: string[];
-  sourceCount: number;
 }
 
 type SortKey =
@@ -26,8 +25,7 @@ type SortKey =
   | "introduced"
   | "status"
   | "author"
-  | "scope"
-  | "sources";
+  | "scope";
 
 export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
   const [search, setSearch] = useState("");
@@ -102,8 +100,6 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
           return (row.author ?? "").toLowerCase();
         case "scope":
           return (row.scope ?? "").toLowerCase();
-        case "sources":
-          return row.sourceCount;
       }
     };
     result = [...result].sort((a, b) =>
@@ -243,14 +239,6 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
                 onSort={handleSort}
                 className="text-left"
               />
-              <SortHeader
-                label="Sources"
-                sortKey="sources"
-                currentSort={sortKey}
-                currentDir={sortDir}
-                onSort={handleSort}
-                className="text-right"
-              />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -316,15 +304,6 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
                 {/* Introduced */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
                   {row.introduced ?? (
-                    <span className="text-muted-foreground/40">&mdash;</span>
-                  )}
-                </td>
-
-                {/* Sources */}
-                <td className="py-2.5 px-3 text-right tabular-nums text-muted-foreground">
-                  {row.sourceCount > 0 ? (
-                    row.sourceCount
-                  ) : (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
