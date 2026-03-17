@@ -192,6 +192,8 @@
   relatedEntries:
     - id: anthropic
       type: organization
+    - id: openai
+      type: organization
     - id: anthropic-core-views
       type: safety-agenda
     - id: jan-leike
@@ -483,6 +485,8 @@
   title: Ilya Sutskever
   website: https://ssi.inc
   relatedEntries:
+    - id: ssi
+      type: organization
     - id: openai
       type: organization
     - id: jan-leike
@@ -545,7 +549,7 @@
       type: person
   customFields:
     - label: Role
-      value: Head of Alignment
+      value: VP of Alignment Science
     - label: Known For
       value: Alignment research, scalable oversight, RLHF
   sources:
@@ -558,7 +562,7 @@
     - title: Departure Statement
       url: https://twitter.com/janleike/status/1790517668677865835
   description: >
-    Jan Leike is the Head of Alignment at Anthropic, where he leads research on ensuring AI systems remain beneficial as
+    Jan Leike is the VP of Alignment Science at Anthropic, where he leads research on ensuring AI systems remain beneficial as
     they become more capable. Before joining Anthropic in 2024, he co-led OpenAI's Superalignment team, which was tasked
     with solving alignment for superintelligent AI systems within four years.
 
