@@ -9,7 +9,7 @@
 
 import { getKBLatest, getKBRecords, getKBEntity } from "@data/factbase";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
-import { numericIdToSlug } from "@/lib/mdx";
+import { wikiIdToSlug } from "@/lib/mdx";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
 import type { FactBaseRecordEntry } from "@data/factbase";
 
@@ -260,7 +260,7 @@ export async function AnthropicStakeholdersTable() {
       const match = s.link.match(numericIdPattern);
       if (!match) continue;
       const numId = match[1];
-      const slug = numericIdToSlug(numId);
+      const slug = wikiIdToSlug(numId);
       if (!slug) continue;
       const entity = getEntityById(slug);
       const page = getPageById(slug);
@@ -337,8 +337,8 @@ export async function AnthropicStakeholdersTable() {
       entityPreviews[href] = preview;
       // Also index by numeric wiki URL so /wiki/E123 stakeholder links resolve
       const kbEnt = getKBEntity(slug);
-      if (kbEnt?.numericId) {
-        entityPreviews[`/wiki/${kbEnt.numericId}`] = preview;
+      if (kbEnt?.wikiPageId) {
+        entityPreviews[`/wiki/${kbEnt.wikiPageId}`] = preview;
       }
     }
 
