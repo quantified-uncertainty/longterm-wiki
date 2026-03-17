@@ -5,6 +5,7 @@
   stableId: aCEdTooCBw
   wikiId: E13
   type: policy
+  scope: International
   policyStatus: active
   introduced: "2023-11"
   summaryPage: governance-overview
@@ -37,6 +38,7 @@
   stableId: Jn7939O5ls
   wikiId: E8
   type: policy
+  scope: Federal
   summaryPage: governance-overview
   title: AI Executive Order
   policyStatus: revoked
@@ -806,6 +808,7 @@
   stableId: HXPEtPD1zw
   wikiId: E288
   type: policy
+  scope: International
   summaryPage: governance-overview
   title: AI Standards Development
   customFields:
@@ -2401,6 +2404,7 @@
   stableId: BU00lGYGAw
   wikiId: E464
   type: policy
+  scope: International
   policyStatus: proposed
   title: Compute Monitoring
   description: >-
@@ -2431,6 +2435,7 @@
   stableId: 3OTN6TAzhw
   wikiId: E465
   type: policy
+  scope: International
   policyStatus: active
   title: Compute Thresholds
   description: >-
@@ -2656,6 +2661,7 @@
   stableId: 4a6Sf9Fupg
   wikiId: E470
   type: policy
+  scope: International
   policyStatus: active
   summaryPage: governance-overview
   title: International Coordination Mechanisms
@@ -2792,6 +2798,7 @@
   stableId: uvwmYLYstg
   wikiId: E473
   type: policy
+  scope: International
   policyStatus: proposed
   summaryPage: governance-overview
   title: International Compute Regimes
@@ -2825,6 +2832,7 @@
   stableId: HkJrXOlE2A
   wikiId: E685
   type: policy
+  scope: International
   policyStatus: proposed
   title: "MAIM (Mutually Assured AI Malfunction)"
   description: >-
@@ -2902,6 +2910,7 @@
   stableId: nvyazaJFew
   wikiId: E475
   type: policy
+  scope: Federal
   policyStatus: proposed
   title: AI Whistleblower Protections
   description: >-
@@ -3806,6 +3815,7 @@
   stableId: 8f8b67vbgw
   wikiId: E688
   type: policy
+  scope: Federal
   policyStatus: proposed
   title: US Government Authority Over Commercial AI Infrastructure
   description: >-
