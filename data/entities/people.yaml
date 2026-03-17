@@ -1006,7 +1006,7 @@
       type: organization
     - id: dario-amodei
       type: person
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
     - id: openai
       type: organization
@@ -1129,7 +1129,7 @@
       type: organization
     - id: metaculus
       type: organization
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
     - id: lesswrong
       type: organization
@@ -1158,8 +1158,6 @@
     - community
   relatedEntries:
     - id: coefficient-giving
-      type: organization
-    - id: open-philanthropy
       type: organization
     - id: jaan-tallinn
       type: person
@@ -1343,7 +1341,7 @@
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries:
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
     - id: ftx-future-fund
       type: organization
@@ -1386,7 +1384,7 @@
       type: organization
     - id: toby-ord
       type: person
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
   customFields:
     - label: Role
@@ -2095,7 +2093,7 @@
       type: organization
     - id: ai-for-human-reasoning-fellowship
       type: approach
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
   customFields:
     - label: Role
