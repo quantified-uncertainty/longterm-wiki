@@ -261,6 +261,7 @@ export default async function PersonProfilePage({
     value: string;
     sub?: string;
     href?: string;
+    suppressHydrationWarning?: boolean;
   }> = [];
 
   if (roleFact?.value.type === "text") {
@@ -281,6 +282,7 @@ export default async function PersonProfilePage({
       label: "Born",
       value: String(bornYearFact.value.value),
       sub: `Age ~${age}`,
+      suppressHydrationWarning: true,
     });
   }
   if (netWorthFact?.value.type === "number") {

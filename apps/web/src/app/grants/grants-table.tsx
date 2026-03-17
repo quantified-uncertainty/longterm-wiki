@@ -317,16 +317,18 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
 
                 {/* Amount */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.amount != null && (
+                  {row.amount != null ? (
                     <span className="font-semibold">
                       {formatCompactCurrency(row.amount)}
                     </span>
+                  ) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
                 </td>
 
                 {/* Date */}
                 <td className="py-2.5 px-3 text-center text-muted-foreground">
-                  {row.date ?? row.period ?? ""}
+                  {row.date ?? row.period ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
 
                 {/* Status */}
