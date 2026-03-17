@@ -46,7 +46,7 @@ export default async function ApproachDetailPage({
   const entity = resolveApproachBySlug(slug);
   if (!entity) return notFound();
 
-  const wikiHref = getWikiHref(entity.id);
+  const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
 
   // Resolve related entities
   const relatedEntities = entity.relatedEntries

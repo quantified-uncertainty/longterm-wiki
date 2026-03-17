@@ -129,7 +129,7 @@ export default async function ProjectDetailPage({
   const entity = resolveProjectBySlug(slug);
   if (!entity) return notFound();
 
-  const wikiHref = getWikiHref(entity.id);
+  const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
   const status = entity.projectStatus ?? entity.status;
 
   // KB facts
