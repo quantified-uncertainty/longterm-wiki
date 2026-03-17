@@ -139,7 +139,7 @@ async function loadFromApi(
   orgTypeMap: Record<string, string>,
 ): Promise<FetchResult<OrgPageData>> {
   const result = await fetchDetailed<ApiOrgsResponse>(
-    "/api/entities/organizations?limit=200",
+    "/api/entities/organizations?limit=500",
     { revalidate: 60 },
   );
 

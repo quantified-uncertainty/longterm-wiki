@@ -8,6 +8,7 @@ import {
   getKBProperty,
   resolveKBSlug,
   getKBEntity,
+  getKBEntitySlug,
 } from "@/data/factbase";
 import {
   formatKBDate,
@@ -241,12 +242,22 @@ export default async function OrgProfilePage({
     // Add key persons first
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
-      const personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
-      const personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      // resolveKBSlug handles slug→entityId; getKBEntity handles both
+      // slugs and stableIds directly, so try it as a fallback.
+      let personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
+      let personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      if (!personEntity && personRef) {
+        personEntity = getKBEntity(personRef);
+        if (personEntity) personEntityId = personEntity.id;
+      }
       const name =
         field(person, "display_name") ??
         personEntity?.name ??
         titleCase(personRef ?? person.key);
+      // Resolve slug for linking — use getKBEntitySlug for stableIds
+      const personSlug = personEntityId
+        ? (getKBEntitySlug(personEntityId) ?? personRef)
+        : personRef;
       // Use entity ID as the dedup key when available; fall back to name.
       // This prevents two different people with the same display name from
       // silently overwriting each other.
@@ -256,7 +267,7 @@ export default async function OrgProfilePage({
       peopleByName.set(finalKey, {
         name,
         title: field(person, "title"),
-        slug: personRef,
+        slug: personSlug,
         entityType: personEntity?.type,
         isFounder: !!person.fields.is_founder,
         isBoard: false,
