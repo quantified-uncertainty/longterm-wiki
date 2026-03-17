@@ -8,6 +8,15 @@ import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data";
 import {
+  getResourcesForPage,
+  getResourceById,
+  getResourceCredibility,
+  getResourcePublication,
+  getPagesForResource,
+} from "@/data/tablebase";
+import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
+import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import {
   resolvePolicyBySlug,
   getPolicySlugs,
   getCustomField,
@@ -443,6 +452,44 @@ export default async function LegislationDetailPage({
             </section>
           )}
         </div>
+      ),
+    });
+  }
+
+  // ── Press / Documents tab ──────────────────────────────────
+  const resourceIds = getResourcesForPage(entity.id);
+  const pressResources: OrgResourceRow[] = [];
+  for (const rid of resourceIds) {
+    const r = getResourceById(rid);
+    if (!r) continue;
+    const publication = getResourcePublication(r);
+    const credibility = getResourceCredibility(r);
+    const citingPages = getPagesForResource(rid);
+    pressResources.push({
+      id: rid,
+      title: r.title ?? r.url,
+      url: r.url,
+      type: r.type ?? "web",
+      publicationName: publication?.name ?? null,
+      credibility: credibility ?? null,
+      citingPageCount: citingPages.length,
+      publishedDate: r.published_date ?? null,
+      authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+    });
+  }
+
+  if (pressResources.length > 0) {
+    tabs.push({
+      id: "press",
+      label: "Documents & Press",
+      count: pressResources.length,
+      content: (
+        <OrgResourcesSection
+          resources={pressResources}
+          title="Official Documents, Analysis & Press Coverage"
+          emptyMessage=""
+          alwaysShowColumns={{ date: true, publication: true }}
+        />
       ),
     });
   }
