@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const grant = parseGrantDetail(record);
   const org = resolveOrgBySlug(slug);
-  const orgName = org?.name ?? slug;
+  const orgName = org?.title ?? slug;
   const parts = [grant.name];
   if (grant.amount) parts.push(formatCompactCurrency(grant.amount));
 

@@ -12,9 +12,8 @@ import {
 } from "@/components/wiki/factbase/format";
 import {
   resolveKBSlug,
-  getKBEntity,
-  getKBEntitySlug,
 } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import { safeHref } from "@/lib/format-compact";
 
 // Re-export so existing consumers of { safeHref } from "./org-shared" keep working.
@@ -38,15 +37,32 @@ export function resolveRefName(
   if (!slugOrId && !displayName) return { name: "Unknown", href: null };
 
   if (slugOrId) {
-    // Try direct entity lookup first (handles both entity IDs and slugs
-    // since getKBEntity resolves both), then fall back to slug resolution.
-    const directEntity = getKBEntity(slugOrId);
+    // Try TableBase first (handles slugs, E-numbers, and 10-char stableIds)
+    const directEntity = getTypedEntityById(slugOrId);
     if (directEntity) {
-      const resolvedSlug = getKBEntitySlug(directEntity.id) ?? slugOrId;
-      const prefix = directEntity.type === "organization" ? "/organizations"
-        : directEntity.type === "person" ? "/people"
+      const slug = directEntity.id; // entity.id is the slug in TableBase
+      const prefix = directEntity.entityType === "organization" ? "/organizations"
+        : directEntity.entityType === "person" ? "/people"
         : null;
-      return { name: directEntity.name, href: prefix ? `${prefix}/${resolvedSlug}` : `/factbase/entity/${directEntity.id}` };
+      return {
+        name: directEntity.title,
+        href: prefix ? `${prefix}/${slug}` : (directEntity.wikiId ? `/wiki/${directEntity.wikiId}` : null),
+      };
+    }
+    // Fallback: try resolving as a FactBase slug
+    const resolvedId = resolveKBSlug(slugOrId);
+    if (resolvedId) {
+      const entity = getTypedEntityById(resolvedId);
+      if (entity) {
+        const slug = entity.id;
+        const prefix = entity.entityType === "organization" ? "/organizations"
+          : entity.entityType === "person" ? "/people"
+          : null;
+        return {
+          name: entity.title,
+          href: prefix ? `${prefix}/${slug}` : (entity.wikiId ? `/wiki/${entity.wikiId}` : null),
+        };
+      }
     }
   }
 
@@ -57,15 +73,15 @@ export function resolveRefName(
 
 /** Resolve a recipient slug/ID to a display name and optional href. */
 export function resolveRecipient(recipientId: string): { name: string; href: string | null } {
-  const entity = getKBEntity(recipientId);
+  const entity = getTypedEntityById(recipientId);
   if (entity) {
-    const slug = getKBEntitySlug(recipientId);
-    const href = slug && entity.type === "organization" ? `/organizations/${slug}`
-      : slug && entity.type === "person" ? `/people/${slug}`
-      : `/factbase/entity/${recipientId}`;
-    // Guard against empty entity name — fall back to titleCased recipientId
-    const name = entity.name?.trim()
-      ? entity.name
+    const slug = entity.id; // entity.id is the slug in TableBase
+    const href = entity.entityType === "organization" ? `/organizations/${slug}`
+      : entity.entityType === "person" ? `/people/${slug}`
+      : entity.wikiId ? `/wiki/${entity.wikiId}` : null;
+    // Guard against empty entity title — fall back to titleCased recipientId
+    const name = entity.title?.trim()
+      ? entity.title
       : titleCase(recipientId.replace(/-/g, " ")) || "Unknown";
     return { name, href };
   }

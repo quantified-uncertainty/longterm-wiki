@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getKBLatest, getKBFacts, getKBEntity, getKBRecords, getKBEntities } from "@/data/factbase";
+import { getKBLatest, getKBFacts, getKBRecords, getKBEntities } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
@@ -47,51 +48,49 @@ function buildOrgSearchText(
   if (org.orgType) parts.push(org.orgType);
   if (org.headquarters) parts.push(org.headquarters);
   if (org.parentOrg) {
-    const parent = getKBEntity(org.parentOrg);
-    if (parent) parts.push(parent.name);
+    const parent = getTypedEntityById(org.parentOrg);
+    if (parent) parts.push(parent.title);
   }
 
-  // KB entity aliases (alternative names)
-  const kbEntity = getKBEntity(org.id);
-  if (kbEntity?.aliases) parts.push(...kbEntity.aliases);
+  // NOTE: TableBase entities don't have aliases; aliases from FactBase are not indexed here.
 
   // KB fact text values (description, headquarters, notable-for, etc.)
+  // getKBFacts resolves slugs to FactBase entity IDs internally
   const SKIP_PROPERTIES = new Set([
     "social-media", "wikipedia-url", "github-profile", "website",
     "revenue", "valuation", "headcount", "total-funding", "founded-date",
   ]);
-  if (kbEntity) {
-    const allFacts = getKBFacts(kbEntity.id);
-    for (const fact of allFacts) {
-      if (SKIP_PROPERTIES.has(fact.propertyId)) continue;
-      if (fact.value.type === "text") {
-        parts.push(fact.value.value);
-      } else if (fact.value.type === "ref") {
-        const refEntity = getKBEntity(fact.value.value);
-        if (refEntity) parts.push(refEntity.name);
-      }
+  const allFacts = getKBFacts(org.id);
+  for (const fact of allFacts) {
+    if (SKIP_PROPERTIES.has(fact.propertyId)) continue;
+    if (fact.value.type === "text") {
+      parts.push(fact.value.value);
+    } else if (fact.value.type === "ref") {
+      const refEntity = getTypedEntityById(fact.value.value);
+      if (refEntity) parts.push(refEntity.title);
     }
   }
 
   // Funding program names from KB records
-  if (kbEntity) {
-    const fundingPrograms = getKBRecords(kbEntity.id, "funding-programs");
-    for (const fp of fundingPrograms) {
-      if (typeof fp.fields.name === "string") parts.push(fp.fields.name);
-      if (typeof fp.fields.description === "string") parts.push(fp.fields.description);
-    }
+  const fundingPrograms = getKBRecords(org.id, "funding-programs");
+  for (const fp of fundingPrograms) {
+    if (typeof fp.fields.name === "string") parts.push(fp.fields.name);
+    if (typeof fp.fields.description === "string") parts.push(fp.fields.description);
   }
 
   // Key people names (people employed by this org)
-  if (kbEntity) {
-    const employeeNames = orgToEmployeeNames.get(kbEntity.id) ?? [];
+  // orgToEmployeeNames is keyed by FactBase entity ID; use org.stableId or org.id
+  const tbEntity = getTypedEntityById(org.id);
+  const stableId = tbEntity?.stableId;
+  if (stableId) {
+    const employeeNames = orgToEmployeeNames.get(stableId) ?? [];
     parts.push(...employeeNames);
   }
 
   // Related entries names
   for (const rel of org.relatedEntries) {
-    const relEntity = getKBEntity(rel.id);
-    if (relEntity) parts.push(relEntity.name);
+    const relEntity = getTypedEntityById(rel.id);
+    if (relEntity) parts.push(relEntity.title);
   }
 
   return parts.join(" ").toLowerCase();
@@ -220,9 +219,10 @@ function loadFromLocal(): OrgPageData {
     const totalFundingFact = getKBLatest(org.id, "total-funding");
     const foundedFact = getKBLatest(org.id, "founded-date");
 
-    // People count from the reverse index
-    const kbEntity = getKBEntity(org.id);
-    const peopleCount = kbEntity ? (orgToEmployeeNames.get(kbEntity.id)?.length ?? 0) : 0;
+    // People count from the reverse index (keyed by FactBase stableId)
+    const orgTbEntity = getTypedEntityById(org.id);
+    const orgStableId = orgTbEntity?.stableId;
+    const peopleCount = orgStableId ? (orgToEmployeeNames.get(orgStableId)?.length ?? 0) : 0;
 
     const revenueNum = numericValue(revenueFact);
     const valuationNum = numericValue(valuationFact);

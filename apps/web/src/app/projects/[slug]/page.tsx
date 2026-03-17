@@ -8,7 +8,6 @@ import { getEntityHref, getWikiHref, getRelatedGraphFor } from "@/data/entity-na
 import {
   getKBLatest,
   getKBFacts,
-  getKBEntity,
   getKBProperty,
 } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";

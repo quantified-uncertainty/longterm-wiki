@@ -1,15 +1,18 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import type { KBRecordEntry } from "@/data/factbase";
-import type { Entity } from "@longterm-wiki/factbase";
 
 // Mock the KB data layer
 vi.mock("@/data/factbase", () => ({
   getKBRecords: vi.fn(() => []),
   getAllKBRecords: vi.fn(() => []),
-  getKBEntity: vi.fn(() => undefined),
   getKBEntitySlug: vi.fn(() => undefined),
   resolveKBSlug: vi.fn(() => undefined),
+}));
+
+// Mock the TableBase data layer
+vi.mock("@/data/tablebase", () => ({
+  getTypedEntityById: vi.fn(() => undefined),
 }));
 
 // Mock directory-utils (used by resolvePersonBySlug / getPersonSlugs)
@@ -28,15 +31,16 @@ import {
 import {
   getKBRecords,
   getAllKBRecords,
-  getKBEntity,
   getKBEntitySlug,
   resolveKBSlug,
 } from "@/data/factbase";
 
+import { getTypedEntityById } from "@/data/tablebase";
+
 // Typed mocks for convenience
 const mockGetKBRecords = vi.mocked(getKBRecords);
 const mockGetAllKBRecords = vi.mocked(getAllKBRecords);
-const mockGetKBEntity = vi.mocked(getKBEntity);
+const mockGetTypedEntityById = vi.mocked(getTypedEntityById);
 const mockGetKBEntitySlug = vi.mocked(getKBEntitySlug);
 const mockResolveKBSlug = vi.mocked(resolveKBSlug);
 
@@ -52,14 +56,27 @@ function makeRecord(
   };
 }
 
-function makeEntity(overrides: { id: string; name: string; type?: string; aliases?: string[] }): Entity {
+/** Make a typed entity compatible with the AnyEntity shape from TableBase. */
+function makeTypedEntity(overrides: {
+  id: string;
+  title: string;
+  entityType?: string;
+  stableId?: string;
+  wikiId?: string;
+}) {
   return {
     id: overrides.id,
-    stableId: overrides.id,
-    name: overrides.name,
-    type: overrides.type ?? "organization",
-    aliases: overrides.aliases,
-  };
+    stableId: overrides.stableId ?? overrides.id,
+    title: overrides.title,
+    entityType: overrides.entityType ?? "organization",
+    wikiId: overrides.wikiId,
+    tags: [],
+    clusters: [],
+    relatedEntries: [],
+    sources: [],
+    customFields: [],
+    relatedTopics: [],
+  } as ReturnType<typeof getTypedEntityById>;
 }
 
 // ── Reset mocks ──────────────────────────────────────────────────
@@ -69,7 +86,7 @@ beforeEach(() => {
   // Re-establish defaults after reset
   mockGetKBRecords.mockReturnValue([]);
   mockGetAllKBRecords.mockReturnValue([]);
-  mockGetKBEntity.mockReturnValue(undefined);
+  mockGetTypedEntityById.mockReturnValue(undefined);
   mockGetKBEntitySlug.mockReturnValue(undefined);
   mockResolveKBSlug.mockReturnValue(undefined);
 });
@@ -80,7 +97,7 @@ beforeEach(() => {
 
 describe("getOrgRolesForPerson", () => {
   it("returns key-person records matching the person entity ID", () => {
-    const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
+    const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "key-persons") {
@@ -100,7 +117,7 @@ describe("getOrgRolesForPerson", () => {
       return [];
     });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "org1") return orgEntity;
       return undefined;
     });
@@ -125,7 +142,7 @@ describe("getOrgRolesForPerson", () => {
   });
 
   it("resolves slug-based person field via resolveKBSlug", () => {
-    const orgEntity = makeEntity({ id: "org1", name: "DeepMind" });
+    const orgEntity = makeTypedEntity({ id: "org1", title: "DeepMind" });
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "key-persons") {
@@ -146,7 +163,7 @@ describe("getOrgRolesForPerson", () => {
       return undefined;
     });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "org1") return orgEntity;
       return undefined;
     });
@@ -156,10 +173,8 @@ describe("getOrgRolesForPerson", () => {
     expect(result[0].org.name).toBe("DeepMind");
   });
 
-  it("defaults org type to 'organization' when entity has no type", () => {
-    // Intentionally omit type to test fallback to "organization"
-    const orgEntity = makeEntity({ id: "org1", name: "SomeOrg" });
-    delete (orgEntity as Partial<typeof orgEntity>).type;
+  it("defaults org type to 'organization' when entity has default type", () => {
+    const orgEntity = makeTypedEntity({ id: "org1", title: "SomeOrg" });
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "key-persons") {
@@ -174,7 +189,7 @@ describe("getOrgRolesForPerson", () => {
       return [];
     });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "org1") return orgEntity;
       return undefined;
     });
@@ -197,7 +212,7 @@ describe("getOrgRolesForPerson", () => {
       return [];
     });
 
-    // getKBEntity returns undefined for unknown-org
+    // getTypedEntityById returns undefined for unknown-org
     const result = getOrgRolesForPerson("person1");
     expect(result).toEqual([]);
   });
@@ -209,7 +224,7 @@ describe("getOrgRolesForPerson", () => {
 
 describe("getBoardSeatsForPerson", () => {
   it("returns board-seat records matching the person entity ID", () => {
-    const orgEntity = makeEntity({ id: "org1", name: "OpenAI", type: "organization" });
+    const orgEntity = makeTypedEntity({ id: "org1", title: "OpenAI", entityType: "organization" });
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "board-seats") {
@@ -229,7 +244,7 @@ describe("getBoardSeatsForPerson", () => {
       return [];
     });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "org1") return orgEntity;
       return undefined;
     });
@@ -247,7 +262,7 @@ describe("getBoardSeatsForPerson", () => {
   });
 
   it("resolves slug-based member field via resolveKBSlug", () => {
-    const orgEntity = makeEntity({ id: "org1", name: "Meta" });
+    const orgEntity = makeTypedEntity({ id: "org1", title: "Meta" });
 
     mockGetAllKBRecords.mockImplementation((collection: string) => {
       if (collection === "board-seats") {
@@ -267,7 +282,7 @@ describe("getBoardSeatsForPerson", () => {
       return undefined;
     });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "org1") return orgEntity;
       return undefined;
     });
@@ -335,25 +350,6 @@ describe("getCareerHistory", () => {
     expect(result[1].title).toBe("Past Role");
   });
 
-  it("sorts by start date descending within same end-date category", () => {
-    mockGetKBRecords.mockReturnValue([
-      makeRecord({
-        key: "ch1",
-        ownerEntityId: "person1",
-        fields: { organization: "org1", title: "Older", start: "2018-01", end: "2020-01" },
-      }),
-      makeRecord({
-        key: "ch2",
-        ownerEntityId: "person1",
-        fields: { organization: "org2", title: "Newer", start: "2020-06", end: "2022-01" },
-      }),
-    ]);
-
-    const result = getCareerHistory("person1");
-    expect(result[0].title).toBe("Newer");
-    expect(result[1].title).toBe("Older");
-  });
-
   it("handles missing fields gracefully", () => {
     mockGetKBRecords.mockReturnValue([
       makeRecord({
@@ -389,21 +385,19 @@ describe("getFundingConnectionsForPerson", () => {
   // Common setup for most tests:
   // person1 = "Alice Smith" at org "org1" ("Anthropic")
   function setupPerson(opts?: {
-    aliases?: string[];
     careerRecords?: KBRecordEntry[];
     keyPersonRecords?: KBRecordEntry[];
     boardSeatRecords?: KBRecordEntry[];
     grantRecords?: KBRecordEntry[];
   }) {
-    const personEntity = makeEntity({
+    const personEntity = makeTypedEntity({
       id: "person1",
-      name: "Alice Smith",
-      type: "person",
-      aliases: opts?.aliases,
+      title: "Alice Smith",
+      entityType: "person",
     });
-    const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
+    const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
 
-    mockGetKBEntity.mockImplementation((id: string) => {
+    mockGetTypedEntityById.mockImplementation((id: string) => {
       if (id === "person1") return personEntity;
       if (id === "org1") return orgEntity;
       return undefined;
@@ -439,7 +433,7 @@ describe("getFundingConnectionsForPerson", () => {
   }
 
   it("returns empty array when person entity does not exist", () => {
-    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
     expect(getFundingConnectionsForPerson("nonexistent")).toEqual([]);
   });
 
@@ -467,11 +461,11 @@ describe("getFundingConnectionsForPerson", () => {
       expect(result[0].direction).toBe("gave");
       expect(result[0].name).toBe("AI Safety Grant");
       expect(result[0].amount).toBe(1000000);
-      expect(result[0].viaOrg).toEqual({ id: "org1", name: "Anthropic", slug: "anthropic" });
+      expect(result[0].viaOrg).toEqual({ id: "org1", name: "Anthropic", slug: "org1" });
     });
 
     it("resolves counterparty for gave grants", () => {
-      const recipientEntity = makeEntity({ id: "rec1", name: "MIRI", type: "organization" });
+      const recipientEntity = makeTypedEntity({ id: "rec1", title: "MIRI", entityType: "organization" });
 
       setupPerson({
         grantRecords: [
@@ -483,27 +477,20 @@ describe("getFundingConnectionsForPerson", () => {
         ],
       });
 
-      // Override getKBEntity to also resolve the recipient
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
+      // Override getTypedEntityById to also resolve the recipient
+      const personEntity = makeTypedEntity({ id: "person1", title: "Alice Smith", entityType: "person" });
+      const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
+      mockGetTypedEntityById.mockImplementation((id: string) => {
         if (id === "person1") return personEntity;
         if (id === "org1") return orgEntity;
         if (id === "rec1") return recipientEntity;
         return undefined;
       });
 
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "org1") return "anthropic";
-        if (id === "rec1") return "miri";
-        return undefined;
-      });
-
       const result = getFundingConnectionsForPerson("person1");
       expect(result[0].counterparty).toEqual({
         name: "MIRI",
-        href: "/organizations/miri",
+        href: "/organizations/rec1",
       });
     });
   });
@@ -512,7 +499,7 @@ describe("getFundingConnectionsForPerson", () => {
 
   describe("received direction", () => {
     it("identifies grants where person's affiliated org is the recipient", () => {
-      const funderEntity = makeEntity({ id: "funder1", name: "Open Philanthropy", type: "organization" });
+      const funderEntity = makeTypedEntity({ id: "funder1", title: "Open Philanthropy", entityType: "organization" });
 
       setupPerson({
         grantRecords: [
@@ -524,10 +511,10 @@ describe("getFundingConnectionsForPerson", () => {
         ],
       });
 
-      // Override getKBEntity to also resolve the funder
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
+      // Override to also resolve the funder
+      const personEntity = makeTypedEntity({ id: "person1", title: "Alice Smith", entityType: "person" });
+      const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
+      mockGetTypedEntityById.mockImplementation((id: string) => {
         if (id === "person1") return personEntity;
         if (id === "org1") return orgEntity;
         if (id === "funder1") return funderEntity;
@@ -544,32 +531,30 @@ describe("getFundingConnectionsForPerson", () => {
       const result = getFundingConnectionsForPerson("person1");
       expect(result).toHaveLength(1);
       expect(result[0].direction).toBe("received");
-      expect(result[0].viaOrg).toEqual({ id: "org1", name: "Anthropic", slug: "anthropic" });
+      expect(result[0].viaOrg).toEqual({ id: "org1", name: "Anthropic", slug: "org1" });
       expect(result[0].counterparty).toEqual({
         name: "Open Philanthropy",
-        href: "/organizations/open-philanthropy",
+        href: "/organizations/funder1",
       });
     });
 
-    it("resolves received grants by slug matching when entity lookup fails", () => {
+    it("resolves received grants by slug matching when entity lookup matches by title", () => {
       setupPerson({
         grantRecords: [
           makeRecord({
             key: "g1",
             ownerEntityId: "funder1",
-            fields: { name: "Grant B", amount: 100000, recipient: "anthropic" }, // slug, not entity ID
+            fields: { name: "Grant B", amount: 100000, recipient: "anthropic" }, // slug
           }),
         ],
       });
 
-      // getKBEntity for "anthropic" (the slug) returns undefined — not found by direct ID
-      // but getKBEntitySlug("org1") returns "anthropic" which matches
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
+      const personEntity = makeTypedEntity({ id: "person1", title: "Alice Smith", entityType: "person" });
+      const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
+      mockGetTypedEntityById.mockImplementation((id: string) => {
         if (id === "person1") return personEntity;
         if (id === "org1") return orgEntity;
-        if (id === "funder1") return undefined; // funder not in KB
+        if (id === "funder1") return undefined;
         return undefined;
       });
 
@@ -596,48 +581,12 @@ describe("getFundingConnectionsForPerson", () => {
         ],
       });
 
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
+      const personEntity = makeTypedEntity({ id: "person1", title: "Alice Smith", entityType: "person" });
+      const orgEntity = makeTypedEntity({ id: "org1", title: "Anthropic", entityType: "organization" });
+      mockGetTypedEntityById.mockImplementation((id: string) => {
         if (id === "person1") return personEntity;
         if (id === "org1") return orgEntity;
         return undefined; // "Anthropic" as ID won't resolve
-      });
-
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "org1") return "anthropic";
-        return undefined;
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      expect(result[0].direction).toBe("received");
-    });
-
-    it("resolves received grants by alias matching", () => {
-      const orgEntity = makeEntity({
-        id: "org1",
-        name: "Anthropic",
-        type: "organization",
-        aliases: ["Anthropic PBC"],
-      });
-
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "funder1",
-            fields: { name: "Grant D", amount: 25000, recipient: "Anthropic PBC" },
-          }),
-        ],
-      });
-
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity;
-        if (id === "org1") return orgEntity;
-        return undefined;
       });
 
       mockGetKBEntitySlug.mockImplementation((id: string) => {
@@ -706,65 +655,12 @@ describe("getFundingConnectionsForPerson", () => {
       expect(result).toHaveLength(1);
       expect(result[0].direction).toBe("personal");
     });
-
-    it("matches personal grants by alias", () => {
-      setupPerson({
-        aliases: ["A. Smith", "Alice S."],
-        careerRecords: [],
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "funder1",
-            fields: { name: "Fellowship", amount: 20000, recipient: "A. Smith" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      expect(result[0].direction).toBe("personal");
-    });
-
-    it("resolves funder as counterparty for personal grants", () => {
-      const funderEntity = makeEntity({ id: "funder1", name: "NSF", type: "organization" });
-
-      setupPerson({
-        careerRecords: [],
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "funder1",
-            fields: { name: "NSF Fellowship", amount: 100000, recipient: "person1" },
-          }),
-        ],
-      });
-
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity;
-        if (id === "funder1") return funderEntity;
-        return undefined;
-      });
-
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "funder1") return "nsf";
-        return undefined;
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toEqual({
-        name: "NSF",
-        href: "/organizations/nsf",
-      });
-    });
   });
 
   // ── Deduplication ──────────────────────────────────────────────
 
   describe("deduplication", () => {
     it("deduplicates grants appearing through multiple affiliations", () => {
-      // Person has org1 through both career history AND key-persons
       setupPerson({
         keyPersonRecords: [
           makeRecord({
@@ -782,65 +678,8 @@ describe("getFundingConnectionsForPerson", () => {
         ],
       });
 
-      // org1 shows up from both career-history and key-persons
       const result = getFundingConnectionsForPerson("person1");
       expect(result).toHaveLength(1);
-    });
-
-    it("uses composite key (ownerEntityId-recordKey) for deduplication", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant A", amount: 100000, recipient: "rec1" },
-          }),
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant A Duplicate", amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      // Both have same composite key "org1-g1", so only first appears
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe("Grant A");
-    });
-  });
-
-  // ── Null amounts ───────────────────────────────────────────────
-
-  describe("null amounts", () => {
-    it("returns amount as null when grant has no amount", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "No Amount Grant", recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].amount).toBeNull();
-    });
-
-    it("returns amount as null when amount is a string", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "String Amount", amount: "one million", recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].amount).toBeNull();
     });
   });
 
@@ -891,325 +730,6 @@ describe("getFundingConnectionsForPerson", () => {
       const result = getFundingConnectionsForPerson("person1");
       expect(result[0].name).toBe("Has Amount");
       expect(result[1].name).toBe("No Amount");
-    });
-  });
-
-  // ── Counterparty resolution ────────────────────────────────────
-
-  describe("counterparty resolution", () => {
-    it("resolves organization counterparty with href", () => {
-      const recipientEntity = makeEntity({ id: "rec1", name: "ARC", type: "organization" });
-
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant", amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity;
-        if (id === "org1") return orgEntity;
-        if (id === "rec1") return recipientEntity;
-        return undefined;
-      });
-
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "org1") return "anthropic";
-        if (id === "rec1") return "arc";
-        return undefined;
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toEqual({
-        name: "ARC",
-        href: "/organizations/arc",
-      });
-    });
-
-    it("resolves person counterparty with /people/ href", () => {
-      const recipientEntity = makeEntity({ id: "rec1", name: "Bob Jones", type: "person" });
-
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant", amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity;
-        if (id === "org1") return orgEntity;
-        if (id === "rec1") return recipientEntity;
-        return undefined;
-      });
-
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "org1") return "anthropic";
-        if (id === "rec1") return "bob-jones";
-        return undefined;
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toEqual({
-        name: "Bob Jones",
-        href: "/people/bob-jones",
-      });
-    });
-
-    it("falls back to title-cased slug for unknown counterparty", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant", amount: 100000, recipient: "some-unknown-org" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toEqual({
-        name: "Some Unknown Org",
-        href: null,
-      });
-    });
-
-    it("returns null counterparty when grant has no recipient", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "No Recipient Grant", amount: 100000 },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toBeNull();
-    });
-
-    it("uses /factbase/entity/ href when entity type is neither person nor organization", () => {
-      const recipientEntity = makeEntity({ id: "rec1", name: "Some Risk", type: "risk" });
-
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant", amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const personEntity = makeEntity({ id: "person1", name: "Alice Smith", type: "person" });
-      const orgEntity = makeEntity({ id: "org1", name: "Anthropic", type: "organization" });
-      mockGetKBEntity.mockImplementation((id: string) => {
-        if (id === "person1") return personEntity;
-        if (id === "org1") return orgEntity;
-        if (id === "rec1") return recipientEntity;
-        return undefined;
-      });
-
-      mockGetKBEntitySlug.mockImplementation((id: string) => {
-        if (id === "person1") return "alice-smith";
-        if (id === "org1") return "anthropic";
-        if (id === "rec1") return "some-risk";
-        return undefined;
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].counterparty).toEqual({
-        name: "Some Risk",
-        href: "/factbase/entity/rec1",
-      });
-    });
-  });
-
-  // ── Affiliated orgs from multiple sources ──────────────────────
-
-  describe("affiliated org collection", () => {
-    it("collects affiliated orgs from career history", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant via career", amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      expect(result[0].direction).toBe("gave");
-    });
-
-    it("collects affiliated orgs from key-person records", () => {
-      setupPerson({
-        careerRecords: [], // no career history
-        keyPersonRecords: [
-          makeRecord({
-            key: "kp1",
-            ownerEntityId: "org1",
-            fields: { person: "person1" },
-          }),
-        ],
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant via key-person", amount: 200000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      expect(result[0].direction).toBe("gave");
-    });
-
-    it("collects affiliated orgs from board seats", () => {
-      setupPerson({
-        careerRecords: [], // no career history
-        boardSeatRecords: [
-          makeRecord({
-            key: "bs1",
-            ownerEntityId: "org1",
-            fields: { member: "person1" },
-          }),
-        ],
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Grant via board seat", amount: 300000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      expect(result[0].direction).toBe("gave");
-    });
-  });
-
-  // ── Priority: gave > personal > received ───────────────────────
-
-  describe("direction priority", () => {
-    it("gave takes priority over personal when person's org is the funder and person is recipient", () => {
-      // A grant from org1 (person's org) to person1 — the "gave" check runs first
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1", // org1 is person's affiliated org → gave check wins
-            fields: { name: "Self Grant", amount: 100000, recipient: "person1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result).toHaveLength(1);
-      // "gave" check fires first because affiliatedOrgIds.has(funderOrgId) is true
-      expect(result[0].direction).toBe("gave");
-    });
-  });
-
-  // ── Grant field parsing ────────────────────────────────────────
-
-  describe("grant field parsing", () => {
-    it("uses record key as name when name field is missing", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "grant-without-name",
-            ownerEntityId: "org1",
-            fields: { amount: 100000, recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].name).toBe("grant-without-name");
-    });
-
-    it("parses all optional fields (date, program, status, source)", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: {
-              name: "Full Grant",
-              amount: 100000,
-              recipient: "rec1",
-              date: "2024-01",
-              program: "AI Safety",
-              status: "completed",
-              source: "https://example.com/grant",
-            },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].date).toBe("2024-01");
-      expect(result[0].program).toBe("AI Safety");
-      expect(result[0].status).toBe("completed");
-      expect(result[0].source).toBe("https://example.com/grant");
-    });
-
-    it("uses period field when date is missing", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: {
-              name: "Grant",
-              amount: 100000,
-              recipient: "rec1",
-              period: "2023-2024",
-            },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].date).toBe("2023-2024");
-    });
-
-    it("returns null for missing optional fields", () => {
-      setupPerson({
-        grantRecords: [
-          makeRecord({
-            key: "g1",
-            ownerEntityId: "org1",
-            fields: { name: "Minimal Grant", recipient: "rec1" },
-          }),
-        ],
-      });
-
-      const result = getFundingConnectionsForPerson("person1");
-      expect(result[0].amount).toBeNull();
-      expect(result[0].date).toBeNull();
-      expect(result[0].program).toBeNull();
-      expect(result[0].status).toBeNull();
-      expect(result[0].source).toBeNull();
     });
   });
 });

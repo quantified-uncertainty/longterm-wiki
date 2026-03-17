@@ -3,7 +3,6 @@
  * (grants, funding-rounds, investments, divisions, funding-programs).
  */
 import Link from "next/link";
-import { getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getTypedEntityById, getIdRegistry } from "@/data";
 import { titleCase } from "@/components/wiki/factbase/format";
 
@@ -71,27 +70,14 @@ function isRawInternalId(id: string): boolean {
 }
 
 /**
- * Resolve a KB entity ID to a display name and optional href.
- * Tries FactBase first, then falls back to TableBase for entities that only
- * exist in YAML (not in FactBase) or use legacy numeric wiki page IDs.
+ * Resolve an entity ID to a display name and optional href.
+ * Uses TableBase (database.json) as the authoritative source.
+ * Handles slugs, E-numbers, and 10-char stableIds via resolveId().
  */
 export function resolveEntityLink(
   entityId: string,
 ): { name: string; href: string | null } {
-  // Primary: try FactBase (handles 10-char entity IDs and slugs)
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization")
-        return { name: entity.name, href: `/organizations/${slug}` };
-      if (entity.type === "person")
-        return { name: entity.name, href: `/people/${slug}` };
-    }
-    return { name: entity.name, href: `/factbase/entity/${entityId}` };
-  }
-
-  // Fallback: try TableBase (handles bare numeric IDs and stableIds not in FactBase)
+  // Primary: try TableBase (handles slugs, E-numbers, and 10-char stableIds)
   const tableBaseResult = resolveViaTableBase(entityId);
   if (tableBaseResult) return tableBaseResult;
 
