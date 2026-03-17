@@ -22,6 +22,8 @@ function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
     totalFunding: null,
     totalFundingNum: null,
     foundedDate: null,
+    peopleCount: 0,
+    completionScore: 1,
     searchText: "",
     ...overrides,
   };
