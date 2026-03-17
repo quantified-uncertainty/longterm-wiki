@@ -8,6 +8,8 @@
   summaryPage: governance-overview
   title: AI Safety Institutes (AISIs)
   customFields:
+    - label: Status
+      value: active
     - label: Established
       value: UK (2023), US (2024), others planned
     - label: Function
@@ -35,6 +37,7 @@
   type: policy
   summaryPage: governance-overview
   title: AI Executive Order
+  policyStatus: revoked
   description: >-
     US executive orders establishing AI safety requirements and oversight,
     including EO 14110 (October 2023) on safe, secure, and trustworthy AI
@@ -2396,6 +2399,7 @@
   stableId: BU00lGYGAw
   numericId: E464
   type: policy
+  policyStatus: proposed
   title: Compute Monitoring
   description: >-
     Framework analyzing compute monitoring approaches for AI governance, finding that cloud KYC
@@ -2425,6 +2429,7 @@
   stableId: 3OTN6TAzhw
   numericId: E465
   type: policy
+  policyStatus: active
   title: Compute Thresholds
   description: >-
     Analysis of compute thresholds as regulatory triggers, examining current implementations (EU AI
@@ -2649,6 +2654,7 @@
   stableId: 4a6Sf9Fupg
   numericId: E470
   type: policy
+  policyStatus: active
   summaryPage: governance-overview
   title: International Coordination Mechanisms
   description: >-
@@ -2784,6 +2790,7 @@
   stableId: uvwmYLYstg
   numericId: E473
   type: policy
+  policyStatus: proposed
   summaryPage: governance-overview
   title: International Compute Regimes
   description: >-
@@ -2816,6 +2823,7 @@
   stableId: HkJrXOlE2A
   numericId: E685
   type: policy
+  policyStatus: proposed
   title: "MAIM (Mutually Assured AI Malfunction)"
   description: >-
     A deterrence framework proposed by Dan Hendrycks, Eric Schmidt, and Alexandr Wang
@@ -2892,6 +2900,7 @@
   stableId: nvyazaJFew
   numericId: E475
   type: policy
+  policyStatus: proposed
   title: AI Whistleblower Protections
   description: >-
     Legal and institutional frameworks for protecting AI researchers and employees who report
@@ -3545,6 +3554,7 @@
   stableId: lHxzXeAMrg
   numericId: E594
   type: policy
+  policyStatus: active
   title: AI Model Specifications
   description: >-
     Model specifications are explicit documents defining AI behavior, now
@@ -3794,6 +3804,7 @@
   stableId: 8f8b67vbgw
   numericId: E688
   type: policy
+  policyStatus: Emerging policy area
   title: US Government Authority Over Commercial AI Infrastructure
   description: >-
     The US government possesses extensive legal authority to direct, commandeer, or access
