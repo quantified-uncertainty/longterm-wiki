@@ -3,7 +3,7 @@ thing:
   stableId: 1i59OZ3q5w
   type: policy
   name: Seoul Declaration on AI Safety
-  numericId: E279
+  wikiId: E279
 facts:
   - id: f_t0E2zpTRIQ
     property: description

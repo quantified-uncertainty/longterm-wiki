@@ -139,7 +139,7 @@ const factsApp = new Hono()
     const { measure, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Resolve slug/numericId/stableId to stableId (facts.entity_id stores stableIds)
+    // Resolve slug/wikiId/stableId to stableId (facts.entity_id stores stableIds)
     const entityId = await resolveEntityStableId(db, rawId) ?? rawId;
 
     const rows = await db
@@ -170,7 +170,7 @@ const factsApp = new Hono()
     const { limit, offset, measure } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Resolve slug/numericId/stableId to stableId (facts.entity_id stores stableIds)
+    // Resolve slug/wikiId/stableId to stableId (facts.entity_id stores stableIds)
     const entityId = await resolveEntityStableId(db, rawId) ?? rawId;
 
     const conditions = [eq(facts.entityId, entityId)];

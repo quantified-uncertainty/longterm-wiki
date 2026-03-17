@@ -3,7 +3,7 @@ thing:
   stableId: ILE6N4wiDA
   type: organization
   name: Coalition for Epidemic Preparedness Innovations
-  numericId: E520
+  wikiId: E520
 facts:
   - id: f_miLYZKVFhg
     property: description

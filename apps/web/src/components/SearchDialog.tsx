@@ -159,7 +159,7 @@ export function SearchDialog() {
   const navigate = useCallback(
     (result: SearchResult) => {
       setOpen(false);
-      router.push(`/wiki/${result.numericId}`);
+      router.push(`/wiki/${result.wikiId}`);
     },
     [router],
   );

@@ -3,7 +3,7 @@ thing:
   stableId: TK450w7sTw
   type: concept
   name: AI Welfare and Digital Minds
-  numericId: E391
+  wikiId: E391
 facts:
   - id: f_wObIEA7IMA
     property: description

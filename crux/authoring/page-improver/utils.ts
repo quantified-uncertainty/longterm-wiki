@@ -210,7 +210,7 @@ export function repairFrontmatter(content: string): string {
 /**
  * Ensure that all frontmatter fields from the original content are preserved
  * in the LLM-generated output. LLMs sometimes drop fields (especially `title`,
- * `numericId`, `entityType`) when regenerating content. This function merges
+ * `wikiId`, `entityType`) when regenerating content. This function merges
  * any missing fields back from the original.
  *
  * Fields present in both versions use the LLM's value (it may have legitimately

@@ -67,13 +67,13 @@ export function getEntityHref(id: string, _type?: string): string {
   if (directoryHref) return directoryHref;
 
   const registry = getIdRegistry();
-  // If already a numeric ID (E35), use it directly
-  if (/^E\d+$/.test(id) && registry.byNumericId[id]) {
+  // If already a wiki ID (E35), use it directly
+  if (/^E\d+$/.test(id) && registry.byWikiId[id]) {
     return `/wiki/${id}`;
   }
-  // Otherwise look up slug → numeric ID
-  const numericId = registry.bySlug[id];
-  return numericId ? `/wiki/${numericId}` : `/wiki/${id}`;
+  // Otherwise look up slug → wiki ID
+  const wikiId = registry.bySlug[id];
+  return wikiId ? `/wiki/${wikiId}` : `/wiki/${id}`;
 }
 
 /**
@@ -83,11 +83,11 @@ export function getEntityHref(id: string, _type?: string): string {
 export function getWikiHref(id: string): string {
   const registry = getIdRegistry();
   const slug = resolveId(id);
-  if (/^E\d+$/.test(id) && registry.byNumericId[id]) {
+  if (/^E\d+$/.test(id) && registry.byWikiId[id]) {
     return `/wiki/${id}`;
   }
-  const numericId = registry.bySlug[slug];
-  return numericId ? `/wiki/${numericId}` : `/wiki/${slug}`;
+  const wikiId = registry.bySlug[slug];
+  return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;
 }
 
 // ============================================================================

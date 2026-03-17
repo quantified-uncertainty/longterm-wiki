@@ -3,7 +3,7 @@ thing:
   stableId: 6c238j1BMw
   type: risk
   name: AI-Enabled Untraceable Misuse
-  numericId: E691
+  wikiId: E691
 facts:
   - id: f_ZSXX1dxLhA
     property: description

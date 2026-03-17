@@ -3,7 +3,7 @@
 
 - id: agentic-ai
   stableId: 95ASV0XEwQ
-  numericId: E2
+  wikiId: E2
   type: capability
   title: Agentic AI
   customFields:
@@ -38,7 +38,7 @@
   lastUpdated: 2025-12
 - id: coding
   stableId: 64WDhlxxKA
-  numericId: E61
+  wikiId: E61
   type: capability
   title: Autonomous Coding
   customFields:
@@ -73,7 +73,7 @@
   lastUpdated: 2025-12
 - id: language-models
   stableId: MznJisvptw
-  numericId: E186
+  wikiId: E186
   type: capability
   title: Large Language Models
   customFields:
@@ -110,7 +110,7 @@
   lastUpdated: 2025-12
 - id: long-horizon
   stableId: ymixRXGD3A
-  numericId: E192
+  wikiId: E192
   type: capability
   title: Long-Horizon Autonomous Tasks
   customFields:
@@ -147,7 +147,7 @@
   lastUpdated: 2025-12
 - id: persuasion
   stableId: n9Mqc0XteA
-  numericId: E224
+  wikiId: E224
   type: capability
   title: Persuasion and Social Manipulation
   customFields:
@@ -185,7 +185,7 @@
   lastUpdated: 2025-12
 - id: reasoning
   stableId: hD7bZ2b7BQ
-  numericId: E246
+  wikiId: E246
   type: capability
   title: Reasoning and Planning
   customFields:
@@ -223,7 +223,7 @@
 # rlhf (E259) moved to data/entities/research-areas.yaml
 - id: scientific-research
   stableId: dpTZOF78vg
-  numericId: E277
+  wikiId: E277
   type: capability
   title: Scientific Research Capabilities
   customFields:
@@ -262,7 +262,7 @@
   lastUpdated: 2025-12
 - id: self-improvement
   stableId: eUR0jvxO5A
-  numericId: E278
+  wikiId: E278
   type: capability
   title: Self-Improvement and Recursive Enhancement
   customFields:
@@ -302,7 +302,7 @@
   lastUpdated: 2025-12
 - id: situational-awareness
   stableId: 5maTNr0PGA
-  numericId: E282
+  wikiId: E282
   type: capability
   title: Situational Awareness
   customFields:
@@ -373,7 +373,7 @@
   lastUpdated: 2025-12
 - id: tool-use
   stableId: C5XsvYDQGA
-  numericId: E356
+  wikiId: E356
   type: capability
   title: Tool Use and Computer Use
   customFields:
@@ -414,7 +414,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: biological-organoid
   stableId: q13KQXAy3A
-  numericId: E491
+  wikiId: E491
   type: capability
   title: Biological / Organoid Computing
   description: >-
@@ -429,7 +429,7 @@
   lastUpdated: 2026-02
 - id: brain-computer-interfaces
   stableId: gAiFk4Y4aQ
-  numericId: E492
+  wikiId: E492
   type: capability
   title: Brain-Computer Interfaces
   description: >-
@@ -443,7 +443,7 @@
   lastUpdated: 2026-02
 - id: collective-intelligence
   stableId: FA0Pwjpvmw
-  numericId: E493
+  wikiId: E493
   type: capability
   title: Collective Intelligence / Coordination
   description: >-
@@ -456,7 +456,7 @@
   lastUpdated: 2026-02
 - id: genetic-enhancement
   stableId: jUbUtHAGqQ
-  numericId: E494
+  wikiId: E494
   type: capability
   title: Genetic Enhancement / Selection
   description: >-
@@ -471,7 +471,7 @@
   lastUpdated: 2026-02
 - id: light-scaffolding
   stableId: BP0tsiccNw
-  numericId: E495
+  wikiId: E495
   type: capability
   title: Light Scaffolding
   description: >-
@@ -486,7 +486,7 @@
   lastUpdated: 2026-02
 - id: minimal-scaffolding
   stableId: LbyeLGVG0g
-  numericId: E496
+  wikiId: E496
   type: capability
   title: Minimal Scaffolding
   description: >-
@@ -500,7 +500,7 @@
   lastUpdated: 2026-02
 - id: neuro-symbolic
   stableId: d9OJFyUmjw
-  numericId: E497
+  wikiId: E497
   type: capability
   title: Neuro-Symbolic Hybrid Systems
   description: >-
@@ -514,7 +514,7 @@
   lastUpdated: 2026-02
 - id: neuromorphic
   stableId: hSC1PO5MBg
-  numericId: E498
+  wikiId: E498
   type: capability
   title: Neuromorphic Hardware
   description: >-
@@ -528,7 +528,7 @@
   lastUpdated: 2026-02
 - id: novel-unknown
   stableId: 63YrqurtZQ
-  numericId: E499
+  wikiId: E499
   type: capability
   title: Novel / Unknown Approaches
   description: >-
@@ -542,7 +542,7 @@
   lastUpdated: 2026-02
 - id: sparse-moe
   stableId: qSUpeYPEoQ
-  numericId: E500
+  wikiId: E500
   type: capability
   title: Sparse / MoE Transformers
   description: >-
@@ -556,7 +556,7 @@
   lastUpdated: 2026-02
 - id: ssm-mamba
   stableId: DjKKneEtdA
-  numericId: E501
+  wikiId: E501
   type: capability
   title: State-Space Models / Mamba
   description: >-
@@ -570,7 +570,7 @@
   lastUpdated: 2026-02
 - id: whole-brain-emulation
   stableId: ReeAY5pNBA
-  numericId: E502
+  wikiId: E502
   type: capability
   title: Whole Brain Emulation
   description: >-
@@ -584,7 +584,7 @@
   lastUpdated: 2026-02
 - id: ai-powered-investigation
   stableId: N0NF4lvS4Q
-  numericId: E698
+  wikiId: E698
   type: capability
   title: AI-Powered Investigation
   description: >-
@@ -621,7 +621,7 @@
   lastUpdated: 2026-02
 - id: world-models
   stableId: vQugEFw5nA
-  numericId: E503
+  wikiId: E503
   type: capability
   title: World Models + Planning
   description: >-

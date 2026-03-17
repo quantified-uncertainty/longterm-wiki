@@ -3,7 +3,7 @@ thing:
   stableId: MEt9F7f50w
   type: approach
   name: Provably Safe AI (davidad agenda)
-  numericId: E484
+  wikiId: E484
 facts:
   - id: f_jcv8swDPxQ
     property: description

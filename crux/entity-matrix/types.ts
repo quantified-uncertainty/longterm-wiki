@@ -93,7 +93,7 @@ export interface EntityTypeRow {
   aggregateScore: number;
   /** Average score per dimension group */
   groupScores: Record<string, number>;
-  /** Sample entity numericId (e.g., "E42") for quick navigation */
+  /** Sample entity wikiId (e.g., "E42") for quick navigation */
   sampleEntityId?: string;
   /** Sample entity slug for directory-style URLs */
   sampleEntitySlug?: string;

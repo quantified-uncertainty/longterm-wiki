@@ -1,5 +1,5 @@
 ---
-numericId: E733
+wikiId: E733
 title: LongtermWiki Vision
 description: Strategic vision and scope for the LongtermWiki project
 pageType: documentation

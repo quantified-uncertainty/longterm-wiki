@@ -100,7 +100,7 @@ function buildOrgSearchText(
 
 interface ApiOrg {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   title: string;
   description: string | null;
@@ -157,9 +157,9 @@ async function loadFromApi(
       id: org.id,
       slug: org.id,
       name: org.title,
-      numericId: org.numericId,
+      wikiId: org.wikiId,
       orgType,
-      wikiPageId: org.numericId,
+      wikiPageId: org.wikiId,
 
       revenue: null, // Display formatting handled by client component
       revenueNum: org.revenueNum,
@@ -220,9 +220,9 @@ function loadFromLocal(): OrgPageData {
       id: org.id,
       slug: org.id,
       name: org.title,
-      numericId: org.numericId ?? null,
+      wikiId: org.wikiId ?? null,
       orgType: org.orgType ?? null,
-      wikiPageId: org.numericId && getPageById(org.id) ? org.numericId : null,
+      wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
       revenueNum: numericValue(revenueFact),

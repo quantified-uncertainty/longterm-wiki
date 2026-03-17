@@ -570,7 +570,7 @@ Instructions:
    - TypeScript/JS files with type errors from combining incompatible changes
    - Build-data failures from mismatched entity/fact references between files
    - MDX files with broken EntityLink references
-   - Numeric ID conflicts: if two entities/pages claim the same numericId, fix by
+   - Wiki ID conflicts: if two entities/pages claim the same wikiId, fix by
      giving one of them a unique ID. IDs are allocated by the wiki server.
    - Unescaped dollar signs in MDX files (e.g. "$100" should be "\\$100")
    - Deprecated frontmatter fields (e.g. "importance" should be "readerImportance")

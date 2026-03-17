@@ -3,7 +3,7 @@ thing:
   stableId: OdDfkoWwQg
   type: person
   name: Vipul Naik
-  numericId: E581
+  wikiId: E581
 facts:
   - id: f_GupKup2iyw
     property: description

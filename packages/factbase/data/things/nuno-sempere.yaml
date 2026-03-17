@@ -3,7 +3,7 @@ thing:
   stableId: AnFfbQlIog
   type: person
   name: Nuño Sempere
-  numericId: E579
+  wikiId: E579
 facts:
   - id: f_xAJL18iX9A
     property: description

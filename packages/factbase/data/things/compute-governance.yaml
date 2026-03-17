@@ -3,7 +3,7 @@ thing:
   stableId: lfvY1bGeoA
   type: policy
   name: Compute Governance
-  numericId: E64
+  wikiId: E64
 facts:
   - id: f_MFv6VHMh7Q
     property: description

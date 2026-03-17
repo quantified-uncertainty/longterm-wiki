@@ -3,7 +3,7 @@ thing:
   stableId: qHOO4Xb9dA
   type: policy
   name: New York RAISE Act
-  numericId: E471
+  wikiId: E471
 facts:
   - id: f_WlEbjQiGPw
     property: description

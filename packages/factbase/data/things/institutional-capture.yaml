@@ -3,7 +3,7 @@ thing:
   stableId: IqKOqHEKag
   type: risk
   name: AI-Driven Institutional Decision Capture
-  numericId: E166
+  wikiId: E166
 facts:
   - id: f_WJGHH0UZmA
     property: description

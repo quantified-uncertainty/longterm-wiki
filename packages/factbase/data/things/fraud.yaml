@@ -3,7 +3,7 @@ thing:
   stableId: GnUTRJhA4g
   type: risk
   name: AI-Powered Fraud
-  numericId: E145
+  wikiId: E145
 facts:
   - id: f_FNoBoVyYow
     property: description

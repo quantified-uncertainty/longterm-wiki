@@ -3,7 +3,7 @@ thing:
   stableId: uhTh3ndt0Q
   type: organization
   name: ControlAI
-  numericId: E426
+  wikiId: E426
 facts:
   - id: f_kD7n4YOz5g
     property: description

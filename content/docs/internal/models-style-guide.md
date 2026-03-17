@@ -1,5 +1,5 @@
 ---
-numericId: E736
+wikiId: E736
 title: Models Style Guide
 description: Style guide for writing model and analysis pages
 subcategory: style-guides

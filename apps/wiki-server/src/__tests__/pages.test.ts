@@ -27,7 +27,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- entity_ids: INSERT (auto-allocation from page-id-helpers, supports bulk) ---
   if (q.includes("insert into") && q.includes("entity_ids")) {
-    const rows: Array<{ numeric_id: number; slug: string }> = [];
+    const rows: Array<{ wiki_id: number; slug: string }> = [];
     for (const p of params) {
       const slug = p as string;
       // Check if already exists (ON CONFLICT DO NOTHING)
@@ -41,18 +41,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (!found) {
         const newId = entityIdsStore.size + 1;
         entityIdsStore.set(newId, { slug, description: null, created_at: new Date() });
-        rows.push({ numeric_id: newId, slug });
+        rows.push({ wiki_id: newId, slug });
       }
     }
     return rows;
   }
 
-  // --- entity_ids: SELECT slug WHERE numeric_id = ? (resolve E-id → slug) ---
-  // Must check for "numeric_id" in the WHERE clause specifically (not just SELECT list).
-  // Drizzle generates: WHERE "entity_ids"."numeric_id" = $1
-  if (q.includes("entity_ids") && q.includes("where") && q.includes('"numeric_id" =') && !q.includes("insert into")) {
-    const numericId = params[0] as number;
-    const entry = entityIdsStore.get(numericId);
+  // --- entity_ids: SELECT slug WHERE wiki_id = ? (resolve E-id → slug) ---
+  // Must check for "wiki_id" in the WHERE clause specifically (not just SELECT list).
+  // Drizzle generates: WHERE "entity_ids"."wiki_id" = $1
+  if (q.includes("entity_ids") && q.includes("where") && q.includes('"wiki_id" =') && !q.includes("insert into")) {
+    const wikiId = params[0] as number;
+    const entry = entityIdsStore.get(wikiId);
     if (entry) {
       return [{ slug: entry.slug }];
     }
@@ -64,7 +64,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const results: Record<string, unknown>[] = [];
     for (const [numId, entry] of entityIdsStore.entries()) {
       if (params.includes(entry.slug)) {
-        results.push({ numeric_id: numId, slug: entry.slug });
+        results.push({ wiki_id: numId, slug: entry.slug });
       }
     }
     return results;
@@ -83,7 +83,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
       const row: Record<string, unknown> = {
         id,
-        numeric_id: params[o + 1],
+        wiki_id: params[o + 1],
         slug: params[o + 2],
         integer_id: params[o + 3],
         title: params[o + 4],
@@ -137,7 +137,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (simpleTextMatch(row, searchWords)) {
         results.push({
           id: row.id,
-          numeric_id: row.numeric_id,
+          wiki_id: row.wiki_id,
           title: row.title,
           description: row.description,
           entity_type: row.entity_type,
@@ -163,7 +163,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (simpleTextMatch(row, searchQuery)) {
         results.push({
           id: row.id,
-          numeric_id: row.numeric_id,
+          wiki_id: row.wiki_id,
           title: row.title,
           description: row.description,
           entity_type: row.entity_type,
@@ -178,13 +178,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- wiki_pages: SELECT with WHERE + OR (get by id or numeric_id) ---
+  // --- wiki_pages: SELECT with WHERE + OR (get by id or wiki_id) ---
   if (q.includes("wiki_pages") && q.includes("where") && q.includes(" or ") && !q.includes("count(*)")) {
     const id = params[0] as string;
-    const numericId = params[1] as string;
+    const wikiId = params[1] as string;
     const results: Record<string, unknown>[] = [];
     for (const row of pagesStore.values()) {
-      if (row.id === id || row.numeric_id === numericId) {
+      if (row.id === id || row.wiki_id === wikiId) {
         results.push(row);
       }
     }
@@ -239,10 +239,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- entity_ids: SELECT slug WHERE numeric_id = ? (numeric ID resolution) ---
-  if (q.includes("entity_ids") && q.includes("where") && q.includes("numeric_id") && !q.includes("count(*)")) {
-    const numericId = params[0] as number;
-    const entry = entityIdsStore.get(numericId);
+  // --- entity_ids: SELECT slug WHERE wiki_id = ? (wiki ID resolution) ---
+  if (q.includes("entity_ids") && q.includes("where") && q.includes("wiki_id") && !q.includes("count(*)")) {
+    const wikiId = params[0] as number;
+    const entry = entityIdsStore.get(wikiId);
     if (entry) {
       return [{ slug: entry.slug }];
     }
@@ -280,7 +280,7 @@ function seedPage(
       {
         id,
         title,
-        numericId: opts.numericId ?? `E${Math.floor(Math.random() * 1000)}`,
+        wikiId: opts.wikiId ?? `E${Math.floor(Math.random() * 1000)}`,
         description: opts.description ?? `Description of ${title}`,
         category: opts.category ?? "concept",
         entityType: opts.entityType ?? "concept",
@@ -312,7 +312,7 @@ describe("Pages API", () => {
           {
             id: "anthropic",
             title: "Anthropic",
-            numericId: "E42",
+            wikiId: "E42",
             description: "AI safety company",
             category: "organizations",
             entityType: "organization",
@@ -320,7 +320,7 @@ describe("Pages API", () => {
           {
             id: "openai",
             title: "OpenAI",
-            numericId: "E43",
+            wikiId: "E43",
             description: "AI research lab",
             category: "organizations",
             entityType: "organization",
@@ -380,7 +380,7 @@ describe("Pages API", () => {
   describe("GET /api/pages/:id", () => {
     it("returns page by slug", async () => {
       await seedPage(app, "anthropic", "Anthropic", {
-        numericId: "E42",
+        wikiId: "E42",
         description: "AI safety company",
       });
 
@@ -389,11 +389,11 @@ describe("Pages API", () => {
       const body = await res.json();
       expect(body.id).toBe("anthropic");
       expect(body.title).toBe("Anthropic");
-      expect(body.numericId).toBe("E42");
+      expect(body.wikiId).toBe("E42");
     });
 
-    it("returns page by numeric ID (legacy wiki_pages.numericId)", async () => {
-      await seedPage(app, "anthropic", "Anthropic", { numericId: "E42" });
+    it("returns page by wiki ID (legacy wiki_pages.wikiId)", async () => {
+      await seedPage(app, "anthropic", "Anthropic", { wikiId: "E42" });
 
       const res = await app.request("/api/pages/E42");
       expect(res.status).toBe(200);
@@ -401,9 +401,9 @@ describe("Pages API", () => {
       expect(body.id).toBe("anthropic");
     });
 
-    it("returns page by numeric ID via entityIds table when wiki_pages.numericId is null", async () => {
-      // Seed a page WITHOUT numericId (as most pages are in production)
-      await seedPage(app, "anthropic", "Anthropic", { numericId: null });
+    it("returns page by wiki ID via entityIds table when wiki_pages.wikiId is null", async () => {
+      // Seed a page WITHOUT wikiId (as most pages are in production)
+      await seedPage(app, "anthropic", "Anthropic", { wikiId: null });
       // Seed the entityIds mapping: E22 → anthropic
       entityIdsStore.set(22, { slug: "anthropic", description: null, created_at: new Date() });
 
@@ -411,11 +411,11 @@ describe("Pages API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.id).toBe("anthropic");
-      expect(body.numericId).toBe("E22");
+      expect(body.wikiId).toBe("E22");
     });
 
-    it("returns page by case-insensitive numeric ID", async () => {
-      await seedPage(app, "anthropic", "Anthropic", { numericId: null });
+    it("returns page by case-insensitive wiki ID", async () => {
+      await seedPage(app, "anthropic", "Anthropic", { wikiId: null });
       entityIdsStore.set(22, { slug: "anthropic", description: null, created_at: new Date() });
 
       // Lowercase e22 should also work
@@ -551,7 +551,7 @@ describe("Pages API", () => {
         pages: [
           {
             id: "__smoke-test__",
-            numericId: null,
+            wikiId: null,
             title: "Smoke Test",
             description: null,
             llmSummary: null,

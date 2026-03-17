@@ -3,7 +3,7 @@ thing:
   stableId: AMhUctK34Q
   type: risk
   name: Sharp Left Turn
-  numericId: E281
+  wikiId: E281
 facts:
   - id: f_RnEBdisK9g
     property: description

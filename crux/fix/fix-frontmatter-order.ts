@@ -39,7 +39,7 @@ if (HELP) {
 ${colors.bold}Frontmatter Field Order Fixer${colors.reset}
 
 Reorders MDX frontmatter fields to follow canonical ordering:
-  1. Identity (numericId, title, description)
+  1. Identity (wikiId, title, description)
   2. Structure (sidebar, entityType, subcategory, ...)
   3. Quality scores (quality, readerImportance, ...)
   4. Temporal (lastEdited, update_frequency, ...)

@@ -3,7 +3,7 @@ thing:
   stableId: 4804DX6Zbg
   type: organization
   name: Lightning Rod Labs
-  numericId: E540
+  wikiId: E540
 facts:
   - id: f_OyfHjujlCQ
     property: description

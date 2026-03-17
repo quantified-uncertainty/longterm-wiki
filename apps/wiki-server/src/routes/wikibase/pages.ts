@@ -29,7 +29,7 @@ import { allocateAndResolvePageIntIds } from "../shared/page-id-helpers.js";
 /** Row shape returned by the FTS and trigram search queries. */
 interface PageSearchRow {
   id: string;
-  numeric_id: string | null;
+  wiki_id: string | null;
   title: string;
   description: string | null;
   entity_type: string | null;
@@ -80,7 +80,7 @@ const pagesApp = new Hono()
       const titleBoost = titleMatchBoostExpr("title", "$3");
       results = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
-        id, numeric_id, title, description, entity_type, category,
+        id, wiki_id, title, description, entity_type, category,
         reader_importance, quality,
         ts_rank_cd(search_vector, to_tsquery('english', $1), 1) + ${titleBoost} AS rank,
         ts_headline('english', coalesce(description, ''),
@@ -89,7 +89,7 @@ const pagesApp = new Hono()
         ) AS snippet
       FROM wiki_pages
       WHERE search_vector @@ to_tsquery('english', $1)
-        AND numeric_id IS NOT NULL
+        AND wiki_id IS NOT NULL
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [prefixQuery, limit, q],
@@ -101,13 +101,13 @@ const pagesApp = new Hono()
     if (results.length < TRIGRAM_FALLBACK_THRESHOLD) {
       const trigramResults = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
-        id, numeric_id, title, description, entity_type, category,
+        id, wiki_id, title, description, entity_type, category,
         reader_importance, quality,
         similarity(title, $1) AS rank,
         description AS snippet
       FROM wiki_pages
       WHERE word_count > 0
-        AND numeric_id IS NOT NULL
+        AND wiki_id IS NOT NULL
         AND similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
         AND id NOT IN (SELECT unnest($3::text[]))
       ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
@@ -120,7 +120,7 @@ const pagesApp = new Hono()
     return c.json({
       results: results.map((r) => ({
         id: r.id,
-        numericId: r.numeric_id,
+        wikiId: r.wiki_id,
         title: r.title,
         description: r.description,
         entityType: r.entity_type,
@@ -144,38 +144,38 @@ const pagesApp = new Hono()
     const db = getDrizzleDb();
 
     // If the ID looks like a numeric entity ID (E42), resolve to slug via entityIds table.
-    // The wiki_pages.numeric_id column is sparsely populated, so we use the authoritative
-    // entityIds table for the mapping and fall back to wiki_pages.numeric_id for legacy data.
+    // The wiki_pages.wiki_id column is sparsely populated, so we use the authoritative
+    // entityIds table for the mapping and fall back to wiki_pages.wiki_id for legacy data.
     let resolvedSlug: string | null = null;
     if (/^E\d+$/i.test(id)) {
       const numericValue = parseInt(id.slice(1), 10);
       const idRows = await db
         .select({ slug: entityIds.slug })
         .from(entityIds)
-        .where(eq(entityIds.numericId, numericValue));
+        .where(eq(entityIds.wikiId, numericValue));
       if (idRows.length > 0) {
         resolvedSlug = idRows[0].slug;
       }
     }
 
-    // Look up by resolved slug, original ID as slug, or legacy numericId column
+    // Look up by resolved slug, original ID as slug, or legacy wikiId column
     const lookupSlug = resolvedSlug || id;
     const rows = await db
       .select()
       .from(wikiPages)
-      .where(or(eq(wikiPages.id, lookupSlug), eq(wikiPages.numericId, id)));
+      .where(or(eq(wikiPages.id, lookupSlug), eq(wikiPages.wikiId, id)));
 
     if (rows.length === 0) {
       return notFoundError(c, `No page found for id: ${id}`);
     }
 
     const page = rows[0];
-    // Use the canonical numeric ID from the entityIds resolution if available,
+    // Use the canonical wiki ID from the entityIds resolution if available,
     // falling back to whatever is stored in wiki_pages
-    const numericId = resolvedSlug ? id.toUpperCase() : page.numericId;
+    const wikiId = resolvedSlug ? id.toUpperCase() : page.wikiId;
     return c.json({
       id: page.id,
-      numericId,
+      wikiId,
       title: page.title,
       description: page.description,
       llmSummary: page.llmSummary,
@@ -221,7 +221,7 @@ const pagesApp = new Hono()
     const rows = await db
       .select({
         id: wikiPages.id,
-        numericId: wikiPages.numericId,
+        wikiId: wikiPages.wikiId,
         title: wikiPages.title,
         description: wikiPages.description,
         category: wikiPages.category,
@@ -290,7 +290,7 @@ const pagesApp = new Hono()
 
       const allVals = pages.map((page) => ({
         id: page.id,
-        numericId: page.numericId ?? null,
+        wikiId: page.wikiId ?? null,
         slug: page.id, // Phase 4a: slug = id (the text slug)
         integerIdCol: intIdMap.get(page.id) ?? null, // Phase 4a: integer ID from entity_ids (nullable until Phase 4b)
         title: page.title,
@@ -325,7 +325,7 @@ const pagesApp = new Hono()
         .onConflictDoUpdate({
           target: wikiPages.id,
           set: {
-            numericId: sql`excluded.numeric_id`,
+            wikiId: sql`excluded.wiki_id`,
             slug: sql`excluded.slug`,
             integerIdCol: sql`excluded.integer_id`,
             title: sql`excluded.title`,

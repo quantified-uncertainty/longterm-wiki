@@ -7,7 +7,7 @@ const noSleep = async () => {};
 function makePage(id: string) {
   return {
     id,
-    numericId: null,
+    wikiId: null,
     title: `Page ${id}`,
     description: null,
     llmSummary: null,

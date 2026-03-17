@@ -3,7 +3,7 @@ thing:
   stableId: k6BfxaEwuQ
   type: research-area
   name: Red Teaming
-  numericId: E449
+  wikiId: E449
 facts:
   - id: f_jqcmM746gw
     property: description

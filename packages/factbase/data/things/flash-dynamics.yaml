@@ -3,7 +3,7 @@ thing:
   stableId: 0t2GLN0sBA
   type: risk
   name: AI Flash Dynamics
-  numericId: E142
+  wikiId: E142
 facts:
   - id: f_WEkSDCRAzQ
     property: description

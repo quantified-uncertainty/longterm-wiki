@@ -3,7 +3,7 @@ thing:
   stableId: zTPtio1cDA
   type: risk
   name: Key Near-Term AI Risks
-  numericId: E1005
+  wikiId: E1005
 facts:
   - id: f_rX1PcCoSSQ
     property: description

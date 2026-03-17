@@ -3,7 +3,7 @@ thing:
   stableId: QbB5KN1Ucg
   type: approach
   name: Goal Misgeneralization Research
-  numericId: E633
+  wikiId: E633
 facts:
   - id: f_hb33WTa9nw
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: HrokCBSmBA
   type: analysis
   name: Anthropic Valuation Analysis
-  numericId: E405
+  wikiId: E405
 facts:
   - id: f_0TUh4le5dQ
     property: description

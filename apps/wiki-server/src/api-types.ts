@@ -464,7 +464,7 @@ export const SyncLinksBatchSchema = z.object({
 export interface PageSearchResult {
   results: Array<{
     id: string;
-    numericId: string | null;
+    wikiId: string | null;
     title: string;
     description: string | null;
     entityType: string | null;
@@ -480,7 +480,7 @@ export interface PageSearchResult {
 
 export interface PageDetailRow {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   title: string;
   description: string | null;
   llmSummary: string | null;
@@ -649,7 +649,7 @@ export interface ResourceListResult {
 
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
-  numericId: z.string().max(20).nullable().optional(),
+  wikiId: z.string().max(20).nullable().optional(),
   stableId: z.string().max(20).nullable().optional(),
   entityType: z.string().min(1).max(100),
   title: z.string().min(1).max(500),
@@ -869,7 +869,7 @@ export type SaveArtifacts = z.infer<typeof SaveArtifactsSchema>;
 
 export const SyncPageSchema = z.object({
   id: z.string().min(1).max(300),
-  numericId: z.string().max(20).nullable().optional(),
+  wikiId: z.string().max(20).nullable().optional(),
   title: z.string().min(1).max(500),
   description: z.string().max(5000).nullable().optional(),
   llmSummary: z.string().max(10000).nullable().optional(),

@@ -53,11 +53,11 @@ export function computeRecommendedScores(pages, buildNow) {
 /**
  * Build the update schedule — per-page staleness, priority, daysSince/daysUntil.
  * @param {Array<object>} pages
- * @param {Record<string, string>} slugToNumericId
+ * @param {Record<string, string>} slugToWikiId
  * @param {number} buildNow - Date.now() at build time
  * @returns {Array<object>} Sorted by priority (descending)
  */
-export function buildUpdateSchedule(pages, slugToNumericId, buildNow) {
+export function buildUpdateSchedule(pages, slugToWikiId, buildNow) {
   const items = [];
 
   for (const page of pages) {
@@ -77,7 +77,7 @@ export function buildUpdateSchedule(pages, slugToNumericId, buildNow) {
 
     items.push({
       id: page.id,
-      numericId: slugToNumericId[page.id] || page.id,
+      wikiId: slugToWikiId[page.id] || page.id,
       title: page.title,
       quality: page.quality ?? null,
       readerImportance: page.readerImportance ?? null,

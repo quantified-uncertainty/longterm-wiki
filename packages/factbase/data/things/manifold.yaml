@@ -3,7 +3,7 @@ thing:
   stableId: Y8MiLNuAWA
   type: organization
   name: Manifold (Prediction Market)
-  numericId: E546
+  wikiId: E546
 facts:
   - id: f_khJpXJ8xhg
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: bmVIhwpQww
   type: concept
   name: Transformative AI
-  numericId: E357
+  wikiId: E357
 facts:
   - id: f_wn3dvLqMxg
     property: description

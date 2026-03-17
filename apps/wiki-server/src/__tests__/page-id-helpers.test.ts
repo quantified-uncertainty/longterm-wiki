@@ -3,28 +3,28 @@ import { mockDbModule } from "./test-utils.js";
 
 // ---- In-memory entity_ids store ----
 
-let entityIdsStore: Map<string, number>; // slug → numeric_id
-let nextNumericId: number;
+let entityIdsStore: Map<string, number>; // slug → wiki_id
+let nextWikiId: number;
 
 function resetStores() {
   entityIdsStore = new Map();
-  nextNumericId = 100; // Start above 0 to detect sentinel bugs
+  nextWikiId = 100; // Start above 0 to detect sentinel bugs
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
   // --- entity_ids: INSERT ... ON CONFLICT DO NOTHING ... RETURNING ---
-  // numericId uses raw SQL nextval(), so it's embedded in the query string, not in params.
+  // wikiId uses raw SQL nextval(), so it's embedded in the query string, not in params.
   // Params only contain the slug values — one per row.
   if (q.includes("insert into") && q.includes('"entity_ids"')) {
-    const rows: Array<{ slug: string; numeric_id: number }> = [];
+    const rows: Array<{ slug: string; wiki_id: number }> = [];
     for (const p of params) {
       const slug = p as string;
       if (!entityIdsStore.has(slug)) {
-        const id = nextNumericId++;
+        const id = nextWikiId++;
         entityIdsStore.set(slug, id);
-        rows.push({ slug, numeric_id: id });
+        rows.push({ slug, wiki_id: id });
       }
       // ON CONFLICT DO NOTHING — skip existing slugs (no RETURNING row)
     }
@@ -35,21 +35,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // Must come before the batch matcher below, since LIMIT queries also contain "where" and "slug".
   if (q.includes('"entity_ids"') && q.includes("limit")) {
     const slug = params[0] as string;
-    const numericId = entityIdsStore.get(slug);
-    if (numericId !== undefined) {
-      return [{ numeric_id: numericId }];
+    const wikiId = entityIdsStore.get(slug);
+    if (wikiId !== undefined) {
+      return [{ wiki_id: wikiId }];
     }
     return [];
   }
 
   // --- entity_ids: SELECT WHERE slug IN (...) ---
   if (q.includes('"entity_ids"') && q.includes("where") && q.includes('"slug"')) {
-    const results: Array<{ slug: string; numeric_id: number }> = [];
+    const results: Array<{ slug: string; wiki_id: number }> = [];
     for (const p of params) {
       const slug = p as string;
-      const numericId = entityIdsStore.get(slug);
-      if (numericId !== undefined) {
-        results.push({ slug, numeric_id: numericId });
+      const wikiId = entityIdsStore.get(slug);
+      if (wikiId !== undefined) {
+        results.push({ slug, wiki_id: wikiId });
       }
     }
     return results;
@@ -78,7 +78,7 @@ describe("page-id-helpers", () => {
       expect(result).toBeNull();
     });
 
-    it("returns correct numericId for known slug", async () => {
+    it("returns correct wikiId for known slug", async () => {
       entityIdsStore.set("anthropic", 42);
       const db = getDrizzleDb();
       const result = await resolvePageIntId(db, "anthropic");
@@ -164,8 +164,8 @@ describe("page-id-helpers", () => {
       expect(result.size).toBe(2);
       expect(result.get("anthropic")).toBe(42);
       expect(result.get("openai")).toBe(99);
-      // nextNumericId should not have been incremented
-      expect(nextNumericId).toBe(100);
+      // nextWikiId should not have been incremented
+      expect(nextWikiId).toBe(100);
     });
 
     it("handles mix of existing and new slugs", async () => {
@@ -195,7 +195,7 @@ describe("page-id-helpers", () => {
 
       expect(result.size).toBe(2);
       // Only 2 IDs allocated, not 4
-      expect(nextNumericId).toBe(102);
+      expect(nextWikiId).toBe(102);
     });
   });
 });

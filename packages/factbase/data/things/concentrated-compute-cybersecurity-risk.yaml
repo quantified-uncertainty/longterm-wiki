@@ -3,7 +3,7 @@ thing:
   stableId: VP53MHxfEg
   type: risk
   name: Concentrated Compute as a Cybersecurity Risk
-  numericId: E689
+  wikiId: E689
 facts:
   - id: f_DE00eu9iIw
     property: description

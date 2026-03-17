@@ -3,7 +3,7 @@ thing:
   stableId: YlrwnKhMqQ
   type: organization
   name: Swift Centre
-  numericId: E569
+  wikiId: E569
 facts:
   - id: f_gq0vpaWDHA
     property: description

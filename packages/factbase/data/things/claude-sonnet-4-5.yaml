@@ -3,7 +3,7 @@ thing:
   stableId: fdp0LajPwQ
   type: ai-model
   name: Claude Sonnet 4.5
-  numericId: E1036
+  wikiId: E1036
 facts:
   - id: f_BS6QBOx2Pw
     property: description

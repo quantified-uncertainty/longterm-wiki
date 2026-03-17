@@ -10,7 +10,7 @@ import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model
 export interface AiModelRow {
   id: string;
   title: string;
-  numericId: string | null;
+  wikiId: string | null;
   modelFamily: string | null;
   modelTier: string | null;
   generation: string | null;

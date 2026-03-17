@@ -3,7 +3,7 @@ thing:
   stableId: 8Bv92x9G1A
   type: risk
   name: Mesa-Optimization
-  numericId: E197
+  wikiId: E197
 facts:
   - id: f_0hCOMZmZrA
     property: description

@@ -27,7 +27,7 @@ interface DirectoryFact {
 
 interface DirectoryEntity {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   entityType: string;
   title: string;
@@ -81,7 +81,7 @@ function apiEntityToRow(e: DirectoryEntity): ProjectRow {
     id: e.id,
     title: e.title,
     description: e.description ?? null,
-    numericId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
     // projectStatus is in metadata; status is a base-level column not in metadata
     status: (meta.projectStatus as string | undefined) ?? null,
     website,
@@ -138,7 +138,7 @@ function loadFromLocal(): ProjectsPageData {
       id: p.id,
       title: p.title,
       description: p.description ?? null,
-      numericId: p.numericId ?? null,
+      wikiId: p.wikiId ?? null,
       status: p.projectStatus ?? p.status ?? null,
       website,
       clusters: p.clusters,

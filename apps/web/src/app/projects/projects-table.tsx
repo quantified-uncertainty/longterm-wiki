@@ -8,7 +8,7 @@ export interface ProjectRow {
   id: string;
   title: string;
   description: string | null;
-  numericId: string | null;
+  wikiId: string | null;
   status: string | null;
   website: string | null;
   clusters: string[];
@@ -147,8 +147,8 @@ export function ProjectsTable({ rows }: { rows: ProjectRow[] }) {
                         {safeHostname(row.website)}
                       </a>
                     )}
-                    {row.numericId && (
-                      <Link href={`/wiki/${row.numericId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors" title="Wiki page">
+                    {row.wikiId && (
+                      <Link href={`/wiki/${row.wikiId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors" title="Wiki page">
                         wiki
                       </Link>
                     )}

@@ -3,7 +3,7 @@ thing:
   stableId: sKOD0uMVGg
   type: organization
   name: Anthropic (Funder)
-  numericId: E406
+  wikiId: E406
 facts:
   - id: f_6EOi4oOMBQ
     property: description

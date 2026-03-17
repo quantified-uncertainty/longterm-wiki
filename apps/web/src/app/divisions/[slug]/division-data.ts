@@ -389,7 +389,7 @@ export function loadDivisionPageData(record: import("@/data/factbase").KBRecordE
 
   // Parent wiki page link
   const parentTypedEntity = getTypedEntityById(division.ownerEntityId);
-  const parentWikiPageId = parentTypedEntity?.numericId ?? null;
+  const parentWikiPageId = parentTypedEntity?.wikiId ?? null;
 
   // Find grants associated with this division via: grant.programId → funding-program.divisionId → division keys
   const programKeysForDivision = new Set(

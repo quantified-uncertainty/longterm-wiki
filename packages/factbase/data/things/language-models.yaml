@@ -3,7 +3,7 @@ thing:
   stableId: MznJisvptw
   type: capability
   name: Large Language Models
-  numericId: E186
+  wikiId: E186
 facts:
   - id: f_EWNGEbX6jA
     property: description

@@ -13,7 +13,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { loadDatabase, loadPathRegistry, loadIdRegistry as loadIdReg, DATA_DIR_ABS, type Entity } from '../content-types.ts';
-import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
+import { WIKI_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
 import { stripFencedCodeBlocks } from '../mdx-utils.ts';
 
 const DATA_DIR = DATA_DIR_ABS;
@@ -28,7 +28,7 @@ let idRegistryCache: Record<string, string> | null = null;
 function loadIdRegistry(): Record<string, string> {
   if (idRegistryCache) return idRegistryCache;
   try {
-    idRegistryCache = loadIdReg().byNumericId;
+    idRegistryCache = loadIdReg().byWikiId;
     return idRegistryCache;
   } catch {
     idRegistryCache = {};
@@ -36,13 +36,13 @@ function loadIdRegistry(): Record<string, string> {
   }
 }
 
-/** Resolve a numeric ID (E35 or bare 35) to its slug, or return the ID unchanged */
-function resolveNumericId(id: string): string {
-  if (NUMERIC_ID_RE.test(id)) {
+/** Resolve a wiki ID (E35 or bare 35) to its slug, or return the ID unchanged */
+function resolveWikiId(id: string): string {
+  if (WIKI_ID_RE.test(id)) {
     const registry = loadIdRegistry();
     return registry[id] || id;
   }
-  // Also handle bare numeric IDs (35 → E35)
+  // Also handle bare wiki IDs (35 → E35)
   if (/^\d+$/.test(id)) {
     const registry = loadIdRegistry();
     return registry[`E${id}`] || id;
@@ -199,7 +199,7 @@ export const componentRefsRule = createRule({
     if (!isInternalDoc) {
       for (const match of body.matchAll(ENTITY_LINK_RE)) {
         const rawId = match[1];
-        const id = resolveNumericId(rawId);
+        const id = resolveWikiId(rawId);
         const lineNum = body.slice(0, match.index).split('\n').length;
 
         const isValid = entities.has(id) ||
@@ -225,7 +225,7 @@ export const componentRefsRule = createRule({
       let match: RegExpExecArray | null;
       while ((match = infoBoxRegex.exec(body)) !== null) {
         const rawId = match[1];
-        const id = resolveNumericId(rawId);
+        const id = resolveWikiId(rawId);
         const lineNum = body.slice(0, match.index).split('\n').length;
 
         if (!entities.has(id)) {

@@ -3,7 +3,7 @@ thing:
   stableId: QzcX3bShmQ
   type: person
   name: "Fei-Fei Li"
-  numericId: "E1303"
+  wikiId: "E1303"
 
 facts:
   - id: f_RObNpFN8Eg

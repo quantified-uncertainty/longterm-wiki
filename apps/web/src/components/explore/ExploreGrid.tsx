@@ -656,8 +656,8 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
           case "recentlyEdited":
             return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
           case "recentlyCreated": {
-            const aNum = parseInt(a.numericId?.replace(/^E/, "") || "0", 10);
-            const bNum = parseInt(b.numericId?.replace(/^E/, "") || "0", 10);
+            const aNum = parseInt(a.wikiId?.replace(/^E/, "") || "0", 10);
+            const bNum = parseInt(b.wikiId?.replace(/^E/, "") || "0", 10);
             return bNum - aNum;
           }
           case "relevance": {

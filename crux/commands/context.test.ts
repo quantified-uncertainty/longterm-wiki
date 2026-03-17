@@ -60,7 +60,7 @@ const mockWriteFileSync = vi.mocked(writeFileSync);
 
 const PAGE_DETAIL = {
   id: 'scheming',
-  numericId: '42',
+  wikiId: '42',
   title: 'Scheming',
   description: 'AI scheming refers to deceptive planning by AI systems.',
   llmSummary: 'A comprehensive overview of AI scheming behaviors.',
@@ -161,7 +161,7 @@ const PAGE_SEARCH_RESULT = {
   results: [
     {
       id: 'scheming',
-      numericId: '42',
+      wikiId: '42',
       title: 'Scheming',
       description: 'AI scheming description',
       entityType: 'risk',

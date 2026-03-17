@@ -3,7 +3,7 @@ thing:
   stableId: 4Rz7XtP9Uw
   type: risk
   name: AI-Accelerated Reality Fragmentation
-  numericId: E244
+  wikiId: E244
 facts:
   - id: f_eT0Uh5YJqQ
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: rQEkFJxS5w
   type: organization
   name: METR
-  numericId: E201
+  wikiId: E201
 facts:
   - id: f_HHpuTWlptw
     property: description

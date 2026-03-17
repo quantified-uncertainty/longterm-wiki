@@ -3,7 +3,7 @@ thing:
   stableId: 3ljdV7I37g
   type: analysis
   name: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
-  numericId: E411
+  wikiId: E411
 facts:
   - id: f_6htuAvtfyg
     property: description

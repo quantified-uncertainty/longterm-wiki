@@ -3,7 +3,7 @@ thing:
   stableId: XqvdX3YisQ
   type: person
   name: Vidur Kapur
-  numericId: E580
+  wikiId: E580
 facts:
   - id: f_JqWDigPJnQ
     property: description

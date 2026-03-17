@@ -26,7 +26,7 @@ function loadPages(): PageInput[] {
   const idRegistry = db.idRegistry ?? { bySlug: {} };
   return (db.pages || []).map((p: Record<string, unknown>) => ({
     id: p.id as string,
-    numericId: (idRegistry.bySlug[p.id as string] as string) || (p.id as string),
+    wikiId: (idRegistry.bySlug[p.id as string] as string) || (p.id as string),
     title: p.title as string,
     entityType: (p.entityType as string) ?? null,
     quality: (p.quality as number) ?? null,
@@ -67,7 +67,7 @@ async function nextActionCommand(_args: string[], options: CommandOptions): Prom
 
   for (let i = 0; i < limited.length; i++) {
     const s = limited[i];
-    const nid = s.numericId !== s.id ? ` (${s.numericId})` : '';
+    const nid = s.wikiId !== s.id ? ` (${s.wikiId})` : '';
     const label = `${s.title}${nid}`;
     const truncLabel = label.length > 39 ? label.slice(0, 36) + '...' : label;
     const scoreStr = s.priority.toFixed(2);

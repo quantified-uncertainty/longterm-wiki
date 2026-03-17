@@ -18,7 +18,7 @@ export default function ResearchAreasPage() {
 
   const rows: ResearchAreaRow[] = areas.map((a) => ({
     id: a.id,
-    numericId: a.numericId ?? null,
+    wikiId: a.wikiId ?? null,
     title: a.title,
     description: a.description ?? null,
     status: a.status,

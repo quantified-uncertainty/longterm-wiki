@@ -15,7 +15,7 @@ export interface MatrixModel {
   title: string;
   developer: string | null;
   developerName: string | null;
-  numericId: string | null;
+  wikiId: string | null;
 }
 
 export interface MatrixScore {
@@ -296,9 +296,9 @@ export function ComparisonMatrix({ benchmarks, models, scores }: Props) {
                 {/* Model name (sticky) */}
                 <td className="sticky left-0 z-10 bg-background/95 backdrop-blur-sm py-1.5 px-3 whitespace-nowrap border-r border-border/30">
                   <div className="flex items-center gap-2">
-                    {model.numericId ? (
+                    {model.wikiId ? (
                       <Link
-                        href={`/wiki/${model.numericId}`}
+                        href={`/wiki/${model.wikiId}`}
                         className="font-medium hover:text-primary transition-colors truncate max-w-[140px]"
                         title={model.title}
                       >

@@ -3,7 +3,7 @@ thing:
   stableId: MvImONf1YA
   type: risk
   name: Compute Concentration
-  numericId: E684
+  wikiId: E684
 facts:
   - id: f_jXDsUg8Q3w
     property: description

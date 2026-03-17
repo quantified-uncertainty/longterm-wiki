@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 interface DirectoryEntity {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   entityType: string;
   title: string;
@@ -60,7 +60,7 @@ function apiEntityToRow(
   return {
     id: e.id,
     title: e.title,
-    numericId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
     category: (meta.category as string | undefined) ?? null,
     scoringMethod: (meta.scoringMethod as string | undefined) ?? null,
     higherIsBetter: (meta.higherIsBetter as boolean | undefined) ?? true,
@@ -110,7 +110,7 @@ function loadFromLocal(): BenchmarksPageData {
     return {
       id: entity.id,
       title: entity.title,
-      numericId: entity.numericId ?? null,
+      wikiId: entity.wikiId ?? null,
       category: entity.category ?? null,
       scoringMethod: entity.scoringMethod ?? null,
       higherIsBetter: entity.higherIsBetter,
@@ -152,7 +152,7 @@ function buildMatrixData() {
           title: r.modelTitle,
           developer: r.developer,
           developerName: r.developerName,
-          numericId: r.numericId,
+          wikiId: r.wikiId,
         });
       }
       if (!matrixScores[r.modelId]) {

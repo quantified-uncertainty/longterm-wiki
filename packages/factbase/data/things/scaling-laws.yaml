@@ -3,7 +3,7 @@ thing:
   stableId: eZJ1oAKS6A
   type: concept
   name: AI Scaling Laws
-  numericId: E273
+  wikiId: E273
 facts:
   - id: f_TNxcLNKMiA
     property: description

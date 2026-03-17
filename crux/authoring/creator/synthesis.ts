@@ -213,7 +213,7 @@ ${canonicalLinksSection}
 
 **Format**: \`<EntityLink id="E##">Display Text</EntityLink>\`
 
-EntityLinks use **numeric IDs** (E##). Use the lookup table below to find the correct ID.
+EntityLinks use **wiki IDs** (E##). Use the lookup table below to find the correct ID.
 ONLY use IDs from this table. If an entity is not listed, use plain text instead.
 NEVER invent EntityLink IDs — if you're not certain, don't use EntityLink.
 

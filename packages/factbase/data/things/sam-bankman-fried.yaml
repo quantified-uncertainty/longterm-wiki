@@ -3,7 +3,7 @@ thing:
   stableId: sace2bALew
   type: person
   name: Sam Bankman-Fried
-  numericId: E857
+  wikiId: E857
 facts:
   - id: f_YjbqhAe0Lg
     property: description

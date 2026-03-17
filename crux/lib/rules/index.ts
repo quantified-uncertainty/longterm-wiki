@@ -42,7 +42,7 @@ import { externalLinksRule } from './external-links.ts';
 
 // Schema validation rules
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
-import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
+import { wikiIdIntegrityRule } from './wiki-id-integrity.ts';
 import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 
 // Quality validation rules
@@ -156,7 +156,7 @@ export {
   vagueCitationsRule,
   externalLinksRule,
   frontmatterSchemaRule,
-  numericIdIntegrityRule,
+  wikiIdIntegrityRule,
   noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
@@ -223,7 +223,7 @@ export const allRules: Rule[] = [
   vagueCitationsRule,
   externalLinksRule,
   frontmatterSchemaRule,
-  numericIdIntegrityRule,
+  wikiIdIntegrityRule,
   noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,

@@ -6,7 +6,7 @@
  * need updating.
  *
  * Usage:
- *   import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../lib/patterns.ts';
+ *   import { ENTITY_LINK_RE, WIKI_ID_RE } from '../lib/patterns.ts';
  */
 
 // ---------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 export const ENTITY_LINK_RE = /<EntityLink\s+[^>]*id=["']([^"']+)["'][^>]*>/g;
 
 /** Match numeric entity IDs like `E35`, `E710`. Case-insensitive. */
-export const NUMERIC_ID_RE = /^E\d+$/i;
+export const WIKI_ID_RE = /^E\d+$/i;
 
 /** Extract `name` attribute value from an EntityLink tag string. */
 export function extractEntityLinkName(tag: string): string | undefined {

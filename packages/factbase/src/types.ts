@@ -33,12 +33,12 @@ export interface Entity {
   previousIds?: string[];
   /** Former slugs for URL redirects (when a YAML file is renamed) */
   previousSlugs?: string[];
-  /** Wiki page URL ID with E prefix, e.g. "E22" (formerly numericId) */
+  /** Wiki page URL ID with E prefix, e.g. "E22" (formerly wikiId) */
   wikiPageId?: string;
   /** @deprecated Use `id` instead. Alias kept for backward compat during migration. */
   stableId: string;
   /** @deprecated Use `wikiPageId` instead. Alias kept for backward compat during migration. */
-  numericId?: string;
+  wikiId?: string;
 }
 
 // ── Fact ────────────────────────────────────────────────────────────
@@ -152,7 +152,7 @@ export interface EntityFile {
     /** Former slugs for URL redirects (when a YAML file is renamed). */
     previousSlugs?: string[];
     /** Old format: wiki page ID. */
-    numericId?: string;
+    wikiId?: string;
     /** New format: wiki page ID. */
     wikiPageId?: string;
   };

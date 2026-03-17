@@ -3,7 +3,7 @@
 
 - id: authentication-collapse
   stableId: GvV1xPNXRw
-  numericId: E27
+  wikiId: E27
   type: risk
   summaryPage: epistemic-overview
   title: Authentication Collapse
@@ -59,7 +59,7 @@
   lastUpdated: 2025-12
 - id: authoritarian-tools
   stableId: eXd3Fe8Lzg
-  numericId: E30
+  wikiId: E30
   type: risk
   summaryPage: misuse-overview
   title: AI Authoritarian Tools
@@ -117,7 +117,7 @@
   lastUpdated: 2025-12
 - id: automation-bias
   stableId: 72cwRMbzMA
-  numericId: E32
+  wikiId: E32
   type: risk
   summaryPage: accident-overview
   title: Automation Bias (AI Systems)
@@ -159,7 +159,7 @@
   lastUpdated: 2025-12
 - id: autonomous-weapons
   stableId: cm5KEblCZg
-  numericId: E35
+  wikiId: E35
   type: risk
   summaryPage: misuse-overview
   title: Autonomous Weapons
@@ -211,7 +211,7 @@
   lastUpdated: 2025-12
 - id: bioweapons
   stableId: wAglEMR2mg
-  numericId: E42
+  wikiId: E42
   type: risk
   summaryPage: misuse-overview
   title: Bioweapons Risk
@@ -273,7 +273,7 @@
   lastUpdated: 2025-12
 - id: concentration-of-power
   stableId: KpMBQkdQ5g
-  numericId: E68
+  wikiId: E68
   type: risk
   summaryPage: structural-overview
   title: AI-Driven Concentration of Power
@@ -325,7 +325,7 @@
   lastUpdated: 2025-12
 - id: consensus-manufacturing
   stableId: gMaUtaXGaw
-  numericId: E72
+  wikiId: E72
   type: risk
   summaryPage: epistemic-overview
   title: AI-Powered Consensus Manufacturing
@@ -383,7 +383,7 @@
   lastUpdated: 2025-12
 - id: corrigibility-failure
   stableId: aE60G9uLyA
-  numericId: E80
+  wikiId: E80
   type: risk
   summaryPage: accident-overview
   title: Corrigibility Failure
@@ -424,7 +424,7 @@
   lastUpdated: 2025-12
 - id: cyber-psychosis
   stableId: lD6bPNfEEg
-  numericId: E83
+  wikiId: E83
   type: risk
   summaryPage: epistemic-overview
   title: AI-Induced Cyber Psychosis
@@ -484,7 +484,7 @@
   lastUpdated: 2025-12
 - id: cyberweapons
   stableId: 7c6UC46TWQ
-  numericId: E86
+  wikiId: E86
   type: risk
   summaryPage: misuse-overview
   title: Cyberweapons Risk
@@ -540,7 +540,7 @@
   lastUpdated: 2025-12
 - id: deceptive-alignment
   stableId: vc60Nthkcg
-  numericId: E93
+  wikiId: E93
   type: risk
   summaryPage: accident-overview
   title: Deceptive Alignment
@@ -589,7 +589,7 @@
   lastUpdated: 2025-12
 - id: deepfakes
   stableId: MUGUxfl2YA
-  numericId: E96
+  wikiId: E96
   type: risk
   summaryPage: misuse-overview
   title: Deepfakes
@@ -645,7 +645,7 @@
   lastUpdated: 2025-12
 - id: disinformation
   stableId: AaAOkTHkug
-  numericId: E102
+  wikiId: E102
   type: risk
   summaryPage: misuse-overview
   title: AI Disinformation
@@ -700,7 +700,7 @@
   lastUpdated: 2025-12
 - id: distributional-shift
   stableId: qYk1BOLgqA
-  numericId: E105
+  wikiId: E105
   type: risk
   summaryPage: accident-overview
   title: AI Distributional Shift
@@ -737,7 +737,7 @@
   lastUpdated: 2025-12
 - id: economic-disruption
   stableId: hRRC36tWDg
-  numericId: E108
+  wikiId: E108
   type: risk
   summaryPage: structural-overview
   title: AI-Driven Economic Disruption
@@ -794,7 +794,7 @@
   lastUpdated: 2025-12
 - id: emergent-capabilities
   stableId: x19LcGDk6Q
-  numericId: E117
+  wikiId: E117
   type: risk
   summaryPage: accident-overview
   title: Emergent Capabilities
@@ -839,7 +839,7 @@
   lastUpdated: 2025-12
 - id: enfeeblement
   stableId: 13OO6CP98g
-  numericId: E118
+  wikiId: E118
   type: risk
   summaryPage: structural-overview
   title: AI-Induced Enfeeblement
@@ -894,7 +894,7 @@
   lastUpdated: 2025-12
 - id: epistemic-collapse
   stableId: GeYirWJrwA
-  numericId: E119
+  wikiId: E119
   type: risk
   summaryPage: epistemic-overview
   title: Epistemic Collapse
@@ -936,7 +936,7 @@
   lastUpdated: 2025-12
 - id: erosion-of-agency
   stableId: 54ItAwh4QA
-  numericId: E126
+  wikiId: E126
   type: risk
   summaryPage: structural-overview
   title: Erosion of Human Agency
@@ -992,7 +992,7 @@
   lastUpdated: 2025-12
 - id: expertise-atrophy
   stableId: ks0lqvZqUg
-  numericId: E133
+  wikiId: E133
   type: risk
   summaryPage: epistemic-overview
   title: AI-Induced Expertise Atrophy
@@ -1051,7 +1051,7 @@
   lastUpdated: 2025-12
 - id: flash-dynamics
   stableId: 0t2GLN0sBA
-  numericId: E142
+  wikiId: E142
   type: risk
   summaryPage: structural-overview
   title: AI Flash Dynamics
@@ -1101,7 +1101,7 @@
   lastUpdated: 2025-12
 - id: fraud
   stableId: GnUTRJhA4g
-  numericId: E145
+  wikiId: E145
   type: risk
   summaryPage: misuse-overview
   title: AI-Powered Fraud
@@ -1154,7 +1154,7 @@
   lastUpdated: 2025-12
 - id: goal-misgeneralization
   stableId: nYPuaov1hA
-  numericId: E151
+  wikiId: E151
   type: risk
   summaryPage: accident-overview
   title: Goal Misgeneralization
@@ -1199,7 +1199,7 @@
   lastUpdated: 2025-12
 - id: historical-revisionism
   stableId: jiqdwTucCA
-  numericId: E155
+  wikiId: E155
   type: risk
   summaryPage: epistemic-overview
   title: AI-Enabled Historical Revisionism
@@ -1254,7 +1254,7 @@
   lastUpdated: 2025-12
 - id: institutional-capture
   stableId: IqKOqHEKag
-  numericId: E166
+  wikiId: E166
   type: risk
   summaryPage: epistemic-overview
   title: AI-Driven Institutional Decision Capture
@@ -1316,7 +1316,7 @@
   lastUpdated: 2025-12
 - id: instrumental-convergence
   stableId: BYKermZj1A
-  numericId: E168
+  wikiId: E168
   type: risk
   summaryPage: accident-overview
   title: Instrumental Convergence
@@ -1362,7 +1362,7 @@
   lastUpdated: 2025-12
 - id: irreversibility
   stableId: 7e3rvE5YgA
-  numericId: E179
+  wikiId: E179
   type: risk
   summaryPage: structural-overview
   title: AI-Induced Irreversibility
@@ -1416,7 +1416,7 @@
   lastUpdated: 2025-12
 - id: knowledge-monopoly
   stableId: TaBC4uj0Bw
-  numericId: E183
+  wikiId: E183
   type: risk
   summaryPage: epistemic-overview
   title: AI Knowledge Monopoly
@@ -1474,7 +1474,7 @@
   lastUpdated: 2025-12
 - id: learned-helplessness
   stableId: SFFrl4Pmag
-  numericId: E187
+  wikiId: E187
   type: risk
   summaryPage: epistemic-overview
   title: Epistemic Learned Helplessness
@@ -1530,7 +1530,7 @@
   lastUpdated: 2025-12
 - id: legal-evidence-crisis
   stableId: 52V4qNAQjw
-  numericId: E188
+  wikiId: E188
   type: risk
   summaryPage: epistemic-overview
   title: AI-Driven Legal Evidence Crisis
@@ -1590,7 +1590,7 @@
   lastUpdated: 2025-12
 - id: lock-in
   stableId: nFwuCHi9qw
-  numericId: E189
+  wikiId: E189
   type: risk
   summaryPage: structural-overview
   title: AI Value Lock-in
@@ -1649,7 +1649,7 @@
   lastUpdated: 2025-12
 - id: authoritarian-takeover
   stableId: AV6AJU1FhQ
-  numericId: E29
+  wikiId: E29
   type: risk
   summaryPage: structural-overview
   title: AI-Enabled Authoritarian Takeover
@@ -1694,7 +1694,7 @@
   lastUpdated: 2025-12
 - id: mesa-optimization
   stableId: 8Bv92x9G1A
-  numericId: E197
+  wikiId: E197
   type: risk
   summaryPage: accident-overview
   title: Mesa-Optimization
@@ -1740,7 +1740,7 @@
   lastUpdated: 2025-12
 - id: multipolar-trap
   stableId: FAvAr2lvzg
-  numericId: E209
+  wikiId: E209
   type: risk
   summaryPage: structural-overview
   title: Multipolar Trap (AI Development)
@@ -1791,7 +1791,7 @@
   lastUpdated: 2025-12
 - id: power-seeking
   stableId: hwDgNNDsDQ
-  numericId: E226
+  wikiId: E226
   type: risk
   summaryPage: accident-overview
   title: Power-Seeking AI
@@ -1837,7 +1837,7 @@
   lastUpdated: 2025-12
 - id: preference-manipulation
   stableId: eM6SuO5nUw
-  numericId: E230
+  wikiId: E230
   type: risk
   summaryPage: epistemic-overview
   title: AI Preference Manipulation
@@ -1895,7 +1895,7 @@
   lastUpdated: 2025-12
 - id: proliferation
   stableId: Pr5xmThNfA
-  numericId: E232
+  wikiId: E232
   type: risk
   summaryPage: structural-overview
   title: AI Proliferation
@@ -1948,7 +1948,7 @@
   lastUpdated: 2025-12
 - id: racing-dynamics
   stableId: SUZgWeZLNA
-  numericId: E239
+  wikiId: E239
   type: risk
   summaryPage: structural-overview
   title: AI Development Racing Dynamics
@@ -2002,7 +2002,7 @@
   lastUpdated: 2025-12
 - id: reality-fragmentation
   stableId: 4Rz7XtP9Uw
-  numericId: E244
+  wikiId: E244
   type: risk
   summaryPage: epistemic-overview
   title: AI-Accelerated Reality Fragmentation
@@ -2061,7 +2061,7 @@
   lastUpdated: 2025-12
 - id: reward-hacking
   stableId: 9XN9QMfecA
-  numericId: E253
+  wikiId: E253
   type: risk
   summaryPage: accident-overview
   title: Reward Hacking
@@ -2108,7 +2108,7 @@
   lastUpdated: 2025-12
 - id: sandbagging
   stableId: GzX9hnrzWw
-  numericId: E270
+  wikiId: E270
   type: risk
   summaryPage: accident-overview
   title: AI Capability Sandbagging
@@ -2151,7 +2151,7 @@
   lastUpdated: 2025-12
 - id: scheming
   stableId: JqMTO0YVEA
-  numericId: E274
+  wikiId: E274
   type: risk
   summaryPage: accident-overview
   title: Scheming
@@ -2204,7 +2204,7 @@
   lastUpdated: 2025-12
 - id: scientific-corruption
   stableId: IK5egiQE9w
-  numericId: E276
+  wikiId: E276
   type: risk
   summaryPage: epistemic-overview
   title: Scientific Knowledge Corruption
@@ -2265,7 +2265,7 @@
   lastUpdated: 2025-12
 - id: sharp-left-turn
   stableId: AMhUctK34Q
-  numericId: E281
+  wikiId: E281
   type: risk
   summaryPage: accident-overview
   title: Sharp Left Turn
@@ -2308,7 +2308,7 @@
   lastUpdated: 2025-12
 - id: surveillance
   stableId: 9ToBZjhsVg
-  numericId: E292
+  wikiId: E292
   type: risk
   summaryPage: misuse-overview
   title: AI Mass Surveillance
@@ -2364,7 +2364,7 @@
   lastUpdated: 2025-12
 - id: us-ai-surveillance-democratic-erosion
   stableId: Tnd9iuHdjw
-  numericId: E1003
+  wikiId: E1003
   type: risk
   summaryPage: misuse-overview
   title: AI Surveillance and US Democratic Erosion
@@ -2419,7 +2419,7 @@
   lastUpdated: 2026-03
 - id: sycophancy
   stableId: 8BWfogRouw
-  numericId: E295
+  wikiId: E295
   type: risk
   summaryPage: accident-overview
   title: Sycophancy
@@ -2463,7 +2463,7 @@
   lastUpdated: 2025-12
 - id: epistemic-sycophancy
   stableId: zzLBCdjXEw
-  numericId: E124
+  wikiId: E124
   type: risk
   summaryPage: epistemic-overview
   title: Epistemic Sycophancy
@@ -2519,7 +2519,7 @@
   lastUpdated: 2025-12
 - id: treacherous-turn
   stableId: tRj4bS6V8Q
-  numericId: E359
+  wikiId: E359
   type: risk
   summaryPage: accident-overview
   title: Treacherous Turn
@@ -2563,7 +2563,7 @@
   lastUpdated: 2025-12
 - id: rogue-ai-scenarios
   stableId: jfSHBPsKiA
-  numericId: E490
+  wikiId: E490
   type: risk
   summaryPage: accident-overview
   title: Rogue AI Scenarios
@@ -2613,7 +2613,7 @@
   lastUpdated: 2026-02
 - id: trust-cascade
   stableId: IQ4E6VkW9A
-  numericId: E360
+  wikiId: E360
   type: risk
   summaryPage: epistemic-overview
   title: AI Trust Cascade Failure
@@ -2671,7 +2671,7 @@
   lastUpdated: 2025-12
 - id: trust-decline
   stableId: 1NWLygwzGw
-  numericId: E362
+  wikiId: E362
   type: risk
   summaryPage: epistemic-overview
   title: AI-Driven Trust Decline
@@ -2711,7 +2711,7 @@
   lastUpdated: 2025-12
 - id: winner-take-all
   stableId: YOMDe574Ew
-  numericId: E374
+  wikiId: E374
   type: risk
   summaryPage: structural-overview
   title: AI Winner-Take-All Dynamics
@@ -2759,7 +2759,7 @@
   lastUpdated: 2025-12
 - id: autonomous-replication
   stableId: 3EuTey4ung
-  numericId: E34
+  wikiId: E34
   type: risk
   title: Autonomous Replication
   description: Risk of AI systems copying themselves to new hardware or cloud instances without authorization.
@@ -2783,7 +2783,7 @@
   lastUpdated: 2025-12
 - id: cyber-offense
   stableId: VPk7sdZtkg
-  numericId: E82
+  wikiId: E82
   type: risk
   title: AI-Enabled Cyberattacks
   description: Risk of AI systems being used to discover vulnerabilities, craft exploits, or conduct sophisticated cyberattacks.
@@ -2802,7 +2802,7 @@
   lastUpdated: 2025-12
 - id: bio-risk
   stableId: kZQP3vYrXA
-  numericId: E40
+  wikiId: E40
   type: risk
   title: AI-Enabled Biological Risks
   description: Risk of AI systems enabling creation or enhancement of biological weapons or dangerous pathogens.
@@ -2824,7 +2824,7 @@
 
 - id: sleeper-agents
   stableId: D8dD07y5oQ
-  numericId: E489
+  wikiId: E489
   type: risk
   summaryPage: accident-overview
   title: "Sleeper Agents: Training Deceptive LLMs"
@@ -2856,7 +2856,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: compute-concentration
   stableId: MvImONf1YA
-  numericId: E684
+  wikiId: E684
   type: risk
   summaryPage: structural-overview
   title: Compute Concentration
@@ -2924,7 +2924,7 @@
 
 - id: concentrated-compute-cybersecurity-risk
   stableId: VP53MHxfEg
-  numericId: E689
+  wikiId: E689
   type: risk
   summaryPage: structural-overview
   title: Concentrated Compute as a Cybersecurity Risk
@@ -2960,7 +2960,7 @@
 
 - id: financial-stability-risks-ai-capex
   stableId: Q0msUgaClw
-  numericId: E690
+  wikiId: E690
   type: risk
   summaryPage: structural-overview
   title: Financial Stability Risks from AI Capital Expenditure
@@ -2998,7 +2998,7 @@
 
 - id: steganography
   stableId: 5dNWb70CDA
-  numericId: E603
+  wikiId: E603
   type: risk
   summaryPage: accident-overview
   title: AI Model Steganography
@@ -3014,7 +3014,7 @@
 
 - id: ai-enabled-untraceable-misuse
   stableId: 6c238j1BMw
-  numericId: E691
+  wikiId: E691
   type: risk
   summaryPage: misuse-overview
   title: AI-Enabled Untraceable Misuse
@@ -3078,7 +3078,7 @@
   lastUpdated: 2026-02
 - id: ai-investigation-risks
   stableId: cJPcbuv5fw
-  numericId: E694
+  wikiId: E694
   type: risk
   title: AI-Powered Investigation Risks
   description: >-
@@ -3148,7 +3148,7 @@
   lastUpdated: 2026-02
 - id: deanonymization
   stableId: 0J0pDyhVtQ
-  numericId: E699
+  wikiId: E699
   type: risk
   title: AI-Powered Deanonymization
   description: >-
@@ -3205,7 +3205,7 @@
 
 - id: near-term-risks
   stableId: zTPtio1cDA
-  numericId: E1005
+  wikiId: E1005
   type: risk
   title: Key Near-Term AI Risks
   description: >

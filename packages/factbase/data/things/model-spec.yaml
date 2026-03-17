@@ -3,7 +3,7 @@ thing:
   stableId: lHxzXeAMrg
   type: policy
   name: AI Model Specifications
-  numericId: E594
+  wikiId: E594
 facts:
   - id: f_34JYoAyuHg
     property: description

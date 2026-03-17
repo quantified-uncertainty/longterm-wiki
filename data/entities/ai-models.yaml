@@ -8,7 +8,7 @@
 
 - id: claude
   stableId: cMKB5i2WZQ
-  numericId: E1041
+  wikiId: E1041
   type: ai-model
   title: Claude
   modelFamily: Claude
@@ -85,7 +85,7 @@
 
 - id: claude-3-opus
   stableId: Ko9DCNV87A
-  numericId: E1027
+  wikiId: E1027
   type: ai-model
   title: Claude 3 Opus
   modelFamily: Claude
@@ -144,7 +144,7 @@
 
 - id: claude-3-sonnet
   stableId: ReFcBG3rJQ
-  numericId: E1028
+  wikiId: E1028
   type: ai-model
   title: Claude 3 Sonnet
   modelFamily: Claude
@@ -183,7 +183,7 @@
 
 - id: claude-3-haiku
   stableId: DlLHB7v8lQ
-  numericId: E1029
+  wikiId: E1029
   type: ai-model
   title: Claude 3 Haiku
   modelFamily: Claude
@@ -222,7 +222,7 @@
 
 - id: claude-3-5-sonnet
   stableId: ISfAiImMYg
-  numericId: E1030
+  wikiId: E1030
   type: ai-model
   title: Claude 3.5 Sonnet
   modelFamily: Claude
@@ -311,7 +311,7 @@
 
 - id: claude-3-5-haiku
   stableId: Dvvt8cKpkg
-  numericId: E1031
+  wikiId: E1031
   type: ai-model
   title: Claude 3.5 Haiku
   modelFamily: Claude
@@ -350,7 +350,7 @@
 
 - id: claude-3-7-sonnet
   stableId: ePVee3jidQ
-  numericId: E1032
+  wikiId: E1032
   type: ai-model
   title: Claude 3.7 Sonnet
   modelFamily: Claude
@@ -415,7 +415,7 @@
 
 - id: claude-sonnet-4
   stableId: 3cgL7jNlgw
-  numericId: E1033
+  wikiId: E1033
   type: ai-model
   title: Claude Sonnet 4
   modelFamily: Claude
@@ -471,7 +471,7 @@
 
 - id: claude-opus-4
   stableId: bmxLNyfK3A
-  numericId: E1034
+  wikiId: E1034
   type: ai-model
   title: Claude Opus 4
   modelFamily: Claude
@@ -529,7 +529,7 @@
 
 - id: claude-opus-4-1
   stableId: dHgSM46fMw
-  numericId: E1035
+  wikiId: E1035
   type: ai-model
   title: Claude Opus 4.1
   modelFamily: Claude
@@ -570,7 +570,7 @@
 
 - id: claude-sonnet-4-5
   stableId: fdp0LajPwQ
-  numericId: E1036
+  wikiId: E1036
   type: ai-model
   title: Claude Sonnet 4.5
   modelFamily: Claude
@@ -622,7 +622,7 @@
 
 - id: claude-haiku-4-5
   stableId: y87VxEBBIA
-  numericId: E1037
+  wikiId: E1037
   type: ai-model
   title: Claude Haiku 4.5
   modelFamily: Claude
@@ -662,7 +662,7 @@
 
 - id: claude-opus-4-5
   stableId: tppPAkJqjQ
-  numericId: E1038
+  wikiId: E1038
   type: ai-model
   title: Claude Opus 4.5
   modelFamily: Claude
@@ -714,7 +714,7 @@
 
 - id: claude-opus-4-6
   stableId: Ac7c55KtVw
-  numericId: E1039
+  wikiId: E1039
   type: ai-model
   title: Claude Opus 4.6
   modelFamily: Claude
@@ -770,7 +770,7 @@
 
 - id: claude-sonnet-4-6
   stableId: Au1yMEZYWQ
-  numericId: E1040
+  wikiId: E1040
   type: ai-model
   title: Claude Sonnet 4.6
   modelFamily: Claude
@@ -820,7 +820,7 @@
 
 - id: gpt
   stableId: Gqv7h9oEwA
-  numericId: E1060
+  wikiId: E1060
   type: ai-model
   title: GPT
   modelFamily: GPT
@@ -868,7 +868,7 @@
 
 - id: gpt-4
   stableId: Zd0khJQ6XA
-  numericId: E1066
+  wikiId: E1066
   type: ai-model
   title: GPT-4
   modelFamily: GPT
@@ -930,7 +930,7 @@
 
 - id: gpt-4-turbo
   stableId: K3lbRphedA
-  numericId: E1067
+  wikiId: E1067
   type: ai-model
   title: GPT-4 Turbo
   modelFamily: GPT
@@ -970,7 +970,7 @@
 
 - id: gpt-4o
   stableId: ziNB5viRfw
-  numericId: E1068
+  wikiId: E1068
   type: ai-model
   title: GPT-4o
   modelFamily: GPT
@@ -1061,7 +1061,7 @@
 
 - id: gpt-4o-mini
   stableId: 6zbeHdP49g
-  numericId: E1069
+  wikiId: E1069
   type: ai-model
   title: GPT-4o mini
   modelFamily: GPT
@@ -1121,7 +1121,7 @@
 
 - id: o1-preview
   stableId: i4hm7GvTew
-  numericId: E1070
+  wikiId: E1070
   type: ai-model
   title: o1-preview
   modelFamily: o-series
@@ -1178,7 +1178,7 @@
 
 - id: o1
   stableId: KpR1gIwJZw
-  numericId: E1071
+  wikiId: E1071
   type: ai-model
   title: o1
   modelFamily: o-series
@@ -1253,7 +1253,7 @@
 
 - id: o1-mini
   stableId: Qjqpsk0VQA
-  numericId: E1072
+  wikiId: E1072
   type: ai-model
   title: o1-mini
   modelFamily: o-series
@@ -1304,7 +1304,7 @@
 
 - id: o3-mini
   stableId: nTRFbfAcAw
-  numericId: E1073
+  wikiId: E1073
   type: ai-model
   title: o3-mini
   modelFamily: o-series
@@ -1366,7 +1366,7 @@
 
 - id: o3
   stableId: x0Qhowq8zA
-  numericId: E1074
+  wikiId: E1074
   type: ai-model
   title: o3
   modelFamily: o-series
@@ -1443,7 +1443,7 @@
 
 - id: gpt-4-1
   stableId: EvEua2w8IA
-  numericId: E1075
+  wikiId: E1075
   type: ai-model
   title: GPT-4.1
   modelFamily: GPT
@@ -1507,7 +1507,7 @@
 
 - id: gpt-4-1-mini
   stableId: nywmt9QdsA
-  numericId: E1076
+  wikiId: E1076
   type: ai-model
   title: GPT-4.1 mini
   modelFamily: GPT
@@ -1549,7 +1549,7 @@
 
 - id: gpt-4-1-nano
   stableId: oSG59ppF7g
-  numericId: E1077
+  wikiId: E1077
   type: ai-model
   title: GPT-4.1 nano
   modelFamily: GPT
@@ -1591,7 +1591,7 @@
 
 - id: o4-mini
   stableId: QUHdhavDNA
-  numericId: E1078
+  wikiId: E1078
   type: ai-model
   title: o4-mini
   modelFamily: o-series
@@ -1663,7 +1663,7 @@
 
 - id: gemini
   stableId: PaKhQQNPkg
-  numericId: E1061
+  wikiId: E1061
   type: ai-model
   title: Gemini
   modelFamily: Gemini
@@ -1713,7 +1713,7 @@
 
 - id: gemini-1-0-ultra
   stableId: DMvYhkrQgg
-  numericId: E1079
+  wikiId: E1079
   type: ai-model
   title: Gemini 1.0 Ultra
   modelFamily: Gemini
@@ -1774,7 +1774,7 @@
 
 - id: gemini-1-5-pro
   stableId: 36NY6axmRA
-  numericId: E1080
+  wikiId: E1080
   type: ai-model
   title: Gemini 1.5 Pro
   modelFamily: Gemini
@@ -1832,7 +1832,7 @@
 
 - id: gemini-1-5-flash
   stableId: hDHozNlJHQ
-  numericId: E1081
+  wikiId: E1081
   type: ai-model
   title: Gemini 1.5 Flash
   modelFamily: Gemini
@@ -1876,7 +1876,7 @@
 
 - id: gemini-2-0-flash
   stableId: 1Vsd6bbAbg
-  numericId: E1082
+  wikiId: E1082
   type: ai-model
   title: Gemini 2.0 Flash
   modelFamily: Gemini
@@ -1938,7 +1938,7 @@
 
 - id: gemini-2-5-pro
   stableId: FmNMFeajhg
-  numericId: E1083
+  wikiId: E1083
   type: ai-model
   title: Gemini 2.5 Pro
   modelFamily: Gemini
@@ -2025,7 +2025,7 @@
 
 - id: gemini-2-5-flash
   stableId: a5llQhfVkw
-  numericId: E1084
+  wikiId: E1084
   type: ai-model
   title: Gemini 2.5 Flash
   modelFamily: Gemini
@@ -2076,7 +2076,7 @@
 
 - id: llama
   stableId: kWPQCvjKSg
-  numericId: E1062
+  wikiId: E1062
   type: ai-model
   title: Llama
   modelFamily: Llama
@@ -2124,7 +2124,7 @@
 
 - id: llama-2
   stableId: B2NbO8iHzQ
-  numericId: E1085
+  wikiId: E1085
   type: ai-model
   title: Llama 2
   modelFamily: Llama
@@ -2164,7 +2164,7 @@
 
 - id: llama-3
   stableId: ws008RbGOA
-  numericId: E1086
+  wikiId: E1086
   type: ai-model
   title: Llama 3
   modelFamily: Llama
@@ -2213,7 +2213,7 @@
 
 - id: llama-3-1
   stableId: kNi5nDKetA
-  numericId: E1087
+  wikiId: E1087
   type: ai-model
   title: Llama 3.1
   modelFamily: Llama
@@ -2272,7 +2272,7 @@
 
 - id: llama-3-3
   stableId: vxov67Lixw
-  numericId: E1088
+  wikiId: E1088
   type: ai-model
   title: Llama 3.3
   modelFamily: Llama
@@ -2324,7 +2324,7 @@
 
 - id: llama-4-scout
   stableId: JodiKHELlg
-  numericId: E1089
+  wikiId: E1089
   type: ai-model
   title: Llama 4 Scout
   modelFamily: Llama
@@ -2370,7 +2370,7 @@
 
 - id: llama-4-maverick
   stableId: T3ipFW0POA
-  numericId: E1090
+  wikiId: E1090
   type: ai-model
   title: Llama 4 Maverick
   modelFamily: Llama
@@ -2419,7 +2419,7 @@
 
 - id: mistral-ai-models
   stableId: v1e1ZwDwoA
-  numericId: E1063
+  wikiId: E1063
   type: ai-model
   title: Mistral
   modelFamily: Mistral
@@ -2454,7 +2454,7 @@
 
 - id: mixtral-8x7b
   stableId: S519Yr3AOw
-  numericId: E1091
+  wikiId: E1091
   type: ai-model
   title: Mixtral 8x7B
   modelFamily: Mistral
@@ -2495,7 +2495,7 @@
 
 - id: mistral-large-2
   stableId: 7aS5YclgSQ
-  numericId: E1092
+  wikiId: E1092
   type: ai-model
   title: Mistral Large 2
   modelFamily: Mistral
@@ -2558,7 +2558,7 @@
 
 - id: grok
   stableId: nnv09Wl5OQ
-  numericId: E1064
+  wikiId: E1064
   type: ai-model
   title: Grok
   modelFamily: Grok
@@ -2593,7 +2593,7 @@
 
 - id: grok-2
   stableId: wRDaY5XnEA
-  numericId: E1093
+  wikiId: E1093
   type: ai-model
   title: Grok-2
   modelFamily: Grok
@@ -2646,7 +2646,7 @@
 
 - id: grok-3
   stableId: ELbPFPb5vA
-  numericId: E1094
+  wikiId: E1094
   type: ai-model
   title: Grok-3
   modelFamily: Grok
@@ -2710,7 +2710,7 @@
 
 - id: deepseek-models
   stableId: svlbcrT5oQ
-  numericId: E1065
+  wikiId: E1065
   type: ai-model
   title: DeepSeek Models
   modelFamily: DeepSeek
@@ -2745,7 +2745,7 @@
 
 - id: deepseek-v3
   stableId: DysvXRWdOQ
-  numericId: E1095
+  wikiId: E1095
   type: ai-model
   title: DeepSeek V3
   modelFamily: DeepSeek
@@ -2820,7 +2820,7 @@
 
 - id: deepseek-r1
   stableId: jhJqRVFXcg
-  numericId: E1096
+  wikiId: E1096
   type: ai-model
   title: DeepSeek R1
   modelFamily: DeepSeek

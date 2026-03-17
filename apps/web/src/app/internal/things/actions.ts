@@ -15,7 +15,7 @@ export interface ThingSearchRow {
   entityType: string | null;
   description: string | null;
   sourceUrl: string | null;
-  numericId: string | null;
+  wikiId: string | null;
   verdict: string | null;
   verdictConfidence: number | null;
   href?: string;
@@ -31,7 +31,7 @@ interface ApiThing {
   entityType: string | null;
   description: string | null;
   sourceUrl: string | null;
-  numericId: string | null;
+  wikiId: string | null;
   verdict: string | null;
   verdictConfidence: number | null;
 }

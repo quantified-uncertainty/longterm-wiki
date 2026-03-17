@@ -3,7 +3,7 @@ thing:
   stableId: AV6AJU1FhQ
   type: risk
   name: AI-Enabled Authoritarian Takeover
-  numericId: E29
+  wikiId: E29
 facts:
   - id: f_L02FHcd2ig
     property: description

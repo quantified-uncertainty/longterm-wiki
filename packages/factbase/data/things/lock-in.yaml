@@ -3,7 +3,7 @@ thing:
   stableId: nFwuCHi9qw
   type: risk
   name: AI Value Lock-in
-  numericId: E189
+  wikiId: E189
 facts:
   - id: f_hIM5i2msOQ
     property: description

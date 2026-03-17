@@ -3,7 +3,7 @@ thing:
   stableId: KYKdAOzynA
   type: organization
   name: Manifest (Forecasting Conference)
-  numericId: E545
+  wikiId: E545
 facts:
   - id: f_8pPGGoe7jQ
     property: description

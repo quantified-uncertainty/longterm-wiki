@@ -3,7 +3,7 @@ thing:
   stableId: p2h6bEqhvQ
   type: organization
   name: Global Partnership on Artificial Intelligence (GPAI)
-  numericId: E533
+  wikiId: E533
 facts:
   - id: f_ZPgV2Jzx3A
     property: description

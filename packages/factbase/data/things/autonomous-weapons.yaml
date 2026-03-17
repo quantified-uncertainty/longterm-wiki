@@ -3,7 +3,7 @@ thing:
   stableId: cm5KEblCZg
   type: risk
   name: Autonomous Weapons
-  numericId: E35
+  wikiId: E35
 facts:
   - id: f_MnfIYHQJ5g
     property: description

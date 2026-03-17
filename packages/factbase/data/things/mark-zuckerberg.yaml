@@ -3,7 +3,7 @@ thing:
   stableId: OxXXTxtbrA
   type: person
   name: "Mark Zuckerberg"
-  numericId: "E1293"
+  wikiId: "E1293"
 
 facts:
   - id: f_mTxD5bcYgw

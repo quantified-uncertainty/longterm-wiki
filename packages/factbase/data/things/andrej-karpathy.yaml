@@ -3,7 +3,7 @@ thing:
   stableId: Q9eaz6joHA
   type: person
   name: "Andrej Karpathy"
-  numericId: "E1287"
+  wikiId: "E1287"
 
 facts:
   - id: f_H65pau0BGg

@@ -27,7 +27,7 @@ interface DirectoryFact {
 
 interface DirectoryEntity {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   entityType: string;
   title: string;
@@ -107,8 +107,8 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
     id: entityId,
     slug: e.id,
     name: e.title,
-    numericId: e.numericId ?? null,
-    wikiPageId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
+    wikiPageId: e.wikiId ?? null,
 
     role: role?.value ?? null,
 
@@ -232,8 +232,8 @@ function loadFromLocal(): PersonRow[] {
       id: entity.id,
       slug,
       name: entity.name,
-      numericId: entity.numericId ?? null,
-      wikiPageId: entity.wikiPageId ?? entity.numericId ?? null,
+      wikiId: entity.wikiId ?? null,
+      wikiPageId: entity.wikiPageId ?? entity.wikiId ?? null,
       role: roleText,
       employerId: employer?.id ?? null,
       employerName: employer?.name ?? null,
@@ -256,8 +256,8 @@ function loadFromLocal(): PersonRow[] {
       id: tp.id,
       slug: tp.id,
       name: tp.title,
-      numericId: tp.numericId ?? null,
-      wikiPageId: tp.numericId ?? null,
+      wikiId: tp.wikiId ?? null,
+      wikiPageId: tp.wikiId ?? null,
       role: null,
       employerId: null,
       employerName: null,

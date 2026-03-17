@@ -58,11 +58,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
   // ---- entity_ids slug resolution (Drizzle SELECT) ----
-  if (q.includes('"entity_ids"') && q.includes('"slug"') && q.includes('"numeric_id"')) {
-    const results: Array<{ slug: string; numeric_id: number }> = [];
+  if (q.includes('"entity_ids"') && q.includes('"slug"') && q.includes('"wiki_id"')) {
+    const results: Array<{ slug: string; wiki_id: number }> = [];
     for (const p of params) {
       if (typeof p === "string" && slugIntIdMap.has(p)) {
-        results.push({ slug: p, numeric_id: slugIntIdMap.get(p)! });
+        results.push({ slug: p, wiki_id: slugIntIdMap.get(p)! });
       }
     }
     return results;

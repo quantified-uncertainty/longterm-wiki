@@ -3,7 +3,7 @@ thing:
   stableId: cJPcbuv5fw
   type: risk
   name: AI-Powered Investigation Risks
-  numericId: E694
+  wikiId: E694
 facts:
   - id: f_nzj4H6QYCQ
     property: description

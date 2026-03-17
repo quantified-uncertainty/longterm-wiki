@@ -3,7 +3,7 @@ thing:
   stableId: iEJPJoRsOQ
   type: approach
   name: Probing / Linear Probes
-  numericId: E596
+  wikiId: E596
 facts:
   - id: f_9hXt00YmPA
     property: description

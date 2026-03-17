@@ -3,7 +3,7 @@ thing:
   stableId: qSUpeYPEoQ
   type: capability
   name: Sparse / MoE Transformers
-  numericId: E500
+  wikiId: E500
 facts:
   - id: f_hd73waMYPw
     property: description

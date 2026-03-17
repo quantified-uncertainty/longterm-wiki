@@ -211,7 +211,7 @@ This allows `<F e="anthropic" f="6796e194">` to resolve to the KB fact during th
 
 Old `data/entities/organizations.yaml` entries (with `relatedEntries`, `sources`, etc.) are NOT migrated to KB. They serve a different purpose (entity metadata for the wiki sidebar, explore page, etc.). KB things are about structured facts, not entity registry metadata.
 
-The `numericId` must match between old entity YAML and KB thing YAML. The migration script enforces this.
+The `wikiId` must match between old entity YAML and KB thing YAML. The migration script enforces this.
 
 ## 5. Migration Script Design
 
@@ -221,7 +221,7 @@ High-level flow:
 
 ```
 1. Read data/facts/<entity>.yaml
-2. Read data/entities/*.yaml to find entity metadata (numericId, type, etc.)
+2. Read data/entities/*.yaml to find entity metadata (wikiId, type, etc.)
 3. Read data/fact-measures.yaml for measure → property mapping
 4. Read packages/kb/data/properties.yaml for existing KB properties
 5. For each old fact:
@@ -234,7 +234,7 @@ High-level flow:
       - Old: { value: "$76,001/year" } → separate string fact (narrative, not numeric)
    d. Convert sourceResource hex → source URL (via resources lookup)
    e. Set asOf from old fact
-6. Generate thing metadata (id, stableId, type, name, numericId, aliases)
+6. Generate thing metadata (id, stableId, type, name, wikiId, aliases)
 7. Extract funding rounds from facts with measure=funding-round → items.funding-rounds
 8. Write packages/kb/data/things/<entity>.yaml
 9. Write migration map entry to data/kb-migration-map.yaml
@@ -262,7 +262,7 @@ pnpm crux kb migrate --batch=2              # Migrate Phase 2 entities
 | Range values `[40, 60]` | Keep as-is — KB supports JSON value type for ranges. Consider adding a `range` type later. |
 | `value: { min: X }` objects | Extract `X` as the value; add `notes: "minimum estimate"` |
 | `sourceResource` hex IDs | Look up in `data/resources/*.yaml` to get URL. If not found, log warning. |
-| Entity not in `data/entities/*.yaml` | Error — entity must exist for numericId |
+| Entity not in `data/entities/*.yaml` | Error — entity must exist for wikiId |
 | Old fact file entity ID differs from entity YAML ID | Map using known aliases (e.g., `deepmind` fact file → `deepmind` entity) |
 
 ## 6. Rollback Plan

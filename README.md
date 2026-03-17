@@ -92,7 +92,7 @@ Entities come from two sources, merged at build time (YAML takes precedence):
 
 ## Entity ID System
 
-Entities have both string slugs (`geoffrey-hinton`) and numeric IDs (`E42`). Wiki pages use numeric IDs as canonical URLs. Each entity stores its `numericId` in its source file (YAML or MDX frontmatter). New IDs are allocated atomically via the wiki server (`apps/wiki-server/`).
+Entities have both string slugs (`geoffrey-hinton`) and wiki IDs (`E42`). Wiki pages use wiki IDs as canonical URLs. Each entity stores its `wikiId` in its source file (YAML or MDX frontmatter). New IDs are allocated atomically via the wiki server (`apps/wiki-server/`).
 
 ## CI
 

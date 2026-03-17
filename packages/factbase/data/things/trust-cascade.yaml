@@ -3,7 +3,7 @@ thing:
   stableId: IQ4E6VkW9A
   type: risk
   name: AI Trust Cascade Failure
-  numericId: E360
+  wikiId: E360
 facts:
   - id: f_bJXKbSVrUw
     property: description

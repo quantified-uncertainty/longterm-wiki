@@ -3,7 +3,7 @@ thing:
   stableId: x19LcGDk6Q
   type: risk
   name: Emergent Capabilities
-  numericId: E117
+  wikiId: E117
 facts:
   - id: f_gv7ucetiKQ
     property: description

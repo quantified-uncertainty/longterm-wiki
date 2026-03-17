@@ -176,7 +176,7 @@ export default function Home() {
                     {topic.items.map((item) => (
                       <Link
                         key={item.id}
-                        href={item.href || `/wiki/${item.numericId}`}
+                        href={item.href || `/wiki/${item.wikiId}`}
                         className="flex items-center justify-between py-2 border-b border-border/50 last:border-b-0 no-underline group"
                       >
                         <span className="text-sm text-foreground group-hover:text-accent-foreground">

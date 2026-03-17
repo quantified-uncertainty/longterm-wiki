@@ -3,7 +3,7 @@ thing:
   stableId: AhnHVmUdyw
   type: policy
   name: Colorado Artificial Intelligence Act
-  numericId: E62
+  wikiId: E62
 facts:
   - id: f_1vbzPQfTng
     property: description

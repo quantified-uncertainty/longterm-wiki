@@ -3,7 +3,7 @@ thing:
   stableId: jfSHBPsKiA
   type: risk
   name: Rogue AI Scenarios
-  numericId: E490
+  wikiId: E490
 facts:
   - id: f_zXOHP7cdgw
     property: description

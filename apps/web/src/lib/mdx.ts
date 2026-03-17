@@ -284,25 +284,25 @@ export async function renderMdxPage(slug: string): Promise<MdxResult | null> {
 }
 
 /**
- * Get all entity numeric IDs for static generation.
+ * Get all entity wiki IDs for static generation.
  */
-export function getAllNumericIds(): string[] {
+export function getAllWikiIds(): string[] {
   const registry = getIdRegistry();
-  return Object.keys(registry.byNumericId);
+  return Object.keys(registry.byWikiId);
 }
 
 /**
- * Resolve a numeric ID (e.g. "E42") to its entity slug.
+ * Resolve a wiki ID (e.g. "E42") to its entity slug.
  */
-export function numericIdToSlug(numericId: string): string | null {
+export function wikiIdToSlug(wikiId: string): string | null {
   const registry = getIdRegistry();
-  return registry.byNumericId[numericId] || null;
+  return registry.byWikiId[wikiId] || null;
 }
 
 /**
- * Resolve an entity slug to its numeric ID (e.g. "E42").
+ * Resolve an entity slug to its wiki ID (e.g. "E42").
  */
-export function slugToNumericId(slug: string): string | null {
+export function slugToWikiId(slug: string): string | null {
   const registry = getIdRegistry();
   return registry.bySlug[slug] || null;
 }

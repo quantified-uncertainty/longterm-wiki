@@ -8,7 +8,7 @@ import { CLUSTER_COLORS, STATUS_COLORS, formatCluster } from "./research-area-co
 
 export interface ResearchAreaRow {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   title: string;
   description: string | null;
   status: string;

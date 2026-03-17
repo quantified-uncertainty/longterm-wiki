@@ -30,7 +30,7 @@ export interface ThingSyncInput {
   entityType?: string | null;
   description?: string | null;
   sourceUrl?: string | null;
-  numericId?: string | null;
+  wikiId?: string | null;
 }
 
 /**
@@ -55,7 +55,7 @@ export async function upsertThingsInTx(
     entityType: item.entityType ?? null,
     description: item.description ?? null,
     sourceUrl: item.sourceUrl ?? null,
-    numericId: item.numericId ?? null,
+    wikiId: item.wikiId ?? null,
   }));
 
   await tx
@@ -69,7 +69,7 @@ export async function upsertThingsInTx(
         entityType: sql`excluded.entity_type`,
         description: sql`excluded.description`,
         sourceUrl: sql`excluded.source_url`,
-        numericId: sql`excluded.numeric_id`,
+        wikiId: sql`excluded.wiki_id`,
         syncedAt: sql`now()`,
         updatedAt: sql`now()`,
       },

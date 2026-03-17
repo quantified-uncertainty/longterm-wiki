@@ -2,7 +2,7 @@
  * Entity Lookup Utilities
  *
  * Provides functions to build entity lookup tables for LLM prompts.
- * This enables the LLM to write EntityLinks with numeric IDs (E##) directly,
+ * This enables the LLM to write EntityLinks with wiki IDs (E##) directly,
  * rather than relying on slug-based IDs and post-processing.
  *
  * Usage:
@@ -13,7 +13,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE } from './patterns.ts';
+import { ENTITY_LINK_RE, WIKI_ID_RE } from './patterns.ts';
 
 interface EntityEntry {
   id: string;      // slug, e.g. "anthropic"
@@ -32,7 +32,7 @@ let _slugToEid: Record<string, string> | null = null;
 
 /**
  * Load the ID registry from the built database.json.
- * Extracts the idRegistry.byNumericId map (E## → slug).
+ * Extracts the idRegistry.byWikiId map (E## → slug).
  * Requires build-data.mjs to have been run first.
  */
 function loadRegistry(ROOT: string): IdRegistry {
@@ -40,7 +40,7 @@ function loadRegistry(ROOT: string): IdRegistry {
   const dbPath = path.join(ROOT, 'apps/web/src/data/database.json');
   const raw = fs.readFileSync(dbPath, 'utf-8');
   const db = JSON.parse(raw);
-  _registry = { entities: db.idRegistry?.byNumericId || {} };
+  _registry = { entities: db.idRegistry?.byWikiId || {} };
   return _registry!;
 }
 
@@ -110,7 +110,7 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
   // 1. Find existing EntityLink references (both E## and slug-based)
   const existingLinks = [...content.matchAll(ENTITY_LINK_RE)].map(m => m[1]);
   for (const id of existingLinks) {
-    if (NUMERIC_ID_RE.test(id)) {
+    if (WIKI_ID_RE.test(id)) {
       // Already numeric — resolve to slug to find title
       const registry = loadRegistry(ROOT);
       const slug = registry.entities[id.toUpperCase()];

@@ -11,8 +11,8 @@ export default async function RiskSlugRedirect({
 
   // Try to find the entity and redirect to its wiki page
   const entity = getTypedEntityById(slug);
-  if (entity && isRisk(entity) && entity.numericId) {
-    permanentRedirect(`/wiki/${entity.numericId}`);
+  if (entity && isRisk(entity) && entity.wikiId) {
+    permanentRedirect(`/wiki/${entity.wikiId}`);
   }
 
   // Fallback: try entity href resolution

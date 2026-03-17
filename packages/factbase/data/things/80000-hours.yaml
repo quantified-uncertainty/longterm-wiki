@@ -3,7 +3,7 @@ thing:
   stableId: hvg9ecR3nA
   type: organization
   name: 80,000 Hours
-  numericId: E510
+  wikiId: E510
 facts:
   - id: f_XmU8cfMaCw
     property: description

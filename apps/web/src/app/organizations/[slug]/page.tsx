@@ -130,8 +130,8 @@ export default async function OrgProfilePage({
     entity = {
       id: slug,
       name: typedEntity.title,
-      numericId: typedEntity.numericId,
-      wikiPageId: typedEntity.numericId,
+      wikiId: typedEntity.wikiId,
+      wikiPageId: typedEntity.wikiId,
     };
   }
 
@@ -611,8 +611,8 @@ export default async function OrgProfilePage({
                               website
                             </a>
                           )}
-                          {p.numericId && (
-                            <Link href={`/wiki/${p.numericId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
+                          {p.wikiId && (
+                            <Link href={`/wiki/${p.wikiId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
                               wiki
                             </Link>
                           )}

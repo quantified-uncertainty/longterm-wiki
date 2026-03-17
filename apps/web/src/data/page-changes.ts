@@ -8,7 +8,7 @@ export interface PageChangeItem {
   pageId: string;
   pageTitle: string;
   pagePath: string;
-  numericId: string;
+  wikiId: string;
   date: string;
   branch: string;
   sessionTitle: string;
@@ -24,7 +24,7 @@ export interface PageChangePageInfo {
   pageId: string;
   pageTitle: string;
   pagePath: string;
-  numericId: string;
+  wikiId: string;
   category: string;
 }
 
@@ -51,13 +51,13 @@ export function getPageChanges(): PageChangeItem[] {
 
   for (const page of pages) {
     if (!page.changeHistory || page.changeHistory.length === 0) continue;
-    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    const wikiId = db.idRegistry?.bySlug[page.id] || page.id;
     for (const entry of page.changeHistory) {
       items.push({
         pageId: page.id,
         pageTitle: page.title,
         pagePath: page.path,
-        numericId,
+        wikiId,
         date: entry.date,
         branch: entry.branch,
         sessionTitle: entry.title,
@@ -83,7 +83,7 @@ export function getPageChangeSessions(): PageChangesSession[] {
 
   for (const page of pages) {
     if (!page.changeHistory || page.changeHistory.length === 0) continue;
-    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    const wikiId = db.idRegistry?.bySlug[page.id] || page.id;
     for (const entry of page.changeHistory) {
       const sessionKey = `${entry.date}|${entry.branch}`;
       if (!sessionMap.has(sessionKey)) {
@@ -111,7 +111,7 @@ export function getPageChangeSessions(): PageChangesSession[] {
         pageId: page.id,
         pageTitle: page.title,
         pagePath: page.path,
-        numericId,
+        wikiId,
         category: page.category,
       });
     }

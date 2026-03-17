@@ -3,7 +3,7 @@ thing:
   stableId: O643v0TxvQ
   type: policy
   name: NIST AI Risk Management Framework (AI RMF)
-  numericId: E216
+  wikiId: E216
 facts:
   - id: f_OYG7e0jkAA
     property: description

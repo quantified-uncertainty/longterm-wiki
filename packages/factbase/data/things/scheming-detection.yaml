@@ -3,7 +3,7 @@ thing:
   stableId: bkQNjmsJoQ
   type: approach
   name: Scheming & Deception Detection
-  numericId: E441
+  wikiId: E441
 facts:
   - id: f_DFvxmbKVJQ
     property: description

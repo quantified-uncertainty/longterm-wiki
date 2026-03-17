@@ -3,7 +3,7 @@ thing:
   stableId: fRo2H0Q2xQ
   type: organization
   name: Polymarket
-  numericId: E555
+  wikiId: E555
 facts:
   - id: f_aUf0i5YixA
     property: description

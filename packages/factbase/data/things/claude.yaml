@@ -3,7 +3,7 @@ thing:
   stableId: cMKB5i2WZQ
   type: ai-model
   name: Claude
-  numericId: E1041
+  wikiId: E1041
 facts:
   - id: f_E9HZ253h0A
     property: description

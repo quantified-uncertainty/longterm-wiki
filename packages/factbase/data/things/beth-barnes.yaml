@@ -3,7 +3,7 @@ thing:
   stableId: ZvfLhIm7pw
   type: person
   name: Beth Barnes
-  numericId: E39
+  wikiId: E39
 facts:
   - id: f_RrAkR6GYlQ
     property: description

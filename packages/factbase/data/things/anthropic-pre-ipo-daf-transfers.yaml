@@ -3,7 +3,7 @@ thing:
   stableId: 1DjpqfXwjA
   type: analysis
   name: Anthropic Pre-IPO DAF Transfers
-  numericId: E412
+  wikiId: E412
 facts:
   - id: f_ssPs0akaMA
     property: description

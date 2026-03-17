@@ -362,15 +362,17 @@ export async function AnthropicStakeholdersTable() {
       const eaAlignMin = ea ? ea[0] : 0;
       const eaAlignMax = ea ? ea[1] : 0;
 
+      // Build link from entity slug
       const holderSlug = typeof f.holder === "string" ? f.holder : undefined;
       let link: string | undefined;
       if (holderSlug) {
         const kbEntity = getKBEntity(holderSlug);
-        if (kbEntity?.numericId) {
-          link = `/wiki/${kbEntity.numericId}`;
+        if (kbEntity?.wikiId) {
+          link = `/wiki/${kbEntity.wikiId}`;
         } else {
+          // Try the wiki data layer
           const href = getEntityHref(holderSlug);
-          if (href !== `/wiki/${holderSlug}`) link = href;
+          if (href !== `/wiki/${holderSlug}`) link = href; // only if it resolved to a wiki ID
         }
       }
 

@@ -23,7 +23,7 @@ import path from "path";
 vi.mock("@/data", () => {
   // Controlled test data — mutated per-test via setMockPages/setMockRegistry
   let pages: any[] = [];
-  let idRegistry = { byNumericId: {} as Record<string, string>, bySlug: {} as Record<string, string> };
+  let idRegistry = { byWikiId: {} as Record<string, string>, bySlug: {} as Record<string, string> };
   let pageIndex: Record<string, any> = {};
 
   return {
@@ -155,7 +155,7 @@ describe("isAboutPage", () => {
 describe("getInternalNav (mocked data)", () => {
   beforeEach(() => {
     setMockRegistry({
-      byNumericId: {
+      byWikiId: {
         E898: "fact-dashboard",
         E899: "page-coverage-dashboard",
         E900: "update-schedule-dashboard",
@@ -264,7 +264,7 @@ describe("getInternalNav (mocked data)", () => {
 describe("getWikiNav dispatch", () => {
   beforeEach(() => {
     setMockPages([]);
-    setMockRegistry({ byNumericId: {}, bySlug: {} });
+    setMockRegistry({ byWikiId: {}, bySlug: {} });
   });
 
   it("returns internal nav for 'internal' type", () => {
@@ -482,7 +482,7 @@ describe("internal sidebar completeness (real data)", () => {
     if (!fs.existsSync(dbPath)) return;
 
     const db = loadJson<{
-      idRegistry: { byNumericId: Record<string, string> };
+      idRegistry: { byWikiId: Record<string, string> };
     }>(dbPath);
 
     const errors: string[] = [];
@@ -496,7 +496,7 @@ describe("internal sidebar completeness (real data)", () => {
       if (!redirectMatch) continue;
 
       const eid = redirectMatch[1];
-      if (!db.idRegistry.byNumericId[eid]) {
+      if (!db.idRegistry.byWikiId[eid]) {
         errors.push(`${entry.name}/page.tsx redirects to /wiki/${eid} but ${eid} not in database`);
       }
     }
@@ -517,7 +517,7 @@ describe("internal sidebar completeness (real data)", () => {
     if (!fs.existsSync(dbPath)) return;
 
     const db = loadJson<{
-      idRegistry: { byNumericId: Record<string, string> };
+      idRegistry: { byWikiId: Record<string, string> };
       pages: Array<{ id: string; contentFormat: string; subcategory: string; filePath?: string }>;
     }>(dbPath);
 
@@ -532,7 +532,7 @@ describe("internal sidebar completeness (real data)", () => {
       if (!redirectMatch) continue;
 
       const eid = redirectMatch[1];
-      const slug = db.idRegistry.byNumericId[eid];
+      const slug = db.idRegistry.byWikiId[eid];
       if (!slug) continue;
 
       const page = db.pages.find(p => p.id === slug);
@@ -568,7 +568,7 @@ describe("internal sidebar completeness (real data)", () => {
     if (!fs.existsSync(dbPath)) return;
 
     const db = loadJson<{
-      idRegistry: { byNumericId: Record<string, string> };
+      idRegistry: { byWikiId: Record<string, string> };
       pages: Array<{ id: string; filePath?: string }>;
     }>(dbPath);
 
@@ -584,7 +584,7 @@ describe("internal sidebar completeness (real data)", () => {
 
       // Skip redirects to non-internal pages (e.g., legacy URLs redirecting to /kb/)
       const eid = redirectMatch[1];
-      const slug = db.idRegistry.byNumericId[eid];
+      const slug = db.idRegistry.byWikiId[eid];
       if (slug) {
         const page = db.pages.find(p => p.id === slug);
         if (page?.filePath && !page.filePath.startsWith("internal/")) continue;

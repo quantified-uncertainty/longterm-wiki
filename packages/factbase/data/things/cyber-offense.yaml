@@ -3,7 +3,7 @@ thing:
   stableId: VPk7sdZtkg
   type: risk
   name: AI-Enabled Cyberattacks
-  numericId: E82
+  wikiId: E82
 facts:
   - id: f_cQNw7vpr5g
     property: description

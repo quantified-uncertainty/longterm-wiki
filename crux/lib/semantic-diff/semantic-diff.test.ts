@@ -40,7 +40,7 @@ function makeClaim(
 }
 
 const SAMPLE_MDX = `---
-numericId: E42
+wikiId: E42
 title: Test Organization
 description: A test organization
 lastEdited: "2024-01-01"
@@ -69,7 +69,7 @@ The organization focuses on AI safety research. In 2023, they published 45 paper
 describe('preprocessMdxForExtraction', () => {
   it('strips frontmatter', () => {
     const result = preprocessMdxForExtraction(SAMPLE_MDX);
-    expect(result).not.toContain('numericId:');
+    expect(result).not.toContain('wikiId:');
     expect(result).not.toContain('lastEdited:');
   });
 

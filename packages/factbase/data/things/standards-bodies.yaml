@@ -3,7 +3,7 @@ thing:
   stableId: HXPEtPD1zw
   type: policy
   name: AI Standards Development
-  numericId: E288
+  wikiId: E288
 facts:
   - id: f_6v2h3W6OEg
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: mnhBgvNfXA
   type: event
   name: AI Safety Summit (Bletchley Park)
-  numericId: E14
+  wikiId: E14
 facts:
   - id: f_eqsk38NhtQ
     property: description

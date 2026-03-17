@@ -870,7 +870,7 @@ function getOrgResources(
 export interface OrgEntity {
   id: string;
   name: string;
-  numericId?: string;
+  wikiId?: string;
   wikiPageId?: string;
   aliases?: string[];
 }
@@ -926,8 +926,8 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     return startB.localeCompare(startA);
   });
 
-  const wikiHref = entity.numericId
-    ? `/wiki/${entity.numericId}`
+  const wikiHref = entity.wikiId
+    ? `/wiki/${entity.wikiId}`
     : entity.wikiPageId
       ? `/wiki/${entity.wikiPageId}`
       : null;
@@ -949,7 +949,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
       id: m.id,
       title: m.title,
       entityType: m.entityType,
-      numericId: m.numericId,
+      wikiId: m.wikiId,
       releaseDate: m.releaseDate ?? null,
       inputPrice: m.inputPrice ?? null,
       outputPrice: m.outputPrice ?? null,

@@ -3,7 +3,7 @@ thing:
   stableId: 8BWfogRouw
   type: risk
   name: Sycophancy
-  numericId: E295
+  wikiId: E295
 facts:
   - id: f_t6pnly6AdA
     property: description

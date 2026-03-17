@@ -20,11 +20,11 @@ export async function resolvePageIntId(
   slug: string
 ): Promise<number | null> {
   const rows = await db
-    .select({ numericId: entityIds.numericId })
+    .select({ wikiId: entityIds.wikiId })
     .from(entityIds)
     .where(eq(entityIds.slug, slug))
     .limit(1);
-  return rows[0]?.numericId ?? null;
+  return rows[0]?.wikiId ?? null;
 }
 
 /**
@@ -39,13 +39,13 @@ export async function resolvePageIntIds(
 
   const uniqueSlugs = [...new Set(slugs)];
   const rows = await db
-    .select({ slug: entityIds.slug, numericId: entityIds.numericId })
+    .select({ slug: entityIds.slug, wikiId: entityIds.wikiId })
     .from(entityIds)
     .where(inArray(entityIds.slug, uniqueSlugs));
 
   const map = new Map<string, number>();
   for (const row of rows) {
-    map.set(row.slug, row.numericId);
+    map.set(row.slug, row.wikiId);
   }
   return map;
 }
@@ -76,15 +76,15 @@ export async function allocateAndResolvePageIntIds(
       .insert(entityIds)
       .values(
         missing.map((slug) => ({
-          numericId: sql`nextval('entity_id_seq')`.mapWith(Number),
+          wikiId: sql`nextval('entity_id_seq')`.mapWith(Number),
           slug,
         }))
       )
       .onConflictDoNothing({ target: entityIds.slug })
-      .returning({ numericId: entityIds.numericId, slug: entityIds.slug });
+      .returning({ wikiId: entityIds.wikiId, slug: entityIds.slug });
 
     for (const row of inserted) {
-      existing.set(row.slug, row.numericId);
+      existing.set(row.slug, row.wikiId);
     }
 
     // Re-fetch any slugs that hit a conflict (inserted concurrently).
@@ -92,11 +92,11 @@ export async function allocateAndResolvePageIntIds(
     const stillMissing = missing.filter((s) => !existing.has(s));
     if (stillMissing.length > 0) {
       const refetched = await db
-        .select({ slug: entityIds.slug, numericId: entityIds.numericId })
+        .select({ slug: entityIds.slug, wikiId: entityIds.wikiId })
         .from(entityIds)
         .where(inArray(entityIds.slug, stillMissing));
       for (const row of refetched) {
-        existing.set(row.slug, row.numericId);
+        existing.set(row.slug, row.wikiId);
       }
     }
   }

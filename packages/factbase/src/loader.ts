@@ -361,7 +361,7 @@ function normalizeWikiPageId(raw: string | number): string {
  * Parse a YAML entity thing block into an Entity, handling both old and new formats.
  * Also returns the filename-derived slug for the filenameMap (loader-internal concern).
  *
- * Old format: { id: "anthropic", stableId: "mK9pX3rQ7n", numericId: "E22" }
+ * Old format: { id: "anthropic", stableId: "mK9pX3rQ7n", wikiId: "E22" }
  * New format: { id: "mK9pX3rQ7n", slug: "anthropic", wikiPageId: "E22" }
  *
  * Detection: if `stableId` is present, it's old format.
@@ -371,8 +371,8 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
 
   if (isOldFormat) {
     // Old format: id is slug (filename), stableId is the stable ID
-    const wikiPageId = raw.numericId !== undefined
-      ? normalizeWikiPageId(raw.numericId)
+    const wikiPageId = raw.wikiId !== undefined
+      ? normalizeWikiPageId(raw.wikiId)
       : undefined;
     return {
       entity: {
@@ -386,7 +386,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
         ...(wikiPageId !== undefined && { wikiPageId }),
         // Deprecated aliases for backward compat
         stableId: raw.stableId!,
-        ...(wikiPageId !== undefined && { numericId: wikiPageId }),
+        ...(wikiPageId !== undefined && { wikiId: wikiPageId }),
       },
       filename: raw.id, // In old format, id IS the filename/slug
     };
@@ -395,8 +395,8 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
   // New format: id is the stable ID, slug field provides the filename hint
   const wikiPageId = raw.wikiPageId !== undefined
     ? normalizeWikiPageId(raw.wikiPageId)
-    : raw.numericId !== undefined
-      ? normalizeWikiPageId(raw.numericId)
+    : raw.wikiId !== undefined
+      ? normalizeWikiPageId(raw.wikiId)
       : undefined;
   if (!raw.slug) {
     throw new Error(
@@ -415,7 +415,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
       ...(wikiPageId !== undefined && { wikiPageId }),
       // Deprecated aliases
       stableId: raw.id,
-      ...(wikiPageId !== undefined && { numericId: wikiPageId }),
+      ...(wikiPageId !== undefined && { wikiId: wikiPageId }),
     },
     filename: raw.slug, // In new format, slug field is the filename hint
   };

@@ -18,7 +18,7 @@ import type { TableProfile, TableScanResult, ScanSummary } from './types.ts';
 
 interface PageData {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   readerImportance?: number | null;
 }
 
@@ -34,7 +34,7 @@ function getImportanceMap(): Map<string, number> {
     for (const page of (db.pages || []) as PageData[]) {
       if (page.readerImportance != null) {
         _importanceMap.set(page.id, page.readerImportance);
-        if (page.numericId) _importanceMap.set(page.numericId, page.readerImportance);
+        if (page.wikiId) _importanceMap.set(page.wikiId, page.readerImportance);
       }
     }
   } catch {
@@ -54,7 +54,7 @@ function lookupImportance(entitySlugOrId: string): number | undefined {
 interface EntityListResponse {
   entities: Array<{
     id: string;
-    numericId?: string;
+    wikiId?: string;
     stableId?: string;
     entityType: string;
     title: string;
@@ -272,7 +272,7 @@ async function scanPersonnelCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -318,7 +318,7 @@ async function scanFundingRoundsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -363,7 +363,7 @@ async function scanInvestmentsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -410,7 +410,7 @@ async function scanBenchmarkResultsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 

@@ -3,7 +3,7 @@ thing:
   stableId: KslhqGaeJw
   type: organization
   name: Forecasting Research Institute (FRI)
-  numericId: E147
+  wikiId: E147
 facts:
   - id: f_ODgv72zg6w
     property: description

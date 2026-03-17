@@ -65,8 +65,8 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
             _source: 'frontmatter',
             _filePath: fullPath,
           };
-          if (fm.numericId) {
-            entity.numericId = fm.numericId;
+          if (fm.wikiId) {
+            entity.wikiId = fm.wikiId;
           }
           if (fm.description) {
             entity.description = fm.description;

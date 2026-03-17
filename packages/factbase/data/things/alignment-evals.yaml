@@ -3,7 +3,7 @@ thing:
   stableId: dMC2spIgVg
   type: approach
   name: Alignment Evaluations
-  numericId: E448
+  wikiId: E448
 facts:
   - id: f_VknoGOp8PQ
     property: description

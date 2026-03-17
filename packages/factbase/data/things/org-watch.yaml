@@ -3,7 +3,7 @@ thing:
   stableId: dquHawryUA
   type: project
   name: Org Watch
-  numericId: E388
+  wikiId: E388
 facts:
   - id: f_NMqcIKlSbQ
     property: description

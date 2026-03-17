@@ -3,7 +3,7 @@ thing:
   stableId: hD7bZ2b7BQ
   type: capability
   name: Reasoning and Planning
-  numericId: E246
+  wikiId: E246
 facts:
   - id: f_PIiaf5jIOw
     property: description

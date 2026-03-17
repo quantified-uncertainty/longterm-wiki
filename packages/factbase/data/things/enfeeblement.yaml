@@ -3,7 +3,7 @@ thing:
   stableId: 13OO6CP98g
   type: risk
   name: AI-Induced Enfeeblement
-  numericId: E118
+  wikiId: E118
 facts:
   - id: f_otFLSGTbQQ
     property: description

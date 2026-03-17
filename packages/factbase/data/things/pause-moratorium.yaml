@@ -3,7 +3,7 @@ thing:
   stableId: 3Mc5fuvtMg
   type: policy
   name: Pause / Moratorium
-  numericId: E460
+  wikiId: E460
 facts:
   - id: f_mZpNEVM5vg
     property: description

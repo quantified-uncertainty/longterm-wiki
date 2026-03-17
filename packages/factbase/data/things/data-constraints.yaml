@@ -3,7 +3,7 @@ thing:
   stableId: HLakK5zplg
   type: concept
   name: AI Training Data Constraints
-  numericId: E92
+  wikiId: E92
 facts:
   - id: f_ammPYMAfIg
     property: description

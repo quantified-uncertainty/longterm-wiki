@@ -3,7 +3,7 @@ thing:
   stableId: HkJrXOlE2A
   type: policy
   name: MAIM (Mutually Assured AI Malfunction)
-  numericId: E685
+  wikiId: E685
 facts:
   - id: f_S9xikTbr6w
     property: description

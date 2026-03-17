@@ -14,8 +14,8 @@ function personHasPage(
   slugToNumeric: Record<string, string>,
 ): boolean {
   if (pageIds.has(personId)) return true;
-  const numericId = slugToNumeric[personId];
-  return numericId ? pageIds.has(numericId) : false;
+  const wikiId = slugToNumeric[personId];
+  return wikiId ? pageIds.has(wikiId) : false;
 }
 
 export function PeopleCoverageContent() {
@@ -27,7 +27,7 @@ export function PeopleCoverageContent() {
   const pages = getAllPages();
   const pageIdSet = new Set(pages.map((p) => p.id));
 
-  // 3. Build slug → numericId mapping
+  // 3. Build slug → wikiId mapping
   const idRegistry = getIdRegistry();
 
   // 4. Build rows
@@ -72,7 +72,7 @@ export function PeopleCoverageContent() {
 
     return {
       id: person.id,
-      numericId: person.numericId ?? idRegistry.bySlug[person.id] ?? "",
+      wikiId: person.wikiId ?? idRegistry.bySlug[person.id] ?? "",
       name: person.title,
       hasRole: hasRoleFallback,
       hasEmployer: hasEmployerFallback,

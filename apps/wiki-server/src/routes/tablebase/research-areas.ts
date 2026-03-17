@@ -44,7 +44,7 @@ const AllQuery = z.object({
 
 const SyncResearchAreaItemSchema = z.object({
   id: z.string().min(1).max(200),
-  numericId: z.string().max(20).nullable().optional(),
+  wikiId: z.string().max(20).nullable().optional(),
   title: z.string().min(1).max(500),
   description: z.string().max(5000).nullable().optional(),
   status: z.enum(VALID_STATUSES).optional().default("active"),
@@ -117,7 +117,7 @@ const SyncRiskLinkSchema = z.object({
 function formatRow(r: typeof researchAreas.$inferSelect) {
   return {
     id: r.id,
-    numericId: r.numericId,
+    wikiId: r.wikiId,
     title: r.title,
     description: r.description,
     status: r.status,
@@ -402,7 +402,7 @@ const researchAreasApp = new Hono()
           .insert(researchAreas)
           .values({
             id: item.id,
-            numericId: item.numericId ?? null,
+            wikiId: item.wikiId ?? null,
             title: item.title,
             description: item.description ?? null,
             status: item.status,
@@ -420,7 +420,7 @@ const researchAreasApp = new Hono()
           .onConflictDoUpdate({
             target: researchAreas.id,
             set: {
-              numericId: item.numericId ?? null,
+              wikiId: item.wikiId ?? null,
               title: item.title,
               description: item.description ?? null,
               status: item.status,
@@ -605,7 +605,7 @@ const researchAreasApp = new Hono()
 
   // ---- POST /backfill-papers-from-citations ----
   // Backfills research_area_papers from resource citations on wiki pages
-  // linked to research areas via numeric_id.
+  // linked to research areas via wiki_id.
   .post("/backfill-papers-from-citations", async (c) => {
     const db = getDrizzleDb();
 
@@ -623,7 +623,7 @@ const researchAreasApp = new Hono()
         r.published_date::text,
         0
       FROM research_areas ra
-      JOIN wiki_pages wp ON ra.numeric_id = wp.numeric_id AND ra.numeric_id IS NOT NULL
+      JOIN wiki_pages wp ON ra.wiki_id = wp.wiki_id AND ra.wiki_id IS NOT NULL
       JOIN resource_citations rc ON rc.page_id_old = wp.id
       JOIN resources r ON rc.resource_id = r.id
       WHERE r.url IS NOT NULL

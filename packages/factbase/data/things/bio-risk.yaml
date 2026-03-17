@@ -3,7 +3,7 @@ thing:
   stableId: kZQP3vYrXA
   type: risk
   name: AI-Enabled Biological Risks
-  numericId: E40
+  wikiId: E40
 facts:
   - id: f_omvSZltcdg
     property: description

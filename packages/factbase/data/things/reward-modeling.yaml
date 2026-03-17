@@ -3,7 +3,7 @@ thing:
   stableId: AqIhbU48OA
   type: approach
   name: Reward Modeling
-  numericId: E600
+  wikiId: E600
 facts:
   - id: f_rl3OA5tKXQ
     property: description

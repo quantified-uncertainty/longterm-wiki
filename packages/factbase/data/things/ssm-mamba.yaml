@@ -3,7 +3,7 @@ thing:
   stableId: DjKKneEtdA
   type: capability
   name: State-Space Models / Mamba
-  numericId: E501
+  wikiId: E501
 facts:
   - id: f_cvrfPGhChw
     property: description

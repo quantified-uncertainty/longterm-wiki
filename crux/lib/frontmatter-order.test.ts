@@ -32,7 +32,7 @@ function mockContent(raw: string): any {
 describe('getFieldSortIndex', () => {
   it('returns correct index for known fields', () => {
     expect(getFieldSortIndex('title')).toBe(FRONTMATTER_FIELD_ORDER.indexOf('title'));
-    expect(getFieldSortIndex('numericId')).toBe(FRONTMATTER_FIELD_ORDER.indexOf('numericId'));
+    expect(getFieldSortIndex('wikiId')).toBe(FRONTMATTER_FIELD_ORDER.indexOf('wikiId'));
     expect(getFieldSortIndex('clusters')).toBe(FRONTMATTER_FIELD_ORDER.indexOf('clusters'));
   });
 
@@ -45,7 +45,7 @@ describe('getFieldSortIndex', () => {
   it('identity fields come before metadata fields', () => {
     expect(getFieldSortIndex('title')).toBeLessThan(getFieldSortIndex('quality'));
     expect(getFieldSortIndex('title')).toBeLessThan(getFieldSortIndex('clusters'));
-    expect(getFieldSortIndex('numericId')).toBeLessThan(getFieldSortIndex('lastEdited'));
+    expect(getFieldSortIndex('wikiId')).toBeLessThan(getFieldSortIndex('lastEdited'));
   });
 
   it('structure fields come before quality fields', () => {
@@ -99,9 +99,9 @@ describe('findFirstOutOfOrder', () => {
 
 describe('sortFields', () => {
   it('sorts fields to canonical order', () => {
-    const input = ['quality', 'title', 'clusters', 'entityType', 'numericId'];
+    const input = ['quality', 'title', 'clusters', 'entityType', 'wikiId'];
     expect(sortFields(input)).toEqual([
-      'numericId', 'title', 'entityType', 'quality', 'clusters',
+      'wikiId', 'title', 'entityType', 'quality', 'clusters',
     ]);
   });
 
@@ -133,10 +133,10 @@ describe('reorderFrontmatterObject', () => {
       clusters: ['ai-safety'],
       quality: 50,
       title: 'Test',
-      numericId: 'E1',
+      wikiId: 'E1',
     };
     const result = reorderFrontmatterObject(obj);
-    expect(Object.keys(result)).toEqual(['numericId', 'title', 'quality', 'clusters']);
+    expect(Object.keys(result)).toEqual(['wikiId', 'title', 'quality', 'clusters']);
   });
 
   it('preserves values during reordering', () => {
@@ -167,7 +167,7 @@ describe('reorderFrontmatterObject', () => {
     // Simulates the grading pipeline adding tacticalValue to an object
     // that was parsed from YAML (so fields are in insertion order)
     const obj: Record<string, unknown> = {
-      numericId: 'E1',
+      wikiId: 'E1',
       title: 'Test',
       entityType: 'concept',
       quality: 50,

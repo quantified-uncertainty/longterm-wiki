@@ -3,7 +3,7 @@ thing:
   stableId: D8dD07y5oQ
   type: risk
   name: "Sleeper Agents: Training Deceptive LLMs"
-  numericId: E489
+  wikiId: E489
 facts:
   - id: f_agLLq1jGYg
     property: description

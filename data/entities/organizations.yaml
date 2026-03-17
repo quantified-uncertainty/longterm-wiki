@@ -3,7 +3,7 @@
 
 - id: anthropic
   stableId: mK9pX3rQ7n
-  numericId: E22
+  wikiId: E22
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -82,7 +82,7 @@
   lastUpdated: 2025-12
 - id: deepmind
   stableId: A4XoubikkQ
-  numericId: E98
+  wikiId: E98
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -154,7 +154,7 @@
   lastUpdated: 2025-12
 - id: openai
   stableId: 1LcLlMGLbw
-  numericId: E218
+  wikiId: E218
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -222,7 +222,7 @@
   lastUpdated: 2025-12
 - id: xai
   stableId: GLXKjYAEKw
-  numericId: E378
+  wikiId: E378
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -268,7 +268,7 @@
   lastUpdated: 2025-12
 - id: chai
   stableId: zMfgJqiEPQ
-  numericId: E57
+  wikiId: E57
   type: organization
   orgType: academic
   # parentOrg = legally separate part of another org (not an internal division)
@@ -303,7 +303,7 @@
   lastUpdated: 2025-12
 - id: apollo-research
   stableId: pKeaWwP6sQ
-  numericId: E24
+  wikiId: E24
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -355,7 +355,7 @@
   lastUpdated: 2025-12
 - id: cais
   stableId: y4bieqSeag
-  numericId: E47
+  wikiId: E47
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -387,7 +387,7 @@
   lastUpdated: 2025-12
 - id: conjecture
   stableId: 0u4J70VqFY
-  numericId: E70
+  wikiId: E70
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -432,7 +432,7 @@
   lastUpdated: 2025-12
 - id: far-ai
   stableId: lCiT37k9pA
-  numericId: E138
+  wikiId: E138
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -476,7 +476,7 @@
   lastUpdated: 2025-12
 - id: govai
   stableId: XLLyzaEaCA
-  numericId: E153
+  wikiId: E153
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -503,7 +503,7 @@
   lastUpdated: 2025-12
 - id: metr
   stableId: rQEkFJxS5w
-  numericId: E201
+  wikiId: E201
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -565,7 +565,7 @@
   lastUpdated: 2025-12
 - id: arc
   stableId: QsXVXtQ0zE
-  numericId: E25
+  wikiId: E25
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -623,7 +623,7 @@
   lastUpdated: 2025-12
 - id: epoch-ai
   stableId: cBPkzcVBBQ
-  numericId: E125
+  wikiId: E125
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -673,7 +673,7 @@
   lastUpdated: 2025-12
 - id: miri
   stableId: puAffUjWSS
-  numericId: E202
+  wikiId: E202
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -734,7 +734,7 @@
   lastUpdated: 2025-12
 - id: uk-aisi
   stableId: aX0jkoaekQ
-  numericId: E364
+  wikiId: E364
   type: organization
   orgType: government
   # parentOrg: uk-dsit — removed, no entity exists for DSIT
@@ -790,7 +790,7 @@
   lastUpdated: 2025-12
 - id: us-aisi
   stableId: fYyAxYlHDQ
-  numericId: E365
+  wikiId: E365
   type: organization
   orgType: government
   # parentOrg: nist — changed to nist-ai (valid entity ID)
@@ -841,7 +841,7 @@
   lastUpdated: 2025-12
 - id: japan-aisi
   stableId: Nc5G0HG5nA
-  numericId: E1013
+  wikiId: E1013
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -870,7 +870,7 @@
   lastUpdated: 2026-03
 - id: singapore-aisi
   stableId: ljAkbGE59A
-  numericId: E1014
+  wikiId: E1014
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -897,7 +897,7 @@
   lastUpdated: 2026-03
 - id: canada-aisi
   stableId: 22LBI06kLw
-  numericId: E1015
+  wikiId: E1015
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -922,7 +922,7 @@
   lastUpdated: 2026-03
 - id: eu-ai-office
   stableId: aobKGolfow
-  numericId: E1016
+  wikiId: E1016
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -948,7 +948,7 @@
   lastUpdated: 2026-03
 - id: arc-evals
   stableId: myeSKJXTMA
-  numericId: E26
+  wikiId: E26
   type: organization
   orgType: safety-org
   title: ARC Evaluations
@@ -963,7 +963,7 @@
   lastUpdated: 2025-12
 - id: fhi
   stableId: Zmw9nfUYWA
-  numericId: E140
+  wikiId: E140
   type: organization
   orgType: academic
   summaryPage: safety-orgs-overview
@@ -988,7 +988,7 @@
 
 - id: openai-foundation
   stableId: GQuPhNkZbg
-  numericId: E421
+  wikiId: E421
   type: organization
   orgType: generic
   title: OpenAI Foundation
@@ -1019,7 +1019,7 @@
 
 - id: leading-the-future
   stableId: pg7Ym4EQ9A
-  numericId: E422
+  wikiId: E422
   type: organization
   orgType: generic
   title: Leading the Future super PAC
@@ -1046,7 +1046,7 @@
 
 - id: johns-hopkins-center-for-health-security
   stableId: vKC8BA9hHA
-  numericId: E423
+  wikiId: E423
   type: organization
   orgType: academic
   title: Johns Hopkins Center for Health Security
@@ -1073,7 +1073,7 @@
 
 - id: nist-ai
   stableId: Eac7pHF06Q
-  numericId: E424
+  wikiId: E424
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1102,7 +1102,7 @@
 
 - id: ssi
   stableId: 1OSiYOaWVL
-  numericId: E425
+  wikiId: E425
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -1135,7 +1135,7 @@
 
 - id: controlai
   stableId: uhTh3ndt0Q
-  numericId: E426
+  wikiId: E426
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1164,7 +1164,7 @@
 
 - id: frontier-model-forum
   stableId: LgiqvRCrvg
-  numericId: E427
+  wikiId: E427
   type: organization
   orgType: generic
   summaryPage: safety-orgs-overview
@@ -1197,7 +1197,7 @@
 
 - id: palisade-research
   stableId: sgEt2BpyOg
-  numericId: E428
+  wikiId: E428
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1232,7 +1232,7 @@
 
 - id: centre-for-long-term-resilience
   stableId: yfUBQLMfgw
-  numericId: E429
+  wikiId: E429
   type: organization
   orgType: safety-org
   title: Centre for Long-Term Resilience
@@ -1260,7 +1260,7 @@
 
 - id: goodfire
   stableId: H74rOLotqg
-  numericId: E430
+  wikiId: E430
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1295,7 +1295,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: 1day-sooner
   stableId: 9k7drw6Qpg
-  numericId: E509
+  wikiId: E509
   type: organization
   orgType: generic
   title: 1Day Sooner
@@ -1313,7 +1313,7 @@
   lastUpdated: 2026-02
 - id: 80000-hours
   stableId: hvg9ecR3nA
-  numericId: E510
+  wikiId: E510
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1331,7 +1331,7 @@
   lastUpdated: 2026-02
 - id: ai-futures-project
   stableId: KDYvrwkgtw
-  numericId: E511
+  wikiId: E511
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1349,7 +1349,7 @@
   lastUpdated: 2026-02
 - id: ai-impacts
   stableId: TdbypiKyCw
-  numericId: E512
+  wikiId: E512
   type: organization
   orgType: safety-org
   title: AI Impacts
@@ -1367,7 +1367,7 @@
   lastUpdated: 2026-02
 - id: ai-revenue-sources
   stableId: B7uHMuvA0Q
-  numericId: E513
+  wikiId: E513
   type: organization
   orgType: generic
   title: AI Revenue Sources
@@ -1383,7 +1383,7 @@
   lastUpdated: 2026-02
 - id: arb-research
   stableId: 6rEo4U4WPw
-  numericId: E514
+  wikiId: E514
   type: organization
   orgType: safety-org
   title: Arb Research
@@ -1401,7 +1401,7 @@
   lastUpdated: 2026-02
 - id: blueprint-biosecurity
   stableId: lZRKSfs5wg
-  numericId: E515
+  wikiId: E515
   type: organization
   orgType: safety-org
   title: Blueprint Biosecurity
@@ -1418,7 +1418,7 @@
   lastUpdated: 2026-02
 - id: bridgewater-aia-labs
   stableId: 19XMJpUWqQ
-  numericId: E516
+  wikiId: E516
   type: organization
   orgType: generic
   summaryPage: labs-overview
@@ -1436,7 +1436,7 @@
   lastUpdated: 2026-02
 - id: cea
   stableId: gNsqAes7Dw
-  numericId: E517
+  wikiId: E517
   type: organization
   orgType: safety-org
   summaryPage: community-building-overview
@@ -1451,7 +1451,7 @@
   lastUpdated: 2026-02
 - id: center-for-applied-rationality
   stableId: l5K9ZdbXww
-  numericId: E518
+  wikiId: E518
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1468,7 +1468,7 @@
   lastUpdated: 2026-02
 - id: chan-zuckerberg-initiative
   stableId: rYERluiUwH
-  numericId: E519
+  wikiId: E519
   type: organization
   orgType: funder
   title: Chan Zuckerberg Initiative
@@ -1484,7 +1484,7 @@
   lastUpdated: 2026-02
 - id: coalition-for-epidemic-preparedness-innovations
   stableId: ILE6N4wiDA
-  numericId: E520
+  wikiId: E520
   type: organization
   orgType: funder
   title: Coalition for Epidemic Preparedness Innovations
@@ -1500,7 +1500,7 @@
   lastUpdated: 2026-02
 - id: coefficient-giving
   stableId: ULjDXpSLCI
-  numericId: E521
+  wikiId: E521
   type: organization
   orgType: funder
   title: Coefficient Giving
@@ -1518,7 +1518,7 @@
   lastUpdated: 2026-02
 - id: council-on-strategic-risks
   stableId: FL52kVPTlA
-  numericId: E522
+  wikiId: E522
   type: organization
   orgType: safety-org
   title: Council on Strategic Risks
@@ -1534,7 +1534,7 @@
   lastUpdated: 2026-02
 - id: cser
   stableId: Qns43S795w
-  numericId: E523
+  wikiId: E523
   type: organization
   orgType: academic
   summaryPage: safety-orgs-overview
@@ -1554,7 +1554,7 @@
   lastUpdated: 2026-02
 - id: cset
   stableId: lvsDuyzPcg
-  numericId: E524
+  wikiId: E524
   type: organization
   orgType: academic
   summaryPage: safety-orgs-overview
@@ -1572,7 +1572,7 @@
   lastUpdated: 2026-02
 - id: ea-global
   stableId: k4IPgRP98A
-  numericId: E525
+  wikiId: E525
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1588,7 +1588,7 @@
   lastUpdated: 2026-02
 - id: elicit
   stableId: 2VexoROapg
-  numericId: E526
+  wikiId: E526
   type: organization
   orgType: startup
   title: Elicit (AI Research Tool)
@@ -1605,7 +1605,7 @@
   lastUpdated: 2026-02
 - id: fli
   stableId: d9sWZtyVwg
-  numericId: E528
+  wikiId: E528
   type: organization
   orgType: safety-org
   title: Future of Life Institute (FLI)
@@ -1623,7 +1623,7 @@
   lastUpdated: 2026-02
 - id: founders-fund
   stableId: LYfneQJbSA
-  numericId: E529
+  wikiId: E529
   type: organization
   orgType: funder
   title: Founders Fund
@@ -1639,7 +1639,7 @@
   lastUpdated: 2026-02
 - id: futuresearch
   stableId: PIC4ivhNpw
-  numericId: E530
+  wikiId: E530
   type: organization
   orgType: startup
   title: FutureSearch
@@ -1657,7 +1657,7 @@
   lastUpdated: 2026-02
 - id: giving-pledge
   stableId: 3w5hW5liew
-  numericId: E531
+  wikiId: E531
   type: organization
   orgType: funder
   title: Giving Pledge
@@ -1672,7 +1672,7 @@
   lastUpdated: 2026-02
 - id: good-judgment
   stableId: Zx7ckq6syw
-  numericId: E532
+  wikiId: E532
   type: organization
   orgType: generic
   title: Good Judgment (Forecasting)
@@ -1689,7 +1689,7 @@
   lastUpdated: 2026-02
 - id: gpai
   stableId: p2h6bEqhvQ
-  numericId: E533
+  wikiId: E533
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1708,7 +1708,7 @@
   lastUpdated: 2026-02
 - id: gratified
   stableId: 2v7A8mb7Ww
-  numericId: E534
+  wikiId: E534
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1723,7 +1723,7 @@
   lastUpdated: 2026-02
 - id: hewlett-foundation
   stableId: 9nUCGERzgQ
-  numericId: E535
+  wikiId: E535
   type: organization
   orgType: funder
   title: William and Flora Hewlett Foundation
@@ -1739,7 +1739,7 @@
   lastUpdated: 2026-02
 - id: ibbis
   stableId: 55HJBLrOzg
-  numericId: E536
+  wikiId: E536
   type: organization
   orgType: academic
   title: IBBIS (International Biosecurity and Biosafety Initiative for Science)
@@ -1756,7 +1756,7 @@
   lastUpdated: 2026-02
 - id: kalshi
   stableId: M7656wW5Bg
-  numericId: E537
+  wikiId: E537
   type: organization
   orgType: startup
   title: Kalshi (Prediction Market)
@@ -1773,7 +1773,7 @@
   lastUpdated: 2026-02
 - id: lesswrong
   stableId: BEKEqQDmkQ
-  numericId: E538
+  wikiId: E538
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1790,7 +1790,7 @@
   lastUpdated: 2026-02
 - id: lighthaven
   stableId: 7E2ylGl7Ug
-  numericId: E539
+  wikiId: E539
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1808,7 +1808,7 @@
   lastUpdated: 2026-02
 - id: lightning-rod-labs
   stableId: 4804DX6Zbg
-  numericId: E540
+  wikiId: E540
   type: organization
   orgType: startup
   summaryPage: safety-orgs-overview
@@ -1825,7 +1825,7 @@
   lastUpdated: 2026-02
 - id: lionheart-ventures
   stableId: fACyX00cnQ
-  numericId: E541
+  wikiId: E541
   type: organization
   orgType: funder
   title: Lionheart Ventures
@@ -1841,7 +1841,7 @@
   lastUpdated: 2026-02
 - id: longview-philanthropy
   stableId: gV4U3qi2QA
-  numericId: E542
+  wikiId: E542
   type: organization
   orgType: funder
   title: Longview Philanthropy
@@ -1860,7 +1860,7 @@
   lastUpdated: 2026-02
 - id: ltff
   stableId: yA12C1KcjQ
-  numericId: E543
+  wikiId: E543
   type: organization
   orgType: funder
   title: Long-Term Future Fund (LTFF)
@@ -1877,7 +1877,7 @@
   lastUpdated: 2026-02
 - id: macarthur-foundation
   stableId: 8q2GhtEmkA
-  numericId: E544
+  wikiId: E544
   type: organization
   orgType: funder
   title: MacArthur Foundation
@@ -1892,7 +1892,7 @@
   lastUpdated: 2026-02
 - id: manifest
   stableId: KYKdAOzynA
-  numericId: E545
+  wikiId: E545
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -1909,7 +1909,7 @@
   lastUpdated: 2026-02
 - id: manifold
   stableId: Y8MiLNuAWA
-  numericId: E546
+  wikiId: E546
   type: organization
   orgType: startup
   title: Manifold (Prediction Market)
@@ -1926,7 +1926,7 @@
   lastUpdated: 2026-02
 - id: manifund
   stableId: fFVOuFZCRf
-  numericId: E547
+  wikiId: E547
   type: organization
   orgType: funder
   title: Manifund
@@ -1943,7 +1943,7 @@
   lastUpdated: 2026-02
 - id: mats
   stableId: yYtGSTsXuw
-  numericId: E548
+  wikiId: E548
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -1961,7 +1961,7 @@
   lastUpdated: 2026-02
 - id: meta-ai
   stableId: tt0f5PYDCw
-  numericId: E549
+  wikiId: E549
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -1980,7 +1980,7 @@
   lastUpdated: 2026-02
 - id: microsoft
   stableId: OIY5gaPpBA
-  numericId: E550
+  wikiId: E550
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -1999,7 +1999,7 @@
   lastUpdated: 2026-02
 - id: nti-bio
   stableId: D9lqMW2HVw
-  numericId: E551
+  wikiId: E551
   type: organization
   orgType: safety-org
   title: "NTI | bio (Nuclear Threat Initiative - Biological Program)"
@@ -2017,7 +2017,7 @@
   lastUpdated: 2026-02
 - id: open-philanthropy
   stableId: NifCYhN75w
-  numericId: E552
+  wikiId: E552
   type: organization
   orgType: funder
   title: Open Philanthropy
@@ -2032,7 +2032,7 @@
   lastUpdated: 2026-02
 - id: pause-ai
   stableId: woL5lkqLpg
-  numericId: E553
+  wikiId: E553
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -2050,7 +2050,7 @@
   lastUpdated: 2026-02
 - id: peter-thiel-philanthropy
   stableId: y4AUeiPifQ
-  numericId: E554
+  wikiId: E554
   type: organization
   orgType: funder
   title: Peter Thiel (Funder)
@@ -2066,7 +2066,7 @@
   lastUpdated: 2026-02
 - id: polymarket
   stableId: fRo2H0Q2xQ
-  numericId: E555
+  wikiId: E555
   type: organization
   orgType: startup
   title: Polymarket
@@ -2083,7 +2083,7 @@
   lastUpdated: 2026-02
 - id: red-queen-bio
   stableId: W9J9yMK82X
-  numericId: E556
+  wikiId: E556
   type: organization
   orgType: startup
   title: Red Queen Bio
@@ -2100,7 +2100,7 @@
   lastUpdated: 2026-02
 - id: redwood-research
   stableId: dwMzc9WzPa
-  numericId: E557
+  wikiId: E557
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -2149,7 +2149,7 @@
   lastUpdated: 2026-02
 - id: rethink-priorities
   stableId: t0p43V5oLA
-  numericId: E558
+  wikiId: E558
   type: organization
   orgType: safety-org
   title: Rethink Priorities
@@ -2168,7 +2168,7 @@
   lastUpdated: 2026-02
 - id: samotsvety
   stableId: 9hPhtQ9AXw
-  numericId: E560
+  wikiId: E560
   type: organization
   orgType: generic
   title: Samotsvety
@@ -2185,7 +2185,7 @@
   lastUpdated: 2026-02
 - id: schmidt-futures
   stableId: h6ntSGk8fg
-  numericId: E561
+  wikiId: E561
   type: organization
   orgType: funder
   title: Schmidt Futures
@@ -2201,7 +2201,7 @@
   lastUpdated: 2026-02
 - id: secure-ai-project
   stableId: Mj1xuvdboQ
-  numericId: E562
+  wikiId: E562
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -2220,7 +2220,7 @@
   lastUpdated: 2026-02
 - id: securebio
   stableId: QFIL8r7vPA
-  numericId: E563
+  wikiId: E563
   type: organization
   orgType: safety-org
   title: SecureBio
@@ -2239,7 +2239,7 @@
   lastUpdated: 2026-02
 - id: securedna
   stableId: m4vhGiF5RQ
-  numericId: E564
+  wikiId: E564
   type: organization
   orgType: safety-org
   title: SecureDNA
@@ -2257,7 +2257,7 @@
   lastUpdated: 2026-02
 - id: seldon-lab
   stableId: eBYk2wn75Q
-  numericId: E565
+  wikiId: E565
   type: organization
   orgType: safety-org
   summaryPage: safety-orgs-overview
@@ -2275,7 +2275,7 @@
   lastUpdated: 2026-02
 - id: sentinel
   stableId: JzhBAecjaA
-  numericId: E566
+  wikiId: E566
   type: organization
   orgType: safety-org
   title: Sentinel (Catastrophic Risk Foresight)
@@ -2293,7 +2293,7 @@
   lastUpdated: 2026-02
 - id: sff
   stableId: pvJ50HupEQ
-  numericId: E567
+  wikiId: E567
   type: organization
   orgType: funder
   title: Survival and Flourishing Fund (SFF)
@@ -2311,7 +2311,7 @@
   lastUpdated: 2026-02
 - id: situational-awareness-lp
   stableId: FxJ9jQ7SlA
-  numericId: E568
+  wikiId: E568
   type: organization
   orgType: generic
   title: Situational Awareness LP
@@ -2328,7 +2328,7 @@
   lastUpdated: 2026-02
 - id: swift-centre
   stableId: YlrwnKhMqQ
-  numericId: E569
+  wikiId: E569
   type: organization
   orgType: safety-org
   title: Swift Centre
@@ -2344,7 +2344,7 @@
   lastUpdated: 2026-02
 - id: the-foundation-layer
   stableId: 5jfxLzMZYg
-  numericId: E697
+  wikiId: E697
   type: organization
   orgType: funder
   title: The Foundation Layer
@@ -2369,7 +2369,7 @@
   lastUpdated: 2026-02
 - id: the-sequences
   stableId: mwlHBrbdBQ
-  numericId: E570
+  wikiId: E570
   type: organization
   orgType: generic
   summaryPage: community-building-overview
@@ -2384,7 +2384,7 @@
   lastUpdated: 2026-02
 - id: turion
   stableId: wixiIVSZdg
-  numericId: E571
+  wikiId: E571
   type: organization
   orgType: generic
   title: Turion
@@ -2399,7 +2399,7 @@
   lastUpdated: 2026-02
 - id: vara
   stableId: 4RoymCjuvA
-  numericId: E572
+  wikiId: E572
   type: organization
   orgType: generic
   title: Value Aligned Research Advisors
@@ -2414,7 +2414,7 @@
   lastUpdated: 2026-02
 - id: vitalik-buterin-philanthropy
   stableId: 2fEPReD49A
-  numericId: E573
+  wikiId: E573
   type: organization
   orgType: funder
   title: Vitalik Buterin (Funder)
@@ -2430,7 +2430,7 @@
   lastUpdated: 2026-02
 - id: astralis-foundation
   stableId: QeknHipQPA
-  numericId: E702
+  wikiId: E702
   type: organization
   orgType: funder
   title: Astralis Foundation
@@ -2472,7 +2472,7 @@
   lastUpdated: 2026-02
 - id: nvidia
   stableId: UvpZCnW3wA
-  numericId: E693
+  wikiId: E693
   type: organization
   orgType: frontier-lab
   title: NVIDIA
@@ -2489,7 +2489,7 @@
   lastUpdated: 2026-02
 - id: ftx
   stableId: yevJm2XDsQ
-  numericId: E856
+  wikiId: E856
   type: organization
   orgType: generic
   title: FTX
@@ -2513,7 +2513,7 @@
   lastUpdated: 2026-02
 - id: ftx-future-fund
   stableId: JhIGCaI3Ng
-  numericId: E855
+  wikiId: E855
   type: organization
   orgType: funder
   title: FTX Future Fund
@@ -2540,7 +2540,7 @@
 
 - id: giving-what-we-can
   stableId: aKZsmUeuWg
-  numericId: E863
+  wikiId: E863
   type: organization
   orgType: safety-org
   title: Giving What We Can
@@ -2582,7 +2582,7 @@
 
 - id: mistral-ai
   stableId: RFHVboBnHg
-  numericId: E1097
+  wikiId: E1097
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -2608,7 +2608,7 @@
 
 - id: deepseek
   stableId: otUkuVHDKw
-  numericId: E1098
+  wikiId: E1098
   type: organization
   orgType: frontier-lab
   summaryPage: labs-overview
@@ -2639,7 +2639,7 @@
 
 - id: uc-berkeley
   stableId: ksqqi7fyeA
-  numericId: E1112
+  wikiId: E1112
   type: organization
   orgType: academic
   title: University of California, Berkeley
@@ -2654,7 +2654,7 @@
 
 - id: stanford-university
   stableId: ngrgdfqafw
-  numericId: E1113
+  wikiId: E1113
   type: organization
   orgType: academic
   title: Stanford University
@@ -2671,7 +2671,7 @@
 
 - id: university-of-oxford
   stableId: 18K3KG3bpg
-  numericId: E1114
+  wikiId: E1114
   type: organization
   orgType: academic
   title: University of Oxford
@@ -2687,7 +2687,7 @@
 
 - id: harvard-university
   stableId: r90ivRT8lA
-  numericId: E1115
+  wikiId: E1115
   type: organization
   orgType: academic
   title: Harvard University
@@ -2700,7 +2700,7 @@
 
 - id: university-of-pennsylvania
   stableId: mGoIaAqCmA
-  numericId: E1116
+  wikiId: E1116
   type: organization
   orgType: academic
   title: University of Pennsylvania
@@ -2713,7 +2713,7 @@
 
 - id: yale-university
   stableId: 1tZbcfTFfw
-  numericId: E1117
+  wikiId: E1117
   type: organization
   orgType: academic
   title: Yale University
@@ -2726,7 +2726,7 @@
 
 - id: usc
   stableId: 5YprRPwFOg
-  numericId: E1118
+  wikiId: E1118
   type: organization
   orgType: academic
   title: University of Southern California
@@ -2739,7 +2739,7 @@
 
 - id: princeton-university
   stableId: 5Lc4bpqlng
-  numericId: E1119
+  wikiId: E1119
   type: organization
   orgType: academic
   title: Princeton University
@@ -2753,7 +2753,7 @@
 
 - id: nyu
   stableId: 5IBy869q9Q
-  numericId: E1120
+  wikiId: E1120
   type: organization
   orgType: academic
   title: New York University
@@ -2766,7 +2766,7 @@
 
 - id: university-of-washington
   stableId: 1K9RsqC7yg
-  numericId: E1121
+  wikiId: E1121
   type: organization
   orgType: academic
   title: University of Washington
@@ -2779,7 +2779,7 @@
 
 - id: university-of-chicago
   stableId: 63eBrDMmpg
-  numericId: E1122
+  wikiId: E1122
   type: organization
   orgType: academic
   title: University of Chicago
@@ -2792,7 +2792,7 @@
 
 - id: mit
   stableId: Z1df97RYbw
-  numericId: E1123
+  wikiId: E1123
   type: organization
   orgType: academic
   title: Massachusetts Institute of Technology
@@ -2807,7 +2807,7 @@
 
 - id: columbia-university
   stableId: OyPqGFqL5A
-  numericId: E1124
+  wikiId: E1124
   type: organization
   orgType: academic
   title: Columbia University
@@ -2820,7 +2820,7 @@
 
 - id: carnegie-mellon-university
   stableId: lOV3OFaWMg
-  numericId: E1125
+  wikiId: E1125
   type: organization
   orgType: academic
   title: Carnegie Mellon University
@@ -2835,7 +2835,7 @@
 
 - id: georgetown-university
   stableId: zab6VSUgQw
-  numericId: E1126
+  wikiId: E1126
   type: organization
   orgType: academic
   title: Georgetown University
@@ -2850,7 +2850,7 @@
 
 - id: university-of-michigan
   stableId: CBeGcCyOyw
-  numericId: E1127
+  wikiId: E1127
   type: organization
   orgType: academic
   title: University of Michigan
@@ -2863,7 +2863,7 @@
 
 - id: university-of-maryland
   stableId: qHM9LBFxXg
-  numericId: E1128
+  wikiId: E1128
   type: organization
   orgType: academic
   title: University of Maryland
@@ -2876,7 +2876,7 @@
 
 - id: uc-davis
   stableId: tW8PGgszJg
-  numericId: E1129
+  wikiId: E1129
   type: organization
   orgType: academic
   title: University of California, Davis
@@ -2889,7 +2889,7 @@
 
 - id: uc-san-francisco
   stableId: 0ILtQkmkeA
-  numericId: E1130
+  wikiId: E1130
   type: organization
   orgType: academic
   title: University of California, San Francisco
@@ -2902,7 +2902,7 @@
 
 - id: dartmouth-college
   stableId: NTfUXx7j5Q
-  numericId: E1131
+  wikiId: E1131
   type: organization
   orgType: academic
   title: Dartmouth College
@@ -2915,7 +2915,7 @@
 
 - id: rutgers-university
   stableId: N7LanuxgEw
-  numericId: E1132
+  wikiId: E1132
   type: organization
   orgType: academic
   title: Rutgers University
@@ -2928,7 +2928,7 @@
 
 - id: cornell-university
   stableId: ItehzmANzA
-  numericId: E1133
+  wikiId: E1133
   type: organization
   orgType: academic
   title: Cornell University
@@ -2941,7 +2941,7 @@
 
 - id: johns-hopkins-university
   stableId: ntpulDMo9w
-  numericId: E1134
+  wikiId: E1134
   type: organization
   orgType: academic
   title: Johns Hopkins University
@@ -2956,7 +2956,7 @@
 
 - id: duke-university
   stableId: vfxNzRQfgg
-  numericId: E1135
+  wikiId: E1135
   type: organization
   orgType: academic
   title: Duke University
@@ -2969,7 +2969,7 @@
 
 - id: university-of-toronto
   stableId: G4vgO5B8oA
-  numericId: E1136
+  wikiId: E1136
   type: organization
   orgType: academic
   title: University of Toronto
@@ -2984,7 +2984,7 @@
 
 - id: georgia-tech
   stableId: Mj36YWAj4A
-  numericId: E1137
+  wikiId: E1137
   type: organization
   orgType: academic
   title: Georgia Institute of Technology
@@ -2997,7 +2997,7 @@
 
 - id: purdue-university
   stableId: ZTE66CIDxA
-  numericId: E1138
+  wikiId: E1138
   type: organization
   orgType: academic
   title: Purdue University
@@ -3010,7 +3010,7 @@
 
 - id: washu
   stableId: 09jjMN7a9g
-  numericId: E1139
+  wikiId: E1139
   type: organization
   orgType: academic
   title: Washington University in St. Louis
@@ -3023,7 +3023,7 @@
 
 - id: university-of-edinburgh
   stableId: RtQm1h5XqQ
-  numericId: E1140
+  wikiId: E1140
   type: organization
   orgType: academic
   title: University of Edinburgh
@@ -3036,7 +3036,7 @@
 
 - id: university-of-cambridge
   stableId: xfad5FwoTA
-  numericId: E1141
+  wikiId: E1141
   type: organization
   orgType: academic
   title: University of Cambridge
@@ -3050,7 +3050,7 @@
 
 - id: brown-university
   stableId: LUrRQBRfOg
-  numericId: E1142
+  wikiId: E1142
   type: organization
   orgType: academic
   title: Brown University
@@ -3063,7 +3063,7 @@
 
 - id: northeastern-university
   stableId: nBi0ynYp3g
-  numericId: E1143
+  wikiId: E1143
   type: organization
   orgType: academic
   title: Northeastern University
@@ -3076,7 +3076,7 @@
 
 - id: university-of-notre-dame
   stableId: feVUShox8A
-  numericId: E1144
+  wikiId: E1144
   type: organization
   orgType: academic
   title: University of Notre Dame
@@ -3089,7 +3089,7 @@
 
 - id: university-of-glasgow
   stableId: BRLCwQt0jg
-  numericId: E1145
+  wikiId: E1145
   type: organization
   orgType: academic
   title: University of Glasgow
@@ -3102,7 +3102,7 @@
 
 - id: university-of-utah
   stableId: Ea8GGLkqdg
-  numericId: E1146
+  wikiId: E1146
   type: organization
   orgType: academic
   title: University of Utah
@@ -3115,7 +3115,7 @@
 
 - id: uc-los-angeles
   stableId: 483amkzufg
-  numericId: E1147
+  wikiId: E1147
   type: organization
   orgType: academic
   title: University of California, Los Angeles
@@ -3128,7 +3128,7 @@
 
 - id: university-of-ottawa
   stableId: znFFeDac6Q
-  numericId: E1148
+  wikiId: E1148
   type: organization
   orgType: academic
   title: University of Ottawa
@@ -3145,7 +3145,7 @@
 
 - id: beri
   stableId: CgscaZc0lA
-  numericId: E1149
+  wikiId: E1149
   type: organization
   orgType: safety-org
   title: Berkeley Existential Risk Initiative
@@ -3160,7 +3160,7 @@
 
 - id: ai-safety-support
   stableId: gCnFEWPFqw
-  numericId: E1150
+  wikiId: E1150
   type: organization
   orgType: safety-org
   title: AI Safety Support
@@ -3175,7 +3175,7 @@
 
 - id: cambridge-boston-alignment-initiative
   stableId: T9M80clN1w
-  numericId: E1151
+  wikiId: E1151
   type: organization
   orgType: safety-org
   title: Cambridge Boston Alignment Initiative
@@ -3190,7 +3190,7 @@
 
 - id: lightcone-infrastructure
   stableId: 47Rkb1DGmw
-  numericId: E1152
+  wikiId: E1152
   type: organization
   orgType: safety-org
   title: Lightcone Infrastructure
@@ -3205,7 +3205,7 @@
 
 - id: global-catastrophic-risk-institute
   stableId: cth6HTkyhA
-  numericId: E1153
+  wikiId: E1153
   type: organization
   orgType: safety-org
   title: Global Catastrophic Risk Institute
@@ -3220,7 +3220,7 @@
 
 - id: allfed
   stableId: Pc9GysNWZA
-  numericId: E1154
+  wikiId: E1154
   type: organization
   orgType: safety-org
   title: Alliance to Feed the Earth in Disasters
@@ -3235,7 +3235,7 @@
 
 - id: arena-alignment
   stableId: knwcFNXNQQ
-  numericId: E1155
+  wikiId: E1155
   type: organization
   orgType: safety-org
   title: Alignment Research Engineer Accelerator
@@ -3251,7 +3251,7 @@
 
 - id: apart-research
   stableId: 5WqgebIWFQ
-  numericId: E1156
+  wikiId: E1156
   type: organization
   orgType: safety-org
   title: Apart Research
@@ -3266,7 +3266,7 @@
 
 - id: saferai
   stableId: VtjvwHCa6g
-  numericId: E1157
+  wikiId: E1157
   type: organization
   orgType: safety-org
   title: SaferAI
@@ -3280,7 +3280,7 @@
 
 - id: ai-safety-camp
   stableId: 2BUn75004w
-  numericId: E1158
+  wikiId: E1158
   type: organization
   orgType: safety-org
   title: AI Safety Camp
@@ -3294,7 +3294,7 @@
 
 - id: london-initiative-safe-ai
   stableId: fffMhacRCQ
-  numericId: E1159
+  wikiId: E1159
   type: organization
   orgType: safety-org
   title: London Initiative for Safe AI
@@ -3308,7 +3308,7 @@
 
 - id: stanford-existential-risks-initiative
   stableId: 8uY7BBVJww
-  numericId: E1160
+  wikiId: E1160
   type: organization
   orgType: safety-org
   title: Stanford Existential Risks Initiative
@@ -3323,7 +3323,7 @@
 
 - id: existential-risk-observatory
   stableId: TFEmCZBWPA
-  numericId: E1161
+  wikiId: E1161
   type: organization
   orgType: safety-org
   title: Existential Risk Observatory
@@ -3337,7 +3337,7 @@
 
 - id: pivotal-research
   stableId: Ay7z1aaMsQ
-  numericId: E1162
+  wikiId: E1162
   type: organization
   orgType: safety-org
   title: Pivotal Research
@@ -3351,7 +3351,7 @@
 
 - id: center-on-long-term-risk
   stableId: i7Y3OcXV8A
-  numericId: E1163
+  wikiId: E1163
   type: organization
   orgType: safety-org
   title: Center on Long-Term Risk
@@ -3366,7 +3366,7 @@
 
 - id: bluedot-impact
   stableId: kHgmzyol5w
-  numericId: E1164
+  wikiId: E1164
   type: organization
   orgType: safety-org
   title: BlueDot Impact
@@ -3382,7 +3382,7 @@
 
 - id: median-group
   stableId: Ii1sWbYtOQ
-  numericId: E1209
+  wikiId: E1209
   type: organization
   orgType: safety-org
   title: Median Group
@@ -3396,7 +3396,7 @@
 
 - id: modeling-cooperation
   stableId: ivJ9P4p2cQ
-  numericId: E1217
+  wikiId: E1217
   type: organization
   orgType: safety-org
   title: Modeling Cooperation
@@ -3415,7 +3415,7 @@
 
 - id: ea-norway
   stableId: vrCKTVoFbw
-  numericId: E1165
+  wikiId: E1165
   type: organization
   orgType: generic
   title: Effective Altruism Norway
@@ -3428,7 +3428,7 @@
 
 - id: czea
   stableId: 1assBhWMcg
-  numericId: E1166
+  wikiId: E1166
   type: organization
   orgType: generic
   title: Czech Association for Effective Altruism
@@ -3441,7 +3441,7 @@
 
 - id: ea-sweden
   stableId: zkLhbMDSVQ
-  numericId: E1167
+  wikiId: E1167
   type: organization
   orgType: generic
   title: Effektiv Altruism Sverige (EA Sweden)
@@ -3454,7 +3454,7 @@
 
 - id: founders-pledge
   stableId: TBgnF576Vg
-  numericId: E1168
+  wikiId: E1168
   type: organization
   orgType: generic
   title: Founders Pledge
@@ -3469,7 +3469,7 @@
 
 - id: ea-funds
   stableId: GURMOHZrFA
-  numericId: E1169
+  wikiId: E1169
   type: organization
   orgType: funder
   title: Effective Altruism Funds
@@ -3484,7 +3484,7 @@
 
 - id: charity-entrepreneurship
   stableId: O4RL1JXU6w
-  numericId: E1170
+  wikiId: E1170
   type: organization
   orgType: generic
   title: Charity Entrepreneurship
@@ -3499,7 +3499,7 @@
 
 - id: ea-geneva
   stableId: 2WT9rbzjkA
-  numericId: E1171
+  wikiId: E1171
   type: organization
   orgType: generic
   title: Effective Altruism Geneva
@@ -3512,7 +3512,7 @@
 
 - id: ea-poland
   stableId: snkmOerhsw
-  numericId: E1172
+  wikiId: E1172
   type: organization
   orgType: generic
   title: Effective Altruism Poland
@@ -3525,7 +3525,7 @@
 
 - id: ea-netherlands
   stableId: Wb5XO6qYwQ
-  numericId: E1173
+  wikiId: E1173
   type: organization
   orgType: generic
   title: Effective Altruism Netherlands
@@ -3538,7 +3538,7 @@
 
 - id: ea-singapore
   stableId: Fr0DnL9USw
-  numericId: E1174
+  wikiId: E1174
   type: organization
   orgType: generic
   title: Effective Altruism Singapore
@@ -3551,7 +3551,7 @@
 
 - id: ea-finland
   stableId: bxNPwLZN3A
-  numericId: E1175
+  wikiId: E1175
   type: organization
   orgType: generic
   title: Effective Altruism Finland
@@ -3564,7 +3564,7 @@
 
 - id: ea-israel
   stableId: eDOLLPm77g
-  numericId: E1176
+  wikiId: E1176
   type: organization
   orgType: generic
   title: Effective Altruism Israel
@@ -3577,7 +3577,7 @@
 
 - id: ea-foundation
   stableId: 4YEaHrpWUQ
-  numericId: E1177
+  wikiId: E1177
   type: organization
   orgType: generic
   title: Effective Altruism Foundation
@@ -3593,7 +3593,7 @@
 
 - id: ea-new-zealand
   stableId: HscPCr9okw
-  numericId: E1178
+  wikiId: E1178
   type: organization
   orgType: generic
   title: Effective Altruism New Zealand
@@ -3606,7 +3606,7 @@
 
 - id: ea-australia
   stableId: ho6fSE1Aow
-  numericId: E1179
+  wikiId: E1179
   type: organization
   orgType: generic
   title: Effective Altruism Australia
@@ -3619,7 +3619,7 @@
 
 - id: ea-denmark
   stableId: 0xZurnQ8SQ
-  numericId: E1180
+  wikiId: E1180
   type: organization
   orgType: generic
   title: Effective Altruism Denmark
@@ -3632,7 +3632,7 @@
 
 - id: ea-austria
   stableId: 2FQ7p7Wgnw
-  numericId: E1181
+  wikiId: E1181
   type: organization
   orgType: generic
   title: Effective Altruism Austria
@@ -3645,7 +3645,7 @@
 
 - id: effective-ventures-usa
   stableId: L04KZ3Ylsw
-  numericId: E1182
+  wikiId: E1182
   type: organization
   orgType: generic
   title: Effective Ventures Foundation USA
@@ -3658,7 +3658,7 @@
 
 - id: cambridge-ea
   stableId: z7spMQKjLQ
-  numericId: E1183
+  wikiId: E1183
   type: organization
   orgType: generic
   title: Cambridge Effective Altruism
@@ -3672,7 +3672,7 @@
 
 - id: one-for-the-world
   stableId: O6YSnkAMqg
-  numericId: E1216
+  wikiId: E1216
   type: organization
   orgType: generic
   title: One for the World
@@ -3687,7 +3687,7 @@
 
 - id: non-trivial
   stableId: e1q5WWd7gQ
-  numericId: E1204
+  wikiId: E1204
   type: organization
   orgType: generic
   title: Non-Trivial
@@ -3702,7 +3702,7 @@
 
 - id: probably-good
   stableId: AndlA1NTng
-  numericId: E1205
+  wikiId: E1205
   type: organization
   orgType: generic
   title: Probably Good
@@ -3716,7 +3716,7 @@
 
 - id: atlas-fellowship
   stableId: VqPPJRKsrQ
-  numericId: E1203
+  wikiId: E1203
   type: organization
   orgType: generic
   title: Atlas Fellowship
@@ -3731,7 +3731,7 @@
 
 - id: high-impact-engineers
   stableId: 4VggZAoQcg
-  numericId: E1207
+  wikiId: E1207
   type: organization
   orgType: generic
   title: High Impact Engineers
@@ -3745,7 +3745,7 @@
 
 - id: high-impact-athletes
   stableId: OmMYaAgZpw
-  numericId: E1220
+  wikiId: E1220
   type: organization
   orgType: generic
   title: High Impact Athletes
@@ -3760,7 +3760,7 @@
 
 - id: generation-pledge
   stableId: slFh7JjUqQ
-  numericId: E1221
+  wikiId: E1221
   type: organization
   orgType: generic
   title: Generation Pledge
@@ -3774,7 +3774,7 @@
 
 - id: ceealar
   stableId: 0d2STsaG4A
-  numericId: E1222
+  wikiId: E1222
   type: organization
   orgType: generic
   title: CEEALAR
@@ -3789,7 +3789,7 @@
 
 - id: ambitious-impact
   stableId: Umu2ZOchow
-  numericId: E1223
+  wikiId: E1223
   type: organization
   orgType: generic
   title: Ambitious Impact
@@ -3803,7 +3803,7 @@
 
 - id: training-for-good
   stableId: 0Ab6GjAl0A
-  numericId: E1224
+  wikiId: E1224
   type: organization
   orgType: generic
   title: Training for Good
@@ -3817,7 +3817,7 @@
 
 - id: effective-institutions-project
   stableId: jweZ80FQSQ
-  numericId: E1225
+  wikiId: E1225
   type: organization
   orgType: generic
   title: Effective Institutions Project
@@ -3831,7 +3831,7 @@
 
 - id: the-unjournal
   stableId: zuzXwcuOLw
-  numericId: E1211
+  wikiId: E1211
   type: organization
   orgType: generic
   title: The Unjournal
@@ -3850,7 +3850,7 @@
 
 - id: center-for-global-development
   stableId: b4M1tU9tGw
-  numericId: E1184
+  wikiId: E1184
   type: organization
   orgType: generic
   title: Center for Global Development
@@ -3864,7 +3864,7 @@
 
 - id: rand-corporation
   stableId: 8grDoD8kig
-  numericId: E1185
+  wikiId: E1185
   type: organization
   orgType: generic
   title: RAND Corporation
@@ -3880,7 +3880,7 @@
 
 - id: legal-priorities-project
   stableId: 8zy1QbFxOg
-  numericId: E1186
+  wikiId: E1186
   type: organization
   orgType: safety-org
   title: Legal Priorities Project
@@ -3896,7 +3896,7 @@
 
 - id: global-priorities-institute
   stableId: VTigs5s4gg
-  numericId: E1187
+  wikiId: E1187
   type: organization
   orgType: safety-org
   title: Global Priorities Institute
@@ -3912,7 +3912,7 @@
 
 - id: simon-institute
   stableId: CneUT6LNVg
-  numericId: E1188
+  wikiId: E1188
   type: organization
   orgType: safety-org
   title: Simon Institute for Longterm Governance
@@ -3927,7 +3927,7 @@
 
 - id: cnas
   stableId: dYjY3Ma1Hw
-  numericId: E1189
+  wikiId: E1189
   type: organization
   orgType: generic
   title: Center for a New American Security
@@ -3942,7 +3942,7 @@
 
 - id: federation-of-american-scientists
   stableId: 2avSHj60sQ
-  numericId: E1190
+  wikiId: E1190
   type: organization
   orgType: generic
   title: Federation of American Scientists
@@ -3957,7 +3957,7 @@
 
 - id: institute-for-progress
   stableId: 7ked5Nus0g
-  numericId: E1191
+  wikiId: E1191
   type: organization
   orgType: generic
   title: Institute for Progress
@@ -3970,7 +3970,7 @@
 
 - id: foundation-for-american-innovation
   stableId: rjdYwdLAvw
-  numericId: E1192
+  wikiId: E1192
   type: organization
   orgType: generic
   title: Foundation for American Innovation
@@ -3983,7 +3983,7 @@
 
 - id: iaps
   stableId: NI4hqOL33A
-  numericId: E1193
+  wikiId: E1193
   type: organization
   orgType: safety-org
   title: Institute for AI Policy and Strategy
@@ -3997,7 +3997,7 @@
 
 - id: niskanen-center
   stableId: O5jCdIWixQ
-  numericId: E1194
+  wikiId: E1194
   type: organization
   orgType: generic
   title: Niskanen Center
@@ -4010,7 +4010,7 @@
 
 - id: carnegie-endowment
   stableId: wrbWEng9gg
-  numericId: E1195
+  wikiId: E1195
   type: organization
   orgType: generic
   title: Carnegie Endowment for International Peace
@@ -4024,7 +4024,7 @@
 
 - id: oxford-china-policy-lab
   stableId: 6T3yDF5wvg
-  numericId: E1196
+  wikiId: E1196
   type: organization
   orgType: generic
   title: Oxford China Policy Lab
@@ -4039,7 +4039,7 @@
 
 - id: bipartisan-commission-biodefense
   stableId: wHfFIBrPcA
-  numericId: E1197
+  wikiId: E1197
   type: organization
   orgType: generic
   title: Bipartisan Commission on Biodefense
@@ -4053,7 +4053,7 @@
 
 - id: georgetown-cghss
   stableId: vgdN9zIzqA
-  numericId: E1198
+  wikiId: E1198
   type: organization
   orgType: generic
   title: Georgetown Center for Global Health Science and Security
@@ -4067,7 +4067,7 @@
 
 - id: vera-institute
   stableId: m4bxbv1MVA
-  numericId: E1199
+  wikiId: E1199
   type: organization
   orgType: generic
   title: Vera Institute of Justice
@@ -4081,7 +4081,7 @@
 
 - id: the-future-society
   stableId: u3Yf4JXH4Q
-  numericId: E1213
+  wikiId: E1213
   type: organization
   orgType: generic
   title: The Future Society
@@ -4095,7 +4095,7 @@
 
 - id: collective-intelligence-project
   stableId: 0TFmORNnKQ
-  numericId: E1218
+  wikiId: E1218
   type: organization
   orgType: generic
   title: Collective Intelligence Project
@@ -4113,7 +4113,7 @@
 
 - id: givedirectly
   stableId: wk3kStH8bw
-  numericId: E1200
+  wikiId: E1200
   type: organization
   orgType: generic
   title: GiveDirectly
@@ -4127,7 +4127,7 @@
 
 - id: against-malaria-foundation
   stableId: c5rNf1vl2A
-  numericId: E1201
+  wikiId: E1201
   type: organization
   orgType: generic
   title: Against Malaria Foundation
@@ -4141,7 +4141,7 @@
 
 - id: topos-institute
   stableId: K40O5WixNQ
-  numericId: E1202
+  wikiId: E1202
   type: organization
   orgType: generic
   title: Topos Institute
@@ -4155,7 +4155,7 @@
 
 - id: arcadia-impact
   stableId: 8VWjCOOGbg
-  numericId: E1206
+  wikiId: E1206
   type: organization
   orgType: generic
   title: Arcadia Impact
@@ -4169,7 +4169,7 @@
 
 - id: sentience-institute
   stableId: NKNm02bYjQ
-  numericId: E1208
+  wikiId: E1208
   type: organization
   orgType: generic
   title: Sentience Institute
@@ -4183,7 +4183,7 @@
 
 - id: foresight-institute
   stableId: NPPTvNqRXA
-  numericId: E1210
+  wikiId: E1210
   type: organization
   orgType: generic
   title: Foresight Institute
@@ -4197,7 +4197,7 @@
 
 - id: charter-cities-institute
   stableId: tGw4aneRnA
-  numericId: E1212
+  wikiId: E1212
   type: organization
   orgType: generic
   title: Charter Cities Institute
@@ -4212,7 +4212,7 @@
 
 - id: our-world-in-data
   stableId: iHh40BybGQ
-  numericId: E1214
+  wikiId: E1214
   type: organization
   orgType: generic
   title: Our World in Data
@@ -4226,7 +4226,7 @@
 
 - id: idinsight
   stableId: zkgz9y0CSw
-  numericId: E1215
+  wikiId: E1215
   type: organization
   orgType: generic
   title: IDinsight
@@ -4240,7 +4240,7 @@
 
 - id: good-food-institute
   stableId: NwOpgmI4Kw
-  numericId: E1219
+  wikiId: E1219
   type: organization
   orgType: generic
   title: The Good Food Institute
@@ -4254,7 +4254,7 @@
 
 - id: convergent-research
   stableId: WTKOsF10bw
-  numericId: E1226
+  wikiId: E1226
   type: organization
   orgType: generic
   title: Convergent Research
@@ -4268,7 +4268,7 @@
 
 - id: innovations-for-poverty-action
   stableId: 3km4O0U8mg
-  numericId: E1227
+  wikiId: E1227
   type: organization
   orgType: generic
   title: Innovations for Poverty Action
@@ -4286,7 +4286,7 @@
 
 - id: malaria-consortium
   stableId: VZunwIHG2Q
-  numericId: E1228
+  wikiId: E1228
   type: organization
   orgType: generic
   title: Malaria Consortium
@@ -4303,7 +4303,7 @@
 
 - id: evidence-action
   stableId: 83v83rovnA
-  numericId: E1229
+  wikiId: E1229
   type: organization
   orgType: generic
   title: Evidence Action
@@ -4319,7 +4319,7 @@
 
 - id: helen-keller-international
   stableId: SJtVOOdDKQ
-  numericId: E1230
+  wikiId: E1230
   type: organization
   orgType: generic
   title: Helen Keller International
@@ -4335,7 +4335,7 @@
 
 - id: gates-philanthropy-partners
   stableId: l9EjmCxIMA
-  numericId: E1231
+  wikiId: E1231
   type: organization
   orgType: funder
   title: Gates Philanthropy Partners
@@ -4351,7 +4351,7 @@
 
 - id: the-humane-league
   stableId: zbjE2ZHmsA
-  numericId: E1232
+  wikiId: E1232
   type: organization
   orgType: generic
   title: The Humane League
@@ -4366,7 +4366,7 @@
 
 - id: anima-international
   stableId: g5RgWEXUCg
-  numericId: E1233
+  wikiId: E1233
   type: organization
   orgType: generic
   title: Anima International
@@ -4381,7 +4381,7 @@
 
 - id: compassion-in-world-farming
   stableId: ZmtYxrupIA
-  numericId: E1234
+  wikiId: E1234
   type: organization
   orgType: generic
   title: Compassion in World Farming
@@ -4397,7 +4397,7 @@
 
 - id: givewell
   stableId: OwXl35e7bg
-  numericId: E1056
+  wikiId: E1056
   type: organization
   orgType: generic
   title: GiveWell
@@ -4418,7 +4418,7 @@
 
 - id: gates-foundation
   stableId: l4EHdNDZqg
-  numericId: E1454
+  wikiId: E1454
   type: organization
   orgType: funder
   title: Gates Foundation
@@ -4439,7 +4439,7 @@
 
 - id: good-ventures
   stableId: hQ4Rdnaihw
-  numericId: E1455
+  wikiId: E1455
   type: organization
   orgType: funder
   title: Good Ventures
@@ -4462,7 +4462,7 @@
 
 - id: wellcome-trust
   stableId: D3QcAF9wzQ
-  numericId: E1456
+  wikiId: E1456
   type: organization
   orgType: funder
   title: Wellcome Trust
@@ -4481,7 +4481,7 @@
 
 - id: rockefeller-foundation
   stableId: 3wtyeezoxQ
-  numericId: E1457
+  wikiId: E1457
   type: organization
   orgType: funder
   title: Rockefeller Foundation
@@ -4500,7 +4500,7 @@
 
 - id: ford-foundation
   stableId: 3ViojCH3Sw
-  numericId: E1458
+  wikiId: E1458
   type: organization
   orgType: funder
   title: Ford Foundation
@@ -4518,7 +4518,7 @@
 
 - id: bloomberg-philanthropies
   stableId: H9mGnBuumA
-  numericId: E1459
+  wikiId: E1459
   type: organization
   orgType: funder
   title: Bloomberg Philanthropies
@@ -4537,7 +4537,7 @@
 
 - id: arnold-ventures
   stableId: AT0VDnvwRw
-  numericId: E1460
+  wikiId: E1460
   type: organization
   orgType: funder
   title: Arnold Ventures
@@ -4555,7 +4555,7 @@
 
 - id: omidyar-network
   stableId: GADd9PU0UA
-  numericId: E1461
+  wikiId: E1461
   type: organization
   orgType: funder
   title: Omidyar Network
@@ -4573,7 +4573,7 @@
 
 - id: skoll-foundation
   stableId: 3swyqpXTRA
-  numericId: E1462
+  wikiId: E1462
   type: organization
   orgType: funder
   title: Skoll Foundation
@@ -4590,7 +4590,7 @@
 
 - id: animal-charity-evaluators
   stableId: nJF5vuz1kA
-  numericId: E1463
+  wikiId: E1463
   type: organization
   orgType: generic
   title: Animal Charity Evaluators
@@ -4610,7 +4610,7 @@
 
 - id: global-health-and-development-fund
   stableId: sQjYpneK8g
-  numericId: E1464
+  wikiId: E1464
   type: organization
   orgType: funder
   title: Global Health and Development Fund
@@ -4633,7 +4633,7 @@
 
 - id: ea-animal-welfare-fund
   stableId: 7oufogONXA
-  numericId: E1465
+  wikiId: E1465
   type: organization
   orgType: funder
   title: EA Animal Welfare Fund
@@ -4656,7 +4656,7 @@
 
 - id: new-incentives
   stableId: hyYuA3BoYw
-  numericId: E1466
+  wikiId: E1466
   type: organization
   orgType: generic
   title: New Incentives
@@ -4675,7 +4675,7 @@
 
 - id: the-life-you-can-save
   stableId: pShgsxdp8Q
-  numericId: E1467
+  wikiId: E1467
   type: organization
   orgType: generic
   title: The Life You Can Save
@@ -4695,7 +4695,7 @@
 
 - id: john-templeton-foundation
   stableId: W3UAlnscAg
-  numericId: E1468
+  wikiId: E1468
   type: organization
   orgType: funder
   title: John Templeton Foundation
@@ -4713,7 +4713,7 @@
 
 - id: childrens-investment-fund-foundation
   stableId: Z6vKggPBaA
-  numericId: E1469
+  wikiId: E1469
   type: organization
   orgType: funder
   title: Children's Investment Fund Foundation
@@ -4732,7 +4732,7 @@
 
 - id: bezos-earth-fund
   stableId: fVMqY7vpMA
-  numericId: E1470
+  wikiId: E1470
   type: organization
   orgType: funder
   title: Bezos Earth Fund

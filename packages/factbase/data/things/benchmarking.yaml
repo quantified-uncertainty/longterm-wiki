@@ -3,7 +3,7 @@ thing:
   stableId: bfK5RgQBcQ
   type: concept
   name: AI Benchmarking
-  numericId: E38
+  wikiId: E38
 facts:
   - id: f_HU1AmRajLw
     property: description

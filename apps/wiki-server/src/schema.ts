@@ -32,7 +32,7 @@ import { sql } from "drizzle-orm";
 export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
 
 export const entityIds = pgTable("entity_ids", {
-  numericId: integer("numeric_id").primaryKey(),
+  wikiId: integer("wiki_id").primaryKey(),
   slug: text("slug").notNull().unique(),
   stableId: text("stable_id").unique(),
   description: text("description"),
@@ -107,7 +107,7 @@ export const wikiPages = pgTable(
   "wiki_pages",
   {
     id: text("id").primaryKey(),
-    numericId: text("numeric_id"),
+    wikiId: text("wiki_id"),
     // Phase 4a: new columns for integer PK migration (#1498)
     slug: text("slug").notNull().unique(),
     integerIdCol: integer("integer_id").unique(),
@@ -161,7 +161,7 @@ export const wikiPages = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_wp_numeric_id").on(table.numericId),
+    index("idx_wp_wiki_id").on(table.wikiId),
     index("idx_wp_category").on(table.category),
     index("idx_wp_entity_type").on(table.entityType),
     index("idx_wp_reader_importance").on(table.readerImportance),
@@ -673,7 +673,7 @@ export const entities = pgTable(
   "entities",
   {
     id: text("id").primaryKey(),
-    numericId: text("numeric_id"),
+    wikiId: text("wiki_id"),
     stableId: text("stable_id").unique(),
     entityType: text("entity_type").notNull(),
     title: text("title").notNull(),
@@ -704,7 +704,7 @@ export const entities = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_ent_numeric_id").on(table.numericId),
+    index("idx_ent_wiki_id").on(table.wikiId),
     index("idx_ent_entity_type").on(table.entityType),
     index("idx_ent_title").on(table.title),
   ]
@@ -2028,7 +2028,7 @@ export const things = pgTable(
     entityType: text("entity_type"),
     description: text("description"),
     sourceUrl: text("source_url"),
-    numericId: text("numeric_id"),
+    wikiId: text("wiki_id"),
     verdict: text("verdict"),
     verdictConfidence: real("verdict_confidence"),
     verdictAt: timestamp("verdict_at", { withTimezone: true }),
@@ -2146,7 +2146,7 @@ export const researchAreas = pgTable(
   "research_areas",
   {
     id: text("id").primaryKey(), // slug: 'rlhf', 'mech-interp'
-    numericId: text("numeric_id"), // 'E259' — links to entity_ids for wiki pages
+    wikiId: text("wiki_id"), // 'E259' — links to entity_ids for wiki pages
     title: text("title").notNull(),
     description: text("description"),
     status: text("status").notNull().default("active"), // active | emerging | mature | declining | archived

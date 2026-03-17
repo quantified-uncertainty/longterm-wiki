@@ -38,7 +38,7 @@ export function findFootnoteRefs(body: string): Set<number> {
 /**
  * Count all unique footnote references (both numeric [^1] and named [^mixtral]).
  * Used by metrics/grading code where we need a total citation count,
- * not just numeric IDs for orphan detection.
+ * not just wiki IDs for orphan detection.
  */
 export function countAllFootnoteRefs(body: string): number {
   const refs = new Set<string>();

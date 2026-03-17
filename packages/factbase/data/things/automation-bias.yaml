@@ -3,7 +3,7 @@ thing:
   stableId: 72cwRMbzMA
   type: risk
   name: Automation Bias (AI Systems)
-  numericId: E32
+  wikiId: E32
 facts:
   - id: f_qeiiuaClaQ
     property: description

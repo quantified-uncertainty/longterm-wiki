@@ -3,7 +3,7 @@ thing:
   stableId: bQ9a5lwwlg
   type: concept
   name: Existential Risk from AI
-  numericId: E131
+  wikiId: E131
 facts:
   - id: f_QovYblRFEg
     property: description

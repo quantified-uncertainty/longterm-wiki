@@ -3,7 +3,7 @@ thing:
   stableId: muueuPOHfg
   type: person
   name: Shane Legg
-  numericId: E280
+  wikiId: E280
 facts:
   - id: f_r70UvkiMgQ
     property: description

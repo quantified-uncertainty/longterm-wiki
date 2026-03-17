@@ -34,7 +34,7 @@ interface PersonRawRow {
   id: string;
   slug: string;
   name: string;
-  numericId: string | null;
+  wikiId: string | null;
   description: string | null;
   role: string | null;
   employerId: string | null;
@@ -59,7 +59,7 @@ function formatPersonRow(r: PersonRawRow) {
     id: r.id,
     slug: r.slug,
     name: r.name,
-    numericId: r.numericId,
+    wikiId: r.wikiId,
     description: r.description,
     role: r.role,
     employerId: r.employerId,
@@ -168,7 +168,7 @@ const peopleApp = new Hono()
         t.id,
         t.source_id AS slug,
         t.title AS name,
-        t.numeric_id AS "numericId",
+        t.wiki_id AS "wikiId",
         t.description,
         ${roleSubquery} AS role,
         (SELECT f_e.value FROM facts f_e WHERE f_e.entity_id = t.id AND f_e.fact_id = 'employed-by' LIMIT 1) AS "employerId",

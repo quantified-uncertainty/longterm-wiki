@@ -3,7 +3,7 @@ thing:
   stableId: 4RoymCjuvA
   type: organization
   name: Value Aligned Research Advisors
-  numericId: E572
+  wikiId: E572
 facts:
   - id: f_anoBXy3d0g
     property: description
