@@ -87,8 +87,8 @@ async function fetchExistingGrantsForOrg(entityId: string): Promise<GrantRecord[
 // Dedup logic
 // ---------------------------------------------------------------------------
 
-function normalize(s: string | undefined | null): string {
-  return (s || '').toLowerCase().trim().replace(/\s+/g, ' ');
+function normalize(s: unknown): string {
+  return (typeof s === 'string' ? s : '').toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
 /** Dedup personnel records. Match on personId + organizationId + role. */
@@ -126,10 +126,10 @@ export async function dedupInvestments(
 ): Promise<Array<Record<string, unknown>>> {
   const existing = await fetchExistingInvestments(entityId);
   const keys = new Set(
-    existing.map(r => `${normalize(r.companyId)}|${normalize(r.investorId)}|${normalize(r.roundName || '')}`),
+    existing.map(r => `${normalize(r.companyId)}|${normalize(r.investorId)}|${normalize(r.roundName)}`),
   );
   return candidates.filter(
-    c => !keys.has(`${normalize(c.companyId)}|${normalize(c.investorId)}|${normalize(c.roundName || '')}`),
+    c => !keys.has(`${normalize(c.companyId)}|${normalize(c.investorId)}|${normalize(c.roundName)}`),
   );
 }
 
