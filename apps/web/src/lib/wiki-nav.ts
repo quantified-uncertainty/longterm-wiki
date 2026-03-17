@@ -266,6 +266,7 @@ export function getInternalNav(): NavSection[] {
         { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
         { label: "Things", href: internalHref("things-dashboard") },
         { label: "Entity Matrix", href: internalHref("entity-matrix-dashboard") },
+        { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
       ],
     },
     {
