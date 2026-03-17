@@ -405,10 +405,51 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   }
 }
 
+/**
+ * Build a map from FactBase array indices to correct stableIds.
+ * The entity matcher previously used Object.entries() on an array of entities,
+ * producing array indices ("0", "1", "108"...) as stableIds instead of the
+ * actual entity ID. This mapping is used to fix records that were stored with
+ * the wrong IDs.
+ */
+async function buildArrayIndexFixMap(): Promise<Map<string, { stableId: string; name: string }>> {
+  const fs = await import('fs');
+  const path = await import('path');
+  const map = new Map<string, { stableId: string; name: string }>();
+
+  try {
+    const kbDataPath = path.resolve('apps/web/src/data/factbase-data.json');
+    const kbData = JSON.parse(fs.readFileSync(kbDataPath, 'utf8'));
+    const entities = Array.isArray(kbData.entities) ? kbData.entities : [];
+
+    for (let i = 0; i < entities.length; i++) {
+      const ent = entities[i];
+      const stableId = ent.stableId || ent.id;
+      if (stableId) {
+        map.set(String(i), { stableId, name: ent.name || '?' });
+      }
+    }
+  } catch {
+    // If factbase-data.json is unavailable, return empty map
+  }
+
+  return map;
+}
+
+/**
+ * Check whether a value looks like it was stored as a FactBase array index
+ * rather than a proper stableId. Array indices are short numeric strings
+ * that happen to be valid indices into the entities array.
+ */
+function isArrayIndex(value: string, fixMap: Map<string, { stableId: string; name: string }>): boolean {
+  return /^\d+$/.test(value) && fixMap.has(value);
+}
+
 async function verifyCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
   const matcher = buildEntityMatcher();
+  const arrayIndexFixes = await buildArrayIndexFixMap();
 
   // Fetch all personnel records
   const allPersonnel: Array<Record<string, unknown>> = [];
@@ -423,48 +464,63 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
 
   const issues: string[] = [];
   let slugPersonIds = 0;
+  let arrayIndexIds = 0;
   let unresolvedPersonIds = 0;
   let missingSource = 0;
   let duplicates = 0;
+  let fixed = 0;
 
   const seen = new Set<string>();
+  // Batch fixes to apply in one sync call
+  const fixBatch: Array<Record<string, unknown>> = [];
 
   for (const rec of allPersonnel) {
-    const pid = rec.personId as string;
-    const oid = rec.organizationId as string;
+    let pid = rec.personId as string;
+    let oid = rec.organizationId as string;
     const role = rec.role as string;
+    let needsFix = false;
+
+    // Check for array-index IDs (e.g., "108" instead of "VoNqoBJkyg")
+    // These were created by a bug where Object.entries() on an array produced indices as keys
+    if (isArrayIndex(pid, arrayIndexFixes)) {
+      const fix = arrayIndexFixes.get(pid)!;
+      issues.push(`ARRAY_INDEX_PERSON: Record ${rec.id} has personId="${pid}" → should be "${fix.stableId}" (${fix.name})`);
+      arrayIndexIds++;
+      pid = fix.stableId;
+      needsFix = true;
+    }
+    if (isArrayIndex(oid, arrayIndexFixes)) {
+      const fix = arrayIndexFixes.get(oid)!;
+      issues.push(`ARRAY_INDEX_ORG: Record ${rec.id} has organizationId="${oid}" → should be "${fix.stableId}" (${fix.name})`);
+      arrayIndexIds++;
+      oid = fix.stableId;
+      needsFix = true;
+    }
 
     // Check for slug-based personIds (should be stableIds)
-    // StableIds are 10-char alphanumeric without hyphens, so hyphens indicate a slug
-    if (pid && pid.includes('-')) {
-      // Try local matcher first, then wiki-server entity lookup
+    if (pid.includes('-')) {
       const match = matcher.match(pid);
       if (match) {
         issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${match.stableId}"`);
         slugPersonIds++;
-        if (options.fix) {
-          const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
-            items: [{ ...rec, personId: match.stableId }],
-          });
-          if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
-        }
+        pid = match.stableId;
+        needsFix = true;
       } else {
-        // Check wiki-server directly (entity may exist but not in local database.json)
         const entityR = await apiRequest<{ id: string; stableId: string | null }>('GET', `/api/entities/${encodeURIComponent(pid)}`);
         if (entityR.ok && entityR.data.stableId) {
           issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${entityR.data.stableId}" (via server)`);
           slugPersonIds++;
-          if (options.fix) {
-            const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
-              items: [{ ...rec, personId: entityR.data.stableId }],
-            });
-            if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
-          }
+          pid = entityR.data.stableId;
+          needsFix = true;
         } else {
           issues.push(`UNRESOLVED_PERSON_ID: Record ${rec.id} has personId="${pid}" which doesn't resolve`);
           unresolvedPersonIds++;
         }
       }
+    }
+
+    if (needsFix && options.fix) {
+      fixBatch.push({ ...rec, personId: pid, organizationId: oid });
     }
 
     // Check for missing dates + no confirmation note
@@ -491,10 +547,25 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
     seen.add(key);
   }
 
+  // Apply fixes in batches
+  if (fixBatch.length > 0 && options.fix) {
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < fixBatch.length; i += BATCH_SIZE) {
+      const batch = fixBatch.slice(i, i + BATCH_SIZE);
+      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', { items: batch });
+      if (fixR.ok) {
+        fixed += fixR.data.upserted;
+      } else {
+        issues.push(`FIX_ERROR: Batch starting at ${i} failed: ${fixR.message}`);
+      }
+    }
+  }
+
   const summary = [
     `\x1b[1mTableBase Data Quality Report\x1b[0m`,
     `Total personnel records: ${allPersonnel.length}`,
     '',
+    `Array-index IDs (bug fix needed): ${arrayIndexIds}`,
     `Slug-based personIds (need normalization): ${slugPersonIds}`,
     `Unresolved personIds: ${unresolvedPersonIds}`,
     `Missing source URLs: ${missingSource}`,
@@ -502,21 +573,26 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
     '',
   ];
 
+  if (options.fix && fixed > 0) {
+    summary.push(`\x1b[32m✓ Fixed ${fixed} records\x1b[0m`);
+    summary.push('');
+  }
+
   if (issues.length === 0) {
     summary.push('\x1b[32m✓ No issues found\x1b[0m');
   } else {
     summary.push(`\x1b[33m${issues.length} issue(s) found:\x1b[0m`);
-    for (const issue of issues.slice(0, 20)) {
+    for (const issue of issues.slice(0, 30)) {
       summary.push(`  ${issue}`);
     }
-    if (issues.length > 20) summary.push(`  ... and ${issues.length - 20} more`);
+    if (issues.length > 30) summary.push(`  ... and ${issues.length - 30} more`);
   }
 
   if (options.ci) {
-    return { exitCode: 0, output: JSON.stringify({ total: allPersonnel.length, slugPersonIds, unresolvedPersonIds, missingSource, duplicates, issues }) };
+    return { exitCode: 0, output: JSON.stringify({ total: allPersonnel.length, arrayIndexIds, slugPersonIds, unresolvedPersonIds, missingSource, duplicates, fixed, issues }) };
   }
 
-  return { exitCode: issues.length > 0 ? 1 : 0, output: summary.join('\n') };
+  return { exitCode: issues.length > 0 && !options.fix ? 1 : 0, output: summary.join('\n') };
 }
 
 async function prepareCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
