@@ -554,6 +554,61 @@ describe("Entities API", () => {
     });
   });
 
+  // ---- Directory endpoint ----
+
+  describe("GET /api/entities/directory", () => {
+    it("returns entities for a valid entityType", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+      });
+      await seedEntity(app, "openai", "OpenAI", {
+        entityType: "organization",
+      });
+
+      const res = await app.request(
+        "/api/entities/directory?entityType=organization"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(Array.isArray(body.entities)).toBe(true);
+      expect(body.total).toBeGreaterThanOrEqual(0);
+    });
+
+    it("rejects unknown entityType with 400", async () => {
+      const res = await app.request(
+        "/api/entities/directory?entityType=unknown-type-xyz"
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toContain("Unknown entityType");
+      expect(body.error).toContain("unknown-type-xyz");
+    });
+
+    it("rejects SQL-injection-style entityType with 400", async () => {
+      const res = await app.request(
+        "/api/entities/directory?entityType='; DROP TABLE entities;--"
+      );
+      expect(res.status).toBe(400);
+    });
+
+    it("accepts a valid alias entityType", async () => {
+      await seedEntity(app, "researcher-1", "A Researcher", {
+        entityType: "researcher",
+      });
+
+      // "researcher" is a known alias — should be accepted (200), not rejected
+      const res = await app.request(
+        "/api/entities/directory?entityType=researcher"
+      );
+      expect(res.status).toBe(200);
+    });
+
+    it("requires entityType parameter", async () => {
+      const res = await app.request("/api/entities/directory");
+      expect(res.status).toBe(400);
+    });
+  });
+
   // ---- Auth ----
 
   describe("Bearer auth", () => {
