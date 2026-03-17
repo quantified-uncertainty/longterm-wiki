@@ -4393,3 +4393,356 @@
   tags:
     - animal-welfare
   lastUpdated: 2026-03
+
+
+- id: givewell
+  stableId: OwXl35e7bg
+  numericId: E1056
+  type: organization
+  orgType: generic
+  title: GiveWell
+  website: https://www.givewell.org
+  description: >-
+    Nonprofit charity evaluator founded in 2007 by Holden Karnofsky and Elie
+    Hassenfeld. GiveWell conducts in-depth research to find outstanding giving
+    opportunities in global health and poverty. In metrics year 2024, GiveWell
+    directed \$397M to its top-rated charities. Its cost-effectiveness analyses
+    and transparent methodology have made it the most influential charity
+    evaluator in effective altruism, significantly shaping where hundreds of
+    millions of dollars in donations flow each year.
+  tags:
+    - ea-community
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: gates-foundation
+  stableId: l4EHdNDZqg
+  numericId: E1454
+  type: organization
+  orgType: funder
+  title: Gates Foundation
+  website: https://www.gatesfoundation.org
+  description: >-
+    The world's largest private charitable foundation, with an endowment
+    exceeding \$75B. Founded in 2000 by Bill and Melinda Gates and rebranded
+    to Gates Foundation effective January 6, 2025, it focuses on global
+    health, poverty alleviation, and US education. It provided \$8.0B in
+    charitable support in 2024, with a \$9B annual payout target for 2026,
+    making it a dominant force in global public health funding, including
+    major investments in vaccine development, malaria eradication, and
+    agricultural development.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: good-ventures
+  stableId: hQ4Rdnaihw
+  numericId: E1455
+  type: organization
+  orgType: funder
+  title: Good Ventures
+  website: https://www.goodventures.org
+  description: >-
+    Philanthropic foundation established by Dustin Moskovitz (Facebook
+    co-founder) and Cari Tuna. Good Ventures has been the primary funding
+    partner of Coefficient Giving (formerly Open Philanthropy), together
+    directing billions in grants across global health, AI safety, biosecurity,
+    and other cause areas. One of the largest funders in the effective altruism
+    ecosystem, with total giving exceeding \$3B.
+  relatedEntries:
+    - id: coefficient-giving
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: wellcome-trust
+  stableId: D3QcAF9wzQ
+  numericId: E1456
+  type: organization
+  orgType: funder
+  title: Wellcome Trust
+  website: https://wellcome.org
+  description: >-
+    Global charitable foundation with an endowment of approximately \$50B,
+    making it one of the largest funders of scientific research worldwide.
+    Founded in 1936 from the estate of Sir Henry Wellcome, the trust focuses
+    on health research, including infectious disease, mental health, and
+    climate-health intersections. It has also funded work on biosecurity
+    and emerging technology governance.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: rockefeller-foundation
+  stableId: 3wtyeezoxQ
+  numericId: E1457
+  type: organization
+  orgType: funder
+  title: Rockefeller Foundation
+  website: https://www.rockefellerfoundation.org
+  description: >-
+    American private foundation established in 1913 by John D. Rockefeller,
+    with an endowment of approximately \$6B. The foundation focuses on global
+    health, food security, energy, and economic opportunity. Historically
+    instrumental in establishing modern public health infrastructure, funding
+    the development of the yellow fever vaccine, and supporting the Green
+    Revolution in agriculture.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: ford-foundation
+  stableId: 3ViojCH3Sw
+  numericId: E1458
+  type: organization
+  orgType: funder
+  title: Ford Foundation
+  website: https://www.fordfoundation.org
+  description: >-
+    One of the largest private foundations in the United States, with an
+    endowment of approximately \$16B. Founded in 1936 by Edsel Ford, the
+    foundation focuses on reducing inequality and advancing social justice,
+    with programs spanning civic engagement, economic fairness, education,
+    and technology and society. It has been a significant funder of digital
+    rights and technology governance work.
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: bloomberg-philanthropies
+  stableId: H9mGnBuumA
+  numericId: E1459
+  type: organization
+  orgType: funder
+  title: Bloomberg Philanthropies
+  website: https://www.bloomberg.org
+  description: >-
+    Philanthropic organization founded by Michael Bloomberg, distributing over
+    \$1.7B annually across five focus areas: public health, the arts,
+    education, the environment, and government innovation. Notable programs
+    include anti-tobacco and anti-sugar campaigns in low- and middle-income
+    countries, and significant climate change mitigation funding through Beyond
+    Carbon and other initiatives.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: arnold-ventures
+  stableId: AT0VDnvwRw
+  numericId: E1460
+  type: organization
+  orgType: funder
+  title: Arnold Ventures
+  website: https://www.arnoldventures.org
+  description: >-
+    Philanthropic organization founded by John and Laura Arnold, focused on
+    evidence-based policy solutions. Key areas include criminal justice reform,
+    health care cost reduction, education, and public finance. Known for
+    funding rigorous research and randomized controlled trials to evaluate
+    social programs, and for supporting research integrity and open science
+    initiatives.
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: omidyar-network
+  stableId: GADd9PU0UA
+  numericId: E1461
+  type: organization
+  orgType: funder
+  title: Omidyar Network
+  website: https://omidyar.com
+  description: >-
+    Philanthropic investment firm established in 2004 by eBay founder Pierre
+    Omidyar and his wife Pam. The organization makes grants and investments
+    to support responsible technology, digital infrastructure, and governance
+    innovation. Focus areas include beneficial AI, platform accountability,
+    and strengthening democratic institutions against technology-driven threats.
+  tags:
+    - philanthropy
+    - governance
+  lastUpdated: 2026-03
+
+- id: skoll-foundation
+  stableId: 3swyqpXTRA
+  numericId: E1462
+  type: organization
+  orgType: funder
+  title: Skoll Foundation
+  website: https://skoll.org
+  description: >-
+    Foundation established in 1999 by Jeff Skoll, first president of eBay.
+    Focused on social entrepreneurship, the foundation supports innovators
+    tackling systemic challenges in climate, health, and inclusive economies.
+    Hosts the annual Skoll World Forum at Oxford and has invested over \$600M
+    in social entrepreneurs and organizations worldwide.
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: animal-charity-evaluators
+  stableId: nJF5vuz1kA
+  numericId: E1463
+  type: organization
+  orgType: generic
+  title: Animal Charity Evaluators
+  website: https://animalcharityevaluators.org
+  description: >-
+    Nonprofit charity evaluator focused on finding and promoting the most
+    effective ways to help animals. Conducts research and publishes annual
+    recommendations of top animal charities, similar to GiveWell's role in
+    global health. Key evaluator in the effective altruism animal welfare
+    space, directing millions in donations to high-impact farmed animal
+    advocacy and welfare organizations.
+  tags:
+    - ea-community
+    - animal-welfare
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: global-health-and-development-fund
+  stableId: sQjYpneK8g
+  numericId: E1464
+  type: organization
+  orgType: funder
+  title: Global Health and Development Fund
+  website: https://funds.effectivealtruism.org/funds/global-health-and-development
+  description: >-
+    One of four EA Funds managed by Effective Ventures, focused on grants to
+    organizations working to improve global health and alleviate poverty in
+    low-income countries. Supports GiveWell-recommended charities and other
+    evidence-based interventions in areas like malaria prevention, deworming,
+    cash transfers, and nutrition programs.
+  relatedEntries:
+    - id: ea-funds
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: ea-animal-welfare-fund
+  stableId: 7oufogONXA
+  numericId: E1465
+  type: organization
+  orgType: funder
+  title: EA Animal Welfare Fund
+  website: https://funds.effectivealtruism.org/funds/animal-welfare
+  description: >-
+    One of four EA Funds managed by Effective Ventures, focused on grants to
+    organizations working to improve animal welfare, primarily for farmed
+    animals. Supports corporate campaigns, legal advocacy, alternative protein
+    research, and other interventions aimed at reducing animal suffering at
+    scale.
+  relatedEntries:
+    - id: ea-funds
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+    - animal-welfare
+  lastUpdated: 2026-03
+
+- id: new-incentives
+  stableId: hyYuA3BoYw
+  numericId: E1466
+  type: organization
+  orgType: generic
+  title: New Incentives
+  website: https://www.newincentives.org
+  description: >-
+    Nonprofit organization operating in Nigeria that provides cash incentives
+    to caregivers who bring infants for routine immunizations. A GiveWell
+    top-rated charity, New Incentives has been shown to significantly increase
+    vaccination rates in areas with low baseline coverage, with
+    cost-effectiveness estimates comparable to other top global health
+    interventions.
+  tags:
+    - global-health
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: the-life-you-can-save
+  stableId: pShgsxdp8Q
+  numericId: E1467
+  type: organization
+  orgType: generic
+  title: The Life You Can Save
+  website: https://www.thelifeyoucansave.org
+  description: >-
+    Nonprofit organization founded in 2009 by philosopher Peter Singer,
+    inspired by his book of the same name. Recommends a curated list of
+    high-impact charities focused on global poverty and health, and advocates
+    for effective giving. Maintains a list of best charities evaluated for
+    cost-effectiveness, and provides tools to help donors maximize their
+    impact.
+  tags:
+    - ea-community
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: john-templeton-foundation
+  stableId: W3UAlnscAg
+  numericId: E1468
+  type: organization
+  orgType: funder
+  title: John Templeton Foundation
+  website: https://www.templeton.org
+  description: >-
+    Philanthropic organization established in 1987 by investor Sir John
+    Templeton, with an endowment of approximately \$3.4B. Funds research at
+    the intersection of science, philosophy, and theology, including work on
+    human flourishing, character development, and the nature of consciousness.
+    Has funded some research relevant to existential risk and long-term
+    thinking.
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: childrens-investment-fund-foundation
+  stableId: Z6vKggPBaA
+  numericId: E1469
+  type: organization
+  orgType: funder
+  title: Children's Investment Fund Foundation
+  website: https://ciff.org
+  description: >-
+    One of the world's largest philanthropies focused on children, founded by
+    Sir Chris Hohn. CIFF operates with a portfolio of approximately \$7B and
+    distributes over \$500M annually across child health and nutrition, climate
+    and environment, adolescent sexual health, and child protection. Known for
+    a results-driven approach and significant investment in climate change
+    mitigation.
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: bezos-earth-fund
+  stableId: fVMqY7vpMA
+  numericId: E1470
+  type: organization
+  orgType: funder
+  title: Bezos Earth Fund
+  website: https://www.bezosearthfund.org
+  description: >-
+    Philanthropic initiative launched in 2020 by Jeff Bezos with a \$10B
+    commitment to fight climate change and protect nature. Funds a wide range
+    of climate solutions including clean energy, nature conservation,
+    environmental justice, and climate-related food system transformation.
+    One of the largest individual philanthropic commitments to climate action.
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
