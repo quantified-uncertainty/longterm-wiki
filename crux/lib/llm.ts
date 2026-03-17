@@ -423,11 +423,17 @@ export interface AgentOptions {
   }>;
   /** Map of tool name → handler function. */
   toolHandlers?: Record<string, ToolHandler>;
+  /** Server-managed tools (e.g., web_search_20250305). Handled by the API — no local handler needed. */
+  serverTools?: Array<Record<string, unknown>>;
   maxToolTurns?: number;
   retryLabel?: string;
   heartbeatPhase?: string;
   /** Called on each retry. Defaults to console.log. */
   onRetry?: (message: string) => void;
+  /** Cost tracker for token usage. */
+  costTracker?: CostTracker;
+  /** Called after each tool result is produced. Useful for logging or tracking. */
+  onToolResult?: (toolName: string, result: string) => void;
 }
 
 /**
@@ -447,11 +453,25 @@ export async function runLlmAgent(
     maxTokens = 16000,
     systemPrompt = '',
     tools = [],
+    serverTools = [],
     toolHandlers = {},
     maxToolTurns = 10,
     retryLabel = 'agent',
     heartbeatPhase = 'api',
+    costTracker,
+    onToolResult,
   } = options;
+
+  // Combine custom tools and server tools
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allTools: any[] = [
+    ...tools.map(t => ({ type: 'custom' as const, ...t })),
+    ...serverTools,
+  ];
+  // If no server tools, use the original format for backward compatibility
+  const toolsParam = serverTools.length > 0
+    ? allTools
+    : (tools.length > 0 ? tools as Anthropic.Messages.Tool[] : undefined);
 
   const messages: MessageParam[] = [{ role: 'user', content: prompt }];
 
@@ -461,18 +481,18 @@ export async function runLlmAgent(
         model,
         max_tokens: maxTokens,
         ...(systemPrompt && { system: systemPrompt }),
-        ...(tools.length > 0 && { tools: tools as Anthropic.Messages.Tool[] }),
+        ...(toolsParam && { tools: toolsParam }),
         messages: msgs,
-      }),
+      }, costTracker ? { tracker: costTracker, label: retryLabel } : undefined),
       { label: `${retryLabel}(${model}, ${maxTokens} tokens)`, onRetry: options.onRetry }
     );
 
-  const stopHeartbeat = startHeartbeat(heartbeatPhase, 30);
+  const stopHb = startHeartbeat(heartbeatPhase, 30);
   let response: Anthropic.Messages.Message;
   try {
     response = await makeRequest(messages);
   } finally {
-    stopHeartbeat();
+    stopHb();
   }
 
   // Handle tool use loop
@@ -483,28 +503,32 @@ export async function runLlmAgent(
     const toolResults: ToolResultBlockParam[] = [];
 
     for (const toolUse of toolUseBlocks) {
-      let result: string;
-      try {
-        const input = (toolUse.input ?? {}) as Record<string, unknown>;
-        const handler = toolHandlers[toolUse.name];
-        if (handler) {
+      const handler = toolHandlers[toolUse.name];
+      if (handler) {
+        let result: string;
+        try {
+          const input = (toolUse.input ?? {}) as Record<string, unknown>;
           result = await handler(input);
-        } else {
-          result = `Unknown tool: ${toolUse.name}`;
+        } catch (err: unknown) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          result = `Error: ${error.message}`;
         }
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        result = `Error: ${error.message}`;
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: toolUse.id,
+          content: typeof result === 'string' ? result : JSON.stringify(result),
+        });
+        if (onToolResult) onToolResult(toolUse.name, toolResults[toolResults.length - 1].content as string);
       }
-      toolResults.push({
-        type: 'tool_result',
-        tool_use_id: toolUse.id,
-        content: typeof result === 'string' ? result : JSON.stringify(result)
-      });
+      // Server tools (web_search, etc.) are handled automatically by the API —
+      // their results appear in the response content, no local handler needed.
     }
 
     messages.push({ role: 'assistant', content: response.content });
-    messages.push({ role: 'user', content: toolResults });
+    // Only send tool results if we have custom tool results to return
+    if (toolResults.length > 0) {
+      messages.push({ role: 'user', content: toolResults });
+    }
 
     const stopLoop = startHeartbeat(`${heartbeatPhase}-tool-loop`, 30);
     try {
