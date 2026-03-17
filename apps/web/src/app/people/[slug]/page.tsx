@@ -273,7 +273,7 @@ export default async function PersonProfilePage({
       value: employer.name,
       href: employer.slug
         ? `/organizations/${employer.slug}`
-        : `/factbase/entity/${employer.id}`,
+        : undefined,
     });
   }
   if (bornYearFact?.value.type === "number") {
