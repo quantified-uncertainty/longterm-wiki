@@ -318,14 +318,23 @@ export default async function OrgProfilePage({
       }
     }
 
-    const allPeople = [...peopleByName.values()].sort((a, b) => {
-      // Current before former
-      if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
-      // Founders first
-      if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
-      // Then alphabetical
-      return a.name.localeCompare(b.name);
-    });
+    // Filter out entries where the display name is an unresolvable stableId
+    // (10-char alphanumeric strings with mixed case, e.g. "KKCwTYU4Zw").
+    // These appear when the person field contains a raw stableId that doesn't
+    // resolve to any known entity — displaying them is confusing for users.
+    const isUnresolvedStableId = (name: string): boolean =>
+      /^[A-Za-z0-9]{10}$/.test(name) && /[a-z]/.test(name) && /[A-Z]/.test(name);
+
+    const allPeople = [...peopleByName.values()]
+      .filter((p) => !isUnresolvedStableId(p.name))
+      .sort((a, b) => {
+        // Current before former
+        if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+        // Founders first
+        if (a.isFounder !== b.isFounder) return a.isFounder ? -1 : 1;
+        // Then alphabetical
+        return a.name.localeCompare(b.name);
+      });
 
     tabs.push({
       id: "people",
