@@ -18,9 +18,15 @@
   type: organization
   orgType: startup
   title: Metaculus
-  description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions.
+  description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions. Created by Anthony Aguirre (FLI/FLF President).
   path: /knowledge-base/organizations/metaculus/
-  lastUpdated: 2026-01
+  relatedEntries:
+    - id: anthony-aguirre
+      type: person
+      relationship: created-by
+    - id: future-of-life-foundation
+      type: organization
+  lastUpdated: 2026-03
 
 - id: fri
   stableId: KslhqGaeJw

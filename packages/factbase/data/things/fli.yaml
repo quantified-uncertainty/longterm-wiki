@@ -24,3 +24,30 @@ facts:
     value: https://futureoflife.org/
     source: https://www.wikidata.org/wiki/Q18356657
     notes: From Wikidata Q18356657
+  - id: zmHy23FJeA
+    property: grant-given
+    value:
+      type: number
+      value: 25025000
+      unit: USD
+    asOf: !date 2022-12
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Initial capitalization of Future of Life Foundation (FLF)
+  - id: 6kND9gRtUg
+    property: grant-given
+    value:
+      type: number
+      value: 15700000
+      unit: USD
+    asOf: !date 2023
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Additional grant to FLF in 2023
+  - id: 4p6lNgGXTw
+    property: grant-given
+    value:
+      type: number
+      value: 18100000
+      unit: USD
+    asOf: !date 2024
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Additional grant to FLF in 2024

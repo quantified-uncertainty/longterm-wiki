@@ -3345,13 +3345,47 @@
   description: >-
     FLF's inaugural 12-week fellowship (July-October 2025) combined research
     fellowship with startup incubator format. 30 fellows received $25-50K
-    stipends to build AI tools for human reasoning. Produced 25+ projects across
-    epistemic tools (Community Notes AI, fact-checking), forecasting
-    (Deliberation M
+    stipends plus $5K compute budgets to build AI tools for human reasoning.
+    Produced 25+ projects across epistemic tools (Community Notes AI with
+    2.5M+ views, Polis 2.0 with 1,000+ participants), forecasting
+    (Deliberation Markets, Sentinel risk monitoring), coordination
+    (Pivotal, Collective Agency), and evaluation (DeliberationBench,
+    Society Library). Notable outcomes include Sylience (founded from
+    Chord project) and Deep Future (compresses week-long RAND scenario
+    planning to 10-15 minutes). Program directed by Ben Goldhaber with
+    advisors including Andreas Stuhlmuller (Elicit), Anthony Aguirre,
+    and Brendan Fong.
+  tags:
+    - epistemic-tools
+    - beneficial-ai
+    - incubation
+    - forecasting
   clusters:
     - community
     - ai-safety
-  lastUpdated: 2026-02
+    - epistemics
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: ben-goldhaber
+      type: person
+      relationship: leads-to
+    - id: timothy-telleen-lawton
+      type: person
+    - id: kathleen-finlinson
+      type: person
+    - id: fli
+      type: organization
+    - id: elicit
+      type: organization
+    - id: sentinel
+      type: organization
+  sources:
+    - title: EA Forum Fellowship Announcement
+      url: https://forum.effectivealtruism.org/posts/dQWHB2s3frDjXwGFe/funded-fellowship-ai-for-human-reasoning-fellowship-with-the
+    - title: AI for Human Reasoning Website
+      url: https://aiforhumanreasoning.com/
+  lastUpdated: 2026-03
 - id: ai-watch
   stableId: gDdFdUktjA
   wikiId: E386
