@@ -169,6 +169,8 @@ function transformEntity(raw, expertMap, orgMap) {
     customFields: raw.customFields || [],
     relatedTopics: raw.relatedTopics || [],
     summaryPage: raw.summaryPage,
+    // Propagate deprecated flag so directory pages can filter out stubs
+    ...(raw.deprecated ? { deprecated: true } : {}),
   };
 
   // Helper to find a customField value

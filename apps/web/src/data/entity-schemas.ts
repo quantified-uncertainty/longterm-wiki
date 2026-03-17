@@ -48,6 +48,8 @@ const BaseEntity = z.object({
   relatedTopics: z.array(z.string()).default([]),
   // Summary/overview page that this entity belongs to (entity or page ID)
   summaryPage: z.string().optional(),
+  // Deprecated stub — should be filtered from directory listings
+  deprecated: z.boolean().optional(),
 });
 
 // ============================================================================

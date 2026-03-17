@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, ilike, or, inArray } from "drizzle-orm";
+import { eq, and, count, asc, sql, ilike, or, inArray, notInArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { entities, facts } from "../../schema.js";
+import { entities, facts, things } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -353,11 +353,22 @@ const entitiesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // 1. Get all entities of the requested type (capped to prevent unbounded scans)
+    // 1. Get all entities of the requested type (capped to prevent unbounded scans).
+    //    Exclude deprecated entities — they should not appear in directory listings.
+    //    The deprecated flag is stored in the metadata JSONB column.
     const entityRows = await db
       .select()
       .from(entities)
-      .where(eq(entities.entityType, entityType))
+      .where(
+        and(
+          eq(entities.entityType, entityType),
+          or(
+            sql`${entities.metadata} IS NULL`,
+            sql`${entities.metadata}->>'deprecated' IS NULL`,
+            sql`${entities.metadata}->>'deprecated' != 'true'`,
+          ),
+        ),
+      )
       .orderBy(asc(entities.title))
       .limit(DIRECTORY_MAX_ENTITIES);
 
@@ -716,7 +727,76 @@ const entitiesApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  // ---- POST /prune ----
+  // Remove stale entity records from PG that are no longer in the YAML source.
+  // Accepts a list of canonical IDs that should be kept; deletes all others of the
+  // specified entity type. Also cleans up corresponding things table entries.
+
+  .post(
+    "/prune",
+    zv(
+      "json",
+      z.object({
+        entityType: z.string().min(1).max(100),
+        keepIds: z.array(z.string().min(1).max(500)).min(1).max(5000),
+      })
+    ),
+    async (c) => {
+      const { entityType, keepIds } = c.req.valid("json");
+
+      if (!VALID_DIRECTORY_ENTITY_TYPES.has(entityType)) {
+        return c.json(
+          { error: `Unknown entityType: "${entityType}".` },
+          400
+        );
+      }
+
+      const db = getDrizzleDb();
+
+      // Find stale entities: same type but ID not in the keep list
+      const staleRows = await db
+        .select({ id: entities.id })
+        .from(entities)
+        .where(
+          and(
+            eq(entities.entityType, entityType),
+            notInArray(entities.id, keepIds),
+          )
+        );
+
+      if (staleRows.length === 0) {
+        return c.json({ deleted: 0, ids: [] });
+      }
+
+      const staleIds = staleRows.map((r) => r.id);
+
+      // Log before deleting (destructive operation)
+      console.log(
+        `[entities/prune] Deleting ${staleIds.length} stale ${entityType} entities: ${staleIds.join(", ")}`
+      );
+
+      await db.transaction(async (tx) => {
+        // Delete from things table first (references entities via source_id)
+        await tx
+          .delete(things)
+          .where(
+            and(
+              eq(things.sourceTable, "entities"),
+              inArray(things.sourceId, staleIds),
+            )
+          );
+
+        // Delete stale entities
+        await tx
+          .delete(entities)
+          .where(inArray(entities.id, staleIds));
+      });
+
+      return c.json({ deleted: staleIds.length, ids: staleIds });
+    }
+  );
 
 export const entitiesRoute = entitiesApp;
 export type EntitiesRoute = typeof entitiesApp;

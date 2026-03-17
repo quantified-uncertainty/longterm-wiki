@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { transformEntity, syncEntities, mergeExpertData, loadExperts, loadPeopleResources, type SyncEntity } from "./sync-entities.ts";
+import { transformEntity, syncEntities, pruneEntities, mergeExpertData, loadExperts, loadPeopleResources, type SyncEntity } from "./sync-entities.ts";
 
 const noSleep = async () => {};
 
@@ -431,5 +431,98 @@ describe("syncEntities", () => {
     expect(callBody.entities).toHaveLength(1);
     expect(callBody.entities[0].id).toBe("anthropic");
     expect(callBody.entities[0].title).toBe("Anthropic");
+  });
+});
+
+describe("pruneEntities", () => {
+  const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    process.env.LONGTERMWIKI_SERVER_URL = "http://localhost:3000";
+    process.env.LONGTERMWIKI_SERVER_API_KEY = "test-key";
+  });
+
+  afterEach(() => {
+    if (origUrl !== undefined)
+      process.env.LONGTERMWIKI_SERVER_URL = origUrl;
+    else delete process.env.LONGTERMWIKI_SERVER_URL;
+    if (origKey !== undefined)
+      process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
+    else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+  });
+
+  it("sends one prune request per entity type", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ deleted: 0, ids: [] }), { status: 200 })
+    );
+
+    const items = [
+      makeEntity("anthropic", { entityType: "organization" }),
+      makeEntity("openai", { entityType: "organization" }),
+      makeEntity("rsp", { entityType: "policy" }),
+    ];
+
+    await pruneEntities("http://localhost:3000", items);
+
+    // Should send 2 prune requests — one for organization, one for policy
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    const calls = fetchSpy.mock.calls;
+    const bodies = calls.map(([, init]) =>
+      JSON.parse((init as RequestInit).body as string)
+    );
+
+    const orgBody = bodies.find((b) => b.entityType === "organization");
+    const policyBody = bodies.find((b) => b.entityType === "policy");
+
+    expect(orgBody).toBeDefined();
+    expect(orgBody.keepIds).toEqual(expect.arrayContaining(["anthropic", "openai"]));
+    expect(orgBody.keepIds).toHaveLength(2);
+
+    expect(policyBody).toBeDefined();
+    expect(policyBody.keepIds).toEqual(["rsp"]);
+  });
+
+  it("returns deleted count and ids from server response", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({ deleted: 2, ids: ["stale-a", "stale-b"] }),
+        { status: 200 }
+      )
+    );
+
+    const items = [makeEntity("good", { entityType: "organization" })];
+    const result = await pruneEntities("http://localhost:3000", items);
+
+    expect(result.deleted).toBe(2);
+    expect(result.ids).toEqual(["stale-a", "stale-b"]);
+  });
+
+  it("handles prune failure gracefully without throwing", async () => {
+    // Use 400 (client error) to avoid fetchWithRetry's 5xx retry loop
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("Bad Request", { status: 400 })
+    );
+
+    const items = [makeEntity("good", { entityType: "organization" })];
+    const result = await pruneEntities("http://localhost:3000", items);
+
+    // Should not throw; returns zero deletions
+    expect(result.deleted).toBe(0);
+    expect(result.ids).toEqual([]);
+  });
+
+  it("returns zero when no stale entities exist", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ deleted: 0, ids: [] }), { status: 200 })
+    );
+
+    const items = [makeEntity("a", { entityType: "policy" })];
+    const result = await pruneEntities("http://localhost:3000", items);
+
+    expect(result.deleted).toBe(0);
+    expect(result.ids).toEqual([]);
   });
 });

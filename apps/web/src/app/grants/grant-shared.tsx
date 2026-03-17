@@ -9,10 +9,8 @@ import {
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import {
-  formatKBDate,
-  titleCase,
-} from "@/components/wiki/factbase/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
+import { resolveEntityLink as resolveEntityLinkBase } from "@/lib/record-detail-ui";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -39,11 +37,17 @@ export interface ParsedGrantDetail {
 
 // ── Resolution helpers ─────────────────────────────────────────────────
 
+/**
+ * Grant-specific variant that also returns the entity slug.
+ * Delegates to the shared resolveEntityLink for fallback resolution,
+ * then extracts the slug from the href when available.
+ */
 export function resolveEntityLink(entityId: string): {
   name: string;
   slug: string | null;
   href: string | null;
 } {
+  // Try FactBase first for slug extraction (slug is not in the base return type)
   const entity = getKBEntity(entityId);
   if (entity) {
     const slug = getKBEntitySlug(entityId);
@@ -55,7 +59,16 @@ export function resolveEntityLink(entityId: string): {
     }
     return { name: entity.name, slug: null, href: `/factbase/entity/${entityId}` };
   }
-  return { name: titleCase(entityId.replace(/-/g, " ")), slug: null, href: null };
+
+  // Fall back to the shared resolution (handles bare numeric IDs and stableIds)
+  const base = resolveEntityLinkBase(entityId);
+  // Extract slug from href if it is a directory URL (e.g. /organizations/anthropic)
+  let slug: string | null = null;
+  if (base.href) {
+    const dirMatch = base.href.match(/^\/(organizations|people)\/(.+)$/);
+    if (dirMatch) slug = dirMatch[2];
+  }
+  return { name: base.name, slug, href: base.href };
 }
 
 export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
