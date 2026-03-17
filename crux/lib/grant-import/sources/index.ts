@@ -6,7 +6,9 @@ import { source as ftxFutureFund } from "./ftx-future-fund.ts";
 import { source as manifund } from "./manifund.ts";
 import { source as givewell } from "./givewell.ts";
 import { source as acxGrants } from "./acx-grants.ts";
-import { source as gatesFoundation } from "./gates-foundation.ts from "./acx-grants.ts";
+import { source as gatesFoundation } from "./gates-foundation.ts";
+import { source as wellcomeTrust } from "./wellcome-trust.ts";
+import { source as fordFoundation } from "./ford-foundation.ts";
 // TODO: Founders Pledge — no machine-readable public grant data available.
 // Their grantees page (https://www.founderspledge.com/grantees) shows organizations
 // but without amounts or structured data. IRS 990 filings on ProPublica have aggregate
@@ -21,6 +23,8 @@ export const ALL_SOURCES: GrantSource[] = [
   givewell,
   acxGrants,
   gatesFoundation,
+  wellcomeTrust,
+  fordFoundation,
 ];
 
-export { coefficientGiving, eaFunds, sff, ftxFutureFund, manifund, givewell, acxGrants, gatesFoundation };
+export { coefficientGiving, eaFunds, sff, ftxFutureFund, manifund, givewell, acxGrants, gatesFoundation, wellcomeTrust, fordFoundation };
