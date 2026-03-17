@@ -2160,3 +2160,18 @@
     - governance
     - ai-policy
 
+- id: greg-brockman
+  stableId: Yq4s2cI7ng
+  type: person
+  title: Greg Brockman
+  description: >-
+    Greg Brockman is the co-founder and President of OpenAI. He previously
+    served as CTO of Stripe before co-founding OpenAI in December 2015.
+  customFields:
+    - label: Role
+      value: Co-founder & President
+    - label: Known For
+      value: Co-founding OpenAI, Former CTO of Stripe
+  tags:
+    - ai
+

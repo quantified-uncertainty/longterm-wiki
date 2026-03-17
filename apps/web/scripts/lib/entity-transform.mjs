@@ -155,6 +155,7 @@ function transformEntity(raw, expertMap, orgMap) {
   // Build base fields shared across all types
   const base = {
     id: raw.id,
+    stableId: raw.stableId,
     title: raw.title,
     description: raw.description,
     tags: raw.tags || [],

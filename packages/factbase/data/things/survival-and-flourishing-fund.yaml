@@ -1,11 +1,13 @@
 thing:
   id: survival-and-flourishing-fund
-  stableId: sIFjGbxVct
+  stableId: pvJ50HupEQ
   type: organization
   name: "Survival and Flourishing Fund"
   wikiId: E567
   aliases:
     - SFF
+  previousIds:
+    - sIFjGbxVct
 
 facts:
   - id: f_bw7KsUsLzQ

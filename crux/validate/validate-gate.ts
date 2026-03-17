@@ -368,6 +368,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'factbase-entities',
+    name: 'FactBase entity coverage (every FactBase file has TableBase entry)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-entities.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory until all FactBase entities are confirmed in TableBase
+    advisory: true,
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',

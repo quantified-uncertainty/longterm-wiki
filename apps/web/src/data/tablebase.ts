@@ -653,6 +653,7 @@ export function getIdRegistry(): IdRegistryMaps {
 // ============================================================================
 
 let _typedEntityIndex: Map<string, AnyEntity> | null = null;
+let _typedEntityByStableId: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
@@ -664,6 +665,25 @@ function typedEntityIndex() {
     _typedEntityIndex = new Map(getTypedEntities().map(e => [e.id, e]));
   }
   return _typedEntityIndex;
+}
+
+/** Secondary index: stableId → entity. Lazily built from typedEntities. */
+function typedEntityByStableIdIndex() {
+  if (!_typedEntityByStableId) {
+    _typedEntityByStableId = new Map();
+    for (const e of getTypedEntities()) {
+      const stableId = (e as Record<string, unknown>).stableId as string | undefined;
+      if (stableId) {
+        _typedEntityByStableId.set(stableId, e);
+      }
+    }
+  }
+  return _typedEntityByStableId;
+}
+
+/** Get a typed entity by stableId (10-char alphanumeric). */
+export function getTypedEntityByStableId(stableId: string): AnyEntity | undefined {
+  return typedEntityByStableIdIndex().get(stableId);
 }
 
 function resourceIndex() {

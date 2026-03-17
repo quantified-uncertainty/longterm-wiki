@@ -4960,3 +4960,19 @@
     - venture-capital
     - ai-investment
   lastUpdated: 2026-03
+
+- id: acx-grants
+  stableId: LBr3ocKKyQ
+  wikiId: E1057
+  type: organization
+  orgType: funder
+  title: ACX Grants
+  website: https://www.astralcodexten.com/p/acx-grants-results
+  description: >-
+    ACX Grants is a grant program run by Scott Alexander through his Astral
+    Codex Ten blog. It funds a variety of projects across effective altruism,
+    biosecurity, AI safety, scientific research, and other areas.
+  tags:
+    - philanthropy
+    - effective-altruism
+  lastUpdated: "2026-03"
