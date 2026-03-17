@@ -108,6 +108,8 @@
     - id: concentration-of-power
       type: risk
       relationship: affects
+    - id: california-sb1047
+      type: policy
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -440,6 +442,10 @@
   website: https://far.ai
   relatedEntries:
     - id: dan-hendrycks
+      type: person
+    - id: ben-goldhaber
+      type: person
+    - id: josh-jacobson
       type: person
     - id: natural-abstractions
       type: concept
@@ -1615,12 +1621,24 @@
     $7M to 37 projects, 2021: $25M program), major public campaigns (Asilomar
     Principles with 5,700+ signatories, 2023 Pause Letter with 33,000+
     signatories), and $665.8M Buterin donation (2021). Organization operates
-    primarily 
+    primarily as an advocacy and grantmaking institute. Sister organization
+    Future of Life Foundation (FLF) handles incubation of new beneficial AI
+    organizations. Both share leadership under Anthony Aguirre.
   clusters:
     - community
     - ai-safety
     - governance
-  lastUpdated: 2026-02
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+      relationship: related
+    - id: max-tegmark
+      type: person
+    - id: anthony-aguirre
+      type: person
+    - id: jaan-tallinn
+      type: person
+  lastUpdated: 2026-03
 - id: founders-fund
   stableId: LYfneQJbSA
   wikiId: E529
@@ -1977,6 +1995,9 @@
     - ai-safety
     - community
     - governance
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
   lastUpdated: 2026-02
 - id: microsoft
   stableId: OIY5gaPpBA
@@ -4745,4 +4766,197 @@
     One of the largest individual philanthropic commitments to climate action.
   tags:
     - philanthropy
+  lastUpdated: 2026-03
+
+- id: future-of-life-foundation
+  stableId: 2V63hGITAw
+  type: organization
+  orgType: funder
+  title: Future of Life Foundation (FLF)
+  website: https://www.flf.org
+  description: >-
+    501(c)(3) nonprofit sister organization to the Future of Life Institute
+    (FLI), focused on incubating new organizations that steer transformative
+    technology toward benefiting life. Founded in 2022 with $25M initial
+    capitalization from FLI (sourced from Vitalik Buterin's 2021 SHIB token
+    donation). Operates as part grant-maker, part strategic research group,
+    part VC firm with a goal of establishing 3-5 new organizations per year.
+    Led by Anthony Aguirre (President) and Josh Jacobson (COO). FLF's
+    four-step approach: research gaps, strategic planning, recruit founders,
+    and provide operational support. Total funding received from FLI through
+    2024 approximately $58.8M ($25M in 2022, $15.7M in 2023, $18.1M in
+    2024). Key initiatives include the AI for Human Reasoning Fellowship
+    (30 fellows, 2025), CARMA (Center for AI Risk Management & Alignment),
+    and Wise Ancestors (conservation genomics). Institutional overhead capped
+    at 15% of direct grant costs.
+  tags:
+    - ai-safety
+    - philanthropy
+    - incubation
+    - epistemic-tools
+    - beneficial-ai
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: fli
+      type: organization
+      relationship: related
+    - id: anthony-aguirre
+      type: person
+      relationship: leads-to
+    - id: ben-goldhaber
+      type: person
+      relationship: leads-to
+    - id: josh-jacobson
+      type: person
+      relationship: leads-to
+    - id: ai-for-human-reasoning-fellowship
+      type: approach
+    - id: max-tegmark
+      type: person
+    - id: jaan-tallinn
+      type: person
+  sources:
+    - title: FLF Website
+      url: https://www.flf.org
+    - title: ProPublica Nonprofit Explorer - FLF (EIN 88-0926067)
+      url: https://projects.propublica.org/nonprofits/organizations/880926067
+    - title: AXRP Episode 38.7 - Anthony Aguirre
+      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
+  customFields:
+    - label: EIN
+      value: 88-0926067
+    - label: Founded
+      value: "2022"
+    - label: Headquarters
+      value: Campbell, CA
+    - label: President
+      value: Anthony Aguirre
+    - label: COO
+      value: Josh Jacobson
+    - label: Tax-Exempt Since
+      value: January 2023
+  lastUpdated: 2026-03
+
+- id: carma
+  stableId: Vc6W6S1qMg
+  type: organization
+  orgType: safety-org
+  title: Center for AI Risk Management & Alignment (CARMA)
+  description: >-
+    AI safety organization incubated by the Future of Life Foundation, led
+    by Richard Mallah (former FLI Principal AI Safety Strategist since 2014).
+    Focus areas include risk assessment, policy strategy, and technical
+    safety. Based in Calabasas, CA. Fiscally sponsored by Social &
+    Environmental Entrepreneurs, Inc. Described by Anthony Aguirre as "the
+    one thing FLF has sort of fully launched." Team of 12+ people. Advisors
+    include Anthony Aguirre and Eric Drexler.
+  tags:
+    - ai-safety
+    - risk-management
+    - alignment
+    - ai-policy
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+      relationship: created-by
+    - id: fli
+      type: organization
+    - id: richard-mallah
+      type: person
+      relationship: leads-to
+    - id: anthony-aguirre
+      type: person
+  sources:
+    - title: CARMA LinkedIn
+      url: https://www.linkedin.com/company/center-for-ai-risk-management-alignment
+  customFields:
+    - label: Executive Director
+      value: Richard Mallah
+    - label: Location
+      value: Calabasas, CA
+    - label: Founded
+      value: "2022"
+    - label: Advisors
+      value: Anthony Aguirre, Eric Drexler
+    - label: Fiscal Sponsor
+      value: Social & Environmental Entrepreneurs, Inc.
+  lastUpdated: 2026-03
+
+- id: wise-ancestors
+  stableId: 518H1VpKLA
+  type: organization
+  orgType: generic
+  title: Wise Ancestors
+  website: https://www.wiseancestors.org
+  description: >-
+    Conservation genomics nonprofit originally funded by FLI, later receiving
+    approximately $800K from the Future of Life Foundation (April 2025).
+    Co-founded by Anthony Aguirre. Operates a platform for crowdfunding
+    species-specific genomic sequencing. Affiliated with the Earth BioGenome
+    Project. Focus on non-human extinction risk by backing up genetic data.
+    Executive Director: Ann Pace, PhD.
+  tags:
+    - conservation
+    - genomics
+    - existential-risk
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+      relationship: supports
+    - id: fli
+      type: organization
+  sources:
+    - title: Wise Ancestors FLF Grant Announcement
+      url: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
+  customFields:
+    - label: Executive Director
+      value: Ann Pace, PhD
+    - label: FLF Grant
+      value: ~$800,000 (April 2025)
+  lastUpdated: 2026-03
+
+- id: y-combinator
+  stableId: d9BCHgtnlw
+  wikiId: E1930
+  type: organization
+  orgType: funder
+  title: Y Combinator
+  website: https://www.ycombinator.com
+  description: >-
+    Y Combinator is the world's most prominent startup accelerator, founded in 2005.
+    It has funded over 4,000 startups including Airbnb, Stripe, Dropbox, and many AI
+    companies. YC publicly opposed SB 1047, arguing it would harm the startup ecosystem
+    and drive AI innovation out of California. CEO Garry Tan was a vocal critic of the bill.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - venture-capital
+    - startups
+  lastUpdated: 2026-03
+
+- id: andreessen-horowitz
+  stableId: u2YCulQ1lg
+  wikiId: E1931
+  type: organization
+  orgType: funder
+  title: Andreessen Horowitz (a16z)
+  website: https://a16z.com
+  description: >-
+    Andreessen Horowitz (a16z) is a major venture capital firm founded in 2009,
+    known for large investments in AI companies. The firm actively opposed SB 1047,
+    publishing detailed analysis arguing the bill would stifle innovation and impose
+    unworkable compliance requirements on AI startups and frontier model developers.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - venture-capital
+    - ai-investment
   lastUpdated: 2026-03

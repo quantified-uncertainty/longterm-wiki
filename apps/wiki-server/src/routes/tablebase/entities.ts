@@ -25,6 +25,59 @@ import { buildSearchCondition, parseSort } from "../shared/query-helpers.js";
 
 const MAX_PAGE_SIZE = 500;
 
+/** Maximum number of entities returned by the /directory endpoint. */
+const DIRECTORY_MAX_ENTITIES = 2000;
+
+/**
+ * Valid entity type names accepted by the /directory endpoint.
+ * Mirrors CANONICAL_ENTITY_TYPE_NAMES + ENTITY_TYPE_ALIAS_NAMES from
+ * apps/web/src/data/entity-type-names.ts — keep in sync when adding types.
+ */
+const VALID_DIRECTORY_ENTITY_TYPES = new Set([
+  // Canonical types
+  "risk",
+  "risk-factor",
+  "capability",
+  "safety-agenda",
+  "approach",
+  "project",
+  "policy",
+  "organization",
+  "crux",
+  "concept",
+  "case-study",
+  "person",
+  "resource",
+  "historical",
+  "analysis",
+  "parameter",
+  "argument",
+  "table",
+  "diagram",
+  "event",
+  "debate",
+  "overview",
+  "intelligence-paradigm",
+  "internal",
+  "ai-model",
+  "benchmark",
+  "research-area",
+  // Aliases (legacy / alternate names)
+  "researcher",
+  "lab",
+  "lab-frontier",
+  "lab-research",
+  "lab-startup",
+  "lab-academic",
+  "funder",
+  "safety-approaches",
+  "policies",
+  "concepts",
+  "events",
+  "models",
+  "model",
+]);
+
 // ---- Schemas (from shared api-types) ----
 
 const SyncEntitySchema = SharedSyncEntitySchema;
@@ -293,14 +346,25 @@ const entitiesApp = new Hono()
   // Returns all entities of a type with their latest facts for directory pages.
   .get("/directory", zv("query", DirectoryQuery), async (c) => {
     const { entityType, measures } = c.req.valid("query");
+
+    // Reject unknown entity types to prevent arbitrary string injection and
+    // to surface misconfigured callers early.
+    if (!VALID_DIRECTORY_ENTITY_TYPES.has(entityType)) {
+      return c.json(
+        { error: `Unknown entityType: "${entityType}". Must be one of the known entity types.` },
+        400
+      );
+    }
+
     const db = getDrizzleDb();
 
-    // 1. Get all entities of the requested type
+    // 1. Get all entities of the requested type (capped to prevent unbounded scans)
     const entityRows = await db
       .select()
       .from(entities)
       .where(eq(entities.entityType, entityType))
-      .orderBy(asc(entities.title));
+      .orderBy(asc(entities.title))
+      .limit(DIRECTORY_MAX_ENTITIES);
 
     // 2. Get latest facts for these entities (if measures requested)
     const measureList = measures

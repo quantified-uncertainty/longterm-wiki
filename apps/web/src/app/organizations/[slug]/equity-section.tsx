@@ -113,7 +113,6 @@ export function EquityPositionsSection({
 
   const hasCategories = enriched.some((p) => p.category != null);
   const hasPledges = enriched.some((p) => p.pledge != null);
-  const hasNotes = enriched.some((p) => p.notes);
 
   const valLabel = valuationLabel ?? (hasValuation ? formatCompactCurrency(latestValuation) : null);
 
@@ -137,9 +136,6 @@ export function EquityPositionsSection({
               {hasPledges && (
                 <th scope="col" className="text-right py-2 px-3 font-medium">Pledge %</th>
               )}
-              {hasNotes && (
-                <th scope="col" className="text-left py-2 px-3 font-medium hidden lg:table-cell">Notes</th>
-              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -148,26 +144,33 @@ export function EquityPositionsSection({
               return (
                 <tr key={pos.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3">
-                    <span className="font-medium text-foreground text-xs">
-                      {pos.holderHref ? (
-                        <Link href={pos.holderHref} className="text-primary hover:underline">
-                          {pos.holderName}
-                        </Link>
-                      ) : (
-                        pos.holderName
+                    <div>
+                      <span className="font-medium text-foreground text-xs">
+                        {pos.holderHref ? (
+                          <Link href={pos.holderHref} className="text-primary hover:underline">
+                            {pos.holderName}
+                          </Link>
+                        ) : (
+                          pos.holderName
+                        )}
+                      </span>
+                      {pos.source && (
+                        <a
+                          href={safeHref(pos.source)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          source
+                        </a>
                       )}
-                    </span>
-                    {pos.source && (
-                      <a
-                        href={safeHref(pos.source)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        source
-                      </a>
+                      <VerificationBadge verdict={verdict} />
+                    </div>
+                    {pos.notes && (
+                      <div className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">
+                        {pos.notes}
+                      </div>
                     )}
-                    <VerificationBadge verdict={verdict} />
                   </td>
                   {hasCategories && (
                     <td className="py-2 px-3">
@@ -193,11 +196,6 @@ export function EquityPositionsSection({
                       )}
                     </td>
                   )}
-                  {hasNotes && (
-                    <td className="py-2 px-3 text-muted-foreground text-xs max-w-[250px] truncate hidden lg:table-cell">
-                      {pos.notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                    </td>
-                  )}
                 </tr>
               );
             })}
@@ -219,7 +217,6 @@ export function EquityPositionsSection({
                   </td>
                 )}
                 {hasPledges && <td />}
-                {hasNotes && <td className="hidden lg:table-cell" />}
               </tr>
             </tfoot>
           )}

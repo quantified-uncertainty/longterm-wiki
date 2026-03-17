@@ -158,6 +158,43 @@ describe('wiki-server/client', () => {
         expect(['timeout', 'unavailable']).toContain(result.error);
       }
     });
+
+    it('returns auth_error for 401 response', async () => {
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:19999';
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+        new Response('Bearer token required', { status: 401 }),
+      );
+      const result = await client.apiRequest('GET', '/api/test');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('auth_error');
+        expect(result.message).toContain('401');
+      }
+    });
+
+    it('returns auth_error for 403 response', async () => {
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:19999';
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+        new Response('Forbidden', { status: 403 }),
+      );
+      const result = await client.apiRequest('GET', '/api/test');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('auth_error');
+      }
+    });
+
+    it('returns bad_request for other 4xx responses', async () => {
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:19999';
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+        new Response('Not Found', { status: 404 }),
+      );
+      const result = await client.apiRequest('GET', '/api/test');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('bad_request');
+      }
+    });
   });
 
   describe('isServerAvailable', () => {

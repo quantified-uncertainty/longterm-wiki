@@ -78,8 +78,6 @@ function apiEntityToRow(e: DirectoryEntity): LegislationRow {
     scope,
     description: e.description ?? null,
     tags: e.tags ?? [],
-    // sources column is not included in directory API response; sourceCount unavailable
-    sourceCount: 0,
   };
 }
 
@@ -118,7 +116,6 @@ function loadFromLocal(): LegislationPageData {
       scope,
       description: entity.description ?? null,
       tags: entity.tags,
-      sourceCount: entity.sources.length,
     };
   });
 

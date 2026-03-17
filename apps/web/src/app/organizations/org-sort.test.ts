@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { OrgRow } from "./organizations-table";
 import { getOrgSortValue, compareOrgRows } from "./org-sort";
+import { computeCompletionScore } from "./org-constants";
 
 function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
   return {
@@ -22,6 +23,8 @@ function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
     totalFunding: null,
     totalFundingNum: null,
     foundedDate: null,
+    peopleCount: null,
+    completionScore: 1,
     searchText: "",
     ...overrides,
   };
@@ -173,6 +176,34 @@ describe("compareOrgRows", () => {
     });
   });
 
+  describe("peopleCount sorting", () => {
+    it("sorts by peopleCount ascending", () => {
+      const low = makeRow({ name: "A", peopleCount: 5 });
+      const high = makeRow({ name: "B", peopleCount: 50 });
+      expect(compareOrgRows(low, high, "peopleCount", "asc")).toBeLessThan(0);
+    });
+
+    it("puts null peopleCount last in ascending order", () => {
+      const withCount = makeRow({ name: "A", peopleCount: 5 });
+      const noCount = makeRow({ name: "B", peopleCount: null });
+      expect(compareOrgRows(withCount, noCount, "peopleCount", "asc")).toBeLessThan(0);
+    });
+  });
+
+  describe("completionScore sorting", () => {
+    it("sorts by completionScore descending", () => {
+      const low = makeRow({ name: "A", completionScore: 1 });
+      const high = makeRow({ name: "B", completionScore: 4 });
+      expect(compareOrgRows(low, high, "completionScore", "desc")).toBeGreaterThan(0);
+    });
+
+    it("sorts by completionScore ascending", () => {
+      const low = makeRow({ name: "A", completionScore: 1 });
+      const high = makeRow({ name: "B", completionScore: 4 });
+      expect(compareOrgRows(low, high, "completionScore", "asc")).toBeLessThan(0);
+    });
+  });
+
   describe("sorting an array", () => {
     it("sorts by revenue descending with nulls last", () => {
       const rows = [
@@ -203,5 +234,39 @@ describe("compareOrgRows", () => {
         "OpenAI",
       ]);
     });
+  });
+});
+
+describe("computeCompletionScore", () => {
+  it("returns 1 for name-only org (no financial data)", () => {
+    expect(computeCompletionScore({})).toBe(1);
+    expect(computeCompletionScore({ revenueNum: null, headcount: null })).toBe(1);
+  });
+
+  it("returns 2 for any single financial metric", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9 })).toBe(2);
+    expect(computeCompletionScore({ headcount: 100 })).toBe(2);
+    expect(computeCompletionScore({ totalFundingNum: 5e6 })).toBe(2);
+    expect(computeCompletionScore({ valuationNum: 10e9 })).toBe(2);
+  });
+
+  it("returns 3 for 2+ metrics plus founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, headcount: 100, foundedDate: "2020" })).toBe(3);
+    expect(computeCompletionScore({ valuationNum: 10e9, totalFundingNum: 5e6, foundedDate: "2015-01-01" })).toBe(3);
+  });
+
+  it("returns 2 (not 3) for 2 metrics without founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, headcount: 100 })).toBe(2);
+  });
+
+  it("returns 4 for 3+ financial metrics", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, valuationNum: 10e9, headcount: 100 })).toBe(4);
+    expect(computeCompletionScore({
+      revenueNum: 1e9, valuationNum: 10e9, headcount: 100, totalFundingNum: 5e6,
+    })).toBe(4);
+  });
+
+  it("returns 4 for 3+ metrics even without founded date", () => {
+    expect(computeCompletionScore({ revenueNum: 1e9, valuationNum: 10e9, headcount: 100 })).toBe(4);
   });
 });

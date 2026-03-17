@@ -63,7 +63,7 @@ export function buildHeaders(): Record<string, string> {
 // ApiResult — discriminated union for typed errors
 // ---------------------------------------------------------------------------
 
-export type ApiError = 'unavailable' | 'timeout' | 'bad_request' | 'server_error';
+export type ApiError = 'unavailable' | 'timeout' | 'bad_request' | 'auth_error' | 'server_error';
 
 export type ApiResult<T> =
   | { ok: true; data: T }
@@ -87,6 +87,7 @@ export function unwrap<T>(result: ApiResult<T>): T | null {
 // ---------------------------------------------------------------------------
 
 function classifyStatus(status: number): ApiError {
+  if (status === 401 || status === 403) return 'auth_error';
   if (status >= 400 && status < 500) return 'bad_request';
   return 'server_error';
 }

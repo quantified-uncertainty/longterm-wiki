@@ -217,7 +217,7 @@ export async function RelatedPages({
 
   return (
     <section className="not-prose mt-10 pt-6 border-t border-border">
-      <h2 className="text-2xl font-bold text-foreground mb-6">Related Pages</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Related Wiki Pages</h2>
       <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
         Top Related Pages
       </h3>

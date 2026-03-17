@@ -851,6 +851,8 @@ function getOrgResources(
   orgSlug: string,
   orgName: string,
   websiteUrl: string | null,
+  /** Grant source URLs to exclude from aboutOrg (press tab) */
+  grantSourceUrls?: Set<string>,
 ): {
   publications: OrgResourceRow[];
   announcements: OrgResourceRow[];
@@ -907,6 +909,8 @@ function getOrgResources(
     if (allOrgIds.has(rid)) continue;
     const r = getResourceById(rid);
     if (!r) continue;
+    // Exclude resources whose URL matches a grant source (these are grant records, not press)
+    if (grantSourceUrls?.has(r.url.replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase())) continue;
     const row = normalizeRow(r, orgName);
     if (!row) continue;
     aboutOrgMap.set(rid, row);
@@ -1288,11 +1292,20 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   }
 
   // ── Resources ──
+  // Collect grant source URLs to exclude from press/resources tab
+  const grantSourceUrls = new Set<string>();
+  for (const g of grantsMade) {
+    if (g.source) grantSourceUrls.add(g.source.replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase());
+  }
+  for (const g of grantsReceived) {
+    if (g.source) grantSourceUrls.add(g.source.replace(/[#?].*$/, "").replace(/\/$/, "").toLowerCase());
+  }
+
   const {
     publications: resourcePublications,
     announcements: resourceAnnouncements,
     aboutOrg: resourcesAboutOrg,
-  } = getOrgResources(slug, entity.name, websiteUrl);
+  } = getOrgResources(slug, entity.name, websiteUrl, grantSourceUrls);
 
   // ── Key Publications (from literature.yaml) ──
   const orgMatchNames = new Set<string>([

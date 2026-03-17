@@ -49,7 +49,8 @@ function withCurrency(sym: string, position: "prefix" | "suffix", formatted: str
  *   formatValue(1500, "count")                 -> "1,500"
  *   formatValue(200000, "tokens")              -> "200,000"
  */
-export function formatValue(n: number, unit?: string | null, currency?: string | null): string {
+export function formatValue(n: number | null | undefined, unit?: string | null, currency?: string | null): string {
+  if (n == null) return "";
   const cur = resolveCurrencyInfo(unit, currency);
   if (cur !== null) {
     if (Math.abs(n) >= 1e12) return withCurrency(cur.symbol, cur.position, `${cleanDecimal(n / 1e12)} trillion`);

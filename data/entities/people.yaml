@@ -952,6 +952,8 @@
       type: organization
     - id: openai
       type: organization
+    - id: california-sb1047
+      type: policy
   tags:
     - entrepreneur
     - ai-labs
@@ -1056,15 +1058,19 @@
   relatedEntries:
     - id: fli
       type: organization
+    - id: future-of-life-foundation
+      type: organization
     - id: elon-musk
       type: person
     - id: yoshua-bengio
+      type: person
+    - id: anthony-aguirre
       type: person
     - id: interpretability
       type: safety-agenda
     - id: prediction-markets
       type: concept
-  lastUpdated: 2026-02
+  lastUpdated: 2026-03
 
 - id: philip-tetlock
   stableId: BCisPStEdQ
@@ -1210,11 +1216,26 @@
     Comprehensive profile of Jaan Tallinn documenting $150M+ lifetime AI safety
     giving (86% of $51M in 2024), primarily through SFF ($34.33M distributed in
     2025). Co-founded CSER (2012) and FLI (2014), led Anthropic's $124M Series A
-    (2021), early DeepMind investor/board member. Evidence shows
+    (2021), early DeepMind investor/board member. Board member of FLF.
   clusters:
     - ai-safety
     - governance
-  lastUpdated: 2026-02
+  relatedEntries:
+    - id: fli
+      type: organization
+    - id: future-of-life-foundation
+      type: organization
+    - id: cser
+      type: organization
+    - id: sff
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: max-tegmark
+      type: person
+    - id: anthony-aguirre
+      type: person
+  lastUpdated: 2026-03
 - id: leopold-aschenbrenner
   stableId: izkduIMBDg
   wikiId: E578
@@ -1770,4 +1791,368 @@
       value: "Founder and Executive Director"
   tags:
     - ai
+
+
+- id: anthony-aguirre
+  stableId: dVQzYIAN3A
+  type: person
+  title: Anthony Aguirre
+  website: https://www.flf.org
+  description: >-
+    Physicist and AI safety advocate serving as Executive Director of the
+    Future of Life Institute and President of the Future of Life Foundation.
+    Faggin Presidential Professor for Physics of Information at UC Santa
+    Cruz. Creator of Metaculus, the forecasting platform. Co-founded Wise
+    Ancestors for conservation genomics. Board member of both FLI and FLF.
+    Key figure in the distribution of Vitalik Buterin's 2021 SHIB token
+    donation (~$500M) through FLI and its affiliated organizations.
+  tags:
+    - ai-safety-advocacy
+    - future-of-life-institute
+    - forecasting
+    - physics
+    - philanthropy
+  clusters:
+    - ai-safety
+    - governance
+    - epistemics
+  relatedEntries:
+    - id: fli
+      type: organization
+    - id: future-of-life-foundation
+      type: organization
+    - id: metaculus
+      type: project
+    - id: max-tegmark
+      type: person
+    - id: wise-ancestors
+      type: organization
+  customFields:
+    - label: Role
+      value: Executive Director of FLI, President of FLF
+    - label: Affiliation
+      value: UC Santa Cruz
+    - label: Known For
+      value: FLI, FLF, Metaculus, Wise Ancestors
+  sources:
+    - title: FLF Website
+      url: https://www.flf.org
+    - title: AXRP Episode 38.7
+      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
+  lastUpdated: 2026-03
+
+- id: ben-goldhaber
+  stableId: 0tQftJKP4Q
+  type: person
+  title: Ben Goldhaber
+  description: >-
+    Projects Lead at the Future of Life Foundation since early 2025, focused
+    on incubating teams working on differentially beneficial technology.
+    Former Director of FAR.Labs (mid-2023 to early 2025). Board member of
+    QURI. Prior roles at Google, Cadmea, Hash, and Ought. Directed the
+    inaugural AI for Human Reasoning Fellowship (30 fellows, Summer 2025).
+    Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025) with
+    Oliver Sourbut, proposing three-layer epistemic infrastructure: Ingestion
+    Layer (cryptographic provenance), Structure Layer (inference and discourse
+    mapping), and Assessment Layer (customizable credence computation). Led
+    the technical roadmapping workshop that produced "Towards Guaranteed Safe
+    AI" (arXiv:2405.06624, co-authored with Yoshua Bengio, Stuart Russell,
+    Max Tegmark, and 13 others). Writes the "Gold Takes" Substack newsletter.
+    Focus areas include AI-assisted provably secure software, AI-enhanced
+    forecasting and sensemaking, and positive future visions through
+    coordination mechanisms he calls "hyper-entities."
+  tags:
+    - epistemic-tools
+    - beneficial-ai
+    - incubation
+    - forecasting
+    - ai-safety
+    - formal-verification
+  clusters:
+    - ai-safety
+    - epistemics
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: ai-for-human-reasoning-fellowship
+      type: approach
+    - id: far-ai
+      type: organization
+    - id: quri
+      type: organization
+    - id: oliver-sourbut
+      type: person
+    - id: anthony-aguirre
+      type: person
+    - id: max-tegmark
+      type: person
+    - id: yoshua-bengio
+      type: person
+  customFields:
+    - label: Role
+      value: Projects Lead, Future of Life Foundation
+    - label: Known For
+      value: AI for Human Reasoning Fellowship, Knowledge Commons, Guaranteed Safe AI
+  sources:
+    - title: Ben Goldhaber Newsletter (Jan 2025)
+      url: https://bengoldhaber.substack.com/p/january-2025-bengoldhabercom-newsletter
+    - title: FAR.AI Profile
+      url: https://www.far.ai/about/people/ben-goldhaber
+    - title: A Knowledge Commons for the 21st Century (Dec 2025)
+      url: https://bengoldhaber.substack.com/
+    - title: Towards Guaranteed Safe AI (arXiv, May 2024)
+      url: https://arxiv.org/abs/2405.06624
+    - title: Some Areas I'm Excited About (May 2025)
+      url: https://bengoldhaber.com/
+  lastUpdated: 2026-03
+
+- id: josh-jacobson
+  stableId: fslZ4KLnXg
+  type: person
+  title: Josh Jacobson
+  description: >-
+    Chief Operating Officer of the Future of Life Foundation since August
+    2023. Extensive background in AI safety and effective altruism
+    organizations with prior roles at ARC Evals, FAR AI, Anthropic,
+    Future of Humanity Institute (EpiFor project), Berkeley Existential
+    Risk Initiative, World Bank, and Centre for Effective Altruism.
+  tags:
+    - ai-safety
+    - operations
+    - effective-altruism
+  clusters:
+    - ai-safety
+    - community
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: arc-evals
+      type: organization
+    - id: far-ai
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: fhi
+      type: organization
+  customFields:
+    - label: Role
+      value: COO, Future of Life Foundation
+    - label: Known For
+      value: Operations leadership across AI safety organizations
+  sources:
+    - title: AXRP Episode 38.7 - Anthony Aguirre
+      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
+  lastUpdated: 2026-03
+
+- id: oliver-sourbut
+  stableId: sdM7KbGOGg
+  type: person
+  title: Oliver Sourbut
+  description: >-
+    Researcher and AI specialist at the Future of Life Foundation. Former
+    UK AI Safety Institute researcher. Engaged with OECD, UK FCDO, and
+    DSIT on AI governance. Researched agent oversight at Oxford. One of
+    the first MATS fellows (2021-22) and MATS mentor for Summer 2026.
+    Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025)
+    with Ben Goldhaber, proposing three-layer epistemic infrastructure
+    for provenance tracing. Also developed the "Full Epistemic Stack"
+    concept outlining technology for tracking claims back through
+    citations to original data sources. Appeared on the FLI podcast
+    (January 2026) discussing AI for human reasoning.
+  tags:
+    - ai-safety
+    - epistemic-tools
+    - ai-governance
+    - agent-oversight
+  clusters:
+    - ai-safety
+    - epistemics
+    - governance
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: uk-aisi
+      type: organization
+    - id: ben-goldhaber
+      type: person
+    - id: ai-for-human-reasoning-fellowship
+      type: approach
+  customFields:
+    - label: Role
+      value: Researcher, AI Specialist, Future of Life Foundation
+    - label: Known For
+      value: Full Epistemic Stack, MATS fellow, UK AISI researcher
+  sources:
+    - title: Oliver Sourbut - A Full Epistemic Stack
+      url: https://www.oliversourbut.net/p/a-full-epistemic-stack
+    - title: FLI Podcast - How AI Can Help Humanity Reason Better
+      url: https://podcast.futureoflife.org/how-ai-can-help-humanity-reason-better-with-oly-sourbut/
+    - title: MATS Mentor Page
+      url: https://www.matsprogram.org/mentor/sourbut
+  lastUpdated: 2026-03
+
+- id: elizabeth-garrett
+  stableId: rWMi3jrTCQ
+  type: person
+  title: Elizabeth Garrett
+  description: >-
+    Headhunter and recruitment lead at the Future of Life Foundation.
+    Former Center for Applied Rationality staff. Led nonprofit workshops
+    on epistemics and AI safety. Prior roles at Aidgrade and Nextspace
+    Coworking. Based in San Francisco.
+  tags:
+    - ai-safety
+    - recruitment
+    - community-building
+  clusters:
+    - community
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+  customFields:
+    - label: Role
+      value: Headhunter/Recruitment Lead, Future of Life Foundation
+  lastUpdated: 2026-03
+
+- id: richard-mallah
+  stableId: mK2KLknYGg
+  type: person
+  title: Richard Mallah
+  description: >-
+    Executive Director of CARMA (Center for AI Risk Management & Alignment),
+    incubated by the Future of Life Foundation. Former Principal AI Safety
+    Strategist at FLI since 2014. Focus areas include AI risk assessment,
+    policy strategy, and technical safety. Based in Calabasas, CA.
+  tags:
+    - ai-safety
+    - risk-management
+    - policy
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: carma
+      type: organization
+    - id: fli
+      type: organization
+    - id: future-of-life-foundation
+      type: organization
+  customFields:
+    - label: Role
+      value: Executive Director, CARMA
+    - label: Known For
+      value: FLI AI Safety Strategy, CARMA
+  lastUpdated: 2026-03
+
+- id: timothy-telleen-lawton
+  stableId: 4ZKddwff5g
+  type: person
+  title: Timothy Telleen-Lawton
+  description: >-
+    Program manager for the AI for Human Reasoning Fellowship at the Future
+    of Life Foundation. Previously spent 4 years in research, operations,
+    and management at GiveWell. B.S. and M.S. in Earth Systems from Stanford.
+  tags:
+    - effective-altruism
+    - program-management
+  clusters:
+    - community
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: ai-for-human-reasoning-fellowship
+      type: approach
+    - id: givewell
+      type: organization
+  customFields:
+    - label: Role
+      value: Program Manager, AI for Human Reasoning Fellowship
+  lastUpdated: 2026-03
+
+- id: kathleen-finlinson
+  stableId: q607cJo21g
+  type: person
+  title: Kathleen Finlinson
+  description: >-
+    Program manager for the AI for Human Reasoning Fellowship at the Future
+    of Life Foundation. AI safety researcher and strategist. Co-founder of
+    Eleos AI Research (October 2024 - May 2025). Former Research Analyst at
+    Open Philanthropy (2018-2019, AI forecasting). M.S. Applied Mathematics
+    from University of Colorado Boulder. Executive coach.
+  tags:
+    - ai-safety
+    - forecasting
+    - program-management
+  clusters:
+    - ai-safety
+    - community
+  relatedEntries:
+    - id: future-of-life-foundation
+      type: organization
+    - id: ai-for-human-reasoning-fellowship
+      type: approach
+    - id: open-philanthropy
+      type: organization
+  customFields:
+    - label: Role
+      value: Program Manager, AI for Human Reasoning Fellowship
+    - label: Known For
+      value: Open Philanthropy AI forecasting, Eleos AI Research
+  sources:
+    - title: Kathleen Finlinson Personal Site
+      url: https://k-finn.github.io/
+  lastUpdated: 2026-03
+
+- id: scott-wiener
+  stableId: HLc6VrCh5w
+  wikiId: E1471
+  type: person
+  title: Scott Wiener
+  description: >
+    Scott Wiener is a California State Senator representing District 11 (San Francisco). He is the
+    author of SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act,
+    which was the most significant AI safety legislation attempted in the United States. After SB 1047
+    was vetoed by Governor Newsom in September 2024, Wiener authored SB 53, a scaled-back transparency
+    bill that was signed into law in September 2025. He has become one of the most prominent state-level
+    legislators working on AI governance.
+  customFields:
+    - label: Role
+      value: "California State Senator (D-San Francisco, District 11)"
+    - label: Known For
+      value: "SB 1047, SB 53, AI safety legislation"
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+    - id: california-sb53
+      type: policy
+  tags:
+    - ai-governance
+    - california
+    - legislation
+
+- id: gavin-newsom
+  stableId: tDwxa07Urw
+  wikiId: E1472
+  type: person
+  title: Gavin Newsom
+  description: >
+    Gavin Newsom is the Governor of California. He vetoed SB 1047 on September 29, 2024, citing concerns
+    about size-based rather than risk-based regulation, while simultaneously signing 18 other AI bills.
+    He convened an expert panel including Fei-Fei Li and Tino Cuéllar to develop alternative regulatory
+    approaches, which ultimately informed SB 53. He later signed SB 53 in September 2025, adopting a
+    transparency-first approach to frontier AI governance.
+  customFields:
+    - label: Role
+      value: "Governor of California"
+    - label: Known For
+      value: "SB 1047 veto, signing 18 AI bills, SB 53"
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+    - id: california-sb53
+      type: policy
+  tags:
+    - california
+    - governance
+    - ai-policy
 

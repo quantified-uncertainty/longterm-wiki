@@ -12,3 +12,26 @@ facts:
       models.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: f_LtdOUHqrg1
+    property: compute-threshold
+    value: 1e26
+    unit: FLOP
+    asOf: 2024-02
+    notes: Training compute threshold for covered models as defined in the bill text
+  - id: f_zcML9r8ngl
+    property: cost-threshold
+    value: 100000000
+    unit: USD
+    asOf: 2024-02
+    notes: Training cost threshold ($100M) for covered models
+  - id: f_g5EEPIxogU
+    property: employee-letter-signatories
+    value: 113
+    asOf: 2024-09
+    notes: Number of AI company employees who signed the September 2024 letter urging Newsom to sign SB 1047
+    source: https://www.wired.com/story/ai-employees-letter-sb-1047-newsom/
+  - id: f_X3vlH2YRBD
+    property: companion-bills-signed
+    value: 18
+    asOf: 2024-09-29
+    notes: Number of other AI bills Newsom signed the same day he vetoed SB 1047

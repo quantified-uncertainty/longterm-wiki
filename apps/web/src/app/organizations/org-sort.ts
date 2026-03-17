@@ -10,7 +10,9 @@ export type OrgSortKey =
   | "valuation"
   | "headcount"
   | "totalFunding"
-  | "founded";
+  | "founded"
+  | "peopleCount"
+  | "completionScore";
 
 export function getOrgSortValue(
   row: OrgRow,
@@ -31,6 +33,10 @@ export function getOrgSortValue(
       return row.totalFundingNum;
     case "founded":
       return row.foundedDate;
+    case "peopleCount":
+      return row.peopleCount;
+    case "completionScore":
+      return row.completionScore;
   }
 }
 
