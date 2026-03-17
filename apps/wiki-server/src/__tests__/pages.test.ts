@@ -229,8 +229,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
-  // --- wiki_pages: DELETE WHERE id = ? RETURNING id ---
-  if (q.includes("delete from") && q.includes("wiki_pages") && q.includes("returning")) {
+  // --- wiki_pages: SELECT WHERE id = ? (no OR — pre-delete fetch) ---
+  if (q.includes("wiki_pages") && q.includes("where") && !q.includes(" or ") && !q.includes("count(*)") && !q.includes("order by") && !q.includes("search_vector") && !q.includes("similarity") && !q.includes("delete from") && !q.includes("entity_ids")) {
+    const id = params[0] as string;
+    const row = pagesStore.get(id);
+    return row ? [row] : [];
+  }
+
+  // --- wiki_pages: DELETE WHERE id = ? (with or without RETURNING) ---
+  if (q.includes("delete from") && q.includes("wiki_pages")) {
     const id = params[0] as string;
     if (pagesStore.has(id)) {
       pagesStore.delete(id);
