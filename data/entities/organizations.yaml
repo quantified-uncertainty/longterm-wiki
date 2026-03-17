@@ -1073,7 +1073,7 @@
     - community
     - governance
   relatedEntries:
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
     - id: anthropic
       type: organization
@@ -1260,7 +1260,7 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
     - id: sff
       type: organization
@@ -1418,7 +1418,7 @@
     An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated
     to achieving breakthroughs in pandemic prevention through far-UVC germicidal
     light, next-generation PPE, and glycol vapor air disinfection. Funded
-    primarily by Open Philanthropy (~$1.85M) and recommended by Founders Pledge.
+    primarily by Coefficient Giving (formerly Open Philanthropy, ~$1.85M) and recommended by Founders Pledge.
   clusters:
     - biorisks
     - community
@@ -1604,7 +1604,7 @@
   description: >-
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
     and automates literature reviews, founded by AI alignment researchers from
-    Ought and funded by Open Philanthropy ($31M total). The platform achieved
+    Ought and funded by Coefficient Giving (formerly Open Philanthropy, $31M total). The platform achieved
     90%+ extraction accuracy and claims 80% time savings for systematic reviews, though independent validation of these claims is limited.
   relatedEntries:
     - id: california-sb1047
@@ -1874,7 +1874,7 @@
     2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
     primarily through UHNW donor advising and managed funds (Frontier AI Fund:
     $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient
-    Giving and Open Philanthropy.
+    Giving.
   clusters:
     - community
     - ai-safety
@@ -2559,7 +2559,7 @@
       type: organization
     - id: cea
       type: organization
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
   clusters:
     - ai-safety
@@ -2580,7 +2580,7 @@
       type: person
     - id: cea
       type: organization
-    - id: open-philanthropy
+    - id: coefficient-giving
       type: organization
   customFields:
     - label: Founded

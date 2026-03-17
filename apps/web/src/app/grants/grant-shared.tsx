@@ -12,6 +12,7 @@ import {
   formatKBDate,
 } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { buildProgramNameMap, resolveProgramName } from "./grants-utils";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -53,6 +54,13 @@ export function resolveEntityLink(entityId: string): {
   return { name: resolved.name, slug, href: resolved.href };
 }
 
+/** Module-level cache for the program name map (static data, built once). */
+let _programNameMap: Map<string, string> | undefined;
+function getProgramNameMap(): Map<string, string> {
+  if (!_programNameMap) _programNameMap = buildProgramNameMap();
+  return _programNameMap;
+}
+
 export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
   const f = record.fields;
   const funder = resolveEntityLink(record.ownerEntityId);
@@ -60,6 +68,8 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
   const recipient = recipientId
     ? { ...resolveEntityName(recipientId, record.displayName), slug: getKBEntitySlug(recipientId) ?? null }
     : { name: "", slug: null, href: null };
+
+  const programId = typeof f.programId === "string" ? f.programId : null;
 
   return {
     key: record.key,
@@ -77,8 +87,8 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
     period: typeof f.period === "string" ? f.period : null,
     status: typeof f.status === "string" ? f.status : null,
     source: typeof f.source === "string" ? f.source : null,
-    program: typeof f.program === "string" ? f.program : null,
-    programId: typeof f.programId === "string" ? f.programId : null,
+    program: resolveProgramName(f, getProgramNameMap()),
+    programId,
     notes: typeof f.notes === "string" ? f.notes : null,
   };
 }

@@ -649,13 +649,18 @@ const resourcesApp = new Hono()
   // ---- GET /citations/all (bulk citation index: resourceId → pageIds) ----
 
   .get("/citations/all", async (c) => {
+    const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
         pageId: resourceCitations.pageId,
       })
-      .from(resourceCitations);
+      .from(resourceCitations)
+      .limit(HARD_LIMIT + 1);
+
+    const truncated = rows.length > HARD_LIMIT;
+    if (truncated) rows.length = HARD_LIMIT; // discard the probe row
 
     // Group by resourceId
     const index: Record<string, string[]> = {};
@@ -664,7 +669,7 @@ const resourcesApp = new Hono()
       index[row.resourceId].push(row.pageId);
     }
 
-    return c.json({ citations: index, count: rows.length });
+    return c.json({ citations: index, count: rows.length, truncated });
   })
 
   // ---- PATCH /:id/fetch-status (update fetch status from source-fetcher) ----
