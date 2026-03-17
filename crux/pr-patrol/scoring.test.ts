@@ -107,10 +107,11 @@ describe('computeBudget', () => {
     expect(budget.timeoutMinutes).toBe(60);
   });
 
-  it('gives medium budget for bot-review-major', () => {
+  it('gives 30-turn / 30-min budget for bot-review-major', () => {
+    // Capped at 30 min/turns to prevent excessive compute on complex reviews (#1982)
     const budget = computeBudget(['bot-review-major']);
-    expect(budget.maxTurns).toBe(50);
-    expect(budget.timeoutMinutes).toBe(45);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(30);
   });
 
   it('gives small budget for bot-review-nitpick', () => {

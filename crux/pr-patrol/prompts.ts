@@ -110,12 +110,21 @@ ${failingCheckInfo}- Check CI status: gh pr checks ${num} --repo ${repo}
 
     if (pr.botComments.length > 0) {
       sections.push('\n#### Bot Comment Details\n');
-      for (const c of pr.botComments) {
+      // Cap at 8 comments in the prompt — overly large prompts correlate with
+      // sessions that run long or get distracted. Remaining comments will still
+      // be visible on GitHub. (#1982)
+      const MAX_PROMPT_COMMENTS = 8;
+      const commentsToShow = pr.botComments.slice(0, MAX_PROMPT_COMMENTS);
+      const remaining = pr.botComments.length - commentsToShow.length;
+      for (const c of commentsToShow) {
         const lineRange = c.startLine && c.startLine !== c.line
           ? `lines ${c.startLine}-${c.line}`
           : `line ${c.line}`;
         const body = c.body.length > 2000 ? c.body.slice(0, 2000) + '\n...(truncated)' : c.body;
         sections.push(`**${c.path}** (${lineRange}) — ${c.author}:\n${body}\n`);
+      }
+      if (remaining > 0) {
+        sections.push(`_(${remaining} more bot comment(s) omitted — see the PR on GitHub for the full list)_\n`);
       }
     }
   }

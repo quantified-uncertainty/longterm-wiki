@@ -34,6 +34,16 @@ import {
   markProcessed,
 } from './state.ts';
 
+// ── Bot comment thresholds ────────────────────────────────────────────────────
+
+/**
+ * Maximum number of unresolved bot review comments a PR can have before
+ * bot-review-major is skipped. PRs with more than this many comments are
+ * unlikely to complete within the 30-minute budget and are better left for
+ * human review. See #1982 for context.
+ */
+export const MAX_BOT_COMMENTS_FOR_AUTO_FIX = 8;
+
 // ── Bot / release PR skip lists ──────────────────────────────────────────────
 
 /** PR authors that are bots — their PRs never reference issues. */
@@ -104,10 +114,25 @@ export function detectAllPrIssuesFromNodes(
     .map((pr) => {
       const { issues: allIssues, botComments, failingChecks } = libDetectIssues(pr, staleThresholdMs);
       const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
-      const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
+      let fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
+
       if (advisoryIssues.length > 0) {
         log(`  PR #${pr.number}: advisory issues (skipped): ${advisoryIssues.join(', ')}`);
       }
+
+      // Skip bot-review-major for PRs with too many unresolved bot comments (#1982).
+      // Reviews with more than MAX_BOT_COMMENTS_FOR_AUTO_FIX comments are unlikely
+      // to complete within the 30-minute budget and are better deferred for human review.
+      if (
+        fixableIssues.includes('bot-review-major') &&
+        botComments.length > MAX_BOT_COMMENTS_FOR_AUTO_FIX
+      ) {
+        log(
+          `  ${cl.yellow}PR #${pr.number}: skipping bot-review-major — ${botComments.length} bot comments exceeds limit of ${MAX_BOT_COMMENTS_FOR_AUTO_FIX} (needs human review)${cl.reset}`,
+        );
+        fixableIssues = fixableIssues.filter((i) => i !== 'bot-review-major');
+      }
+
       return {
         number: pr.number,
         title: pr.title,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectIssues, extractBotComments, detectAllPrIssuesFromNodes } from './detection.ts';
+import { detectIssues, extractBotComments, detectAllPrIssuesFromNodes, MAX_BOT_COMMENTS_FOR_AUTO_FIX } from './detection.ts';
 import type { GqlPrNode, PatrolConfig } from './types.ts';
 
 function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
@@ -408,5 +408,77 @@ describe('detectAllPrIssuesFromNodes — bot/release PR skipping', () => {
     });
     const result = detectAllPrIssuesFromNodes([pr], verboseConfig);
     expect(result.find((r) => r.number === 41)).toBeUndefined();
+  });
+});
+
+// ── detectAllPrIssuesFromNodes — bot-review-major comment cap ─────────────
+
+/** Make a review thread node with a bot comment. */
+function makeBotThread(id: string, severity = '🟠 Major: Fix this') {
+  return {
+    id,
+    isResolved: false,
+    isOutdated: false,
+    path: `src/${id}.ts`,
+    line: 10,
+    startLine: null,
+    comments: {
+      nodes: [{ author: { login: 'coderabbitai' }, body: severity }],
+    },
+  };
+}
+
+/** Make a PR node with bot review threads. Uses a recent updatedAt to avoid stale detection. */
+function makeBotReviewPr(threadCount: number, severity = '🟠 Major: Fix this') {
+  const threads = Array.from({ length: threadCount }, (_, i) => makeBotThread(`thread-${i}`, severity));
+  return makePrNode({
+    number: 100,
+    // Include test plan and issue ref so bot-review is the ONLY issue,
+    // making it easy to assert on whether it gets stripped.
+    body: '## Test plan\n\nChecked.\n\nCloses #1',
+    // Use a very recent updatedAt so the PR is not flagged as stale
+    updatedAt: new Date().toISOString(),
+    reviewThreads: { nodes: threads },
+  });
+}
+
+describe('detectAllPrIssuesFromNodes — bot-review-major comment cap', () => {
+  it('includes bot-review-major when comment count is at the limit', () => {
+    const pr = makeBotReviewPr(MAX_BOT_COMMENTS_FOR_AUTO_FIX);
+    const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
+    const found = result.find((r) => r.number === 100);
+    expect(found).toBeDefined();
+    expect(found?.issues).toContain('bot-review-major');
+  });
+
+  it('strips bot-review-major when comment count exceeds the limit', () => {
+    const pr = makeBotReviewPr(MAX_BOT_COMMENTS_FOR_AUTO_FIX + 1);
+    const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
+    // With only bot-review-major stripped and no other issues, PR should be absent
+    const found = result.find((r) => r.number === 100);
+    expect(found).toBeUndefined(); // no remaining fixable issues
+  });
+
+  it('keeps remaining fixable issues after stripping bot-review-major', () => {
+    const pr = makeBotReviewPr(MAX_BOT_COMMENTS_FOR_AUTO_FIX + 1);
+    // Override to also have a conflict so there's still at least one fixable issue
+    const prWithConflict = { ...pr, mergeable: 'CONFLICTING' };
+    const result = detectAllPrIssuesFromNodes([prWithConflict], defaultConfig);
+    const found = result.find((r) => r.number === 100);
+    expect(found).toBeDefined();
+    expect(found?.issues).not.toContain('bot-review-major');
+    expect(found?.issues).toContain('conflict');
+  });
+
+  it('does not strip bot-review-nitpick when comment count exceeds limit', () => {
+    // bot-review-nitpick (all 🧹 Nitpick comments) should NOT be stripped by this logic
+    const pr = makeBotReviewPr(MAX_BOT_COMMENTS_FOR_AUTO_FIX + 1, '🧹 Nitpick: style');
+    const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
+    // This PR has bot-review-nitpick (not major), which isn't subject to the cap
+    // — so it SHOULD appear in results
+    const found = result.find((r) => r.number === 100);
+    expect(found).toBeDefined();
+    expect(found?.issues).toContain('bot-review-nitpick');
+    expect(found?.issues).not.toContain('bot-review-major');
   });
 });

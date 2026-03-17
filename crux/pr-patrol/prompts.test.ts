@@ -203,6 +203,41 @@ describe('buildPrompt', () => {
     const prompt = buildPrompt(pr, REPO);
     expect(prompt).toContain('lines 15-20');
   });
+
+  it('caps bot comments at 8 in the prompt and notes remaining count', () => {
+    const manyComments = Array.from({ length: 12 }, (_, i) => ({
+      threadId: `thread-${i}`,
+      path: `src/file${i}.ts`,
+      line: i + 1,
+      startLine: null,
+      body: `🟠 Major: Issue ${i}`,
+      author: 'coderabbitai',
+    }));
+    const pr = makeDetectedPr({ issues: ['bot-review-major'], botComments: manyComments });
+    const prompt = buildPrompt(pr, REPO);
+    // First 8 comments should be included
+    expect(prompt).toContain('src/file0.ts');
+    expect(prompt).toContain('src/file7.ts');
+    // Comments 9–12 should NOT be individually included
+    expect(prompt).not.toContain('src/file8.ts');
+    expect(prompt).not.toContain('src/file11.ts');
+    // Should note the remaining count
+    expect(prompt).toContain('4 more bot comment(s) omitted');
+  });
+
+  it('does not show omission note when comments fit within cap', () => {
+    const fewComments = Array.from({ length: 3 }, (_, i) => ({
+      threadId: `thread-${i}`,
+      path: `src/file${i}.ts`,
+      line: i + 1,
+      startLine: null,
+      body: `🟠 Major: Issue ${i}`,
+      author: 'coderabbitai',
+    }));
+    const pr = makeDetectedPr({ issues: ['bot-review-major'], botComments: fewComments });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).not.toContain('more bot comment(s) omitted');
+  });
 });
 
 describe('buildMainBranchPrompt', () => {

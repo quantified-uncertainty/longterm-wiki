@@ -28,10 +28,14 @@ export interface IssueBudget {
 
 // Note: missing-issue-ref is an advisory-only issue (see ADVISORY_ISSUES in types.ts)
 // and is filtered out before reaching the budget system, so it's not listed here.
+//
+// bot-review-major is capped at 30 min / 30 turns (#1982): log data showed runs
+// hitting 30–67 min, which wastes compute. Reviews that need more than 30 min
+// are better deferred for human review rather than burning the entire budget.
 const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
   conflict:            { maxTurns: 60, timeoutMinutes: 60 },
   'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
-  'bot-review-major':  { maxTurns: 50, timeoutMinutes: 45 },
+  'bot-review-major':  { maxTurns: 30, timeoutMinutes: 30 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
   'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },
