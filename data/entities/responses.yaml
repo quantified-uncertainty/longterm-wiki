@@ -5,6 +5,8 @@
   stableId: aCEdTooCBw
   wikiId: E13
   type: policy
+  policyStatus: active
+  introduced: "2023-11"
   summaryPage: governance-overview
   title: AI Safety Institutes (AISIs)
   customFields:
