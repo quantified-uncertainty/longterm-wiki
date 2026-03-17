@@ -136,10 +136,13 @@ export function parseRange(value: unknown): { low: string | null; high: string |
 }
 
 /**
- * Zod validator helper for Hono query params.
+ * Zod validator helper for Hono query params or JSON request bodies.
  * Uses Hono's built-in validator to preserve RPC type inference in method-chained routes.
+ *
+ * - `zv("query", Schema)` — validates URL query string params
+ * - `zv("json", Schema)` — validates JSON request body
  */
-export function zv<T extends z.ZodType>(target: "query", schema: T) {
+export function zv<T extends z.ZodType>(target: "query" | "json", schema: T) {
   return validator(target, (value, c) => {
     const result = schema.safeParse(value);
     if (!result.success) {
