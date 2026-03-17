@@ -10,6 +10,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -152,6 +153,14 @@ const benchmarkResultsApp = new Hono()
     }
 
     const db = getDrizzleDb();
+
+    // Validate entity FK references before inserting
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "benchmarkId", ids: parsed.data.items.map((i) => i.benchmarkId) },
+      { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 
