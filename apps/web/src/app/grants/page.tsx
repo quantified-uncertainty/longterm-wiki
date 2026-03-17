@@ -5,7 +5,7 @@ import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { GrantsTable, type GrantRow } from "./grants-table";
+import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -150,6 +150,14 @@ export default function GrantsPage() {
     (a, b) => b.total - a.total,
   );
 
+  // Build lightweight funder summaries for the table filter tabs
+  const funderSummaries: FunderSummary[] = topFunders.map((f) => ({
+    id: f.id,
+    name: f.name,
+    count: f.count,
+    total: f.total,
+  }));
+
   const stats = [
     { label: "Total Grants", value: totalGrants.toLocaleString() },
     { label: "Total Funding", value: formatCompactCurrency(totalAmount) },
@@ -214,7 +222,7 @@ export default function GrantsPage() {
 
       {/* Grants table */}
       {totalGrants > 0 ? (
-        <GrantsTable rows={rows} />
+        <GrantsTable rows={rows} funders={funderSummaries} />
       ) : (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
           <p className="text-lg font-medium mb-2">No grants data available</p>
