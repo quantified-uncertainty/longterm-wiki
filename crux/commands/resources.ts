@@ -50,6 +50,10 @@ const COMMANDS: Record<string, ResourceCommandConfig> = {
     passthrough: ['limit'],
     positional: true,
   },
+  'refresh-titles': {
+    description: 'Fetch real page titles and fix bad ones',
+    passthrough: ['apply', 'limit', 'domain', 'verbose', 'force-all'],
+  },
 };
 
 /**
