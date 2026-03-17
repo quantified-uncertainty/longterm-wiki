@@ -6,6 +6,7 @@
   stableId: Khej79OA8g
   numericId: E238
   type: organization
+  orgType: safety-org
   title: QURI (Quantified Uncertainty Research Institute)
   description: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle, Metaforecast, and SquiggleAI.
   path: /knowledge-base/organizations/quri/
@@ -15,6 +16,7 @@
   stableId: CUBiiyCfOA
   numericId: E199
   type: organization
+  orgType: startup
   title: Metaculus
   description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions.
   path: /knowledge-base/organizations/metaculus/
@@ -24,6 +26,7 @@
   stableId: KslhqGaeJw
   numericId: E147
   type: organization
+  orgType: academic
   title: Forecasting Research Institute (FRI)
   description: Research institute advancing forecasting methodology through large-scale tournaments and rigorous experiments, led by Philip Tetlock.
   path: /knowledge-base/organizations/fri/

@@ -763,3 +763,190 @@
       estimate: Decades to centuries
       confidence: medium
       date: "2016"
+
+# =============================================================================
+# ADDITIONAL PEOPLE (affiliation enrichment)
+# =============================================================================
+
+- id: beth-barnes
+  name: Beth Barnes
+  affiliation: metr
+  role: Founder & CEO
+
+- id: david-sacks
+  name: David Sacks
+  role: White House AI & Crypto Czar
+
+- id: marc-andreessen
+  name: Marc Andreessen
+  role: Co-founder & General Partner, Andreessen Horowitz
+
+- id: philip-tetlock
+  name: Philip Tetlock
+  affiliation: university-of-pennsylvania
+  role: Professor of Psychology and Political Science
+
+- id: eli-lifland
+  name: Eli Lifland
+  affiliation: metr
+  role: Researcher
+
+- id: dustin-moskovitz
+  name: Dustin Moskovitz
+  affiliation: good-ventures
+  role: Co-founder, Good Ventures & Asana
+
+- id: gwern
+  name: Gwern Branwen
+  role: Independent Researcher
+
+- id: helen-toner
+  name: Helen Toner
+  affiliation: cset
+  role: Former Director of Strategy, Georgetown CSET
+
+- id: issa-rice
+  name: Issa Rice
+  role: Independent Researcher
+
+- id: jaan-tallinn
+  name: Jaan Tallinn
+  affiliation: sff
+  role: Co-founder of Skype, SFF co-founder
+
+- id: nuno-sempere
+  name: Nuño Sempere
+  role: Independent Researcher & Forecaster
+
+- id: vidur-kapur
+  name: Vidur Kapur
+  affiliation: conjecture
+  role: Co-founder
+
+- id: vipul-naik
+  name: Vipul Naik
+  role: Independent Researcher
+
+- id: sam-bankman-fried
+  name: Sam Bankman-Fried
+  affiliation: ftx
+  role: Former CEO
+
+- id: nick-beckstead
+  name: Nick Beckstead
+  affiliation: coefficient-giving
+  role: Former Program Officer
+
+- id: will-macaskill
+  name: Will MacAskill
+  affiliation: university-of-oxford
+  role: Associate Professor of Philosophy
+
+- id: joe-biden
+  name: Joe Biden
+  role: 46th President of the United States
+
+- id: andrej-karpathy
+  name: Andrej Karpathy
+  role: Founder, Eureka Labs
+
+- id: mustafa-suleyman
+  name: Mustafa Suleyman
+  affiliation: microsoft
+  role: CEO of Microsoft AI
+
+- id: jack-clark
+  name: Jack Clark
+  affiliation: anthropic
+  role: Co-founder
+
+- id: sam-mccandlish
+  name: Sam McCandlish
+  affiliation: anthropic
+  role: Co-founder
+
+- id: jared-kaplan
+  name: Jared Kaplan
+  affiliation: anthropic
+  role: Co-founder
+
+- id: mira-murati
+  name: Mira Murati
+  role: Founder, Thinking Machines Lab
+
+- id: satya-nadella
+  name: Satya Nadella
+  affiliation: microsoft
+  role: CEO
+
+- id: sundar-pichai
+  name: Sundar Pichai
+  role: CEO, Google & Alphabet
+
+- id: jensen-huang
+  name: Jensen Huang
+  affiliation: nvidia
+  role: Founder & CEO
+
+- id: mark-zuckerberg
+  name: Mark Zuckerberg
+  affiliation: meta-ai
+  role: Founder & CEO, Meta
+
+- id: katja-grace
+  name: Katja Grace
+  affiliation: ai-impacts
+  role: Founder
+
+- id: allan-dafoe
+  name: Allan Dafoe
+  affiliation: govai
+  role: Founding Director, GovAI
+
+- id: victoria-krakovna
+  name: Victoria Krakovna
+  affiliation: deepmind
+  role: Research Scientist
+
+- id: rohin-shah
+  name: Rohin Shah
+  affiliation: deepmind
+  role: Research Scientist
+
+- id: richard-ngo
+  name: Richard Ngo
+  affiliation: deepmind
+  role: AI Governance Researcher
+
+- id: jacob-steinhardt
+  name: Jacob Steinhardt
+  affiliation: uc-berkeley
+  role: Assistant Professor
+
+- id: scott-alexander
+  name: Scott Alexander
+  role: Writer, Astral Codex Ten
+
+- id: luke-muehlhauser
+  name: Luke Muehlhauser
+  affiliation: coefficient-giving
+  role: Senior Advisor
+
+- id: andrew-ng
+  name: Andrew Ng
+  affiliation: stanford-university
+  role: Adjunct Professor, Founder of DeepLearning.AI
+
+- id: fei-fei-li
+  name: Fei-Fei Li
+  affiliation: stanford-university
+  role: Professor and Co-Director, Stanford HAI
+
+- id: david-krueger
+  name: David Krueger
+  affiliation: university-of-cambridge
+  role: Assistant Professor
+
+- id: timnit-gebru
+  name: Timnit Gebru
+  role: Founder and Executive Director, DAIR Institute

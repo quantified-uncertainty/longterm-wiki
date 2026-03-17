@@ -281,3 +281,157 @@
   funding: "~$30-50M/year"
   safetyFocus: >
     AI safety research, unconventional projects, smaller grants.
+
+# =============================================================================
+# TECH COMPANIES
+# =============================================================================
+
+- id: microsoft
+  name: Microsoft
+  type: frontier-lab
+  founded: "1975"
+  headquarters: Redmond, WA
+  website: https://microsoft.com
+  description: >
+    Technology company. Major AI investor (OpenAI partnership). Develops
+    Copilot AI products and Azure cloud infrastructure.
+
+- id: meta-ai
+  name: Meta AI (FAIR)
+  type: frontier-lab
+  founded: "2013"
+  headquarters: Menlo Park, CA
+  website: https://ai.meta.com
+  description: >
+    Meta's AI research lab, formerly Facebook AI Research. Develops
+    open-source LLaMA models.
+
+- id: nvidia
+  name: NVIDIA
+  type: other
+  founded: "1993"
+  headquarters: Santa Clara, CA
+  website: https://nvidia.com
+  description: >
+    Leading GPU manufacturer. Dominant provider of AI training hardware.
+
+# =============================================================================
+# EVALUATIONS & POLICY ORGS
+# =============================================================================
+
+- id: metr
+  name: METR
+  type: safety-org
+  founded: "2023"
+  headquarters: Berkeley, CA
+  website: https://metr.org
+  description: >
+    Model Evaluation and Threat Research. Evaluates frontier AI models
+    for dangerous capabilities. Formerly ARC Evaluations.
+  keyPeople:
+    - beth-barnes
+
+- id: cset
+  name: Georgetown CSET
+  type: academic
+  founded: "2019"
+  headquarters: Washington, DC
+  website: https://cset.georgetown.edu
+  description: >
+    Center for Security and Emerging Technology at Georgetown University.
+    AI policy research.
+
+- id: ai-impacts
+  name: AI Impacts
+  type: safety-org
+  founded: "2014"
+  website: https://aiimpacts.org
+  description: >
+    Research project investigating the expected impacts of AI. Produces
+    surveys and analyses of AI timelines and impacts.
+  keyPeople:
+    - katja-grace
+
+- id: fli
+  name: Future of Life Institute
+  type: safety-org
+  founded: "2014"
+  headquarters: Boston, MA
+  website: https://futureoflife.org
+  description: >
+    Organization focused on reducing existential risks from AI and other
+    technologies. Organized the AI pause letter.
+  keyPeople:
+    - max-tegmark
+
+# =============================================================================
+# UNIVERSITIES
+# =============================================================================
+
+- id: stanford-university
+  name: Stanford University
+  type: academic
+  founded: "1885"
+  headquarters: Stanford, CA
+  website: https://stanford.edu
+  description: >
+    Major AI research university. Home to Stanford HAI (Human-Centered AI Institute).
+
+- id: uc-berkeley
+  name: University of California, Berkeley
+  type: academic
+  founded: "1868"
+  headquarters: Berkeley, CA
+  website: https://berkeley.edu
+  description: >
+    Major AI research university. Home to CHAI and BAIR (Berkeley AI Research).
+
+- id: university-of-cambridge
+  name: University of Cambridge
+  type: academic
+  founded: "1209"
+  headquarters: Cambridge, UK
+  website: https://cam.ac.uk
+  description: >
+    Home to CSER (Centre for the Study of Existential Risk) and Leverhulme
+    Centre for the Future of Intelligence.
+
+- id: university-of-oxford
+  name: University of Oxford
+  type: academic
+  founded: "1096"
+  headquarters: Oxford, UK
+  website: https://ox.ac.uk
+  description: >
+    Home to FHI (now closed), Global Priorities Institute, and other
+    existential risk research centers.
+
+- id: university-of-pennsylvania
+  name: University of Pennsylvania
+  type: academic
+  founded: "1740"
+  headquarters: Philadelphia, PA
+  website: https://upenn.edu
+  description: >
+    Major research university. Philip Tetlock's home institution for
+    forecasting research.
+
+- id: good-ventures
+  name: Good Ventures
+  type: funder
+  founded: "2011"
+  headquarters: San Francisco, CA
+  website: https://www.goodventures.org
+  description: >
+    Philanthropic foundation co-founded by Dustin Moskovitz and Cari Tuna.
+    Major funder of effective altruism causes including AI safety.
+
+- id: ftx
+  name: FTX
+  type: other
+  founded: "2019"
+  headquarters: Nassau, Bahamas
+  website: https://ftx.com
+  description: >
+    Cryptocurrency exchange founded by Sam Bankman-Fried. Collapsed in
+    November 2022 amid fraud allegations.
