@@ -412,16 +412,22 @@
   amendments:
     - date: March 20, 2024
       description: Initial committee amendments; defined covered model thresholds (>10^26 FLOP or >$100M training cost)
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104798AMD
     - date: April 8, 2024
       description: Refined definitions and exemptions; clarified academic research and open-source carve-outs
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104797AMD
     - date: April 16, 2024
       description: Adjusted enforcement provisions; refined scope of Attorney General authority
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104796AMD
     - date: April 30, 2024
       description: Senate Judiciary Committee amendments; narrowed hazardous capability definitions
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104795AMD
     - date: June 20, 2024
       description: Added safe harbors and affirmative defenses for compliant developers; reduced liability from strict to negligence standard
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104792AMD
     - date: July 3, 2024
       description: Clarified compute cluster reporting requirements and fine-tuning thresholds
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104791AMD
     - date: August 19, 2024
       description: >-
         Major overhaul after Assembly Appropriations hearing: removed Frontier Model Division (enforcement stays with AG);
@@ -429,8 +435,10 @@
         narrowed pre-harm enforcement (AG only acts on actual harm or imminent threat); added fine-tuning safe harbor
         (<$10M exempts fine-tuner); expanded Board of Frontier Models from 5 to 9 members
       author: Senator Wiener
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104790AMD
     - date: August 22, 2024
       description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined whistleblower protections
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104789AMD
   customFields:
     - label: Introduced
       value: February 2024
@@ -444,6 +452,12 @@
       value: August 29, 2024
     - label: Vetoed
       value: September 29, 2024
+    - label: Introduced Version (PDF)
+      value: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104799INT
+    - label: Enrolled Version (PDF)
+      value: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104788ENR
+    - label: Version Comparison Tool
+      value: https://leginfo.legislature.ca.gov/faces/billVersionsCompareClient.xhtml?bill_id=202320240SB1047
     - label: Compute Threshold
       value: 10^26 FLOP
     - label: Cost Threshold
