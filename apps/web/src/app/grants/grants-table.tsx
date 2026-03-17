@@ -84,8 +84,22 @@ function PaginationControls({
   );
 }
 
-export function GrantsTable({ rows }: { rows: GrantRow[] }) {
+export interface FunderSummary {
+  id: string;
+  name: string;
+  count: number;
+  total: number;
+}
+
+export function GrantsTable({
+  rows,
+  funders,
+}: {
+  rows: GrantRow[];
+  funders: FunderSummary[];
+}) {
   const [search, setSearch] = useState("");
+  const [funderFilter, setFunderFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("amount");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -121,6 +135,10 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
   const filtered = useMemo(() => {
     let result = rows;
 
+    if (funderFilter !== "all") {
+      result = result.filter((r) => r.organizationId === funderFilter);
+    }
+
     if (statusFilter !== "all") {
       result = result.filter((r) => r.status === statusFilter);
     }
@@ -140,7 +158,7 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
     result = [...result].sort((a, b) => compareGrantRows(a, b, sortKey, sortDir));
 
     return result;
-  }, [rows, search, statusFilter, sortKey, sortDir]);
+  }, [rows, search, funderFilter, statusFilter, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -148,59 +166,108 @@ export function GrantsTable({ rows }: { rows: GrantRow[] }) {
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search grants, recipients, or funders..."
-          aria-label="Search grants"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(0);
-          }}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => {
-              setStatusFilter("all");
+      <div className="flex flex-col gap-3 mb-5">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Search grants, recipients, or funders..."
+            aria-label="Search grants"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
               setPage(0);
             }}
-            aria-pressed={statusFilter === "all"}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-              statusFilter === "all"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-            }`}
-          >
-            All
-            <span className="ml-1 text-[10px] opacity-60">
-              {statusCounts.all}
-            </span>
-          </button>
-          {statuses.map((s) => (
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
+          />
+          {/* Status filter */}
+          <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
-              key={s}
               onClick={() => {
-                setStatusFilter(statusFilter === s ? "all" : s);
+                setStatusFilter("all");
                 setPage(0);
               }}
-              aria-pressed={statusFilter === s}
+              aria-pressed={statusFilter === "all"}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                statusFilter === s
+                statusFilter === "all"
                   ? "bg-primary/10 border-primary/30 text-primary font-semibold"
                   : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
               }`}
             >
-              {s}
+              All
               <span className="ml-1 text-[10px] opacity-60">
-                {statusCounts[s] ?? 0}
+                {statusCounts.all}
               </span>
             </button>
-          ))}
+            {statuses.map((s) => (
+              <button
+                type="button"
+                key={s}
+                onClick={() => {
+                  setStatusFilter(statusFilter === s ? "all" : s);
+                  setPage(0);
+                }}
+                aria-pressed={statusFilter === s}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  statusFilter === s
+                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                }`}
+              >
+                {s}
+                <span className="ml-1 text-[10px] opacity-60">
+                  {statusCounts[s] ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Funder filter */}
+        {funders.length > 1 && (
+          <div className="flex flex-wrap gap-1.5">
+            <span className="text-xs text-muted-foreground self-center mr-1">Funder:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setFunderFilter("all");
+                setPage(0);
+              }}
+              aria-pressed={funderFilter === "all"}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                funderFilter === "all"
+                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+              }`}
+            >
+              All funders
+              <span className="ml-1 text-[10px] opacity-60">
+                {rows.length}
+              </span>
+            </button>
+            {funders.map((f) => (
+              <button
+                type="button"
+                key={f.id}
+                onClick={() => {
+                  setFunderFilter(funderFilter === f.id ? "all" : f.id);
+                  setPage(0);
+                }}
+                aria-pressed={funderFilter === f.id}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  funderFilter === f.id
+                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                }`}
+              >
+                {f.name}
+                <span className="ml-1 text-[10px] opacity-60">
+                  {f.count}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Results count + pagination */}
