@@ -3,11 +3,15 @@
  * Used by both /organizations/[slug]/grants/[grantId] and /funding-programs/[id].
  */
 import Link from "next/link";
+import {
+  getKBEntitySlug,
+} from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
-import { getTypedEntityById } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { formatKBDate } from "@/components/wiki/factbase/format";
-import { resolveEntityLink as resolveEntityLinkBase } from "@/lib/record-detail-ui";
+import {
+  formatKBDate,
+} from "@/components/wiki/factbase/format";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -44,30 +48,9 @@ export function resolveEntityLink(entityId: string): {
   slug: string | null;
   href: string | null;
 } {
-  // Try TableBase first (handles slugs, E-numbers, and 10-char stableIds)
-  const entity = getTypedEntityById(entityId);
-  if (entity) {
-    const slug = entity.id; // entity.id is the slug in TableBase
-    if (entity.entityType === "organization")
-      return { name: entity.title, slug, href: `/organizations/${slug}` };
-    if (entity.entityType === "person")
-      return { name: entity.title, slug, href: `/people/${slug}` };
-    return {
-      name: entity.title,
-      slug,
-      href: entity.wikiId ? `/wiki/${entity.wikiId}` : null,
-    };
-  }
-
-  // Fall back to the shared resolution (handles bare numeric IDs and stableIds)
-  const base = resolveEntityLinkBase(entityId);
-  // Extract slug from href if it is a directory URL (e.g. /organizations/anthropic)
-  let slug: string | null = null;
-  if (base.href) {
-    const dirMatch = base.href.match(/^\/(organizations|people)\/(.+)$/);
-    if (dirMatch) slug = dirMatch[2];
-  }
-  return { name: base.name, slug, href: base.href };
+  const resolved = resolveEntityName(entityId);
+  const slug = getKBEntitySlug(entityId) ?? null;
+  return { name: resolved.name, slug, href: resolved.href };
 }
 
 export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
@@ -75,7 +58,7 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
   const funder = resolveEntityLink(record.ownerEntityId);
   const recipientId = typeof f.recipient === "string" ? f.recipient : null;
   const recipient = recipientId
-    ? resolveEntityLink(recipientId)
+    ? { ...resolveEntityName(recipientId, record.displayName), slug: getKBEntitySlug(recipientId) ?? null }
     : { name: "", slug: null, href: null };
 
   return {

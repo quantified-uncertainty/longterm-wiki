@@ -1568,12 +1568,15 @@ function personnelRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema,
     ownerEntityId: row.roleType === 'career' ? row.personId : row.organizationId,
     fields,
   };
+  // Embed resolved display name from API JOIN (personnel API returns personResolvedName)
+  if (row.personResolvedName) entry.displayName = row.personResolvedName;
+  return entry;
 }
 
 /**
@@ -1595,12 +1598,15 @@ function grantRowToRecordEntry(row) {
   if (row.notes) fields.notes = row.notes;
   if (row.programId) fields.programId = row.programId;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'grant',
     ownerEntityId: row.organizationId,
     fields,
   };
+  // Embed resolved grantee display name from API JOIN
+  if (row.granteeResolvedName) entry.displayName = row.granteeResolvedName;
+  return entry;
 }
 
 /**
@@ -1618,12 +1624,15 @@ function fundingRoundRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'funding-round',
     ownerEntityId: row.companyId,
     fields,
   };
+  // Embed resolved lead investor display name from API JOIN
+  if (row.leadInvestorResolvedName) entry.displayName = row.leadInvestorResolvedName;
+  return entry;
 }
 
 /**
@@ -1655,12 +1664,15 @@ function investmentRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'investment',
     ownerEntityId: row.companyId,
     fields,
   };
+  // Embed resolved investor display name from API JOIN
+  if (row.investorResolvedName) entry.displayName = row.investorResolvedName;
+  return entry;
 }
 
 /**
@@ -1694,6 +1706,8 @@ function equityPositionRowToRecordEntry(row) {
   };
   if (row.asOf) entry.asOf = row.asOf;
   if (row.validEnd) entry.validEnd = row.validEnd;
+  // Embed resolved holder display name from API JOIN
+  if (row.holderResolvedName) entry.displayName = row.holderResolvedName;
   return entry;
 }
 

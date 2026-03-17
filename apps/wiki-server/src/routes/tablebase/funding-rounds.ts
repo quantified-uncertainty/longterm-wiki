@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { fundingRounds } from "../../schema.js";
+import { fundingRounds, entities } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -16,6 +17,9 @@ import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -50,25 +54,55 @@ const SyncFundingRoundsBatchSchema = z.object({
 
 // ---- Helpers ----
 
-function formatRow(r: typeof fundingRounds.$inferSelect) {
+const leadInvestorEntity = alias(entities, "lead_investor_entity");
+const companyEntity = alias(entities, "company_entity");
+
+/** Selection shape for funding_rounds + joined entity titles. */
+const joinedSelect = {
+  fundingRound: fundingRounds,
+  leadInvestorTitle: leadInvestorEntity.title,
+  companyTitle: companyEntity.title,
+};
+
+interface JoinedRow {
+  fundingRound: typeof fundingRounds.$inferSelect;
+  leadInvestorTitle: string | null;
+  companyTitle: string | null;
+}
+
+function cleanLeadInvestor(li: string | null): string | null {
+  if (!li) return null;
+  if (li.startsWith("new:")) return li.slice(4).trim();
+  if (STABLE_ID_PATTERN.test(li)) return null;
+  return li;
+}
+
+function formatRow(r: JoinedRow) {
+  const fr = r.fundingRound;
   return {
-    id: r.id,
-    companyId: r.companyId,
-    name: r.name,
-    date: r.date,
-    raised: r.raised != null ? Number(r.raised) : null,
-    raisedLow: r.raisedLow != null ? Number(r.raisedLow) : null,
-    raisedHigh: r.raisedHigh != null ? Number(r.raisedHigh) : null,
-    valuation: r.valuation != null ? Number(r.valuation) : null,
-    valuationLow: r.valuationLow != null ? Number(r.valuationLow) : null,
-    valuationHigh: r.valuationHigh != null ? Number(r.valuationHigh) : null,
-    instrument: r.instrument,
-    leadInvestor: r.leadInvestor,
-    source: r.source,
-    notes: r.notes,
-    syncedAt: r.syncedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    id: fr.id,
+    companyId: fr.companyId,
+    companyEntityId: fr.companyEntityId,
+    companyDisplayName: fr.companyDisplayName,
+    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? fr.companyId,
+    name: fr.name,
+    date: fr.date,
+    raised: fr.raised != null ? Number(fr.raised) : null,
+    raisedLow: fr.raisedLow != null ? Number(fr.raisedLow) : null,
+    raisedHigh: fr.raisedHigh != null ? Number(fr.raisedHigh) : null,
+    valuation: fr.valuation != null ? Number(fr.valuation) : null,
+    valuationLow: fr.valuationLow != null ? Number(fr.valuationLow) : null,
+    valuationHigh: fr.valuationHigh != null ? Number(fr.valuationHigh) : null,
+    instrument: fr.instrument,
+    leadInvestor: fr.leadInvestor,
+    leadInvestorEntityId: fr.leadInvestorEntityId,
+    leadInvestorDisplayName: fr.leadInvestorDisplayName,
+    leadInvestorResolvedName: r.leadInvestorTitle ?? fr.leadInvestorDisplayName ?? cleanLeadInvestor(fr.leadInvestor),
+    source: fr.source,
+    notes: fr.notes,
+    syncedAt: fr.syncedAt,
+    createdAt: fr.createdAt,
+    updatedAt: fr.updatedAt,
   };
 }
 
@@ -101,8 +135,10 @@ const fundingRoundsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(fundingRounds)
+      .leftJoin(companyEntity, eq(fundingRounds.companyEntityId, companyEntity.stableId))
+      .leftJoin(leadInvestorEntity, eq(fundingRounds.leadInvestorEntityId, leadInvestorEntity.stableId))
       .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id)
       .limit(limit)
       .offset(offset);
@@ -127,8 +163,10 @@ const fundingRoundsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(fundingRounds)
+      .leftJoin(companyEntity, eq(fundingRounds.companyEntityId, companyEntity.stableId))
+      .leftJoin(leadInvestorEntity, eq(fundingRounds.leadInvestorEntityId, leadInvestorEntity.stableId))
       .where(eq(fundingRounds.companyId, entityId))
       .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id)
       .limit(limit)
