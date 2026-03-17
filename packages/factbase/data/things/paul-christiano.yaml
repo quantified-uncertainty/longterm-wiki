@@ -65,13 +65,13 @@ facts:
   - id: f_DRwx53YvWw
     property: role
     value: "Head of AI Safety, US AI Safety Institute"
-    asOf: 2024-02
+    asOf: 2024-08
     source: https://www.nist.gov/people/paul-christiano
-    notes: "Joined the U.S. AI Safety Institute (under NIST) in 2024 as Head of AI Safety"
+    notes: "Publicly announced as Head of AI Safety at the U.S. AI Safety Institute (under NIST) in August 2024"
 
   - id: f_He1SsMRfAw
     property: employed-by
     value: us-aisi
-    asOf: 2024-02
+    asOf: 2024-08
     source: https://www.nist.gov/people/paul-christiano
-    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in 2024"
+    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in August 2024"
