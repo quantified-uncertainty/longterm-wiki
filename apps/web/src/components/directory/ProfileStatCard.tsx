@@ -9,11 +9,14 @@ export function ProfileStatCard({
   value,
   sub,
   href,
+  suppressHydrationWarning,
 }: {
   label: string;
   value: string;
   sub?: string;
   href?: string;
+  /** Pass true for values derived from the current date (e.g., computed age) */
+  suppressHydrationWarning?: boolean;
 }) {
   const content = (
     <>
@@ -24,7 +27,7 @@ export function ProfileStatCard({
         {value}
       </div>
       {sub && (
-        <div className="text-[10px] text-muted-foreground/50 mt-1">{sub}</div>
+        <div className="text-[10px] text-muted-foreground/50 mt-1" suppressHydrationWarning={suppressHydrationWarning}>{sub}</div>
       )}
     </>
   );

@@ -117,14 +117,15 @@ export default async function AiModelDetailPage({
             {entity.title}
           </h1>
           {entity.developer && (
-            <span
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+            <Link
+              href={`/organizations/${entity.developer}`}
+              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity ${
                 DEVELOPER_COLORS[entity.developer] ??
                 "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
               }`}
             >
               {developerEntity?.title ?? entity.developer}
-            </span>
+            </Link>
           )}
           {entity.openWeight && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">

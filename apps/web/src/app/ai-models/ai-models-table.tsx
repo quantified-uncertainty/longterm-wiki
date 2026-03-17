@@ -377,15 +377,16 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 </td>
               </tr>
             ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={11} className="text-center py-12 text-muted-foreground">
+                  No models match your search.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          No models match your search.
-        </div>
-      )}
 
       {/* Bottom pagination */}
       <div className="mt-3">
