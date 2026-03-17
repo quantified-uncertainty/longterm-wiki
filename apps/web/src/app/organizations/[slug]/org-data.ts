@@ -267,6 +267,56 @@ export function formatStake(stake: NumericOrRange): string {
   return `${(stake * 100).toFixed(1).replace(/\.0$/, "")}%`;
 }
 
+// ── Equity category derivation ───────────────────────────────────────
+
+/**
+ * Derive a display category for an equity holder from their investment records.
+ * - If any investment has role=founder → "Co-founder"
+ * - If earliest round participation is ≤ 2021-12 → "Early investor"
+ * - If investor name matches major tech companies → "Strategic investor"
+ * - If holder name contains "employee"/"pool" → "Employees"
+ * - If holder name contains "institutional"/"other" → "Institutional"
+ * - Otherwise → "Investor"
+ */
+export function deriveEquityCategory(
+  holderName: string,
+  investments: Array<{ role: string | null; date: string | null; roundName: string | null }>,
+): string {
+  if (investments.length === 0) {
+    const lower = holderName.toLowerCase();
+    if (lower.includes("employee") || lower.includes("pool")) return "Employees";
+    if (lower.includes("institutional") || lower.includes("other")) return "Institutional";
+    return "Investor";
+  }
+
+  if (investments.some((inv) => inv.role === "founder")) return "Co-founder";
+
+  const dates = investments.map((inv) => inv.date).filter(Boolean) as string[];
+  dates.sort();
+  if (dates[0] && dates[0] <= "2021-12") return "Early investor";
+
+  const lower = holderName.toLowerCase();
+  const strategicNames = ["google", "amazon", "microsoft", "nvidia"];
+  if (strategicNames.some((s) => lower.includes(s))) return "Strategic investor";
+
+  const roundNames = investments.map((inv) => inv.roundName?.toLowerCase() ?? "");
+  if (roundNames.some((n) => strategicNames.some((s) => n.includes(s)) || n.includes("partnership"))) {
+    return "Strategic investor";
+  }
+
+  return "Investor";
+}
+
+/** Compute the estimated value of a stake given a valuation. Returns [low, high] for range stakes. */
+export function computeStakeValue(
+  stake: NumericOrRange | null,
+  valuation: number,
+): NumericOrRange | null {
+  if (stake == null) return null;
+  if (Array.isArray(stake)) return [stake[0] * valuation, stake[1] * valuation];
+  return stake * valuation;
+}
+
 // ── Record parsers ───────────────────────────────────────────────────
 
 export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
