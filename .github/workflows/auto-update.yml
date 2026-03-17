@@ -6,8 +6,9 @@ run-name: "Auto-Update Wiki${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' |
 # This workflow handles only: trigger, permissions, setup, and the single crux call.
 
 on:
-  schedule:
-    - cron: '0 6 * * *'
+  # schedule disabled — run locally with `pnpm crux auto-update run` or trigger manually via workflow_dispatch
+  # schedule:
+  #   - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       budget:
