@@ -5,6 +5,9 @@ import type { UnifiedEntityRow } from "./entities-data-table";
 /**
  * Compute "Next Best Action" priority score for a page.
  * priority = importance * qualityDeficit * stalenessFactor * riskFactor
+ *
+ * Priority formula duplicated from crux/lib/next-best-action.ts — keep in sync.
+ * Cross-package import not feasible (crux/ cannot be imported into apps/web/).
  */
 function computePriorityScore(row: {
   quality: number | null;
