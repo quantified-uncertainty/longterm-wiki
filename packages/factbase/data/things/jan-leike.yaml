@@ -23,10 +23,10 @@ facts:
 
   - id: f_gW2pL8rA7m
     property: role
-    value: "Head of Alignment Science"
+    value: "VP of Alignment Science"
     asOf: 2024-05
     source: https://anthropic.com/news/jan-leike-joins-anthropic
-    notes: "Leads alignment science at Anthropic; focuses on scalable oversight, weak-to-strong generalization, and robustness to jailbreaks"
+    notes: "VP leading alignment science at Anthropic; focuses on scalable oversight, weak-to-strong generalization, and robustness to jailbreaks"
 
   - id: f_jL1aB2cD3e
     property: education
@@ -36,7 +36,7 @@ facts:
 
   - id: f_jL4fG5hI6j
     property: notable-for
-    value: "Head of Alignment Science at Anthropic; former co-lead of OpenAI Superalignment team; prominent advocate for AI safety resource allocation"
+    value: "VP of Alignment Science at Anthropic; former co-lead of OpenAI Superalignment team; prominent advocate for AI safety resource allocation"
     source: https://en.wikipedia.org/wiki/Jan_Leike
 
   - id: f_jL7kL8mN9o
