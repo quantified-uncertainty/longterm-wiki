@@ -248,6 +248,7 @@ function formatResource(r: typeof resources.$inferSelect) {
     keyPoints: r.keyPoints,
     publicationId: r.publicationId,
     authors: r.authors,
+    authorEntityIds: r.authorEntityIds,
     publishedDate: r.publishedDate,
     tags: r.tags,
     localFilename: r.localFilename,
@@ -704,6 +705,62 @@ const resourcesApp = new Hono()
     logger.info({ resourceId: id, fetchStatus, lastFetchedAt }, "Updated resource fetch status");
 
     return c.json({ ok: true, id, fetchStatus, lastFetchedAt });
+  })
+
+  // ---- GET /by-author-entity/:entityId ----
+  // Returns resources where authorEntityIds contains the given entity stableId.
+
+  .get("/by-author-entity/:entityId", async (c) => {
+    const entityId = c.req.param("entityId");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(sql`${resources.authorEntityIds} @> ${JSON.stringify([entityId])}::jsonb`)
+      .orderBy(desc(resources.publishedDate))
+      .limit(100);
+
+    return c.json({
+      entityId,
+      resources: rows.map(formatResource),
+      total: rows.length,
+    });
+  })
+
+  // ---- PATCH /author-entity-ids ----
+  // Batch update authorEntityIds for resources (used by crux people link-resources).
+
+  .patch("/author-entity-ids", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const schema = z.object({
+      items: z.array(z.object({
+        resourceId: z.string().min(1),
+        authorEntityIds: z.array(z.string().min(1)),
+      })).min(1).max(500),
+    });
+
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const db = getDrizzleDb();
+    let updated = 0;
+
+    // Batch update in a single transaction
+    await db.transaction(async (tx) => {
+      for (const item of parsed.data.items) {
+        const jsonText = JSON.stringify(item.authorEntityIds);
+        await tx
+          .update(resources)
+          .set({ authorEntityIds: sql`${jsonText}::jsonb` })
+          .where(eq(resources.id, item.resourceId));
+        updated++;
+      }
+    });
+
+    return c.json({ updated });
   })
 
   // ---- GET /:id (get by ID) ----

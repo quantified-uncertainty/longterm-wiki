@@ -606,6 +606,8 @@ export const resources = pgTable(
     keyPoints: jsonb("key_points").$type<string[]>(),
     publicationId: text("publication_id"),
     authors: jsonb("authors").$type<string[]>(),
+    /** Entity stableIds of matched authors (linked by crux people link-resources) */
+    authorEntityIds: jsonb("author_entity_ids").$type<string[]>(),
     publishedDate: date("published_date"),
     tags: jsonb("tags").$type<string[]>(),
     localFilename: text("local_filename"),
