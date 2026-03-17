@@ -117,6 +117,16 @@ export default async function LegislationDetailPage({
 
   const reachedStage = getReachedStage(timelineEvents, statusKey);
 
+  // Only show the pipeline bar if the entity has actual legislative process data.
+  // Frameworks, declarations, and voluntary commitments have policyStatus: active
+  // which maps to "in-effect", but they are not legislation and have no timeline
+  // events, votes, or amendments — so the pipeline would falsely show "Enacted".
+  const hasLegislativeProcessData =
+    timelineEvents.length > 0 ||
+    entity.votes.length > 0 ||
+    entity.amendments.length > 0;
+  const showPipelineBar = reachedStage >= 0 && hasLegislativeProcessData;
+
   // ── Build tabs ────────────────────────────────────────────
   const tabs: ProfileTab[] = [];
 
@@ -124,7 +134,7 @@ export default async function LegislationDetailPage({
   const overviewContent = (
     <div className="space-y-8">
       {/* Status pipeline */}
-      {reachedStage >= 0 && (
+      {showPipelineBar && (
         <div className="flex items-center gap-1 overflow-x-auto pb-2">
           {PIPELINE_STAGES.map((stage, i) => {
             const reached = i <= reachedStage;
