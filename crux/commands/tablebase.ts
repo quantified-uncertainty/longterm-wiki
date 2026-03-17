@@ -729,8 +729,8 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
       console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
       continue;
     }
-    toCreate.push({ slug, name: trimmed, wikiId: idResult.data.wikiId, stableId: idResult.data.stableId ?? '' });
-    results.push({ name: trimmed, stableId: idResult.data.stableId ?? '', created: true });
+    toCreate.push({ slug, name: trimmed, wikiId: idResult.data.wikiId, stableId: idResult.data.stableId! });
+    results.push({ name: trimmed, stableId: idResult.data.stableId!, created: true });
   }
 
   // Batch sync all new entities

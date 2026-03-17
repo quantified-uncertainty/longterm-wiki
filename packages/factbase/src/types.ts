@@ -33,7 +33,7 @@ export interface Entity {
   previousIds?: string[];
   /** Former slugs for URL redirects (when a YAML file is renamed) */
   previousSlugs?: string[];
-  /** Wiki page URL ID with E prefix, e.g. "E22" (formerly wikiId) */
+  /** Wiki page URL ID with E prefix, e.g. "E22" (formerly numericId) */
   wikiPageId?: string;
   /** @deprecated Use `id` instead. Alias kept for backward compat during migration. */
   stableId: string;
