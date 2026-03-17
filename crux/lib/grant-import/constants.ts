@@ -10,7 +10,11 @@ export const FUNDER_IDS = {
   OPEN_PHILANTHROPY: "ULjDXpSLCI",
   // Coefficient Giving is Open Philanthropy's grantmaking arm — same entity
   COEFFICIENT_GIVING: "ULjDXpSLCI",
-  SFF: "sIFjGbxVct",
+  // Updated from "sIFjGbxVct" to match TableBase entity after Entity Unification.
+  // Existing SFF grants in the DB have organizationId = "sIFjGbxVct" and grant IDs
+  // generated with the old funderId. A re-import of SFF will generate new grant IDs;
+  // run a DB migration to update organization_id and delete stale rows before re-importing.
+  SFF: "pvJ50HupEQ",
   FTX_FUTURE_FUND: "JhIGCaI3Ng",
   MANIFUND: "fFVOuFZCRf",
   LTFF: "yA12C1KcjQ",
