@@ -328,12 +328,18 @@ export async function AnthropicStakeholdersTable() {
       const page = getPageById(slug);
       if (!entity) continue;
       const href = getEntityHref(slug, entity.type);
-      entityPreviews[href] = {
+      const preview: EntityPreview = {
         title: entity.title || slug,
         type: entity.type,
         description: page?.description || entity.description,
         href,
       };
+      entityPreviews[href] = preview;
+      // Also index by numeric wiki URL so /wiki/E123 stakeholder links resolve
+      const kbEnt = getKBEntity(slug);
+      if (kbEnt?.numericId) {
+        entityPreviews[`/wiki/${kbEnt.numericId}`] = preview;
+      }
     }
 
     // Join equity positions with investments, pledges, and EA alignment
