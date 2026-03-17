@@ -17,16 +17,17 @@ facts:
 
   - id: f_EUADNVkvmr
     property: role
-    value: "CEO, Asana; Co-founder, Good Ventures / Open Philanthropy"
-    asOf: 2008-01
-    source: https://www.openphilanthropy.org/
-    notes: "Co-founded Facebook in 2004; youngest self-made billionaire at age 23;
-      with wife Cari Tuna, funds Open Philanthropy and Good Ventures"
+    value: "Board Chair, Asana; Co-founder, Good Ventures / Coefficient Giving"
+    asOf: 2025-07
+    source: https://coefficientgiving.org/
+    notes: "Co-founded Facebook in 2004; was CEO of Asana until July 2025 when he became
+      Board Chair; with wife Cari Tuna, funds Coefficient Giving (formerly Open Philanthropy)
+      and Good Ventures"
 
   - id: f_8PBld3Shsv
     property: born-year
     value: 1984
-    source: https://en.wikipedia.org/wiki/Dustin_Moskovitz
+    source: https://www.bloomberg.com/billionaires/profiles/dustin-a-moskovitz/
     notes: "Born May 22, 1984 in Gainesville, Florida"
 
   # ── Migrated from old facts system ─────────────────────────────
@@ -34,7 +35,7 @@ facts:
     property: net-worth
     value: 1.74e+10
     asOf: 2025-05
-    source: https://en.wikipedia.org/wiki/Dustin_Moskovitz
+    source: https://www.forbes.com/profile/dustin-moskovitz/
     notes: "Forbes estimate, May 2025; primarily from Meta and Asana stakes"
 
   - id: f_Vp6Cwbn1IQ
