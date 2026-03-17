@@ -9,6 +9,7 @@
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
+import { toSlug } from './types.ts';
 import type { EnrichmentTask, TaskType } from './types.ts';
 import {
   dedupPersonnel,
@@ -210,7 +211,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const description = input.description as string | undefined;
 
   // Generate slug
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const slug = toSlug(name);
 
   // Check if already exists
   const matcher = getEntityMatcher();

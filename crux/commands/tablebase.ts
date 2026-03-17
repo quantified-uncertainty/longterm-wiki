@@ -16,7 +16,7 @@
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import type { TaskType } from '../tablebase/types.ts';
-import { TASK_TYPES } from '../tablebase/types.ts';
+import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -308,7 +308,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   const entityType = (options.type as string) || 'person';
 
   // Generate slug from name
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const slug = toSlug(name);
 
   // Check if entity already exists
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
@@ -390,7 +390,8 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   }
 
   try {
-    const output = execSync(`node "${scriptPath}" "${url.replace(/"/g, '')}"`, {
+    const { execFileSync } = await import('child_process');
+    const output = execFileSync('node', [scriptPath, url], {
       timeout: 30000,
       maxBuffer: 10 * 1024 * 1024,
       env: { ...process.env, ...(nodePath && { NODE_PATH: nodePath }) },
@@ -733,7 +734,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
     }
 
     // Generate lightweight stableId (no wikiId allocation — not a full wiki entity)
-    const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = toSlug(trimmed);
     const stableId = generateId(`${entityType}:${slug}`);
 
     if (dryRun) {
