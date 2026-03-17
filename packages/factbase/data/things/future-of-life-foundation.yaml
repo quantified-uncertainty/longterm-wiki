@@ -85,21 +85,22 @@ facts:
     property: grant-given
     value:
       type: number
-      value: 1125000
+      value: 1275000
       unit: USD
     asOf: !date 2025-07
     notes: >-
-      Estimated cost of AI for Human Reasoning Fellowship (30 fellows x
-      $25K-$50K stipends + $5K compute budgets). Actual total not publicly
-      disclosed.
+      Estimated cost of AI for Human Reasoning Fellowship: 30 fellows x
+      $25K-$50K stipends (~$1,125K at midpoint) + 30 x $5K compute budgets
+      ($150K). Actual total not publicly disclosed.
 
   - id: 4Qv6Ekm99A
     property: headcount
     value:
       type: number
       value: 5
-    asOf: !date 2025-02
+    asOf: !date 2025-06
     source: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
     notes: >-
-      Anthony Aguirre noted FLF had a staff of two that "recently doubled"
-      as of early 2025. With Goldhaber joining, approximately 5 staff.
+      Approximate. Aguirre said FLF had "a staff of two that recently doubled"
+      (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known
+      staff by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
