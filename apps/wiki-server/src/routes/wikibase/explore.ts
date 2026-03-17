@@ -289,7 +289,7 @@ const exploreApp = new Hono()
     const dataQuery = `
       SELECT
         wp.id, wp.wiki_id, wp.title, wp.entity_type, wp.content_format,
-        wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
+        wp.category, COALESCE(wp.summary, wp.description) AS description,
         wp.tags AS page_tags, wp.clusters AS page_clusters,
         wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
         wp.tactical_value, wp.backlink_count, wp.risk_category,
@@ -387,7 +387,7 @@ const exploreApp = new Hono()
       const trigramQuery = `
         SELECT
           wp.id, wp.wiki_id, wp.title, wp.entity_type, wp.content_format,
-          wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
+          wp.category, COALESCE(wp.summary, wp.description) AS description,
           wp.tags AS page_tags, wp.clusters AS page_clusters,
           wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
           wp.tactical_value, wp.backlink_count, wp.risk_category,

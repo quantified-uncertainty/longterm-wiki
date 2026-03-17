@@ -222,8 +222,8 @@ describe("POST /api/build-metrics/coverage", () => {
   it("updates coverage for known pages", async () => {
     const res = await postJson(app, "/api/build-metrics/coverage", {
       coverage: [
-        { pageId: "page-alpha", passing: 8, total: 12, items: { llmSummary: "green", entity: "red" } },
-        { pageId: "page-beta", passing: 5, total: 12, items: { llmSummary: "amber" } },
+        { pageId: "page-alpha", passing: 8, total: 12, items: { summary: "green", entity: "red" } },
+        { pageId: "page-beta", passing: 5, total: 12, items: { summary: "amber" } },
       ],
     });
 

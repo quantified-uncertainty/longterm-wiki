@@ -66,7 +66,7 @@ const frontmatterSchema = z.object({
   contentFormat: z.enum(['article', 'table', 'diagram', 'index', 'dashboard']).optional(),
   // Scoring fields (quality, ratings, importance) are now sourced from PG assessments.
   // They are no longer stored in frontmatter — see epic #2428.
-  llmSummary: z.string().optional(),
+  summary: z.string().optional(),
   lastEdited: z.string().optional(),
   todo: z.string().optional(),
   todos: z.array(z.string()).min(1).optional(),

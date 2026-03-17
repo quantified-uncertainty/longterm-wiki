@@ -14,7 +14,7 @@ const SMOKE_TEST_BODY = {
       wikiId: null,
       title: "Smoke Test",
       description: null,
-      llmSummary: null,
+      summary: null,
       category: null,
       subcategory: null,
       entityType: null,

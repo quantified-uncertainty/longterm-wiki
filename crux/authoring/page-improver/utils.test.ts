@@ -3,17 +3,17 @@ import { repairFrontmatter, ensureFrontmatterFields } from './utils.js';
 
 describe('repairFrontmatter', () => {
   describe('Fix 4: YAML-safe quoting', () => {
-    it('quotes llmSummary containing colon-space', () => {
+    it('quotes summary containing colon-space', () => {
       const input = [
         '---',
-        "llmSummary: Stuart Russell co-authored 'Artificial Intelligence: A Modern Approach'",
+        "summary: Stuart Russell co-authored 'Artificial Intelligence: A Modern Approach'",
         '---',
         'Body text',
       ].join('\n');
 
       const result = repairFrontmatter(input);
       expect(result).toContain(
-        'llmSummary: "Stuart Russell co-authored \'Artificial Intelligence: A Modern Approach\'"'
+        'summary: "Stuart Russell co-authored \'Artificial Intelligence: A Modern Approach\'"'
       );
     });
 
@@ -34,13 +34,13 @@ describe('repairFrontmatter', () => {
     it('does not double-quote already-quoted values', () => {
       const input = [
         '---',
-        'llmSummary: "Already quoted: with colons"',
+        'summary: "Already quoted: with colons"',
         '---',
         'Body',
       ].join('\n');
 
       const result = repairFrontmatter(input);
-      expect(result).toContain('llmSummary: "Already quoted: with colons"');
+      expect(result).toContain('summary: "Already quoted: with colons"');
       // Should not have escaped inner quotes or double-wrapped
       expect(result).not.toContain('\\"');
     });
@@ -48,14 +48,14 @@ describe('repairFrontmatter', () => {
     it('does not quote values without colon-space', () => {
       const input = [
         '---',
-        'llmSummary: A simple summary without problematic characters',
+        'summary: A simple summary without problematic characters',
         '---',
         'Body',
       ].join('\n');
 
       const result = repairFrontmatter(input);
       expect(result).toContain(
-        'llmSummary: A simple summary without problematic characters'
+        'summary: A simple summary without problematic characters'
       );
       // Should remain unquoted
       expect(result).not.toContain('"A simple');

@@ -1981,7 +1981,7 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           // frontmatter. Bulk-import git dates are already filtered out of
           // gitCreatedMap by buildGitDateMaps().
           dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
-          llmSummary: fm.llmSummary || null,
+          summary: fm.summary || null,
           description: fm.description || null,
           // Ratings sourced from PG assessments
           ratings: assessment ? buildRatingsFromAssessment(assessment, null) : null,
@@ -2702,7 +2702,7 @@ async function main() {
     const coverage = computePageCoverage({
       wordCount: page.metrics?.wordCount ?? page.wordCount ?? 0,
       contentFormat: page.contentFormat || 'article',
-      llmSummary: page.llmSummary,
+      summary: page.summary,
       updateFrequency: page.updateFrequency,
       hasEntity: entityMap.has(page.id),
       changeHistoryCount: page.changeHistory?.length ?? 0,

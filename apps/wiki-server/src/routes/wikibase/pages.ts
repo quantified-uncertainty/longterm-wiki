@@ -68,7 +68,7 @@ const pagesApp = new Hono()
 
     // Phase 1: Prefix search with to_tsquery — supports search-as-you-type.
     // Each word gets a :* suffix for prefix matching, ANDed together.
-    // Weighted ranking: title (A=1.0), description (B=0.4), llm_summary (C=0.2), tags+entityType (D=0.1).
+    // Weighted ranking: title (A=1.0), description (B=0.4), summary (C=0.2), tags+entityType (D=0.1).
     const prefixQuery = buildPrefixTsquery(q);
 
     let results: PageSearchRow[] = [];
@@ -175,7 +175,7 @@ const pagesApp = new Hono()
       wikiId,
       title: page.title,
       description: page.description,
-      llmSummary: page.llmSummary,
+      summary: page.summary,
       category: page.category,
       subcategory: page.subcategory,
       entityType: page.entityType,
@@ -290,7 +290,7 @@ const pagesApp = new Hono()
         integerIdCol: intIdMap.get(page.id) ?? null, // Phase 4a: integer ID from entity_ids (nullable until Phase 4b)
         title: page.title,
         description: page.description ?? null,
-        llmSummary: page.llmSummary ?? null,
+        summary: page.summary ?? null,
         category: page.category ?? null,
         subcategory: page.subcategory ?? null,
         entityType: page.entityType ?? null,
@@ -325,7 +325,7 @@ const pagesApp = new Hono()
             integerIdCol: sql`excluded.integer_id`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
-            llmSummary: sql`excluded.llm_summary`,
+            summary: sql`excluded.summary`,
             category: sql`excluded.category`,
             subcategory: sql`excluded.subcategory`,
             entityType: sql`excluded.entity_type`,
@@ -359,7 +359,7 @@ const pagesApp = new Hono()
         UPDATE wiki_pages SET search_vector =
           setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
           setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
-          setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
+          setweight(to_tsvector('english', coalesce(summary, '')), 'C') ||
           setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
           setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
         WHERE id IN (${idList})

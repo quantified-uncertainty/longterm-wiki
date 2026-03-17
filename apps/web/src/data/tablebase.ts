@@ -256,7 +256,7 @@ export interface Page {
   causalLevel: string | null;
   lastUpdated: string | null;
   dateCreated?: string | null;
-  llmSummary: string | null;
+  summary: string | null;
   description: string | null;
   ratings: {
     novelty?: number;

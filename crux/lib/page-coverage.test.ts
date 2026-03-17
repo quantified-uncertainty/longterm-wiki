@@ -15,7 +15,7 @@ function makeInput(overrides: Partial<CoverageInput> = {}): CoverageInput {
   return {
     wordCount: 1000,
     contentFormat: 'article',
-    llmSummary: 'A brief summary.',
+    summary: 'A brief summary.',
     updateFrequency: 30,
     hasEntity: true,
     changeHistoryCount: 1,
@@ -120,8 +120,8 @@ describe('getRecommendedTargets', () => {
 
 describe('computePageCoverage — boolean items', () => {
   it.each([
-    ['llmSummary', { llmSummary: 'Summary text' }, 'green'],
-    ['llmSummary', { llmSummary: null }, 'red'],
+    ['summary', { summary: 'Summary text' }, 'green'],
+    ['summary', { summary: null }, 'red'],
     ['schedule', { updateFrequency: 14 }, 'green'],
     ['schedule', { updateFrequency: null }, 'red'],
     ['entity', { hasEntity: true }, 'green'],
@@ -272,7 +272,7 @@ describe('computePageCoverage — passing and total counts', () => {
   it('passing equals number of green items', () => {
     const result = computePageCoverage(
       makeInput({
-        llmSummary: 'yes',
+        summary: 'yes',
         updateFrequency: 14,
         hasEntity: true,
         changeHistoryCount: 1,
@@ -296,7 +296,7 @@ describe('computePageCoverage — passing and total counts', () => {
       makeInput({
         wordCount: 3000,
         contentFormat: 'article',
-        llmSummary: 'summary',
+        summary: 'summary',
         updateFrequency: 30,
         hasEntity: true,
         changeHistoryCount: 5,
@@ -420,7 +420,7 @@ describe('computePageCoverage — edge cases', () => {
     const result = computePageCoverage(
       makeInput({
         wordCount: 0,
-        llmSummary: null,
+        summary: null,
         updateFrequency: null,
         hasEntity: false,
         changeHistoryCount: 0,
@@ -446,7 +446,7 @@ describe('computePageCoverage — edge cases', () => {
   it('total is consistent: no extra unknown keys', () => {
     const result = computePageCoverage(makeInput());
     const knownKeys = new Set([
-      'llmSummary', 'schedule', 'entity', 'editHistory',
+      'summary', 'schedule', 'entity', 'editHistory',
       'overview',
       'tables', 'diagrams', 'internalLinks', 'externalLinks', 'footnotes', 'references',
       'quotes', 'accuracy',

@@ -109,7 +109,7 @@ CALIBRATION: For typical wiki content, expect scores of 3-5. A score of 6+ means
 - Internal/infrastructure: -30
 
 Also provide:
-- **llmSummary**: 1-2 sentences with methodology AND conclusions (include numbers if available)
+- **summary**: 1-2 sentences with methodology AND conclusions (include numbers if available)
 
 Respond with valid JSON only, no markdown.`;
 
@@ -139,7 +139,7 @@ Respond with JSON (keep reasoning SHORT - max 2-3 sentences total):
     "actionability": <0-10, one decimal>,
     "objectivity": <0-10, one decimal>
   },
-  "llmSummary": "<1-2 sentences with conclusions>",
+  "summary": "<1-2 sentences with conclusions>",
   "reasoning": "<2-3 sentences max explaining the scores>"
 }`;
 

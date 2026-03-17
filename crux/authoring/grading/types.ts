@@ -67,7 +67,7 @@ export interface GradeResult {
   readerImportance: number;
   tacticalValue?: number;
   ratings: Ratings;
-  llmSummary?: string;
+  summary?: string;
   reasoning?: string;
 }
 
@@ -81,7 +81,7 @@ export interface PageResult {
   ratings?: Ratings;
   metrics: Metrics;
   quality?: number;
-  llmSummary?: string;
+  summary?: string;
   warnings?: {
     automated: Warning[];
     checklist: ChecklistWarning[];
