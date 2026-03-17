@@ -19,6 +19,7 @@ export default defineConfig({
       'evals/**/*.test.ts',
       'health/**/*.test.ts',
       'pr-patrol/**/*.test.ts',
+      'tablebase/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

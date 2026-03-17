@@ -23,9 +23,11 @@ const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const entityFilter = args.find(a => a.startsWith("--entity="))?.split("=")[1];
 
-// Slug generation: lowercase, replace spaces/special chars with hyphens
+// Slug generation: lowercase, replace spaces/special chars with hyphens. Transliterates Unicode (e.g. ü→u).
 function toSlug(name: string): string {
   return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks (ü→u, ñ→n, etc.)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
