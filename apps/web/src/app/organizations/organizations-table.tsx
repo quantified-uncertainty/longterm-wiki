@@ -70,8 +70,9 @@ function DateHint({ date }: { date: string | null }) {
   if (!date) return null;
   const parts = date.split("-");
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const label = parts.length >= 2
-    ? `${MONTHS[parseInt(parts[1], 10) - 1]} ${parts[0]}`
+  const monthIdx = parts.length >= 2 ? parseInt(parts[1], 10) - 1 : NaN;
+  const label = parts.length >= 2 && monthIdx >= 0 && monthIdx < 12
+    ? `${MONTHS[monthIdx]} ${parts[0]}`
     : date;
   return (
     <span className="text-[10px] text-muted-foreground/50 ml-1">

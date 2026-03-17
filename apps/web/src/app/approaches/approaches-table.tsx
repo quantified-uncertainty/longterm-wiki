@@ -61,6 +61,7 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
         <input
           type="text"
           placeholder="Search approaches by name, description, or tag..."
+          aria-label="Search approaches"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-80"
