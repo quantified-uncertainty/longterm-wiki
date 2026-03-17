@@ -4904,3 +4904,43 @@
     - label: FLF Grant
       value: ~$800,000 (April 2025)
   lastUpdated: 2026-03
+
+- id: y-combinator
+  stableId: d9BCHgtnlw
+  wikiId: E1930
+  type: organization
+  orgType: funder
+  title: Y Combinator
+  website: https://www.ycombinator.com
+  description: >-
+    Y Combinator is the world's most prominent startup accelerator, founded in 2005.
+    It has funded over 4,000 startups including Airbnb, Stripe, Dropbox, and many AI
+    companies. YC publicly opposed SB 1047, arguing it would harm the startup ecosystem
+    and drive AI innovation out of California. CEO Garry Tan was a vocal critic of the bill.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - venture-capital
+    - startups
+  lastUpdated: 2026-03
+
+- id: andreessen-horowitz
+  stableId: u2YCulQ1lg
+  wikiId: E1931
+  type: organization
+  orgType: funder
+  title: Andreessen Horowitz (a16z)
+  website: https://a16z.com
+  description: >-
+    Andreessen Horowitz (a16z) is a major venture capital firm founded in 2009,
+    known for large investments in AI companies. The firm actively opposed SB 1047,
+    publishing detailed analysis arguing the bill would stifle innovation and impose
+    unworkable compliance requirements on AI startups and frontier model developers.
+  relatedEntries:
+    - id: california-sb1047
+      type: policy
+  tags:
+    - venture-capital
+    - ai-investment
+  lastUpdated: 2026-03
