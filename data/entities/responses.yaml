@@ -643,11 +643,9 @@
 - id: failed-stalled-proposals
   stableId: dj6xnXmB7A
   wikiId: E137
-  type: policy
+  type: analysis
   summaryPage: governance-overview
   title: Failed and Stalled AI Proposals
-  policyStatus: proposed
-  scope: Federal
   customFields:
     - label: Purpose
       value: Learning from unsuccessful efforts
@@ -812,8 +810,7 @@
 - id: standards-bodies
   stableId: HXPEtPD1zw
   wikiId: E288
-  type: policy
-  scope: International
+  type: concept
   summaryPage: governance-overview
   title: AI Standards Development
   policyStatus: active
@@ -2837,9 +2834,7 @@
 - id: maim
   stableId: HkJrXOlE2A
   wikiId: E685
-  type: policy
-  scope: International
-  policyStatus: proposed
+  type: approach
   title: "MAIM (Mutually Assured AI Malfunction)"
   description: >-
     A deterrence framework proposed by Dan Hendrycks, Eric Schmidt, and Alexandr Wang
