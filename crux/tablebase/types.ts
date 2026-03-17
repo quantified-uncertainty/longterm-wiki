@@ -2,6 +2,11 @@
  * Core types for the TableBase enrichment system.
  */
 
+/** Convert a display name to a URL-safe slug. */
+export function toSlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 export const TASK_TYPES = [
   "grant-grantee-backfill",
   "personnel-enrichment",

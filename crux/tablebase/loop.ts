@@ -100,9 +100,12 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       });
     }
 
-    if (i + 1 >= maxTasks) {
-      stoppedReason = 'max_tasks_reached';
-    }
+  }
+
+  // Determine stop reason: 'max_tasks_reached' only when the user's --max cap
+  // was the binding constraint (i.e., there were more tasks available than we ran)
+  if (stoppedReason === 'completed' && tasks.length > results.length) {
+    stoppedReason = 'max_tasks_reached';
   }
 
   // Step 4: Summary report

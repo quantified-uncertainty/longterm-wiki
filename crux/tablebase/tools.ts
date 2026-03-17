@@ -9,6 +9,8 @@
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
+import { toSlug } from './types.ts';
+import { getTableConfig } from './table-registry.ts';
 import type { EnrichmentTask, TaskType } from './types.ts';
 import {
   dedupPersonnel,
@@ -145,36 +147,12 @@ async function handleQueryExistingRecords(input: Record<string, unknown>): Promi
   const table = input.table as string;
   const entityId = input.entityId as string;
 
-  let path: string;
-  let resultKey: string;
-  switch (table) {
-    case 'personnel':
-      path = `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'personnel';
-      break;
-    case 'grants':
-      path = `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'grants';
-      break;
-    case 'funding-rounds':
-      path = `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'fundingRounds';
-      break;
-    case 'investments':
-      path = `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'investments';
-      break;
-    case 'benchmark-results':
-      path = `/api/benchmark-results/by-model/${encodeURIComponent(entityId)}?limit=100`;
-      resultKey = 'benchmarkResults';
-      break;
-    default:
-      return `Error: Unknown table "${table}"`;
-  }
+  const config = getTableConfig(table);
+  if (!config) return `Error: Unknown table "${table}"`;
 
-  const result = await apiRequest<Record<string, unknown>>('GET', path);
+  const result = await apiRequest<Record<string, unknown>>('GET', `${config.fetchByEntityPath(entityId)}?limit=100`);
   if (!result.ok) return `Error: ${result.message}`;
-  const records = result.data[resultKey];
+  const records = result.data[config.resultKey];
   return JSON.stringify(records);
 }
 
@@ -210,7 +188,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const description = input.description as string | undefined;
 
   // Generate slug
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const slug = toSlug(name);
 
   // Check if already exists
   const matcher = getEntityMatcher();
@@ -219,19 +197,14 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
     return JSON.stringify({ created: false, existing: true, stableId: existing.stableId, name: existing.name });
   }
 
-  // Allocate ID
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
-  const idResult = await allocateId(slug, `${entityType}: ${name}`);
-  if (!idResult.ok) {
-    return `Error allocating ID: ${idResult.message}`;
-  }
+  // Generate lightweight stableId (no wikiId — not a full wiki entity)
+  const stableId = generateId(`${entityType}:${slug}`);
 
-  // Sync entity
+  // Sync entity to wiki-server (lightweight — no wikiId)
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      wikiId: idResult.data.wikiId,
-      stableId: idResult.data.stableId,
+      stableId,
       entityType,
       title: name,
       ...(description && { description }),
@@ -247,8 +220,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
 
   return JSON.stringify({
     created: true,
-    stableId: idResult.data.stableId,
-    wikiId: idResult.data.wikiId,
+    stableId,
     slug,
     name,
     entityType,
@@ -304,16 +276,16 @@ async function handleSubmitRecords(
   let deduped: Array<Record<string, unknown>>;
   switch (table) {
     case 'personnel':
-      deduped = await dedupPersonnel(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupPersonnel(task.entityId, records );
       break;
     case 'funding-rounds':
-      deduped = await dedupFundingRounds(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupFundingRounds(task.entityId, records );
       break;
     case 'investments':
-      deduped = await dedupInvestments(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupInvestments(task.entityId, records );
       break;
     case 'benchmark-results':
-      deduped = await dedupBenchmarkResults(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupBenchmarkResults(task.entityId, records );
       break;
     case 'grants':
       // Grants are updated (granteeId backfill), not deduped
@@ -331,40 +303,13 @@ async function handleSubmitRecords(
     return `[DRY RUN] Would submit ${deduped.length} records to ${table} (${records.length - deduped.length} duplicates filtered):\n${JSON.stringify(deduped, null, 2)}`;
   }
 
-  // Map table name to API path
-  let apiPath: string;
-  let bodyKey: string;
-  switch (table) {
-    case 'personnel':
-      apiPath = '/api/personnel/sync';
-      bodyKey = 'items';
-      break;
-    case 'grants':
-      apiPath = '/api/grants/batch-update-grantee';
-      bodyKey = 'items';
-      break;
-    case 'funding-rounds':
-      apiPath = '/api/funding-rounds/sync';
-      bodyKey = 'items';
-      break;
-    case 'investments':
-      apiPath = '/api/investments/sync';
-      bodyKey = 'items';
-      break;
-    case 'benchmark-results':
-      apiPath = '/api/benchmark-results/sync';
-      bodyKey = 'items';
-      break;
-    default:
-      return `Error: Unknown table "${table}"`;
-  }
+  const syncConfig = getTableConfig(table);
+  if (!syncConfig) return `Error: Unknown table "${table}"`;
 
-  // For grant grantee backfill, use PATCH endpoint
-  const method = table === 'grants' ? 'PATCH' as const : 'POST' as const;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    method,
-    apiPath,
-    { [bodyKey]: deduped },
+    syncConfig.syncMethod,
+    syncConfig.syncPath,
+    { [syncConfig.syncBodyKey]: deduped },
   );
 
   if (!result.ok) {
