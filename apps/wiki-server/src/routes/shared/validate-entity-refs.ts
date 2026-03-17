@@ -36,7 +36,7 @@ export async function findMissingEntityRefs(
     SELECT unnest AS ref
     FROM unnest(ARRAY[${inList}]::text[]) AS unnest
     WHERE unnest IN (SELECT id FROM entities)
-       OR unnest IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL)
+       OR unnest IN (SELECT stable_id FROM entities)
   `);
 
   const found = new Set(rows.map((r) => r.ref));
