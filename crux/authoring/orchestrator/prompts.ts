@@ -61,7 +61,7 @@ Follow this general approach, adapting based on the page's specific needs:
 5. **Finalize**: Near the end of your session:
    - Run \`adversarial_review\` to catch uncited claims and quality issues (free, $0 cost)
    - Run \`suggest_cross_links\` to find missing relatedEntries and add them via \`edit_frontmatter\`
-   - Update \`llmSummary\` and other frontmatter fields via \`edit_frontmatter\` if you changed major facts
+   - Update \`summary\` and other frontmatter fields via \`edit_frontmatter\` if you changed major facts
    - Run \`validate_content\` as your final tool call
 
 6. **Be selective**: Not every section needs rewriting. Focus on sections with the most room for improvement. Short sections (<30 words) and terminal sections (Sources, References) should be skipped.
@@ -77,7 +77,7 @@ Follow this general approach, adapting based on the page's specific needs:
 - **Preserve tables.** If a section contains Markdown tables, keep them (improve the data if needed). Tables add structural quality — don't replace them with prose paragraphs.
 - **Preserve existing citations.** When rewriting a section, ensure existing footnote references (\`[^N]\`) are retained. Don't strip citations.
 - **Cite accurately.** Each footnote reference \`[^N]\` must match its definition. Don't cite a source for claims it doesn't support.
-- **Update frontmatter.** If you correct major facts (dates, funding amounts, team size), also update the \`llmSummary\` field in the YAML frontmatter to match.
+- **Update frontmatter.** If you correct major facts (dates, funding amounts, team size), also update the \`summary\` field in the YAML frontmatter to match.
 
 ## When you're done
 

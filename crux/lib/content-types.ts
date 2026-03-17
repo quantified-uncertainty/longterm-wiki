@@ -29,7 +29,7 @@ export interface Frontmatter {
   tractability?: number;
   neglectedness?: number;
   uncertainty?: number;
-  llmSummary?: string;
+  summary?: string;
   lastEdited?: string;
   lastUpdated?: Date | string | boolean;
   createdAt?: Date | string;
@@ -112,7 +112,7 @@ export interface PageEntry {
   uncertainty?: number | null;
   causalLevel?: string | null;
   lastUpdated?: string | null;
-  llmSummary?: string | null;
+  summary?: string | null;
   description?: string | null;
   ratings?: Record<string, unknown> | null;
   category?: string;

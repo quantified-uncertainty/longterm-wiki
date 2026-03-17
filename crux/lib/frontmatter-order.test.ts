@@ -59,7 +59,7 @@ describe('getFieldSortIndex', () => {
   });
 
   it('collections come after summaries and ratings', () => {
-    expect(getFieldSortIndex('llmSummary')).toBeLessThan(getFieldSortIndex('clusters'));
+    expect(getFieldSortIndex('summary')).toBeLessThan(getFieldSortIndex('clusters'));
     expect(getFieldSortIndex('ratings')).toBeLessThan(getFieldSortIndex('clusters'));
     expect(getFieldSortIndex('ratings')).toBeLessThan(getFieldSortIndex('todos'));
   });
@@ -173,7 +173,7 @@ describe('reorderFrontmatterObject', () => {
       quality: 50,
       readerImportance: 60,
       lastEdited: '2026-01-01',
-      llmSummary: 'Summary',
+      summary: 'Summary',
       clusters: ['ai-safety'],
     };
     // Grading adds tacticalValue — in JS, new keys go to end

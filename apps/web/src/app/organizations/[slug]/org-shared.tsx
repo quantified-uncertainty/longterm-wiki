@@ -6,19 +6,14 @@ import Link from "next/link";
 import type { KBRecordEntry } from "@/data/factbase";
 import {
   formatKBDate,
-  titleCase,
   shortDomain,
   isUrl,
 } from "@/components/wiki/factbase/format";
-import {
-  resolveKBSlug,
-  getKBEntity,
-  getKBEntitySlug,
-} from "@/data/factbase";
 import { safeHref } from "@/lib/format-compact";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
-// Re-export so existing consumers of { safeHref } from "./org-shared" keep working.
-export { safeHref };
+// Re-export so existing consumers keep working.
+export { safeHref, resolveEntityName };
 
 // ── Formatting helpers ────────────────────────────────────────────────
 
@@ -29,49 +24,19 @@ export function field(item: KBRecordEntry, key: string): string | undefined {
   return String(v);
 }
 
-// ── Entity ref resolver helper ────────────────────────────────────────
+// ── Entity ref resolver helpers (delegate to shared resolver) ─────────
 
+/** @deprecated Use resolveEntityName directly */
 export function resolveRefName(
   slugOrId: string | undefined,
   displayName: string | undefined,
 ): { name: string; href: string | null } {
-  if (!slugOrId && !displayName) return { name: "Unknown", href: null };
-
-  if (slugOrId) {
-    // Try direct entity lookup first (handles both entity IDs and slugs
-    // since getKBEntity resolves both), then fall back to slug resolution.
-    const directEntity = getKBEntity(slugOrId);
-    if (directEntity) {
-      const resolvedSlug = getKBEntitySlug(directEntity.id) ?? slugOrId;
-      const prefix = directEntity.type === "organization" ? "/organizations"
-        : directEntity.type === "person" ? "/people"
-        : null;
-      return { name: directEntity.name, href: prefix ? `${prefix}/${resolvedSlug}` : `/factbase/entity/${directEntity.id}` };
-    }
-  }
-
-  // Fall back to display name or humanized slug
-  const fallbackName = displayName ?? (slugOrId ? titleCase(slugOrId) : "Unknown");
-  return { name: fallbackName, href: null };
+  return resolveEntityName(slugOrId, displayName);
 }
 
-/** Resolve a recipient slug/ID to a display name and optional href. */
+/** @deprecated Use resolveEntityName directly */
 export function resolveRecipient(recipientId: string): { name: string; href: string | null } {
-  const entity = getKBEntity(recipientId);
-  if (entity) {
-    const slug = getKBEntitySlug(recipientId);
-    const href = slug && entity.type === "organization" ? `/organizations/${slug}`
-      : slug && entity.type === "person" ? `/people/${slug}`
-      : `/factbase/entity/${recipientId}`;
-    // Guard against empty entity name — fall back to titleCased recipientId
-    const name = entity.name?.trim()
-      ? entity.name
-      : titleCase(recipientId.replace(/-/g, " ")) || "Unknown";
-    return { name, href };
-  }
-  // Fall back: titleCase the slug, or "Unknown" as last resort
-  const fallbackName = titleCase(recipientId.replace(/-/g, " "));
-  return { name: fallbackName || "Unknown", href: null };
+  return resolveEntityName(recipientId);
 }
 
 // ── Subcomponents ─────────────────────────────────────────────────────

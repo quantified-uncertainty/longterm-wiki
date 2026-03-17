@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import { getAllKBRecords } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { parseFundingProgram } from "./[id]/program-data";
@@ -23,10 +24,9 @@ function resolveOrg(orgId: string): {
   name: string;
   slug: string | null;
 } {
-  const entity = getKBEntity(orgId);
+  const entity = getTypedEntityById(orgId);
   if (entity) {
-    const slug = getKBEntitySlug(orgId) ?? null;
-    return { name: entity.name, slug };
+    return { name: entity.title, slug: entity.id };
   }
   return { name: orgId, slug: null };
 }

@@ -58,7 +58,7 @@ export function EntityLink({
     ? { target: "_blank" as const, rel: "noopener noreferrer" }
     : {};
 
-  const summary = page?.llmSummary || page?.description || entity?.description;
+  const summary = page?.summary || page?.description || entity?.description;
   const entityType = entity?.type;
   const TypeIconComponent = entity ? getEntityTypeIcon(entity.type) : null;
 

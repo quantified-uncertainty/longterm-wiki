@@ -113,7 +113,7 @@ export const wikiPages = pgTable(
     integerIdCol: integer("integer_id").unique(),
     title: text("title").notNull(),
     description: text("description"),
-    llmSummary: text("llm_summary"),
+    summary: text("summary"),
     category: text("category"),
     subcategory: text("subcategory"),
     entityType: text("entity_type"),

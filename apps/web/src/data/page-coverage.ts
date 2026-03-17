@@ -45,7 +45,7 @@ export interface PageCoverageItem {
   sectionCount: number;
   unconvertedLinkCount: number;
   // Boolean items
-  llmSummary: boolean;
+  summary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
@@ -126,7 +126,7 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       sectionCount: page.metrics?.sectionCount ?? 0,
       unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
       // Booleans
-      llmSummary: cov.items.llmSummary === "green",
+      summary: cov.items.summary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",

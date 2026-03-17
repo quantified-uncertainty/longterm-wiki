@@ -85,7 +85,7 @@ function makePage(overrides: {
     uncertainty: null,
     causalLevel: null,
     lastUpdated: null,
-    llmSummary: null,
+    summary: null,
     description: null,
     ratings: {},
     category: "internal",

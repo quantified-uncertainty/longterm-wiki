@@ -183,7 +183,7 @@ const mockDatabase = {
       uncertainty: null,
       causalLevel: null,
       lastUpdated: "2025-01-15",
-      llmSummary: "A summary of the test entity.",
+      summary: "A summary of the test entity.",
       description: null,
       ratings: { novelty: 3, rigor: 4 },
       category: "risks",

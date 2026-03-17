@@ -191,7 +191,7 @@ function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; sl
     "@type": schemaType(format),
     headline,
     ...(pageData?.description && { description: pageData.description }),
-    ...(pageData?.llmSummary && { abstract: pageData.llmSummary }),
+    ...(pageData?.summary && { abstract: pageData.summary }),
     ...(pageData?.lastUpdated && { dateModified: pageData.lastUpdated }),
     isPartOf: {
       "@type": "WebSite",
@@ -372,7 +372,7 @@ async function ContentView({
         quality={pageData?.quality ?? undefined}
         importance={pageData?.readerImportance ?? undefined}
         researchImportance={pageData?.researchImportance ?? undefined}
-        llmSummary={pageData?.llmSummary ?? undefined}
+        summary={pageData?.summary ?? undefined}
         lastEdited={pageData?.lastUpdated ?? undefined}
         updateFrequency={pageData?.updateFrequency ?? undefined}
         evergreen={pageData?.evergreen}
@@ -477,14 +477,17 @@ export default async function WikiPage({ params }: PageProps) {
     const slug = wikiIdToSlug(id.toUpperCase());
     if (!slug) notFound();
 
-    // Redirect to semantic directory URL if entity has a dedicated page
-    const directoryHref = getDirectoryHref(slug);
-    if (directoryHref) permanentRedirect(directoryHref);
-
     const entityPath = getEntityPath(slug) || "";
 
     const result = await renderMdxPage(slug);
-    if (!result) notFound();
+
+    // Redirect to directory page only if this entity has NO wiki content.
+    // Entities with MDX pages should render their wiki content at /wiki/E*.
+    if (!result) {
+      const directoryHref = getDirectoryHref(slug);
+      if (directoryHref) permanentRedirect(directoryHref);
+      notFound();
+    }
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const citationQuotes = getCitationQuotes(slug);
@@ -508,21 +511,22 @@ export default async function WikiPage({ params }: PageProps) {
     );
   } else {
     // String slug like "geoffrey-hinton"
-    // Redirect to semantic directory URL if entity has a dedicated page
-    const directoryHref = getDirectoryHref(id);
-    if (directoryHref) permanentRedirect(directoryHref);
-
     // If it has a wiki ID, redirect to canonical wiki URL
     const wikiId = slugToWikiId(id);
     if (wikiId) {
       redirect(`/wiki/${wikiId}`);
     }
 
-    // No wiki ID — render directly by slug (page-only content without entity)
+    // No wiki ID — try to render by slug, or redirect to directory page
     const entityPath = getEntityPath(id) || "";
 
     const result = await renderMdxPage(id);
-    if (!result) notFound();
+    if (!result) {
+      // No MDX content — redirect to directory page if available
+      const directoryHref = getDirectoryHref(id);
+      if (directoryHref) permanentRedirect(directoryHref);
+      notFound();
+    }
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
     const citationQuotes = getCitationQuotes(id);

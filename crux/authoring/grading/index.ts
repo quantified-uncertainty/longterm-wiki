@@ -133,7 +133,7 @@ async function processPage(
         ratings: grades.ratings,
         metrics,
         quality: derivedQuality,
-        llmSummary: grades.llmSummary,
+        summary: grades.summary,
         warnings: options.skipWarnings ? undefined : {
           automated: automatedWarnings,
           checklist: checklistWarnings,

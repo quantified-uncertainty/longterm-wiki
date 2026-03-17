@@ -5,7 +5,7 @@ description: Strategic vision and scope for the LongtermWiki project
 pageType: documentation
 lastEdited: 2026-02-17
 update_frequency: 90
-llmSummary: Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping.
+summary: Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping.
 ---
 # LongtermWiki: Comprehensive AI Impact & Risk Navigator
 

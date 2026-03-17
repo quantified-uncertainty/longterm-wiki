@@ -9,7 +9,7 @@ import {
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
-import { resolveEntityLink } from "@/lib/record-detail-ui";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -70,8 +70,10 @@ export interface ParsedDivisionPersonnel {
 
 // ── Resolution helpers ─────────────────────────────────────────────────
 
-// Re-export the shared resolveEntityLink (with TableBase fallback for stableIds and numeric IDs)
-export { resolveEntityLink };
+/** @deprecated Use resolveEntityName from @/lib/resolve-entity-name */
+export function resolveEntityLink(entityId: string, displayName?: string | null): { name: string; href: string | null } {
+  return resolveEntityName(entityId, displayName);
+}
 
 // ── Record parsers ────────────────────────────────────────────────────
 
@@ -110,7 +112,7 @@ export function parseFundingProgram(record: KBRecordEntry): ParsedFundingProgram
 export function parseDivisionPersonnel(record: KBRecordEntry): ParsedDivisionPersonnel {
   const f = record.fields;
   const personId = (f.personId as string) ?? "";
-  const person = personId ? resolveEntityLink(personId) : { name: personId, href: null };
+  const person = personId ? resolveEntityLink(personId, record.displayName) : { name: personId, href: null };
 
   return {
     key: record.key,

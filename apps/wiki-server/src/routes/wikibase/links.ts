@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, getDrizzleDb, type SqlQuery } from "../../db.js";
+import { getDb, getDrizzleDb, beginTransaction } from "../../db.js";
 import {
   parseJsonBody,
   validationError,
@@ -160,15 +160,13 @@ const linksApp = new Hono()
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     const { links, replace } = parsed.data;
-    const rawDb = getDb();
 
     let upserted = 0;
 
     // Use a raw postgres transaction with an advisory lock to serialize concurrent
     // sync operations. Without this, two concurrent syncs deadlock on the unique
     // index when inserting overlapping rows.
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
+    await beginTransaction(async (tx) => {
       await tx`SELECT pg_advisory_xact_lock(${PAGE_LINKS_SYNC_LOCK})`;
 
       if (replace) {

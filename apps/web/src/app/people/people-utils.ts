@@ -12,10 +12,10 @@ import {
   getKBRecords,
   getKBEntitySlug,
   getAllKBRecords,
-  getKBEntity,
   resolveKBSlug,
   type KBRecordEntry,
 } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import {
   resolveEntityBySlug,
   getEntitySlugs,
@@ -68,14 +68,14 @@ export function getOrgRolesForPerson(
   for (const rec of records) {
     if (!matchesPersonField(rec.fields.person, personEntityId)) continue;
 
-    const orgEntity = getKBEntity(rec.ownerEntityId);
+    const orgEntity = getTypedEntityById(rec.ownerEntityId);
     if (!orgEntity) continue;
 
     results.push({
       org: {
-        id: orgEntity.id,
-        name: orgEntity.name,
-        type: orgEntity.type ?? "organization",
+        id: orgEntity.stableId ?? orgEntity.id,
+        name: orgEntity.title,
+        type: orgEntity.entityType ?? "organization",
       },
       record: {
         key: rec.key,
@@ -108,14 +108,14 @@ export function getBoardSeatsForPerson(
   for (const rec of records) {
     if (!matchesPersonField(rec.fields.member, personEntityId)) continue;
 
-    const orgEntity = getKBEntity(rec.ownerEntityId);
+    const orgEntity = getTypedEntityById(rec.ownerEntityId);
     if (!orgEntity) continue;
 
     results.push({
       org: {
-        id: orgEntity.id,
-        name: orgEntity.name,
-        type: orgEntity.type ?? "organization",
+        id: orgEntity.stableId ?? orgEntity.id,
+        name: orgEntity.title,
+        type: orgEntity.entityType ?? "organization",
       },
       record: {
         key: rec.key,
@@ -218,7 +218,7 @@ export function getFundingConnectionsForPerson(
   prefetchedKeyPersons?: KBRecordEntry[],
   prefetchedBoardSeats?: KBRecordEntry[],
 ): FundingConnection[] {
-  const entity = getKBEntity(personEntityId);
+  const entity = getTypedEntityById(personEntityId);
   if (!entity) return [];
 
   const personSlug = getKBEntitySlug(personEntityId);
@@ -252,21 +252,23 @@ export function getFundingConnectionsForPerson(
   }
 
   // Build a set of names/slugs to match for personal grants
+  // NOTE: TableBase entities don't have aliases; FactBase aliases are not available here.
   const personalMatchNames = new Set<string>([
     personEntityId.toLowerCase(),
-    entity.name.toLowerCase(),
+    entity.title.toLowerCase(),
     ...(personSlug ? [personSlug.toLowerCase()] : []),
-    ...(entity.aliases?.map((a: string) => a.toLowerCase()) ?? []),
+    // Include the slug (entity.id) for matching
+    entity.id.toLowerCase(),
   ]);
 
   // Resolve an org ID to display info
   function resolveOrg(orgId: string) {
-    const orgEntity = getKBEntity(orgId);
+    const orgEntity = getTypedEntityById(orgId);
     if (!orgEntity) return { id: orgId, name: orgId, slug: undefined };
     return {
-      id: orgEntity.id,
-      name: orgEntity.name,
-      slug: getKBEntitySlug(orgEntity.id),
+      id: orgEntity.stableId ?? orgEntity.id,
+      name: orgEntity.title,
+      slug: orgEntity.id, // entity.id is the slug in TableBase
     };
   }
 
@@ -274,16 +276,16 @@ export function getFundingConnectionsForPerson(
   function resolveCounterparty(
     id: string,
   ): { name: string; href: string | null } {
-    const e = getKBEntity(id);
+    const e = getTypedEntityById(id);
     if (e) {
-      const slug = getKBEntitySlug(id);
+      const slug = e.id; // entity.id is the slug in TableBase
       const href =
-        slug && e.type === "organization"
+        e.entityType === "organization"
           ? `/organizations/${slug}`
-          : slug && e.type === "person"
+          : e.entityType === "person"
             ? `/people/${slug}`
-            : `/factbase/entity/${id}`;
-      return { name: e.name, href };
+            : e.wikiId ? `/wiki/${e.wikiId}` : null;
+      return { name: e.title, href };
     }
     // Title-case the slug as fallback
     const name = id
@@ -362,20 +364,19 @@ export function getFundingConnectionsForPerson(
     if (recipientRaw && !seen.has(compositeKey)) {
       // Try to resolve recipient to an entity ID
       let recipientEntityId: string | null = null;
-      const recipientEntity = getKBEntity(recipientRaw);
+      const recipientEntity = getTypedEntityById(recipientRaw);
       if (recipientEntity) {
-        recipientEntityId = recipientEntity.id;
+        recipientEntityId = recipientEntity.stableId ?? recipientEntity.id;
       } else {
-        // Try matching by slug
+        // Try matching by slug/name against affiliated orgs
         for (const orgId of affiliatedOrgIds) {
-          const orgEntity = getKBEntity(orgId);
+          const orgEntity = getTypedEntityById(orgId);
           if (!orgEntity) continue;
-          const orgSlug = getKBEntitySlug(orgId);
           const matchNames = new Set([
             orgId.toLowerCase(),
-            orgEntity.name.toLowerCase(),
-            ...(orgSlug ? [orgSlug.toLowerCase()] : []),
-            ...(orgEntity.aliases?.map((a: string) => a.toLowerCase()) ?? []),
+            orgEntity.title.toLowerCase(),
+            orgEntity.id.toLowerCase(), // slug
+            ...(orgEntity.stableId ? [orgEntity.stableId.toLowerCase()] : []),
           ]);
           if (matchNames.has(recipientRaw.toLowerCase())) {
             recipientEntityId = orgId;

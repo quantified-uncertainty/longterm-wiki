@@ -4,13 +4,14 @@
  */
 import Link from "next/link";
 import {
-  getKBEntity,
   getKBEntitySlug,
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { formatKBDate } from "@/components/wiki/factbase/format";
-import { resolveEntityLink as resolveEntityLinkBase } from "@/lib/record-detail-ui";
+import {
+  formatKBDate,
+} from "@/components/wiki/factbase/format";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -47,28 +48,9 @@ export function resolveEntityLink(entityId: string): {
   slug: string | null;
   href: string | null;
 } {
-  // Try FactBase first for slug extraction (slug is not in the base return type)
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization")
-        return { name: entity.name, slug, href: `/organizations/${slug}` };
-      if (entity.type === "person")
-        return { name: entity.name, slug, href: `/people/${slug}` };
-    }
-    return { name: entity.name, slug: null, href: `/factbase/entity/${entityId}` };
-  }
-
-  // Fall back to the shared resolution (handles bare numeric IDs and stableIds)
-  const base = resolveEntityLinkBase(entityId);
-  // Extract slug from href if it is a directory URL (e.g. /organizations/anthropic)
-  let slug: string | null = null;
-  if (base.href) {
-    const dirMatch = base.href.match(/^\/(organizations|people)\/(.+)$/);
-    if (dirMatch) slug = dirMatch[2];
-  }
-  return { name: base.name, slug, href: base.href };
+  const resolved = resolveEntityName(entityId);
+  const slug = getKBEntitySlug(entityId) ?? null;
+  return { name: resolved.name, slug, href: resolved.href };
 }
 
 export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
@@ -76,7 +58,7 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
   const funder = resolveEntityLink(record.ownerEntityId);
   const recipientId = typeof f.recipient === "string" ? f.recipient : null;
   const recipient = recipientId
-    ? resolveEntityLink(recipientId)
+    ? { ...resolveEntityName(recipientId, record.displayName), slug: getKBEntitySlug(recipientId) ?? null }
     : { name: "", slug: null, href: null };
 
   return {

@@ -1,4 +1,4 @@
-import postgres, { type Row } from "postgres";
+import postgres, { type Row, type TransactionSql } from "postgres";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { fileURLToPath } from "node:url";
@@ -21,6 +21,46 @@ export interface SqlQuery {
     template: TemplateStringsArray,
     ...parameters: readonly unknown[]
   ): Promise<T & postgres.RowList<T>>;
+}
+
+/**
+ * postgres.js TransactionSql with the tagged-template call signature restored.
+ *
+ * TransactionSql extends Omit<Sql, ...>, which drops Sql's call signatures
+ * (a TypeScript limitation — Omit cannot preserve call signatures). At runtime,
+ * the transaction object IS callable as a tagged template. This intersection
+ * type restores the call signature so we can use transactions without
+ * double-casts in route files.
+ */
+type CallableTransactionSql = TransactionSql & SqlQuery;
+
+/**
+ * Typed wrapper around `sql.begin()` that provides the callback with a
+ * properly-typed transaction that includes the tagged-template call signature.
+ *
+ * This centralizes the postgres.js TransactionSql type workaround so route
+ * files don't need `as unknown as SqlQuery` casts.
+ */
+export async function beginTransaction(
+  cb: (tx: CallableTransactionSql) => Promise<void>,
+): Promise<void> {
+  const db = getDb();
+  await db.begin(async (tx) => {
+    // Runtime validation: TransactionSql inherits Sql's tagged-template
+    // callable at runtime, but the TS type loses it due to Omit.
+    // Verify the object is actually callable before narrowing the type.
+    if (typeof tx !== "function") {
+      throw new TypeError(
+        `Expected postgres.js transaction to be callable, got ${typeof tx}`
+      );
+    }
+    // After runtime validation, we know tx is callable. Narrow from Function
+    // (which typeof === "function" proves) to CallableTransactionSql.
+    // This is a single-step assertion from a validated callable, not a blind
+    // double-cast — the typeof check above provides the runtime guarantee.
+    const typedTx: CallableTransactionSql = tx as CallableTransactionSql;
+    await cb(typedTx);
+  });
 }
 
 let sql: Sql | null = null;

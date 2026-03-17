@@ -1568,12 +1568,15 @@ function personnelRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema,
     ownerEntityId: row.roleType === 'career' ? row.personId : row.organizationId,
     fields,
   };
+  // Embed resolved display name from API JOIN (personnel API returns personResolvedName)
+  if (row.personResolvedName) entry.displayName = row.personResolvedName;
+  return entry;
 }
 
 /**
@@ -1595,12 +1598,15 @@ function grantRowToRecordEntry(row) {
   if (row.notes) fields.notes = row.notes;
   if (row.programId) fields.programId = row.programId;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'grant',
     ownerEntityId: row.organizationId,
     fields,
   };
+  // Embed resolved grantee display name from API JOIN
+  if (row.granteeResolvedName) entry.displayName = row.granteeResolvedName;
+  return entry;
 }
 
 /**
@@ -1618,12 +1624,15 @@ function fundingRoundRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'funding-round',
     ownerEntityId: row.companyId,
     fields,
   };
+  // Embed resolved lead investor display name from API JOIN
+  if (row.leadInvestorResolvedName) entry.displayName = row.leadInvestorResolvedName;
+  return entry;
 }
 
 /**
@@ -1655,12 +1664,15 @@ function investmentRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
 
-  return {
+  const entry = {
     key: row.id,
     schema: 'investment',
     ownerEntityId: row.companyId,
     fields,
   };
+  // Embed resolved investor display name from API JOIN
+  if (row.investorResolvedName) entry.displayName = row.investorResolvedName;
+  return entry;
 }
 
 /**
@@ -1694,6 +1706,8 @@ function equityPositionRowToRecordEntry(row) {
   };
   if (row.asOf) entry.asOf = row.asOf;
   if (row.validEnd) entry.validEnd = row.validEnd;
+  // Embed resolved holder display name from API JOIN
+  if (row.holderResolvedName) entry.displayName = row.holderResolvedName;
   return entry;
 }
 
@@ -1988,7 +2002,7 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
           // frontmatter. Bulk-import git dates are already filtered out of
           // gitCreatedMap by buildGitDateMaps().
           dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
-          llmSummary: fm.llmSummary || null,
+          summary: fm.summary || null,
           description: fm.description || null,
           // Ratings sourced from PG assessments
           ratings: assessment ? buildRatingsFromAssessment(assessment, null) : null,
@@ -2326,9 +2340,8 @@ async function main() {
     });
     const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
-    const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${entityCount} entities, ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected)`);
+    console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }
@@ -2740,7 +2753,7 @@ async function main() {
     const coverage = computePageCoverage({
       wordCount: page.metrics?.wordCount ?? page.wordCount ?? 0,
       contentFormat: page.contentFormat || 'article',
-      llmSummary: page.llmSummary,
+      summary: page.summary,
       updateFrequency: page.updateFrequency,
       hasEntity: entityMap.has(page.id),
       changeHistoryCount: page.changeHistory?.length ?? 0,
@@ -2913,7 +2926,7 @@ async function main() {
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
   if (_kbData) {
     writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
-    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase entities, facts, records, schemas)`);
+    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase facts, records, schemas — entities owned by TableBase)`);
   } else {
     console.warn('⚠ FactBase data not available — factbase-data.json not written');
   }

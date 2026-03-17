@@ -6,6 +6,7 @@ import { getTypedEntityById } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -23,35 +24,23 @@ const CEA_SLUG_ALIAS = "cea";
 
 /**
  * Resolve an entity identifier to a display name, slug, and wiki page ID.
- * Handles both entity IDs (stableIds) and plain-text names gracefully.
+ * Uses the shared resolveEntityName for name/href, enriches with slug + wikiPageId.
  */
-function resolveRecipient(recipientId: string): {
+function resolveGrantRecipient(
+  recipientId: string,
+  displayName?: string | null,
+): {
   name: string;
   slug: string | null;
   href: string | null;
   wikiPageId: string | null;
 } {
+  const resolved = resolveEntityName(recipientId, displayName);
   const entity = getKBEntity(recipientId);
-  if (entity) {
-    const slug = getKBEntitySlug(recipientId) ?? null;
-    const typedEntity = getTypedEntityById(recipientId);
-    const wikiPageId = typedEntity?.wikiId ?? null;
-    // Build type-aware href: /organizations/ for orgs, /people/ for people
-    let href: string | null = null;
-    if (slug) {
-      if (entity.type === "person") {
-        href = `/people/${slug}`;
-      } else {
-        href = `/organizations/${slug}`;
-      }
-    }
-    return { name: entity.name, slug, href, wikiPageId };
-  }
-  // Not a known entity — convert slug to readable title case
-  const displayName = recipientId
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-  return { name: displayName, slug: null, href: null, wikiPageId: null };
+  const slug = entity ? (getKBEntitySlug(recipientId) ?? null) : null;
+  const typedEntity = entity ? getTypedEntityById(recipientId) : null;
+  const wikiPageId = typedEntity?.wikiId ?? null;
+  return { name: resolved.name, slug, href: resolved.href, wikiPageId };
 }
 
 export default function GrantsPage() {
@@ -65,11 +54,10 @@ export default function GrantsPage() {
         ? CEA_CANONICAL_ID
         : record.ownerEntityId;
 
-    const orgEntity = getKBEntity(orgId);
-    const orgName = orgEntity?.name ?? orgId;
-    const orgSlug = getKBEntitySlug(orgId) ?? null;
-    const orgTypedEntity = getTypedEntityById(orgId);
-    const orgWikiPageId = orgTypedEntity?.wikiId ?? null;
+    const orgEntity = getTypedEntityById(orgId);
+    const orgName = orgEntity?.title ?? orgId;
+    const orgSlug = orgEntity?.id ?? null;
+    const orgWikiPageId = orgEntity?.wikiId ?? null;
 
     const recipientId =
       typeof record.fields.recipient === "string"
@@ -77,7 +65,7 @@ export default function GrantsPage() {
         : null;
 
     // Resolve recipient to display name and link info
-    const resolved = recipientId ? resolveRecipient(recipientId) : null;
+    const resolved = recipientId ? resolveGrantRecipient(recipientId, record.displayName) : null;
 
     return {
       compositeKey: `${orgId}-${record.key}`,

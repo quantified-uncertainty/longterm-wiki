@@ -10,7 +10,7 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, getDrizzleDb, type SqlQuery } from "../../db.js";
+import { getDb, getDrizzleDb, beginTransaction, type SqlQuery } from "../../db.js";
 import {
   parseJsonBody,
   validationError,
@@ -115,11 +115,9 @@ async function batchedPageUpdate<T extends { pageId: string }>(
   const slugs = items.map((item) => item.pageId);
   const intIdMap = await resolvePageIntIds(db, slugs);
 
-  const rawDb = getDb();
   let updated = 0;
 
-  await rawDb.begin(async (txRaw) => {
-    const tx = txRaw as unknown as SqlQuery;
+  await beginTransaction(async (tx) => {
     await tx`SELECT pg_advisory_xact_lock(${lockKey})`;
 
     for (let i = 0; i < items.length; i += SQL_BATCH_SIZE) {
@@ -267,11 +265,9 @@ const buildMetricsApp = new Hono()
     }
     const intIdMap = await resolvePageIntIds(db, [...allSlugs]);
 
-    const rawDb = getDb();
     let upserted = 0;
 
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
+    await beginTransaction(async (tx) => {
       await tx`SELECT pg_advisory_xact_lock(${SIMILARITY_SYNC_LOCK})`;
 
       if (replace) {

@@ -16,7 +16,7 @@ The wiki has ~625 pages ranging from empty stubs (0 words) to comprehensive anal
 - **Decision-makers** want a structured 200-word summary with key numbers
 - **Researchers** want the full article with all evidence and nuance
 
-Currently every reader gets the same page. The wiki has a two-tier summary system (`description` and `llmSummary` in frontmatter) and infoboxes, but these aren't doing enough to serve short-attention readers.
+Currently every reader gets the same page. The wiki has a two-tier summary system (`description` and `summary` in frontmatter) and infoboxes, but these aren't doing enough to serve short-attention readers.
 
 ## Current State
 
@@ -37,14 +37,14 @@ Median: ~2,200 words. Mean: ~2,274 words. The longest page (bioweapons) is 10,64
 
 **Two-tier summaries:**
 - `description` (frontmatter): 1–2 sentences, ~100–200 chars. Used in meta tags and OG cards.
-- `llmSummary` (frontmatter): AI-generated, 200–500 chars. Shown in PageStatus component, EntityLink hover tooltips, and InfoBox fallback.
+- `summary` (frontmatter): AI-generated, 200–500 chars. Shown in PageStatus component, EntityLink hover tooltips, and InfoBox fallback.
 
 **InfoBox:**
 - Right-floating card (280px desktop, full-width mobile) showing entity metadata, key facts, related entries, ratings, links.
 - Description is CSS-truncated to 3 lines (`line-clamp-3`) with no "read more" button.
 
 **PageStatus banner:**
-- Shows quality/importance badges, word count, and llmSummary text above the article.
+- Shows quality/importance badges, word count, and summary text above the article.
 - Currently a static block — no collapse/expand behavior.
 
 **Table of Contents:**
@@ -66,17 +66,17 @@ Don't change the page rendering model at all. Instead, invest in making the top-
 
 **What to do:**
 
-1. **Structured llmSummary**: Instead of a single paragraph, generate summaries with a consistent structure:
+1. **Structured summary**: Instead of a single paragraph, generate summaries with a consistent structure:
    - **One-liner** (what is this thing, in one sentence)
    - **Key numbers** (2–4 bullet points with the most important quantitative claims)
    - **Bottom line** (so-what for a decision-maker)
    - Store this as structured YAML in frontmatter rather than a single string.
 
-2. **Expand the InfoBox description**: Add a "Show full summary" toggle to the InfoBox so the `line-clamp-3` truncation is interactive. The `llmSummary` text is already there — just hidden by CSS.
+2. **Expand the InfoBox description**: Add a "Show full summary" toggle to the InfoBox so the `line-clamp-3` truncation is interactive. The `summary` text is already there — just hidden by CSS.
 
 3. **Quick Assessment tables**: Many KB risk pages already have a "Quick Assessment" table at the top. Standardize this across all page types (not just risks) and enforce it in page templates.
 
-4. **Key Takeaways component**: A new MDX component (`<KeyTakeaways>`) that authors place after the first heading. Renders as a highlighted box with 3–5 bullet points. Unlike the auto-generated llmSummary, this is hand-curated.
+4. **Key Takeaways component**: A new MDX component (`<KeyTakeaways>`) that authors place after the first heading. Renders as a highlighted box with 3–5 bullet points. Unlike the auto-generated summary, this is hand-curated.
 
 **Pros:** No architectural changes. Works with static generation. Improves every page visit. Incremental — can improve one page at a time.
 
@@ -169,7 +169,7 @@ The approaches aren't mutually exclusive. Here's a phased plan:
 
 This is the highest-leverage, lowest-risk starting point:
 
-- Restructure `llmSummary` into a structured format (one-liner, key numbers, bottom line). Run the `crux` authoring pipeline to regenerate summaries for all pages.
+- Restructure `summary` into a structured format (one-liner, key numbers, bottom line). Run the `crux` authoring pipeline to regenerate summaries for all pages.
 - Add an expand toggle to the InfoBox description (currently just CSS `line-clamp-3`).
 - Standardize Quick Assessment tables across all page types (risks already have them).
 - Create a `<KeyTakeaways>` MDX component for hand-curated bullet summaries.
@@ -259,7 +259,7 @@ When a `structuredSummary` is available, PageStatus renders it as:
 - **Key points** as a bullet list
 - **Bottom line** in a highlighted indigo box with a "BOTTOM LINE" label
 
-Falls back to the existing flat `llmSummary` paragraph when no structured summary exists.
+Falls back to the existing flat `summary` paragraph when no structured summary exists.
 
 ### 5. Example Pages
 

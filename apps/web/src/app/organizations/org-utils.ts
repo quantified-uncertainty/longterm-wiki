@@ -3,22 +3,25 @@
  */
 import {
   getKBEntities,
-  getKBEntity,
   resolveKBSlug,
   getKBSlugMap,
 } from "@/data/factbase";
-import { getTypedEntities, isOrganization } from "@/data";
-import type { Entity } from "@longterm-wiki/factbase";
+import { getTypedEntities, getTypedEntityById, isOrganization, type AnyEntity } from "@/data";
 
 /**
- * Resolve a URL slug (e.g., "anthropic") to a KB organization entity.
+ * Resolve a URL slug (e.g., "anthropic") to an organization entity.
+ * Uses TableBase as the authoritative source.
  * Returns undefined if not found or not an organization.
  */
-export function resolveOrgBySlug(slug: string): Entity | undefined {
+export function resolveOrgBySlug(slug: string): AnyEntity | undefined {
+  // Try TableBase first (slug is the primary key for typed entities)
+  const directEntity = getTypedEntityById(slug);
+  if (directEntity && isOrganization(directEntity)) return directEntity;
+  // Fallback: try resolving as a FactBase slug -> stableId -> TableBase
   const entityId = resolveKBSlug(slug);
   if (!entityId) return undefined;
-  const entity = getKBEntity(entityId);
-  if (!entity || entity.type !== "organization") return undefined;
+  const entity = getTypedEntityById(entityId);
+  if (!entity || !isOrganization(entity)) return undefined;
   return entity;
 }
 

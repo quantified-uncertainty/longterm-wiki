@@ -9,7 +9,7 @@
  * 3. Footnotes with description-only text and no URL (e.g. "[^4]: Series G announcement source")
  * 4. Table cells containing filler citation strings like "Internal planning",
  *    "Market consensus", "Aggregated", "Expert consensus" used as sources
- * 5. llmSummary frontmatter containing known grader error phrases
+ * 5. summary frontmatter containing known grader error phrases
  *
  * Severity: WARNING for most; ERROR for footnotes that block citations.
  *
@@ -31,7 +31,7 @@ const FILLER_CITATION_STRINGS = [
   'Multiple sources',
 ];
 
-/** Known grader error phrases that sometimes end up written into llmSummary */
+/** Known grader error phrases that sometimes end up written into summary */
 const GRADER_ERROR_PHRASES = [
   'Error generating summary',
   'Failed to generate',
@@ -137,16 +137,16 @@ export const placeholderTextRule = createRule({
       }
     }
 
-    // --- 5. llmSummary grader error phrases in frontmatter ---
-    const llmSummary = content.frontmatter?.llmSummary as string | undefined;
-    if (llmSummary && typeof llmSummary === 'string') {
+    // --- 5. summary grader error phrases in frontmatter ---
+    const summary = content.frontmatter?.summary as string | undefined;
+    if (summary && typeof summary === 'string') {
       for (const phrase of GRADER_ERROR_PHRASES) {
-        if (llmSummary.toLowerCase().includes(phrase.toLowerCase())) {
+        if (summary.toLowerCase().includes(phrase.toLowerCase())) {
           issues.push(new Issue({
             rule: this.id,
             file: content.path,
             line: 1,
-            message: `llmSummary contains a grader error phrase "${phrase}" — clear the field or regenerate the summary.`,
+            message: `summary contains a grader error phrase "${phrase}" — clear the field or regenerate the summary.`,
             severity: Severity.WARNING,
           }));
           break; // Only report once per file

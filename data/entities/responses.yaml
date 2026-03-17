@@ -150,87 +150,252 @@
       entityId: cais
       position: support
       reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
+      context:
+        - "Funded by Open Philanthropy (~$15M total grants)"
+        - "Director Dan Hendrycks (also listed as supporter) co-authored the Statement on AI Risk"
+        - "Open Philanthropy also funds Anthropic (mixed position) and supported MIRI"
     - name: Future of Life Institute
       entityId: fli
       position: support
       reason: Supports proactive regulation of frontier AI
+      context:
+        - "Primarily funded by Vitalik Buterin's 2021 SHIB donation (~$500M to FLI)"
+        - "Co-founded by Max Tegmark (also listed as supporter) and Jaan Tallinn (Skype co-founder)"
+        - "Organized the 2023 Pause Letter (33,000+ signatories) calling for 6-month AI training moratorium"
+        - "Sister org FLF received $58.8M from FLI"
     - name: Yoshua Bengio
       entityId: yoshua-bengio
       position: support
       reason: Turing Award winner supporting frontier AI safety regulation
+      context:
+        - "Scientific Director of Mila (Quebec AI Institute)"
+        - "Co-author (with Hinton) of the foundational deep learning work; one of 'three godfathers of AI'"
+        - "Member of UN High-Level Advisory Body on AI"
+        - "Funded via Canadian government (CIFAR AI Chair) and Quebec government"
     - name: Geoffrey Hinton
       entityId: geoffrey-hinton
       position: support
       reason: Godfather of AI, warning about AI risks
+      context:
+        - "Former Google VP; resigned May 2023 to speak freely about AI risks"
+        - "2024 Nobel Prize in Physics (with John Hopfield) for neural network foundations"
+        - "Co-authored foundational deep learning papers with Bengio (also supporter)"
+        - "Former advisor to Google DeepMind (which opposes the bill)"
     - name: Stuart Russell
       entityId: stuart-russell
       position: support
       reason: Leading AI researcher supporting enforceable safety requirements
+      context:
+        - "UC Berkeley professor; director of CHAI (Center for Human-Compatible AI)"
+        - "CHAI funded by Open Philanthropy, Elon Musk Foundation"
+        - "Author of 'Human Compatible' (2019); co-author of leading AI textbook"
     - name: Elon Musk
       entityId: elon-musk
       position: support
       reason: Publicly endorsed the bill on X (Aug 26, 2024)
       source: https://sfstandard.com/2024/08/26/elon-musk-openai-scott-wiener-sb1046/
+      context:
+        - "CEO of xAI (competitor to OpenAI, which opposes the bill)"
+        - "Co-founded OpenAI in 2015; departed board in 2018; sued OpenAI in 2024"
+        - "Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)"
+        - "Owns X (Twitter), the platform where much SB-1047 debate occurred"
     - name: OpenAI
       entityId: openai
       position: oppose
-      reason: Initially opposed; argued it would stifle innovation and drive development out of California
+      reason: Initially opposed; argued it would stifle innovation and drive development out of California (opposition letter Aug 20, 2024)
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
+      context:
+        - "Backed by Microsoft ($13B invested), Thrive Capital, a16z (also opposes)"
+        - "Co-founded by Elon Musk (who supports the bill); acrimonious split in 2018"
+        - "Transitioning from nonprofit to for-profit; this bill would have increased compliance burden"
+        - "113+ of its employees signed letter supporting the bill despite company opposition"
     - name: Anthropic
       entityId: anthropic
       position: mixed
-      reason: "Called final version 'benefits likely outweigh costs' but remained uncertain about approach"
+      reason: "Initial opposition Jul 25, 2024; revised to 'benefits likely outweigh costs' Aug 21, 2024 after amendments"
       source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
+      context:
+        - "Founded by ex-OpenAI researchers (Dario/Daniela Amodei)"
+        - "Backed by Amazon ($4B invested), Google ($2B), Spark Capital, Jaan Tallinn"
+        - "Jaan Tallinn also co-founded FLI (supporter); connection to safety-oriented funders"
+        - "Funded by Open Philanthropy (early investment); Open Phil also funds CAIS (supporter)"
+        - "Has its own Responsible Scaling Policy — bill aligned with their existing safety approach"
     - name: Google DeepMind
       entityId: deepmind
       position: oppose
       reason: Opposed on grounds of premature regulation and preference for federal approach
+      context:
+        - "Subsidiary of Alphabet/Google"
+        - "Geoffrey Hinton (supporter) was former VP at Google; resigned to speak about AI risks"
+        - "Google is a major investor in Anthropic ($2B), which took a mixed position"
+        - "Member of AI Alliance (also opposes)"
     - name: Meta AI
       entityId: meta-ai
       position: oppose
       reason: Strongly opposed; concerned about open-source implications and compliance burden
+      context:
+        - "Subsidiary of Meta; employs Yann LeCun (also opposes) as Chief AI Scientist"
+        - "Co-founded AI Alliance (also opposes) with IBM"
+        - "Open-source AI strategy (Llama models) most affected by bill's liability provisions"
+        - "Mark Zuckerberg personally lobbied Governor Newsom against the bill"
     - name: Y Combinator
       entityId: y-combinator
       position: oppose
       reason: Concerned about startup ecosystem impact and compliance costs
+      context:
+        - "Top startup accelerator; early backer of OpenAI (opposes), Stripe, Airbnb"
+        - "Sam Altman (OpenAI CEO) was former YC president (2014-2019)"
+        - "YC-funded startups would face compliance costs under the bill"
+        - "Garry Tan (YC CEO) was vocal opponent on social media"
     - name: Andreessen Horowitz
       entityId: andreessen-horowitz
       position: oppose
       reason: Opposed on innovation and competition grounds
+      context:
+        - "Major AI VC; invested in OpenAI (opposes), Mistral, Character.AI, others"
+        - "a16z portfolio companies would face compliance costs under the bill"
+        - "Marc Andreessen and Ben Horowitz are vocal opponents of AI regulation generally"
+        - "Spent $39,750 on SB-1047 lobbying in Q2 2024"
     - name: Yann LeCun
       entityId: yann-lecun
       position: oppose
       reason: Turing Award winner opposing the regulatory approach
+      context:
+        - "Chief AI Scientist at Meta AI (also opposes)"
+        - "Turing Award with Bengio (supporter) and Hinton (supporter) — all three took different positions"
+        - "Strong advocate for open-source AI; bill's liability provisions threaten open model releases"
     - name: Andrew Ng
       entityId: andrew-ng
       position: oppose
       reason: Stanford professor and Google Brain co-founder opposing the bill
+      context:
+        - "Founder of Coursera, Landing AI, AI Fund"
+        - "Former VP and Chief Scientist at Baidu; co-founded Google Brain"
+        - "Board member of Woebot Health; advisor to several AI startups"
+        - "Vocal opponent of 'AI doomerism'; frames regulation debate as large-lab rent-seeking"
     - name: Fei-Fei Li
       entityId: fei-fei-li
       position: oppose
-      reason: Stanford professor; later appointed by Newsom to expert panel on alternative approach
+      reason: Stanford professor; Fortune open letter opposing SB 1047 (Aug 10, 2024); later appointed by Newsom to expert panel on alternative approach
+      context:
+        - "Co-director of Stanford HAI (Human-Centered AI Institute)"
+        - "Board member of companies including Amgen and Twitter (pre-Musk acquisition)"
+        - "Co-founded World Labs (spatial AI startup) with a16z (also opposes) funding"
+        - "Appointed by Newsom to panel drafting alternative AI regulation after veto"
     - name: Max Tegmark
       entityId: max-tegmark
       position: support
       reason: MIT professor and FLI co-founder; advocated for frontier AI regulation
+      context:
+        - "Co-founded FLI (also supports) with Jaan Tallinn (Skype co-founder)"
+        - "MIT Physics professor; author of 'Life 3.0'"
+        - "Jaan Tallinn also invested in Anthropic (mixed position)"
     - name: Dan Hendrycks
       entityId: dan-hendrycks
       position: support
       reason: CAIS director; key organizer of AI safety research support for the bill
+      context:
+        - "Director of Center for AI Safety (also supports)"
+        - "CAIS funded by Open Philanthropy (~$15M)"
+        - "Lead author of the Statement on AI Risk (2023) signed by Hinton, Bengio, and others"
+        - "Advisor to xAI (Elon Musk's company; Musk also supports)"
     - name: Nancy Pelosi
       position: oppose
       reason: "Led CA Congressional Democrats opposing; called bill 'well-intentioned but ill informed' (Aug 16, 2024)"
       source: https://pelosi.house.gov/news/press-releases/pelosi-statement-opposition-california-senate-bill-1047
+      context:
+        - "US Representative for San Francisco (tech industry heartland)"
+        - "Her district includes headquarters of OpenAI, multiple a16z portfolio companies"
+        - "Husband Paul Pelosi holds significant tech stock investments"
     - name: California Chamber of Commerce
       position: oppose
       reason: Commissioned push poll showing 46% opposition; lobbied through industry coalition
+      context:
+        - "State's largest business advocacy organization"
+        - "Members include major tech companies opposing the bill"
+        - "Push poll methodology criticized; independent polls showed ~73% public support"
     - name: AI Alliance
       position: oppose
       reason: Industry coalition opposing the bill's approach to frontier model regulation
+      context:
+        - "Co-founded by Meta (also opposes) and IBM"
+        - "Members include Google DeepMind (opposes), Intel, AMD, Sony, Oracle"
+        - "Focuses on open-source AI; bill's liability framework seen as threat to open model releases"
     - name: 113+ AI Company Employees
       position: support
       reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill (Sep 9, 2024)
       source: https://sfstandard.com/2024/09/09/ai-workers-support-wiener-bill/
+      context:
+        - "Signers included employees of companies that officially opposed the bill (OpenAI, DeepMind, Meta)"
+        - "Highlighted tension between company positions and individual researcher views on AI safety"
+    - name: Encode Justice
+      entityId: encode-justice
+      position: support
+      reason: Youth-led AI accountability organization; co-source of SB 1047
+    - name: Imbue
+      entityId: imbue
+      position: support
+      reason: AI safety-focused company supporting frontier AI regulation
+    - name: Gladstone AI
+      entityId: gladstone-ai
+      position: support
+      reason: AI safety advisory firm; authors of RAND-commissioned report on catastrophic AI risks
+    - name: Nonlinear
+      entityId: nonlinear
+      position: support
+      reason: EA-adjacent AI safety organization supporting the bill
+    - name: Economic Security Project Action
+      entityId: economic-security-project
+      position: support
+      reason: Economic policy organization; co-source of SB 1047
+    - name: Apart Research
+      entityId: apart-research
+      position: support
+      reason: AI safety research organization supporting frontier AI regulation
+    - name: Elicit
+      entityId: elicit
+      position: support
+      reason: AI research assistant tool supporting AI safety regulation
+    - name: Panoplia Labs
+      entityId: panoplia-labs
+      position: support
+      reason: AI safety research lab supporting the bill
+    - name: Kira Center
+      entityId: kira-center
+      position: support
+      reason: Center for AI Risks and Impacts supporting frontier AI regulation
+    - name: Redwood Research
+      entityId: redwood-research
+      position: support
+      reason: AI safety research organization supporting the bill
+    - name: FAR AI
+      entityId: far-ai
+      position: support
+      reason: AI safety research organization supporting the bill
+    - name: Foresight Institute
+      entityId: foresight-institute
+      position: support
+      reason: Research organization focused on beneficial emerging technologies; supported the bill
+    - name: Chamber of Progress
+      entityId: chamber-of-progress
+      position: oppose
+      reason: Tech industry coalition opposing the bill
+    - name: TechNet
+      entityId: technet
+      position: oppose
+      reason: Bipartisan network of technology CEOs opposing the bill
+    - name: Consumer Technology Association
+      entityId: consumer-technology-association
+      position: oppose
+      reason: Trade association representing consumer technology industry; opposed the bill
+    - name: R Street Institute
+      entityId: r-street-institute
+      position: oppose
+      reason: Free-market think tank opposing the bill's regulatory approach
+    - name: Competitive Enterprise Institute
+      entityId: competitive-enterprise-institute
+      position: oppose
+      reason: Free-market policy organization opposing the bill
   keyPoliticians:
     - name: Senator Scott Wiener
       entityId: scott-wiener
@@ -279,6 +444,20 @@
       value: August 29, 2024
     - label: Vetoed
       value: September 29, 2024
+    - label: Compute Threshold
+      value: 10^26 FLOP
+    - label: Cost Threshold
+      value: $100M
+    - label: Employee Letter Signatories
+      value: "113"
+    - label: Companion Bills Signed
+      value: "18"
+    - label: Total Amendments
+      value: "10"
+    - label: Days to Veto
+      value: "235"
+    - label: a16z Lobbying (Apr-Jun 2024)
+      value: $39,750
   relatedEntries:
     - id: us-executive-order
       type: policy
@@ -3688,6 +3867,7 @@
   type: project
   title: MIT AI Risk Repository
   projectStatus: active
+  organization: mit
   summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into

@@ -64,7 +64,7 @@ export interface PageStatusProps {
   quality?: number;
   importance?: number;
   researchImportance?: number;
-  llmSummary?: string;
+  summary?: string;
   lastEdited?: string;
   updateFrequency?: number;
   evergreen?: boolean;
@@ -702,7 +702,7 @@ const statusIcons = {
 };
 
 function ContentCoverageSection({
-  llmSummary,
+  summary,
   updateFrequency,
   hasEntity,
   metrics,
@@ -716,7 +716,7 @@ function ContentCoverageSection({
   entityType,
   backlinkCount,
 }: {
-  llmSummary?: string;
+  summary?: string;
   updateFrequency?: number;
   hasEntity?: boolean;
   metrics?: PageMetrics;
@@ -739,8 +739,8 @@ function ContentCoverageSection({
   // --- Boolean items (yes/no chips) ---
   const booleanItems: BooleanCoverageItem[] = [
     {
-      label: "LLM summary",
-      present: !!llmSummary,
+      label: "Summary",
+      present: !!summary,
       hint: "crux content improve <id>",
       description: "Basic text summary used in search results, entity link tooltips, info boxes, and related page cards.",
       anchor: "structured-summary",
@@ -1139,7 +1139,7 @@ export function PageStatus({
   quality,
   importance,
   researchImportance,
-  llmSummary,
+  summary,
   lastEdited,
   updateFrequency,
   evergreen,
@@ -1167,7 +1167,7 @@ export function PageStatus({
     quality ||
     importance ||
     researchImportance ||
-    llmSummary ||
+    summary ||
     lastEdited ||
     todo ||
     (todos && todos.length > 0) ||
@@ -1243,7 +1243,7 @@ export function PageStatus({
 
       {/* Content — boolean chips + numeric metrics table */}
       <ContentCoverageSection
-        llmSummary={llmSummary}
+        summary={summary}
         updateFrequency={updateFrequency}
         hasEntity={hasEntity}
         metrics={metrics}

@@ -13,7 +13,7 @@ import type { ToolRegistration } from './types.ts';
 
 /** Fields the edit_frontmatter tool is allowed to update. */
 export const EDITABLE_FRONTMATTER_FIELDS = new Set([
-  'llmSummary',
+  'summary',
   'description',
   'lastEdited',
   'quality',
