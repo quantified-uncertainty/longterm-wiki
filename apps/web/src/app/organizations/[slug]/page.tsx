@@ -8,6 +8,7 @@ import {
   getKBProperty,
   resolveKBSlug,
   getKBEntity,
+  getKBEntitySlug,
 } from "@/data/factbase";
 import {
   formatKBDate,
@@ -45,7 +46,7 @@ import {
 import type { AuthorRef } from "./org-data";
 
 // Section components
-import { RelatedOrganizationsSection } from "./related-orgs-section";
+
 import { EquityPositionsSection } from "./equity-section";
 import { DivisionsSection, DivisionsOverview } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
@@ -181,6 +182,13 @@ export default async function OrgProfilePage({
   // ── Overview tab: stat cards, facts, related wiki pages, related orgs ──
   const overviewContent = (
     <div className="space-y-8">
+      {/* Description */}
+      {data.descriptionText && (
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
+          {data.descriptionText}
+        </p>
+      )}
+
       {/* Stat cards */}
       {heroStatCards.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -206,11 +214,6 @@ export default async function OrgProfilePage({
       {/* Divisions overview */}
       {data.divisions.length > 0 && (
         <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} members={data.divisionMembers} />
-      )}
-
-      {/* Related Orgs */}
-      {data.relatedOrgs.length > 0 && (
-        <RelatedOrganizationsSection orgs={data.relatedOrgs} />
       )}
 
       {/* Related Wiki Pages */}
@@ -241,12 +244,22 @@ export default async function OrgProfilePage({
     // Add key persons first
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
-      const personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
-      const personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      // resolveKBSlug handles slug→entityId; getKBEntity handles both
+      // slugs and stableIds directly, so try it as a fallback.
+      let personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
+      let personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
+      if (!personEntity && personRef) {
+        personEntity = getKBEntity(personRef);
+        if (personEntity) personEntityId = personEntity.id;
+      }
       const name =
         field(person, "display_name") ??
         personEntity?.name ??
         titleCase(personRef ?? person.key);
+      // Resolve slug for linking — use getKBEntitySlug for stableIds
+      const personSlug = personEntityId
+        ? (getKBEntitySlug(personEntityId) ?? personRef)
+        : personRef;
       // Use entity ID as the dedup key when available; fall back to name.
       // This prevents two different people with the same display name from
       // silently overwriting each other.
@@ -256,7 +269,7 @@ export default async function OrgProfilePage({
       peopleByName.set(finalKey, {
         name,
         title: field(person, "title"),
-        slug: personRef,
+        slug: personSlug,
         entityType: personEntity?.type,
         isFounder: !!person.fields.is_founder,
         isBoard: false,
@@ -724,11 +737,6 @@ export default async function OrgProfilePage({
               </p>
             )}
 
-            {data.descriptionText && (
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose line-clamp-3">
-                {data.descriptionText}
-              </p>
-            )}
           </div>
         </div>
       </div>

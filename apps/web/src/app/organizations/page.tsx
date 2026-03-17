@@ -7,6 +7,7 @@ import type { Fact, Property } from "@longterm-wiki/factbase";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { computeCompletionScore } from "@/app/organizations/org-constants";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -139,7 +140,7 @@ async function loadFromApi(
   orgTypeMap: Record<string, string>,
 ): Promise<FetchResult<OrgPageData>> {
   const result = await fetchDetailed<ApiOrgsResponse>(
-    "/api/entities/organizations?limit=200",
+    "/api/entities/organizations?limit=500",
     { revalidate: 60 },
   );
 
@@ -176,6 +177,9 @@ async function loadFromApi(
       totalFundingNum: org.totalFundingNum,
 
       foundedDate: org.foundedDate,
+
+      peopleCount: null, // Not available from API
+      completionScore: computeCompletionScore(org),
 
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -216,6 +220,22 @@ function loadFromLocal(): OrgPageData {
     const totalFundingFact = getKBLatest(org.id, "total-funding");
     const foundedFact = getKBLatest(org.id, "founded-date");
 
+    // People count from the reverse index
+    const kbEntity = getKBEntity(org.id);
+    const peopleCount = kbEntity ? (orgToEmployeeNames.get(kbEntity.id)?.length ?? 0) : 0;
+
+    const revenueNum = numericValue(revenueFact);
+    const valuationNum = numericValue(valuationFact);
+    const headcountVal = headcountFact?.value.type === "number" ? headcountFact.value.value : null;
+    const totalFundingNum = numericValue(totalFundingFact);
+    const foundedDate = foundedFact?.value.type === "date"
+      ? foundedFact.value.value
+      : foundedFact?.value.type === "text"
+        ? foundedFact.value.value
+        : foundedFact?.value.type === "number"
+          ? String(foundedFact.value.value)
+          : null;
+
     return {
       id: org.id,
       slug: org.id,
@@ -225,26 +245,25 @@ function loadFromLocal(): OrgPageData {
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      revenueNum: numericValue(revenueFact),
+      revenueNum,
       revenueDate: revenueFact?.asOf ?? null,
 
       valuation: formatFact(valuationFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      valuationNum: numericValue(valuationFact),
+      valuationNum,
       valuationDate: valuationFact?.asOf ?? null,
 
-      headcount: headcountFact?.value.type === "number" ? headcountFact.value.value : null,
+      headcount: headcountVal,
       headcountDate: headcountFact?.asOf ?? null,
 
       totalFunding: formatFact(totalFundingFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      totalFundingNum: numericValue(totalFundingFact),
+      totalFundingNum,
 
-      foundedDate: foundedFact?.value.type === "date"
-        ? foundedFact.value.value
-        : foundedFact?.value.type === "text"
-          ? foundedFact.value.value
-          : foundedFact?.value.type === "number"
-            ? String(foundedFact.value.value)
-            : null,
+      foundedDate,
+
+      peopleCount,
+      completionScore: computeCompletionScore({
+        revenueNum, valuationNum, headcount: headcountVal, totalFundingNum, foundedDate,
+      }),
 
       searchText: buildOrgSearchText(org, orgToEmployeeNames),
     };

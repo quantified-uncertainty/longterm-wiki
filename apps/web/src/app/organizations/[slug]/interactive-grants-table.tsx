@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
@@ -88,6 +88,7 @@ type ColumnId =
   | "funder"
   | "amount"
   | "date"
+  | "source"
   | "program"
   | "division"
   | "status"
@@ -128,6 +129,13 @@ const ALL_COLUMNS: ColumnDef[] = [
   },
   { id: "amount", label: "Amount", defaultVisible: true, align: "right" },
   { id: "date", label: "Date", defaultVisible: true, align: "center" },
+  {
+    id: "source",
+    label: "Source",
+    defaultVisible: true,
+    align: "left",
+    onlyIfData: (rows) => rows.some((r) => r.source),
+  },
   {
     id: "program",
     label: "Program",
@@ -186,14 +194,14 @@ export function InteractiveGrantsTable({
   const server = useServerTable<GrantRow>({
     endpoint: `/api/grants/by-entity/${entityId ?? ""}`,
     defaultPageSize: PAGE_SIZE,
-    defaultSort: { field: "amount", dir: "desc" },
+    defaultSort: { field: "date", dir: "desc" },
     transform: makeTransform(orgSlug),
     enabled: serverMode,
   });
 
   // ── Static-mode state ──
   const [localSearch, setLocalSearch] = useState("");
-  const [localSortCol, setLocalSortCol] = useState<ColumnId>("amount");
+  const [localSortCol, setLocalSortCol] = useState<ColumnId>("date");
   const [localSortDir, setLocalSortDir] = useState<SortDir>("desc");
   const [localPage, setLocalPage] = useState(0);
 
@@ -235,6 +243,9 @@ export function InteractiveGrantsTable({
           break;
         case "date":
           cmp = (a.date ?? "").localeCompare(b.date ?? "");
+          break;
+        case "source":
+          cmp = (a.source ?? "").localeCompare(b.source ?? "");
           break;
         case "program":
           cmp = (a.programName ?? "").localeCompare(b.programName ?? "");
@@ -306,7 +317,7 @@ export function InteractiveGrantsTable({
         setLocalSortDir((d) => (d === "asc" ? "desc" : "asc"));
       } else {
         setLocalSortCol(col);
-        setLocalSortDir(col === "amount" ? "desc" : "asc");
+        setLocalSortDir(col === "amount" || col === "date" ? "desc" : "asc");
       }
       setLocalPage(0);
     }
@@ -322,6 +333,17 @@ export function InteractiveGrantsTable({
 
   // ── Column visibility ──
   const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const colPickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showColumnPicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (colPickerRef.current && !colPickerRef.current.contains(e.target as Node)) {
+        setShowColumnPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showColumnPicker]);
 
   // For server mode, use a fixed set of available columns (we don't have all data to check)
   const availableColumns = useMemo(() => {
@@ -417,7 +439,7 @@ export function InteractiveGrantsTable({
           )}
         </div>
 
-        <div className="relative">
+        <div className="relative" ref={colPickerRef}>
           <button
             type="button"
             onClick={() => setShowColumnPicker((v) => !v)}
@@ -591,29 +613,15 @@ function CellContent({
 }) {
   switch (column) {
     case "name":
-      return (
-        <span>
-          {grant.grantHref ? (
-            <Link
-              href={grant.grantHref}
-              className="font-medium text-foreground hover:text-primary transition-colors"
-            >
-              {grant.name}
-            </Link>
-          ) : (
-            <span className="font-medium text-foreground">{grant.name}</span>
-          )}
-          {grant.source && (
-            <a
-              href={grant.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-            >
-              source
-            </a>
-          )}
-        </span>
+      return grant.grantHref ? (
+        <Link
+          href={grant.grantHref}
+          className="font-medium text-foreground hover:text-primary transition-colors"
+        >
+          {grant.name}
+        </Link>
+      ) : (
+        <span className="font-medium text-foreground">{grant.name}</span>
       );
     case "recipient":
       return grant.recipientHref ? (
@@ -630,12 +638,12 @@ function CellContent({
       return grant.funderHref ? (
         <Link
           href={grant.funderHref}
-          className="text-primary hover:underline"
+          className="text-primary hover:underline min-w-[160px] inline-block whitespace-nowrap"
         >
           {grant.funderName}
         </Link>
       ) : (
-        <span className="text-muted-foreground">
+        <span className="text-muted-foreground min-w-[160px] inline-block whitespace-nowrap">
           {grant.funderName ?? "\u2014"}
         </span>
       );
@@ -649,6 +657,23 @@ function CellContent({
       return (
         <span className="text-muted-foreground">{grant.date ?? "\u2014"}</span>
       );
+    case "source":
+      if (!grant.source) return null;
+      try {
+        const domain = new URL(grant.source).hostname.replace(/^www\./, "");
+        return (
+          <a
+            href={grant.source}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary/70 hover:text-primary hover:underline transition-colors"
+          >
+            {domain}
+          </a>
+        );
+      } catch {
+        return <span className="text-xs text-muted-foreground">{grant.source}</span>;
+      }
     case "program":
       return (
         <span className="text-muted-foreground text-xs">
