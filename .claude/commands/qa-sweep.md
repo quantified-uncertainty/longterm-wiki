@@ -37,7 +37,7 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 
 Check `$ARGUMENTS` for focus areas and depth. Parse as follows:
 
-```
+```text
 $ARGUMENTS = ""                                    → standard sweep, all directories
 $ARGUMENTS = "legislation"                         → standard sweep, legislation only
 $ARGUMENTS = "organizations,people"                → standard sweep, listed directories
@@ -189,7 +189,7 @@ Launch an agent to read wiki-server routes and check for:
 
 Wait for all agents to complete. Compile a deduplicated, prioritized report:
 
-```
+```markdown
 ## QA Sweep — [DATE]
 ### Focus: [directory name or "full sweep"] | Depth: [quick/standard/deep/exhaustive]
 ### Agents launched: N | Pages checked: N
