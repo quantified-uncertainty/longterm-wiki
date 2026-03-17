@@ -39,7 +39,8 @@ pnpm crux fix escaping           # After any page edit
 pnpm crux fix markdown           # After any page edit
 
 pnpm crux query search "topic"   # Full-text search
-pnpm crux ids allocate <slug>    # Allocate entity ID (never invent manually)
+pnpm crux ids allocate <slug>    # Wiki entity: allocate numericId + stableId (for pages)
+pnpm crux tablebase ensure-entities --type=person  # Lightweight: stableId only (no wiki page)
 pnpm crux context for-page <id>  # Full context for a page
 pnpm crux context for-issue <N>  # Context for a GitHub issue
 
@@ -128,7 +129,10 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/things/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **GitHub API**: Use `crux issues/pr/ci/epic` commands — never raw `curl`
-- **Entity IDs**: Never manually invent — always `pnpm crux ids allocate <slug>`
+- **Entity IDs — two tiers**:
+  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux ids allocate <slug>` to get a `numericId` (E-number) + `stableId`. These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
+  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only. NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tablebase ensure-entities` or `crux tablebase create-entity` for these.
+  - **Never manually invent IDs** — use the functions above.
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
