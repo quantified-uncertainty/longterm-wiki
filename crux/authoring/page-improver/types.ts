@@ -200,6 +200,22 @@ export interface TriageResult {
   newDevelopments: string[];
   estimatedCost: string;
   triageCost: string;
+  /**
+   * Quality-based tier selection signal, included when the page has a quality
+   * score. Separate from the news-based tier so callers can see both signals.
+   */
+  qualitySignal?: {
+    /** Numeric quality score (0–100) from the page's frontmatter. */
+    qualityScore: number;
+    /** Letter grade derived from quality score (A/B/C/D/F). */
+    qualityGrade: string;
+    /** Total citation count (footnote refs in page body). */
+    citationCount: number;
+    /** Tier recommended by quality/citation analysis alone. */
+    qualityRecommendedTier: 'skip' | 'polish' | 'standard' | 'deep';
+    /** Human-readable explanation of the quality-based recommendation. */
+    qualityReason: string;
+  };
 }
 
 export type AdversarialGapType =
