@@ -9,6 +9,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  dbError,
   zv,
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
@@ -249,68 +250,72 @@ const factsApp = new Hono()
 
     let upserted = 0;
 
-    await db.transaction(async (tx) => {
-      const allVals = items.map((f) => ({
-        entityId: f.entityId,
-        factId: f.factId,
-        label: f.label ?? null,
-        value: f.value ?? null,
-        numeric: f.numeric ?? null,
-        low: f.low ?? null,
-        high: f.high ?? null,
-        asOf: f.asOf ?? null,
-        measure: f.measure ?? null,
-        subject: f.subject ?? null,
-        note: f.note ?? null,
-        source: f.source ?? null,
-        format: f.format ?? null,
-        formatDivisor: f.formatDivisor ?? null,
-      }));
+    try {
+      await db.transaction(async (tx) => {
+        const allVals = items.map((f) => ({
+          entityId: f.entityId,
+          factId: f.factId,
+          label: f.label ?? null,
+          value: f.value ?? null,
+          numeric: f.numeric ?? null,
+          low: f.low ?? null,
+          high: f.high ?? null,
+          asOf: f.asOf ?? null,
+          measure: f.measure ?? null,
+          subject: f.subject ?? null,
+          note: f.note ?? null,
+          source: f.source ?? null,
+          format: f.format ?? null,
+          formatDivisor: f.formatDivisor ?? null,
+        }));
 
-      await tx
-        .insert(facts)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [facts.entityId, facts.factId],
-          set: {
-            label: sql`excluded.label`,
-            value: sql`excluded.value`,
-            numeric: sql`excluded.numeric`,
-            low: sql`excluded.low`,
-            high: sql`excluded.high`,
-            asOf: sql`excluded.as_of`,
-            measure: sql`excluded.measure`,
-            subject: sql`excluded.subject`,
-            note: sql`excluded.note`,
-            source: sql`excluded.source`,
-            format: sql`excluded.format`,
-            formatDivisor: sql`excluded.format_divisor`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-      // Dual-write to things table
-      const toFactThingKey = (entityId: string, factId: string) =>
-        `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+        await tx
+          .insert(facts)
+          .values(allVals)
+          .onConflictDoUpdate({
+            target: [facts.entityId, facts.factId],
+            set: {
+              label: sql`excluded.label`,
+              value: sql`excluded.value`,
+              numeric: sql`excluded.numeric`,
+              low: sql`excluded.low`,
+              high: sql`excluded.high`,
+              asOf: sql`excluded.as_of`,
+              measure: sql`excluded.measure`,
+              subject: sql`excluded.subject`,
+              note: sql`excluded.note`,
+              source: sql`excluded.source`,
+              format: sql`excluded.format`,
+              formatDivisor: sql`excluded.format_divisor`,
+              syncedAt: sql`now()`,
+              updatedAt: sql`now()`,
+            },
+          });
+        // Dual-write to things table
+        const toFactThingKey = (entityId: string, factId: string) =>
+          `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
 
-      await upsertThingsInTx(
-        tx,
-        items.map((f) => ({
-          id: toFactThingKey(f.entityId, f.factId),
-          thingType: "fact" as const,
-          title: f.label || `${f.factId} for ${f.entityId}`,
-          sourceTable: "facts",
-          sourceId: toFactThingKey(f.entityId, f.factId),
-          description: f.value
-            ? `${f.label || f.factId}: ${f.value}`
-            : f.numeric != null
-              ? `${f.label || f.factId}: ${f.numeric}`
-              : undefined,
-        }))
-      );
+        await upsertThingsInTx(
+          tx,
+          items.map((f) => ({
+            id: toFactThingKey(f.entityId, f.factId),
+            thingType: "fact" as const,
+            title: f.label || `${f.factId} for ${f.entityId}`,
+            sourceTable: "facts",
+            sourceId: toFactThingKey(f.entityId, f.factId),
+            description: f.value
+              ? `${f.label || f.factId}: ${f.value}`
+              : f.numeric != null
+                ? `${f.label || f.factId}: ${f.numeric}`
+                : undefined,
+          }))
+        );
 
-      upserted = allVals.length;
-    });
+        upserted = allVals.length;
+      });
+    } catch (err) {
+      return dbError(c, "facts sync", err, { factCount: items.length });
+    }
 
     return c.json({ upserted });
   });
