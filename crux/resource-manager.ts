@@ -36,6 +36,7 @@ import { loadResources, loadResourcesPGFirst, saveResources, loadPages, loadPubl
 import { hashId, normalizeUrl, buildUrlToResourceMap, extractMarkdownLinks, findFileByName, guessResourceType } from './resource-utils.ts';
 import { cmdMetadata } from './resource-metadata.ts';
 import { cmdValidate } from './resource-validator.ts';
+import { cmdRefreshTitles } from './resource-refresh-titles.ts';
 
 // ============ Arg Parsing ============
 
@@ -525,6 +526,7 @@ Commands:
   validate <source>      Validate resources against authoritative sources
   enrich                 Add publication_id and tags to resources
   rebuild-citations      Rebuild cited_by from MDX files
+  refresh-titles         Fetch real page titles and fix bad ones
 
 Metadata Sources:
   arxiv                  ArXiv papers (free API)
@@ -599,6 +601,9 @@ async function main(): Promise<void> {
       break;
     case 'validate':
       await cmdValidate(opts);
+      break;
+    case 'refresh-titles':
+      await cmdRefreshTitles(opts);
       break;
     case 'help':
     case '--help':
