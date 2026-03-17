@@ -74,6 +74,41 @@ function ProfileTabsInner({ tabs }: { tabs: ProfileTab[] }) {
 }
 
 /**
+ * Static fallback rendered during SSR before useSearchParams resolves.
+ * Shows the default (first) tab without URL syncing.
+ */
+function ProfileTabsFallback({ tabs }: { tabs: ProfileTab[] }) {
+  const visibleTabs = tabs.filter((t) => t.count !== 0);
+  if (visibleTabs.length === 0) return null;
+  if (visibleTabs.length === 1) return <>{visibleTabs[0].content}</>;
+  return (
+    <Tabs defaultValue={visibleTabs[0].id}>
+      <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0 overflow-x-auto">
+        {visibleTabs.map((tab) => (
+          <TabsTrigger
+            key={tab.id}
+            value={tab.id}
+            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          >
+            {tab.label}
+            {tab.count != null && tab.count > 0 && (
+              <span className="ml-1.5 text-[11px] tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {tab.count}
+              </span>
+            )}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {visibleTabs.map((tab) => (
+        <TabsContent key={tab.id} value={tab.id} className="mt-6 min-w-0">
+          {tab.content}
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
+/**
  * Reusable tabbed layout for profile pages (organizations, people, etc.).
  * - Automatically hides tabs where count is 0
  * - Renders content directly (no tab chrome) when only one tab remains
@@ -81,7 +116,7 @@ function ProfileTabsInner({ tabs }: { tabs: ProfileTab[] }) {
  */
 export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
   return (
-    <Suspense fallback={<div className="mt-6">{tabs[0]?.content}</div>}>
+    <Suspense fallback={<ProfileTabsFallback tabs={tabs} />}>
       <ProfileTabsInner tabs={tabs} />
     </Suspense>
   );

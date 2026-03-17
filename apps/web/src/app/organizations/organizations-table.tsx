@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
@@ -10,7 +10,7 @@ import type { SortDir } from "@/lib/sort-utils";
 import { toggleSort } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
-import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
+import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, computeCompletionScore } from "@/app/organizations/org-constants";
 import { useServerTable } from "@/hooks/use-server-table";
 
 export interface OrgRow {
@@ -148,22 +148,6 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
     })),
     total: data.total ?? 0,
   };
-}
-
-/** Compute a 1-4 star completeness score for an org. */
-function computeCompletionScore(row: {
-  revenueNum: number | null;
-  valuationNum: number | null;
-  headcount: number | null;
-  totalFundingNum: number | null;
-  foundedDate: string | null;
-}): number {
-  const financialMetrics = [row.revenueNum, row.valuationNum, row.headcount, row.totalFundingNum]
-    .filter((v) => v != null).length;
-  if (financialMetrics >= 3) return 4; // 3+ financial metrics
-  if (financialMetrics >= 2 && row.foundedDate) return 3; // 2+ metrics + founded
-  if (financialMetrics >= 1) return 2; // any financial metric
-  return 1; // name only
 }
 
 // ── Component ───────────────────────────────────────────────────────
@@ -377,6 +361,17 @@ export function OrganizationsTable({
 
   // ── Column picker ──
   const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const colPickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showColumnPicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (colPickerRef.current && !colPickerRef.current.contains(e.target as Node)) {
+        setShowColumnPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showColumnPicker]);
   type OptionalColumnKey = "peopleCount" | "completionScore";
   const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
     { key: "completionScore", label: "Data Completeness" },
@@ -450,7 +445,7 @@ export function OrganizationsTable({
         <span className="text-xs text-muted-foreground">
           {statusText}
         </span>
-        <div className="ml-auto relative">
+        <div className="ml-auto relative" ref={colPickerRef}>
           <button
             type="button"
             onClick={() => setShowColumnPicker((v) => !v)}

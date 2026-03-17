@@ -36,6 +36,22 @@ export const PROGRAM_TYPE_LABELS: Record<string, string> = {
   call: "Call",
 };
 
+/** Compute a 1-4 completeness score for an org based on available data. */
+export function computeCompletionScore(row: {
+  revenueNum?: number | null;
+  valuationNum?: number | null;
+  headcount?: number | null;
+  totalFundingNum?: number | null;
+  foundedDate?: string | null;
+}): number {
+  const financialMetrics = [row.revenueNum, row.valuationNum, row.headcount, row.totalFundingNum]
+    .filter((v) => v != null).length;
+  if (financialMetrics >= 3) return 4;
+  if (financialMetrics >= 2 && row.foundedDate) return 3;
+  if (financialMetrics >= 1) return 2;
+  return 1;
+}
+
 /** Tailwind class strings for funding program type badge colors. */
 export const PROGRAM_TYPE_COLORS: Record<string, string> = {
   rfp: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
@@ -333,6 +333,17 @@ export function InteractiveGrantsTable({
 
   // ── Column visibility ──
   const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const colPickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showColumnPicker) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (colPickerRef.current && !colPickerRef.current.contains(e.target as Node)) {
+        setShowColumnPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showColumnPicker]);
 
   // For server mode, use a fixed set of available columns (we don't have all data to check)
   const availableColumns = useMemo(() => {
@@ -428,7 +439,7 @@ export function InteractiveGrantsTable({
           )}
         </div>
 
-        <div className="relative">
+        <div className="relative" ref={colPickerRef}>
           <button
             type="button"
             onClick={() => setShowColumnPicker((v) => !v)}

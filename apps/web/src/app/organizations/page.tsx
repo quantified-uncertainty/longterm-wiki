@@ -7,6 +7,7 @@ import type { Fact, Property } from "@longterm-wiki/factbase";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { computeCompletionScore } from "@/app/organizations/org-constants";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -28,22 +29,6 @@ function formatFact(
 ): string | null {
   if (!fact) return null;
   return formatKBFactValue(fact, property?.unit, property?.display);
-}
-
-/** Compute a 1-4 star completeness score for an org. */
-function computeCompletionScore(row: {
-  revenueNum?: number | null;
-  valuationNum?: number | null;
-  headcount?: number | null;
-  totalFundingNum?: number | null;
-  foundedDate?: string | null;
-}): number {
-  const financialMetrics = [row.revenueNum, row.valuationNum, row.headcount, row.totalFundingNum]
-    .filter((v) => v != null).length;
-  if (financialMetrics >= 3) return 4;
-  if (financialMetrics >= 2 && row.foundedDate) return 3;
-  if (financialMetrics >= 1) return 2;
-  return 1;
 }
 
 /** Build a pre-computed lowercase text blob for full-text search across all org fields. */
