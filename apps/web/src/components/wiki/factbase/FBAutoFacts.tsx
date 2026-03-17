@@ -67,6 +67,9 @@ const CATEGORY_ORDER: Record<string, number> = {
   incident: 17,
   relationship: 18,
   research: 19,
+  requirements: 20,
+  legislative: 21,
+  political: 22,
   other: 99,
 };
 
