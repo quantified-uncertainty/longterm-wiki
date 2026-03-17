@@ -2326,9 +2326,8 @@ async function main() {
     });
     const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
-    const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${entityCount} entities, ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected)`);
+    console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }
@@ -2913,7 +2912,7 @@ async function main() {
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
   if (_kbData) {
     writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
-    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase entities, facts, records, schemas)`);
+    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase facts, records, schemas — entities owned by TableBase)`);
   } else {
     console.warn('⚠ FactBase data not available — factbase-data.json not written');
   }
