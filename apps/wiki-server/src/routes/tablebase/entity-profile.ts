@@ -91,6 +91,17 @@ function stripInternalColumns(rows: Record<string, unknown>[]): Record<string, u
   });
 }
 
+// ---- Query safety ----
+
+/** Hard cap on rows returned per section to prevent unbounded payloads. */
+const SECTION_ROW_LIMIT = 500;
+
+/**
+ * Fetch limit used in SQL — one extra row so we can detect truncation
+ * without an additional COUNT query.
+ */
+const FETCH_LIMIT = SECTION_ROW_LIMIT + 1;
+
 // ---- Section definition ----
 
 interface SectionDef {
@@ -112,7 +123,7 @@ const SECTIONS: SectionDef[] = [
     query: (db, stableId) =>
       db.select().from(personnel).where(
         or(eq(personnel.orgEntityId, stableId), eq(personnel.personEntityId, stableId))
-      ),
+      ).limit(FETCH_LIMIT),
   },
   {
     key: "divisions",
@@ -121,7 +132,7 @@ const SECTIONS: SectionDef[] = [
     table: divisions,
     tableName: "divisions",
     query: (db, stableId) =>
-      db.select().from(divisions).where(eq(divisions.parentOrgId, stableId)),
+      db.select().from(divisions).where(eq(divisions.parentOrgId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "divisionPersonnel",
@@ -136,7 +147,7 @@ const SECTIONS: SectionDef[] = [
       const divIds = orgDivisions.map((d) => d.id);
       return db.select().from(divisionPersonnel).where(
         inArray(divisionPersonnel.divisionId, divIds)
-      );
+      ).limit(FETCH_LIMIT);
     },
   },
   {
@@ -146,7 +157,7 @@ const SECTIONS: SectionDef[] = [
     table: grants,
     tableName: "grants",
     query: (db, stableId) =>
-      db.select().from(grants).where(eq(grants.orgEntityId, stableId)),
+      db.select().from(grants).where(eq(grants.orgEntityId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "grantsReceived",
@@ -155,7 +166,7 @@ const SECTIONS: SectionDef[] = [
     table: grants,
     tableName: "grants",
     query: (db, stableId) =>
-      db.select().from(grants).where(eq(grants.granteeEntityId, stableId)),
+      db.select().from(grants).where(eq(grants.granteeEntityId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "fundingRounds",
@@ -164,7 +175,7 @@ const SECTIONS: SectionDef[] = [
     table: fundingRounds,
     tableName: "funding_rounds",
     query: (db, stableId) =>
-      db.select().from(fundingRounds).where(eq(fundingRounds.companyEntityId, stableId)),
+      db.select().from(fundingRounds).where(eq(fundingRounds.companyEntityId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "investments",
@@ -175,7 +186,7 @@ const SECTIONS: SectionDef[] = [
     query: (db, stableId) =>
       db.select().from(investments).where(
         or(eq(investments.companyEntityId, stableId), eq(investments.investorEntityId, stableId))
-      ),
+      ).limit(FETCH_LIMIT),
   },
   {
     key: "equityPositions",
@@ -186,7 +197,7 @@ const SECTIONS: SectionDef[] = [
     query: (db, stableId) =>
       db.select().from(equityPositions).where(
         or(eq(equityPositions.companyEntityId, stableId), eq(equityPositions.holderEntityId, stableId))
-      ),
+      ).limit(FETCH_LIMIT),
   },
   {
     key: "fundingPrograms",
@@ -195,7 +206,7 @@ const SECTIONS: SectionDef[] = [
     table: fundingPrograms,
     tableName: "funding_programs",
     query: (db, stableId) =>
-      db.select().from(fundingPrograms).where(eq(fundingPrograms.orgId, stableId)),
+      db.select().from(fundingPrograms).where(eq(fundingPrograms.orgId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "researchAreaOrganizations",
@@ -206,7 +217,7 @@ const SECTIONS: SectionDef[] = [
     query: (db, _stableId, slug) =>
       db.select().from(researchAreaOrganizations).where(
         eq(researchAreaOrganizations.organizationId, slug)
-      ),
+      ).limit(FETCH_LIMIT),
   },
   {
     key: "benchmarkResults",
@@ -215,7 +226,7 @@ const SECTIONS: SectionDef[] = [
     table: benchmarkResults,
     tableName: "benchmark_results",
     query: (db, _stableId, slug) =>
-      db.select().from(benchmarkResults).where(eq(benchmarkResults.modelId, slug)),
+      db.select().from(benchmarkResults).where(eq(benchmarkResults.modelId, slug)).limit(FETCH_LIMIT),
   },
   {
     key: "facts",
@@ -224,7 +235,7 @@ const SECTIONS: SectionDef[] = [
     table: facts,
     tableName: "facts",
     query: (db, stableId) =>
-      db.select().from(facts).where(eq(facts.entityId, stableId)),
+      db.select().from(facts).where(eq(facts.entityId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "things",
@@ -233,7 +244,7 @@ const SECTIONS: SectionDef[] = [
     table: things,
     tableName: "things",
     query: (db, stableId) =>
-      db.select().from(things).where(eq(things.parentThingId, stableId)),
+      db.select().from(things).where(eq(things.parentThingId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "wikiPages",
@@ -264,7 +275,7 @@ const SECTIONS: SectionDef[] = [
         staleness: wikiPages.staleness,
         readerRank: wikiPages.readerRank,
         researchRank: wikiPages.researchRank,
-      }).from(wikiPages).where(eq(wikiPages.slug, slug)),
+      }).from(wikiPages).where(eq(wikiPages.slug, slug)).limit(FETCH_LIMIT),
   },
 ];
 
@@ -314,13 +325,16 @@ const entityProfileApp = new Hono()
       SECTIONS.map(async (section) => {
         try {
           const rows = await section.query(db, stableId, slug);
+          const truncated = rows.length > SECTION_ROW_LIMIT;
+          const capped = truncated ? rows.slice(0, SECTION_ROW_LIMIT) : rows;
           return {
             key: section.key,
             label: section.label,
             description: section.description,
             schema: { columns: SCHEMA_CACHE.get(section.tableName) ?? [] },
-            rows: stripInternalColumns(rows),
-            total: rows.length,
+            rows: stripInternalColumns(capped),
+            total: capped.length,
+            truncated,
           };
         } catch (err) {
           console.error(`Entity profile section ${section.key} failed:`, err);
@@ -331,6 +345,7 @@ const entityProfileApp = new Hono()
             schema: { columns: [] },
             rows: [],
             total: 0,
+            truncated: false,
             error: err instanceof Error ? err.message : String(err),
           };
         }
