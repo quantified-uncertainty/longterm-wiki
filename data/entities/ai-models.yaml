@@ -260,6 +260,30 @@
     - name: MMLU-Pro
       score: 78.0
       unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 4.1
+      unit: "%"
+    - name: MathVista
+      score: 67.7
+      unit: "%"
+    - name: MGSM
+      score: 91.6
+      unit: "%"
+    - name: LiveBench
+      score: 61.2
+      unit: "%"
+    - name: BFCL
+      score: 90.2
+      unit: "%"
+    - name: Chatbot Arena Elo
+      score: 1271
+      unit: elo
+    - name: MLE-bench
+      score: 7.6
+      unit: "%"
+    - name: TAU-bench
+      score: 58.8
+      unit: "%"
   capabilities:
     - tool-use
     - computer-use
@@ -357,6 +381,12 @@
       unit: "%"
     - name: AIME 2024
       score: 80.0
+      unit: "%"
+    - name: MGSM
+      score: 92.4
+      unit: "%"
+    - name: TAU-bench
+      score: 69.8
       unit: "%"
   capabilities:
     - tool-use
@@ -704,7 +734,7 @@
     - name: ARC-AGI-2
       score: 68.8
       unit: "%"
-    - name: Terminal-Bench 2.0
+    - name: Terminal-Bench 2
       score: 65.4
       unit: "%"
     - name: OSWorld
@@ -872,6 +902,9 @@
     - name: GPQA Diamond
       score: 35.7
       unit: "%"
+    - name: WebArena
+      score: 14.4
+      unit: "%"
   capabilities:
     - tool-use
   description: >-
@@ -972,6 +1005,33 @@
       unit: "%"
     - name: IFEval
       score: 84.5
+      unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 3.3
+      unit: "%"
+    - name: MathVista
+      score: 63.8
+      unit: "%"
+    - name: MGSM
+      score: 90.5
+      unit: "%"
+    - name: LiveBench
+      score: 55.0
+      unit: "%"
+    - name: Chatbot Arena Elo
+      score: 1285
+      unit: elo
+    - name: MLE-bench
+      score: 8.7
+      unit: "%"
+    - name: TAU-bench
+      score: 48.0
+      unit: "%"
+    - name: BFCL
+      score: 88.4
+      unit: "%"
+    - name: WebArena
+      score: 53.0
       unit: "%"
   capabilities:
     - tool-use
@@ -1155,6 +1215,18 @@
     - name: MMLU-Pro
       score: 80.3
       unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 8.0
+      unit: "%"
+    - name: MathVista
+      score: 73.9
+      unit: "%"
+    - name: Chatbot Arena Elo
+      score: 1350
+      unit: elo
+    - name: MLE-bench
+      score: 16.9
+      unit: "%"
   capabilities:
     - reasoning
     - tool-use
@@ -1265,6 +1337,9 @@
     - name: LiveCodeBench
       score: 57.6
       unit: "%"
+    - name: AIME 2025
+      score: 86.5
+      unit: "%"
   capabilities:
     - reasoning
     - tool-use
@@ -1333,6 +1408,12 @@
       unit: "%"
     - name: SimpleQA
       score: 47.6
+      unit: "%"
+    - name: AIME 2025
+      score: 85.3
+      unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 19.8
       unit: "%"
   capabilities:
     - reasoning
@@ -1902,6 +1983,18 @@
     - name: SimpleQA
       score: 52.9
       unit: "%"
+    - name: AIME 2025
+      score: 85.8
+      unit: "%"
+    - name: Chatbot Arena Elo
+      score: 1444
+      unit: elo
+    - name: "Humanity's Last Exam"
+      score: 18.8
+      unit: "%"
+    - name: MGSM
+      score: 92.2
+      unit: "%"
   capabilities:
     - reasoning
     - tool-use
@@ -2150,6 +2243,9 @@
       unit: "%"
     - name: BBH
       score: 89.0
+      unit: "%"
+    - name: MGSM
+      score: 91.6
       unit: "%"
   capabilities:
     - tool-use
@@ -2768,6 +2864,12 @@
       unit: elo
     - name: HumanEval
       score: 92.0
+      unit: "%"
+    - name: AIME 2025
+      score: 74.0
+      unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 8.6
       unit: "%"
   capabilities:
     - reasoning
