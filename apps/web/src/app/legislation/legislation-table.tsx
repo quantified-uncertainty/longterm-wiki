@@ -5,6 +5,7 @@ import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { STATUS_COLORS, SCOPE_COLORS, normalizeStatus } from "./legislation-constants";
+import { formatIntroducedDate } from "@/lib/format-compact";
 
 export interface LegislationRow {
   id: string;
@@ -315,7 +316,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
 
                 {/* Introduced */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
-                  {row.introduced ?? (
+                  {formatIntroducedDate(row.introduced) ?? (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
