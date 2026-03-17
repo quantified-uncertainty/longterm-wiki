@@ -232,7 +232,27 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       {/* Results count + top pagination */}
       <div className="flex flex-col gap-2 mb-3">
         <div className="text-xs text-muted-foreground">
-          Showing {filtered.length} of {rows.length} models
+          {(() => {
+            const familyCount = rows.filter((r) => r.isFamily).length;
+            const modelCount = rows.length - familyCount;
+            const filteredFamilies = filtered.filter((r) => r.isFamily).length;
+            const filteredModels = filtered.length - filteredFamilies;
+
+            if (showFamilies) {
+              // Showing both models and families
+              const parts: string[] = [];
+              if (filteredModels > 0) parts.push(`${filteredModels} model${filteredModels !== 1 ? "s" : ""}`);
+              if (filteredFamilies > 0) parts.push(`${filteredFamilies} famil${filteredFamilies !== 1 ? "ies" : "y"}`);
+              const total = modelCount + familyCount;
+              return `Showing ${parts.join(" + ")} (${filtered.length} of ${total} entries)`;
+            } else {
+              // Families hidden — denominator is only models
+              if (filtered.length === modelCount) {
+                return `Showing ${filtered.length} model${filtered.length !== 1 ? "s" : ""}`;
+              }
+              return `Showing ${filtered.length} of ${modelCount} models`;
+            }
+          })()}
         </div>
         <PaginationControls
           page={safePage}
