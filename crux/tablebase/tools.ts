@@ -219,19 +219,14 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
     return JSON.stringify({ created: false, existing: true, stableId: existing.stableId, name: existing.name });
   }
 
-  // Allocate ID
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
-  const idResult = await allocateId(slug, `${entityType}: ${name}`);
-  if (!idResult.ok) {
-    return `Error allocating ID: ${idResult.message}`;
-  }
+  // Generate lightweight stableId (no wikiId — not a full wiki entity)
+  const stableId = generateId(`${entityType}:${slug}`);
 
-  // Sync entity
+  // Sync entity to wiki-server (lightweight — no wikiId)
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      wikiId: idResult.data.wikiId,
-      stableId: idResult.data.stableId,
+      stableId,
       entityType,
       title: name,
       ...(description && { description }),
@@ -247,8 +242,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
 
   return JSON.stringify({
     created: true,
-    stableId: idResult.data.stableId,
-    wikiId: idResult.data.wikiId,
+    stableId,
     slug,
     name,
     entityType,

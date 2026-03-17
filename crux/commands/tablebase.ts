@@ -322,21 +322,16 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     };
   }
 
-  // Allocate wiki ID
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
-  const idResult = await allocateId(slug, `${entityType}: ${name}`);
-  if (!idResult.ok) {
-    return { exitCode: 1, output: `ID allocation failed: ${idResult.message}` };
-  }
-  const { wikiId, stableId } = idResult.data;
+  // Generate a stable ID deterministically (no wikiId allocation — lightweight record)
+  const { generateId } = await import('../lib/grant-import/id.ts');
+  const stableId = generateId(`${entityType}:${slug}`);
 
-  // Sync entity to wiki-server
+  // Sync entity to wiki-server (no wikiId — not a full wiki entity)
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const description = (options.description as string) || undefined;
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      wikiId,
       stableId,
       entityType,
       title: name,
@@ -348,10 +343,10 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
   }
 
-  const result = { created: true, stableId, wikiId, slug, name, entityType };
+  const result = { created: true, stableId, slug, name, entityType };
   return {
     exitCode: 0,
-    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId} (${wikiId})`,
+    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId}`,
   };
 }
 
@@ -698,12 +693,12 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   const dryRun = !!options.dryRun;
 
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
+  const { generateId } = await import('../lib/grant-import/id.ts');
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const matcher = buildEntityMatcher();
 
   const results: Array<{ name: string; stableId: string; created: boolean }> = [];
-  const toCreate: Array<{ slug: string; name: string; wikiId: string; stableId: string }> = [];
+  const toCreate: Array<{ slug: string; name: string; stableId: string }> = [];
 
   for (const name of names) {
     if (typeof name !== 'string' || !name.trim()) continue;
@@ -716,37 +711,24 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
       continue;
     }
 
-    // Allocate ID
+    // Generate lightweight stableId (no wikiId allocation — not a full wiki entity)
     const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const stableId = generateId(`${entityType}:${slug}`);
 
     if (dryRun) {
-      results.push({ name: trimmed, stableId: `(dry-run:${slug})`, created: true });
+      results.push({ name: trimmed, stableId, created: true });
       continue;
     }
 
-    const idResult = await allocateId(slug, `${entityType}: ${trimmed}`);
-    if (!idResult.ok) {
-      console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
-      continue;
-    }
-    const wikiId = idResult.data.wikiId;
-    const stableId = idResult.data.stableId;
-    if (!wikiId || !stableId) {
-      return {
-        exitCode: 1,
-        output: `ID allocation returned incomplete IDs for "${trimmed}" (${!wikiId ? 'wikiId' : 'stableId'} missing)`,
-      };
-    }
-    toCreate.push({ slug, name: trimmed, wikiId, stableId });
+    toCreate.push({ slug, name: trimmed, stableId });
     results.push({ name: trimmed, stableId, created: true });
   }
 
-  // Batch sync all new entities
+  // Batch sync all new entities (lightweight — no wikiId)
   if (toCreate.length > 0 && !dryRun) {
     const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
       entities: toCreate.map(e => ({
         id: e.slug,
-        wikiId: e.wikiId,
         stableId: e.stableId,
         entityType,
         title: e.name,
