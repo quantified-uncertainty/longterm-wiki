@@ -1,7 +1,7 @@
 /**
  * ID Registry Builder
  *
- * Builds the slug ↔ wikiId bidirectional mapping from entities and pages.
+ * Builds the slug ↔ wikiId ↔ stableId mappings from entities and pages.
  * Detects conflicts, assigns fallback IDs for local dev.
  *
  * Extracted from build-data.mjs for modularity.
@@ -9,12 +9,14 @@
 
 /**
  * Build initial ID registry from entities.
- * @param {Array<{id: string, wikiId?: string}>} entities
- * @returns {{ slugToWikiId: Record<string, string>, wikiIdToSlug: Record<string, string>, nextId: number }}
+ * @param {Array<{id: string, wikiId?: string, stableId?: string}>} entities
+ * @returns {{ slugToWikiId: Record<string, string>, wikiIdToSlug: Record<string, string>, byStableId: Record<string, string>, stableIdBySlug: Record<string, string>, nextId: number }}
  */
 export function buildIdRegistry(entities) {
   const slugToWikiId = {};
   const wikiIdToSlug = {};
+  const byStableId = {};
+  const stableIdBySlug = {};
   const conflicts = [];
 
   for (const entity of entities) {
@@ -24,6 +26,14 @@ export function buildIdRegistry(entities) {
       }
       wikiIdToSlug[entity.wikiId] = entity.id;
       slugToWikiId[entity.id] = entity.wikiId;
+    }
+    // Build stableId ↔ slug mappings
+    if (entity.stableId) {
+      if (byStableId[entity.stableId] && byStableId[entity.stableId] !== entity.id) {
+        conflicts.push(`stableId ${entity.stableId} claimed by both "${byStableId[entity.stableId]}" and "${entity.id}"`);
+      }
+      byStableId[entity.stableId] = entity.id;
+      stableIdBySlug[entity.id] = entity.stableId;
     }
   }
 
@@ -59,7 +69,7 @@ export function buildIdRegistry(entities) {
     console.log(`  idRegistry: all ${Object.keys(wikiIdToSlug).length} entities have IDs`);
   }
 
-  return { slugToWikiId, wikiIdToSlug, nextId };
+  return { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId };
 }
 
 /**

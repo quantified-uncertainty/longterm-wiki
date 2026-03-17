@@ -32,6 +32,7 @@ const CustomField = z.object({
 
 const BaseEntity = z.object({
   id: z.string(),
+  stableId: z.string().optional(), // 10-char stable identifier for cross-system references
   title: z.string(),
   description: z.string().optional(),
   tags: z.array(z.string()).default([]),
