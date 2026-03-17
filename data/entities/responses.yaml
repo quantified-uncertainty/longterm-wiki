@@ -76,13 +76,20 @@
     other narrower AI bills simultaneously.
   votes:
     - chamber: Senate Judiciary Committee
-      date: April 30, 2024
+      date: April 2, 2024
       result: Passed
-      ayes: 8
-      noes: 3
+      ayes: 9
+      noes: 0
+    - chamber: Senate Governmental Organization Committee
+      date: April 23, 2024
+      result: Passed
+      ayes: 11
+      noes: 0
     - chamber: Senate Appropriations Committee
       date: May 16, 2024
       result: Passed
+      ayes: 5
+      noes: 0
     - chamber: Senate Floor
       date: May 21, 2024
       result: Passed
@@ -91,18 +98,27 @@
     - chamber: Assembly Privacy & Consumer Protection Committee
       date: June 18, 2024
       result: Passed
+      ayes: 8
+      noes: 0
+    - chamber: Assembly Judiciary Committee
+      date: July 2, 2024
+      result: Passed
+      ayes: 9
+      noes: 1
     - chamber: Assembly Appropriations Committee
       date: August 15, 2024
       result: Passed
+      ayes: 11
+      noes: 3
     - chamber: Assembly Floor
       date: August 28, 2024
       result: Passed
-      ayes: 45
-      noes: 11
+      ayes: 48
+      noes: 16
     - chamber: Senate Floor (Concurrence)
       date: August 29, 2024
       result: Passed
-      ayes: 29
+      ayes: 30
       noes: 9
   provisions:
     - title: Safety Testing
@@ -153,7 +169,8 @@
     - name: Elon Musk
       entityId: elon-musk
       position: support
-      reason: Publicly endorsed the bill
+      reason: Publicly endorsed the bill on X (Aug 26, 2024)
+      source: https://sfstandard.com/2024/08/26/elon-musk-openai-scott-wiener-sb1046/
     - name: OpenAI
       entityId: openai
       position: oppose
@@ -202,11 +219,18 @@
       reason: CAIS director; key organizer of AI safety research support for the bill
     - name: Nancy Pelosi
       position: oppose
-      reason: Led California Congressional Democrats opposing the bill; signed August 2024 letter urging veto
-      source: https://www.politico.com/news/2024/08/22/pelosi-california-ai-regulation-00175510
+      reason: "Led CA Congressional Democrats opposing; called bill 'well-intentioned but ill informed' (Aug 16, 2024)"
+      source: https://pelosi.house.gov/news/press-releases/pelosi-statement-opposition-california-senate-bill-1047
+    - name: California Chamber of Commerce
+      position: oppose
+      reason: Commissioned push poll showing 46% opposition; lobbied through industry coalition
+    - name: AI Alliance
+      position: oppose
+      reason: Industry coalition opposing the bill's approach to frontier model regulation
     - name: 113+ AI Company Employees
       position: support
-      reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill
+      reason: Current and former employees of OpenAI, DeepMind, Anthropic, Meta, and xAI signed letter to Governor Newsom urging him to sign the bill (Sep 9, 2024)
+      source: https://sfstandard.com/2024/09/09/ai-workers-support-wiener-bill/
   keyPoliticians:
     - name: Senator Scott Wiener
       entityId: scott-wiener
@@ -234,7 +258,11 @@
     - date: July 3, 2024
       description: Clarified compute cluster reporting requirements and fine-tuning thresholds
     - date: August 19, 2024
-      description: Major revision removing Frontier Model Division and criminal penalties; replaced with AG enforcement model
+      description: >-
+        Major overhaul after Assembly Appropriations hearing: removed Frontier Model Division (enforcement stays with AG);
+        removed all criminal penalties; changed legal standard from "reasonable assurance" to "reasonable care";
+        narrowed pre-harm enforcement (AG only acts on actual harm or imminent threat); added fine-tuning safe harbor
+        (<$10M exempts fine-tuner); expanded Board of Frontier Models from 5 to 9 members
       author: Senator Wiener
     - date: August 22, 2024
       description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined whistleblower protections
@@ -290,10 +318,23 @@
     - title: Academic Analysis
       url: https://law.stanford.edu/2024/09/25/sb-1047-analysis/
       author: Stanford HAI
+    - title: Pelosi Statement Opposing SB 1047
+      url: https://pelosi.house.gov/news/press-releases/pelosi-statement-opposition-california-senate-bill-1047
+      date: August 16, 2024
+    - title: Carnegie Endowment Post-Veto Analysis
+      url: https://carnegieendowment.org/posts/2024/10/california-sb1047-ai-safety-bill-veto-lessons
+      date: October 2024
+    - title: CSET Georgetown Veto Analysis
+      url: https://cset.georgetown.edu/article/governor-newsom-vetoes-sweeping-ai-regulation-sb-1047/
+      date: October 2024
+    - title: Expert Panel Final Report
+      url: https://www.gov.ca.gov/wp-content/uploads/2025/06/June-17-2025-%E2%80%93-The-California-Report-on-Frontier-AI-Policy.pdf
+      date: June 17, 2025
+      author: Joint California Policy Working Group
   description: >-
     SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California state
     legislation that would have required safety testing and liability measures for developers of the most powerful AI
-    models. Passed the legislature with strong majorities (Senate 32-1, Assembly 45-11) but was vetoed by Governor
+    models. Passed the legislature with strong majorities (Senate 32-1, Assembly 48-16) but was vetoed by Governor
     Newsom, who cited concerns about regulating based on model size rather than risk.
   tags:
     - regulation

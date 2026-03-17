@@ -7,7 +7,7 @@ sidebar:
 subcategory: legislation
 lastEdited: 2026-03-17
 update_frequency: 7
-llmSummary: "California's SB 1047 required safety testing, shutdown capabilities, and third-party audits for AI models exceeding 10^26 FLOP or \\$100M training cost; it passed the legislature (Assembly 45-11, Senate 32-1) but was vetoed September 29, 2024, with Governor Newsom citing concerns about size-based rather than risk-based regulation. The bill's legislative success demonstrated political feasibility of frontier AI regulation while its veto revealed formidable industry opposition (from OpenAI, Anthropic, Google, Meta) and preference for federal approaches."
+llmSummary: "California's SB 1047 required safety testing, shutdown capabilities, and third-party audits for AI models exceeding 10^26 FLOP or \\$100M training cost; it passed the legislature (Assembly 48-16, Senate 32-1) but was vetoed September 29, 2024, with Governor Newsom citing concerns about size-based rather than risk-based regulation. The bill's legislative success demonstrated political feasibility of frontier AI regulation while its veto revealed formidable industry opposition (from OpenAI, Anthropic, Google, Meta) and preference for federal approaches."
 clusters:
   - ai-safety
   - governance
@@ -28,7 +28,7 @@ SB 1047 was the **most significant AI safety legislation attempted in the United
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Tractability** | Medium | Passed legislature (Assembly 45-11, Senate 32-1) but vetoed; demonstrated political feasibility with refinement |
+| **Tractability** | Medium | Passed legislature (Assembly 48-16, Senate 32-1) but vetoed; demonstrated political feasibility with refinement |
 | **Effectiveness** | Medium-High (if enacted) | Would have created enforceable requirements for frontier AI safety testing, shutdown capabilities, and incident reporting |
 | **Political Viability** | Low-Medium | Strong industry opposition including safety-focused labs; governor cited innovation concerns; federal approach preferred |
 | **Enforcement Mechanism** | Strong | Attorney General enforcement with civil penalties up to 10% of training costs; whistleblower protections; mandatory auditing |
@@ -363,8 +363,8 @@ Some AI safety researchers opposed SB 1047 despite sharing its goals:
 ### Legislative Passage
 
 **August 29, 2024: Passed California Legislature**
-- Assembly: 45-11 (80% approval)
-- Senate: 32-1 (97% approval)
+- Assembly: 48-16 (75% approval)
+- Senate: 32-1 (97% approval), concurrence 30-9
 - Bipartisan support across party lines
 - Most significant AI legislation to pass any US state legislature
 - Represented months of amendments responding to >50 industry comments
@@ -652,7 +652,7 @@ SB 1047 generated <R id="aa1edac7c8c30d83">extensive discussion within EA online
 **Overton Window Shift:**
 - Made AI regulation a mainstream political issue rather than a fringe concern
 - Future regulatory proposals are now measured against SB 1047 as a reference point
-- The bill's passage through the legislature (Assembly 45-11, Senate 32-1) proved that AI safety legislation can achieve overwhelming bipartisan support
+- The bill's passage through the legislature (Assembly 48-16, Senate 32-1) proved that AI safety legislation can achieve overwhelming bipartisan support
 
 **Community Building:**
 - Built coalitions between AI safety researchers, policy advocates, and sympathetic legislators
@@ -720,6 +720,34 @@ SB 1047 generated <R id="aa1edac7c8c30d83">extensive discussion within EA online
 - Labor coalition
 - Public education
 
+## Lobbying and Industry Tactics
+
+The opposition to SB 1047 involved sophisticated political tactics from the technology industry:
+
+**Lobbyist connections to Newsom:**
+- <EntityLink id="E1931" name="andreessen-horowitz">Andreessen Horowitz</EntityLink> hired Axiom Advisors, led by Jason Kinney — a long-time Newsom advisor and dining companion (the "French Laundry connection"). a16z paid \$39,750 for April-June 2024 lobbying work.
+- <EntityLink id="E1930" name="y-combinator">Y Combinator</EntityLink> engaged in formal California lobbying **for the first time**, hiring Platinum Advisors led by Darius Anderson, another firm with close Newsom ties.
+
+**Push polling:**
+The California Chamber of Commerce commissioned a push poll (August 9-12, 2024) using loaded language about "small startup companies" paying "tens of millions in fines from state bureaucrats." Results: 28% support, 46% oppose, 26% neutral. The poll was conducted by Adam Rosenblatt of Bold Decision. Despite the framing, the bill's actual exemptions for small companies and open-source developers were not mentioned in the poll questions.
+
+**Campaign contribution context:**
+Google was described as the biggest contributor to certain California representatives, with nearly \$1 million in total campaign contributions, though these were not SB 1047-specific.
+
+## State-Level Copycat Legislation
+
+SB 1047's influence extended beyond California even after its veto, inspiring frontier AI legislation in other states:
+
+| State | Bill | Status | Relationship to SB 1047 |
+|-------|------|--------|------------------------|
+| **New York** | RAISE Act | Signed Dec 19, 2025 | Frontier model transparency and risk management; stricter penalties (\$10M first offense, \$30M repeat) |
+| **Texas** | TRAIGA | Signed 2025 | Final version stripped to public sector only; original draft inspired by SB 1047 |
+| **Rhode Island** | Frontier model bill | Introduced 2025 | Centered on catastrophic risk prevention |
+| **Michigan** | Frontier model bill | Introduced 2025 | Similar frontier model regulation |
+| **Illinois** | Frontier model bill | Introduced 2025 | Similar frontier model regulation |
+
+The New York RAISE Act became the first state law directly comparable to SB 1047's ambitions, though California's SB 53 took a lighter-touch transparency approach. This divergence illustrates the ongoing policy debate: whether frontier AI regulation should focus on mandatory safety requirements (SB 1047 / NY RAISE) or transparency and reporting (SB 53).
+
 ## Successor Legislation: SB 53 and the Expert Panel
 
 ### Newsom's Expert Panel
@@ -755,15 +783,43 @@ The panel released its recommendations in June 2025, which:
 
 When vetoing SB 1047, Newsom simultaneously signed 18 other AI bills, signaling support for narrower regulation:
 
+**Privacy, Data, and Transparency:**
+
 | Bill | Topic | Key Provision |
 |------|-------|---------------|
-| AB 2013 | AI training data transparency | Requires disclosure of datasets used to train AI |
-| AB 2655 | AI-generated deepfakes | Platforms must label or remove AI-generated election content |
-| AB 2885 | AI in government | Standards for state agency use of AI systems |
-| SB 942 | AI transparency | Requires AI detection tools and content provenance |
-| SB 896 | AI risk assessment | State agencies must assess AI risks and benefits |
+| AB 1008 | CCPA + AI | Extends CCPA coverage to personal information processed by AI |
+| AB 2013 | AI training data transparency | Requires disclosure of datasets used to train AI (effective Jan 1, 2026) |
+| AB 2885 | AI definition | Establishes uniform statutory definition for "artificial intelligence" |
+| SB 942 | AI transparency | California AI Transparency Act; watermarking and AI content detection tools |
+
+**Protection Against Harmful AI Content:**
+
+| Bill | Topic | Key Provision |
+|------|-------|---------------|
+| AB 1831 | Child safety | Expands child pornography statutes to cover AI-generated material |
 | AB 1836 | Digital replicas | Protects deceased individuals from unauthorized AI replicas |
 | AB 2602 | Performer protections | Requires consent for AI-generated replicas of performers |
+| SB 926 | Deepfake crimes | Criminal penalties for creating/distributing sexually explicit deepfakes |
+| SB 981 | Platform obligations | Social media must report and remove deepfake pornography |
+| SB 1381 | Child safety | Manufacturing offenses involving minors (companion to AB 1831) |
+
+**Elections:**
+
+| Bill | Topic | Key Provision |
+|------|-------|---------------|
+| AB 2355 | Campaign disclosure | Requires disclosure when campaign ads use AI technology |
+| AB 2655 | Election deception | Platforms must block/label deceptive AI-generated election content |
+| AB 2839 | Campaign material | Prohibits malicious distribution of deceptive AI-generated material |
+
+**Public Sector and Healthcare:**
+
+| Bill | Topic | Key Provision |
+|------|-------|---------------|
+| AB 2876 | Education | Directs consideration of AI literacy in K-12 curriculum standards |
+| SB 1288 | Schools | Working groups on AI in schools; guidance by Jan 1, 2026 |
+| AB 3030 | Healthcare transparency | Healthcare providers must disclose GenAI use in patient communications |
+| SB 1120 | Healthcare oversight | Licensed physician supervision required for AI in healthcare decisions |
+| SB 896 | Government risk | Generative AI Accountability Act; state procurement and critical infrastructure risk analysis |
 
 ### SB 1047 to SB 53 Arc as Policy Case Study
 
