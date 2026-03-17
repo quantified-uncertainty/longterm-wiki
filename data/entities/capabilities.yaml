@@ -422,7 +422,7 @@
     systems (DishBrain with ~800k neurons, Brainoware at 78% speech recognition)
     achieve 10^6-10^9x better energy efficiency than silicon but face
     insurmountable scaling challenges. Concludes <1% probability of
-    TAI-relevance due to 
+    TAI-relevance due tobiological constraints on neuron density, signal speed, and maintainability. 
   clusters:
     - ai-safety
     - biorisks
@@ -437,7 +437,7 @@
     timelines (<1% probability of dominance) due to fundamental bandwidth
     constraints—current best of 62 WPM vs. billions of operations/second for AI
     systems—and slow biological adaptation timescales measured in months/years.
-    Well-sou
+    Well-sourced with extensive citations covering medical, military, and consumer applications.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -450,7 +450,7 @@
     Comprehensive analysis concluding human-only collective intelligence has <1%
     probability of matching transformative AI, but collective AI architectures
     (MoE, multi-agent systems) have 60-80% probability of playing significant
-    roles with documented 5-40% performance gains. Multi-agent systems introdu
+    roles with documented 5-40% performance gains. Multi-agent systems introduce novel coordination challenges including emergent deception and coalition dynamics.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -464,7 +464,7 @@
     per generation with 10% variance explained by polygenic scores, while
     theoretical iterated embryo selection could achieve 15-30 IQ points by
     2050+. Extremely unlikely (<1%) path to transformative intelligence due to
-    20-30 year
+    20-30 year generational timescales and fundamental biological constraints.
   clusters:
     - ai-safety
     - biorisks
@@ -479,7 +479,7 @@
     current enterprise deployment standard with 92% Fortune 500 adoption,
     achieving 88-91% function calling accuracy and 18% RAG accuracy
     improvements, but faces 73% attack success rates without defenses (reduced
-    to 23% with layered
+    to 23% with layered security measures).
   clusters:
     - ai-safety
     - governance
@@ -494,7 +494,7 @@
     performance gap vs agent systems on code tasks (1.96% → 75% on SWE-bench),
     declining market share from 80% (2023) to 35% (2025), but retaining
     advantages in cost ($0.001-0.05 vs $0.10-5.00 per query), latency (0.5-3s vs
-    30-300s), an
+    30-300s), and reliability (99.9% vs 60-80% task completion).
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -508,7 +508,7 @@
     networks with formal reasoning, documenting AlphaProof's 2024 IMO silver
     medal (28/42 points) and 2025 gold medal achievements. Shows 10-100x data
     efficiency over pure neural methods in specific domains, but estimates only
-    3-10% pr
+    3-10% probability of being the dominant paradigm at transformative AI.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -522,7 +522,7 @@
     sparse inference (Intel Hala Point: 15 TOPS/W) but faces a 15%+ capability
     gap on ImageNet and is not competitive with transformers for
     language/reasoning tasks. Estimated only 1-3% probability of being dominant
-    at TAI due to 
+    at TAI due to fundamental architectural limitations for general-purpose AI workloads. 
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -536,7 +536,7 @@
     transformative AI, systematically reviewing historical prediction failures
     (expert AGI timelines shifted 43 years in 4 years, 13 years in one survey
     cycle) and comparing alternative approaches like neuro-symbolic (8-15%
-    probability),
+    probability), neuromorphic (1-3%), and quantum (0.1-1%).
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -550,7 +550,7 @@
     achieving 2-7x compute savings while matching dense model performance
     (Mixtral 8x7B with 12.9B active matches Llama 2 70B). Safety research is
     underdeveloped - no expert-level interpretability tools exist despite rapid
-    adoption (Mi
+    adoption (Mixtral deployed commercially within 6 months of release).
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -564,7 +564,7 @@
     transformer alternatives, documenting that Mamba-3B matches Transformer-6B
     perplexity with 5x throughput but lags on in-context learning (MMLU: 46.3%
     vs 51.2% at 8B scale). Hybrid architectures combining 43% SSM + 7% attention
-    outperf
+    outperform pure transformers on hybrid benchmarks.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -578,7 +578,7 @@
     arriving before AI-based TAI, with scanning speed (100,000x too slow for
     human brains) as the primary bottleneck despite resolution requirements
     being met. Documents technical requirements (10^18-10^25 FLOPS depending on
-    deta
+    detail level) and timeline estimates (2060-2080+).
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -629,7 +629,7 @@
     10-500x sample efficiency gains over model-free RL (EfficientZero: 194%
     human performance with 100k vs 50M steps), but estimating only 5-15%
     probability of TAI dominance due to LLM superiority on general tasks. Key
-    systems inclu
+    systems include Sora (video generation), DreamerV3 (RL), and Genie (interactive environments).
   clusters:
     - ai-safety
   lastUpdated: 2026-02

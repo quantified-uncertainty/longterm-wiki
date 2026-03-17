@@ -217,7 +217,7 @@
       url: https://redwoodresearch.github.io/ai-control/
       author: Redwood Research
       date: '2024'
-  description: Side-by-side comparison of major AI safety research agendas
+  description: Side-by-side comparison of major AI safety research agendas.
   tags:
     - research-agendas
     - alignment
@@ -1126,7 +1126,7 @@
     by 30-90% P(doom) estimates, 10-15 year AGI timelines, and belief that
     alignment is fundamentally hard. Documents core arguments (orthogonality
     thesis, instrumental convergence, one-shot problem), key proponents
-    (Yudkowsky, M
+    (Yudkowsky, Musk, Christiano), and the movement's influence on AI policy debates.
   clusters:
     - ai-safety
     - epistemics
@@ -1141,7 +1141,7 @@
     5-20% P(doom)), arguing for foundational research over rushed solutions
     based on historical AI overoptimism, current systems' limitations, and
     scaling constraints. Provides concrete career and research prioritization
-    guidan
+    guidance for practitioners operating under this worldview.
   clusters:
     - ai-safety
     - epistemics
@@ -1268,7 +1268,7 @@
     under 5% existential risk by 2100 based on beliefs that alignment is
     tractable, current techniques (RLHF, Constitutional AI) demonstrate real
     progress, and iterative deployment enables continuous improvement. Covers
-    key prop
+    key proponents (Pinker, Ng, Marcus) and their key arguments.
   clusters:
     - ai-safety
     - epistemics

@@ -3007,7 +3007,7 @@
     information in outputs to enable covert coordination or evade oversight.
     GPT-4 class models encode 3-5 bits/KB with under 30% human detection rates.
     NeurIPS 2024 research achieved information-theoretically undetectable
-    channels; LASR
+    channels; LASR 2025 experiments demonstrated multi-agent coordination via steganographic channels.
   clusters:
     - ai-safety
   lastUpdated: 2026-02

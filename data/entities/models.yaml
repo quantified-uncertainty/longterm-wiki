@@ -245,7 +245,7 @@
   wikiId: E254
   type: analysis
   title: Reward Hacking Taxonomy and Severity Model
-  description: Comprehensive taxonomy of reward hacking failure modes with severity estimates and mitigation analysis
+  description: Comprehensive taxonomy of reward hacking failure modes with severity estimates and mitigation analysis.
   customFields:
     - label: Model Type
       value: Taxonomy + Severity Analysis
@@ -1616,7 +1616,7 @@
   wikiId: E177
   type: analysis
   title: AI Safety Intervention Effectiveness Matrix
-  description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis
+  description: Mapping AI safety interventions to the risks they mitigate, with effectiveness estimates and gap analysis.
   customFields:
     - label: Model Type
       value: Prioritization Framework
@@ -2224,7 +2224,7 @@
     shows 3% of donors choose based on effectiveness research; 80k Hours
     achieves ~107 significant plan changes/year; think tanks rarely demonstrate
     causal policy impact. Conservative central estimate: $100-500K/yr in
-    effective valu
+    effective value generation through improved decision-making.
   clusters:
     - ai-safety
     - governance
@@ -2239,7 +2239,7 @@
     adequacy with 3-5 year institutional lag, requiring $550M-1.1B/year
     investment (5-10x current) across regulatory capacity (20%→60%), legislative
     speed (24→6 months), safety pipeline (500→2,000/year), and international
-    coordinati
+    coordination capacity (bilateral to multilateral).
   clusters:
     - ai-safety
     - governance
