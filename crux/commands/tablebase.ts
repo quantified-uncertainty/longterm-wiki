@@ -729,8 +729,16 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
       console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
       continue;
     }
-    toCreate.push({ slug, name: trimmed, wikiId: idResult.data.wikiId, stableId: idResult.data.stableId! });
-    results.push({ name: trimmed, stableId: idResult.data.stableId!, created: true });
+    const wikiId = idResult.data.wikiId;
+    const stableId = idResult.data.stableId;
+    if (!wikiId || !stableId) {
+      return {
+        exitCode: 1,
+        output: `ID allocation returned incomplete IDs for "${trimmed}" (${!wikiId ? 'wikiId' : 'stableId'} missing)`,
+      };
+    }
+    toCreate.push({ slug, name: trimmed, wikiId, stableId });
+    results.push({ name: trimmed, stableId, created: true });
   }
 
   // Batch sync all new entities
