@@ -1056,15 +1056,19 @@
   relatedEntries:
     - id: fli
       type: organization
+    - id: future-of-life-foundation
+      type: organization
     - id: elon-musk
       type: person
     - id: yoshua-bengio
+      type: person
+    - id: anthony-aguirre
       type: person
     - id: interpretability
       type: safety-agenda
     - id: prediction-markets
       type: concept
-  lastUpdated: 2026-02
+  lastUpdated: 2026-03
 
 - id: philip-tetlock
   stableId: BCisPStEdQ
@@ -1210,11 +1214,26 @@
     Comprehensive profile of Jaan Tallinn documenting $150M+ lifetime AI safety
     giving (86% of $51M in 2024), primarily through SFF ($34.33M distributed in
     2025). Co-founded CSER (2012) and FLI (2014), led Anthropic's $124M Series A
-    (2021), early DeepMind investor/board member. Evidence shows
+    (2021), early DeepMind investor/board member. Board member of FLF.
   clusters:
     - ai-safety
     - governance
-  lastUpdated: 2026-02
+  relatedEntries:
+    - id: fli
+      type: organization
+    - id: future-of-life-foundation
+      type: organization
+    - id: cser
+      type: organization
+    - id: sff
+      type: organization
+    - id: anthropic
+      type: organization
+    - id: max-tegmark
+      type: person
+    - id: anthony-aguirre
+      type: person
+  lastUpdated: 2026-03
 - id: leopold-aschenbrenner
   stableId: izkduIMBDg
   wikiId: E578
@@ -1830,17 +1849,23 @@
     Former Director of FAR.Labs (mid-2023 to early 2025). Board member of
     QURI. Prior roles at Google, Cadmea, Hash, and Ought. Directed the
     inaugural AI for Human Reasoning Fellowship (30 fellows, Summer 2025).
-    Co-developed the "Full Epistemic Stack" concept with Oliver Sourbut,
-    envisioning technology infrastructure for epistemic provenance tracing.
-    Led a technical roadmapping workshop contributing to "Towards Guaranteed
-    Safe AI" (arXiv:2405.06624). Focus areas include forecasting/planning
-    systems, AI evaluation, multi-lateral bargaining, and recommender systems.
+    Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025) with
+    Oliver Sourbut, proposing three-layer epistemic infrastructure: Ingestion
+    Layer (cryptographic provenance), Structure Layer (inference and discourse
+    mapping), and Assessment Layer (customizable credence computation). Led
+    the technical roadmapping workshop that produced "Towards Guaranteed Safe
+    AI" (arXiv:2405.06624, co-authored with Yoshua Bengio, Stuart Russell,
+    Max Tegmark, and 13 others). Writes the "Gold Takes" Substack newsletter.
+    Focus areas include AI-assisted provably secure software, AI-enhanced
+    forecasting and sensemaking, and positive future visions through
+    coordination mechanisms he calls "hyper-entities."
   tags:
     - epistemic-tools
     - beneficial-ai
     - incubation
     - forecasting
     - ai-safety
+    - formal-verification
   clusters:
     - ai-safety
     - epistemics
@@ -1855,16 +1880,28 @@
       type: organization
     - id: oliver-sourbut
       type: person
+    - id: anthony-aguirre
+      type: person
+    - id: max-tegmark
+      type: person
+    - id: yoshua-bengio
+      type: person
   customFields:
     - label: Role
       value: Projects Lead, Future of Life Foundation
     - label: Known For
-      value: AI for Human Reasoning Fellowship, Full Epistemic Stack, FAR.Labs
+      value: AI for Human Reasoning Fellowship, Knowledge Commons, Guaranteed Safe AI
   sources:
-    - title: Ben Goldhaber Newsletter
+    - title: Ben Goldhaber Newsletter (Jan 2025)
       url: https://bengoldhaber.substack.com/p/january-2025-bengoldhabercom-newsletter
     - title: FAR.AI Profile
       url: https://www.far.ai/about/people/ben-goldhaber
+    - title: A Knowledge Commons for the 21st Century (Dec 2025)
+      url: https://bengoldhaber.substack.com/
+    - title: Towards Guaranteed Safe AI (arXiv, May 2024)
+      url: https://arxiv.org/abs/2405.06624
+    - title: Some Areas I'm Excited About (May 2025)
+      url: https://bengoldhaber.com/
   lastUpdated: 2026-03
 
 - id: josh-jacobson
@@ -1914,11 +1951,12 @@
     UK AI Safety Institute researcher. Engaged with OECD, UK FCDO, and
     DSIT on AI governance. Researched agent oversight at Oxford. One of
     the first MATS fellows (2021-22) and MATS mentor for Summer 2026.
-    Co-developed the "Full Epistemic Stack" concept with Ben Goldhaber,
-    outlining a vision for technology infrastructure enabling epistemic
-    provenance tracing—tracking claims back through citations to original
-    data sources. Appeared on the FLI podcast (January 2026) discussing
-    AI for human reasoning.
+    Co-authored "A Knowledge Commons for the 21st Century" (Dec 2025)
+    with Ben Goldhaber, proposing three-layer epistemic infrastructure
+    for provenance tracing. Also developed the "Full Epistemic Stack"
+    concept outlining technology for tracking claims back through
+    citations to original data sources. Appeared on the FLI podcast
+    (January 2026) discussing AI for human reasoning.
   tags:
     - ai-safety
     - epistemic-tools

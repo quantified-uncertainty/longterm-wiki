@@ -441,6 +441,10 @@
   relatedEntries:
     - id: dan-hendrycks
       type: person
+    - id: ben-goldhaber
+      type: person
+    - id: josh-jacobson
+      type: person
     - id: natural-abstractions
       type: concept
     - id: metr
@@ -4842,19 +4846,27 @@
     Focus areas include risk assessment, policy strategy, and technical
     safety. Based in Calabasas, CA. Fiscally sponsored by Social &
     Environmental Entrepreneurs, Inc. Described by Anthony Aguirre as "the
-    one thing FLF has sort of fully launched."
+    one thing FLF has sort of fully launched." Team of 12+ people. Advisors
+    include Anthony Aguirre and Eric Drexler.
   tags:
     - ai-safety
     - risk-management
     - alignment
+    - ai-policy
   clusters:
     - ai-safety
+    - governance
   relatedEntries:
     - id: future-of-life-foundation
       type: organization
       relationship: created-by
     - id: fli
       type: organization
+    - id: richard-mallah
+      type: person
+      relationship: leads-to
+    - id: anthony-aguirre
+      type: person
   sources:
     - title: CARMA LinkedIn
       url: https://www.linkedin.com/company/center-for-ai-risk-management-alignment
@@ -4865,6 +4877,10 @@
       value: Calabasas, CA
     - label: Founded
       value: "2022"
+    - label: Advisors
+      value: Anthony Aguirre, Eric Drexler
+    - label: Fiscal Sponsor
+      value: Social & Environmental Entrepreneurs, Inc.
   lastUpdated: 2026-03
 
 - id: wise-ancestors
