@@ -380,7 +380,7 @@ const personnelApp = new Hono()
           person_display_name = person_id
         WHERE person_entity_id IS NULL
           AND person_display_name IS NULL
-          AND person_id !~ '^[A-Za-z0-9]{10}$'
+          AND NOT (person_id ~ '^[A-Za-z0-9]{10}$' AND person_id ~ '[A-Z]')
           AND id = ANY(${syncedIds})
       `);
 

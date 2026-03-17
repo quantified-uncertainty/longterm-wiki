@@ -2,6 +2,12 @@
 -- Migration 0093 only matched on stable_id; this also matches on entities.id
 -- (slug) and adds entityType guards to prevent cross-type matches.
 -- All tables are small (<500 rows) — runs in milliseconds.
+--
+-- StableId detection: 10-char alphanumeric with at least one uppercase letter.
+-- PostgreSQL POSIX regex equivalent of TS /^(?=.*[A-Z])[A-Za-z0-9]{10}$/:
+--   ~  '^[A-Za-z0-9]{10}$'   AND   ~ '[A-Z]'
+-- 10-char lowercase slugs like "bioweapons" are NOT stableIds and should
+-- be backfilled as display names.
 
 -- ============================================================
 -- PERSONNEL
@@ -44,19 +50,19 @@ WHERE e.id = p.organization_id
   AND p.org_entity_id IS NULL;
 
 -- 6. Backfill person_display_name for records still unresolved
--- (where personId looks like a human name, not a stableId)
+-- Skip only values that look like stableIds (10 alnum with uppercase)
 UPDATE personnel SET
   person_display_name = person_id
 WHERE person_entity_id IS NULL
   AND person_display_name IS NULL
-  AND person_id !~ '^[A-Za-z0-9]{10}$';
+  AND NOT (person_id ~ '^[A-Za-z0-9]{10}$' AND person_id ~ '[A-Z]');
 
 -- 7. Backfill org_display_name for unresolved orgs
 UPDATE personnel SET
   org_display_name = organization_id
 WHERE org_entity_id IS NULL
   AND org_display_name IS NULL
-  AND organization_id !~ '^[A-Za-z0-9]{10}$';
+  AND NOT (organization_id ~ '^[A-Za-z0-9]{10}$' AND organization_id ~ '[A-Z]');
 
 -- ============================================================
 -- GRANTS — resolve grantee by slug + entityType guard
@@ -79,8 +85,8 @@ UPDATE grants SET
 WHERE grantee_entity_id IS NULL
   AND grantee_display_name IS NULL
   AND grantee_id IS NOT NULL
-  AND grantee_id !~ '^[A-Za-z0-9]{10}$'
-  AND grantee_id !~ '^\d+$';
+  AND grantee_id !~ '^\d+$'
+  AND NOT (grantee_id ~ '^[A-Za-z0-9]{10}$' AND grantee_id ~ '[A-Z]');
 
 -- Resolve org by slug
 UPDATE grants g SET org_entity_id = e.stable_id
@@ -110,7 +116,7 @@ UPDATE funding_rounds SET
 WHERE lead_investor_entity_id IS NULL
   AND lead_investor_display_name IS NULL
   AND lead_investor IS NOT NULL
-  AND lead_investor !~ '^[A-Za-z0-9]{10}$';
+  AND NOT (lead_investor ~ '^[A-Za-z0-9]{10}$' AND lead_investor ~ '[A-Z]');
 
 UPDATE funding_rounds fr SET company_entity_id = e.stable_id
 FROM entities e
@@ -136,7 +142,7 @@ UPDATE investments SET
   investor_display_name = investor_id
 WHERE investor_entity_id IS NULL
   AND investor_display_name IS NULL
-  AND investor_id !~ '^[A-Za-z0-9]{10}$';
+  AND NOT (investor_id ~ '^[A-Za-z0-9]{10}$' AND investor_id ~ '[A-Z]');
 
 UPDATE investments inv SET company_entity_id = e.stable_id
 FROM entities e
@@ -162,7 +168,7 @@ UPDATE equity_positions SET
   holder_display_name = holder_id
 WHERE holder_entity_id IS NULL
   AND holder_display_name IS NULL
-  AND holder_id !~ '^[A-Za-z0-9]{10}$';
+  AND NOT (holder_id ~ '^[A-Za-z0-9]{10}$' AND holder_id ~ '[A-Z]');
 
 UPDATE equity_positions ep SET company_entity_id = e.stable_id
 FROM entities e
