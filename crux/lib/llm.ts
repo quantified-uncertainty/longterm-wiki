@@ -525,9 +525,14 @@ export async function runLlmAgent(
     }
 
     messages.push({ role: 'assistant', content: response.content });
-    // Only send tool results if we have custom tool results to return
     if (toolResults.length > 0) {
       messages.push({ role: 'user', content: toolResults });
+    } else if (toolUseBlocks.length > 0) {
+      // All tool_use blocks were server tools (no local handler).
+      // Server tools are processed transparently by the API, so stop_reason='tool_use'
+      // with only server tools shouldn't happen. If it does, break to avoid infinite loop.
+      console.warn(`[llm] All ${toolUseBlocks.length} tool calls were server tools with no results to return — breaking loop`);
+      break;
     }
 
     const stopLoop = startHeartbeat(`${heartbeatPhase}-tool-loop`, 30);

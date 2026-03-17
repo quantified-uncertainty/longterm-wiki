@@ -90,7 +90,9 @@ async function resolvePersonFromServer(slug: string): Promise<Entity | undefined
       wikiId: data.wikiId,
       wikiPageId: data.wikiId,
     };
-  } catch {
+  } catch (e: unknown) {
+    // Best-effort fallback — wiki-server may be unreachable during build
+    console.warn(`[people] Failed to resolve person "${slug}" from server: ${e instanceof Error ? e.message : String(e)}`);
     return undefined;
   }
 }
