@@ -248,15 +248,15 @@ facts:
     value: 40
     asOf: 2025-12
     source: https://www.theinformation.com/articles/anthropics-finances
-    notes: "10 percentage points below previous estimate; inference costs surged 23%
-      more than expected"
+    notes: "Actual 2025 gross margin; 10 percentage points below previous estimate;
+      inference costs surged 23% more than expected"
 
   - id: f_VeJPtr2gAQ
     property: gross-margin
     value: 63
     asOf: 2026-12
     source: https://www.theinformation.com/articles/anthropics-finances
-    notes: "2026 target gross margin; 2028 target is 77%"
+    notes: "2026 target gross margin (forward-looking); 2028 target is 77%"
 
   - id: f_TaHnceQDdQ
     property: cash-burn
