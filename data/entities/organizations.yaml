@@ -4405,11 +4405,11 @@
   description: >-
     Nonprofit charity evaluator founded in 2007 by Holden Karnofsky and Elie
     Hassenfeld. GiveWell conducts in-depth research to find outstanding giving
-    opportunities in global health and poverty, directing over \$1B annually to
-    its top-rated charities. Its cost-effectiveness analyses and transparent
-    methodology have made it the most influential charity evaluator in
-    effective altruism, significantly shaping where hundreds of millions of
-    dollars in donations flow each year.
+    opportunities in global health and poverty. In metrics year 2024, GiveWell
+    directed \$397M to its top-rated charities. Its cost-effectiveness analyses
+    and transparent methodology have made it the most influential charity
+    evaluator in effective altruism, significantly shaping where hundreds of
+    millions of dollars in donations flow each year.
   tags:
     - ea-community
     - philanthropy
@@ -4421,15 +4421,17 @@
   numericId: E1454
   type: organization
   orgType: funder
-  title: Bill & Melinda Gates Foundation
+  title: Gates Foundation
   website: https://www.gatesfoundation.org
   description: >-
     The world's largest private charitable foundation, with an endowment
-    exceeding \$75B. Founded in 2000 by Bill and Melinda Gates, the foundation
-    focuses on global health, poverty alleviation, and US education. It
-    distributes approximately \$7B annually in grants, making it a dominant
-    force in global public health funding, including major investments in
-    vaccine development, malaria eradication, and agricultural development.
+    exceeding \$75B. Founded in 2000 by Bill and Melinda Gates and rebranded
+    to Gates Foundation effective January 6, 2025, it focuses on global
+    health, poverty alleviation, and US education. It provided \$8.0B in
+    charitable support in 2024, with a \$9B annual payout target for 2026,
+    making it a dominant force in global public health funding, including
+    major investments in vaccine development, malaria eradication, and
+    agricultural development.
   tags:
     - philanthropy
     - global-health
@@ -4620,7 +4622,7 @@
     evidence-based interventions in areas like malaria prevention, deworming,
     cash transfers, and nutrition programs.
   relatedEntries:
-    - id: effective-altruism-funds
+    - id: ea-funds
       type: organization
       relationship: related
   tags:
@@ -4643,7 +4645,7 @@
     research, and other interventions aimed at reducing animal suffering at
     scale.
   relatedEntries:
-    - id: effective-altruism-funds
+    - id: ea-funds
       type: organization
       relationship: related
   tags:
