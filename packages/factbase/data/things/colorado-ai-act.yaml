@@ -1,9 +1,4 @@
-thing:
-  id: colorado-ai-act
-  stableId: AhnHVmUdyw
-  type: policy
-  name: Colorado Artificial Intelligence Act
-  wikiId: E62
+entity: AhnHVmUdyw
 facts:
   - id: f_1vbzPQfTng
     property: description

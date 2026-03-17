@@ -1,9 +1,4 @@
-thing:
-  id: council-on-strategic-risks
-  stableId: FL52kVPTlA
-  type: organization
-  name: Council on Strategic Risks
-  wikiId: E522
+entity: FL52kVPTlA
 facts:
   - id: f_dmsVtlWt9A
     property: description

@@ -16,9 +16,9 @@
     - label: Outcome
       value: AI safety becomes professionalized research field
   relatedEntries:
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: ImageNet Classification with Deep Convolutional Neural Networks
@@ -141,9 +141,9 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: 'Constitutional AI: Harmlessness from AI Feedback'
@@ -204,9 +204,9 @@
     - label: Milestone
       value: Superintelligence (2014) brings academic legitimacy
   relatedEntries:
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: fhi
+    - id: Zmw9nfUYWA
       type: organization
   sources:
     - title: Creating Friendly AI
@@ -258,7 +258,7 @@
     Declaration.
   status: stub
   relatedEntries:
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   tags:
     - policy

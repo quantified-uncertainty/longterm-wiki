@@ -1,9 +1,4 @@
-thing:
-  id: issa-rice
-  stableId: nuR3te3Rkw
-  type: person
-  name: Issa Rice
-  wikiId: E576
+entity: nuR3te3Rkw
 facts:
   - id: f_z6ueVAGyzQ
     property: description

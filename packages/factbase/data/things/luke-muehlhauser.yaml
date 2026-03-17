@@ -1,10 +1,4 @@
-thing:
-  id: luke-muehlhauser
-  stableId: TclWePCJ7w
-  type: person
-  name: "Luke Muehlhauser"
-  wikiId: "E1301"
-
+entity: TclWePCJ7w
 facts:
   - id: f_oXdOBNJysw
     property: role

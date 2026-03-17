@@ -1,9 +1,4 @@
-thing:
-  id: long-horizon
-  stableId: ymixRXGD3A
-  type: capability
-  name: Long-Horizon Autonomous Tasks
-  wikiId: E192
+entity: ymixRXGD3A
 facts:
   - id: f_Locc5AX46A
     property: description

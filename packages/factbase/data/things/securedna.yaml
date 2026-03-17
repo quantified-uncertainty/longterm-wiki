@@ -1,9 +1,4 @@
-thing:
-  id: securedna
-  stableId: m4vhGiF5RQ
-  type: organization
-  name: SecureDNA
-  wikiId: E564
+entity: m4vhGiF5RQ
 facts:
   - id: f_C4X2eIlw6g
     property: description

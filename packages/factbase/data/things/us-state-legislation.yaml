@@ -1,9 +1,4 @@
-thing:
-  id: us-state-legislation
-  stableId: 2dwY9wnuYA
-  type: policy
-  name: US State AI Legislation Landscape
-  wikiId: E367
+entity: 2dwY9wnuYA
 facts:
   - id: f_ZXY5qA4yJg
     property: description

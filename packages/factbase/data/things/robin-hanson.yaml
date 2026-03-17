@@ -1,9 +1,4 @@
-thing:
-  id: robin-hanson
-  stableId: DmGXPl1h2g
-  type: person
-  name: Robin Hanson
-  wikiId: E260
+entity: DmGXPl1h2g
 facts:
   - id: f_Gtl0JxK7MQ
     property: description

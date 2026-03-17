@@ -1,9 +1,4 @@
-thing:
-  id: claude-3-sonnet
-  stableId: ReFcBG3rJQ
-  type: ai-model
-  name: Claude 3 Sonnet
-  wikiId: E1028
+entity: ReFcBG3rJQ
 facts:
   - id: f_cqzJ66YCOg
     property: description

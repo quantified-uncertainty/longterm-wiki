@@ -1,9 +1,4 @@
-thing:
-  id: samotsvety
-  stableId: 9hPhtQ9AXw
-  type: organization
-  name: Samotsvety
-  wikiId: E560
+entity: 9hPhtQ9AXw
 facts:
   - id: f_M2EOKVGeLg
     property: description

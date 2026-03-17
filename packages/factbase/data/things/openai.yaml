@@ -1,14 +1,4 @@
-thing:
-  id: openai
-  stableId: 1LcLlMGLbw
-  type: organization
-  name: OpenAI
-  wikiId: "E218"
-  aliases:
-    - OpenAI Inc
-    - OpenAI LP
-    - OpenAI Global LLC
-
+entity: 1LcLlMGLbw
 facts:
   - id: f_1Y4HfGVOvA
     property: founded-date

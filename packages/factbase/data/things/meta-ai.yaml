@@ -1,15 +1,4 @@
-thing:
-  id: meta-ai
-  stableId: tt0f5PYDCw
-  type: organization
-  name: Meta AI (FAIR)
-  wikiId: "E549"
-  aliases:
-    - Meta AI
-    - FAIR
-    - Facebook AI Research
-    - Meta Fundamental AI Research
-
+entity: tt0f5PYDCw
 facts:
   - id: f_S2gCtemHdA
     property: founded-date

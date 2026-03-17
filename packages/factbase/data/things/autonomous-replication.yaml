@@ -1,9 +1,4 @@
-thing:
-  id: autonomous-replication
-  stableId: 3EuTey4ung
-  type: risk
-  name: Autonomous Replication
-  wikiId: E34
+entity: 3EuTey4ung
 facts:
   - id: f_yh02ckX6zg
     property: description

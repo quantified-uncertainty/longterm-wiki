@@ -1,9 +1,4 @@
-thing:
-  id: roastmypost
-  stableId: xFFP7KkzFQ
-  type: project
-  name: RoastMyPost
-  wikiId: E385
+entity: xFFP7KkzFQ
 facts:
   - id: f_LwlMmudfYw
     property: description

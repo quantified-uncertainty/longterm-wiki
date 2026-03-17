@@ -1,9 +1,4 @@
-thing:
-  id: miri-era
-  stableId: 7kMHUDshhw
-  type: event
-  name: The MIRI Era
-  wikiId: E203
+entity: 7kMHUDshhw
 facts:
   - id: f_v3jez4h83w
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: ai-forecasting
-  stableId: RW4LTglM1Q
-  type: approach
-  name: AI-Augmented Forecasting
-  wikiId: E9
+entity: RW4LTglM1Q
 facts:
   - id: f_0Ud8LQYQCA
     property: description

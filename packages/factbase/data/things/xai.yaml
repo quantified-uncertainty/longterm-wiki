@@ -1,13 +1,4 @@
-thing:
-  id: xai
-  stableId: GLXKjYAEKw
-  type: organization
-  name: xAI
-  wikiId: "E378"
-  aliases:
-    - xAI Corp
-    - X.AI
-
+entity: GLXKjYAEKw
 facts:
   - id: f_3rNHFIucqQ
     property: founded-date

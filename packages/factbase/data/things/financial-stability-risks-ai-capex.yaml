@@ -1,9 +1,4 @@
-thing:
-  id: financial-stability-risks-ai-capex
-  stableId: Q0msUgaClw
-  type: risk
-  name: Financial Stability Risks from AI Capital Expenditure
-  wikiId: E690
+entity: Q0msUgaClw
 facts:
   - id: f_CZFwfKw9bA
     property: description

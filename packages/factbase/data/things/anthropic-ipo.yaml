@@ -1,9 +1,4 @@
-thing:
-  id: anthropic-ipo
-  stableId: hPZbflFceQ
-  type: event
-  name: Anthropic IPO
-  wikiId: E409
+entity: hPZbflFceQ
 facts:
   - id: f_zvqYiIzJRw
     property: description

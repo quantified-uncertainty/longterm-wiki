@@ -1,12 +1,4 @@
-thing:
-  id: elon-musk
-  stableId: 69vftmr1jg
-  type: person
-  name: "Elon Musk"
-  wikiId: "E116"
-  aliases:
-    - "Musk"
-
+entity: 69vftmr1jg
 facts:
   - id: f_N2rrW9c6JA
     property: employed-by

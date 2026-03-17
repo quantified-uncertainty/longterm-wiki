@@ -1,9 +1,4 @@
-thing:
-  id: canada-aida
-  stableId: pxSyZBoBpA
-  type: policy
-  name: Artificial Intelligence and Data Act (AIDA)
-  wikiId: E49
+entity: pxSyZBoBpA
 facts:
   - id: f_qXoS1mSjrA
     property: description

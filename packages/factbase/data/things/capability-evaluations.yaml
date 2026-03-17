@@ -1,9 +1,4 @@
-thing:
-  id: capability-evaluations
-  stableId: CD9w0PDxvg
-  type: concept
-  name: Capability Evaluations
-  wikiId: E52
+entity: CD9w0PDxvg
 facts:
   - id: f_39oSmzz3cw
     property: description

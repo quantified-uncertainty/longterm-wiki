@@ -1,9 +1,4 @@
-thing:
-  id: thresholds
-  stableId: 3OTN6TAzhw
-  type: policy
-  name: Compute Thresholds
-  wikiId: E465
+entity: 3OTN6TAzhw
 facts:
   - id: f_BslUtC4f8Q
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: lionheart-ventures
-  stableId: fACyX00cnQ
-  type: organization
-  name: Lionheart Ventures
-  wikiId: E541
+entity: fACyX00cnQ
 facts:
   - id: f_amwoW75Tjg
     property: description

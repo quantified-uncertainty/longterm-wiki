@@ -1,9 +1,4 @@
-thing:
-  id: shane-legg
-  stableId: muueuPOHfg
-  type: person
-  name: Shane Legg
-  wikiId: E280
+entity: muueuPOHfg
 facts:
   - id: f_r70UvkiMgQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: mats
-  stableId: yYtGSTsXuw
-  type: organization
-  name: MATS ML Alignment Theory Scholars program
-  wikiId: E548
+entity: yYtGSTsXuw
 facts:
   - id: f_jJuhKPhVEw
     property: description

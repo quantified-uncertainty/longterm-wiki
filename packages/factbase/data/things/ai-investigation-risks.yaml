@@ -1,9 +1,4 @@
-thing:
-  id: ai-investigation-risks
-  stableId: cJPcbuv5fw
-  type: risk
-  name: AI-Powered Investigation Risks
-  wikiId: E694
+entity: cJPcbuv5fw
 facts:
   - id: f_nzj4H6QYCQ
     property: description

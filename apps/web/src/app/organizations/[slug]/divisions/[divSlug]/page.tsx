@@ -10,7 +10,6 @@ import {
 
 import {
   findDivision,
-  getAllDivisionParams,
   loadDivisionPageData,
   resolveEntityLink,
   parseDivision,
@@ -65,11 +64,11 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
   return <ProfileTabs tabs={tabs} />;
 }
 
-// ── Static params ──────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  return getAllDivisionParams();
-}
+// ── Rendering strategy ──────────────────────────────────────────────────
+// Dynamic rendering with ISR — pre-rendering all ~1000 division×org
+// combinations added ~5 min to builds with minimal SEO benefit.
+export const dynamicParams = true;
+export const revalidate = 3600; // 1 hour
 
 // ── Metadata ───────────────────────────────────────────────────────────
 

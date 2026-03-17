@@ -1,10 +1,4 @@
-thing:
-  id: jacob-steinhardt
-  stableId: C20cHdGiHQ
-  type: person
-  name: "Jacob Steinhardt"
-  wikiId: "E1299"
-
+entity: C20cHdGiHQ
 facts:
   - id: f_3RwfPS8yPQ
     property: role

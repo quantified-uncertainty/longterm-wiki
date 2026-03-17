@@ -1,9 +1,4 @@
-thing:
-  id: manifold
-  stableId: Y8MiLNuAWA
-  type: organization
-  name: Manifold (Prediction Market)
-  wikiId: E546
+entity: Y8MiLNuAWA
 facts:
   - id: f_khJpXJ8xhg
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: ssm-mamba
-  stableId: DjKKneEtdA
-  type: capability
-  name: State-Space Models / Mamba
-  wikiId: E501
+entity: DjKKneEtdA
 facts:
   - id: f_cvrfPGhChw
     property: description

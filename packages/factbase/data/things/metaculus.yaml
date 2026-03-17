@@ -1,9 +1,4 @@
-thing:
-  id: metaculus
-  stableId: CUBiiyCfOA
-  type: organization
-  name: Metaculus
-  wikiId: E199
+entity: CUBiiyCfOA
 facts:
   - id: f_IpjoaSzaEQ
     property: description

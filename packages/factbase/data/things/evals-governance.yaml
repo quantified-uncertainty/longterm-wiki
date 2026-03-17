@@ -1,9 +1,4 @@
-thing:
-  id: evals-governance
-  stableId: iCNSRgyFAA
-  type: policy
-  name: Evals-Based Deployment Gates
-  wikiId: E459
+entity: iCNSRgyFAA
 facts:
   - id: f_j9Qn65qT0g
     property: description

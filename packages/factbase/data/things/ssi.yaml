@@ -1,13 +1,4 @@
-thing:
-  id: ssi
-  stableId: 1OSiYOaWVL
-  type: organization
-  name: "Safe Superintelligence Inc. (SSI)"
-  wikiId: "E425"
-  aliases:
-    - SSI
-    - Safe Superintelligence
-
+entity: 1OSiYOaWVL
 facts:
   - id: f_RYwXutlEmN
     property: founded-date

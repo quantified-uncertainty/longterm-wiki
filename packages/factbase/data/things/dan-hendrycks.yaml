@@ -1,9 +1,4 @@
-thing:
-  id: dan-hendrycks
-  stableId: VoNqoBJkyg
-  type: person
-  name: Dan Hendrycks
-  wikiId: E89
+entity: VoNqoBJkyg
 facts:
   - id: f_13yRhPOk4w
     property: description

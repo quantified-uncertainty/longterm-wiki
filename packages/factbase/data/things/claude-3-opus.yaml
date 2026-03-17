@@ -1,9 +1,4 @@
-thing:
-  id: claude-3-opus
-  stableId: Ko9DCNV87A
-  type: ai-model
-  name: Claude 3 Opus
-  wikiId: E1027
+entity: Ko9DCNV87A
 facts:
   - id: f_nMKfXJ65ww
     property: description

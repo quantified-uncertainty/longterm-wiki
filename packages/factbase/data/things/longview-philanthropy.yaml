@@ -1,9 +1,4 @@
-thing:
-  id: longview-philanthropy
-  stableId: gV4U3qi2QA
-  type: organization
-  name: Longview Philanthropy
-  wikiId: E542
+entity: gV4U3qi2QA
 facts:
   - id: f_wP669aJGyw
     property: description

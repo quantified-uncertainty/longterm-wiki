@@ -1,10 +1,4 @@
-thing:
-  id: allan-dafoe
-  stableId: uNNO9uwEoA
-  type: person
-  name: "Allan Dafoe"
-  wikiId: "E1295"
-
+entity: uNNO9uwEoA
 facts:
   - id: f_6datGmST5Q
     property: role

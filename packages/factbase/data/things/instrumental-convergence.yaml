@@ -1,9 +1,4 @@
-thing:
-  id: instrumental-convergence
-  stableId: BYKermZj1A
-  type: risk
-  name: Instrumental Convergence
-  wikiId: E168
+entity: BYKermZj1A
 facts:
   - id: f_UVqpAVCPJA
     property: description

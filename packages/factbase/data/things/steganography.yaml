@@ -1,9 +1,4 @@
-thing:
-  id: steganography
-  stableId: 5dNWb70CDA
-  type: risk
-  name: AI Model Steganography
-  wikiId: E603
+entity: 5dNWb70CDA
 facts:
   - id: f_FYR7dj9zBA
     property: description

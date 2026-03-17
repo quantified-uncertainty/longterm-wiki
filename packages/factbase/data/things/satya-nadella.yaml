@@ -1,10 +1,4 @@
-thing:
-  id: satya-nadella
-  stableId: 1L16qpyk5A
-  type: person
-  name: "Satya Nadella"
-  wikiId: "E1290"
-
+entity: 1L16qpyk5A
 facts:
   - id: f_pBjLkYCEHw
     property: employed-by

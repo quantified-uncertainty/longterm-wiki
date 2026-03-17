@@ -1,9 +1,4 @@
-thing:
-  id: prosaic-alignment
-  stableId: EQgTf1t7dg
-  type: approach
-  name: Prosaic Alignment
-  wikiId: E235
+entity: EQgTf1t7dg
 facts:
   - id: f_xAkt2SYoDg
     property: description

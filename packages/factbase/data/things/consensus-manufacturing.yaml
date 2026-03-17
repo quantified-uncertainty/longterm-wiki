@@ -1,9 +1,4 @@
-thing:
-  id: consensus-manufacturing
-  stableId: gMaUtaXGaw
-  type: risk
-  name: AI-Powered Consensus Manufacturing
-  wikiId: E72
+entity: gMaUtaXGaw
 facts:
   - id: f_V9uYIun6ng
     property: description

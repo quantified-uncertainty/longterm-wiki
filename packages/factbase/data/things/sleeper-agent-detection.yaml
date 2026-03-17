@@ -1,9 +1,4 @@
-thing:
-  id: sleeper-agent-detection
-  stableId: BBVRwgJ43w
-  type: approach
-  name: Sleeper Agent Detection
-  wikiId: E445
+entity: BBVRwgJ43w
 facts:
   - id: f_WI61pnLoCg
     property: description

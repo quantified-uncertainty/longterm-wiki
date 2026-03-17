@@ -1,9 +1,4 @@
-thing:
-  id: securebio
-  stableId: QFIL8r7vPA
-  type: organization
-  name: SecureBio
-  wikiId: E563
+entity: QFIL8r7vPA
 facts:
   - id: f_rwGRhie6mA
     property: description

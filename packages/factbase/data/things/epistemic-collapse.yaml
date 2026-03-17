@@ -1,9 +1,4 @@
-thing:
-  id: epistemic-collapse
-  stableId: GeYirWJrwA
-  type: risk
-  name: Epistemic Collapse
-  wikiId: E119
+entity: GeYirWJrwA
 facts:
   - id: f_cGmzzvhs8w
     property: description

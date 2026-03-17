@@ -1,10 +1,4 @@
-thing:
-  id: richard-ngo
-  stableId: FB9xXKFuqg
-  type: person
-  name: "Richard Ngo"
-  wikiId: "E1298"
-
+entity: FB9xXKFuqg
 facts:
   - id: f_HjIWrNNPuQ
     property: role

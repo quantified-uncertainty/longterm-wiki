@@ -1,9 +1,4 @@
-thing:
-  id: nick-beckstead
-  stableId: licWPlOJMg
-  type: person
-  name: Nick Beckstead
-  wikiId: E861
+entity: licWPlOJMg
 facts:
   - id: f_NwIcIbqfqQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: evan-hubinger
-  stableId: XnqqKHiNmw
-  type: person
-  name: Evan Hubinger
-  wikiId: E129
+entity: XnqqKHiNmw
 facts:
   - id: f_ENQaaYa3Gw
     property: description

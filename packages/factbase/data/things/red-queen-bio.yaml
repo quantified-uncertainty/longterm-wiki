@@ -1,12 +1,4 @@
-thing:
-  id: red-queen-bio
-  stableId: W9J9yMK82X
-  type: organization
-  name: "Red Queen Bio"
-  wikiId: "E556"
-  aliases:
-    - RQB
-
+entity: W9J9yMK82X
 facts:
   - id: f_zxbmbdSgwA
     property: founded-date

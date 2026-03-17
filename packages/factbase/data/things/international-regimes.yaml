@@ -1,9 +1,4 @@
-thing:
-  id: international-regimes
-  stableId: uvwmYLYstg
-  type: policy
-  name: International Compute Regimes
-  wikiId: E473
+entity: uvwmYLYstg
 facts:
   - id: f_sNLrIgmMDQ
     property: description

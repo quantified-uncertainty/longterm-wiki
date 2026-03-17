@@ -1,9 +1,4 @@
-thing:
-  id: superintelligence
-  stableId: 3fyHbDnHIQ
-  type: concept
-  name: Superintelligence
-  wikiId: E291
+entity: 3fyHbDnHIQ
 facts:
   - id: f_rtGiz6tnlQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: toby-ord
-  stableId: 8nmqy7vFiA
-  type: person
-  name: Toby Ord
-  wikiId: E355
+entity: 8nmqy7vFiA
 facts:
   - id: f_jO6LtwIQmA
     property: description

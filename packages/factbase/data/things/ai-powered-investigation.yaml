@@ -1,9 +1,4 @@
-thing:
-  id: ai-powered-investigation
-  stableId: N0NF4lvS4Q
-  type: capability
-  name: AI-Powered Investigation
-  wikiId: E698
+entity: N0NF4lvS4Q
 facts:
   - id: f_mGXOnkuIEw
     property: description

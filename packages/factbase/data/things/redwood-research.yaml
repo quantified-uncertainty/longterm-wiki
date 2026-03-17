@@ -1,12 +1,4 @@
-thing:
-  id: redwood-research
-  stableId: dwMzc9WzPa
-  type: organization
-  name: "Redwood Research"
-  wikiId: "E557"
-  aliases:
-    - Redwood
-
+entity: dwMzc9WzPa
 facts:
   - id: f_GXvWNFPV7M
     property: founded-date

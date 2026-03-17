@@ -1,9 +1,4 @@
-thing:
-  id: goal-misgeneralization-research
-  stableId: QbB5KN1Ucg
-  type: approach
-  name: Goal Misgeneralization Research
-  wikiId: E633
+entity: QbB5KN1Ucg
 facts:
   - id: f_hb33WTa9nw
     property: description

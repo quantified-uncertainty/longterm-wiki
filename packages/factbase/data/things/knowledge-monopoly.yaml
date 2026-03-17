@@ -1,9 +1,4 @@
-thing:
-  id: knowledge-monopoly
-  stableId: TaBC4uj0Bw
-  type: risk
-  name: AI Knowledge Monopoly
-  wikiId: E183
+entity: TaBC4uj0Bw
 facts:
   - id: f_VpW4dCKdmg
     property: description

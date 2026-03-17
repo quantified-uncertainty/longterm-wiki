@@ -1,9 +1,4 @@
-thing:
-  id: centre-for-long-term-resilience
-  stableId: yfUBQLMfgw
-  type: organization
-  name: Centre for Long-Term Resilience
-  wikiId: E429
+entity: yfUBQLMfgw
 facts:
   - id: f_HDafGrfwfg
     property: description

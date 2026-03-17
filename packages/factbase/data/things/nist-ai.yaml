@@ -1,9 +1,4 @@
-thing:
-  id: nist-ai
-  stableId: Eac7pHF06Q
-  type: organization
-  name: NIST and AI Safety
-  wikiId: E424
+entity: Eac7pHF06Q
 facts:
   - id: f_JXkqQ4jqwQ
     property: description

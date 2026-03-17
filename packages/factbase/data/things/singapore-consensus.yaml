@@ -1,9 +1,4 @@
-thing:
-  id: singapore-consensus
-  stableId: NLSUTzzH5g
-  type: policy
-  name: Singapore Consensus on AI Safety Research Priorities
-  wikiId: E701
+entity: NLSUTzzH5g
 facts:
   - id: f_oJdOncWzZg
     property: description

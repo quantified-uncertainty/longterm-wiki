@@ -1,9 +1,4 @@
-thing:
-  id: secure-ai-project
-  stableId: Mj1xuvdboQ
-  type: organization
-  name: Secure AI Project
-  wikiId: E562
+entity: Mj1xuvdboQ
 facts:
   - id: f_rgLTjTXrhA
     property: description

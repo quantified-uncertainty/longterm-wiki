@@ -1,9 +1,4 @@
-thing:
-  id: authoritarian-takeover
-  stableId: AV6AJU1FhQ
-  type: risk
-  name: AI-Enabled Authoritarian Takeover
-  wikiId: E29
+entity: AV6AJU1FhQ
 facts:
   - id: f_L02FHcd2ig
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: new-york-raise-act
-  stableId: qHOO4Xb9dA
-  type: policy
-  name: New York RAISE Act
-  wikiId: E471
+entity: qHOO4Xb9dA
 facts:
   - id: f_WlEbjQiGPw
     property: description

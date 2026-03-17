@@ -1,9 +1,4 @@
-thing:
-  id: provably-safe
-  stableId: MEt9F7f50w
-  type: approach
-  name: Provably Safe AI (davidad agenda)
-  wikiId: E484
+entity: MEt9F7f50w
 facts:
   - id: f_jcv8swDPxQ
     property: description

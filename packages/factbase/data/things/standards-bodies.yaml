@@ -1,9 +1,4 @@
-thing:
-  id: standards-bodies
-  stableId: HXPEtPD1zw
-  type: policy
-  name: AI Standards Development
-  wikiId: E288
+entity: HXPEtPD1zw
 facts:
   - id: f_6v2h3W6OEg
     property: description

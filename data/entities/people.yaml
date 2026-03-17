@@ -20,11 +20,11 @@
   title: Chris Olah
   website: https://colah.github.io
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
   customFields:
     - label: Role
@@ -75,11 +75,11 @@
   title: Connor Leahy
   website: https://conjecture.dev
   relatedEntries:
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
-    - id: neel-nanda
+    - id: zaRXTCXPPk
       type: person
   customFields:
     - label: Role
@@ -127,11 +127,11 @@
   title: Dan Hendrycks
   website: https://hendrycks.com
   relatedEntries:
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
   customFields:
     - label: Role
@@ -190,15 +190,15 @@
   title: Dario Amodei
   website: https://anthropic.com
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic-core-views
+    - id: CsWO4o3gZw
       type: safety-agenda
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
   customFields:
     - label: Role
@@ -256,13 +256,13 @@
   title: Eliezer Yudkowsky
   website: https://intelligence.org
   relatedEntries:
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: sharp-left-turn
+    - id: AMhUctK34Q
       type: risk
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -338,9 +338,9 @@
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   customFields:
     - label: Role
@@ -390,13 +390,13 @@
   title: Ajeya Cotra
   website: https://metr.org
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: holden-karnofsky
+    - id: eQh3ZhWv8D
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -423,9 +423,9 @@
   title: Holden Karnofsky
   website: https://coefficientgiving.org
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -485,13 +485,13 @@
   title: Ilya Sutskever
   website: https://ssi.inc
   relatedEntries:
-    - id: ssi
+    - id: 1OSiYOaWVL
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
-    - id: geoffrey-hinton
+    - id: 5N5UqXNkkg
       type: person
   customFields:
     - label: Role
@@ -539,13 +539,13 @@
   title: Jan Leike
   website: https://anthropic.com
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -600,11 +600,11 @@
   title: Neel Nanda
   website: https://www.neelnanda.io
   relatedEntries:
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   customFields:
     - label: Role
@@ -654,11 +654,11 @@
   title: Nick Bostrom
   website: https://nickbostrom.com
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: treacherous-turn
+    - id: tRj4bS6V8Q
       type: risk
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -708,13 +708,13 @@
   title: Paul Christiano
   website: https://alignment.org
   relatedEntries:
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: eliezer-yudkowsky
+    - id: fS1tEGKuNq
       type: person
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
   customFields:
     - label: Role
@@ -790,11 +790,11 @@
   title: Stuart Russell
   website: https://people.eecs.berkeley.edu/~russell/
   relatedEntries:
-    - id: chai
+    - id: zMfgJqiEPQ
       type: organization
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -845,9 +845,9 @@
   title: Toby Ord
   website: https://www.tobyord.com
   relatedEntries:
-    - id: nick-bostrom
+    - id: IQvWHA3OiF
       type: person
-    - id: holden-karnofsky
+    - id: eQh3ZhWv8D
       type: person
   customFields:
     - label: Role
@@ -898,9 +898,9 @@
   title: Yoshua Bengio
   website: https://yoshuabengio.org
   relatedEntries:
-    - id: geoffrey-hinton
+    - id: 5N5UqXNkkg
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   customFields:
     - label: Role
@@ -952,11 +952,11 @@
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   status: stub
   relatedEntries:
-    - id: xai
+    - id: GLXKjYAEKw
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   tags:
     - entrepreneur
@@ -970,9 +970,9 @@
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
   status: stub
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
   tags:
     - evaluations
@@ -1000,15 +1000,15 @@
   clusters:
     - governance
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -1030,13 +1030,13 @@
   clusters:
     - governance
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: alignment
+    - id: rt6jVH9yuA
       type: concept
     - id: bioweapons
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
   lastUpdated: 2026-02
 
@@ -1060,19 +1060,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: prediction-markets
+    - id: l8ZPtVJdsA
       type: concept
   lastUpdated: 2026-03
 
@@ -1095,11 +1095,11 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: good-judgment
+    - id: Zx7ckq6syw
       type: organization
-    - id: fri
+    - id: KslhqGaeJw
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
   lastUpdated: 2026-02
 
@@ -1123,15 +1123,15 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: ai-futures-project
+    - id: KDYvrwkgtw
       type: organization
     - id: samotsvety
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: lesswrong
+    - id: BEKEqQDmkQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1157,13 +1157,11 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: open-philanthropy
-      type: organization
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1225,19 +1223,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: cser
+    - id: Qns43S795w
       type: organization
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
   lastUpdated: 2026-03
 - id: leopold-aschenbrenner
@@ -1325,11 +1323,11 @@
     estimated $8–9 billion in customer funds. His collapse severely damaged the
     EA community's reputation and disrupted AI safety funding pipelines.
   relatedEntries:
-    - id: ftx
+    - id: yevJm2XDsQ
       type: organization
-    - id: ftx-future-fund
+    - id: JhIGCaI3Ng
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
   clusters:
     - ai-safety
@@ -1343,11 +1341,11 @@
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries:
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: ftx-future-fund
+    - id: JhIGCaI3Ng
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -1380,13 +1378,13 @@
   title: Will MacAskill
   website: https://www.willmacaskill.com/
   relatedEntries:
-    - id: giving-what-we-can
+    - id: aKZsmUeuWg
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   customFields:
     - label: Role
@@ -1425,9 +1423,9 @@
     AI on October 30, 2023, the most comprehensive US government action on AI policy. The EO was revoked by
     President Trump on January 20, 2025.
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
   customFields:
     - label: Role
@@ -1821,15 +1819,15 @@
     - governance
     - epistemics
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: project
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: wise-ancestors
+    - id: 518H1VpKLA
       type: organization
   customFields:
     - label: Role
@@ -1876,21 +1874,21 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: far-ai
+    - id: lCiT37k9pA
       type: organization
-    - id: quri
+    - id: Khej79OA8g
       type: organization
-    - id: oliver-sourbut
+    - id: sdM7KbGOGg
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
   customFields:
     - label: Role
@@ -1928,15 +1926,15 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
-    - id: far-ai
+    - id: lCiT37k9pA
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: fhi
+    - id: Zmw9nfUYWA
       type: organization
   customFields:
     - label: Role
@@ -1973,13 +1971,13 @@
     - epistemics
     - governance
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
   customFields:
     - label: Role
@@ -2011,7 +2009,7 @@
   clusters:
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   customFields:
     - label: Role
@@ -2035,11 +2033,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: carma
+    - id: Vc6W6S1qMg
       type: organization
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   customFields:
     - label: Role
@@ -2062,11 +2060,11 @@
   clusters:
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: givewell
+    - id: OwXl35e7bg
       type: organization
   customFields:
     - label: Role
@@ -2091,11 +2089,11 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   customFields:
     - label: Role
@@ -2125,9 +2123,9 @@
     - label: Known For
       value: "SB 1047, SB 53, AI safety legislation"
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
   tags:
     - ai-governance
@@ -2151,9 +2149,9 @@
     - label: Known For
       value: "SB 1047 veto, signing 18 AI bills, SB 53"
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
   tags:
     - california

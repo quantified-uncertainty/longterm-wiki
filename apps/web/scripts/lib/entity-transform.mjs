@@ -279,6 +279,10 @@ function transformEntity(raw, expertMap, orgMap) {
         safetyLevel: raw.safetyLevel,
         benchmarks: raw.benchmarks || [],
         capabilities: raw.capabilities || [],
+        modality: raw.modality || [],
+        openWeight: raw.openWeight,
+        parameterCount: raw.parameterCount,
+        trainingCutoff: raw.trainingCutoff,
       };
 
     case 'benchmark':

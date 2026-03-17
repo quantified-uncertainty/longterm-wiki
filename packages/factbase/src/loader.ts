@@ -371,7 +371,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
 
   if (isOldFormat) {
     // Old format: id is slug (filename), stableId is the stable ID
-    const wikiPageId = raw.wikiId !== undefined
+    const wikiPageId = raw.wikiId != null
       ? normalizeWikiPageId(raw.wikiId)
       : undefined;
     return {
@@ -395,7 +395,7 @@ function parseEntity(raw: EntityFile["thing"]): { entity: Entity; filename: stri
   // New format: id is the stable ID, slug field provides the filename hint
   const wikiPageId = raw.wikiPageId !== undefined
     ? normalizeWikiPageId(raw.wikiPageId)
-    : raw.wikiId !== undefined
+    : raw.wikiId != null
       ? normalizeWikiPageId(raw.wikiId)
       : undefined;
   if (!raw.slug) {

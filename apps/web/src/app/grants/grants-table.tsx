@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 import { compareGrantRows, type SortDir } from "./grants-sort";
 import { STATUS_COLORS } from "./grants-constants";
@@ -40,50 +41,6 @@ type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "d
 
 const PAGE_SIZE = 100;
 
-function PaginationControls({
-  page,
-  totalPages,
-  totalFiltered,
-  onPrev,
-  onNext,
-}: {
-  page: number;
-  totalPages: number;
-  totalFiltered: number;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
-  if (totalPages <= 1) return null;
-  const start = page * PAGE_SIZE + 1;
-  const end = Math.min((page + 1) * PAGE_SIZE, totalFiltered);
-  return (
-    <div className="flex items-center justify-end gap-2">
-      <span className="text-xs text-muted-foreground tabular-nums">
-        {start}&ndash;{end} of {totalFiltered}
-      </span>
-      <button
-        type="button"
-        onClick={onPrev}
-        disabled={page === 0}
-        className="text-xs px-2.5 py-1 rounded border border-border bg-card hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Prev
-      </button>
-      <span className="text-xs text-muted-foreground tabular-nums">
-        {page + 1} / {totalPages}
-      </span>
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={page >= totalPages - 1}
-        className="text-xs px-2.5 py-1 rounded border border-border bg-card hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Next
-      </button>
-    </div>
-  );
-}
-
 export interface FunderSummary {
   id: string;
   name: string;
@@ -104,6 +61,14 @@ export function GrantsTable({
   const [sortKey, setSortKey] = useState<SortKey>("amount");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
+
+  // Dynamically detect whether status data exists in the dataset.
+  // The grant import pipeline currently sets status to null for all PG-sourced
+  // grants, so this column is hidden until status data is populated.
+  const hasAnyStatus = useMemo(
+    () => rows.some((r) => r.status != null),
+    [rows],
+  );
 
   const statuses = useMemo(() => {
     const set = new Set<string>();
@@ -179,48 +144,50 @@ export function GrantsTable({
             }}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
-          {/* Status filter */}
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                setStatusFilter("all");
-                setPage(0);
-              }}
-              aria-pressed={statusFilter === "all"}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                statusFilter === "all"
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All
-              <span className="ml-1 text-[10px] opacity-60">
-                {statusCounts.all}
-              </span>
-            </button>
-            {statuses.map((s) => (
+          {/* Status filter — only shown when any grants have status data */}
+          {hasAnyStatus && (
+            <div className="flex flex-wrap gap-1.5">
               <button
                 type="button"
-                key={s}
                 onClick={() => {
-                  setStatusFilter(statusFilter === s ? "all" : s);
+                  setStatusFilter("all");
                   setPage(0);
                 }}
-                aria-pressed={statusFilter === s}
+                aria-pressed={statusFilter === "all"}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  statusFilter === s
+                  statusFilter === "all"
                     ? "bg-primary/10 border-primary/30 text-primary font-semibold"
                     : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
                 }`}
               >
-                {s}
+                All
                 <span className="ml-1 text-[10px] opacity-60">
-                  {statusCounts[s] ?? 0}
+                  {statusCounts.all}
                 </span>
               </button>
-            ))}
-          </div>
+              {statuses.map((s) => (
+                <button
+                  type="button"
+                  key={s}
+                  onClick={() => {
+                    setStatusFilter(statusFilter === s ? "all" : s);
+                    setPage(0);
+                  }}
+                  aria-pressed={statusFilter === s}
+                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                    statusFilter === s
+                      ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                      : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
+                  }`}
+                >
+                  {s}
+                  <span className="ml-1 text-[10px] opacity-60">
+                    {statusCounts[s] ?? 0}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Funder filter */}
@@ -277,10 +244,10 @@ export function GrantsTable({
         </div>
         <PaginationControls
           page={page}
-          totalPages={totalPages}
-          totalFiltered={filtered.length}
-          onPrev={() => setPage((p) => Math.max(0, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          pageCount={totalPages}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
         />
       </div>
 
@@ -295,7 +262,9 @@ export function GrantsTable({
               <SortHeader label="Program" sortKey="program" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Amount" sortKey="amount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
-              <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              {hasAnyStatus && (
+                <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -398,18 +367,20 @@ export function GrantsTable({
                   {row.date ?? row.period ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
 
-                {/* Status */}
-                <td className="py-2.5 px-3 text-center">
-                  {row.status && (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        STATUS_COLORS[row.status] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  )}
-                </td>
+                {/* Status — only shown when any grants have status data */}
+                {hasAnyStatus && (
+                  <td className="py-2.5 px-3 text-center">
+                    {row.status && (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          STATUS_COLORS[row.status] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -426,10 +397,10 @@ export function GrantsTable({
       <div className="mt-3">
         <PaginationControls
           page={page}
-          totalPages={totalPages}
-          totalFiltered={filtered.length}
-          onPrev={() => setPage((p) => Math.max(0, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          pageCount={totalPages}
+          totalItems={filtered.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
         />
       </div>
     </div>
