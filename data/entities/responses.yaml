@@ -3378,7 +3378,7 @@
     $10-150M/year investment, improves robustness to known attacks but creates
     an arms race dynamic and provides no protection against model deception or
     novel attack categories. While necessary for operational security, it only
-    defends ext
+    defends external threats, not internal model misalignment.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3391,7 +3391,7 @@
     Agent foundations research (MIRI's mathematical frameworks for aligned
     agency) faces low tractability after 10+ years with core problems unsolved,
     leading to MIRI's 2024 strategic pivot away from the field. Assessment shows
-    ~15-25% probability the work is essential, 60-75% confidence in low tractabi
+    ~15-25% probability the work is essential, 60-75% confidence in low tractability, and the field receiving minimal new funding.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3455,7 +3455,7 @@
     organizations, people, funding, and publications as part of his broader
     knowledge infrastructure ecosystem. The article provides useful context
     about Rice's systematic approach to documentation but lacks concrete details
-    about AI W
+    about AI Watch's actual scope, methodology, or current operational status.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3469,7 +3469,7 @@
     CIRL is a theoretical framework where AI systems maintain uncertainty about
     human preferences, which naturally incentivizes corrigibility and deference.
     Despite elegant theory with formal proofs, the approach faces a substantial
-    theory-practice gap with no production deployments and only $1-5M/year 
+    theory-practice gap with no production deployments and only $1-5M/year in annual research funding. 
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3486,7 +3486,7 @@
     binding international AI treaty, establishing human rights-focused
     governance principles across 57+ countries, though it has significant
     enforcement gaps and excludes national security applications. While
-    historically signi
+    historically significant as the first binding AI treaty, its practical enforcement mechanisms remain weak.
   clusters:
     - governance
     - ai-safety
@@ -3515,7 +3515,7 @@
     Community Notes uses a bridging algorithm requiring cross-partisan consensus
     to display fact-checks, reducing retweets 25-50% when notes appear. However,
     only 8.3% of notes achieve visibility, taking median 7 hours (mean 38.5
-    hours) by which time 96.7% of spread has occurred, limiting aggregate effe
+    hours) by which time 96.7% of spread has occurred, limiting aggregate effectiveness to approximately 3-4% of misinformation reduction.
   clusters:
     - epistemics
     - governance
@@ -3558,7 +3558,7 @@
     Cooperative AI research addresses multi-agent coordination failures through
     game theory and mechanism design, with ~$1-20M/year investment primarily at
     DeepMind and academic groups. The field remains largely theoretical with
-    limited production deployment, facing fundamental challenges in defining co
+    limited production deployment, facing fundamental challenges in defining cooperation objectives across diverse multi-agent scenarios.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3588,7 +3588,7 @@
     philanthropic donations (1969-2023) across 75+ donors, with particular
     coverage of EA/AI safety funding. The page thoroughly describes the tool's
     features, data coverage, and limitations, but is purely descriptive
-    reference ma
+    reference material about a data tool rather than analysis of AI safety funding patterns.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3617,7 +3617,7 @@
     automation taxes) for managing AI-driven job displacement, citing WEF
     projection of 14 million net job losses by 2027 and 23% of US workers
     already using GenAI weekly. Finds medium tractability and grades as B-tier
-    priority, 
+    priority, ranking below direct AI safety interventions. 
   clusters:
     - ai-safety
     - governance
@@ -3635,7 +3635,7 @@
     itself—a strategic intelligence tool with ~550 pages, crux mapping of ~50
     uncertainties, and quality scoring across 6 dimensions. Features include
     entity cross-linking, interactive causal diagrams, and structured YAML
-    databa
+    database layer for structured entity data.
   clusters:
     - epistemics
     - community
@@ -3653,7 +3653,7 @@
     a searchable database with dual taxonomies (causal and domain-based).
     Updated quarterly since August 2024, it provides the first comprehensive
     public catalog of AI risks but is limited by framework extraction
-    methodology an
+    methodology and incomplete coverage of some risk domains.
   clusters:
     - epistemics
     - ai-safety
@@ -3670,7 +3670,7 @@
     published by all major frontier labs (Anthropic, OpenAI, Google, Meta) as of
     2025. While they improve transparency and enable external scrutiny, they
     face a fundamental spec-reality gap—specifications don't guarantee
-    implementatio
+    implementation, and current compliance verification mechanisms are limited.
   clusters:
     - ai-safety
     - governance
@@ -3685,7 +3685,7 @@
     Org Watch is a tracking website by Issa Rice that monitors EA and AI safety
     organizations, but the article lacks concrete information about its actual
     features, scope, or current status. The piece reads more like speculative
-    analysis about what the tool might do rather than documentation of an estab
+    analysis about what the tool might do rather than documentation of an established, operational product.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3700,7 +3700,7 @@
     70-98% depending on content type, with 100% of models vulnerable to
     jailbreaks per UK AISI testing, though Anthropic's Constitutional
     Classifiers blocked 95.6% of attacks. Concludes filtering provides marginal
-    safety benefits f
+    safety benefits for production deployment but is insufficient as a standalone safety measure.
   clusters:
     - ai-safety
     - governance
@@ -3715,7 +3715,7 @@
     foundational diagnostic tool for interpretability research. While
     computationally cheap and widely adopted, probes are vulnerable to
     adversarial hiding and only detect linearly separable features, limiting
-    their standalone s
+    their standalone safety utility without complementary techniques.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3743,7 +3743,7 @@
     programs increased accurate AI risk perception by 34%, while 67% of
     Americans and 73% of policymakers still lack sufficient AI understanding.
     Research-backed communication strategies (Yale framing research showing 28%
-    concern incre
+    concern increase) suggest targeted campaigns can shift public opinion on AI risk.
   clusters:
     - ai-safety
     - governance
@@ -3772,7 +3772,7 @@
     investment, trains neural networks on human preference comparisons to enable
     scalable reinforcement learning. The technique is universally adopted but
     inherits fundamental limitations including reward hacking (which worsens
-    with capab
+    with capability scaling) and difficulty specifying complex human values.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -3820,7 +3820,7 @@
     existential risk, complemented by Stampy, an LLM chatbot searching 10K-100K
     alignment documents via RAG. Features include a Discord bot bridging YouTube
     comments, PageRank-style karma voting for answer quality control, and the
-    Dist
+    Distillation of AI safety arguments into accessible formats.
   clusters:
     - epistemics
     - community
@@ -3888,7 +3888,7 @@
     histories of AI safety and EA organizations, created by Issa Rice with
     funding from Vipul Naik in 2017. While useful as a historical reference
     source, it primarily serves as documentation infrastructure rather than
-    providing
+    providing original analytical insight.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
