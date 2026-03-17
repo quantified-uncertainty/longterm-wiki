@@ -98,12 +98,16 @@ async function main() {
   const serverUrl = getServerUrl();
   const apiKey = getApiKey();
 
+  const envPrefix = process.env.WIKI_SERVER_ENV === 'prod' || process.env.WIKI_SERVER_ENV === 'production'
+    ? 'PROD_'
+    : '';
+
   if (!serverUrl) {
-    console.error('Error: LONGTERMWIKI_SERVER_URL environment variable is required');
+    console.error(`Error: ${envPrefix}LONGTERMWIKI_SERVER_URL environment variable is required`);
     process.exit(1);
   }
   if (!apiKey) {
-    console.error('Error: LONGTERMWIKI_SERVER_API_KEY environment variable is required');
+    console.error(`Error: ${envPrefix}LONGTERMWIKI_SERVER_API_KEY environment variable is required`);
     process.exit(1);
   }
 

@@ -245,9 +245,16 @@ export async function batchSync<T>(
 
       if (!res.ok) {
         const resBody = await res.text();
-        console.error(
-          `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${resBody}`,
-        );
+        if (res.status === 401 || res.status === 403) {
+          console.error(
+            `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — Authentication failed. ` +
+            `Check LONGTERMWIKI_SERVER_API_KEY (or PROD_LONGTERMWIKI_SERVER_API_KEY with WIKI_SERVER_ENV=prod). Detail: ${resBody}`,
+          );
+        } else {
+          console.error(
+            `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${resBody}`,
+          );
+        }
         onBatchError?.(resBody);
         totalErrors += batch.length;
         consecutiveFailures++;
