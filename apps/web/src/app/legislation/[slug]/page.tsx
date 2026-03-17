@@ -380,10 +380,22 @@ export default async function LegislationDetailPage({
                           {stakeholder.position}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-sm">
-                        {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                        {stakeholder.source && (
-                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
+                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-lg">
+                        <div>
+                          {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                          {stakeholder.source && (
+                            <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
+                          )}
+                        </div>
+                        {stakeholder.context && stakeholder.context.length > 0 && (
+                          <ul className="mt-1.5 space-y-0.5 text-[11px] text-muted-foreground/70 list-none pl-0">
+                            {stakeholder.context.map((note, j) => (
+                              <li key={j} className="leading-relaxed">
+                                <span className="text-muted-foreground/40 mr-1">→</span>
+                                {note}
+                              </li>
+                            ))}
+                          </ul>
                         )}
                       </td>
                     </tr>

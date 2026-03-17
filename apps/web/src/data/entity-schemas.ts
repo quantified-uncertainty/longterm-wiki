@@ -148,6 +148,8 @@ const PolicyStakeholder = z.object({
   position: z.enum(["support", "oppose", "neutral", "mixed"]),
   reason: z.string().optional(),
   source: z.string().optional(),
+  /** Short notes on funding, affiliations, and connections to other stakeholders */
+  context: z.array(z.string()).optional(),
 });
 
 const PolicyProvision = z.object({
