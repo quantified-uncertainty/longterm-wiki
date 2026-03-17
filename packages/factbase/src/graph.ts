@@ -14,6 +14,8 @@ import type {
 
 export class Graph {
   private entities: Map<string, Entity> = new Map(); // keyed by entity.id (stableId)
+  /** Maps previousIds → current entity.id for backward-compat lookups */
+  private previousIdAliases: Map<string, string> = new Map();
   /** Tracks duplicate entity IDs detected during loading */
   private _duplicateIds: Array<{ id: string; name: string; existingName: string }> = [];
   private facts: Map<string, Fact[]> = new Map(); // keyed by entity.id (subjectId)
@@ -33,6 +35,28 @@ export class Graph {
       });
     }
     this.entities.set(entity.id, entity);
+
+    // Register previousIds as aliases so !ref tags using old IDs still resolve.
+    // A previousId must not collide with any current entity's primary ID.
+    if (entity.previousIds) {
+      for (const prevId of entity.previousIds) {
+        if (this.entities.has(prevId)) {
+          console.warn(
+            `[kb/graph] previousId "${prevId}" on entity "${entity.id}" (${entity.name}) ` +
+            `collides with an existing entity's primary ID — skipping alias`
+          );
+          continue;
+        }
+        const existingAlias = this.previousIdAliases.get(prevId);
+        if (existingAlias && existingAlias !== entity.id) {
+          console.warn(
+            `[kb/graph] previousId "${prevId}" claimed by both "${existingAlias}" and ` +
+            `"${entity.id}" (${entity.name}) — last writer wins`
+          );
+        }
+        this.previousIdAliases.set(prevId, entity.id);
+      }
+    }
   }
 
   /** Returns duplicate entity IDs detected during loading. */
@@ -68,9 +92,19 @@ export class Graph {
 
   /**
    * Look up an entity by its ID (stable 10-char).
+   * Also checks previousIds aliases so that !ref tags using old IDs still resolve.
    */
   getEntity(id: string): Entity | undefined {
-    return this.entities.get(id);
+    const direct = this.entities.get(id);
+    if (direct) return direct;
+
+    // Check previousIds aliases
+    const aliasedId = this.previousIdAliases.get(id);
+    if (aliasedId) {
+      return this.entities.get(aliasedId);
+    }
+
+    return undefined;
   }
 
   /**

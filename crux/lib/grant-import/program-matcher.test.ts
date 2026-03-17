@@ -455,7 +455,7 @@ describe("matchProgram", () => {
   it("matches SFF grants to S-Process by default", () => {
     const result = matchProgram({
       source: "sff",
-      funderId: "sIFjGbxVct",
+      funderId: "pvJ50HupEQ",
       focusArea: null,
       name: "Grant to MIRI",
       description: "Round: SFF-2024-H1; Source: SFF",
@@ -466,7 +466,7 @@ describe("matchProgram", () => {
   it("matches SFF speculation grants", () => {
     const result = matchProgram({
       source: "sff",
-      funderId: "sIFjGbxVct",
+      funderId: "pvJ50HupEQ",
       focusArea: null,
       name: "Grant to MIRI",
       description: "Round: SFF-2024 Speculation; Source: SFF",
