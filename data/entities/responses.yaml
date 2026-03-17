@@ -147,7 +147,7 @@
       category: Enforcement
   stakeholders:
     - name: Center for AI Safety
-      entityId: cais
+      entityId: y4bieqSeag
       position: support
       reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
       context:
@@ -155,7 +155,7 @@
         - "Director Dan Hendrycks (also listed as supporter) co-authored the Statement on AI Risk"
         - "Open Philanthropy also funds Anthropic (mixed position) and supported MIRI"
     - name: Future of Life Institute
-      entityId: fli
+      entityId: d9sWZtyVwg
       position: support
       reason: Supports proactive regulation of frontier AI
       context:
@@ -164,7 +164,7 @@
         - "Organized the 2023 Pause Letter (33,000+ signatories) calling for 6-month AI training moratorium"
         - "Sister org FLF received $58.8M from FLI"
     - name: Yoshua Bengio
-      entityId: yoshua-bengio
+      entityId: nGFBXZeM3d
       position: support
       reason: Turing Award winner supporting frontier AI safety regulation
       context:
@@ -173,7 +173,7 @@
         - "Member of UN High-Level Advisory Body on AI"
         - "Funded via Canadian government (CIFAR AI Chair) and Quebec government"
     - name: Geoffrey Hinton
-      entityId: geoffrey-hinton
+      entityId: 5N5UqXNkkg
       position: support
       reason: Godfather of AI, warning about AI risks
       context:
@@ -182,7 +182,7 @@
         - "Co-authored foundational deep learning papers with Bengio (also supporter)"
         - "Former advisor to Google DeepMind (which opposes the bill)"
     - name: Stuart Russell
-      entityId: stuart-russell
+      entityId: ZxUirlzHke
       position: support
       reason: Leading AI researcher supporting enforceable safety requirements
       context:
@@ -190,7 +190,7 @@
         - "CHAI funded by Open Philanthropy, Elon Musk Foundation"
         - "Author of 'Human Compatible' (2019); co-author of leading AI textbook"
     - name: Elon Musk
-      entityId: elon-musk
+      entityId: 69vftmr1jg
       position: support
       reason: Publicly endorsed the bill on X (Aug 26, 2024)
       source: https://sfstandard.com/2024/08/26/elon-musk-openai-scott-wiener-sb1046/
@@ -200,7 +200,7 @@
         - "Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)"
         - "Owns X (Twitter), the platform where much SB-1047 debate occurred"
     - name: OpenAI
-      entityId: openai
+      entityId: 1LcLlMGLbw
       position: oppose
       reason: Initially opposed; argued it would stifle innovation and drive development out of California (opposition letter Aug 20, 2024)
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
@@ -210,7 +210,7 @@
         - "Transitioning from nonprofit to for-profit; this bill would have increased compliance burden"
         - "113+ of its employees signed letter supporting the bill despite company opposition"
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: mixed
       reason: "Initial opposition Jul 25, 2024; revised to 'benefits likely outweigh costs' Aug 21, 2024 after amendments"
       source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
@@ -221,7 +221,7 @@
         - "Funded by Open Philanthropy (early investment); Open Phil also funds CAIS (supporter)"
         - "Has its own Responsible Scaling Policy — bill aligned with their existing safety approach"
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: A4XoubikkQ
       position: oppose
       reason: Opposed on grounds of premature regulation and preference for federal approach
       context:
@@ -230,7 +230,7 @@
         - "Google is a major investor in Anthropic ($2B), which took a mixed position"
         - "Member of AI Alliance (also opposes)"
     - name: Meta AI
-      entityId: meta-ai
+      entityId: tt0f5PYDCw
       position: oppose
       reason: Strongly opposed; concerned about open-source implications and compliance burden
       context:
@@ -239,7 +239,7 @@
         - "Open-source AI strategy (Llama models) most affected by bill's liability provisions"
         - "Mark Zuckerberg personally lobbied Governor Newsom against the bill"
     - name: Y Combinator
-      entityId: y-combinator
+      entityId: d9BCHgtnlw
       position: oppose
       reason: Concerned about startup ecosystem impact and compliance costs
       context:
@@ -248,7 +248,7 @@
         - "YC-funded startups would face compliance costs under the bill"
         - "Garry Tan (YC CEO) was vocal opponent on social media"
     - name: Andreessen Horowitz
-      entityId: andreessen-horowitz
+      entityId: u2YCulQ1lg
       position: oppose
       reason: Opposed on innovation and competition grounds
       context:
@@ -257,7 +257,7 @@
         - "Marc Andreessen and Ben Horowitz are vocal opponents of AI regulation generally"
         - "Spent $39,750 on SB-1047 lobbying in Q2 2024"
     - name: Yann LeCun
-      entityId: yann-lecun
+      entityId: cMbVUVK29Q
       position: oppose
       reason: Turing Award winner opposing the regulatory approach
       context:
@@ -265,7 +265,7 @@
         - "Turing Award with Bengio (supporter) and Hinton (supporter) — all three took different positions"
         - "Strong advocate for open-source AI; bill's liability provisions threaten open model releases"
     - name: Andrew Ng
-      entityId: andrew-ng
+      entityId: v13BF4zP2A
       position: oppose
       reason: Stanford professor and Google Brain co-founder opposing the bill
       context:
@@ -274,7 +274,7 @@
         - "Board member of Woebot Health; advisor to several AI startups"
         - "Vocal opponent of 'AI doomerism'; frames regulation debate as large-lab rent-seeking"
     - name: Fei-Fei Li
-      entityId: fei-fei-li
+      entityId: QzcX3bShmQ
       position: oppose
       reason: Stanford professor; Fortune open letter opposing SB 1047 (Aug 10, 2024); later appointed by Newsom to expert panel on alternative approach
       context:
@@ -283,7 +283,7 @@
         - "Co-founded World Labs (spatial AI startup) with a16z (also opposes) funding"
         - "Appointed by Newsom to panel drafting alternative AI regulation after veto"
     - name: Max Tegmark
-      entityId: max-tegmark
+      entityId: 3KjUCZCV8w
       position: support
       reason: MIT professor and FLI co-founder; advocated for frontier AI regulation
       context:
@@ -291,7 +291,7 @@
         - "MIT Physics professor; author of 'Life 3.0'"
         - "Jaan Tallinn also invested in Anthropic (mixed position)"
     - name: Dan Hendrycks
-      entityId: dan-hendrycks
+      entityId: VoNqoBJkyg
       position: support
       reason: CAIS director; key organizer of AI safety research support for the bill
       context:
@@ -329,79 +329,79 @@
         - "Signers included employees of companies that officially opposed the bill (OpenAI, DeepMind, Meta)"
         - "Highlighted tension between company positions and individual researcher views on AI safety"
     - name: Encode Justice
-      entityId: encode-justice
+      entityId: etCe7rcH1g
       position: support
       reason: Youth-led AI accountability organization; co-source of SB 1047
     - name: Imbue
-      entityId: imbue
+      entityId: hCtMHcUWaw
       position: support
       reason: AI safety-focused company supporting frontier AI regulation
     - name: Gladstone AI
-      entityId: gladstone-ai
+      entityId: HkfUxsbBLQ
       position: support
       reason: AI safety advisory firm; authors of RAND-commissioned report on catastrophic AI risks
     - name: Nonlinear
-      entityId: nonlinear
+      entityId: PfIAYFXC9Q
       position: support
       reason: EA-adjacent AI safety organization supporting the bill
     - name: Economic Security Project Action
-      entityId: economic-security-project
+      entityId: 2ecnsQqcRg
       position: support
       reason: Economic policy organization; co-source of SB 1047
     - name: Apart Research
-      entityId: apart-research
+      entityId: 5WqgebIWFQ
       position: support
       reason: AI safety research organization supporting frontier AI regulation
     - name: Elicit
-      entityId: elicit
+      entityId: 2VexoROapg
       position: support
       reason: AI research assistant tool supporting AI safety regulation
     - name: Panoplia Labs
-      entityId: panoplia-labs
+      entityId: NY4i2W6IVA
       position: support
       reason: AI safety research lab supporting the bill
     - name: Kira Center
-      entityId: kira-center
+      entityId: oMgy3kQqOg
       position: support
       reason: Center for AI Risks and Impacts supporting frontier AI regulation
     - name: Redwood Research
-      entityId: redwood-research
+      entityId: dwMzc9WzPa
       position: support
       reason: AI safety research organization supporting the bill
     - name: FAR AI
-      entityId: far-ai
+      entityId: lCiT37k9pA
       position: support
       reason: AI safety research organization supporting the bill
     - name: Foresight Institute
-      entityId: foresight-institute
+      entityId: NPPTvNqRXA
       position: support
       reason: Research organization focused on beneficial emerging technologies; supported the bill
     - name: Chamber of Progress
-      entityId: chamber-of-progress
+      entityId: IEav94hygQ
       position: oppose
       reason: Tech industry coalition opposing the bill
     - name: TechNet
-      entityId: technet
+      entityId: 0PNw6yTH0g
       position: oppose
       reason: Bipartisan network of technology CEOs opposing the bill
     - name: Consumer Technology Association
-      entityId: consumer-technology-association
+      entityId: b89p7duRrQ
       position: oppose
       reason: Trade association representing consumer technology industry; opposed the bill
     - name: R Street Institute
-      entityId: r-street-institute
+      entityId: yfAYuNTKxQ
       position: oppose
       reason: Free-market think tank opposing the bill's regulatory approach
     - name: Competitive Enterprise Institute
-      entityId: competitive-enterprise-institute
+      entityId: Le8eSvx8EQ
       position: oppose
       reason: Free-market policy organization opposing the bill
   keyPoliticians:
     - name: Senator Scott Wiener
-      entityId: scott-wiener
+      entityId: HLc6VrCh5w
       role: Primary Author / Sponsor
     - name: Governor Gavin Newsom
-      entityId: gavin-newsom
+      entityId: tDwxa07Urw
       role: Vetoed the bill
     - name: Senator Richard Roth
       role: Co-author
@@ -459,25 +459,25 @@
     - label: a16z Lobbying (Apr-Jun 2024)
       value: $39,750
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: voluntary-commitments
+    - id: ZXvLxl4RMw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: scott-wiener
+    - id: HLc6VrCh5w
       type: person
-    - id: gavin-newsom
+    - id: tDwxa07Urw
       type: person
   sources:
     - title: SB 1047 Bill Text (Final Amended Version)
@@ -603,13 +603,13 @@
     - label: Enforcement
       value: Cyberspace Administration of China (CAC)
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
   sources:
     - title: 'Translation: Interim Measures for Generative AI Management'
@@ -743,19 +743,19 @@
     - label: Status
       value: Emerging policy area
   relatedEntries:
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
-    - id: governance-policy
+    - id: khXUiwWtkg
       type: approach
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
     - id: bioweapons
       type: risk
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: Computing Power and the Governance of AI
@@ -835,11 +835,11 @@
     - label: Type
       value: Binding Regulation
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
   sources:
     - title: EU AI Act Full Text
@@ -975,13 +975,13 @@
     - label: Format
       value: Government-led, multi-stakeholder
   relatedEntries:
-    - id: voluntary-commitments
+    - id: ZXvLxl4RMw
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: china-ai-regulations
+    - id: LyLbPk4iNQ
       type: policy
   sources:
     - title: The Bletchley Declaration
@@ -1134,13 +1134,13 @@
     - label: Durability
       value: Can be revoked by future president
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: voluntary-commitments
+    - id: ZXvLxl4RMw
       type: policy
   sources:
     - title: 'Executive Order 14110: Full Text'
@@ -1223,15 +1223,15 @@
       category: Transparency
   stakeholders:
     - name: OpenAI
-      entityId: openai
+      entityId: 1LcLlMGLbw
       position: support
       reason: 83.3% compliance score across 30 indicators
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: support
       reason: 80.0% compliance; ASL framework developed
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: A4XoubikkQ
       position: support
       reason: 76.7% compliance; Frontier Safety Framework published
     - name: Apple
@@ -1245,13 +1245,13 @@
     - label: Participants
       value: Major AI labs
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: 'White House Fact Sheet: Voluntary AI Commitments'
@@ -1301,21 +1301,21 @@
     - label: Key Research
       value: RAND, Stanford Internet Observatory, Oxford
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: consensus-manufacturing
+    - id: gMaUtaXGaw
       type: risk
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
-    - id: reality-fragmentation
+    - id: 4Rz7XtP9Uw
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: historical-revisionism
+    - id: jiqdwTucCA
       type: risk
-    - id: epistemic-sycophancy
+    - id: zzLBCdjXEw
       type: risk
   sources:
     - title: The Vulnerability of Democracies to Disinformation
@@ -1379,11 +1379,11 @@
     - label: Status
       value: Active
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
   sources:
     - title: Core Views on AI Safety
@@ -1476,13 +1476,13 @@
     - label: Key Players
       value: Adobe, Microsoft, Google, BBC, camera manufacturers
   relatedEntries:
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
   sources:
     - title: C2PA Technical Specification
@@ -1536,13 +1536,13 @@
     - label: Key Domains
       value: AI governance, epistemic defense, international cooperation
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
   sources:
     - title: The Strategy of Conflict
@@ -1650,15 +1650,15 @@
     - label: Key Examples
       value: Wikipedia, Semantic Scholar, fact-checking networks
   relatedEntries:
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: knowledge-monopoly
+    - id: TaBC4uj0Bw
       type: risk
-    - id: scientific-corruption
+    - id: IK5egiQE9w
       type: risk
-    - id: historical-revisionism
+    - id: jiqdwTucCA
       type: risk
   sources:
     - title: Wikimedia Foundation
@@ -1713,15 +1713,15 @@
     - label: Related Fields
       value: HITL, human-computer interaction, AI safety
   relatedEntries:
-    - id: automation-bias
+    - id: 72cwRMbzMA
       type: risk
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
-    - id: enfeeblement
+    - id: 13OO6CP98g
       type: risk
-    - id: learned-helplessness
+    - id: SFFrl4Pmag
       type: risk
-    - id: expertise-atrophy
+    - id: ks0lqvZqUg
       type: risk
   sources:
     - title: 'Humans and Automation: Use, Misuse, Disuse, Abuse'
@@ -1775,11 +1775,11 @@
     - label: Key Players
       value: Polymarket, Metaculus, Manifold, Kalshi
   relatedEntries:
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: consensus-manufacturing
+    - id: gMaUtaXGaw
       type: risk
   sources:
     - title: Prediction Markets
@@ -1856,15 +1856,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: evaluation-awareness
+    - id: YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
@@ -1888,15 +1888,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: eval-saturation
+    - id: qGR2sFQRoQ
       type: approach
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -1918,15 +1918,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -1949,15 +1949,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: eval-saturation
+    - id: qGR2sFQRoQ
       type: approach
-    - id: evaluation-awareness
+    - id: YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
@@ -1979,15 +1979,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2011,15 +2011,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2042,13 +2042,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
   lastUpdated: 2026-02
 
@@ -2071,15 +2071,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2102,13 +2102,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
   lastUpdated: 2026-02
 
@@ -2130,13 +2130,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: weak-to-strong
+    - id: JOXqSmPOiQ
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
   lastUpdated: 2026-02
 
@@ -2159,15 +2159,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2190,15 +2190,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2223,13 +2223,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2251,13 +2251,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: alignment
+    - id: rt6jVH9yuA
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
@@ -2279,15 +2279,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2309,11 +2309,11 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: representation-engineering
+    - id: xwxKWEAkSQ
       type: approach
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2335,13 +2335,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
@@ -2363,13 +2363,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
   lastUpdated: 2026-02
 
@@ -2392,13 +2392,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2437,11 +2437,11 @@
       position: support
       reason: Signed after vetoing more ambitious SB 1047
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: support
       reason: Backed final version; worked with sponsors on framework
     - name: OpenAI
-      entityId: openai
+      entityId: 1LcLlMGLbw
       position: mixed
       reason: Opposed stricter SB 1047; less opposed to SB 53 transparency focus
   votes:
@@ -2466,13 +2466,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: new-york-raise-act
+    - id: qHOO4Xb9dA
       type: policy
   lastUpdated: 2026-02
 
@@ -2496,13 +2496,13 @@
     - governance
     - community
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: concept
-    - id: evals
+    - id: etuIjQhFbQ
       type: concept
   lastUpdated: 2026-02
 
@@ -2535,13 +2535,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -2566,13 +2566,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: stuart-russell
+    - id: ZxUirlzHke
       type: person
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: pause
+    - id: Wa3RyF9Y9A
       type: approach
   lastUpdated: 2026-02
 
@@ -2599,13 +2599,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
   sources:
     - title: Anthropic's Responsible Scaling Policy
@@ -2641,15 +2641,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: frontier-model-forum
+    - id: LgiqvRCrvg
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
@@ -2676,13 +2676,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
     - id: monitoring
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
 
@@ -2707,13 +2707,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
-    - id: hardware-enabled-governance
+    - id: 57vCq45URQ
       type: policy
   lastUpdated: 2026-02
 
@@ -2740,13 +2740,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: monitoring
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
 
@@ -2769,15 +2769,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: frontier-model-forum
+    - id: LgiqvRCrvg
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: whistleblower-protections
+    - id: nvyazaJFew
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
@@ -2800,15 +2800,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: pause-moratorium
+    - id: 3Mc5fuvtMg
       type: policy
   lastUpdated: 2026-02
 
@@ -2830,13 +2830,13 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: field-building-analysis
+    - id: R07X01PXQA
       type: approach
   lastUpdated: 2026-02
 
@@ -2892,15 +2892,15 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   lastUpdated: 2026-02
 
@@ -2926,13 +2926,13 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   sources:
     - title: The Singapore Consensus on Global AI Safety Research Priorities
@@ -2966,13 +2966,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
@@ -3032,11 +3032,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
     - id: thresholds
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3070,13 +3070,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -3102,15 +3102,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
     - id: monitoring
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
@@ -3145,19 +3145,19 @@
       url: https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/
       author: MIRI
   relatedEntries:
-    - id: dan-hendrycks
+    - id: VoNqoBJkyg
       type: person
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   lastUpdated: 2026-02
 
@@ -3180,13 +3180,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
   lastUpdated: 2026-02
 
@@ -3212,15 +3212,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: lab-culture
+    - id: OVgVMhhdHQ
       type: approach
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3243,11 +3243,11 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: training-programs
+    - id: GZzovyoIJg
       type: approach
-    - id: intervention-portfolio
+    - id: 1tYGw60kig
       type: approach
   lastUpdated: 2026-02
 
@@ -3273,13 +3273,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: output-filtering
+    - id: JbV7e3EaHA
       type: approach
-    - id: adversarial-training
+    - id: omIL5LhGnQ
       type: approach
-    - id: refusal-training
+    - id: wPEnPRTQVQ
       type: approach
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3301,13 +3301,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mech-interp
+    - id: 0vyIQ4YLIA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: approach
-    - id: cais
+    - id: y4bieqSeag
       type: organization
   lastUpdated: 2026-02
 
@@ -3330,15 +3330,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mech-interp
+    - id: 0vyIQ4YLIA
       type: approach
-    - id: representation-engineering
+    - id: xwxKWEAkSQ
       type: approach
-    - id: goodfire
+    - id: H74rOLotqg
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3361,13 +3361,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
   lastUpdated: 2026-02
 
@@ -3390,15 +3390,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3420,13 +3420,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: provably-safe
+    - id: MEt9F7f50w
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -3451,13 +3451,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: formal-verification
+    - id: DSSCdI8gLA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
   lastUpdated: 2026-02
 
@@ -3481,15 +3481,15 @@
     - ai-safety
     - cyber
   relatedEntries:
-    - id: tool-restrictions
+    - id: nl9oD17gfg
       type: approach
-    - id: structured-access
+    - id: cYETfX9wzA
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3513,13 +3513,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
     - id: sandboxing
       type: approach
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3547,13 +3547,13 @@
   relatedEntries:
     - id: sandboxing
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3576,13 +3576,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: red-teaming
+    - id: k6BfxaEwuQ
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: cooperative-ai
+    - id: LSqNo6FATg
       type: organization
   lastUpdated: 2026-02
 
@@ -3643,20 +3643,20 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
       relationship: leads-to
-    - id: timothy-telleen-lawton
+    - id: 4ZKddwff5g
       type: person
-    - id: kathleen-finlinson
+    - id: q607cJo21g
       type: person
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: elicit
+    - id: 2VexoROapg
       type: organization
-    - id: sentinel
+    - id: JzhBAecjaA
       type: organization
   sources:
     - title: EA Forum Fellowship Announcement
@@ -3867,7 +3867,7 @@
   type: project
   title: MIT AI Risk Repository
   projectStatus: active
-  organization: mit
+  organization: Z1df97RYbw
   summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
@@ -4147,9 +4147,9 @@
     with Anthropic, Google, OpenAI, xAI; GenAI.mil serving 3M personnel) creates pre-existing
     channels for rapid mobilization.
   relatedEntries:
-    - id: compute-concentration
+    - id: MvImONf1YA
       type: risk
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
   tags:
     - governance
@@ -4171,7 +4171,7 @@
     a core alignment problem where AI systems pursue proxy objectives that diverge
     from intended goals when deployed outside their training distribution.
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
   clusters:
     - ai-safety
@@ -4189,19 +4189,19 @@
     hidden wealth. This sousveillance dynamic represents the beneficial flip
     side of AI surveillance capabilities.
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: ai-powered-investigation
+    - id: N0NF4lvS4Q
       type: capability
-    - id: deanonymization
+    - id: 0J0pDyhVtQ
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
   clusters:
     - ai-safety
@@ -4220,11 +4220,11 @@
     - label: Key Thinker
       value: Jennifer Pahlka (Code for America, USDS)
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: recoding-america
+    - id: 7ptWHyqwBA
       type: resource
   sources:
     - title: Recoding America - Jennifer Pahlka
@@ -4257,9 +4257,9 @@
     - label: Core Thesis
       value: Government technology failures stem from institutional culture separating policy from implementation
   relatedEntries:
-    - id: state-capacity-ai-governance
+    - id: y8Ib2pmieA
       type: concept
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
   sources:
     - title: Recoding America Official Website

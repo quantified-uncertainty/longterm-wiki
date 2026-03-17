@@ -12,11 +12,11 @@
     - label: Examples
       value: Devin, Claude Computer Use
   relatedEntries:
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: Claude Computer Use
@@ -47,11 +47,11 @@
     - label: Key Systems
       value: Devin, Claude Code, Cursor
   relatedEntries:
-    - id: self-improvement
+    - id: eUR0jvxO5A
       type: capability
-    - id: tool-use
+    - id: C5XsvYDQGA
       type: capability
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
@@ -82,11 +82,11 @@
     - label: Key Labs
       value: OpenAI, Anthropic, Google
   relatedEntries:
-    - id: reasoning
+    - id: hD7bZ2b7BQ
       type: capability
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: Language Models are Few-Shot Learners (GPT-3)
@@ -119,11 +119,11 @@
     - label: Current Limit
       value: ~hours with heavy scaffolding
   relatedEntries:
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
   sources:
     - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
@@ -156,11 +156,11 @@
     - label: Status
       value: Demonstrated but understudied
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: language-models
+    - id: MznJisvptw
       type: capability
-    - id: misuse
+    - id: DAaRZ9Q15A
       type: risk
   sources:
     - title: Personalized Persuasion with LLMs
@@ -194,11 +194,11 @@
     - label: Key Models
       value: OpenAI o1, o3
   relatedEntries:
-    - id: language-models
+    - id: MznJisvptw
       type: capability
-    - id: self-improvement
+    - id: eUR0jvxO5A
       type: capability
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: Learning to Reason with LLMs
@@ -232,11 +232,11 @@
     - label: Key Examples
       value: AlphaFold, AI Scientists
   relatedEntries:
-    - id: self-improvement
+    - id: eUR0jvxO5A
       type: capability
-    - id: dual-use
+    - id: CwBPBQAmxA
       type: risk
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   sources:
     - title: Highly accurate protein structure prediction with AlphaFold
@@ -271,11 +271,11 @@
     - label: Status
       value: Partial automation, human-led
   relatedEntries:
-    - id: fast-takeoff
+    - id: fRYu1EXclA
       type: analysis
-    - id: coding
+    - id: 64WDhlxxKA
       type: capability
-    - id: superintelligence
+    - id: 3fyHbDnHIQ
       type: concept
   sources:
     - title: 'Intelligence Explosion: Evidence and Import'
@@ -313,15 +313,15 @@
     - label: Key Concern
       value: Enables strategic deception
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: evals
+    - id: etuIjQhFbQ
       type: capability
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: Sleeper Agents Paper
@@ -382,11 +382,11 @@
     - label: Key Examples
       value: Claude Computer Use, GPT Actions
   relatedEntries:
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
-    - id: coding
+    - id: 64WDhlxxKA
       type: capability
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: Claude Computer Use
@@ -602,17 +602,17 @@
     - label: Key Concern
       value: Dual-use tension between accountability and privacy
   relatedEntries:
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: deanonymization
+    - id: 0J0pDyhVtQ
       type: risk
-    - id: ai-accountability
+    - id: oifBdRbmYg
       type: approach
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
   clusters:
     - ai-safety

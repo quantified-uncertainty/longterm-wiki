@@ -253,7 +253,12 @@ describe("Entity data validation", () => {
 
   describe("relatedEntries reference existing entities", () => {
     it("every relatedEntries[].id resolves to an actual entity", () => {
-      const entityIds = new Set(entities.map((e) => e.id));
+      // Build lookup set with both slugs and stableIds (relatedEntries may use either)
+      const entityIds = new Set(entities.map((e: Record<string, unknown>) => e.id as string));
+      for (const e of entities) {
+        const stableId = (e as Record<string, unknown>).stableId as string | undefined;
+        if (stableId) entityIds.add(stableId);
+      }
       const broken: string[] = [];
       for (const entity of entities) {
         for (const rel of entity.relatedEntries || []) {
