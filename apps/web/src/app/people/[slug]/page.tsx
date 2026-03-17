@@ -335,41 +335,47 @@ export default async function PersonProfilePage({
     ),
   });
 
-  // Career history
-  tabs.push({
-    id: "career",
-    label: "Career",
-    count: careerHistory.length,
-    content: <CareerHistory careerHistory={careerHistory} />,
-  });
+  // Career history (hidden when empty to avoid unfulfilled expectations)
+  if (careerHistory.length > 0) {
+    tabs.push({
+      id: "career",
+      label: "Career",
+      count: careerHistory.length,
+      content: <CareerHistory careerHistory={careerHistory} />,
+    });
+  }
 
-  // Publications
-  tabs.push({
-    id: "publications",
-    label: "Publications",
-    count: effectivePubCount,
-    content: (
-      <>
-        <PublicationsSection publications={publications} />
-        {publications.length === 0 && metaPubCount > 0 && (
-          <div className="border border-border/40 border-dashed rounded-xl px-6 py-6 text-center">
-            <p className="text-sm text-muted-foreground/70">
-              {metaPubCount} publication{metaPubCount !== 1 ? "s" : ""} attributed to this person
-              in the index, but detailed records are not yet linked.
-            </p>
-          </div>
-        )}
-      </>
-    ),
-  });
+  // Publications (hidden when no publications exist locally or in the index)
+  if (effectivePubCount > 0) {
+    tabs.push({
+      id: "publications",
+      label: "Publications",
+      count: effectivePubCount,
+      content: (
+        <>
+          <PublicationsSection publications={publications} />
+          {publications.length === 0 && metaPubCount > 0 && (
+            <div className="border border-border/40 border-dashed rounded-xl px-6 py-6 text-center">
+              <p className="text-sm text-muted-foreground/70">
+                {metaPubCount} publication{metaPubCount !== 1 ? "s" : ""} attributed to this person
+                in the index, but detailed records are not yet linked.
+              </p>
+            </div>
+          )}
+        </>
+      ),
+    });
+  }
 
-  // Funding connections
-  tabs.push({
-    id: "funding",
-    label: "Funding",
-    count: fundingConnections.length,
-    content: <FundingConnections fundingConnections={fundingConnections} />,
-  });
+  // Funding connections (hidden when empty to avoid unfulfilled expectations)
+  if (fundingConnections.length > 0) {
+    tabs.push({
+      id: "funding",
+      label: "Funding",
+      count: fundingConnections.length,
+      content: <FundingConnections fundingConnections={fundingConnections} />,
+    });
+  }
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8">
