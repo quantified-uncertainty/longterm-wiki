@@ -144,16 +144,16 @@ describe('dollar-signs rule', () => {
     expect(fmIssues.length).toBe(0);
   });
 
-  it('detects unescaped $ in llmSummary field', () => {
-    const raw = '---\ntitle: Test\nllmSummary: Fund manages $3B in assets\n---\nBody text here.';
+  it('detects unescaped $ in summary field', () => {
+    const raw = '---\ntitle: Test\nsummary: Fund manages $3B in assets\n---\nBody text here.';
     const content = mockContent('Body text here.', {
       raw,
-      frontmatter: { title: 'Test', llmSummary: 'Fund manages $3B in assets' },
+      frontmatter: { title: 'Test', summary: 'Fund manages $3B in assets' },
     });
     const issues = check(dollarSignsRule, content);
     const fmIssues = issues.filter((i: any) => i.message.includes('frontmatter'));
     expect(fmIssues.length).toBe(1);
-    expect(fmIssues[0].message).toContain('llmSummary');
+    expect(fmIssues[0].message).toContain('summary');
   });
 
   it('handles multiple $ on same frontmatter field', () => {

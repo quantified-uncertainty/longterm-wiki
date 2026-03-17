@@ -7,7 +7,7 @@ sidebar:
 subcategory: style-guides
 lastEdited: 2026-02-17
 update_frequency: 90
-llmSummary: Internal documentation providing guidelines for creating minimal placeholder pages (stubs) in the knowledge base, including when to use them, required formatting, and when to convert them to full pages. Covers basic content structure and validation procedures.
+summary: Internal documentation providing guidelines for creating minimal placeholder pages (stubs) in the knowledge base, including when to use them, required formatting, and when to convert them to full pages. Covers basic content structure and validation procedures.
 ---
 # Stub Pages Style Guide
 

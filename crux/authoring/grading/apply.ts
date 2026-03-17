@@ -2,7 +2,7 @@
  * Frontmatter application — writes grading results back to MDX source files.
  *
  * Scoring fields (quality, ratings, importance) are written only to PG
- * assessments — not to frontmatter. Only llmSummary is written to frontmatter.
+ * assessments — not to frontmatter. Only summary is written to frontmatter.
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -17,7 +17,7 @@ import { recordAssessment } from '../../lib/wiki-server/assessments.ts';
  * Safely serialize a frontmatter object to YAML.
  *
  * Tries PLAIN string type first (clean output), then falls back to
- * QUOTE_DOUBLE if round-trip validation fails (e.g. llmSummary with colons).
+ * QUOTE_DOUBLE if round-trip validation fails (e.g. summary with colons).
  */
 export function safeStringifyFm(obj: Record<string, unknown>): string {
   const plainYaml = stringifyYaml(obj, {
@@ -79,9 +79,9 @@ export function applyGradesToFile(
   delete fm.tractability;
   delete fm.neglectedness;
 
-  // llmSummary is still written to frontmatter (used by build-data for page descriptions)
-  if (grades.llmSummary) {
-    fm.llmSummary = grades.llmSummary;
+  // summary is still written to frontmatter (used by build-data for page descriptions)
+  if (grades.summary) {
+    fm.summary = grades.summary;
   }
   // Metrics are computed at build time — not stored in frontmatter.
   delete fm.metrics;

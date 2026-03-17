@@ -37,7 +37,7 @@ export function GET() {
       const url = `${SITE_URL}${getEntityHref(page.id)}`;
       const published = toAtomDate(page.feedDate!);
       if (!published) return null;
-      const summary = page.description || page.llmSummary || "";
+      const summary = page.description || page.summary || "";
 
       return `  <entry>
     <title>${escapeXml(page.title)}</title>

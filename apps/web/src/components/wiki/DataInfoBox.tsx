@@ -16,7 +16,7 @@ export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }
     const pageData = getPageById(entityId);
     const externalLinks = getExternalLinks(entityId);
 
-    const description = pageData?.llmSummary || pageData?.description || undefined;
+    const description = pageData?.summary || pageData?.description || undefined;
     const clusters: string[] | undefined = pageData?.clusters?.length ? pageData.clusters : undefined;
     const wordCount: number | undefined = pageData?.wordCount ?? undefined;
     const backlinkCount: number | undefined = pageData?.backlinkCount ?? undefined;

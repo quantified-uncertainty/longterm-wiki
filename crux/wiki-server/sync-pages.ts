@@ -49,7 +49,7 @@ interface PageData {
   wikiId?: string;
   title: string;
   description?: string;
-  llmSummary?: string;
+  summary?: string;
   category?: string;
   subcategory?: string;
   entityType?: string;
@@ -77,7 +77,7 @@ interface SyncPage {
   wikiId: string | null;
   title: string;
   description: string | null;
-  llmSummary: string | null;
+  summary: string | null;
   category: string | null;
   subcategory: string | null;
   entityType: string | null;
@@ -120,7 +120,7 @@ function transformPage(page: PageData): SyncPage {
     wikiId: page.wikiId ?? null,
     title: page.title,
     description: page.description ?? null,
-    llmSummary: page.llmSummary ?? null,
+    summary: page.summary ?? null,
     category: page.category ?? null,
     subcategory: page.subcategory ?? null,
     entityType: page.entityType ?? null,

@@ -186,8 +186,8 @@ function pageDetailBlock(p: PageDetail): string {
   if (p.description) {
     md += `${p.description}\n\n`;
   }
-  if (p.llmSummary) {
-    md += `### LLM Summary\n\n${p.llmSummary}\n\n`;
+  if (p.summary) {
+    md += `### Summary\n\n${p.summary}\n\n`;
   }
 
   return md;

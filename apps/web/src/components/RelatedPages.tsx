@@ -189,7 +189,7 @@ export async function RelatedPages({
       const page = getPageById(entry.id);
       const desc =
         page?.description ||
-        page?.llmSummary ||
+        page?.summary ||
         undefined;
       return {
         id: entry.id,

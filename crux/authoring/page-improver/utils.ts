@@ -161,7 +161,7 @@ export function repairFrontmatter(content: string): string {
   ]);
   const topLevelKeys = new Set([
     'title', 'description', 'sidebar', 'quality', 'readerImportance', 'lastEdited',
-    'update_frequency', 'evergreen', 'llmSummary', 'ratings', 'clusters',
+    'update_frequency', 'evergreen', 'summary', 'ratings', 'clusters',
     'draft', 'aliases', 'redirects', 'tags',
   ]);
   const lines = fm.split('\n');
@@ -181,11 +181,11 @@ export function repairFrontmatter(content: string): string {
 
   // Fix 4: Quote string values that contain YAML-breaking characters.
   // LLMs often produce unquoted values like:
-  //   llmSummary: Text with 'Title: Subtitle' here
+  //   summary: Text with 'Title: Subtitle' here
   // The colon-space inside single quotes breaks YAML parsers.
   // We wrap such values in double quotes to make them safe.
   const STRING_FIELDS = new Set([
-    'llmSummary', 'description', 'title',
+    'summary', 'description', 'title',
   ]);
   const fmLines = fm.split('\n');
   for (let i = 0; i < fmLines.length; i++) {
@@ -214,7 +214,7 @@ export function repairFrontmatter(content: string): string {
  * any missing fields back from the original.
  *
  * Fields present in both versions use the LLM's value (it may have legitimately
- * updated `description`, `llmSummary`, etc.).
+ * updated `description`, `summary`, etc.).
  */
 export function ensureFrontmatterFields(originalContent: string, improvedContent: string): string {
   const origMatch = originalContent.match(/^---\n([\s\S]*?)\n---/);

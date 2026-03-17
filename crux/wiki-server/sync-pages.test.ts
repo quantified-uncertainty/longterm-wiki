@@ -10,7 +10,7 @@ function makePage(id: string) {
     wikiId: null,
     title: `Page ${id}`,
     description: null,
-    llmSummary: null,
+    summary: null,
     category: null,
     subcategory: null,
     entityType: null,
