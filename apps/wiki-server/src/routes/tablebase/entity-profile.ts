@@ -255,7 +255,7 @@ const SECTIONS: SectionDef[] = [
     query: (db, _stableId, slug) =>
       db.select({
         id: wikiPages.id,
-        numericId: wikiPages.numericId,
+        wikiId: wikiPages.wikiId,
         slug: wikiPages.slug,
         title: wikiPages.title,
         description: wikiPages.description,
