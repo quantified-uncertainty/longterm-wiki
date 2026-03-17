@@ -211,7 +211,7 @@ function makeColumns(opts: {
     {
       accessorKey: "citingPageCount",
       header: ({ column }) => (
-        <SortableHeader column={column}>Pages</SortableHeader>
+        <SortableHeader column={column}>Citing Pages</SortableHeader>
       ),
       cell: ({ row }) => (
         <span className="text-xs tabular-nums text-muted-foreground">
