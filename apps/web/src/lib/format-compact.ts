@@ -27,3 +27,49 @@ export function formatCompactNumber(n: number | null | undefined): string {
 export function safeHref(url: string): string {
   return /^https?:\/\//i.test(url) ? url : "#";
 }
+
+const MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Format a legislation `introduced` date string with appropriate precision:
+ * - Year-only ("2021")        → "2021"
+ * - Year-month ("2021-04")    → "Apr 2021"
+ * - Full ISO ("2021-04-15")   → "Apr 15, 2021"
+ * Returns the raw value as-is if it does not match any of these patterns.
+ */
+export function formatIntroducedDate(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+
+  // Full ISO date: YYYY-MM-DD
+  const fullMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+  if (fullMatch) {
+    const year = fullMatch[1];
+    const month = parseInt(fullMatch[2], 10);
+    const day = parseInt(fullMatch[3], 10);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return `${MONTH_ABBR[month - 1]} ${day}, ${year}`;
+    }
+  }
+
+  // Year-month: YYYY-MM
+  const ymMatch = /^(\d{4})-(\d{2})$/.exec(trimmed);
+  if (ymMatch) {
+    const year = ymMatch[1];
+    const month = parseInt(ymMatch[2], 10);
+    if (month >= 1 && month <= 12) {
+      return `${MONTH_ABBR[month - 1]} ${year}`;
+    }
+  }
+
+  // Year-only: YYYY
+  if (/^\d{4}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Unknown format: return as-is
+  return trimmed;
+}
