@@ -20,6 +20,7 @@ import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
+import { type ApiResult, apiOk, apiErr } from '../lib/wiki-server/client.ts';
 
 const PAGE_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -128,7 +129,7 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
 
 /**
  * Sync a single session YAML file to the wiki-server.
- * Returns true if the update succeeded, false otherwise.
+ * Returns an ApiResult — ok on success, or a typed error with an actionable message.
  *
  * Writes all session log fields (title, summary, model, cost, duration, pages, etc.)
  * directly to the agent_sessions row matched by branch. This makes agent_sessions
@@ -137,12 +138,12 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
  * If no agent_session exists for the branch (e.g., pre-checklist sessions),
  * this is a no-op — those sessions are tracked in the sessions table by the pipeline.
  */
-export async function syncSessionFile(filePath: string): Promise<boolean> {
+export async function syncSessionFile(filePath: string): Promise<ApiResult<true>> {
   const entry = parseSessionYaml(filePath);
-  if (!entry || !entry.branch) return false;
+  if (!entry || !entry.branch) return apiErr('bad_request', 'Could not parse session YAML or missing branch field');
 
   const agentSessionResult = await getAgentSessionByBranch(entry.branch);
-  if (!agentSessionResult.ok) return false;
+  if (!agentSessionResult.ok) return agentSessionResult as ApiResult<true>;
 
   const updates = {
     date: entry.date,
@@ -162,7 +163,8 @@ export async function syncSessionFile(filePath: string): Promise<boolean> {
   };
 
   const result = await updateAgentSession(agentSessionResult.data.id, updates);
-  return result.ok;
+  if (!result.ok) return result as ApiResult<true>;
+  return apiOk(true as const);
 }
 
 // ---------------------------------------------------------------------------
@@ -197,12 +199,20 @@ async function main() {
   console.log(`  Branch: ${entry.branch || '(none)'}`);
   console.log(`  Pages: ${entry.pages?.length || 0}`);
 
-  const ok = await syncSessionFile(resolved);
-  if (ok) {
+  const result = await syncSessionFile(resolved);
+  if (result.ok) {
     console.log(`\u2713 Session synced to wiki-server`);
   } else {
-    console.log('Warning: could not sync session to wiki-server (server unavailable or error)');
-    // Not a hard failure — YAML is authoritative
+    // Not a hard failure — YAML is authoritative, but give actionable message
+    if (result.error === 'auth_error') {
+      console.warn(
+        `Warning: authentication failed — check LONGTERMWIKI_SERVER_API_KEY (or PROD_LONGTERMWIKI_SERVER_API_KEY with WIKI_SERVER_ENV=prod)\n  Detail: ${result.message}`,
+      );
+    } else if (result.error === 'unavailable') {
+      console.warn(`Warning: wiki-server is unavailable — ${result.message}`);
+    } else {
+      console.warn(`Warning: could not sync session to wiki-server — ${result.message}`);
+    }
   }
 }
 
