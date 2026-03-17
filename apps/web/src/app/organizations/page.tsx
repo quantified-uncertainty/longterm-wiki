@@ -135,9 +135,15 @@ interface OrgPageData {
 /**
  * Try loading organizations from the wiki-server API.
  * orgTypeMap is always built from local data since orgType is not in the DB.
+ *
+ * After building rows from the API, merges in any local-only organizations
+ * that the API didn't return. This ensures entities that haven't been synced
+ * to the wiki-server PG database (e.g., recently added YAML entities) still
+ * appear in the directory with their correct orgType.
  */
 async function loadFromApi(
   orgTypeMap: Record<string, string>,
+  localOrgs: OrganizationEntity[],
 ): Promise<FetchResult<OrgPageData>> {
   const result = await fetchDetailed<ApiOrgsResponse>(
     "/api/entities/organizations?limit=500",
@@ -184,6 +190,56 @@ async function loadFromApi(
       searchText: searchParts.join(" ").toLowerCase(),
     };
   });
+
+  // Merge local-only orgs that the API didn't return (not yet synced to PG).
+  // This prevents entities added to YAML but not yet synced from disappearing
+  // in the directory. Without this, orgType filter tabs show incorrect counts.
+  const apiIds = new Set(organizations.map((o) => o.id));
+  for (const org of localOrgs) {
+    if (apiIds.has(org.id)) continue;
+    const orgType = org.orgType ?? null;
+    const searchParts = [org.title];
+    if (org.description) searchParts.push(org.description);
+    if (orgType) searchParts.push(orgType);
+    const foundedFact = getKBLatest(org.id, "founded-date");
+    const foundedDate = foundedFact?.value.type === "date"
+      ? foundedFact.value.value
+      : foundedFact?.value.type === "text"
+        ? foundedFact.value.value
+        : foundedFact?.value.type === "number"
+          ? String(foundedFact.value.value)
+          : null;
+
+    rows.push({
+      id: org.id,
+      slug: org.id,
+      name: org.title,
+      wikiId: org.wikiId ?? null,
+      orgType,
+      wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
+
+      revenue: null,
+      revenueNum: null,
+      revenueDate: null,
+
+      valuation: null,
+      valuationNum: null,
+      valuationDate: null,
+
+      headcount: null,
+      headcountDate: null,
+
+      totalFunding: null,
+      totalFundingNum: null,
+
+      foundedDate,
+
+      peopleCount: null,
+      completionScore: computeCompletionScore({}),
+
+      searchText: searchParts.join(" ").toLowerCase(),
+    });
+  }
 
   const stats = buildStats(rows);
 
@@ -313,7 +369,7 @@ export default async function OrganizationsPage() {
   }
 
   const { data, source, apiError } = await withApiFallback(
-    () => loadFromApi(orgTypeMap),
+    () => loadFromApi(orgTypeMap, orgs),
     () => loadFromLocal(),
   );
 
