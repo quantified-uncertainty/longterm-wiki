@@ -30,6 +30,22 @@ function formatFact(
   return formatKBFactValue(fact, property?.unit, property?.display);
 }
 
+/** Compute a 1-4 star completeness score for an org. */
+function computeCompletionScore(row: {
+  revenueNum?: number | null;
+  valuationNum?: number | null;
+  headcount?: number | null;
+  totalFundingNum?: number | null;
+  foundedDate?: string | null;
+}): number {
+  const financialMetrics = [row.revenueNum, row.valuationNum, row.headcount, row.totalFundingNum]
+    .filter((v) => v != null).length;
+  if (financialMetrics >= 3) return 4;
+  if (financialMetrics >= 2 && row.foundedDate) return 3;
+  if (financialMetrics >= 1) return 2;
+  return 1;
+}
+
 /** Build a pre-computed lowercase text blob for full-text search across all org fields. */
 function buildOrgSearchText(
   org: OrganizationEntity,
@@ -177,6 +193,9 @@ async function loadFromApi(
 
       foundedDate: org.foundedDate,
 
+      peopleCount: 0, // Not available from API
+      completionScore: computeCompletionScore(org),
+
       searchText: searchParts.join(" ").toLowerCase(),
     };
   });
@@ -216,6 +235,22 @@ function loadFromLocal(): OrgPageData {
     const totalFundingFact = getKBLatest(org.id, "total-funding");
     const foundedFact = getKBLatest(org.id, "founded-date");
 
+    // People count from the reverse index
+    const kbEntity = getKBEntity(org.id);
+    const peopleCount = kbEntity ? (orgToEmployeeNames.get(kbEntity.id)?.length ?? 0) : 0;
+
+    const revenueNum = numericValue(revenueFact);
+    const valuationNum = numericValue(valuationFact);
+    const headcountVal = headcountFact?.value.type === "number" ? headcountFact.value.value : null;
+    const totalFundingNum = numericValue(totalFundingFact);
+    const foundedDate = foundedFact?.value.type === "date"
+      ? foundedFact.value.value
+      : foundedFact?.value.type === "text"
+        ? foundedFact.value.value
+        : foundedFact?.value.type === "number"
+          ? String(foundedFact.value.value)
+          : null;
+
     return {
       id: org.id,
       slug: org.id,
@@ -225,26 +260,25 @@ function loadFromLocal(): OrgPageData {
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
 
       revenue: formatFact(revenueFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      revenueNum: numericValue(revenueFact),
+      revenueNum,
       revenueDate: revenueFact?.asOf ?? null,
 
       valuation: formatFact(valuationFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      valuationNum: numericValue(valuationFact),
+      valuationNum,
       valuationDate: valuationFact?.asOf ?? null,
 
-      headcount: headcountFact?.value.type === "number" ? headcountFact.value.value : null,
+      headcount: headcountVal,
       headcountDate: headcountFact?.asOf ?? null,
 
       totalFunding: formatFact(totalFundingFact, { unit: "USD", display: { divisor: 1e9, prefix: "$", suffix: "B" } }),
-      totalFundingNum: numericValue(totalFundingFact),
+      totalFundingNum,
 
-      foundedDate: foundedFact?.value.type === "date"
-        ? foundedFact.value.value
-        : foundedFact?.value.type === "text"
-          ? foundedFact.value.value
-          : foundedFact?.value.type === "number"
-            ? String(foundedFact.value.value)
-            : null,
+      foundedDate,
+
+      peopleCount,
+      completionScore: computeCompletionScore({
+        revenueNum, valuationNum, headcount: headcountVal, totalFundingNum, foundedDate,
+      }),
 
       searchText: buildOrgSearchText(org, orgToEmployeeNames),
     };

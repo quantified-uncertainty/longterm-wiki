@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
@@ -36,6 +36,11 @@ export interface OrgRow {
   totalFundingNum: number | null;
 
   foundedDate: string | null;
+
+  /** Number of tracked people (from employed-by facts) */
+  peopleCount: number;
+  /** Completeness score 1-4 based on available data */
+  completionScore: number;
 
   /** Pre-computed lowercase text blob for full-text search across all fields */
   searchText: string;
@@ -137,10 +142,28 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       totalFunding: null,
       totalFundingNum: org.totalFundingNum,
       foundedDate: org.foundedDate,
+      peopleCount: 0,
+      completionScore: computeCompletionScore(org),
       searchText: "",
     })),
     total: data.total ?? 0,
   };
+}
+
+/** Compute a 1-4 star completeness score for an org. */
+function computeCompletionScore(row: {
+  revenueNum: number | null;
+  valuationNum: number | null;
+  headcount: number | null;
+  totalFundingNum: number | null;
+  foundedDate: string | null;
+}): number {
+  const financialMetrics = [row.revenueNum, row.valuationNum, row.headcount, row.totalFundingNum]
+    .filter((v) => v != null).length;
+  if (financialMetrics >= 3) return 4; // 3+ financial metrics
+  if (financialMetrics >= 2 && row.foundedDate) return 3; // 2+ metrics + founded
+  if (financialMetrics >= 1) return 2; // any financial metric
+  return 1; // name only
 }
 
 // ── Component ───────────────────────────────────────────────────────
@@ -352,6 +375,27 @@ export function OrganizationsTable({
     return `Showing ${filteredTotal} of ${rows.length} organizations`;
   })();
 
+  // ── Column picker ──
+  const [showColumnPicker, setShowColumnPicker] = useState(false);
+  type OptionalColumnKey = "peopleCount" | "completionScore";
+  const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
+    { key: "completionScore", label: "Data Completeness" },
+    { key: "peopleCount", label: "People Tracked" },
+  ];
+  const [visibleColumns, setVisibleColumns] = useState<Set<OptionalColumnKey>>(
+    () => new Set(["completionScore"]),
+  );
+  const toggleColumn = (key: OptionalColumnKey) => {
+    setVisibleColumns((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  // Base column count: Name + Type + Revenue + Valuation + Headcount + Funding + Founded = 7
+  const activeColCount = 7 + (visibleColumns.has("completionScore") ? 1 : 0) + (visibleColumns.has("peopleCount") ? 1 : 0);
+
   return (
     <div>
       {/* Clickable stat cards */}
@@ -401,9 +445,38 @@ export function OrganizationsTable({
         />
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">
-        {statusText}
+      {/* Results count + column picker */}
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-xs text-muted-foreground">
+          {statusText}
+        </span>
+        <div className="ml-auto relative">
+          <button
+            type="button"
+            onClick={() => setShowColumnPicker((v) => !v)}
+            className="px-3 py-1.5 text-xs border border-border rounded-lg bg-background hover:bg-muted/50 transition-colors text-muted-foreground"
+          >
+            Columns ({visibleColumns.size})
+          </button>
+          {showColumnPicker && (
+            <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-lg shadow-lg p-2 min-w-[180px]">
+              {OPTIONAL_COLUMNS.map((col) => (
+                <label
+                  key={col.key}
+                  className="flex items-center gap-2 px-2 py-1 text-xs hover:bg-muted/50 rounded cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={visibleColumns.has(col.key)}
+                    onChange={() => toggleColumn(col.key)}
+                    className="rounded"
+                  />
+                  {col.label}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -417,18 +490,24 @@ export function OrganizationsTable({
               ) : (
                 <th className="py-2.5 px-3 font-medium text-left">Type</th>
               )}
+              {visibleColumns.has("completionScore") && (
+                <SortHeader label="Data" sortKey="completionScore" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              )}
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Valuation" sortKey="valuation" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Headcount" sortKey="headcount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Total Funding" sortKey="totalFunding" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Founded" sortKey="founded" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              {visibleColumns.has("peopleCount") && (
+                <SortHeader label="People" sortKey="peopleCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={activeColCount}
                   className="py-8 text-center text-muted-foreground text-sm"
                 >
                   Loading organizations...
@@ -476,6 +555,13 @@ export function OrganizationsTable({
                         </span>
                       )}
                     </td>
+
+                    {/* Completion Score */}
+                    {visibleColumns.has("completionScore") && (
+                      <td className="py-2.5 px-3 text-center" title={`Completeness: ${row.completionScore}/4`}>
+                        <CompletionDots score={row.completionScore} />
+                      </td>
+                    )}
 
                     {/* Revenue */}
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
@@ -527,12 +613,23 @@ export function OrganizationsTable({
                       {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
 
+                    {/* People Count */}
+                    {visibleColumns.has("peopleCount") && (
+                      <td className="py-2.5 px-3 text-right tabular-nums">
+                        {row.peopleCount > 0 ? (
+                          <span>{row.peopleCount}</span>
+                        ) : (
+                          <span className="text-muted-foreground/40">{"\u2014"}</span>
+                        )}
+                      </td>
+                    )}
+
                   </tr>
                 ))}
                 {displayRows.length === 0 && !isInitialLoad && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={activeColCount}
                       className="py-8 text-center text-muted-foreground text-sm"
                     >
                       {search
@@ -560,5 +657,23 @@ export function OrganizationsTable({
         </div>
       )}
     </div>
+  );
+}
+
+/** Renders 1-4 filled/empty dots for data completeness. */
+function CompletionDots({ score }: { score: number }) {
+  return (
+    <span className="inline-flex gap-0.5">
+      {[1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className={`inline-block w-1.5 h-1.5 rounded-full ${
+            i <= score
+              ? "bg-primary/70"
+              : "bg-muted-foreground/20"
+          }`}
+        />
+      ))}
+    </span>
   );
 }
