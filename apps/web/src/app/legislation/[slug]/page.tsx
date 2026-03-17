@@ -224,11 +224,25 @@ export default async function LegislationDetailPage({
                         {vote.result}
                       </span>
                     </td>
-                    <td className="py-2 px-3 text-right tabular-nums font-semibold text-green-700 dark:text-green-400">
-                      {vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                    <td className="py-2 px-3 text-right tabular-nums text-green-700 dark:text-green-400">
+                      <span className="font-semibold">{vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
+                      {(vote.ayesDem != null || vote.ayesRep != null) && (
+                        <div className="text-[10px] text-muted-foreground font-normal">
+                          {vote.ayesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.ayesDem}D</span>}
+                          {vote.ayesDem != null && vote.ayesRep != null && " "}
+                          {vote.ayesRep != null && <span className="text-red-500 dark:text-red-400">{vote.ayesRep}R</span>}
+                        </div>
+                      )}
                     </td>
-                    <td className="py-2 px-3 text-right tabular-nums font-semibold text-red-700 dark:text-red-400">
-                      {vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                    <td className="py-2 px-3 text-right tabular-nums text-red-700 dark:text-red-400">
+                      <span className="font-semibold">{vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
+                      {(vote.noesDem != null || vote.noesRep != null) && (
+                        <div className="text-[10px] text-muted-foreground font-normal">
+                          {vote.noesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.noesDem}D</span>}
+                          {vote.noesDem != null && vote.noesRep != null && " "}
+                          {vote.noesRep != null && <span className="text-red-500 dark:text-red-400">{vote.noesRep}R</span>}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -427,7 +441,11 @@ export default async function LegislationDetailPage({
                     <div className="absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background bg-amber-500" />
                     <div>
                       <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className="font-semibold text-sm">{amendment.date}</span>
+                        {amendment.url ? (
+                          <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
+                        ) : (
+                          <span className="font-semibold text-sm">{amendment.date}</span>
+                        )}
                         {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
                       </div>
                       <p className="text-sm text-muted-foreground">{amendment.description}</p>
