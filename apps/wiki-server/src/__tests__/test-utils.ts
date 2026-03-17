@@ -153,6 +153,9 @@ export async function mockDbModule(dispatch: SqlDispatcher) {
     getDrizzleDb: () => mockDrizzle,
     initDb: vi.fn(),
     closeDb: vi.fn(),
+    beginTransaction: async (cb: (tx: typeof mockSql) => Promise<void>) => {
+      await cb(mockSql);
+    },
   };
 }
 
