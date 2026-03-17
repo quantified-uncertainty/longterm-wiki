@@ -24,3 +24,4 @@ export { resolvePageIntId, resolvePageIntIds, allocateAndResolvePageIntIds } fro
 export { upsertThingsInTx, type ThingSyncInput } from "./thing-sync.js";
 export { resolveEntityStableId } from "./entity-resolution.js";
 export { buildSearchCondition, parseSort, paginationMeta, type PaginationMeta } from "./query-helpers.js";
+export { validateEntityRefs, findMissingEntityRefs, type EntityRefField } from "./validate-entity-refs.js";
