@@ -34,7 +34,13 @@ export const INVALID_JSON_ERROR = "invalid_json" as const;
 
 /** Safely parse JSON body, returning null on parse failure. */
 export function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
+  return c.req.json().catch((e: unknown) => {
+    logger.debug(
+      { error: e instanceof Error ? e.message : String(e), path: c.req.path },
+      "parseJsonBody: failed to parse request body as JSON"
+    );
+    return null;
+  });
 }
 
 /** Return a 400 validation error response. */

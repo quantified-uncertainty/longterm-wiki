@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
+import { logger as rootLogger } from "../../logger.js";
 import { sessions, sessionPages } from "../../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "../shared/utils.js";
 import {
@@ -10,6 +11,8 @@ import {
   DateStringSchema,
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
+
+const logger = rootLogger.child({ component: "sessions" });
 
 // ---- Constants ----
 
@@ -471,8 +474,9 @@ const sessionsApp = new Hono()
       .limit(INSIGHTS_LIMIT);
 
     if (rows.length === INSIGHTS_LIMIT) {
-      console.warn(
-        `[sessions/insights] Result count hit limit (${INSIGHTS_LIMIT}); insights may be truncated. Consider adding pagination.`
+      logger.warn(
+        { limit: INSIGHTS_LIMIT },
+        "sessions/insights result count hit limit; insights may be truncated — consider adding pagination"
       );
     }
 

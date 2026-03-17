@@ -8,6 +8,7 @@ import { Hono } from "hono";
 import { eq, or, inArray } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
+import { logger as rootLogger } from "../../logger.js";
 import {
   entities,
   personnel,
@@ -29,6 +30,8 @@ import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import { notFoundError } from "../shared/utils.js";
 import { COLUMN_DESCRIPTIONS } from "./entity-profile-descriptions.js";
 import type { PgTable } from "drizzle-orm/pg-core";
+
+const logger = rootLogger.child({ component: "entity-profile" });
 
 // ---- Schema introspection (cached at module level — schema is static) ----
 
@@ -337,7 +340,10 @@ const entityProfileApp = new Hono()
             truncated,
           };
         } catch (err) {
-          console.error(`Entity profile section ${section.key} failed:`, err);
+          logger.error(
+            { error: err instanceof Error ? err.message : String(err), section: section.key },
+            `Entity profile section ${section.key} failed`
+          );
           return {
             key: section.key,
             label: section.label,
@@ -346,7 +352,7 @@ const entityProfileApp = new Hono()
             rows: [],
             total: 0,
             truncated: false,
-            error: err instanceof Error ? err.message : String(err),
+            error: `Failed to load section "${section.key}"`,
           };
         }
       })

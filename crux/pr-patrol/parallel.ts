@@ -119,6 +119,9 @@ function gitInDir(dir: string, ...args: string[]): string {
       timeout: 30000,
     }).trim();
   } catch {
+    // Intentionally silent: this runs during slot discovery where directories may
+    // not be git repos or may have missing refs. Returning '' lets callers skip
+    // non-functional slots gracefully.
     return '';
   }
 }
@@ -986,9 +989,7 @@ export async function runParallelDaemon(config: ParallelConfig): Promise<void> {
     return;
   }
 
-  let cycleCount = 0;
   while (!shuttingDown) {
-    cycleCount++;
     try {
       await runParallelCycle(config);
     } catch (e) {
