@@ -11,6 +11,7 @@ import {
   dbError,
   paginationQuery,
 } from "../shared/utils.js";
+import { logger } from "../../logger.js";
 import {
   SyncPageSchema as SharedSyncPageSchema,
   SyncPagesBatchSchema,
@@ -256,16 +257,23 @@ const pagesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    const deleted = await db
-      .delete(wikiPages)
-      .where(eq(wikiPages.id, id))
-      .returning({ id: wikiPages.id });
+    // Fetch the page before deleting so we can log identifying info.
+    // Per code-review-guidelines: destructive endpoints must log before executing.
+    const existing = await db
+      .select({ id: wikiPages.id, wikiId: wikiPages.wikiId, title: wikiPages.title })
+      .from(wikiPages)
+      .where(eq(wikiPages.id, id));
 
-    if (deleted.length === 0) {
+    if (existing.length === 0) {
       return notFoundError(c, `No page found for id: ${id}`);
     }
 
-    return c.json({ deleted: deleted.length });
+    const page = existing[0];
+    logger.info({ pageId: page.id, wikiId: page.wikiId, title: page.title }, "Deleting page");
+
+    await db.delete(wikiPages).where(eq(wikiPages.id, id));
+
+    return c.json({ deleted: 1 });
   })
 
   // ---- POST /sync ----
