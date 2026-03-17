@@ -2,9 +2,14 @@
  * Core types for the TableBase enrichment system.
  */
 
-/** Convert a display name to a URL-safe slug. */
+/** Convert a display name to a URL-safe slug. Transliterates Unicode (e.g. ü→u). */
 export function toSlug(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks (ü→u, ñ→n, etc.)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 }
 
 export const TASK_TYPES = [
