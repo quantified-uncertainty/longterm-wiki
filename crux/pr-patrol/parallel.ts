@@ -15,7 +15,7 @@ import { execSync } from 'child_process';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { REPO } from '../lib/github.ts';
-import type { PatrolConfig, ScoredPr, FixOutcome } from './types.ts';
+import type { PatrolConfig, ScoredPr, FixOutcome, GqlPrNode } from './types.ts';
 import {
   appendJsonl,
   cl,
@@ -266,6 +266,68 @@ function cleanStaleLocks(lwDir: string): void {
       unlockSlot(s.dir);
     }
   }
+}
+
+/**
+ * Build the set of PR numbers currently held by active (non-stale) locks.
+ * Used to determine which pr-patrol:working labels are still legitimately held.
+ */
+function getActiveLockPrNumbers(lwDir: string): Set<number> {
+  const allSlots = findSlotDirs(lwDir);
+  const active = new Set<number>();
+
+  for (const s of allSlots) {
+    const lockFile = join(s.dir, LOCK_FILE_NAME);
+    if (!existsSync(lockFile)) continue;
+    if (isLockStale(s.dir)) continue; // Process dead or expired — skip
+    try {
+      const data = JSON.parse(readFileSync(lockFile, 'utf-8'));
+      if (typeof data.prNumber === 'number') {
+        active.add(data.prNumber);
+      }
+    } catch {
+      // Can't parse lock — treat as inactive
+    }
+  }
+
+  return active;
+}
+
+/**
+ * Remove pr-patrol:working labels from PRs that no longer have an active lock.
+ *
+ * This handles the case where the patrol process was killed (SIGKILL, OOM, machine
+ * restart) before the finally block could release the label. Without this cleanup,
+ * PRs with stale working labels are invisible to the detector forever.
+ *
+ * Must be called AFTER cleanStaleLocks() so stale locks are already removed.
+ */
+async function cleanStaleWorkingLabels(
+  lwDir: string,
+  prs: GqlPrNode[],
+  repo: string,
+): Promise<number[]> {
+  // Which PR numbers are currently held by an alive lock?
+  const activePrNums = getActiveLockPrNumbers(lwDir);
+
+  // Find PRs that carry the working label but have no active lock
+  const staleLabeled = prs.filter((pr) =>
+    pr.labels.nodes.some((l) => l.name === LABELS.PR_PATROL_WORKING) &&
+    !activePrNums.has(pr.number),
+  );
+
+  if (staleLabeled.length === 0) return [];
+
+  log(`  ${cl.yellow}Found ${staleLabeled.length} PR(s) with stale ${LABELS.PR_PATROL_WORKING} label — cleaning up${cl.reset}`);
+
+  const cleaned: number[] = [];
+  for (const pr of staleLabeled) {
+    log(`  ${cl.yellow}Removing stale ${LABELS.PR_PATROL_WORKING} from PR #${pr.number}: ${pr.title}${cl.reset}`);
+    await releasePr(pr.number, repo);
+    cleaned.push(pr.number);
+  }
+
+  return cleaned;
 }
 
 /** Fetch latest and checkout a PR branch in a slot. */
@@ -700,6 +762,28 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
 
   // 1. Detect: Fetch open PRs and find issues
   const allPrs = await fetchOpenPrs(config);
+
+  // 1a. Stale working-label cleanup: remove pr-patrol:working from PRs that
+  // have no active lock (e.g., process was killed before the finally block ran).
+  // Must run AFTER cleanStaleLocks() above so stale locks are already gone.
+  // Strip the label from in-memory nodes so they are visible to the detector.
+  const cleanedPrNums = config.dryRun
+    ? []
+    : await cleanStaleWorkingLabels(lwDir, allPrs, config.repo).catch((e: unknown) => {
+        log(`  ${cl.yellow}Warning: stale working-label cleanup failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        return [] as number[];
+      });
+  if (cleanedPrNums.length > 0) {
+    const cleanedSet = new Set(cleanedPrNums);
+    for (const pr of allPrs) {
+      if (cleanedSet.has(pr.number)) {
+        pr.labels = {
+          nodes: pr.labels.nodes.filter((l) => l.name !== LABELS.PR_PATROL_WORKING),
+        };
+      }
+    }
+  }
+
   const detected = detectAllPrIssuesFromNodes(allPrs, config);
 
   if (detected.length === 0) {
