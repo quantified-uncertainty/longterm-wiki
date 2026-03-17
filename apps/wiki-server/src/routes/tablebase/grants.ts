@@ -4,7 +4,7 @@ import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants } from "../../schema.js";
+import { grants, things } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -314,16 +314,34 @@ const grantsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    logger.info(`batch-update-grantee: updating ${items.length} grants`);
+
     // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
     const valuesList = items
       .map((item) => sql`(${item.id}, ${item.granteeId})`)
       .reduce((acc, val, i) => (i === 0 ? val : sql`${acc}, ${val}`));
 
-    const result = await db.execute(sql`
-      UPDATE grants SET grantee_id = v.grantee_id, updated_at = now()
-      FROM (VALUES ${valuesList}) AS v(id, grantee_id)
-      WHERE grants.id = v.id
-    `);
+    const grantIds = items.map((item) => item.id);
+    const thingIdList = sql.join(
+      grantIds.map((id) => sql`${id}`),
+      sql`, `,
+    );
+
+    const result = await db.transaction(async (tx) => {
+      const res = await tx.execute(sql`
+        UPDATE grants SET grantee_id = v.grantee_id, updated_at = now()
+        FROM (VALUES ${valuesList}) AS v(id, grantee_id)
+        WHERE grants.id = v.id
+      `);
+
+      // Touch things.updatedAt for affected grants
+      await tx.execute(sql`
+        UPDATE things SET updated_at = now()
+        WHERE source_table = 'grants' AND source_id IN (${thingIdList})
+      `);
+
+      return res;
+    });
 
     // db.execute returns rowCount at runtime (postgres.js) but it's not in Drizzle's type
     const updated = "rowCount" in result ? Number(result.rowCount) : items.length;
@@ -525,7 +543,6 @@ const grantsApp = new Hono()
 
     logger.info({ count: ids.length }, "Deleting grants batch");
 
-    const { things } = await import("../../schema.js");
     await db.transaction(async (tx) => {
       // Delete from things table first (FK-safe)
       await tx
