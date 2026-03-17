@@ -165,12 +165,17 @@ const PolicyVote = z.object({
   ayes: z.number().optional(),
   noes: z.number().optional(),
   abstain: z.number().optional(),
+  ayesDem: z.number().optional(),
+  ayesRep: z.number().optional(),
+  noesDem: z.number().optional(),
+  noesRep: z.number().optional(),
 });
 
 const PolicyAmendment = z.object({
   date: z.string(),
   description: z.string(),
   author: z.string().optional(),
+  url: z.string().optional(),
 });
 
 const PolicyEntitySchema = BaseEntity.extend({
