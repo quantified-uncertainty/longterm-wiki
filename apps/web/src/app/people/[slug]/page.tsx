@@ -97,6 +97,33 @@ async function resolvePersonFromServer(slug: string): Promise<Entity | undefined
   }
 }
 
+/**
+ * Fetch the publication count from wiki-server entity metadata.
+ * The wiki-server stores publicationCount (from experts.yaml + people-resources.yaml)
+ * in the entity metadata, which may differ from local getPublicationsForPerson().
+ * Returns 0 if unavailable.
+ */
+async function getMetaPublicationCount(slug: string): Promise<number> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL || process.env.PROD_LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) return 0;
+  try {
+    const res = await fetch(`${serverUrl}/api/entities/${encodeURIComponent(slug)}`, {
+      headers: {
+        ...(process.env.LONGTERMWIKI_SERVER_API_KEY && {
+          Authorization: `Bearer ${process.env.LONGTERMWIKI_SERVER_API_KEY}`,
+        }),
+      },
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return (data.metadata?.publicationCount as number) ?? 0;
+  } catch {
+    // Non-critical: fall back to local count silently
+    return 0;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -169,8 +196,15 @@ export default async function PersonProfilePage({
   const personEntity = getPersonEntityById(slug);
   const positions = personEntity?.positions ?? [];
 
-  // Publications linked to this person
+  // Publications linked to this person (from people-resources.yaml via database.json).
+  // The wiki-server API may report a different (typically higher) publicationCount
+  // from experts.yaml metadata. When local data has 0 publications but the server
+  // knows about some, use the server count so the tab badge isn't misleadingly zero.
   const publications = getPublicationsForPerson(slug);
+  const metaPubCount = publications.length === 0
+    ? await getMetaPublicationCount(slug)
+    : 0;
+  const effectivePubCount = publications.length > 0 ? publications.length : metaPubCount;
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);
@@ -311,8 +345,20 @@ export default async function PersonProfilePage({
   tabs.push({
     id: "publications",
     label: "Publications",
-    count: publications.length,
-    content: <PublicationsSection publications={publications} />,
+    count: effectivePubCount,
+    content: (
+      <>
+        <PublicationsSection publications={publications} />
+        {publications.length === 0 && metaPubCount > 0 && (
+          <div className="border border-border/40 border-dashed rounded-xl px-6 py-6 text-center">
+            <p className="text-sm text-muted-foreground/70">
+              {metaPubCount} publication{metaPubCount !== 1 ? "s" : ""} attributed to this person
+              in the index, but detailed records are not yet linked.
+            </p>
+          </div>
+        )}
+      </>
+    ),
   });
 
   // Funding connections
