@@ -169,6 +169,12 @@ export default async function AiModelDetailPage({
               Source &rarr;
             </a>
           )}
+          <Link
+            href={`/ai-models/${slug}/db`}
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            DB records &rarr;
+          </Link>
         </div>
       </div>
 

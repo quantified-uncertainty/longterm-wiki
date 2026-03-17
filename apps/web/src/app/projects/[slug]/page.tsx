@@ -426,6 +426,12 @@ export default async function ProjectDetailPage({
               >
                 KB data &rarr;
               </Link>
+              <Link
+                href={`/projects/${slug}/db`}
+                className="text-xs text-primary hover:underline"
+              >
+                DB records &rarr;
+              </Link>
             </div>
           </section>
         </div>

@@ -162,6 +162,7 @@ function CellValue({ value, columnName }: { value: unknown; columnName: string }
       <Link
         href={`/wiki/E1929?entity=${encodeURIComponent(value)}`}
         className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline font-mono text-[11px]"
+        title="View entity DB profile"
       >
         {value}
         <ExternalLink className="h-2.5 w-2.5 opacity-40" />
@@ -548,9 +549,15 @@ function EmptyState({ onSearch }: { onSearch: (q: string) => void }) {
 export function EntityProfileViewer({
   initialData,
   initialEntity,
+  backHref,
+  backLabel,
 }: {
   initialData: EntityProfileData | null;
   initialEntity: string;
+  /** Optional back link (e.g., "/organizations/anthropic") shown above the viewer */
+  backHref?: string;
+  /** Label for the back link (e.g., "Anthropic") */
+  backLabel?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -594,12 +601,15 @@ export function EntityProfileViewer({
     }
   }, []);
 
-  // Search when the URL entity param changes (handles initial load and browser back/forward)
+  // Auto-load: when initialEntity is set (e.g., from /organizations/anthropic/db)
+  // or when the URL entity param changes (handles browser back/forward)
   useEffect(() => {
     const urlEntityParam = searchParams.get("entity");
-    if (urlEntityParam && !initialData) {
-      doSearch(urlEntityParam);
+    const target = urlEntityParam || initialEntity;
+    if (target && !initialData) {
+      doSearch(target);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, initialData, doSearch]);
 
   const handleSearch = useCallback(
@@ -630,6 +640,16 @@ export function EntityProfileViewer({
 
   return (
     <div>
+      {backHref && (
+        <div className="mb-4">
+          <Link
+            href={backHref}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            &larr; {backLabel || "Back"}
+          </Link>
+        </div>
+      )}
       <EntitySearch
         initialQuery={effectiveInitial}
         onSearch={handleSearch}
