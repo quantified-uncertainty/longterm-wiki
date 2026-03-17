@@ -65,7 +65,7 @@ interface YamlEntity {
 
 export interface SyncEntity {
   id: string;
-  stableId: string | null;
+  stableId: string; // Required — PK of entities table
   wikiId: string | null;
   entityType: string;
   title: string;
@@ -230,10 +230,14 @@ export function mergeExpertData(
   return entity;
 }
 
-export function transformEntity(e: YamlEntity): SyncEntity {
+export function transformEntity(e: YamlEntity): SyncEntity | null {
+  if (!e.stableId) {
+    console.warn(`  WARN: Entity ${e.id} has no stableId — skipping (stableId is required for PG sync)`);
+    return null;
+  }
   return {
     id: e.id,
-    stableId: e.stableId ?? null,
+    stableId: e.stableId,
     wikiId: e.wikiId ?? null,
     entityType: resolveEntityType(e.type) ?? e.type,
     title: e.title,
@@ -509,9 +513,14 @@ async function main() {
   const publicationCounts = loadPeopleResources();
   console.log(`  Loaded publication counts for ${publicationCounts.size} people`);
 
-  // Transform and merge expert data
-  const syncPayloads = yamlEntities
-    .map(transformEntity)
+  // Transform and merge expert data (skip entities without stableId)
+  const transformed = yamlEntities.map(transformEntity);
+  const dropped = transformed.filter((e) => e === null).length;
+  if (dropped > 0) {
+    console.warn(`  WARNING: ${dropped} entities skipped (missing stableId)`);
+  }
+  const syncPayloads = transformed
+    .filter((e): e is SyncEntity => e !== null)
     .map((e) => mergeExpertData(e, experts, publicationCounts));
 
   // Group by type for summary

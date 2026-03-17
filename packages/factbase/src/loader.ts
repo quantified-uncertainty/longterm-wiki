@@ -557,10 +557,11 @@ async function discoverEntityFiles(
 }
 
 /**
- * Merges multiple YAML files from a per-entity directory into a single EntityFile.
+ * Merges multiple YAML files from a per-entity directory into a single record.
  *
  * Rules:
- * - Exactly one file must have a `thing:` block (the main file). Error if 0 or 2+.
+ * - Exactly one file must have a `thing:` block OR an `entity:` key (the main file).
+ *   Error if 0 or 2+, or if both formats are present.
  * - `facts:` arrays are concatenated.
  * - `_sources:` maps are merged. Error on key conflicts with different values.
  */
@@ -568,7 +569,7 @@ function mergeEntityFiles(
   files: { name: string; parsed: unknown }[],
   dirName: string
 ): Record<string, unknown> {
-  let mainFile: { name: string; thing: unknown } | undefined;
+  let mainFile: { name: string; thing?: unknown; entity?: unknown } | undefined;
   const allFacts: unknown[] = [];
   const mergedSources: Record<string, string> = {};
 
@@ -583,15 +584,32 @@ function mergeEntityFiles(
       );
     }
 
-    // Check for thing: block
-    if (file.thing !== undefined) {
+    // Check for thing: block or entity: key
+    const hasThing = file.thing !== undefined;
+    const hasEntity = file.entity !== undefined;
+
+    // Reject ambiguous files that have both thing: and entity: keys
+    if (hasThing && hasEntity) {
+      throw new Error(
+        `[kb/loader] Per-entity directory "${dirName}": file "${name}" has both "thing:" block ` +
+        `and "entity:" key — this is ambiguous. Use one format or the other.`
+      );
+    }
+
+    if (hasThing || hasEntity) {
       if (mainFile) {
+        const existingFormat = mainFile.thing !== undefined ? "thing:" : "entity:";
+        const newFormat = hasThing ? "thing:" : "entity:";
         throw new Error(
-          `[kb/loader] Per-entity directory "${dirName}": multiple files have a ` +
-            `"thing:" block — "${mainFile.name}" and "${name}". Only one is allowed.`
+          `[kb/loader] Per-entity directory "${dirName}": multiple files have entity headers — ` +
+            `"${mainFile.name}" (${existingFormat}) and "${name}" (${newFormat}). Only one is allowed.`
         );
       }
-      mainFile = { name, thing: file.thing };
+      mainFile = {
+        name,
+        ...(hasThing && { thing: file.thing }),
+        ...(hasEntity && { entity: file.entity }),
+      };
     }
 
     // Collect facts
@@ -622,11 +640,13 @@ function mergeEntityFiles(
   if (!mainFile) {
     throw new Error(
       `[kb/loader] Per-entity directory "${dirName}": no file contains a ` +
-        `"thing:" block. Exactly one is required.`
+        `"thing:" block or "entity:" key. Exactly one is required.`
     );
   }
 
-  const result: Record<string, unknown> = { thing: mainFile.thing };
+  const result: Record<string, unknown> = {};
+  if (mainFile.thing !== undefined) result.thing = mainFile.thing;
+  if (mainFile.entity !== undefined) result.entity = mainFile.entity;
   if (allFacts.length > 0) result.facts = allFacts;
   if (Object.keys(mergedSources).length > 0) result._sources = mergedSources;
 
@@ -643,6 +663,22 @@ export interface LoadResult {
 }
 
 /**
+ * Options for loadKB.
+ */
+export interface LoadOptions {
+  /**
+   * Pre-built entity map from TableBase. When provided, entities come from here
+   * instead of from YAML `thing:` headers. The `thing:` headers are still parsed
+   * for backward-compat (filenameMap, slug association) but the TableBase entity
+   * is authoritative for the graph.
+   *
+   * For `entity:` format files, the stableId is looked up in this map. If not
+   * found, a minimal stub entity is created with a warning.
+   */
+  entities?: Map<string, Entity>;
+}
+
+/**
  * Loads a knowledge base from a data directory into an in-memory Graph.
  *
  * Expected directory layout:
@@ -654,11 +690,19 @@ export interface LoadResult {
  *   Pass 1: Load all entity headers (builds entity ID index)
  *   Pass 2: Load facts (resolves !ref tags using the index)
  *
+ * Supports two YAML formats for entity files:
+ *   - `thing:` block (legacy): full entity definition with all fields
+ *   - `entity: <stableId>` (new): minimal reference to a TableBase entity
+ *
+ * When `options.entities` is provided, TableBase entities are authoritative.
+ * The `thing:` blocks are still parsed for backward compat (filenameMap) but
+ * the injected entity takes precedence in the graph.
+ *
  * Note: Records (grants, funding rounds, investments, etc.) are now served
  * exclusively from PostgreSQL via build-data.mjs. Any YAML "records:" section
  * in a thing file causes a loud error — records must be removed from YAML.
  */
-export async function loadKB(dataDir: string): Promise<LoadResult> {
+export async function loadKB(dataDir: string, options?: LoadOptions): Promise<LoadResult> {
   const graph = new Graph();
   const filenameMap = new Map<string, string>();
 
@@ -694,25 +738,31 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
 
   // Pass 1: Load all entity headers to build entity ID index.
   // Also extract _sources per entity file for !src resolution.
+  // Handles both `thing:` block format and `entity:` reference format.
   const parsedEntityFiles: {
     entity: Entity;
     filename: string;
-    file: EntityFile;
+    facts?: RawFact[];
     sources: Record<string, string>;
   }[] = [];
-  for (const { parsed } of entityFiles) {
-    const rawFile = parsed as EntityFile & { _sources?: Record<string, unknown>; records?: unknown };
+
+  for (const { name, parsed } of entityFiles) {
+    const rawFile = parsed as Record<string, unknown>;
+
     // Records have been fully migrated to PostgreSQL. Any "records:" block in a
     // thing YAML file is a mistake — fail loudly so it gets cleaned up.
     if (rawFile.records !== undefined) {
-      const thingId = (rawFile.thing as { id?: string; slug?: string })?.id ?? (rawFile.thing as { id?: string; slug?: string })?.slug ?? "unknown";
+      const thingId = rawFile.entity !== undefined
+        ? String(rawFile.entity)
+        : (rawFile.thing as { id?: string; slug?: string })?.id ?? (rawFile.thing as { id?: string; slug?: string })?.slug ?? "unknown";
       throw new Error(
         `[kb/loader] Entity "${thingId}" has a "records:" block in its YAML file. ` +
         `Records are served from PostgreSQL — remove the "records:" section from the YAML file.`
       );
     }
+
     // Extract and strip _sources before treating as entity data; filter non-string values
-    const rawSources = rawFile._sources ?? {};
+    const rawSources = (rawFile._sources ?? {}) as Record<string, unknown>;
     const sources: Record<string, string> = {};
     for (const [alias, url] of Object.entries(rawSources)) {
       if (typeof url === "string") {
@@ -721,20 +771,80 @@ export async function loadKB(dataDir: string): Promise<LoadResult> {
         console.warn(`[kb/loader] _sources alias "${alias}" has non-string value (${typeof url}), skipping`);
       }
     }
-    const file: EntityFile = {
-      thing: rawFile.thing,
-      ...(rawFile.facts && { facts: rawFile.facts }),
-    };
-    const { entity, filename } = parseEntity(file.thing);
-    graph.addEntity(entity);
-    filenameMap.set(entity.id, filename);
-    parsedEntityFiles.push({ entity, filename, file, sources });
+
+    const facts = Array.isArray(rawFile.facts) ? rawFile.facts as RawFact[] : undefined;
+
+    // Reject ambiguous files that have both thing: and entity: keys
+    if (rawFile.entity !== undefined && rawFile.thing !== undefined) {
+      const filename = name.replace(/\.(yaml|yml)$/, "");
+      throw new Error(
+        `[kb/loader] File "${filename}" has both "thing:" block and "entity:" key — ` +
+        `this is ambiguous. Use one format or the other.`
+      );
+    }
+
+    if (rawFile.entity !== undefined) {
+      // ── New format: entity: <stableId> ──
+      const stableId = String(rawFile.entity);
+      const filename = name.replace(/\.(yaml|yml)$/, "");
+
+      let entity: Entity;
+      if (options?.entities?.has(stableId)) {
+        entity = options.entities.get(stableId)!;
+      } else {
+        // Fallback: create minimal entity (for standalone FactBase usage)
+        entity = {
+          id: stableId,
+          stableId: stableId,
+          type: "unknown",
+          name: filename,
+        };
+        console.warn(
+          `[kb/loader] Entity "${stableId}" (${filename}) not found in provided entities map`
+        );
+      }
+
+      graph.addEntity(entity);
+      filenameMap.set(entity.id, filename);
+      parsedEntityFiles.push({ entity, filename, facts, sources });
+    } else if (rawFile.thing !== undefined) {
+      // ── Legacy format: thing: { ... } ──
+      const file: EntityFile = {
+        thing: rawFile.thing as EntityFile["thing"],
+        ...(facts && { facts }),
+      };
+      const { entity: parsedEntity, filename } = parseEntity(file.thing);
+
+      // When TableBase entities are injected, they take precedence
+      let entity: Entity;
+      if (options?.entities?.has(parsedEntity.id)) {
+        entity = options.entities.get(parsedEntity.id)!;
+      } else {
+        entity = parsedEntity;
+      }
+
+      graph.addEntity(entity);
+      filenameMap.set(entity.id, filename);
+      parsedEntityFiles.push({ entity, filename, facts, sources });
+    } else {
+      const filename = name.replace(/\.(yaml|yml)$/, "");
+      console.warn(
+        `[kb/loader] File "${name}" has neither "thing:" block nor "entity:" key — skipping`
+      );
+      // Still collect facts if present (orphaned facts — warn but don't crash)
+      if (facts && facts.length > 0) {
+        console.warn(
+          `[kb/loader] File "${name}" has ${facts.length} facts but no entity header — facts will be lost`
+        );
+      }
+      continue;
+    }
   }
 
   // Pass 2: Load facts with !src and !ref resolution
-  for (const { entity, filename, file, sources } of parsedEntityFiles) {
+  for (const { entity, filename, facts, sources } of parsedEntityFiles) {
     // Resolve !src aliases in facts BEFORE !ref resolution (source aliases are file-scoped)
-    for (const rawFact of file.facts ?? []) {
+    for (const rawFact of facts ?? []) {
       const srcResolved = resolveSrcAliases(rawFact, sources, `${filename}/facts`);
       const resolvedValue = resolveRefs(
         (srcResolved as RawFact).value, graph, filenameMap, `${filename}/facts`

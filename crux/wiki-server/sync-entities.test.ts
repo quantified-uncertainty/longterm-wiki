@@ -6,7 +6,7 @@ const noSleep = async () => {};
 function makeEntity(id: string, overrides: Partial<SyncEntity> = {}): SyncEntity {
   return {
     id,
-    stableId: null,
+    stableId: `test${id}`.slice(0, 10).padEnd(10, "0"),
     wikiId: null,
     entityType: "organization",
     title: `Entity ${id}`,
@@ -25,16 +25,17 @@ function makeEntity(id: string, overrides: Partial<SyncEntity> = {}): SyncEntity
 }
 
 describe("transformEntity", () => {
-  it("transforms a minimal YAML entity", () => {
+  it("transforms a YAML entity with stableId", () => {
     const result = transformEntity({
       id: "anthropic",
+      stableId: "aB1cD2eF3g",
       type: "organization",
       title: "Anthropic",
     });
 
     expect(result).toEqual({
       id: "anthropic",
-      stableId: null,
+      stableId: "aB1cD2eF3g",
       wikiId: null,
       entityType: "organization",
       title: "Anthropic",
@@ -51,9 +52,20 @@ describe("transformEntity", () => {
     });
   });
 
+  it("returns null for entities without stableId", () => {
+    const result = transformEntity({
+      id: "anthropic",
+      type: "organization",
+      title: "Anthropic",
+    });
+
+    expect(result).toBeNull();
+  });
+
   it("transforms a fully-populated YAML entity", () => {
     const result = transformEntity({
       id: "anthropic",
+      stableId: "aB1cD2eF3g",
       wikiId: "E22",
       type: "organization",
       title: "Anthropic",
@@ -68,72 +80,86 @@ describe("transformEntity", () => {
       sources: [{ title: "Website", url: "https://anthropic.com" }],
     });
 
-    expect(result.id).toBe("anthropic");
-    expect(result.wikiId).toBe("E22");
-    expect(result.entityType).toBe("organization");
-    expect(result.title).toBe("Anthropic");
-    expect(result.description).toBe("AI safety company");
-    expect(result.tags).toEqual(["ai-safety", "frontier-lab"]);
-    expect(result.customFields).toEqual([{ label: "Founded", value: "2021" }]);
-    expect(result.relatedEntries).toEqual([{ id: "openai", type: "organization" }]);
-    expect(result.sources).toEqual([{ title: "Website", url: "https://anthropic.com" }]);
+    expect(result).not.toBeNull();
+    expect(result!.id).toBe("anthropic");
+    expect(result!.stableId).toBe("aB1cD2eF3g");
+    expect(result!.wikiId).toBe("E22");
+    expect(result!.entityType).toBe("organization");
+    expect(result!.title).toBe("Anthropic");
+    expect(result!.description).toBe("AI safety company");
+    expect(result!.tags).toEqual(["ai-safety", "frontier-lab"]);
+    expect(result!.customFields).toEqual([{ label: "Founded", value: "2021" }]);
+    expect(result!.relatedEntries).toEqual([{ id: "openai", type: "organization" }]);
+    expect(result!.sources).toEqual([{ title: "Website", url: "https://anthropic.com" }]);
   });
 
   it("resolves legacy entity type 'researcher' to 'person'", () => {
     const result = transformEntity({
       id: "yann-lecun",
+      stableId: "yL1234abcd",
       type: "researcher",
       title: "Yann LeCun",
     });
-    expect(result.entityType).toBe("person");
+    expect(result).not.toBeNull();
+    expect(result!.entityType).toBe("person");
   });
 
   it("resolves legacy entity type 'lab' to 'organization'", () => {
     const result = transformEntity({
       id: "deepmind",
+      stableId: "dM5678efgh",
       type: "lab",
       title: "DeepMind",
     });
-    expect(result.entityType).toBe("organization");
+    expect(result).not.toBeNull();
+    expect(result!.entityType).toBe("organization");
   });
 
   it("resolves 'lab-frontier' to 'organization'", () => {
     const result = transformEntity({
       id: "openai",
+      stableId: "oA9012ijkl",
       type: "lab-frontier",
       title: "OpenAI",
     });
-    expect(result.entityType).toBe("organization");
+    expect(result).not.toBeNull();
+    expect(result!.entityType).toBe("organization");
   });
 
   it("resolves 'lab-research' to 'organization'", () => {
     const result = transformEntity({
       id: "miri",
+      stableId: "mI3456mnop",
       type: "lab-research",
       title: "MIRI",
     });
-    expect(result.entityType).toBe("organization");
+    expect(result).not.toBeNull();
+    expect(result!.entityType).toBe("organization");
   });
 
   it("passes through unknown entity types unchanged", () => {
     const result = transformEntity({
       id: "custom-thing",
+      stableId: "cT7890qrst",
       type: "my-custom-type",
       title: "Custom",
     });
-    expect(result.entityType).toBe("my-custom-type");
+    expect(result).not.toBeNull();
+    expect(result!.entityType).toBe("my-custom-type");
   });
 
   it("extracts type-specific fields into metadata", () => {
     const result = transformEntity({
       id: "anthropic",
+      stableId: "aB1cD2eF3g",
       type: "organization",
       title: "Anthropic",
       orgType: "frontier-lab",
       summaryPage: "labs-overview",
     });
 
-    expect(result.metadata).toEqual({
+    expect(result).not.toBeNull();
+    expect(result!.metadata).toEqual({
       orgType: "frontier-lab",
       summaryPage: "labs-overview",
     });
@@ -142,6 +168,7 @@ describe("transformEntity", () => {
   it("extracts AI model metadata fields", () => {
     const result = transformEntity({
       id: "gpt-4",
+      stableId: "gP4uvwxyz1",
       type: "ai-model",
       title: "GPT-4",
       developer: "openai",
@@ -149,7 +176,8 @@ describe("transformEntity", () => {
       contextWindow: 128000,
     });
 
-    expect(result.metadata).toEqual({
+    expect(result).not.toBeNull();
+    expect(result!.metadata).toEqual({
       developer: "openai",
       releaseDate: "2023-03-14",
       contextWindow: 128000,
@@ -159,22 +187,23 @@ describe("transformEntity", () => {
   it("converts undefined optional fields to null", () => {
     const result = transformEntity({
       id: "test",
+      stableId: "tS2345abcd",
       type: "concept",
       title: "Test",
     });
 
-    expect(result.stableId).toBeNull();
-    expect(result.wikiId).toBeNull();
-    expect(result.description).toBeNull();
-    expect(result.website).toBeNull();
-    expect(result.tags).toBeNull();
-    expect(result.clusters).toBeNull();
-    expect(result.status).toBeNull();
-    expect(result.lastUpdated).toBeNull();
-    expect(result.customFields).toBeNull();
-    expect(result.relatedEntries).toBeNull();
-    expect(result.sources).toBeNull();
-    expect(result.metadata).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result!.wikiId).toBeNull();
+    expect(result!.description).toBeNull();
+    expect(result!.website).toBeNull();
+    expect(result!.tags).toBeNull();
+    expect(result!.clusters).toBeNull();
+    expect(result!.status).toBeNull();
+    expect(result!.lastUpdated).toBeNull();
+    expect(result!.customFields).toBeNull();
+    expect(result!.relatedEntries).toBeNull();
+    expect(result!.sources).toBeNull();
+    expect(result!.metadata).toBeNull();
   });
 });
 

@@ -133,6 +133,24 @@ export interface TypeSchema {
 // ── YAML file shapes ────────────────────────────────────────────────
 
 /**
+ * Simplified entity YAML format: just a stableId reference + facts.
+ * Used after entity ownership moves to TableBase.
+ *
+ * Example:
+ *   entity: mK9pX3rQ7n
+ *   facts:
+ *     - id: f_abc123
+ *       property: revenue
+ *       value: 1e9
+ */
+export interface FactOnlyFile {
+  /** stableId referencing a TableBase entity */
+  entity: string;
+  facts?: RawFact[];
+  _sources?: Record<string, string>;
+}
+
+/**
  * Shape of an entity's YAML file (data/things/anthropic.yaml).
  * Supports both old format (id=slug, stableId) and new format (id=stableId, slug).
  */

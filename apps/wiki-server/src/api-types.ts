@@ -650,7 +650,7 @@ export interface ResourceListResult {
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   wikiId: z.string().max(20).nullable().optional(),
-  stableId: z.string().max(20).nullable().optional(),
+  stableId: z.string().min(1).max(20), // Required — PK of entities table
   entityType: z.string().min(1).max(100),
   title: z.string().min(1).max(500),
   description: z.string().max(50000).nullable().optional(),

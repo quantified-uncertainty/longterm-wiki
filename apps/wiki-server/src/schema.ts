@@ -674,9 +674,9 @@ export const resourceCitations = pgTable(
 export const entities = pgTable(
   "entities",
   {
-    id: text("id").primaryKey(),
+    id: text("id").notNull().unique(), // slug — kept unique for URL resolution
     wikiId: text("wiki_id"),
-    stableId: text("stable_id").unique(),
+    stableId: text("stable_id").notNull().primaryKey(), // stableId is the PK
     entityType: text("entity_type").notNull(),
     title: text("title").notNull(),
     description: text("description"),

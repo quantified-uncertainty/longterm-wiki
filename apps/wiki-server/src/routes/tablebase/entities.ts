@@ -667,7 +667,7 @@ const entitiesApp = new Hono()
       const allVals = items.map((e) => ({
         id: e.id,
         wikiId: e.wikiId ?? null,
-        stableId: e.stableId ?? null,
+        stableId: e.stableId, // PK — always required
         entityType: e.entityType,
         title: e.title,
         description: e.description ?? null,
@@ -686,11 +686,10 @@ const entitiesApp = new Hono()
         .insert(entities)
         .values(allVals)
         .onConflictDoUpdate({
-          target: entities.id,
+          target: entities.stableId, // PK is now stable_id
           set: {
+            id: sql`excluded.id`, // slug may change
             wikiId: sql`excluded.wiki_id`,
-            // Use incoming stableId when provided; fall back to existing.
-            stableId: sql`COALESCE(excluded.stable_id, "entities"."stable_id")`,
             entityType: sql`excluded.entity_type`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,

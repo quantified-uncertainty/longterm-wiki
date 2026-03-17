@@ -71,6 +71,12 @@ export function getEntityHref(id: string, _type?: string): string {
   if (/^E\d+$/.test(id) && registry.byWikiId[id]) {
     return `/wiki/${id}`;
   }
+  // If it's a stableId, resolve to slug first, then get wikiId
+  if (/^[A-Za-z0-9]{10}$/.test(id) && registry.byStableId?.[id]) {
+    const slug = registry.byStableId[id];
+    const wikiId = registry.bySlug[slug];
+    return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;
+  }
   // Otherwise look up slug → wiki ID
   const wikiId = registry.bySlug[id];
   return wikiId ? `/wiki/${wikiId}` : `/wiki/${id}`;

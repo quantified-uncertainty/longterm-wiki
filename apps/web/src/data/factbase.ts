@@ -49,12 +49,24 @@ export function getFactBase(): SerializedKB | undefined {
  * Resolve an entity identifier to the entity ID used as key in facts/records.
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
+ *
+ * Resolution chain: FactBase slugToEntityId → idRegistry stableIdBySlug → identity
  */
 function resolveEntityKey(entityOrSlug: string, fb?: SerializedKB): string {
   const resolved = fb ?? getFactBase();
-  if (!resolved?.slugToEntityId) return entityOrSlug;
-  // If it's a slug, resolve to entity ID; otherwise return as-is (already an ID)
-  return resolved.slugToEntityId[entityOrSlug] ?? entityOrSlug;
+  // Try FactBase's own slug map first (most complete for FactBase entities)
+  if (resolved?.slugToEntityId?.[entityOrSlug]) {
+    return resolved.slugToEntityId[entityOrSlug];
+  }
+  // Fall back to idRegistry stableIdBySlug (works for all TableBase entities)
+  try {
+    const db = getDatabase();
+    const stableId = db.idRegistry?.stableIdBySlug?.[entityOrSlug];
+    if (stableId) return stableId;
+  } catch {
+    // database.json not available yet (during build) — ignore
+  }
+  return entityOrSlug;
 }
 
 /** Sort facts most-recent-first by asOf (undefined asOf sorts last). */
@@ -211,9 +223,13 @@ export function getFactBaseProperty(propertyId: string): Property | undefined {
 let entityByIdIndex: Map<string, Entity> | undefined;
 
 /**
- * Get an entity definition by ID or slug.
+ * Get a FactBase entity definition by ID or slug.
  * Accepts either an internal entity ID (e.g. "mK9pX3rQ7n") or a YAML slug
  * (e.g. "anthropic"). Uses a lazy-built index for O(1) lookups after initial build.
+ *
+ * Note: Entity ownership is moving to TableBase. For new code, prefer
+ * `getTypedEntityById()` or `getTypedEntityByStableId()` from tablebase.ts.
+ * This function still works because entities are in factbase-data.json.
  */
 export function getFactBaseEntity(entityId: string): Entity | undefined {
   const fb = getFactBase();
