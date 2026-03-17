@@ -10,7 +10,7 @@ export interface EventRow {
   description: string | null;
   status: string | null;
   tags: string[];
-  numericId: string | null;
+  wikiId: string | null;
 }
 
 type SortKey = "title" | "status";
@@ -151,9 +151,9 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                  {row.numericId && (
+                  {row.wikiId && (
                     <Link
-                      href={`/wiki/${row.numericId}`}
+                      href={`/wiki/${row.wikiId}`}
                       className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
                       title="Wiki page"
                     >

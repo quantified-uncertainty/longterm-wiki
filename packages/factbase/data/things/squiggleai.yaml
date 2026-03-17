@@ -3,7 +3,7 @@ thing:
   stableId: 8slnDr4emg
   type: project
   name: SquiggleAI
-  numericId: E287
+  wikiId: E287
 facts:
   - id: f_KaC6RqSuIw
     property: description

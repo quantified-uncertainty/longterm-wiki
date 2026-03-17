@@ -3,7 +3,7 @@ thing:
   stableId: 8q2GhtEmkA
   type: organization
   name: MacArthur Foundation
-  numericId: E544
+  wikiId: E544
 facts:
   - id: f_hzPewqzvnA
     property: description

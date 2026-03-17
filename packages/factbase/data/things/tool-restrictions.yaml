@@ -3,7 +3,7 @@ thing:
   stableId: nl9oD17gfg
   type: approach
   name: Tool-Use Restrictions
-  numericId: E487
+  wikiId: E487
 facts:
   - id: f_E8vKq523fA
     property: description

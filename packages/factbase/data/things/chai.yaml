@@ -5,7 +5,7 @@ thing:
   name: Center for Human-Compatible AI (CHAI)
   aliases:
     - CHAI
-  numericId: E57
+  wikiId: E57
 facts:
   - id: f_yNQJE8kYNw
     property: description

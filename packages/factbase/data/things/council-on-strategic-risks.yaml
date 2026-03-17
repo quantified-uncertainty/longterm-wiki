@@ -3,7 +3,7 @@ thing:
   stableId: FL52kVPTlA
   type: organization
   name: Council on Strategic Risks
-  numericId: E522
+  wikiId: E522
 facts:
   - id: f_dmsVtlWt9A
     property: description

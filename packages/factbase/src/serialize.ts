@@ -38,7 +38,7 @@ export function serialize(
 
   for (const entity of entities) {
     const entityFacts = graph.getFacts(entity.id);
-    // Key by entity ID (the stable 10-char alphanumeric ID)
+    // Key by entity ID (the stable 10-char alphawiki ID)
     if (entityFacts.length > 0) {
       facts[entity.id] = entityFacts;
     }

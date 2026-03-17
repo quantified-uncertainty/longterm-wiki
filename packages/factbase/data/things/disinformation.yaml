@@ -3,7 +3,7 @@ thing:
   stableId: AaAOkTHkug
   type: risk
   name: AI Disinformation
-  numericId: E102
+  wikiId: E102
 facts:
   - id: f_M1gumKNh6g
     property: description

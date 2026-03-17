@@ -16,7 +16,7 @@
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import type { TaskType } from '../tablebase/types.ts';
-import { TASK_TYPES } from '../tablebase/types.ts';
+import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -224,19 +224,12 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
   }
 
-  let apiPath: string;
-  let method: 'POST' | 'PATCH' = 'POST';
-  switch (table) {
-    case 'personnel': apiPath = '/api/personnel/sync'; break;
-    case 'grants': apiPath = '/api/grants/batch-update-grantee'; method = 'PATCH'; break;
-    case 'funding-rounds': apiPath = '/api/funding-rounds/sync'; break;
-    case 'investments': apiPath = '/api/investments/sync'; break;
-    case 'benchmark-results': apiPath = '/api/benchmark-results/sync'; break;
-    default: return { exitCode: 1, output: `Unknown table: ${table}` };
-  }
+  const { getTableConfig } = await import('../tablebase/table-registry.ts');
+  const tableConfig = getTableConfig(table);
+  if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
 
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    method, apiPath, { items: records },
+    tableConfig.syncMethod, tableConfig.syncPath, { [tableConfig.syncBodyKey]: records },
   );
 
   if (!result.ok) {
@@ -262,39 +255,16 @@ async function existingCommand(args: string[], options: CommandOptions): Promise
 
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
 
-  let path: string;
-  let resultKey: string;
-  switch (table) {
-    case 'personnel':
-      path = `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'personnel';
-      break;
-    case 'grants':
-      path = `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'grants';
-      break;
-    case 'funding-rounds':
-      path = `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'fundingRounds';
-      break;
-    case 'investments':
-      path = `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'investments';
-      break;
-    case 'benchmark-results':
-      path = `/api/benchmark-results/by-model/${encodeURIComponent(entityId)}?limit=200`;
-      resultKey = 'benchmarkResults';
-      break;
-    default:
-      return { exitCode: 1, output: `Invalid table: ${table}` };
-  }
+  const { getTableConfig } = await import('../tablebase/table-registry.ts');
+  const tableConfig = getTableConfig(table);
+  if (!tableConfig) return { exitCode: 1, output: `Invalid table: ${table}` };
 
-  const result = await apiRequest<Record<string, unknown>>('GET', path);
+  const result = await apiRequest<Record<string, unknown>>('GET', `${tableConfig.fetchByEntityPath(entityId)}?limit=200`);
   if (!result.ok) {
     return { exitCode: 1, output: `Query failed: ${result.message}` };
   }
 
-  const records = result.data[resultKey] as Array<Record<string, unknown>>;
+  const records = result.data[tableConfig.resultKey] as Array<Record<string, unknown>>;
   return { exitCode: 0, output: JSON.stringify(records, null, 2) };
 }
 
@@ -308,7 +278,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   const entityType = (options.type as string) || 'person';
 
   // Generate slug from name
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const slug = toSlug(name);
 
   // Check if entity already exists
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
@@ -322,21 +292,16 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     };
   }
 
-  // Allocate numeric ID
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
-  const idResult = await allocateId(slug, `${entityType}: ${name}`);
-  if (!idResult.ok) {
-    return { exitCode: 1, output: `ID allocation failed: ${idResult.message}` };
-  }
-  const { numericId, stableId } = idResult.data;
+  // Generate a stable ID deterministically (no wikiId allocation — lightweight record)
+  const { generateId } = await import('../lib/grant-import/id.ts');
+  const stableId = generateId(`${entityType}:${slug}`);
 
-  // Sync entity to wiki-server
+  // Sync entity to wiki-server (no wikiId — not a full wiki entity)
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const description = (options.description as string) || undefined;
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
-      numericId,
       stableId,
       entityType,
       title: name,
@@ -348,10 +313,10 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
     return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
   }
 
-  const result = { created: true, stableId, numericId, slug, name, entityType };
+  const result = { created: true, stableId, slug, name, entityType };
   return {
     exitCode: 0,
-    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId} (${numericId})`,
+    output: options.ci ? JSON.stringify(result) : `\x1b[32m✓\x1b[0m Created ${entityType} "${name}" → ${stableId}`,
   };
 }
 
@@ -362,36 +327,99 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   }
 
   const { execSync } = await import('child_process');
-  // Use node with the global playwright module to extract rendered text
+  const { writeFileSync, unlinkSync } = await import('fs');
+  const { tmpdir } = await import('os');
+  const { join } = await import('path');
+
+  // Write script to temp file to avoid shell injection via URL
+  const scriptPath = join(tmpdir(), `tablebase-fetch-${Date.now()}.cjs`);
   const script = `
     const { chromium } = require('playwright');
     (async () => {
       const browser = await chromium.launch({ headless: true });
       const page = await browser.newPage();
-      await page.goto(${JSON.stringify(url)}, { waitUntil: 'networkidle', timeout: 20000 });
+      await page.goto(process.argv[2], { waitUntil: 'networkidle', timeout: 20000 });
       const text = await page.innerText('body');
       process.stdout.write(text);
       await browser.close();
     })().catch(e => { process.stderr.write(e.message); process.exit(1); });
   `.trim();
 
+  writeFileSync(scriptPath, script);
+
+  // Resolve playwright's node_modules path dynamically
+  let nodePath: string | undefined;
   try {
-    const output = execSync(`node -e "${script.replace(/"/g, '\\"')}"`, {
+    const playwrightPath = execSync('which playwright', { encoding: 'utf-8' }).trim();
+    // Follow symlinks: /opt/homebrew/bin/playwright → ../lib/node_modules/playwright/...
+    const resolved = execSync(`realpath "${playwrightPath}"`, { encoding: 'utf-8' }).trim();
+    nodePath = resolved.replace(/\/playwright.*$/, '');
+  } catch {
+    // Fall back to common paths
+    nodePath = '/opt/homebrew/lib/node_modules';
+  }
+
+  try {
+    const { execFileSync } = await import('child_process');
+    const output = execFileSync('node', [scriptPath, url], {
       timeout: 30000,
       maxBuffer: 10 * 1024 * 1024,
-      env: { ...process.env, NODE_PATH: '/opt/homebrew/lib/node_modules' },
+      env: { ...process.env, ...(nodePath && { NODE_PATH: nodePath }) },
     });
     return { exitCode: 0, output: output.toString() };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return { exitCode: 1, output: `Playwright fetch failed: ${msg}\nIs Playwright installed? Run: npm i -g playwright` };
+  } finally {
+    try { unlinkSync(scriptPath); } catch { /* cleanup best-effort */ }
   }
+}
+
+/**
+ * Build a map from FactBase array indices to correct stableIds.
+ * The entity matcher previously used Object.entries() on an array of entities,
+ * producing array indices ("0", "1", "108"...) as stableIds instead of the
+ * actual entity ID. This mapping is used to fix records that were stored with
+ * the wrong IDs.
+ */
+async function buildArrayIndexFixMap(): Promise<Map<string, { stableId: string; name: string }>> {
+  const fs = await import('fs');
+  const path = await import('path');
+  const map = new Map<string, { stableId: string; name: string }>();
+
+  try {
+    const kbDataPath = path.resolve('apps/web/src/data/factbase-data.json');
+    const kbData = JSON.parse(fs.readFileSync(kbDataPath, 'utf8'));
+    const entities = Array.isArray(kbData.entities) ? kbData.entities : [];
+
+    for (let i = 0; i < entities.length; i++) {
+      const ent = entities[i];
+      const stableId = ent.stableId || ent.id;
+      if (stableId) {
+        map.set(String(i), { stableId, name: ent.name || '?' });
+      }
+    }
+  } catch {
+    // If factbase-data.json is unavailable, return empty map
+  }
+
+  return map;
+}
+
+/**
+ * Check whether a value looks like it was stored as a FactBase array index
+ * rather than a proper stableId. Array indices are short numeric strings
+ * that happen to be valid indices into the entities array.
+ */
+function isArrayIndex(value: string, fixMap: Map<string, { stableId: string; name: string }>): boolean {
+  return /^\d+$/.test(value) && fixMap.has(value);
 }
 
 async function verifyCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
   const matcher = buildEntityMatcher();
+  const arrayIndexFixes = await buildArrayIndexFixMap();
 
   // Fetch all personnel records
   const allPersonnel: Array<Record<string, unknown>> = [];
@@ -406,48 +434,63 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
 
   const issues: string[] = [];
   let slugPersonIds = 0;
+  let arrayIndexIds = 0;
   let unresolvedPersonIds = 0;
   let missingSource = 0;
   let duplicates = 0;
+  let fixed = 0;
 
   const seen = new Set<string>();
+  // Batch fixes to apply in one sync call
+  const fixBatch: Array<Record<string, unknown>> = [];
 
   for (const rec of allPersonnel) {
-    const pid = rec.personId as string;
-    const oid = rec.organizationId as string;
+    let pid = rec.personId as string;
+    let oid = rec.organizationId as string;
     const role = rec.role as string;
+    let needsFix = false;
+
+    // Check for array-index IDs (e.g., "108" instead of "VoNqoBJkyg")
+    // These were created by a bug where Object.entries() on an array produced indices as keys
+    if (isArrayIndex(pid, arrayIndexFixes)) {
+      const fix = arrayIndexFixes.get(pid)!;
+      issues.push(`ARRAY_INDEX_PERSON: Record ${rec.id} has personId="${pid}" → should be "${fix.stableId}" (${fix.name})`);
+      arrayIndexIds++;
+      pid = fix.stableId;
+      needsFix = true;
+    }
+    if (isArrayIndex(oid, arrayIndexFixes)) {
+      const fix = arrayIndexFixes.get(oid)!;
+      issues.push(`ARRAY_INDEX_ORG: Record ${rec.id} has organizationId="${oid}" → should be "${fix.stableId}" (${fix.name})`);
+      arrayIndexIds++;
+      oid = fix.stableId;
+      needsFix = true;
+    }
 
     // Check for slug-based personIds (should be stableIds)
-    // StableIds are 10-char alphanumeric without hyphens, so hyphens indicate a slug
-    if (pid && pid.includes('-')) {
-      // Try local matcher first, then wiki-server entity lookup
+    if (pid.includes('-')) {
       const match = matcher.match(pid);
       if (match) {
         issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${match.stableId}"`);
         slugPersonIds++;
-        if (options.fix) {
-          const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
-            items: [{ ...rec, personId: match.stableId }],
-          });
-          if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
-        }
+        pid = match.stableId;
+        needsFix = true;
       } else {
-        // Check wiki-server directly (entity may exist but not in local database.json)
         const entityR = await apiRequest<{ id: string; stableId: string | null }>('GET', `/api/entities/${encodeURIComponent(pid)}`);
         if (entityR.ok && entityR.data.stableId) {
           issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${entityR.data.stableId}" (via server)`);
           slugPersonIds++;
-          if (options.fix) {
-            const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', {
-              items: [{ ...rec, personId: entityR.data.stableId }],
-            });
-            if (fixR.ok) issues[issues.length - 1] += ' [FIXED]';
-          }
+          pid = entityR.data.stableId;
+          needsFix = true;
         } else {
           issues.push(`UNRESOLVED_PERSON_ID: Record ${rec.id} has personId="${pid}" which doesn't resolve`);
           unresolvedPersonIds++;
         }
       }
+    }
+
+    if (needsFix && options.fix) {
+      fixBatch.push({ ...rec, personId: pid, organizationId: oid });
     }
 
     // Check for missing dates + no confirmation note
@@ -474,10 +517,25 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
     seen.add(key);
   }
 
+  // Apply fixes in batches
+  if (fixBatch.length > 0 && options.fix) {
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < fixBatch.length; i += BATCH_SIZE) {
+      const batch = fixBatch.slice(i, i + BATCH_SIZE);
+      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', { items: batch });
+      if (fixR.ok) {
+        fixed += fixR.data.upserted;
+      } else {
+        issues.push(`FIX_ERROR: Batch starting at ${i} failed: ${fixR.message}`);
+      }
+    }
+  }
+
   const summary = [
     `\x1b[1mTableBase Data Quality Report\x1b[0m`,
     `Total personnel records: ${allPersonnel.length}`,
     '',
+    `Array-index IDs (bug fix needed): ${arrayIndexIds}`,
     `Slug-based personIds (need normalization): ${slugPersonIds}`,
     `Unresolved personIds: ${unresolvedPersonIds}`,
     `Missing source URLs: ${missingSource}`,
@@ -485,21 +543,26 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
     '',
   ];
 
+  if (options.fix && fixed > 0) {
+    summary.push(`\x1b[32m✓ Fixed ${fixed} records\x1b[0m`);
+    summary.push('');
+  }
+
   if (issues.length === 0) {
     summary.push('\x1b[32m✓ No issues found\x1b[0m');
   } else {
     summary.push(`\x1b[33m${issues.length} issue(s) found:\x1b[0m`);
-    for (const issue of issues.slice(0, 20)) {
+    for (const issue of issues.slice(0, 30)) {
       summary.push(`  ${issue}`);
     }
-    if (issues.length > 20) summary.push(`  ... and ${issues.length - 20} more`);
+    if (issues.length > 30) summary.push(`  ... and ${issues.length - 30} more`);
   }
 
   if (options.ci) {
-    return { exitCode: 0, output: JSON.stringify({ total: allPersonnel.length, slugPersonIds, unresolvedPersonIds, missingSource, duplicates, issues }) };
+    return { exitCode: 0, output: JSON.stringify({ total: allPersonnel.length, arrayIndexIds, slugPersonIds, unresolvedPersonIds, missingSource, duplicates, fixed, issues }) };
   }
 
-  return { exitCode: issues.length > 0 ? 1 : 0, output: summary.join('\n') };
+  return { exitCode: issues.length > 0 && !options.fix ? 1 : 0, output: summary.join('\n') };
 }
 
 async function prepareCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -526,37 +589,13 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
 
   // Get existing records
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
-  let existingPath: string;
-  let existingKey: string;
-  switch (task.table) {
-    case 'personnel':
-      existingPath = `/api/personnel/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'personnel';
-      break;
-    case 'grants':
-      existingPath = `/api/grants/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'grants';
-      break;
-    case 'funding_rounds':
-      existingPath = `/api/funding-rounds/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'fundingRounds';
-      break;
-    case 'investments':
-      existingPath = `/api/investments/by-entity/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'investments';
-      break;
-    case 'benchmark_results':
-      existingPath = `/api/benchmark-results/by-model/${encodeURIComponent(task.entityId)}?limit=50`;
-      existingKey = 'benchmarkResults';
-      break;
-    default:
-      existingPath = ''; existingKey = '';
-  }
+  const { getTableConfig: getTC } = await import('../tablebase/table-registry.ts');
+  const taskTableConfig = getTC(task.table);
 
   let existingRecords: unknown[] = [];
-  if (existingPath) {
-    const r = await apiRequest<Record<string, unknown>>('GET', existingPath);
-    if (r.ok) existingRecords = (r.data[existingKey] as unknown[]) || [];
+  if (taskTableConfig) {
+    const r = await apiRequest<Record<string, unknown>>('GET', `${taskTableConfig.fetchByEntityPath(task.entityId)}?limit=50`);
+    if (r.ok) existingRecords = (r.data[taskTableConfig.resultKey] as unknown[]) || [];
   }
 
   // Build search queries by task type
@@ -698,12 +737,12 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   const dryRun = !!options.dryRun;
 
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
-  const { allocateId } = await import('../lib/wiki-server/ids.ts');
+  const { generateId } = await import('../lib/grant-import/id.ts');
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const matcher = buildEntityMatcher();
 
   const results: Array<{ name: string; stableId: string; created: boolean }> = [];
-  const toCreate: Array<{ slug: string; name: string; numericId: string; stableId: string }> = [];
+  const toCreate: Array<{ slug: string; name: string; stableId: string }> = [];
 
   for (const name of names) {
     if (typeof name !== 'string' || !name.trim()) continue;
@@ -716,29 +755,24 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
       continue;
     }
 
-    // Allocate ID
-    const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    // Generate lightweight stableId (no wikiId allocation — not a full wiki entity)
+    const slug = toSlug(trimmed);
+    const stableId = generateId(`${entityType}:${slug}`);
 
     if (dryRun) {
-      results.push({ name: trimmed, stableId: `(dry-run:${slug})`, created: true });
+      results.push({ name: trimmed, stableId, created: true });
       continue;
     }
 
-    const idResult = await allocateId(slug, `${entityType}: ${trimmed}`);
-    if (!idResult.ok) {
-      console.warn(`[tablebase] Failed to allocate ID for "${trimmed}": ${idResult.message}`);
-      continue;
-    }
-    toCreate.push({ slug, name: trimmed, numericId: idResult.data.numericId, stableId: idResult.data.stableId });
-    results.push({ name: trimmed, stableId: idResult.data.stableId, created: true });
+    toCreate.push({ slug, name: trimmed, stableId });
+    results.push({ name: trimmed, stableId, created: true });
   }
 
-  // Batch sync all new entities
+  // Batch sync all new entities (lightweight — no wikiId)
   if (toCreate.length > 0 && !dryRun) {
     const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
       entities: toCreate.map(e => ({
         id: e.slug,
-        numericId: e.numericId,
         stableId: e.stableId,
         entityType,
         title: e.name,

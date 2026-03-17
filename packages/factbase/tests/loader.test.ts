@@ -20,7 +20,7 @@ describe("loader", () => {
       expect(anthropic!.wikiPageId).toBe("E22");
       // Deprecated aliases still work
       expect(anthropic!.stableId).toBe("mK9pX3rQ7n");
-      expect(anthropic!.numericId).toBe("E22");
+      expect(anthropic!.wikiId).toBe("E22");
     });
 
     it("loads all entities (360+ after bulk migration)", () => {

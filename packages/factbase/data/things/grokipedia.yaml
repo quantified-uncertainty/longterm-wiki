@@ -3,7 +3,7 @@ thing:
   stableId: 2QDkp6k5pw
   type: project
   name: Grokipedia
-  numericId: E682
+  wikiId: E682
 facts:
   - id: f_5aZtjmXMCw
     property: description

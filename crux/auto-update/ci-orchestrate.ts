@@ -461,7 +461,7 @@ export async function orchestrateCiAutoUpdate(
       try {
         execFileSync('pnpm', [
           'crux', 'validate', 'unified',
-          '--rules=dollar-signs,comparison-operators,frontmatter-schema,numeric-id-integrity,prefer-entitylink',
+          '--rules=dollar-signs,comparison-operators,frontmatter-schema,wiki-id-integrity,prefer-entitylink',
           `--pages=${pageId}`,
           '--errors-only',
         ], { cwd: PROJECT_ROOT, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });

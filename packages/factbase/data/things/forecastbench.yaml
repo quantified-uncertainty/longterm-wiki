@@ -3,7 +3,7 @@ thing:
   stableId: 2smzyptQJg
   type: project
   name: ForecastBench
-  numericId: E144
+  wikiId: E144
 facts:
   - id: f_WXk4Z58tdg
     property: description

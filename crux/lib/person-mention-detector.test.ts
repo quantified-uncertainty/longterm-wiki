@@ -9,11 +9,11 @@ import {
 } from './person-mention-detector.ts';
 
 const samplePeople: PersonEntity[] = [
-  { id: 'dario-amodei', numericId: 'E91', title: 'Dario Amodei' },
-  { id: 'geoffrey-hinton', numericId: 'E149', title: 'Geoffrey Hinton' },
-  { id: 'nuno-sempere', numericId: 'E207', title: 'Nuño Sempere' },
-  { id: 'sam-altman', numericId: 'E269', title: 'Sam Altman' },
-  { id: 'eliezer-yudkowsky', numericId: 'E132', title: 'Eliezer Yudkowsky' },
+  { id: 'dario-amodei', wikiId: 'E91', title: 'Dario Amodei' },
+  { id: 'geoffrey-hinton', wikiId: 'E149', title: 'Geoffrey Hinton' },
+  { id: 'nuno-sempere', wikiId: 'E207', title: 'Nuño Sempere' },
+  { id: 'sam-altman', wikiId: 'E269', title: 'Sam Altman' },
+  { id: 'eliezer-yudkowsky', wikiId: 'E132', title: 'Eliezer Yudkowsky' },
 ];
 
 describe('buildPersonLookup', () => {
@@ -25,7 +25,7 @@ describe('buildPersonLookup', () => {
 
   it('strips parentheticals from titles', () => {
     const people: PersonEntity[] = [
-      { id: 'sbf', numericId: 'E999', title: 'Sam Bankman-Fried (FTX)' },
+      { id: 'sbf', wikiId: 'E999', title: 'Sam Bankman-Fried (FTX)' },
     ];
     const lookup = buildPersonLookup(people);
     expect(lookup.get('sam bankman-fried')?.id).toBe('sbf');

@@ -209,7 +209,7 @@ export class ValidationEngine {
   pathRegistry: Record<string, string>;
   reversePathRegistry: Record<string, string>;
   entities: unknown;
-  idRegistry: { byNumericId: Record<string, string>; bySlug: Record<string, string> } | null;
+  idRegistry: { byWikiId: Record<string, string>; bySlug: Record<string, string> } | null;
 
   constructor(options: EngineOptions = {}) {
     this.options = {
@@ -249,10 +249,10 @@ export class ValidationEngine {
     this.pathRegistry = loadCanonicalPathRegistry();
     this.entities = loadCanonicalEntities();
 
-    // Load id-registry for numeric ID resolution (from database.json)
+    // Load id-registry for wiki ID resolution (from database.json)
     try {
       const reg = loadIdRegistry();
-      if (Object.keys(reg.byNumericId).length > 0) {
+      if (Object.keys(reg.byWikiId).length > 0) {
         this.idRegistry = reg;
       } else {
         this.idRegistry = null;

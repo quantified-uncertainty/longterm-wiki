@@ -35,7 +35,7 @@ function resolveRecipient(recipientId: string): {
   if (entity) {
     const slug = getKBEntitySlug(recipientId) ?? null;
     const typedEntity = getTypedEntityById(recipientId);
-    const wikiPageId = typedEntity?.numericId ?? null;
+    const wikiPageId = typedEntity?.wikiId ?? null;
     // Build type-aware href: /organizations/ for orgs, /people/ for people
     let href: string | null = null;
     if (slug) {
@@ -69,7 +69,7 @@ export default function GrantsPage() {
     const orgName = orgEntity?.name ?? orgId;
     const orgSlug = getKBEntitySlug(orgId) ?? null;
     const orgTypedEntity = getTypedEntityById(orgId);
-    const orgWikiPageId = orgTypedEntity?.numericId ?? null;
+    const orgWikiPageId = orgTypedEntity?.wikiId ?? null;
 
     const recipientId =
       typeof record.fields.recipient === "string"

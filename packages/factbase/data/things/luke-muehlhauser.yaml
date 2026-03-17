@@ -3,7 +3,7 @@ thing:
   stableId: TclWePCJ7w
   type: person
   name: "Luke Muehlhauser"
-  numericId: "E1301"
+  wikiId: "E1301"
 
 facts:
   - id: f_oXdOBNJysw

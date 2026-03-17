@@ -3,7 +3,7 @@ thing:
   stableId: MBGtb3Qlkw
   type: research-area
   name: Scalable Oversight
-  numericId: E271
+  wikiId: E271
 facts:
   - id: f_KY0XVVu5hQ
     property: description

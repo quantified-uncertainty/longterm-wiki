@@ -601,7 +601,7 @@ async function resolveLargeFile(filePath, content) {
  * volatile metadata last. Keep in sync with crux/lib/frontmatter-order.ts.
  */
 const FRONTMATTER_FIELD_ORDER = [
-  'numericId', 'title', 'description',
+  'wikiId', 'title', 'description',
   'sidebar', 'entityType', 'subcategory', 'pageType', 'contentFormat', 'pageTemplate', 'draft', 'fullWidth',
   'quality', 'maturity', 'readerImportance', 'researchImportance', 'tacticalValue', 'tractability', 'neglectedness', 'uncertainty', 'causalLevel',
   'lastEdited', 'lastUpdated', 'createdAt', 'update_frequency', 'evergreen',

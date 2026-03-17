@@ -3,7 +3,7 @@ thing:
   stableId: JOXqSmPOiQ
   type: approach
   name: Weak-to-Strong Generalization
-  numericId: E452
+  wikiId: E452
 facts:
   - id: f_MOiHXSK0mQ
     property: description

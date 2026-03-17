@@ -1,7 +1,7 @@
 /**
  * id-client.mjs — HTTP client for the wiki server (ID allocation)
  *
- * Used by assign-ids.mjs to allocate numeric IDs atomically when the
+ * Used by assign-ids.mjs to allocate wiki IDs atomically when the
  * server is available. Falls back gracefully (returns null) on any failure.
  *
  * NOTE: This file runs under plain `node` (no tsx), so it cannot import
@@ -57,11 +57,11 @@ export async function isServerAvailable() {
 }
 
 /**
- * Allocate a single numeric ID for a slug.
+ * Allocate a single wiki ID for a slug.
  *
  * @param {string} slug — Entity or page slug
  * @param {string} [description] — Optional description
- * @returns {Promise<{ numericId: string, created: boolean } | null>}
+ * @returns {Promise<{ wikiId: string, created: boolean } | null>}
  *   Returns null on any failure (network, timeout, non-2xx).
  */
 export async function allocateId(slug, description) {
@@ -83,7 +83,7 @@ export async function allocateId(slug, description) {
 
     const data = await res.json();
     return {
-      numericId: data.numericId,
+      wikiId: data.wikiId,
       created: data.created,
     };
   } catch {
@@ -92,10 +92,10 @@ export async function allocateId(slug, description) {
 }
 
 /**
- * Allocate numeric IDs for multiple slugs in a single request.
+ * Allocate wiki IDs for multiple slugs in a single request.
  *
  * @param {Array<{ slug: string, description?: string }>} items
- * @returns {Promise<Array<{ numericId: string, slug: string, created: boolean }> | null>}
+ * @returns {Promise<Array<{ wikiId: string, slug: string, created: boolean }> | null>}
  *   Returns null on any failure.
  */
 export async function allocateBatch(items) {
@@ -128,7 +128,7 @@ const BATCH_CHUNK_SIZE = 50;
  * BATCH_CHUNK_SIZE groups to respect server limits.
  *
  * @param {string[]} slugs — Slugs to allocate IDs for
- * @returns {Promise<Map<string, string>>} Map of slug → numericId
+ * @returns {Promise<Map<string, string>>} Map of slug → wikiId
  * @throws {Error} If any batch request fails
  */
 export async function allocateIds(slugs) {
@@ -142,7 +142,7 @@ export async function allocateIds(slugs) {
       throw new Error(`Batch allocation failed for slugs: ${batch.join(', ')}`);
     }
     for (const r of results) {
-      resultMap.set(r.slug, r.numericId);
+      resultMap.set(r.slug, r.wikiId);
     }
   }
 
@@ -156,7 +156,7 @@ export async function allocateIds(slugs) {
 }
 
 /**
- * Fetch all entity ID registrations from the server as a slug→numericId map.
+ * Fetch all entity ID registrations from the server as a slug→wikiId map.
  *
  * Paginates through GET /api/entities with the given page size until all
  * entities have been fetched.  Returns an empty Map on any failure — the
@@ -164,7 +164,7 @@ export async function allocateIds(slugs) {
  * verification rather than failing the build.
  *
  * @param {number} [pageSize=200]
- * @returns {Promise<Map<string, string>>}  Map of slug → numericId
+ * @returns {Promise<Map<string, string>>}  Map of slug → wikiId
  */
 export async function fetchServerEntityIdMap(pageSize = 200) {
   const serverUrl = getServerUrl();
@@ -187,8 +187,8 @@ export async function fetchServerEntityIdMap(pageSize = 200) {
       const data = await res.json();
       const entities = data.entities || [];
       for (const entity of entities) {
-        if (entity.id && entity.numericId) {
-          resultMap.set(entity.id, entity.numericId);
+        if (entity.id && entity.wikiId) {
+          resultMap.set(entity.id, entity.wikiId);
         }
       }
 

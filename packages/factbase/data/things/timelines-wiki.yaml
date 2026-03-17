@@ -3,7 +3,7 @@ thing:
   stableId: 8AMSTHrvSg
   type: project
   name: Timelines Wiki
-  numericId: E387
+  wikiId: E387
 facts:
   - id: f_sBiX4f2Dig
     property: description

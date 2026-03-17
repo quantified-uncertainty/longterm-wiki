@@ -28,7 +28,7 @@ import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { WIKI_ID_RE } from '../lib/patterns.ts';
 import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 // ---------------------------------------------------------------------------
@@ -396,7 +396,7 @@ export async function enrichEntityLinks(
   }
 
   // Validate all entityIds are in E## format
-  replacements = replacements.filter(r => NUMERIC_ID_RE.test(r.entityId));
+  replacements = replacements.filter(r => WIKI_ID_RE.test(r.entityId));
 
   const { content: enriched, applied, appliedReplacements } = applyEntityLinkReplacements(content, replacements);
 

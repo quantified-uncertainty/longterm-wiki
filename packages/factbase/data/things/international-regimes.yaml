@@ -3,7 +3,7 @@ thing:
   stableId: uvwmYLYstg
   type: policy
   name: International Compute Regimes
-  numericId: E473
+  wikiId: E473
 facts:
   - id: f_sNLrIgmMDQ
     property: description

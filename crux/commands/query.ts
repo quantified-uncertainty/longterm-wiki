@@ -346,7 +346,7 @@ export async function page(args: string[], options: Record<string, unknown>): Pr
                     p.hallucinationRiskLevel === 'medium' ? c.yellow : c.green;
 
   let output = `${c.bold}${c.blue}Page: ${p.id}${c.reset}\n\n`;
-  if (p.numericId) output += `  ${c.bold}Numeric ID:${c.reset}  ${p.numericId}\n`;
+  if (p.wikiId) output += `  ${c.bold}Wiki ID:${c.reset}  ${p.wikiId}\n`;
   output += `  ${c.bold}Title:${c.reset}       ${p.title}\n`;
   if (p.entityType) output += `  ${c.bold}Type:${c.reset}        ${p.entityType}\n`;
   if (p.category) output += `  ${c.bold}Category:${c.reset}    ${p.category}${p.subcategory ? ` / ${p.subcategory}` : ''}\n`;

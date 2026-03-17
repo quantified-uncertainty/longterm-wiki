@@ -3,7 +3,7 @@ thing:
   stableId: izkduIMBDg
   type: person
   name: Leopold Aschenbrenner
-  numericId: E578
+  wikiId: E578
 facts:
   - id: f_qMoglL9DLg
     property: description

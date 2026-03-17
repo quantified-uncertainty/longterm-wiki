@@ -5,7 +5,7 @@
  * Generates:
  * - packages/factbase/data/things/{slug}.yaml for each person
  * - Appends to data/entities/people.yaml
- * - Allocates numeric IDs via crux
+ * - Allocates wiki IDs via crux
  */
 
 import { randomBytes } from "node:crypto";
@@ -61,7 +61,7 @@ function lookupOrgStableId(slug: string): string | undefined {
   return undefined;
 }
 
-function allocateNumericId(slug: string): string {
+function allocateWikiId(slug: string): string {
   // First check if already allocated
   try {
     const checkOutput = execSync(`WIKI_SERVER_ENV=prod pnpm crux ids check ${slug}`, {
@@ -313,14 +313,14 @@ async function main() {
       continue;
     }
 
-    // Allocate numeric ID
+    // Allocate wiki ID
     console.log(`🆔  Allocating ID for ${person.slug}...`);
-    const numericId = allocateNumericId(person.slug);
-    if (!numericId) {
+    const wikiId = allocateWikiId(person.slug);
+    if (!wikiId) {
       console.error(`❌  Failed to allocate ID for ${person.slug}`);
       continue;
     }
-    console.log(`   → ${numericId}`);
+    console.log(`   → ${wikiId}`);
 
     // Generate stable ID and fact IDs
     const stableId = generateId();
@@ -350,7 +350,7 @@ async function main() {
     yaml += `  stableId: ${stableId}\n`;
     yaml += `  type: person\n`;
     yaml += `  name: "${person.name}"\n`;
-    yaml += `  numericId: "${numericId}"\n`;
+    yaml += `  wikiId: "${wikiId}"\n`;
     yaml += `\n`;
     yaml += `facts:\n`;
 
@@ -424,7 +424,7 @@ async function main() {
 
     entityAppendBlock += `- id: ${person.slug}\n`;
     entityAppendBlock += `  stableId: ${stableId}\n`;
-    entityAppendBlock += `  numericId: ${numericId}\n`;
+    entityAppendBlock += `  wikiId: ${wikiId}\n`;
     entityAppendBlock += `  type: person\n`;
     entityAppendBlock += `  title: "${person.name}"\n`;
     entityAppendBlock += `  description: >\n${descYaml}\n`;

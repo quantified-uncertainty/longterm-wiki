@@ -3,7 +3,7 @@ thing:
   stableId: XcGTez1oFw
   type: policy
   name: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
-  numericId: E48
+  wikiId: E48
 facts:
   - id: f_fIOdg7UWQA
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: aw8anZDbCg
   type: organization
   name: Elon Musk (Funder)
-  numericId: E410
+  wikiId: E410
 facts:
   - id: f_lOKOPFyjWw
     property: description

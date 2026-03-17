@@ -19,15 +19,15 @@ import { normalizeName } from './name-utils.ts';
 
 export interface PersonEntity {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   title: string;
 }
 
 export interface PersonMention {
   /** Entity slug (e.g. "dario-amodei") */
   personId: string;
-  /** Entity numeric ID (e.g. "E91") */
-  numericId: string | undefined;
+  /** Entity wiki ID (e.g. "E91") */
+  wikiId: string | undefined;
   /** Display name as found in the text */
   matchedText: string;
   /** Entity canonical name */
@@ -346,7 +346,7 @@ export function detectPersonMentions(
 
       mentions.push({
         personId: person.id,
-        numericId: person.numericId,
+        wikiId: person.wikiId,
         matchedText,
         canonicalName: person.title.replace(/\s*\(.*?\)\s*$/, '').trim(),
         line: lineNum,
@@ -450,7 +450,7 @@ export function applyEntityLinks(
   const linkedPersons: string[] = [];
 
   for (const mention of replacements) {
-    const idAttr = mention.numericId || mention.personId;
+    const idAttr = mention.wikiId || mention.personId;
     const nameAttr = mention.personId;
     const replacement = `<EntityLink id="${idAttr}" name="${nameAttr}">${mention.matchedText}</EntityLink>`;
 

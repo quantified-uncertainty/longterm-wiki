@@ -3,7 +3,7 @@ thing:
   stableId: DSSCdI8gLA
   type: approach
   name: Formal Verification (AI Safety)
-  numericId: E483
+  wikiId: E483
 facts:
   - id: f_9Kozt7eUyA
     property: description

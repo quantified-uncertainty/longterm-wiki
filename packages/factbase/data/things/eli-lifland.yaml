@@ -3,7 +3,7 @@ thing:
   stableId: wjtZjN8acQ
   type: person
   name: Eli Lifland
-  numericId: E435
+  wikiId: E435
 facts:
   - id: f_MGt6wCbGFA
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: C5XsvYDQGA
   type: capability
   name: Tool Use and Computer Use
-  numericId: E356
+  wikiId: E356
 facts:
   - id: f_IjKedRyjSQ
     property: description

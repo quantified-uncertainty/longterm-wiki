@@ -3,7 +3,7 @@ thing:
   stableId: YOMDe574Ew
   type: risk
   name: AI Winner-Take-All Dynamics
-  numericId: E374
+  wikiId: E374
 facts:
   - id: f_PyILTBvltw
     property: description

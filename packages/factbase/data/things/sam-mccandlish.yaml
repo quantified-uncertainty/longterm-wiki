@@ -3,7 +3,7 @@ thing:
   stableId: ENl8sgChDQ
   type: person
   name: "Sam McCandlish"
-  numericId: "E1259"
+  wikiId: "E1259"
 
 facts:
   - id: f_FiKueyUA8w

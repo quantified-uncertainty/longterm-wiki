@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 interface DirectoryEntity {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   entityType: string;
   title: string;
@@ -70,7 +70,7 @@ function apiEntityToRow(e: DirectoryEntity): LegislationRow {
   return {
     id: e.id,
     title: e.title,
-    numericId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
     introduced: (meta.introduced as string | undefined) ?? null,
     policyStatus: effectiveStatus,
     statusKey: normalizeStatus(effectiveStatus),
@@ -110,7 +110,7 @@ function loadFromLocal(): LegislationPageData {
     return {
       id: entity.id,
       title: entity.title,
-      numericId: entity.numericId ?? null,
+      wikiId: entity.wikiId ?? null,
       introduced: entity.introduced ?? null,
       policyStatus: effectiveStatus,
       statusKey: normalizeStatus(effectiveStatus),

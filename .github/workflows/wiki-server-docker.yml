@@ -285,7 +285,7 @@ jobs:
           #    Retries up to 3 times with backoff to handle transient errors during rolling deploys
           #    (e.g., a request hitting a pod mid-rollout). Uses -s without -f so the response body
           #    is always captured for debugging — -f suppresses the body on HTTP errors.
-          SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"researchImportance":null,"tacticalValue":null,"backlinkCount":null,"riskCategory":null,"dateCreated":null,"recommendedScore":null,"clusters":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
+          SYNC_BODY='{"pages":[{"id":"__smoke-test__","wikiId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"researchImportance":null,"tacticalValue":null,"backlinkCount":null,"riskCategory":null,"dateCreated":null,"recommendedScore":null,"clusters":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
           UPSERTED=""
           SYNC_HTTP_CODE=""
           SYNC_RESPONSE=""

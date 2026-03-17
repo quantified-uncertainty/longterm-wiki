@@ -13,7 +13,7 @@ File a GitHub issue when you encounter any of the following during normal work:
 | **Missing documentation** | "No docs on how `update_frequency` interacts with `evergreen: false`" | P3 |
 | **Confusing DX** | "Error message says 'invalid entity' but doesn't say which field" | P2-P3 |
 | **Flaky or slow process** | "Gate check takes 5 min but could skip unchanged validators" | P2 |
-| **Missing validation** | "Nothing prevents duplicate `numericId` across YAML files" | P1-P2 |
+| **Missing validation** | "Nothing prevents duplicate `wikiId` across YAML files" | P1-P2 |
 | **Inconsistency** | "Some pages use `<R>` components, others use raw markdown links for the same resources" | P3 |
 | **Stale content** | "Page references 2024 data but it's now 2026" (if not fixable in current session) | P3 |
 | **Security concern** | "API endpoint doesn't validate input length" | P0-P1 |

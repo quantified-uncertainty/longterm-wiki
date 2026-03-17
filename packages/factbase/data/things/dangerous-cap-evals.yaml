@@ -3,7 +3,7 @@ thing:
   stableId: 8NzBoa41MA
   type: approach
   name: Dangerous Capability Evaluations
-  numericId: E442
+  wikiId: E442
 facts:
   - id: f_euI77sCG0g
     property: description

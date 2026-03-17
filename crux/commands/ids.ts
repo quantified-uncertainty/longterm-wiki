@@ -4,7 +4,7 @@
  * Allocate and query numeric entity IDs from the wiki-server.
  *
  * Usage:
- *   crux ids allocate <slug> [--description="..."]   Allocate a numeric ID
+ *   crux ids allocate <slug> [--description="..."]   Allocate a wiki ID
  *   crux ids check <slug>                            Check if a slug has an ID
  *   crux ids list [--limit=50] [--offset=0]          List all allocated IDs
  */
@@ -40,7 +40,7 @@ async function allocateCommand(
       exitCode: 1,
       output: `Usage: crux ids allocate <slug> [--description="..."]
 
-  Allocate a numeric ID (E##) for the given slug from the wiki-server.
+  Allocate a wiki ID (E##) for the given slug from the wiki-server.
   Idempotent: returns existing ID if slug is already registered.
 
 Examples:
@@ -64,7 +64,7 @@ Examples:
     return { exitCode: 1, output: `Error: ${result.message}` };
   }
 
-  const { numericId, stableId, created, createdAt } = result.data;
+  const { wikiId, stableId, created, createdAt } = result.data;
   const verb = created ? 'Allocated new' : 'Found existing';
 
   if (options.ci) {
@@ -74,7 +74,7 @@ Examples:
   const stableIdLine = stableId ? `\n  Stable ID: ${stableId}` : '';
   return {
     exitCode: 0,
-    output: `${verb} ID: ${numericId} → ${slug}${stableIdLine}\n  Created: ${createdAt}`,
+    output: `${verb} ID: ${wikiId} → ${slug}${stableIdLine}\n  Created: ${createdAt}`,
   };
 }
 
@@ -93,7 +93,7 @@ async function checkCommand(
       exitCode: 1,
       output: `Usage: crux ids check <slug>
 
-  Check if a slug has a numeric ID allocated on the server.
+  Check if a slug has a wiki ID allocated on the server.
 
 Examples:
   crux ids check anthropic
@@ -121,7 +121,7 @@ Examples:
   const stableIdLine = result.data.stableId ? `\n  Stable ID: ${result.data.stableId}` : '';
   return {
     exitCode: 0,
-    output: `${result.data.numericId} → ${slug}${stableIdLine}\n  Created: ${result.data.createdAt}`,
+    output: `${result.data.wikiId} → ${slug}${stableIdLine}\n  Created: ${result.data.createdAt}`,
   };
 }
 
@@ -158,7 +158,7 @@ async function listCommand(
 
   for (const entry of ids) {
     const stableId = entry.stableId ?? '—';
-    lines.push(`  ${entry.numericId.padEnd(8)} ${stableId.padEnd(12)} ${entry.slug}`);
+    lines.push(`  ${entry.wikiId.padEnd(8)} ${stableId.padEnd(12)} ${entry.slug}`);
   }
 
   if (offset + ids.length < total) {
@@ -184,7 +184,7 @@ export function getHelp(): string {
 IDs Domain — Entity ID allocation and lookup
 
 Commands:
-  allocate <slug>   Allocate a numeric ID (E##) for a slug from the wiki-server
+  allocate <slug>   Allocate a wiki ID (E##) for a slug from the wiki-server
   check <slug>      Check if a slug has an ID allocated
   list              List all allocated IDs
 
@@ -195,7 +195,7 @@ Options:
   --ci                  JSON output
 
 Why use this:
-  Entity numeric IDs (E42, E886, etc.) are allocated by the wiki-server
+  Entity wiki IDs (E42, E886, etc.) are allocated by the wiki-server
   using a PostgreSQL sequence to guarantee uniqueness. Never manually
   invent an ID — always allocate from the server. This prevents ID
   conflicts when multiple agents work concurrently.

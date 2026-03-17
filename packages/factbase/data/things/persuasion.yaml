@@ -3,7 +3,7 @@ thing:
   stableId: n9Mqc0XteA
   type: capability
   name: Persuasion and Social Manipulation
-  numericId: E224
+  wikiId: E224
 facts:
   - id: f_0xzpFJCG5g
     property: description

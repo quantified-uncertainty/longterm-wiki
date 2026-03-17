@@ -144,7 +144,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
 
   // Company wiki page link
   const companyTypedEntity = getTypedEntityById(round.ownerEntityId);
-  const companyWikiPageId = companyTypedEntity?.numericId ?? null;
+  const companyWikiPageId = companyTypedEntity?.wikiId ?? null;
 
   // Find investments in this round
   const companyInvestments = getKBRecords(round.ownerEntityId, "investments");

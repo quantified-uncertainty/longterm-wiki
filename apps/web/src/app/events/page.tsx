@@ -22,7 +22,7 @@ export default function EventsPage() {
       description: e.description ?? null,
       status: statusField?.value ?? null,
       tags: e.tags ?? [],
-      numericId: e.numericId ?? null,
+      wikiId: e.wikiId ?? null,
     };
   });
 

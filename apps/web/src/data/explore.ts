@@ -10,7 +10,7 @@ import type { SerializedKB } from "@longterm-wiki/factbase";
 
 export interface ExploreItem {
   id: string;
-  numericId: string;
+  wikiId: string;
   title: string;
   type: string;
   description: string | null;
@@ -119,11 +119,11 @@ export function getExploreItems(): ExploreItem[] {
     }
   }
 
-  // Items from typed entities (only those with actual content pages and numeric IDs)
+  // Items from typed entities (only those with actual content pages and wiki IDs)
   const entityItems: ExploreItem[] = typedEntities.filter((entity) => {
     const pageId = entityPageIdMap.get(entity.id);
     if (!pageId) return false;
-    const numId = entity.numericId || db.idRegistry?.bySlug[pageId];
+    const numId = entity.wikiId || db.idRegistry?.bySlug[pageId];
     return !!numId;
   }).map((entity) => {
     const pageId = entityPageIdMap.get(entity.id)!;
@@ -131,7 +131,7 @@ export function getExploreItems(): ExploreItem[] {
     const kbCounts = getKBCounts(entity.id, kb);
     return {
       id: entity.id,
-      numericId: (entity.numericId || db.idRegistry?.bySlug[pageId])!,
+      wikiId: (entity.wikiId || db.idRegistry?.bySlug[pageId])!,
       title: entity.title,
       type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
       description: page?.llmSummary || page?.description || entity.description || null,
@@ -154,7 +154,7 @@ export function getExploreItems(): ExploreItem[] {
     };
   });
 
-  // Items from pages that have no entity (only those with numeric IDs)
+  // Items from pages that have no entity (only those with wiki IDs)
   const pageOnlyItems: ExploreItem[] = (db.pages || [])
     .filter((p) => !entityClaimedPageIds.has(p.id))
     .filter((p) => p.title && p.category !== "schema")
@@ -163,7 +163,7 @@ export function getExploreItems(): ExploreItem[] {
       const kbCounts = getKBCounts(page.id, kb);
       return {
         id: page.id,
-        numericId: db.idRegistry!.bySlug[page.id],
+        wikiId: db.idRegistry!.bySlug[page.id],
         title: page.title,
         type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
         description: page.llmSummary || page.description || null,
@@ -208,7 +208,7 @@ export function getExploreItems(): ExploreItem[] {
       const nodeCount = ceg.nodes?.length || 0;
       return {
         id: `diagram-${e.id}`,
-        numericId: `diagram-${e.id}`,
+        wikiId: `diagram-${e.id}`,
         title: ceg.title || e.title,
         type: "diagram",
         description: ceg.description || `Cause-effect diagram for ${e.title}`,

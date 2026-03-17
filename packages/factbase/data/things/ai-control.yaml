@@ -3,7 +3,7 @@ thing:
   stableId: sFjyY5xXZA
   type: research-area
   name: AI Control
-  numericId: E6
+  wikiId: E6
 facts:
   - id: f_VniJGgrVgA
     property: description

@@ -1,5 +1,5 @@
 ---
-numericId: E732
+wikiId: E732
 title: LongtermWiki Strategy Brainstorm
 description: Strategic planning and brainstorming for LongtermWiki development
 pageType: documentation

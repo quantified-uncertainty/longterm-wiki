@@ -3,7 +3,7 @@ thing:
   stableId: GeYirWJrwA
   type: risk
   name: Epistemic Collapse
-  numericId: E119
+  wikiId: E119
 facts:
   - id: f_cGmzzvhs8w
     property: description

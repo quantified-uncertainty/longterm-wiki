@@ -3,7 +3,7 @@ thing:
   stableId: 9f8eF0CObQ
   type: project
   name: Stampy / AISafety.info
-  numericId: E382
+  wikiId: E382
 facts:
   - id: f_pO7q8RaK4A
     property: description

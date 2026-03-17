@@ -122,7 +122,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
 
   // Company wiki page link
   const companyTypedEntity = getTypedEntityById(investment.ownerEntityId);
-  const companyWikiPageId = companyTypedEntity?.numericId ?? null;
+  const companyWikiPageId = companyTypedEntity?.wikiId ?? null;
 
   // Find other investments in the same company
   const otherInSameCompany = allInvestments

@@ -3,7 +3,7 @@ thing:
   stableId: gWxL0U06oQ
   type: concept
   name: Adversarial Robustness
-  numericId: E1
+  wikiId: E1
 facts:
   - id: f_eOvbg9l9YQ
     property: description

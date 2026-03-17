@@ -3,7 +3,7 @@ thing:
   stableId: SpFgTz2INg
   type: policy
   name: US AI Chip Export Controls
-  numericId: E136
+  wikiId: E136
 facts:
   - id: f_EtUqpwCXzw
     property: description

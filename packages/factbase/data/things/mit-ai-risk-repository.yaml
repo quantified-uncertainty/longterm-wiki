@@ -3,7 +3,7 @@ thing:
   stableId: Qalx4pvUXQ
   type: project
   name: MIT AI Risk Repository
-  numericId: E383
+  wikiId: E383
 facts:
   - id: f_h9RLqzdaqQ
     property: description

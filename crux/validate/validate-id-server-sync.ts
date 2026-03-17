@@ -3,11 +3,11 @@
 /**
  * ID Server Sync Validation
  *
- * Checks that all locally-defined numericIds match the wiki-server's
+ * Checks that all locally-defined wikiIds match the wiki-server's
  * canonical ID allocations. Catches:
  *   1. Agent-invented IDs that were never allocated from the server
  *   2. Slug→ID mismatches (local says E42→foo, server says E42→bar)
- *   3. Entities/pages with no numericId at all
+ *   3. Entities/pages with no wikiId at all
  *
  * Usage:
  *   npx tsx crux/validate/validate-id-server-sync.ts
@@ -30,12 +30,12 @@ const c = getColors(CI_MODE);
 
 interface LocalId {
   slug: string;
-  numericId: string;
+  wikiId: string;
   source: string; // "entity:filename" or "page:path"
 }
 
 interface ServerIdEntry {
-  numericId: string;
+  wikiId: string;
   slug: string;
 }
 
@@ -56,10 +56,10 @@ function collectLocalIds(): LocalId[] {
         const entities = parse(content) || [];
         if (Array.isArray(entities)) {
           for (const e of entities) {
-            if (e?.id && e?.numericId) {
+            if (e?.id && e?.wikiId) {
               results.push({
                 slug: e.id,
-                numericId: e.numericId,
+                wikiId: e.wikiId,
                 source: `entity:${file}`,
               });
             }
@@ -81,10 +81,10 @@ function collectLocalIds(): LocalId[] {
           const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
           if (!fmMatch) return;
           const fm = parse(fmMatch[1]) || {};
-          if (fm.numericId && fm.entityId) {
+          if (fm.wikiId && fm.entityId) {
             results.push({
               slug: fm.entityId,
-              numericId: fm.numericId,
+              wikiId: fm.wikiId,
               source: `page:${join(dir, entry.name).replace(PROJECT_ROOT + '/', '')}`,
             });
           }
@@ -147,17 +147,17 @@ async function main() {
 
   const localIds = collectLocalIds();
   if (localIds.length === 0) {
-    if (!CI_MODE) console.log(`${c.dim}No local numericIds found${c.reset}`);
+    if (!CI_MODE) console.log(`${c.dim}No local wikiIds found${c.reset}`);
     process.exit(0);
   }
 
   const serverIds = await fetchServerIds();
   const issues: string[] = [];
 
-  // Build reverse map: numericId → slug (server)
+  // Build reverse map: wikiId → slug (server)
   const serverNumericToSlug = new Map<string, string>();
   for (const [slug, entry] of serverIds) {
-    serverNumericToSlug.set(entry.numericId, slug);
+    serverNumericToSlug.set(entry.wikiId, slug);
   }
 
   for (const local of localIds) {
@@ -166,25 +166,25 @@ async function main() {
     if (!serverEntry) {
       // Slug not registered at all — might be agent-invented
       issues.push(
-        `${local.source}: slug "${local.slug}" (${local.numericId}) is not registered on the server. ` +
+        `${local.source}: slug "${local.slug}" (${local.wikiId}) is not registered on the server. ` +
         `Run: pnpm crux ids allocate ${local.slug}`
       );
       continue;
     }
 
-    if (serverEntry.numericId !== local.numericId) {
+    if (serverEntry.wikiId !== local.wikiId) {
       // Slug exists but with different ID — conflict
       issues.push(
-        `${local.source}: slug "${local.slug}" has local ID ${local.numericId} but server says ${serverEntry.numericId}`
+        `${local.source}: slug "${local.slug}" has local ID ${local.wikiId} but server says ${serverEntry.wikiId}`
       );
       continue;
     }
 
-    // Also check: is this numericId claimed by a different slug on the server?
-    const serverSlug = serverNumericToSlug.get(local.numericId);
+    // Also check: is this wikiId claimed by a different slug on the server?
+    const serverSlug = serverNumericToSlug.get(local.wikiId);
     if (serverSlug && serverSlug !== local.slug) {
       issues.push(
-        `${local.source}: numericId ${local.numericId} is locally assigned to "${local.slug}" but server assigns it to "${serverSlug}"`
+        `${local.source}: wikiId ${local.wikiId} is locally assigned to "${local.slug}" but server assigns it to "${serverSlug}"`
       );
     }
   }

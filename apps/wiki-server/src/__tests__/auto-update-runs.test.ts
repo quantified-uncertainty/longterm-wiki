@@ -98,7 +98,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- entity_ids: SELECT WHERE slug (for resolvePageIntIds) ----
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-    return params.map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
+    return params.map((p) => ({ wiki_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // ---- TRUNCATE ----

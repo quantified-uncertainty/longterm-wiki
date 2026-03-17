@@ -3,7 +3,7 @@ thing:
   stableId: B3alpHHvzg
   type: policy
   name: International AI Safety Summit Series
-  numericId: E173
+  wikiId: E173
 facts:
   - id: f_luk0gzcjzA
     property: description

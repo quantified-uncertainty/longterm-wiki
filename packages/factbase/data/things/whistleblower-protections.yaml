@@ -3,7 +3,7 @@ thing:
   stableId: nvyazaJFew
   type: policy
   name: AI Whistleblower Protections
-  numericId: E475
+  wikiId: E475
 facts:
   - id: f_9kQI00Ihkw
     property: description

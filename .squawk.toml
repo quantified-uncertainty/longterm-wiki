@@ -46,6 +46,11 @@ pg_version = "16"
 #   Generated/default columns added during CREATE TABLE or to small tables (< 100K rows)
 #   are instant or near-instant. The table rewrite warning is only relevant for large
 #   existing tables. All tables in this project are well below this threshold.
+#
+# renaming-column:
+#   Intentional column renames are coordinated in the same PR that updates all consumers
+#   (TypeScript types, Drizzle schema, queries). The rename is metadata-only (no data
+#   movement) and all references are updated atomically in the deploy.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -59,6 +64,7 @@ excluded_rules = [
   "adding-not-nullable-field",
   "adding-foreign-key-constraint",
   "renaming-table",
+  "renaming-column",
   "ban-drop-column",
   "changing-column-type",
   "adding-field-with-default",

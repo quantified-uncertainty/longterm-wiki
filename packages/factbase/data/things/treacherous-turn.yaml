@@ -3,7 +3,7 @@ thing:
   stableId: tRj4bS6V8Q
   type: risk
   name: Treacherous Turn
-  numericId: E359
+  wikiId: E359
 facts:
   - id: f_wwfOMgeSvQ
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: CUBiiyCfOA
   type: organization
   name: Metaculus
-  numericId: E199
+  wikiId: E199
 facts:
   - id: f_IpjoaSzaEQ
     property: description

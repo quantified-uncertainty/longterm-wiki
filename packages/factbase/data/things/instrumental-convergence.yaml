@@ -3,7 +3,7 @@ thing:
   stableId: BYKermZj1A
   type: risk
   name: Instrumental Convergence
-  numericId: E168
+  wikiId: E168
 facts:
   - id: f_UVqpAVCPJA
     property: description

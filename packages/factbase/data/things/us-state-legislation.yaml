@@ -3,7 +3,7 @@ thing:
   stableId: 2dwY9wnuYA
   type: policy
   name: US State AI Legislation Landscape
-  numericId: E367
+  wikiId: E367
 facts:
   - id: f_ZXY5qA4yJg
     property: description

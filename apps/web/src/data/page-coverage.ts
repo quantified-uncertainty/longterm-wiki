@@ -8,7 +8,7 @@ import type { ValidSubcategory } from "./valid-subcategories";
 
 export interface PageCoverageItem {
   id: string;
-  numericId: string;
+  wikiId: string;
   title: string;
   // Quality & importance
   quality: number | null;
@@ -85,11 +85,11 @@ export function getPageCoverageItems(): PageCoverageItem[] {
     const cov = page.coverage;
     if (!cov) continue;
 
-    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    const wikiId = db.idRegistry?.bySlug[page.id] || page.id;
     const ch = page.citationHealth;
     items.push({
       id: page.id,
-      numericId,
+      wikiId,
       title: page.title,
       // Quality & importance
       quality: page.quality,

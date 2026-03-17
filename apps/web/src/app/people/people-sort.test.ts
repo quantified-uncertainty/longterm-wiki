@@ -12,7 +12,7 @@ function makeRow(overrides: Partial<PersonRow> = {}): PersonRow {
     id: "p1",
     slug: "person-1",
     name: "Alice",
-    numericId: null,
+    wikiId: null,
     wikiPageId: null,
     role: null,
     employerId: null,

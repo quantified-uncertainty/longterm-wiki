@@ -3,7 +3,7 @@ thing:
   stableId: Khej79OA8g
   type: organization
   name: QURI (Quantified Uncertainty Research Institute)
-  numericId: E238
+  wikiId: E238
 facts:
   - id: f_hdxXdOaXLg
     property: description

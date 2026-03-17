@@ -3,7 +3,7 @@ thing:
   stableId: 55HJBLrOzg
   type: organization
   name: IBBIS (International Biosecurity and Biosafety Initiative for Science)
-  numericId: E536
+  wikiId: E536
 facts:
   - id: f_GF37tEIIOA
     property: description

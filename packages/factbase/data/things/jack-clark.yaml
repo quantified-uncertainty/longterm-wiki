@@ -3,7 +3,7 @@ thing:
   stableId: YqSmRNVRAg
   type: person
   name: "Jack Clark"
-  numericId: "E1248"
+  wikiId: "E1248"
 
 facts:
   - id: f_5QqO5k4Svg

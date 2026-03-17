@@ -3,7 +3,7 @@ thing:
   stableId: XLLyzaEaCA
   type: organization
   name: GovAI
-  numericId: E153
+  wikiId: E153
 facts:
   - id: f_H6HJHvsAfg
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: 6rEo4U4WPw
   type: organization
   name: Arb Research
-  numericId: E514
+  wikiId: E514
 facts:
   - id: f_qtE3Bo05ag
     property: description

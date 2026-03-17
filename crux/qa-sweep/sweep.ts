@@ -5,7 +5,7 @@
  *
  * Runs automated checks that don't require LLM judgment:
  * - Recent changes summary (what to prioritize)
- * - Duplicate numericIds
+ * - Duplicate wikiIds
  * - Broken entity references
  * - NEEDS CITATION markers in content
  * - Test status
@@ -100,7 +100,7 @@ function getChangedFiles(): string[] {
 // Automated checks
 // ─────────────────────────────────────────────────────────────────────────────
 
-function checkDuplicateNumericIds(): CheckResult {
+function checkDuplicateWikiIds(): CheckResult {
   const entitiesDir = join(PROJECT_ROOT, 'data/entities');
   const contentDir = join(PROJECT_ROOT, 'content/docs');
 
@@ -112,9 +112,9 @@ function checkDuplicateNumericIds(): CheckResult {
 
   // Scan entity YAML
   try {
-    const yamlOutput = run(`grep -rh 'numericId:' ${entitiesDir}`);
+    const yamlOutput = run(`grep -rh 'wikiId:' ${entitiesDir}`);
     for (const line of yamlOutput.split('\n')) {
-      const match = line.match(/numericId:\s*"?(E\d+)"?/);
+      const match = line.match(/wikiId:\s*"?(E\d+)"?/);
       if (match) {
         yamlIds.set(match[1], (yamlIds.get(match[1]) ?? 0) + 1);
       }
@@ -123,9 +123,9 @@ function checkDuplicateNumericIds(): CheckResult {
 
   // Scan MDX frontmatter
   try {
-    const mdxOutput = run(`grep -rh 'numericId:' ${contentDir} --include='*.mdx' --include='*.md'`);
+    const mdxOutput = run(`grep -rh 'wikiId:' ${contentDir} --include='*.mdx' --include='*.md'`);
     for (const line of mdxOutput.split('\n')) {
-      const match = line.match(/numericId:\s*"?(E\d+)"?/);
+      const match = line.match(/wikiId:\s*"?(E\d+)"?/);
       if (match) {
         mdxIds.set(match[1], (mdxIds.get(match[1]) ?? 0) + 1);
       }
@@ -143,13 +143,13 @@ function checkDuplicateNumericIds(): CheckResult {
   const totalIds = new Set([...yamlIds.keys(), ...mdxIds.keys()]).size;
 
   if (duplicates.length === 0) {
-    return { name: 'Duplicate numericIds', status: 'pass', message: `${totalIds} unique IDs, no duplicates within sources` };
+    return { name: 'Duplicate wikiIds', status: 'pass', message: `${totalIds} unique IDs, no duplicates within sources` };
   }
 
   return {
-    name: 'Duplicate numericIds',
+    name: 'Duplicate wikiIds',
     status: 'fail',
-    message: `${duplicates.length} duplicate numericIds found`,
+    message: `${duplicates.length} duplicate wikiIds found`,
     details: duplicates,
   };
 }
@@ -380,7 +380,7 @@ async function main() {
 
     // Fast checks first
     if (!JSON_MODE) console.log(`${c.dim}Running checks...${c.reset}`);
-    checks.push(checkDuplicateNumericIds());
+    checks.push(checkDuplicateWikiIds());
     checks.push(checkBrokenEntityRefs());
     checks.push(checkNeedsCitation());
     checks.push(checkTodos());

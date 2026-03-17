@@ -3,7 +3,7 @@ thing:
   stableId: M7656wW5Bg
   type: organization
   name: Kalshi (Prediction Market)
-  numericId: E537
+  wikiId: E537
 facts:
   - id: f_QNucBwZfpw
     property: description

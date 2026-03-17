@@ -3,7 +3,7 @@ thing:
   stableId: lCiT37k9pA
   type: organization
   name: FAR AI
-  numericId: E138
+  wikiId: E138
 facts:
   - id: f_5ThouaLWpw
     property: description

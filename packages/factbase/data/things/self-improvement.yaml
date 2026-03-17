@@ -3,7 +3,7 @@ thing:
   stableId: eUR0jvxO5A
   type: capability
   name: Self-Improvement and Recursive Enhancement
-  numericId: E278
+  wikiId: E278
 facts:
   - id: f_9IvR8eF36g
     property: description

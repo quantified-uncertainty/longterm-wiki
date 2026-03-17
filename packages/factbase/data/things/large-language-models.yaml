@@ -3,7 +3,7 @@ thing:
   stableId: KwyMqBNvOQ
   type: concept
   name: Large Language Models
-  numericId: E400
+  wikiId: E400
 facts:
   - id: f_Mpifk7VljQ
     property: description

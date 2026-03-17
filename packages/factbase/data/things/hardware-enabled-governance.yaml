@@ -3,7 +3,7 @@ thing:
   stableId: 57vCq45URQ
   type: policy
   name: Hardware-Enabled Governance
-  numericId: E463
+  wikiId: E463
 facts:
   - id: f_soK8DuWeCA
     property: description

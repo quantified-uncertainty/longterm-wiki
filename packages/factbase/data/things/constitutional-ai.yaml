@@ -3,7 +3,7 @@ thing:
   stableId: 6sdr78k9kQ
   type: approach
   name: Constitutional AI
-  numericId: E451
+  wikiId: E451
 facts:
   - id: f_eRr3fA8yLA
     property: description

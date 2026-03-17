@@ -3,7 +3,7 @@ thing:
   stableId: nYPuaov1hA
   type: risk
   name: Goal Misgeneralization
-  numericId: E151
+  wikiId: E151
 facts:
   - id: f_OtNVXviKvw
     property: description

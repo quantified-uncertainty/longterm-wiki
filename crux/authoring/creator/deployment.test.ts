@@ -2,7 +2,7 @@
  * Tests for deployment.ts utility functions.
  *
  * Covers:
- *   - convertSlugsToNumericIds: EntityLink and DataInfoBox ID conversion
+ *   - convertSlugsToWikiIds: EntityLink and DataInfoBox ID conversion
  *   - validateCrossLinks: EntityLink counting and footnote balance checks
  *
  * All tests are offline — no file system access beyond what's explicitly mocked.
@@ -22,13 +22,13 @@ vi.mock('../../lib/validation/validate-mdx-content.ts', () => ({
 }));
 
 // Import the functions under test AFTER mocking
-import { convertSlugsToNumericIds, validateCrossLinks } from './deployment.ts';
+import { convertSlugsToWikiIds, validateCrossLinks } from './deployment.ts';
 
 // ---------------------------------------------------------------------------
-// convertSlugsToNumericIds
+// convertSlugsToWikiIds
 // ---------------------------------------------------------------------------
 
-describe('convertSlugsToNumericIds', () => {
+describe('convertSlugsToWikiIds', () => {
   it('leaves content unchanged when there are no slug-based EntityLinks', () => {
     const content = `---
 title: Test
@@ -38,14 +38,14 @@ title: Test
 
 Some content without any entity links.
 `;
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
   });
 
   it('leaves numeric EntityLink IDs unchanged (already E## format)', () => {
     const content = `<EntityLink id="E123">Some Entity</EntityLink>`;
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
   });
@@ -54,7 +54,7 @@ Some content without any entity links.
     // The module caches the registry. Since database.json doesn't exist in the
     // test environment, the registry is empty and slugs are left as-is.
     const content = `<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>`;
-    const result = convertSlugsToNumericIds(content, '/nonexistent/path');
+    const result = convertSlugsToWikiIds(content, '/nonexistent/path');
     // Slug not in registry → leave as-is
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
@@ -62,7 +62,7 @@ Some content without any entity links.
 
   it('handles content with no EntityLinks or DataInfoBox attributes', () => {
     const content = `## Section\n\nJust plain text with entityId mentioned inline.`;
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
   });
@@ -73,21 +73,21 @@ Some content without any entity links.
       'and',
       '<EntityLink id="org-b">Org B</EntityLink>',
     ].join(' ');
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
   });
 
   it('does not modify numeric entityId attributes in DataInfoBox', () => {
     const content = `<DataInfoBox entityId="E456" />`;
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.content).toBe(content);
     expect(result.converted).toBe(0);
   });
 
   it('returns converted count of zero when no conversions occur', () => {
     const content = `<EntityLink id="some-slug">text</EntityLink>`;
-    const result = convertSlugsToNumericIds(content, '/fake/root');
+    const result = convertSlugsToWikiIds(content, '/fake/root');
     expect(result.converted).toBe(0);
   });
 
@@ -102,12 +102,12 @@ Some content without any entity links.
     mkdirSync(dataDir, { recursive: true });
     writeFileSync(
       join(dataDir, 'database.json'),
-      JSON.stringify({ idRegistry: { byNumericId: { E123: 'open-philanthropy' } } })
+      JSON.stringify({ idRegistry: { byWikiId: { E123: 'open-philanthropy' } } })
     );
 
     try {
       vi.resetModules();
-      const { convertSlugsToNumericIds: convert } = await import('./deployment.ts');
+      const { convertSlugsToWikiIds: convert } = await import('./deployment.ts');
 
       // EntityLink id rewrite
       const r1 = convert(

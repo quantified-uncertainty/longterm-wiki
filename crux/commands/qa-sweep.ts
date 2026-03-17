@@ -47,7 +47,7 @@ Options:
   --json          JSON output for scripting
 
 Automated checks:
-  - Duplicate numericIds across YAML + MDX
+  - Duplicate wikiIds across YAML + MDX
   - References to deleted/merged entities
   - NEEDS CITATION markers in content
   - TODO markers in content

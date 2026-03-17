@@ -3,7 +3,7 @@ thing:
   stableId: 52V4qNAQjw
   type: risk
   name: AI-Driven Legal Evidence Crisis
-  numericId: E188
+  wikiId: E188
 facts:
   - id: f_ftlDS0KQTw
     property: description

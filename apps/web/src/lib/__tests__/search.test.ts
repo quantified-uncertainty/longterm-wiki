@@ -30,7 +30,7 @@ describe("search", () => {
         results: [
           {
             id: "miri",
-            numericId: "E42",
+            wikiId: "E42",
             title: "MIRI",
             description: "Machine Intelligence Research Institute",
             entityType: "organization",
@@ -92,7 +92,7 @@ describe("search", () => {
         results: [
           {
             id: "test-page",
-            numericId: "E1",
+            wikiId: "E1",
             title: "Test Page",
             description: "Some description about testing",
             entityType: "concept",
@@ -127,7 +127,7 @@ describe("search", () => {
         results: [
           {
             id: "anthropic",
-            numericId: "E50",
+            wikiId: "E50",
             title: "Anthropic",
             description: "AI safety company founded by Dario Amodei",
             entityType: "organization",
@@ -160,7 +160,7 @@ describe("search", () => {
         results: [
           {
             id: "test",
-            numericId: "E1",
+            wikiId: "E1",
             title: "Test",
             description: "A page",
             entityType: "concept",

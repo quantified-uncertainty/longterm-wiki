@@ -69,7 +69,7 @@ export interface YamlEntity {
   relatedEntries?: Array<{ id: string; type?: string; relationship?: string }>;
   description?: string;
   summaryPage?: string;
-  numericId?: string;
+  wikiId?: string;
 }
 
 export interface Suggestion {

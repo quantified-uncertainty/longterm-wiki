@@ -3,7 +3,7 @@ thing:
   stableId: Z3twlLAzJg
   type: analysis
   name: Carlsmith's Six-Premise Argument
-  numericId: E54
+  wikiId: E54
 facts:
   - id: f_ZJN3xy0suw
     property: description

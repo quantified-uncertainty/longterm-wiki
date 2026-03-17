@@ -1,9 +1,9 @@
 import { notFound, permanentRedirect, redirect } from "next/navigation";
 import {
   renderMdxPage,
-  getAllNumericIds,
-  numericIdToSlug,
-  slugToNumericId,
+  getAllWikiIds,
+  wikiIdToSlug,
+  slugToWikiId,
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
@@ -124,20 +124,20 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-function isNumericId(id: string): boolean {
+function isWikiId(id: string): boolean {
   return /^E\d+$/i.test(id);
 }
 
 export async function generateStaticParams() {
-  return getAllNumericIds().map((id) => ({ id }));
+  return getAllWikiIds().map((id) => ({ id }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
 
   let slug: string | null;
-  if (isNumericId(id)) {
-    slug = numericIdToSlug(id.toUpperCase());
+  if (isWikiId(id)) {
+    slug = wikiIdToSlug(id.toUpperCase());
   } else {
     slug = id;
   }
@@ -234,7 +234,7 @@ function ContentMeta({
     ? `${GITHUB_HISTORY_BASE}/${pageData.filePath}`
     : null;
   const entity = getEntityById(slug);
-  const numId = slugToNumericId(slug);
+  const numId = slugToWikiId(slug);
   const pageTitle = page.frontmatter.title || entity?.title || slug;
 
   return (
@@ -467,14 +467,14 @@ function WithSidebar({
 export default async function WikiPage({ params }: PageProps) {
   const { id } = await params;
 
-  if (isNumericId(id)) {
+  if (isWikiId(id)) {
     // Redirect to standalone listing pages that replaced MDX stubs (before slug
     // canonicalization to avoid an extra redirect hop)
     const standaloneRedirect = STANDALONE_PAGE_REDIRECTS[id.toUpperCase()];
     if (standaloneRedirect) permanentRedirect(standaloneRedirect);
 
-    // Numeric ID like E42 — look up slug and render
-    const slug = numericIdToSlug(id.toUpperCase());
+    // Wiki ID like E42 — look up slug and render
+    const slug = wikiIdToSlug(id.toUpperCase());
     if (!slug) notFound();
 
     // Redirect to semantic directory URL if entity has a dedicated page
@@ -512,13 +512,13 @@ export default async function WikiPage({ params }: PageProps) {
     const directoryHref = getDirectoryHref(id);
     if (directoryHref) permanentRedirect(directoryHref);
 
-    // If it has a numeric ID, redirect to canonical wiki URL
-    const numericId = slugToNumericId(id);
-    if (numericId) {
-      redirect(`/wiki/${numericId}`);
+    // If it has a wiki ID, redirect to canonical wiki URL
+    const wikiId = slugToWikiId(id);
+    if (wikiId) {
+      redirect(`/wiki/${wikiId}`);
     }
 
-    // No numeric ID — render directly by slug (page-only content without entity)
+    // No wiki ID — render directly by slug (page-only content without entity)
     const entityPath = getEntityPath(id) || "";
 
     const result = await renderMdxPage(id);

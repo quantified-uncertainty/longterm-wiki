@@ -3,7 +3,7 @@ thing:
   stableId: p1P9oQwB6w
   type: person
   name: Will MacAskill
-  numericId: E862
+  wikiId: E862
 facts:
   - id: f_ai1K4HXqHA
     property: description

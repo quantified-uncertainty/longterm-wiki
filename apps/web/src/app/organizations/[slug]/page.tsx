@@ -130,8 +130,8 @@ export default async function OrgProfilePage({
     entity = {
       id: slug,
       name: typedEntity.title,
-      numericId: typedEntity.numericId,
-      wikiPageId: typedEntity.numericId,
+      wikiId: typedEntity.wikiId,
+      wikiPageId: typedEntity.wikiId,
     };
   }
 
@@ -365,15 +365,17 @@ export default async function OrgProfilePage({
         <div className="space-y-8">
           <FundingHistorySection rounds={data.sortedRounds} />
 
-          {(meaningfulInvestments.length > 0 || meaningfulEquity.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {meaningfulInvestments.length > 0 && (
-                <InvestorParticipationSection investments={meaningfulInvestments} />
-              )}
-              {meaningfulEquity.length > 0 && (
-                <EquityPositionsSection positions={meaningfulEquity} />
-              )}
-            </div>
+          {meaningfulInvestments.length > 0 && (
+            <InvestorParticipationSection investments={meaningfulInvestments} />
+          )}
+
+          {meaningfulEquity.length > 0 && (
+            <EquityPositionsSection
+              positions={meaningfulEquity}
+              investments={data.investmentsReceived}
+              latestValuation={data.chartData.latestValuation}
+              charitablePledges={data.charitablePledges}
+            />
           )}
 
           {data.grantsMade.length > 0 && (
@@ -611,8 +613,8 @@ export default async function OrgProfilePage({
                               website
                             </a>
                           )}
-                          {p.numericId && (
-                            <Link href={`/wiki/${p.numericId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
+                          {p.wikiId && (
+                            <Link href={`/wiki/${p.wikiId}`} className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
                               wiki
                             </Link>
                           )}

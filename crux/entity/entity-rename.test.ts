@@ -13,7 +13,7 @@ import { escapeRegex, buildIdRegex, renameInContent } from './entity-rename.ts';
 // ---------------------------------------------------------------------------
 
 describe('escapeRegex', () => {
-  it('passes through plain alphanumeric IDs unchanged', () => {
+  it('passes through plain alphawiki IDs unchanged', () => {
     expect(escapeRegex('E6')).toBe('E6');
     expect(escapeRegex('ai-control')).toBe('ai-control');
   });
@@ -63,15 +63,15 @@ describe('buildIdRegex — word-boundary safety', () => {
     expect('id="E1"'.match(re)).not.toBeNull();
   });
 
-  it('matches E6 in YAML numericId field', () => {
+  it('matches E6 in YAML wikiId field', () => {
     const re = buildIdRegex('E6');
-    expect('numericId: E6'.match(re)).not.toBeNull();
-    expect('numericId: E64'.match(re)).toBeNull();
+    expect('wikiId: E6'.match(re)).not.toBeNull();
+    expect('wikiId: E64'.match(re)).toBeNull();
   });
 
   it('matches E6 at end of line (YAML)', () => {
     const re = buildIdRegex('E6');
-    expect('  numericId: E6\n'.match(re)).not.toBeNull();
+    expect('  wikiId: E6\n'.match(re)).not.toBeNull();
   });
 
   it('matches slug IDs in quoted attribute context', () => {
@@ -82,7 +82,7 @@ describe('buildIdRegex — word-boundary safety', () => {
     // In practice this is acceptable: slug IDs are always quoted in EntityLink
     // (id="slug") or in YAML (id: slug) providing additional context; and
     // having one slug as an exact prefix of another is very rare.
-    // The word-boundary guard primarily protects numeric IDs (E6 vs E64).
+    // The word-boundary guard primarily protects wiki IDs (E6 vs E64).
     expect('id="ai-control"'.match(re)).not.toBeNull();
   });
 
@@ -108,15 +108,15 @@ describe('renameInContent', () => {
     expect(result.newContent).toContain('id="E64"'); // unchanged
   });
 
-  it('replaces numericId in YAML frontmatter', () => {
+  it('replaces wikiId in YAML frontmatter', () => {
     const content = `---
-numericId: E6
+wikiId: E6
 title: Test
 ---
 Content here.`;
     const result = renameInContent(content, 'E6', 'E999', '/fake/page.mdx');
     expect(result.changed).toBe(true);
-    expect(result.newContent).toContain('numericId: E999');
+    expect(result.newContent).toContain('wikiId: E999');
   });
 
   it('handles multiple occurrences on the same line', () => {
@@ -155,11 +155,11 @@ Content here.`;
     const content = `<EntityLink id="E1">One</EntityLink>
 <EntityLink id="E10">Ten</EntityLink>
 <EntityLink id="E100">Hundred</EntityLink>
-numericId: E1`;
+wikiId: E1`;
     const result = renameInContent(content, 'E1', 'entity-one', '/fake/file.mdx');
     expect(result.newContent).toContain('id="entity-one"');
     expect(result.newContent).toContain('id="E10"');
     expect(result.newContent).toContain('id="E100"');
-    expect(result.newContent).toContain('numericId: entity-one');
+    expect(result.newContent).toContain('wikiId: entity-one');
   });
 });

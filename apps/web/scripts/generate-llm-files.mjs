@@ -65,11 +65,11 @@ function loadDatabase() {
   if (_dbCache) return _dbCache;
   const dbPath = join(DATA_DIR, 'database.json');
   if (!existsSync(dbPath)) {
-    _dbCache = { slugToNumericId: {}, entities: {} };
+    _dbCache = { slugToWikiId: {}, entities: {} };
     return _dbCache;
   }
   const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
-  const slugToNumericId = db.idRegistry?.bySlug || {};
+  const slugToWikiId = db.idRegistry?.bySlug || {};
 
   // Build entity type lookup: slug → entityType
   const entities = {};
@@ -81,7 +81,7 @@ function loadDatabase() {
     }
   }
 
-  _dbCache = { slugToNumericId, entities };
+  _dbCache = { slugToWikiId, entities };
   return _dbCache;
 }
 
@@ -89,7 +89,7 @@ function loadDatabase() {
  * Get the canonical URL for a page, using semantic directory URLs when available.
  */
 function getPageUrl(page) {
-  const { slugToNumericId, entities } = loadDatabase();
+  const { slugToWikiId, entities } = loadDatabase();
 
   // Check if entity has a dedicated directory page
   const entityType = page.entityType || entities[page.id];
@@ -99,8 +99,8 @@ function getPageUrl(page) {
   }
 
   // Fall back to /wiki/E{N} numeric URL
-  const numericId = slugToNumericId[page.id];
-  const wikiPath = numericId ? `/wiki/${numericId}` : `/wiki/${page.id}`;
+  const wikiId = slugToWikiId[page.id];
+  const wikiPath = wikiId ? `/wiki/${wikiId}` : `/wiki/${page.id}`;
   return `${CONFIG.site.url}${wikiPath}`;
 }
 
@@ -427,7 +427,7 @@ Estimated tokens: ~${Math.round(totalTokens / 1000)}K
 
 /**
  * Generate per-page .txt files for individual LLM access.
- * Writes one file per page to public/wiki/{numericId}.txt
+ * Writes one file per page to public/wiki/{wikiId}.txt
  */
 function generatePerPageTxt(pages) {
   const wikiDir = join(OUTPUT_DIR, 'wiki');
@@ -443,13 +443,13 @@ function generatePerPageTxt(pages) {
     mkdirSync(wikiDir, { recursive: true });
   }
 
-  const { slugToNumericId } = loadDatabase();
+  const { slugToWikiId } = loadDatabase();
   let generated = 0;
   let skipped = 0;
 
   for (const page of pages) {
-    const numericId = slugToNumericId[page.id];
-    if (!numericId) {
+    const wikiId = slugToWikiId[page.id];
+    if (!wikiId) {
       skipped++;
       continue;
     }
@@ -474,7 +474,7 @@ function generatePerPageTxt(pages) {
       '',
     ].filter((line) => line !== null).join('\n');
 
-    writeFileSync(join(wikiDir, `${numericId}.txt`), meta + body + '\n');
+    writeFileSync(join(wikiDir, `${wikiId}.txt`), meta + body + '\n');
     generated++;
   }
 

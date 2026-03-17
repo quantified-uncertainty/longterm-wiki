@@ -3,7 +3,7 @@ thing:
   stableId: zzLBCdjXEw
   type: risk
   name: Epistemic Sycophancy
-  numericId: E124
+  wikiId: E124
 facts:
   - id: f_N1toqonxxQ
     property: description

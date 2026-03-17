@@ -3,7 +3,7 @@ thing:
   stableId: s8PQomHkvA
   type: concept
   name: AI Content Moderation
-  numericId: E75
+  wikiId: E75
 facts:
   - id: f_2NPHorW4Rw
     property: description

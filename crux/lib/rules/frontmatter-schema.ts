@@ -80,7 +80,7 @@ const frontmatterSchema = z.object({
   evergreen: z.literal(false).optional(),
   entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
   entityId: z.string().optional(),
-  numericId: z.string().regex(/^E\d+$/, 'numericId must match format "E" followed by digits (e.g. "E710")').optional(),
+  wikiId: z.string().regex(/^E\d+$/, 'wikiId must match format "E" followed by digits (e.g. "E710")').optional(),
   subcategory: z.enum(VALID_SUBCATEGORIES).optional(),
   roles: z.array(z.string()).optional(),
   clusters: z.array(z.string()).optional(),
@@ -160,7 +160,7 @@ export const frontmatterSchemaRule = {
         rule: 'frontmatter-schema',
         file: contentFile.path,
         line: 1,
-        message: 'entityId: is deprecated — remove it; entity linking is handled via numericId: or filename-based ID',
+        message: 'entityId: is deprecated — remove it; entity linking is handled via wikiId: or filename-based ID',
         severity: Severity.ERROR,
       }));
     }
@@ -195,14 +195,14 @@ export const frontmatterSchemaRule = {
       }
     }
 
-    // Cross-field: entityType in frontmatter is redundant when numericId is set
+    // Cross-field: entityType in frontmatter is redundant when wikiId is set
     // (YAML entity.type is canonical for entity pages; frontmatter entityType can drift)
-    if (frontmatter.entityType !== undefined && frontmatter.numericId !== undefined) {
+    if (frontmatter.entityType !== undefined && frontmatter.wikiId !== undefined) {
       issues.push(new Issue({
         rule: 'frontmatter-schema',
         file: contentFile.path,
         line: 1,
-        message: 'entityType: is redundant when numericId: is set — remove it (entity type is sourced from YAML entity.type)',
+        message: 'entityType: is redundant when wikiId: is set — remove it (entity type is sourced from YAML entity.type)',
         severity: Severity.ERROR,
       }));
     }

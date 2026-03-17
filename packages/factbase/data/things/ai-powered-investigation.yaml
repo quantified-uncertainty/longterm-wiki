@@ -3,7 +3,7 @@ thing:
   stableId: N0NF4lvS4Q
   type: capability
   name: AI-Powered Investigation
-  numericId: E698
+  wikiId: E698
 facts:
   - id: f_mGXOnkuIEw
     property: description

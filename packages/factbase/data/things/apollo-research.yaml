@@ -3,7 +3,7 @@ thing:
   stableId: pKeaWwP6sQ
   type: organization
   name: Apollo Research
-  numericId: E24
+  wikiId: E24
 facts:
   - id: f_lblFLoiIfQ
     property: description

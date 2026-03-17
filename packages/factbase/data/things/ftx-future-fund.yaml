@@ -3,7 +3,7 @@ thing:
   stableId: JhIGCaI3Ng
   type: organization
   name: FTX Future Fund
-  numericId: E855
+  wikiId: E855
 facts:
   - id: f_e6sqIlWDIQ
     property: description

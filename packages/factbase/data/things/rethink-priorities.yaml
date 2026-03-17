@@ -3,7 +3,7 @@ thing:
   stableId: t0p43V5oLA
   type: organization
   name: Rethink Priorities
-  numericId: E558
+  wikiId: E558
 facts:
   - id: f_lxaXiuCgfw
     property: description

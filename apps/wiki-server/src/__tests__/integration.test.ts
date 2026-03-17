@@ -166,14 +166,14 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
     const inserted = await db
       .insert(entityIds)
       .values({
-        numericId: sql`nextval('entity_id_seq')`,
+        wikiId: sql`nextval('entity_id_seq')`,
         slug: "test-entity",
         description: "A test entity",
       })
       .returning();
 
     expect(inserted).toHaveLength(1);
-    expect(inserted[0].numericId).toBe(1);
+    expect(inserted[0].wikiId).toBe(1);
     expect(inserted[0].slug).toBe("test-entity");
     expect(inserted[0].description).toBe("A test entity");
     expect(inserted[0].createdAt).toBeInstanceOf(Date);
@@ -181,7 +181,7 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
 
   it("enforces unique slug constraint", async () => {
     await db.insert(entityIds).values({
-      numericId: sql`nextval('entity_id_seq')`,
+      wikiId: sql`nextval('entity_id_seq')`,
       slug: "unique-test",
     });
 
@@ -189,7 +189,7 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
     const result = await db
       .insert(entityIds)
       .values({
-        numericId: sql`nextval('entity_id_seq')`,
+        wikiId: sql`nextval('entity_id_seq')`,
         slug: "unique-test",
       })
       .onConflictDoNothing({ target: entityIds.slug })
@@ -200,7 +200,7 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
 
   it("selects by slug", async () => {
     await db.insert(entityIds).values({
-      numericId: sql`nextval('entity_id_seq')`,
+      wikiId: sql`nextval('entity_id_seq')`,
       slug: "findme",
     });
 
@@ -224,9 +224,9 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
 
   it("counts entities", async () => {
     await db.insert(entityIds).values([
-      { numericId: sql`nextval('entity_id_seq')`, slug: "a" },
-      { numericId: sql`nextval('entity_id_seq')`, slug: "b" },
-      { numericId: sql`nextval('entity_id_seq')`, slug: "c" },
+      { wikiId: sql`nextval('entity_id_seq')`, slug: "a" },
+      { wikiId: sql`nextval('entity_id_seq')`, slug: "b" },
+      { wikiId: sql`nextval('entity_id_seq')`, slug: "c" },
     ]);
 
     const result = await db.select({ count: count() }).from(entityIds);
@@ -236,7 +236,7 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
   it("supports transactions", async () => {
     await db.transaction(async (tx) => {
       await tx.insert(entityIds).values({
-        numericId: sql`nextval('entity_id_seq')`,
+        wikiId: sql`nextval('entity_id_seq')`,
         slug: "tx-test",
       });
     });
@@ -507,7 +507,7 @@ describeWithDb("Integration: Route handlers against real DB", () => {
 
     expect(res.status).toBe(201);
     const body = await res.json();
-    expect(body.numericId).toBe("E886");
+    expect(body.wikiId).toBe("E886");
     expect(body.slug).toBe("integration-test");
     expect(body.created).toBe(true);
   });

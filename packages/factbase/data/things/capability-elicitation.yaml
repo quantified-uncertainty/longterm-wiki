@@ -3,7 +3,7 @@ thing:
   stableId: PQgF6Ve9ZA
   type: approach
   name: Capability Elicitation
-  numericId: E443
+  wikiId: E443
 facts:
   - id: f_nzr39RC8aQ
     property: description

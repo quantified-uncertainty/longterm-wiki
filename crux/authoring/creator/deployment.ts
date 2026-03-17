@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
+import { ENTITY_LINK_RE, WIKI_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
 
 let _slugToNumeric: Record<string, string> | null = null;
@@ -23,9 +23,9 @@ function getSlugToNumericMap(ROOT: string): Record<string, string> {
     const dbPath = path.join(ROOT, 'apps/web/src/data/database.json');
     const raw = fs.readFileSync(dbPath, 'utf-8');
     const db = JSON.parse(raw);
-    const byNumericId: Record<string, string> = db.idRegistry?.byNumericId || {};
+    const byWikiId: Record<string, string> = db.idRegistry?.byWikiId || {};
     _slugToNumeric = {};
-    for (const [eid, slug] of Object.entries(byNumericId)) {
+    for (const [eid, slug] of Object.entries(byWikiId)) {
       _slugToNumeric[slug] = eid;
     }
     return _slugToNumeric;
@@ -36,7 +36,7 @@ function getSlugToNumericMap(ROOT: string): Record<string, string> {
 }
 
 /** Convert slug-based EntityLink/DataInfoBox IDs to numeric (E##) format */
-export function convertSlugsToNumericIds(content: string, ROOT: string): { content: string; converted: number } {
+export function convertSlugsToWikiIds(content: string, ROOT: string): { content: string; converted: number } {
   const slugToNumeric = getSlugToNumericMap(ROOT);
   let converted = 0;
 
@@ -44,7 +44,7 @@ export function convertSlugsToNumericIds(content: string, ROOT: string): { conte
   const result = content.replace(
     /(<EntityLink\s+[^>]*?)id="([^"]+)"/g,
     (_match, prefix, id) => {
-      if (NUMERIC_ID_RE.test(id)) return _match; // already numeric
+      if (WIKI_ID_RE.test(id)) return _match; // already numeric
       if (slugToNumeric[id]) {
         converted++;
         return `${prefix}id="${slugToNumeric[id]}"`;
@@ -57,7 +57,7 @@ export function convertSlugsToNumericIds(content: string, ROOT: string): { conte
   const result2 = result.replace(
     /entityId="([^"]+)"/g,
     (_match, id) => {
-      if (NUMERIC_ID_RE.test(id)) return _match;
+      if (WIKI_ID_RE.test(id)) return _match;
       if (slugToNumeric[id]) {
         converted++;
         return `entityId="${slugToNumeric[id]}"`;
@@ -122,7 +122,7 @@ export function deployToDestination(topic: string, destPath: string, { ROOT, get
 
   // Copy and convert slug-based EntityLink IDs to numeric (E##) format
   let content = fs.readFileSync(finalPath, 'utf-8');
-  const { content: converted, converted: count } = convertSlugsToNumericIds(content, ROOT);
+  const { content: converted, converted: count } = convertSlugsToWikiIds(content, ROOT);
 
   // Validate content structure before writing (#818) — defense-in-depth against JSON blob corruption
   const validation = validateMdxContent(converted);

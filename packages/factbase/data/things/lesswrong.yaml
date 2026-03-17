@@ -3,7 +3,7 @@ thing:
   stableId: BEKEqQDmkQ
   type: organization
   name: LessWrong
-  numericId: E538
+  wikiId: E538
 facts:
   - id: f_58FgydQFRQ
     property: description

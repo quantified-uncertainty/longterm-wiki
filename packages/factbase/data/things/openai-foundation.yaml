@@ -3,7 +3,7 @@ thing:
   stableId: GQuPhNkZbg
   type: organization
   name: OpenAI Foundation
-  numericId: E421
+  wikiId: E421
 facts:
   - id: f_O77nrMaAKQ
     property: description

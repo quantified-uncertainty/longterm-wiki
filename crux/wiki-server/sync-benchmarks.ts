@@ -36,7 +36,7 @@ const DEFAULT_BATCH_SIZE = 100;
 
 interface YamlBenchmark {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   type: string;
   title: string;
   description?: string;
@@ -51,7 +51,7 @@ interface YamlBenchmark {
 
 interface YamlModel {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   type: string;
   title: string;
   developer?: string;
@@ -262,10 +262,10 @@ export function loadModels(filePath: string = AI_MODELS_FILE): YamlModel[] {
 // --- Transform ---
 
 function transformBenchmark(b: YamlBenchmark): SyncBenchmark {
-  // Use the numericId's stable ID from the ID registry
-  // The numericId like "E1100" maps to a 10-char stable ID
+  // Use the wikiId's stable ID from the ID registry
+  // The wikiId like "E1100" maps to a 10-char stable ID
   // For the sync, we need the 10-char stable PK.
-  // Since benchmarks.yaml uses numericId like "E1100", we derive a deterministic
+  // Since benchmarks.yaml uses wikiId like "E1100", we derive a deterministic
   // 10-char ID from the slug to ensure idempotent syncs.
   const stableId = contentHash(["benchmark", b.id]);
 

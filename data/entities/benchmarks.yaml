@@ -4,7 +4,7 @@
 
 - id: mmlu
   stableId: pDqehtEoiw
-  numericId: E1100
+  wikiId: E1100
   type: benchmark
   title: MMLU
   description: "Massive Multitask Language Understanding — a multiple-choice benchmark covering 57 academic subjects from STEM to humanities."
@@ -20,7 +20,7 @@
 
 - id: swe-bench-verified
   stableId: FaFyApPcNQ
-  numericId: E1101
+  wikiId: E1101
   type: benchmark
   title: SWE-bench Verified
   description: "A curated subset of SWE-bench with human-verified task instances for evaluating AI systems on real-world software engineering tasks from GitHub issues."
@@ -36,7 +36,7 @@
 
 - id: math-benchmark
   stableId: j76swRBTVA
-  numericId: E1102
+  wikiId: E1102
   type: benchmark
   title: MATH
   description: "A dataset of 12,500 competition mathematics problems testing mathematical reasoning across difficulty levels 1-5."
@@ -51,7 +51,7 @@
 
 - id: humaneval
   stableId: 7nyWJfSgOQ
-  numericId: E1103
+  wikiId: E1103
   type: benchmark
   title: HumanEval
   description: "A benchmark of 164 hand-written Python programming problems with unit tests, evaluating code generation from docstrings."
@@ -66,7 +66,7 @@
 
 - id: gpqa-diamond
   stableId: TOj1uhYwMA
-  numericId: E1104
+  wikiId: E1104
   type: benchmark
   title: GPQA Diamond
   description: "Graduate-level Google-Proof Q&A Diamond subset — extremely difficult questions in physics, chemistry, and biology that even domain experts struggle with."
@@ -81,7 +81,7 @@
 
 - id: arc-agi
   stableId: GtNBCWxnjA
-  numericId: E1105
+  wikiId: E1105
   type: benchmark
   title: ARC-AGI
   description: "Abstraction and Reasoning Corpus — a benchmark of visual pattern recognition tasks designed to test fluid intelligence and novel reasoning."
@@ -97,7 +97,7 @@
 
 - id: arc-agi-2
   stableId: C7CZ1MleIQ
-  numericId: E1106
+  wikiId: E1106
   type: benchmark
   title: ARC-AGI-2
   description: "Second iteration of the ARC benchmark with harder tasks, designed to remain challenging as AI capabilities improve."
@@ -110,7 +110,7 @@
 
 - id: terminal-bench-hard
   stableId: 9kQIZcOluA
-  numericId: E1107
+  wikiId: E1107
   type: benchmark
   title: Terminal-Bench Hard
   description: "A benchmark evaluating AI agents on complex terminal-based tasks requiring multi-step reasoning and system administration skills."
@@ -124,7 +124,7 @@
 
 - id: terminal-bench-2
   stableId: lbTyjIb90A
-  numericId: E1108
+  wikiId: E1108
   type: benchmark
   title: Terminal-Bench 2
   description: "Second version of the Terminal-Bench benchmark with expanded task coverage and difficulty."
@@ -135,7 +135,7 @@
 
 - id: artificial-analysis-intelligence-index
   stableId: dEzoE9HQTg
-  numericId: E1109
+  wikiId: E1109
   type: benchmark
   title: Artificial Analysis Intelligence Index
   description: "A composite intelligence index from Artificial Analysis that aggregates performance across multiple benchmarks to provide a single capability score."
@@ -148,7 +148,7 @@
 
 - id: osworld
   stableId: WYTefOxYPQ
-  numericId: E1110
+  wikiId: E1110
   type: benchmark
   title: OSWorld
   description: "A benchmark for multimodal agents on real-world computer tasks across operating systems, testing GUI interaction and task completion."
@@ -162,7 +162,7 @@
 
 - id: aime-2025
   stableId: OiqJ2XUuMQ
-  numericId: E1111
+  wikiId: E1111
   type: benchmark
   title: AIME 2025
   description: "American Invitational Mathematics Examination 2025 — a prestigious math competition used as a benchmark for advanced mathematical reasoning."
@@ -174,7 +174,7 @@
 
 - id: mmlu-pro
   stableId: RT858MkjuQ
-  numericId: E1301
+  wikiId: E1301
   type: benchmark
   title: MMLU-Pro
   description: "A harder variant of MMLU with 10 answer choices (vs 4), chain-of-thought reasoning, and reduced sensitivity to prompt format. Designed to better discriminate among top models."
@@ -190,7 +190,7 @@
 
 - id: simpleqa
   stableId: oxtbxgfUUg
-  numericId: E1302
+  wikiId: E1302
   type: benchmark
   title: SimpleQA
   description: "A factual question-answering benchmark from OpenAI testing short, fact-seeking questions with verifiable answers. Evaluates factual accuracy and calibration."
@@ -205,7 +205,7 @@
 
 - id: humanitys-last-exam
   stableId: Lh6IqIxepw
-  numericId: E1235
+  wikiId: E1235
   type: benchmark
   title: "Humanity's Last Exam"
   description: "A benchmark of 2,500+ expert-level questions across dozens of academic disciplines, designed to be the hardest public AI evaluation. Questions contributed by domain experts worldwide."
@@ -221,7 +221,7 @@
 
 - id: ifeval
   stableId: 3DEqmUEGPQ
-  numericId: E1236
+  wikiId: E1236
   type: benchmark
   title: IFEval
   description: "Instruction-Following Evaluation benchmark testing whether LLMs can follow explicit formatting constraints (e.g., 'write exactly 3 paragraphs', 'include these keywords')."
@@ -236,7 +236,7 @@
 
 - id: chatbot-arena-elo
   stableId: HcdwpPmRSw
-  numericId: E1237
+  wikiId: E1237
   type: benchmark
   title: Chatbot Arena Elo
   description: "Community-driven model ranking based on pairwise human preference votes. Users compare anonymous model outputs and vote for the better response. Over 2 million votes collected."
@@ -252,7 +252,7 @@
 
 - id: livecodebench
   stableId: RoW25Cag2g
-  numericId: E1238
+  wikiId: E1238
   type: benchmark
   title: LiveCodeBench
   description: "A contamination-free coding benchmark using new competitive programming problems from LeetCode, AtCoder, and Codeforces. Problems are refreshed continuously to prevent data leakage."
@@ -268,7 +268,7 @@
 
 - id: livebench
   stableId: QZHbwL6aHg
-  numericId: E1240
+  wikiId: E1240
   type: benchmark
   title: LiveBench
   description: "A monthly-refreshed benchmark with objective ground-truth answers across math, coding, reasoning, language, instruction following, and data analysis. Designed to resist contamination."
@@ -284,7 +284,7 @@
 
 - id: bfcl
   stableId: 67KLm5yAHQ
-  numericId: E1241
+  wikiId: E1241
   type: benchmark
   title: BFCL
   description: "Berkeley Function Calling Leaderboard — evaluates LLMs on their ability to correctly generate function/tool calls including parameter extraction, type handling, and multi-turn interactions."
@@ -300,7 +300,7 @@
 
 - id: frontiermath
   stableId: MnqcmhPTaQ
-  numericId: E1242
+  wikiId: E1242
   type: benchmark
   title: FrontierMath
   description: "Research-grade mathematics benchmark from Epoch AI featuring original problems created by professional mathematicians. Designed to remain unsaturated for years."
@@ -316,7 +316,7 @@
 
 - id: aime-2024
   stableId: lUijiPGVBw
-  numericId: E1243
+  wikiId: E1243
   type: benchmark
   title: AIME 2024
   description: "American Invitational Mathematics Examination 2024 — a prestigious math competition testing advanced problem-solving. 30 problems with integer answers 0-999."
@@ -328,7 +328,7 @@
 
 - id: bbh
   stableId: oojQVYfPfw
-  numericId: E1245
+  wikiId: E1245
   type: benchmark
   title: BBH
   description: "BIG-Bench Hard — a curated subset of 23 challenging tasks from BIG-Bench where language models previously failed to outperform average human raters. Tests multi-step reasoning."
@@ -343,7 +343,7 @@
 
 - id: hellaswag
   stableId: Huw5YsSoMg
-  numericId: E1247
+  wikiId: E1247
   type: benchmark
   title: HellaSwag
   description: "A commonsense natural language inference benchmark testing whether models can predict the most plausible continuation of a scenario. Uses adversarial filtering against LMs."
@@ -358,7 +358,7 @@
 
 - id: re-bench
   stableId: sOJOmnwGmA
-  numericId: E1249
+  wikiId: E1249
   type: benchmark
   title: RE-Bench
   description: "Research Engineering Benchmark from METR — evaluates AI agents on 7 challenging ML research engineering tasks requiring multi-step problem solving over extended time horizons."
@@ -373,7 +373,7 @@
 
 - id: mle-bench
   stableId: dPZFXNFXcA
-  numericId: E1251
+  wikiId: E1251
   type: benchmark
   title: MLE-bench
   description: "Machine Learning Engineering benchmark from OpenAI — evaluates AI agents on 75 real Kaggle competitions testing data science and ML engineering skills."
@@ -388,7 +388,7 @@
 
 - id: webarena
   stableId: 0HEF0o51UA
-  numericId: E1253
+  wikiId: E1253
   type: benchmark
   title: WebArena
   description: "A realistic web agent benchmark where AI must complete tasks on self-hosted replicas of real websites (Reddit, GitLab, shopping, maps). Tests multi-step web navigation and interaction."
@@ -404,7 +404,7 @@
 
 - id: tau-bench
   stableId: Z6tH7RnpHg
-  numericId: E1254
+  wikiId: E1254
   type: benchmark
   title: TAU-bench
   description: "Tool Agent User benchmark from Sierra AI — evaluates AI agents on realistic customer service scenarios requiring multi-turn tool use across airline and retail domains."
@@ -419,7 +419,7 @@
 
 - id: mgsm
   stableId: tDWpiYrrkQ
-  numericId: E1255
+  wikiId: E1255
   type: benchmark
   title: MGSM
   description: "Multilingual Grade School Math — a benchmark of 250 grade-school math problems translated into 10 typologically diverse languages. Tests multilingual mathematical reasoning."
@@ -434,7 +434,7 @@
 
 - id: mathvista
   stableId: 1mGW7D6lwQ
-  numericId: E1256
+  wikiId: E1256
   type: benchmark
   title: MathVista
   description: "A benchmark for mathematical reasoning in visual contexts — combines visual understanding with mathematical problem-solving across geometry, charts, scientific figures, and more."
@@ -449,7 +449,7 @@
 
 - id: codeforces-rating
   stableId: 2deBrz125g
-  numericId: E1257
+  wikiId: E1257
   type: benchmark
   title: Codeforces Rating
   description: "Performance rating on Codeforces competitive programming platform, measuring algorithmic problem-solving ability. Ratings range from ~800 (beginner) to 3500+ (legendary grandmaster)."

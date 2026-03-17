@@ -3,7 +3,7 @@ thing:
   stableId: RW4LTglM1Q
   type: approach
   name: AI-Augmented Forecasting
-  numericId: E9
+  wikiId: E9
 facts:
   - id: f_0Ud8LQYQCA
     property: description

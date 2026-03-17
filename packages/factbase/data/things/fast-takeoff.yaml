@@ -3,7 +3,7 @@ thing:
   stableId: fRYu1EXclA
   type: concept
   name: Fast Takeoff
-  numericId: E139
+  wikiId: E139
 facts:
   - id: f_fJfbHFw1aw
     property: description

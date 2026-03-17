@@ -3,7 +3,7 @@ thing:
   stableId: a2PktXtU4A
   type: approach
   name: Process Supervision
-  numericId: E455
+  wikiId: E455
 facts:
   - id: f_sar1r80isw
     property: description

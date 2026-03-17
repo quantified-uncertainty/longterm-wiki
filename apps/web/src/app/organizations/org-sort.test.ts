@@ -8,7 +8,7 @@ function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
     id: "o1",
     slug: "org-1",
     name: "Acme Corp",
-    numericId: null,
+    wikiId: null,
     orgType: null,
     wikiPageId: null,
     revenue: null,

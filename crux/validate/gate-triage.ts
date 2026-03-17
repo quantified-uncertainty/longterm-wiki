@@ -125,7 +125,7 @@ export interface TriageResult {
 /** Step descriptions for the Haiku prompt */
 const STEP_DESCRIPTIONS: Record<string, string> = {
   'test': 'Run vitest tests (apps/web/ test files). Relevant when app TS, crux TS, or test files change.',
-  'unified-blocking': 'MDX syntax, frontmatter schema, numeric IDs, EntityLink, pipeline artifacts. Relevant when MDX content or YAML data changes.',
+  'unified-blocking': 'MDX syntax, frontmatter schema, wiki IDs, EntityLink, pipeline artifacts. Relevant when MDX content or YAML data changes.',
   'yaml-schema': 'YAML entity schema validation. Relevant when YAML data files change.',
   'typecheck': 'TypeScript type check for apps/web/. Relevant when app TS files, config, or package.json change.',
   'typecheck-crux': 'TypeScript type check for crux/. Relevant when crux TS files change.',

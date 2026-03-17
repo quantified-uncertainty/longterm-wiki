@@ -3,7 +3,7 @@ thing:
   stableId: xwxKWEAkSQ
   type: approach
   name: Representation Engineering
-  numericId: E479
+  wikiId: E479
 facts:
   - id: f_YvlG2uTZ8Q
     property: description

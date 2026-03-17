@@ -3,7 +3,7 @@ thing:
   stableId: 5jfxLzMZYg
   type: organization
   name: The Foundation Layer
-  numericId: E697
+  wikiId: E697
 facts:
   - id: f_nSN5I77cmA
     property: description

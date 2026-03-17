@@ -3,7 +3,7 @@ thing:
   stableId: VoNqoBJkyg
   type: person
   name: Dan Hendrycks
-  numericId: E89
+  wikiId: E89
 facts:
   - id: f_13yRhPOk4w
     property: description

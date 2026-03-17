@@ -18,7 +18,7 @@ export default function ApproachesPage() {
     title: a.title,
     description: a.description ?? null,
     tags: a.tags ?? [],
-    numericId: a.numericId ?? null,
+    wikiId: a.wikiId ?? null,
   }));
 
   const uniqueTagCount = new Set(rows.flatMap((r) => r.tags)).size;

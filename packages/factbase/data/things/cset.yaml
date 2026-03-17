@@ -3,7 +3,7 @@ thing:
   stableId: lvsDuyzPcg
   type: organization
   name: CSET (Center for Security and Emerging Technology)
-  numericId: E524
+  wikiId: E524
 facts:
   - id: f_5GrL7XHIjQ
     property: description

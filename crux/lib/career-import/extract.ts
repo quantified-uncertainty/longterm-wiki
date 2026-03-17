@@ -60,7 +60,7 @@ interface KBThing {
     stableId: string;
     type: string;
     name: string;
-    numericId?: string;
+    wikiId?: string;
     aliases?: string[];
   };
   facts?: Array<{

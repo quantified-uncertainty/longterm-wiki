@@ -33,7 +33,7 @@ const PAGES_JSON_PATH = join(
 
 interface PageData {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   title: string;
   quality?: number | null;
   readerImportance?: number | null;

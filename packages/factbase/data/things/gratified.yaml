@@ -3,7 +3,7 @@ thing:
   stableId: 2v7A8mb7Ww
   type: organization
   name: Gratified
-  numericId: E534
+  wikiId: E534
 facts:
   - id: f_BFePo6Kaqg
     property: description

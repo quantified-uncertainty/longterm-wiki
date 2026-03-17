@@ -69,7 +69,7 @@ export interface Entity {
   type: string;
   entityType?: string;  // Legacy alias for type, used by some scripts
   title: string;
-  numericId?: string;
+  wikiId?: string;
   description?: string;
   aliases?: string[];
   status?: string;
@@ -409,7 +409,7 @@ export function loadDatabase(): DatabaseSchema {
 }
 
 export interface IdRegistryData {
-  byNumericId: Record<string, string>; // E## → slug
+  byWikiId: Record<string, string>; // E## → slug
   bySlug: Record<string, string>;      // slug → E##
 }
 
@@ -420,7 +420,7 @@ export interface IdRegistryData {
 export function loadIdRegistry(): IdRegistryData {
   const db = loadDatabase();
   const reg = (db as Record<string, unknown>).idRegistry as IdRegistryData | undefined;
-  return reg || { byNumericId: {}, bySlug: {} };
+  return reg || { byWikiId: {}, bySlug: {} };
 }
 
 // ---------------------------------------------------------------------------

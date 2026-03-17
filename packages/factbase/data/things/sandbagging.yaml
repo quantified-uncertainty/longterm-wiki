@@ -3,7 +3,7 @@ thing:
   stableId: GzX9hnrzWw
   type: risk
   name: AI Capability Sandbagging
-  numericId: E270
+  wikiId: E270
 facts:
   - id: f_w74jgVyOHw
     property: description

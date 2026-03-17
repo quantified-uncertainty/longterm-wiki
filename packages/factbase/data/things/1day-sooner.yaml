@@ -3,7 +3,7 @@ thing:
   stableId: 9k7drw6Qpg
   type: organization
   name: 1Day Sooner
-  numericId: E509
+  wikiId: E509
 facts:
   - id: f_ym4qkTsDVg
     property: description

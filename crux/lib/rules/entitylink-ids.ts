@@ -2,7 +2,7 @@
  * Rule: EntityLink ID Validation
  *
  * Checks that all <EntityLink id="..."> components reference valid IDs
- * and follow the preferred format: numeric ID primary, optional name cross-check.
+ * and follow the preferred format: wiki ID primary, optional name cross-check.
  *
  * Preferred format:
  *   <EntityLink id="E42" name="anthropic">Anthropic</EntityLink>
@@ -10,14 +10,14 @@
  * Checks:
  * 1. ID resolves to a known entity (via pathRegistry, entities DB, or content file)
  * 2. Slug IDs should use numeric format instead (ERROR, auto-fixable)
- * 3. Numeric ID + name: validates name matches the entity's slug (ERROR if mismatch)
- * 4. Numeric ID without name: advisory (WARNING, auto-fixable)
- * 5. Unknown numeric ID: warning
+ * 3. Wiki ID + name: validates name matches the entity's slug (ERROR if mismatch)
+ * 4. Wiki ID without name: advisory (WARNING, auto-fixable)
+ * 5. Unknown wiki ID: warning
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE, extractEntityLinkName } from '../patterns.ts';
+import { ENTITY_LINK_RE, WIKI_ID_RE, extractEntityLinkName } from '../patterns.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
@@ -88,16 +88,16 @@ export const entityLinkIdsRule = createRule({
         const rawId = match[1];
         const nameAttr = extractEntityLinkName(fullTag);
 
-        // --- Bare numeric ID (35 instead of E35) ---
+        // --- Bare wiki ID (35 instead of E35) ---
         if (/^\d+$/.test(rawId)) {
           const eId = `E${rawId}`;
-          const slug = engine.idRegistry?.byNumericId[eId];
+          const slug = engine.idRegistry?.byWikiId[eId];
           const nameStr = slug ? ` name="${slug}"` : '';
           issues.push(new Issue({
             rule: this.id,
             file: content.path,
             line: lineNum,
-            message: `EntityLink id="${rawId}" — bare numeric ID; use "${eId}"${slug ? ` (${slug})` : ''} instead`,
+            message: `EntityLink id="${rawId}" — bare wiki ID; use "${eId}"${slug ? ` (${slug})` : ''} instead`,
             severity: Severity.ERROR,
             fix: {
               type: FixType.REPLACE_TEXT,
@@ -108,11 +108,11 @@ export const entityLinkIdsRule = createRule({
           continue;
         }
 
-        // --- Numeric ID (E35) ---
-        if (NUMERIC_ID_RE.test(rawId) && engine.idRegistry) {
-          const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];
+        // --- Wiki ID (E35) ---
+        if (WIKI_ID_RE.test(rawId) && engine.idRegistry) {
+          const slug = engine.idRegistry.byWikiId[rawId.toUpperCase()];
           if (slug) {
-            // Numeric ID resolves — check name attribute
+            // Wiki ID resolves — check name attribute
             if (nameAttr) {
               if (nameAttr !== slug) {
                 // Name mismatch — ERROR (hallucination or stale reference)
@@ -131,7 +131,7 @@ export const entityLinkIdsRule = createRule({
               }
               // else: name matches — perfect, no issue
             } else {
-              // Numeric ID without name — advisory warning with auto-fix
+              // Wiki ID without name — advisory warning with auto-fix
               issues.push(new Issue({
                 rule: this.id,
                 file: content.path,
@@ -145,14 +145,14 @@ export const entityLinkIdsRule = createRule({
                 },
               }));
             }
-            continue; // Numeric ID is valid; skip path/entity resolution check
+            continue; // Wiki ID is valid; skip path/entity resolution check
           } else {
-            // Unknown numeric ID
+            // Unknown wiki ID
             issues.push(new Issue({
               rule: this.id,
               file: content.path,
               line: lineNum,
-              message: `EntityLink id="${rawId}" is not a registered numeric ID`,
+              message: `EntityLink id="${rawId}" is not a registered wiki ID`,
               severity: Severity.WARNING,
             }));
             continue;
@@ -180,20 +180,20 @@ export const entityLinkIdsRule = createRule({
           continue;
         }
 
-        // Slug resolves — suggest numeric+name format if numeric ID is available
+        // Slug resolves — suggest numeric+name format if wiki ID is available
         if (engine.idRegistry) {
-          const numericId = engine.idRegistry.bySlug[id];
-          if (numericId) {
+          const wikiId = engine.idRegistry.bySlug[id];
+          if (wikiId) {
             issues.push(new Issue({
               rule: this.id,
               file: content.path,
               line: lineNum,
-              message: `EntityLink id="${rawId}" — use numeric format: id="${numericId}" name="${id}"`,
+              message: `EntityLink id="${rawId}" — use numeric format: id="${wikiId}" name="${id}"`,
               severity: Severity.ERROR,
               fix: {
                 type: FixType.REPLACE_TEXT,
                 oldText: `id="${rawId}"`,
-                newText: `id="${numericId}" name="${rawId}"`,
+                newText: `id="${wikiId}" name="${rawId}"`,
               },
             }));
           }

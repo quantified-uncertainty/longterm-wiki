@@ -1,5 +1,5 @@
 ---
-numericId: E894
+wikiId: E894
 title: "Knowledge Graph Ontology: Design & Implementation Status"
 description: Design document for the wiki's knowledge graph property ontology, tracking what was proposed versus what the KB system now implements — including typed properties, entity schemas, temporal facts, source attribution, and inverse relationships
 sidebar:
@@ -93,7 +93,7 @@ A single TechCrunch article produces 8-12 claims. A single annual report might p
 
 ### Layer 1: Universal Properties (apply to all entity types)
 
-**Status: Largely implemented in KB.** Each KB entity file (`packages/kb/data/things/*.yaml`) has a `thing:` header with `id`, `name`, `type`, `numericId`, and `aliases`. Many of the properties below now exist as KB properties:
+**Status: Largely implemented in KB.** Each KB entity file (`packages/kb/data/things/*.yaml`) has a `thing:` header with `id`, `name`, `type`, `wikiId`, and `aliases`. Many of the properties below now exist as KB properties:
 
 | Property | Value type | Description | KB status |
 |---|---|---|---|

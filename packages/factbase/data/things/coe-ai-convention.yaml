@@ -3,7 +3,7 @@ thing:
   stableId: SrEFtBmBYg
   type: policy
   name: Council of Europe Framework Convention on Artificial Intelligence
-  numericId: E587
+  wikiId: E587
 facts:
   - id: f_ycxL5xOiuQ
     property: description

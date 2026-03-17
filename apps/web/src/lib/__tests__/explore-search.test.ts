@@ -5,7 +5,7 @@ import type { ExploreItem } from "@/data";
 /** Helper to create a minimal ExploreItem for testing. */
 function makeItem(overrides: Partial<ExploreItem> & { id: string; title: string }): ExploreItem {
   return {
-    numericId: "E1",
+    wikiId: "E1",
     type: "concept",
     description: null,
     tags: [],
@@ -109,7 +109,7 @@ describe("filterAndRankBySearch", () => {
     makeItem({
       id: "ai-alignment",
       title: "AI Alignment",
-      numericId: "E1",
+      wikiId: "E1",
       description: "Comprehensive review of AI alignment approaches",
       tags: ["alignment", "anthropic"],
       recommendedScore: 95,
@@ -117,7 +117,7 @@ describe("filterAndRankBySearch", () => {
     makeItem({
       id: "anthropic",
       title: "Anthropic",
-      numericId: "E2",
+      wikiId: "E2",
       description: "AI safety company",
       tags: ["ai-company"],
       recommendedScore: 80,
@@ -125,7 +125,7 @@ describe("filterAndRankBySearch", () => {
     makeItem({
       id: "anthropic-pentagon",
       title: "Anthropic-Pentagon Partnership",
-      numericId: "E3",
+      wikiId: "E3",
       description: "Analysis of Anthropic defense contract",
       tags: ["defense"],
       recommendedScore: 60,
@@ -133,7 +133,7 @@ describe("filterAndRankBySearch", () => {
     makeItem({
       id: "structured-access",
       title: "Structured Access / API-Only",
-      numericId: "E4",
+      wikiId: "E4",
       description: "Structured access deployment by Anthropic and others",
       tags: ["deployment-safety"],
       recommendedScore: 70,
@@ -141,7 +141,7 @@ describe("filterAndRankBySearch", () => {
     makeItem({
       id: "openai",
       title: "OpenAI",
-      numericId: "E5",
+      wikiId: "E5",
       description: "AI research company",
       tags: ["ai-company"],
       recommendedScore: 85,

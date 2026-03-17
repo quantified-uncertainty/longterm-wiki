@@ -3,7 +3,7 @@ thing:
   stableId: 1tpQRlyyIQ
   type: project
   name: Metaforecast
-  numericId: E200
+  wikiId: E200
 facts:
   - id: f_3cJPlhlDBA
     property: description

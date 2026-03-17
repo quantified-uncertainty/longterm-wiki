@@ -3,7 +3,7 @@ thing:
   stableId: UD11PlWtlg
   type: policy
   name: California SB 53
-  numericId: E457
+  wikiId: E457
 facts:
   - id: f_qT9iciEztQ
     property: description

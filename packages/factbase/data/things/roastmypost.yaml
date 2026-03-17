@@ -3,7 +3,7 @@ thing:
   stableId: xFFP7KkzFQ
   type: project
   name: RoastMyPost
-  numericId: E385
+  wikiId: E385
 facts:
   - id: f_LwlMmudfYw
     property: description

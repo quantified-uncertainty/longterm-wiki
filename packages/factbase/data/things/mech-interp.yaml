@@ -3,7 +3,7 @@ thing:
   stableId: 0vyIQ4YLIA
   type: research-area
   name: Mechanistic Interpretability
-  numericId: E477
+  wikiId: E477
 facts:
   - id: f_MHmnJw6d8w
     property: description

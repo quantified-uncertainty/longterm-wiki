@@ -3,7 +3,7 @@ thing:
   stableId: 9nUCGERzgQ
   type: organization
   name: William and Flora Hewlett Foundation
-  numericId: E535
+  wikiId: E535
 facts:
   - id: f_lgHSlgia8Q
     property: description

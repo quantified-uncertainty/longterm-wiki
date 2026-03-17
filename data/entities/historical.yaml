@@ -3,7 +3,7 @@
 
 - id: deep-learning-era
   stableId: SbxvDZzTsQ
-  numericId: E95
+  wikiId: E95
   type: historical
   title: Deep Learning Revolution Era
   customFields:
@@ -69,7 +69,7 @@
   lastUpdated: 2025-12
 - id: early-warnings
   stableId: PjjrjKmJvg
-  numericId: E107
+  wikiId: E107
   type: historical
   title: Early Warnings Era
   customFields:
@@ -128,7 +128,7 @@
   lastUpdated: 2025-12
 - id: mainstream-era
   stableId: G1XyCr76gw
-  numericId: E195
+  wikiId: E195
   type: historical
   title: Mainstream Era
   customFields:
@@ -191,7 +191,7 @@
   lastUpdated: 2025-12
 - id: miri-era
   stableId: 7kMHUDshhw
-  numericId: E203
+  wikiId: E203
   type: historical
   title: The MIRI Era
   customFields:
@@ -250,7 +250,7 @@
   lastUpdated: 2025-12
 - id: ai-safety-summit
   stableId: mnhBgvNfXA
-  numericId: E14
+  wikiId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
   description: >-

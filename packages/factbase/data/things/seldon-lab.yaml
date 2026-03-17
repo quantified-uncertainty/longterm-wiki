@@ -3,7 +3,7 @@ thing:
   stableId: eBYk2wn75Q
   type: organization
   name: Seldon Lab
-  numericId: E565
+  wikiId: E565
 facts:
   - id: f_rWTu9hF2kg
     property: description

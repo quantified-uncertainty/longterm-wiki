@@ -149,15 +149,15 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
   const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
 
-  // Build numeric ID → slug mapping from database.json
+  // Build wiki ID → slug mapping from database.json
   const numericToSlug = new Map<string, string>();
   try {
     const reg = loadIdRegistry();
-    for (const [numId, slug] of Object.entries(reg.byNumericId)) {
+    for (const [numId, slug] of Object.entries(reg.byWikiId)) {
       numericToSlug.set(numId, slug);
     }
   } catch {
-    // Registry unavailable — proceed without numeric ID resolution
+    // Registry unavailable — proceed without wiki ID resolution
   }
 
   // Find all MDX files
@@ -302,7 +302,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     const match = content.match(/<DataInfoBox\s+entityId="([^"]+)"/);
     if (match) {
       const rawId = match[1];
-      // Resolve numeric IDs (e.g. "E5") to slugs
+      // Resolve wiki IDs (e.g. "E5") to slugs
       const entityId = rawId.match(/^E\d+$/) ? (numericToSlug.get(rawId) ?? rawId) : rawId;
       if (!entityIds.has(entityId) && !expertIds.has(entityId) && !orgIds.has(entityId)) {
         console.log(`${colors.red}❌ ${file}: DataInfoBox references unknown entityId "${rawId}"${colors.reset}`);

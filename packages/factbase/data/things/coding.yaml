@@ -3,7 +3,7 @@ thing:
   stableId: 64WDhlxxKA
   type: capability
   name: Autonomous Coding
-  numericId: E61
+  wikiId: E61
 facts:
   - id: f_efSuCb0t2w
     property: description

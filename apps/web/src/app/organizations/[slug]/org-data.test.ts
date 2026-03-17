@@ -446,3 +446,69 @@ describe("extractDateFromUrl", () => {
     ).toBe("2023-07-01");
   });
 });
+
+// ── deriveEquityCategory ─────────────────────────────────────────────
+
+import { deriveEquityCategory, computeStakeValue } from "./org-data";
+
+describe("deriveEquityCategory", () => {
+  it("returns Co-founder when any investment has role=founder", () => {
+    expect(
+      deriveEquityCategory("Dario Amodei", [
+        { role: "founder", date: "2021-01", roundName: "Founding" },
+      ]),
+    ).toBe("Co-founder");
+  });
+
+  it("returns Early investor when earliest date is ≤ 2021-12", () => {
+    expect(
+      deriveEquityCategory("Jaan Tallinn", [
+        { role: "lead", date: "2021-05", roundName: "Series A" },
+      ]),
+    ).toBe("Early investor");
+  });
+
+  it("returns Strategic investor for known tech companies", () => {
+    expect(
+      deriveEquityCategory("Google", [
+        { role: null, date: "2023-06", roundName: "Series C" },
+      ]),
+    ).toBe("Strategic investor");
+  });
+
+  it("returns Investor as default for later-stage investors", () => {
+    expect(
+      deriveEquityCategory("Some Fund", [
+        { role: null, date: "2024-03", roundName: "Series E" },
+      ]),
+    ).toBe("Investor");
+  });
+
+  it("returns Employees for holder names containing 'employee'", () => {
+    expect(deriveEquityCategory("Employee Equity Pool", [])).toBe("Employees");
+  });
+
+  it("returns Institutional for holder names containing 'institutional'", () => {
+    expect(deriveEquityCategory("Institutional Investors", [])).toBe("Institutional");
+  });
+
+  it("returns Investor when no investments and name is generic", () => {
+    expect(deriveEquityCategory("Random Person", [])).toBe("Investor");
+  });
+});
+
+// ── computeStakeValue ────────────────────────────────────────────────
+
+describe("computeStakeValue", () => {
+  it("computes value for a single stake number", () => {
+    expect(computeStakeValue(0.1, 100e9)).toBe(10e9);
+  });
+
+  it("computes value range for a stake range", () => {
+    expect(computeStakeValue([0.02, 0.03], 380e9)).toEqual([7.6e9, 11.4e9]);
+  });
+
+  it("returns null for null stake", () => {
+    expect(computeStakeValue(null, 380e9)).toBeNull();
+  });
+});

@@ -1,5 +1,5 @@
 ---
-numericId: E1054
+wikiId: E1054
 title: "Database Schema Overview"
 description: "Complete reference for the wiki-server PostgreSQL schema — tables, relationships, ER diagrams, and migration history"
 subcategory: architecture
@@ -55,7 +55,7 @@ The foundational tables that mirror YAML/MDX source data into a queryable Postgr
 <Mermaid chart={`
 erDiagram
     entity_ids {
-        integer numeric_id PK
+        integer wiki_id PK
         text slug UK
         text description
         timestamp created_at
@@ -78,7 +78,7 @@ erDiagram
     }
     entities {
         text id PK
-        text numeric_id
+        text wiki_id
         text entity_type
         text title
         text description

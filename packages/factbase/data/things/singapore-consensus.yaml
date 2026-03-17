@@ -3,7 +3,7 @@ thing:
   stableId: NLSUTzzH5g
   type: policy
   name: Singapore Consensus on AI Safety Research Priorities
-  numericId: E701
+  wikiId: E701
 facts:
   - id: f_oJdOncWzZg
     property: description

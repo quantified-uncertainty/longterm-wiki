@@ -3,7 +3,7 @@ thing:
   stableId: pz3KSt33AA
   type: policy
   name: US Executive Order on Safe, Secure, and Trustworthy AI
-  numericId: E366
+  wikiId: E366
 facts:
   - id: f_Wdn2JgtzqA
     property: description

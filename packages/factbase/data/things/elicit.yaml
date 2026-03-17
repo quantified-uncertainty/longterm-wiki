@@ -3,7 +3,7 @@ thing:
   stableId: 2VexoROapg
   type: organization
   name: Elicit (AI Research Tool)
-  numericId: E526
+  wikiId: E526
 facts:
   - id: f_bpBSyOAslA
     property: description

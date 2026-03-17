@@ -17,7 +17,7 @@ function formatKBBadge(factCount?: number, itemCount?: number): string | null {
 }
 
 export function ContentCard({ item }: { item: ExploreItem }) {
-  const href = item.href || `/wiki/${item.numericId}`;
+  const href = item.href || `/wiki/${item.wikiId}`;
   const format = item.contentFormat || "article";
   const showFormatBadge = format !== "article" && FORMAT_BADGE_COLORS[format];
   const kbBadge = formatKBBadge(item.kbFactCount, item.kbItemCount);

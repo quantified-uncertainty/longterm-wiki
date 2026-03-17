@@ -13,7 +13,7 @@ interface AiModelEntry {
   id: string;
   title: string;
   entityType: string;
-  numericId?: string;
+  wikiId?: string;
   releaseDate?: string | null;
   inputPrice?: number | null;
   outputPrice?: number | null;
@@ -139,7 +139,7 @@ export function AiModelsSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {models.map((model) => {
-              const href = model.numericId ? `/wiki/${model.numericId}` : getEntityHref(model.id, model.entityType);
+              const href = model.wikiId ? `/wiki/${model.wikiId}` : getEntityHref(model.id, model.entityType);
               const benchmarks = benchmarksByModel?.get(model.id);
               const topBenchmarks = benchmarks
                 ? pickTopBenchmarks(benchmarks)

@@ -3,7 +3,7 @@ thing:
   stableId: oTieHq0pRA
   type: person
   name: Helen Toner
-  numericId: E575
+  wikiId: E575
 facts:
   - id: f_xzqOizPpxQ
     property: description

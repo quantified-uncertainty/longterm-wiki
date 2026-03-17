@@ -3,7 +3,7 @@ thing:
   stableId: tyNVsTtRVA
   type: approach
   name: Circuit Breakers / Inference Interventions
-  numericId: E478
+  wikiId: E478
 facts:
   - id: f_tyDfo7AChA
     property: description

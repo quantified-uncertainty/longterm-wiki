@@ -3,7 +3,7 @@ thing:
   stableId: UXhjjryeZg
   type: approach
   name: Agent Foundations
-  numericId: E584
+  wikiId: E584
 facts:
   - id: f_tFsSLbrZ9A
     property: description

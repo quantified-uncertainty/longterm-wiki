@@ -7,7 +7,7 @@ import type { Page, WithSource } from "./tablebase";
 
 export interface UpdateScheduleItem {
   id: string;
-  numericId: string;
+  wikiId: string;
   title: string;
   quality: number | null;
   readerImportance: number | null;
@@ -35,7 +35,7 @@ export async function getUpdateSchedule(): Promise<WithSource<UpdateScheduleItem
 
 export interface PageRankingItem {
   id: string;
-  numericId: string;
+  wikiId: string;
   title: string;
   quality: number | null;
   readerImportance: number | null;
@@ -56,7 +56,7 @@ export function getPageRankings(): PageRankingItem[] {
     .filter((p: Page) => p.readerImportance != null || p.researchImportance != null)
     .map((p: Page) => ({
       id: p.id,
-      numericId: db.idRegistry?.bySlug[p.id] || p.id,
+      wikiId: db.idRegistry?.bySlug[p.id] || p.id,
       title: p.title,
       quality: p.quality,
       readerImportance: p.readerImportance,

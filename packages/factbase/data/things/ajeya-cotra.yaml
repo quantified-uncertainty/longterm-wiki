@@ -3,7 +3,7 @@ thing:
   stableId: dPzCwzIxiQ
   type: person
   name: Ajeya Cotra
-  numericId: E864
+  wikiId: E864
 facts:
   - id: f_A33S9FgkxA
     property: description

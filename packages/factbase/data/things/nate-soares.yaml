@@ -5,7 +5,7 @@ thing:
   name: Nate Soares
   aliases:
     - "Nate Soares (MIRI)"
-  numericId: E212
+  wikiId: E212
 facts:
   - id: f_MCKelTrhAw
     property: description

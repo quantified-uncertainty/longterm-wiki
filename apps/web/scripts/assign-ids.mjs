@@ -2,7 +2,7 @@
  * assign-ids.mjs — Pre-build ID assignment step
  *
  * Scans source files (YAML entities + MDX frontmatter) for entities and pages
- * without numericIds, assigns new IDs via the wiki server, and writes them
+ * without wikiIds, assigns new IDs via the wiki server, and writes them
  * back to source files.
  *
  * This runs as a dedicated pre-build step before build-data.mjs, ensuring:
@@ -64,8 +64,8 @@ function extractFrontmatter(content) {
 }
 
 /**
- * Load all YAML entities (id + numericId only) from data/entities/.
- * Returns array of { id, numericId? }.
+ * Load all YAML entities (id + wikiId only) from data/entities/.
+ * Returns array of { id, wikiId? }.
  */
 function loadYamlEntityIds() {
   const entityDir = join(DATA_DIR, 'entities');
@@ -81,7 +81,7 @@ function loadYamlEntityIds() {
           if (e?.id) {
             results.push({
               id: e.id,
-              numericId: e.numericId || null,
+              wikiId: e.wikiId || null,
               _source: 'yaml',
             });
           }
@@ -96,7 +96,7 @@ function loadYamlEntityIds() {
 
 /**
  * Scan MDX content directories for pages needing IDs.
- * Returns array of { id, numericId?, category, contentFormat, _fullPath }.
+ * Returns array of { id, wikiId?, category, contentFormat, _fullPath }.
  * Mirrors the page-scanning logic in build-data.mjs.
  */
 function scanPages() {
@@ -118,7 +118,7 @@ function scanPages() {
         const fm = extractFrontmatter(content);
         pages.push({
           id,
-          numericId: fm.numericId || null,
+          wikiId: fm.wikiId || null,
           _fullPath: fullPath,
           contentFormat: fm.contentFormat || 'article',
           // Mirrors build-data.mjs: prefer subdirectory, fall back to top-level dir
@@ -165,31 +165,31 @@ async function main() {
   }
 
   // -------------------------------------------------------------------------
-  // Collect existing numericIds from YAML entities + frontmatter entities
+  // Collect existing wikiIds from YAML entities + frontmatter entities
   // -------------------------------------------------------------------------
   const yamlEntityItems = loadYamlEntityIds();
   const yamlEntityIds = new Set(yamlEntityItems.map(e => e.id));
   const frontmatterEntities = scanFrontmatterEntities(yamlEntityIds, CONTENT_DIR);
   const entities = [...yamlEntityItems, ...frontmatterEntities];
 
-  const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps(entities);
+  const { wikiIdToSlug, slugToWikiId, conflicts } = buildIdMaps(entities);
 
   if (conflicts.length > 0) {
-    console.error('\n  ERROR: numericId conflicts detected:');
+    console.error('\n  ERROR: wikiId conflicts detected:');
     for (const c of conflicts) console.error(`    ${c}`);
     process.exit(1);
   }
 
   // -------------------------------------------------------------------------
-  // Verify manually-set numericIds for YAML entities against the server.
+  // Verify manually-set wikiIds for YAML entities against the server.
   //
-  // YAML entity numericIds cannot be written back by assign-ids (we have no
+  // YAML entity wikiIds cannot be written back by assign-ids (we have no
   // safe way to round-trip YAML), so they must be added manually.  When
-  // someone manually writes a numericId in a YAML file there is a risk of
-  // bypassing the server-based ID allocation — e.g. writing a numericId
+  // someone manually writes a wikiId in a YAML file there is a risk of
+  // bypassing the server-based ID allocation — e.g. writing a wikiId
   // that the server has already allocated to a different slug.
   //
-  // This step verifies every manually-set YAML entity numericId by asking the
+  // This step verifies every manually-set YAML entity wikiId by asking the
   // server what ID it allocated for that slug.  The allocate endpoint is
   // idempotent: if the server has already registered the slug (e.g. from a
   // previous run), it returns the same ID with created=false; if not, it
@@ -199,63 +199,63 @@ async function main() {
   // When the server is unavailable we skip verification and warn — this keeps
   // the offline/CI-without-server workflow working.
   // -------------------------------------------------------------------------
-  const yamlEntitiesWithManualIds = yamlEntityItems.filter(e => e.numericId);
+  const yamlEntitiesWithManualIds = yamlEntityItems.filter(e => e.wikiId);
 
   if (yamlEntitiesWithManualIds.length > 0 && serverAvailable && !DRY_RUN) {
-    // Verify manually-set numericIds against the server using a bulk read-only
+    // Verify manually-set wikiIds against the server using a bulk read-only
     // lookup (no side effects — uses GET /api/entities, not the allocate endpoint).
     // We fetch all server-registered entities once and compare in-memory.
-    console.log(`  Verifying ${yamlEntitiesWithManualIds.length} manually-set YAML entity numericIds against server...`);
+    console.log(`  Verifying ${yamlEntitiesWithManualIds.length} manually-set YAML entity wikiIds against server...`);
     const serverIdMap = await fetchServerEntityIdMap();
 
     if (serverIdMap.size === 0) {
-      console.warn(`  WARNING: Could not fetch entity registry from server — skipping numericId verification.`);
+      console.warn(`  WARNING: Could not fetch entity registry from server — skipping wikiId verification.`);
     } else {
       let conflictFound = false;
       let verified = 0;
       let notInServer = 0;
       for (const entity of yamlEntitiesWithManualIds) {
-        const serverNumericId = serverIdMap.get(entity.id);
-        if (!serverNumericId) {
+        const serverWikiId = serverIdMap.get(entity.id);
+        if (!serverWikiId) {
           // Server has no record for this slug — new entity, skip
           notInServer++;
           continue;
         }
         verified++;
-        if (serverNumericId !== entity.numericId) {
-          console.error(`    ERROR: numericId conflict for YAML entity "${entity.id}":`);
-          console.error(`      Locally set:       ${entity.numericId}`);
-          console.error(`      Server registered: ${serverNumericId}`);
-          console.error(`      Fix: update numericId in data/entities/ to "${serverNumericId}",`);
-          console.error(`           or ask an admin to register "${entity.numericId}" for "${entity.id}" on the server.`);
+        if (serverWikiId !== entity.wikiId) {
+          console.error(`    ERROR: wikiId conflict for YAML entity "${entity.id}":`);
+          console.error(`      Locally set:       ${entity.wikiId}`);
+          console.error(`      Server registered: ${serverWikiId}`);
+          console.error(`      Fix: update wikiId in data/entities/ to "${serverWikiId}",`);
+          console.error(`           or ask an admin to register "${entity.wikiId}" for "${entity.id}" on the server.`);
           conflictFound = true;
         }
       }
       if (conflictFound) {
-        console.error('\n  Manual numericId bypass detected. Aborting to prevent ID registry corruption.');
+        console.error('\n  Manual wikiId bypass detected. Aborting to prevent ID registry corruption.');
         process.exit(1);
       }
       const notInServerNote = notInServer > 0 ? ` (${notInServer} not yet in server — OK for new entities)` : '';
-      console.log(`  Verification complete: ${verified} numericIds verified OK${notInServerNote}.`);
+      console.log(`  Verification complete: ${verified} wikiIds verified OK${notInServerNote}.`);
     }
   } else if (yamlEntitiesWithManualIds.length > 0 && !serverAvailable && !DRY_RUN) {
-    console.warn(`  WARNING: Server unavailable — skipping verification of ${yamlEntitiesWithManualIds.length} manually-set YAML entity numericIds.`);
+    console.warn(`  WARNING: Server unavailable — skipping verification of ${yamlEntitiesWithManualIds.length} manually-set YAML entity wikiIds.`);
   }
 
   // -------------------------------------------------------------------------
   // Assign IDs to entities without one via the server.
-  // YAML entities without numericIds are skipped — they cannot be written
+  // YAML entities without wikiIds are skipped — they cannot be written
   // back automatically and must be updated in the source YAML manually.
   // -------------------------------------------------------------------------
   let yamlSkipped = 0;
   const entitiesNeedingIds = [];
 
   for (const entity of entities) {
-    if (entity.numericId) continue;
+    if (entity.wikiId) continue;
 
     if (entity._source !== 'frontmatter' || !entity._filePath) {
-      // YAML entity without numericId — can't write back, skip
-      console.warn(`    WARNING: ${entity.id} (YAML entity) has no numericId — add it manually to the source YAML`);
+      // YAML entity without wikiId — can't write back, skip
+      console.warn(`    WARNING: ${entity.id} (YAML entity) has no wikiId — add it manually to the source YAML`);
       yamlSkipped++;
       continue;
     }
@@ -286,12 +286,12 @@ async function main() {
         process.exit(1);
       }
 
-      entity.numericId = numId;
-      numericIdToSlug[numId] = entity.id;
-      slugToNumericId[entity.id] = numId;
+      entity.wikiId = numId;
+      wikiIdToSlug[numId] = entity.id;
+      slugToWikiId[entity.id] = numId;
 
       const content = readFileSync(entity._filePath, 'utf-8');
-      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+      const updated = content.replace(/^---\n/, `---\nwikiId: ${numId}\n`);
       writeFileSync(entity._filePath, updated);
       console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
     }
@@ -301,36 +301,36 @@ async function main() {
   if (entityAssignments > 0 && DRY_RUN) {
     console.log(`  entities: would assign ${entityAssignments} new IDs`);
   } else if (entityAssignments > 0) {
-    console.log(`  entities: assigned ${entityAssignments} new IDs (total: ${Object.keys(numericIdToSlug).length})`);
+    console.log(`  entities: assigned ${entityAssignments} new IDs (total: ${Object.keys(wikiIdToSlug).length})`);
   } else {
-    console.log(`  entities: ${Object.keys(numericIdToSlug).length} entities all have IDs${yamlSkipped > 0 ? ` (${yamlSkipped} YAML entities need manual numericId)` : ''}`);
+    console.log(`  entities: ${Object.keys(wikiIdToSlug).length} entities all have IDs${yamlSkipped > 0 ? ` (${yamlSkipped} YAML entities need manual wikiId)` : ''}`);
   }
 
   // -------------------------------------------------------------------------
-  // Scan pages and assign page-level numericIds
+  // Scan pages and assign page-level wikiIds
   // -------------------------------------------------------------------------
   const pages = scanPages();
   const entityIds = new Set(entities.map(e => e.id));
   const eligiblePages = filterEligiblePages(pages, entityIds, SKIP_CATEGORIES);
 
-  // Pass 1: collect existing page numericIds from frontmatter
+  // Pass 1: collect existing page wikiIds from frontmatter
   for (const page of eligiblePages) {
-    if (slugToNumericId[page.id]) continue; // already assigned (entity or prior pass)
+    if (slugToWikiId[page.id]) continue; // already assigned (entity or prior pass)
 
-    if (page.numericId) {
-      const existingOwner = numericIdToSlug[page.numericId];
+    if (page.wikiId) {
+      const existingOwner = wikiIdToSlug[page.wikiId];
       if (existingOwner && existingOwner !== page.id) {
-        console.warn(`    WARNING: ${page.numericId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
+        console.warn(`    WARNING: ${page.wikiId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
       }
-      if (!numericIdToSlug[page.numericId]) {
-        numericIdToSlug[page.numericId] = page.id;
+      if (!wikiIdToSlug[page.wikiId]) {
+        wikiIdToSlug[page.wikiId] = page.id;
       }
-      slugToNumericId[page.id] = page.numericId;
+      slugToWikiId[page.id] = page.wikiId;
     }
   }
 
   // Pass 2: assign new IDs to pages that don't have one yet
-  const pagesNeedingIds = eligiblePages.filter(p => !slugToNumericId[p.id]);
+  const pagesNeedingIds = eligiblePages.filter(p => !slugToWikiId[p.id]);
 
   if (pagesNeedingIds.length > 0 && DRY_RUN) {
     for (const page of pagesNeedingIds) {
@@ -355,12 +355,12 @@ async function main() {
         process.exit(1);
       }
 
-      numericIdToSlug[numId] = page.id;
-      slugToNumericId[page.id] = numId;
-      page.numericId = numId;
+      wikiIdToSlug[numId] = page.id;
+      slugToWikiId[page.id] = numId;
+      page.wikiId = numId;
 
       const content = readFileSync(page._fullPath, 'utf-8');
-      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+      const updated = content.replace(/^---\n/, `---\nwikiId: ${numId}\n`);
       writeFileSync(page._fullPath, updated);
       console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
     }

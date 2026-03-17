@@ -32,7 +32,7 @@ function loadPersonEntitiesForDetector(): DetectorPersonEntity[] {
     .filter((e) => e.type === 'person' && e.title)
     .map((e) => ({
       id: e.id,
-      numericId: e.numericId,
+      wikiId: e.wikiId,
       title: e.title!,
     }));
 }
@@ -135,7 +135,7 @@ export async function suggestLinksCommand(
     for (const page of pagesWithUnlinked) {
       lines.push(`\n  \x1b[36m${page.filePath}\x1b[0m`);
       for (const m of page.unlinkedMentions) {
-        const idLabel = m.numericId ? `${m.numericId} (${m.personId})` : m.personId;
+        const idLabel = m.wikiId ? `${m.wikiId} (${m.personId})` : m.personId;
         lines.push(`    L${m.line}: "${m.matchedText}" -> ${idLabel}`);
       }
     }

@@ -63,7 +63,7 @@ export async function createCommand(
     }
 
     lines.push(`- id: ${c.id}`);
-    lines.push(`  numericId: # Run: pnpm crux ids allocate ${c.id}`);
+    lines.push(`  wikiId: # Run: pnpm crux ids allocate ${c.id}`);
     lines.push('  type: person');
     lines.push(`  title: ${c.name}`);
 

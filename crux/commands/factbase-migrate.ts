@@ -14,7 +14,7 @@ const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things
 
 interface OldEntity {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   type: string;
   title?: string;
   name?: string;
@@ -104,9 +104,9 @@ const VALID_KB_TYPES = new Set([
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-/** Validate E-prefix numericId format (e.g., "E22") */
-function isValidNumericId(numericId: string): boolean {
-  return /^E\d+$/.test(numericId);
+/** Validate E-prefix wikiId format (e.g., "E22") */
+function isValidWikiId(wikiId: string): boolean {
+  return /^E\d+$/.test(wikiId);
 }
 
 /** Get today's date as YYYY-MM (matches KB convention) */
@@ -156,10 +156,10 @@ function buildKBThing(entity: OldEntity): { yaml: string; warnings: string[] } {
     type: kbType,
     name: entity.title || entity.name || entity.id,
   };
-  if (entity.numericId && isValidNumericId(entity.numericId)) {
-    thing.numericId = entity.numericId; // Keep E-prefix format (e.g., "E22")
-  } else if (entity.numericId) {
-    warnings.push(`numericId "${entity.numericId}" doesn't match E-prefix format. Skipped.`);
+  if (entity.wikiId && isValidWikiId(entity.wikiId)) {
+    thing.wikiId = entity.wikiId; // Keep E-prefix format (e.g., "E22")
+  } else if (entity.wikiId) {
+    warnings.push(`wikiId "${entity.wikiId}" doesn't match E-prefix format. Skipped.`);
   }
   if (entity.aliases && entity.aliases.length > 0) {
     thing.aliases = entity.aliases;
@@ -247,7 +247,7 @@ function buildKBThing(entity: OldEntity): { yaml: string; warnings: string[] } {
 function buildStubEntity(entity: OldEntity): OldEntity {
   const stub: OldEntity = {
     id: entity.id,
-    ...(entity.numericId && { numericId: entity.numericId }),
+    ...(entity.wikiId && { wikiId: entity.wikiId }),
     type: entity.type,
     title: entity.title || entity.name,
   } as OldEntity;
@@ -344,7 +344,7 @@ Examples:
         writeFileSync(tmpPath, header + updatedYaml, 'utf-8');
         renameSync(tmpPath, filePath);
         lines.push(`\x1b[33mStubbed old entity in:\x1b[0m ${filePath}`);
-        lines.push('  Kept: id, numericId, type, title, relatedEntries');
+        lines.push('  Kept: id, wikiId, type, title, relatedEntries');
         lines.push('  Removed: description, website, sources, tags, customFields, type-specific fields');
       }
     }
@@ -363,8 +363,8 @@ Examples:
   lines.push('');
   lines.push(`Entity: ${entity.title || entity.name} (${entity.id})`);
   lines.push(`Type: ${entity.type} -> ${TYPE_MAP[entity.type] ?? entity.type}`);
-  if (entity.numericId) {
-    lines.push(`NumericId: ${entity.numericId}`);
+  if (entity.wikiId) {
+    lines.push(`WikiId: ${entity.wikiId}`);
   }
 
   if (!dryRun) {
@@ -398,7 +398,7 @@ Usage:
 Options:
   --dry-run    Print the generated YAML without writing any files
   --stub-old   After migration, strip the old entity down to a minimal stub
-               (keeps id, numericId, type, title, relatedEntries)
+               (keeps id, wikiId, type, title, relatedEntries)
   --force      Overwrite existing KB thing file if it already exists
 
 Type Mapping:
@@ -411,7 +411,7 @@ Type Mapping:
    historical, risk-factor, case-study — these have their own KB schemas)
 
 What gets migrated:
-  - id, numericId, type, name/title, aliases
+  - id, wikiId, type, name/title, aliases
   - description -> facts[].property: description
   - website -> facts[].property: website
 

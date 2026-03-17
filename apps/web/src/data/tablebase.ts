@@ -48,7 +48,7 @@ export const DATA_DIR = path.resolve(process.cwd(), "../../data");
 // ============================================================================
 
 export interface IdRegistryMaps {
-  byNumericId: Record<string, string>; // E1 → slug
+  byWikiId: Record<string, string>; // E1 → slug
   bySlug: Record<string, string>; // slug → E1
 }
 
@@ -92,7 +92,7 @@ export interface RawEntity {
   sourceRefs?: string[];
   sources?: { title: string; url?: string; author?: string; date?: string }[];
   content?: unknown;
-  numericId?: string;
+  wikiId?: string;
   path?: string;
   status?: string;
   clusters?: string[];
@@ -372,7 +372,7 @@ interface TableBaseShape {
   /** Pre-computed update schedule items (staleness, priority, etc.) */
   updateSchedule?: Array<{
     id: string;
-    numericId: string;
+    wikiId: string;
     title: string;
     quality: number | null;
     readerImportance: number | null;
@@ -429,7 +429,7 @@ interface TableBaseShape {
   /** Enriched research areas from PG (with computed stats) */
   researchAreas?: Array<{
     id: string;
-    numericId: string | null;
+    wikiId: string | null;
     title: string;
     description: string | null;
     status: string;
@@ -503,14 +503,14 @@ export function getEntityBundle(entityId: string): EntityBundle | null {
 }
 
 /**
- * Resolve a numeric ID (E35) to slug without loading the full database.
+ * Resolve a wiki ID (E35) to slug without loading the full database.
  * Falls back to the full registry if needed, but tries the lightweight approach first.
  */
 function resolveIdWithoutRegistry(id: string): string {
   if (!/^E\d+$/.test(id)) return id;
   // Must use the registry — load it from the database
   const registry = getIdRegistry();
-  return registry.byNumericId[id] || id;
+  return registry.byWikiId[id] || id;
 }
 
 // ============================================================================
@@ -621,7 +621,7 @@ interface Entity {
 export function resolveId(id: string): string {
   if (/^E\d+$/.test(id)) {
     const registry = getIdRegistry();
-    return registry.byNumericId[id] || id;
+    return registry.byWikiId[id] || id;
   }
   return id;
 }

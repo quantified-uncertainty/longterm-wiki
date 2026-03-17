@@ -3,7 +3,7 @@ thing:
   stableId: DX4NK1gGtg
   type: person
   name: Ian Hogarth
-  numericId: E162
+  wikiId: E162
 facts:
   - id: f_fIpd1bJ2xg
     property: description

@@ -79,7 +79,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // INSERT which also references entity_ids in a LEFT JOIN clause.
   if (q.includes("insert into") && q.includes('"entity_ids"')) {
     const slug = params[0] as string;
-    return [{ numeric_id: getIntIdForSlug(slug), slug }];
+    return [{ wiki_id: getIntIdForSlug(slug), slug }];
   }
 
   // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
@@ -88,10 +88,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return params
       .map((p) => {
         const slug = String(p);
-        const numeric_id = lookupIntIdForSlug(slug);
-        return numeric_id === undefined ? null : { numeric_id, slug };
+        const wiki_id = lookupIntIdForSlug(slug);
+        return wiki_id === undefined ? null : { wiki_id, slug };
       })
-      .filter((r): r is { numeric_id: number; slug: string } => r !== null);
+      .filter((r): r is { wiki_id: number; slug: string } => r !== null);
   }
 
   // --- page_links: DELETE all ---
@@ -471,7 +471,7 @@ function seedPage(
       {
         id,
         title,
-        numericId: opts.numericId ?? `E${Math.floor(Math.random() * 1000)}`,
+        wikiId: opts.wikiId ?? `E${Math.floor(Math.random() * 1000)}`,
         description: opts.description ?? `Description of ${title}`,
         category: opts.category ?? "concept",
         entityType: opts.entityType ?? "concept",

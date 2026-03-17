@@ -3,7 +3,7 @@ thing:
   stableId: Q0msUgaClw
   type: risk
   name: Financial Stability Risks from AI Capital Expenditure
-  numericId: E690
+  wikiId: E690
 facts:
   - id: f_CZFwfKw9bA
     property: description

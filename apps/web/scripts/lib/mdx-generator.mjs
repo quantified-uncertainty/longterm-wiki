@@ -41,8 +41,8 @@ function generateMdxStub(entity) {
   // Extract sidebar order from entity if available
   const sidebarOrder = entity.sidebarOrder || 99;
 
-  // Include numericId so the page inherits the entity's stable ID
-  const numericIdLine = entity.numericId ? `\nnumericId: ${entity.numericId}` : '';
+  // Include wikiId so the page inherits the entity's stable ID
+  const wikiIdLine = entity.wikiId ? `\nwikiId: ${entity.wikiId}` : '';
 
   // Include description from entity content intro if available
   let descriptionLine = '';
@@ -54,7 +54,7 @@ function generateMdxStub(entity) {
   }
 
   return `---
-title: "${entity.title}"${descriptionLine}${numericIdLine}
+title: "${entity.title}"${descriptionLine}${wikiIdLine}
 sidebar:
   order: ${sidebarOrder}
 ---

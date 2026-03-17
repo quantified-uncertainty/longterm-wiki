@@ -246,7 +246,7 @@ const summariesApp = new Hono()
     const rawId = c.req.param("entityId");
     const db = getDrizzleDb();
 
-    // Resolve identifier (slug, stableId, or numericId) to stableId
+    // Resolve identifier (slug, stableId, or wikiId) to stableId
     const stableId = await resolveEntityStableId(db, rawId);
     const lookupId = stableId ?? rawId;
 

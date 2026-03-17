@@ -28,7 +28,7 @@ export function resolveBenchmarkBySlug(slug: string): BenchmarkEntity | undefine
 export interface BenchmarkResultRow {
   modelId: string;
   modelTitle: string;
-  numericId: string | null;
+  wikiId: string | null;
   developer: string | null;
   developerName: string | null;
   score: number;
@@ -158,7 +158,7 @@ function buildFromPGResults(
       const row: BenchmarkResultRow = {
         modelId: model.id,
         modelTitle: model.title,
-        numericId: model.numericId ?? null,
+        wikiId: model.wikiId ?? null,
         developer: developerField ?? null,
         developerName: developerEntity?.title ?? null,
         score: s.score,
@@ -201,7 +201,7 @@ function buildFromInlineData(
       const row: BenchmarkResultRow = {
         modelId: entity.id,
         modelTitle: entity.title,
-        numericId: entity.numericId ?? null,
+        wikiId: entity.wikiId ?? null,
         developer: entity.developer ?? null,
         developerName: developerEntity?.title ?? null,
         score: b.score,

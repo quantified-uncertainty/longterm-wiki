@@ -9,7 +9,7 @@ import { STATUS_COLORS, SCOPE_COLORS, normalizeStatus } from "./legislation-cons
 export interface LegislationRow {
   id: string;
   title: string;
-  numericId: string | null;
+  wikiId: string | null;
   introduced: string | null;
   policyStatus: string | null;
   /** Normalized status key for badge color. */

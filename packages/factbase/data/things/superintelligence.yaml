@@ -3,7 +3,7 @@ thing:
   stableId: 3fyHbDnHIQ
   type: concept
   name: Superintelligence
-  numericId: E291
+  wikiId: E291
 facts:
   - id: f_rtGiz6tnlQ
     property: description

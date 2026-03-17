@@ -3,7 +3,7 @@ thing:
   stableId: 8nmqy7vFiA
   type: person
   name: Toby Ord
-  numericId: E355
+  wikiId: E355
 facts:
   - id: f_jO6LtwIQmA
     property: description

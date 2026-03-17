@@ -3,7 +3,7 @@ thing:
   stableId: LyLbPk4iNQ
   type: policy
   name: China AI Regulatory Framework
-  numericId: E58
+  wikiId: E58
 facts:
   - id: f_mGgihUKCOQ
     property: description

@@ -25,7 +25,7 @@ function makeThing(overrides: Record<string, unknown> = {}): Record<string, unkn
     entity_type: null,
     description: null,
     source_url: null,
-    numeric_id: null,
+    wiki_id: null,
     verdict: null,
     verdict_confidence: null,
     verdict_at: null,
@@ -108,7 +108,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- things: INSERT ... ON CONFLICT DO UPDATE ---
   if (q.includes("insert into") && q.includes('"things"')) {
-    const COLS = 10; // id, thingType, title, parentThingId, sourceTable, sourceId, entityType, description, sourceUrl, numericId
+    const COLS = 10; // id, thingType, title, parentThingId, sourceTable, sourceId, entityType, description, sourceUrl, wikiId
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -133,7 +133,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         entity_type: params[o + 6],
         description: params[o + 7],
         source_url: params[o + 8],
-        numeric_id: params[o + 9],
+        wiki_id: params[o + 9],
         created_at: existing?.created_at ?? now,
         updated_at: now,
         synced_at: now,
@@ -317,7 +317,7 @@ function seedThing(
         entityType: opts.entityType ?? undefined,
         description: opts.description ?? undefined,
         sourceUrl: opts.sourceUrl ?? undefined,
-        numericId: opts.numericId ?? undefined,
+        wikiId: opts.wikiId ?? undefined,
         parentThingId: opts.parentThingId ?? undefined,
       },
     ],

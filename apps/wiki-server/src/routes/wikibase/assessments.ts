@@ -243,7 +243,7 @@ const assessmentsApp = new Hono()
             wpa.rating_concreteness, wpa.rating_actionability, wpa.rating_objectivity,
             wpa.structural_score, wpa.word_count, wpa.note, wpa.assessed_at
           FROM wikibase_page_assessments wpa
-          JOIN entity_ids ei ON ei.numeric_id = wpa.page_id_int
+          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id_int
           WHERE wpa.assessor = ${assessor} AND wpa.page_id_int IS NOT NULL
           ORDER BY wpa.page_id_int, wpa.assessed_at DESC
           LIMIT ${limit} OFFSET ${offset}
@@ -257,7 +257,7 @@ const assessmentsApp = new Hono()
             wpa.rating_concreteness, wpa.rating_actionability, wpa.rating_objectivity,
             wpa.structural_score, wpa.word_count, wpa.note, wpa.assessed_at
           FROM wikibase_page_assessments wpa
-          JOIN entity_ids ei ON ei.numeric_id = wpa.page_id_int
+          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id_int
           WHERE wpa.page_id_int IS NOT NULL
           ORDER BY wpa.page_id_int, wpa.assessor, wpa.assessed_at DESC
           LIMIT ${limit} OFFSET ${offset}

@@ -18,7 +18,7 @@ export interface PersonRow {
   id: string;
   slug: string;
   name: string;
-  numericId: string | null;
+  wikiId: string | null;
   wikiPageId: string | null;
 
   role: string | null;
@@ -47,7 +47,7 @@ interface ServerPerson {
   id: string;
   slug: string;
   name: string;
-  numericId: string | null;
+  wikiId: string | null;
   description: string | null;
   role: string | null;
   employerId: string | null;
@@ -61,8 +61,8 @@ function serverPersonToRow(p: ServerPerson): PersonRow {
     id: p.id,
     slug: p.slug,
     name: p.name,
-    numericId: p.numericId,
-    wikiPageId: p.numericId ?? null,
+    wikiId: p.wikiId,
+    wikiPageId: p.wikiId ?? null,
     role: p.role,
     employerId: p.employerId,
     employerName: p.employerName,

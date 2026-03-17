@@ -3,7 +3,7 @@ thing:
   stableId: 2xZD4XR3MQ
   type: project
   name: Donations List Website
-  numericId: E389
+  wikiId: E389
 facts:
   - id: f_CBi6j58xDg
     property: description

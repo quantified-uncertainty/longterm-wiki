@@ -3,7 +3,7 @@ thing:
   stableId: gMaUtaXGaw
   type: risk
   name: AI-Powered Consensus Manufacturing
-  numericId: E72
+  wikiId: E72
 facts:
   - id: f_V9uYIun6ng
     property: description

@@ -111,7 +111,7 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
   // Funder wiki page link
   const funderTypedEntity = getTypedEntityById(grant.ownerEntityId);
-  const funderWikiPageId = funderTypedEntity?.numericId ?? null;
+  const funderWikiPageId = funderTypedEntity?.wikiId ?? null;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">

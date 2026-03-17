@@ -18,7 +18,7 @@ import type { TableProfile, TableScanResult, ScanSummary } from './types.ts';
 
 interface PageData {
   id: string;
-  numericId?: string;
+  wikiId?: string;
   readerImportance?: number | null;
 }
 
@@ -34,7 +34,7 @@ function getImportanceMap(): Map<string, number> {
     for (const page of (db.pages || []) as PageData[]) {
       if (page.readerImportance != null) {
         _importanceMap.set(page.id, page.readerImportance);
-        if (page.numericId) _importanceMap.set(page.numericId, page.readerImportance);
+        if (page.wikiId) _importanceMap.set(page.wikiId, page.readerImportance);
       }
     }
   } catch {
@@ -54,7 +54,7 @@ function lookupImportance(entitySlugOrId: string): number | undefined {
 interface EntityListResponse {
   entities: Array<{
     id: string;
-    numericId?: string;
+    wikiId?: string;
     stableId?: string;
     entityType: string;
     title: string;
@@ -151,7 +151,7 @@ async function fetchAllPaginated<T>(
     const data = result.data;
     const page = (data[resultKey] as T[]) || [];
     items.push(...page);
-    total = (data.total as number) ?? page.length;
+    total = (data.total as number) ?? Infinity;
     offset += pageSize;
     if (page.length < pageSize) break;
   }
@@ -175,7 +175,7 @@ async function fetchEntitiesByType(entityType: string): Promise<EntityListRespon
 // Per-table scanners
 // ---------------------------------------------------------------------------
 
-async function scanGrantCompleteness(): Promise<TableScanResult> {
+async function scanGrantCompleteness(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   // Get org-level summary
   const summaryResult = await apiRequest<GrantOrgSummary>('GET', '/api/grants/by-org-summary');
   const orgs = summaryResult.ok ? summaryResult.data.organizations : [];
@@ -187,7 +187,7 @@ async function scanGrantCompleteness(): Promise<TableScanResult> {
   );
 
   // Build per-org profiles
-  const orgEntities = await fetchEntitiesByType('organization');
+  const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
   const orgMap = new Map(orgEntities.map(e => [e.stableId || e.id, e]));
 
   // Group grants by org
@@ -241,13 +241,13 @@ async function scanGrantCompleteness(): Promise<TableScanResult> {
   };
 }
 
-async function scanPersonnelCompleteness(): Promise<TableScanResult> {
+async function scanPersonnelCompleteness(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   const allPersonnel = await fetchAllPaginated<PersonnelAllResponse['personnel'][number]>(
     '/api/personnel/all',
     'personnel',
   );
 
-  const orgEntities = await fetchEntitiesByType('organization');
+  const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   // Group by org
   const byOrg = new Map<string, number>();
@@ -258,10 +258,11 @@ async function scanPersonnelCompleteness(): Promise<TableScanResult> {
   const profiles: TableProfile[] = orgEntities.map(entity => {
     const orgId = entity.stableId || entity.id;
     const count = byOrg.get(orgId) || 0;
-    const completeness = count > 0 ? Math.min(100, count * 20) : 0; // 5+ records = 100%
+    const completeness = count > 0 ? Math.min(100, count * 5) : 0; // 20+ records = 100%
     const missing: string[] = [];
     if (count === 0) missing.push('no personnel records');
-    else if (count < 3) missing.push(`only ${count} personnel records`);
+    else if (count < 5) missing.push(`only ${count} personnel records — missing broader team`);
+    else if (count < 15) missing.push(`${count} personnel records — deeper coverage needed`);
 
     return {
       entityId: orgId,
@@ -272,7 +273,7 @@ async function scanPersonnelCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -288,13 +289,13 @@ async function scanPersonnelCompleteness(): Promise<TableScanResult> {
   };
 }
 
-async function scanFundingRoundsCompleteness(): Promise<TableScanResult> {
+async function scanFundingRoundsCompleteness(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   const allRounds = await fetchAllPaginated<FundingRoundsAllResponse['fundingRounds'][number]>(
     '/api/funding-rounds/all',
     'fundingRounds',
   );
 
-  const orgEntities = await fetchEntitiesByType('organization');
+  const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   const byCompany = new Map<string, number>();
   for (const r of allRounds) {
@@ -318,7 +319,7 @@ async function scanFundingRoundsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -334,13 +335,13 @@ async function scanFundingRoundsCompleteness(): Promise<TableScanResult> {
   };
 }
 
-async function scanInvestmentsCompleteness(): Promise<TableScanResult> {
+async function scanInvestmentsCompleteness(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   const allInvestments = await fetchAllPaginated<InvestmentsAllResponse['investments'][number]>(
     '/api/investments/all',
     'investments',
   );
 
-  const orgEntities = await fetchEntitiesByType('organization');
+  const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   const byCompany = new Map<string, number>();
   for (const inv of allInvestments) {
@@ -363,7 +364,7 @@ async function scanInvestmentsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -379,13 +380,13 @@ async function scanInvestmentsCompleteness(): Promise<TableScanResult> {
   };
 }
 
-async function scanBenchmarkResultsCompleteness(): Promise<TableScanResult> {
+async function scanBenchmarkResultsCompleteness(prefetchedModels?: EntityListResponse['entities']): Promise<TableScanResult> {
   const allResults = await fetchAllPaginated<BenchmarkResultsAllResponse['benchmarkResults'][number]>(
     '/api/benchmark-results/all',
     'benchmarkResults',
   );
 
-  const modelEntities = await fetchEntitiesByType('ai-model');
+  const modelEntities = prefetchedModels ?? await fetchEntitiesByType('ai-model');
 
   const byModel = new Map<string, number>();
   for (const r of allResults) {
@@ -410,7 +411,7 @@ async function scanBenchmarkResultsCompleteness(): Promise<TableScanResult> {
       completenessPercent: completeness,
       missingFields: missing,
       website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.numericId || ''),
+      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
     };
   });
 
@@ -431,12 +432,18 @@ async function scanBenchmarkResultsCompleteness(): Promise<TableScanResult> {
 // ---------------------------------------------------------------------------
 
 export async function runFullScan(): Promise<ScanSummary> {
+  // Fetch shared entity lists once (avoids 4x redundant API calls for org entities)
+  const [orgEntities, modelEntities] = await Promise.all([
+    fetchEntitiesByType('organization'),
+    fetchEntitiesByType('ai-model'),
+  ]);
+
   const [grants, personnel, fundingRounds, investments, benchmarkResults] = await Promise.all([
-    scanGrantCompleteness(),
-    scanPersonnelCompleteness(),
-    scanFundingRoundsCompleteness(),
-    scanInvestmentsCompleteness(),
-    scanBenchmarkResultsCompleteness(),
+    scanGrantCompleteness(orgEntities),
+    scanPersonnelCompleteness(orgEntities),
+    scanFundingRoundsCompleteness(orgEntities),
+    scanInvestmentsCompleteness(orgEntities),
+    scanBenchmarkResultsCompleteness(modelEntities),
   ]);
 
   return {

@@ -3,7 +3,7 @@ thing:
   stableId: Qns43S795w
   type: organization
   name: CSER (Centre for the Study of Existential Risk)
-  numericId: E523
+  wikiId: E523
 facts:
   - id: f_IwwEfifHjQ
     property: description

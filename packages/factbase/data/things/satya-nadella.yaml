@@ -3,7 +3,7 @@ thing:
   stableId: 1L16qpyk5A
   type: person
   name: "Satya Nadella"
-  numericId: "E1290"
+  wikiId: "E1290"
 
 facts:
   - id: f_pBjLkYCEHw

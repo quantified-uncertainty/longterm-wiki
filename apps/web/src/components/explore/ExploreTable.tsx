@@ -60,7 +60,7 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       header: ({ column }) => <SortableHeader column={column}>Title</SortableHeader>,
       cell: ({ row }) => {
         const item = row.original;
-        const href = item.href || `/wiki/${item.numericId}`;
+        const href = item.href || `/wiki/${item.wikiId}`;
         return (
           <Link
             href={href}
@@ -195,11 +195,11 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       sortUndefined: "last",
     },
     {
-      accessorKey: "numericId",
+      accessorKey: "wikiId",
       header: ({ column }) => <SortableHeader column={column}>ID</SortableHeader>,
       cell: ({ row }) => (
         <span className="text-[0.65rem] text-muted-foreground/60 tabular-nums">
-          {row.original.numericId}
+          {row.original.wikiId}
         </span>
       ),
       size: 55,

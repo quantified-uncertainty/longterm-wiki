@@ -3,7 +3,7 @@ thing:
   stableId: QVsRgOaeUw
   type: concept
   name: AGI Race
-  numericId: E3
+  wikiId: E3
 facts:
   - id: f_eZDUSUGW6Q
     property: description

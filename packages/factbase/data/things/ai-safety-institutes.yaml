@@ -3,7 +3,7 @@ thing:
   stableId: aCEdTooCBw
   type: policy
   name: AI Safety Institutes (AISIs)
-  numericId: E13
+  wikiId: E13
 facts:
   - id: f_Ufgd2soLGg
     property: description

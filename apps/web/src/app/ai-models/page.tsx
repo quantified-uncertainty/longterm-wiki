@@ -25,7 +25,7 @@ interface DirectoryFact {
 
 interface DirectoryEntity {
   id: string;
-  numericId: string | null;
+  wikiId: string | null;
   stableId: string | null;
   entityType: string;
   title: string;
@@ -86,7 +86,7 @@ function apiEntityToRow(e: DirectoryEntity): AiModelRow {
   return {
     id: e.id,
     title: e.title,
-    numericId: e.numericId ?? null,
+    wikiId: e.wikiId ?? null,
     modelFamily: (meta.modelFamily as string | undefined) ?? null,
     modelTier,
     generation: (meta.generation as string | undefined) ?? null,
@@ -150,7 +150,7 @@ function loadFromLocal(): AiModelsPageData {
     return {
       id: entity.id,
       title: entity.title,
-      numericId: entity.numericId ?? null,
+      wikiId: entity.wikiId ?? null,
       modelFamily: entity.modelFamily ?? null,
       modelTier: entity.modelTier ?? null,
       generation: entity.generation ?? null,

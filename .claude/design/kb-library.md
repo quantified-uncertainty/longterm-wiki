@@ -33,7 +33,7 @@ interface Thing {
   parent?: string;        // Parent thing ID (funding round → org)
   aliases?: string[];     // Alternative names for search
   previousIds?: string[]; // Former slugs (for redirects)
-  numericId?: number;     // Legacy wiki URL ID (E42). Not all things have one.
+  wikiId?: number;     // Legacy wiki URL ID (E42). Not all things have one.
 }
 ```
 
@@ -124,7 +124,7 @@ thing:
   stableId: a7xK2mP9qR
   type: organization
   name: Anthropic
-  numericId: 3
+  wikiId: 3
 
 facts:
   - id: f_8kX2pQ7mNr

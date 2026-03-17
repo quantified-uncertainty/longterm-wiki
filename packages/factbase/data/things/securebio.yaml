@@ -3,7 +3,7 @@ thing:
   stableId: QFIL8r7vPA
   type: organization
   name: SecureBio
-  numericId: E563
+  wikiId: E563
 facts:
   - id: f_rwGRhie6mA
     property: description

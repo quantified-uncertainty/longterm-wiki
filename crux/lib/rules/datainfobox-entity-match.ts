@@ -2,7 +2,7 @@
  * Rule: DataInfoBox Entity ID Match
  *
  * Validates that DataInfoBox components on a page reference the page's own
- * numericId. If a page has `numericId: E887` in frontmatter, any
+ * wikiId. If a page has `wikiId: E887` in frontmatter, any
  * `<DataInfoBox entityId="E886">` would be pointing to a different entity,
  * causing a visible render error.
  *
@@ -19,14 +19,14 @@ import type { ContentFile, ValidationEngine } from '../validation/validation-eng
 export const datainfoboxEntityMatchRule = createRule({
   id: 'datainfobox-entity-match',
   name: 'DataInfoBox Entity ID Match',
-  description: 'Flag DataInfoBox components with entityId that does not match the page\'s own numericId',
+  description: 'Flag DataInfoBox components with entityId that does not match the page\'s own wikiId',
 
   check(content: ContentFile, _engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
 
-    // Only check pages with a numericId in frontmatter
-    const pageNumericId = content.frontmatter?.numericId as string | undefined;
-    if (!pageNumericId) return issues;
+    // Only check pages with a wikiId in frontmatter
+    const pageWikiId = content.frontmatter?.wikiId as string | undefined;
+    if (!pageWikiId) return issues;
 
     // Skip internal/ pages (templates and docs that embed multiple DataInfoBoxes).
     const rel = content.relativePath;
@@ -48,7 +48,7 @@ export const datainfoboxEntityMatchRule = createRule({
     while ((match = datainfoboxPattern.exec(body)) !== null) {
       const entityId = match[1].trim();
 
-      if (entityId !== pageNumericId) {
+      if (entityId !== pageWikiId) {
         const linesBefore = body.substring(0, match.index).split('\n');
         const lineNumber = linesBefore.length;
 
@@ -56,7 +56,7 @@ export const datainfoboxEntityMatchRule = createRule({
           rule: this.id,
           file: content.path,
           line: lineNumber,
-          message: `DataInfoBox entityId="${entityId}" does not match page numericId="${pageNumericId}". This will display data for the wrong entity.`,
+          message: `DataInfoBox entityId="${entityId}" does not match page wikiId="${pageWikiId}". This will display data for the wrong entity.`,
           severity: Severity.ERROR,
         }));
       }

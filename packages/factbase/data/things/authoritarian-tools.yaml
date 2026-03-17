@@ -3,7 +3,7 @@ thing:
   stableId: eXd3Fe8Lzg
   type: risk
   name: AI Authoritarian Tools
-  numericId: E30
+  wikiId: E30
 facts:
   - id: f_F2Eo7wmO2w
     property: description

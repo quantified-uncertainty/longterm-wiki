@@ -3,7 +3,7 @@ thing:
   stableId: vKC8BA9hHA
   type: organization
   name: Johns Hopkins Center for Health Security
-  numericId: E423
+  wikiId: E423
 facts:
   - id: f_35Bt5h7alQ
     property: description

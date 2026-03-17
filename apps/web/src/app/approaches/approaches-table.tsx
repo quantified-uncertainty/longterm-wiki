@@ -9,7 +9,7 @@ export interface ApproachRow {
   title: string;
   description: string | null;
   tags: string[];
-  numericId: string | null;
+  wikiId: string | null;
 }
 
 type SortKey = "title" | "tags";
@@ -134,9 +134,9 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                  {row.numericId && (
+                  {row.wikiId && (
                     <Link
-                      href={`/wiki/${row.numericId}`}
+                      href={`/wiki/${row.wikiId}`}
                       className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
                       title="Wiki page"
                     >

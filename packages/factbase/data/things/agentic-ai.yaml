@@ -3,7 +3,7 @@ thing:
   stableId: 95ASV0XEwQ
   type: capability
   name: Agentic AI
-  numericId: E2
+  wikiId: E2
 facts:
   - id: f_Oq8CcXaolg
     property: description

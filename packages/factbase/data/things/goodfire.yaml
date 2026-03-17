@@ -3,7 +3,7 @@ thing:
   stableId: H74rOLotqg
   type: organization
   name: Goodfire
-  numericId: E430
+  wikiId: E430
 facts:
   - id: f_NPjYnmfB4w
     property: description

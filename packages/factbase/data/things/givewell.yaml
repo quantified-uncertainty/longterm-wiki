@@ -3,7 +3,7 @@ thing:
   stableId: OwXl35e7bg
   type: organization
   name: "GiveWell"
-  numericId: E1056
+  wikiId: E1056
   aliases:
     - GiveWell.org
 

@@ -141,9 +141,9 @@ export default async function BenchmarkDetailPage({
           </p>
         )}
         <div className="flex items-center gap-4 mt-3 text-sm">
-          {entity.numericId && (
+          {entity.wikiId && (
             <Link
-              href={`/wiki/${entity.numericId}`}
+              href={`/wiki/${entity.wikiId}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Wiki page &rarr;

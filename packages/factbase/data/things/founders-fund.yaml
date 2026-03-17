@@ -3,7 +3,7 @@ thing:
   stableId: LYfneQJbSA
   type: organization
   name: Founders Fund
-  numericId: E529
+  wikiId: E529
 facts:
   - id: f_QJ9J38qA6Q
     property: description

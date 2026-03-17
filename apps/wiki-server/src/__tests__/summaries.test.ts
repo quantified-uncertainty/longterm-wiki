@@ -21,7 +21,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
-  // ---- entity resolution: SELECT stable_id FROM entities WHERE stable_id/id/numeric_id = ... ----
+  // ---- entity resolution: SELECT stable_id FROM entities WHERE stable_id/id/wiki_id = ... ----
   if (q.includes("stable_id") && q.includes('"entities"') && q.includes("limit")) {
     // Return the identifier as-is as the stableId (simulating resolution)
     return params.length > 0 ? [{ stable_id: params[0] }] : [];

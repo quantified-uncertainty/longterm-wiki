@@ -3,7 +3,7 @@ thing:
   stableId: cYETfX9wzA
   type: approach
   name: Structured Access / API-Only
-  numericId: E486
+  wikiId: E486
 facts:
   - id: f_pQfRvtChwA
     property: description

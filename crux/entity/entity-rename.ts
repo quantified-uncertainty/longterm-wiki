@@ -47,7 +47,7 @@ export function escapeRegex(str: string): string {
  *   - E6  in  `E6:`     → boundary after 6 (next char `:` is non-word) ✓
  *
  * JavaScript \b considers digits (\d) as word characters, so this works
- * correctly for both numeric IDs (E6) and slug IDs (ai-control).
+ * correctly for both wiki IDs (E6) and slug IDs (ai-control).
  *
  * Note: hyphens in slug IDs are NOT word characters, so \b sits at each
  * hyphen boundary too — but that's fine since we match the full slug string.

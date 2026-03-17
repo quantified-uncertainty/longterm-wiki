@@ -3,7 +3,7 @@ thing:
   stableId: aE60G9uLyA
   type: risk
   name: Corrigibility Failure
-  numericId: E80
+  wikiId: E80
 facts:
   - id: f_vsexbmZdEg
     property: description

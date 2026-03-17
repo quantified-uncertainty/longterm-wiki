@@ -3,7 +3,7 @@ thing:
   stableId: y87VxEBBIA
   type: ai-model
   name: Claude Haiku 4.5
-  numericId: E1037
+  wikiId: E1037
 facts:
   - id: f_KcUpuzjuwg
     property: description

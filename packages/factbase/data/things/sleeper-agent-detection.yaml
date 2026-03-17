@@ -3,7 +3,7 @@ thing:
   stableId: BBVRwgJ43w
   type: approach
   name: Sleeper Agent Detection
-  numericId: E445
+  wikiId: E445
 facts:
   - id: f_WI61pnLoCg
     property: description

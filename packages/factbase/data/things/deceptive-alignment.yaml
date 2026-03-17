@@ -3,7 +3,7 @@ thing:
   stableId: vc60Nthkcg
   type: risk
   name: Deceptive Alignment
-  numericId: E93
+  wikiId: E93
 facts:
   - id: f_EkvWWzhRSA
     property: description

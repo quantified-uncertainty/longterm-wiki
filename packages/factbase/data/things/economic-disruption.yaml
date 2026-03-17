@@ -3,7 +3,7 @@ thing:
   stableId: hRRC36tWDg
   type: risk
   name: AI-Driven Economic Disruption
-  numericId: E108
+  wikiId: E108
 facts:
   - id: f_qY2pQobxeg
     property: description

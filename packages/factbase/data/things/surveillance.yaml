@@ -3,7 +3,7 @@ thing:
   stableId: 9ToBZjhsVg
   type: risk
   name: AI Mass Surveillance
-  numericId: E292
+  wikiId: E292
 facts:
   - id: f_f8hVnFVu5w
     property: description

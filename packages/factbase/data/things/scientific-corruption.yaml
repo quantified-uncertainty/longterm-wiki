@@ -3,7 +3,7 @@ thing:
   stableId: IK5egiQE9w
   type: risk
   name: Scientific Knowledge Corruption
-  numericId: E276
+  wikiId: E276
 facts:
   - id: f_G9I5Syd4bg
     property: description

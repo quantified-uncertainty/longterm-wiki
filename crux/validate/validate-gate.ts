@@ -11,7 +11,7 @@
  *   1. Build data layer (required for validation + tests) — skippable if only crux/ changed
  *   2. Auto-fix escaping + markdown (with --fix)
  *   3. [Parallel] Run vitest tests
- *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)
+ *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, wiki IDs, EntityLink)
  *      [Parallel] YAML schema validation
  *      [Parallel] TypeScript type check — app
  *      [Parallel] TypeScript type check — crux
@@ -216,7 +216,7 @@ const UNIFIED_BLOCKING_RULES = [
   'kbf-refs',
   'no-deprecated-components',
   'no-quoted-subcategory',
-  'numeric-id-integrity',
+  'wiki-id-integrity',
   'pipeline-artifacts',
   'prefer-entitylink',
   'resource-ref-integrity',
@@ -235,7 +235,7 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'unified-blocking',
-    name: 'Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink, pipeline artifacts)',
+    name: 'Unified blocking rules (MDX syntax, frontmatter, wiki IDs, EntityLink, pipeline artifacts)',
     command: 'pnpm',
     args: [
       'crux', 'validate', 'unified',

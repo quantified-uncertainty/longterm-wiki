@@ -38,11 +38,15 @@ import { FundingConnections } from "./funding-connections";
 import { OrgRoles } from "./org-roles";
 import { BoardSeats } from "./board-seats";
 
+// Allow dynamic rendering of person pages not in generateStaticParams
+// (e.g., entities created via tablebase enrichment in the wiki-server DB)
+export const dynamicParams = true;
+
 export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
 }
 
-/** Resolve a slug to a person entity (KB-first, typed entity fallback). */
+/** Resolve a slug to a person entity (KB-first, typed entity fallback, wiki-server fallback). */
 function resolvePersonEntity(slug: string): Entity | undefined {
   const kbEntity = resolvePersonBySlug(slug);
   if (kbEntity) return kbEntity;
@@ -55,11 +59,42 @@ function resolvePersonEntity(slug: string): Entity | undefined {
       stableId: slug,
       type: "person",
       name: typedEntity.title,
-      numericId: typedEntity.numericId,
-      wikiPageId: typedEntity.numericId,
+      wikiId: typedEntity.wikiId,
+      wikiPageId: typedEntity.wikiId,
     };
   }
   return undefined;
+}
+
+/** Async fallback: try wiki-server for entities not in local data. */
+async function resolvePersonFromServer(slug: string): Promise<Entity | undefined> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL || process.env.PROD_LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) return undefined;
+  try {
+    const res = await fetch(`${serverUrl}/api/entities/${encodeURIComponent(slug)}`, {
+      headers: {
+        ...(process.env.LONGTERMWIKI_SERVER_API_KEY && {
+          Authorization: `Bearer ${process.env.LONGTERMWIKI_SERVER_API_KEY}`,
+        }),
+      },
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    if (data.entityType !== "person") return undefined;
+    return {
+      id: data.id,
+      stableId: data.stableId || data.id,
+      type: "person",
+      name: data.title,
+      wikiId: data.wikiId,
+      wikiPageId: data.wikiId,
+    };
+  } catch (e: unknown) {
+    // Best-effort fallback — wiki-server may be unreachable during build
+    console.warn(`[people] Failed to resolve person "${slug}" from server: ${e instanceof Error ? e.message : String(e)}`);
+    return undefined;
+  }
 }
 
 export async function generateMetadata({
@@ -68,7 +103,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const entity = resolvePersonEntity(slug);
+  const entity = resolvePersonEntity(slug) ?? await resolvePersonFromServer(slug);
   if (!entity) return { title: "Person Not Found" };
 
   const roleFact = getKBLatest(entity.id, "role");
@@ -101,7 +136,7 @@ export default async function PersonProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entity = resolvePersonEntity(slug);
+  const entity = resolvePersonEntity(slug) ?? await resolvePersonFromServer(slug);
   if (!entity) {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/people/${canonical}`);

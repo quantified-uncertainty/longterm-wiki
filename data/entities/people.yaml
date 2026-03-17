@@ -3,7 +3,7 @@
 
 - id: buck-shlegeris
   stableId: Z62bQynY4g
-  numericId: E46
+  wikiId: E46
   type: person
   title: Buck Shlegeris
   description: CEO of Redwood Research, focused on AI safety research and alignment techniques.
@@ -15,7 +15,7 @@
       value: AI safety research, Redwood Research leadership
 - id: chris-olah
   stableId: Tz48rTriBg
-  numericId: E59
+  wikiId: E59
   type: person
   title: Chris Olah
   website: https://colah.github.io
@@ -70,7 +70,7 @@
   lastUpdated: 2025-12
 - id: connor-leahy
   stableId: CrXoCsIucX
-  numericId: E71
+  wikiId: E71
   type: person
   title: Connor Leahy
   website: https://conjecture.dev
@@ -122,7 +122,7 @@
   lastUpdated: 2025-12
 - id: dan-hendrycks
   stableId: VoNqoBJkyg
-  numericId: E89
+  wikiId: E89
   type: person
   title: Dan Hendrycks
   website: https://hendrycks.com
@@ -173,7 +173,7 @@
   lastUpdated: 2025-12
 - id: daniela-amodei
   stableId: tKMznr07QA
-  numericId: E90
+  wikiId: E90
   type: person
   title: Daniela Amodei
   website: https://anthropic.com
@@ -185,7 +185,7 @@
   description: "Co-founder and President of Anthropic, previously VP of Operations at OpenAI. Leads the business and operational strategy of Anthropic alongside her brother Dario Amodei as CEO."
 - id: dario-amodei
   stableId: zR4nW8xB2f
-  numericId: E91
+  wikiId: E91
   type: person
   title: Dario Amodei
   website: https://anthropic.com
@@ -243,13 +243,13 @@
   lastUpdated: 2025-12
 - id: demis-hassabis
   stableId: Aqcyu3onCA
-  numericId: E101
+  wikiId: E101
   type: person
   title: Demis Hassabis
   description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
   stableId: fS1tEGKuNq
-  numericId: E114
+  wikiId: E114
   type: person
   title: Eliezer Yudkowsky
   website: https://intelligence.org
@@ -308,7 +308,7 @@
   lastUpdated: 2025-12
 - id: elizabeth-kelly
   stableId: 1CHfDs0vsg
-  numericId: E115
+  wikiId: E115
   type: person
   title: Elizabeth Kelly
   description: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
@@ -319,19 +319,19 @@
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
   stableId: XnqqKHiNmw
-  numericId: E129
+  wikiId: E129
   type: person
   title: Evan Hubinger
   description: "AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner alignment and corrigibility."
 - id: gary-marcus
   stableId: ILx7EzDqXQ
-  numericId: E148
+  wikiId: E148
   type: person
   title: Gary Marcus
   description: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI approaches.
 - id: geoffrey-hinton
   stableId: 5N5UqXNkkg
-  numericId: E149
+  wikiId: E149
   type: person
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
@@ -383,7 +383,7 @@
   lastUpdated: 2025-12
 - id: ajeya-cotra
   stableId: dPzCwzIxiQ
-  numericId: E864
+  wikiId: E864
   type: person
   title: Ajeya Cotra
   website: https://metr.org
@@ -416,7 +416,7 @@
 
 - id: holden-karnofsky
   stableId: eQh3ZhWv8D
-  numericId: E156
+  wikiId: E156
   type: person
   title: Holden Karnofsky
   website: https://coefficientgiving.org
@@ -467,7 +467,7 @@
   lastUpdated: 2025-12
 - id: ian-hogarth
   stableId: DX4NK1gGtg
-  numericId: E162
+  wikiId: E162
   type: person
   title: Ian Hogarth
   description: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
@@ -478,7 +478,7 @@
       value: Leading UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
   stableId: eYrBgMLJDw
-  numericId: E163
+  wikiId: E163
   type: person
   title: Ilya Sutskever
   website: https://ssi.inc
@@ -530,7 +530,7 @@
   lastUpdated: 2025-12
 - id: jan-leike
   stableId: hQ7mR2kN5p
-  numericId: E182
+  wikiId: E182
   type: person
   title: Jan Leike
   website: https://anthropic.com
@@ -585,13 +585,13 @@
   lastUpdated: 2025-12
 - id: nate-soares
   stableId: 5MVd90lzCg
-  numericId: E212
+  wikiId: E212
   type: person
   title: Nate Soares
   description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   stableId: zaRXTCXPPk
-  numericId: E214
+  wikiId: E214
   type: person
   title: Neel Nanda
   website: https://www.neelnanda.io
@@ -645,7 +645,7 @@
   lastUpdated: 2025-12
 - id: nick-bostrom
   stableId: IQvWHA3OiF
-  numericId: E215
+  wikiId: E215
   type: person
   title: Nick Bostrom
   website: https://nickbostrom.com
@@ -699,7 +699,7 @@
   lastUpdated: 2025-12
 - id: paul-christiano
   stableId: vzxfzxBITd
-  numericId: E220
+  wikiId: E220
   type: person
   title: Paul Christiano
   website: https://alignment.org
@@ -757,19 +757,19 @@
   lastUpdated: 2025-12
 - id: robin-hanson
   stableId: DmGXPl1h2g
-  numericId: E260
+  wikiId: E260
   type: person
   title: Robin Hanson
   description: "Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics, and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain."
 - id: sam-altman
   stableId: JKsVHQ5stQ
-  numericId: E269
+  wikiId: E269
   type: person
   title: Sam Altman
   description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
   stableId: muueuPOHfg
-  numericId: E280
+  wikiId: E280
   type: person
   title: Shane Legg
   description: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of machine superintelligence research.
@@ -781,7 +781,7 @@
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
 - id: stuart-russell
   stableId: ZxUirlzHke
-  numericId: E290
+  wikiId: E290
   type: person
   title: Stuart Russell
   website: https://people.eecs.berkeley.edu/~russell/
@@ -836,7 +836,7 @@
   lastUpdated: 2025-12
 - id: toby-ord
   stableId: 8nmqy7vFiA
-  numericId: E355
+  wikiId: E355
   type: person
   title: Toby Ord
   website: https://www.tobyord.com
@@ -889,7 +889,7 @@
   lastUpdated: 2025-12
 - id: yoshua-bengio
   stableId: nGFBXZeM3d
-  numericId: E380
+  wikiId: E380
   type: person
   title: Yoshua Bengio
   website: https://yoshuabengio.org
@@ -942,7 +942,7 @@
   lastUpdated: 2025-12
 - id: elon-musk
   stableId: 69vftmr1jg
-  numericId: E116
+  wikiId: E116
   type: person
   title: Elon Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
@@ -958,7 +958,7 @@
   lastUpdated: 2025-12
 - id: beth-barnes
   stableId: ZvfLhIm7pw
-  numericId: E39
+  wikiId: E39
   type: person
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
@@ -977,7 +977,7 @@
 
 - id: david-sacks
   stableId: JjyNWsA91A
-  numericId: E431
+  wikiId: E431
   type: person
   title: David Sacks
   description: >-
@@ -1008,7 +1008,7 @@
 
 - id: marc-andreessen
   stableId: qspeazccPg
-  numericId: E432
+  wikiId: E432
   type: person
   title: Marc Andreessen
   description: >-
@@ -1036,7 +1036,7 @@
 
 - id: max-tegmark
   stableId: 3KjUCZCV8w
-  numericId: E433
+  wikiId: E433
   type: person
   title: Max Tegmark
   description: >-
@@ -1068,7 +1068,7 @@
 
 - id: philip-tetlock
   stableId: BCisPStEdQ
-  numericId: E434
+  wikiId: E434
   type: person
   title: Philip Tetlock
   description: >-
@@ -1095,7 +1095,7 @@
 
 - id: eli-lifland
   stableId: wjtZjN8acQ
-  numericId: E435
+  wikiId: E435
   type: person
   title: Eli Lifland
   description: >-
@@ -1127,7 +1127,7 @@
 
 - id: dustin-moskovitz
   stableId: Jtj6jHbuQ7
-  numericId: E436
+  wikiId: E436
   type: person
   title: Dustin Moskovitz
   description: >-
@@ -1161,7 +1161,7 @@
 # === Auto-generated stubs for pages missing entities ===
 - id: gwern
   stableId: 25eyvY39Bw
-  numericId: E574
+  wikiId: E574
   type: person
   title: Gwern Branwen
   description: >-
@@ -1175,7 +1175,7 @@
   lastUpdated: 2026-02
 - id: helen-toner
   stableId: oTieHq0pRA
-  numericId: E575
+  wikiId: E575
   type: person
   title: Helen Toner
   description: >-
@@ -1189,7 +1189,7 @@
   lastUpdated: 2026-02
 - id: issa-rice
   stableId: nuR3te3Rkw
-  numericId: E576
+  wikiId: E576
   type: person
   title: Issa Rice
   description: >-
@@ -1203,7 +1203,7 @@
   lastUpdated: 2026-02
 - id: jaan-tallinn
   stableId: 6gjF5d3geg
-  numericId: E577
+  wikiId: E577
   type: person
   title: Jaan Tallinn
   description: >-
@@ -1217,7 +1217,7 @@
   lastUpdated: 2026-02
 - id: leopold-aschenbrenner
   stableId: izkduIMBDg
-  numericId: E578
+  wikiId: E578
   type: person
   title: Leopold Aschenbrenner
   description: >-
@@ -1231,7 +1231,7 @@
   lastUpdated: 2026-02
 - id: nuno-sempere
   stableId: AnFfbQlIog
-  numericId: E579
+  wikiId: E579
   type: person
   title: Nuño Sempere
   description: >-
@@ -1245,7 +1245,7 @@
   lastUpdated: 2026-02
 - id: vidur-kapur
   stableId: XqvdX3YisQ
-  numericId: E580
+  wikiId: E580
   type: person
   title: Vidur Kapur
   description: >-
@@ -1260,7 +1260,7 @@
   lastUpdated: 2026-02
 - id: vipul-naik
   stableId: OdDfkoWwQg
-  numericId: E581
+  wikiId: E581
   type: person
   title: Vipul Naik
   description: >-
@@ -1274,7 +1274,7 @@
   lastUpdated: 2026-02
 - id: yann-lecun
   stableId: cMbVUVK29Q
-  numericId: E582
+  wikiId: E582
   type: person
   title: Yann LeCun
   description: >-
@@ -1288,7 +1288,7 @@
   lastUpdated: 2026-02
 - id: sam-bankman-fried
   stableId: sace2bALew
-  numericId: E857
+  wikiId: E857
   type: person
   title: Sam Bankman-Fried
   website: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
@@ -1313,7 +1313,7 @@
 
 - id: nick-beckstead
   stableId: licWPlOJMg
-  numericId: E861
+  wikiId: E861
   type: person
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
@@ -1350,7 +1350,7 @@
 
 - id: will-macaskill
   stableId: p1P9oQwB6w
-  numericId: E862
+  wikiId: E862
   type: person
   title: Will MacAskill
   website: https://www.willmacaskill.com/
@@ -1391,7 +1391,7 @@
   lastUpdated: 2026-02
 - id: joe-biden
   stableId: 6kAEE9sPCg
-  numericId: E1017
+  wikiId: E1017
   type: person
   summaryPage: people-overview
   title: Joe Biden
@@ -1416,7 +1416,7 @@
 
 - id: andrej-karpathy
   stableId: Q9eaz6joHA
-  numericId: E1287
+  wikiId: E1287
   type: person
   title: "Andrej Karpathy"
   description: >
@@ -1433,7 +1433,7 @@
 
 - id: mustafa-suleyman
   stableId: DBq1ddu8Mg
-  numericId: E1288
+  wikiId: E1288
   type: person
   title: "Mustafa Suleyman"
   description: >
@@ -1449,7 +1449,7 @@
 
 - id: jack-clark
   stableId: YqSmRNVRAg
-  numericId: E1248
+  wikiId: E1248
   type: person
   title: "Jack Clark"
   description: >
@@ -1465,7 +1465,7 @@
 
 - id: sam-mccandlish
   stableId: ENl8sgChDQ
-  numericId: E1259
+  wikiId: E1259
   type: person
   title: "Sam McCandlish"
   description: >
@@ -1480,7 +1480,7 @@
 
 - id: jared-kaplan
   stableId: x16GL4gP2A
-  numericId: E1239
+  wikiId: E1239
   type: person
   title: "Jared Kaplan"
   description: >
@@ -1496,7 +1496,7 @@
 
 - id: mira-murati
   stableId: yiBasS5uXQ
-  numericId: E1289
+  wikiId: E1289
   type: person
   title: "Mira Murati"
   description: >
@@ -1512,7 +1512,7 @@
 
 - id: satya-nadella
   stableId: 1L16qpyk5A
-  numericId: E1290
+  wikiId: E1290
   type: person
   title: "Satya Nadella"
   description: >
@@ -1528,7 +1528,7 @@
 
 - id: sundar-pichai
   stableId: APUqKVNaAA
-  numericId: E1291
+  wikiId: E1291
   type: person
   title: "Sundar Pichai"
   description: >
@@ -1543,7 +1543,7 @@
 
 - id: jensen-huang
   stableId: So79iNy2sQ
-  numericId: E1292
+  wikiId: E1292
   type: person
   title: "Jensen Huang"
   description: >
@@ -1559,7 +1559,7 @@
 
 - id: mark-zuckerberg
   stableId: OxXXTxtbrA
-  numericId: E1293
+  wikiId: E1293
   type: person
   title: "Mark Zuckerberg"
   description: >
@@ -1575,7 +1575,7 @@
 
 - id: katja-grace
   stableId: t2wkJarnWQ
-  numericId: E1294
+  wikiId: E1294
   type: person
   title: "Katja Grace"
   description: >
@@ -1591,7 +1591,7 @@
 
 - id: allan-dafoe
   stableId: uNNO9uwEoA
-  numericId: E1295
+  wikiId: E1295
   type: person
   title: "Allan Dafoe"
   description: >
@@ -1607,7 +1607,7 @@
 
 - id: victoria-krakovna
   stableId: utxQdymSEg
-  numericId: E1296
+  wikiId: E1296
   type: person
   title: "Victoria Krakovna"
   description: >
@@ -1624,7 +1624,7 @@
 
 - id: rohin-shah
   stableId: GAlcP90tvw
-  numericId: E1297
+  wikiId: E1297
   type: person
   title: "Rohin Shah"
   description: >
@@ -1640,7 +1640,7 @@
 
 - id: richard-ngo
   stableId: FB9xXKFuqg
-  numericId: E1298
+  wikiId: E1298
   type: person
   title: "Richard Ngo"
   description: >
@@ -1656,7 +1656,7 @@
 
 - id: jacob-steinhardt
   stableId: C20cHdGiHQ
-  numericId: E1299
+  wikiId: E1299
   type: person
   title: "Jacob Steinhardt"
   description: >
@@ -1673,7 +1673,7 @@
 
 - id: scott-alexander
   stableId: ykTqvdkiLQ
-  numericId: E1308
+  wikiId: E1308
   type: person
   title: "Scott Alexander"
   description: >
@@ -1690,7 +1690,7 @@
 
 - id: luke-muehlhauser
   stableId: TclWePCJ7w
-  numericId: E1306
+  wikiId: E1306
   type: person
   title: "Luke Muehlhauser"
   description: >
@@ -1707,7 +1707,7 @@
 
 - id: andrew-ng
   stableId: v13BF4zP2A
-  numericId: E1307
+  wikiId: E1307
   type: person
   title: "Andrew Ng"
   description: >
@@ -1724,7 +1724,7 @@
 
 - id: fei-fei-li
   stableId: QzcX3bShmQ
-  numericId: E1303
+  wikiId: E1303
   type: person
   title: "Fei-Fei Li"
   description: >
@@ -1740,7 +1740,7 @@
 
 - id: david-krueger
   stableId: ATFBoSnuqA
-  numericId: E1304
+  wikiId: E1304
   type: person
   title: "David Krueger"
   description: >
@@ -1757,7 +1757,7 @@
 
 - id: timnit-gebru
   stableId: xVdjAKxCSQ
-  numericId: E1305
+  wikiId: E1305
   type: person
   title: "Timnit Gebru"
   description: >

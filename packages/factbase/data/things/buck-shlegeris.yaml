@@ -3,7 +3,7 @@ thing:
   stableId: Z62bQynY4g
   type: person
   name: Buck Shlegeris
-  numericId: E46
+  wikiId: E46
 facts:
   - id: f_UR3u0VcRwQ
     property: description

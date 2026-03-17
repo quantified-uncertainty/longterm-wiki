@@ -544,7 +544,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)")) {
     return params
       .filter((p) => String(p) !== "no-entity-id")
-      .map((p) => ({ numeric_id: getIntIdForSlug(String(p)), slug: p }));
+      .map((p) => ({ wiki_id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // --- entity_ids fallbacks (for health check count) ---

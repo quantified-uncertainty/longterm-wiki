@@ -3,7 +3,7 @@ thing:
   stableId: TaBC4uj0Bw
   type: risk
   name: AI Knowledge Monopoly
-  numericId: E183
+  wikiId: E183
 facts:
   - id: f_VpW4dCKdmg
     property: description

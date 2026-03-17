@@ -3,7 +3,7 @@ thing:
   stableId: 4a6Sf9Fupg
   type: policy
   name: International Coordination Mechanisms
-  numericId: E470
+  wikiId: E470
 facts:
   - id: f_NNIDBg6foQ
     property: description

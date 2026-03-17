@@ -3,7 +3,7 @@ thing:
   stableId: D9lqMW2HVw
   type: organization
   name: NTI | bio (Nuclear Threat Initiative - Biological Program)
-  numericId: E551
+  wikiId: E551
 facts:
   - id: f_3Ru8HX0IQQ
     property: description

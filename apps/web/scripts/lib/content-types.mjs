@@ -162,6 +162,6 @@ export const TOP_LEVEL_CONTENT_DIRS = [
   'insight-hunting',
   'dashboard',
   'project',
-  'kb',
+  'factbase',
   'sources',
 ];

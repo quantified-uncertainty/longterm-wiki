@@ -3,7 +3,7 @@ thing:
   stableId: etuIjQhFbQ
   type: research-area
   name: AI Evaluations
-  numericId: E128
+  wikiId: E128
 facts:
   - id: f_fj8uLG4jOg
     property: description

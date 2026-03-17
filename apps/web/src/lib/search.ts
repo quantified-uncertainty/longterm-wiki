@@ -9,7 +9,7 @@ export interface SearchDoc {
   id: string;
   title: string;
   description: string;
-  numericId: string;
+  wikiId: string;
   type: string;
   readerImportance: number | null;
   quality: number | null;
@@ -35,7 +35,7 @@ export interface SearchResult extends SearchDoc {
 interface ServerSearchResponse {
   results: Array<{
     id: string;
-    numericId: string | null;
+    wikiId: string | null;
     title: string;
     description: string | null;
     entityType: string | null;
@@ -77,7 +77,7 @@ async function searchServer(
         id: r.id,
         title: r.title,
         description: r.description ?? "",
-        numericId: r.numericId ?? r.id,
+        wikiId: r.wikiId ?? r.id,
         type: r.entityType ?? "",
         readerImportance: r.readerImportance,
         quality: r.quality,

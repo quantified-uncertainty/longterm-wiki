@@ -73,7 +73,7 @@ while [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ] && [ "$ATTEMPT" -lt "$MAX_TOTAL_ATT
   fi
 
   PAGE_SLUG=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.id)})")
-  PAGE_ID=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.numericId)})")
+  PAGE_ID=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.wikiId)})")
   PAGE_TITLE=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.title)})")
   IMPACT=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.impactScore)})")
   ENTITY_TYPE=$(echo "$TASK_JSON" | node -e "process.stdin.setEncoding('utf8'); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{const j=JSON.parse(d); console.log(j.entityType)})")
@@ -88,7 +88,7 @@ while [ "$SUCCEEDED" -lt "$MAX_ITERATIONS" ] && [ "$ATTEMPT" -lt "$MAX_TOTAL_ATT
 
   echo -e "${BLUE}Page: ${PAGE_TITLE} (${PAGE_SLUG} / ${PAGE_ID}) — impact: ${IMPACT}${RESET}"
 
-  # Run content improve (uses slug, not numericId)
+  # Run content improve (uses slug, not wikiId)
   echo -e "${DIM}Running content improve --tier=$TIER...${RESET}"
   if pnpm crux content improve "$PAGE_SLUG" --tier="$TIER" --apply --skip-session-log 2>&1; then
     echo -e "${GREEN}✓ Content improved${RESET}"

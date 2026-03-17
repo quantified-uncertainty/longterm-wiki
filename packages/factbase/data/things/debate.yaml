@@ -3,7 +3,7 @@ thing:
   stableId: kNfdvSgC2g
   type: approach
   name: AI Safety via Debate
-  numericId: E482
+  wikiId: E482
 facts:
   - id: f_nKjp92MKzA
     property: description

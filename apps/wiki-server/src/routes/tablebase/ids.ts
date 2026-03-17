@@ -34,7 +34,7 @@ function generateStableId(): string {
 // ---- Helpers ----
 
 type EntityIdRow = {
-  numericId: number;
+  wikiId: number;
   slug: string;
   stableId: string | null;
   description: string | null;
@@ -43,7 +43,7 @@ type EntityIdRow = {
 
 function formatIdResponse(row: EntityIdRow, created: boolean) {
   return {
-    numericId: `E${row.numericId}`,
+    wikiId: `E${row.wikiId}`,
     slug: row.slug,
     stableId: row.stableId,
     description: row.description,
@@ -54,7 +54,7 @@ function formatIdResponse(row: EntityIdRow, created: boolean) {
 
 function formatIdSummary(row: EntityIdRow) {
   return {
-    numericId: `E${row.numericId}`,
+    wikiId: `E${row.wikiId}`,
     slug: row.slug,
     stableId: row.stableId,
     description: row.description,
@@ -114,7 +114,7 @@ const idsApp = new Hono()
     const inserted = await db
       .insert(entityIds)
       .values({
-        numericId: sql`nextval('entity_id_seq')`,
+        wikiId: sql`nextval('entity_id_seq')`,
         slug,
         stableId: generateStableId(),
         description: description ?? null,
@@ -172,7 +172,7 @@ const idsApp = new Hono()
         const inserted = await tx
           .insert(entityIds)
           .values({
-            numericId: sql`nextval('entity_id_seq')`,
+            wikiId: sql`nextval('entity_id_seq')`,
             slug: item.slug,
             stableId: generateStableId(),
             description: item.description ?? null,
@@ -210,7 +210,7 @@ const idsApp = new Hono()
     const rows = await db
       .select()
       .from(entityIds)
-      .orderBy(asc(entityIds.numericId))
+      .orderBy(asc(entityIds.wikiId))
       .limit(limit)
       .offset(offset);
 

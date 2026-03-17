@@ -3,7 +3,7 @@ thing:
   stableId: omIL5LhGnQ
   type: approach
   name: Adversarial Training
-  numericId: E583
+  wikiId: E583
 facts:
   - id: f_7AUTHQfMuQ
     property: description

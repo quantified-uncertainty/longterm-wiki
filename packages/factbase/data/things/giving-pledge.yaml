@@ -3,7 +3,7 @@ thing:
   stableId: 3w5hW5liew
   type: organization
   name: Giving Pledge
-  numericId: E531
+  wikiId: E531
 facts:
   - id: f_LOqgkOyz7Q
     property: description

@@ -3,7 +3,7 @@ thing:
   stableId: Eac7pHF06Q
   type: organization
   name: NIST and AI Safety
-  numericId: E424
+  wikiId: E424
 facts:
   - id: f_JXkqQ4jqwQ
     property: description

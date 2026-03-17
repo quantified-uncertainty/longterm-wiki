@@ -915,7 +915,7 @@ Having read the Ken source (ReasonML core, TOML data files, property definitions
 
 | Concept | Ken Standard | Our system | Gap |
 |---------|-------------|------------|-----|
-| **Entity** | "Thing" — any subject with an ID | Entity — YAML entry with `id`, `numericId`, `type` | Ken's Things are lightweight (TOML section header). Ours are heavyweight (YAML entry, numeric ID allocation, build pipeline). |
+| **Entity** | "Thing" — any subject with an ID | Entity — YAML entry with `id`, `wikiId`, `type` | Ken's Things are lightweight (TOML section header). Ours are heavyweight (YAML entry, numeric ID allocation, build pipeline). |
 | **Fact** | `{subjectId, propertyId, value, factId}` — a triple with its own ID | YAML fact: `{measure, value, asOf, source}` keyed by hash. Statement: `{subjectEntityId, propertyId, valueNumeric, ...}` | We have TWO fact systems (YAML facts + Postgres statements) that overlap. Ken has one. |
 | **Property** | TOML section in `properties.toml` — self-describing (name, data-type, inverse-name) | YAML entry in `fact-measures.yaml` — similar (label, unit, category, display) | Very similar. Ken has `inverse-name` (e.g., "Employed By" ↔ "Employs") which we lack. |
 | **Value type** | `String(string) \| ThingId(string) \| JSON(json)` — three variants | `valueNumeric \| valueText \| valueEntityId \| valueDate \| valueSeries` — five+ variants | Ken is simpler. Most values are either strings or references to other Things. |
@@ -980,7 +980,7 @@ These overlap (Anthropic's valuation exists in both). Ken would say: pick one.
 **2. Heavyweight entities vs. lightweight things**
 
 Creating a Ken Thing: add a `[section-header]` to a TOML file. Done.
-Creating our entity: `pnpm crux ids allocate <slug>`, add to `data/entities/*.yaml` with `numericId`, `type`, `relatedEntries`, build-data processes it.
+Creating our entity: `pnpm crux ids allocate <slug>`, add to `data/entities/*.yaml` with `wikiId`, `type`, `relatedEntries`, build-data processes it.
 
 This matters for the "sub-item" question. Should a funding round be an entity? In Ken, yes — it's just a section header. In our system, it's a heavyweight operation. This is why the "items" proposal felt necessary — we need something lighter than entities for sub-items.
 

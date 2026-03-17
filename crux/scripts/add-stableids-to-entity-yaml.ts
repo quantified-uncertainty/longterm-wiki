@@ -69,7 +69,7 @@ for (const file of readdirSync(ENTITIES_DIR).sort()) {
       continue;
     }
 
-    // Insert stableId after the id line (before numericId or other fields)
+    // Insert stableId after the id line (before wikiId or other fields)
     newLines.push(`  stableId: ${stableId}`);
     added++;
     modified = true;

@@ -3,7 +3,7 @@ thing:
   stableId: zkYFTnzRLA
   type: concept
   name: AGI Timeline
-  numericId: E399
+  wikiId: E399
 facts:
   - id: f_MjGVgIncSQ
     property: description

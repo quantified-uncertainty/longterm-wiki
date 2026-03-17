@@ -3,7 +3,7 @@ thing:
   stableId: aUMeFdALrA
   type: research-area
   name: Corrigibility
-  numericId: E79
+  wikiId: E79
 facts:
   - id: f_7N9ms2wIpA
     property: description

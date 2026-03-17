@@ -3,7 +3,7 @@ thing:
   stableId: OIY5gaPpBA
   type: organization
   name: Microsoft AI
-  numericId: E550
+  wikiId: E550
 facts:
   - id: f_1yvvPWOHUQ
     property: description

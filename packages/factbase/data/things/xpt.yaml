@@ -3,7 +3,7 @@ thing:
   stableId: PnUBtoCeMw
   type: project
   name: XPT (Existential Risk Persuasion Tournament)
-  numericId: E379
+  wikiId: E379
 facts:
   - id: f_GKYIGEv15w
     property: description

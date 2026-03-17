@@ -90,10 +90,10 @@ const DATA_FILES = [
  * Scan MDX files for <EntityLink id="..."> references and check each against
  * the entity registry. EntityLink ids can be numeric (E42) or slug-based.
  */
-function scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry) {
+function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry) {
   const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
-  const knownNumericIds = new Set(Object.keys(numericIdToSlug));
-  const knownSlugs = new Set(Object.keys(slugToNumericId));
+  const knownWikiIds = new Set(Object.keys(wikiIdToSlug));
+  const knownSlugs = new Set(Object.keys(slugToWikiId));
   const reachableSlugs = new Set(Object.keys(pathRegistry));
   const broken = [];
   const unreachable = [];
@@ -118,8 +118,8 @@ function scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry) {
 
       // Resolve to slug: id can be numeric (E42) or slug-based
       let slug;
-      if (knownNumericIds.has(id)) {
-        slug = numericIdToSlug[id];
+      if (knownWikiIds.has(id)) {
+        slug = wikiIdToSlug[id];
       } else if (knownSlugs.has(id)) {
         slug = id;
       } else {
@@ -255,7 +255,7 @@ function computeBacklinks(entities) {
  * Returns inbound map: targetEntityId -> array of source pages that link to it.
  * Must be called before rawContent is stripped from pages.
  */
-function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
+function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
   const inbound = {};
   let totalLinks = 0;
 
@@ -268,9 +268,9 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
 
     while ((match = regex.exec(page.rawContent)) !== null) {
       let targetId = match[1];
-      // Resolve numeric IDs (e.g. "E22") to slug IDs (e.g. "anthropic")
-      if (numericIdToSlug && numericIdToSlug[targetId]) {
-        targetId = numericIdToSlug[targetId];
+      // Resolve wiki IDs (e.g. "E22") to slug IDs (e.g. "anthropic")
+      if (wikiIdToSlug && wikiIdToSlug[targetId]) {
+        targetId = wikiIdToSlug[targetId];
       }
       if (targetId === page.id) continue; // Skip self-links
       if (seen.has(targetId)) continue;
@@ -1958,7 +1958,7 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEd
 
         pages.push({
           id: effectiveId,
-          numericId: fm.numericId || null,
+          wikiId: fm.wikiId || null,
           _fullPath: fullPath,
           path: urlPath,
           filePath: relative(CONTENT_DIR, fullPath),
@@ -2236,13 +2236,13 @@ async function main() {
   database.entities = entities;
 
   // =========================================================================
-  // ID REGISTRY — derive from numericId fields in source files (YAML + MDX)
+  // ID REGISTRY — derive from wikiId fields in source files (YAML + MDX)
   // =========================================================================
-  const { slugToNumericId, numericIdToSlug, nextId: nextIdInit } = buildIdRegistry(entities);
+  const { slugToWikiId, wikiIdToSlug, nextId: nextIdInit } = buildIdRegistry(entities);
   let nextId = nextIdInit;
   const idRegistryOutput = {
-    byNumericId: { ...numericIdToSlug },
-    bySlug: { ...slugToNumericId },
+    byWikiId: { ...wikiIdToSlug },
+    bySlug: { ...slugToWikiId },
   };
   database.idRegistry = idRegistryOutput;
 
@@ -2349,38 +2349,38 @@ async function main() {
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
   // Must happen before rawContent is stripped (below).
   // =========================================================================
-  // Pre-populate numericIdToSlug with page-level numericIds (pages that aren't
-  // YAML entities but have numericId in frontmatter). This ensures numeric IDs
+  // Pre-populate wikiIdToSlug with page-level wikiIds (pages that aren't
+  // YAML entities but have wikiId in frontmatter). This ensures wiki IDs
   // like "E660" resolve to slugs like "factors-ai-capabilities-overview" when
   // scanning EntityLink references below.
-  // Also detect conflicts where a page claims a numericId already owned by an entity.
+  // Also detect conflicts where a page claims a wikiId already owned by an entity.
   const pageIdConflicts = [];
   for (const page of pages) {
-    if (page.numericId) {
-      const existing = numericIdToSlug[page.numericId];
+    if (page.wikiId) {
+      const existing = wikiIdToSlug[page.wikiId];
       if (existing && existing !== page.id) {
         // Check if this is a legitimate alias: the entity's path maps to this page
         // (e.g. an entity renders at a page with a different slug)
         const entityPath = pathRegistry[existing];
         if (entityPath && entityPath.endsWith(`/${page.id}/`)) {
           // Entity maps to this page — they're the same content, just add alias
-          slugToNumericId[page.id] = page.numericId;
+          slugToWikiId[page.id] = page.wikiId;
         } else {
-          pageIdConflicts.push(`${page.numericId} claimed by entity "${existing}" and page "${page.id}"`);
+          pageIdConflicts.push(`${page.wikiId} claimed by entity "${existing}" and page "${page.id}"`);
         }
       } else {
-        numericIdToSlug[page.numericId] = page.id;
+        wikiIdToSlug[page.wikiId] = page.id;
       }
     }
   }
   if (pageIdConflicts.length > 0) {
-    console.error('\n  ERROR: numericId conflicts between entities and pages:');
+    console.error('\n  ERROR: wikiId conflicts between entities and pages:');
     for (const c of pageIdConflicts) console.error(`    ${c}`);
     process.exit(1);
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, numericIdToSlug);
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, wikiIdToSlug);
 
   // Merge content-derived inbound links into backlinks
   let contentBacklinksMerged = 0;
@@ -2740,7 +2740,7 @@ async function main() {
   console.log(`  recommendedScores: computed for ${pages.length} pages`);
 
   console.log('  Computing update schedule...');
-  const updateScheduleItems = buildUpdateSchedule(pages, slugToNumericId, buildNow);
+  const updateScheduleItems = buildUpdateSchedule(pages, slugToWikiId, buildNow);
   database.updateSchedule = updateScheduleItems;
   const overdue = updateScheduleItems.filter(i => i.daysUntilDue < 0).length;
   console.log(`  updateSchedule: ${updateScheduleItems.length} pages tracked, ${overdue} overdue`);
@@ -2829,15 +2829,15 @@ async function main() {
   database.pages = pages;
 
   // =========================================================================
-  // EXTEND ID REGISTRY — page-only numericIds
+  // EXTEND ID REGISTRY — page-only wikiIds
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
   const { nextId: _finalNextId } = extendIdRegistryWithPages({
-    pages, entityIds, slugToNumericId, numericIdToSlug, pathRegistry, nextId,
+    pages, entityIds, slugToWikiId, wikiIdToSlug, pathRegistry, nextId,
   });
   // Update registry output maps
-  idRegistryOutput.byNumericId = { ...numericIdToSlug };
-  idRegistryOutput.bySlug = { ...slugToNumericId };
+  idRegistryOutput.byWikiId = { ...wikiIdToSlug };
+  idRegistryOutput.bySlug = { ...slugToWikiId };
   database.idRegistry = idRegistryOutput;
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;
@@ -3009,7 +3009,7 @@ async function main() {
   // Broken EntityLink scan
   // ==========================================================================
   console.log('\nScanning for broken EntityLink references...');
-  const brokenLinksResult = scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry);
+  const brokenLinksResult = scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry);
   writeFileSync(join(OUTPUT_DIR, 'broken-entity-links.json'), JSON.stringify(brokenLinksResult, null, 2));
   console.log(`✓ EntityLink scan: ${brokenLinksResult.totalBroken} broken, ${brokenLinksResult.totalUnreachable} unreachable`);
 

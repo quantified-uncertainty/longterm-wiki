@@ -3,7 +3,7 @@ thing:
   stableId: 54ItAwh4QA
   type: risk
   name: Erosion of Human Agency
-  numericId: E126
+  wikiId: E126
 facts:
   - id: f_ccUokYgs9w
     property: description

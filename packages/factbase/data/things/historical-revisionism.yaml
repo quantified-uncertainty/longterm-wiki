@@ -3,7 +3,7 @@ thing:
   stableId: jiqdwTucCA
   type: risk
   name: AI-Enabled Historical Revisionism
-  numericId: E155
+  wikiId: E155
 facts:
   - id: f_Oy80LvZuBQ
     property: description

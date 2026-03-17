@@ -3,7 +3,7 @@ thing:
   stableId: Zx7ckq6syw
   type: organization
   name: Good Judgment (Forecasting)
-  numericId: E532
+  wikiId: E532
 facts:
   - id: f_GlDCNPXumA
     property: description

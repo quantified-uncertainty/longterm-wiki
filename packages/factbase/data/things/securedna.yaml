@@ -3,7 +3,7 @@ thing:
   stableId: m4vhGiF5RQ
   type: organization
   name: SecureDNA
-  numericId: E564
+  wikiId: E564
 facts:
   - id: f_C4X2eIlw6g
     property: description

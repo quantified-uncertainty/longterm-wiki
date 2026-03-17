@@ -5,7 +5,7 @@ thing:
   name: David Sacks
   aliases:
     - "David Sacks (White House AI Czar)"
-  numericId: E431
+  wikiId: E431
 facts:
   - id: f_XwwBzQAhXg
     property: description

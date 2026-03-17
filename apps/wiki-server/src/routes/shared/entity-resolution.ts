@@ -3,7 +3,7 @@ import { getDrizzleDb } from "../../db.js";
 import { entities } from "../../schema.js";
 
 /**
- * Resolve an entity identifier (stableId, slug, or numericId) to a stableId.
+ * Resolve an entity identifier (stableId, slug, or wikiId) to a stableId.
  * Returns null if the entity is not found.
  */
 export async function resolveEntityStableId(
@@ -17,7 +17,7 @@ export async function resolveEntityStableId(
       or(
         eq(entities.stableId, identifier),
         eq(entities.id, identifier),
-        eq(entities.numericId, identifier),
+        eq(entities.wikiId, identifier),
       )
     )
     .limit(1);

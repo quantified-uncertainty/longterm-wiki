@@ -3,7 +3,7 @@ thing:
   stableId: QeknHipQPA
   type: organization
   name: Astralis Foundation
-  numericId: E702
+  wikiId: E702
 facts:
   - id: f_BGt4Vo09rw
     property: description

@@ -10,7 +10,7 @@ let seqIsCalled = true;
 
 let store: Map<
   string,
-  { numeric_id: number; slug: string; stable_id: string | null; description: string | null; created_at: Date }
+  { wiki_id: number; slug: string; stable_id: string | null; description: string | null; created_at: Date }
 >;
 
 function resetStore() {
@@ -57,9 +57,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
     if (store.has(slug)) return [];
 
-    const numeric_id = nextSeqVal++;
-    lastSeqVal = numeric_id;
-    const row = { numeric_id, slug, stable_id, description, created_at: new Date() };
+    const wiki_id = nextSeqVal++;
+    lastSeqVal = wiki_id;
+    const row = { wiki_id, slug, stable_id, description, created_at: new Date() };
     store.set(slug, row);
     return [row];
   }
@@ -95,7 +95,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const limit = (params[0] as number) || 100;
     const offset = (params[1] as number) || 0;
     const all = Array.from(store.values()).sort(
-      (a, b) => a.numeric_id - b.numeric_id
+      (a, b) => a.wiki_id - b.wiki_id
     );
     return all.slice(offset, offset + limit);
   }
@@ -144,7 +144,7 @@ describe("ID Server API", () => {
       const res = await postJson(app, "/api/ids/allocate", { slug: "test-entity" });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.numericId).toBe("E886");
+      expect(body.wikiId).toBe("E886");
       expect(body.slug).toBe("test-entity");
       expect(body.created).toBe(true);
     });
@@ -155,7 +155,7 @@ describe("ID Server API", () => {
       const res = await postJson(app, "/api/ids/allocate", { slug: "dup-entity" });
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.numericId).toBe("E886");
+      expect(body.wikiId).toBe("E886");
       expect(body.created).toBe(false);
     });
 
@@ -182,8 +182,8 @@ describe("ID Server API", () => {
 
       const body1 = await res1.json();
       const body2 = await res2.json();
-      expect(body1.numericId).toBe("E886");
-      expect(body2.numericId).toBe("E887");
+      expect(body1.wikiId).toBe("E886");
+      expect(body2.wikiId).toBe("E887");
     });
   });
 
@@ -199,9 +199,9 @@ describe("ID Server API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.results).toHaveLength(3);
-      expect(body.results[0].numericId).toBe("E886");
-      expect(body.results[1].numericId).toBe("E887");
-      expect(body.results[2].numericId).toBe("E888");
+      expect(body.results[0].wikiId).toBe("E886");
+      expect(body.results[1].wikiId).toBe("E887");
+      expect(body.results[2].wikiId).toBe("E888");
       expect(body.results.every((r: { created: boolean }) => r.created)).toBe(true);
     });
 
@@ -247,7 +247,7 @@ describe("ID Server API", () => {
       const res = await app.request("/api/ids/by-slug?slug=lookup-me");
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.numericId).toBe("E886");
+      expect(body.wikiId).toBe("E886");
       expect(body.slug).toBe("lookup-me");
     });
 

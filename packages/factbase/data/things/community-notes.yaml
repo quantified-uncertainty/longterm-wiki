@@ -3,7 +3,7 @@ thing:
   stableId: g75DdACthg
   type: project
   name: X Community Notes
-  numericId: E381
+  wikiId: E381
 facts:
   - id: f_t0PiM5dVTA
     property: description

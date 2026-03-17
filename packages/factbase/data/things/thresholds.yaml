@@ -3,7 +3,7 @@ thing:
   stableId: 3OTN6TAzhw
   type: policy
   name: Compute Thresholds
-  numericId: E465
+  wikiId: E465
 facts:
   - id: f_BslUtC4f8Q
     property: description

@@ -39,7 +39,7 @@ const BATCH_CHUNK_SIZE = 50;
 // ---------------------------------------------------------------------------
 
 /**
- * Allocate a single numeric ID for a slug.
+ * Allocate a single wiki ID for a slug.
  * Idempotent: returns existing ID if slug is already registered.
  */
 export async function allocateId(
@@ -57,7 +57,7 @@ export async function allocateId(
 }
 
 /**
- * Allocate numeric IDs for multiple slugs in a single request.
+ * Allocate wiki IDs for multiple slugs in a single request.
  * All-or-nothing: either all succeed or the whole batch fails.
  */
 export async function allocateBatch(
@@ -90,7 +90,7 @@ export async function allocateIds(
     }
 
     for (const r of result.data.results) {
-      resultMap.set(r.slug, r.numericId);
+      resultMap.set(r.slug, r.wikiId);
     }
   }
 
@@ -98,7 +98,7 @@ export async function allocateIds(
 }
 
 /**
- * Look up the numeric ID for a single slug.
+ * Look up the wiki ID for a single slug.
  */
 export async function getIdBySlug(
   slug: string,

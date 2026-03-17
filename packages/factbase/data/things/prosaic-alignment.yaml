@@ -3,7 +3,7 @@ thing:
   stableId: EQgTf1t7dg
   type: approach
   name: Prosaic Alignment
-  numericId: E235
+  wikiId: E235
 facts:
   - id: f_xAkt2SYoDg
     property: description

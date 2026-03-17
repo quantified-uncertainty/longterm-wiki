@@ -41,7 +41,7 @@ const BaseEntity = z.object({
   lastUpdated: z.string().optional(),
   website: z.string().optional(),
   // Metadata fields carried from database.json
-  numericId: z.string().optional(),
+  wikiId: z.string().optional(),
   path: z.string().optional(),
   status: z.string().optional(),
   customFields: z.array(CustomField).default([]),

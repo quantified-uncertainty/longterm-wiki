@@ -236,6 +236,47 @@ vi.mock("fs", async () => {
   return { ...actual, readFileSync: vi.fn(actual.readFileSync) };
 });
 
+describe("buildEntityMatcher — entity array format", () => {
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  it("reads stableId from entity objects, not array indices", () => {
+    const readMock = vi.mocked(fs.readFileSync);
+    readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
+      const pathStr = String(path);
+      if (pathStr.includes("grantee-overrides.yaml")) {
+        return "overrides: {}";
+      }
+      if (pathStr.includes("factbase-data.json")) {
+        return JSON.stringify({
+          slugToEntityId: { "dan-hendrycks": "VoNqoBJkyg" },
+          entities: [
+            { id: "aaa1111111", stableId: "aaa1111111", name: "First Person" },
+            { id: "VoNqoBJkyg", stableId: "VoNqoBJkyg", name: "Dan Hendrycks" },
+          ],
+        });
+      }
+      if (pathStr.includes("database.json")) {
+        return JSON.stringify({ typedEntities: [] });
+      }
+      throw new Error(`Unexpected read: ${pathStr}`);
+    });
+
+    const matcher = buildEntityMatcher();
+
+    // Should match by name and return the entity's stableId, NOT the array index
+    const match = matcher.match("Dan Hendrycks");
+    expect(match).not.toBeNull();
+    expect(match!.stableId).toBe("VoNqoBJkyg");
+    // Bug: previously returned "1" (the array index)
+    expect(match!.stableId).not.toBe("1");
+
+    const firstMatch = matcher.match("First Person");
+    expect(firstMatch).not.toBeNull();
+    expect(firstMatch!.stableId).toBe("aaa1111111");
+    expect(firstMatch!.stableId).not.toBe("0");
+  });
+});
+
 describe("buildEntityMatcher — missing files", () => {
   afterEach(() => { vi.restoreAllMocks(); });
 

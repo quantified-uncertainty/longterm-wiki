@@ -87,7 +87,7 @@ async function runBackfill(dryRun: boolean): Promise<void> {
   // 3. Categorize grants
   const alreadyLinked: GrantIdRow[] = [];
   const noGranteeId: GrantIdRow[] = [];
-  const numericIds: GrantIdRow[] = [];
+  const wikiIds: GrantIdRow[] = [];
   const needsMatching: GrantIdRow[] = [];
 
   for (const grant of allGrants) {
@@ -96,7 +96,7 @@ async function runBackfill(dryRun: boolean): Promise<void> {
     } else if (looksLikeStableId(grant.granteeId)) {
       alreadyLinked.push(grant);
     } else if (isNumericGranteeId(grant.granteeId)) {
-      numericIds.push(grant);
+      wikiIds.push(grant);
     } else {
       needsMatching.push(grant);
     }
@@ -105,13 +105,13 @@ async function runBackfill(dryRun: boolean): Promise<void> {
   console.log("=== Grant Categorization ===");
   console.log(`  Already linked (stableId):  ${alreadyLinked.length}`);
   console.log(`  No granteeId (null):        ${noGranteeId.length}`);
-  console.log(`  Numeric IDs (to clear):     ${numericIds.length}`);
+  console.log(`  Wiki IDs (to clear):     ${wikiIds.length}`);
   console.log(`  Display names (to match):   ${needsMatching.length}\n`);
 
-  // Show numeric IDs that will be cleared
-  if (numericIds.length > 0) {
+  // Show wiki IDs that will be cleared
+  if (wikiIds.length > 0) {
     const uniqueIds = new Map<string, number>();
-    for (const g of numericIds) {
+    for (const g of wikiIds) {
       uniqueIds.set(g.granteeId!, (uniqueIds.get(g.granteeId!) || 0) + 1);
     }
     console.log(`Numeric grantee IDs (${uniqueIds.size} unique, will be set to null):`);
@@ -168,9 +168,9 @@ async function runBackfill(dryRun: boolean): Promise<void> {
     }
   }
 
-  // 7. Build combined update list: matched display names + numeric IDs to clear
+  // 7. Build combined update list: matched display names + wiki IDs to clear
   const toClear: Array<{ id: string; granteeId: string | null; oldValue: string }> =
-    numericIds.map((g) => ({ id: g.id, granteeId: null, oldValue: g.granteeId! }));
+    wikiIds.map((g) => ({ id: g.id, granteeId: null, oldValue: g.granteeId! }));
   const allUpdates = [...matched, ...toClear];
 
   if (allUpdates.length === 0) {

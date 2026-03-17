@@ -3,7 +3,7 @@ thing:
   stableId: RScckMUC2g
   type: concept
   name: Dense Transformers
-  numericId: E403
+  wikiId: E403
 facts:
   - id: f_XeERIkKcRQ
     property: description
