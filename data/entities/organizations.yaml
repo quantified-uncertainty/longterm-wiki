@@ -1311,7 +1311,7 @@
     COVID-19 human challenge trials, now working on indoor air quality
     (germicidal UV), advance market commitments for vaccines, hepatitis C
     challenge studies, and biosecurity policy. Cumulative funding of ~$12.8M
-    from sources includin
+    from sources including Open Philanthropy and the Patrick J. McGovern Foundation.
   clusters:
     - biorisks
     - community
@@ -1330,7 +1330,7 @@
     and reporting 3,000+ significant career plan changes, with 80% of $10M+
     funding from Coefficient Giving. Since 2016 they've prioritized AI safety,
     shifting explicitly to AGI focus in 2025, providing career guidance through
-    the
+    their website, podcast, and job board.
   clusters:
     - community
     - ai-safety
@@ -1348,7 +1348,7 @@
     researcher Daniel Kokotajlo that produces detailed AI capability forecasts,
     most notably the AI 2027 scenario depicting rapid progress to
     superintelligence. The organization has revised timelines significantly (AGI
-    median shifte
+    median shifted from 2028 to 2027), drawing both attention and skepticism from the AI safety community.
   clusters:
     - ai-safety
     - community
@@ -1365,7 +1365,7 @@
     timelines and risks through surveys and historical trend analysis,
     contributing valuable data to AI safety discourse. While their work provides
     useful evidence synthesis and expert opinion surveys, it faces inherent
-    limitat
+    limitations in survey methodology and response bias.
   clusters:
     - ai-safety
     - community
@@ -1382,7 +1382,7 @@
     infrastructure in 2026 while direct AI service revenue is ~$25-50B—a 6-14x
     mismatch. Sequoia's framework identifies a $500B+ hole between required and
     actual AI revenue. Largest current revenue streams: Nvidia hardware ($130B),
-    A
+    AWS cloud ($105B), and Microsoft/Google AI services.
   clusters:
     - ai-safety
     - governance
@@ -1399,7 +1399,7 @@
     methodologically rigorous research and evaluations, particularly known for
     their AI Safety Camp impact assessment and forecasting work. While their
     contributions are solid and well-documented, they represent incremental
-    progress rather 
+    progress rather than field-shaping contributions. 
   clusters:
     - community
     - ai-safety
@@ -1435,7 +1435,7 @@
     returned 11.9% in 2025, using proprietary ML models plus LLMs from
     OpenAI/Anthropic/Perplexity with multi-layer guardrails that reduced error
     rates from 8% to 1.6%. The division has minimal AI safety relevance,
-    focusing on fi
+    focusing on financial applications rather than safety research.
   clusters:
     - community
     - ai-safety
@@ -1468,7 +1468,7 @@
     workshops ($3,900 for 4.5 days), trained 1,300+ alumni reporting 9.2/10
     satisfaction and 0.17σ life satisfaction increase at 1-year follow-up.
     Received $3.5M+ from Open Philanthropy and $5M from FTX (later clawed back);
-    faced major
+    faced major organizational challenges in the early 2020s.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1484,7 +1484,7 @@
     dramatically from broad social causes to AI-powered biomedical research,
     with substantial funding ($10B+ over next decade) but minimal engagement
     with AI safety concerns despite heavy AI investment. The article provides
-    comprehen
+    comprehensive coverage of its biomedical AI investments and organizational structure.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1500,7 +1500,7 @@
     that addresses market failures in pandemic preparedness by funding vaccines
     for diseases with limited commercial viability. While achieving notable
     success during COVID-19, the organization faces ongoing criticism for
-    weakening
+    weakening IP provisions that limit vaccine access in low-income countries.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1516,7 +1516,7 @@
     since 2014, including $336M to AI safety (~60% of external funding). The
     organization spent ~$50M on AI safety in 2024, with 68% going to
     evaluations/benchmarking, and launched a $40M Technical AI Safety RFP in
-    2025 covering
+    2025 covering 8 research areas.
   clusters:
     - community
     - ai-safety
@@ -1534,7 +1534,7 @@
     focuses on climate-security intersections, strategic weapons, and ecological
     risks through three research centers. While the organization claims
     nonpartisan status, its left-leaning funding sources and critical stance
-    toward
+    toward certain administrations may limit perceived objectivity.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1551,7 +1551,7 @@
     now funded at ~$1M+ annually from FLI and other sources, producing 24+
     publications in 2022 across AI safety, biosecurity, climate catastrophes,
     and nuclear risks. The centre has advised UN, WHO, and multiple governments
-    on 
+    on existential risk policy. 
   clusters:
     - community
     - ai-safety
@@ -1588,7 +1588,7 @@
     EA Global is a series of selective conferences organized by the Centre for
     Effective Altruism that connects committed EA practitioners to collaborate
     on global challenges, with AI safety becoming increasingly prominent (53% of
-    2024 survey respondents identified it as most pressing). The conferences 
+    2024 survey respondents identified it as most pressing). The conferences typically host 1,500-3,000 attendees across multiple annual events. 
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1603,7 +1603,7 @@
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
     and automates literature reviews, founded by AI alignment researchers from
     Ought and funded by Open Philanthropy ($31M total). The platform achieved
-    90%+ extraction accuracy and claims 80% time savings for systematic reviews
+    90%+ extraction accuracy and claims 80% time savings for systematic reviews, though independent validation of these claims is limited.
   clusters:
     - ai-safety
     - community
@@ -1651,7 +1651,7 @@
     companies like OpenAI and DeepMind but shows no explicit focus on AI safety
     or alignment research, instead emphasizing rapid capability development and
     transformative technologies. The firm has achieved exceptional returns
-    through c
+    through contrarian bets on transformative technology companies.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1667,7 +1667,7 @@
     leaders that combines LLM research agents with human judgment, demonstrating
     some prediction accuracy but facing uncertain commercial viability and
     limited proven impact on AI safety decisions. While the company contributes
-    to AGI
+    to AGI timeline forecasting, its safety-specific contributions remain limited.
   clusters:
     - epistemics
     - community
@@ -1684,7 +1684,7 @@
     The Giving Pledge, while attracting 250+ billionaire signatories since 2010,
     has a disappointing track record with only 36% of deceased pledgers actually
     meeting their commitments and living pledgers growing wealth 166% faster
-    than they give it away. The initiative functions more as reputation manag
+    than they give it away. The initiative functions more as reputation management than an effective mechanism for charitable giving.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1700,7 +1700,7 @@
     from successful IARPA research, demonstrating that trained
     'superforecasters' can outperform intelligence analysts and prediction
     markets by 30-72%. While not directly focused on AI safety, their
-    methodology for identifying for
+    methodology for identifying forecasters and improving collective judgment has significant implications for AI risk assessment.
   clusters:
     - epistemics
     - community
@@ -1718,7 +1718,7 @@
     operates as a non-binding policy laboratory with limited enforcement power
     and structural coordination challenges. While providing valuable
     international cooperation frameworks, its voluntary nature and exclusion of
-    key AI-dev
+    key AI-developing nations like China reduce its governance reach.
   clusters:
     - governance
     - community
@@ -1751,7 +1751,7 @@
     focuses primarily on AI cybersecurity rather than AI alignment or
     existential risk, distinguishing it from AI safety-focused funders like Open
     Philanthropy. While comprehensive in covering the foundation's history and
-    controve
+    controversies, the AI safety relevance is limited.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1766,7 +1766,7 @@
     An independent Swiss foundation launched in February 2024, spun out of NTI |
     bio, that develops free open-source tools for DNA synthesis screening and
     works to strengthen international biosecurity norms. Led by Piers Millett,
-    IBBIS created the Common Mechanism (commec), launched the DNA Screening St
+    IBBIS created the Common Mechanism (commec), launched the DNA Screening Standard, and partnered with Twist Bioscience for implementation.
   clusters:
     - biorisks
     - governance
@@ -1784,7 +1784,7 @@
     platform that offers some AI safety-related contracts but is primarily
     focused on sports, politics, and economics. The AI safety relevance is
     minimal, limited to a few markets on AI research pauses and regulation that
-    show l
+    show low trading volume and minimal analytical depth.
   clusters:
     - epistemics
     - community
@@ -1801,7 +1801,7 @@
     LessWrong is a rationality-focused community blog founded in 2009 that has
     influenced AI safety discourse, receiving $5M+ in funding and serving as the
     origin point for ~31% of EA survey respondents in 2014. Survey participation
-    peaked at 3,000+ in 2016, declining to 558 by 2023, with the community 
+    peaked at 3,000+ in 2016, declining to 558 by 2023, with the community increasingly focused on AI alignment discussions. 
   clusters:
     - community
     - ai-safety
@@ -1836,7 +1836,7 @@
     Lightning Rod Labs is an early-stage AI company using temporal data to train
     prediction models, claiming 10% returns on prediction markets but with
     limited independent validation. The company has no apparent connection to AI
-    safety concerns and represents standard commercial AI development rather th
+    safety concerns and represents standard commercial AI development rather than safety-oriented work.
   clusters:
     - ai-safety
     - community
@@ -1853,7 +1853,7 @@
     focused on AI safety and mental health investments, notable for its
     investment in Anthropic and integration with the EA community through
     advisors and personnel. The firm represents an interesting model of
-    for-profit AI safety 
+    for-profit AI safety investing, though its small scale limits overall field impact. 
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1869,7 +1869,7 @@
     2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
     primarily through UHNW donor advising and managed funds (Frontier AI Fund:
     $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient
-    Givi
+    Giving and Open Philanthropy.
   clusters:
     - community
     - ai-safety
@@ -1888,7 +1888,7 @@
     (approximately $10M to AI safety) with median grants of $25K, filling a
     critical niche between personal savings and institutional funders like
     Coefficient Giving (median $257K). In 2023, LTFF granted $6.67M with a 19.3%
-    acceptance rat
+    acceptance rate, filling an important gap in the AI safety funding ecosystem.
   clusters:
     - community
     - ai-safety
@@ -1904,7 +1904,7 @@
     Comprehensive profile of the $9 billion MacArthur Foundation documenting its
     evolution from 1978 to present, with $8.27 billion in total grants across
     climate, criminal justice, nuclear threats, and journalism. AI governance
-    work totals modest funding ($400K to IST for LLM risk; general support to P
+    work totals modest funding ($400K to IST for LLM risk; general support to PAI and AI safety organizations).
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -1921,7 +1921,7 @@
     controversy within EA/rationalist communities due to speaker selection
     including individuals associated with race science, highlighting tensions
     between intellectual openness and community standards. While not directly AI
-    safety fo
+    safety focused, it influenced EA community norms around speaker vetting and controversy management.
   clusters:
     - community
   lastUpdated: 2026-02
@@ -1937,7 +1937,7 @@
     ~2,000 peak daily users, showing AGI by 2030 at ~60% vs Metaculus ~45%.
     Platform scored Brier 0.0342 on 2024 election (vs Polymarket's 0.0296),
     demonstrating play-money markets can approach real-money accuracy but with
-    syste
+    systematic liquidity limitations.
   clusters:
     - epistemics
     - community
@@ -1954,7 +1954,7 @@
     provides fast grants (<1 week) to AI safety projects through expert
     regrantors ($50K-400K budgets), fiscal sponsorship, and experimental impact
     certificates. The platform distributed $2.06M in 2023 (~40% to AI safety
-    resear
+    research), with a growing focus on AI safety evaluations and field-building.
   clusters:
     - community
     - ai-safety
@@ -1972,7 +1972,7 @@
     trained 213 AI safety researchers with strong career outcomes (80% in
     alignment work) and research impact (160+ publications, 8000+ citations).
     The program provides comprehensive support ($27k per scholar) and has
-    produced no
+    produced notable alumni contributions to alignment research.
   clusters:
     - community
     - ai-safety
@@ -1990,7 +1990,7 @@
     for 2027, pioneering open-source AI through PyTorch (63% market share) and
     LLaMA (1B+ downloads). However, the organization exhibits weak safety
     culture with Chief AI Scientist dismissing existential risk, 50%+ researcher
-    att
+    attrition to competitors, and no published responsible scaling policy.
   clusters:
     - ai-safety
     - community
@@ -2012,7 +2012,7 @@
     $135B stake (27%) in OpenAI, generating $13B AI revenue run rate (175% YoY
     growth) and 16 percentage points of Azure's 39% growth. GitHub Copilot
     reached 20M users generating 46% of code, while responsible AI framework
-    conduc
+    conducts hundreds of internal audits annually.
   clusters:
     - community
     - ai-safety
@@ -2063,7 +2063,7 @@
     Pause AI is a grassroots advocacy movement founded May 2023 calling for
     international pause on frontier AI development until safety proven, growing
     to multi-continental network but achieving zero documented policy victories
-    despite ~70% public support in US polling. Organization operates primarily t
+    despite ~70% public support in US polling. Organization operates primarily through volunteer organizing, protests, and social media campaigns.
   clusters:
     - ai-safety
     - community
@@ -2081,7 +2081,7 @@
     believed they were "building an AGI" rather than doing safety research. He
     became disillusioned around 2015 when they became "more pessimistic,"
     describing their shift as going "from trans-humanist to Luddite." After the
-    FTX colla
+    FTX collapse, Thiel's direct AI safety funding has been minimal.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -2097,7 +2097,7 @@
     platform, covering its history, mechanics, and accuracy, but has minimal
     relevance to AI safety beyond brief mentions in the EA/forecasting section.
     While well-documented, it primarily serves as general reference material
-    about a 
+    about a prediction market platform rather than AI safety analysis. 
   clusters:
     - epistemics
     - community
@@ -2113,7 +2113,7 @@
     An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
     Eroshenko and Hannu Rajaniemi (co-founders of HelixNano), spun out to build
     defensive biological countermeasures at the pace of frontier AI development.
-    Raised a $15M seed round led by OpenAI based on a 'defensive co-scaling' th
+    Raised a $15M seed round led by OpenAI based on a 'defensive co-scaling' thesis that defensive countermeasures must improve as AI capabilities advance.
   clusters:
     - biorisks
     - ai-safety
@@ -2180,7 +2180,7 @@
     2 to ~130 people by 2022, conducting evidence-based analysis across animal
     welfare, global health, and AI governance. The organization reported
     influencing >$10M in grants by 2023 but acknowledges significant failures in
-    im
+    impact measurement and shifting organizational priorities.
   clusters:
     - community
     - ai-safety
@@ -2199,7 +2199,7 @@
     with relative Brier scores twice as good as competitors, providing
     influential probabilistic forecasts including 28% TAI by 2030, 60% by 2050,
     and 25% misaligned AI takeover by 2100. Their work is widely cited in
-    EA/rationalis
+    EA/rationalist communities and by policymakers.
   clusters:
     - epistemics
     - community
@@ -2216,7 +2216,7 @@
     that has committed substantial funding to AI safety research ($135M across
     AI2050 and AI Safety Science programs) while also supporting talent
     development and scientific research across multiple domains. The
-    organization has
+    organization has demonstrated growing engagement with AI safety issues over time.
   clusters:
     - ai-safety
   lastUpdated: 2026-02
@@ -2233,7 +2233,7 @@
     on legislative requirements for AI safety protocols, whistleblower
     protections, and risk mitigation incentives. Rated highly by evaluators with
     confidential achievements at major AI lab; advocates mandatory
-    safety/security pr
+    safety/security protocols for frontier AI developers.
   clusters:
     - community
     - ai-safety
@@ -2251,7 +2251,7 @@
     protect against catastrophic pandemics, including AI-enabled biological
     threats, through wastewater surveillance (Nucleic Acid Observatory) and AI
     capability evaluations (Virology Capabilities Test). Co-founded by Kevin
-    Esvelt, wh
+    Esvelt, who has been a leading voice on AI-enabled biosecurity threats.
   clusters:
     - biorisks
     - community
@@ -2270,7 +2270,7 @@
     synthesis screening software using novel cryptographic protocols. Co-founded
     by Kevin Esvelt and Turing Award winner Andrew Yao, SecureDNA screens
     sequences down to 30 base pairs—already exceeding 2026 US regulatory
-    requirements—whi
+    requirements—while maintaining client privacy through cryptographic protocols.
   clusters:
     - biorisks
     - ai-safety
@@ -2288,7 +2288,7 @@
     Seldon Lab is a San Francisco-based AI safety accelerator founded in early
     2025 that combines research publication with startup investment, claiming
     early success with portfolio companies raising $10M+ and selling to major AI
-    companies. The article provides comprehensive documentation of a new organ
+    companies. The article provides comprehensive documentation of a new organization model combining safety research with commercial acceleration.
   clusters:
     - ai-safety
     - community
@@ -2306,7 +2306,7 @@
     processes millions of news items weekly through AI filtering and elite
     forecaster assessment to identify global catastrophic risks, publishing
     findings via newsletter and podcast. The page describes their multi-stage
-    detectio
+    detection pipeline and forecaster network but lacks independent validation of accuracy claims.
   clusters:
     - epistemics
     - community
@@ -2324,7 +2324,7 @@
     fortune), with the 2025 round totaling $34.33M (86% to AI safety). Uses
     unique S-process mechanism where 6-12 recommenders express utility functions
     and an algorithm allocates grants favoring projects with enthusiastic
-    champions 
+    champions, though the mechanism can produce volatile grant distributions year-to-year.
   clusters:
     - community
     - ai-safety
@@ -2341,7 +2341,7 @@
     Situational Awareness LP is a hedge fund founded by Leopold Aschenbrenner in
     2024 that manages ~$2B in AI-focused public equities (semiconductors, energy
     infrastructure, data centers), delivering 47% gains in H1 2025. The fund's
-    concentrated portfolio (100% in top 10 positions) includes major holdin
+    concentrated portfolio (100% in top 10 positions) includes major holdings in Nvidia, TSMC, and energy infrastructure companies.
   clusters:
     - community
     - ai-safety
@@ -2358,7 +2358,7 @@
     Swift Centre is a UK forecasting organization that provides conditional
     forecasting services to various clients including some AI companies, but is
     not primarily focused on AI safety. While they demonstrate good forecasting
-    methodology and track record, their relevance to AI risk is limited to clien
+    methodology and track record, their relevance to AI risk is limited to client-specific engagements rather than systematic AI risk research.
   clusters:
     - epistemics
     - community
@@ -2398,7 +2398,7 @@
   description: >-
     A foundational collection of blog posts on rationality, cognitive biases,
     and AI alignment that shaped the rationalist movement and influenced
-    effective altruism
+    effective altruism.
   clusters:
     - community
     - ai-safety
@@ -2413,7 +2413,7 @@
     Point72's Turion hedge fund, launched October 2024 with $150M seed capital,
     manages ~$3B focused on AI hardware/semiconductors and returned ~30% in 2025
     (14.2% in Q4 2024). The fund represents one of several major AI-focused
-    hedge funds launched 2024-2025, with concentrated exposure to semiconductor
+    hedge funds launched 2024-2025, with concentrated exposure to semiconductors and AI infrastructure companies.
   clusters:
     - community
     - ai-safety
@@ -2444,7 +2444,7 @@
     of the largest single donations to AI safety in history. Beyond this
     landmark gift, he gives ~$50M annually to AI safety (~$15M), longevity
     research, crypto public goods, and pandemic preparedness through MIRI,
-    Balvi, and di
+    Balvi, and direct grants to various organizations.
   clusters:
     - ai-safety
     - community

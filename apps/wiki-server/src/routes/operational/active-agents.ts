@@ -219,6 +219,8 @@ const activeAgentsApp = new Hono()
 
   // ---- POST /sweep (mark stale agents) ----
   .post("/sweep", async (c) => {
+    // Intentional fallback: sweep is best-effort housekeeping; if the body can't
+    // be parsed we fall through to defaults (timeoutMinutes). No user-facing impact.
     const body = await parseJsonBody(c).catch(() => ({}));
     const raw = Number((body as Record<string, unknown>)?.timeoutMinutes || STALE_TIMEOUT_MINUTES);
     const timeoutMinutes = Math.max(5, Math.min(Number.isFinite(raw) ? raw : STALE_TIMEOUT_MINUTES, 43200));
@@ -244,6 +246,8 @@ const activeAgentsApp = new Hono()
 
   // ---- POST /cleanup (delete old completed/errored/stale agents) ----
   .post("/cleanup", async (c) => {
+    // Intentional fallback: cleanup is best-effort housekeeping; if the body can't
+    // be parsed we fall through to defaults (ageDays). No user-facing impact.
     const body = await parseJsonBody(c).catch(() => ({}));
     const raw = Number((body as Record<string, unknown>)?.ageDays || CLEANUP_AGE_DAYS);
     const ageDays = Math.max(1, Math.min(Number.isFinite(raw) ? raw : CLEANUP_AGE_DAYS, 365));

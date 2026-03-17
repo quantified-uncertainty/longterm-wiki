@@ -4,14 +4,11 @@
  */
 import {
   getAllKBRecords,
-  getKBEntity,
   getKBEntitySlug,
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
-import {
-  titleCase,
-} from "@/components/wiki/factbase/format";
+import { resolveEntityLink } from "@/lib/record-detail-ui";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -50,18 +47,8 @@ export interface ParsedGrant {
 
 // ── Resolution helpers ─────────────────────────────────────────────────
 
-export function resolveEntityLink(entityId: string): { name: string; href: string | null } {
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization") return { name: entity.name, href: `/organizations/${slug}` };
-      if (entity.type === "person") return { name: entity.name, href: `/people/${slug}` };
-    }
-    return { name: entity.name, href: `/factbase/entity/${entityId}` };
-  }
-  return { name: titleCase(entityId.replace(/-/g, " ")), href: null };
-}
+// Re-export the shared resolveEntityLink (with TableBase fallback for stableIds and numeric IDs)
+export { resolveEntityLink };
 
 // ── Record parsers ────────────────────────────────────────────────────
 

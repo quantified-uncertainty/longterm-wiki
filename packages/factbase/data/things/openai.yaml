@@ -58,10 +58,10 @@ facts:
 
   - id: f_HfB3WmNDFQ
     property: total-funding
-    value: 1.3e+10
-    asOf: 2024-01
-    source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
-    notes: "Microsoft cumulative investment across multiple rounds"
+    value: 1.79e+10
+    asOf: 2025-10
+    source: https://openai.com/index/openai-announces-a-new-funding-round/
+    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds"
 
   - id: f_b56n3kcD2g
     property: valuation

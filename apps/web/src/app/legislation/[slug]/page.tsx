@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
 import { RelatedPages } from "@/components/RelatedPages";
+import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data";
 import {
@@ -291,6 +292,8 @@ export default async function LegislationDetailPage({
           </div>
         </section>
       )}
+
+      <FBAutoFacts entityId={entity.id} />
 
       <RelatedPages entityId={entity.id} entity={{ type: "policy" }} />
     </div>

@@ -1,14 +1,13 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, ilike, or, inArray } from "drizzle-orm";
+import { eq, and, count, asc, sql, ilike, or, inArray, notInArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { entities, facts } from "../../schema.js";
+import { logger } from "../../logger.js";
+import { entities, facts, things } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   paginationQuery,
   escapeIlike,
@@ -153,11 +152,8 @@ const entitiesApp = new Hono()
 
   // ---- GET /search?q=...&limit=20 ----
 
-  .get("/search", async (c) => {
-    const parsed = SearchQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { q, limit } = parsed.data;
+  .get("/search", zv("query", SearchQuery), async (c) => {
+    const { q, limit } = c.req.valid("query");
     const db = getDrizzleDb();
     const pattern = `%${escapeIlike(q)}%`;
 
@@ -358,11 +354,22 @@ const entitiesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // 1. Get all entities of the requested type (capped to prevent unbounded scans)
+    // 1. Get all entities of the requested type (capped to prevent unbounded scans).
+    //    Exclude deprecated entities — they should not appear in directory listings.
+    //    The deprecated flag is stored in the metadata JSONB column.
     const entityRows = await db
       .select()
       .from(entities)
-      .where(eq(entities.entityType, entityType))
+      .where(
+        and(
+          eq(entities.entityType, entityType),
+          or(
+            sql`${entities.metadata} IS NULL`,
+            sql`${entities.metadata}->>'deprecated' IS NULL`,
+            sql`${entities.metadata}->>'deprecated' != 'true'`,
+          ),
+        ),
+      )
       .orderBy(asc(entities.title))
       .limit(DIRECTORY_MAX_ENTITIES);
 
@@ -461,42 +468,42 @@ const entitiesApp = new Hono()
       .map((e) => e.stableId)
       .filter((id): id is string => id != null);
 
-    // Personnel counts: person_id → count (career history entries)
+    // Personnel counts: person_entity_id → count (career history entries)
     const personnelCountMap = new Map<string, number>();
     if (stableIds.length > 0) {
       type PersonnelCountRow = { personId: string; cnt: number };
       const personnelCounts = await db.execute<PersonnelCountRow>(sql`
-        SELECT person_id AS "personId", COUNT(*)::int AS cnt
+        SELECT person_entity_id AS "personId", COUNT(*)::int AS cnt
         FROM personnel
-        WHERE person_id IN (${sqlInList(stableIds)})
+        WHERE person_entity_id IN (${sqlInList(stableIds)})
           AND role_type = 'career'
-        GROUP BY person_id
+        GROUP BY person_entity_id
       `);
       for (const r of personnelCounts) {
         personnelCountMap.set(r.personId, r.cnt);
       }
     }
 
-    // Grant counts: organization_id → grantsGiven, grantee_id → grantsReceived
+    // Grant counts: org_entity_id → grantsGiven, grantee_entity_id → grantsReceived
     const grantsGivenMap = new Map<string, number>();
     const grantsReceivedMap = new Map<string, number>();
     if (stableIds.length > 0) {
       type GrantCountRow = { entityId: string; cnt: number };
       const grantsGiven = await db.execute<GrantCountRow>(sql`
-        SELECT organization_id AS "entityId", COUNT(*)::int AS cnt
+        SELECT org_entity_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE organization_id IN (${sqlInList(stableIds)})
-        GROUP BY organization_id
+        WHERE org_entity_id IN (${sqlInList(stableIds)})
+        GROUP BY org_entity_id
       `);
       for (const r of grantsGiven) {
         grantsGivenMap.set(r.entityId, r.cnt);
       }
 
       const grantsReceived = await db.execute<GrantCountRow>(sql`
-        SELECT grantee_id AS "entityId", COUNT(*)::int AS cnt
+        SELECT grantee_entity_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE grantee_id IN (${sqlInList(stableIds)})
-        GROUP BY grantee_id
+        WHERE grantee_entity_id IN (${sqlInList(stableIds)})
+        GROUP BY grantee_entity_id
       `);
       for (const r of grantsReceived) {
         grantsReceivedMap.set(r.entityId, r.cnt);
@@ -585,11 +592,8 @@ const entitiesApp = new Hono()
 
   // ---- GET / (paginated listing) ----
 
-  .get("/", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset, entityType } = parsed.data;
+  .get("/", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset, entityType } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions = [];
@@ -632,14 +636,8 @@ const entitiesApp = new Hono()
 
   // ---- POST /sync ----
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { entities: items } = parsed.data;
+  .post("/sync", zv("json", SyncBatchSchema), async (c) => {
+    const { entities: items } = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate relatedEntries references: check that referenced entity IDs exist
@@ -730,7 +728,77 @@ const entitiesApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  // ---- POST /prune ----
+  // Remove stale entity records from PG that are no longer in the YAML source.
+  // Accepts a list of canonical IDs that should be kept; deletes all others of the
+  // specified entity type. Also cleans up corresponding things table entries.
+
+  .post(
+    "/prune",
+    zv(
+      "json",
+      z.object({
+        entityType: z.string().min(1).max(100),
+        keepIds: z.array(z.string().min(1).max(500)).min(1).max(5000),
+      })
+    ),
+    async (c) => {
+      const { entityType, keepIds } = c.req.valid("json");
+
+      if (!VALID_DIRECTORY_ENTITY_TYPES.has(entityType)) {
+        return c.json(
+          { error: `Unknown entityType: "${entityType}".` },
+          400
+        );
+      }
+
+      const db = getDrizzleDb();
+
+      // Find stale entities: same type but ID not in the keep list
+      const staleRows = await db
+        .select({ id: entities.id })
+        .from(entities)
+        .where(
+          and(
+            eq(entities.entityType, entityType),
+            notInArray(entities.id, keepIds),
+          )
+        );
+
+      if (staleRows.length === 0) {
+        return c.json({ deleted: 0, ids: [] });
+      }
+
+      const staleIds = staleRows.map((r) => r.id);
+
+      // Log before deleting (destructive operation)
+      logger.info(
+        { entityType, count: staleIds.length, ids: staleIds },
+        `Deleting ${staleIds.length} stale ${entityType} entities`
+      );
+
+      await db.transaction(async (tx) => {
+        // Delete from things table first (references entities via source_id)
+        await tx
+          .delete(things)
+          .where(
+            and(
+              eq(things.sourceTable, "entities"),
+              inArray(things.sourceId, staleIds),
+            )
+          );
+
+        // Delete stale entities
+        await tx
+          .delete(entities)
+          .where(inArray(entities.id, staleIds));
+      });
+
+      return c.json({ deleted: staleIds.length, ids: staleIds });
+    }
+  );
 
 export const entitiesRoute = entitiesApp;
 export type EntitiesRoute = typeof entitiesApp;

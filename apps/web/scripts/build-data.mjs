@@ -2240,9 +2240,18 @@ async function main() {
   // =========================================================================
   const { slugToWikiId, wikiIdToSlug, nextId: nextIdInit } = buildIdRegistry(entities);
   let nextId = nextIdInit;
+  // Build stableId → slug mapping from YAML entities (for entity resolution
+  // in directory pages where ownerEntityId is a stableId rather than a slug)
+  const stableIdToSlug = {};
+  for (const e of entities) {
+    if (e.stableId) {
+      stableIdToSlug[e.stableId] = e.id;
+    }
+  }
   const idRegistryOutput = {
     byWikiId: { ...wikiIdToSlug },
     bySlug: { ...slugToWikiId },
+    stableIdToSlug,
   };
   database.idRegistry = idRegistryOutput;
 

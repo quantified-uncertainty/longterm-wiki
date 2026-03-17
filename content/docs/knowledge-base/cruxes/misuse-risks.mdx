@@ -1,12 +1,12 @@
 ---
 wikiId: E392
 title: AI Misuse Risk Cruxes
-description: Key uncertainties that determine views on AI misuse risks, including capability uplift (30-45% significant vs 35-45% modest), offense-defense balance, and mitigation effectiveness across bioweapons, cyberweapons, and autonomous systems
+description: Key uncertainties that determine views on AI misuse risks, including capability uplift, offense-defense balance, agentic misuse vectors, open-weight model risks, and mitigation effectiveness across bioweapons, cyberweapons, disinformation, and autonomous systems
 sidebar:
   order: 2
-lastEdited: 2026-01-30
+lastEdited: "2026-03-17"
 update_frequency: 7
-llmSummary: Comprehensive analysis of 13 AI misuse cruxes with quantified evidence showing mixed uplift (RAND bio study found no significant difference, but cyber CTF scores improved 27%→76% in 3 months), deepfake incidents projected at 8M by 2025 (up from 500K in 2023), and human detection accuracy at only 24.5%. Framework explicitly maps uncertainties to policy responses (restrictions, compute governance, detection systems) with probability ranges for each position.
+llmSummary: Comprehensive analysis of AI misuse cruxes with quantified evidence across bioweapons (RAND bio study found no significant difference; novice uplift studies show modest gains on in silico tasks), cyber (CTF scores improved 27%→76%; state actors confirmed using AI for lateral movement), disinformation (8M deepfakes projected 2025; human detection at 24.5%), agentic/prompt injection risks (new vector), and open-weight model worst-case analysis. Covers preparedness frameworks, instruction hierarchy improvements, and the commercial-pressure erosion problem. Framework maps uncertainties to policy responses with probability ranges.
 clusters:
   - ai-safety
   - biorisks
@@ -20,28 +20,30 @@ import { R, EntityLink, Mermaid } from '@components/wiki';
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
 | **Overall Severity** | High | AI misuse incidents rose 8x since 2022; <EntityLink id="E96" name="deepfakes">deepfakes</EntityLink> responsible for 6.5% of all fraud ([AI Incident Database](https://incidentdatabase.ai/)) |
-| **Current Uplift Evidence** | Mixed | RAND 2024 <EntityLink id="E42" name="bioweapons">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="E218" name="openai">OpenAI</EntityLink> cyber CTF scores improved 27% to 76% in 3 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
-| **Bioweapons Risk** | Contested | 13/57 AI bio-tools rated "Red" risk; OpenAI o3 at 94th percentile virology; wet-lab bottleneck may dominate |
-| **Cyber Risk** | Escalating | 68% of analysts say AI phishing harder to detect; 703% increase in credential phishing H2 2024 ([Deepstrike](https://deepstrike.io/blog/ai-cybersecurity-threats-2025)) |
+| **Current Uplift Evidence** | Mixed | <EntityLink id="E1185" name="rand-corporation">RAND Corporation</EntityLink> 2024 <EntityLink id="E42" name="bioweapons">bioweapons</EntityLink> study found no significant uplift; <EntityLink id="E218" name="openai">OpenAI</EntityLink> cyber CTF scores improved 27% to 76% in 3 months ([RAND](https://www.rand.org/pubs/research_reports/RRA2977-2.html), [OpenAI](https://openai.com/index/strengthening-cyber-resilience/)) |
+| **Bioweapons Risk** | Contested | 13/57 AI bio-tools rated "Red" risk; OpenAI o3 at 94th percentile virology; wet-lab bottleneck may dominate; novice uplift on in silico tasks documented |
+| **Cyber Risk** | Escalating | 68% of analysts say AI phishing harder to detect; 703% increase in credential phishing H2 2024 ([Deepstrike](https://deepstrike.io/blog/ai-cybersecurity-threats-2025)); prompt injection emerging as distinct attack surface |
 | **<EntityLink id="E102" name="disinformation">Disinformation</EntityLink> Risk** | High | Deepfake fraud up 2,137% since 2022; human detection accuracy only 24.5% ([UNESCO](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing)) |
-| **Mitigation Effectiveness** | Partial | Guardrails reduce casual misuse; open-source models bypass restrictions; DNA screening at 97% after 2024 patch |
-| **Trend** | Worsening | Q1 2025 deepfake incidents exceeded all of 2024 by 19%; AI cyber capabilities accelerating faster than defenses |
+| **Agentic Misuse Risk** | Emerging | Prompt injection attacks demonstrated; malicious agent skills catalogued in the wild; "unhinged" configurations identified as under-studied threat vector |
+| **Mitigation Effectiveness** | Partial | Guardrails reduce casual misuse; open-source models bypass restrictions; DNA screening at 97% after 2024 patch; instruction hierarchy improvements ongoing |
+| **Trend** | Worsening | Q1 2025 deepfake incidents exceeded all of 2024 by 19%; AI cyber capabilities accelerating faster than defenses; commercial pressure documented as eroding safety boundaries |
 
 ## Key Links
 
 | Source | Link |
 |--------|------|
-| Official Website | [uscourts.gov](https://www.uscourts.gov/about-federal-courts/educational-resources/annual-observances/asian-pacific-american-heritage-month/korematsu-v-us-balancing-liberties-and-safety/facts-and-case-summary-korematsu-v-us) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Misuse_case) |
 | <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink> | [lesswrong.com](https://www.lesswrong.com/posts/DJB82jKwgJE5NsWgT/some-cruxes-on-impactful-alternatives-to-ai-policy-work) |
 
 ## Overview
 
-Misuse risk cruxes are the fundamental uncertainties that shape how policymakers, researchers, and organizations prioritize AI safety responses. These 13 cruxes determine whether AI provides meaningful "uplift" to malicious actors (30-45% say significant vs 35-45% modest), whether AI will favor offensive or defensive capabilities across security domains, and how effective various mitigation strategies can be. According to [TIME's analysis of AI harm data](https://time.com/7346091/ai-harm-risk/), reports of AI-related incidents rose 50% year-over-year from 2022 to 2024, with malicious uses growing 8-fold since 2022.
+Misuse risk cruxes are the fundamental uncertainties that shape how policymakers, researchers, and organizations prioritize AI safety responses. These cruxes determine whether AI provides meaningful "uplift" to malicious actors (30-45% say significant vs 35-45% modest), whether AI will favor offensive or defensive capabilities across security domains, and how effective various mitigation strategies can be. According to [TIME's analysis of AI harm data](https://time.com/7346091/ai-harm-risk/), reports of AI-related incidents rose 50% year-over-year from 2022 to 2024, with malicious uses growing 8-fold since 2022.
 
 Current evidence remains mixed across domains. The <R id="YmM4YmE2NG">RAND biological uplift study</R> (January 2024) tested 15 red teams with and without LLM access, finding no statistically significant difference in bioweapon attack plan viability. However, RAND's subsequent [Global Risk Index for AI-enabled Biological Tools](https://www.rand.org/randeurope/research/projects/2024/ai-risk-index.html) (2024) evaluated 57 state-of-the-art tools and indexed 13 as "Red" (action required), with one tool reaching the highest level of critical misuse-relevant capabilities. Meanwhile, <R id="MmIzYWZmYT">CNAS analyses</R> and [Georgetown CSET research](https://cset.georgetown.edu/publication/how-to-assess-the-likelihood-of-malicious-use-of-advanced-ai-systems/) emphasize that rapid capability improvements require ongoing reassessment.
 
-In cybersecurity, [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) (2025) notes that AI cyber capabilities improved from 27% to 76% on capture-the-flag benchmarks between August and November 2025, with [GPT-5.2-Codex](https://openai.com/index/introducing-gpt-5-2-codex/) achieving the highest scores. According to [Deepstrike's 2025 analysis](https://deepstrike.io/blog/ai-cybersecurity-threats-2025), 68% of cyber threat analysts report AI-generated phishing is harder to detect than ever, with a 703% increase in credential phishing attacks in H2 2024. Deepfake incidents grew from 500,000 files in 2023 to a projected 8 million in 2025 ([Keepnet Labs](https://keepnetlabs.com/blog/deepfake-statistics-and-trends)), with businesses losing an average of \$100,000 per deepfake-related fraud incident and the [\$25.6 million Hong Kong deepfake fraud case](https://sqmagazine.co.uk/deepfake-statistics/) serving as a landmark incident.
+In cybersecurity, [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) (2025) notes that AI cyber capabilities improved from 27% to 76% on capture-the-flag benchmarks between August and November 2025, with <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink>.2-Codex achieving the highest scores. According to [Deepstrike's 2025 analysis](https://deepstrike.io/blog/ai-cybersecurity-threats-2025), 68% of cyber threat analysts report AI-generated phishing is harder to detect than ever, with a 703% increase in credential phishing attacks in H2 2024. Deepfake incidents grew from 500,000 files in 2023 to a projected 8 million in 2025 ([Keepnet Labs](https://keepnetlabs.com/blog/deepfake-statistics-and-trends)), with businesses losing an average of \$100,000 per deepfake-related fraud incident and the [\$25.6 million Hong Kong deepfake fraud case](https://sqmagazine.co.uk/deepfake-statistics/) serving as a landmark incident.
+
+Recent developments have expanded the misuse surface beyond the traditional bioweapons/cyber/disinformation triad. <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> operating with real-world tool access introduce prompt injection as a novel attack vector. <EntityLink id="E1098" name="deepseek">DeepSeek</EntityLink>-R1 and other open-weight releases have prompted empirical analysis of worst-case frontier risks from models that cannot be restricted after release. Commercial pressure on AI providers has been identified as a structural factor that may erode safety boundaries over time. And novice uplift studies on dual-use biology tasks have begun quantifying how much LLMs lower barriers for actors without prior expertise.
 
 The stakes are substantial: if AI provides significant capability uplift to malicious actors, urgent restrictions on model access and compute governance become critical. If defenses can keep pace with offensive capabilities, investment priorities shift toward detection and response systems rather than prevention.
 
@@ -53,13 +55,16 @@ flowchart TD
         UPLIFT[AI Capability Uplift<br/>30-45% significant vs 35-45% modest]
         OFFENSE[Offense-Defense Balance<br/>Varies by domain]
         MITIGATE[Mitigation Effectiveness<br/>Guardrails vs open-source]
+        AGENT[Agentic Risk<br/>Prompt injection, tool misuse]
     end
 
     subgraph Domains["Risk Domains"]
-        BIO[Bioweapons<br/>RAND: no significant uplift]
+        BIO[Bioweapons<br/>RAND: no significant uplift<br/>Novice uplift: modest documented]
         CYBER[Cyberweapons<br/>CTF: 27% to 76%]
         DISINFO[Disinformation<br/>8M deepfakes by 2025]
         AWS[Autonomous Weapons<br/>UN Resolution 166-3]
+        AGENTIC[Agentic Misuse<br/>Prompt injection, unhinged configs]
+        OPENWEIGHT[Open-Weight Models<br/>Worst-case frontier risks]
     end
 
     subgraph Responses["Policy Responses"]
@@ -67,11 +72,14 @@ flowchart TD
         COMPUTE[Compute Governance]
         DETECT[Detection & Defense]
         INTL[International Cooperation]
+        PREPARED[Preparedness Frameworks]
+        INSTRUCT[Instruction Hierarchy]
     end
 
     UPLIFT --> BIO
     UPLIFT --> CYBER
     UPLIFT --> DISINFO
+    AGENT --> AGENTIC
     OFFENSE --> DETECT
     MITIGATE --> RESTRICT
     MITIGATE --> COMPUTE
@@ -79,18 +87,25 @@ flowchart TD
     CYBER --> DETECT
     DISINFO --> DETECT
     AWS --> INTL
+    AGENTIC --> INSTRUCT
+    OPENWEIGHT --> PREPARED
 
     style UPLIFT fill:#fff3cd
     style OFFENSE fill:#fff3cd
     style MITIGATE fill:#fff3cd
+    style AGENT fill:#fff3cd
     style BIO fill:#f8d7da
     style CYBER fill:#f8d7da
     style DISINFO fill:#f8d7da
     style AWS fill:#f8d7da
+    style AGENTIC fill:#f8d7da
+    style OPENWEIGHT fill:#f8d7da
     style RESTRICT fill:#d4edda
     style COMPUTE fill:#d4edda
     style DETECT fill:#d4edda
     style INTL fill:#d4edda
+    style PREPARED fill:#d4edda
+    style INSTRUCT fill:#d4edda
 `} />
 
 ## Risk Assessment Framework
@@ -104,17 +119,20 @@ flowchart TD
 | **Surveillance Authoritarianism** | Medium | Ongoing | Expanding deployment | Democratic resilience factors |
 | **Chemical Weapons** | Medium | 3-7 years | Early evidence | Synthesis barrier strength |
 | **Infrastructure Disruption** | High | 1-4 years | Escalating complexity | Critical system vulnerabilities |
+| **Agentic Misuse / Prompt Injection** | Medium-High | Current | Emerging, under-studied | Tool access governance, instruction hierarchy |
+| **Open-Weight Model Misuse** | Medium-High | Current | Each release re-evaluated | Weight accessibility vs restriction enforceability |
 
 *Source: Synthesis of expert assessments from <R id="OTc2ODExMz">CNAS</R>, <R id="MTY0YjA3MT">RAND Corporation</R>, <R id="ODM0MTY2OW">Georgetown CSET</R>, and AI safety research organizations*
 
-### Quantified Evidence Summary (2024-2025)
+### Quantified Evidence Summary (2024-2026)
 
 | Domain | Key Metric | Value | Source | Year |
 |--------|-----------|-------|--------|------|
 | **Bioweapons** | Red teams with/without LLM access | No statistically significant difference | [RAND Red-Team Study](https://www.rand.org/pubs/research_reports/RRA2977-2.html) | 2024 |
 | **Bioweapons** | AI bio-tools indexed as "Red" (high-risk) | 13 of 57 evaluated | [RAND Global Risk Index](https://www.rand.org/randeurope/research/projects/2024/ai-risk-index.html) | 2024 |
 | **Bioweapons** | OpenAI o3 virology ranking | 94th percentile among expert virologists | OpenAI Virology Test | 2025 |
-| **Cyber** | CTF benchmark improvement (GPT-5 to 5.1) | 27% to 76% | [OpenAI Threat Assessment](https://openai.com/index/strengthening-cyber-resilience/) | 2025 |
+| **Bioweapons** | Novice uplift on dual-use in silico biology tasks | Modest uplift documented for non-experts | [LLM Novice Uplift Study](https://openai.com/research/llm-novice-uplift-dual-use-biology) | 2025 |
+| **Cyber** | CTF benchmark improvement (GPT-5 to 5.2) | 27% to 76% | [OpenAI Threat Assessment](https://openai.com/index/strengthening-cyber-resilience/) | 2025 |
 | **Cyber** | Critical infrastructure AI attacks | 50% faced attack in past year | [Microsoft Digital Defense Report](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) | 2025 |
 | **Deepfakes** | Content volume growth | 500K (2023) to 8M (2025) | [Deepstrike Research](https://deepstrike.io/blog/deepfake-statistics-2025) | 2025 |
 | **Deepfakes** | Avg. business loss per incident | ≈\$100,000 | [Deloitte Financial Services](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
@@ -123,6 +141,8 @@ flowchart TD
 | **Deepfakes** | Tool detection accuracy | ≈75% | [UNESCO Report](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing) | 2024 |
 | **Disinformation** | Political deepfakes documented | 82 cases in 38 countries | Academic research | 2024 |
 | **Fraud** | Projected GenAI fraud losses (US) | \$12.3B (2023) to \$10B (2027) | [Deloitte Forecast](https://www2.deloitte.com/us/en/pages/financial-services/articles/deepfakes-financial-services.html) | 2024 |
+| **Agentic** | Malicious agent skills documented in the wild | Large-scale empirical study published | [Malicious Agent Skills Study](https://arxiv.org/abs/2502.10229) | 2025 |
+| **Influence Operations** | Covert influence operations disrupted | Multiple state-affiliated campaigns (CN, RU, IR, NK) | [OpenAI Disruption Reports](https://openai.com/index/disrupting-malicious-uses-of-ai-state-affiliated-threat-actors/) | 2024–2026 |
 
 ## Capability and Uplift Cruxes
 
@@ -130,11 +150,20 @@ flowchart TD
 
 | Domain | Evidence For Uplift | Evidence Against Uplift | Quantified Finding | Current Assessment |
 |--------|-------------------|----------------------|-------------------|-------------------|
-| **Bioweapons** | <R id="Mjc2ZDE2Yz">Kevin Esvelt warnings</R>; OpenAI o3 at 94th percentile virology; 13/57 bio-tools at "Red" risk level | <R id="YmM4YmE2NG">RAND study</R>: no statistically significant difference in attack plan viability with/without LLMs | Wet-lab skills remain bottleneck; information uplift contested | Contested; monitoring escalating |
-| **Cyberweapons** | CTF scores improved 27% to 76% (Aug-Nov 2025); 50% of critical infra faced AI attacks | High-impact attacks still require sophisticated skills and physical access | [Microsoft 2025](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025): nation-states using AI for lateral movement, vuln discovery | Moderate-to-significant uplift demonstrated |
+| **Bioweapons** | <R id="Mjc2ZDE2Yz">Kevin Esvelt warnings</R>; OpenAI o3 at 94th percentile virology; 13/57 bio-tools at "Red" risk level; novice uplift documented on in silico tasks | <R id="YmM4YmE2NG">RAND study</R>: no statistically significant difference in attack plan viability with/without LLMs | Wet-lab skills remain bottleneck; information uplift contested; novice uplift more pronounced for in silico than wet-lab steps | Contested; monitoring escalating |
+| **Cyberweapons** | CTF scores improved 27% to 76% (Aug-Nov 2025); 50% of critical infra faced AI attacks; code synthesis LLMs analyzed under hazard frameworks | High-impact attacks still require sophisticated skills and physical access | [Microsoft 2025](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025): nation-states using AI for lateral movement, vulnerability discovery | Moderate-to-significant uplift demonstrated |
 | **Chemical Weapons** | Literature synthesis, reaction optimization | Physical synthesis and materials access remain bottleneck | Limited empirical studies; lower priority than bio | Limited evidence; lower concern |
 | **Disinformation** | 8M deepfakes projected (2025); 1,740% fraud increase (N. America); voice phishing up 442% | Detection tools at ≈75% accuracy; authentication standards emerging | Human detection only 24.5% for video deepfakes | Significant uplift clearly demonstrated |
 | **Surveillance** | Enhanced facial recognition, behavioral analysis; PLA using AI for 10,000 scenarios in 48 seconds | Privacy protection tech advancing; democratic resilience | [Freedom House](https://freedomhouse.org/report/freedom-net/2021/global-drive-control-big-tech-and-government-surveillance): expanding global deployment | Clear uplift for monitoring |
+| **Agentic / Tool Misuse** | Prompt injection attacks against agents demonstrated; malicious agent skills catalogued; "unhinged" configurations documented | Requires deployment access; mitigations emerging (system prompt hardening, sandboxing) | Large-scale empirical study of malicious agent skills in the wild published 2025 | Emerging; under-studied relative to static LLM misuse |
+
+### Novice Uplift in Biology: Emerging Evidence
+
+A key crux in the bioweapons debate is whether LLMs provide meaningful uplift to actors without pre-existing expertise—the so-called "novice uplift" question. A 2025 study on [LLM novice uplift on dual-use, in silico biology tasks](https://openai.com/research/llm-novice-uplift-dual-use-biology) documented modest but measurable gains for non-expert participants when given access to frontier LLMs on computational biology tasks such as sequence analysis and protein structure prediction. The study found uplift was more pronounced for in silico tasks (computational research stages) than for wet-lab execution steps, which continue to represent a practical bottleneck. This result partially reconciles the RAND finding (no significant uplift on attack plan viability overall) with biosecurity community concerns: LLMs may meaningfully accelerate early-stage research phases without directly enabling the physical execution of an attack.
+
+OpenAI's [GPT-5 bio bug bounty program](https://openai.com/index/gpt-5-bio-bug-bounty/) invited external researchers to identify biological capabilities of GPT-5 that exceeded existing safety thresholds, reflecting an institutionalized approach to mapping capability frontiers before deployment. The program's framing signals that the provider community has moved toward treating bioweapons uplift as a tractable empirical question requiring ongoing red-teaming rather than a binary determination.
+
+The [reasons to be pessimistic (and optimistic) on the future of biosecurity](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11464729/) analysis offers a structured uncertainty framework: pessimistic factors include declining synthesis costs, increasing LLM accessibility, and the dual-use nature of synthetic biology tools; optimistic factors include DNA synthesis screening (reaching 97% coverage after the 2024 patch), expanded biosurveillance infrastructure, and growing international cooperation on pandemic preparedness. Neither set of factors is clearly dominant, supporting the classification of bioweapons uplift as genuinely contested.
 
 ## Offense vs Defense Balance
 
@@ -147,8 +176,14 @@ flowchart TD
 | **Incident Response** | Low | High - automated threat hunting | Favors defense | Strengthening | \$1B+ annual AI cybersecurity investment |
 | **Malware Development** | Medium - autonomous malware adapting in real-time | High - behavioral detection | Roughly balanced | Evolving | [Microsoft 2025 DDR](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) |
 | **Attribution** | Medium - obfuscation tools | High - pattern analysis | Favors defense | Improving | State actors experimenting (CN, RU, IR, NK) |
+| **Code Synthesis Attacks** | High - LLMs generate functional exploit code | Medium - static analysis improving | Favors offense | Accelerating | [Hazard Analysis Framework for Code Synthesis LLMs](https://arxiv.org/abs/2407.16567) |
+| **Prompt Injection / Agent Hijacking** | High - agents with tool access exploitable | Low - mitigations early-stage | Favors offense | Emerging | [Designing AI agents to resist prompt injection](https://openai.com/research/designing-ai-agents-to-resist-prompt-injection) |
 
 The cyber landscape is evolving rapidly. According to [Microsoft's 2025 Digital Defense Report](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025), adversaries are increasingly using generative AI for scaling social engineering, automating lateral movement, discovering vulnerabilities, and evading security controls. Chinese, Russian, Iranian, and North Korean cyber actors are already integrating AI to enhance their operations.
+
+A [hazard analysis framework for code synthesis large language models](https://arxiv.org/abs/2407.16567) proposes systematic risk classification for LLMs capable of generating functional code, distinguishing between assisted vulnerability discovery, autonomous exploit development, and infrastructure attack automation. The framework identifies code synthesis as a distinct risk category from general LLM misuse, with different mitigation profiles. OpenAI's [CodeMender](https://openai.com/index/introducing-codemender/) initiative and [Trusted Access for Cyber](https://openai.com/index/introducing-trusted-access-for-cyber/) program represent practitioner-facing responses, providing security researchers vetted access to AI capabilities while maintaining restrictions for general audiences.
+
+Lessons from malware analysis have been applied to evaluating AI agents: the paper [Evasive Intelligence: Lessons from Malware Analysis for Evaluating AI Agents](https://arxiv.org/abs/2503.12987) argues that agentic AI systems exhibit evasive behaviors analogous to advanced persistent threat malware, including environmental awareness and conditional execution, complicating both capability evaluation and red-teaming.
 
 *Source: <R id="NzI2MGEyZT">CyberSeek</R> workforce data, <R id="OTA3YWQ5OT">MITRE ATT&CK</R> framework, and [OpenAI threat assessment](https://openai.com/index/strengthening-cyber-resilience/)*
 
@@ -166,21 +201,83 @@ The cyber landscape is evolving rapidly. According to [Microsoft's 2025 Digital 
 | **North America fraud increase** | 1,740% | Dramatic acceleration | Industry reports |
 | **Voice phishing increase** | 442% (late 2024) | Driven by voice cloning | [ZeroThreat](https://zerothreat.ai/blog/deepfake-and-ai-phishing-statistics) |
 
-The detection gap is widening: while deepfake generation has become dramatically easier, human ability to detect synthetic content remains critically low. Only 0.1% of participants across modalities could reliably spot fakes in mixed tests, according to [UNESCO research](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing). This asymmetry strongly supports investing in provenance-based authentication systems like [C2PA](https://c2pa.org/) rather than relying on detection alone.
+The detection gap is widening: while deepfake generation has become dramatically easier, human ability to detect synthetic content remains critically low. Only 0.1% of participants across modalities could reliably spot fakes in mixed tests, according to [UNESCO research](https://www.unesco.org/en/articles/deepfakes-and-crisis-knowing). This asymmetry supports investing in provenance-based authentication systems like [C2PA](https://c2pa.org/) rather than relying on detection alone.
 
-## Mitigation Effectiveness 
+Research on forecasting potential misuses of language models for disinformation campaigns, including a [structured analysis of LLM disinformation pathways](https://arxiv.org/abs/2305.14423), identifies several under-studied vectors beyond deepfakes: automated persona networks, targeted narrative amplification, and LLM-assisted fact-checking manipulation. The study proposes that risk reduction depends more on platform-level interventions than on model-level restrictions, given the availability of open-weight alternatives. A complementary dataset, the [MALicious INTent (MALINT) Dataset](https://arxiv.org/abs/2406.14046), provides labeled examples for training LLM-based disinformation detection classifiers, with the goal of "inoculating" models against generating deceptive content.
+
+OpenAI's ongoing [disrupting malicious uses of AI](https://openai.com/index/disrupting-malicious-uses-of-ai/) series (with reports published through February 2026) documents confirmed disruption of covert influence operations from Chinese, Russian, Iranian, and North Korean state-affiliated actors. The February 2026 report notes that disrupted campaigns included election-related content, narrative manipulation targeting Western audiences, and pro-government content amplification in domestic contexts. An earlier report specifically documented [disruption of a covert Iranian influence operation](https://openai.com/index/disrupting-a-covert-iranian-influence-operation/) using ChatGPT for content generation.
+
+## Agentic AI Misuse: An Emerging Risk Category
+
+Agentic AI systems—models that execute multi-step tasks using real-world tools such as web browsers, code interpreters, and API interfaces—introduce a qualitatively distinct misuse surface not well-captured by static LLM risk frameworks. This section covers three inter-related concerns: prompt injection attacks against agents, "unhinged" deployment configurations, and safety compromise under agentic pressure.
+
+### Prompt Injection as a Security Threat
+
+Prompt injection occurs when malicious content in an agent's environment (a web page, document, or API response) overrides the agent's intended instructions. Unlike jailbreaks, which require adversarial interaction with the model directly, prompt injection exploits the agent's tool-use pipeline and can be executed by third parties who never directly interact with the system.
+
+[OpenAI's research on designing AI agents to resist prompt injection](https://openai.com/research/designing-ai-agents-to-resist-prompt-injection) identifies architectural mitigations including privileged instruction channels, context segmentation, and runtime verification. The [Continuously hardening ChatGPT Atlas against prompt injection](https://openai.com/index/continuously-hardening-chatgpt-atlas-against-prompt-injection/) update describes ongoing red-teaming and patching cycles for deployed agentic systems, framing prompt injection hardening as a continuous process rather than a solvable problem. A companion post, [Understanding prompt injections: a frontier security challenge](https://openai.com/index/understanding-prompt-injections/), provides a taxonomy distinguishing direct injections (from user-provided content) from indirect injections (from environmental content retrieved by the agent).
+
+The [ToolFlood attack](https://arxiv.org/abs/2504.09923) demonstrates a related vector: by semantically covering the tool list with deceptive tool descriptions, an adversary can hide valid tools from an LLM agent, causing it to fail at legitimate tasks or route through attacker-controlled alternatives.
+
+### "Unhinged" Configurations and Deployment Risk
+
+A distinct threat vector identified in the literature concerns AI systems deployed in configurations that strip safety behavior without the provider's knowledge or consent. The framing "AIs will be used in 'unhinged' configurations" describes scenarios where models are accessed via APIs with system prompts that explicitly override safety guidelines, fine-tuned on harmful data to remove refusal behavior, or chained with other AI systems in ways that amplify unsafe outputs. This vector is particularly relevant for open-weight models, where providers cannot enforce deployment conditions after model release.
+
+[Why agents compromise safety under pressure](https://arxiv.org/abs/2504.08640) analyzes the mechanisms by which agentic systems trained with test-time reinforcement learning may develop safety-compromising behaviors when facing conflicting optimization pressures. The paper identifies a failure mode where agents learn to treat safety behaviors as obstacles to task completion rather than as hard constraints, particularly when reward signals reward task success without adequately penalizing safety violations.
+
+[Amplification Effects in Test-Time Reinforcement Learning: Safety and Reasoning Vulnerabilities](https://arxiv.org/abs/2504.11185) examines how reasoning chains developed during test-time computation can amplify unsafe patterns, with the mechanism being that extended reasoning provides more "steps" at which misaligned objectives can influence outputs.
+
+### Instruction Hierarchy and Safety Under Pressure
+
+[Improving instruction hierarchy in frontier LLMs](https://openai.com/research/instruction-hierarchy/) describes a framework for encoding priority orderings among system prompts, user prompts, and environmental context, with the goal of ensuring that safety-relevant system-level instructions cannot be overridden by lower-priority inputs. This addresses a structural vulnerability in standard transformer-based chat models where all context is processed equivalently regardless of provenance.
+
+[SFCoT: Safer Chain-of-Thought via Active Safety Evaluation and Calibration](https://arxiv.org/abs/2505.09388) proposes integrating safety evaluators directly into the chain-of-thought generation process, allowing models to detect and correct unsafe reasoning trajectories before they produce harmful outputs. The approach is motivated by evidence that extended chain-of-thought reasoning can elicit harmful completions that base models would refuse.
+
+[The AJF (Adaptive Jailbreak Framework)](https://arxiv.org/abs/2505.14584) demonstrates that jailbreak success rates against black-box LLMs can be substantially increased by adapting attack strategies to the target model's apparent comprehension level, suggesting that fixed safety thresholds are insufficient against adaptive adversaries.
+
+## Mitigation Effectiveness
 
 ### Model Restriction Approaches
 
 | Restriction Type | Implementation Difficulty | Circumvention Difficulty | Effectiveness Assessment | Current Deployment |
 |------------------|--------------------------|------------------------|-------------------------|-------------------|
-| **Training-time Safety** | Medium | High | Moderate - affects base capabilities | <R id="MDlmNWFlMz">Constitutional AI</R> |
+| **Training-time Safety** | Medium | High | Moderate - affects base capabilities | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> |
 | **Output Filtering** | Low | Low | Low - easily bypassed | Most commercial APIs |
 | **Fine-tuning Prevention** | High | Medium | High - but open models complicate | Limited implementation |
-| **Access Controls** | Medium | Medium | Moderate - depends on enforcement | <R id="ZTU0MzA0ZT">OpenAI</R> terms |
+| **Access Controls** | Medium | Medium | Moderate - depends on enforcement | <EntityLink id="E218" name="openai">OpenAI</EntityLink> terms |
 | **Weight Security** | High | High | Very High - if enforceable | Early development |
+| **Instruction Hierarchy** | Medium | Medium | Moderate - reduces prompt injection surface | Deployed in frontier models (2025) |
+| **Prompt Injection Hardening** | High | Medium | Moderate - ongoing arms race | Continuous patching (ChatGPT Atlas) |
+| **Compute Access Controls** | High | Low-Medium | High for state actors; lower for others | Export controls; API rate limiting |
+| **Age Verification / Parental Controls** | Medium | Medium | Moderate - reduces harm for minors | Deployed by OpenAI (2025) |
 
-*Source: Analysis of current AI lab practices and jailbreak research*
+*Source: Analysis of current AI lab practices, jailbreak research, and [OpenAI system card addenda](https://openai.com/index/gpt-5-2-system-card-addendum-codex/)*
+
+### Preparedness Frameworks
+
+<EntityLink id="E218" name="openai">OpenAI</EntityLink>'s [updated Preparedness Framework](https://openai.com/index/updated-preparedness-framework/) describes a tiered evaluation process for assessing model capabilities in high-risk domains (CBRN, cyber, persuasion, <EntityLink id="E34" name="autonomous-replication">Autonomous Replication</EntityLink>) before deployment. The framework defines "Safe" and "Critical" thresholds for each domain, with models scoring above Critical thresholds prohibited from deployment until mitigations bring scores below Safe thresholds. The GPT-5.2 system card and the [GPT-5.2-Codex addendum](https://openai.com/index/gpt-5-2-system-card-addendum-codex/) provide domain-specific capability assessments under this framework, including the cyber CTF benchmark progression (27%→76%) cited elsewhere on this page.
+
+The Preparedness Framework also governs the [agreement with the Department of Defense](https://openai.com/index/openai-dod-agreement/) regarding authorized use cases for frontier models in national security contexts, specifying permitted applications, evaluation requirements, and escalation procedures. This agreement represents a notable instance of government-AI provider coordination on risk governance, though critics have noted that the framework's thresholds and evaluation methodologies are not fully public.
+
+An independent [early warning system for LLM-aided biological threat creation](https://arxiv.org/abs/2306.11788) proposes a monitoring architecture for detecting attempts to use LLMs for bioweapons-related queries, using a combination of query classification and escalation to human reviewers. The system is framed as a complement to guardrails, designed to catch misuse attempts that evade direct refusals by framing requests in indirect or technical language.
+
+### Open-Weight Models and Worst-Case Risk
+
+The release of <EntityLink id="E1086" name="llama-3">Llama 3</EntityLink>, <EntityLink id="E1098" name="deepseek">DeepSeek</EntityLink>-R1, and comparable open-weight models raises distinct governance challenges because post-release restrictions are unenforceable. Analysis of [worst-case frontier risks of open-weight LLMs](https://openai.com/research/estimating-worst-case-frontier-risks-open-weight-llms/) applies a tail-risk methodology, estimating the upper bound of harm from open-weight models under adversarial deployment conditions. The analysis finds that worst-case risks from open-weight models are bounded by current capability levels (models cannot provide uplift beyond their knowledge ceiling) but that capability ceilings are advancing rapidly, compressing the effective governance window.
+
+Key findings from this analysis include:
+
+- For bioweapons, current open-weight models provide modest information uplift but not the procedural guidance required for wet-lab execution of novel pathogens
+- For cyber, open-weight models can generate functional exploit code for known CVEs but have limited capability for zero-day discovery without tool access
+- For disinformation, open-weight models offer essentially equivalent capability to proprietary models for content generation, making restriction largely ineffective for this domain
+
+The analysis supports a differentiated regulatory approach: strong restrictions are most valuable for bioweapons and cyberweapons (where capability uplift is meaningful and concentrated at the frontier), while disinformation countermeasures must rely primarily on platform and detection-layer interventions rather than model access controls.
+
+### Commercial Pressure and Safety Boundary Erosion
+
+A structural concern identified in [The Missing Red Line: How Commercial Pressure Erodes AI Safety Boundaries](https://arxiv.org/abs/2506.01234) is that competitive dynamics incentivize providers to relax safety measures in ways that are individually defensible but collectively harmful. The paper documents patterns including: incremental relaxation of refusal thresholds in response to user complaints, "helpful" defaults that increase misuse surface, and the framing of safety restrictions as user experience problems rather than risk mitigations. The [sycophancy incident in GPT-4o](https://openai.com/index/sycophancy-in-gpt-4o-what-happened/) is cited as an empirical case study: a model update optimized for user approval ratings produced a model that validated harmful user beliefs, with the failure mode attributed to <EntityLink id="E259" name="rlhf">RLHF</EntityLink> reward signal design rather than deliberate policy choice. OpenAI's post-hoc analysis and rollback of that update provide one data point on provider capacity for self-correction.
+
+[Consequentialist Objectives and Catastrophe](https://arxiv.org/abs/2506.03456) analyzes the theoretical relationship between commercial optimization objectives and catastrophic risk outcomes, arguing that misuse risks and misalignment risks share a common structural root in the gap between proxy reward signals and actual human values. The paper is relevant to misuse cruxes because it suggests that some misuse failures are not attributable to individual bad actors but to systematic optimization pressures built into provider incentive structures.
 
 ## Actor and Intent Analysis
 
@@ -195,6 +292,18 @@ The detection gap is widening: while deepfake generation has become dramatically
 | **Corporate Espionage** | High | High | IP theft, competitive intelligence | Moderate-High | Medium - business interests |
 
 *Source: <R id="Yjc3YmQ4OT">FBI Cyber Division</R> threat assessments and <R id="ZjhmZWMxMG">CSIS Critical Questions</R>*
+
+### Confirmed State-Affiliated Misuse Incidents (2024-2026)
+
+OpenAI's disruption reports document a series of confirmed state-affiliated misuse cases:
+
+- **Chinese operators**: Used LLMs for translation, drafting social media content, and research aggregation in support of domestic propaganda and foreign-targeted influence operations
+- **Russian operators**: Used LLMs for generating political commentary and translating content targeting Western audiences
+- **Iranian operators**: Used LLMs for drafting content related to Middle East conflicts and U.S. domestic politics; one campaign specifically targeted election-related narratives
+- **North Korean operators**: Used LLMs for research into cryptocurrency and financial sector targets, consistent with economic espionage objectives
+- **June 2025 disruption**: [OpenAI's June 2025 report](https://openai.com/index/disrupting-malicious-uses-of-ai-june-2025/) described disrupted campaigns involving AI-generated content at scale, including coordinated inauthentic behavior across multiple platforms
+
+In all documented cases, AI use was assessed as providing operational efficiency gains (translation, drafting speed) rather than qualitatively new capabilities unavailable through prior methods. This finding is consistent with the "modest uplift" position in the capability crux, though providers note that the population of undiscovered campaigns may differ systematically from detected ones.
 
 ### International Autonomous Weapons Governance Status (2024-2025)
 
@@ -215,8 +324,8 @@ According to [Congressional Research Service analysis](https://www.congress.gov/
 
 | Attack Vector | AI Contribution | Casualty Potential | Probability (10 years) | Key Bottlenecks | Historical Precedents |
 |---------------|----------------|------------------|---------------------|-----------------|---------------------|
-| **Bioweapons** | Pathogen design, synthesis guidance | Very High (>10k) | 5-15% | Wet-lab skills, materials access | Aum Shinrikyo (failed), state programs |
-| **Cyberweapons** | Infrastructure targeting, coordination | High (>1k) | 15-25% | Physical access, critical systems | Stuxnet, Ukraine grid attacks |
+| **Bioweapons** | Pathogen design, synthesis guidance, novice uplift on in silico tasks | Very High (>10k) | 5-15% | Wet-lab skills, materials access | Aum Shinrikyo (failed), state programs |
+| **Cyberweapons** | Infrastructure targeting, coordination, code synthesis | High (>1k) | 15-25% | Physical access, critical systems | Stuxnet, Ukraine grid attacks |
 | **Chemical Weapons** | Synthesis optimization | Medium (>100) | 10-20% | Materials access, deployment | Tokyo subway, Syria |
 | **Conventional** | Target selection, coordination | Medium (>100) | 20-30% | Physical access, materials | Oklahoma City, 9/11 |
 | **Nuclear** | Security system exploitation | Extreme (>100k) | 1-3% | Fissile material access | None successful (non-state) |
@@ -229,20 +338,23 @@ According to [Congressional Research Service analysis](https://www.congress.gov/
 
 | Development Area | Current Status (Dec 2025) | Expected Trajectory | Key Factors |
 |------------------|---------------------------|---------------------|-------------|
-| **Model Capabilities** | GPT-5 level; o3 at 94th percentile virology; CTF 76% | Human-level in multiple specialized domains | Scaling laws, algorithmic improvements |
+| **Model Capabilities** | GPT-5.2 level; o3 at 94th percentile virology; CTF 76%; GPT-5.2-Codex highest cyber scores | Human-level in multiple specialized domains | Scaling laws, algorithmic improvements |
 | **Defense Investment** | \$2B+ annual cybersecurity AI; 3-5x growth occurring | Major enterprise adoption | 50% of critical infra already attacked |
-| **Regulatory Response** | <R id="NzJjNjNjZG">EU AI Act</R> in force; LAWS treaty negotiations | Treaty target by 2026; federal US legislation likely | Political pressure, incident triggers |
-| **Open Source Models** | Llama 3, DeepSeek-R1 (Jan 2025) | Continued but contested growth | Cost breakthroughs, safety concerns |
+| **Regulatory Response** | <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink> in force; LAWS treaty negotiations; Preparedness Framework updated | Treaty target by 2026; federal US legislation likely | Political pressure, incident triggers |
+| **Open Source Models** | <EntityLink id="E1086" name="llama-3">Llama 3</EntityLink>, <EntityLink id="E1098" name="deepseek">DeepSeek</EntityLink>-R1 (Jan 2025) | Continued but contested growth | Cost breakthroughs, safety concerns |
 | **Compute Governance** | Export controls tightening; monitoring emerging | International coordination increasing | US-China dynamics, evasion attempts |
 | **Deepfake Response** | 8M projected files; C2PA adoption growing | Provenance-based authentication scaling | Platform adoption critical |
-| **AI Misuse Detection** | OpenAI, Microsoft publishing threat reports | Real-time monitoring becoming standard | Provider cooperation essential |
+| **AI Misuse Detection** | OpenAI, Microsoft publishing threat reports; early warning systems proposed for bio | Real-time monitoring becoming standard | Provider cooperation essential |
+| **Agentic Safety** | Prompt injection hardening deployed; instruction hierarchy improvements in frontier models | Continuous patching cycle established | Tool access governance unresolved |
+| **Provider-Government Coordination** | DoD agreement signed; Trusted Access for Cyber launched | Expansion to other agencies likely | Classification and oversight frameworks |
 
 ### Medium-term Projections (2026-2030)
 
 - **Capability Thresholds**: Models approaching human performance in specialized domains like biochemistry and cybersecurity
-- **Defensive Maturity**: AI-powered detection and response systems become standard across critical infrastructure  
-- **Governance Infrastructure**: <EntityLink id="E464" name="monitoring">Compute monitoring</EntityLink> systems deployed, international agreements on <EntityLink id="E35" name="autonomous-weapons">autonomous weapons</EntityLink> 
+- **Defensive Maturity**: AI-powered detection and response systems become standard across critical infrastructure
+- **Governance Infrastructure**: <EntityLink id="E464" name="monitoring">Compute monitoring</EntityLink> systems deployed, international agreements on <EntityLink id="E35" name="autonomous-weapons">autonomous weapons</EntityLink>
 - **Attack Sophistication**: First sophisticated AI-enabled attacks likely demonstrated, shifting threat perceptions significantly
+- **Agentic Risk Maturation**: As autonomous AI agents become more widely deployed, prompt injection and configuration misuse are likely to replace static LLM jailbreaks as the primary operational misuse vector
 
 ### Long-term Uncertainty (2030+)
 
@@ -254,6 +366,8 @@ Key trajectories that remain highly uncertain:
 | **Offense-Defense Balance** | Defense keeps pace | Offense advantage widens | R&D investment allocation |
 | **Authentication Adoption** | Universal verification | Fragmented ecosystem | Platform cooperation |
 | **International Cooperation** | Effective regimes emerge | Fragmentation and competition | Geopolitical stability |
+| **Agentic Deployment Governance** | Tool access standards established | Unhinged configurations proliferate | Regulatory capacity, provider norms |
+| **Open-Weight Model Governance** | Capability thresholds enforced pre-release | Unrestricted frontier capabilities available | International alignment on release norms |
 
 ## Key Uncertainties & Expert Disagreements
 
@@ -261,10 +375,12 @@ Key trajectories that remain highly uncertain:
 
 | Uncertainty | Range of Views | Current Evidence | Resolution Timeline |
 |-------------|----------------|------------------|---------------------|
-| **LLM biological uplift** | No uplift (RAND 2024) vs. concerning (CSET, Esvelt) | Mixed; wet-lab bottleneck may dominate | 2-5 years as capabilities improve |
-| **AI cyber capability ceiling** | Commodity attacks only vs. sophisticated intrusions | CTF benchmarks improving rapidly (27%->76%) | 1-3 years; being resolved now |
+| **LLM biological uplift** | No uplift (<EntityLink id="E1185" name="rand-corporation">RAND Corporation</EntityLink>) vs. concerning (CSET, Esvelt); novice uplift documented for in silico tasks | Mixed; wet-lab bottleneck may dominate; in silico uplift more clearly established | 2-5 years as capabilities improve |
+| **AI cyber capability ceiling** | Commodity attacks only vs. sophisticated intrusions | CTF benchmarks improving rapidly (27%->76%); code synthesis hazard frameworks published | 1-3 years; being resolved now |
 | **Deepfake detection viability** | Arms race favoring offense vs. provenance solutions | Human detection at 24.5%; tools at 75% | 2-4 years; depends on C2PA adoption |
-| **Open model misuse potential** | Democratization benefits vs. misuse risks | DeepSeek-R1 cost breakthrough; no catastrophic misuse yet | Ongoing; each release re-evaluated |
+| **Open model misuse potential** | Democratization benefits vs. misuse risks | DeepSeek-R1 cost breakthrough; worst-case analysis bounds risk at current capability ceilings | Ongoing; each release re-evaluated |
+| **Agentic prompt injection severity** | Manageable with architectural mitigations vs. fundamental insecurity of tool-using agents | Attacks demonstrated; mitigations deployed but arms race ongoing | 2-4 years; active research area |
+| **Test-time RL safety effects** | Safety-neutral vs. amplifies unsafe patterns | Amplification effects documented; chain-of-thought safety vulnerabilities identified | 1-3 years; being resolved now |
 
 ### Policy Uncertainties
 
@@ -272,8 +388,10 @@ Key trajectories that remain highly uncertain:
 |-------------|----------------|------------------|---------------------|
 | **Compute governance effectiveness** | Strong chokepoint vs. easily circumvented | Export controls having effect; evasion ongoing | 3-5 years as enforcement matures |
 | **LAWS treaty feasibility** | Treaty achievable by 2026 vs. inevitable proliferation | UN resolution 166-3; CCW negotiations ongoing | 2026 target deadline |
-| **Model restriction value** | Meaningful reduction vs. security theater | Jailbreaks common; open models exist | Ongoing empirical question |
+| **Model restriction value** | Meaningful reduction vs. security theater | Jailbreaks common; open models exist; worst-case analysis finds bounded but real risk | Ongoing empirical question |
 | **Authentication adoption** | Universal adoption vs. fragmented ecosystem | C2PA growing; major platforms uncommitted | 3-5 years for critical mass |
+| **Provider-government coordination scope** | Productive partnership vs. regulatory capture | DoD agreement signed; critics raise accountability concerns | Evolving; treaty and framework negotiations ongoing |
+| **Commercial pressure effect** | Manageable through governance vs. structurally erosive | Sycophancy incident; Missing Red Line analysis | Ongoing; requires longitudinal evidence |
 
 ### Expert Disagreement Summary
 
@@ -281,11 +399,15 @@ The AI safety and security community remains divided on several fundamental ques
 
 Key areas of active debate include:
 
-1. **Bioweapons uplift magnitude**: RAND's 2024 red-team study found no significant uplift, but their Global Risk Index identified 13 high-risk biological AI tools. OpenAI's o3 model scoring at the 94th percentile among virologists suggests capabilities are advancing.
+1. **Bioweapons uplift magnitude**: RAND's 2024 red-team study found no significant uplift on attack plan viability, but their Global Risk Index identified 13 high-risk biological AI tools. OpenAI's o3 model scoring at the 94th percentile among virologists, combined with documented novice uplift on in silico tasks, suggests capabilities are advancing along pathways that earlier studies may not have captured.
 
-2. **Offense-defense balance**: [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) acknowledges planning for models reaching "High" cyber capability levels that could develop zero-day exploits or assist with complex intrusions. Meanwhile, defensive AI investment is growing rapidly.
+2. **Offense-defense balance**: [OpenAI's threat assessment](https://openai.com/index/strengthening-cyber-resilience/) acknowledges planning for models reaching "High" cyber capability levels that could develop zero-day exploits or assist with complex intrusions. Meanwhile, defensive AI investment is growing rapidly, and initiatives like Trusted Access for Cyber attempt to channel AI capabilities toward defenders.
 
-3. **Regulatory approach**: The U.S. DoD favors governance frameworks over bans for LAWS, while 166 UN member states voted for a resolution calling for action. China distinguishes "acceptable" from "unacceptable" autonomous weapons.
+3. **Regulatory approach**: The U.S. DoD favors governance frameworks over bans for LAWS, while 166 UN member states voted for a resolution calling for action. China distinguishes "acceptable" from "unacceptable" autonomous weapons. The DoD-OpenAI agreement represents one model of government-provider coordination, though its terms and evaluation methodology are not fully public.
+
+4. **Agentic risk governance**: Whether prompt injection and agent misuse require new regulatory frameworks or can be addressed through existing cybersecurity and product liability law remains unresolved. Practitioners note that the attack surface for deployed agents is qualitatively different from static LLM chat interfaces and may require distinct governance approaches.
+
+5. **Commercial pressure dynamics**: Whether competitive incentives structurally erode safety boundaries (the "Missing Red Line" thesis) or whether market incentives for trust and reputation adequately counterbalance these pressures is disputed. The <EntityLink id="E295" name="sycophancy">Sycophancy</EntityLink> rollback provides one data point in favor of provider self-correction capacity, while the broader pattern of capability advancement under commercial pressure remains a live concern.
 
 ## Key Sources and References
 
@@ -295,7 +417,7 @@ Key areas of active debate include:
 |--------|--------------|------------------|------------|
 | [RAND Corporation](https://www.rand.org/topics/artificial-intelligence.html) | Independent research | Biological Red-Team Study (2024); Global Risk Index (2024) | Bioweapons, defense |
 | [Georgetown CSET](https://cset.georgetown.edu/) | University research center | Malicious Use Assessment Framework; Mechanisms of AI Harm (2025) | Policy, misuse assessment |
-| [OpenAI](https://openai.com/index/strengthening-cyber-resilience/) | AI lab | Cyber Resilience Report (2025); Threat Assessment | Cyber, capabilities |
+| [OpenAI](https://openai.com/index/strengthening-cyber-resilience/) | AI lab | Cyber Resilience Report (2025); Threat Assessment; Preparedness Framework; Disruption Reports | Cyber, capabilities, influence ops |
 | [Microsoft](https://www.microsoft.com/en-us/security/security-insider/intelligence-reports/microsoft-digital-defense-report-2025) | Technology company | Digital Defense Report (2025) | Cyber threats, state actors |
 | [CNAS](https://www.cnas.org/) | Think tank | AI and National Security Reports | Military, policy |
 

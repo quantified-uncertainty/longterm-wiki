@@ -50,6 +50,7 @@ export const DATA_DIR = path.resolve(process.cwd(), "../../data");
 export interface IdRegistryMaps {
   byWikiId: Record<string, string>; // E1 → slug
   bySlug: Record<string, string>; // slug → E1
+  stableIdToSlug?: Record<string, string>; // 10-char stableId → slug (from YAML entities)
 }
 
 /**

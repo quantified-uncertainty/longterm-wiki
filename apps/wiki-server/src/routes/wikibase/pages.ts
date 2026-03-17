@@ -4,12 +4,11 @@ import { eq, or, and, count, asc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { wikiPages, entityIds } from "../../schema.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   dbError,
   paginationQuery,
+  zv,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import {
@@ -63,11 +62,8 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 
 const pagesApp = new Hono()
   // ---- GET /search?q=...&limit=20 ----
-  .get("/search", async (c) => {
-    const parsed = SearchQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { q, limit } = parsed.data;
+  .get("/search", zv("query", SearchQuery), async (c) => {
+    const { q, limit } = c.req.valid("query");
     const rawDb = getDb();
 
     // Phase 1: Prefix search with to_tsquery — supports search-as-you-type.
@@ -200,11 +196,8 @@ const pagesApp = new Hono()
 
   // ---- GET / (paginated listing) ----
 
-  .get("/", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset, category, entityType } = parsed.data;
+  .get("/", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset, category, entityType } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Build where conditions
@@ -278,14 +271,8 @@ const pagesApp = new Hono()
 
   // ---- POST /sync ----
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pages, syncedFromBranch, syncedFromCommit } = parsed.data;
+  .post("/sync", zv("json", SyncBatchSchema), async (c) => {
+    const { pages, syncedFromBranch, syncedFromCommit } = c.req.valid("json");
     const db = getDrizzleDb();
     let upserted = 0;
 

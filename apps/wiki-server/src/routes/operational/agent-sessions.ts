@@ -318,6 +318,8 @@ const agentSessionsApp = new Hono()
     return c.json({ insights, summary: { total: insights.length, byType } });
   })
   .post("/sweep", async (c) => {
+    // Intentional fallback: sweep is best-effort housekeeping; if the body can't
+    // be parsed we fall through to defaults (timeoutHours=2). No user-facing impact.
     const body = await parseJsonBody(c).catch(() => ({}));
     const raw = Number((body as Record<string, unknown>)?.timeoutHours || 2);
     const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));

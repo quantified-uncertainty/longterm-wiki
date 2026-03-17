@@ -34,7 +34,13 @@ export const INVALID_JSON_ERROR = "invalid_json" as const;
 
 /** Safely parse JSON body, returning null on parse failure. */
 export function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
+  return c.req.json().catch((e: unknown) => {
+    logger.debug(
+      { error: e instanceof Error ? e.message : String(e), path: c.req.path },
+      "parseJsonBody: failed to parse request body as JSON"
+    );
+    return null;
+  });
 }
 
 /** Return a 400 validation error response. */
@@ -136,10 +142,13 @@ export function parseRange(value: unknown): { low: string | null; high: string |
 }
 
 /**
- * Zod validator helper for Hono query params.
+ * Zod validator helper for Hono query params or JSON request bodies.
  * Uses Hono's built-in validator to preserve RPC type inference in method-chained routes.
+ *
+ * - `zv("query", Schema)` — validates URL query string params
+ * - `zv("json", Schema)` — validates JSON request body
  */
-export function zv<T extends z.ZodType>(target: "query", schema: T) {
+export function zv<T extends z.ZodType>(target: "query" | "json", schema: T) {
   return validator(target, (value, c) => {
     const result = schema.safeParse(value);
     if (!result.success) {
