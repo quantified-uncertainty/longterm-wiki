@@ -534,7 +534,7 @@ properties:
     category: requirements
     appliesTo: [policy]
     display:
-      format: scientific
+      suffix: " FLOP"
 
   cost-threshold:
     name: Cost Threshold

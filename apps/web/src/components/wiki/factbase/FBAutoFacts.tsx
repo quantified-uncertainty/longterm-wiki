@@ -67,6 +67,9 @@ const CATEGORY_ORDER: Record<string, number> = {
   incident: 17,
   relationship: 18,
   research: 19,
+  requirements: 20,
+  legislative: 21,
+  political: 22,
   other: 99,
 };
 
@@ -78,8 +81,6 @@ const HERO_STAT_PROPERTIES: Record<string, string[]> = {
   policy: [
     "compute-threshold",
     "cost-threshold",
-    "employee-letter-signatories",
-    "companion-bills-signed",
   ],
 };
 
