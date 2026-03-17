@@ -4,6 +4,7 @@
 
 ALTER TABLE resources ADD COLUMN IF NOT EXISTS author_entity_ids jsonb;
 
--- GIN index for efficient containment queries (@> operator)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_res_author_entity_ids
-  ON resources USING gin (author_entity_ids);
+-- NOTE: GIN index must be created manually (CONCURRENTLY cannot run in a transaction).
+-- After migration, run:
+--   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_res_author_entity_ids
+--     ON resources USING gin (author_entity_ids);
