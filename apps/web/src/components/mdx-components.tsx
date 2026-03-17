@@ -84,6 +84,7 @@ import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-cov
 import { ThingsContent } from "@/app/internal/things/things-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
 import { EntityMatrixContent } from "@/app/internal/entity-matrix/entity-matrix-content";
+import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -249,6 +250,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   ThingsContent,
   AgentActivityContent,
   EntityMatrixContent,
+  EntityProfileContent,
 
   // Table view components
   SafetyApproachesTableView,
