@@ -46,7 +46,7 @@ import {
 import type { AuthorRef } from "./org-data";
 
 // Section components
-import { RelatedOrganizationsSection } from "./related-orgs-section";
+
 import { EquityPositionsSection } from "./equity-section";
 import { DivisionsSection, DivisionsOverview } from "./divisions-section";
 import { FundingProgramsSection } from "./programs-section";
@@ -182,6 +182,13 @@ export default async function OrgProfilePage({
   // ── Overview tab: stat cards, facts, related wiki pages, related orgs ──
   const overviewContent = (
     <div className="space-y-8">
+      {/* Description */}
+      {data.descriptionText && (
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
+          {data.descriptionText}
+        </p>
+      )}
+
       {/* Stat cards */}
       {heroStatCards.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -207,11 +214,6 @@ export default async function OrgProfilePage({
       {/* Divisions overview */}
       {data.divisions.length > 0 && (
         <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} members={data.divisionMembers} />
-      )}
-
-      {/* Related Orgs */}
-      {data.relatedOrgs.length > 0 && (
-        <RelatedOrganizationsSection orgs={data.relatedOrgs} />
       )}
 
       {/* Related Wiki Pages */}
@@ -733,11 +735,6 @@ export default async function OrgProfilePage({
               </p>
             )}
 
-            {data.descriptionText && (
-              <p className="text-sm text-muted-foreground leading-relaxed mt-1 max-w-prose line-clamp-3">
-                {data.descriptionText}
-              </p>
-            )}
           </div>
         </div>
       </div>

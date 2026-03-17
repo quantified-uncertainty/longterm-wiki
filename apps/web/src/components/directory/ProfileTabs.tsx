@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export interface ProfileTab {
@@ -10,11 +12,13 @@ export interface ProfileTab {
 }
 
 /**
- * Reusable tabbed layout for profile pages (organizations, people, etc.).
- * - Automatically hides tabs where count is 0
- * - Renders content directly (no tab chrome) when only one tab remains
+ * Inner component that reads search params (must be wrapped in Suspense).
  */
-export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
+function ProfileTabsInner({ tabs }: { tabs: ProfileTab[] }) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
   // Filter out tabs with explicit count of 0
   const visibleTabs = tabs.filter((t) => t.count !== 0);
 
@@ -25,8 +29,24 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
     return <>{visibleTabs[0].content}</>;
   }
 
+  const defaultTabId = visibleTabs[0].id;
+  const tabParam = searchParams.get("tab");
+  // Use URL tab param if it matches a visible tab, otherwise default
+  const activeTab = tabParam && visibleTabs.some((t) => t.id === tabParam)
+    ? tabParam
+    : defaultTabId;
+
+  function handleTabChange(value: string) {
+    // Omit ?tab= when it matches the first tab (clean URLs)
+    if (value === defaultTabId) {
+      router.replace(pathname, { scroll: false });
+    } else {
+      router.replace(`${pathname}?tab=${value}`, { scroll: false });
+    }
+  }
+
   return (
-    <Tabs defaultValue={visibleTabs[0].id}>
+    <Tabs value={activeTab} onValueChange={handleTabChange}>
       <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0 overflow-x-auto">
         {visibleTabs.map((tab) => (
           <TabsTrigger
@@ -50,5 +70,19 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
         </TabsContent>
       ))}
     </Tabs>
+  );
+}
+
+/**
+ * Reusable tabbed layout for profile pages (organizations, people, etc.).
+ * - Automatically hides tabs where count is 0
+ * - Renders content directly (no tab chrome) when only one tab remains
+ * - Syncs active tab to ?tab= URL query param for shareable links
+ */
+export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
+  return (
+    <Suspense fallback={<div className="mt-6">{tabs[0]?.content}</div>}>
+      <ProfileTabsInner tabs={tabs} />
+    </Suspense>
   );
 }
