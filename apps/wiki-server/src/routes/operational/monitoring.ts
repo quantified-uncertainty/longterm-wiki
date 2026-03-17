@@ -372,60 +372,28 @@ const monitoringApp = new Hono()
       agentActivityResult,
       apiKeysResult,
     ] = await Promise.all([
-      // 1. GitHub CI status for main branch
-      fetchCiStatus().catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch CI status");
-        return null;
-      }),
-
-      // 2. Groundskeeper task stats (last 24h)
-      fetchGroundskeeperStats(db).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch groundskeeper stats");
-        return [];
-      }),
-
-      // 3. Data integrity summary (dangling refs)
-      fetchIntegritySummary(rawDb).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch integrity summary");
-        return { totalDanglingRefs: 0, status: "error" as const, breakdown: { facts: 0, claims: 0, summaries: 0, citations: 0, editLogs: 0 } };
-      }),
-
-      // 4. Auto-update system stats
-      fetchAutoUpdateStats(db).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch auto-update stats");
-        return { totalRuns: 0, recentRuns: [] as { id: number; date: string; trigger: string; pagesUpdated: number; pagesFailed: number; budgetSpent: number; completed: boolean }[] };
-      }),
-
-      // 5. Recent agent sessions
-      fetchRecentSessions(rawDb).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch recent sessions");
-        return [];
-      }),
-
-      // 6. Migration status
-      fetchMigrationStatus(rawDb).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch migration status");
-        return null;
-      }),
-
-      // 7. Deploy history
-      fetchDeployHistory().catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch deploy history");
-        return null;
-      }),
-
-      // 8. Agent activity summary
-      fetchAgentActivity(rawDb).catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch agent activity");
-        return { activeNow: 0, sessionsThisWeek: 0, prsThisWeek: 0, completedThisWeek: 0, completionRate: null as number | null };
-      }),
-
-      // 9. API key health
-      fetchApiKeyHealth().catch((err) => {
-        logger.warn({ err: err instanceof Error ? err.message : String(err) }, "Failed to fetch API key health");
-        return null;
-      }),
+      fetchCiStatus().catch(catchWith("CI status", null)),
+      fetchGroundskeeperStats(db).catch(catchWith("groundskeeper stats", [] as Awaited<ReturnType<typeof fetchGroundskeeperStats>>)),
+      fetchIntegritySummary(rawDb).catch(catchWith("integrity summary",
+        { totalDanglingRefs: 0, status: "error" as const, breakdown: { facts: 0, summaries: 0, citations: 0, editLogs: 0 } })),
+      fetchAutoUpdateStats(db).catch(catchWith("auto-update stats", { totalRuns: 0, recentRuns: [] as { id: number; date: string; trigger: string; pagesUpdated: number; pagesFailed: number; budgetSpent: number; completed: boolean }[] })),
+      fetchRecentSessions(rawDb).catch(catchWith("recent sessions", [])),
+      fetchMigrationStatus(rawDb).catch(catchWith("migration status", null)),
+      fetchDeployHistory().catch(catchWith("deploy history", null)),
+      fetchAgentActivity(rawDb).catch(catchWith("agent activity", { activeNow: 0, sessionsThisWeek: 0, prsThisWeek: 0, completedThisWeek: 0, completionRate: null as number | null })),
+      fetchApiKeyHealth().catch(catchWith("API key health", null)),
     ]);
+
+    // Derive GitHub API key health from CI result to avoid a redundant API call
+    const apiKeysWithGithub = apiKeysResult
+      ? apiKeysResult
+      : null;
+    if (apiKeysWithGithub) {
+      apiKeysWithGithub.github = {
+        configured: !!process.env.GITHUB_TOKEN,
+        healthy: ciResult !== null,
+      };
+    }
 
     return c.json({
       ci: ciResult,
@@ -439,6 +407,14 @@ const monitoringApp = new Hono()
       apiKeys: apiKeysResult,
     });
   });
+
+/** Log a warning and return a fallback value — DRY wrapper for Promise.all .catch() handlers. */
+function catchWith<T>(label: string, fallback: T) {
+  return (err: unknown) => {
+    logger.warn({ err: err instanceof Error ? err.message : String(err) }, `Failed to fetch ${label}`);
+    return fallback;
+  };
+}
 
 // ---- Helper functions for /extended endpoint ----
 
@@ -652,7 +628,7 @@ async function fetchMigrationStatus(rawDb: ReturnType<typeof getDb>) {
   const recent = recentResult.map((r) => ({
     id: r.id as MigrationRow["id"],
     hash: r.hash as MigrationRow["hash"],
-    createdAt: String(r.created_at),
+    createdAt: new Date(Number(r.created_at)).toISOString(),
   }));
 
   return {
@@ -698,14 +674,16 @@ async function fetchDeployHistory() {
       const createdMs = new Date(run.created_at).getTime();
       const updatedMs = new Date(run.updated_at).getTime();
       const durationSeconds =
-        createdMs && updatedMs ? Math.round((updatedMs - createdMs) / 1000) : null;
+        !isNaN(createdMs) && !isNaN(updatedMs)
+          ? Math.round((updatedMs - createdMs) / 1000)
+          : null;
 
       return {
         id: run.id,
         status: run.status,
         conclusion: run.conclusion ?? "unknown",
         createdAt: run.created_at,
-        headSha: run.head_sha.slice(0, 8),
+        headSha: run.head_sha,
         runNumber: run.run_number,
         durationSeconds,
       };
@@ -744,7 +722,6 @@ async function fetchAgentActivity(rawDb: ReturnType<typeof getDb>) {
 
 async function fetchApiKeyHealth() {
   const checkKey = async (
-    name: string,
     envVar: string,
     testFn: (key: string) => Promise<boolean>
   ): Promise<{ configured: boolean; healthy: boolean }> => {
@@ -758,24 +735,12 @@ async function fetchApiKeyHealth() {
     }
   };
 
-  const [github, anthropic, openrouter] = await Promise.all([
-    // GitHub — reuse CI status logic: if GITHUB_TOKEN exists and can hit the API
-    checkKey("github", "GITHUB_TOKEN", async (token) => {
-      const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}`,
-        {
-          headers: {
-            Authorization: `token ${token}`,
-            Accept: "application/vnd.github+json",
-          },
-          signal: AbortSignal.timeout(5000),
-        }
-      );
-      return resp.ok;
-    }),
+  // GitHub key health is derived from fetchCiStatus() result after Promise.all
+  // to avoid a redundant API call — see the /extended handler.
+  const github = { configured: !!process.env.GITHUB_TOKEN, healthy: false };
 
-    // Anthropic
-    checkKey("anthropic", "ANTHROPIC_API_KEY", async (key) => {
+  const [anthropic, openrouter] = await Promise.all([
+    checkKey("ANTHROPIC_API_KEY", async (key) => {
       const resp = await fetch("https://api.anthropic.com/v1/models", {
         headers: {
           "x-api-key": key,
@@ -787,7 +752,7 @@ async function fetchApiKeyHealth() {
     }),
 
     // OpenRouter
-    checkKey("openrouter", "OPENROUTER_API_KEY", async (key) => {
+    checkKey("OPENROUTER_API_KEY", async (key) => {
       const resp = await fetch("https://openrouter.ai/api/v1/models", {
         headers: {
           Authorization: `Bearer ${key}`,

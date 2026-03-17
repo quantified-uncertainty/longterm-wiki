@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
 import {
   fetchDetailed,
@@ -7,6 +7,7 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { GITHUB_REPO } from "@lib/site-config";
 import { SystemHealthTable } from "./system-health-table";
 import { OpenPRsTable, type OpenPRDisplayRow } from "./open-prs-table";
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -74,7 +75,6 @@ interface ExtendedHealthData {
     status: string;
     breakdown: {
       facts: number;
-      claims: number;
       summaries: number;
       citations: number;
       editLogs: number;
@@ -682,8 +682,6 @@ function AutoUpdateSection({
   );
 }
 
-const GITHUB_REPO = "quantified-uncertainty/longterm-wiki";
-
 function CurrentDeploymentSection() {
   const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "";
   const commitRef = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF ?? "";
@@ -949,7 +947,7 @@ function DeployHistorySection({ deploys }: { deploys: ExtendedHealthData["deploy
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
-                      {deploy.headSha}
+                      {deploy.headSha.slice(0, 8)}
                     </a>
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums text-muted-foreground text-xs">
@@ -1117,9 +1115,7 @@ export async function SystemHealthContent() {
   let brokenEntityLinks: BrokenEntityLinksData | null = null;
   try {
     const brokenLinksPath = join(process.cwd(), "src/data/broken-entity-links.json");
-    if (existsSync(brokenLinksPath)) {
-      brokenEntityLinks = JSON.parse(readFileSync(brokenLinksPath, "utf-8"));
-    }
+    brokenEntityLinks = JSON.parse(readFileSync(brokenLinksPath, "utf-8"));
   } catch {
     // Build-time data not available — section will show fallback
   }

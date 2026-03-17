@@ -88,19 +88,7 @@ const DATA_FILES = [
 
 /**
  * Scan MDX files for <EntityLink id="..."> references and check each against
- * the entity registry. Returns a summary of broken and unreachable links.
- *
- * @param {Map<string, string>} numericIdToSlug - Maps numeric IDs (E42) to slugs
- * @param {object} pathRegistry - Maps slugs to URL paths
- */
-/**
- * Scan MDX files for <EntityLink id="..."> references and check each against
- * the entity registry. Returns a summary of broken and unreachable links.
- * EntityLink ids can be numeric (E42) or slug-based (geoffrey-hinton).
- *
- * @param {object} numericIdToSlug - Maps numeric IDs (E42) to slugs
- * @param {object} slugToNumericId - Maps slugs to numeric IDs (E42)
- * @param {object} pathRegistry - Maps slugs to URL paths
+ * the entity registry. EntityLink ids can be numeric (E42) or slug-based.
  */
 function scanBrokenEntityLinks(numericIdToSlug, slugToNumericId, pathRegistry) {
   const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
