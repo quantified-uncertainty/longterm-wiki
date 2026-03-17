@@ -121,14 +121,22 @@ function checkDuplicateWikiIds(): CheckResult {
     }
   } catch { /* empty */ }
 
-  // Scan MDX frontmatter
+  // Scan MDX frontmatter only (lines between the first --- delimiters, not code blocks)
   try {
-    const mdxOutput = run(`grep -rh 'wikiId:' ${contentDir} --include='*.mdx' --include='*.md'`);
-    for (const line of mdxOutput.split('\n')) {
-      const match = line.match(/wikiId:\s*"?(E\d+)"?/);
-      if (match) {
-        mdxIds.set(match[1], (mdxIds.get(match[1]) ?? 0) + 1);
-      }
+    const mdxFiles = run(`find ${contentDir} -type f \\( -name '*.mdx' -o -name '*.md' \\)`);
+    for (const filePath of mdxFiles.split('\n').filter(Boolean)) {
+      try {
+        const content = readFileSync(filePath, 'utf-8');
+        // Extract only the YAML frontmatter block (between first pair of ---)
+        const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+        if (!frontmatterMatch) continue;
+        for (const line of frontmatterMatch[1].split('\n')) {
+          const match = line.match(/^wikiId:\s*"?(E\d+)"?/);
+          if (match) {
+            mdxIds.set(match[1], (mdxIds.get(match[1]) ?? 0) + 1);
+          }
+        }
+      } catch { /* skip unreadable files */ }
     }
   } catch { /* empty */ }
 
