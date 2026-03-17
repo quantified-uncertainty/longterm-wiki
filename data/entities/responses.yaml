@@ -112,6 +112,7 @@
       position: support
       reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
     - name: Future of Life Institute
+      entityId: fli
       position: support
       reason: Supports proactive regulation of frontier AI
     - name: Yoshua Bengio
