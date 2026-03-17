@@ -141,6 +141,11 @@ const SCRIPTS = {
     description: 'Cross-entity consistency (bidirectional refs, affiliation coherence)',
     passthrough: ['ci', 'verbose', 'type'],
   },
+  'cross-check': {
+    script: 'validate/cross-check-people.ts',
+    description: 'Cross-check people roles between YAML entities and FactBase (advisory)',
+    passthrough: ['ci', 'verbose'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
