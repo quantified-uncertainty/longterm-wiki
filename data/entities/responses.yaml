@@ -34,6 +34,8 @@
       author: Summit Participants
   description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
+# DEPRECATED: E8 ai-executive-order is a stub that duplicates E366 us-executive-order (the full page).
+# Kept for backward-compat link resolution; do not create new links to this entity.
 - id: ai-executive-order
   stableId: Jn7939O5ls
   wikiId: E8
@@ -42,7 +44,10 @@
   summaryPage: governance-overview
   title: AI Executive Order
   policyStatus: revoked
+  deprecated: true
+  deprecatedInFavorOf: us-executive-order
   description: >-
+    Deprecated stub. Use the us-executive-order entity (E366) instead.
     US executive orders establishing AI safety requirements and oversight,
     including EO 14110 (October 2023) on safe, secure, and trustworthy AI
     development. Revoked by the Trump administration in January 2025.
@@ -395,7 +400,6 @@
       category: Consumer protection
   stakeholders:
     - name: Google
-      entityId: deepmind
       position: support
       reason: Applauded risk-based approach; suggested alignment with future national/global laws
     - name: Microsoft
@@ -414,7 +418,7 @@
       value: Risk-based, EU-influenced
   sources:
     - title: Colorado AI Act Full Text
-      url: https://leg.colorado.gov/bills/sb21-205
+      url: https://leg.colorado.gov/bills/sb24-205
       author: Colorado General Assembly
     - title: Colorado Governor Signs AI Law
       url: https://www.reuters.com/technology/colorado-governor-signs-first-us-ai-regulation-law-2024-05-17/
@@ -551,7 +555,7 @@
     - id: compute-governance
       type: policy
     - id: uk-aisi
-      type: policy
+      type: organization
     - id: govai
       type: organization
   sources:
@@ -642,7 +646,7 @@
   type: policy
   summaryPage: governance-overview
   title: Failed and Stalled AI Proposals
-  policyStatus: active
+  policyStatus: proposed
   scope: Federal
   customFields:
     - label: Purpose
@@ -693,7 +697,7 @@
     - id: voluntary-commitments
       type: policy
     - id: uk-aisi
-      type: policy
+      type: organization
     - id: us-executive-order
       type: policy
     - id: china-ai-regulations
@@ -812,11 +816,12 @@
   scope: International
   summaryPage: governance-overview
   title: AI Standards Development
+  policyStatus: active
   customFields:
     - label: Key Bodies
       value: ISO, IEEE, NIST, CEN-CENELEC
     - label: Status
-      value: Rapidly developing
+      value: Active
     - label: Relevance
       value: Standards increasingly referenced in law
   sources:
@@ -852,7 +857,7 @@
     - id: compute-governance
       type: policy
     - id: uk-aisi
-      type: policy
+      type: organization
     - id: eu-ai-act
       type: policy
     - id: voluntary-commitments
