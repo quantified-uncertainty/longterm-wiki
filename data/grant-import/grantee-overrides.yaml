@@ -113,6 +113,15 @@ overrides:
   "AI Safety Info": "stampy-aisafety-info"
   "Cambridge Boston Alignment Initiative": "cambridge-boston-alignment-initiative"
 
+  # --- FLF and Incubated Orgs ---
+  "Future of Life Foundation": "future-of-life-foundation"
+  "Future of Life Foundation (FLF)": "future-of-life-foundation"
+  FLF: "future-of-life-foundation"
+  "Center for AI Risk Management & Alignment": "carma"
+  "Center for AI Risk Management and Alignment": "carma"
+  CARMA: "carma"
+  "Wise Ancestors": "wise-ancestors"
+
   # --- Policy/Governance Orgs ---
   "Center for Security and Emerging Technology": "cset"
   CSET: "cset"

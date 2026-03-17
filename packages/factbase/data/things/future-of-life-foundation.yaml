@@ -1,0 +1,105 @@
+thing:
+  id: future-of-life-foundation
+  stableId: 2V63hGITAw
+  type: organization
+  name: Future of Life Foundation (FLF)
+  wikiId: null
+  aliases:
+    - FLF
+facts:
+  - id: Am1UqQs1Cw
+    property: founded-date
+    value: !date 2022
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Tax-exempt since January 2023 (EIN 88-0926067)
+
+  - id: czOWfDOLvg
+    property: website
+    value: https://www.flf.org
+    source: https://www.flf.org
+
+  - id: WVxS6glRig
+    property: headquarters
+    value: Campbell, CA
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: "300 Orchard City Dr Suite 134, Campbell, CA 95008"
+
+  - id: jcWxrJcFHA
+    property: funding-received
+    value:
+      type: number
+      value: 25025000
+      unit: USD
+    asOf: !date 2022
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Initial capitalization from FLI in December 2022
+
+  - id: kkD8QJ7GnQ
+    property: funding-received
+    value:
+      type: number
+      value: 15700000
+      unit: USD
+    asOf: !date 2023
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Additional FLI grant in 2023
+
+  - id: c4n53UgmJQ
+    property: funding-received
+    value:
+      type: number
+      value: 18100000
+      unit: USD
+    asOf: !date 2024
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: Additional FLI grant in 2024
+
+  - id: f70xd6480Q
+    property: parent-org
+    value: !ref d9sWZtyVwg
+    source: https://www.flf.org
+    notes: FLF is a sister organization to FLI, sharing board members (FLI stableId)
+
+  - id: mVvmM5aSOA
+    property: description
+    value: >-
+      501(c)(3) nonprofit sister organization to FLI, focused on incubating
+      new organizations that steer transformative technology toward benefiting
+      life. Operates as part grant-maker, part strategic research group, part
+      VC firm. Goal of establishing 3-5 new organizations per year. Four-step
+      approach: research gaps, strategic planning, recruit founders, provide
+      operational support. Institutional overhead capped at 15%.
+    asOf: !date 2026-03
+
+  - id: oVR358oLnw
+    property: grant-given
+    value:
+      type: number
+      value: 800000
+      unit: USD
+    asOf: !date 2025-04
+    source: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
+    notes: Grant to Wise Ancestors for conservation genomics platform growth
+
+  - id: XoYyHGrQXw
+    property: grant-given
+    value:
+      type: number
+      value: 1125000
+      unit: USD
+    asOf: !date 2025-07
+    notes: >-
+      Estimated cost of AI for Human Reasoning Fellowship (30 fellows x
+      $25K-$50K stipends + $5K compute budgets). Actual total not publicly
+      disclosed.
+
+  - id: 4Qv6Ekm99A
+    property: headcount
+    value:
+      type: number
+      value: 5
+    asOf: !date 2025-02
+    source: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
+    notes: >-
+      Anthony Aguirre noted FLF had a staff of two that "recently doubled"
+      as of early 2025. With Goldhaber joining, approximately 5 staff.
