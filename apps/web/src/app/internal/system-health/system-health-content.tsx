@@ -433,7 +433,7 @@ function GroundskeeperSection({
 }: {
   tasks: ExtendedHealthData["groundskeeperTasks"];
 }) {
-  if (tasks.length === 0) {
+  if (!tasks || tasks.length === 0) {
     return (
       <>
         <SectionHeader>Groundskeeper Tasks (last 24h)</SectionHeader>
@@ -551,6 +551,17 @@ function IntegritySection({
 }: {
   integrity: ExtendedHealthData["integrity"];
 }) {
+  if (!integrity) {
+    return (
+      <>
+        <SectionHeader>Data Integrity</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Integrity data unavailable
+        </div>
+      </>
+    );
+  }
+
   const isClean = integrity.status === "clean";
   const isError = integrity.status === "error";
 
@@ -602,6 +613,17 @@ function AutoUpdateSection({
 }: {
   autoUpdate: ExtendedHealthData["autoUpdate"];
 }) {
+  if (!autoUpdate) {
+    return (
+      <>
+        <SectionHeader>Auto-Update System</SectionHeader>
+        <div className="rounded-lg border border-border/60 p-4 text-muted-foreground text-sm mb-6">
+          Auto-update data unavailable
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SectionHeader>Auto-Update System</SectionHeader>
@@ -1020,6 +1042,8 @@ function BrokenEntityLinksSection({ data }: { data: BrokenEntityLinksData | null
 }
 
 function AgentActivitySection({ activity }: { activity: ExtendedHealthData["agentActivity"] | undefined }) {
+  // Defensive null check — during CI prerendering the API may return
+  // extended data without agentActivity (e.g. server version mismatch).
   if (!activity) {
     return (
       <>
@@ -1030,28 +1054,30 @@ function AgentActivitySection({ activity }: { activity: ExtendedHealthData["agen
       </>
     );
   }
+
+
   return (
     <>
       <SectionHeader>Agent Activity (last 7 days)</SectionHeader>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <StatCard
           label="Active Now"
-          value={activity.activeNow}
-          colorClass={activity.activeNow > 0 ? "text-green-600" : ""}
+          value={activity.activeNow ?? 0}
+          colorClass={(activity.activeNow ?? 0) > 0 ? "text-green-600" : ""}
         />
         <StatCard
           label="Sessions (7d)"
-          value={activity.sessionsThisWeek}
+          value={activity.sessionsThisWeek ?? 0}
         />
         <StatCard
           label="PRs Created (7d)"
-          value={activity.prsThisWeek}
+          value={activity.prsThisWeek ?? 0}
         />
         <StatCard
           label="Completion Rate (7d)"
-          value={activity.completionRate !== null ? `${activity.completionRate}%` : null}
+          value={activity.completionRate != null ? `${activity.completionRate}%` : null}
           colorClass={
-            activity.completionRate !== null
+            activity.completionRate != null
               ? activity.completionRate >= 80
                 ? "text-green-600"
                 : activity.completionRate >= 50
@@ -1240,7 +1266,7 @@ export async function SystemHealthContent() {
       )}
 
       {/* Agent Activity Summary */}
-      {extended?.agentActivity ? (
+      {extended ? (
         <AgentActivitySection activity={extended.agentActivity} />
       ) : extendedError ? (
         <SectionUnavailable title="Agent Activity (last 7 days)" error={extendedError} />

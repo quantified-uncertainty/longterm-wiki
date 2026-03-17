@@ -120,6 +120,37 @@ const mockExtendedData = {
       model: "claude-opus-4-6",
     },
   ],
+  migrations: {
+    appliedCount: 48,
+    expectedCount: 48,
+    inSync: true,
+    recent: [{ id: 48, hash: "abc123", createdAt: "2025-01-01T10:00:00Z" }],
+  },
+  deploys: {
+    recent: [
+      {
+        id: 1,
+        status: "completed",
+        conclusion: "success",
+        createdAt: "2025-01-01T10:00:00Z",
+        headSha: "abc12345def67890",
+        runNumber: 100,
+        durationSeconds: 300,
+      },
+    ],
+  },
+  agentActivity: {
+    activeNow: 1,
+    sessionsThisWeek: 5,
+    prsThisWeek: 3,
+    completedThisWeek: 4,
+    completionRate: 80,
+  },
+  apiKeys: {
+    github: { configured: true, healthy: true },
+    anthropic: { configured: true, healthy: true },
+    openrouter: { configured: true, healthy: false },
+  },
 };
 
 const mockOpenPRs = {
@@ -423,6 +454,66 @@ describe("SystemHealthContent", () => {
       data: mockExtendedData,
     });
     vi.mocked(fetchFromWikiServer).mockResolvedValue(conflictingPRs);
+
+    const element = await SystemHealthContent();
+    expect(element).toBeTruthy();
+  });
+
+  it("renders without throwing when agentActivity is null in extended data", async () => {
+    const extendedWithNullActivity = {
+      ...mockExtendedData,
+      agentActivity: null,
+    };
+
+    vi.mocked(withApiFallback).mockResolvedValue({
+      data: mockMonitoringStatus,
+      source: "api" as const,
+    });
+    vi.mocked(fetchDetailed).mockResolvedValue({
+      ok: true,
+      data: extendedWithNullActivity,
+    });
+    vi.mocked(fetchFromWikiServer).mockResolvedValue({ pulls: [] });
+
+    const element = await SystemHealthContent();
+    expect(element).toBeTruthy();
+  });
+
+  it("renders without throwing when agentActivity is undefined in extended data (server version mismatch)", async () => {
+    // Simulates a server that doesn't have the agentActivity field yet
+    const { agentActivity: _, ...extendedWithoutActivity } = mockExtendedData;
+
+    vi.mocked(withApiFallback).mockResolvedValue({
+      data: mockMonitoringStatus,
+      source: "api" as const,
+    });
+    vi.mocked(fetchDetailed).mockResolvedValue({
+      ok: true,
+      data: extendedWithoutActivity as typeof mockExtendedData,
+    });
+    vi.mocked(fetchFromWikiServer).mockResolvedValue({ pulls: [] });
+
+    const element = await SystemHealthContent();
+    expect(element).toBeTruthy();
+  });
+
+  it("renders without throwing when extended data has null migrations and deploys", async () => {
+    const extendedWithNulls = {
+      ...mockExtendedData,
+      migrations: null,
+      deploys: null,
+      apiKeys: null,
+    };
+
+    vi.mocked(withApiFallback).mockResolvedValue({
+      data: mockMonitoringStatus,
+      source: "api" as const,
+    });
+    vi.mocked(fetchDetailed).mockResolvedValue({
+      ok: true,
+      data: extendedWithNulls,
+    });
+    vi.mocked(fetchFromWikiServer).mockResolvedValue({ pulls: [] });
 
     const element = await SystemHealthContent();
     expect(element).toBeTruthy();
