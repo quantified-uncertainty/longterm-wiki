@@ -115,7 +115,11 @@ async function fetchRecords(recordType: RecordType, entityFilter?: string): Prom
 
   const response = await apiRequest<PaginatedResponse>('GET', apiPath);
   if (!response.ok) {
-    console.warn(`[verify] Failed to fetch ${recordType} records: ${response.error ?? 'unknown error'}`);
+    console.warn(`[verify] Failed to fetch ${recordType} records: ${response.message ?? 'unknown error'}`);
+    return records;
+  }
+  if (!response.data) {
+    console.warn(`[verify] Failed to fetch ${recordType} records: unknown error`);
     return records;
   }
 
@@ -663,7 +667,10 @@ async function syncThingsCommand(): Promise<CommandResult> {
     }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
     if (!response.ok) {
-      return { exitCode: 1, output: `Failed to fetch verdicts: ${response.error}` };
+      return { exitCode: 1, output: `Failed to fetch verdicts: ${response.message}` };
+    }
+    if (!response.data) {
+      return { exitCode: 1, output: `Failed to fetch verdicts: unknown error` };
     }
 
     allVerdicts.push(...response.data.verdicts);
