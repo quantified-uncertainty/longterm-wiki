@@ -95,6 +95,6 @@ facts:
     notes: From Wikidata Q25345685
   - id: AZlMk0b5hg
     property: website
-    value: http://www.openphilanthropy.org
-    source: https://www.wikidata.org/wiki/Q25345685
-    notes: From Wikidata Q25345685
+    value: https://www.coefficientgiving.org
+    source: https://www.coefficientgiving.org
+    notes: Updated from openphilanthropy.org after Nov 2025 rebrand
