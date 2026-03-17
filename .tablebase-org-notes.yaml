@@ -365,3 +365,11 @@ policy-people-notes: |
   - Thierry Breton (e7Uzh4eUIA) - EU Commissioner, co-led EU AI Act
   - Jason Matheny (U3llWAe1dg) - RAND CEO, founded CSET, ran IARPA
   - Jade Leung (Fud5QhdJjg) - UK AISI CTO, PM Starmer's AI adviser
+
+# --- Batch entity creation from resource authors ---
+# Date: 2026-03-16
+# Created ~456 person entities from authors appearing in 2+ wiki resources.
+# Total person entities now: 642 (up from ~70 original).
+# These are minimal entities (name + type only) — need enrichment with
+# descriptions, org affiliations, and publication links.
+# Source: /api/resources/all → extract authors → frequency rank → ensure-entities
