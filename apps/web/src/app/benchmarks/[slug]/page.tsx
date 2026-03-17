@@ -77,9 +77,20 @@ export default async function BenchmarkDetailPage({
     entity.higherIsBetter ? b.score - a.score : a.score - b.score,
   );
 
-  // Compute score range for bar widths
+  // Compute score range for bar widths.
+  // For percentage-like benchmarks (accuracy, percentage, pass_at_1), scores are 0-100
+  // and relative comparison between dataset min/max works well.
+  // For Elo/points benchmarks (e.g., Codeforces Rating 0-3500, Chatbot Arena Elo),
+  // anchor bars at 0 so bar width reflects absolute score magnitude — otherwise a
+  // score of 1759 out of 3500 could render at ~15% width instead of ~50%.
   const allScores = sorted.map((r) => r.score);
-  const minScore = allScores.length > 0 ? Math.min(...allScores) : 0;
+  const isAbsoluteScale =
+    entity.scoringMethod === "elo" || entity.scoringMethod === "points";
+  const minScore = isAbsoluteScale
+    ? 0
+    : allScores.length > 0
+      ? Math.min(...allScores)
+      : 0;
   const maxScore = allScores.length > 0 ? Math.max(...allScores) : 1;
 
   // Compute stats
