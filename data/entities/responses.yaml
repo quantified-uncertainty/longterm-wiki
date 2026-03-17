@@ -501,7 +501,7 @@
 - id: compute-governance
   stableId: lfvY1bGeoA
   wikiId: E64
-  type: policy
+  type: concept
   summaryPage: governance-overview
   title: Compute Governance
   introduced: '2022'
@@ -729,7 +729,7 @@
 - id: international-summits
   stableId: B3alpHHvzg
   wikiId: E173
-  type: policy
+  type: event
   summaryPage: governance-overview
   title: International AI Safety Summit Series
   introduced: '2023-11'
@@ -954,7 +954,7 @@
 - id: us-state-legislation
   stableId: 2dwY9wnuYA
   wikiId: E367
-  type: policy
+  type: analysis
   summaryPage: governance-overview
   title: US State AI Legislation Landscape
   introduced: '2019'
@@ -2289,7 +2289,7 @@
 - id: evals-governance
   stableId: iCNSRgyFAA
   wikiId: E459
-  type: policy
+  type: approach
   title: Evals-Based Deployment Gates
   introduced: '2023'
   policyStatus: active
@@ -2328,7 +2328,7 @@
 - id: pause-moratorium
   stableId: 3Mc5fuvtMg
   wikiId: E460
-  type: policy
+  type: concept
   title: Pause / Moratorium
   policyStatus: proposed
   scope: International
@@ -2359,7 +2359,7 @@
 - id: rsp
   stableId: i1qSgjAj5A
   wikiId: E461
-  type: policy
+  type: approach
   summaryPage: governance-overview
   title: Responsible Scaling Policies
   policyStatus: active
@@ -2436,7 +2436,7 @@
 - id: hardware-enabled-governance
   stableId: 57vCq45URQ
   wikiId: E463
-  type: policy
+  type: approach
   title: Hardware-Enabled Governance
   introduced: '2024'
   policyStatus: proposed
@@ -2469,7 +2469,7 @@
 - id: monitoring
   stableId: BU00lGYGAw
   wikiId: E464
-  type: policy
+  type: approach
   scope: International
   policyStatus: proposed
   title: Compute Monitoring
@@ -2500,7 +2500,7 @@
 - id: thresholds
   stableId: 3OTN6TAzhw
   wikiId: E465
-  type: policy
+  type: concept
   scope: International
   policyStatus: active
   title: Compute Thresholds
@@ -2687,7 +2687,7 @@
 - id: singapore-consensus
   stableId: NLSUTzzH5g
   wikiId: E701
-  type: policy
+  type: concept
   title: Singapore Consensus on AI Safety Research Priorities
   introduced: '2025'
   policyStatus: active
@@ -2726,7 +2726,7 @@
 - id: coordination-mechanisms
   stableId: 4a6Sf9Fupg
   wikiId: E470
-  type: policy
+  type: concept
   scope: International
   policyStatus: active
   summaryPage: governance-overview
@@ -2823,7 +2823,7 @@
 - id: model-registries
   stableId: r8rKW3KkSg
   wikiId: E472
-  type: policy
+  type: concept
   summaryPage: governance-overview
   title: Model Registries
   introduced: '2023'
@@ -2863,7 +2863,7 @@
 - id: international-regimes
   stableId: uvwmYLYstg
   wikiId: E473
-  type: policy
+  type: concept
   scope: International
   policyStatus: proposed
   summaryPage: governance-overview
@@ -3662,7 +3662,7 @@
 - id: model-spec
   stableId: lHxzXeAMrg
   wikiId: E594
-  type: policy
+  type: approach
   policyStatus: active
   title: AI Model Specifications
   description: >-
@@ -3912,7 +3912,7 @@
 - id: government-authority-commercial-ai-infrastructure
   stableId: 8f8b67vbgw
   wikiId: E688
-  type: policy
+  type: analysis
   scope: Federal
   policyStatus: proposed
   title: US Government Authority Over Commercial AI Infrastructure
