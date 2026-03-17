@@ -77,7 +77,9 @@ function transformFile(
 
   // Find the thing: block. It starts with "thing:" at the beginning of a line
   // and ends at the next top-level key (facts:, _sources:, or end of file).
-  const thingMatch = content.match(/^thing:\n((?:[ \t]+.*\n?)*)/m);
+  // The regex also matches blank lines (whitespace-only) within the indented block
+  // to avoid truncating thing: blocks that contain blank lines in their headers.
+  const thingMatch = content.match(/^thing:\n((?:(?:[ \t]+.*|[ \t]*)\n)*)/m);
   if (!thingMatch) {
     return { transformed: false, reason: 'no thing: block found' };
   }

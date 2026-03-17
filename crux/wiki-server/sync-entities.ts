@@ -514,8 +514,12 @@ async function main() {
   console.log(`  Loaded publication counts for ${publicationCounts.size} people`);
 
   // Transform and merge expert data (skip entities without stableId)
-  const syncPayloads = yamlEntities
-    .map(transformEntity)
+  const transformed = yamlEntities.map(transformEntity);
+  const dropped = transformed.filter((e) => e === null).length;
+  if (dropped > 0) {
+    console.warn(`  WARNING: ${dropped} entities skipped (missing stableId)`);
+  }
+  const syncPayloads = transformed
     .filter((e): e is SyncEntity => e !== null)
     .map((e) => mergeExpertData(e, experts, publicationCounts));
 

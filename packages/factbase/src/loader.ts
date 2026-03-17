@@ -588,6 +588,14 @@ function mergeEntityFiles(
     const hasThing = file.thing !== undefined;
     const hasEntity = file.entity !== undefined;
 
+    // Reject ambiguous files that have both thing: and entity: keys
+    if (hasThing && hasEntity) {
+      throw new Error(
+        `[kb/loader] Per-entity directory "${dirName}": file "${name}" has both "thing:" block ` +
+        `and "entity:" key — this is ambiguous. Use one format or the other.`
+      );
+    }
+
     if (hasThing || hasEntity) {
       if (mainFile) {
         const existingFormat = mainFile.thing !== undefined ? "thing:" : "entity:";
@@ -765,6 +773,15 @@ export async function loadKB(dataDir: string, options?: LoadOptions): Promise<Lo
     }
 
     const facts = Array.isArray(rawFile.facts) ? rawFile.facts as RawFact[] : undefined;
+
+    // Reject ambiguous files that have both thing: and entity: keys
+    if (rawFile.entity !== undefined && rawFile.thing !== undefined) {
+      const filename = name.replace(/\.(yaml|yml)$/, "");
+      throw new Error(
+        `[kb/loader] File "${filename}" has both "thing:" block and "entity:" key — ` +
+        `this is ambiguous. Use one format or the other.`
+      );
+    }
 
     if (rawFile.entity !== undefined) {
       // ── New format: entity: <stableId> ──
