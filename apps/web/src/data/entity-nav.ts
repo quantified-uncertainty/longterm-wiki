@@ -42,8 +42,11 @@ export function getDirectoryHref(id: string): string | null {
   }
 
   const slug = getKBEntitySlug(id) || getKBEntitySlug(resolveId(id));
-  if (!slug) return null;
-  return `${prefix}/${slug}`;
+  if (slug) return `${prefix}/${slug}`;
+
+  // Fall back to entity ID as slug for person/organization types that exist
+  // in TableBase but may not have a FactBase entity file
+  return `${prefix}/${entity.id}`;
 }
 
 // ============================================================================
