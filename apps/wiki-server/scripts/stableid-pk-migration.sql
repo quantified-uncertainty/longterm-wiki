@@ -134,6 +134,8 @@ EXCEPTION
     RAISE NOTICE 'Step 9b: Some statements FKs already exist';
 END $$;
 
-RAISE NOTICE 'Migration complete: stable_id is now the entities PK, id (slug) is UNIQUE + NOT NULL';
+DO $$ BEGIN
+  RAISE NOTICE 'Migration complete: stable_id is now the entities PK, id (slug) is UNIQUE + NOT NULL';
+END $$;
 
 COMMIT;
