@@ -160,13 +160,12 @@ async function main(): Promise<void> {
     }
   }
 
-  // Advisory only — don't exit non-zero for mismatches since not all entities
-  // may be in TableBase yet during the migration period.
-  if (unmatched > 0) {
+  if (unmatched > 0 || noStableId > 0) {
     console.log(
-      `\n\x1b[33mWarning: ${unmatched} FactBase entities not found in TableBase.\x1b[0m` +
-      `\nThis is expected during the migration period.`,
+      `\n\x1b[31mError: ${unmatched + noStableId} FactBase entities have coverage gaps ` +
+      `(${unmatched} missing from TableBase, ${noStableId} without stableId).\x1b[0m`,
     );
+    process.exit(1);
   }
 }
 

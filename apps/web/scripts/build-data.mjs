@@ -90,10 +90,11 @@ const DATA_FILES = [
  * Scan MDX files for <EntityLink id="..."> references and check each against
  * the entity registry. EntityLink ids can be numeric (E42) or slug-based.
  */
-function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry) {
+function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry, byStableId) {
   const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
   const knownWikiIds = new Set(Object.keys(wikiIdToSlug));
   const knownSlugs = new Set(Object.keys(slugToWikiId));
+  const knownStableIds = byStableId ? new Set(Object.keys(byStableId)) : new Set();
   const reachableSlugs = new Set(Object.keys(pathRegistry));
   const broken = [];
   const unreachable = [];
@@ -116,12 +117,14 @@ function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry) {
       const id = match[1];
       const pageId = relative(CONTENT_DIR, filePath).replace(/\.mdx$/, '');
 
-      // Resolve to slug: id can be numeric (E42) or slug-based
+      // Resolve to slug: id can be numeric (E42), slug-based, or stableId (10-char alphanum)
       let slug;
       if (knownWikiIds.has(id)) {
         slug = wikiIdToSlug[id];
       } else if (knownSlugs.has(id)) {
         slug = id;
+      } else if (knownStableIds.has(id)) {
+        slug = byStableId[id];
       } else {
         broken.push({ pageId, entityId: id, reason: 'not_found' });
         continue;
@@ -255,7 +258,7 @@ function computeBacklinks(entities) {
  * Returns inbound map: targetEntityId -> array of source pages that link to it.
  * Must be called before rawContent is stripped from pages.
  */
-function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
+function scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId) {
   const inbound = {};
   let totalLinks = 0;
 
@@ -271,6 +274,10 @@ function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
       // Resolve wiki IDs (e.g. "E22") to slug IDs (e.g. "anthropic")
       if (wikiIdToSlug && wikiIdToSlug[targetId]) {
         targetId = wikiIdToSlug[targetId];
+      }
+      // Resolve stableIds (e.g. "mK9pX3rQ7n") to slug IDs
+      else if (byStableId && byStableId[targetId]) {
+        targetId = byStableId[targetId];
       }
       if (targetId === page.id) continue; // Skip self-links
       if (seen.has(targetId)) continue;
@@ -2299,13 +2306,15 @@ async function main() {
     const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
 
     // Build TableBase entity map keyed by stableId for FactBase entity injection
+    // Canonicalize entity types (e.g. "lab" -> "organization", "researcher" -> "person")
+    // since transformEntities() runs later and raw YAML types may still be present here.
     const tableBaseEntityMap = new Map();
     for (const entity of entities) {
       if (entity.stableId) {
         tableBaseEntityMap.set(entity.stableId, {
           id: entity.stableId,
           stableId: entity.stableId,
-          type: entity.type,
+          type: resolveEntityType(entity.type) || entity.type,
           name: entity.title || entity.id,
           ...(entity.wikiId && { wikiPageId: entity.wikiId, wikiId: entity.wikiId }),
         });
@@ -2409,7 +2418,7 @@ async function main() {
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, wikiIdToSlug);
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId);
 
   // Merge content-derived inbound links into backlinks
   let contentBacklinksMerged = 0;
@@ -3039,7 +3048,7 @@ async function main() {
   // Broken EntityLink scan
   // ==========================================================================
   console.log('\nScanning for broken EntityLink references...');
-  const brokenLinksResult = scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry);
+  const brokenLinksResult = scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry, byStableId);
   writeFileSync(join(OUTPUT_DIR, 'broken-entity-links.json'), JSON.stringify(brokenLinksResult, null, 2));
   console.log(`✓ EntityLink scan: ${brokenLinksResult.totalBroken} broken, ${brokenLinksResult.totalUnreachable} unreachable`);
 

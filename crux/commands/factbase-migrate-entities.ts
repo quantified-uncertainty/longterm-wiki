@@ -75,6 +75,11 @@ function transformFile(
     return { transformed: false, reason: 'already migrated' };
   }
 
+  // Ambiguous: has both thing: and entity: — refuse to migrate
+  if (content.match(/^entity:\s*\S+/m) && content.match(/^thing:/m)) {
+    return { transformed: false, reason: 'file has both thing: and entity: blocks — resolve manually' };
+  }
+
   // Find the thing: block. It starts with "thing:" at the beginning of a line
   // and ends at the next top-level key (facts:, _sources:, or end of file).
   // The regex also matches blank lines (whitespace-only) within the indented block
@@ -121,23 +126,29 @@ async function runCommand(
 
   for (const filename of yamlFiles.sort()) {
     const filePath = join(KB_THINGS_DIR, filename);
-    const content = readFileSync(filePath, 'utf-8');
+    try {
+      const content = readFileSync(filePath, 'utf-8');
 
-    const result = transformFile(content);
+      const result = transformFile(content);
 
-    if (!result.transformed) {
-      if (result.reason !== 'already migrated') {
-        lines.push(`  \x1b[33mSKIP\x1b[0m ${filename}: ${result.reason}`);
+      if (!result.transformed) {
+        if (result.reason !== 'already migrated') {
+          lines.push(`  \x1b[33mSKIP\x1b[0m ${filename}: ${result.reason}`);
+        }
+        skipped++;
+        continue;
       }
-      skipped++;
-      continue;
-    }
 
-    transformed++;
-    lines.push(`  \x1b[32m OK \x1b[0m ${filename} -> entity: ${result.stableId}`);
+      transformed++;
+      lines.push(`  \x1b[32m OK \x1b[0m ${filename} -> entity: ${result.stableId}`);
 
-    if (!dryRun) {
-      writeFileSync(filePath, result.result, 'utf-8');
+      if (!dryRun) {
+        writeFileSync(filePath, result.result, 'utf-8');
+      }
+    } catch (err) {
+      errors++;
+      const msg = err instanceof Error ? err.message : String(err);
+      lines.push(`  \x1b[31mERROR\x1b[0m ${filename}: ${msg}`);
     }
   }
 
