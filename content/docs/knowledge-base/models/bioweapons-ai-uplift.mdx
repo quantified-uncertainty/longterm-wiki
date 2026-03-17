@@ -1,20 +1,19 @@
 ---
 wikiId: E43
 title: AI Uplift Assessment Model
-description: This model estimates AI's marginal contribution to bioweapons risk over time. It projects uplift increasing from 1.3-2.5x (2024) to 3-5x by 2030, with biosecurity evasion capabilities posing the greatest concern as they could undermine existing defenses before triggering policy response.
+description: This model estimates AI's marginal contribution to bioweapons risk over time. It projects uplift increasing from 1.3-2.5x (2024) to 3-5x by 2030, with biosecurity evasion capabilities posing the greatest concern as they could undermine existing defenses before triggering policy response. Recent benchmarks show frontier models surpassing expert-level virology knowledge, while wet-lab RCTs suggest a gap between in silico performance and physical laboratory utility.
 sidebar:
   order: 11
 subcategory: domain-models
-lastEdited: 2026-02-02
+lastEdited: "2026-03-17"
 update_frequency: 90
-llmSummary: "Quantitative assessment estimating AI provides modest knowledge uplift for bioweapons (1.0-1.2x per RAND 2024) but concerning evasion capabilities (2-3x, potentially 7-10x by 2028), with projected overall uplift increasing from 1.3-2.5x (2024) to 3-5x by 2030. Recommends prioritizing adaptive DNA synthesis screening (\\$200-400M/year) over information restriction, given asymmetry where evasion capabilities advance faster than synthesis knowledge."
+llmSummary: "Quantitative assessment estimating AI provides modest knowledge uplift for bioweapons (1.0-1.2x per RAND 2024) but more substantial evasion capabilities (2-3x, potentially 7-10x by 2028). The Virology Capabilities Test (VCT, 2025) found frontier models outperform most human virology experts on tacit knowledge tasks (o3 at 95th percentile), though a concurrent wet-lab RCT found mid-2025 LLMs did not substantially increase novice completion of complex laboratory procedures. OpenAI's April 2025 Preparedness Framework v2 anticipates models reaching 'High' biological capability thresholds in the near term. The OpenAI-LANL partnership extended biosecurity evaluation from text tasks to physical lab settings, and OpenAI's 'Building an Early Warning System for LLM-Aided Biological Threat Creation' study found GPT-4 provides at most mild uplift under controlled conditions. Recommends prioritizing adaptive DNA synthesis screening over information restriction, given asymmetry where evasion capabilities advance faster than synthesis knowledge."
 clusters:
   - ai-safety
   - biorisks
   - governance
 ---
 import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
-
 
 ## Summary
 
@@ -24,11 +23,11 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
 The concept of "uplift" quantifies how much AI assistance increases an attacker's probability of successfully developing and deploying biological weapons compared to what they could achieve using traditional information sources alone. This model attempts to provide a rigorous framework for estimating that marginal contribution across different actor types, attack phases, and technological trajectories. Understanding uplift is essential for calibrating policy responses—overestimating it leads to counterproductive restrictions on beneficial AI research, while underestimating it could leave critical vulnerabilities unaddressed.
 
-The central challenge in assessing AI-enabled <EntityLink id="E42" name="bioweapons">bioweapons</EntityLink> risk is separating genuinely novel capabilities from information already accessible through scientific literature, textbooks, and expert consultation. Current <EntityLink id="E186" name="language-models">large language models</EntityLink> compress and make searchable vast amounts of published knowledge, but the question remains: **does AI meaningfully lower the barrier to bioweapons development, or is it largely redundant with existing information sources?** The answer appears to depend critically on actor type, with non-experts potentially gaining significant knowledge uplift while sophisticated state programs may see only marginal benefits from AI assistance.
+The central challenge in assessing AI-enabled <EntityLink id="E42" name="bioweapons">bioweapons</EntityLink> risk is separating genuinely novel capabilities from information already accessible through scientific literature, textbooks, and expert consultation. Current <EntityLink id="E186" name="language-models">large language models</EntityLink> compress and make searchable vast amounts of published knowledge, but the question remains: does AI meaningfully lower the barrier to bioweapons development, or is it largely redundant with existing information sources? The answer appears to depend critically on actor type, with non-experts potentially gaining significant knowledge uplift while sophisticated state programs may see only marginal benefits from AI assistance.
 
-Early empirical evidence suggests current LLMs provide modest uplift for attack planning, but concerning capabilities in evading biosecurity measures. The <R id="YmM4YmE2NG">RAND Corporation's 2024 study</R> found no statistically significant difference between AI-assisted and non-AI groups in creating viable bioweapon attack plans, yet Microsoft's research demonstrated that AI-designed toxins could evade over 75% of DNA synthesis screening tools. This asymmetry—limited knowledge uplift but significant evasion uplift—has important implications for where defensive investments should be prioritized. The combination of LLMs with specialized biological design tools and increasing laboratory automation may create compound uplift effects that exceed any individual technology's contribution.
+Early empirical evidence suggests current LLMs provide modest uplift for attack planning, with more substantial capabilities emerging in evading biosecurity measures. The <R id="YmM4YmE2NG">RAND Corporation's 2024 study</R> found no statistically significant difference between AI-assisted and non-AI groups in creating viable bioweapon attack plans, and <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s controlled study ("Building an Early Warning System for LLM-Aided Biological Threat Creation") found <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> provides at most mild uplift under A/B test conditions.[^rc-76f9] Yet the Virology Capabilities Test (VCT), developed by <EntityLink id="E563" name="securebio">SecureBio</EntityLink> and the <EntityLink id="E47" name="cais">Center for AI Safety</EntityLink>, found that several frontier models now outperform the majority of human virology experts on tacit knowledge tasks.[^rc-62ff] Microsoft's research demonstrated that AI-designed toxins could evade over 75% of DNA synthesis screening tools, exposing a structural vulnerability in current biosecurity controls. These findings point to an asymmetry—limited knowledge uplift under controlled conditions but significant evasion uplift—that has important implications for where defensive investments should be prioritized. The combination of LLMs with specialized biological design tools and increasing laboratory automation may create compound uplift effects that exceed any individual technology's contribution.
 
-Critically, the risk landscape is evolving rapidly. The [CSIS report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should) on AI-enabled bioterrorism (August 2025) notes that while <EntityLink id="E218" name="openai">OpenAI</EntityLink> and <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> initially reported "little to no uplift" in 2024 assessments, both labs have since updated their evaluations to flag "substantial and immediate biorisks." OpenAI concluded in April 2025 that it expects its models to demonstrate "high risks" in the near future—meaning they could substantially increase the likelihood and frequency of bioterrorist attacks by providing meaningful assistance to novices. This rapid evolution underscores the importance of dynamic uplift assessment rather than static point-in-time evaluations.
+The risk landscape is evolving. The [CSIS report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should) on AI-enabled bioterrorism (August 2025) notes that while <EntityLink id="E218" name="openai">OpenAI</EntityLink> and <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> initially reported "little to no uplift" in 2024 assessments, both labs have since updated their evaluations to flag "substantial and immediate biorisks." OpenAI's April 2025 Preparedness Framework v2 concluded it expects upcoming models to reach "High" capability levels in biology—defined as providing meaningful assistance to novice actors with basic relevant training to create biological or chemical threats—and committed not to release such a model until risks are sufficiently mitigated. This evolution underscores the importance of dynamic uplift assessment rather than static point-in-time evaluations.
 
 ## Conceptual Framework
 
@@ -55,7 +54,7 @@ flowchart TD
     style DEPLOY fill:#ffddcc
 `} />
 
-The diagram illustrates the attack chain from information acquisition through deployment, highlighting three key points where AI may provide uplift: knowledge acquisition, technical planning, and biosecurity evasion. Critically, the wet laboratory barrier remains a significant bottleneck that AI alone cannot currently address—synthesizing dangerous biological agents requires physical infrastructure, specialized equipment, and tacit knowledge that cannot be easily transferred through digital means.
+The diagram illustrates the attack chain from information acquisition through deployment, highlighting three key points where AI may provide uplift: knowledge acquisition, technical planning, and biosecurity evasion. The wet laboratory barrier remains a significant bottleneck that AI alone cannot currently address—synthesizing dangerous biological agents requires physical infrastructure, specialized equipment, and tacit knowledge that cannot be easily transferred through digital means. A 2025 pre-registered wet-lab randomized controlled trial (n=153) found that mid-2025 LLMs did not substantially increase novice completion of complex laboratory procedures, providing direct experimental evidence that high in silico benchmark scores do not automatically translate to physical laboratory utility.
 
 ### Mathematical Formulation
 
@@ -99,11 +98,11 @@ Before assessing AI-specific uplift, it is essential to understand the baseline 
 | Future LLMs (2026-28) | Very High | High-Very High | Uncertain | Low | Very Low |
 | Biological Design Tools | Moderate | Very High | High | Moderate | Moderate |
 
-Scientific literature remains the most dangerous information source in terms of depth—published research contains detailed protocols that far exceed what any current LLM can provide. However, literature requires significant expertise to locate, synthesize, and apply, whereas AI systems dramatically reduce the friction of information access. This friction reduction, rather than novel information generation, likely represents AI's primary current contribution to uplift.
+Scientific literature remains the most detailed information source—published research contains protocols that may exceed what current LLMs can provide. However, literature requires significant expertise to locate, synthesize, and apply, whereas AI systems reduce the friction of information access. This friction reduction, rather than novel information generation, likely represents AI's primary current contribution to knowledge uplift. The VCT benchmark results (see Empirical Evidence section) suggest this characterization may shift for virology-specific tacit knowledge as frontier models advance.[^rc-62ff]
 
 ### Uplift Estimates by Actor Type
 
-Different actor types have vastly different baseline capabilities, meaning AI provides differential uplift depending on who is using it. A non-expert individual may gain substantial knowledge uplift from AI but still faces insurmountable wet laboratory barriers, while a state program with existing expertise gains minimal knowledge uplift but could potentially use AI to develop novel agents or evasion strategies. The [Johns Hopkins Center for Health Security](https://centerforhealthsecurity.org/2024/leaders-in-biosecurity-commend-nsceb-interim-report-and-aixbio-policy-options-paper) notes that AI capabilities could "lower the threshold of expertise and resources that malicious actors need to create biological weapons, and raise the ceiling of potential harm that AI-designed pathogens could cause."
+Different actor types have vastly different baseline capabilities, meaning AI provides differential uplift depending on who is using it. A non-expert individual may gain substantial knowledge uplift from AI but still faces laboratory barriers, while a state program with existing expertise gains minimal knowledge uplift but could potentially use AI to develop novel agents or evasion strategies. The [Johns Hopkins Center for Health Security](https://centerforhealthsecurity.org/2024/leaders-in-biosecurity-commend-nsceb-interim-report-and-aixbio-policy-options-paper) notes that AI capabilities could "lower the threshold of expertise and resources that malicious actors need to create biological weapons, and raise the ceiling of potential harm that AI-designed pathogens could cause," though the empirical evidence on these effects remains contested and methodologically limited.
 
 | Actor Type | Baseline Capability | Knowledge Uplift | Planning Uplift | Overall Uplift | Confidence |
 |------------|--------------------|--------------------|-----------------|----------------|------------|
@@ -113,7 +112,7 @@ Different actor types have vastly different baseline capabilities, meaning AI pr
 | State program | High (0.3) | 1.1-1.3x | 1.2-1.5x | 1.2-2x | Medium |
 | Biohacker collective | Low (0.005) | 2-4x | 2-3x | 1.5-2.5x | Low |
 
-The relatively modest overall uplift estimates—even for non-experts—reflect the dominating influence of the wet laboratory barrier. Knowledge is necessary but not sufficient for bioweapons development; translating theoretical knowledge into functional weapons requires physical capabilities that AI cannot currently provide. However, this calculus may shift significantly as laboratory automation advances.
+The relatively modest overall uplift estimates—even for non-experts—reflect the importance of the wet laboratory barrier. Knowledge is necessary but not sufficient for bioweapons development; translating theoretical knowledge into functional weapons requires physical capabilities that AI cannot currently substitute for. A 2025 long-form human uplift study (arXiv preprint) found that novices with access to frontier LLMs were 4.16 times more accurate than controls on in silico biological tasks (95% CI [2.63, 6.87]) and outperformed domain experts on three of four benchmarks with available expert baselines—however, the same research noted that novices may underestimate risk because they do not use AI optimally, potentially meaning current uplift measurements underestimate potential risk if users develop better interaction strategies. This calculus may shift further as laboratory automation advances.
 
 ### Detailed Threat Actor Analysis
 
@@ -128,11 +127,11 @@ The following table provides a more granular analysis of AI uplift by threat act
 | **Rogue state program** | Very High (\$1B+) | High | Full stack + custom | Strategic deterrence | 1.1-1.5x | 1.5-2.5x | Optimization + evasion |
 | **Insider threat (expert)** | Low but facility access | Very High | Any | Personal grievance | 1.0-1.3x | 1.2-1.6x | Marginal (already expert) |
 
-**Key insight**: The actors most likely to benefit from AI uplift (non-expert individuals, ideological groups) face the steepest wet-lab barriers, while actors with laboratory capabilities (state programs, insider threats) gain least from AI knowledge assistance. However, evasion uplift—helping attackers circumvent DNA synthesis screening and detection systems—applies more uniformly across actor types and represents the most concerning capability gap.
+**Note on evasion uplift**: The actors most likely to benefit from knowledge uplift (non-expert individuals, ideological groups) face the steepest wet-lab barriers, while actors with laboratory capabilities (state programs, insider threats) gain least from AI knowledge assistance. Evasion uplift—helping attackers circumvent DNA synthesis screening and detection systems—may apply more broadly across actor types, though direct empirical evidence on how uniformly this applies across state versus non-state actors is limited; the claim that evasion assistance benefits state actors as much as non-state actors is an inference rather than an established finding.
 
 ### Task-Specific Uplift Analysis
 
-AI's contribution varies substantially across different phases of the attack chain. The highest uplift appears in areas where AI provides unique advantages—such as evading detection systems designed around known threat signatures—rather than in core synthesis knowledge where scientific literature already provides extensive detail.
+AI's contribution varies substantially across different phases of the attack chain. The highest estimated uplift appears in areas where AI provides potential advantages—such as evading detection systems designed around known threat signatures—rather than in core synthesis knowledge where scientific literature already provides extensive detail.
 
 | Task Phase | Current Uplift (2024) | Near-term Uplift (2026-28) | Long-term Uplift (2030+) | Key Drivers |
 |------------|----------------------|---------------------------|-------------------------|-------------|
@@ -143,21 +142,21 @@ AI's contribution varies substantially across different phases of the attack cha
 | Biosecurity evasion | 2x (1.5-3) | 5x (3-8) | 10x (5-20) | Novel agent design, screening evasion |
 | Deployment planning | 1.1x (1.0-1.3) | 2x (1.5-3) | 3x (2-5) | Dispersal modeling, timing optimization |
 
-The asymmetry between evasion uplift and knowledge uplift has critical policy implications. Current DNA synthesis screening relies on detecting known dangerous sequences—AI's ability to design functional but novel sequences that evade these screens could undermine a key biosecurity control without providing new synthesis knowledge. This suggests defensive investments should prioritize adaptable screening systems over static sequence databases.
+The asymmetry between estimated evasion uplift and knowledge uplift has policy implications. Current DNA synthesis screening relies primarily on detecting known dangerous sequences—AI's demonstrated ability to design functional but novel sequences that evade these screens (as shown by the Microsoft Paraphrase Project) could undermine a key biosecurity control without requiring new synthesis knowledge. This suggests defensive investments should prioritize adaptable screening systems over static sequence databases.
 
 ## Scenario Analysis
 
-The future trajectory of AI uplift depends on several key uncertainties. The following scenarios explore different combinations of technological development and policy response.
+The future trajectory of AI uplift depends on several key uncertainties. The following scenarios explore different combinations of technological development and policy response. The probability assignments below are expert judgment estimates, not empirically derived probabilities; they carry substantial uncertainty and should be interpreted as illustrative of relative likelihood rather than precise forecasts.
 
-| Scenario | Probability | Uplift by 2030 | Key Assumptions | Policy Implications |
-|----------|-------------|----------------|-----------------|---------------------|
-| Managed Development | 20% | 1.5-2x | Strong AI governance, biosecurity advances keep pace | Continue monitoring, maintain countermeasures |
-| Capability Surge | 35% | 3-5x | BDT integration, lab automation, weak governance | Urgent need for adaptive biosecurity |
-| Defensive Advantage | 15% | 1.0-1.5x | Screening technology improves faster than evasion | Invest heavily in defensive capabilities |
-| Asymmetric Uplift | 25% | Varies (1.2-8x) | High evasion uplift, low knowledge uplift | Focus on evasion-specific countermeasures |
-| Wild Card | 5% | 10x+ | Transformative AI capabilities, autonomous bio-agents | Crisis response preparation |
+| Scenario | Indicative Probability | Uplift by 2030 | Key Assumptions | Policy Implications |
+|----------|----------------------|----------------|-----------------|---------------------|
+| Managed Development | ≈20% | 1.5-2x | Strong AI governance, biosecurity advances keep pace | Continue monitoring, maintain countermeasures |
+| Capability Surge | ≈35% | 3-5x | BDT integration, lab automation, weak governance | Need for adaptive biosecurity |
+| Defensive Advantage | ≈15% | 1.0-1.5x | Screening technology improves faster than evasion | Invest in defensive capabilities |
+| Asymmetric Uplift | ≈25% | Varies (1.2-8x) | High evasion uplift, low knowledge uplift | Focus on evasion-specific countermeasures |
+| Wild Card | ≈5% | 10x+ | <EntityLink id="E357" name="transformative-ai">Transformative AI</EntityLink> capabilities, autonomous bio-agents | Crisis response preparation |
 
-The most likely outcome appears to be the "Asymmetric Uplift" scenario, where AI provides limited additional knowledge uplift but significantly enhances attackers' ability to evade biosecurity measures. This scenario is particularly concerning because it could undermine existing defenses without triggering the kind of obvious capability jump that would prompt policy response. The "Capability Surge" scenario, while less likely, represents the highest-impact outcome and warrants serious contingency planning.
+The "Asymmetric Uplift" scenario—where AI provides limited additional knowledge uplift but significantly enhances attackers' ability to evade biosecurity measures—is assigned the highest probability among scenarios other than "Capability Surge." This scenario is of particular concern because it could undermine existing defenses without producing an obvious capability jump that would prompt policy response. The "Capability Surge" scenario represents the highest-impact outcome and warrants contingency planning. These assessments reflect the analytical judgment of the model's authors and should be updated as empirical evidence accumulates.
 
 ## Empirical Evidence Review
 
@@ -165,32 +164,56 @@ The most likely outcome appears to be the "Asymmetric Uplift" scenario, where AI
 
 | Study | Year | Method | Key Finding | Uplift Estimate | Confidence |
 |-------|------|--------|-------------|-----------------|------------|
-| <R id="YmM4YmE2NG">RAND Corporation</R> | 2024 | Red team exercise (n=45) | No significant difference AI vs. internet-only | Knowledge: 1.0-1.2x | High |
-| Microsoft Research | 2024 | Toxin design exercise | 75%+ evasion of DNA screening | Evasion: 2-3x | High |
+| <R id="YmM4YmE2NG">RAND Corporation</R> | 2024 | Red team exercise (n=45) | No significant difference AI vs. internet-only for attack planning | Knowledge: 1.0-1.2x | High |
+| OpenAI/<EntityLink id="E556" name="red-queen-bio">Red Queen Bio</EntityLink> Early Warning | 2024 | Controlled A/B study (n=100) | GPT-4 provides at most mild uplift in biological threat creation accuracy | Knowledge: ≈1.0-1.1x | High |
+| [Microsoft Paraphrase Project](https://www.microsoft.com/en-us/research/publication/strengthening-nucleic-acid-biosecurity-screening-against-generative-protein-design-tools/) | 2024 | Toxin design exercise | AI-designed variants evaded 75%+ of DNA screening tools | Evasion: 2-3x | High |
 | <R id="MGFiMDU2ND">Gryphon Scientific/Anthropic</R> | 2023 | 150+ hour red team | "Post-doc level" knowledge provision | Knowledge: 1.5-2.5x | Medium |
-| OpenAI internal eval | 2024-25 | Expert uplift trials | o1 provided "measurable benefits to experts" | Expert: 1.3-1.8x | Medium |
+| VCT (SecureBio/CAIS) | 2025 | Expert benchmark (322 questions) | <EntityLink id="E1041" name="claude">Claude</EntityLink> at 95th percentile vs. human experts; <EntityLink id="E1068" name="gpt-4o">GPT-4o</EntityLink> at 53rd percentile | Expert knowledge: varies by model | High |
+| Wet-lab RCT (arXiv:2602.16703) | 2025 | Pre-registered RCT (n=153) | LLMs did not substantially increase novice completion of complex lab procedures | Physical lab uplift: modest | High |
+| In silico uplift study (arXiv:2602.23329) | 2025-26 | Human uplift study, multi-model | Novices with LLMs 4.16x more accurate on in silico tasks than controls | In silico: 4.16x (95% CI 2.63-6.87) | Medium |
+| OpenAI internal eval | 2024-25 | Expert uplift trials | <EntityLink id="E1041" name="claude">Claude</EntityLink> provided "measurable benefits to experts" | Expert: 1.3-1.8x | Medium |
 | Anthropic Claude 4.5 eval | 2025 | Protocol generation | "Substantially higher scores, fewer critical errors" | Expert: 1.5-2x | Medium |
 | [NASEM Report](https://nap.nationalacademies.org/read/28868/chapter/5) | 2025 | Expert consensus | BDTs cannot yet design self-replicating pathogens | Novel agents: &lt;1.2x | High |
 
-### RAND Corporation Study (2024)
+### RAND Corporation Study (2024) and the OpenAI/Gryphon Early Warning Study
 
-The <R id="YmM4YmE2NG">RAND study</R> represents the most rigorous empirical assessment of AI uplift to date. Forty-five participants were randomly assigned to teams with varying degrees of expertise in both LLM technologies and biology, then tasked with planning biological attacks. Teams with access to LLMs in addition to the internet did not score significantly higher than those without LLM access. As lead author Christopher Mouton stated: "Just because today's LLMs aren't able to close the knowledge gap needed to facilitate biological weapons attack planning doesn't preclude the possibility that they may be able to in the future."
+The <R id="YmM4YmE2NG">RAND study</R> represents one of the most systematic empirical assessments of AI uplift for attack planning to date. Forty-five participants were randomly assigned to teams with varying degrees of expertise, then tasked with planning biological attacks. Teams with access to LLMs in addition to the internet did not score significantly higher than those without LLM access. The study found that while LLMs produced what researchers termed "unfortunate outputs," these outputs "generally mirror information readily available on the internet." Key methodological limitations include: testing planning rather than synthesis capability, use of 2023-era models that have since been superseded, and a relatively small sample size that limits statistical power. These limitations mean the "High" confidence assigned to this finding reflects methodological rigor within the study's scope, not certainty about current or future models.
 
-The study found that while LLMs produced what researchers termed "unfortunate outputs"—problematic responses to prompts—these outputs "generally mirror information readily available on the internet." This suggests LLMs currently provide convenience rather than novel dangerous capabilities. Key methodological limitations include: testing planning rather than synthesis capability, use of 2023-era models that have since been superseded, and a relatively small sample size.
+A separate controlled study authored by Tejal Patwardhan, Kevin Liu, Todor Markov, and colleagues from <EntityLink id="E218" name="openai">OpenAI</EntityLink> and Gryphon Scientific—"Building an Early Warning System for LLM-Aided Biological Threat Creation"—used a 100-participant A/B design (50 biology PhD experts with wet lab experience and 50 students), assigning participants randomly to an "internet-only" or "internet + GPT-4" group.[^rc-76f9] GPT-4 access improved accuracy scores for almost all tasks for both cohorts, with a mean uplift of 0.25 out of 10 for students and 0.88 out of 10 for experts, but differences were not statistically significant. The study concluded that GPT-4 provides at most mild uplift in biological threat creation accuracy. The paper serves as a blueprint for evaluating LLM biosecurity risk and is incorporated into OpenAI's Preparedness Framework; OpenAI called for methods-sharing with the broader AI risk research community.[^rc-76f9]
+
+As lead RAND author Christopher Mouton stated: "Just because today's LLMs aren't able to close the knowledge gap needed to facilitate biological weapons attack planning doesn't preclude the possibility that they may be able to in the future."
 
 ### Microsoft DNA Screening Research (2024)
 
-Microsoft's research revealed a more concerning capability: AI-designed toxins successfully evaded over 75% of commercial DNA synthesis screening tools. One tool flagged only 23% of AI-designed sequences. This finding suggests AI could provide substantial uplift in circumventing biosecurity controls even without providing novel scientific knowledge. The screening tools tested rely primarily on sequence matching against known threat databases—AI's ability to design functional variants with low sequence similarity to known threats exposes a structural vulnerability in current screening approaches. Following publication, a software patch was deployed globally that now catches approximately 97% of threats, though [experts warn](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should) the fix remains "incomplete."
+Microsoft researchers led by Chief Scientific Officer Eric Horvitz used open-source AI protein design tools to create over 75,000 variants of known toxins such as ricin and botulinum toxin—collectively described as the Paraphrase Project—and found that AI-designed variants could evade commercial DNA synthesis screening software while potentially retaining lethal properties. One tool flagged only 23% of AI-designed sequences. This finding suggests AI could provide substantial uplift in circumventing biosecurity controls even without providing novel scientific knowledge. The screening tools tested rely primarily on sequence matching against known threat databases; AI's ability to design functional variants with low sequence similarity to known threats exposes a structural vulnerability in current screening approaches based on homology.
+
+Over 10 months, the team worked to develop and globally distribute a patch to DNA synthesis companies. After the patch, systems flagged 97% of AI-generated sequences that in-silico models rated most likely to retain wild-type-like function; overall, the patch was associated with flagging 72% of all AI-generated sequences on average. This 97% figure originates from the Microsoft Research team's own paper and has not been independently verified by a third party. The approach calls for a shift from sequence similarity checks to semantic and functional understanding of what proteins do. Experts at <EntityLink id="E522" name="council-on-strategic-risks">Council on Strategic Risks</EntityLink> note the fix remains "incomplete" because the underlying vulnerability—list-based screening that cannot detect functionally novel sequences—is structural rather than addressable by a single patch.
+
+### Expert Virology Benchmark: Virology Capabilities Test (2025)
+
+The Virology Capabilities Test (VCT), developed primarily by teams from SecureBio and the <EntityLink id="E47" name="cais">Center for AI Safety</EntityLink>, represents a domain-specific benchmark for virology capabilities designed to provide quantitative grounding for uplift estimates.[^rc-62ff] The VCT consists of 322 multimodal questions designed to be "Google-proof"—requiring tacit knowledge that cannot be easily found through web searches—validated by PhD-level virologists and measuring an AI system's ability to troubleshoot complex virology laboratory protocols.[^rc-62ff]
+
+Results as of 2025 show that several frontier models substantially outperform the human expert average of 22.1%: GPT-4o performed better than 53% of experts; Gemini 1.5 Pro better than 67%; Claude Sonnet 3.5 scored at the 75th percentile; o1 at the 89th percentile; and OpenAI's o3 achieved 43.8% accuracy, placing it at approximately the 95th percentile.[^rc-62ff] The o3 model was reported to outperform 94% of domain experts even within their sub-areas of specialization.
+
+The benchmark's authors recommend that highly dual-use virology capabilities should be excluded from publicly available systems, and that know-your-customer mechanisms could ensure these capabilities remain accessible to researchers in institutions with appropriate safety protocols.[^rc-62ff] As a result of the paper, xAI added new safeguards to their systems.[^rc-62ff] <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> analysis notes that the VCT is among the most commonly used benchmarks in AI lab biorisk evaluations, and that benchmarks are the only evaluation type that can be easily compared quantitatively over time and across labs; <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s external testing program formally includes the VCT as part of its independent evaluation suite alongside <EntityLink id="E201" name="metr">METR</EntityLink>'s time horizon evaluation.
+
+**Important interpretive caveat**: The VCT measures tacit knowledge for troubleshooting virology laboratory protocols—an in silico capability. A concurrent 2025 pre-registered wet-lab RCT (n=153) evaluating novice performance on a viral reverse genetics workflow found that mid-2025 LLMs did not substantially increase novice completion of complex laboratory procedures, demonstrating a meaningful gap between in silico benchmark performance and real-world physical laboratory utility. These two findings are not contradictory: models can hold expert-level knowledge yet be limited in translating that knowledge into physical experimental success for novice operators. This distinction is important for calibrating which threat scenarios are most empirically supported.
+
+### Domain-Specific Benchmarking and Uplift Calibration
+
+The VCT illustrates a broader methodological development: structured capability benchmarks are increasingly used alongside red-team exercises to provide quantitative, reproducible uplift estimates. <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> analysis of OpenAI's biorisk evaluation methodology found that benchmarks comprised approximately 50% of the evaluations examined, valued precisely because they enable comparison over time and across organizations. This contrasts with red-team exercises, which are often not directly comparable across studies due to variation in participant selection, scenarios, and adjudication criteria.
+
+The shift toward structured benchmarks creates both opportunities and risks for uplift assessment: opportunities because benchmark results can track capability advances systematically; risks because a benchmark optimized against known threats may not capture capability advances in dimensions the benchmark does not measure. The RAND study's use of older models and planning-focused scenarios, for example, may not capture the kind of tacit knowledge gains the VCT reveals. Triangulating across multiple evaluation methods—controlled uplift studies, red-team exercises, and domain benchmarks—provides more robust calibration than any single approach.
 
 ### Anthropic and OpenAI Evaluations
 
-Both Anthropic and OpenAI have conducted extensive internal evaluations of their models' dangerous capabilities, with findings that have evolved significantly over time:
+Both Anthropic and <EntityLink id="E218" name="openai">OpenAI</EntityLink> have conducted internal evaluations of their models' dangerous capabilities, with findings that have evolved over time:
 
-**Anthropic's Framework**: Anthropic's <R id="NGU0MjEyN2">Responsible Scaling Policy</R> defines AI Safety Levels (ASL) modeled on biosafety level standards. ASL-3 capability threshold is reached when models could "significantly help individuals or groups with basic technical backgrounds (e.g., undergraduate STEM degrees) to create, obtain, and deploy CBRN weapons." In expert uplift trials for Claude Opus 4.5 (2025), the model was "meaningfully more helpful to participants than previous models, leading to substantially higher scores and fewer critical errors." However, models still "produced critical errors that yielded non-viable protocols." Anthropic interprets this as an indicator of general model progress where "a clear rule-out of the next capability threshold may soon be difficult or impossible."
+**Anthropic's Framework**: Anthropic's <R id="NGU0MjEyN2">Responsible Scaling Policy</R> defines AI Safety Levels (ASL) modeled on biosafety level standards. ASL-3 capability threshold is reached when models could "significantly help individuals or groups with basic technical backgrounds (e.g., undergraduate STEM degrees) to create, obtain, and deploy CBRN weapons." In expert uplift trials for <EntityLink id="E1038" name="claude-opus-4-5">Claude Opus 4.5</EntityLink> (2025), the model was "meaningfully more helpful to participants than previous models, leading to substantially higher scores and fewer critical errors." However, models still "produced critical errors that yielded non-viable protocols." Anthropic interprets this as an indicator of general model progress where "a clear rule-out of the next capability threshold may soon be difficult or impossible."
 
-**OpenAI's Framework**: OpenAI's <R id="OTU2ZjU2MD">Preparedness Framework</R> categorizes biological capabilities from Low to Critical. The "High" threshold is breached when a model could "provide meaningful counterfactual assistance to 'novice' actors (anyone with a basic relevant technical background) that enables them to create known biological or chemical threats." OpenAI's o1 model demonstrated measurable benefits for experts, "particularly in synthesising existing threat information and enhancing access to previously obscure knowledge." In April 2025, OpenAI concluded it expects models to demonstrate "high risks" in the near future. In July 2025, OpenAI classified its new ChatGPT agent as "highly capable" in the biological portion of its Preparedness Framework.
+**OpenAI's Framework**: <EntityLink id="E218" name="openai" name="openai">OpenAI</EntityLink>'s updated <R id="OTU2ZjU2MD">Preparedness Framework v2</R> (April 2025) streamlined capability levels to two clear thresholds: "High" (a model that amplifies existing pathways to severe harm, such as providing meaningful assistance to novice actors with basic relevant training to create biological or chemical threats) and "Critical" (a model that introduces unprecedented new pathways to severe harm). The framework removed "low" and "medium" risk levels and prioritized biological capability evaluations as indicators for High and Critical capability thresholds, given the higher potential severity of biological threats relative to chemical ones. OpenAI also implemented stricter biological safeguards in its ChatGPT agent as a precautionary measure, classifying it as "highly capable" in the biological portion of the framework. <EntityLink id="E218">OpenAI</EntityLink>'s o1 model demonstrated measurable benefits for experts, "particularly in synthesising existing threat information and enhancing access to previously obscure knowledge."
 
-**Joint Evaluation (2025)**: In early summer 2025, OpenAI and Anthropic [collaborated on a first-of-its-kind joint evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/) where each lab ran their internal safety and misalignment evaluations on the other's publicly released models, marking an important step toward industry-wide safety standards.
+**Joint Evaluation (2025)**: In early summer 2025, <EntityLink id="E218" name="openai">OpenAI</EntityLink> and <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> [collaborated on a first-of-its-kind joint evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/) where each lab ran their internal safety and misalignment evaluations on the other's publicly released models, marking a step toward cross-industry safety evaluation standards.
 
 ### NASEM Consensus Report (2025)
 
@@ -201,11 +224,35 @@ The [National Academies of Sciences, Engineering, and Medicine](https://www.nati
 - "AI-enabled biological tools do not necessarily reduce the bottlenecks and barriers to crossing the digital-physical divide"
 - AI capabilities can enhance both offensive and defensive biological capabilities, with the report recommending creation of a BioCATALYST research network co-led by DOD and ODNI
 
+## Government-Industry Collaboration and Institutional Frameworks
+
+### OpenAI and Los Alamos National Laboratory Partnership
+
+In July 2024, <EntityLink id="E218" name="openai">OpenAI</EntityLink> and Los Alamos National Laboratory's (LANL) Bioscience Division announced a research partnership described as the first of its kind to assess how frontier models can assist humans performing tasks in a physical laboratory setting through multimodal capabilities including vision and voice. The partnership was established under the mandate of Executive Order 14110 on Safe, Secure, and Trustworthy AI, which tasks Department of Energy national laboratories with evaluating frontier AI model capabilities including biological capabilities.
+
+The initial experiment evaluated whether GPT-4o could help someone without specialized molecular biology skills perform basic biomedical tasks—specifically, assisting genetically engineered E. coli bacteria to produce insulin. LANL research scientist Erick LeBrun noted at the time that "understanding potential dangers or misuse of advanced AI related to biological threats remains largely unexplored" and that existing work had "not assessed how multimodal, frontier models could lower the barrier of entry for non-experts to create a biological threat." The partnership was conducted under LANL's new AI Risks Technical Assessment Group (AIRTAG), established to develop strategies to understand the benefits and risks of AI tools.
+
+The significance of the LANL partnership lies in extending biosecurity evaluation from text-based tasks—which the prior literature largely focused on—to real physical laboratory settings where multimodal AI capabilities interact with physical procedures. OpenAI's earlier internal evaluations had found that GPT-4 offered a "mild uplift" in delivering information that could lead to the creation of biological threats, but those experiments focused only on written tasks. The LANL collaboration was designed to test whether these constraints hold in a physical experimental context.
+
+A subsequent study (December 2025) by OpenAI, Red Queen Bio (a biosecurity startup), and Robot on Rails extended this research direction by testing GPT-5 in an AI-lab loop evaluating how a model proposes, analyzes, and iterates on ideas in the wet lab. GPT-5 introduced a novel enzymatic mechanism (combining RecA and gp32 proteins) that improved cloning efficiency by 79x over the baseline protocol; human execution of the improved protocol achieved 2.39x improvement over baseline, and robotic execution achieved 2.13x improvement. The study's chief scientist Nikolai Eroshenko described the result as showing "some glimpses of creativity" beyond published research. These results have implications for biosecurity as described in OpenAI's Preparedness Framework, and represent the published output of the research program seeded by the LANL partnership.
+
+OpenAI's June 2025 report "Preparing for Future AI Capabilities in Biology" summarized the commitment to this research direction: the lab stated it had worked with LANL to study AI's role in wet lab settings and was supporting external researchers advancing biosecurity tools and evaluations, with mitigation approaches including developing responsible biological capabilities, training models to safely handle dual-use biological requests, and building detection, monitoring, and enforcement systems.
+
+### Building an Early Warning System: Institutional Architecture
+
+OpenAI's "Building an Early Warning System for LLM-Aided Biological Threat Creation" study—beyond its findings on mild uplift under A/B test conditions—proposed a structured architecture for ongoing biosecurity monitoring of LLM capabilities.[^rc-76f9] The study's biosecurity specialists at Gryphon Scientific developed five research tasks corresponding to the five stages of biological threat creation, providing a replicable methodology for tracking capability changes over time. OpenAI's call for methods-sharing with the broader AI risk research community reflects the institutional challenge: individual company evaluations are not publicly verifiable, and there is no standardized cross-industry framework for tracking uplift over time.
+
+The study's methodological contribution—a controlled, blinded A/B design with 100 participants across expert and novice cohorts—represents a more rigorous experimental design than many prior assessments, which relied on open red-team exercises without matched control groups. The non-significant uplift finding under this design, combined with the statistically significant in silico uplift found in later studies using frontier models, suggests that the A/B design and model generation tested may not fully capture the capability trajectory of 2025 and later models. This underscores the value of the early warning framework as a repeated-measurement infrastructure rather than a one-time assessment.
+
 ## The Biological Design Tool Integration Risk
 
-Current analysis focuses primarily on text-based LLMs, but the emerging combination of multiple AI capabilities may create compound uplift effects exceeding any individual technology's contribution. The integration of LLMs for knowledge synthesis, AlphaFold and similar tools for protein structure prediction, generative biological models for novel agent design, and automated laboratory systems for synthesis creates a "capability stack" that deserves particular attention.
+Current analysis focuses primarily on text-based LLMs, but the combination of multiple AI capabilities may create compound uplift effects exceeding any individual technology's contribution. The integration of LLMs for knowledge synthesis, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> and similar tools for protein structure prediction, generative biological models for novel agent design, and automated laboratory systems for synthesis creates a "capability stack" that warrants analytical attention.
 
-This integration risk is currently understudied. Most biosecurity assessments evaluate individual technologies rather than their combination, potentially missing emergent risks from capability stacking. A sophisticated attacker with access to all these tools could potentially: use LLMs to identify targets and plan synthesis; employ protein structure prediction to design novel variants; use generative models to optimize functional properties; and eventually leverage automated labs to iterate synthesis protocols with minimal human intervention. Each component might provide modest individual uplift, but the compound effect could be substantial.
+This integration risk is currently understudied. Most biosecurity assessments evaluate individual technologies rather than their combination, potentially missing risks from capability stacking. A sophisticated attacker with access to all these tools could potentially: use LLMs to identify targets and plan synthesis; employ protein structure prediction to design novel variants; use generative models to optimize functional properties; and eventually leverage automated labs to iterate synthesis protocols with minimal human intervention. Each component might provide modest individual uplift, but the compound effect could be substantial.
+
+A counterargument deserves consideration: capability stacking also requires coordinated access to multiple specialized tools and expertise in using each effectively. The barriers to accessing and integrating a full capability stack may themselves be limiting factors that partially offset the multiplied uplift. Empirical assessment of compound uplift remains sparse, and claims about the magnitude of stacking effects are currently inference rather than measurement.
+
+The NASEM 2025 consensus report explicitly found that current BDTs "cannot yet design self-replicating pathogens, which are orders of magnitude more complex" than simpler biological structures—a finding that constrains the upper bound of near-term integration risk for the most severe attack scenarios. OpenAI's June 2025 preparedness update anticipates this may change as models advance toward "High" capability thresholds, and is monitoring this transition as a key decision point for release policy.
 
 ## Time Dynamics and Trend Analysis
 
@@ -221,27 +268,39 @@ Uplift is not static—it evolves as capabilities advance and defenses adapt. Se
 | **Novel agent design** | 1.1x (1.0-1.2) | 1.3x (1.1-1.6) | 2x (1.4-3) | 3x (2-5) | Training data + compute availability |
 | **Acquisition guidance** | 1.1x (1.0-1.2) | 1.4x (1.2-1.7) | 1.8x (1.4-2.3) | 2x (1.5-2.8) | Supply chain knowledge |
 
-**Critical observation**: Evasion capabilities are projected to advance fastest, potentially reaching 7-10x uplift by 2028-2030. This asymmetry means AI could undermine biosecurity defenses (DNA screening, surveillance) before significantly enhancing attackers' synthesis capabilities—a dangerous sequencing that could create windows of elevated vulnerability.
+These projections are speculative estimates based on current capability trajectories; they should not be treated as forecasts with quantified uncertainty bounds. The key analytical claim is directional: evasion capabilities are projected to advance at a faster rate than knowledge synthesis capabilities, based on the structural observation that evasion benefits directly from generative protein design advances while knowledge synthesis is partly rate-limited by the wet-lab bottleneck. If this directional claim is correct, AI could erode biosecurity defenses (DNA screening, surveillance) at a different rate than it enhances attackers' synthesis capabilities—a sequencing dynamic that would shape the timing of when biosecurity interventions become most important.
 
 ### Factors Affecting Trajectory
 
-**Factors increasing uplift** include improving model capabilities, expanding open-source availability (the [Future of Life Institute 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) notes only 3 of 7 major AI firms conduct substantive dangerous capability testing), advancing wet lab automation, integration of specialized biological design tools, and decreasing costs of DNA synthesis equipment.
+**Factors increasing uplift** include improving model capabilities, expanding open-source availability (the [Future of Life Institute 2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/) notes only 3 of 7 major AI firms conduct substantive dangerous capability testing), advancing wet lab automation, integration of specialized biological design tools, and decreasing costs of DNA synthesis equipment. The Arms Control Association noted in November 2025 that benchtop nucleic acid synthesis equipment is now small enough to fit on a kitchen counter, enabling potentially clandestine local synthesis—a hardware development that could reduce the wet-lab barrier independently of AI advances.
 
-**Factors decreasing uplift** include improving biosecurity measures, enhanced DNA synthesis screening (97% effectiveness post-Microsoft patch, up from ~40-70%), export controls on critical equipment, increasing attention to AI safety in biology, and deployment of metagenomic surveillance systems like the Nucleic Acid Observatory.
+**Factors decreasing uplift** include improving biosecurity measures, enhanced DNA synthesis screening (the Microsoft Paraphrase Project patch improved detection of highest-risk sequences to 97%, though overall detection of all AI-generated sequences averaged 72%), export controls on critical equipment, increasing attention to AI safety in biology, and deployment of metagenomic surveillance systems like the Nucleic Acid Observatory. As of October 2025, both IBBIS and <EntityLink id="E564" name="securedna">SecureDNA</EntityLink> have deployed portals where synthesis providers can undergo blinded testing and receive pass/fail attestations; NIST, in partnership with IGSC and SBRC, developed test sets in 2024 that are being used for pilot projects. In November 2025, IBBIS launched a Technical Consortium to internationally align standards for DNA synthesis screening.
 
-The net direction depends on the relative pace of offense and defense, which remains highly uncertain. The [NTI biosecurity program](https://www.nti.org/analysis/articles/statement-on-biosecurity-risks-at-the-convergence-of-ai-and-the-life-sciences/) warns that "AIxBio capabilities could reduce the effectiveness of biosecurity and biodefense measures, including evading biosurveillance systems, enabling resistance to medical countermeasures, and circumventing nucleic acid synthesis screening."
+The net direction depends on the relative pace of offense and defense, which remains uncertain. The [NTI biosecurity program](https://www.nti.org/analysis/articles/statement-on-biosecurity-risks-at-the-convergence-of-ai-and-the-life-sciences/) warns that "AIxBio capabilities could reduce the effectiveness of biosecurity and biodefense measures, including evading biosurveillance systems, enabling resistance to medical countermeasures, and circumventing nucleic acid synthesis screening." An NTI report on the convergence of AI and the life sciences (released at the UK AI Safety Summit, October 2023) recommended establishing an international "AI-Bio Forum" to develop AI model guardrails, noting that misuse scenarios could be feasible within a few years if sufficient guardrails are not developed. RAND and NTI co-convened a workshop at the AI Action Summit in Paris in February 2025, noting that current oversight norms like the Biological Weapons Convention were developed before current AI capabilities and are not well-suited to address these challenges.
 
-Current trajectory analysis suggests uplift is likely to increase over the 2025-2030 period, with the most significant increases in evasion capabilities and protocol optimization. The wet laboratory barrier may erode as automation advances, potentially removing the key bottleneck that currently limits non-expert attackers. This suggests the next five years represent a critical window for establishing robust biosecurity measures.
+**Regulatory context**: On May 5, 2025, President Trump issued an Executive Order on Improving the Safety and Security of Biological Research with updates to U.S. government guidelines on nucleic acid synthesis screening. A 90-day deadline from that EO to revise the nucleic acid synthesis screening framework expired on August 3, 2025, without new guidance being issued. The [CSIS August 2025 report](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should) noted that "efforts to expand synthesis-screening protocols to capture additional sequences of concern are nascent and could quickly fall behind AI-generated sequence capabilities," and that critical safeguards embedded within biological design tool models are already circumventable post-deployment.
+
+## Early Warning Systems for LLM-Aided Biological Threats
+
+A distinct defensive category emerging in the biosecurity literature is dedicated early warning infrastructure for monitoring LLM-aided biological threat creation—separate from metagenomic disease surveillance, which monitors for pathogen presence in the environment, and from nucleic acid synthesis screening, which monitors at the point of synthesis.
+
+The OpenAI/Gryphon Scientific "Building an Early Warning System" study outlined a blueprint for this infrastructure: regular, controlled, blinded A/B studies assessing LLM uplift across the stages of biological threat creation, using biosecurity-expert-developed task sets that reflect current threat vectors.[^rc-76f9] The proposed system would function as a repeated-measurement early warning capability—tracking when and how quickly LLM capabilities cross defined thresholds—rather than providing a single static assessment. OpenAI called for methods-sharing with the broader AI risk research community to enable this kind of cross-institutional monitoring.[^rc-76f9]
+
+The early warning framing addresses a structural gap in current biosecurity governance: most evaluation occurs within individual AI companies using proprietary methodologies, making it difficult to compare results across organizations or verify claims independently. <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s external testing program, which formally incorporates the VCT alongside METR's time horizon evaluation, represents a partial step toward externally verifiable capability assessment. The VCT's design as a standardized, reproducible benchmark—with results from multiple models now publicly reported—provides one component of an early warning architecture for virology-specific knowledge capabilities.
+
+Key unresolved questions for early warning system design include: what thresholds should trigger escalating responses; how to validate that controlled study designs adequately represent real-world threat scenarios; how to govern access to the evaluation tasks themselves (which by design assess dual-use capabilities); and how to establish appropriate governance for cross-institutional data-sharing given the sensitive nature of biosecurity evaluations.
 
 ## Limitations
 
-This model faces several important limitations that constrain confidence in its estimates. First, empirical data remains sparse—only a handful of studies have directly assessed AI uplift, and these have significant methodological limitations. Second, the model relies heavily on expert judgment for parameter estimates, introducing potential biases and anchoring effects. Third, the analysis focuses on information and planning uplift while treating the wet laboratory barrier as exogenous, potentially underestimating future scenarios where this barrier erodes.
+This model faces several important limitations that constrain confidence in its estimates. First, empirical data remains sparse—the handful of studies that have directly assessed AI uplift have significant methodological differences (varying model generations, participant pools, task designs, and adjudication criteria) that make cross-study comparison difficult. Second, the model relies heavily on expert judgment for parameter estimates, introducing potential biases and anchoring effects. Third, the analysis focuses on information and planning uplift while treating the wet laboratory barrier as exogenous, potentially underestimating future scenarios where this barrier erodes through hardware advances (e.g., benchtop synthesizers) independent of AI.
 
-The model also struggles to account for "unknown unknowns"—novel AI capabilities or integration pathways that could provide uplift in ways not currently anticipated. History suggests transformative capabilities often emerge unexpectedly, and the model's scenario analysis may not adequately capture tail risks. Finally, the model treats actor types as discrete categories, but real actors exist on a spectrum and may combine characteristics in ways that alter uplift dynamics.
+The probability assignments in the Scenario Analysis table are expert judgment estimates with substantial uncertainty; the tabular format may imply more precision than is warranted. The basis for these estimates is analytical judgment about which combinations of technical and governance assumptions are most plausible, not empirical calibration against historical base rates.
+
+The model also struggles to account for capability developments not currently anticipated. Compound uplift from capability stacking is a particular uncertainty: each individual tool may show modest uplift in isolation, but integration effects are largely unstudied. The model treats actor types as discrete categories, but real actors exist on a spectrum and may combine characteristics in ways that alter uplift dynamics. Finally, the model's empirical calibration relies on evaluations of specific model generations that are rapidly superseded; the VCT results show a substantial spread across model generations (GPT-4o at 53rd percentile vs. o3 at 95th percentile), illustrating how quickly the empirical landscape can shift.
 
 ## Policy Implications
 
-Regardless of precise uplift estimates, several policy conclusions appear robust. First, investing in adaptable biosecurity countermeasures—particularly AI-enabled screening that can detect novel threats—addresses both high-uplift and low-uplift scenarios. Second, monitoring for capability jumps, especially in biological design tool integration and laboratory automation, can provide early warning of escalating risk. Third, maintaining uncertainty about uplift argues for precautionary investments in defensive capabilities even if current uplift appears modest.
+Regardless of precise uplift estimates, several policy directions appear robust across scenarios. Investing in adaptable biosecurity countermeasures—particularly AI-enabled screening that can detect novel threats—addresses both high-uplift and low-uplift scenarios. Monitoring for capability advances, especially in biological design tool integration and laboratory automation, can provide early warning of escalating risk. Maintaining uncertainty about uplift argues for precautionary investments in defensive capabilities even if current uplift appears modest under controlled conditions.
 
 ### Defense Priority Matrix
 
@@ -249,24 +308,27 @@ The [CSIS report](https://www.csis.org/analysis/opportunities-strengthen-us-bios
 
 | Intervention | Target Uplift Domain | Cost Estimate | Expected Impact | Priority |
 |--------------|---------------------|---------------|-----------------|----------|
-| AI-enabled DNA synthesis screening | Evasion (-1.5 to -2.5x) | \$200-400M/year | High | **Critical** |
+| AI-enabled DNA synthesis screening (functional detection) | Evasion (-1.5 to -2.5x) | \$200-400M/year | High | **Critical** |
+| Early warning system for LLM-aided threats | All domains (monitoring) | \$20-50M/year | Medium (informational) | High |
 | NIST/CAISI biosecurity standards | All domains (-0.3 to -0.5x) | \$50-100M/year | Medium | High |
 | Frontier BDT evaluation requirements | Novel agent design (-0.5 to -1x) | \$30-50M/year | Medium | High |
 | Open-weight model monitoring | Knowledge/evasion (-0.2 to -0.4x) | \$50-80M/year | Low-Medium | Medium |
 | Metagenomic surveillance expansion | Detection (not uplift) | \$300-500M/year | High | High |
 | International AI Safety Institute coordination | All domains (-0.1 to -0.3x) | \$20-40M/year | Low-Medium | Medium |
 
-**Key recommendation**: Given the asymmetry between evasion uplift (2-3x current, potentially 7-10x by 2028) and knowledge uplift (1.0-1.2x current), resources should prioritize adaptive screening systems over information restriction approaches. The [CSIS report](https://csis-website-prod.s3.amazonaws.com/s3fs-public/2025-08/250806_Adamson_AI-Enabled_Bioterrorism.pdf) specifically recommends that "the White House should direct agencies to develop a standardized AI-enabled screening system for DNA synthesis, capable of identifying novel threats that evade today's static lists."
+The asymmetry between estimated evasion uplift (2-3x current, with projections of 7-10x by 2028) and knowledge uplift (1.0-1.2x under controlled conditions) is an argument—advanced by CSIS and others—for prioritizing adaptive screening systems. This position is contested in the biosecurity community: some experts argue that information restriction and adaptive screening are not trade-offs and that both are needed simultaneously. The [CSIS report](https://csis-website-prod.s3.amazonaws.com/s3fs-public/2025-08/250806_Adamson_Allen_AI-Enabled_Bioterrorism.pdf) specifically recommends that "the White House should direct agencies to develop a standardized AI-enabled screening system for DNA synthesis, capable of identifying novel threats that evade today's static lists." OpenAI's June 2025 preparedness report similarly recommended strengthened nucleic acid synthesis screening, robust early detection systems for novel pathogens, and investment in biosecurity innovations as its primary defensive recommendations.
+
+A proposed hybrid screening strategy integrates functional prediction algorithms into traditional homology-based systems; research suggests this hybrid approach can flag synthetic genes encoding hazardous functions even when sequence signatures appear novel.
 
 ### Conditional Policy Responses
 
-If current uplift is indeed low, resources should focus on maintaining that low uplift rather than restricting AI development broadly. This suggests targeted interventions at specific high-risk capability points—particularly evasion capabilities—rather than general LLM restrictions. If uplift is being underestimated, urgent action on AI guardrails, open-source biological model restrictions, and attack preparedness becomes essential.
+If current uplift is indeed low under controlled conditions, one view holds that resources should focus on maintaining that low uplift rather than restricting AI development broadly—targeting specific high-risk capability points, particularly evasion capabilities. If uplift is being underestimated (for example, because controlled studies use suboptimal prompting strategies, as suggested by the in silico uplift study finding that novices do not use AI optimally), then the urgency of guardrail development and open-source model restrictions increases.
 
 | If This Is True... | Then Prioritize... | Deprioritize... |
 |--------------------|--------------------|--------------------|
-| Knowledge uplift remains &lt;1.5x | Evasion countermeasures, adaptive screening | LLM content restrictions |
-| Evasion uplift exceeds 5x by 2027 | AI-enabled screening R&D, SecureDNA deployment | Static sequence databases |
-| Open-weight BDTs proliferate | International coordination, compute governance | Model-level guardrails |
+| Knowledge uplift remains &lt;1.5x | Evasion countermeasures, adaptive screening | LLM content restrictions alone |
+| Evasion uplift exceeds 5x by 2027 | AI-enabled screening R&D, <EntityLink id="E564" name="securedna">SecureDNA</EntityLink> deployment | Static sequence databases |
+| Open-weight BDTs proliferate | International coordination, compute governance | Model-level guardrails alone |
 | Lab automation enables non-expert synthesis | Pandemic preparedness, stockpiles, surveillance | Knowledge-focused interventions |
 | Wet-lab barrier holds through 2030 | Maintain current approach, monitor trends | Emergency interventions |
 
@@ -278,7 +340,7 @@ This model quantifies AI's marginal contribution to bioweapons risk, distinguish
 
 | Dimension | Assessment | Quantitative Estimate |
 |-----------|------------|----------------------|
-| **Potential severity** | High - even modest uplift enables additional catastrophic attacks | 2x uplift = ≈50% more feasible attacks |
+| **Potential severity** | High - even modest uplift enables additional catastrophic attacks | 2x uplift ≈ 50% more feasible attacks |
 | **Probability-weighted importance** | Medium-High - uplift increasing, 3-5x projected by 2030 | Expected uplift trajectory: 1.5x (2025) to 4x (2030) |
 | **Comparative ranking** | Top-tier for near-term catastrophic risk | Among top 3 AI-enabled WMD risks |
 
@@ -286,12 +348,15 @@ This model quantifies AI's marginal contribution to bioweapons risk, distinguish
 
 | Study/Source | Finding | Uplift Estimate | Confidence |
 |--------------|---------|-----------------|------------|
-| RAND Corporation (2024) | No significant difference in attack plan viability | Knowledge uplift: 1.0-1.2x | High |
-| Microsoft DNA Screening (2024) | 75%+ evasion of commercial screening | Evasion uplift: 2-3x | High |
-| Anthropic Internal Evals | Guardrails limit practical uplift | Current LLM uplift: 1.1-1.5x | Medium |
-| Bug bounty platform data | AI-assisted vulnerability discovery accelerating | Methodology uplift: 1.5-2x | Medium |
+| [RAND Corporation (2024)](https://www.rand.org/pubs/research_reports/RRA2977-2.html) | No significant difference in attack plan viability (n=45) | Knowledge uplift: 1.0-1.2x | High (within study scope) |
+| OpenAI/Gryphon Early Warning (2024) | Mild, non-significant uplift under A/B design (n=100) | Knowledge uplift: ≈1.0-1.1x | High (within study scope) |
+| [Microsoft Paraphrase Project (2024)](https://www.microsoft.com/en-us/research/publication/strengthening-nucleic-acid-biosecurity-screening-against-generative-protein-design-tools/) | AI-designed variants evaded 75%+ of commercial screening | Evasion uplift: 2-3x | High |
+| VCT / SecureBio + CAIS (2025) | o3 at 95th percentile vs. expert virologists; GPT-4o at 53rd | Expert knowledge: model-dependent | High |
+| In silico uplift study, arXiv:2602.23329 (2025) | Novices with LLMs 4.16x more accurate on in silico tasks | In silico: 4.16x (95% CI 2.63-6.87) | Medium |
+| Wet-lab RCT, arXiv:2602.16703 (2025) | LLMs did not substantially increase novice completion of lab procedures | Physical lab: modest | High |
+| Anthropic Internal Evals | Guardrails limit practical uplift; models still produce non-viable protocols | Current LLM uplift: 1.1-1.5x | Medium |
 
-**Key Asymmetry**: Evasion uplift (2-3x) substantially exceeds knowledge uplift (1.0-1.2x), suggesting defenses should prioritize adaptive screening over information restriction.
+**Key Asymmetry**: Estimated evasion uplift (2-3x under current conditions) substantially exceeds measured knowledge uplift (1.0-1.2x under controlled conditions), and in silico benchmark performance substantially exceeds observed physical laboratory utility. These distinctions suggest that threat scenario specificity matters: the policy-relevant question is not "does AI provide uplift?" but "under what conditions, for which tasks, and for which actor types?"
 
 ### Resource Implications
 
@@ -301,17 +366,19 @@ This model quantifies AI's marginal contribution to bioweapons risk, distinguish
 | Open-weight model monitoring | \$50M | -0.1 to -0.2x knowledge | \$50-100M |
 | AI-enabled pathogen detection | \$300M | -0.3 to -0.5x effective | \$100-170M |
 | Targeted guardrail enforcement | \$100M | -0.1 to -0.3x knowledge | \$50-150M |
+| Early warning system infrastructure | \$20-50M | Monitoring value (not direct reduction) | N/A |
 
-Priority ranking: DNA synthesis screening offers best cost-effectiveness, followed by AI-enabled detection.
+These cost-effectiveness estimates are illustrative; they are derived from policy analysis rather than program evaluation data. DNA synthesis screening upgrades targeting evasion capabilities are estimated to offer favorable cost-effectiveness relative to knowledge-restriction approaches, based on the observed asymmetry between evasion and knowledge uplift. These figures should be treated as planning parameters rather than precise projections.
 
 ### Key Cruxes
 
 | Crux | If True | If False | Current Assessment |
 |------|---------|----------|-------------------|
-| Knowledge uplift remains low (less than 1.5x) | Focus resources on evasion countermeasures | Broader AI restrictions warranted | 70% likely through 2026 |
-| Evasion capabilities outpace detection | Current screening becomes obsolete | Static defenses sufficient | 60% likely by 2028 |
-| Open-weight biology models proliferate | Uplift becomes uncontrollable | Centralized mitigation possible | 50% by 2027 |
-| Lab automation enables non-expert synthesis | Wet lab barrier erodes | Knowledge uplift remains theoretical | 30% by 2030 |
+| Knowledge uplift remains low (&lt;1.5x under realistic conditions) | Focus resources on evasion countermeasures | Broader AI restrictions warranted | Uncertain; controlled studies support low uplift but in silico benchmarks suggest growing knowledge capabilities |
+| Evasion capabilities outpace detection | Current screening becomes obsolete | Static defenses sufficient | Probable by 2028 given current trajectories |
+| Open-weight biology models proliferate | Uplift becomes harder to contain centrally | Centralized mitigation more feasible | ≈50% by 2027 |
+| Lab automation enables non-expert synthesis | Wet lab barrier erodes | Knowledge uplift remains partially theoretical | ≈30% by 2030 |
+| In silico benchmark gains translate to physical lab uplift | VCT-style results predict real threat increases | Benchmark-physical gap persists | Contested; current evidence supports a gap |
 
 ## Related Models
 
@@ -322,27 +389,41 @@ Priority ranking: DNA synthesis screening offers best cost-effectiveness, follow
 
 ### Primary Research
 
-- <R id="YmM4YmE2NG">RAND Corporation</R>. "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study" (January 2024) - Most rigorous empirical assessment of LLM uplift
-- Microsoft Research. "AI-designed toxins evade DNA synthesis screening" (2024) - Demonstrated 75%+ evasion of commercial screening tools
+- <R id="YmM4YmE2NG">RAND Corporation</R>. "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study" (January 2024) - Systematic empirical assessment of LLM uplift for attack planning
+- OpenAI / Gryphon Scientific. ["Building an Early Warning System for LLM-Aided Biological Threat Creation"](https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/) (2024) - Controlled A/B study (n=100) finding at most mild uplift from GPT-4
+- [Microsoft Research (Paraphrase Project)](https://www.microsoft.com/en-us/research/publication/strengthening-nucleic-acid-biosecurity-screening-against-generative-protein-design-tools/). "Strengthening Nucleic Acid Biosecurity Screening Against Generative Protein Design Tools" (October 2024) - Demonstrated evasion of 75%+ of commercial screening; patch improved highest-risk sequence detection to 97%
 - <R id="MGFiMDU2ND">Gryphon Scientific</R>. Red-team evaluation of Claude (November 2023) - 150+ hour assessment finding "post-doc level" knowledge provision
-- [National Academies of Sciences, Engineering, and Medicine](https://nap.nationalacademies.org/read/28868/chapter/5). "The Age of AI in the Life Sciences: Benefits and Biosecurity Considerations" (March 2025) - DOD-commissioned consensus report on AI-enabled biosecurity risks
+- [National Academies of Sciences, Engineering, and Medicine](https://nap.nationalacademies.org/read/28868/chapter/5). "The Age of AI in the Life Sciences: Benefits and Biosecurity Considerations" (March 2025) - DOD-commissioned consensus report
+- [Virology Capabilities Test (VCT)](https://newsletter.safe.ai/p/ai-safety-newsletter-52-an-expert), SecureBio / Center for AI Safety (2025) - 322-question expert benchmark; o3 at 95th percentile vs. human expert average
+- [Wet-lab RCT](https://arxiv.org/abs/2602.16703) (arXiv:2602.16703, 2025) - Pre-registered, blinded RCT (n=153) finding LLMs did not substantially increase novice completion of complex laboratory procedures
+- [In silico uplift study](https://arxiv.org/abs/2602.23329) (arXiv:2602.23329, 2025) - Multi-model human uplift study finding 4.16x accuracy advantage for novices with frontier LLM access on in silico biological tasks
 
 ### Policy Analysis
 
 - [CSIS](https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should). "Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism" (August 2025) - Comprehensive policy recommendations
-- <R id="MmIzYWZmYT">CNAS</R>. "AI and the Evolution of Biological National Security Risks" (August 2024) - Analysis of AI-biosecurity intersection
+- <R id="MmIzYWZmYT">CNAS</R>. "AI and the Evolution of Biological National Security Risks" (August 2024)
 - [Johns Hopkins Center for Health Security](https://centerforhealthsecurity.org/2024/leaders-in-biosecurity-commend-nsceb-interim-report-and-aixbio-policy-options-paper). AIxBio policy recommendations (2024)
-- [NTI Biosecurity](https://www.nti.org/analysis/articles/statement-on-biosecurity-risks-at-the-convergence-of-ai-and-the-life-sciences/). "Statement on Biosecurity Risks at the Convergence of AI and the Life Sciences"
+- [NTI Biosecurity](https://www.nti.org/analysis/articles/the-convergence-of-artificial-intelligence-and-the-life-sciences/). "The Convergence of Artificial Intelligence and the Life Sciences: Safeguarding Technology, Rethinking Governance, and Preventing Catastrophe" (October 2023) - Released at UK AI Safety Summit; includes six governance recommendations
+- [RAND / NTI](https://www.rand.org/content/dam/rand/pubs/conf_proceedings/CFA4100/CFA4186-1/RAND_CFA4186-1.pdf). "Biosecurity Governance Across Uncertain Artificial Intelligence Futures" (February 2025) - Workshop proceedings from AI Action Summit, Paris
+- [Arms Control Association](https://www.armscontrol.org/blog/2025-11-24/regulatory-gaps-benchtop-nucleic-acid-synthesis-create-biosecurity-vulnerabilities). "Regulatory Gaps in Benchtop Nucleic Acid Synthesis Create Biosecurity Vulnerabilities" (November 2025)
+- [Council on Strategic Risks](https://councilonstrategicrisks.org/2025/12/22/2025-aixbio-wrapped-a-year-in-review-and-projections-for-2026/). "2025 AIxBio Wrapped: A Year in Review and Projections for 2026" (December 2025)
 
-### Industry Frameworks
+### Industry and Government Frameworks
 
 - <R id="NGU0MjEyN2">Anthropic</R>. Responsible Scaling Policy and CBRN evaluations (2024-2025)
-- <R id="OTU2ZjU2MD">OpenAI</R>. Preparedness Framework and biological capability evaluations (2024-2025)
-- [OpenAI-Anthropic Joint Evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/). First collaborative safety evaluation exercise (Summer 2025)
-- [Future of Life Institute](https://futureoflife.org/ai-safety-index-summer-2025/). 2025 AI Safety Index - Industry safety practice assessment
-
-### Government Frameworks
-
+- <R id="OTU2ZjU2MD">OpenAI</R>. [Preparedness Framework Version 2](https://openai.com/index/updating-our-preparedness-framework/) (April 15, 2025) - Streamlined to "High" and "Critical" thresholds; biological capabilities prioritized
+- OpenAI. ["Preparing for Future AI Capabilities in Biology"](https://openai.com/index/preparing-for-future-ai-capabilities-in-biology/) (June 2025) - Anticipates upcoming models reaching "High" biological capability threshold
+- OpenAI. ["Measuring AI's Capability to Accelerate Biological Research in the Wet Lab"](https://openai.com/index/accelerating-biological-research-in-the-wet-lab/) (December 2025) - GPT-5 wet lab evaluation with Red Queen Bio and Robot on Rails
+- OpenAI. ["Strengthening Our Safety Ecosystem with External Testing"](https://openai.com/index/strengthening-safety-with-external-testing/) (2025) - Formal disclosure of VCT use in independent evaluation program
+- [OpenAI-Anthropic Joint Evaluation](https://openai.com/index/openai-anthropic-safety-evaluation/). First collaborative cross-lab safety evaluation exercise (Summer 2025)
+- [OpenAI / LANL Partnership](https://openai.com/index/openai-and-los-alamos-national-laboratory-work-together/) (July 2024) - First multimodal frontier model assessment in physical laboratory setting; conducted under LANL's AIRTAG
+- [Future of Life Institute](https://futureoflife.org/ai-safety-index-summer-2025/). 2025 AI Safety Index
 - <R id="ZTU2ZDQ0NW">White House OSTP</R>. Framework for Nucleic Acid Synthesis Screening (April 2024)
 - Executive Order 14110. Safe, Secure, and Trustworthy Development and Use of AI (October 2023)
-- Trump Administration AI Action Plan (July 2025) - Acknowledged dual-use biotechnology risks
+- Trump Administration Executive Order on Improving the Safety and Security of Biological Research (May 5, 2025)
+- [Epoch AI](https://epoch.ai/gradient-updates/do-the-biorisk-evaluations-of-ai-labs-actually-measure-the-risk-of-developing-bioweapons). "Do the Biorisk Evaluations of AI Labs Actually Measure the Risk of Developing Bioweapons?" (June 2025)
+- [PMC/NIH](https://pmc.ncbi.nlm.nih.gov/articles/PMC12710665/). "Creating Enforceable Biosecurity Standards for Nucleic Acid Providers" (October 2025)
+
+[^rc-76f9]: Tejal Patwardhan, Kevin Liu, Todor Markov, et al. (OpenAI / Gryphon Scientific). ["Building an Early Warning System for LLM-Aided Biological Threat Creation."](https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/) 2024.
+
+[^rc-62ff]: Center for AI Safety / SecureBio. ["AISN #52: An Expert Virology Benchmark."](https://newsletter.safe.ai/p/ai-safety-newsletter-52-an-expert) 2025
