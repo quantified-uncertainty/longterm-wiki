@@ -559,27 +559,23 @@ export function EntityProfileViewer({
   const [data, setData] = useState<EntityProfileData | null>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Auto-search on mount if URL has entity param
-  const hasAutoSearched = useRef(false);
-  useEffect(() => {
-    if (hasAutoSearched.current) return;
-    const urlEntity = searchParams.get("entity");
-    if (urlEntity && !initialData) {
-      hasAutoSearched.current = true;
-      doSearch(urlEntity);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const doSearch = useCallback(async (query: string) => {
+    // Cancel any inflight request to prevent stale responses overwriting newer ones
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     setError(null);
 
     try {
       const res = await fetch(
-        `/api/entity-profile-proxy?entity=${encodeURIComponent(query)}`
+        `/api/entity-profile-proxy?entity=${encodeURIComponent(query)}`,
+        { signal: controller.signal }
       );
+      if (controller.signal.aborted) return;
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         setError(body.message || `HTTP ${res.status}`);
@@ -588,12 +584,23 @@ export function EntityProfileViewer({
         setData(await res.json());
       }
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : String(err));
       setData(null);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, []);
+
+  // Search when the URL entity param changes (handles initial load and browser back/forward)
+  useEffect(() => {
+    const urlEntityParam = searchParams.get("entity");
+    if (urlEntityParam && !initialData) {
+      doSearch(urlEntityParam);
+    }
+  }, [searchParams, initialData, doSearch]);
 
   const handleSearch = useCallback(
     (query: string) => {
