@@ -1,9 +1,4 @@
-thing:
-  id: corrigibility-failure
-  stableId: aE60G9uLyA
-  type: risk
-  name: Corrigibility Failure
-  wikiId: E80
+entity: aE60G9uLyA
 facts:
   - id: f_vsexbmZdEg
     property: description

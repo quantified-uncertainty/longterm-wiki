@@ -1,9 +1,4 @@
-thing:
-  id: futuresearch
-  stableId: PIC4ivhNpw
-  type: organization
-  name: FutureSearch
-  wikiId: E530
+entity: PIC4ivhNpw
 facts:
   - id: f_NsWFzyt9Ag
     property: description

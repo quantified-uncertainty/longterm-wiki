@@ -1,12 +1,4 @@
-thing:
-  id: daniela-amodei
-  stableId: tKMznr07QA
-  type: person
-  name: "Daniela Amodei"
-  wikiId: "E90"
-  aliases:
-    - "Daniela"
-
+entity: tKMznr07QA
 facts:
   - id: f_R5GtlfjvmA
     property: employed-by

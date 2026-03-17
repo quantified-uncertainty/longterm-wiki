@@ -1,9 +1,4 @@
-thing:
-  id: sparse-moe
-  stableId: qSUpeYPEoQ
-  type: capability
-  name: Sparse / MoE Transformers
-  wikiId: E500
+entity: qSUpeYPEoQ
 facts:
   - id: f_hd73waMYPw
     property: description

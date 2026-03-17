@@ -1,12 +1,4 @@
-thing:
-  id: stuart-russell
-  stableId: ZxUirlzHke
-  type: person
-  name: "Stuart Russell"
-  wikiId: "E290"
-  aliases:
-    - Stuart J. Russell
-
+entity: ZxUirlzHke
 facts:
   - id: f_xSvwobPnd7
     property: employed-by

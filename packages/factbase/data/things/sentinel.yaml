@@ -1,9 +1,4 @@
-thing:
-  id: sentinel
-  stableId: JzhBAecjaA
-  type: organization
-  name: Sentinel (Catastrophic Risk Foresight)
-  wikiId: E566
+entity: JzhBAecjaA
 facts:
   - id: f_yt76DHUQOQ
     property: description

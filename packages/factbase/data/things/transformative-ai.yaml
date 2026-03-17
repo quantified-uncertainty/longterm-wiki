@@ -1,9 +1,4 @@
-thing:
-  id: transformative-ai
-  stableId: bmVIhwpQww
-  type: concept
-  name: Transformative AI
-  wikiId: E357
+entity: bmVIhwpQww
 facts:
   - id: f_wn3dvLqMxg
     property: description

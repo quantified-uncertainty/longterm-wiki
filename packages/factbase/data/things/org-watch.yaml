@@ -1,9 +1,4 @@
-thing:
-  id: org-watch
-  stableId: dquHawryUA
-  type: project
-  name: Org Watch
-  wikiId: E388
+entity: dquHawryUA
 facts:
   - id: f_NMqcIKlSbQ
     property: description

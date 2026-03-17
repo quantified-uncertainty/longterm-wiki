@@ -1,14 +1,4 @@
-thing:
-  id: center-for-ai-safety
-  stableId: y4bieqSeag
-  type: organization
-  name: "Center for AI Safety"
-  wikiId: E47
-  aliases:
-    - CAIS
-  previousIds:
-    - oa9A0OV0RX
-
+entity: y4bieqSeag
 facts:
   - id: f_SaGQWpxjYQ
     property: total-funding

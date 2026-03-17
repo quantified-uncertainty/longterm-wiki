@@ -1,9 +1,4 @@
-thing:
-  id: ai-impacts
-  stableId: TdbypiKyCw
-  type: organization
-  name: AI Impacts
-  wikiId: E512
+entity: TdbypiKyCw
 facts:
   - id: f_KeADXc2nlQ
     property: description

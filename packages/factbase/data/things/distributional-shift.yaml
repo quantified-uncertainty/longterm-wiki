@@ -1,9 +1,4 @@
-thing:
-  id: distributional-shift
-  stableId: qYk1BOLgqA
-  type: risk
-  name: AI Distributional Shift
-  wikiId: E105
+entity: qYk1BOLgqA
 facts:
   - id: f_2v4muuXRSw
     property: description

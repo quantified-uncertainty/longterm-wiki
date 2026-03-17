@@ -1,12 +1,4 @@
-thing:
-  id: jaan-tallinn
-  stableId: 6gjF5d3geg
-  type: person
-  name: "Jaan Tallinn"
-  wikiId: E577
-  aliases:
-    - Tallinn
-
+entity: 6gjF5d3geg
 facts:
   - id: f_m9kTf3qYKQ
     property: description

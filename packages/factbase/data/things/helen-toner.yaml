@@ -1,9 +1,4 @@
-thing:
-  id: helen-toner
-  stableId: oTieHq0pRA
-  type: person
-  name: Helen Toner
-  wikiId: E575
+entity: oTieHq0pRA
 facts:
   - id: f_xzqOizPpxQ
     property: description

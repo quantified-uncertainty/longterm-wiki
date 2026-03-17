@@ -1,10 +1,4 @@
-thing:
-  id: fei-fei-li
-  stableId: QzcX3bShmQ
-  type: person
-  name: "Fei-Fei Li"
-  wikiId: "E1303"
-
+entity: QzcX3bShmQ
 facts:
   - id: f_RObNpFN8Eg
     property: role

@@ -1,12 +1,4 @@
-thing:
-  id: conjecture
-  stableId: 0u4J70VqFY
-  type: organization
-  name: "Conjecture"
-  wikiId: "E70"
-  aliases:
-    - Conjecture AI
-
+entity: 0u4J70VqFY
 facts:
   - id: f_bzhF0Iaop1
     property: founded-date

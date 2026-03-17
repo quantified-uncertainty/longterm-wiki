@@ -1,9 +1,4 @@
-thing:
-  id: scheming
-  stableId: JqMTO0YVEA
-  type: risk
-  name: Scheming
-  wikiId: E274
+entity: JqMTO0YVEA
 facts:
   - id: f_pj2Z1ayzcg
     property: description

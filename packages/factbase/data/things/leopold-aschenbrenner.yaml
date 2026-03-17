@@ -1,9 +1,4 @@
-thing:
-  id: leopold-aschenbrenner
-  stableId: izkduIMBDg
-  type: person
-  name: Leopold Aschenbrenner
-  wikiId: E578
+entity: izkduIMBDg
 facts:
   - id: f_qMoglL9DLg
     property: description

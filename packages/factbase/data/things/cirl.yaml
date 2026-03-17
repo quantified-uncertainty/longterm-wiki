@@ -1,9 +1,4 @@
-thing:
-  id: cirl
-  stableId: SDvbPMOcQw
-  type: approach
-  name: Cooperative IRL (CIRL)
-  wikiId: E586
+entity: SDvbPMOcQw
 facts:
   - id: f_tujcJhsezg
     property: description

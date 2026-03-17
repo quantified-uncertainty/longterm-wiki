@@ -1,9 +1,4 @@
-thing:
-  id: mesa-optimization
-  stableId: 8Bv92x9G1A
-  type: risk
-  name: Mesa-Optimization
-  wikiId: E197
+entity: 8Bv92x9G1A
 facts:
   - id: f_0hCOMZmZrA
     property: description

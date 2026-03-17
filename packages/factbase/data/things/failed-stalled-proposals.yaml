@@ -1,9 +1,4 @@
-thing:
-  id: failed-stalled-proposals
-  stableId: dj6xnXmB7A
-  type: policy
-  name: Failed and Stalled AI Proposals
-  wikiId: E137
+entity: dj6xnXmB7A
 facts:
   - id: f_9Qsfs77rRg
     property: description

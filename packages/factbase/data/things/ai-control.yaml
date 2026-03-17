@@ -1,9 +1,4 @@
-thing:
-  id: ai-control
-  stableId: sFjyY5xXZA
-  type: research-area
-  name: AI Control
-  wikiId: E6
+entity: sFjyY5xXZA
 facts:
   - id: f_VniJGgrVgA
     property: description

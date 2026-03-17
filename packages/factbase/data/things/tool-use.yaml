@@ -1,9 +1,4 @@
-thing:
-  id: tool-use
-  stableId: C5XsvYDQGA
-  type: capability
-  name: Tool Use and Computer Use
-  wikiId: E356
+entity: C5XsvYDQGA
 facts:
   - id: f_IjKedRyjSQ
     property: description

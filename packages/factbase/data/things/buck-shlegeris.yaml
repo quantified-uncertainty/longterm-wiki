@@ -1,9 +1,4 @@
-thing:
-  id: buck-shlegeris
-  stableId: Z62bQynY4g
-  type: person
-  name: Buck Shlegeris
-  wikiId: E46
+entity: Z62bQynY4g
 facts:
   - id: f_UR3u0VcRwQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: macarthur-foundation
-  stableId: 8q2GhtEmkA
-  type: organization
-  name: MacArthur Foundation
-  wikiId: E544
+entity: 8q2GhtEmkA
 facts:
   - id: f_hzPewqzvnA
     property: description

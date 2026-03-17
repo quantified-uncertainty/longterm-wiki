@@ -1,10 +1,4 @@
-thing:
-  id: mark-zuckerberg
-  stableId: OxXXTxtbrA
-  type: person
-  name: "Mark Zuckerberg"
-  wikiId: "E1293"
-
+entity: OxXXTxtbrA
 facts:
   - id: f_mTxD5bcYgw
     property: role

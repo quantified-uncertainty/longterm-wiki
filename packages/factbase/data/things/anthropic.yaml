@@ -1,13 +1,4 @@
-thing:
-  id: anthropic
-  stableId: mK9pX3rQ7n
-  type: organization
-  name: Anthropic
-  wikiId: "E22"
-  aliases:
-    - Anthropic PBC
-    - Anthropic AI
-
+entity: mK9pX3rQ7n
 facts:
   # ── Revenue (ARR time series) ───────────────────────────────────
   - id: f_qR5tY9wE1a

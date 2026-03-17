@@ -1,9 +1,4 @@
-thing:
-  id: will-macaskill
-  stableId: p1P9oQwB6w
-  type: person
-  name: Will MacAskill
-  wikiId: E862
+entity: p1P9oQwB6w
 facts:
   - id: f_ai1K4HXqHA
     property: description

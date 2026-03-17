@@ -1,9 +1,4 @@
-thing:
-  id: power-seeking
-  stableId: hwDgNNDsDQ
-  type: risk
-  name: Power-Seeking AI
-  wikiId: E226
+entity: hwDgNNDsDQ
 facts:
   - id: f_BiCTuqGAvA
     property: description

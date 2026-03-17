@@ -1,9 +1,4 @@
-thing:
-  id: quri
-  stableId: Khej79OA8g
-  type: organization
-  name: QURI (Quantified Uncertainty Research Institute)
-  wikiId: E238
+entity: Khej79OA8g
 facts:
   - id: f_hdxXdOaXLg
     property: description

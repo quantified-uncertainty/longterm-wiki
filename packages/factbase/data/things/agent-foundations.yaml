@@ -1,9 +1,4 @@
-thing:
-  id: agent-foundations
-  stableId: UXhjjryeZg
-  type: approach
-  name: Agent Foundations
-  wikiId: E584
+entity: UXhjjryeZg
 facts:
   - id: f_tFsSLbrZ9A
     property: description

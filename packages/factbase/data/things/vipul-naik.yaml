@@ -1,9 +1,4 @@
-thing:
-  id: vipul-naik
-  stableId: OdDfkoWwQg
-  type: person
-  name: Vipul Naik
-  wikiId: E581
+entity: OdDfkoWwQg
 facts:
   - id: f_GupKup2iyw
     property: description

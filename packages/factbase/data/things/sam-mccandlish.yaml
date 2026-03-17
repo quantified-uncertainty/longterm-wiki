@@ -1,10 +1,4 @@
-thing:
-  id: sam-mccandlish
-  stableId: ENl8sgChDQ
-  type: person
-  name: "Sam McCandlish"
-  wikiId: "E1259"
-
+entity: ENl8sgChDQ
 facts:
   - id: f_FiKueyUA8w
     property: employed-by

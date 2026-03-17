@@ -1,9 +1,4 @@
-thing:
-  id: 1day-sooner
-  stableId: 9k7drw6Qpg
-  type: organization
-  name: 1Day Sooner
-  wikiId: E509
+entity: 9k7drw6Qpg
 facts:
   - id: f_ym4qkTsDVg
     property: description

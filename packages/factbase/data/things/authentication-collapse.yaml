@@ -1,9 +1,4 @@
-thing:
-  id: authentication-collapse
-  stableId: GvV1xPNXRw
-  type: risk
-  name: Authentication Collapse
-  wikiId: E27
+entity: GvV1xPNXRw
 facts:
   - id: f_LTye2fgagQ
     property: description

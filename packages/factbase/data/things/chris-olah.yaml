@@ -1,12 +1,4 @@
-thing:
-  id: chris-olah
-  stableId: Tz48rTriBg
-  type: person
-  name: "Chris Olah"
-  wikiId: "E59"
-  aliases:
-    - "Christopher Olah"
-
+entity: Tz48rTriBg
 facts:
   - id: f_PbzJNYhoQQ
     property: employed-by

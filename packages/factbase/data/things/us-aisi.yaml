@@ -1,9 +1,4 @@
-thing:
-  id: us-aisi
-  stableId: fYyAxYlHDQ
-  type: organization
-  name: US AI Safety Institute
-  wikiId: E365
+entity: fYyAxYlHDQ
 facts:
   - id: f_LiIWWhTjAw
     property: description

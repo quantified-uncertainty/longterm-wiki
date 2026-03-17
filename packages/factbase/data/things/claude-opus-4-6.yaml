@@ -1,9 +1,4 @@
-thing:
-  id: claude-opus-4-6
-  stableId: Ac7c55KtVw
-  type: ai-model
-  name: Claude Opus 4.6
-  wikiId: E1039
+entity: Ac7c55KtVw
 facts:
   - id: f_qWKppqiSkQ
     property: description

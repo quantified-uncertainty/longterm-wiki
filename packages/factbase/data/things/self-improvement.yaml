@@ -1,9 +1,4 @@
-thing:
-  id: self-improvement
-  stableId: eUR0jvxO5A
-  type: capability
-  name: Self-Improvement and Recursive Enhancement
-  wikiId: E278
+entity: eUR0jvxO5A
 facts:
   - id: f_9IvR8eF36g
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: pause-moratorium
-  stableId: 3Mc5fuvtMg
-  type: policy
-  name: Pause / Moratorium
-  wikiId: E460
+entity: 3Mc5fuvtMg
 facts:
   - id: f_mZpNEVM5vg
     property: description

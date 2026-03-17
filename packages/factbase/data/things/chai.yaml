@@ -1,11 +1,4 @@
-thing:
-  id: chai
-  stableId: zMfgJqiEPQ
-  type: organization
-  name: Center for Human-Compatible AI (CHAI)
-  aliases:
-    - CHAI
-  wikiId: E57
+entity: zMfgJqiEPQ
 facts:
   - id: f_yNQJE8kYNw
     property: description

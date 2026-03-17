@@ -15,6 +15,7 @@ import { readFileSync, readdirSync } from "fs";
 import { join, basename } from "path";
 import { parse as parseYaml } from "yaml";
 import { PROJECT_ROOT } from "../content-types.ts";
+import { buildTableBaseEntityMap } from "../factbase-loader.ts";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -89,6 +90,12 @@ interface KBThing {
   >;
 }
 
+/** Raw YAML shape for new-format files: `entity: <stableId>` */
+interface KBEntityFile {
+  entity: string;
+  facts?: KBThing["facts"];
+}
+
 interface ExpertEntry {
   id: string;
   name: string;
@@ -99,19 +106,43 @@ interface ExpertEntry {
 
 /**
  * Load all KB thing files, returning person entities only.
+ * Handles both legacy `thing:` block format and new `entity: <stableId>` format.
  */
 function loadKBPersons(): KBThing[] {
   const files = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith(".yaml"));
   const persons: KBThing[] = [];
+  const tbEntities = buildTableBaseEntityMap();
 
   for (const file of files) {
     try {
       const content = readFileSync(join(KB_THINGS_DIR, file), "utf-8");
       // Handle YAML custom tags by stripping them
       const cleaned = content.replace(/!ref\s+/g, "");
-      const data = parseYaml(cleaned) as KBThing;
-      if (data?.thing?.type === "person") {
-        persons.push(data);
+      const data = parseYaml(cleaned);
+
+      // New format: entity: <stableId>
+      if (data?.entity && typeof data.entity === "string") {
+        const stableId = data.entity;
+        const tbEntity = tbEntities.get(stableId);
+        if (tbEntity && tbEntity.type === "person") {
+          persons.push({
+            thing: {
+              id: basename(file, ".yaml"),
+              stableId,
+              type: tbEntity.type,
+              name: tbEntity.name,
+              ...(tbEntity.wikiPageId && { wikiId: tbEntity.wikiPageId }),
+            },
+            facts: (data as KBEntityFile).facts,
+          });
+        }
+        continue;
+      }
+
+      // Legacy format: thing: { ... }
+      const thingData = data as KBThing;
+      if (thingData?.thing?.type === "person") {
+        persons.push(thingData);
       }
     } catch (e) {
       console.warn(
@@ -125,6 +156,7 @@ function loadKBPersons(): KBThing[] {
 
 /**
  * Build a map from slug/id → stableId for all KB entities (for org resolution).
+ * Handles both legacy `thing:` block format and new `entity: <stableId>` format.
  */
 function buildEntityMap(): Map<string, string> {
   const files = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith(".yaml"));
@@ -135,11 +167,20 @@ function buildEntityMap(): Map<string, string> {
       const content = readFileSync(join(KB_THINGS_DIR, file), "utf-8");
       const cleaned = content.replace(/!ref\s+/g, "");
       const data = parseYaml(cleaned);
+      const slug = basename(file, ".yaml");
+
+      // New format: entity: <stableId>
+      if (data?.entity && typeof data.entity === "string") {
+        const stableId = data.entity;
+        map.set(slug, stableId);
+        map.set(stableId, stableId);
+        continue;
+      }
+
+      // Legacy format: thing: { id, stableId }
       if (data?.thing?.id && data?.thing?.stableId) {
-        const slug = basename(file, ".yaml");
         map.set(data.thing.id, data.thing.stableId);
         map.set(slug, data.thing.stableId);
-        // Also map stableId to itself
         map.set(data.thing.stableId, data.thing.stableId);
       }
     } catch {
@@ -286,15 +327,29 @@ function extractFromExperts(entityMap: Map<string, string>): CareerEntry[] {
 
   const entries: CareerEntry[] = [];
   // Build a map from expert slug → person stableId
+  // Uses TableBase entity map for new-format files (entity: <stableId>)
   const personStableIds = new Map<string, string>();
+  const tbEntities = buildTableBaseEntityMap();
   const files = readdirSync(KB_THINGS_DIR).filter((f) => f.endsWith(".yaml"));
   for (const file of files) {
     try {
       const content = readFileSync(join(KB_THINGS_DIR, file), "utf-8");
       const cleaned = content.replace(/!ref\s+/g, "");
       const data = parseYaml(cleaned);
+      const slug = basename(file, ".yaml");
+
+      // New format: entity: <stableId>
+      if (data?.entity && typeof data.entity === "string") {
+        const stableId = data.entity;
+        const tbEntity = tbEntities.get(stableId);
+        if (tbEntity && tbEntity.type === "person") {
+          personStableIds.set(slug, stableId);
+        }
+        continue;
+      }
+
+      // Legacy format: thing: { ... }
       if (data?.thing?.type === "person") {
-        const slug = basename(file, ".yaml");
         personStableIds.set(slug, data.thing.stableId);
         personStableIds.set(data.thing.id, data.thing.stableId);
       }

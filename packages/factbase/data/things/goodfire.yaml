@@ -1,9 +1,4 @@
-thing:
-  id: goodfire
-  stableId: H74rOLotqg
-  type: organization
-  name: Goodfire
-  wikiId: E430
+entity: H74rOLotqg
 facts:
   - id: f_NPjYnmfB4w
     property: description

@@ -1,12 +1,4 @@
-thing:
-  id: paul-christiano
-  stableId: vzxfzxBITd
-  type: person
-  name: "Paul Christiano"
-  wikiId: "E220"
-  aliases:
-    - Paul
-
+entity: vzxfzxBITd
 facts:
   - id: f_rPQmiVa1LH
     property: employed-by

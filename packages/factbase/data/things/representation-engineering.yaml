@@ -1,9 +1,4 @@
-thing:
-  id: representation-engineering
-  stableId: xwxKWEAkSQ
-  type: approach
-  name: Representation Engineering
-  wikiId: E479
+entity: xwxKWEAkSQ
 facts:
   - id: f_YvlG2uTZ8Q
     property: description

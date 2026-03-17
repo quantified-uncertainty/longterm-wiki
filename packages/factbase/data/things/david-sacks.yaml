@@ -1,11 +1,4 @@
-thing:
-  id: david-sacks
-  stableId: JjyNWsA91A
-  type: person
-  name: David Sacks
-  aliases:
-    - "David Sacks (White House AI Czar)"
-  wikiId: E431
+entity: JjyNWsA91A
 facts:
   - id: f_XwwBzQAhXg
     property: description

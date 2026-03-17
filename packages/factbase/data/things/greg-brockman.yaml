@@ -1,11 +1,4 @@
-thing:
-  id: greg-brockman
-  stableId: Yq4s2cI7ng
-  type: person
-  name: "Greg Brockman"
-  aliases:
-    - "Brockman"
-
+entity: Yq4s2cI7ng
 facts:
   - id: f_tZxixtemow
     property: employed-by

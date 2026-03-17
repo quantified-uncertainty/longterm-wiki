@@ -1,9 +1,4 @@
-thing:
-  id: mit-ai-risk-repository
-  stableId: Qalx4pvUXQ
-  type: project
-  name: MIT AI Risk Repository
-  wikiId: E383
+entity: Qalx4pvUXQ
 facts:
   - id: f_h9RLqzdaqQ
     property: description

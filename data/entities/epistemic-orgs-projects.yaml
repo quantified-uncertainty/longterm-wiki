@@ -21,10 +21,10 @@
   description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions. Created by Anthony Aguirre (FLI/FLF President).
   path: /knowledge-base/organizations/metaculus/
   relatedEntries:
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
       relationship: created-by
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   lastUpdated: 2026-03
 
@@ -84,7 +84,7 @@
   title: XPT (Existential Risk Persuasion Tournament)
   projectStatus: active
   projectUrl: https://xpt.forecastingresearch.org
-  organization: fri
+  organization: KslhqGaeJw
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
@@ -97,7 +97,7 @@
   title: ForecastBench
   projectStatus: active
   projectUrl: https://forecastbench.org
-  organization: fri
+  organization: KslhqGaeJw
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
@@ -109,7 +109,7 @@
   type: project
   title: AI Forecasting Benchmark Tournament
   projectStatus: active
-  organization: metaculus
+  organization: CUBiiyCfOA
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
@@ -132,7 +132,7 @@
   title: Grokipedia
   projectStatus: active
   projectUrl: https://grokipedia.com
-  organization: xai
+  organization: GLXKjYAEKw
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02

@@ -1,12 +1,4 @@
-thing:
-  id: holden-karnofsky
-  stableId: eQh3ZhWv8D
-  type: person
-  name: "Holden Karnofsky"
-  wikiId: "E156"
-  aliases:
-    - Holden
-
+entity: eQh3ZhWv8D
 facts:
   - id: f_FxnbY9edJA
     property: employed-by

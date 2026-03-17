@@ -1,9 +1,4 @@
-thing:
-  id: ftx
-  stableId: yevJm2XDsQ
-  type: organization
-  name: FTX
-  wikiId: E856
+entity: yevJm2XDsQ
 facts:
   - id: f_kdFqCc8h7g
     property: description

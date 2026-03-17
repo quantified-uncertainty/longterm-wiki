@@ -1,9 +1,4 @@
-thing:
-  id: model-spec
-  stableId: lHxzXeAMrg
-  type: policy
-  name: AI Model Specifications
-  wikiId: E594
+entity: lHxzXeAMrg
 facts:
   - id: f_34JYoAyuHg
     property: description

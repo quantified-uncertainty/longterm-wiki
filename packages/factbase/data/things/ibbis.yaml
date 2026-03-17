@@ -1,9 +1,4 @@
-thing:
-  id: ibbis
-  stableId: 55HJBLrOzg
-  type: organization
-  name: IBBIS (International Biosecurity and Biosafety Initiative for Science)
-  wikiId: E536
+entity: 55HJBLrOzg
 facts:
   - id: f_GF37tEIIOA
     property: description

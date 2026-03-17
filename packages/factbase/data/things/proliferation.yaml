@@ -1,9 +1,4 @@
-thing:
-  id: proliferation
-  stableId: Pr5xmThNfA
-  type: risk
-  name: AI Proliferation
-  wikiId: E232
+entity: Pr5xmThNfA
 facts:
   - id: f_E7cjB2LW9w
     property: description

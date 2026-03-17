@@ -23,52 +23,52 @@
     including Claude 1, Claude 2, Claude 3, and Claude 4. Claude is available via API, the claude.ai
     web interface, and Claude Code (a CLI tool for software engineering).
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
-    - id: claude-3-opus
+    - id: Ko9DCNV87A
       type: ai-model
       relationship: composed-of
-    - id: claude-3-sonnet
+    - id: ReFcBG3rJQ
       type: ai-model
       relationship: composed-of
-    - id: claude-3-haiku
+    - id: DlLHB7v8lQ
       type: ai-model
       relationship: composed-of
-    - id: claude-3-5-sonnet
+    - id: ISfAiImMYg
       type: ai-model
       relationship: composed-of
-    - id: claude-3-5-haiku
+    - id: Dvvt8cKpkg
       type: ai-model
       relationship: composed-of
-    - id: claude-3-7-sonnet
+    - id: ePVee3jidQ
       type: ai-model
       relationship: composed-of
-    - id: claude-sonnet-4
+    - id: 3cgL7jNlgw
       type: ai-model
       relationship: composed-of
-    - id: claude-opus-4
+    - id: bmxLNyfK3A
       type: ai-model
       relationship: composed-of
-    - id: claude-opus-4-1
+    - id: dHgSM46fMw
       type: ai-model
       relationship: composed-of
-    - id: claude-sonnet-4-5
+    - id: fdp0LajPwQ
       type: ai-model
       relationship: composed-of
-    - id: claude-haiku-4-5
+    - id: y87VxEBBIA
       type: ai-model
       relationship: composed-of
-    - id: claude-opus-4-5
+    - id: tppPAkJqjQ
       type: ai-model
       relationship: composed-of
-    - id: claude-opus-4-6
+    - id: Ac7c55KtVw
       type: ai-model
       relationship: composed-of
-    - id: claude-sonnet-4-6
+    - id: Au1yMEZYWQ
       type: ai-model
       relationship: composed-of
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: concept
       relationship: related
   sources:
@@ -127,10 +127,10 @@
     GPT-4 on MMLU (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at \$15/\$75 per million
     tokens (input/output) with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -167,10 +167,10 @@
     2x the speed of Claude 2 at higher intelligence levels. Priced at \$3/\$15 per million tokens with a
     200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -206,10 +206,10 @@
     March 4, 2024. It could process a 10K-token research paper in under 3 seconds. Priced at \$0.25/\$1.25
     per million tokens with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -292,10 +292,10 @@
     outperformed Claude 3 Opus across the board at half the price (\$3/\$15 per MTok). The October update
     introduced computer use capability in public beta. Scored 92.0% on HumanEval and 88.7% on MMLU.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -334,10 +334,10 @@
     evaluations while maintaining Haiku-class speed. Priced at \$0.80/\$4 per million tokens (reduced
     from initial \$1/\$5 in December 2024) with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -396,10 +396,10 @@
     toggle extended thinking mode on or off, allowing the model to self-reflect before answering.
     Priced at \$3/\$15 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -455,10 +455,10 @@
     a new naming convention. Scored 72.7% on SWE-bench Verified. Priced at \$3/\$15 per million tokens
     with a 200K token context window (1M beta added later).
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -512,10 +512,10 @@
     model at launch, capable of autonomous coding for up to 7 hours. Scored 72.5% on SWE-bench Verified.
     Priced at \$15/\$75 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -554,10 +554,10 @@
     in software engineering, agentic reasoning, and research-level tasks. Priced at \$15/\$75 per million
     tokens with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -605,10 +605,10 @@
     parallel compute) and 61.4% on OSWorld. Maintained focus for 30+ hours on multi-step tasks. Launched
     alongside Claude Code 2.0. Priced at \$3/\$15 per million tokens with 200K context (1M beta).
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -646,10 +646,10 @@
     fraction of the cost, making near-frontier intelligence accessible for scaled deployments. Priced at
     \$1/\$5 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -697,10 +697,10 @@
     (80.9%). Featured a 67% price reduction from Opus 4 (\$5/\$25 vs \$15/\$75 per MTok). Scored 44% on
     Terminal-Bench Hard and 70 on Artificial Analysis Intelligence Index.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -752,10 +752,10 @@
     (83% improvement over Opus 4.5), 65.4% on Terminal-Bench 2.0, and 72.7% on OSWorld.
     Priced at \$5/\$25 per million tokens.
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -800,10 +800,10 @@
     cost. Default model for free and Pro Claude users. Priced at \$3/\$15 per million tokens with
     200K context (1M beta).
   relatedEntries:
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -836,25 +836,25 @@
     (o1, o3) extends GPT with chain-of-thought reasoning. GPT models are available via the OpenAI
     API, ChatGPT, and Microsoft Copilot.
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
-    - id: gpt-4
+    - id: Zd0khJQ6XA
       type: ai-model
       relationship: composed-of
-    - id: gpt-4o
+    - id: ziNB5viRfw
       type: ai-model
       relationship: composed-of
-    - id: gpt-4o-mini
+    - id: 6zbeHdP49g
       type: ai-model
       relationship: composed-of
-    - id: o1
+    - id: KpR1gIwJZw
       type: ai-model
       relationship: composed-of
-    - id: o3
+    - id: x0Qhowq8zA
       type: ai-model
       relationship: composed-of
-    - id: gpt-4-1
+    - id: EvEua2w8IA
       type: ai-model
       relationship: composed-of
   sources:
@@ -913,10 +913,10 @@
     90th percentile on the bar exam. Initially text-only with an 8K context window (32K variant
     available). Priced at \$30/\$60 per million tokens.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -954,10 +954,10 @@
     (16x the original GPT-4), lower pricing (\$10/\$30 per MTok, 3x cheaper than GPT-4), multimodal
     vision capabilities, and a knowledge cutoff of April 2023 (later updated to December 2023).
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1044,10 +1044,10 @@
     at 50% lower price (\$2.50/\$10 per MTok) and 2x faster speed. Scored 88.7% on MMLU. Available
     free to all ChatGPT users with rate limits.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1104,10 +1104,10 @@
     Priced at \$0.15/\$0.60 per million tokens — over 60% cheaper than GPT-3.5 Turbo. Scored 82% on
     MMLU and 87.2% on HumanEval. Replaced GPT-3.5 Turbo as the default free-tier model in ChatGPT.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1158,13 +1158,13 @@
     chain-of-thought to think through complex problems before responding. Scored 83.3% on the
     International Mathematics Olympiad qualifying exam (vs 13.4% for GPT-4o) and 78% on GPQA Diamond.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
-    - id: o1
+    - id: KpR1gIwJZw
       type: ai-model
       relationship: related
   sources:
@@ -1236,10 +1236,10 @@
     Added vision capabilities, tool use, and a 200K context window. Scored 96.4% on MATH and
     79.2% on GPQA Diamond. Priced at \$15/\$60 per million tokens.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1286,10 +1286,10 @@
     o1-mini was released alongside o1-preview on September 12, 2024. A smaller, faster, 80% cheaper
     reasoning model optimized for STEM tasks. Scored 90% on MATH. Priced at \$3/\$12 per million tokens.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1348,10 +1348,10 @@
     On high effort, scored 97.9% on MATH and 79.7% on GPQA Diamond. Priced at \$1.10/\$4.40 per
     million tokens — significantly cheaper than o1. Available in the API and ChatGPT.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1425,10 +1425,10 @@
     87.5% on ARC-AGI, and 83.3% on GPQA Diamond. Featured improved tool use, image understanding,
     and code execution. Priced at \$10/\$40 per million tokens with a 200K context window.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1490,10 +1490,10 @@
     following. Featured a 1M token context window, scored 54.6% on SWE-bench Verified, and priced at
     \$2/\$8 per million tokens. Replaced GPT-4o as the recommended general-purpose API model.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1532,10 +1532,10 @@
     same 1M token context window. Priced at \$0.40/\$1.60 per million tokens — nearly 3x cheaper than
     GPT-4o mini with better performance.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1574,10 +1574,10 @@
     Designed for high-throughput classification, routing, and structured output tasks. Priced at
     \$0.10/\$0.40 per million tokens with a 1M token context window.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1641,10 +1641,10 @@
     approaches o3 performance at a fraction of the cost. Scored 68.1% on SWE-bench Verified
     and 81.4% on GPQA Diamond. Priced at \$1.10/\$4.40 per million tokens.
   relatedEntries:
-    - id: gpt
+    - id: Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1680,25 +1680,25 @@
     The family spans three tiers: Ultra (most capable), Pro (balanced), and Flash (fast/efficient).
     Gemini powers Google AI Studio, the Gemini API, and various Google products.
   relatedEntries:
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
-    - id: gemini-1-0-ultra
+    - id: DMvYhkrQgg
       type: ai-model
       relationship: composed-of
-    - id: gemini-1-5-pro
+    - id: 36NY6axmRA
       type: ai-model
       relationship: composed-of
-    - id: gemini-1-5-flash
+    - id: hDHozNlJHQ
       type: ai-model
       relationship: composed-of
-    - id: gemini-2-0-flash
+    - id: 1Vsd6bbAbg
       type: ai-model
       relationship: composed-of
-    - id: gemini-2-5-pro
+    - id: FmNMFeajhg
       type: ai-model
       relationship: composed-of
-    - id: gemini-2-5-flash
+    - id: a5llQhfVkw
       type: ai-model
       relationship: composed-of
   sources:
@@ -1756,10 +1756,10 @@
     performance on MMLU (90.0%). Built natively multimodal, processing text, images, audio, and video
     in a single model. Powered the Gemini Advanced subscription tier.
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -1814,10 +1814,10 @@
     extended to 2M). Used a Mixture-of-Experts architecture for efficiency. Could process up to 1 hour
     of video, 11 hours of audio, or 30,000+ lines of code. Priced at \$1.25/\$5 per million tokens.
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -1859,10 +1859,10 @@
     Designed for high-volume, cost-sensitive tasks. Featured a 1M token context window at an
     extremely low price point (\$0.075/\$0.30 per million tokens).
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -1921,10 +1921,10 @@
     tool use, multimodal generation (images and audio output), and agentic capabilities.
     Priced at \$0.10/\$0.40 per million tokens.
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2007,10 +2007,10 @@
     on SWE-bench Verified, 84% on GPQA Diamond, and 97.3% on MATH. Featured a 1M token context
     window with reasoning capabilities. Priced at \$1.25/\$10 per million tokens.
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2054,10 +2054,10 @@
     multimodal capabilities. Priced at \$0.15/\$0.60 per million tokens. Designed to bring 2.5 Pro
     reasoning quality to Flash-tier pricing.
   relatedEntries:
-    - id: gemini
+    - id: PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2091,25 +2091,25 @@
     the gap to proprietary models, and Llama 4 (April 2025) introduced mixture-of-experts
     architecture. Llama models are available for download and can be self-hosted.
   relatedEntries:
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
-    - id: llama-2
+    - id: B2NbO8iHzQ
       type: ai-model
       relationship: composed-of
-    - id: llama-3
+    - id: ws008RbGOA
       type: ai-model
       relationship: composed-of
-    - id: llama-3-1
+    - id: kNi5nDKetA
       type: ai-model
       relationship: composed-of
-    - id: llama-3-3
+    - id: vxov67Lixw
       type: ai-model
       relationship: composed-of
-    - id: llama-4-scout
+    - id: JodiKHELlg
       type: ai-model
       relationship: composed-of
-    - id: llama-4-maverick
+    - id: T3ipFW0POA
       type: ai-model
       relationship: composed-of
   sources:
@@ -2147,10 +2147,10 @@
     MMLU. Trained on 2T tokens with a 4K context window. Llama 2 Chat variants were fine-tuned for
     dialogue using RLHF.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2196,10 +2196,10 @@
     The 70B model scored 82% on MMLU and 81.7% on HumanEval, approaching GPT-4 performance.
     Used a Grouped Query Attention (GQA) architecture and a 128K token vocabulary.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2254,10 +2254,10 @@
     openly available model at the time. The 405B scored 88.6% on MMLU, competitive with GPT-4o and
     Claude 3.5 Sonnet. Extended context to 128K tokens. Released under the Llama 3.1 Community License.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2307,10 +2307,10 @@
     on many benchmarks. This represented a significant efficiency improvement — near-405B quality at
     70B cost. Scored 86% on MMLU with 128K context window.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2351,10 +2351,10 @@
     model at launch. Natively multimodal (text + image). Scored 89.3% on MMLU. Beat Gemini 2.0 Flash
     and GPT-4o on multiple benchmarks while being deployable on a single H100 GPU.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2396,10 +2396,10 @@
     Featured a 1M token context window and native multimodal support. Could be deployed on a single
     H100 DGX host.
   relatedEntries:
-    - id: llama
+    - id: kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: meta-ai
+    - id: tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2434,13 +2434,13 @@
     (the first competitive small open model), Mixtral (mixture-of-experts), and Mistral Large
     (frontier-class). The company offers both open-weight and proprietary models.
   relatedEntries:
-    - id: mistral-ai
+    - id: RFHVboBnHg
       type: organization
       relationship: created-by
-    - id: mixtral-8x7b
+    - id: S519Yr3AOw
       type: ai-model
       relationship: composed-of
-    - id: mistral-large-2
+    - id: 7aS5YclgSQ
       type: ai-model
       relationship: composed-of
   sources:
@@ -2478,10 +2478,10 @@
     or outperformed Llama 2 70B and GPT-3.5 on most benchmarks while being 6x faster at inference.
     Scored 70.6% on MMLU. Released under Apache 2.0 license.
   relatedEntries:
-    - id: mistral-ai-models
+    - id: v1e1ZwDwoA
       type: ai-model
       relationship: part-of
-    - id: mistral-ai
+    - id: RFHVboBnHg
       type: organization
       relationship: created-by
   sources:
@@ -2537,10 +2537,10 @@
     Featured a 128K context window and was released under the Mistral Research License (later made
     more permissive). Available via API and self-hosting.
   relatedEntries:
-    - id: mistral-ai-models
+    - id: v1e1ZwDwoA
       type: ai-model
       relationship: part-of
-    - id: mistral-ai
+    - id: RFHVboBnHg
       type: organization
       relationship: created-by
   sources:
@@ -2573,13 +2573,13 @@
     information via the X (Twitter) platform. Grok-1 was partially open-sourced, but later versions
     are proprietary. Available via the xAI API and the X platform.
   relatedEntries:
-    - id: xai
+    - id: GLXKjYAEKw
       type: organization
       relationship: created-by
-    - id: grok-2
+    - id: wRDaY5XnEA
       type: ai-model
       relationship: composed-of
-    - id: grok-3
+    - id: ELbPFPb5vA
       type: ai-model
       relationship: composed-of
   sources:
@@ -2629,10 +2629,10 @@
     3.5 Sonnet. Featured vision capabilities and integrated image generation via FLUX. Available
     through the xAI API and X Premium+ subscribers. Priced at \$2/\$10 per million tokens.
   relatedEntries:
-    - id: grok
+    - id: nnv09Wl5OQ
       type: ai-model
       relationship: part-of
-    - id: xai
+    - id: GLXKjYAEKw
       type: organization
       relationship: created-by
   sources:
@@ -2688,10 +2688,10 @@
     H100 GPUs). Scored 80% on GPQA Diamond and 95% on MATH. Featured a "think" mode for chain-of-thought
     reasoning. Available via the xAI API and X platform. Priced at \$3/\$15 per million tokens.
   relatedEntries:
-    - id: grok
+    - id: nnv09Wl5OQ
       type: ai-model
       relationship: part-of
-    - id: xai
+    - id: GLXKjYAEKw
       type: organization
       relationship: created-by
   sources:
@@ -2725,13 +2725,13 @@
     training cost, and R1's open-weight reasoning capabilities that rivaled o1. All models are
     released under permissive MIT licenses.
   relatedEntries:
-    - id: deepseek
+    - id: otUkuVHDKw
       type: organization
       relationship: created-by
-    - id: deepseek-v3
+    - id: DysvXRWdOQ
       type: ai-model
       relationship: composed-of
-    - id: deepseek-r1
+    - id: jhJqRVFXcg
       type: ai-model
       relationship: composed-of
   sources:
@@ -2802,10 +2802,10 @@
     90.2% on MATH. Released under MIT license. API pricing at \$0.27/\$1.10 per million tokens — one
     of the cheapest frontier-class models.
   relatedEntries:
-    - id: deepseek-models
+    - id: svlbcrT5oQ
       type: ai-model
       relationship: part-of
-    - id: deepseek
+    - id: otUkuVHDKw
       type: organization
       relationship: created-by
   sources:
@@ -2881,10 +2881,10 @@
     versions (1.5B to 70B). Released under MIT license, making it the first open-weight model competitive
     with proprietary reasoning models.
   relatedEntries:
-    - id: deepseek-models
+    - id: svlbcrT5oQ
       type: ai-model
       relationship: part-of
-    - id: deepseek
+    - id: otUkuVHDKw
       type: organization
       relationship: created-by
   sources:

@@ -1,11 +1,4 @@
-thing:
-  id: nate-soares
-  stableId: 5MVd90lzCg
-  type: person
-  name: Nate Soares
-  aliases:
-    - "Nate Soares (MIRI)"
-  wikiId: E212
+entity: 5MVd90lzCg
 facts:
   - id: f_MCKelTrhAw
     property: description

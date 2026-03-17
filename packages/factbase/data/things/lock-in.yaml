@@ -1,9 +1,4 @@
-thing:
-  id: lock-in
-  stableId: nFwuCHi9qw
-  type: risk
-  name: AI Value Lock-in
-  wikiId: E189
+entity: nFwuCHi9qw
 facts:
   - id: f_hIM5i2msOQ
     property: description

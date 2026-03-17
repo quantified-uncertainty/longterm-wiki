@@ -1,9 +1,4 @@
-thing:
-  id: astralis-foundation
-  stableId: QeknHipQPA
-  type: organization
-  name: Astralis Foundation
-  wikiId: E702
+entity: QeknHipQPA
 facts:
   - id: f_BGt4Vo09rw
     property: description

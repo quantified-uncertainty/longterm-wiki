@@ -1,9 +1,4 @@
-thing:
-  id: founders-fund
-  stableId: LYfneQJbSA
-  type: organization
-  name: Founders Fund
-  wikiId: E529
+entity: LYfneQJbSA
 facts:
   - id: f_QJ9J38qA6Q
     property: description

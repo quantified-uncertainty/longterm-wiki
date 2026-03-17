@@ -1,9 +1,4 @@
-thing:
-  id: claude
-  stableId: cMKB5i2WZQ
-  type: ai-model
-  name: Claude
-  wikiId: E1041
+entity: cMKB5i2WZQ
 facts:
   - id: f_E9HZ253h0A
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: donations-list-website
-  stableId: 2xZD4XR3MQ
-  type: project
-  name: Donations List Website
-  wikiId: E389
+entity: 2xZD4XR3MQ
 facts:
   - id: f_CBi6j58xDg
     property: description

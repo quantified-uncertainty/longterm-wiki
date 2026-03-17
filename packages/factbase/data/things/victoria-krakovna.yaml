@@ -1,10 +1,4 @@
-thing:
-  id: victoria-krakovna
-  stableId: utxQdymSEg
-  type: person
-  name: "Victoria Krakovna"
-  wikiId: "E1296"
-
+entity: utxQdymSEg
 facts:
   - id: f_L8SLq90qgA
     property: role

@@ -1,9 +1,4 @@
-thing:
-  id: alignment
-  stableId: rt6jVH9yuA
-  type: approach
-  name: AI Alignment
-  wikiId: E439
+entity: rt6jVH9yuA
 facts:
   - id: f_zbzg5bIlgA
     property: description

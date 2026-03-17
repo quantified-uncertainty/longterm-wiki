@@ -1,9 +1,4 @@
-thing:
-  id: anthropic-pre-ipo-daf-transfers
-  stableId: 1DjpqfXwjA
-  type: analysis
-  name: Anthropic Pre-IPO DAF Transfers
-  wikiId: E412
+entity: 1DjpqfXwjA
 facts:
   - id: f_ssPs0akaMA
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: coding
-  stableId: 64WDhlxxKA
-  type: capability
-  name: Autonomous Coding
-  wikiId: E61
+entity: 64WDhlxxKA
 facts:
   - id: f_efSuCb0t2w
     property: description

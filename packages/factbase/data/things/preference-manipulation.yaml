@@ -1,9 +1,4 @@
-thing:
-  id: preference-manipulation
-  stableId: eM6SuO5nUw
-  type: risk
-  name: AI Preference Manipulation
-  wikiId: E230
+entity: eM6SuO5nUw
 facts:
   - id: f_FS4q0V070w
     property: description

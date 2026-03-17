@@ -1,9 +1,4 @@
-thing:
-  id: polymarket
-  stableId: fRo2H0Q2xQ
-  type: organization
-  name: Polymarket
-  wikiId: E555
+entity: fRo2H0Q2xQ
 facts:
   - id: f_aUf0i5YixA
     property: description

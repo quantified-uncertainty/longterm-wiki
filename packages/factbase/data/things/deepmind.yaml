@@ -1,16 +1,4 @@
-thing:
-  id: deepmind
-  stableId: A4XoubikkQ
-  type: organization
-  name: Google DeepMind
-  wikiId: "E98"
-  aliases:
-    - DeepMind
-    - DeepMind Technologies
-    - Google DeepMind
-  previousSlugs:
-    - google-deepmind
-
+entity: A4XoubikkQ
 facts:
   - id: f_mEKUPPFYRg
     property: founded-date

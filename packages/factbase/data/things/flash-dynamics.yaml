@@ -1,9 +1,4 @@
-thing:
-  id: flash-dynamics
-  stableId: 0t2GLN0sBA
-  type: risk
-  name: AI Flash Dynamics
-  wikiId: E142
+entity: 0t2GLN0sBA
 facts:
   - id: f_WEkSDCRAzQ
     property: description

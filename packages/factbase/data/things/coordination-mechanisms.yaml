@@ -1,9 +1,4 @@
-thing:
-  id: coordination-mechanisms
-  stableId: 4a6Sf9Fupg
-  type: policy
-  name: International Coordination Mechanisms
-  wikiId: E470
+entity: 4a6Sf9Fupg
 facts:
   - id: f_NNIDBg6foQ
     property: description

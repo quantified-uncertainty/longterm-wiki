@@ -1,9 +1,4 @@
-thing:
-  id: giving-pledge
-  stableId: 3w5hW5liew
-  type: organization
-  name: Giving Pledge
-  wikiId: E531
+entity: 3w5hW5liew
 facts:
   - id: f_LOqgkOyz7Q
     property: description

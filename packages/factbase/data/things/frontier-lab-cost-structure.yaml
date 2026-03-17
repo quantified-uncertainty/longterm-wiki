@@ -1,9 +1,4 @@
-thing:
-  id: frontier-lab-cost-structure
-  stableId: gS4YxcslRg
-  type: analysis
-  name: Frontier Lab Cost Structure
-  wikiId: E703
+entity: gS4YxcslRg
 facts:
   - id: f_RKfchz0Jcw
     property: description

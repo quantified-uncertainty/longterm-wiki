@@ -1,9 +1,4 @@
-thing:
-  id: ai-safety-institutes
-  stableId: aCEdTooCBw
-  type: policy
-  name: AI Safety Institutes (AISIs)
-  wikiId: E13
+entity: aCEdTooCBw
 facts:
   - id: f_Ufgd2soLGg
     property: description

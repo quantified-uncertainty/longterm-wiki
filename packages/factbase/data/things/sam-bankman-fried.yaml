@@ -1,9 +1,4 @@
-thing:
-  id: sam-bankman-fried
-  stableId: sace2bALew
-  type: person
-  name: Sam Bankman-Fried
-  wikiId: E857
+entity: sace2bALew
 facts:
   - id: f_YjbqhAe0Lg
     property: description

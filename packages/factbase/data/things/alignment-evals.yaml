@@ -1,9 +1,4 @@
-thing:
-  id: alignment-evals
-  stableId: dMC2spIgVg
-  type: approach
-  name: Alignment Evaluations
-  wikiId: E448
+entity: dMC2spIgVg
 facts:
   - id: f_VknoGOp8PQ
     property: description

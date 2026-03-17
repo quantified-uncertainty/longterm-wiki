@@ -1,9 +1,4 @@
-thing:
-  id: schmidt-futures
-  stableId: h6ntSGk8fg
-  type: organization
-  name: Schmidt Futures
-  wikiId: E561
+entity: h6ntSGk8fg
 facts:
   - id: f_gvxwABjqxA
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: leading-the-future
-  stableId: pg7Ym4EQ9A
-  type: organization
-  name: Leading the Future super PAC
-  wikiId: E422
+entity: pg7Ym4EQ9A
 facts:
   - id: f_QHeg4m6Knw
     property: description

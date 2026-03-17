@@ -1,9 +1,4 @@
-thing:
-  id: lightning-rod-labs
-  stableId: 4804DX6Zbg
-  type: organization
-  name: Lightning Rod Labs
-  wikiId: E540
+entity: 4804DX6Zbg
 facts:
   - id: f_OyfHjujlCQ
     property: description

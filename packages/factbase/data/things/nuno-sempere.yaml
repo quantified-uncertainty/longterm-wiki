@@ -1,9 +1,4 @@
-thing:
-  id: nuno-sempere
-  stableId: AnFfbQlIog
-  type: person
-  name: Nuño Sempere
-  wikiId: E579
+entity: AnFfbQlIog
 facts:
   - id: f_xAJL18iX9A
     property: description

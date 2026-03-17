@@ -1,12 +1,4 @@
-thing:
-  id: yann-lecun
-  stableId: cMbVUVK29Q
-  type: person
-  name: "Yann LeCun"
-  wikiId: "E582"
-  aliases:
-    - "LeCun"
-
+entity: cMbVUVK29Q
 facts:
   - id: f_y9K773heIw
     property: employed-by
