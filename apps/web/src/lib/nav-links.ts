@@ -25,7 +25,6 @@ export const NAV_ITEMS: NavItem[] = [
       { href: "/people", label: "People" },
       { href: "/ai-models", label: "AI Models" },
       { href: "/projects", label: "Projects" },
-      { href: "/events", label: "Events" },
     ],
   },
   {
