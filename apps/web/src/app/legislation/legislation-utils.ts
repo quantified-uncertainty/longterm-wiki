@@ -56,7 +56,7 @@ export function getCustomField(
  */
 export function getPolicyWikiHref(entity: PolicyEntity): string | null {
   if (!entity.wikiId) return null;
-  return getWikiHref(entity.id);
+  return getWikiHref(entity.wikiId);
 }
 
 /**

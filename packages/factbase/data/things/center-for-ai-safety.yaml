@@ -1,11 +1,13 @@
 thing:
   id: center-for-ai-safety
-  stableId: oa9A0OV0RX
+  stableId: y4bieqSeag
   type: organization
   name: "Center for AI Safety"
   wikiId: E47
   aliases:
     - CAIS
+  previousIds:
+    - oa9A0OV0RX
 
 facts:
   - id: f_SaGQWpxjYQ

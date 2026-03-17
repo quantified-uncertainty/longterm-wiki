@@ -4,14 +4,23 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 // ---- In-memory store simulating Postgres entities table ----
 
+/** Primary store: stableId -> row */
 let entitiesStore: Map<string, Record<string, unknown>>;
+/** Secondary index: slug (id) -> stableId */
+let slugIndex: Map<string, string>;
 
 /** Captured dispatch calls for asserting SQL parameters. */
 let dispatchCalls: Array<{ query: string; params: unknown[] }>;
 
 function resetStores() {
   entitiesStore = new Map();
+  slugIndex = new Map();
   dispatchCalls = [];
+}
+
+/** Look up entity by any key (stableId or slug). */
+function lookupEntity(key: string): Record<string, unknown> | undefined {
+  return entitiesStore.get(key) ?? entitiesStore.get(slugIndex.get(key) ?? "");
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -20,9 +29,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- ref-check: SELECT id FROM entities WHERE id IN (...) ---
   if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
-    // Return only IDs that exist in the entities store
+    // Return only IDs that exist in the entities store (check both slug and stableId)
     return params
-      .filter((p) => entitiesStore.has(p as string))
+      .filter((p) => lookupEntity(p as string) !== undefined)
       .map((p) => ({ id: p }));
   }
 
@@ -35,12 +44,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const id = params[o] as string;
-      const existing = entitiesStore.get(id);
+      const stableId = params[o + 2] as string;
+      const existing = entitiesStore.get(stableId);
 
       const row: Record<string, unknown> = {
         id,
         wiki_id: params[o + 1],
-        stable_id: params[o + 2],
+        stable_id: stableId,
         entity_type: params[o + 3],
         title: params[o + 4],
         description: params[o + 5],
@@ -57,7 +67,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         created_at: existing?.created_at ?? now,
         updated_at: now,
       };
-      entitiesStore.set(id, row);
+      // Primary key: stableId; secondary index: slug
+      entitiesStore.set(stableId, row);
+      slugIndex.set(id, stableId);
       rows.push(row);
     }
     return rows;
@@ -182,6 +194,14 @@ const { createApp } = await import("../app.js");
 
 // ---- Helpers ----
 
+/** Generate a deterministic 10-char stableId from a slug for tests. */
+function testStableId(slug: string): string {
+  // Simple hash for test determinism — not cryptographic
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = ((h << 5) - h + slug.charCodeAt(i)) | 0;
+  return `test${Math.abs(h).toString(36).padEnd(6, "0")}`.slice(0, 10);
+}
+
 function seedEntity(
   app: Hono,
   id: string,
@@ -194,6 +214,7 @@ function seedEntity(
         id,
         title,
         entityType: opts.entityType ?? "organization",
+        stableId: opts.stableId ?? testStableId(id),
         wikiId: opts.wikiId ?? `E${Math.floor(Math.random() * 1000)}`,
         description: opts.description ?? `Description of ${title}`,
         ...opts,
@@ -221,6 +242,7 @@ describe("Entities API", () => {
         entities: [
           {
             id: "anthropic",
+            stableId: "aB1cD2eF3g",
             title: "Anthropic",
             entityType: "organization",
             wikiId: "E22",
@@ -228,6 +250,7 @@ describe("Entities API", () => {
           },
           {
             id: "openai",
+            stableId: "hI4jK5lM6n",
             title: "OpenAI",
             entityType: "organization",
             wikiId: "E43",
@@ -242,12 +265,13 @@ describe("Entities API", () => {
     });
 
     it("updates existing entities", async () => {
-      await seedEntity(app, "anthropic", "Anthropic");
+      await seedEntity(app, "anthropic", "Anthropic", { stableId: "aB1cD2eF3g" });
 
       const res = await postJson(app, "/api/entities/sync", {
         entities: [
           {
             id: "anthropic",
+            stableId: "aB1cD2eF3g",
             title: "Anthropic (Updated)",
             entityType: "organization",
             description: "Updated description",
@@ -267,14 +291,21 @@ describe("Entities API", () => {
 
     it("rejects entities without title", async () => {
       const res = await postJson(app, "/api/entities/sync", {
-        entities: [{ id: "no-title", entityType: "concept" }],
+        entities: [{ id: "no-title", stableId: "nT1234abcd", entityType: "concept" }],
       });
       expect(res.status).toBe(400);
     });
 
     it("rejects entities without entityType", async () => {
       const res = await postJson(app, "/api/entities/sync", {
-        entities: [{ id: "no-type", title: "No Type" }],
+        entities: [{ id: "no-type", stableId: "nT5678efgh", title: "No Type" }],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects entities without stableId", async () => {
+      const res = await postJson(app, "/api/entities/sync", {
+        entities: [{ id: "no-stable", title: "No Stable ID", entityType: "concept" }],
       });
       expect(res.status).toBe(400);
     });
@@ -296,6 +327,7 @@ describe("Entities API", () => {
   describe("GET /api/entities/:id", () => {
     it("returns entity by slug", async () => {
       await seedEntity(app, "anthropic", "Anthropic", {
+        stableId: "aB1cD2eF3g",
         wikiId: "E22",
         description: "AI safety company",
       });
@@ -309,7 +341,7 @@ describe("Entities API", () => {
     });
 
     it("returns entity by wiki ID", async () => {
-      await seedEntity(app, "anthropic", "Anthropic", { wikiId: "E22" });
+      await seedEntity(app, "anthropic", "Anthropic", { stableId: "aB1cD2eF3g", wikiId: "E22" });
 
       const res = await app.request("/api/entities/E22");
       expect(res.status).toBe(200);
@@ -479,15 +511,17 @@ describe("Entities API", () => {
   describe("JSONB fields", () => {
     it("syncs entities with tags, relatedEntries, sources", async () => {
       // Pre-seed referenced entities so ref-check passes
-      await seedEntity(app, "openai", "OpenAI");
+      await seedEntity(app, "openai", "OpenAI", { stableId: "hI4jK5lM6n" });
       await seedEntity(app, "interpretability", "Interpretability", {
         entityType: "safety-agenda",
+        stableId: "xY7zA8bC9d",
       });
 
       const res = await postJson(app, "/api/entities/sync", {
         entities: [
           {
             id: "anthropic",
+            stableId: "aB1cD2eF3g",
             title: "Anthropic",
             entityType: "organization",
             tags: ["ai-safety", "frontier-lab"],
@@ -516,6 +550,7 @@ describe("Entities API", () => {
         entities: [
           {
             id: "anthropic",
+            stableId: "aB1cD2eF3g",
             title: "Anthropic",
             entityType: "organization",
             relatedEntries: [
@@ -535,12 +570,14 @@ describe("Entities API", () => {
         entities: [
           {
             id: "alpha",
+            stableId: "alPHa12345",
             title: "Alpha",
             entityType: "organization",
             relatedEntries: [{ id: "beta", type: "organization" }],
           },
           {
             id: "beta",
+            stableId: "bETa678901",
             title: "Beta",
             entityType: "organization",
             relatedEntries: [{ id: "alpha", type: "organization" }],
@@ -620,6 +657,7 @@ describe("Entities API", () => {
         entities: [
           {
             id: "anthropic",
+            stableId: "aB1cD2eF3g",
             title: "Anthropic",
             entityType: "organization",
           },
@@ -643,6 +681,7 @@ describe("Entities API", () => {
           entities: [
             {
               id: "anthropic",
+              stableId: "aB1cD2eF3g",
               title: "Anthropic",
               entityType: "organization",
             },

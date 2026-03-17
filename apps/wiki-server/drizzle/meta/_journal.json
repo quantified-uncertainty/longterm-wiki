@@ -708,6 +708,13 @@
       "when": 1777276800000,
       "tag": "0100_add_author_entity_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1777363200000,
+      "tag": "0101_stableid_pk",
+      "breakpoints": true
     }
   ]
 }

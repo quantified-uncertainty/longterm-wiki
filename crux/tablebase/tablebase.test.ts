@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { ScanSummary, EnrichmentTask, TableProfile } from './types.ts';
-import { TASK_TYPE_WEIGHTS } from './types.ts';
+import { TASK_TYPE_WEIGHTS, toSlug } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Task Ranker Tests
@@ -156,6 +156,39 @@ describe('types', () => {
       expect(weights[tt]).toBeDefined();
       expect(typeof weights[tt]).toBe('number');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toSlug Tests
+// ---------------------------------------------------------------------------
+
+describe('toSlug', () => {
+  it('converts basic names', () => {
+    expect(toSlug('Dario Amodei')).toBe('dario-amodei');
+  });
+
+  it('transliterates German umlauts (ü→u, ö→o, ä→a)', () => {
+    expect(toSlug('Andreas Stuhlmüller')).toBe('andreas-stuhlmuller');
+    expect(toSlug('Jörgen Björk')).toBe('jorgen-bjork');
+    expect(toSlug('Bäcker')).toBe('backer');
+  });
+
+  it('transliterates Spanish ñ', () => {
+    expect(toSlug('Nuño Sempere')).toBe('nuno-sempere');
+  });
+
+  it('transliterates accented vowels', () => {
+    expect(toSlug('café résumé')).toBe('cafe-resume');
+    expect(toSlug('Fei-Fei Lì')).toBe('fei-fei-li');
+  });
+
+  it('trims leading/trailing dashes', () => {
+    expect(toSlug('--hello--')).toBe('hello');
+  });
+
+  it('handles numbers', () => {
+    expect(toSlug('80000 Hours')).toBe('80000-hours');
   });
 });
 

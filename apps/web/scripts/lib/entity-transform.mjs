@@ -153,8 +153,10 @@ function transformEntity(raw, expertMap, orgMap) {
   const canonicalType = OLD_TYPE_MAP[oldType] || oldType;
 
   // Build base fields shared across all types
+  // Only include stableId when defined (synthetic entities from frontmatter may not have one)
   const base = {
     id: raw.id,
+    ...(raw.stableId != null ? { stableId: raw.stableId } : {}),
     title: raw.title,
     description: raw.description,
     tags: raw.tags || [],

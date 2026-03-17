@@ -51,6 +51,8 @@ export interface IdRegistryMaps {
   byWikiId: Record<string, string>; // E1 → slug
   bySlug: Record<string, string>; // slug → E1
   stableIdToSlug?: Record<string, string>; // 10-char stableId → slug (from YAML entities)
+  byStableId?: Record<string, string>; // stableId → slug (optional for backward compat)
+  stableIdBySlug?: Record<string, string>; // slug → stableId (optional for backward compat)
 }
 
 /**
@@ -504,14 +506,22 @@ export function getEntityBundle(entityId: string): EntityBundle | null {
 }
 
 /**
- * Resolve a wiki ID (E35) to slug without loading the full database.
- * Falls back to the full registry if needed, but tries the lightweight approach first.
+ * Resolve a wiki ID (E35) or stableId (10-char alphanumeric) to slug without
+ * loading the full database. Falls back to the full registry if needed,
+ * but tries the lightweight approach first.
  */
 function resolveIdWithoutRegistry(id: string): string {
-  if (!/^E\d+$/.test(id)) return id;
-  // Must use the registry — load it from the database
-  const registry = getIdRegistry();
-  return registry.byWikiId[id] || id;
+  // Wiki ID: E35 → slug
+  if (/^E\d+$/.test(id)) {
+    const registry = getIdRegistry();
+    return registry.byWikiId[id] || id;
+  }
+  // StableId: 10-char alphanumeric → slug
+  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+    const registry = getIdRegistry();
+    return registry.byStableId?.[id] || id;
+  }
+  return id;
 }
 
 // ============================================================================
@@ -616,13 +626,20 @@ interface Entity {
 // ============================================================================
 
 /**
- * Resolve an ID that may be numeric (E35) or a slug (deepmind) to its slug form.
+ * Resolve an ID that may be numeric (E35), a stableId (10-char alphanumeric),
+ * or a slug (deepmind) to its slug form.
  * Returns the original ID if it's already a slug or not found in the registry.
  */
 export function resolveId(id: string): string {
+  // Wiki ID: E35 → slug
   if (/^E\d+$/.test(id)) {
     const registry = getIdRegistry();
     return registry.byWikiId[id] || id;
+  }
+  // StableId: 10-char alphanumeric → slug
+  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+    const registry = getIdRegistry();
+    return registry.byStableId?.[id] || id;
   }
   return id;
 }
@@ -647,6 +664,17 @@ function typedEntityIndex() {
     _typedEntityIndex = new Map(getTypedEntities().map(e => [e.id, e]));
   }
   return _typedEntityIndex;
+}
+
+/**
+ * Get a typed entity by stableId (10-char alphanumeric).
+ * Resolves stableId → slug via idRegistry, then looks up the entity by slug.
+ */
+export function getTypedEntityByStableId(stableId: string): AnyEntity | undefined {
+  const registry = getIdRegistry();
+  const slug = registry.byStableId?.[stableId];
+  if (!slug) return undefined;
+  return typedEntityIndex().get(slug);
 }
 
 function resourceIndex() {
