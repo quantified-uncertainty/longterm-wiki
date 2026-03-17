@@ -107,6 +107,17 @@ export function getFactBaseFacts(entity: string, property?: string): Fact[] {
 }
 
 /**
+ * Pad a partial date string to YYYY-MM-DD for lexicographic comparison.
+ * "2024" → "2024-01-01", "2024-06" → "2024-06-01", "2024-06-15" → "2024-06-15".
+ */
+function padDateToFull(date: string): string {
+  const parts = date.split("-");
+  if (parts.length === 1) return `${parts[0]}-01-01`;
+  if (parts.length === 2) return `${parts[0]}-${parts[1]}-01`;
+  return date;
+}
+
+/**
  * Check whether a fact has expired based on its validEnd field.
  * A fact is expired if validEnd is set AND validEnd < today's date.
  * Supports YYYY, YYYY-MM, and YYYY-MM-DD formats.
@@ -114,33 +125,66 @@ export function getFactBaseFacts(entity: string, property?: string): Fact[] {
  */
 export function isFactExpired(fact: Fact): boolean {
   if (!fact.validEnd) return false;
-  // Pad partial dates so comparison works: "2024" → "2024-01-01", "2024-06" → "2024-06-01"
-  const parts = fact.validEnd.split("-");
-  const padded =
-    parts.length === 1
-      ? `${parts[0]}-01-01`
-      : parts.length === 2
-        ? `${parts[0]}-${parts[1]}-01`
-        : fact.validEnd;
+  const padded = padDateToFull(fact.validEnd);
   const today = new Date().toISOString().slice(0, 10);
   return padded < today;
 }
 
 /**
+ * Check whether a fact's asOf date is in the future (after today).
+ * A fact is future-dated if asOf is set AND asOf > today's date.
+ * Supports YYYY, YYYY-MM, and YYYY-MM-DD formats.
+ * Facts without asOf are never considered future-dated.
+ */
+export function isFactFutureDated(fact: Fact): boolean {
+  if (!fact.asOf) return false;
+  const padded = padDateToFull(fact.asOf);
+  const today = new Date().toISOString().slice(0, 10);
+  return padded > today;
+}
+
+/**
  * Get the latest (most recent by asOf) fact for an entity + property.
- * By default, excludes expired facts (those with a validEnd in the past).
+ * By default, excludes expired facts (those with a validEnd in the past)
+ * and future-dated facts (those with an asOf after today).
+ *
+ * This prevents forecasts/targets (e.g., "2026 target gross margin: 63%")
+ * from being returned over actual reported values (e.g., "2024 actual: 40%").
+ *
+ * If all facts are future-dated, falls back to the most recent one
+ * (after expiry filtering) to avoid returning nothing.
+ *
  * Set includeExpired=true to return expired facts as well.
+ * Set includeFuture=true to include future-dated facts in selection.
  */
 export function getFactBaseLatest(
   entity: string,
   property: string,
-  options?: { includeExpired?: boolean },
+  options?: { includeExpired?: boolean; includeFuture?: boolean },
 ): Fact | undefined {
   const facts = getFactBaseFacts(entity, property);
-  if (options?.includeExpired) {
+  if (options?.includeExpired && options?.includeFuture) {
     return facts[0]; // Already sorted most-recent-first
   }
-  return facts.find((f) => !isFactExpired(f));
+
+  // Apply expiry filter
+  const afterExpiry = options?.includeExpired
+    ? facts
+    : facts.filter((f) => !isFactExpired(f));
+
+  if (afterExpiry.length === 0) return undefined;
+
+  // Apply future-date filter
+  if (options?.includeFuture) {
+    return afterExpiry[0];
+  }
+
+  const nonFuture = afterExpiry.filter((f) => !isFactFutureDated(f));
+  // Fallback: if all remaining facts are future-dated, return the most recent
+  // (closest to today) to avoid returning nothing
+  if (nonFuture.length === 0) return afterExpiry[afterExpiry.length - 1];
+
+  return nonFuture[0];
 }
 
 /** Lazy-initialized index: propertyId → Property. Built once on first call. */
