@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq, and, count, asc, sql, ilike, or, inArray, notInArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
+import { logger } from "../../logger.js";
 import { entities, facts, things } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
@@ -773,8 +774,9 @@ const entitiesApp = new Hono()
       const staleIds = staleRows.map((r) => r.id);
 
       // Log before deleting (destructive operation)
-      console.log(
-        `[entities/prune] Deleting ${staleIds.length} stale ${entityType} entities: ${staleIds.join(", ")}`
+      logger.info(
+        { entityType, count: staleIds.length, ids: staleIds },
+        `Deleting ${staleIds.length} stale ${entityType} entities`
       );
 
       await db.transaction(async (tx) => {
