@@ -5,15 +5,12 @@
  */
 
 import {
-  getKBEntity,
-  getKBEntitySlug,
   getKBSlugMap,
   getKBEntities,
   resolveKBSlug,
 } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import type { Entity } from "@longterm-wiki/factbase";
-import { getTypedEntities, isPerson, isRisk, isOrganization } from "@/data";
+import { getTypedEntities, getTypedEntityById, isPerson, isRisk, isOrganization, type AnyEntity } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
 
@@ -50,24 +47,33 @@ export interface ResolvedEntity {
  */
 export function resolveEntityRef(ref: unknown): ResolvedEntity | null {
   if (typeof ref !== "string" || !ref) return null;
-  // Try as entity ID first, then as slug
-  let entity = getKBEntity(ref);
-  if (!entity) {
-    const entityId = resolveKBSlug(ref);
-    if (entityId) entity = getKBEntity(entityId);
+  // Try TableBase first (handles slugs, E-numbers, and 10-char stableIds)
+  const entity = getTypedEntityById(ref);
+  if (entity) {
+    return {
+      name: entity.title,
+      id: entity.stableId ?? entity.id,
+      slug: entity.id, // entity.id is the slug in TableBase
+    };
   }
-  if (!entity) return { name: ref, id: ref, slug: undefined };
-  return {
-    name: entity.name,
-    id: entity.id,
-    slug: getKBEntitySlug(entity.id) ?? undefined,
-  };
+  // Fallback: try resolving as a FactBase slug
+  const entityId = resolveKBSlug(ref);
+  if (entityId) {
+    const resolved = getTypedEntityById(entityId);
+    if (resolved) {
+      return {
+        name: resolved.title,
+        id: resolved.stableId ?? resolved.id,
+        slug: resolved.id,
+      };
+    }
+  }
+  return { name: ref, id: ref, slug: undefined };
 }
 
 /** Get the wiki page href for an entity, or null if no wiki page. */
-export function getEntityWikiHref(entity: Entity): string | null {
+export function getEntityWikiHref(entity: { wikiId?: string }): string | null {
   if (entity.wikiId) return `/wiki/${entity.wikiId}`;
-  if (entity.wikiPageId) return `/wiki/${entity.wikiPageId}`;
   return null;
 }
 
@@ -80,11 +86,15 @@ export function getEntityWikiHref(entity: Entity): string | null {
 export function resolveEntityBySlug(
   slug: string,
   type: "person" | "organization" | "risk",
-): Entity | undefined {
+): AnyEntity | undefined {
+  // Try TableBase first (slug is the primary key for typed entities)
+  const directEntity = getTypedEntityById(slug);
+  if (directEntity && directEntity.entityType === type) return directEntity;
+  // Fallback: try resolving as a FactBase slug -> stableId -> TableBase
   const entityId = resolveKBSlug(slug);
   if (!entityId) return undefined;
-  const entity = getKBEntity(entityId);
-  if (!entity || entity.type !== type) return undefined;
+  const entity = getTypedEntityById(entityId);
+  if (!entity || entity.entityType !== type) return undefined;
   return entity;
 }
 

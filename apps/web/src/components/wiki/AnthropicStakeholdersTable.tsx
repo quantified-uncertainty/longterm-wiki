@@ -7,7 +7,8 @@
  * not structured data.
  */
 
-import { getKBLatest, getKBRecords, getKBEntity } from "@data/factbase";
+import { getKBLatest, getKBRecords } from "@data/factbase";
+import { getTypedEntityById } from "@data/tablebase";
 import { getEntityById, getPageById, getEntityHref } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
 
@@ -70,8 +71,8 @@ function parseRange(field: unknown): [number, number] | null {
 
 /** Get a display name for a holder slug. */
 function resolveHolderName(holderSlug: string): string {
-  const entity = getKBEntity(holderSlug);
-  if (entity?.name) return entity.name;
+  const entity = getTypedEntityById(holderSlug);
+  if (entity?.title) return entity.title;
   return holderSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
@@ -121,9 +122,9 @@ export async function AnthropicStakeholdersTable() {
     };
     entityPreviews[href] = preview;
     // Also index by wiki page ID URL so /wiki/E123 stakeholder links resolve
-    const kbEnt = getKBEntity(holderSlug);
-    if (kbEnt?.wikiPageId) {
-      entityPreviews[`/wiki/${kbEnt.wikiPageId}`] = preview;
+    const tbEnt = getTypedEntityById(holderSlug);
+    if (tbEnt?.wikiId) {
+      entityPreviews[`/wiki/${tbEnt.wikiId}`] = preview;
     }
   }
 
@@ -147,9 +148,9 @@ export async function AnthropicStakeholdersTable() {
 
     // Build link from entity slug
     let link: string | undefined;
-    const kbEntity = getKBEntity(holderSlug);
-    if (kbEntity?.wikiPageId) {
-      link = `/wiki/${kbEntity.wikiPageId}`;
+    const tbEntity = getTypedEntityById(holderSlug);
+    if (tbEntity?.wikiId) {
+      link = `/wiki/${tbEntity.wikiId}`;
     } else {
       const href = getEntityHref(holderSlug);
       if (href !== `/wiki/${holderSlug}`) link = href;

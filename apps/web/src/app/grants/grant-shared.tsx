@@ -3,11 +3,8 @@
  * Used by both /organizations/[slug]/grants/[grantId] and /funding-programs/[id].
  */
 import Link from "next/link";
-import {
-  getKBEntity,
-  getKBEntitySlug,
-} from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { resolveEntityLink as resolveEntityLinkBase } from "@/lib/record-detail-ui";
@@ -47,17 +44,19 @@ export function resolveEntityLink(entityId: string): {
   slug: string | null;
   href: string | null;
 } {
-  // Try FactBase first for slug extraction (slug is not in the base return type)
-  const entity = getKBEntity(entityId);
+  // Try TableBase first (handles slugs, E-numbers, and 10-char stableIds)
+  const entity = getTypedEntityById(entityId);
   if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization")
-        return { name: entity.name, slug, href: `/organizations/${slug}` };
-      if (entity.type === "person")
-        return { name: entity.name, slug, href: `/people/${slug}` };
-    }
-    return { name: entity.name, slug: null, href: `/factbase/entity/${entityId}` };
+    const slug = entity.id; // entity.id is the slug in TableBase
+    if (entity.entityType === "organization")
+      return { name: entity.title, slug, href: `/organizations/${slug}` };
+    if (entity.entityType === "person")
+      return { name: entity.title, slug, href: `/people/${slug}` };
+    return {
+      name: entity.title,
+      slug,
+      href: entity.wikiId ? `/wiki/${entity.wikiId}` : null,
+    };
   }
 
   // Fall back to the shared resolution (handles bare numeric IDs and stableIds)

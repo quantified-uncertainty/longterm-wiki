@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import { getAllKBRecords } from "@/data/factbase";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
@@ -31,21 +31,18 @@ function resolveRecipient(recipientId: string): {
   href: string | null;
   wikiPageId: string | null;
 } {
-  const entity = getKBEntity(recipientId);
+  const entity = getTypedEntityById(recipientId);
   if (entity) {
-    const slug = getKBEntitySlug(recipientId) ?? null;
-    const typedEntity = getTypedEntityById(recipientId);
-    const wikiPageId = typedEntity?.wikiId ?? null;
+    const slug = entity.id; // entity.id is the slug in TableBase
+    const wikiPageId = entity.wikiId ?? null;
     // Build type-aware href: /organizations/ for orgs, /people/ for people
     let href: string | null = null;
-    if (slug) {
-      if (entity.type === "person") {
-        href = `/people/${slug}`;
-      } else {
-        href = `/organizations/${slug}`;
-      }
+    if (entity.entityType === "person") {
+      href = `/people/${slug}`;
+    } else {
+      href = `/organizations/${slug}`;
     }
-    return { name: entity.name, slug, href, wikiPageId };
+    return { name: entity.title, slug, href, wikiPageId };
   }
   // Not a known entity — convert slug to readable title case
   const displayName = recipientId
@@ -65,11 +62,10 @@ export default function GrantsPage() {
         ? CEA_CANONICAL_ID
         : record.ownerEntityId;
 
-    const orgEntity = getKBEntity(orgId);
-    const orgName = orgEntity?.name ?? orgId;
-    const orgSlug = getKBEntitySlug(orgId) ?? null;
-    const orgTypedEntity = getTypedEntityById(orgId);
-    const orgWikiPageId = orgTypedEntity?.wikiId ?? null;
+    const orgEntity = getTypedEntityById(orgId);
+    const orgName = orgEntity?.title ?? orgId;
+    const orgSlug = orgEntity?.id ?? null;
+    const orgWikiPageId = orgEntity?.wikiId ?? null;
 
     const recipientId =
       typeof record.fields.recipient === "string"

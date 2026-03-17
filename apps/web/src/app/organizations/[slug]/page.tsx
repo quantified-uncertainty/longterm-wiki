@@ -7,7 +7,6 @@ import {
   getKBLatest,
   getKBProperty,
   resolveKBSlug,
-  getKBEntity,
   getKBEntitySlug,
 } from "@/data/factbase";
 import {
@@ -88,11 +87,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const kbEntity = resolveOrgBySlug(slug);
-  if (kbEntity) {
+  const resolved = resolveOrgBySlug(slug);
+  if (resolved) {
     return {
-      title: `${kbEntity.name} | Organizations`,
-      description: `Profile and key metrics for ${kbEntity.name}.`,
+      title: `${resolved.title} | Organizations`,
+      description: `Profile and key metrics for ${resolved.title}.`,
     };
   }
   const typedEntity = getTypedEntityById(slug);
@@ -114,11 +113,16 @@ export default async function OrgProfilePage({
 }) {
   const { slug } = await params;
 
-  // Try KB entity first (full data), then fall back to typed entity (minimal data)
+  // Try resolving slug to a typed entity, then build OrgEntity from it
   let entity: OrgEntity;
-  const kbEntity = resolveOrgBySlug(slug);
-  if (kbEntity) {
-    entity = kbEntity;
+  const resolved = resolveOrgBySlug(slug);
+  if (resolved) {
+    entity = {
+      id: resolved.id,
+      name: resolved.title,
+      wikiId: resolved.wikiId,
+      wikiPageId: resolved.wikiId,
+    };
   } else {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/organizations/${canonical}`);
@@ -244,22 +248,20 @@ export default async function OrgProfilePage({
     // Add key persons first
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
-      // resolveKBSlug handles slug→entityId; getKBEntity handles both
-      // slugs and stableIds directly, so try it as a fallback.
-      let personEntityId = personRef ? resolveKBSlug(personRef) : undefined;
-      let personEntity = personEntityId ? getKBEntity(personEntityId) : undefined;
-      if (!personEntity && personRef) {
-        personEntity = getKBEntity(personRef);
-        if (personEntity) personEntityId = personEntity.id;
+      // Resolve person ref through TableBase (handles slugs, E-numbers, stableIds)
+      let typedPerson = personRef ? getTypedEntityById(personRef) : undefined;
+      if (!typedPerson && personRef) {
+        // Try resolving as a FactBase slug -> stableId -> TableBase
+        const resolvedId = resolveKBSlug(personRef);
+        if (resolvedId) typedPerson = getTypedEntityById(resolvedId);
       }
       const name =
         field(person, "display_name") ??
-        personEntity?.name ??
+        typedPerson?.title ??
         titleCase(personRef ?? person.key);
-      // Resolve slug for linking — use getKBEntitySlug for stableIds
-      const personSlug = personEntityId
-        ? (getKBEntitySlug(personEntityId) ?? personRef)
-        : personRef;
+      // Resolve slug for linking — typedPerson.id is the slug
+      const personSlug = typedPerson?.id ?? personRef;
+      const personEntityId = typedPerson?.stableId ?? typedPerson?.id;
       // Use entity ID as the dedup key when available; fall back to name.
       // This prevents two different people with the same display name from
       // silently overwriting each other.
@@ -270,7 +272,7 @@ export default async function OrgProfilePage({
         name,
         title: field(person, "title"),
         slug: personSlug,
-        entityType: personEntity?.type,
+        entityType: typedPerson?.entityType,
         isFounder: !!person.fields.is_founder,
         isBoard: false,
         isCurrent: !person.fields.end,
