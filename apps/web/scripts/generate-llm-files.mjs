@@ -260,7 +260,7 @@ This file provides an index of site content for LLMs. For full documentation, se
 
   // Summary stats
   const totalPages = pages.length;
-  const pagesWithSummary = pages.filter((p) => p.llmSummary).length;
+  const pagesWithSummary = pages.filter((p) => p.summary).length;
   const highImportance = pages.filter((p) => p.readerImportance >= CONFIG.coreReaderImportanceThreshold).length;
 
   content += `## Statistics
@@ -271,7 +271,7 @@ This file provides an index of site content for LLMs. For full documentation, se
 
 ## Usage Notes
 
-- Each page has an \`llmSummary\` field optimized for LLM consumption
+- Each page has an \`summary\` field optimized for LLM consumption
 - Pages are rated by \`readerImportance\` (0-100) and \`quality\` (0-100)
 - Pages include \`hallucinationRisk\` (level: low/medium/high, score: 0-100, factors[])
 - All content is AI-generated; higher risk scores indicate pages more likely to contain hallucinations
@@ -293,7 +293,7 @@ function generateLlmsCoreTxt(pages) {
 
   // Filter to high reader-importance pages with summaries
   const corePagesRaw = pages
-    .filter((p) => p.readerImportance >= CONFIG.coreReaderImportanceThreshold && p.llmSummary)
+    .filter((p) => p.readerImportance >= CONFIG.coreReaderImportanceThreshold && p.summary)
     .sort((a, b) => (b.readerImportance || 0) - (a.readerImportance || 0));
 
   // Build content, respecting token budget
@@ -320,7 +320,7 @@ URL: ${pageUrl}
 Reader Importance: ${page.readerImportance} | Quality: ${page.quality || 'unrated'} | Hallucination Risk: ${page.hallucinationRisk?.level || 'unknown'} (${page.hallucinationRisk?.score ?? '?'}/100)
 ------------------------------------------------------------
 
-${page.llmSummary}
+${page.summary}
 
 `;
 
@@ -401,7 +401,7 @@ function generateLlmsFullTxt(pages) {
 ## ${page.title}
 URL: ${pageUrl}
 Reader Importance: ${page.readerImportance || 'unrated'} | Quality: ${page.quality || 'unrated'} | Hallucination Risk: ${page.hallucinationRisk?.level || 'unknown'} (${page.hallucinationRisk?.score ?? '?'}/100)
-${page.llmSummary ? `Summary: ${page.llmSummary}` : ''}
+${page.summary ? `Summary: ${page.summary}` : ''}
 ------------------------------------------------------------
 
 `;
@@ -468,7 +468,7 @@ function generatePerPageTxt(pages) {
       page.readerImportance != null ? `Reader Importance: ${page.readerImportance}` : null,
       page.quality != null ? `Quality: ${page.quality}` : null,
       risk ? `Hallucination Risk: ${risk.level} (${risk.score}/100)${risk.factors.length ? ' — ' + risk.factors.join(', ') : ''}` : null,
-      page.llmSummary ? `Summary: ${page.llmSummary}` : null,
+      page.summary ? `Summary: ${page.summary}` : null,
       '',
       '---',
       '',

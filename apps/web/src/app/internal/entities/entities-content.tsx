@@ -108,7 +108,7 @@ export function EntitiesContent() {
       sectionCount: cov?.sectionCount ?? null,
       unconvertedLinkCount: cov?.unconvertedLinkCount ?? null,
       // Booleans
-      llmSummary: cov?.llmSummary ?? null,
+      summary: cov?.summary ?? null,
       schedule: cov?.schedule ?? null,
       entity: cov?.entity ?? null,
       editHistory: cov?.editHistory ?? null,

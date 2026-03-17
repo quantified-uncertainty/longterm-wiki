@@ -71,7 +71,7 @@ export interface UnifiedEntityRow {
   sectionCount: number | null;
   unconvertedLinkCount: number | null;
   // Boolean items
-  llmSummary: boolean | null;
+  summary: boolean | null;
   schedule: boolean | null;
   entity: boolean | null;
   editHistory: boolean | null;
@@ -744,15 +744,15 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   {
     id: "booleans",
     header: () => (
-      <span className="text-xs font-medium cursor-help" title="Boolean checks: LLM Summary, Update Schedule, Entity, Edit History">
+      <span className="text-xs font-medium cursor-help" title="Boolean checks: Summary, Update Schedule, Entity, Edit History">
         Bool
       </span>
     ),
     cell: ({ row }) => {
-      if (row.original.llmSummary == null) return <Dash />;
+      if (row.original.summary == null) return <Dash />;
       return (
         <span className="inline-flex items-center gap-1">
-          <BoolIcon value={row.original.llmSummary} label="LLM Summary" />
+          <BoolIcon value={row.original.summary} label="Summary" />
           <BoolIcon value={row.original.schedule} label="Update Schedule" />
           <BoolIcon value={row.original.entity} label="Entity" />
           <BoolIcon value={row.original.editHistory} label="Edit History" />

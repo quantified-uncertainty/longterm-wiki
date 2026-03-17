@@ -128,7 +128,7 @@ async function main() {
     pagesMap.set(p.id, {
       id: p.id,
       title: p.title,
-      description: p.description || p.llmSummary,
+      description: p.description || p.summary,
       category: p.category,
     });
   }

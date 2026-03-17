@@ -321,7 +321,7 @@ async function main() {
     pagesMap.set(p.id, {
       id: p.id,
       title: p.title,
-      description: (p.description || p.llmSummary || '').slice(0, 200),
+      description: (p.description || p.summary || '').slice(0, 200),
       category: p.category || '',
     });
   }

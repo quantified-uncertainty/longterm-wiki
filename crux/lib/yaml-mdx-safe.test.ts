@@ -3,25 +3,25 @@ import { ensureMdxSafeYaml } from './yaml-mdx-safe.ts';
 
 describe('ensureMdxSafeYaml', () => {
   it('converts unquoted \\$ to double-quoted \\\\$', () => {
-    const input = 'llmSummary: costs exceed \\$1B by 2027\n';
+    const input = 'summary: costs exceed \\$1B by 2027\n';
     const result = ensureMdxSafeYaml(input);
-    expect(result).toBe('llmSummary: "costs exceed \\\\$1B by 2027"\n');
+    expect(result).toBe('summary: "costs exceed \\\\$1B by 2027"\n');
   });
 
   it('leaves already-double-quoted values unchanged', () => {
-    const input = 'llmSummary: "costs exceed \\\\$1B by 2027"\n';
+    const input = 'summary: "costs exceed \\\\$1B by 2027"\n';
     const result = ensureMdxSafeYaml(input);
     expect(result).toBe(input);
   });
 
   it('leaves single-quoted values unchanged', () => {
-    const input = "llmSummary: 'costs exceed \\$1B by 2027'\n";
+    const input = "summary: 'costs exceed \\$1B by 2027'\n";
     const result = ensureMdxSafeYaml(input);
     expect(result).toBe(input);
   });
 
   it('leaves values without \\$ unchanged', () => {
-    const input = 'llmSummary: no dollar signs here\ntitle: Test Page\n';
+    const input = 'summary: no dollar signs here\ntitle: Test Page\n';
     const result = ensureMdxSafeYaml(input);
     expect(result).toBe(input);
   });

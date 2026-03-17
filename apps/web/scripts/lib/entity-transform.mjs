@@ -131,7 +131,7 @@ function applyEntityOverrides(entities, pages) {
         id: page.id,
         type: 'project',
         title: page.title,
-        description: page.llmSummary || page.description || undefined,
+        description: page.summary || page.description || undefined,
         tags: page.tags || [],
         lastUpdated: page.lastUpdated || undefined,
       });

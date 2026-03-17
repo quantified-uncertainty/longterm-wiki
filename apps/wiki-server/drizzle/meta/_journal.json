@@ -715,6 +715,13 @@
       "when": 1777363200000,
       "tag": "0101_stableid_pk",
       "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1777449600000,
+      "tag": "0102_rename_llm_summary_to_summary",
+      "breakpoints": true
     }
   ]
 }

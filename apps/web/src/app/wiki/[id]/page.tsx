@@ -191,7 +191,7 @@ function JsonLd({ pageData, title, slug }: { pageData?: Page; title?: string; sl
     "@type": schemaType(format),
     headline,
     ...(pageData?.description && { description: pageData.description }),
-    ...(pageData?.llmSummary && { abstract: pageData.llmSummary }),
+    ...(pageData?.summary && { abstract: pageData.summary }),
     ...(pageData?.lastUpdated && { dateModified: pageData.lastUpdated }),
     isPartOf: {
       "@type": "WebSite",
@@ -372,7 +372,7 @@ async function ContentView({
         quality={pageData?.quality ?? undefined}
         importance={pageData?.readerImportance ?? undefined}
         researchImportance={pageData?.researchImportance ?? undefined}
-        llmSummary={pageData?.llmSummary ?? undefined}
+        summary={pageData?.summary ?? undefined}
         lastEdited={pageData?.lastUpdated ?? undefined}
         updateFrequency={pageData?.updateFrequency ?? undefined}
         evergreen={pageData?.evergreen}

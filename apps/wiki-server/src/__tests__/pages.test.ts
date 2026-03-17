@@ -14,11 +14,11 @@ function resetStores() {
 
 /**
  * Simple in-memory text search to simulate PostgreSQL tsvector matching.
- * Searches title, description, entity_type, tags, and llm_summary fields.
+ * Searches title, description, entity_type, tags, and summary fields.
  */
 function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
   const q = query.toLowerCase();
-  const fields = [row.title, row.description, row.entity_type, row.tags, row.llm_summary];
+  const fields = [row.title, row.description, row.entity_type, row.tags, row.summary];
   return fields.some((f) => typeof f === "string" && f.toLowerCase().includes(q));
 }
 
@@ -88,7 +88,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         integer_id: params[o + 3],
         title: params[o + 4],
         description: params[o + 5],
-        llm_summary: params[o + 6],
+        summary: params[o + 6],
         category: params[o + 7],
         subcategory: params[o + 8],
         entity_type: params[o + 9],
@@ -561,7 +561,7 @@ describe("Pages API", () => {
             wikiId: null,
             title: "Smoke Test",
             description: null,
-            llmSummary: null,
+            summary: null,
             category: null,
             subcategory: null,
             entityType: null,

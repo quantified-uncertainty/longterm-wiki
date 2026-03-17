@@ -364,9 +364,9 @@ export async function page(args: string[], options: Record<string, unknown>): Pr
     output += `\n  ${c.bold}Description:${c.reset}\n`;
     output += `  ${p.description.slice(0, 400)}${p.description.length > 400 ? '…' : ''}\n`;
   }
-  if (p.llmSummary && options.summary) {
+  if (p.summary && options.summary) {
     output += `\n  ${c.bold}Summary:${c.reset}\n`;
-    output += `  ${p.llmSummary.slice(0, 600)}${p.llmSummary.length > 600 ? '…' : ''}\n`;
+    output += `  ${p.summary.slice(0, 600)}${p.summary.length > 600 ? '…' : ''}\n`;
   }
 
   output += `\n  ${c.dim}Synced: ${p.syncedAt}${c.reset}`;

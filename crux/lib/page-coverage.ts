@@ -60,7 +60,7 @@ export interface PageCoverage {
 export interface CoverageInput {
   wordCount: number;
   contentFormat: string;
-  llmSummary?: string | null;
+  summary?: string | null;
   updateFrequency?: number | null;
   hasEntity: boolean;
   changeHistoryCount: number;
@@ -176,7 +176,7 @@ export function computePageCoverage(input: CoverageInput): PageCoverage {
   const items: Record<string, CoverageStatus> = {};
 
   // Boolean items (4 core)
-  items.llmSummary = input.llmSummary ? 'green' : 'red';
+  items.summary = input.summary ? 'green' : 'red';
   items.schedule = input.updateFrequency != null ? 'green' : 'red';
   items.entity = input.hasEntity ? 'green' : 'red';
   items.editHistory = input.changeHistoryCount > 0 ? 'green' : 'red';
