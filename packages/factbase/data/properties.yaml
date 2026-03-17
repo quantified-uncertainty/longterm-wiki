@@ -523,3 +523,96 @@ properties:
     dataType: text
     category: incident
     appliesTo: [incident]
+
+  # ── Policy / Legislation ──────────────────────────────────────
+
+  compute-threshold:
+    name: Compute Threshold
+    description: "Training compute threshold that triggers regulatory requirements"
+    dataType: number
+    unit: FLOP
+    category: requirements
+    appliesTo: [policy]
+    display:
+      format: scientific
+
+  cost-threshold:
+    name: Cost Threshold
+    description: "Training cost threshold that triggers regulatory requirements"
+    dataType: number
+    unit: USD
+    category: requirements
+    appliesTo: [policy]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  employee-letter-signatories:
+    name: Employee Letter Signatories
+    description: "Number of AI company employees who signed a letter regarding the legislation"
+    dataType: number
+    category: political
+    appliesTo: [policy]
+
+  companion-bills-signed:
+    name: Companion Bills Signed
+    description: "Number of related bills signed alongside this legislation"
+    dataType: number
+    category: legislative
+    appliesTo: [policy]
+
+  total-amendments:
+    name: Total Amendments
+    description: "Number of amendment versions the bill went through"
+    dataType: number
+    category: legislative
+    appliesTo: [policy]
+
+  days-introduction-to-veto:
+    name: Days to Veto
+    description: "Number of days from bill introduction to executive veto"
+    dataType: number
+    unit: days
+    category: legislative
+    appliesTo: [policy]
+
+  lobbying-spend:
+    name: Lobbying Spend
+    description: "Reported lobbying expenditure on this legislation"
+    dataType: number
+    unit: USD
+    category: political
+    temporal: true
+    appliesTo: [policy]
+    display:
+      prefix: "$"
+      suffix: ""
+
+  stakeholder-position-date:
+    name: Stakeholder Position
+    description: "Date a stakeholder announced their position on the legislation"
+    dataType: text
+    category: political
+    temporal: true
+    appliesTo: [policy]
+
+  push-poll-support:
+    name: Push Poll Support
+    description: "Percentage supporting in a push poll"
+    dataType: number
+    unit: percent
+    category: political
+    appliesTo: [policy]
+    display:
+      suffix: "%"
+
+  push-poll-oppose:
+    name: Push Poll Opposition
+    description: "Percentage opposing in a push poll"
+    dataType: number
+    unit: percent
+    category: political
+    appliesTo: [policy]
+    display:
+      suffix: "%"
