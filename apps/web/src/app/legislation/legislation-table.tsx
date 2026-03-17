@@ -118,6 +118,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
           <input
             type="text"
             placeholder="Search legislation..."
+            aria-label="Search legislation"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
