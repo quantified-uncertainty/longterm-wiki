@@ -468,42 +468,42 @@ const entitiesApp = new Hono()
       .map((e) => e.stableId)
       .filter((id): id is string => id != null);
 
-    // Personnel counts: person_id → count (career history entries)
+    // Personnel counts: person_entity_id → count (career history entries)
     const personnelCountMap = new Map<string, number>();
     if (stableIds.length > 0) {
       type PersonnelCountRow = { personId: string; cnt: number };
       const personnelCounts = await db.execute<PersonnelCountRow>(sql`
-        SELECT person_id AS "personId", COUNT(*)::int AS cnt
+        SELECT person_entity_id AS "personId", COUNT(*)::int AS cnt
         FROM personnel
-        WHERE person_id IN (${sqlInList(stableIds)})
+        WHERE person_entity_id IN (${sqlInList(stableIds)})
           AND role_type = 'career'
-        GROUP BY person_id
+        GROUP BY person_entity_id
       `);
       for (const r of personnelCounts) {
         personnelCountMap.set(r.personId, r.cnt);
       }
     }
 
-    // Grant counts: organization_id → grantsGiven, grantee_id → grantsReceived
+    // Grant counts: org_entity_id → grantsGiven, grantee_entity_id → grantsReceived
     const grantsGivenMap = new Map<string, number>();
     const grantsReceivedMap = new Map<string, number>();
     if (stableIds.length > 0) {
       type GrantCountRow = { entityId: string; cnt: number };
       const grantsGiven = await db.execute<GrantCountRow>(sql`
-        SELECT organization_id AS "entityId", COUNT(*)::int AS cnt
+        SELECT org_entity_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE organization_id IN (${sqlInList(stableIds)})
-        GROUP BY organization_id
+        WHERE org_entity_id IN (${sqlInList(stableIds)})
+        GROUP BY org_entity_id
       `);
       for (const r of grantsGiven) {
         grantsGivenMap.set(r.entityId, r.cnt);
       }
 
       const grantsReceived = await db.execute<GrantCountRow>(sql`
-        SELECT grantee_id AS "entityId", COUNT(*)::int AS cnt
+        SELECT grantee_entity_id AS "entityId", COUNT(*)::int AS cnt
         FROM grants
-        WHERE grantee_id IN (${sqlInList(stableIds)})
-        GROUP BY grantee_id
+        WHERE grantee_entity_id IN (${sqlInList(stableIds)})
+        GROUP BY grantee_entity_id
       `);
       for (const r of grantsReceived) {
         grantsReceivedMap.set(r.entityId, r.cnt);
