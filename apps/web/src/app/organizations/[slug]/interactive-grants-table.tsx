@@ -672,7 +672,7 @@ function CellContent({
           </a>
         );
       } catch {
-        return <span className="text-xs text-muted-foreground">{grant.source}</span>;
+        return <span className="text-xs text-muted-foreground truncate max-w-[120px] inline-block">{grant.source}</span>;
       }
     case "program":
       return (
