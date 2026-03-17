@@ -258,10 +258,11 @@ async function scanPersonnelCompleteness(prefetchedOrgs?: EntityListResponse['en
   const profiles: TableProfile[] = orgEntities.map(entity => {
     const orgId = entity.stableId || entity.id;
     const count = byOrg.get(orgId) || 0;
-    const completeness = count > 0 ? Math.min(100, count * 20) : 0; // 5+ records = 100%
+    const completeness = count > 0 ? Math.min(100, count * 5) : 0; // 20+ records = 100%
     const missing: string[] = [];
     if (count === 0) missing.push('no personnel records');
-    else if (count < 3) missing.push(`only ${count} personnel records`);
+    else if (count < 5) missing.push(`only ${count} personnel records — missing broader team`);
+    else if (count < 15) missing.push(`${count} personnel records — deeper coverage needed`);
 
     return {
       entityId: orgId,

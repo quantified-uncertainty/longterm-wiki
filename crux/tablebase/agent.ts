@@ -11,7 +11,7 @@ import type { EnrichmentTask, TaskResult } from './types.ts';
 import { getSystemPrompt, getUserPrompt } from './prompts.ts';
 import { getToolDefinitions, buildToolHandlers } from './tools.ts';
 
-const MAX_TOOL_TURNS = 15;
+const MAX_TOOL_TURNS = 25;
 
 export interface AgentRunOptions {
   dryRun?: boolean;
