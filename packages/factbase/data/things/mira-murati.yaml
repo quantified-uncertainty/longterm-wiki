@@ -1,10 +1,4 @@
-thing:
-  id: mira-murati
-  stableId: yiBasS5uXQ
-  type: person
-  name: "Mira Murati"
-  wikiId: "E1289"
-
+entity: yiBasS5uXQ
 facts:
   - id: f_kOWUqG4MeQ
     property: role

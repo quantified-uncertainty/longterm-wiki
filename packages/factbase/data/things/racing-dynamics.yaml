@@ -1,9 +1,4 @@
-thing:
-  id: racing-dynamics
-  stableId: SUZgWeZLNA
-  type: risk
-  name: AI Development Racing Dynamics
-  wikiId: E239
+entity: SUZgWeZLNA
 facts:
   - id: f_OU9bCFdx1g
     property: description

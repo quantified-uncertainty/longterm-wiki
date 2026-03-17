@@ -1,9 +1,4 @@
-thing:
-  id: manifest
-  stableId: KYKdAOzynA
-  type: organization
-  name: Manifest (Forecasting Conference)
-  wikiId: E545
+entity: KYKdAOzynA
 facts:
   - id: f_8pPGGoe7jQ
     property: description

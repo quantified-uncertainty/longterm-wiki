@@ -1,9 +1,4 @@
-thing:
-  id: ian-hogarth
-  stableId: DX4NK1gGtg
-  type: person
-  name: Ian Hogarth
-  wikiId: E162
+entity: DX4NK1gGtg
 facts:
   - id: f_fIpd1bJ2xg
     property: description

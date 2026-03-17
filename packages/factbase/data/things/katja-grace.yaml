@@ -1,10 +1,4 @@
-thing:
-  id: katja-grace
-  stableId: t2wkJarnWQ
-  type: person
-  name: "Katja Grace"
-  wikiId: "E1294"
-
+entity: t2wkJarnWQ
 facts:
   - id: f_7hCiEcjMwA
     property: role

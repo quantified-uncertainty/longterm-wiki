@@ -1,9 +1,4 @@
-thing:
-  id: fri
-  stableId: KslhqGaeJw
-  type: organization
-  name: Forecasting Research Institute (FRI)
-  wikiId: E147
+entity: KslhqGaeJw
 facts:
   - id: f_ODgv72zg6w
     property: description

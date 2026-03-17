@@ -1,9 +1,4 @@
-thing:
-  id: eli-lifland
-  stableId: wjtZjN8acQ
-  type: person
-  name: Eli Lifland
-  wikiId: E435
+entity: wjtZjN8acQ
 facts:
   - id: f_MGt6wCbGFA
     property: description

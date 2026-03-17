@@ -1,12 +1,4 @@
-thing:
-  id: dustin-moskovitz
-  stableId: Jtj6jHbuQ7
-  type: person
-  name: "Dustin Moskovitz"
-  wikiId: "E436"
-  aliases:
-    - Dustin
-
+entity: Jtj6jHbuQ7
 facts:
   - id: f_KHaU3bGPmQ
     property: employed-by

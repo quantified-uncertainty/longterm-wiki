@@ -1,9 +1,4 @@
-thing:
-  id: us-ai-surveillance-democratic-erosion
-  stableId: Tnd9iuHdjw
-  type: risk
-  name: AI Surveillance and US Democratic Erosion
-  wikiId: E1003
+entity: Tnd9iuHdjw
 facts:
   - id: f_krqLXGjcWQ
     property: description

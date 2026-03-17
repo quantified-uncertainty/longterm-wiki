@@ -1,9 +1,4 @@
-thing:
-  id: process-supervision
-  stableId: a2PktXtU4A
-  type: approach
-  name: Process Supervision
-  wikiId: E455
+entity: a2PktXtU4A
 facts:
   - id: f_sar1r80isw
     property: description

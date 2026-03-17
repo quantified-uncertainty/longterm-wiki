@@ -1,9 +1,4 @@
-thing:
-  id: interpretability
-  stableId: 73qTEkYyWA
-  type: research-area
-  name: Interpretability
-  wikiId: E174
+entity: 73qTEkYyWA
 facts:
   - id: f_XWURN27JKA
     property: description

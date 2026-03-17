@@ -1,9 +1,4 @@
-thing:
-  id: beth-barnes
-  stableId: ZvfLhIm7pw
-  type: person
-  name: Beth Barnes
-  wikiId: E39
+entity: ZvfLhIm7pw
 facts:
   - id: f_RrAkR6GYlQ
     property: description

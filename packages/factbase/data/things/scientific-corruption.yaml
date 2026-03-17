@@ -1,9 +1,4 @@
-thing:
-  id: scientific-corruption
-  stableId: IK5egiQE9w
-  type: risk
-  name: Scientific Knowledge Corruption
-  wikiId: E276
+entity: IK5egiQE9w
 facts:
   - id: f_G9I5Syd4bg
     property: description

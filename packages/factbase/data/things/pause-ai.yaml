@@ -1,9 +1,4 @@
-thing:
-  id: pause-ai
-  stableId: woL5lkqLpg
-  type: organization
-  name: Pause AI
-  wikiId: E553
+entity: woL5lkqLpg
 facts:
   - id: f_rk8dJa89eA
     property: description

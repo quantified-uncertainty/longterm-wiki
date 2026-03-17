@@ -1,9 +1,4 @@
-thing:
-  id: learned-helplessness
-  stableId: SFFrl4Pmag
-  type: risk
-  name: Epistemic Learned Helplessness
-  wikiId: E187
+entity: SFFrl4Pmag
 facts:
   - id: f_3bMLSsOEyQ
     property: description

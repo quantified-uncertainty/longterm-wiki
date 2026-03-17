@@ -1,9 +1,4 @@
-thing:
-  id: disinformation
-  stableId: AaAOkTHkug
-  type: risk
-  name: AI Disinformation
-  wikiId: E102
+entity: AaAOkTHkug
 facts:
   - id: f_M1gumKNh6g
     property: description

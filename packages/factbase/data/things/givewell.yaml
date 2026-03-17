@@ -1,12 +1,4 @@
-thing:
-  id: givewell
-  stableId: OwXl35e7bg
-  type: organization
-  name: "GiveWell"
-  wikiId: E1056
-  aliases:
-    - GiveWell.org
-
+entity: OwXl35e7bg
 facts:
   - id: f_afp7cku2dp
     property: description

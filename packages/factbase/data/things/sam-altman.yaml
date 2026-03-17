@@ -1,12 +1,4 @@
-thing:
-  id: sam-altman
-  stableId: JKsVHQ5stQ
-  type: person
-  name: "Sam Altman"
-  wikiId: "E269"
-  aliases:
-    - "Samuel H. Altman"
-
+entity: JKsVHQ5stQ
 facts:
   - id: f_StIAxD850A
     property: employed-by

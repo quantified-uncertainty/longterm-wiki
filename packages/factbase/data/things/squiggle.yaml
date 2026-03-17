@@ -1,9 +1,4 @@
-thing:
-  id: squiggle
-  stableId: nAjP2vwwSw
-  type: project
-  name: Squiggle
-  wikiId: E286
+entity: nAjP2vwwSw
 facts:
   - id: f_voCxsWhgvg
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: scalable-oversight
-  stableId: MBGtb3Qlkw
-  type: research-area
-  name: Scalable Oversight
-  wikiId: E271
+entity: MBGtb3Qlkw
 facts:
   - id: f_KY0XVVu5hQ
     property: description

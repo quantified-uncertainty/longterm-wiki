@@ -1,9 +1,4 @@
-thing:
-  id: circuit-breakers
-  stableId: tyNVsTtRVA
-  type: approach
-  name: Circuit Breakers / Inference Interventions
-  wikiId: E478
+entity: tyNVsTtRVA
 facts:
   - id: f_tyDfo7AChA
     property: description

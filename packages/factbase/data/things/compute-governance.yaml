@@ -1,9 +1,4 @@
-thing:
-  id: compute-governance
-  stableId: lfvY1bGeoA
-  type: policy
-  name: Compute Governance
-  wikiId: E64
+entity: lfvY1bGeoA
 facts:
   - id: f_MFv6VHMh7Q
     property: description

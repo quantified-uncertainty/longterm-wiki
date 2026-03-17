@@ -1,9 +1,4 @@
-thing:
-  id: near-term-risks
-  stableId: zTPtio1cDA
-  type: risk
-  name: Key Near-Term AI Risks
-  wikiId: E1005
+entity: zTPtio1cDA
 facts:
   - id: f_rX1PcCoSSQ
     property: description

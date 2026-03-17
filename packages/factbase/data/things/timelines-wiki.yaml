@@ -1,9 +1,4 @@
-thing:
-  id: timelines-wiki
-  stableId: 8AMSTHrvSg
-  type: project
-  name: Timelines Wiki
-  wikiId: E387
+entity: 8AMSTHrvSg
 facts:
   - id: f_sBiX4f2Dig
     property: description

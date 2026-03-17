@@ -1,9 +1,4 @@
-thing:
-  id: capability-unlearning
-  stableId: PUhEWjLnnQ
-  type: approach
-  name: Capability Unlearning / Removal
-  wikiId: E453
+entity: PUhEWjLnnQ
 facts:
   - id: f_r1hWNp2xOA
     property: description

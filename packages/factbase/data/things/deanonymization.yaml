@@ -1,9 +1,4 @@
-thing:
-  id: deanonymization
-  stableId: 0J0pDyhVtQ
-  type: risk
-  name: AI-Powered Deanonymization
-  wikiId: E699
+entity: 0J0pDyhVtQ
 facts:
   - id: f_k9d1jSji5g
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: cser
-  stableId: Qns43S795w
-  type: organization
-  name: CSER (Centre for the Study of Existential Risk)
-  wikiId: E523
+entity: Qns43S795w
 facts:
   - id: f_IwwEfifHjQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: reward-hacking
-  stableId: 9XN9QMfecA
-  type: risk
-  name: Reward Hacking
-  wikiId: E253
+entity: 9XN9QMfecA
 facts:
   - id: f_OHAdLLc4tA
     property: description

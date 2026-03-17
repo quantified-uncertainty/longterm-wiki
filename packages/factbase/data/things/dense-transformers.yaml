@@ -1,9 +1,4 @@
-thing:
-  id: dense-transformers
-  stableId: RScckMUC2g
-  type: concept
-  name: Dense Transformers
-  wikiId: E403
+entity: RScckMUC2g
 facts:
   - id: f_XeERIkKcRQ
     property: description

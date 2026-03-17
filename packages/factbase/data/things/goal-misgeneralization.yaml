@@ -1,9 +1,4 @@
-thing:
-  id: goal-misgeneralization
-  stableId: nYPuaov1hA
-  type: risk
-  name: Goal Misgeneralization
-  wikiId: E151
+entity: nYPuaov1hA
 facts:
   - id: f_OtNVXviKvw
     property: description

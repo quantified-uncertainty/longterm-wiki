@@ -1,9 +1,4 @@
-thing:
-  id: rsp
-  stableId: i1qSgjAj5A
-  type: policy
-  name: Responsible Scaling Policies
-  wikiId: E461
+entity: i1qSgjAj5A
 facts:
   - id: f_l3IjlPutCQ
     property: description

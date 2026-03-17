@@ -1,9 +1,4 @@
-thing:
-  id: gratified
-  stableId: 2v7A8mb7Ww
-  type: organization
-  name: Gratified
-  wikiId: E534
+entity: 2v7A8mb7Ww
 facts:
   - id: f_BFePo6Kaqg
     property: description

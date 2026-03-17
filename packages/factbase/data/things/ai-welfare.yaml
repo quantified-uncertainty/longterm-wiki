@@ -1,9 +1,4 @@
-thing:
-  id: ai-welfare
-  stableId: TK450w7sTw
-  type: concept
-  name: AI Welfare and Digital Minds
-  wikiId: E391
+entity: TK450w7sTw
 facts:
   - id: f_wObIEA7IMA
     property: description

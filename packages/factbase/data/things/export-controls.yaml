@@ -1,9 +1,4 @@
-thing:
-  id: export-controls
-  stableId: SpFgTz2INg
-  type: policy
-  name: US AI Chip Export Controls
-  wikiId: E136
+entity: SpFgTz2INg
 facts:
   - id: f_EtUqpwCXzw
     property: description

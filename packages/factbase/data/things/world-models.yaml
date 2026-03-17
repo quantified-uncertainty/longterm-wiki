@@ -1,9 +1,4 @@
-thing:
-  id: world-models
-  stableId: vQugEFw5nA
-  type: capability
-  name: World Models + Planning
-  wikiId: E503
+entity: vQugEFw5nA
 facts:
   - id: f_4UF1k5qJvQ
     property: description

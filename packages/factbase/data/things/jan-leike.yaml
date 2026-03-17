@@ -1,10 +1,4 @@
-thing:
-  id: jan-leike
-  stableId: hQ7mR2kN5p
-  type: person
-  name: "Jan Leike"
-  wikiId: "E182"
-
+entity: hQ7mR2kN5p
 facts:
   - id: f_dF5bX8wC3g
     property: employed-by

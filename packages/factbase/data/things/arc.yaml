@@ -1,13 +1,4 @@
-thing:
-  id: arc
-  stableId: QsXVXtQ0zE
-  type: organization
-  name: "Alignment Research Center (ARC)"
-  wikiId: "E25"
-  aliases:
-    - ARC
-    - ARC Alignment
-
+entity: QsXVXtQ0zE
 facts:
   - id: f_rTz84X69ZB
     property: founded-date

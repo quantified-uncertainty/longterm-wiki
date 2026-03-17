@@ -1,9 +1,4 @@
-thing:
-  id: maim
-  stableId: HkJrXOlE2A
-  type: policy
-  name: MAIM (Mutually Assured AI Malfunction)
-  wikiId: E685
+entity: HkJrXOlE2A
 facts:
   - id: f_S9xikTbr6w
     property: description

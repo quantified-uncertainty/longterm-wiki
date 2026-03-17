@@ -1,9 +1,4 @@
-thing:
-  id: ai-timelines
-  stableId: URCXiRsX0w
-  type: concept
-  name: AI Timelines
-  wikiId: E16
+entity: URCXiRsX0w
 facts:
   - id: f_r67VKzhNYg
     property: description

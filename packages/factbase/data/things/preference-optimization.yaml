@@ -1,9 +1,4 @@
-thing:
-  id: preference-optimization
-  stableId: xNAFtHP1RA
-  type: approach
-  name: Preference Optimization Methods
-  wikiId: E454
+entity: xNAFtHP1RA
 facts:
   - id: f_yhcrk3jNOg
     property: description

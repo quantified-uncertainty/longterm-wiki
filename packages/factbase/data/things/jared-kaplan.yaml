@@ -1,10 +1,4 @@
-thing:
-  id: jared-kaplan
-  stableId: x16GL4gP2A
-  type: person
-  name: "Jared Kaplan"
-  wikiId: "E1239"
-
+entity: x16GL4gP2A
 facts:
   - id: f_1f8OrwS6Gw
     property: employed-by

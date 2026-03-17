@@ -1,9 +1,4 @@
-thing:
-  id: the-foundation-layer
-  stableId: 5jfxLzMZYg
-  type: organization
-  name: The Foundation Layer
-  wikiId: E697
+entity: 5jfxLzMZYg
 facts:
   - id: f_nSN5I77cmA
     property: description

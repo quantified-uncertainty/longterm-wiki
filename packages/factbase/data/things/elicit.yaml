@@ -1,9 +1,4 @@
-thing:
-  id: elicit
-  stableId: 2VexoROapg
-  type: organization
-  name: Elicit (AI Research Tool)
-  wikiId: E526
+entity: 2VexoROapg
 facts:
   - id: f_bpBSyOAslA
     property: description

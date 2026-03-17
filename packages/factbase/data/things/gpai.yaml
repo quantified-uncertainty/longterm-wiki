@@ -1,9 +1,4 @@
-thing:
-  id: gpai
-  stableId: p2h6bEqhvQ
-  type: organization
-  name: Global Partnership on Artificial Intelligence (GPAI)
-  wikiId: E533
+entity: p2h6bEqhvQ
 facts:
   - id: f_ZPgV2Jzx3A
     property: description

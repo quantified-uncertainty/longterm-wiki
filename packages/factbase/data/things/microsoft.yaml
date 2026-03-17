@@ -1,9 +1,4 @@
-thing:
-  id: microsoft
-  stableId: OIY5gaPpBA
-  type: organization
-  name: Microsoft AI
-  wikiId: E550
+entity: OIY5gaPpBA
 facts:
   - id: f_1yvvPWOHUQ
     property: description

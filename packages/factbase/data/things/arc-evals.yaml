@@ -1,9 +1,4 @@
-thing:
-  id: arc-evals
-  stableId: myeSKJXTMA
-  type: organization
-  name: ARC Evaluations
-  wikiId: E26
+entity: myeSKJXTMA
 facts:
   - id: f_YcQuGsd98A
     property: description

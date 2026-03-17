@@ -1,9 +1,4 @@
-thing:
-  id: claude-3-7-sonnet
-  stableId: ePVee3jidQ
-  type: ai-model
-  name: Claude 3.7 Sonnet
-  wikiId: E1032
+entity: ePVee3jidQ
 facts:
   - id: f_OZ4w8EhxQg
     property: description

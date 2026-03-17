@@ -1,9 +1,4 @@
-thing:
-  id: hardware-enabled-governance
-  stableId: 57vCq45URQ
-  type: policy
-  name: Hardware-Enabled Governance
-  wikiId: E463
+entity: 57vCq45URQ
 facts:
   - id: f_soK8DuWeCA
     property: description

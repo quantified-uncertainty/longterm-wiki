@@ -1,9 +1,4 @@
-thing:
-  id: eu-ai-act
-  stableId: La8s84s3zg
-  type: policy
-  name: EU AI Act
-  wikiId: E127
+entity: La8s84s3zg
 facts:
   - id: f_HyDGn7aMpA
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: international-summits
-  stableId: B3alpHHvzg
-  type: policy
-  name: International AI Safety Summit Series
-  wikiId: E173
+entity: B3alpHHvzg
 facts:
   - id: f_luk0gzcjzA
     property: description

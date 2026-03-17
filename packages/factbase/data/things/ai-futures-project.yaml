@@ -1,9 +1,4 @@
-thing:
-  id: ai-futures-project
-  stableId: KDYvrwkgtw
-  type: organization
-  name: AI Futures Project
-  wikiId: E511
+entity: KDYvrwkgtw
 facts:
   - id: f_4Wa5ItAEjw
     property: description

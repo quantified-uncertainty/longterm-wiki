@@ -1,9 +1,4 @@
-thing:
-  id: rlhf
-  stableId: rSE7kY5k4Q
-  type: research-area
-  name: RLHF
-  wikiId: E259
+entity: rSE7kY5k4Q
 facts:
   - id: f_0AG1TrBdcQ
     property: description

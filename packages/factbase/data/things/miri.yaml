@@ -1,15 +1,4 @@
-thing:
-  id: miri
-  stableId: puAffUjWSS
-  type: organization
-  name: "Machine Intelligence Research Institute (MIRI)"
-  wikiId: "E202"
-  aliases:
-    - MIRI
-    - Singularity Institute
-    - Singularity Institute for Artificial Intelligence
-    - SIAI
-
+entity: puAffUjWSS
 facts:
   - id: f_0YMlj7An1L
     property: founded-date

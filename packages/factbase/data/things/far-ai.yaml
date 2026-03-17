@@ -1,9 +1,4 @@
-thing:
-  id: far-ai
-  stableId: lCiT37k9pA
-  type: organization
-  name: FAR AI
-  wikiId: E138
+entity: lCiT37k9pA
 facts:
   - id: f_5ThouaLWpw
     property: description

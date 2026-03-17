@@ -1,9 +1,4 @@
-thing:
-  id: mech-interp
-  stableId: 0vyIQ4YLIA
-  type: research-area
-  name: Mechanistic Interpretability
-  wikiId: E477
+entity: 0vyIQ4YLIA
 facts:
   - id: f_MHmnJw6d8w
     property: description

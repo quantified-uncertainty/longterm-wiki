@@ -1,9 +1,4 @@
-thing:
-  id: erosion-of-agency
-  stableId: 54ItAwh4QA
-  type: risk
-  name: Erosion of Human Agency
-  wikiId: E126
+entity: 54ItAwh4QA
 facts:
   - id: f_ccUokYgs9w
     property: description

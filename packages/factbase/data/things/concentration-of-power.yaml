@@ -1,9 +1,4 @@
-thing:
-  id: concentration-of-power
-  stableId: KpMBQkdQ5g
-  type: risk
-  name: AI-Driven Concentration of Power
-  wikiId: E68
+entity: KpMBQkdQ5g
 facts:
   - id: f_mhXrl9Pvag
     property: description

@@ -1,12 +1,4 @@
-thing:
-  id: dario-amodei
-  stableId: zR4nW8xB2f
-  type: person
-  name: "Dario Amodei"
-  wikiId: "E91"
-  aliases:
-    - "Dario"
-
+entity: zR4nW8xB2f
 facts:
   - id: f_aE3mK7pQ9x
     property: employed-by

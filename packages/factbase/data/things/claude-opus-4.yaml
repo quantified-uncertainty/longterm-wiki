@@ -1,9 +1,4 @@
-thing:
-  id: claude-opus-4
-  stableId: bmxLNyfK3A
-  type: ai-model
-  name: Claude Opus 4
-  wikiId: E1034
+entity: bmxLNyfK3A
 facts:
   - id: f_F9gpuJW2AA
     property: description

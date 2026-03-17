@@ -1,9 +1,4 @@
-thing:
-  id: enfeeblement
-  stableId: 13OO6CP98g
-  type: risk
-  name: AI-Induced Enfeeblement
-  wikiId: E118
+entity: 13OO6CP98g
 facts:
   - id: f_otFLSGTbQQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: center-for-applied-rationality
-  stableId: l5K9ZdbXww
-  type: organization
-  name: Center for Applied Rationality
-  wikiId: E518
+entity: l5K9ZdbXww
 facts:
   - id: f_xxqgtpab8Q
     property: description

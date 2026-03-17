@@ -1,10 +1,4 @@
-thing:
-  id: andrej-karpathy
-  stableId: Q9eaz6joHA
-  type: person
-  name: "Andrej Karpathy"
-  wikiId: "E1287"
-
+entity: Q9eaz6joHA
 facts:
   - id: f_H65pau0BGg
     property: role

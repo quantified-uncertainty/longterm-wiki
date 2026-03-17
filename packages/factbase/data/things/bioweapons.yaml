@@ -1,9 +1,4 @@
-thing:
-  id: bioweapons
-  stableId: wAglEMR2mg
-  type: risk
-  name: Bioweapons Risk
-  wikiId: E42
+entity: wAglEMR2mg
 facts:
   - id: f_2zQSbAvwPw
     property: description

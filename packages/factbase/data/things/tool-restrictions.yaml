@@ -1,9 +1,4 @@
-thing:
-  id: tool-restrictions
-  stableId: nl9oD17gfg
-  type: approach
-  name: Tool-Use Restrictions
-  wikiId: E487
+entity: nl9oD17gfg
 facts:
   - id: f_E8vKq523fA
     property: description

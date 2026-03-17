@@ -1,9 +1,4 @@
-thing:
-  id: scientific-research
-  stableId: dpTZOF78vg
-  type: capability
-  name: Scientific Research Capabilities
-  wikiId: E277
+entity: dpTZOF78vg
 facts:
   - id: f_2euF7FnoMg
     property: description

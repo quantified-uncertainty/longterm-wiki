@@ -1,9 +1,4 @@
-thing:
-  id: content-moderation
-  stableId: s8PQomHkvA
-  type: concept
-  name: AI Content Moderation
-  wikiId: E75
+entity: s8PQomHkvA
 facts:
   - id: f_2NPHorW4Rw
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: wikipedia-views
-  stableId: SCwLOSwuiQ
-  type: project
-  name: Wikipedia Views
-  wikiId: E390
+entity: SCwLOSwuiQ
 facts:
   - id: f_2XQoeTnrxA
     property: description

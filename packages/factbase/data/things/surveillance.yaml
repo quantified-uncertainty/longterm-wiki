@@ -1,9 +1,4 @@
-thing:
-  id: surveillance
-  stableId: 9ToBZjhsVg
-  type: risk
-  name: AI Mass Surveillance
-  wikiId: E292
+entity: 9ToBZjhsVg
 facts:
   - id: f_f8hVnFVu5w
     property: description

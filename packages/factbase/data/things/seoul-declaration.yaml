@@ -1,9 +1,4 @@
-thing:
-  id: seoul-declaration
-  stableId: 1i59OZ3q5w
-  type: policy
-  name: Seoul Declaration on AI Safety
-  wikiId: E279
+entity: 1i59OZ3q5w
 facts:
   - id: f_t0E2zpTRIQ
     property: description

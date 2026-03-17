@@ -1,9 +1,4 @@
-thing:
-  id: red-teaming
-  stableId: k6BfxaEwuQ
-  type: research-area
-  name: Red Teaming
-  wikiId: E449
+entity: k6BfxaEwuQ
 facts:
   - id: f_jqcmM746gw
     property: description

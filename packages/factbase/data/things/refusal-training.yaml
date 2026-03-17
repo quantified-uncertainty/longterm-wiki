@@ -1,9 +1,4 @@
-thing:
-  id: refusal-training
-  stableId: wPEnPRTQVQ
-  type: approach
-  name: Refusal Training
-  wikiId: E456
+entity: wPEnPRTQVQ
 facts:
   - id: f_vVwMulR1nw
     property: description

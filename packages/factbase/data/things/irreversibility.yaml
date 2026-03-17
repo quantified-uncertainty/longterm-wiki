@@ -1,9 +1,4 @@
-thing:
-  id: irreversibility
-  stableId: 7e3rvE5YgA
-  type: risk
-  name: AI-Induced Irreversibility
-  wikiId: E179
+entity: 7e3rvE5YgA
 facts:
   - id: f_QOKTa1CZNQ
     property: description

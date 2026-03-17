@@ -1,9 +1,4 @@
-thing:
-  id: epoch-ai
-  stableId: cBPkzcVBBQ
-  type: organization
-  name: Epoch AI
-  wikiId: E125
+entity: cBPkzcVBBQ
 facts:
   - id: f_jhTXlLe1eA
     property: description

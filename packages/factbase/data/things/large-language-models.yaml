@@ -1,9 +1,4 @@
-thing:
-  id: large-language-models
-  stableId: KwyMqBNvOQ
-  type: concept
-  name: Large Language Models
-  wikiId: E400
+entity: KwyMqBNvOQ
 facts:
   - id: f_Mpifk7VljQ
     property: description

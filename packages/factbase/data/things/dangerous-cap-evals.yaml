@@ -1,9 +1,4 @@
-thing:
-  id: dangerous-cap-evals
-  stableId: 8NzBoa41MA
-  type: approach
-  name: Dangerous Capability Evaluations
-  wikiId: E442
+entity: 8NzBoa41MA
 facts:
   - id: f_euI77sCG0g
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: 80000-hours
-  stableId: hvg9ecR3nA
-  type: organization
-  name: 80,000 Hours
-  wikiId: E510
+entity: hvg9ecR3nA
 facts:
   - id: f_XmU8cfMaCw
     property: description

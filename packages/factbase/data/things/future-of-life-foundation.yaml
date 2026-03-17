@@ -1,11 +1,4 @@
-thing:
-  id: future-of-life-foundation
-  stableId: 2V63hGITAw
-  type: organization
-  name: Future of Life Foundation (FLF)
-  # no wikiId — FLF does not have a wiki page
-  aliases:
-    - FLF
+entity: 2V63hGITAw
 facts:
   - id: Am1UqQs1Cw
     property: founded-date

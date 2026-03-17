@@ -1,9 +1,4 @@
-thing:
-  id: authoritarian-tools
-  stableId: eXd3Fe8Lzg
-  type: risk
-  name: AI Authoritarian Tools
-  wikiId: E30
+entity: eXd3Fe8Lzg
 facts:
   - id: f_F2Eo7wmO2w
     property: description

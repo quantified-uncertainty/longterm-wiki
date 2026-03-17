@@ -1,9 +1,4 @@
-thing:
-  id: benchmarking
-  stableId: bfK5RgQBcQ
-  type: concept
-  name: AI Benchmarking
-  wikiId: E38
+entity: bfK5RgQBcQ
 facts:
   - id: f_HU1AmRajLw
     property: description

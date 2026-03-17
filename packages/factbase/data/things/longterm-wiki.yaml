@@ -1,9 +1,4 @@
-thing:
-  id: longterm-wiki
-  stableId: WxrOEBPBpA
-  type: project
-  name: Longterm Wiki
-  wikiId: E384
+entity: WxrOEBPBpA
 facts:
   - id: f_hg6wIUFYqQ
     property: description
