@@ -100,9 +100,11 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       });
     }
 
-    if (i + 1 >= maxTasks) {
-      stoppedReason = 'max_tasks_reached';
-    }
+  }
+
+  // Determine stop reason: if we processed all available tasks, it's 'completed'
+  if (stoppedReason === 'completed' && results.length >= maxTasks) {
+    stoppedReason = 'max_tasks_reached';
   }
 
   // Step 4: Summary report

@@ -357,29 +357,50 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   }
 
   const { execSync } = await import('child_process');
-  // Use node with the global playwright module to extract rendered text
+  const { writeFileSync, unlinkSync } = await import('fs');
+  const { tmpdir } = await import('os');
+  const { join } = await import('path');
+
+  // Write script to temp file to avoid shell injection via URL
+  const scriptPath = join(tmpdir(), `tablebase-fetch-${Date.now()}.cjs`);
   const script = `
     const { chromium } = require('playwright');
     (async () => {
       const browser = await chromium.launch({ headless: true });
       const page = await browser.newPage();
-      await page.goto(${JSON.stringify(url)}, { waitUntil: 'networkidle', timeout: 20000 });
+      await page.goto(process.argv[2], { waitUntil: 'networkidle', timeout: 20000 });
       const text = await page.innerText('body');
       process.stdout.write(text);
       await browser.close();
     })().catch(e => { process.stderr.write(e.message); process.exit(1); });
   `.trim();
 
+  writeFileSync(scriptPath, script);
+
+  // Resolve playwright's node_modules path dynamically
+  let nodePath: string | undefined;
   try {
-    const output = execSync(`node -e "${script.replace(/"/g, '\\"')}"`, {
+    const playwrightPath = execSync('which playwright', { encoding: 'utf-8' }).trim();
+    // Follow symlinks: /opt/homebrew/bin/playwright → ../lib/node_modules/playwright/...
+    const resolved = execSync(`realpath "${playwrightPath}"`, { encoding: 'utf-8' }).trim();
+    nodePath = resolved.replace(/\/playwright.*$/, '');
+  } catch {
+    // Fall back to common paths
+    nodePath = '/opt/homebrew/lib/node_modules';
+  }
+
+  try {
+    const output = execSync(`node "${scriptPath}" "${url.replace(/"/g, '')}"`, {
       timeout: 30000,
       maxBuffer: 10 * 1024 * 1024,
-      env: { ...process.env, NODE_PATH: '/opt/homebrew/lib/node_modules' },
+      env: { ...process.env, ...(nodePath && { NODE_PATH: nodePath }) },
     });
     return { exitCode: 0, output: output.toString() };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return { exitCode: 1, output: `Playwright fetch failed: ${msg}\nIs Playwright installed? Run: npm i -g playwright` };
+  } finally {
+    try { unlinkSync(scriptPath); } catch { /* cleanup best-effort */ }
   }
 }
 

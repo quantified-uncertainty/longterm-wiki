@@ -298,16 +298,16 @@ async function handleSubmitRecords(
   let deduped: Array<Record<string, unknown>>;
   switch (table) {
     case 'personnel':
-      deduped = await dedupPersonnel(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupPersonnel(task.entityId, records );
       break;
     case 'funding-rounds':
-      deduped = await dedupFundingRounds(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupFundingRounds(task.entityId, records );
       break;
     case 'investments':
-      deduped = await dedupInvestments(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupInvestments(task.entityId, records );
       break;
     case 'benchmark-results':
-      deduped = await dedupBenchmarkResults(task.entityId, records as never[]) as unknown as Array<Record<string, unknown>>;
+      deduped = await dedupBenchmarkResults(task.entityId, records );
       break;
     case 'grants':
       // Grants are updated (granteeId backfill), not deduped

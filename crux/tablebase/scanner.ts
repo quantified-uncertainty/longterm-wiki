@@ -151,7 +151,7 @@ async function fetchAllPaginated<T>(
     const data = result.data;
     const page = (data[resultKey] as T[]) || [];
     items.push(...page);
-    total = (data.total as number) ?? page.length;
+    total = (data.total as number) ?? Infinity;
     offset += pageSize;
     if (page.length < pageSize) break;
   }

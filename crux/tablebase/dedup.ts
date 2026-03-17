@@ -94,8 +94,8 @@ function normalize(s: string | undefined | null): string {
 /** Dedup personnel records. Match on personId + organizationId + role. */
 export async function dedupPersonnel(
   entityId: string,
-  candidates: PersonnelRecord[],
-): Promise<PersonnelRecord[]> {
+  candidates: Array<Record<string, unknown>>,
+): Promise<Array<Record<string, unknown>>> {
   const existing = await fetchExistingPersonnel(entityId);
   const keys = new Set(
     existing.map(r => `${normalize(r.personId)}|${normalize(r.organizationId)}|${normalize(r.role)}`),
@@ -108,8 +108,8 @@ export async function dedupPersonnel(
 /** Dedup funding rounds. Match on companyId + name. */
 export async function dedupFundingRounds(
   entityId: string,
-  candidates: FundingRoundRecord[],
-): Promise<FundingRoundRecord[]> {
+  candidates: Array<Record<string, unknown>>,
+): Promise<Array<Record<string, unknown>>> {
   const existing = await fetchExistingFundingRounds(entityId);
   const keys = new Set(
     existing.map(r => `${normalize(r.companyId)}|${normalize(r.name)}`),
@@ -122,8 +122,8 @@ export async function dedupFundingRounds(
 /** Dedup investments. Match on companyId + investorId + roundName. */
 export async function dedupInvestments(
   entityId: string,
-  candidates: InvestmentRecord[],
-): Promise<InvestmentRecord[]> {
+  candidates: Array<Record<string, unknown>>,
+): Promise<Array<Record<string, unknown>>> {
   const existing = await fetchExistingInvestments(entityId);
   const keys = new Set(
     existing.map(r => `${normalize(r.companyId)}|${normalize(r.investorId)}|${normalize(r.roundName || '')}`),
@@ -136,8 +136,8 @@ export async function dedupInvestments(
 /** Dedup benchmark results. Match on benchmarkId + modelId. */
 export async function dedupBenchmarkResults(
   modelId: string,
-  candidates: BenchmarkResultRecord[],
-): Promise<BenchmarkResultRecord[]> {
+  candidates: Array<Record<string, unknown>>,
+): Promise<Array<Record<string, unknown>>> {
   const existing = await fetchExistingBenchmarkResults(modelId);
   const keys = new Set(
     existing.map(r => `${normalize(r.benchmarkId)}|${normalize(r.modelId)}`),
