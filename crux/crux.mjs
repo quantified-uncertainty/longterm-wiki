@@ -6,63 +6,37 @@
  * Unified command-line interface for project tools.
  *
  * Usage:
- *   crux <domain> <command> [options]
- *   crux <domain> [options]          # Runs default command
+ *   crux <group> <domain> <command> [options]   # Group routing (preferred)
+ *   crux <group> <command> [options]             # Flattened group command
+ *   crux <domain> <command> [options]            # Legacy flat routing (still works)
  *
- * Domains:
- *   validate    Run validation checks
- *   analyze     Analysis & reporting
- *   fix         Auto-fix operations
- *   content     Page management (improve, create, grade)
- *   generate    Content generation (yaml, summaries, diagrams)
- *   visual      Diagram, chart & model pipeline (create, review, audit, improve)
- *   resources   External resource management
- *   updates     Schedule-aware page update system
- *   auto-update News-driven automatic wiki updates
- *   check-links External URL health checking
- *   edit-log    View and query per-page edit history
- *   importance  Ranking-based importance scoring
- *   ci          GitHub CI status and monitoring
- *   maintain    Periodic maintenance and housekeeping
- *   review      Human review tracking and status
- *   citations   Citation verification and archival
- *   issues      Track Claude Code work on GitHub issues
- *   pr          GitHub PR utilities (fix-body: repair literal \n in PR descriptions)
- *   pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
- *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
- *   entity      Entity ID management (rename with safe word-boundary matching)
- *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
- *   jobs        Job queue management (list, stats, create, claim, sweep)
- *   context     Assemble research bundles for Claude Code sessions (for-page, for-issue, for-entity, for-topic)
- *   enrich      Standalone enrichment tools (entity-links, fact-refs)
- *   sessions    Session log management (write: scaffold a session YAML)
- *   research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
- *   epic        Multi-issue epic management via GitHub Discussions
- *   health      System wellness checks (server, DB, GitHub Actions, frontend, data freshness)
- *   ids         Entity ID allocation and lookup (allocate, check, list)
- *   audits      System-level behavioral verification (ongoing + post-merge)
- *   release     Production release management (create release PRs from main → production)
- *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
- *   backfill-grantee-ids Backfill granteeId with matched entity stableIds
- *   backfill-program-ids Backfill programId linking grants to funding programs
- *   import-divisions Import curated organizational divisions
- *   import-funding-programs Import curated funding programs
- *   people       Person discovery and data tools (discover, create, link-resources, enrich)
- *   orgs         Organization data tools (enrich from Wikidata)
- *   research-areas Research area linking (link-grants, backfill-papers, discover-orgs, stats)
+ * Groups:
+ *   w   / wiki       Wiki content (validate, fix, content, citations, ...)
+ *   fb  / factbase   FactBase (show, list, verify, migrate, ...)
+ *   tb  / tablebase  TableBase (scan, gaps, people, orgs, ids, imports, ...)
+ *   gh              GitHub (issues, pr, ci, epic, release, ...)
+ *   sys / system     System (agents, jobs, sessions, health, audits, ...)
+ *
+ * Cross-cutting (top-level):
+ *   query       Query wiki-server DB
+ *   context     Assemble research bundles
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
  *   --help      Show help
  *
  * Examples:
- *   crux validate                            Run all validation checks
- *   crux validate compile --quick            Quick MDX compilation check
- *   crux validate unified --rules=dollars    Run specific rules
+ *   crux w validate gate --fix          Wiki validation gate
+ *   crux w improve far-ai --tier=deep   Improve a wiki page (flattened from content)
+ *   crux fb show anthropic              Show FactBase entity
+ *   crux tb people discover             Discover people (TableBase)
+ *   crux gh issues start 42             Start working on issue #42
+ *   crux validate gate --fix            Legacy flat syntax (still works)
  */
 
 import { createLogger } from './lib/output.ts';
 import { parseCliArgs as _parseCliArgs, kebabToCamel } from './lib/cli.ts';
+import { GROUPS, buildShortcutMap } from './lib/groups.ts';
 
 // Domain handlers
 import * as validateCommands from './commands/validate.ts';
@@ -182,140 +156,252 @@ const domains = {
   pages: pagesCommands,
 };
 
+const shortcutMap = buildShortcutMap();
+
 /**
- * Parse command-line arguments using the shared parseCliArgs from cli.ts.
- * Extracts domain (first positional) and command (second positional),
- * then converts remaining named options to camelCase.
+ * Parse raw CLI arguments into positionals, options, and flags.
+ * Does NOT interpret domain/command — that's done by the router in main().
  */
 function parseArgs() {
   const parsed = _parseCliArgs(process.argv.slice(2));
   const positional = parsed._positional;
 
-  const domain = positional[0] || null;
-  const command = positional[1] || null;
-
-  // Convert kebab-case option keys to camelCase and build remaining args
-  // Positionals come first so that args[0] is always the first positional,
-  // not a flag (flags are also available in options for handlers to use).
   const options = {};
-  const remaining = [];
-  // Extra positional args (beyond domain + command) come first
-  for (const arg of positional.slice(2)) {
-    remaining.push(arg);
-  }
-  // Then flags (also available via options, but included for pass-through)
+  const flags = [];
   for (const [key, value] of Object.entries(parsed)) {
     if (key === '_positional') continue;
     options[kebabToCamel(key)] = value;
-    // Reconstruct the raw arg for passing to subcommands
     if (value === true) {
-      remaining.push(`--${key}`);
+      flags.push(`--${key}`);
     } else {
-      remaining.push(`--${key}=${value}`);
+      flags.push(`--${key}=${value}`);
     }
   }
 
-  return { domain, command, args: remaining, options };
+  return { positional, options, flags };
 }
 
 /**
- * Show main help
+ * Show main help — organized by group
  */
 function showHelp() {
+  const B = '\x1b[1m';
+  const D = '\x1b[2m';
+  const R = '\x1b[0m';
+
   console.log(`
-${'\x1b[1m'}Crux Project CLI${'\x1b[0m'}
+${B}Crux Project CLI${R}
 
-Unified command-line interface for project tools.
+${B}Usage:${R}
+  crux <group> <domain> <command> [options]   ${D}# Grouped${R}
+  crux <group> <command> [options]             ${D}# Flattened (for common commands)${R}
+  crux <domain> <command> [options]            ${D}# Legacy flat (still works)${R}
 
-${'\x1b[1m'}Usage:${'\x1b[0m'}
-  crux <domain> <command> [options]
-  crux <domain> [options]          # Runs default command
+${B}Groups:${R}
+  ${B}w${R}   ${D}(wiki)${R}       Wiki content — validate, fix, improve, citations, generate, ...
+  ${B}fb${R}  ${D}(factbase)${R}   FactBase — structured facts with temporal data & provenance
+  ${B}tb${R}  ${D}(tablebase)${R}  TableBase — PG entities, people, orgs, grants, imports, ...
+  ${B}gh${R}               GitHub — issues, PRs, CI, epics, releases
+  ${B}sys${R} ${D}(system)${R}     System — agents, jobs, sessions, health, audits, wiki-server
 
-${'\x1b[1m'}Domains:${'\x1b[0m'}
-  validate    Run validation checks
-  analyze     Analysis & reporting
-  fix         Auto-fix operations
-  content     Page management (improve, create, grade)
-  generate    Content generation (yaml, summaries, diagrams)
-  visual      Diagram, chart & model pipeline
-  resources   External resource management
-  updates     Schedule-aware page update system
-  auto-update News-driven automatic wiki updates
-  check-links External URL health checking
-  edit-log    View and query per-page edit history
-  importance  Ranking-based importance scoring
-  ci          GitHub CI status and monitoring
-  maintain    Periodic maintenance and housekeeping
-  review      Human review tracking and status
-  citations   Citation verification and archival
-  issues      Track Claude Code work on GitHub issues
-  agent-checklist  Manage agent checklists
-  entity      Entity ID management (safe rename)
-  query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
-  jobs        Background job queue management
+${B}Cross-cutting (top-level):${R}
+  query       Query wiki-server DB (search, entity, facts, related, risk, stats)
   context     Assemble research bundles (for-page, for-issue, for-entity, for-topic)
-  enrich      Standalone enrichment tools (entity-links, fact-refs)
-  sessions    Session log management (write: scaffold a session YAML)
-  research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
-  evals       Hallucination detection evals & adversarial agents
-  epic        Multi-issue epic management (via GitHub Discussions)
-  ids         Entity ID allocation and lookup (allocate, check, list)
-  audits      System-level behavioral verification (ongoing + post-merge)
-  release     Production release management (main → production)
-  pr-patrol   Continuous PR maintenance daemon (scan, prioritize, fix)
-  kb          Knowledge base readability tools (show, list, lookup)
-  footnotes        Footnote migration tools (migrate-cr)
-  agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
-  import-grants    Import external grant databases (Coefficient Giving, EA Funds)
-  backfill-grantee-ids  Backfill granteeId with matched entity stableIds
-  backfill-program-ids  Backfill programId linking grants to funding programs
-  import-divisions Import curated organizational divisions
-  import-funding-programs Import curated funding programs
-  people           Person discovery and data tools (discover, create, link-resources, enrich)
-  orgs             Organization data tools (enrich from Wikidata)
-  research-areas   Research area linking (link-grants, backfill-papers, discover-orgs, stats)
-  verify           Verify structured data records against source URLs (grants, personnel, etc.)
-  matrix           Entity matrix analysis and improvement targeting
-  tablebase        Structured data enrichment via LLM agents (scan, gaps, improve, loop)
-  pages            Page prioritization (next-action: NBA scoring for editorial attention)
 
-${'\x1b[1m'}Global Options:${'\x1b[0m'}
+${B}Examples:${R}
+  crux w validate gate --fix          ${D}# Wiki validation gate${R}
+  crux w improve far-ai --tier=deep   ${D}# Improve a wiki page${R}
+  crux w fix escaping                 ${D}# Fix dollar sign escaping${R}
+  crux fb show anthropic              ${D}# Show FactBase entity${R}
+  crux tb people discover             ${D}# Discover people${R}
+  crux tb ids allocate my-slug        ${D}# Allocate entity ID${R}
+  crux gh issues start 42             ${D}# Start working on issue #42${R}
+  crux sys health check               ${D}# System health check${R}
+  crux query search "topic"           ${D}# Full-text search${R}
+
+  ${D}# Legacy flat syntax (still works):${R}
+  crux validate gate --fix
+  crux content improve far-ai
+
+${B}Group Help:${R}
+  crux <group> --help                 ${D}# e.g. crux w --help${R}
+
+${B}Domain Help:${R}
+  crux <domain> --help                ${D}# e.g. crux validate --help${R}
+
+${B}Global Options:${R}
   --ci        JSON output for CI pipelines
   --help      Show help
-
-${'\x1b[1m'}Examples:${'\x1b[0m'}
-  crux validate                       Run all validation checks
-  crux validate compile --quick       Quick MDX compilation check
-  crux validate unified --fix         Auto-fix unified rule issues
-
-${'\x1b[1m'}Domain Help:${'\x1b[0m'}
-  crux <domain> --help
 `);
+}
+
+/**
+ * Show help for a specific group
+ */
+function showGroupHelp(groupName) {
+  const group = GROUPS[groupName];
+  if (!group) return;
+
+  const B = '\x1b[1m';
+  const D = '\x1b[2m';
+  const R = '\x1b[0m';
+
+  const prefix = group.shortcut === groupName ? groupName : `${group.shortcut} (${groupName})`;
+
+  let output = `\n${B}crux ${prefix}${R} — ${group.description}\n\n`;
+  output += `${B}Usage:${R}\n`;
+  output += `  crux ${group.shortcut} <domain> <command> [options]\n`;
+
+  // Show flattened commands if any
+  if (group.flattened?.length > 0) {
+    output += `  crux ${group.shortcut} <command> [options]             ${D}# For commands from: ${group.flattened.join(', ')}${R}\n`;
+  }
+  output += '\n';
+
+  // List domains in this group with their descriptions
+  output += `${B}Domains:${R}\n`;
+  const maxLen = Math.max(...group.domains.map(d => d.length));
+  for (const domainName of group.domains) {
+    const handler = domains[domainName];
+    // Try to extract a one-liner from getHelp or fall back to the domain name
+    let desc = '';
+    if (handler?.getHelp) {
+      const helpText = handler.getHelp();
+      // Extract first meaningful line from help text
+      const lines = helpText.split('\n').filter(l => l.trim() && !l.startsWith('Usage') && !l.startsWith('crux'));
+      if (lines[0]) desc = lines[0].trim().replace(/^#+\s*/, '').replace(/^\*\*.*?\*\*\s*[-–—]\s*/, '');
+    }
+    output += `  ${domainName.padEnd(maxLen + 2)}${desc ? D + desc + R : ''}\n`;
+  }
+
+  // Show flattened commands
+  if (group.flattened?.length > 0) {
+    output += `\n${B}Shorthand commands${R} ${D}(from ${group.flattened.join(', ')}):${R}\n`;
+    for (const flatDomain of group.flattened) {
+      const handler = domains[flatDomain];
+      if (handler?.commands) {
+        for (const cmd of Object.keys(handler.commands)) {
+          if (cmd === 'default') continue;
+          output += `  crux ${group.shortcut} ${cmd}\n`;
+        }
+      }
+    }
+  }
+
+  output += `\n${B}Domain help:${R}  crux ${group.shortcut} <domain> --help\n`;
+  console.log(output);
+}
+
+/**
+ * Resolve group routing.
+ *
+ * Given the positional args, determines if the first arg is a group
+ * name/shortcut. If so, resolves the domain and command within that group.
+ *
+ * Returns { domain, command, argsStartIndex } or null if not a group.
+ */
+function resolveGroupRouting(positional) {
+  const p0 = positional[0];
+  const p1 = positional[1];
+  const p2 = positional[2];
+
+  if (!p0 || !shortcutMap[p0]) return null;
+
+  const groupName = shortcutMap[p0];
+  const group = GROUPS[groupName];
+
+  // crux w --help (no p1 or p1 is a flag)
+  if (!p1 || p1.startsWith('-')) {
+    return { groupName, domain: null, command: null, argsStart: 1 };
+  }
+
+  // Check if p1 is a known domain in this group
+  if (group.domains.includes(p1)) {
+    return { groupName, domain: p1, command: p2 || null, argsStart: 3 };
+  }
+
+  // Check flattened domains: p1 might be a command name in a flattened domain
+  if (group.flattened) {
+    for (const flatDomain of group.flattened) {
+      const handler = domains[flatDomain];
+      if (handler?.commands?.[p1]) {
+        return { groupName, domain: flatDomain, command: p1, argsStart: 2 };
+      }
+    }
+  }
+
+  // p1 is not a recognized domain or flattened command in this group
+  return { groupName, domain: null, command: null, argsStart: 1, unknownArg: p1 };
 }
 
 /**
  * Main entry point
  */
 async function main() {
-  let { domain, command, args, options } = parseArgs();
+  const { positional, options, flags } = parseArgs();
   const log = createLogger(options.ci);
 
-  // Show help if requested or no domain specified
-  if (options.help && !domain) {
+  // Show help if no args
+  if (positional.length === 0 && options.help) {
     showHelp();
     process.exit(0);
   }
-
-  if (!domain) {
+  if (positional.length === 0) {
     showHelp();
     process.exit(1);
   }
 
-  // Check if domain exists
+  // --- Group routing ---
+  const groupResult = resolveGroupRouting(positional);
+
+  let domain, command, args;
+
+  if (groupResult) {
+    // Group was matched
+    const { groupName, unknownArg } = groupResult;
+
+    // Group help: crux w --help
+    if (!groupResult.domain && options.help) {
+      showGroupHelp(groupName);
+      process.exit(0);
+    }
+
+    // No domain resolved
+    if (!groupResult.domain) {
+      if (unknownArg) {
+        const group = GROUPS[groupName];
+        log.error(`Unknown domain or command in group '${groupName}': ${unknownArg}`);
+        log.dim(`Available domains: ${group.domains.join(', ')}`);
+        if (group.flattened) {
+          for (const flatDomain of group.flattened) {
+            const handler = domains[flatDomain];
+            if (handler?.commands) {
+              log.dim(`Shorthand commands: ${Object.keys(handler.commands).filter(c => c !== 'default').join(', ')}`);
+            }
+          }
+        }
+      } else {
+        showGroupHelp(groupName);
+      }
+      process.exit(1);
+    }
+
+    domain = groupResult.domain;
+    command = groupResult.command;
+    args = [...positional.slice(groupResult.argsStart), ...flags];
+  } else {
+    // --- Legacy flat routing ---
+    domain = positional[0];
+    command = positional[1] || null;
+    args = [...positional.slice(2), ...flags];
+  }
+
+  // Resolve domain handler
   const domainHandler = domains[domain];
   if (!domainHandler) {
     log.error(`Unknown domain: ${domain}`);
     log.dim(`Available domains: ${Object.keys(domains).join(', ')}`);
+    log.dim(`Or use a group prefix: w, fb, tb, gh, sys`);
     process.exit(1);
   }
 
@@ -330,7 +416,6 @@ async function main() {
   }
 
   // Determine which command to run
-  // Use explicit command, or 'default' if defined, or fall back to 'check'
   let commandName = command;
   let commandHandler;
 

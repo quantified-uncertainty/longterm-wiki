@@ -29,5 +29,5 @@ if [[ "$FILE_PATH" == *"/.claude/"* ]] || [[ "$FILE_PATH" == *".claude/"* ]]; th
 fi
 
 # Block: no checklist and trying to edit a non-.claude file
-echo "BLOCKED: No agent checklist found. Run 'pnpm crux agent-checklist init' before editing code. This is mandatory — see .claude/rules/agent-session-workflow.md" >&2
+echo "BLOCKED: No agent checklist found. Run 'pnpm crux sys agent-checklist init' before editing code. This is mandatory — see .claude/rules/agent-session-workflow.md" >&2
 exit 2

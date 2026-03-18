@@ -6,9 +6,9 @@ This command assumes `/agent-session-start` was run earlier and `.claude/wip-che
 
 ## Step 1: Check progress
 
-Run `pnpm crux agent-checklist status` to see what remains.
+Run `pnpm crux sys agent-checklist status` to see what remains.
 
-If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux agent-checklist init "Task description" --type=X` and work through ALL items before proceeding.
+If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux sys agent-checklist init "Task description" --type=X` and work through ALL items before proceeding.
 
 ## Step 2: Build + test verification (MANDATORY)
 
@@ -105,12 +105,12 @@ Skip this step if the PR only changes code, content, or styling that is fully ve
 
 If working on a GitHub issue:
 ```bash
-pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
 ## Step 6: Session log
 
-Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
+Run `pnpm crux sys agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
 
 Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
 
@@ -137,7 +137,7 @@ Include `reviewed: true` or `reviewed: false` in the session log payload sent to
 
 ## Step 7: Validate completion
 
-Run `pnpm crux agent-checklist complete` — must exit 0 (all items checked or N/A).
+Run `pnpm crux sys agent-checklist complete` — must exit 0 (all items checked or N/A).
 
 ## Step 8: Ship
 
