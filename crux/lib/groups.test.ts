@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GROUPS, buildShortcutMap, buildDomainToGroupMap } from './groups.ts';
+import { GROUPS, buildShortcutMap, buildDomainToGroupMap, checkGroupDomainCollisions } from './groups.ts';
 
 describe('GROUPS', () => {
   it('every group has a shortcut', () => {
@@ -38,6 +38,12 @@ describe('GROUPS', () => {
       for (const flat of def.flattened ?? []) {
         expect(def.domains, `flattened '${flat}' not in group '${name}' domains`).toContain(flat);
       }
+    }
+  });
+
+  it('every group has at least one domain', () => {
+    for (const [name, def] of Object.entries(GROUPS)) {
+      expect(def.domains.length, `group '${name}' has empty domains`).toBeGreaterThan(0);
     }
   });
 });
@@ -98,5 +104,35 @@ describe('buildDomainToGroupMap', () => {
   it('does not include cross-cutting domains', () => {
     expect(map['query']).toBeUndefined();
     expect(map['context']).toBeUndefined();
+  });
+});
+
+describe('checkGroupDomainCollisions', () => {
+  it('returns empty for safe domain keys', () => {
+    expect(checkGroupDomainCollisions(['validate', 'content', 'fix'])).toEqual([]);
+  });
+
+  it('allows domain keys that match their own group name', () => {
+    // 'factbase' domain is inside the 'factbase' group — safe
+    expect(checkGroupDomainCollisions(['factbase', 'tablebase', 'validate'])).toEqual([]);
+  });
+
+  it('detects collision with shortcut from outside the group', () => {
+    // 'w' is not a domain inside the wiki group — dangerous
+    const result = checkGroupDomainCollisions(['validate', 'w']);
+    expect(result.length).toBe(1);
+    expect(result[0]).toContain("'w'");
+  });
+
+  it('detects collision with group name from outside the group', () => {
+    // A hypothetical 'wiki' domain that is NOT in the wiki group
+    const result = checkGroupDomainCollisions(['wiki']);
+    expect(result.length).toBe(1);
+    expect(result[0]).toContain('wiki');
+  });
+
+  it('detects multiple collisions', () => {
+    const result = checkGroupDomainCollisions(['w', 'fb', 'validate']);
+    expect(result.length).toBe(2);
   });
 });

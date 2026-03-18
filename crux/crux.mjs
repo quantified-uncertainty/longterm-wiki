@@ -36,7 +36,7 @@
 
 import { createLogger } from './lib/output.ts';
 import { parseCliArgs as _parseCliArgs, kebabToCamel } from './lib/cli.ts';
-import { GROUPS, buildShortcutMap } from './lib/groups.ts';
+import { GROUPS, buildShortcutMap, checkGroupDomainCollisions } from './lib/groups.ts';
 
 // Domain handlers
 import * as validateCommands from './commands/validate.ts';
@@ -157,6 +157,12 @@ const domains = {
 };
 
 const shortcutMap = buildShortcutMap();
+
+// Fail fast if a domain key collides with a group name/shortcut
+const collisions = checkGroupDomainCollisions(Object.keys(domains));
+if (collisions.length > 0) {
+  throw new Error(`Group/domain collision detected:\n  ${collisions.join('\n  ')}`);
+}
 
 /**
  * Parse raw CLI arguments into positionals, options, and flags.

@@ -39,18 +39,18 @@ File a GitHub issue when you encounter any of the following during normal work:
 **This is mandatory.** Before creating any issue, check if it already exists:
 
 ```bash
-pnpm crux gh search "your topic here"
-pnpm crux gh search "your topic here" --closed   # also check resolved issues
+pnpm crux gh issues search "your topic here"
+pnpm crux gh issues search "your topic here" --closed   # also check resolved issues
 ```
 
-- **Match found (open)** → Add a comment: `pnpm crux gh comment <N> "your finding"`
+- **Match found (open)** → Add a comment: `pnpm crux gh issues comment <N> "your finding"`
 - **Match found (closed)** → Check if the fix resolved your concern. If not, file a new issue referencing it.
 - **No match** → File a new issue
 
 ## How to File
 
 ```bash
-pnpm crux gh create "Descriptive title" \
+pnpm crux gh issues create "Descriptive title" \
   --problem="What's wrong and why it matters" \
   --model=haiku \
   --criteria="Fix applied|Tests pass|CI green" \
@@ -63,8 +63,8 @@ For longer descriptions, use `--problem-file=/tmp/problem.md`. Run `crux gh issu
 
 ## Guardrails
 
-- **Evidence required**: `crux gh create` requires `--problem`, `--file`, or `--evidence`. You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
-- **Rate limited**: `crux gh create` enforces a daily cap (5/day). This is intentional — if you're hitting the limit, you're filing too many.
+- **Evidence required**: `crux gh issues create` requires `--problem`, `--file`, or `--evidence`. You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
+- **Rate limited**: `crux gh issues create` enforces a daily cap (5/day). This is intentional — if you're hitting the limit, you're filing too many.
 - **Agent-labeled**: All agent-filed issues are auto-labeled `agent:filed` for tracking.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
 

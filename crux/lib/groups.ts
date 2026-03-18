@@ -137,3 +137,29 @@ export function buildDomainToGroupMap(): Record<string, string> {
   }
   return map;
 }
+
+/**
+ * Validate that no domain key unsafely collides with a group name/shortcut.
+ *
+ * Safe collision: a domain key matching its own group's full name (e.g. the
+ * 'factbase' domain in the 'factbase' group). Group routing handles this
+ * correctly because flattened lookup finds the domain's commands.
+ *
+ * Unsafe collision: a domain key matching a shortcut it doesn't belong to
+ * (e.g. a domain called 'w' would shadow the wiki group shortcut).
+ */
+export function checkGroupDomainCollisions(domainKeys: string[]): string[] {
+  const shortcutMap = buildShortcutMap();
+  const domainToGroup = buildDomainToGroupMap();
+  const collisions: string[] = [];
+  for (const key of domainKeys) {
+    const matchedGroup = shortcutMap[key];
+    if (!matchedGroup) continue;
+
+    // Safe: domain is inside the group it matches (e.g. 'factbase' domain in 'factbase' group)
+    if (domainToGroup[key] === matchedGroup) continue;
+
+    collisions.push(`domain '${key}' collides with group '${matchedGroup}' (name or shortcut)`);
+  }
+  return collisions;
+}
