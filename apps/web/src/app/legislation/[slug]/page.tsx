@@ -304,7 +304,7 @@ export default async function LegislationDetailPage({
 
       <FBAutoFacts entityId={entity.id} />
 
-      <RelatedPages entityId={entity.id} entity={{ type: "policy" }} />
+      <RelatedPages entityId={entity.id} entity={{ entityType: "policy" }} />
     </div>
   );
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });

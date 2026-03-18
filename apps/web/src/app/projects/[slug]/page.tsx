@@ -326,7 +326,7 @@ export default async function ProjectDetailPage({
             </section>
           )}
 
-          <RelatedPages entityId={entity.id} entity={{ type: "project" }} />
+          <RelatedPages entityId={entity.id} entity={{ entityType: "project" }} />
         </div>
 
         {/* Sidebar */}

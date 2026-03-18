@@ -221,7 +221,7 @@ export default async function OrgProfilePage({
       )}
 
       {/* Related Wiki Pages */}
-      <RelatedPages entityId={slug} entity={{ type: "organization" }} />
+      <RelatedPages entityId={slug} entity={{ entityType: "organization" }} />
     </div>
   );
 
