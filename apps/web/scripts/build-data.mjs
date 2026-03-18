@@ -319,9 +319,22 @@ function scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId) {
  *
  * Returns: entityId -> sorted array of { id, type, title, score, label? }
  */
-function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
+function computeRelatedGraph(entities, pages, contentInbound, tagIndex, byStableId) {
   const entityMap = new Map(entities.map(e => [e.id, e]));
+  // Also index by stableId so relatedEntries that use stableId refs can be resolved
+  if (byStableId) {
+    for (const entity of entities) {
+      if (entity.stableId) {
+        entityMap.set(entity.stableId, entity);
+      }
+    }
+  }
   const pageMap = new Map(pages.map(p => [p.id, p]));
+  // Helper: resolve a ref.id that may be a stableId or wikiId to the canonical slug
+  function resolveRefId(id) {
+    if (byStableId && byStableId[id]) return byStableId[id];
+    return id;
+  }
 
   // Accumulator: graph[entityId] = Map<relatedId, score>
   const graph = {};
@@ -377,18 +390,20 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
   for (const entity of entities) {
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        addEdge(entity.id, ref.id, 10);
+        // Resolve stableId references (10-char alphanum) to canonical slug IDs
+        const resolvedRefId = resolveRefId(ref.id);
+        addEdge(entity.id, resolvedRefId, 10);
         // Store directional label if present
         if (ref.relationship && ref.relationship !== 'related') {
           if (!labels[entity.id]) labels[entity.id] = {};
-          labels[entity.id][ref.id] = ref.relationship.replace(/-/g, ' ');
+          labels[entity.id][resolvedRefId] = ref.relationship.replace(/-/g, ' ');
           // Also store inverse label for the reverse direction
           const inverse = INVERSE_LABEL[ref.relationship];
           if (inverse) {
-            if (!labels[ref.id]) labels[ref.id] = {};
+            if (!labels[resolvedRefId]) labels[resolvedRefId] = {};
             // Don't overwrite an explicit label with an inferred one
-            if (!labels[ref.id][entity.id]) {
-              labels[ref.id][entity.id] = inverse;
+            if (!labels[resolvedRefId][entity.id]) {
+              labels[resolvedRefId][entity.id] = inverse;
             }
           }
         }
@@ -2635,7 +2650,7 @@ async function main() {
   // RELATED GRAPH — unified bidirectional graph combining all signals:
   // explicit YAML, content EntityLinks, tags, similarity, name-prefix.
   // =========================================================================
-  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
+  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex, byStableId);
   database.relatedGraph = relatedGraph;
   console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
 
