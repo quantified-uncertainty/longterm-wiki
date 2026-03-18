@@ -41,6 +41,7 @@ import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucina
 
 // Extracted modules
 import {
+  buildHeaders,
   buildEditLogDateMap,
   buildEarliestEditLogDateMap,
   buildCitationStatsMap,
@@ -1290,7 +1291,6 @@ async function main() {
     const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
     if (serverUrl) {
       try {
-        const { buildHeaders } = await import('./lib/wiki-server-data.mjs');
         const headers = buildHeaders();
 
         const res = await fetch(`${serverUrl}/api/sessions/page-changes`, {
