@@ -2,7 +2,61 @@ entity: Khej79OA8g
 facts:
   - id: f_hdxXdOaXLg
     property: description
-    value: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle,
-      Metaforecast, and SquiggleAI.
-    asOf: 2026-03
-    notes: Migrated from old entity system
+    value: >-
+      Nonprofit research organization developing tools for probabilistic
+      reasoning, forecasting, and epistemic infrastructure. Key projects
+      include Squiggle, Squiggle Hub, Metaforecast, SquiggleAI, RoastMyPost,
+      and Guesstimate.
+    asOf: !date 2026-03
+
+  - id: f_quri_founded
+    property: founded-date
+    value: !date 2019
+    source: https://quantifieduncertainty.org
+    notes: Evolved from earlier Guesstimate work (2016)
+
+  - id: f_quri_website
+    property: website
+    value: https://quantifieduncertainty.org
+
+  - id: f_quri_hq
+    property: headquarters
+    value: Berkeley, CA
+    notes: Primarily remote team
+
+  - id: f_quri_headcount
+    property: headcount
+    value:
+      type: number
+      value: 4
+    asOf: !date 2026-03
+    notes: ~3-5 core contributors including Ozzie Gooen, Sam Nolan; previously Nuño Sempere
+
+  - id: f_quri_sff_funding
+    property: funding-received
+    value:
+      type: number
+      value: 650000
+      unit: USD
+    asOf: !date 2022
+    source: https://survivalandflourishing.fund
+    notes: Survival and Flourishing Fund grants 2019-2022
+
+  - id: f_quri_ff_funding
+    property: funding-received
+    value:
+      type: number
+      value: 200000
+      unit: USD
+    asOf: !date 2022
+    source: https://ftxfuturefund.org
+    notes: Future Fund grant 2022 (pre-FTX collapse)
+
+  - id: f_quri_ltff_funding
+    property: funding-received
+    value:
+      type: number
+      value: 100000
+      unit: USD
+    asOf: !date 2024
+    notes: Long-Term Future Fund ongoing support (estimated annual)
