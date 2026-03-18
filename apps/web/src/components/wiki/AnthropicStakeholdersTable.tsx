@@ -8,8 +8,7 @@
  */
 
 import { getKBLatest, getKBRecords } from "@data/factbase";
-import { getTypedEntityById } from "@data/tablebase";
-import { getEntityById, getPageById, getEntityHref } from "@/data";
+import { getTypedEntityById, getPageById, getEntityHref } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
 
 // ── Editorial data (keyed by holderId slug) ─────────────────────────────────
@@ -110,13 +109,13 @@ export async function AnthropicStakeholdersTable() {
   for (const rec of equityRecords) {
     const holderSlug = rec.fields.holder;
     if (typeof holderSlug !== "string") continue;
-    const entity = getEntityById(holderSlug);
+    const entity = getTypedEntityById(holderSlug);
     const page = getPageById(holderSlug);
     if (!entity) continue;
-    const href = getEntityHref(holderSlug, entity.type);
+    const href = getEntityHref(holderSlug, entity.entityType);
     const preview: EntityPreview = {
       title: entity.title || holderSlug,
-      type: entity.type,
+      type: entity.entityType,
       description: page?.description || entity.description,
       href,
     };
