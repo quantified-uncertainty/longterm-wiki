@@ -166,22 +166,6 @@
       relationship: related
   lastUpdated: 2026-03
 
-- id: roastmypost
-  stableId: xFFP7KkzFQ
-  wikiId: E385
-  type: project
-  title: RoastMyPost
-  projectStatus: active
-  projectUrl: https://roastmypost.com
-  organization: quantified-uncertainty
-  description: >-
-    LLM-powered tool for evaluating blog posts, research papers, and other written
-    content. Runs multiple AI evaluator personas (skeptic, methodologist, clarity
-    checker, etc.) and produces structured feedback with scores. Free and
-    open-source. Launched December 2025.
-  path: /knowledge-base/responses/roastmypost/
-  lastUpdated: 2026-03
-
 - id: guesstimate
   stableId: MlKFIMTdRg
   wikiId: E1945
