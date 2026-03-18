@@ -512,7 +512,8 @@ const citationsApp = new Hono()
     })
       .from(citationQuotes)
       .groupBy(citationQuotes.pageId)
-      .orderBy(asc(citationQuotes.pageId));
+      .orderBy(asc(citationQuotes.pageId))
+      .limit(1000);
 
     return c.json({
       pages: rows.map((r) => ({
@@ -542,7 +543,8 @@ const citationsApp = new Hono()
       .from(citationQuotes)
       .groupBy(citationQuotes.pageId)
       .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`)
-      .orderBy(asc(citationQuotes.pageId));
+      .orderBy(asc(citationQuotes.pageId))
+      .limit(500);
 
     return c.json({
       pages: rows.map((r) => ({
@@ -579,7 +581,8 @@ const citationsApp = new Hono()
         asc(citationQuotes.verificationScore),
         asc(citationQuotes.pageId),
         asc(citationQuotes.footnote)
-      );
+      )
+      .limit(500);
 
     return c.json({ broken: rows });
   })
@@ -791,137 +794,98 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /accuracy-dashboard ----
+  // Aggregation is pushed into SQL to avoid loading the full citation_quotes table
+  // into memory. Three queries replace the previous single full-scan + in-process loop.
   .get("/accuracy-dashboard", async (c) => {
     const db = getDrizzleDb();
 
-    // Get all quotes with accuracy data
-    const allQuotes = await db
-      .select()
+    // --- 1. Overall summary stats ---
+    const [summaryRow] = await db.select({
+      totalCitations: count(),
+      checkedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurateCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurateCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupportedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssueCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      averageScore: avg(citationQuotes.accuracyScore),
+    }).from(citationQuotes);
+
+    const totalCitations = summaryRow.totalCitations;
+    const checkedCitations = Number(summaryRow.checkedCitations);
+    const summary = {
+      totalCitations,
+      checkedCitations,
+      accurateCitations: Number(summaryRow.accurateCitations),
+      inaccurateCitations: Number(summaryRow.inaccurateCitations),
+      unsupportedCitations: Number(summaryRow.unsupportedCitations),
+      minorIssueCitations: Number(summaryRow.minorIssueCitations),
+      uncheckedCitations: totalCitations - checkedCitations,
+      averageScore: summaryRow.averageScore != null
+        ? Math.round(Number(summaryRow.averageScore) * 100) / 100
+        : null,
+    };
+
+    // --- 2. Verdict distribution (GROUP BY verdict, checked only) ---
+    const verdictRows = await db.select({
+      verdict: citationQuotes.accuracyVerdict,
+      cnt: count(),
+    })
       .from(citationQuotes)
-      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote));
+      .where(isNotNull(citationQuotes.accuracyVerdict))
+      .groupBy(citationQuotes.accuracyVerdict);
 
-    // Compute summary stats
-    let checkedCount = 0;
-    let accurateCount = 0;
-    let inaccurateCount = 0;
-    let unsupportedCount = 0;
-    let minorIssueCount = 0;
-    let scoreSum = 0;
-    let scoreCount = 0;
-
-    const verdictDist: Record<string, number> = {};
-    const difficultyDist: Record<string, number> = {};
-
-    // Page aggregation
-    const pageMap = new Map<string, {
-      total: number; checked: number; accurate: number;
-      inaccurate: number; unsupported: number; minorIssues: number;
-      scoreSum: number; scoreCount: number;
-    }>();
-
-    // Domain aggregation
-    const domainMap = new Map<string, {
-      total: number; checked: number; accurate: number;
-      inaccurate: number; unsupported: number; minorIssues: number;
-    }>();
-
-    // Flagged citations
-    const flagged: Array<{
-      pageId: string; footnote: number; claimText: string;
-      sourceTitle: string | null; url: string | null;
-      verdict: string; score: number | null;
-      issues: string | null; difficulty: string | null;
-      checkedAt: string | null;
-    }> = [];
-
-    for (const q of allQuotes) {
-      const pageId = q.pageId;
-      const verdict = q.accuracyVerdict;
-      const score = q.accuracyScore;
-      const difficulty = q.verificationDifficulty;
-      const url = q.url;
-
-      // Extract domain
-      let domain: string | null = null;
-      if (url) {
-        try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* invalid URL — safe to ignore */ }
-      }
-
-      // Page aggregation
-      if (!pageMap.has(pageId)) {
-        pageMap.set(pageId, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
-      }
-      const page = pageMap.get(pageId)!;
-      page.total++;
-
-      // Domain aggregation
-      if (domain) {
-        if (!domainMap.has(domain)) {
-          domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0 });
-        }
-        const d = domainMap.get(domain)!;
-        d.total++;
-      }
-
-      if (verdict) {
-        checkedCount++;
-        page.checked++;
-        verdictDist[verdict] = (verdictDist[verdict] || 0) + 1;
-
-        if (domain) domainMap.get(domain)!.checked++;
-
-        if (score !== null) {
-          scoreSum += score;
-          scoreCount++;
-          page.scoreSum += score;
-          page.scoreCount++;
-        }
-
-        if (difficulty) {
-          difficultyDist[difficulty] = (difficultyDist[difficulty] || 0) + 1;
-        }
-
-        if (verdict === 'accurate') {
-          accurateCount++; page.accurate++;
-          if (domain) domainMap.get(domain)!.accurate++;
-        } else if (verdict === 'inaccurate') {
-          inaccurateCount++; page.inaccurate++;
-          if (domain) domainMap.get(domain)!.inaccurate++;
-        } else if (verdict === 'unsupported') {
-          unsupportedCount++; page.unsupported++;
-          if (domain) domainMap.get(domain)!.unsupported++;
-        } else if (verdict === 'minor_issues') {
-          minorIssueCount++; page.minorIssues++;
-          if (domain) domainMap.get(domain)!.minorIssues++;
-        }
-
-        // Flag problematic citations
-        if (verdict === 'inaccurate' || verdict === 'unsupported') {
-          const claimText = q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText;
-          flagged.push({
-            pageId, footnote: q.footnote, claimText,
-            sourceTitle: q.sourceTitle, url,
-            verdict, score,
-            issues: q.accuracyIssues,
-            difficulty,
-            checkedAt: q.accuracyCheckedAt?.toISOString() ?? null,
-          });
-        }
-      }
+    const verdictDistribution: Record<string, number> = {};
+    for (const r of verdictRows) {
+      if (r.verdict) verdictDistribution[r.verdict] = r.cnt;
     }
 
-    // Build page summaries
-    const pages = Array.from(pageMap.entries()).map(([pageId, p]) => ({
-      pageId,
-      totalCitations: p.total,
-      checked: p.checked,
-      accurate: p.accurate,
-      inaccurate: p.inaccurate,
-      unsupported: p.unsupported,
-      minorIssues: p.minorIssues,
-      accuracyRate: p.checked > 0 ? Math.round(((p.accurate + p.minorIssues) / p.checked) * 100) / 100 : null,
-      avgScore: p.scoreCount > 0 ? Math.round((p.scoreSum / p.scoreCount) * 100) / 100 : null,
-    }));
+    // --- 3. Difficulty distribution ---
+    const difficultyRows = await db.select({
+      difficulty: citationQuotes.verificationDifficulty,
+      cnt: count(),
+    })
+      .from(citationQuotes)
+      .where(isNotNull(citationQuotes.verificationDifficulty))
+      .groupBy(citationQuotes.verificationDifficulty);
+
+    const difficultyDistribution: Record<string, number> = {};
+    for (const r of difficultyRows) {
+      if (r.difficulty) difficultyDistribution[r.difficulty] = r.cnt;
+    }
+
+    // --- 4. Per-page aggregation (GROUP BY pageId) ---
+    const pageRows = await db.select({
+      pageId: citationQuotes.pageId,
+      totalCitations: count(),
+      checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      avgScore: avg(citationQuotes.accuracyScore),
+    })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.pageId)
+      .limit(1000);
+
+    const pages = pageRows.map((r) => {
+      const checked = Number(r.checked);
+      const accurate = Number(r.accurate);
+      const inaccurate = Number(r.inaccurate);
+      const unsupported = Number(r.unsupported);
+      const minorIssues = Number(r.minorIssues);
+      return {
+        pageId: r.pageId,
+        totalCitations: r.totalCitations,
+        checked,
+        accurate,
+        inaccurate,
+        unsupported,
+        minorIssues,
+        accuracyRate: checked > 0 ? Math.round(((accurate + minorIssues) / checked) * 100) / 100 : null,
+        avgScore: r.avgScore != null ? Math.round(Number(r.avgScore) * 100) / 100 : null,
+      };
+    });
     pages.sort((a, b) => {
       const aInacc = a.checked > 0 ? (a.inaccurate + a.unsupported) / a.checked : 0;
       const bInacc = b.checked > 0 ? (b.inaccurate + b.unsupported) / b.checked : 0;
@@ -929,20 +893,39 @@ const citationsApp = new Hono()
       return b.totalCitations - a.totalCitations;
     });
 
-    // Build domain summaries
-    const MIN_DOMAIN_CITATIONS = 2;
-    const domainAnalysis = Array.from(domainMap.entries())
-      .filter(([, d]) => d.total >= MIN_DOMAIN_CITATIONS)
-      .map(([domain, d]) => ({
-        domain,
-        totalCitations: d.total,
-        checked: d.checked,
-        accurate: d.accurate,
-        inaccurate: d.inaccurate,
-        unsupported: d.unsupported,
-        minorIssues: d.minorIssues,
-        inaccuracyRate: d.checked > 0 ? Math.round(((d.inaccurate + d.unsupported) / d.checked) * 100) / 100 : null,
-      }));
+    // --- 5. Domain aggregation (GROUP BY extracted hostname) ---
+    // PostgreSQL regexp_replace strips scheme and www. prefix to yield the bare domain.
+    const domainRows = await db.select({
+      domain: sql<string>`regexp_replace(${citationQuotes.url}, '^https?://(www\\.)?([^/?#]+).*', '\\2')`,
+      totalCitations: count(),
+      checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+    })
+      .from(citationQuotes)
+      .where(isNotNull(citationQuotes.url))
+      .groupBy(sql`regexp_replace(${citationQuotes.url}, '^https?://(www\\.)?([^/?#]+).*', '\\2')`)
+      .having(sql`count(*) >= 2`)
+      .orderBy(desc(sql`count(*)`))
+      .limit(200);
+
+    const domainAnalysis = domainRows.map((r) => {
+      const checked = Number(r.checked);
+      const inaccurate = Number(r.inaccurate);
+      const unsupported = Number(r.unsupported);
+      return {
+        domain: r.domain,
+        totalCitations: r.totalCitations,
+        checked,
+        accurate: Number(r.accurate),
+        inaccurate,
+        unsupported,
+        minorIssues: Number(r.minorIssues),
+        inaccuracyRate: checked > 0 ? Math.round(((inaccurate + unsupported) / checked) * 100) / 100 : null,
+      };
+    });
     domainAnalysis.sort((a, b) => {
       const aRate = a.inaccuracyRate ?? 0;
       const bRate = b.inaccuracyRate ?? 0;
@@ -950,25 +933,44 @@ const citationsApp = new Hono()
       return b.totalCitations - a.totalCitations;
     });
 
-    // Sort flagged by score (worst first)
-    flagged.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
+    // --- 6. Flagged citations (inaccurate or unsupported, worst score first) ---
+    const flaggedRows = await db.select({
+      pageId: citationQuotes.pageId,
+      footnote: citationQuotes.footnote,
+      claimText: citationQuotes.claimText,
+      sourceTitle: citationQuotes.sourceTitle,
+      url: citationQuotes.url,
+      verdict: citationQuotes.accuracyVerdict,
+      score: citationQuotes.accuracyScore,
+      issues: citationQuotes.accuracyIssues,
+      difficulty: citationQuotes.verificationDifficulty,
+      checkedAt: citationQuotes.accuracyCheckedAt,
+    })
+      .from(citationQuotes)
+      .where(sql`${citationQuotes.accuracyVerdict} in ('inaccurate', 'unsupported')`)
+      .orderBy(asc(citationQuotes.accuracyScore))
+      .limit(500);
+
+    const flaggedCitations = flaggedRows.map((q) => ({
+      pageId: q.pageId,
+      footnote: q.footnote,
+      claimText: q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText,
+      sourceTitle: q.sourceTitle,
+      url: q.url,
+      verdict: q.verdict ?? '',
+      score: q.score,
+      issues: q.issues,
+      difficulty: q.difficulty,
+      checkedAt: q.checkedAt?.toISOString() ?? null,
+    }));
 
     return c.json({
       exportedAt: new Date().toISOString(),
-      summary: {
-        totalCitations: allQuotes.length,
-        checkedCitations: checkedCount,
-        accurateCitations: accurateCount,
-        inaccurateCitations: inaccurateCount,
-        unsupportedCitations: unsupportedCount,
-        minorIssueCitations: minorIssueCount,
-        uncheckedCitations: allQuotes.length - checkedCount,
-        averageScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
-      },
-      verdictDistribution: verdictDist,
-      difficultyDistribution: difficultyDist,
+      summary,
+      verdictDistribution,
+      difficultyDistribution,
       pages,
-      flaggedCitations: flagged,
+      flaggedCitations,
       domainAnalysis,
     });
   })
