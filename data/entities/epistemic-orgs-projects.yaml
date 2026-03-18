@@ -31,22 +31,22 @@
   relatedEntries:
     - id: squiggle
       type: project
-      relationship: created-by
+      relationship: related
     - id: squiggle-hub
       type: project
-      relationship: created-by
+      relationship: related
     - id: metaforecast
       type: project
-      relationship: created-by
+      relationship: related
     - id: squiggleai
       type: project
-      relationship: created-by
+      relationship: related
     - id: roastmypost
       type: project
-      relationship: created-by
+      relationship: related
     - id: guesstimate
       type: project
-      relationship: created-by
+      relationship: related
     - id: nuno-sempere
       type: person
     - id: rethink-priorities
