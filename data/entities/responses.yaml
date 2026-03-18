@@ -1437,35 +1437,117 @@
   policyStatus: revoked
   author: President Biden
   scope: Federal
+  billNumber: EO 14110
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+  provisions:
+    - title: Compute Threshold Reporting
+      description: >-
+        Companies training models using >10^26 FLOP (general dual-use) or >10^23 FLOP (biological sequence)
+        must notify Commerce Department before and during training, share safety testing results. Same 10^26
+        threshold later adopted by SB 1047.
+      category: Reporting
+    - title: Safety Testing & Red-Teaming
+      description: >-
+        Developers of dual-use foundation models must conduct red-team testing for CBRN capabilities,
+        cybersecurity vulnerabilities, and societal risks before deployment.
+      category: Pre-deployment
+    - title: AI Safety Institute Creation
+      description: >-
+        Established AISI within NIST to develop evaluation methodologies, conduct safety assessments of
+        frontier models, and coordinate with international partners.
+      category: Institutional
+    - title: AI-Generated Content Watermarking
+      description: Standards and tools for authenticating AI-generated content through watermarking, labeling, and content provenance.
+      category: Transparency
+    - title: Cloud Compute KYC Requirements
+      description: >-
+        IaaS providers must verify identity of foreign customers, monitor large training runs, and report
+        to Commerce when foreign customers train large AI models.
+      category: Enforcement
+    - title: Federal Agency AI Standards
+      description: Each agency must designate a Chief AI Officer; OMB guidance on rights-impacting and safety-impacting AI use.
+      category: Government modernization
+    - title: AI Talent Immigration
+      description: Streamlined visa processing for AI researchers; modernized O-1A, EB-1A, EB-2 pathways.
+      category: Immigration
+    - title: NIST AI Safety Standards
+      description: Directed NIST to develop standards and best practices for AI safety and security, building on the AI Risk Management Framework.
+      category: Standards
+  stakeholders:
+    - name: Biden Administration
+      position: support
+      reason: Authored and signed the order; framed as essential for safe AI development and national security
+      source: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+    - name: OpenAI
+      entityId: openai
+      position: support
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024)
+      source: https://www.nist.gov/aisi
+    - name: Anthropic
+      entityId: anthropic
+      position: support
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation
+      source: https://www.nist.gov/aisi
+    - name: Google DeepMind
+      entityId: deepmind
+      position: mixed
+      reason: Supported voluntary safety commitments but expressed concerns about regulatory burden
+    - name: AI safety research community
+      position: support
+      reason: "Broadly welcomed; Stanford HAI called it 'a good start' but 'not enough' without legislation"
+      source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+    - name: US Chamber of Commerce
+      position: oppose
+      reason: Opposed mandatory reporting requirements as overly burdensome; preferred voluntary industry-led frameworks
+    - name: Trump Administration
+      position: oppose
+      reason: "Revoked the order Jan 20, 2025, stating it 'hindered AI innovation and imposed onerous government control'"
+      source: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
+  keyPoliticians:
+    - name: President Joe Biden
+      role: Signed the executive order (October 30, 2023)
+    - name: President Donald Trump
+      role: Revoked the order (January 20, 2025)
+    - name: Gina Raimondo
+      role: Commerce Secretary; led implementation including AISI creation
+  amendments:
+    - date: January 20, 2025
+      description: Fully revoked by President Trump via Executive Order 14179 "Removing Barriers to American Leadership in AI"
+      url: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
   customFields:
     - label: Type
       value: Executive Order
     - label: Number
       value: '14110'
-    - label: Durability
-      value: Can be revoked by future president
+    - label: Signed
+      value: October 30, 2023
+    - label: Revoked
+      value: January 20, 2025
+    - label: Duration
+      value: 15 months
+    - label: Implementation at Revocation
+      value: ~85% of 150 requirements completed
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: california-sb1047
       type: policy
-    - id: aX0jkoaekQ
-      type: organization
-    - id: La8s84s3zg
+    - id: compute-governance
       type: policy
-    - id: ZXvLxl4RMw
+    - id: eu-ai-act
+      type: policy
+    - id: voluntary-commitments
       type: policy
   sources:
     - title: 'Executive Order 14110: Full Text'
-      url: >-
-        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+      url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
       date: October 30, 2023
     - title: White House Fact Sheet
-      url: >-
-        https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+      url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
     - title: US AI Safety Institute
       url: https://www.nist.gov/aisi
     - title: NIST AI Risk Management Framework
       url: https://www.nist.gov/itl/ai-risk-management-framework
-    - title: Analysis from Center for Security and Emerging Technology
+    - title: Analysis from CSET
       url: https://cset.georgetown.edu/article/understanding-the-ai-executive-order/
       author: CSET
       date: '2023'
@@ -1473,10 +1555,18 @@
       url: https://www.wiley.law/alert-President-Trump-Revokes-Biden-Administrations-AI-EO-What-To-Know
       author: Wiley Law
       date: January 2025
+    - title: 'EO 14179: Removing Barriers to American Leadership in AI'
+      url: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
+      date: January 23, 2025
+    - title: Stanford HAI AI Executive Order Tracker
+      url: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+      author: Stanford HAI
   description: >-
-    The Executive Order on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on October
-    30, 2023, is the most comprehensive US government action on AI to date. It establishes safety requirements for
-    frontier AI systems, mandates government agency actions, and creates oversight mechanisms.
+    Executive Order 14110 on Safe, Secure, and Trustworthy AI, signed by President Biden on October 30, 2023,
+    was the most comprehensive US government action on AI governance. The 111-page directive established
+    mandatory compute-based reporting thresholds (10^26 FLOP—the same threshold later used in California's
+    SB 1047), created the US AI Safety Institute at NIST, and placed 150+ requirements on 50+ federal entities.
+    Revoked by President Trump on January 20, 2025, approximately 85% of requirements had been completed.
   tags:
     - thresholds
     - governance
@@ -1485,7 +1575,7 @@
     - know-your-customer
     - safety-evaluations
     - executive-policy
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: us-state-legislation
   stableId: 2dwY9wnuYA
   wikiId: E367
