@@ -340,7 +340,7 @@
     - title: Apollo Research Blog
       url: https://www.apolloresearch.ai/blog
   description: >-
-    Apollo Research is an AI safety research organization founded in 2022 with a specific focus on one of the most
+    Apollo Research is an AI safety research organization founded in 2023 with a specific focus on one of the most
     concerning potential failure modes: deceptive alignment and scheming behavior in advanced AI systems.
   tags:
     - deception
@@ -419,7 +419,7 @@
       url: https://conjecture.dev/research
     - title: Connor Leahy Podcast Appearances
   description: >-
-    Conjecture is an AI safety research organization founded in 2021 by Connor Leahy and a team of researchers concerned
+    Conjecture is an AI safety research organization founded in 2022 by Connor Leahy and a team of researchers concerned
     about existential risks from advanced AI.
   tags:
     - cognitive-emulation
