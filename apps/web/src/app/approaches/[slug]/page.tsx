@@ -169,7 +169,7 @@ export default async function ApproachDetailPage({
             </section>
           )}
 
-          <RelatedPages entityId={entity.id} entity={{ type: "approach" }} />
+          <RelatedPages entityId={entity.id} entity={{ entityType: "approach" }} />
         </div>
 
         {/* Sidebar */}

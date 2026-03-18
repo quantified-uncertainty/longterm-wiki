@@ -7,7 +7,7 @@ import {
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
-import { getEntityById, getPageById, getEntityPath, getResourcesForPage, getDirectoryHref } from "@/data";
+import { getTypedEntityById, getPageById, getEntityPath, getResourcesForPage, getDirectoryHref } from "@/data";
 import type { Page, ContentFormat } from "@/data";
 import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
@@ -144,7 +144,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!slug) return { title: "Not Found" };
 
-  const entity = getEntityById(slug);
+  const entity = getTypedEntityById(slug);
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const isInternal = entityPath?.startsWith("/internal");
@@ -233,7 +233,7 @@ function ContentMeta({
   const githubUrl = pageData?.filePath
     ? `${GITHUB_HISTORY_BASE}/${pageData.filePath}`
     : null;
-  const entity = getEntityById(slug);
+  const entity = getTypedEntityById(slug);
   const numId = slugToWikiId(slug);
   const pageTitle = page.frontmatter.title || entity?.title || slug;
 
@@ -314,7 +314,7 @@ async function ContentView({
   hideSidebar?: boolean;
   citationQuotes?: import("@/lib/citation-data").CitationQuote[];
 }) {
-  const entity = getEntityById(slug);
+  const entity = getTypedEntityById(slug);
   const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
   const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
   const isArticle = contentFormat === "article";
