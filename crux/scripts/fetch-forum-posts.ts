@@ -38,7 +38,13 @@ async function graphql(forumUrl: string, query: string): Promise<unknown> {
     body: JSON.stringify({ query }),
   });
   if (!resp.ok) throw new Error(`GraphQL error: ${resp.status}`);
-  return resp.json();
+  const body = await resp.json() as { errors?: { message?: string }[] };
+  if (body.errors?.length) {
+    throw new Error(
+      body.errors.map((err) => err.message ?? 'Unknown GraphQL error').join('; ')
+    );
+  }
+  return body;
 }
 
 async function getUserId(forum: Forum, slug: string): Promise<{ id: string; name: string } | null> {
@@ -53,29 +59,41 @@ async function getUserId(forum: Forum, slug: string): Promise<{ id: string; name
   return { id: user._id, name: user.displayName };
 }
 
-async function getUserPosts(forum: Forum, userId: string, limit = 100): Promise<ForumPost[]> {
-  const data = await graphql(forum.url, `query {
-    posts(input: {
-      terms: {
-        userId: "${userId}",
-        limit: ${limit},
-        sortedBy: "top"
-      }
-    }) {
-      results {
-        _id title slug postedAt baseScore voteCount url
-        user { displayName slug }
-        coauthors { displayName slug }
-      }
-      totalCount
-    }
-  }`) as { data?: { posts?: { results?: ForumPost[]; totalCount?: number } } };
+async function getUserPosts(forum: Forum, userId: string, pageSize = 100): Promise<ForumPost[]> {
+  const allPosts: ForumPost[] = [];
+  let offset = 0;
 
-  return data?.data?.posts?.results || [];
+  while (true) {
+    const data = await graphql(forum.url, `query {
+      posts(input: {
+        terms: {
+          userId: "${userId}",
+          limit: ${pageSize},
+          offset: ${offset},
+          sortedBy: "top"
+        }
+      }) {
+        results {
+          _id title slug postedAt baseScore voteCount url
+          user { displayName slug }
+          coauthors { displayName slug }
+        }
+        totalCount
+      }
+    }`) as { data?: { posts?: { results?: ForumPost[]; totalCount?: number } } };
+
+    const page = data?.data?.posts?.results ?? [];
+    const totalCount = data?.data?.posts?.totalCount ?? 0;
+    allPosts.push(...page);
+
+    if (page.length === 0 || allPosts.length >= totalCount) break;
+    offset += pageSize;
+  }
+
+  return allPosts;
 }
 
 function postToResourceUrl(forum: Forum, post: ForumPost): string {
-  if (post.url) return post.url;
   return `${forum.baseUrl}/posts/${post._id}/${post.slug}`;
 }
 

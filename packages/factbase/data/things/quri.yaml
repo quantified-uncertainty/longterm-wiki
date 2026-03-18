@@ -27,8 +27,9 @@ facts:
   - id: f_quri_headcount
     property: headcount
     value:
-      type: number
-      value: 4
+      type: range
+      low: 3
+      high: 5
     asOf: !date 2026-03
     notes: ~3-5 core contributors including Ozzie Gooen, Sam Nolan; previously Nuño Sempere
 
@@ -55,8 +56,9 @@ facts:
   - id: f_quri_ltff_funding
     property: funding-received
     value:
-      type: number
-      value: 100000
+      type: range
+      low: 50000
+      high: 150000
       unit: USD
     asOf: !date 2024
-    notes: Long-Term Future Fund ongoing support (estimated annual)
+    notes: Long-Term Future Fund ongoing support (estimated annual ~$100K; not a sourced exact figure)
