@@ -4627,17 +4627,18 @@
   type: project
   title: RoastMyPost
   projectStatus: active
+  projectUrl: https://roastmypost.com
+  organization: quantified-uncertainty
   description: >-
-    RoastMyPost is an LLM tool (Claude Sonnet 4.5 + Perplexity) that evaluates
-    written content through multiple specialized AI agents—fact-checking,
-    logical fallacy detection, math verification, and more. Aimed at improving
-    epistemic quality of research posts, particularly in EA/rationalist
-    communities.
+    LLM-powered tool for evaluating blog posts, research papers, and other written
+    content. Runs multiple AI evaluator personas (skeptic, methodologist, clarity
+    checker, etc.) and produces structured feedback with scores. Free and
+    open-source. Launched December 2025.
   clusters:
     - epistemics
     - ai-safety
     - community
-  lastUpdated: 2026-02
+  lastUpdated: 2026-03
   summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
   stableId: 9f8eF0CObQ
