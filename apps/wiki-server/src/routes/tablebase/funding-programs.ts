@@ -321,8 +321,9 @@ const fundingProgramsApp = new Hono()
           title: fp.name,
           sourceTable: "funding_programs",
           sourceId: fp.id,
-          description: fp.description,
+          description: fp.description || null,
           sourceUrl: fp.source,
+          parentTitle: fp.orgId,
         }))
       );
 

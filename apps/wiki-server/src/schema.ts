@@ -2031,6 +2031,7 @@ export const things = pgTable(
     description: text("description"),
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
+    parentTitle: text("parent_title"),
     verdict: text("verdict"),
     verdictConfidence: real("verdict_confidence"),
     verdictAt: timestamp("verdict_at", { withTimezone: true }),

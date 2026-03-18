@@ -20,6 +20,72 @@ type DbOrTx =
       ExtractTablesWithRelations<typeof schema>
     >;
 
+// ── href computation (single source of truth for URL patterns) ──────
+
+/** Map entity type to its directory route prefix. */
+const ENTITY_TYPE_ROUTE: Record<string, string> = {
+  organization: "/organizations",
+  person: "/people",
+  "ai-model": "/ai-models",
+  benchmark: "/benchmarks",
+  policy: "/legislation",
+  project: "/projects",
+  approach: "/approaches",
+  event: "/events",
+  "research-area": "/research-areas",
+};
+
+/** Compute href for an entity based on its type and slug. */
+export function entityHref(entityType: string | null | undefined, slug: string, wikiId?: string | null): string {
+  const prefix = entityType ? ENTITY_TYPE_ROUTE[entityType] : null;
+  if (prefix) return `${prefix}/${slug}`;
+  if (wikiId) return `/wiki/${wikiId}`;
+  return `/wiki/${slug}`;
+}
+
+/**
+ * Compute the navigable href for any thing row.
+ * This is the SINGLE source of truth for thing → URL mapping.
+ * Called at query time (not stored in DB) to avoid staleness.
+ */
+export function thingHref(t: {
+  thingType: string;
+  sourceTable: string;
+  sourceId: string;
+  entityType?: string | null;
+  wikiId?: string | null;
+  sourceUrl?: string | null;
+  parentThingId?: string | null;
+}): string | null {
+  switch (t.thingType) {
+    case "entity":
+      return entityHref(t.entityType, t.sourceId, t.wikiId);
+    case "grant":
+      // parentThingId is the org's stableId — but we need the org slug (sourceId).
+      // For grants, the sourceTable is "grants" and we can use the org-scoped route
+      // if we have parentThingId. Fall back to the flat grant route.
+      return `/grants/${t.sourceId}`;
+    case "funding-round":
+      return `/funding-rounds/${t.sourceId}`;
+    case "funding-program":
+      return `/funding-programs/${t.sourceId}`;
+    case "division":
+      return `/divisions/${t.sourceId}`;
+    case "benchmark":
+      return `/benchmarks/${t.sourceId}`;
+    case "research-area":
+      return `/research-areas/${t.sourceId}`;
+    case "resource":
+      return t.sourceUrl || null;
+    default:
+      // Join-table types (investment, equity-position, personnel, etc.)
+      // don't have dedicated pages
+      return null;
+  }
+}
+
+// ── Sync types ──────────────────────────────────────────────────────
+
 export interface ThingSyncInput {
   id: string;
   thingType: string;
@@ -31,6 +97,7 @@ export interface ThingSyncInput {
   description?: string | null;
   sourceUrl?: string | null;
   wikiId?: string | null;
+  parentTitle?: string | null;
 }
 
 /**
@@ -56,6 +123,7 @@ export async function upsertThingsInTx(
     description: item.description ?? null,
     sourceUrl: item.sourceUrl ?? null,
     wikiId: item.wikiId ?? null,
+    parentTitle: item.parentTitle ?? null,
   }));
 
   await tx
@@ -70,6 +138,7 @@ export async function upsertThingsInTx(
         description: sql`excluded.description`,
         sourceUrl: sql`excluded.source_url`,
         wikiId: sql`excluded.wiki_id`,
+        parentTitle: sql`excluded.parent_title`,
         syncedAt: sql`now()`,
         updatedAt: sql`now()`,
       },

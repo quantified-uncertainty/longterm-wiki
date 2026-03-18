@@ -561,6 +561,12 @@ const grantsApp = new Hono()
           sourceTable: "grants",
           sourceId: g.id,
           sourceUrl: g.source,
+          parentTitle: g.organizationId,
+          description: [
+            g.granteeId ? `to ${g.granteeId}` : null,
+            g.amount != null ? `$${Number(g.amount).toLocaleString()}` : null,
+            g.date,
+          ].filter(Boolean).join(", ") || null,
         }))
       );
 
