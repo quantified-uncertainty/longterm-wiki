@@ -544,6 +544,202 @@ function EmptyState({ onSearch }: { onSearch: (q: string) => void }) {
 }
 
 
+// ── Entity JSONB data sections ────────────────────────────────────────────
+
+/** Render structured entity data from JSONB columns (metadata, customFields, etc.) */
+function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
+  const metadata = entity.metadata as Record<string, unknown> | null;
+  const customFields = entity.customFields as Array<{ label: string; value: string; link?: string }> | null;
+  const relatedEntries = entity.relatedEntries as Array<{ id: string; type: string; relationship?: string }> | null;
+  const sources = entity.sources as Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+
+  // Extract interesting metadata keys (skip boring ones)
+  const metadataEntries = metadata
+    ? Object.entries(metadata).filter(([, v]) => v !== null && v !== undefined && v !== "")
+    : [];
+
+  const hasData = metadataEntries.length > 0 || (customFields && customFields.length > 0) ||
+    (relatedEntries && relatedEntries.length > 0) || (sources && sources.length > 0);
+
+  if (!hasData) return null;
+
+  return (
+    <div className="space-y-2 mb-4">
+      {/* Metadata fields (type-specific: stakeholders, provisions, votes, etc.) */}
+      {metadataEntries.length > 0 && (
+        <CollapsibleJsonSection
+          title="Entity Metadata"
+          description="Type-specific structured fields from YAML entity data"
+          count={metadataEntries.length}
+          data={metadata!}
+        />
+      )}
+
+      {/* Custom fields */}
+      {customFields && customFields.length > 0 && (
+        <CollapsibleTableSection
+          title="Custom Fields"
+          description="Key-value fields from entity YAML"
+          headers={["Label", "Value", "Link"]}
+          rows={customFields.map((f) => [f.label, f.value, f.link ?? ""])}
+        />
+      )}
+
+      {/* Related entries */}
+      {relatedEntries && relatedEntries.length > 0 && (
+        <CollapsibleTableSection
+          title="Related Entries"
+          description="Cross-references to other entities"
+          headers={["Entity ID", "Type", "Relationship"]}
+          rows={relatedEntries.map((r) => [r.id, r.type, r.relationship ?? ""])}
+        />
+      )}
+
+      {/* Sources */}
+      {sources && sources.length > 0 && (
+        <CollapsibleTableSection
+          title="Sources"
+          description="Citations and references for this entity"
+          headers={["Title", "URL", "Author", "Date"]}
+          rows={sources.map((s) => [s.title, s.url ?? "", s.author ?? "", s.date ?? ""])}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Collapsible section that renders a JSON tree */
+function CollapsibleJsonSection({
+  title,
+  description,
+  count,
+  data,
+}: {
+  title: string;
+  description: string;
+  count: number;
+  data: Record<string, unknown>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-lg border border-border/50 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors"
+      >
+        {expanded ? (
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        )}
+        <span className="text-sm font-medium">{title}</span>
+        <span className="text-[11px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+          {count}
+        </span>
+        <span className="text-[11px] text-muted-foreground/60 ml-auto">{description}</span>
+      </button>
+      {expanded && (
+        <div className="border-t border-border/30 px-4 py-3 overflow-x-auto">
+          {Object.entries(data).map(([key, value]) => (
+            <div key={key} className="mb-3 last:mb-0">
+              <div className="text-[11px] font-mono font-semibold text-muted-foreground mb-1">{key}</div>
+              {Array.isArray(value) ? (
+                <div className="ml-2 space-y-1">
+                  {value.map((item, i) => (
+                    <div key={i} className="text-xs border-l-2 border-border/50 pl-2">
+                      {typeof item === "object" && item !== null ? (
+                        <pre className="text-[11px] whitespace-pre-wrap break-words text-muted-foreground">
+                          {JSON.stringify(item, null, 2)}
+                        </pre>
+                      ) : (
+                        <span className="text-foreground/80">{String(item)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : typeof value === "object" && value !== null ? (
+                <pre className="text-[11px] ml-2 whitespace-pre-wrap break-words text-muted-foreground">
+                  {JSON.stringify(value, null, 2)}
+                </pre>
+              ) : (
+                <div className="text-xs ml-2 text-foreground/80">{String(value)}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Collapsible section with a simple table */
+function CollapsibleTableSection({
+  title,
+  description,
+  headers,
+  rows,
+}: {
+  title: string;
+  description: string;
+  headers: string[];
+  rows: string[][];
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-lg border border-border/50 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors"
+      >
+        {expanded ? (
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        )}
+        <span className="text-sm font-medium">{title}</span>
+        <span className="text-[11px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+          {rows.length}
+        </span>
+        <span className="text-[11px] text-muted-foreground/60 ml-auto">{description}</span>
+      </button>
+      {expanded && (
+        <div className="border-t border-border/30 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-muted/20">
+                {headers.map((h) => (
+                  <th key={h} className="px-3 py-1.5 text-left font-medium text-muted-foreground text-[11px]">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => (
+                <tr key={i} className="border-t border-border/20">
+                  {row.map((cell, j) => (
+                    <td key={j} className="px-3 py-1.5 text-foreground/80 max-w-xs truncate">
+                      {cell.startsWith("http") ? (
+                        <a href={cell} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                          {cell.length > 60 ? cell.slice(0, 60) + "..." : cell}
+                        </a>
+                      ) : (
+                        cell || <span className="text-muted-foreground/20">&mdash;</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main viewer ────────────────────────────────────────────────────────────
 
 export function EntityProfileViewer({
@@ -677,6 +873,9 @@ export function EntityProfileViewer({
               <StatPill icon={ShieldCheck} label="Verified" value={stats.verifiedCount} />
             )}
           </div>
+
+          {/* Entity JSONB fields (metadata, customFields, relatedEntries, sources) */}
+          <EntityDataSections entity={data.entity} />
 
           <div className="space-y-2">
             {sortedSections.map((section) => (
