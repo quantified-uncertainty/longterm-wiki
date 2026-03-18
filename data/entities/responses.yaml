@@ -95,6 +95,10 @@
       result: Passed
       ayes: 32
       noes: 1
+      ayesDem: 30
+      ayesRep: 2
+      noesDem: 0
+      noesRep: 1
     - chamber: Assembly Privacy & Consumer Protection Committee
       date: June 18, 2024
       result: Passed
@@ -115,11 +119,19 @@
       result: Passed
       ayes: 48
       noes: 16
+      ayesDem: 44
+      ayesRep: 4
+      noesDem: 1
+      noesRep: 15
     - chamber: Senate Floor (Concurrence)
       date: August 29, 2024
       result: Passed
       ayes: 30
       noes: 9
+      ayesDem: 29
+      ayesRep: 1
+      noesDem: 0
+      noesRep: 9
   provisions:
     - title: Safety Testing
       description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment

@@ -24,12 +24,12 @@ node crux/crux.mjs validate      # Run validation suite
 **Always use path aliases instead of relative imports.** Configured in `tsconfig.json`:
 ```tsx
 // Good
-import { getEntityById } from "@/data";
+import { getTypedEntityById } from "@/data";
 import { InfoBox } from "@/components/wiki/InfoBox";
 import { renderMdxPage } from "@/lib/mdx";
 
 // Bad
-import { getEntityById } from "../../data";
+import { getTypedEntityById } from "../../data";
 ```
 
 Available aliases:
@@ -88,7 +88,7 @@ Entities come from two sources (merged at build time, YAML takes precedence):
 2. MDX frontmatter `entityType` field — auto-creates minimal entities for pages without YAML entries
 
 Key data functions in `src/data/index.ts`:
-- `getEntityById(id)` — Entity lookup
+- `getTypedEntityById(id)` — Entity lookup (returns `AnyEntity` with `.entityType`)
 - `getPageById(id)` — Page metadata (quality, importance, lastUpdated, etc.)
 - `getBacklinksFor(id)` — Reverse references
 - `getExploreItems()` — All items for browse page

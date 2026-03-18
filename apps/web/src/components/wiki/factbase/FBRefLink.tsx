@@ -12,7 +12,7 @@
 
 import { cn } from "@lib/utils";
 import { getKBEntity } from "@data/factbase";
-import { getEntityById } from "@data";
+import { getTypedEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
 
 interface FBRefLinkProps {
@@ -27,7 +27,7 @@ export function FBRefLink({ id, label, className }: FBRefLinkProps) {
   const kbEntity = getKBEntity(id);
 
   // Try wiki entity lookup (KB slug or direct id)
-  const wikiEntity = getEntityById(kbEntity?.id ?? id);
+  const wikiEntity = getTypedEntityById(kbEntity?.id ?? id);
   if (wikiEntity) {
     return (
       <EntityLink id={wikiEntity.id} className={className}>

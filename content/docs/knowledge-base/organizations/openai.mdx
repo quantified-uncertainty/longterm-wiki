@@ -5,7 +5,7 @@ description: Leading AI lab that developed GPT models and ChatGPT, analyzing org
 sidebar:
   order: 2
 subcategory: labs
-lastEdited: 2026-02-26
+lastEdited: 2026-03-18
 update_frequency: 3
 summary: Comprehensive organizational profile of OpenAI documenting evolution from 2015 non-profit to Public Benefit Corporation, with detailed analysis of governance crisis, 2024-2025 ownership restructuring (conversion from capped-profit LLC to PBC, with specific post-conversion equity percentages subject to regulatory finalization), key leadership departures, and capability advancement (o1/o3 reasoning models). Updated with 2025 developments including o3-mini release, 800M weekly active users, Altman's AGI timeline statements, enterprise market share decline from 50% to 25% between 2023 and 2025, and joint safety evaluation with Anthropic in summer 2025.
 clusters:
@@ -22,7 +22,7 @@ import { DataInfoBox, KeyQuestions, EntityLink } from '@components/wiki';
 
 The company achieved capability advances through massive scale (175B parameters for GPT-3), pioneered <EntityLink id="E259" name="rlhf">Reinforcement Learning from Human Feedback</EntityLink> as a practical alignment technique, and launched ChatGPT—reaching 800 million weekly active users by October 2025[^rc-f297] and maintaining 81.13% market share in generative AI chatbot usage[^rc-a742] (note: this consumer chatbot figure is distinct from overall enterprise LLM market share, which has declined from approximately 50% to 25% between 2023 and 2025, as discussed in the Competitive Landscape section below). OpenAI's trajectory has involved ongoing tensions between commercial pressures and safety priorities, exemplified by the November 2023 board crisis that temporarily ousted CEO <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> and the 2024 departures of key safety researchers including co-founder <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>.
 
-With over \$13 billion in <EntityLink id="E550" name="microsoft">Microsoft</EntityLink> investment and capability advancement through reasoning models like o1 and the recent o3-mini release[^rc-6d75], OpenAI sits at the center of debates about AI safety governance, racing dynamics, and whether commercial incentives can align with existential risk mitigation. In 2024–2025, the company undertook a formal legal restructuring from a capped-profit LLC to a Public Benefit Corporation (PBC), a transition with significant implications for ownership, governance, and mission accountability.
+With over \$13 billion in <EntityLink id="E550" name="microsoft">Microsoft</EntityLink> investment, a \$40 billion funding round from SoftBank in March 2025[^rc-softbank-round], and capability advancement through reasoning models like o1 and the recent o3-mini release[^rc-6d75], OpenAI sits at the center of debates about AI safety governance, racing dynamics, and whether commercial incentives can align with existential risk mitigation. In 2024–2025, the company undertook a formal legal restructuring from a capped-profit LLC to a Public Benefit Corporation (PBC), a transition with significant implications for ownership, governance, and mission accountability.
 
 ## Ownership Structure
 
@@ -34,8 +34,9 @@ OpenAI's 2024–2025 conversion from a capped-profit LLC to a Public Benefit Cor
 | **Microsoft** | Transitioning from capped-profit share to direct equity | Original structure gave Microsoft 49% of profits up to a return cap; PBC restructuring converts this to a direct equity stake. Final terms subject to ongoing negotiation and regulatory approval |
 | **Sam Altman** | No equity under original charter; proposed equity grant under discussion | Under OpenAI's original non-profit charter, Altman received no equity. A proposed equity grant is reported to be part of restructuring negotiations; terms not finalized |
 | **October 2024 funding round investors** | Equity (primary round) | October 2024 funding round led by Thrive Capital at <FBF entity="1LcLlMGLbw" property="valuation" asOf="2024-12">\$157B valuation</FBF>; Tiger Global, Khosla Ventures among reported participants |
+| **SoftBank** | Equity (primary round, March 2025) | \$40B round led by SoftBank at a \$300B valuation (March 2025)[^rc-softbank-round]; part of a broader strategic partnership including a joint venture |
 
-**Valuation context:** OpenAI's October 2024 funding round valued the company at <FBF entity="1LcLlMGLbw" property="valuation" asOf="2024-12">\$157B</FBF>. Secondary market activity has suggested higher valuations in subsequent months, though no primary funding round had confirmed those figures as of early 2025.
+**Valuation context:** OpenAI's October 2024 funding round valued the company at <FBF entity="1LcLlMGLbw" property="valuation" asOf="2024-12">\$157B</FBF>. The subsequent SoftBank-led \$40B round in March 2025 raised the valuation to approximately \$300B[^rc-softbank-round], representing a roughly doubling within six months. Secondary market activity in late 2025 has suggested valuations approaching \$500B.
 
 **Regulatory context:** The restructuring requires approval from the California Attorney General, given OpenAI's non-profit origins. Legal challenges to the conversion have been filed by outside parties; the status of those proceedings remained ongoing as of early 2025.
 
@@ -114,7 +115,7 @@ The following risk assessments synthesize published views from safety researcher
 | Aspect | 2015 Foundation | 2025 Reality | Change |
 |--------|-----------------|--------------|--------|
 | **Structure** | Non-profit | Public Benefit Corporation (converted from capped-profit LLC) | Major structural change |
-| **Funding** | ≈\$1B founder commitment | \$13B+ Microsoft investment | 13x scale increase |
+| **Funding** | ≈\$1B founder commitment | \$57.9B+ total (including \$13B+ Microsoft, \$40B SoftBank round) | 57x+ scale increase |
 | **Openness** | "Open by default" research publishing | Proprietary models, limited disclosure | Substantial shift toward proprietary development |
 | **Mission Priority** | "AGI benefits all humanity" | Product revenue and market leadership | Contested; company argues commercial success funds mission |
 | **Safety Approach** | "Safety over competitive advantage" | Safety integrated as constraint within product development | Disputed; safety researchers cite deprioritization, company disputes characterization |
@@ -211,6 +212,10 @@ In summer 2025, OpenAI and <EntityLink id="E22" name="anthropic">Anthropic</Enti
 - Operating losses: \$5 billion in 2024 despite revenue growth[^rc-2f7e]
 - Primary cost drivers: compute infrastructure, talent acquisition, research investment. OpenAI leadership has characterized these losses as reflecting deliberate investment in infrastructure and talent rather than financial distress.
 
+**Major 2025 Funding:**
+- **March 2025**: SoftBank-led \$40 billion round at a \$300 billion valuation[^rc-softbank-round], the largest single funding round in AI history at that time. SoftBank contributed directly and facilitated third-party investment through a joint venture structure. This round brought OpenAI's total cumulative funding to approximately \$57.9 billion.
+- The SoftBank round was part of a broader "Stargate" strategic partnership for AI infrastructure investment in the United States.
+
 ### Microsoft Partnership
 
 | Component | Details | Strategic Implications |
@@ -221,6 +226,9 @@ In summer 2025, OpenAI and <EntityLink id="E22" name="anthropic">Anthropic</Enti
 | **API Monetization** | Enterprise and developer access | Success depends on maintaining capability lead |
 
 <FBRecordTable entity="1LcLlMGLbw" collection="funding-rounds" title="Funding History" columns={["date", "raised", "valuation", "lead_investor", "notes"]} />
+
+**Early Funding History:**
+OpenAI's initial funding came primarily from founder pledges, including a \$1 billion commitment from a group including Elon Musk, Sam Altman, Peter Thiel, and Reid Hoffman. In 2017, <EntityLink id="E521" name="coefficient-giving">Open Philanthropy</EntityLink> (now Coefficient Giving) granted \$30 million to OpenAI[^rc-op-grant-2017] as part of its early investment in AI safety research—at that time OpenAI was a nonprofit and Open Philanthropy viewed supporting frontier AI safety research as a priority. This grant predated OpenAI's commercial pivot and the creation of the capped-profit subsidiary in 2019.
 
 ## Governance Crisis Analysis
 
@@ -423,6 +431,11 @@ The following departures occurred in 2024. Stated reasons varied across individu
 | Sora 2 Release | Product announcement | Video generation capabilities | [Sora 2 Launch](https://openai.com/index/sora-2/) |
 | o3-mini Launch | Model release | Latest reasoning model availability | [Computerworld Coverage](https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html) |
 | AGI Timeline Interview | Executive statement | Altman's AGI predictions | [TIME Magazine Interview](https://time.com/7205596/sam-altman-superintelligence-agi/) |
+| SoftBank \$40B Round | Funding announcement | Largest single AI funding round; \$300B valuation | [OpenAI Announcement](https://openai.com/index/softbank-openai-joint-announcement/) |
+
+[^rc-softbank-round]: [OpenAI and SoftBank Joint Announcement](https://openai.com/index/softbank-openai-joint-announcement/), OpenAI, March 2025. SoftBank-led \$40B funding round at \$300B valuation, as part of the Stargate AI infrastructure initiative.
+
+[^rc-op-grant-2017]: [Open Philanthropy — OpenAI General Support](https://www.openphilanthropy.org/grants/openai-general-support/), Open Philanthropy, March 2017. \$30 million grant to support OpenAI's work on technical AI safety research.
 
 ### Academic Research
 | Paper | Authors | Contribution | Citation |
