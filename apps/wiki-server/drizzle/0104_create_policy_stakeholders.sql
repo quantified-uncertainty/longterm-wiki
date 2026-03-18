@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS policy_stakeholders (
   policy_entity_id TEXT NOT NULL REFERENCES entities(stable_id) ON DELETE CASCADE,
   stakeholder_entity_id TEXT REFERENCES entities(stable_id) ON DELETE SET NULL,
   stakeholder_display_name TEXT NOT NULL,
-  position TEXT NOT NULL,  -- support | oppose | neutral | mixed
+  position TEXT NOT NULL CHECK (position IN ('support', 'oppose', 'neutral', 'mixed')),
   reason TEXT,
   source TEXT,
   context JSONB,  -- array of contextual notes

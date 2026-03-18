@@ -548,10 +548,12 @@ function EmptyState({ onSearch }: { onSearch: (q: string) => void }) {
 
 /** Render structured entity data from JSONB columns (metadata, customFields, etc.) */
 function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
-  const metadata = entity.metadata as Record<string, unknown> | null;
-  const customFields = entity.customFields as Array<{ label: string; value: string; link?: string }> | null;
-  const relatedEntries = entity.relatedEntries as Array<{ id: string; type: string; relationship?: string }> | null;
-  const sources = entity.sources as Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+  const metadata = (entity.metadata && typeof entity.metadata === "object" && !Array.isArray(entity.metadata))
+    ? entity.metadata as Record<string, unknown>
+    : null;
+  const customFields = Array.isArray(entity.customFields) ? entity.customFields as Array<{ label: string; value: string; link?: string }> : null;
+  const relatedEntries = Array.isArray(entity.relatedEntries) ? entity.relatedEntries as Array<{ id: string; type: string; relationship?: string }> : null;
+  const sources = Array.isArray(entity.sources) ? entity.sources as Array<{ title: string; url?: string; author?: string; date?: string }> : null;
 
   // Extract interesting metadata keys (skip boring ones)
   const metadataEntries = metadata
@@ -721,7 +723,7 @@ function CollapsibleTableSection({
                 <tr key={i} className="border-t border-border/20">
                   {row.map((cell, j) => (
                     <td key={j} className="px-3 py-1.5 text-foreground/80 max-w-xs truncate">
-                      {cell.startsWith("http") ? (
+                      {(cell.startsWith("http://") || cell.startsWith("https://")) ? (
                         <a href={cell} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                           {cell.length > 60 ? cell.slice(0, 60) + "..." : cell}
                         </a>

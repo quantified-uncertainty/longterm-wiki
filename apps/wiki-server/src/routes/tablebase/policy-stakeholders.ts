@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { policyStakeholders, entities } from "../../schema.js";
+import { policyStakeholders } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -38,6 +38,11 @@ const ByPolicyQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+const ByStakeholderQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 // ---- Route ----
 
 const policyStakeholdersApp = new Hono()
@@ -48,27 +53,23 @@ const policyStakeholdersApp = new Hono()
     const { position, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    let query = db.select().from(policyStakeholders)
-      .where(eq(policyStakeholders.policyEntityId, entityId))
+    const whereClause = position
+      ? and(eq(policyStakeholders.policyEntityId, entityId), eq(policyStakeholders.position, position))
+      : eq(policyStakeholders.policyEntityId, entityId);
+
+    const rows = await db.select().from(policyStakeholders)
+      .where(whereClause)
       .limit(limit)
       .offset(offset);
 
-    if (position) {
-      query = db.select().from(policyStakeholders)
-        .where(sql`${policyStakeholders.policyEntityId} = ${entityId} AND ${policyStakeholders.position} = ${position}`)
-        .limit(limit)
-        .offset(offset);
-    }
-
-    const rows = await query;
     const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders)
-      .where(eq(policyStakeholders.policyEntityId, entityId));
+      .where(whereClause);
 
     return c.json({ stakeholders: rows, total });
   })
 
   // GET /by-stakeholder/:entityId — policies where this entity is a stakeholder
-  .get("/by-stakeholder/:entityId", zv("query", ByPolicyQuery), async (c) => {
+  .get("/by-stakeholder/:entityId", zv("query", ByStakeholderQuery), async (c) => {
     const entityId = c.req.param("entityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -94,6 +95,7 @@ const policyStakeholdersApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+    const now = new Date();
     let upserted = 0;
 
     await db.transaction(async (tx) => {
@@ -109,8 +111,8 @@ const policyStakeholdersApp = new Hono()
             reason: item.reason ?? null,
             source: item.source ?? null,
             context: item.context ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
+            syncedAt: now,
+            updatedAt: now,
           })
           .onConflictDoUpdate({
             target: policyStakeholders.id,
@@ -122,8 +124,8 @@ const policyStakeholdersApp = new Hono()
               reason: item.reason ?? null,
               source: item.source ?? null,
               context: item.context ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
+              syncedAt: now,
+              updatedAt: now,
             },
           });
         upserted++;
