@@ -50,14 +50,29 @@ facts:
     property: total-funding
     value: 1.79e+10
     asOf: 2025-10
+    validEnd: 2025-03
     source: https://openai.com/index/openai-announces-a-new-funding-round/
-    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds"
+    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds. Superseded by SoftBank $40B round in March 2025."
+
+  - id: f_Sb4nW9mT7a
+    property: total-funding
+    value: 5.79e+10
+    asOf: 2025-03
+    source: https://openai.com/index/softbank-openai-joint-announcement/
+    notes: "Cumulative funding after SoftBank's $40B round (March 2025) at a $300B valuation, bringing total to approximately $57.9B. Round co-led by SoftBank ($15B from third parties, $15B from SoftBank directly, with additional participants)."
 
   - id: f_b56n3kcD2g
     property: valuation
     value: 1.57e+11
     asOf: 2024-12
     notes: "October 2024 funding round valuation"
+
+  - id: f_Qj7kR2pX9v
+    property: valuation
+    value: 3e+11
+    asOf: 2025-03
+    source: https://openai.com/index/softbank-openai-joint-announcement/
+    notes: "SoftBank $40B funding round valuation, March 2025"
 
   - id: f_YZ7zzKgBsA
     property: valuation
