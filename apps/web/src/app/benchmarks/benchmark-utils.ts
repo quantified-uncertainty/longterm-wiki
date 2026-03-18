@@ -119,34 +119,73 @@ export function getBenchmarkSlugByName(name: string): string | undefined {
 /**
  * Build a map of benchmarkId -> model results.
  *
- * Uses PG-sourced benchmark results from database.json when available,
- * falling back to extracting inline `benchmarks[]` from ai-model entities.
+ * Always starts with inline benchmark data from ai-model entities, then
+ * overlays PG-sourced results where available. PG data takes priority for
+ * any (model, benchmark) pair it covers, ensuring authoritative/recent scores
+ * win. Inline data fills gaps for benchmarks not yet synced to PG.
+ *
+ * This merge strategy fixes a bug where benchmarks present in ai-model YAML
+ * but absent from PG showed "0 models tested" on the benchmark detail page
+ * when PG had any data at all (making hasPGData=true and skipping inline).
  */
 export function getBenchmarkResultsFromModels(): Map<string, BenchmarkResultRow[]> {
   const allEntities = getTypedEntities();
   const entityById = new Map(allEntities.map((e) => [e.id, e]));
 
-  // Try PG data first
+  // Start with inline data from ai-model entities (always available)
+  const inlineResults = buildFromInlineData(allEntities, entityById);
+
+  // Overlay PG data where available: PG wins for covered (benchmark, model) pairs
   const pgResults = getBenchmarkResults();
   const hasPGData = Object.keys(pgResults).length > 0;
 
-  if (hasPGData) {
-    return buildFromPGResults(pgResults, entityById);
+  if (!hasPGData) {
+    return inlineResults;
   }
 
-  // Fallback: extract from inline ai-model benchmarks arrays
-  return buildFromInlineData(allEntities, entityById);
+  return mergeWithPGResults(inlineResults, pgResults, entityById);
 }
 
 /**
- * Build results map from PG-sourced benchmark_results (keyed by model ID).
+ * Merge inline results with PG-sourced results.
+ *
+ * Strategy: start from inline data, then for each (benchmark, model) pair
+ * present in PG, replace the inline entry with the PG value. This ensures:
+ * - Benchmarks fully absent from PG still show inline data (fixing the bug)
+ * - PG data wins for benchmarks it does cover (more authoritative/recent)
  */
-function buildFromPGResults(
+function mergeWithPGResults(
+  inlineResults: Map<string, BenchmarkResultRow[]>,
   pgResults: Record<string, Array<{ benchmarkId: string; score: number; unit: string | null }>>,
   entityById: Map<string, AnyEntity>,
 ): Map<string, BenchmarkResultRow[]> {
-  const results = new Map<string, BenchmarkResultRow[]>();
+  // Deep-copy inline results so we don't mutate the original
+  const merged = new Map<string, BenchmarkResultRow[]>();
+  for (const [benchmarkId, rows] of inlineResults) {
+    merged.set(benchmarkId, [...rows]);
+  }
 
+  // Build a set of (benchmarkId, modelId) pairs covered by PG
+  const pgCoveredPairs = new Set<string>();
+  for (const [modelId, scores] of Object.entries(pgResults)) {
+    for (const s of scores) {
+      pgCoveredPairs.add(`${s.benchmarkId}:${modelId}`);
+    }
+  }
+
+  // Remove inline entries where PG has data for that (benchmark, model) pair
+  for (const [benchmarkId, rows] of merged) {
+    const filtered = rows.filter(
+      (row) => !pgCoveredPairs.has(`${benchmarkId}:${row.modelId}`)
+    );
+    if (filtered.length > 0) {
+      merged.set(benchmarkId, filtered);
+    } else {
+      merged.delete(benchmarkId);
+    }
+  }
+
+  // Add PG entries
   for (const [modelId, scores] of Object.entries(pgResults)) {
     const model = entityById.get(modelId);
     if (!model) continue;
@@ -165,13 +204,13 @@ function buildFromPGResults(
         unit: s.unit ?? undefined,
       };
 
-      const arr = results.get(s.benchmarkId) ?? [];
+      const arr = merged.get(s.benchmarkId) ?? [];
       arr.push(row);
-      results.set(s.benchmarkId, arr);
+      merged.set(s.benchmarkId, arr);
     }
   }
 
-  return results;
+  return merged;
 }
 
 /**

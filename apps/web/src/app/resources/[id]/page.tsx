@@ -6,10 +6,9 @@ import {
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
-  getEntityById,
+  getTypedEntityById,
   getPageById,
   getEntityHref,
-  getTypedEntityById,
   findPersonByName,
 } from "@data";
 import { getEntityTypeLabel } from "@data/entity-ontology";
@@ -64,7 +63,7 @@ function formatDate(iso: string): string {
 
 /** Resolve a page slug to its display title */
 function getPageTitle(pageId: string): string {
-  const entity = getEntityById(pageId);
+  const entity = getTypedEntityById(pageId);
   if (entity?.title) return entity.title;
   const page = getPageById(pageId);
   if (page?.title) return page.title;
@@ -130,12 +129,11 @@ export default async function ResourcePage({ params }: PageProps) {
 
   // Build citing page info for the table
   const citingPageInfo = citingPages.map((pageId) => {
-    const entity = getEntityById(pageId);
-    const typedEntity = getTypedEntityById(pageId);
+    const entity = getTypedEntityById(pageId);
     const page = getPageById(pageId);
-    const href = getEntityHref(pageId, entity?.type);
+    const href = getEntityHref(pageId, entity?.entityType);
     const title = getPageTitle(pageId);
-    const entityType = typedEntity?.entityType ?? entity?.type ?? null;
+    const entityType = entity?.entityType ?? null;
     const quality = page?.quality ?? null;
     return { pageId, href, title, entityType, quality };
   });

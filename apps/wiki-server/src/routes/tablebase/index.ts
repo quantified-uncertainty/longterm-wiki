@@ -21,3 +21,4 @@ export { benchmarkResultsRoute, type BenchmarkResultsRoute } from "./benchmark-r
 export { recordVerificationsRoute, type RecordVerificationsRoute } from "./record-verifications.js";
 export { thingsRoute, type ThingsRoute } from "./things.js";
 export { researchAreasRoute, type ResearchAreasRoute } from "./research-areas.js";
+export { policyStakeholdersRoute, type PolicyStakeholdersRoute } from "./policy-stakeholders.js";

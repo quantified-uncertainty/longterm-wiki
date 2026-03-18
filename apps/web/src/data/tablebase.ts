@@ -552,14 +552,11 @@ export function getTableBase(): TableBaseShape {
   return _database;
 }
 
-/** @deprecated Use getTableBase() */
-export const getDatabase = getTableBase;
-
 /** Get all typed entities from the database */
 export function getTypedEntities(): AnyEntity[] {
   if (_typedEntities) return _typedEntities;
 
-  const db = getDatabase();
+  const db = getTableBase();
 
   if (!db.typedEntities || db.typedEntities.length === 0) {
     throw new Error(
@@ -601,27 +598,6 @@ export function getTypedEntities(): AnyEntity[] {
 export type { TypedEntity, GenericEntity, RiskEntity, PersonEntity, OrganizationEntity, PolicyEntity, AiModelEntity, BenchmarkEntity, ProjectEntity, ApproachEntity, EventEntity, ExpertPosition } from "./entity-schemas";
 export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isProject, isApproach, isEvent } from "./entity-schemas";
 
-/** @deprecated Use TypedEntity instead */
-interface Entity {
-  id: string;
-  type: string;
-  title: string;
-  description?: string;
-  severity?: string;
-  likelihood?: string | { level: string; status?: string; display?: string };
-  timeframe?: string | { median: number; earliest?: number; latest?: number; display?: string };
-  maturity?: string;
-  website?: string;
-  customFields?: { label: string; value: string; link?: string }[];
-  relatedTopics?: string[];
-  relatedEntries?: { id: string; type: string; relationship?: string }[];
-  tags?: string[];
-  lastUpdated?: string;
-  sourceRefs?: string[];
-  sources?: { title: string; url?: string; author?: string; date?: string }[];
-  content?: unknown;
-}
-
 // ============================================================================
 // ID RESOLUTION
 // ============================================================================
@@ -646,7 +622,7 @@ export function resolveId(id: string): string {
 }
 
 export function getIdRegistry(): IdRegistryMaps {
-  return getDatabase().idRegistry;
+  return getTableBase().idRegistry;
 }
 
 // ============================================================================
@@ -680,7 +656,7 @@ export function getTypedEntityByStableId(stableId: string): AnyEntity | undefine
 
 function resourceIndex() {
   if (!_resourceIndex) {
-    const db = getDatabase();
+    const db = getTableBase();
     const resources = db.resources || [];
     _resourceIndex = new Map();
     _stableIdIndex = new Map();
@@ -707,7 +683,7 @@ function stableIdIndex() {
 
 function publicationIndex() {
   if (!_publicationIndex) {
-    const db = getDatabase();
+    const db = getTableBase();
     _publicationIndex = new Map(
       (db.publications || []).map((p) => [p.id, p])
     );
@@ -717,7 +693,7 @@ function publicationIndex() {
 
 function orgIndex() {
   if (!_orgIndex) {
-    const db = getDatabase();
+    const db = getTableBase();
     _orgIndex = new Map((db.organizations || []).map((o) => [o.id, o]));
   }
   return _orgIndex;
@@ -725,7 +701,7 @@ function orgIndex() {
 
 function pageIndex() {
   if (!_pageIndex) {
-    const db = getDatabase();
+    const db = getTableBase();
     _pageIndex = new Map((db.pages || []).map((p) => [p.id, p]));
   }
   return _pageIndex;
@@ -746,32 +722,6 @@ export function getPersonEntityById(id: string): PersonEntity | null {
   return entity && isPerson(entity) ? entity : null;
 }
 
-/** @deprecated Use getTypedEntityById for new code */
-export function getEntityById(id: string): Entity | undefined {
-  // Return typed entity cast to the old Entity interface for backward compat
-  const typed = typedEntityIndex().get(resolveId(id));
-  if (!typed) return undefined;
-  return {
-    id: typed.id,
-    type: typed.entityType,
-    title: typed.title,
-    description: typed.description,
-    tags: typed.tags,
-    relatedEntries: typed.relatedEntries,
-    sources: typed.sources,
-    lastUpdated: typed.lastUpdated,
-    website: typed.website,
-    customFields: typed.customFields,
-    // Type-specific fields (spread them for backward compat)
-    ...(isRisk(typed) ? {
-      severity: typed.severity,
-      likelihood: typed.likelihood,
-      timeframe: typed.timeframe,
-      maturity: typed.maturity,
-    } : {}),
-  };
-}
-
 export function getResourceById(id: string): Resource | undefined {
   return resourceIndex().get(id);
 }
@@ -786,7 +736,7 @@ export function resolveResource(id: string): Resource | undefined {
 
 /** Get all resources */
 export function getAllResources(): Resource[] {
-  const db = getDatabase();
+  const db = getTableBase();
   return db.resources ?? [];
 }
 
@@ -796,13 +746,13 @@ export function getResourcesForPage(pageId: string): string[] {
   // Try per-entity bundle first (avoids loading full database.json)
   const bundle = getEntityBundle(slug);
   if (bundle?.pageResources) return bundle.pageResources;
-  const db = getDatabase();
+  const db = getTableBase();
   return db.pageResources?.[slug] ?? [];
 }
 
 /** Get page IDs that cite a given resource (reverse lookup of pageResources) */
 export function getPagesForResource(resourceId: string): string[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pr = db.pageResources ?? {};
   const pages: string[] = [];
   for (const [pageId, ids] of Object.entries(pr)) {
@@ -819,7 +769,7 @@ export function getPageReferences(pageId: string): SerializedPageReferences | nu
   // Try per-entity bundle first
   const bundle = getEntityBundle(slug);
   if (bundle?.pageReferences) return bundle.pageReferences;
-  const db = getDatabase();
+  const db = getTableBase();
   return db.pageReferenceIndex?.[slug] ?? null;
 }
 
@@ -829,13 +779,13 @@ export function getPublicationById(id: string): Publication | undefined {
 
 /** Get all publications */
 export function getAllPublications(): Publication[] {
-  const db = getDatabase();
+  const db = getTableBase();
   return db.publications ?? [];
 }
 
 /** Get all literature papers (from literature.yaml loaded at build time). */
 export function getLiteraturePapers(): LiteraturePaper[] {
-  const db = getDatabase();
+  const db = getTableBase();
   if (!db.literature?.categories) return [];
   return db.literature.categories.flatMap((c) => c.papers ?? []);
 }
@@ -849,7 +799,7 @@ export function getResourcesForPublication(publicationId: string): Resource[] {
 export function getPublicationsForPerson(
   personId: string,
 ): PersonPublicationEntry[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const entry = (db.peopleResources ?? []).find(
     (pr) => pr.personId === personId,
   );
@@ -869,7 +819,7 @@ export function getPageById(id: string): Page | undefined {
 }
 
 export function getAllPages(): Page[] {
-  return getDatabase().pages || [];
+  return getTableBase().pages || [];
 }
 
 // ============================================================================
@@ -940,7 +890,7 @@ export interface PGBenchmarkResult {
 
 /** Get all PG benchmark results keyed by model ID. Returns empty object if not available. */
 export function getBenchmarkResults(): Record<string, PGBenchmarkResult[]> {
-  return getDatabase().benchmarkResults ?? {};
+  return getTableBase().benchmarkResults ?? {};
 }
 
 /** Get PG benchmark results for a specific model. Returns empty array if none. */
@@ -956,7 +906,7 @@ export type PGResearchArea = NonNullable<TableBaseShape["researchAreas"]>[number
 
 /** Get all enriched research areas from PG. Returns empty array if not available. */
 export function getResearchAreasFromPG(): PGResearchArea[] {
-  return getDatabase().researchAreas ?? [];
+  return getTableBase().researchAreas ?? [];
 }
 
 // ============================================================================
@@ -974,7 +924,7 @@ export interface RecordVerdict {
 
 /** Get all record verdicts (keyed by "recordType:recordId") */
 export function getRecordVerdicts(): Record<string, RecordVerdict> {
-  return getDatabase().recordVerdicts ?? {};
+  return getTableBase().recordVerdicts ?? {};
 }
 
 /** Get the verification verdict for a specific record */

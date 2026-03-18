@@ -2,7 +2,7 @@
  * Page update schedule and rankings data.
  */
 
-import { getDatabase, fetchFromWikiServer, withApiFallback } from "./tablebase";
+import { getTableBase, fetchFromWikiServer, withApiFallback } from "./tablebase";
 import type { Page, WithSource } from "./tablebase";
 
 export interface UpdateScheduleItem {
@@ -29,7 +29,7 @@ export async function getUpdateSchedule(): Promise<WithSource<UpdateScheduleItem
       return data;
     },
     // Local fallback: pre-computed at build time in build-data.mjs
-    () => getDatabase().updateSchedule || []
+    () => getTableBase().updateSchedule || []
   );
 }
 
@@ -48,7 +48,7 @@ export interface PageRankingItem {
 }
 
 export function getPageRankings(): PageRankingItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pages = db.pages || [];
 
   // Ranks are pre-computed at build time in build-data.mjs

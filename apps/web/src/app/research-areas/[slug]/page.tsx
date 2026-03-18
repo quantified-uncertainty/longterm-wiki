@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResearchAreasFromPG, getEntityById } from "@/data/tablebase";
+import { getResearchAreasFromPG, getTypedEntityById } from "@/data/tablebase";
 import { getEntityHref } from "@/data/entity-nav";
 import {
   CLUSTER_COLORS,
@@ -70,12 +70,12 @@ function getAllSlugs(): string[] {
 }
 
 function resolveEntityName(id: string): string {
-  const entity = getEntityById(id);
+  const entity = getTypedEntityById(id);
   return entity?.title ?? id;
 }
 
 function resolveEntityLink(id: string): { name: string; href: string | null } {
-  const entity = getEntityById(id);
+  const entity = getTypedEntityById(id);
   return {
     name: entity?.title ?? id,
     href: entity ? getEntityHref(id) : null,

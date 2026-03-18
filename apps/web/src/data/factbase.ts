@@ -22,7 +22,7 @@
 
 import fs from "fs";
 import path from "path";
-import { getDatabase, getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
+import { getTableBase, getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
 import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 
@@ -319,7 +319,7 @@ const VALID_VERDICTS: Set<string> = new Set([
  */
 export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
   try {
-    const db = getDatabase();
+    const db = getTableBase();
     const verdict = db.kbFactVerification?.[factId];
     if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
     return verdict as FactBaseVerdict;

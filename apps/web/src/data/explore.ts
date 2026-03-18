@@ -2,7 +2,7 @@
  * Explore page data: items from entities, pages, and diagrams.
  */
 
-import { getDatabase, getTypedEntities, isRisk } from "./tablebase";
+import { getTableBase, getTypedEntities, isRisk } from "./tablebase";
 import type { ContentFormat, RawEntity, AnyEntity } from "./tablebase";
 import { getEntityHref } from "./entity-nav";
 import { getKB } from "./factbase";
@@ -103,7 +103,7 @@ function resolvePageId(entity: AnyEntity, pageMap: Map<string, unknown>): string
 }
 
 export function getExploreItems(): ExploreItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
   const kb = getKB();

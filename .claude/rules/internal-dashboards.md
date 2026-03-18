@@ -40,6 +40,6 @@ Follow existing patterns in `apps/web/src/app/internal/entities/` (Pattern A ref
 
 All dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect).
 
-**Dashboards:** Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Auto-Update Runs (E914), Auto-Update News (E915), Active Agents (E925), Groundskeeper Runs (E926), System Health (E927). *(E899 deprecated — merged into E908.)*
+**Dashboards:** Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Auto-Update Runs (E914), Auto-Update News (E915), Active Agents (E925), Groundskeeper Runs (E926), System Health (E927), Entity Profile (E1929). *(E899 deprecated — merged into E908.)*
 
 **Citations:** Fact Dashboard (E898), Resources, Citation Accuracy (E917), Citation Content (E918), Hallucination Risk (E919), Hallucination Evals (E920).
