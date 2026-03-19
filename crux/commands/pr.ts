@@ -798,7 +798,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
   const prNum = parseInt(args[0], 10);
   if (!prNum || isNaN(prNum)) {
     return {
-      output: `${c.red}Usage: crux gh pr check <N> or crux pr check --all${c.reset}\n`,
+      output: `${c.red}Usage: crux gh pr check <N> or crux gh pr check --all${c.reset}\n`,
       exitCode: 1,
     };
   }

@@ -16,7 +16,7 @@ Run these before anything else — a PR that doesn't build is not worth reviewin
 
 1. **`pnpm build`** — must exit 0. If it fails, fix the issue before proceeding.
 2. **`pnpm test`** — existing tests must pass. If you added new logic (helpers, utilities, transformations), write tests for it.
-3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux validate gate --fix`
+3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux w validate gate --fix`
 
 See `.claude/rules/pre-pr-verification.md` for full details on when tests are required.
 
@@ -90,7 +90,7 @@ Pay special attention to:
 
 ## Step 4: Write / update PR description
 
-Check if a PR exists using `pnpm crux pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux pr create`.
+Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux gh pr create`.
 
 ## Step 4b: Consider post-merge verification
 
