@@ -161,12 +161,30 @@ async function searchThingsServer(
 }
 
 // ---------------------------------------------------------------------------
+// Query normalization
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a search query for better FTS matching.
+ * Inserts spaces at letter/digit boundaries so concatenated terms like
+ * "sb1047" become "sb 1047", matching how titles are tokenized.
+ * Returns null if the query is already normalized.
+ */
+function normalizeQuery(query: string): string | null {
+  // Insert space between letter→digit and digit→letter transitions
+  const normalized = query.replace(/([a-zA-Z])(\d)/g, "$1 $2").replace(/(\d)([a-zA-Z])/g, "$1 $2");
+  return normalized !== query ? normalized : null;
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
 /**
  * Search the wiki via server-side PostgreSQL FTS.
  * Returns an empty array if the server is unreachable.
+ * Automatically tries a normalized query (splitting letter/digit boundaries)
+ * if the original query returns few results.
  */
 export async function searchWiki(
   query: string,
@@ -175,12 +193,32 @@ export async function searchWiki(
   if (!query.trim()) return [];
 
   const results = await searchServer(query, limit);
-  return results ?? [];
+  const items = results ?? [];
+
+  // If few results, also try with normalized query and merge
+  if (items.length < 5) {
+    const normalized = normalizeQuery(query);
+    if (normalized) {
+      const extra = await searchServer(normalized, limit);
+      if (extra) {
+        const seen = new Set(items.map((r) => r.id));
+        for (const r of extra) {
+          if (!seen.has(r.id)) {
+            items.push(r);
+            seen.add(r.id);
+          }
+        }
+      }
+    }
+  }
+
+  return items;
 }
 
 /**
  * Search the things table (grants, funding-rounds, benchmarks, etc.).
  * Returns an empty array if the server is unreachable.
+ * Also tries normalized query for concatenated terms.
  */
 export async function searchThings(
   query: string,
@@ -190,5 +228,24 @@ export async function searchThings(
   if (!query.trim()) return [];
 
   const results = await searchThingsServer(query, limit, thingType);
-  return results ?? [];
+  const items = results ?? [];
+
+  // Also try normalized query for concatenated terms like "sb1047"
+  if (items.length < 5) {
+    const normalized = normalizeQuery(query);
+    if (normalized) {
+      const extra = await searchThingsServer(normalized, limit, thingType);
+      if (extra) {
+        const seen = new Set(items.map((r) => r.id));
+        for (const r of extra) {
+          if (!seen.has(r.id)) {
+            items.push(r);
+            seen.add(r.id);
+          }
+        }
+      }
+    }
+  }
+
+  return items;
 }
