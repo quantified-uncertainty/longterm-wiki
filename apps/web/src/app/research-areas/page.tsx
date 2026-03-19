@@ -25,6 +25,8 @@ export default function ResearchAreasPage() {
     cluster: a.cluster ?? null,
     parentAreaId: a.parentAreaId ?? null,
     firstProposedYear: a.firstProposedYear ?? null,
+    orgCount: a.orgCount,
+    paperCount: a.paperCount,
   }));
 
   // Summary stats
