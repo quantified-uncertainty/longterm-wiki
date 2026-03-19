@@ -46,7 +46,7 @@ export default async function EventDetailPage({
   const entity = resolveEventBySlug(slug);
   if (!entity) return notFound();
 
-  const wikiHref = getWikiHref(entity.id);
+  const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
 
   // Resolve related entities
   const relatedEntities = entity.relatedEntries
@@ -154,7 +154,7 @@ export default async function EventDetailPage({
             </section>
           )}
 
-          <RelatedPages entityId={entity.id} entity={{ type: "event" }} />
+          <RelatedPages entityId={entity.id} entity={{ entityType: "event" }} />
         </div>
 
         {/* Sidebar */}

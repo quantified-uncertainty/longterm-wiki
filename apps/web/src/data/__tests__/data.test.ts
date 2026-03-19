@@ -183,7 +183,7 @@ const mockDatabase = {
       uncertainty: null,
       causalLevel: null,
       lastUpdated: "2025-01-15",
-      llmSummary: "A summary of the test entity.",
+      summary: "A summary of the test entity.",
       description: null,
       ratings: { novelty: 3, rigor: 4 },
       category: "risks",
@@ -271,18 +271,18 @@ describe("Data Layer", () => {
     vi.resetModules();
   });
 
-  describe("getEntityById", () => {
+  describe("getTypedEntityById", () => {
     it("returns entity by ID", async () => {
-      const { getEntityById } = await import("../../data/index");
-      const entity = getEntityById("test-entity");
+      const { getTypedEntityById } = await import("../../data/index");
+      const entity = getTypedEntityById("test-entity");
       expect(entity).toBeDefined();
       expect(entity?.title).toBe("Test Entity");
-      expect(entity?.type).toBe("risk");
+      expect(entity?.entityType).toBe("risk");
     });
 
     it("returns undefined for missing entity", async () => {
-      const { getEntityById } = await import("../../data/index");
-      expect(getEntityById("nonexistent")).toBeUndefined();
+      const { getTypedEntityById } = await import("../../data/index");
+      expect(getTypedEntityById("nonexistent")).toBeUndefined();
     });
   });
 

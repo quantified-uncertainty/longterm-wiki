@@ -1,10 +1,4 @@
-thing:
-  id: timnit-gebru
-  stableId: xVdjAKxCSQ
-  type: person
-  name: "Timnit Gebru"
-  wikiId: "E1305"
-
+entity: xVdjAKxCSQ
 facts:
   - id: f_M0qzQXcHlg
     property: role

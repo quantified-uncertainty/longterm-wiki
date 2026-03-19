@@ -1,9 +1,4 @@
-thing:
-  id: deepfakes
-  stableId: MUGUxfl2YA
-  type: risk
-  name: Deepfakes
-  wikiId: E96
+entity: MUGUxfl2YA
 facts:
   - id: f_2VKxH9KJOg
     property: description

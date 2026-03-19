@@ -1,9 +1,4 @@
-thing:
-  id: blueprint-biosecurity
-  stableId: lZRKSfs5wg
-  type: organization
-  name: Blueprint Biosecurity
-  wikiId: E515
+entity: lZRKSfs5wg
 facts:
   - id: f_KviVbST13g
     property: description

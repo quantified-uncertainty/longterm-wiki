@@ -1,9 +1,4 @@
-thing:
-  id: ajeya-cotra
-  stableId: dPzCwzIxiQ
-  type: person
-  name: Ajeya Cotra
-  wikiId: E864
+entity: dPzCwzIxiQ
 facts:
   - id: f_A33S9FgkxA
     property: description

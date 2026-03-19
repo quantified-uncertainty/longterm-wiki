@@ -2,9 +2,10 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things } from "../../schema.js";
+import { grants, things, entities } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -83,23 +84,61 @@ const BatchUpdateProgramSchema = z.object({
 
 // ---- Helpers ----
 
-function formatRow(r: typeof grants.$inferSelect) {
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+
+const granteeEntity = alias(entities, "grantee_entity");
+const orgEntity = alias(entities, "org_entity");
+
+/** Selection shape for grants + joined entity titles. */
+const joinedSelect = {
+  grants: grants,
+  granteeTitle: granteeEntity.title,
+  orgTitle: orgEntity.title,
+};
+
+interface JoinedRow {
+  grants: typeof grants.$inferSelect;
+  granteeTitle: string | null;
+  orgTitle: string | null;
+}
+
+function cleanGranteeId(gid: string | null): string | null {
+  if (!gid) return null;
+  if (STABLE_ID_PATTERN.test(gid)) return null;
+  return gid;
+}
+
+function cleanOrgId(oid: string): string | null {
+  if (STABLE_ID_PATTERN.test(oid)) return null;
+  return oid;
+}
+
+function formatRow(r: JoinedRow) {
+  const g = r.grants;
   return {
-    id: r.id,
-    organizationId: r.organizationId,
-    granteeId: r.granteeId,
-    name: r.name,
-    amount: r.amount != null ? Number(r.amount) : null,
-    currency: r.currency,
-    period: r.period,
-    date: r.date,
-    status: r.status,
-    source: r.source,
-    notes: r.notes,
-    programId: r.programId,
-    syncedAt: r.syncedAt,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    id: g.id,
+    organizationId: g.organizationId,
+    granteeId: g.granteeId,
+    name: g.name,
+    amount: g.amount != null ? Number(g.amount) : null,
+    currency: g.currency,
+    period: g.period,
+    date: g.date,
+    status: g.status,
+    source: g.source,
+    notes: g.notes,
+    programId: g.programId,
+    granteeEntityId: g.granteeEntityId,
+    granteeDisplayName: g.granteeDisplayName,
+    orgEntityId: g.orgEntityId,
+    orgDisplayName: g.orgDisplayName,
+    // Resolved names — prefer entity title, then display name, then cleaned ID
+    granteeResolvedName: r.granteeTitle ?? g.granteeDisplayName ?? cleanGranteeId(g.granteeId),
+    orgResolvedName: r.orgTitle ?? g.orgDisplayName ?? cleanOrgId(g.organizationId),
+    syncedAt: g.syncedAt,
+    createdAt: g.createdAt,
+    updatedAt: g.updatedAt,
   };
 }
 
@@ -132,8 +171,10 @@ const grantsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(grants)
+      .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
+      .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
       .orderBy(desc(grants.syncedAt), grants.id)
       .limit(limit)
       .offset(offset);
@@ -209,8 +250,10 @@ const grantsApp = new Hono()
 
     // Data query
     const rows = await db
-      .select()
+      .select(joinedSelect)
       .from(grants)
+      .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
+      .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
       .where(where)
       .orderBy(orderClause, grants.id)
       .limit(limit)
@@ -518,6 +561,12 @@ const grantsApp = new Hono()
           sourceTable: "grants",
           sourceId: g.id,
           sourceUrl: g.source,
+          parentTitle: g.organizationId,
+          description: [
+            g.granteeId ? `to ${g.granteeId}` : null,
+            g.amount != null ? `$${Number(g.amount).toLocaleString()}` : null,
+            g.date,
+          ].filter(Boolean).join(", ") || null,
         }))
       );
 

@@ -1,9 +1,4 @@
-thing:
-  id: provable-safe
-  stableId: gmRaYb1fgg
-  type: concept
-  name: Provable / Guaranteed Safe AI
-  wikiId: E402
+entity: gmRaYb1fgg
 facts:
   - id: f_dToAVhIc2A
     property: description

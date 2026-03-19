@@ -1,9 +1,4 @@
-thing:
-  id: weak-to-strong
-  stableId: JOXqSmPOiQ
-  type: approach
-  name: Weak-to-Strong Generalization
-  wikiId: E452
+entity: JOXqSmPOiQ
 facts:
   - id: f_MOiHXSK0mQ
     property: description

@@ -1,12 +1,4 @@
-thing:
-  id: neel-nanda
-  stableId: zaRXTCXPPk
-  type: person
-  name: "Neel Nanda"
-  wikiId: "E214"
-  aliases:
-    - Neel
-
+entity: zaRXTCXPPk
 facts:
   - id: f_MC1O0jwEcB
     property: employed-by

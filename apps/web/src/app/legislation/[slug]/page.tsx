@@ -8,6 +8,15 @@ import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
 import { getEntityHref } from "@/data/entity-nav";
 import { getTypedEntityById } from "@/data";
 import {
+  getResourcesForPage,
+  getResourceById,
+  getResourceCredibility,
+  getResourcePublication,
+  getPagesForResource,
+} from "@/data/tablebase";
+import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
+import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import {
   resolvePolicyBySlug,
   getPolicySlugs,
   getCustomField,
@@ -22,6 +31,7 @@ import {
   SCOPE_COLORS,
   normalizeStatus,
 } from "../legislation-constants";
+import { formatIntroducedDate } from "@/lib/format-compact";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -215,11 +225,25 @@ export default async function LegislationDetailPage({
                         {vote.result}
                       </span>
                     </td>
-                    <td className="py-2 px-3 text-right tabular-nums font-semibold text-green-700 dark:text-green-400">
-                      {vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                    <td className="py-2 px-3 text-right tabular-nums text-green-700 dark:text-green-400">
+                      <span className="font-semibold">{vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
+                      {(vote.ayesDem != null || vote.ayesRep != null) && (
+                        <div className="text-[10px] text-muted-foreground font-normal">
+                          {vote.ayesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.ayesDem}D</span>}
+                          {vote.ayesDem != null && vote.ayesRep != null && " "}
+                          {vote.ayesRep != null && <span className="text-red-500 dark:text-red-400">{vote.ayesRep}R</span>}
+                        </div>
+                      )}
                     </td>
-                    <td className="py-2 px-3 text-right tabular-nums font-semibold text-red-700 dark:text-red-400">
-                      {vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                    <td className="py-2 px-3 text-right tabular-nums text-red-700 dark:text-red-400">
+                      <span className="font-semibold">{vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
+                      {(vote.noesDem != null || vote.noesRep != null) && (
+                        <div className="text-[10px] text-muted-foreground font-normal">
+                          {vote.noesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.noesDem}D</span>}
+                          {vote.noesDem != null && vote.noesRep != null && " "}
+                          {vote.noesRep != null && <span className="text-red-500 dark:text-red-400">{vote.noesRep}R</span>}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -295,7 +319,7 @@ export default async function LegislationDetailPage({
 
       <FBAutoFacts entityId={entity.id} />
 
-      <RelatedPages entityId={entity.id} entity={{ type: "policy" }} />
+      <RelatedPages entityId={entity.id} entity={{ entityType: "policy" }} />
     </div>
   );
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
@@ -371,10 +395,22 @@ export default async function LegislationDetailPage({
                           {stakeholder.position}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-sm">
-                        {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                        {stakeholder.source && (
-                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
+                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-lg">
+                        <div>
+                          {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                          {stakeholder.source && (
+                            <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
+                          )}
+                        </div>
+                        {stakeholder.context && stakeholder.context.length > 0 && (
+                          <ul className="mt-1.5 space-y-0.5 text-[11px] text-muted-foreground/70 list-none pl-0">
+                            {stakeholder.context.map((note, j) => (
+                              <li key={j} className="leading-relaxed">
+                                <span className="text-muted-foreground/40 mr-1">→</span>
+                                {note}
+                              </li>
+                            ))}
+                          </ul>
                         )}
                       </td>
                     </tr>
@@ -406,7 +442,11 @@ export default async function LegislationDetailPage({
                     <div className="absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background bg-amber-500" />
                     <div>
                       <div className="flex items-baseline gap-2 mb-0.5">
-                        <span className="font-semibold text-sm">{amendment.date}</span>
+                        {amendment.url ? (
+                          <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
+                        ) : (
+                          <span className="font-semibold text-sm">{amendment.date}</span>
+                        )}
                         {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
                       </div>
                       <p className="text-sm text-muted-foreground">{amendment.description}</p>
@@ -443,6 +483,44 @@ export default async function LegislationDetailPage({
             </section>
           )}
         </div>
+      ),
+    });
+  }
+
+  // ── Press / Documents tab ──────────────────────────────────
+  const resourceIds = getResourcesForPage(entity.id);
+  const pressResources: OrgResourceRow[] = [];
+  for (const rid of resourceIds) {
+    const r = getResourceById(rid);
+    if (!r) continue;
+    const publication = getResourcePublication(r);
+    const credibility = getResourceCredibility(r);
+    const citingPages = getPagesForResource(rid);
+    pressResources.push({
+      id: rid,
+      title: r.title ?? r.url,
+      url: r.url,
+      type: r.type ?? "web",
+      publicationName: publication?.name ?? null,
+      credibility: credibility ?? null,
+      citingPageCount: citingPages.length,
+      publishedDate: r.published_date ?? null,
+      authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+    });
+  }
+
+  if (pressResources.length > 0) {
+    tabs.push({
+      id: "press",
+      label: "Documents & Press",
+      count: pressResources.length,
+      content: (
+        <OrgResourcesSection
+          resources={pressResources}
+          title="Official Documents, Analysis & Press Coverage"
+          emptyMessage=""
+          alwaysShowColumns={{ date: true, publication: true }}
+        />
       ),
     });
   }
@@ -487,7 +565,7 @@ export default async function LegislationDetailPage({
             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
               {jurisdiction && <span>{jurisdiction}</span>}
               {author && <span>by {author}</span>}
-              {introduced && <span>Introduced {introduced}</span>}
+              {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
               {entity.fullTextUrl && (
                 <a href={entity.fullTextUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Full text &#8599;
@@ -523,8 +601,8 @@ export default async function LegislationDetailPage({
               {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
               {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
               {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
-              {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{introduced}</dd></div>}
-              {rawStatus && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd>{rawStatus}</dd></div>}
+              {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
+              {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
               {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
             </dl>
           </section>

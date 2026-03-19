@@ -1,9 +1,4 @@
-thing:
-  id: apollo-research
-  stableId: pKeaWwP6sQ
-  type: organization
-  name: Apollo Research
-  wikiId: E24
+entity: pKeaWwP6sQ
 facts:
   - id: f_lblFLoiIfQ
     property: description

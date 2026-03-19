@@ -1,10 +1,4 @@
-thing:
-  id: david-krueger
-  stableId: ATFBoSnuqA
-  type: person
-  name: "David Krueger"
-  wikiId: "E1304"
-
+entity: ATFBoSnuqA
 facts:
   - id: f_uOJo5hO7uQ
     property: role

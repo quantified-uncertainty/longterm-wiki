@@ -46,12 +46,21 @@ export function generateStaticParams() {
   return getPersonSlugs().map((slug) => ({ slug }));
 }
 
-/** Resolve a slug to a person entity (KB-first, typed entity fallback, wiki-server fallback). */
+/** Resolve a slug to a person entity (TableBase-first, wiki-server fallback). */
 function resolvePersonEntity(slug: string): Entity | undefined {
-  const kbEntity = resolvePersonBySlug(slug);
-  if (kbEntity) return kbEntity;
+  const resolved = resolvePersonBySlug(slug);
+  if (resolved) {
+    return {
+      id: resolved.stableId ?? resolved.id,
+      stableId: resolved.stableId ?? resolved.id,
+      type: "person",
+      name: resolved.title,
+      wikiId: resolved.wikiId,
+      wikiPageId: resolved.wikiId,
+    };
+  }
 
-  // Fall back to typed entity from database.json
+  // Fall back to typed entity from database.json (direct slug lookup)
   const typedEntity = getTypedEntityById(slug);
   if (typedEntity && isPerson(typedEntity)) {
     return {
@@ -273,7 +282,7 @@ export default async function PersonProfilePage({
       value: employer.name,
       href: employer.slug
         ? `/organizations/${employer.slug}`
-        : `/factbase/entity/${employer.id}`,
+        : undefined,
     });
   }
   if (bornYearFact?.value.type === "number") {

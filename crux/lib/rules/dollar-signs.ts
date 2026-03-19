@@ -4,7 +4,7 @@
  * Checks for dollar sign issues in MDX content and frontmatter:
  * 1. Unescaped $ before numbers in body — gets parsed as LaTeX math by KaTeX
  * 2. Double-escaped \\$ in body — renders as \$ with visible backslash
- * 3. Unescaped $ before numbers in frontmatter description/llmSummary fields —
+ * 3. Unescaped $ before numbers in frontmatter description/summary fields —
  *    these fields are rendered in meta tags, JSON-LD, and page previews
  *
  * Frontmatter escaping conventions:
@@ -23,7 +23,7 @@ const skipJsxAndMermaid = (body: string, pos: number) =>
   isInMermaid(body, pos) || isInJsxAttribute(body, pos);
 
 /** Frontmatter fields that contain prose and should be checked for dollar sign escaping */
-const FRONTMATTER_PROSE_FIELDS = ['description', 'llmSummary'] as const;
+const FRONTMATTER_PROSE_FIELDS = ['description', 'summary'] as const;
 
 /**
  * Get the frontmatter end line using the same convention as

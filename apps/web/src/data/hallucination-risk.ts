@@ -2,7 +2,7 @@
  * Hallucination risk stats and citation quote lookups.
  */
 
-import { getDatabase, getEntityBundle, resolveId, fetchFromWikiServer, withApiFallback } from "./tablebase";
+import { getTableBase, getEntityBundle, resolveId, fetchFromWikiServer, withApiFallback } from "./tablebase";
 
 export interface RiskStats {
   total: number;
@@ -16,7 +16,7 @@ export interface RiskStats {
 export async function getRiskStats(): Promise<RiskStats | null> {
   const result = await withApiFallback(
     () => fetchFromWikiServer<RiskStats>(`/api/hallucination-risk/stats`),
-    () => getDatabase().riskStats ?? null
+    () => getTableBase().riskStats ?? null
   );
   return result.data;
 }
@@ -31,6 +31,6 @@ export function getLocalCitationQuotes(pageId: string) {
   const bundle = getEntityBundle(pageId);
   if (bundle?.citationQuotes) return bundle.citationQuotes;
   // DB keys are slugs, so resolve wiki IDs (e.g. E123) to slugs
-  return getDatabase().citationQuotes?.[resolveId(pageId)];
+  return getTableBase().citationQuotes?.[resolveId(pageId)];
 }
 

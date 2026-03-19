@@ -1,9 +1,4 @@
-thing:
-  id: sandboxing
-  stableId: yycfp6INgw
-  type: approach
-  name: Sandboxing / Containment
-  wikiId: E485
+entity: yycfp6INgw
 facts:
   - id: f_U2tsvZnb7Q
     property: description

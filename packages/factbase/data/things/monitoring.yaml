@@ -1,9 +1,4 @@
-thing:
-  id: monitoring
-  stableId: BU00lGYGAw
-  type: policy
-  name: Compute Monitoring
-  wikiId: E464
+entity: BU00lGYGAw
 facts:
   - id: f_VRiRPzsLew
     property: description

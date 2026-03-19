@@ -1,9 +1,4 @@
-thing:
-  id: texas-traiga
-  stableId: 561xbhJAeQ
-  type: policy
-  name: Texas TRAIGA Responsible AI Governance Act
-  wikiId: E602
+entity: 561xbhJAeQ
 facts:
   - id: f_6FJA35ImyA
     property: description

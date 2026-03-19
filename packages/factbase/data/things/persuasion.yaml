@@ -1,9 +1,4 @@
-thing:
-  id: persuasion
-  stableId: n9Mqc0XteA
-  type: capability
-  name: Persuasion and Social Manipulation
-  wikiId: E224
+entity: n9Mqc0XteA
 facts:
   - id: f_0xzpFJCG5g
     property: description

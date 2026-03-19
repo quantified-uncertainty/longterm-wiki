@@ -63,7 +63,7 @@ const PAGE_DETAIL = {
   wikiId: '42',
   title: 'Scheming',
   description: 'AI scheming refers to deceptive planning by AI systems.',
-  llmSummary: 'A comprehensive overview of AI scheming behaviors.',
+  summary: 'A comprehensive overview of AI scheming behaviors.',
   category: 'risks',
   subcategory: null,
   entityType: 'risk',

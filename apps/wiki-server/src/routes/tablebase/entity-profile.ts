@@ -25,6 +25,7 @@ import {
   wikiPages,
   researchAreaOrganizations,
   recordVerdicts,
+  policyStakeholders,
 } from "../../schema.js";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import { notFoundError } from "../shared/utils.js";
@@ -230,6 +231,17 @@ const SECTIONS: SectionDef[] = [
     tableName: "benchmark_results",
     query: (db, _stableId, slug) =>
       db.select().from(benchmarkResults).where(eq(benchmarkResults.modelId, slug)).limit(FETCH_LIMIT),
+  },
+  {
+    key: "policyStakeholders",
+    label: "Policy Stakeholders",
+    description: "Positions on policies (as policy or stakeholder entity)",
+    table: policyStakeholders,
+    tableName: "policy_stakeholders",
+    query: (db, stableId) =>
+      db.select().from(policyStakeholders).where(
+        or(eq(policyStakeholders.policyEntityId, stableId), eq(policyStakeholders.stakeholderEntityId, stableId))
+      ).limit(FETCH_LIMIT),
   },
   {
     key: "facts",

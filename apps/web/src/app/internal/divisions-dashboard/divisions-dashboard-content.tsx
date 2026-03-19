@@ -7,7 +7,7 @@ import {
   type RpcDivisionRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { getKBEntity } from "@data/factbase";
+import { getTypedEntityById } from "@data/tablebase";
 import { DivisionsTable, type DivisionRow } from "./divisions-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -55,8 +55,8 @@ function emptyFallback(): DashboardData {
 // ── Entity name resolution ────────────────────────────────────────────────
 
 function resolveEntityName(stableId: string): string {
-  const entity = getKBEntity(stableId);
-  return entity?.name ?? stableId;
+  const entity = getTypedEntityById(stableId);
+  return entity?.title ?? stableId;
 }
 
 function enrichWithNames(divisions: RpcDivisionRow[]): DivisionRow[] {

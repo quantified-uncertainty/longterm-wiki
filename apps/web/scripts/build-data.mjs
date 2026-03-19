@@ -18,18 +18,16 @@
  *                    history, coverage, rankings, schedule, transform, write
 */
 
-import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { spawnSync } from 'child_process';
-import { join, basename, relative } from 'path';
+import { join, relative } from 'path';
 import { parse } from 'yaml';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
-import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
-import { syncPageLinks, refreshRelatedGraph } from './lib/links-client.mjs';
+import { resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
 import { filterBulkImportDates } from './lib/git-date-utils.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
-import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
-import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
+import { buildUrlToResourceMap } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
 import { computeStats } from './lib/statistics.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
@@ -37,23 +35,39 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
-import { parseFootnoteSources } from '../../../crux/lib/footnote-parser.ts';
 import { buildIdRegistry, extendIdRegistryWithPages } from './lib/id-registry.mjs';
 import { computePageRankings, computeRecommendedScores, buildUpdateSchedule } from './lib/page-rankings.mjs';
 import { computeAllHallucinationRisks, syncRiskSnapshots } from './lib/hallucination-risk-build.mjs';
-import { syncCoverage, syncSchedule, syncRankings, syncSimilarity } from './lib/build-metrics-client.mjs';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Build headers for wiki-server API requests, including auth if configured. */
-function buildHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
-  return headers;
-}
+// Extracted modules
+import {
+  buildHeaders,
+  buildEditLogDateMap,
+  buildEarliestEditLogDateMap,
+  buildCitationStatsMap,
+  buildCitationQuotesBundle,
+  mergePGRecordsIntoKB,
+  fetchAssessments,
+  fetchBenchmarkResults,
+  fetchResearchAreas,
+  fetchRecordVerdicts,
+  fetchResourcesFromPG,
+  buildPageReferenceIndex,
+} from './lib/wiki-server-data.mjs';
+import {
+  buildPagesRegistry,
+  buildPathRegistry,
+  computeHallucinationRisk,
+  extractPrNumber,
+} from './lib/pages-builder.mjs';
+import { syncBuildMetrics, syncLinksAndRefreshGraph } from './lib/metrics-sync.mjs';
+import {
+  writeMainOutputFiles,
+  writeIndividualFiles,
+  writePerEntityBundles,
+  generateLinkHealth,
+  generateEntityMatrix,
+} from './lib/output-writer.mjs';
 
 // ---------------------------------------------------------------------------
 // Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
@@ -90,10 +104,11 @@ const DATA_FILES = [
  * Scan MDX files for <EntityLink id="..."> references and check each against
  * the entity registry. EntityLink ids can be numeric (E42) or slug-based.
  */
-function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry) {
+function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry, byStableId) {
   const entityLinkRegex = /<EntityLink\s+id="([^"]+)"/g;
   const knownWikiIds = new Set(Object.keys(wikiIdToSlug));
   const knownSlugs = new Set(Object.keys(slugToWikiId));
+  const knownStableIds = byStableId ? new Set(Object.keys(byStableId)) : new Set();
   const reachableSlugs = new Set(Object.keys(pathRegistry));
   const broken = [];
   const unreachable = [];
@@ -116,12 +131,14 @@ function scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry) {
       const id = match[1];
       const pageId = relative(CONTENT_DIR, filePath).replace(/\.mdx$/, '');
 
-      // Resolve to slug: id can be numeric (E42) or slug-based
+      // Resolve to slug: id can be numeric (E42), slug-based, or stableId (10-char alphanum)
       let slug;
       if (knownWikiIds.has(id)) {
         slug = wikiIdToSlug[id];
       } else if (knownSlugs.has(id)) {
         slug = id;
+      } else if (knownStableIds.has(id)) {
+        slug = byStableId[id];
       } else {
         broken.push({ pageId, entityId: id, reason: 'not_found' });
         continue;
@@ -255,7 +272,7 @@ function computeBacklinks(entities) {
  * Returns inbound map: targetEntityId -> array of source pages that link to it.
  * Must be called before rawContent is stripped from pages.
  */
-function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
+function scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId) {
   const inbound = {};
   let totalLinks = 0;
 
@@ -271,6 +288,10 @@ function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
       // Resolve wiki IDs (e.g. "E22") to slug IDs (e.g. "anthropic")
       if (wikiIdToSlug && wikiIdToSlug[targetId]) {
         targetId = wikiIdToSlug[targetId];
+      }
+      // Resolve stableIds (e.g. "mK9pX3rQ7n") to slug IDs
+      else if (byStableId && byStableId[targetId]) {
+        targetId = byStableId[targetId];
       }
       if (targetId === page.id) continue; // Skip self-links
       if (seen.has(targetId)) continue;
@@ -312,9 +333,22 @@ function scanContentEntityLinks(pages, entityMap, wikiIdToSlug) {
  *
  * Returns: entityId -> sorted array of { id, type, title, score, label? }
  */
-function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
+function computeRelatedGraph(entities, pages, contentInbound, tagIndex, byStableId) {
   const entityMap = new Map(entities.map(e => [e.id, e]));
+  // Also index by stableId so relatedEntries that use stableId refs can be resolved
+  if (byStableId) {
+    for (const entity of entities) {
+      if (entity.stableId) {
+        entityMap.set(entity.stableId, entity);
+      }
+    }
+  }
   const pageMap = new Map(pages.map(p => [p.id, p]));
+  // Helper: resolve a ref.id that may be a stableId or wikiId to the canonical slug
+  function resolveRefId(id) {
+    if (byStableId && byStableId[id]) return byStableId[id];
+    return id;
+  }
 
   // Accumulator: graph[entityId] = Map<relatedId, score>
   const graph = {};
@@ -370,18 +404,20 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
   for (const entity of entities) {
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        addEdge(entity.id, ref.id, 10);
+        // Resolve stableId references (10-char alphanum) to canonical slug IDs
+        const resolvedRefId = resolveRefId(ref.id);
+        addEdge(entity.id, resolvedRefId, 10);
         // Store directional label if present
         if (ref.relationship && ref.relationship !== 'related') {
           if (!labels[entity.id]) labels[entity.id] = {};
-          labels[entity.id][ref.id] = ref.relationship.replace(/-/g, ' ');
+          labels[entity.id][resolvedRefId] = ref.relationship.replace(/-/g, ' ');
           // Also store inverse label for the reverse direction
           const inverse = INVERSE_LABEL[ref.relationship];
           if (inverse) {
-            if (!labels[ref.id]) labels[ref.id] = {};
+            if (!labels[resolvedRefId]) labels[resolvedRefId] = {};
             // Don't overwrite an explicit label with an inferred one
-            if (!labels[ref.id][entity.id]) {
-              labels[ref.id][entity.id] = inverse;
+            if (!labels[resolvedRefId][entity.id]) {
+              labels[resolvedRefId][entity.id] = inverse;
             }
           }
         }
@@ -616,315 +652,6 @@ function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
 }
 
 /**
- * Normalize a YAML date value (string or Date object) to a YYYY-MM-DD string.
- * Returns null if the value is falsy.
- */
-function toDateString(val) {
-  if (!val) return null;
-  if (typeof val === 'string') return val;
-  if (val instanceof Date) return val.toISOString().slice(0, 10);
-  return String(val);
-}
-
-/**
- * Extract PR number from a URL like "https://github.com/.../pull/123".
- */
-function extractPrNumber(prUrl) {
-  if (!prUrl) return undefined;
-  if (typeof prUrl === 'number') return prUrl;
-  const m = String(prUrl).match(/\/pull\/(\d+)/);
-  return m ? parseInt(m[1], 10) : undefined;
-}
-
-/**
- * Resolve the last-updated date for a page using a priority fallback chain.
- *
- * Priority:
- *   1. frontmatter `lastEdited` (set by content editing tools)
- *   2. frontmatter `lastUpdated` (legacy field)
- *   3. edit log date from wiki-server
- *   4. git modified date (last resort — includes metadata-only commits)
- *
- * @param {object} fm           - parsed frontmatter object
- * @param {string|null} editLogDate - date string from wiki-server edit logs
- * @param {string|null} gitDate     - date string from git modified map
- * @returns {string|null}
- */
-function resolveLastUpdated(fm, editLogDate, gitDate) {
-  return toDateString(fm.lastEdited)
-    || toDateString(fm.lastUpdated)
-    || editLogDate
-    || gitDate
-    || null;
-}
-
-// maxDate was removed — see resolveLastUpdated above.
-// dateCreated already uses a fallback chain (resolveDateCreated in git-date-utils.mjs).
-
-/**
- * Build git-based date maps for all content files.
- * Returns two Maps keyed by repo-relative file path:
- *   - gitCreatedMap: path → YYYY-MM-DD of first commit (approximate, when file was added)
- *   - gitModifiedMap: path → YYYY-MM-DD of last commit
- * Falls back to empty maps if git is unavailable (e.g. shallow clones, no git installed).
- *
- * Bulk-import detection: uses filterBulkImportDates() to remove entries where
- * more than 50 files share the same git-created date. This prevents mass
- * restructures (e.g. an import that touched 650 files) from giving every page
- * an identical, meaningless creation date.
- */
-function buildGitDateMaps() {
-  let gitCreatedMap = new Map();
-  const gitModifiedMap = new Map();
-
-  try {
-    // Single git log pass: newest-first, all content file changes.
-    // "COMMIT <date>" marker lines separate commits; filenames follow.
-    const result = spawnSync('git', [
-      'log',
-      '--format=COMMIT %ad',
-      '--date=short',
-      '--name-only',
-      '--',
-      'content/docs/',
-    ], {
-      cwd: REPO_ROOT,
-      maxBuffer: 50 * 1024 * 1024,
-      encoding: 'utf-8',
-    });
-
-    if (result.status !== 0 || result.error) {
-      const reason = result.error?.message || result.stderr?.trim() || `exit ${result.status}`;
-      console.log(`  gitDateMaps: skipped (${reason})`);
-      return { gitCreatedMap, gitModifiedMap };
-    }
-
-    let currentDate = null;
-    for (const line of result.stdout.split('\n')) {
-      if (line.startsWith('COMMIT ')) {
-        currentDate = line.slice(7).trim();
-      } else if (currentDate && line.trim()) {
-        const filePath = line.trim();
-        // git log is newest-first: first occurrence = most recent modification
-        if (!gitModifiedMap.has(filePath)) {
-          gitModifiedMap.set(filePath, currentDate);
-        }
-        // Keep overwriting: last occurrence = oldest = approximate creation date
-        gitCreatedMap.set(filePath, currentDate);
-      }
-    }
-
-    // Filter out bulk-import dates using the extracted utility
-    const { filtered, discardedDates } = filterBulkImportDates(gitCreatedMap);
-    const removed = gitCreatedMap.size - filtered.size;
-    gitCreatedMap = filtered;
-
-    if (discardedDates.length > 0) {
-      for (const { date, fileCount } of discardedDates) {
-        console.log(`  gitDateMaps: discarded bulk-import date ${date} (${fileCount} files)`);
-      }
-      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked, ${removed} bulk-import created dates discarded`);
-    } else {
-      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked`);
-    }
-  } catch (err) {
-    console.log(`  gitDateMaps: skipped (${err.message || 'unknown error'})`);
-  }
-
-  return { gitCreatedMap, gitModifiedMap };
-}
-
-/**
- * Fetch latest edit dates per page from the wiki-server API.
- * Falls back to an empty map if the server is unavailable.
- */
-async function buildEditLogDateMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  editLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return new Map();
-  }
-
-  try {
-    const headers = buildHeaders();
-
-    const res = await fetch(`${serverUrl}/api/edit-logs/latest-dates`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (!res.ok) {
-      console.log(`  editLogDates: skipped (server returned ${res.status})`);
-      return new Map();
-    }
-
-    const data = await res.json();
-    const dateMap = new Map();
-    for (const [pageId, dateStr] of Object.entries(data.dates)) {
-      dateMap.set(pageId, dateStr);
-    }
-    console.log(`  editLogDates: ${dateMap.size} pages fetched from API`);
-    return dateMap;
-  } catch (err) {
-    console.log(`  editLogDates: skipped (${err.message || 'server unavailable'})`);
-    return new Map();
-  }
-}
-
-/**
- * Fetch earliest edit dates per page from the wiki-server API.
- * Used as a fallback for dateCreated when git dates were discarded (bulk import)
- * and no frontmatter createdAt exists.
- * Falls back to an empty map if the server is unavailable.
- */
-async function buildEarliestEditLogDateMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  earliestEditLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return new Map();
-  }
-
-  try {
-    const headers = buildHeaders();
-
-    const res = await fetch(`${serverUrl}/api/edit-logs/earliest-dates`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (!res.ok) {
-      console.log(`  earliestEditLogDates: skipped (server returned ${res.status})`);
-      return new Map();
-    }
-
-    const data = await res.json();
-    const dateMap = new Map();
-    for (const [pageId, dateStr] of Object.entries(data.dates)) {
-      dateMap.set(pageId, dateStr);
-    }
-    console.log(`  earliestEditLogDates: ${dateMap.size} pages fetched from API`);
-    return dateMap;
-  } catch (err) {
-    console.log(`  earliestEditLogDates: skipped (${err.message || 'server unavailable'})`);
-    return new Map();
-  }
-}
-
-/**
- * Fetch per-page citation stats from the wiki-server API.
- * Returns a Map of pageId → { total, verified, accurate, inaccurate, avgScore }.
- * Falls back to an empty map if the server is unavailable.
- */
-async function buildCitationStatsMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  citationStats: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return new Map();
-  }
-
-  try {
-    const headers = buildHeaders();
-
-    const res = await fetch(`${serverUrl}/api/citations/page-stats`, {
-      headers,
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (!res.ok) {
-      console.log(`  citationStats: skipped (server returned ${res.status})`);
-      return new Map();
-    }
-
-    const data = await res.json();
-    const statsMap = new Map();
-    for (const page of data.pages || []) {
-      statsMap.set(page.pageId, {
-        total: page.total,
-        withQuotes: page.withQuotes,
-        verified: page.verified,
-        accuracyChecked: page.accuracyChecked,
-        accurate: page.accurate,
-        inaccurate: page.inaccurate,
-        avgScore: page.avgScore,
-      });
-    }
-    console.log(`  citationStats: ${statsMap.size} pages fetched from API`);
-    return statsMap;
-  } catch (err) {
-    console.log(`  citationStats: skipped (${err.message || 'server unavailable'})`);
-    return new Map();
-  }
-}
-
-/**
- * Fetch all citation quotes from wiki-server, grouped by pageId.
- * Used by the frontend to render citation health banners and footnote tooltips
- * without making per-page API calls at runtime.
- * Returns { [pageId]: CitationQuote[] } or empty object if unavailable.
- */
-async function buildCitationQuotesBundle() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  citationQuotes: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  try {
-    const headers = buildHeaders();
-
-    // Paginate through all quotes (max 5000 per page)
-    const allQuotes = [];
-    let offset = 0;
-    const limit = 5000;
-
-    while (true) {
-      const res = await fetch(
-        `${serverUrl}/api/citations/quotes/all?limit=${limit}&offset=${offset}`,
-        { headers, signal: AbortSignal.timeout(30_000) }
-      );
-      if (!res.ok) {
-        console.log(`  citationQuotes: skipped (server returned ${res.status})`);
-        return {};
-      }
-      const data = await res.json();
-      allQuotes.push(...(data.quotes || []));
-      if (data.quotes.length < limit) break;
-      offset += limit;
-    }
-
-    // Group by pageId
-    const byPage = {};
-    for (const q of allQuotes) {
-      if (!byPage[q.pageId]) byPage[q.pageId] = [];
-      byPage[q.pageId].push({
-        footnote: q.footnote,
-        url: q.url,
-        resourceId: q.resourceId,
-        claimText: q.claimText,
-        sourceQuote: q.sourceQuote,
-        sourceTitle: q.sourceTitle,
-        sourceType: q.sourceType,
-        quoteVerified: q.quoteVerified,
-        verificationScore: q.verificationScore,
-        verifiedAt: q.verifiedAt,
-        accuracyVerdict: q.accuracyVerdict,
-        accuracyScore: q.accuracyScore,
-        accuracyIssues: q.accuracyIssues,
-        accuracySupportingQuotes: q.accuracySupportingQuotes,
-        verificationDifficulty: q.verificationDifficulty,
-        accuracyCheckedAt: q.accuracyCheckedAt,
-      });
-    }
-
-    console.log(`  citationQuotes: ${allQuotes.length} quotes across ${Object.keys(byPage).length} pages`);
-    return byPage;
-  } catch (err) {
-    console.log(`  citationQuotes: skipped (${err.message || 'server unavailable'})`);
-    return {};
-  }
-}
-
-/**
  * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
  * Strips protocol, www. prefix, trailing slashes, and hash fragments. Preserves
  * query string. Mirrors the logic in resource-utils.ts (cannot import .ts in .mjs).
@@ -1020,1139 +747,76 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
 }
 
 /**
- * Fetch personnel, grants, funding rounds, investments, and equity positions
- * from the wiki-server PG tables and merge them into the serialized KB records
- * structure (same format as YAML-sourced records).
+ * Build git-based date maps for all content files.
+ * Returns two Maps keyed by repo-relative file path:
+ *   - gitCreatedMap: path → YYYY-MM-DD of first commit (approximate, when file was added)
+ *   - gitModifiedMap: path → YYYY-MM-DD of last commit
+ * Falls back to empty maps if git is unavailable (e.g. shallow clones, no git installed).
  *
- * PG stores canonical entity IDs (10-char) in personId/organizationId fields,
- * which match the keys used in kb.records. No slug→entityId remapping needed.
- *
- * For collections that exist in both YAML and PG, PG records replace YAML.
- * Falls back gracefully if the wiki-server is unavailable (YAML records remain).
+ * Bulk-import detection: uses filterBulkImportDates() to remove entries where
+ * more than 50 files share the same git-created date. This prevents mass
+ * restructures (e.g. an import that touched 650 files) from giving every page
+ * an identical, meaningless creation date.
  */
-async function mergePGRecordsIntoKB(kb) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0, divisionPersonnel: 0 };
-  }
+function buildGitDateMaps() {
+  let gitCreatedMap = new Map();
+  const gitModifiedMap = new Map();
 
-  const headers = buildHeaders();
+  try {
+    // Single git log pass: newest-first, all content file changes.
+    // "COMMIT <date>" marker lines separate commits; filenames follow.
+    const result = spawnSync('git', [
+      'log',
+      '--format=COMMIT %ad',
+      '--date=short',
+      '--name-only',
+      '--',
+      'content/docs/',
+    ], {
+      cwd: REPO_ROOT,
+      maxBuffer: 50 * 1024 * 1024,
+      encoding: 'utf-8',
+    });
 
-  let personnelCount = 0;
-  let grantsCount = 0;
-  let fundingRoundsCount = 0;
-  let investmentsCount = 0;
-  let equityPositionsCount = 0;
-  let divisionsCount = 0;
-  let fundingProgramsCount = 0;
-  let divisionPersonnelCount = 0;
-
-  if (!kb.records) kb.records = {};
-
-  // Fetch all pages (paginate to avoid truncation at MAX_PAGE_SIZE)
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
-
-  /**
-   * Generic paginated fetcher. `itemsKey` is the response field containing the array.
-   */
-  async function fetchAllPages(endpoint, itemsKey) {
-    const pageSize = 200;
-    let allItems = [];
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}${endpoint}?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const items = data[itemsKey] || [];
-      allItems = allItems.concat(items);
-      if (items.length < pageSize) break; // last page
-      offset += pageSize;
+    if (result.status !== 0 || result.error) {
+      const reason = result.error?.message || result.stderr?.trim() || `exit ${result.status}`;
+      console.log(`  gitDateMaps: skipped (${reason})`);
+      return { gitCreatedMap, gitModifiedMap };
     }
-    return allItems;
-  }
 
-  const [
-    personnelResult,
-    grantsResult,
-    fundingRoundsResult,
-    investmentsResult,
-    equityPositionsResult,
-    divisionsResult,
-    fundingProgramsResult,
-    divisionPersonnelResult,
-  ] = await Promise.allSettled([
-    fetchAllPages('/api/personnel/all', 'personnel'),
-    fetchAllPages('/api/grants/all', 'grants'),
-    fetchAllPages('/api/funding-rounds/all', 'fundingRounds'),
-    fetchAllPages('/api/investments/all', 'investments'),
-    fetchAllPages('/api/equity-positions/all', 'equityPositions'),
-    fetchAllPages('/api/divisions/all', 'divisions'),
-    fetchAllPages('/api/funding-programs/all', 'fundingPrograms'),
-    fetchAllPages('/api/division-personnel/all', 'divisionPersonnel'),
-  ]);
-
-  /**
-   * Helper: clear YAML collections, replace with PG rows.
-   * @param {string} label - for logging
-   * @param {object} result - Promise.allSettled result
-   * @param {string[]} yamlCollections - collections to clear from kb.records
-   * @param {function} getEntityKey - (row) => entity key
-   * @param {function} getCollectionName - (row) => collection name
-   * @param {function} rowToEntry - (row) => RecordEntry
-   * @returns {number} count of records merged
-   */
-  function mergeCollection(label, result, yamlCollections, getEntityKey, getCollectionName, rowToEntry) {
-    const rows = result.status === 'fulfilled' ? result.value : null;
-    if (!rows) {
-      const reason = result.status === 'rejected' ? result.reason?.message : 'no data';
-      console.log(`  kb-pg ${label}: skipped (${reason || 'server unavailable'})`);
-      return 0;
-    }
-    if (rows.length === 0) return 0;
-
-    // Clear YAML-sourced collections — PG is the authority when available
-    for (const entityKey of Object.keys(kb.records)) {
-      for (const collection of yamlCollections) {
-        if (kb.records[entityKey]?.[collection]) {
-          delete kb.records[entityKey][collection];
-          if (Object.keys(kb.records[entityKey]).length === 0) {
-            delete kb.records[entityKey];
-          }
+    let currentDate = null;
+    for (const line of result.stdout.split('\n')) {
+      if (line.startsWith('COMMIT ')) {
+        currentDate = line.slice(7).trim();
+      } else if (currentDate && line.trim()) {
+        const filePath = line.trim();
+        // git log is newest-first: first occurrence = most recent modification
+        if (!gitModifiedMap.has(filePath)) {
+          gitModifiedMap.set(filePath, currentDate);
         }
+        // Keep overwriting: last occurrence = oldest = approximate creation date
+        gitCreatedMap.set(filePath, currentDate);
       }
     }
 
-    let count = 0;
-    for (const row of rows) {
-      const entityKey = getEntityKey(row);
-      const collectionName = getCollectionName(row);
-      if (!entityKey || !collectionName) continue;
+    // Filter out bulk-import dates using the extracted utility
+    const { filtered, discardedDates } = filterBulkImportDates(gitCreatedMap);
+    const removed = gitCreatedMap.size - filtered.size;
+    gitCreatedMap = filtered;
 
-      if (!kb.records[entityKey]) kb.records[entityKey] = {};
-      if (!kb.records[entityKey][collectionName]) kb.records[entityKey][collectionName] = [];
-
-      kb.records[entityKey][collectionName].push(rowToEntry(row));
-      count++;
-    }
-    return count;
-  }
-
-  // --- Process personnel ---
-  personnelCount = mergeCollection(
-    'personnel',
-    personnelResult,
-    ['key-persons', 'board-seats', 'career-history'],
-    (row) => {
-      if (row.roleType === 'career') return row.personId;
-      return row.organizationId;
-    },
-    (row) => {
-      if (row.roleType === 'key-person') return 'key-persons';
-      if (row.roleType === 'board') return 'board-seats';
-      if (row.roleType === 'career') return 'career-history';
-      return null;
-    },
-    personnelRowToRecordEntry,
-  );
-
-  // --- Process grants ---
-  grantsCount = mergeCollection(
-    'grants',
-    grantsResult,
-    ['grants'],
-    (row) => row.organizationId,
-    () => 'grants',
-    grantRowToRecordEntry,
-  );
-
-  // --- Process funding rounds ---
-  fundingRoundsCount = mergeCollection(
-    'funding-rounds',
-    fundingRoundsResult,
-    ['funding-rounds'],
-    (row) => row.companyId,
-    () => 'funding-rounds',
-    fundingRoundRowToRecordEntry,
-  );
-
-  // --- Process investments ---
-  investmentsCount = mergeCollection(
-    'investments',
-    investmentsResult,
-    ['investments'],
-    (row) => row.companyId,
-    () => 'investments',
-    investmentRowToRecordEntry,
-  );
-
-  // --- Process equity positions ---
-  equityPositionsCount = mergeCollection(
-    'equity-positions',
-    equityPositionsResult,
-    ['equity-positions'],
-    (row) => row.companyId,
-    () => 'equity-positions',
-    equityPositionRowToRecordEntry,
-  );
-
-  // --- Process divisions ---
-  divisionsCount = mergeCollection(
-    'divisions',
-    divisionsResult,
-    ['divisions'],
-    (row) => row.parentOrgId,
-    () => 'divisions',
-    divisionRowToRecordEntry,
-  );
-
-  // --- Process funding programs ---
-  fundingProgramsCount = mergeCollection(
-    'funding-programs',
-    fundingProgramsResult,
-    ['funding-programs'],
-    (row) => row.orgId,
-    () => 'funding-programs',
-    fundingProgramRowToRecordEntry,
-  );
-
-  // --- Process division personnel ---
-  // Division personnel are keyed by divisionId (stored in a synthetic entity key)
-  divisionPersonnelCount = mergeCollection(
-    'division-personnel',
-    divisionPersonnelResult,
-    ['division-personnel'],
-    (row) => `__division__${row.divisionId}`,
-    () => 'division-personnel',
-    divisionPersonnelRowToRecordEntry,
-  );
-
-  return {
-    personnel: personnelCount,
-    grants: grantsCount,
-    fundingRounds: fundingRoundsCount,
-    investments: investmentsCount,
-    equityPositions: equityPositionsCount,
-    divisions: divisionsCount,
-    fundingPrograms: fundingProgramsCount,
-    divisionPersonnel: divisionPersonnelCount,
-  };
-}
-
-/**
- * Build a ratings object from a PG assessment, falling back to frontmatter ratings
- * for any missing dimensions.
- */
-/** Map from frontmatter rating name → PG assessment column name. */
-const RATING_FIELD_MAP = {
-  focus: 'ratingFocus',
-  novelty: 'ratingNovelty',
-  rigor: 'ratingRigor',
-  completeness: 'ratingCompleteness',
-  concreteness: 'ratingConcreteness',
-  actionability: 'ratingActionability',
-  objectivity: 'ratingObjectivity',
-};
-
-function buildRatingsFromAssessment(assessment, fmRatings) {
-  const ratings = {};
-  let hasAny = false;
-
-  for (const [shortName, pgName] of Object.entries(RATING_FIELD_MAP)) {
-    const val = assessment[pgName] ?? (fmRatings ? fmRatings[shortName] : null) ?? null;
-    if (val != null) {
-      ratings[shortName] = val;
-      hasAny = true;
-    }
-  }
-
-  return hasAny ? ratings : (fmRatings || null);
-}
-
-/**
- * Fetch latest page assessments from wiki-server PG tables.
- * Returns a Map<pageSlug, coalesced assessment> where scores are merged
- * across assessors (llm-grading > frontmatter-sync > structural for quality).
- * Falls back to empty map if wiki-server is unavailable.
- */
-async function fetchAssessments() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  assessments: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return new Map();
-  }
-
-  const headers = buildHeaders();
-
-  try {
-    // Paginate through all latest assessments (one per page per assessor)
-    const allRows = [];
-    let offset = 0;
-    const pageSize = 1000;
-    while (true) {
-      const url = `${serverUrl}/api/assessments/latest?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) });
-      if (!resp.ok) {
-        console.log(`  assessments: skipped (HTTP ${resp.status})`);
-        return new Map();
+    if (discardedDates.length > 0) {
+      for (const { date, fileCount } of discardedDates) {
+        console.log(`  gitDateMaps: discarded bulk-import date ${date} (${fileCount} files)`);
       }
-      const data = await resp.json();
-      const items = data.assessments || [];
-      allRows.push(...items);
-      if (items.length < pageSize) break;
-      offset += pageSize;
-    }
-
-    // Coalesce: for each page, pick the best value per dimension across assessors.
-    // Priority: llm-grading > editorial > frontmatter-sync > structural
-    const ASSESSOR_PRIORITY = { 'llm-grading': 3, 'editorial': 2, 'frontmatter-sync': 1, 'structural': 0 };
-    const COALESCE_FIELDS = [
-      'quality', 'readerImportance', 'researchImportance', 'tacticalValue',
-      'ratingFocus', 'ratingNovelty', 'ratingRigor', 'ratingCompleteness',
-      'ratingConcreteness', 'ratingActionability', 'ratingObjectivity',
-      'structuralScore', 'wordCount',
-    ];
-
-    const byPage = new Map();       // pageId → coalesced assessment values
-    const priorities = new Map();    // pageId → { [field]: priority }
-
-    for (const row of allRows) {
-      const pageId = row.pageId;
-      if (!pageId) continue;
-
-      if (!byPage.has(pageId)) {
-        byPage.set(pageId, {});
-        priorities.set(pageId, {});
-      }
-      const entry = byPage.get(pageId);
-      const fieldPriorities = priorities.get(pageId);
-      const priority = ASSESSOR_PRIORITY[row.assessor] ?? -1;
-
-      for (const field of COALESCE_FIELDS) {
-        if (row[field] != null && priority >= (fieldPriorities[field] ?? -1)) {
-          entry[field] = row[field];
-          fieldPriorities[field] = priority;
-        }
-      }
-    }
-
-    if (byPage.size > 0) {
-      console.log(`  assessments: ${allRows.length} rows coalesced into ${byPage.size} pages from PG`);
-    }
-    return byPage;
-  } catch (err) {
-    console.log(`  assessments: skipped (${err instanceof Error ? err.message : err})`);
-    return new Map();
-  }
-}
-
-/**
- * Fetch benchmark results from wiki-server PG tables.
- * Returns a map of modelId → array of { benchmarkId, score, unit }.
- * Falls back to empty object if wiki-server is unavailable.
- */
-async function fetchBenchmarkResults() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  benchmark-results: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  const headers = buildHeaders();
-
-  try {
-    // Fetch the benchmarks table to build a PG id → entity slug mapping.
-    // PG benchmark_results.benchmark_id references benchmarks.id (a random string),
-    // but the frontend expects entity slugs (e.g., "mmlu", "swe-bench-verified").
-    const benchmarkIdToSlug = new Map();
-    try {
-      const bmFetchOpts = { headers, signal: AbortSignal.timeout(15_000) };
-      let bmOffset = 0;
-      while (true) {
-        const bmUrl = `${serverUrl}/api/benchmarks/all?limit=200&offset=${bmOffset}`;
-        const bmResp = await fetch(bmUrl, bmFetchOpts);
-        if (!bmResp.ok) break;
-        const bmData = await bmResp.json();
-        const bmItems = bmData.benchmarks || [];
-        for (const bm of bmItems) {
-          benchmarkIdToSlug.set(bm.id, bm.slug);
-        }
-        if (bmItems.length < 200) break;
-        bmOffset += 200;
-      }
-    } catch (err) {
-      console.log(`  benchmark-results: slug lookup failed (${err instanceof Error ? err.message : err})`);
-    }
-
-    const resultsFetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
-    const pageSize = 200;
-    let allItems = [];
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}/api/benchmark-results/all?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, resultsFetchOpts);
-      if (!resp.ok) {
-        console.log(`  benchmark-results: skipped (HTTP ${resp.status})`);
-        return {};
-      }
-      const data = await resp.json();
-      const items = data.benchmarkResults || [];
-      allItems = allItems.concat(items);
-      if (items.length < pageSize) break;
-      offset += pageSize;
-    }
-
-    // Group by modelId, resolving PG benchmarkId to entity slug
-    const byModel = {};
-    let unresolvedCount = 0;
-    for (const row of allItems) {
-      const slug = benchmarkIdToSlug.get(row.benchmarkId) || row.benchmarkId;
-      if (!benchmarkIdToSlug.has(row.benchmarkId)) unresolvedCount++;
-      if (!byModel[row.modelId]) byModel[row.modelId] = [];
-      byModel[row.modelId].push({
-        benchmarkId: slug,
-        score: row.score,
-        unit: row.unit,
-        date: row.date,
-        sourceUrl: row.sourceUrl,
-      });
-    }
-
-    const modelCount = Object.keys(byModel).length;
-    if (allItems.length > 0) {
-      console.log(`  benchmark-results: ${allItems.length} results for ${modelCount} models fetched from PG (${benchmarkIdToSlug.size} benchmark slugs resolved${unresolvedCount > 0 ? `, ${unresolvedCount} unresolved` : ''})`);
-    }
-    return byModel;
-  } catch (err) {
-    console.log(`  benchmark-results: skipped (${err instanceof Error ? err.message : err})`);
-    return {};
-  }
-}
-
-/**
- * Fetch enriched research areas from wiki-server PG tables.
- * Returns an array of enriched research area objects.
- * Falls back to empty array if wiki-server is unavailable.
- */
-async function fetchResearchAreas() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  research-areas: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return [];
-  }
-
-  const headers = buildHeaders();
-  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
-
-  try {
-    const pageSize = 200;
-    let allItems = [];
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}/api/research-areas/enriched?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, fetchOpts);
-      if (!resp.ok) {
-        console.log(`  research-areas: skipped (HTTP ${resp.status})`);
-        return [];
-      }
-      const data = await resp.json();
-      const items = data.researchAreas || [];
-      allItems = allItems.concat(items);
-      if (items.length < pageSize) break;
-      offset += pageSize;
-    }
-
-    if (allItems.length > 0) {
-      console.log(`  research-areas: ${allItems.length} enriched areas fetched from PG`);
-    }
-    return allItems;
-  } catch (err) {
-    console.log(`  research-areas: skipped (${err instanceof Error ? err.message : err})`);
-    return [];
-  }
-}
-
-/**
- * Fetch record verification verdicts from wiki-server.
- * Returns a map keyed by "recordType:recordId" → verdict info.
- */
-async function fetchRecordVerdicts() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  record-verdicts: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  const headers = buildHeaders();
-
-  try {
-    const pageSize = 200;
-    const verdicts = {};
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}/api/record-verifications/verdicts?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
-      if (!resp.ok) {
-        console.log(`  record-verdicts: skipped (HTTP ${resp.status})`);
-        return {};
-      }
-      const data = await resp.json();
-      const items = data.verdicts || [];
-      for (const v of items) {
-        verdicts[`${v.recordType}:${v.recordId}`] = {
-          verdict: v.verdict,
-          confidence: v.confidence,
-          sourcesChecked: v.sourcesChecked,
-          needsRecheck: v.needsRecheck,
-          lastComputedAt: v.lastComputedAt,
-        };
-      }
-      if (items.length < pageSize) break;
-      offset += pageSize;
-    }
-
-    const count = Object.keys(verdicts).length;
-    if (count > 0) {
-      console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
+      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked, ${removed} bulk-import created dates discarded`);
     } else {
-      console.log('  record-verdicts: 0 verdicts (none computed yet)');
+      console.log(`  gitDateMaps: ${gitModifiedMap.size} files tracked`);
     }
-    return verdicts;
   } catch (err) {
-    console.log(`  record-verdicts: skipped (${err instanceof Error ? err.message : err})`);
-    return {};
-  }
-}
-
-/**
- * Convert a PG personnel row to the RecordEntry format used by frontend components.
- * PG stores canonical entity IDs in personId/organizationId.
- */
-function personnelRowToRecordEntry(row) {
-  const fields = {};
-  const schemaMap = {
-    'key-person': 'key-person',
-    'board': 'board-seat',
-    'career': 'career-history',
-  };
-  const schema = schemaMap[row.roleType] || row.roleType;
-
-  if (row.roleType === 'key-person') {
-    fields.person = row.personId;
-    fields.title = row.role;
-    if (row.startDate) fields.start = row.startDate;
-    if (row.endDate) fields.end = row.endDate;
-    if (row.isFounder) fields.is_founder = true;
-  } else if (row.roleType === 'board') {
-    fields.member = row.personId;
-    fields.role = row.role;
-    if (row.startDate) fields.appointed = row.startDate;
-    if (row.endDate) fields.departed = row.endDate;
-    if (row.appointedBy) fields.appointed_by = row.appointedBy;
-    if (row.background) fields.background = row.background;
-  } else if (row.roleType === 'career') {
-    fields.organization = row.organizationId;
-    fields.title = row.role;
-    if (row.startDate) fields.start = row.startDate;
-    if (row.endDate) fields.end = row.endDate;
+    console.log(`  gitDateMaps: skipped (${err.message || 'unknown error'})`);
   }
 
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema,
-    ownerEntityId: row.roleType === 'career' ? row.personId : row.organizationId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG grant row to the RecordEntry format used by frontend components.
- */
-function grantRowToRecordEntry(row) {
-  const fields = {
-    name: row.name,
-  };
-  if (row.amount != null) fields.amount = row.amount;
-  // Skip purely numeric granteeIds — these are unresolved internal IDs from
-  // external systems (e.g., Open Philanthropy) that aren't meaningful as
-  // entity references or display names.
-  if (row.granteeId && !/^\d+$/.test(row.granteeId)) fields.recipient = row.granteeId;
-  if (row.period) fields.period = row.period;
-  if (row.date) fields.date = row.date;
-  if (row.status) fields.status = row.status;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-  if (row.programId) fields.programId = row.programId;
-
-  return {
-    key: row.id,
-    schema: 'grant',
-    ownerEntityId: row.organizationId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG funding round row to the RecordEntry format used by frontend components.
- */
-function fundingRoundRowToRecordEntry(row) {
-  const fields = {
-    name: row.name,
-  };
-  if (row.date) fields.date = row.date;
-  if (row.raised != null) fields.raised = row.raised;
-  if (row.valuation != null) fields.valuation = row.valuation;
-  if (row.instrument) fields.instrument = row.instrument;
-  if (row.leadInvestor) fields.lead_investor = row.leadInvestor;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema: 'funding-round',
-    ownerEntityId: row.companyId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG investment row to the RecordEntry format used by frontend components.
- */
-function investmentRowToRecordEntry(row) {
-  const fields = {};
-  fields.investor = row.investorId;
-  if (row.roundName) fields.round_name = row.roundName;
-  if (row.date) fields.date = row.date;
-  if (row.amount != null) fields.amount = row.amount;
-  if (row.stakeAcquired != null) {
-    // Parse JSON array back to array if applicable, otherwise use as number
-    try {
-      const parsed = JSON.parse(row.stakeAcquired);
-      if (Array.isArray(parsed)) {
-        fields.stake_acquired = parsed;
-      } else {
-        fields.stake_acquired = typeof parsed === 'number' ? parsed : row.stakeAcquired;
-      }
-    } catch {
-      const n = Number(row.stakeAcquired);
-      fields.stake_acquired = isNaN(n) ? row.stakeAcquired : n;
-    }
-  }
-  if (row.instrument) fields.instrument = row.instrument;
-  if (row.role) fields.role = row.role;
-  if (row.conditions) fields.conditions = row.conditions;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema: 'investment',
-    ownerEntityId: row.companyId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG equity position row to the RecordEntry format used by frontend components.
- */
-function equityPositionRowToRecordEntry(row) {
-  const fields = {};
-  fields.holder = row.holderId;
-  if (row.stake) {
-    // Parse JSON array back to array if applicable, otherwise use as number
-    try {
-      const parsed = JSON.parse(row.stake);
-      if (Array.isArray(parsed)) {
-        fields.stake = parsed;
-      } else {
-        fields.stake = typeof parsed === 'number' ? parsed : row.stake;
-      }
-    } catch {
-      const n = Number(row.stake);
-      fields.stake = isNaN(n) ? row.stake : n;
-    }
-  }
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  const entry = {
-    key: row.id,
-    schema: 'equity-position',
-    ownerEntityId: row.companyId,
-    fields,
-  };
-  if (row.asOf) entry.asOf = row.asOf;
-  if (row.validEnd) entry.validEnd = row.validEnd;
-  return entry;
-}
-
-/**
- * Convert a PG division row to the RecordEntry format used by frontend components.
- */
-function divisionRowToRecordEntry(row) {
-  const fields = {
-    name: row.name,
-    divisionType: row.divisionType,
-  };
-  if (row.slug) fields.slug = row.slug;
-  if (row.lead) fields.lead = row.lead;
-  if (row.status) fields.status = row.status;
-  if (row.startDate) fields.startDate = row.startDate;
-  if (row.endDate) fields.endDate = row.endDate;
-  if (row.website) fields.website = row.website;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema: 'division',
-    ownerEntityId: row.parentOrgId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG funding program row to the RecordEntry format used by frontend components.
- */
-function fundingProgramRowToRecordEntry(row) {
-  const fields = {
-    name: row.name,
-    programType: row.programType,
-  };
-  if (row.description) fields.description = row.description;
-  if (row.divisionId) fields.divisionId = row.divisionId;
-  if (row.totalBudget != null) fields.totalBudget = row.totalBudget;
-  if (row.currency) fields.currency = row.currency;
-  if (row.applicationUrl) fields.applicationUrl = row.applicationUrl;
-  if (row.openDate) fields.openDate = row.openDate;
-  if (row.deadline) fields.deadline = row.deadline;
-  if (row.status) fields.status = row.status;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema: 'funding-program',
-    ownerEntityId: row.orgId,
-    fields,
-  };
-}
-
-/**
- * Convert a PG division personnel row to the RecordEntry format used by frontend components.
- */
-function divisionPersonnelRowToRecordEntry(row) {
-  const fields = {
-    personId: row.personId,
-    role: row.role,
-  };
-  if (row.startDate) fields.startDate = row.startDate;
-  if (row.endDate) fields.endDate = row.endDate;
-  if (row.source) fields.source = row.source;
-  if (row.notes) fields.notes = row.notes;
-
-  return {
-    key: row.id,
-    schema: 'division-personnel',
-    ownerEntityId: `__division__${row.divisionId}`,
-    fields,
-  };
-}
-
-/**
- * Fetch all resources from the wiki-server PG database.
- * Returns them in the same shape as YAML resources (snake_case keys, cited_by array).
- * Falls back to null if the server is unavailable (caller should use YAML).
- */
-async function fetchResourcesFromPG() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) return null;
-
-  const headers = buildHeaders();
-  const allResources = [];
-  let offset = 0;
-  const limit = 200;
-
-  try {
-    // Paginate through all resources
-    while (true) {
-      const resp = await fetch(
-        `${serverUrl}/api/resources/all?limit=${limit}&offset=${offset}`,
-        { headers, signal: AbortSignal.timeout(30_000) }
-      );
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const rows = data.resources || [];
-      if (rows.length === 0) break;
-
-      for (const r of rows) {
-        // Transform PG camelCase → YAML snake_case shape for backward compat
-        allResources.push({
-          id: r.id,
-          url: r.url,
-          title: r.title ?? undefined,
-          type: r.type ?? undefined,
-          summary: r.summary ?? undefined,
-          review: r.review ?? undefined,
-          abstract: r.abstract ?? undefined,
-          key_points: r.keyPoints ?? undefined,
-          publication_id: r.publicationId ?? undefined,
-          authors: r.authors ?? undefined,
-          published_date: r.publishedDate ?? undefined,
-          tags: r.tags ?? undefined,
-          local_filename: r.localFilename ?? undefined,
-          credibility_override: r.credibilityOverride ?? undefined,
-          fetched_at: r.fetchedAt ?? undefined,
-          content_hash: r.contentHash ?? undefined,
-          stable_id: r.stableId ?? undefined,
-        });
-      }
-
-      offset += rows.length;
-      if (rows.length < limit) break;
-    }
-
-    // Fetch bulk citation index (resourceId → pageIds[])
-    try {
-      const citResp = await fetch(
-        `${serverUrl}/api/resources/citations/all`,
-        { headers, signal: AbortSignal.timeout(15_000) }
-      );
-      if (citResp.ok) {
-        const citData = await citResp.json();
-        const citations = citData.citations || {};
-        for (const r of allResources) {
-          const pages = citations[r.id];
-          if (pages && pages.length > 0) {
-            r.cited_by = pages;
-          }
-        }
-      }
-    } catch (citErr) {
-      // Non-fatal — cited_by from YAML will be used for pageResources
-      console.log(`  resources-pg: citation fetch failed (${citErr instanceof Error ? citErr.message : String(citErr)})`);
-    }
-
-    return allResources;
-  } catch (err) {
-    console.log(`  resources-pg: fetch failed (${err instanceof Error ? err.message : String(err)})`);
-    return null;
-  }
-}
-
-/**
- * Fetch all page references (claim refs + citations) from the wiki-server.
- * Returns a map of pageId → { claimReferences, citations } for the reference preprocessor.
- * Falls back to an empty object if the server is unavailable.
- */
-async function buildPageReferenceIndex() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) {
-    console.log('  pageReferenceIndex: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return {};
-  }
-
-  const headers = buildHeaders();
-
-  // Retry with increasing timeouts — this endpoint can be slow on large datasets
-  const retryTimeouts = [30_000, 60_000];
-  for (let i = 0; i < retryTimeouts.length; i++) {
-    try {
-      const res = await fetch(`${serverUrl}/api/references/all`, {
-        headers,
-        signal: AbortSignal.timeout(retryTimeouts[i]),
-      });
-
-      if (!res.ok) {
-        console.log(`  pageReferenceIndex: server returned ${res.status} (attempt ${i + 1}/${retryTimeouts.length})`);
-        if (i < retryTimeouts.length - 1) continue;
-        console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
-        return {};
-      }
-
-      const data = await res.json();
-      const pages = data.pages || {};
-      const pageCount = Object.keys(pages).length;
-      console.log(`  pageReferenceIndex: ${pageCount} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
-
-      if (pageCount === 0 && data.totalCitations === 0) {
-        console.warn('  ⚠ pageReferenceIndex: server returned 0 pages — citations will show "data unavailable"');
-      }
-
-      return pages;
-    } catch (err) {
-      console.log(`  pageReferenceIndex: ${err.message || 'server unavailable'} (attempt ${i + 1}/${retryTimeouts.length})`);
-      if (i < retryTimeouts.length - 1) continue;
-      console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
-      return {};
-    }
-  }
-  // Unreachable — loop always returns, but TypeScript/eslint may require it
-  return {};
-}
-
-/**
- * Extract frontmatter from MDX/MD content using YAML parser
- * Properly handles nested objects like ratings
- */
-function extractFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return {};
-
-  try {
-    return parse(match[1]) || {};
-  } catch (e) {
-    console.warn('Failed to parse frontmatter:', e.message);
-    return {};
-  }
-}
-
-/**
- * Build pages registry by scanning all MDX/MD files
- * Extracts frontmatter including quality, lastUpdated, title, etc.
- * Also detects unconverted links (markdown links with matching resources)
- */
-function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates, assessmentMap = new Map()) {
-  const { gitCreatedMap = new Map(), gitModifiedMap = new Map() } = gitDateMaps || {};
-  const earliestDates = earliestEditLogDates || new Map();
-  const pages = [];
-
-  function scanDirectory(dir, urlPrefix = '') {
-    if (!existsSync(dir)) return;
-
-    const entries = readdirSync(dir);
-
-    for (const entry of entries) {
-      const fullPath = join(dir, entry);
-      const stat = statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        scanDirectory(fullPath, `${urlPrefix}/${entry}`);
-      } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
-        const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
-        const content = readFileSync(fullPath, 'utf-8');
-        const fm = extractFrontmatter(content);
-
-        // Index files use __index__ slug and are marked for ID registration only
-        const isIndexFile = (id === 'index');
-        const effectiveId = isIndexFile ? `__index__${urlPrefix}` : id;
-
-        const urlPath = isIndexFile ? `${urlPrefix}/` : `${urlPrefix}/${id}/`;
-
-        // Extract structural metrics (format-aware scoring)
-        const contentFormat = fm.contentFormat || 'article';
-        const metrics = extractMetrics(content, fullPath, contentFormat);
-
-        // Find unconverted links (markdown links that have matching resources)
-        const unconvertedLinks = urlToResource ? findUnconvertedLinks(content, urlToResource) : [];
-
-        // Count already converted links (<R> components)
-        const convertedLinkCount = countConvertedLinks(content);
-
-        // Scoring fields are sourced exclusively from PG assessments (epic #2428)
-        const assessment = assessmentMap.get(effectiveId);
-
-        pages.push({
-          id: effectiveId,
-          wikiId: fm.wikiId || null,
-          _fullPath: fullPath,
-          path: urlPath,
-          filePath: relative(CONTENT_DIR, fullPath),
-          title: fm.title || id.replace(/-/g, ' '),
-          quality: assessment?.quality ?? null,
-          readerImportance: assessment?.readerImportance ?? null,
-          researchImportance: assessment?.researchImportance ?? null,
-          tacticalValue: assessment?.tacticalValue ?? null,
-          // Content format: article (default), table, diagram, index, dashboard
-          contentFormat: fm.contentFormat || 'article',
-          causalLevel: fm.causalLevel || null,
-          // Fallback chain — see resolveLastUpdated() for priority order.
-          lastUpdated: resolveLastUpdated(
-            fm,
-            editLogDates.get(isIndexFile ? null : id),
-            gitModifiedMap.get(relative(REPO_ROOT, fullPath)),
-          ),
-          // Derive creation date: prefer explicit frontmatter, then non-bulk git
-          // first-commit, then earliest edit log from wiki-server, then legacy
-          // frontmatter. Bulk-import git dates are already filtered out of
-          // gitCreatedMap by buildGitDateMaps().
-          dateCreated: toDateString(fm.createdAt) || gitCreatedMap.get(relative(REPO_ROOT, fullPath)) || earliestDates.get(isIndexFile ? null : id) || toDateString(fm.dateCreated) || null,
-          llmSummary: fm.llmSummary || null,
-          description: fm.description || null,
-          // Ratings sourced from PG assessments
-          ratings: assessment ? buildRatingsFromAssessment(assessment, null) : null,
-          // Extract category from path (prefer subdirectory, fallback to top-level dir)
-          category: urlPrefix.split('/').filter(Boolean)[1] || urlPrefix.split('/').filter(Boolean)[0] || 'other',
-          // Subcategory from frontmatter (set by flatten-content migration)
-          subcategory: fm.subcategory || null,
-          // Topic clusters for filtering
-          clusters: fm.clusters || ['ai-safety'],
-          // Structural metrics
-          metrics: {
-            wordCount: metrics.wordCount,
-            tableCount: metrics.tableCount,
-            diagramCount: metrics.diagramCount,
-            internalLinks: metrics.internalLinks,
-            externalLinks: metrics.externalLinks,
-            footnoteCount: metrics.footnoteCount,
-            bulletRatio: Math.round(metrics.bulletRatio * 100) / 100,
-            sectionCount: metrics.sectionCount.total,
-            hasOverview: metrics.hasOverview,
-            structuralScore: metrics.structuralScore,
-          },
-          // Suggested quality based on structure
-          suggestedQuality: suggestQuality(metrics.structuralScore, fm),
-          // Update frequency (days between updates)
-          updateFrequency: fm.update_frequency ? parseInt(fm.update_frequency) : null,
-          // Evergreen flag (false = point-in-time content like reports, excluded from update schedule)
-          evergreen: fm.evergreen === false ? false : true,
-          // Legacy field for backwards compatibility
-          wordCount: metrics.wordCount,
-          // Unconverted links (markdown links with matching resources)
-          unconvertedLinks,
-          unconvertedLinkCount: unconvertedLinks.length,
-          // Already converted links (<R> components)
-          convertedLinkCount,
-          // Raw content for redundancy analysis (removed before JSON output)
-          rawContent: content,
-        });
-      }
-    }
-  }
-
-  // Scan all content directories
-  scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
-
-  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
-    const dirPath = join(CONTENT_DIR, topDir);
-    if (existsSync(dirPath)) {
-      scanDirectory(dirPath, `/${topDir}`);
-    }
-  }
-
-  return pages;
-}
-
-/**
- * Build path registry by scanning all MDX/MD files
- * Maps entity IDs (from filenames) to their URL paths.
- * Also adds entity-ID-to-path mappings from YAML data for entities
- * whose IDs differ from their page filenames.
- */
-function buildPathRegistry() {
-  const registry = {};
-
-  function scanDirectory(dir, urlPrefix = '') {
-    if (!existsSync(dir)) return;
-
-    const entries = readdirSync(dir);
-
-    for (const entry of entries) {
-      const fullPath = join(dir, entry);
-      const stat = statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        // Recurse into subdirectory
-        scanDirectory(fullPath, `${urlPrefix}/${entry}`);
-      } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
-        // Extract ID from filename (remove extension)
-        const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
-
-        // Skip index files - they use the directory path
-        if (id === 'index') {
-          // The directory itself is the URL
-          registry[`__index__${urlPrefix}`] = `${urlPrefix}/`;
-        } else {
-          // Build the URL path
-          const urlPath = `${urlPrefix}/${id}/`;
-          registry[id] = urlPath;
-        }
-      }
-    }
-  }
-
-  // Scan the knowledge-base directory
-  scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
-
-  // Also scan other top-level content directories
-  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
-    const dirPath = join(CONTENT_DIR, topDir);
-    if (existsSync(dirPath)) {
-      scanDirectory(dirPath, `/${topDir}`);
-    }
-  }
-
-  // Add entity-to-path mappings from YAML entity data.
-  // Many entities have IDs that differ from their page filenames
-  // (e.g. entities whose IDs don't match their page filenames).
-  // Also handle factor entities that follow "factors-{id}-overview" naming.
-  const entityDir = join(DATA_DIR, 'entities');
-  if (existsSync(entityDir)) {
-    for (const file of readdirSync(entityDir)) {
-      if (!file.endsWith('.yaml')) continue;
-      const content = readFileSync(join(entityDir, file), 'utf-8');
-      let entities;
-      try {
-        entities = parse(content);
-      } catch (e) {
-        console.error(`Failed to parse YAML ${join(entityDir, file)}: ${e.message}`);
-        process.exitCode = 1;
-        continue;
-      }
-      if (!Array.isArray(entities)) continue;
-      for (const entity of entities) {
-        if (!entity.id || registry[entity.id]) continue;
-        // Use explicit path field if present
-        if (entity.path) {
-          const normalized = entity.path.replace(/\/$/, '') + '/';
-          registry[entity.id] = normalized;
-        } else {
-          // Try "factors-{id}-overview" pattern for factor entities
-          const overviewId = `factors-${entity.id}-overview`;
-          if (registry[overviewId]) {
-            registry[entity.id] = registry[overviewId];
-          }
-        }
-      }
-    }
-  }
-
-  return registry;
-}
-
-
-/**
- * Compute hallucination risk score for a page (build-time wrapper).
- *
- * Delegates to the canonical scorer in crux/lib/hallucination-risk.ts.
- * See that module for scoring details and factor weights.
- *
- * @param {object} page  – page object from buildPagesRegistry (with metrics, ratings, etc.)
- * @param {Map}    entityMap – Map<entityId, entity> from YAML data
- */
-function computeHallucinationRisk(page, entityMap) {
-  const entity = entityMap.get(page.id);
-  const rawType = entity?.type || null;
-
-  // Strip frontmatter from raw content for integrity checks
-  const contentBody = page.rawContent
-    ? page.rawContent.replace(/^---\n[\s\S]*?\n---\n?/, '')
-    : null;
-
-  return computeCanonicalRisk({
-    entityType: resolveEntityType(rawType),
-    wordCount: page.metrics?.wordCount || 0,
-    footnoteCount: page.metrics?.footnoteCount || 0,
-    externalLinks: page.metrics?.externalLinks || 0,
-    rigor: page.ratings?.rigor ?? null,
-    quality: page.quality ?? null,
-    contentBody,
-    contentFormat: page.contentFormat || null,
-  });
+  return { gitCreatedMap, gitModifiedMap };
 }
 
 async function main() {
@@ -2238,7 +902,7 @@ async function main() {
   // =========================================================================
   // ID REGISTRY — derive from wikiId fields in source files (YAML + MDX)
   // =========================================================================
-  const { slugToWikiId, wikiIdToSlug, nextId: nextIdInit } = buildIdRegistry(entities);
+  const { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId: nextIdInit } = buildIdRegistry(entities);
   let nextId = nextIdInit;
   // Build stableId → slug mapping from YAML entities (for entity resolution
   // in directory pages where ownerEntityId is a stableId rather than a slug)
@@ -2252,6 +916,8 @@ async function main() {
     byWikiId: { ...wikiIdToSlug },
     bySlug: { ...slugToWikiId },
     stableIdToSlug,
+    byStableId: { ...byStableId },
+    stableIdBySlug: { ...stableIdBySlug },
   };
   database.idRegistry = idRegistryOutput;
 
@@ -2291,15 +957,34 @@ async function main() {
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
   // Load FactBase (structured facts graph) from packages/factbase
+  // Build entity map from TableBase entities for injection into FactBase loader
   const factbaseDataDir = join(REPO_ROOT, 'packages', 'factbase', 'data');
   if (existsSync(factbaseDataDir)) {
     const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
-    const { graph, filenameMap } = await loadKB(factbaseDataDir);
+
+    // Build TableBase entity map keyed by stableId for FactBase entity injection
+    // Canonicalize entity types (e.g. "lab" -> "organization", "researcher" -> "person")
+    // since transformEntities() runs later and raw YAML types may still be present here.
+    const tableBaseEntityMap = new Map();
+    for (const entity of entities) {
+      if (entity.stableId) {
+        tableBaseEntityMap.set(entity.stableId, {
+          id: entity.stableId,
+          stableId: entity.stableId,
+          type: resolveEntityType(entity.type) || entity.type,
+          name: entity.title || entity.id,
+          ...(entity.wikiId && { wikiPageId: entity.wikiId, wikiId: entity.wikiId }),
+        });
+      }
+    }
+
+    const { graph, filenameMap } = await loadKB(factbaseDataDir, {
+      entities: tableBaseEntityMap,
+    });
     const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
-    const entityCount = serializedKB.entities?.length ?? 0;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${entityCount} entities, ${factCount} fact groups`);
+    console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }
@@ -2389,7 +1074,7 @@ async function main() {
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
-  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, wikiIdToSlug);
+  const { inbound: contentInbound, totalLinks: contentLinkCount } = scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId);
 
   // Merge content-derived inbound links into backlinks
   let contentBacklinksMerged = 0;
@@ -2593,7 +1278,7 @@ async function main() {
   // RELATED GRAPH — unified bidirectional graph combining all signals:
   // explicit YAML, content EntityLinks, tags, similarity, name-prefix.
   // =========================================================================
-  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
+  const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex, byStableId);
   database.relatedGraph = relatedGraph;
   console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
 
@@ -2602,20 +1287,7 @@ async function main() {
     console.log('  linkSync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
-    console.log(`  linkSignals: ${linkSignals.length} link signals collected for server sync`);
-    const linkResult = await syncPageLinks(linkSignals);
-    if (linkResult.ok) {
-      console.log(`  linkSync: synced ${linkResult.data.upserted} links to wiki server`);
-      // Refresh the materialized view after link sync completes
-      const refreshResult = await refreshRelatedGraph();
-      if (refreshResult.ok) {
-        console.log(`  relatedGraphRefresh: materialized view refreshed`);
-      } else {
-        console.log(`  relatedGraphRefresh: skipped (${refreshResult.message || 'server unavailable or error'})`);
-      }
-    } else {
-      console.log(`  linkSync: skipped (${linkResult.message || 'server unavailable or error'})`);
-    }
+    await syncLinksAndRefreshGraph(linkSignals);
   }
 
   // =========================================================================
@@ -2711,7 +1383,7 @@ async function main() {
     const coverage = computePageCoverage({
       wordCount: page.metrics?.wordCount ?? page.wordCount ?? 0,
       contentFormat: page.contentFormat || 'article',
-      llmSummary: page.llmSummary,
+      summary: page.summary,
       updateFrequency: page.updateFrequency,
       hasEntity: entityMap.has(page.id),
       changeHistoryCount: page.changeHistory?.length ?? 0,
@@ -2761,78 +1433,7 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('  buildMetricsSync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    console.log('  Syncing build metrics to wiki-server...');
-
-    // 1. Coverage
-    const coverageItems = pages
-      .filter(p => p.coverage)
-      .map(p => ({
-        pageId: p.id,
-        passing: p.coverage.passing,
-        total: p.coverage.total,
-        items: p.coverage.items,
-      }));
-    const coverageResult = await syncCoverage(coverageItems);
-    if (coverageResult.ok) {
-      console.log(`  coverageSync: updated ${coverageResult.data.updated} pages`);
-    } else {
-      console.log(`  coverageSync: skipped (${coverageResult.message || 'server unavailable'})`);
-    }
-
-    // 2. Rankings
-    const rankingItems = pages
-      .filter(p => p.readerRank != null || p.researchRank != null || p.recommendedScore != null)
-      .map(p => ({
-        pageId: p.id,
-        readerRank: p.readerRank ?? null,
-        researchRank: p.researchRank ?? null,
-        recommendedScore: p.recommendedScore ?? null,
-      }));
-    const rankingsResult = await syncRankings(rankingItems);
-    if (rankingsResult.ok) {
-      console.log(`  rankingsSync: updated ${rankingsResult.data.updated} pages`);
-    } else {
-      console.log(`  rankingsSync: skipped (${rankingsResult.message || 'server unavailable'})`);
-    }
-
-    // 3. Update schedule
-    const scheduleItems = updateScheduleItems.map(item => ({
-      pageId: item.id,
-      updateFrequency: item.updateFrequency,
-      daysSinceUpdate: item.daysSinceUpdate,
-      daysUntilDue: item.daysUntilDue,
-      staleness: item.staleness,
-      priority: item.priority,
-    }));
-    if (scheduleItems.length > 0) {
-      const scheduleResult = await syncSchedule(scheduleItems);
-      if (scheduleResult.ok) {
-        console.log(`  scheduleSync: updated ${scheduleResult.data.updated} pages`);
-      } else {
-        console.log(`  scheduleSync: skipped (${scheduleResult.message || 'server unavailable'})`);
-      }
-    }
-
-    // 4. Similarity (from redundancy data)
-    const similarityPairs = [];
-    for (const page of pages) {
-      if (!page.redundancy?.similarPages) continue;
-      for (let rank = 0; rank < page.redundancy.similarPages.length; rank++) {
-        const sp = page.redundancy.similarPages[rank];
-        similarityPairs.push({
-          pageId: page.id,
-          similarPageId: sp.id,
-          similarity: sp.similarity,
-          rank: rank + 1,
-        });
-      }
-    }
-    const similarityResult = await syncSimilarity(similarityPairs);
-    if (similarityResult.ok) {
-      console.log(`  similaritySync: upserted ${similarityResult.data.upserted} pairs`);
-    } else {
-      console.log(`  similaritySync: skipped (${similarityResult.message || 'server unavailable'})`);
-    }
+    await syncBuildMetrics({ pages, updateScheduleItems });
   }
 
   database.pages = pages;
@@ -2844,10 +1445,11 @@ async function main() {
   const { nextId: _finalNextId } = extendIdRegistryWithPages({
     pages, entityIds, slugToWikiId, wikiIdToSlug, pathRegistry, nextId,
   });
-  // Update registry output maps
+  // Update registry output maps (byStableId/stableIdBySlug don't change from page extensions)
   idRegistryOutput.byWikiId = { ...wikiIdToSlug };
   idRegistryOutput.bySlug = { ...slugToWikiId };
   database.idRegistry = idRegistryOutput;
+  console.log(`  idRegistry: ${Object.keys(byStableId).length} stableId mappings`);
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;
   const pagesWithUnconvertedLinks = pages.filter(p => p.unconvertedLinkCount > 0).length;
@@ -2868,157 +1470,43 @@ async function main() {
   stats.withDescription = typedEntities.filter(e => e.description).length;
   console.log(`  typedEntities: ${typedEntities.length} transformed`);
 
-  // Ensure output directory exists
-  if (!existsSync(OUTPUT_DIR)) {
-    mkdirSync(OUTPUT_DIR, { recursive: true });
-  }
-
-  // Write combined JSON (strip raw entities, KB data, and experts — only typedEntities needed at runtime)
-  // Experts data is now consolidated into typedEntities (person entities include positions).
-  const { entities: _rawEntities, kb: _kbData, experts: _experts, ...databaseForOutput } = database;
-  writeFileSync(OUTPUT_FILE, JSON.stringify(databaseForOutput, null, 2));
-  console.log(`\n✓ Written: ${OUTPUT_FILE} (raw entities stripped, KB split out, experts consolidated, typedEntities only)`);
-
-  // Write FactBase data to a separate file (loaded independently by factbase.ts)
-  const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
-  if (_kbData) {
-    writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
-    console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase entities, facts, records, schemas)`);
-  } else {
-    console.warn('⚠ FactBase data not available — factbase-data.json not written');
-  }
-
-  // Also write individual JSON files for selective imports
-  for (const { key, file, dir } of DATA_FILES) {
-    const jsonFile = dir ? `${key}.json` : file.replace('.yaml', '.json');
-    writeFileSync(join(OUTPUT_DIR, jsonFile), JSON.stringify(database[key], null, 2));
-  }
-
-  // Write derived data as separate files too
-  writeFileSync(join(OUTPUT_DIR, 'backlinks.json'), JSON.stringify(backlinks, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'tagIndex.json'), JSON.stringify(tagIndex, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'stats.json'), JSON.stringify(stats, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'pathRegistry.json'), JSON.stringify(pathRegistry, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'pages.json'), JSON.stringify(pages, null, 2));
-  writeFileSync(join(OUTPUT_DIR, 'relatedGraph.json'), JSON.stringify(relatedGraph, null, 2));
-  if (Object.keys(blockIndex).length > 0) {
-    writeFileSync(join(OUTPUT_DIR, 'block-index.json'), JSON.stringify(blockIndex));
-    console.log(`✓ Written block-index.json (${Object.keys(blockIndex).length} pages)`);
-  }
-
-  console.log('✓ Written individual JSON files');
-  console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');
-
   // =========================================================================
-  // PER-ENTITY JSON FILES
+  // WRITE OUTPUT FILES
   // =========================================================================
-  // Generate individual JSON files per entity containing all data needed to
-  // render that entity's wiki page, so the full database.json doesn't need
-  // to be loaded for single-entity pages.
-  console.log('\nGenerating per-entity JSON files...');
-  const ENTITY_DIR = join(OUTPUT_DIR, 'generated', 'entities');
-  if (!existsSync(ENTITY_DIR)) {
-    mkdirSync(ENTITY_DIR, { recursive: true });
-  }
+  const { databaseForOutput } = writeMainOutputFiles({ database, outputFile: OUTPUT_FILE });
 
-  // Scan existing .json files before writing so we can remove stale ones afterward
-  const existingEntityFiles = new Set(
-    readdirSync(ENTITY_DIR).filter(f => f.endsWith('.json'))
-  );
+  writeIndividualFiles({
+    database,
+    dataFiles: DATA_FILES,
+    backlinks,
+    tagIndex,
+    stats,
+    pathRegistry,
+    pages,
+    relatedGraph,
+    blockIndex,
+  });
 
-  // Build lookup maps for efficient per-entity bundling
-  const typedEntityMap = new Map(typedEntities.map(e => [e.id, e]));
-  const pageMap = new Map(pages.map(p => [p.id, p]));
-
-  // Collect all entity IDs that have either a typed entity or a page
-  const allEntityIds = new Set([
-    ...typedEntities.map(e => e.id),
-    ...pages.map(p => p.id),
-  ]);
-
-  const writtenEntityFiles = new Set();
-  let entityFilesWritten = 0;
-  for (const entityId of allEntityIds) {
-    const bundle = {};
-
-    // Entity data
-    const entity = typedEntityMap.get(entityId);
-    if (entity) bundle.entity = entity;
-
-    // Page metadata
-    const page = pageMap.get(entityId);
-    if (page) bundle.page = page;
-
-    // Backlinks for this entity
-    const entityBacklinks = backlinks[entityId];
-    if (entityBacklinks) bundle.backlinks = entityBacklinks;
-
-    // Related graph entries
-    const entityRelated = relatedGraph[entityId];
-    if (entityRelated) bundle.relatedGraph = entityRelated;
-
-    // Citation quotes
-    const entityCitationQuotes = databaseForOutput.citationQuotes?.[entityId];
-    if (entityCitationQuotes) bundle.citationQuotes = entityCitationQuotes;
-
-    // Page references
-    const entityPageRefs = databaseForOutput.pageReferenceIndex?.[entityId];
-    if (entityPageRefs) bundle.pageReferences = entityPageRefs;
-
-    // Page resources
-    const entityPageResources = databaseForOutput.pageResources?.[entityId];
-    if (entityPageResources) bundle.pageResources = entityPageResources;
-
-    // Only write if there's meaningful data
-    if (Object.keys(bundle).length > 0) {
-      // Sanitize entityId for use as filename (some IDs contain path separators like __index__/...)
-      const safeFilename = entityId.replace(/\//g, '__');
-      const filename = `${safeFilename}.json`;
-      writeFileSync(join(ENTITY_DIR, filename), JSON.stringify(bundle));
-      writtenEntityFiles.add(filename);
-      entityFilesWritten++;
-    }
-  }
-
-  // Remove stale entity files from previous builds (deleted/renamed entities)
-  let staleFilesRemoved = 0;
-  for (const existingFile of existingEntityFiles) {
-    if (!writtenEntityFiles.has(existingFile)) {
-      unlinkSync(join(ENTITY_DIR, existingFile));
-      staleFilesRemoved++;
-    }
-  }
-  console.log(`✓ Written ${entityFilesWritten} per-entity JSON files to ${ENTITY_DIR}`);
-  if (staleFilesRemoved > 0) {
-    console.log(`  Removed ${staleFilesRemoved} stale entity file(s)`);
-  }
+  writePerEntityBundles({
+    typedEntities,
+    pages,
+    backlinks,
+    relatedGraph,
+    databaseForOutput,
+  });
 
   // Generate link health data
   if (CONTENT_ONLY) {
     console.log('\nLink health: skipped (content-only scope)');
   } else {
-    console.log('\nGenerating link health data...');
-    const linkHealthPath = join(OUTPUT_DIR, 'link-health.json');
-    const linkValidation = spawnSync('node', [
-      'scripts/validate/validate-internal-links.mjs',
-      '--ci',
-      `--output=${linkHealthPath}`
-    ], { encoding: 'utf-8', cwd: process.cwd() });
-
-    if (linkValidation.status === 0 || linkValidation.status === 1) {
-      // Exit 0 = all valid, Exit 1 = broken links found
-      // Both are acceptable for data generation
-      console.log('✓ Link health data generated');
-    } else {
-      console.error('⚠️  Link health generation failed:', linkValidation.stderr);
-    }
+    generateLinkHealth();
   }
 
   // ==========================================================================
   // Broken EntityLink scan
   // ==========================================================================
   console.log('\nScanning for broken EntityLink references...');
-  const brokenLinksResult = scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry);
+  const brokenLinksResult = scanBrokenEntityLinks(wikiIdToSlug, slugToWikiId, pathRegistry, byStableId);
   writeFileSync(join(OUTPUT_DIR, 'broken-entity-links.json'), JSON.stringify(brokenLinksResult, null, 2));
   console.log(`✓ EntityLink scan: ${brokenLinksResult.totalBroken} broken, ${brokenLinksResult.totalUnreachable} unreachable`);
 
@@ -3047,15 +1535,7 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('Entity matrix: skipped (content-only scope)');
   } else {
-    console.log('\nGenerating entity completeness matrix...');
-    const matrixResult = spawnSync('node', [
-      '--import', 'tsx/esm', '--no-warnings',
-      '../../crux/entity-matrix/generate.ts',
-    ], { encoding: 'utf-8', cwd: process.cwd() });
-    if (matrixResult.stdout) process.stdout.write(matrixResult.stdout);
-    if (matrixResult.status !== 0) {
-      console.warn('⚠ Entity matrix generation failed:', matrixResult.stderr?.slice(0, 200));
-    }
+    generateEntityMatrix();
   }
 
   // ==========================================================================

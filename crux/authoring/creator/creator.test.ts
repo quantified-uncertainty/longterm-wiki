@@ -66,6 +66,22 @@ describe('Duplicate Detection', () => {
   it('toSlug: handles numbers', () => {
     expect(toSlug('80000 Hours')).toBe('80000-hours');
   });
+
+  it('toSlug: transliterates German umlauts', () => {
+    expect(toSlug('Andreas Stuhlmüller')).toBe('andreas-stuhlmuller');
+  });
+
+  it('toSlug: transliterates Spanish ñ', () => {
+    expect(toSlug('Nuño Sempere')).toBe('nuno-sempere');
+  });
+
+  it('toSlug: transliterates accented characters', () => {
+    expect(toSlug('café résumé')).toBe('cafe-resume');
+  });
+
+  it('toSlug: transliterates Nordic characters', () => {
+    expect(toSlug('Jörgen Björk')).toBe('jorgen-bjork');
+  });
 });
 
 // ─── URL Extraction Tests ───

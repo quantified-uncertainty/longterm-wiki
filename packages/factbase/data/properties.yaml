@@ -214,6 +214,13 @@ properties:
     category: organization
     appliesTo: [organization, funder]
 
+  parent-org:
+    name: Parent Organization
+    description: "Parent or umbrella organization"
+    dataType: ref
+    category: organization
+    appliesTo: [organization]
+
   legal-structure:
     name: Legal Structure
     description: "Corporate form (e.g. Public benefit corporation, LLC, 501(c)(3))"
@@ -534,7 +541,7 @@ properties:
     category: requirements
     appliesTo: [policy]
     display:
-      format: scientific
+      suffix: " FLOP"
 
   cost-threshold:
     name: Cost Threshold

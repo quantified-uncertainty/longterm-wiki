@@ -1,9 +1,4 @@
-thing:
-  id: claude-sonnet-4
-  stableId: 3cgL7jNlgw
-  type: ai-model
-  name: Claude Sonnet 4
-  wikiId: E1033
+entity: 3cgL7jNlgw
 facts:
   - id: f_46rp7yfOsw
     property: description

@@ -10,36 +10,36 @@
   title: Anthropic
   website: https://anthropic.com
   relatedEntries:
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
       relationship: leads-to
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
       relationship: research
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
       relationship: research
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
       relationship: addresses
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: shaped-by
-    - id: daniela-amodei
+    - id: tKMznr07QA
       type: person
       relationship: leads-to
-    - id: holden-karnofsky
+    - id: eQh3ZhWv8D
       type: person
       relationship: leads-to
-    - id: claude
+    - id: cMKB5i2WZQ
       type: ai-model
       relationship: composed-of
-    - id: sleeper-agents
+    - id: D8dD07y5oQ
       type: concept
       relationship: research
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   sources:
     - title: Anthropic Company Website
@@ -89,26 +89,26 @@
   title: Google DeepMind
   website: https://deepmind.google
   relatedEntries:
-    - id: demis-hassabis
+    - id: Aqcyu3onCA
       type: person
       relationship: leads-to
-    - id: shane-legg
+    - id: muueuPOHfg
       type: person
       relationship: leads-to
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
       relationship: addresses
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: affects
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: affects
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   sources:
     - title: Google DeepMind Website
@@ -163,21 +163,21 @@
   title: OpenAI
   website: https://openai.com
   relatedEntries:
-    - id: sam-altman
+    - id: JKsVHQ5stQ
       type: person
       relationship: leads-to
-    - id: ilya-sutskever
+    - id: eYrBgMLJDw
       type: person
       relationship: leads-to
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
       relationship: research
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: affects
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
       relationship: addresses
   sources:
@@ -231,17 +231,17 @@
   title: xAI
   website: https://x.ai
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: content-moderation
+    - id: s8PQomHkvA
       type: concept
-    - id: agi-race
+    - id: QVsRgOaeUw
       type: concept
   sources:
     - title: xAI Website
@@ -274,16 +274,16 @@
   type: organization
   orgType: academic
   # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: uc-berkeley
+  parentOrg: ksqqi7fyeA
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
   website: https://humancompatible.ai
   relatedEntries:
-    - id: value-learning
+    - id: Ub7IaobzDA
       type: safety-agenda
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: corrigibility
+    - id: aUMeFdALrA
       type: safety-agenda
   sources:
     - title: CHAI Website
@@ -312,19 +312,19 @@
   title: Apollo Research
   website: https://www.apolloresearch.ai
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
   sources:
     - title: Apollo Research Website
@@ -340,7 +340,7 @@
     - title: Apollo Research Blog
       url: https://www.apolloresearch.ai/blog
   description: >-
-    Apollo Research is an AI safety research organization founded in 2022 with a specific focus on one of the most
+    Apollo Research is an AI safety research organization founded in 2023 with a specific focus on one of the most
     concerning potential failure modes: deceptive alignment and scheming behavior in advanced AI systems.
   tags:
     - deception
@@ -364,11 +364,11 @@
   title: Center for AI Safety (CAIS)
   website: https://safe.ai
   relatedEntries:
-    - id: existential-risk
+    - id: bQ9a5lwwlg
       type: concept
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: CAIS Website
@@ -396,15 +396,15 @@
   title: Conjecture
   website: https://conjecture.dev
   relatedEntries:
-    - id: connor-leahy
+    - id: CrXoCsIucX
       type: person
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: redwood-research
+    - id: dwMzc9WzPa
       type: organization
-    - id: prosaic-alignment
+    - id: EQgTf1t7dg
       type: safety-agenda
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   sources:
     - title: Conjecture Website
@@ -419,7 +419,7 @@
       url: https://conjecture.dev/research
     - title: Connor Leahy Podcast Appearances
   description: >-
-    Conjecture is an AI safety research organization founded in 2021 by Connor Leahy and a team of researchers concerned
+    Conjecture is an AI safety research organization founded in 2022 by Connor Leahy and a team of researchers concerned
     about existential risks from advanced AI.
   tags:
     - cognitive-emulation
@@ -441,18 +441,20 @@
   title: FAR AI
   website: https://far.ai
   relatedEntries:
-    - id: dan-hendrycks
+    - id: VoNqoBJkyg
       type: person
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
-    - id: josh-jacobson
+    - id: fslZ4KLnXg
       type: person
-    - id: natural-abstractions
+    - id: jHU2ZaCpdQ
       type: concept
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
+    - id: XcGTez1oFw
+      type: policy
   sources:
     - title: FAR AI Website
       url: https://far.ai
@@ -489,7 +491,7 @@
   title: GovAI
   website: https://governance.ai
   relatedEntries:
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   sources:
     - title: GovAI Website
@@ -516,25 +518,25 @@
   title: METR
   website: https://metr.org
   relatedEntries:
-    - id: beth-barnes
+    - id: ZvfLhIm7pw
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: autonomous-replication
+    - id: 3EuTey4ung
       type: risk
-    - id: cyber-offense
+    - id: VPk7sdZtkg
       type: risk
-    - id: bio-risk
+    - id: kZQP3vYrXA
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   sources:
     - title: METR Website
@@ -578,19 +580,19 @@
   title: Alignment Research Center (ARC)
   website: https://alignment.org
   relatedEntries:
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: policy
   sources:
     - title: ARC Website
@@ -636,13 +638,13 @@
   title: Epoch AI
   website: https://epochai.org
   relatedEntries:
-    - id: transformative-ai
+    - id: bmVIhwpQww
       type: concept
-    - id: scaling-laws
+    - id: eZJ1oAKS6A
       type: concept
-    - id: ai-timelines
+    - id: URCXiRsX0w
       type: concept
-    - id: data-constraints
+    - id: HLakK5zplg
       type: concept
   sources:
     - title: Epoch AI Website
@@ -686,19 +688,19 @@
   title: Machine Intelligence Research Institute (MIRI)
   website: https://intelligence.org
   relatedEntries:
-    - id: eliezer-yudkowsky
+    - id: fS1tEGKuNq
       type: person
-    - id: nate-soares
+    - id: 5MVd90lzCg
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
-    - id: sharp-left-turn
+    - id: AMhUctK34Q
       type: risk
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
   sources:
     - title: MIRI Website
@@ -748,21 +750,21 @@
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
   relatedEntries:
-    - id: ian-hogarth
+    - id: DX4NK1gGtg
       type: person
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: ai-safety-summit
+    - id: mnhBgvNfXA
       type: event
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   sources:
     - title: UK AI Safety Institute Website
@@ -800,20 +802,20 @@
   type: organization
   orgType: government
   # parentOrg: nist — changed to nist-ai (valid entity ID)
-  parentOrg: nist-ai
+  parentOrg: Eac7pHF06Q
   summaryPage: government-orgs-overview
   title: US AI Safety Institute
   website: https://www.nist.gov/aisi
   relatedEntries:
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: US AI Safety Institute Website
@@ -858,9 +860,9 @@
     Industry (METI). Focuses on AI standards research and evaluation frameworks. Part of the international AISI
     network established through the Seoul Declaration.
   relatedEntries:
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   sources:
     - title: Japan AISI Website
@@ -887,9 +889,9 @@
     Development Authority (IMDA). Focuses on testing frameworks and regional AI safety coordination in Southeast
     Asia.
   relatedEntries:
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   sources:
     - title: Singapore AISI Website
@@ -913,9 +915,9 @@
     Canada's national AI safety institute, launched in November 2024 at the Seoul AI Safety Summit. Received
     C$50M (~$37M USD) in initial pledged funding from the Canadian government.
   relatedEntries:
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
   sources:
     - title: Canadian AI Safety Institute
@@ -938,9 +940,9 @@
     The European Commission's dedicated office for AI governance, established in February 2024. Responsible for
     enforcing the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI policy.
   relatedEntries:
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
   sources:
     - title: EU AI Office
@@ -961,7 +963,7 @@
   description: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
   status: stub
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
   tags:
     - evaluations
@@ -980,9 +982,9 @@
     available.
   status: stub
   relatedEntries:
-    - id: nick-bostrom
+    - id: IQvWHA3OiF
       type: person
-    - id: existential-risk
+    - id: bQ9a5lwwlg
       type: concept
   tags:
     - research-org
@@ -1013,13 +1015,13 @@
     - governance
     - community
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: sam-altman
+    - id: JKsVHQ5stQ
       type: person
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: giving-pledge
+    - id: 3w5hW5liew
       type: concept
   lastUpdated: 2026-02
 
@@ -1044,9 +1046,9 @@
     - community
     - governance
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: marc-andreessen
+    - id: qspeazccPg
       type: person
   lastUpdated: 2026-02
 
@@ -1071,9 +1073,9 @@
     - community
     - governance
   relatedEntries:
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -1100,9 +1102,9 @@
     - governance
     - community
   relatedEntries:
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -1129,13 +1131,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: ilya-sutskever
+    - id: eYrBgMLJDw
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1164,7 +1166,7 @@
   relatedEntries:
     - id: conjecture
       type: organization
-    - id: connor-leahy
+    - id: CrXoCsIucX
       type: person
   lastUpdated: 2026-02
 
@@ -1191,13 +1193,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
   lastUpdated: 2026-02
 
@@ -1224,15 +1226,15 @@
     - community
     - cyber
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
-    - id: alignment
+    - id: rt6jVH9yuA
       type: concept
   lastUpdated: 2026-02
 
@@ -1258,9 +1260,9 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1285,15 +1287,15 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1416,7 +1418,7 @@
     An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated
     to achieving breakthroughs in pandemic prevention through far-UVC germicidal
     light, next-generation PPE, and glycol vapor air disinfection. Funded
-    primarily by Open Philanthropy (~$1.85M) and recommended by Founders Pledge.
+    primarily by Coefficient Giving (formerly Open Philanthropy, ~$1.85M) and recommended by Founders Pledge.
   clusters:
     - biorisks
     - community
@@ -1602,8 +1604,11 @@
   description: >-
     Elicit is an AI research assistant with 2M+ users that searches 138M papers
     and automates literature reviews, founded by AI alignment researchers from
-    Ought and funded by Open Philanthropy ($31M total). The platform achieved
+    Ought and funded by Coefficient Giving (formerly Open Philanthropy, $31M total). The platform achieved
     90%+ extraction accuracy and claims 80% time savings for systematic reviews, though independent validation of these claims is limited.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
   clusters:
     - ai-safety
     - community
@@ -1629,14 +1634,14 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
       relationship: related
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
   lastUpdated: 2026-03
 - id: founders-fund
@@ -1869,7 +1874,7 @@
     2018 that has directed $140M+ to longtermist causes ($89M+ to AI risk),
     primarily through UHNW donor advising and managed funds (Frontier AI Fund:
     $13M raised, $11.1M disbursed to 18 orgs). Funded primarily by Coefficient
-    Giving and Open Philanthropy.
+    Giving.
   clusters:
     - community
     - ai-safety
@@ -1996,7 +2001,7 @@
     - community
     - governance
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   lastUpdated: 2026-02
 - id: microsoft
@@ -2128,16 +2133,18 @@
   title: Redwood Research
   website: https://redwoodresearch.org
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: miri
+    - id: puAffUjWSS
       type: organization
+    - id: XcGTez1oFw
+      type: policy
   sources:
     - title: Redwood Research Website
       url: https://redwoodresearch.org
@@ -2377,10 +2384,10 @@
     intervention areas: alignment science, nonproliferation, defensive
     technology, power distribution, and talent mobilization.
   relatedEntries:
-    - id: longview-philanthropy
+    - id: gV4U3qi2QA
       type: organization
       relationship: related
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
       relationship: related
   clusters:
@@ -2457,16 +2464,16 @@
   title: Astralis Foundation
   website: https://astralisfoundation.org
   relatedEntries:
-    - id: longview-philanthropy
+    - id: gV4U3qi2QA
       type: organization
       relationship: leads-to
-    - id: rethink-priorities
+    - id: t0p43V5oLA
       type: organization
       relationship: leads-to
-    - id: beth-barnes
+    - id: ZvfLhIm7pw
       type: person
       relationship: leads-to
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
       relationship: leads-to
   sources:
@@ -2524,9 +2531,9 @@
     committed over $130 million to longtermist causes including AI safety before
     its bankruptcy rendered those commitments void.
   relatedEntries:
-    - id: ftx-future-fund
+    - id: JhIGCaI3Ng
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
   clusters:
     - ai-safety
@@ -2548,11 +2555,11 @@
     stating that they believed committed grants could not be honored and raising
     questions about the legitimacy of the funds' source.
   relatedEntries:
-    - id: ftx
+    - id: yevJm2XDsQ
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   clusters:
     - ai-safety
@@ -2567,13 +2574,13 @@
   title: Giving What We Can
   website: https://www.givingwhatwecan.org/
   relatedEntries:
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
-    - id: will-macaskill
+    - id: p1P9oQwB6w
       type: person
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   customFields:
     - label: Founded
@@ -2610,7 +2617,7 @@
   title: Mistral AI
   website: https://mistral.ai
   relatedEntries:
-    - id: mistral-ai-models
+    - id: v1e1ZwDwoA
       type: ai-model
       relationship: created-by
   description: >-
@@ -2636,7 +2643,7 @@
   title: DeepSeek
   website: https://www.deepseek.com
   relatedEntries:
-    - id: deepseek-models
+    - id: svlbcrT5oQ
       type: ai-model
       relationship: created-by
   description: >-
@@ -3280,6 +3287,9 @@
   description: >-
     AI safety research organization running hackathons, fellowships, and
     collaborative research projects.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
   tags:
     - ai-safety
     - alignment
@@ -4211,6 +4221,9 @@
   website: https://foresight.org
   description: >-
     Research organization focused on beneficial use of emerging technologies.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
   tags:
     - existential-risk
     - research
@@ -4473,7 +4486,7 @@
     and other cause areas. One of the largest funders in the effective altruism
     ecosystem, with total giving exceeding \$3B.
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
       relationship: related
   tags:
@@ -4643,7 +4656,7 @@
     evidence-based interventions in areas like malaria prevention, deworming,
     cash transfers, and nutrition programs.
   relatedEntries:
-    - id: ea-funds
+    - id: GURMOHZrFA
       type: organization
       relationship: related
   tags:
@@ -4666,7 +4679,7 @@
     research, and other interventions aimed at reducing animal suffering at
     scale.
   relatedEntries:
-    - id: ea-funds
+    - id: GURMOHZrFA
       type: organization
       relationship: related
   tags:
@@ -4800,23 +4813,23 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
       relationship: related
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
       relationship: leads-to
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
       relationship: leads-to
-    - id: josh-jacobson
+    - id: fslZ4KLnXg
       type: person
       relationship: leads-to
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
   sources:
     - title: FLF Website
@@ -4862,15 +4875,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
       relationship: created-by
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: richard-mallah
+    - id: mK2KLknYGg
       type: person
       relationship: leads-to
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
   sources:
     - title: CARMA LinkedIn
@@ -4906,10 +4919,10 @@
     - genomics
     - existential-risk
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
       relationship: supports
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
   sources:
     - title: Wise Ancestors FLF Grant Announcement
@@ -4934,7 +4947,7 @@
     companies. YC publicly opposed SB 1047, arguing it would harm the startup ecosystem
     and drive AI innovation out of California. CEO Garry Tan was a vocal critic of the bill.
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   tags:
     - venture-capital
@@ -4954,9 +4967,230 @@
     publishing detailed analysis arguing the bill would stifle innovation and impose
     unworkable compliance requirements on AI startups and frontier model developers.
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   tags:
     - venture-capital
     - ai-investment
+  lastUpdated: 2026-03
+
+- id: acx-grants
+  stableId: LBr3ocKKyQ
+  wikiId: E1057
+  type: organization
+  orgType: funder
+  title: ACX Grants
+  website: https://www.astralcodexten.com/p/acx-grants-results
+  description: >-
+    ACX Grants is a grant program run by Scott Alexander through his Astral
+    Codex Ten blog. It funds a variety of projects across effective altruism,
+    biosecurity, AI safety, scientific research, and other areas.
+  tags:
+    - philanthropy
+    - effective-altruism
+  lastUpdated: 2026-03
+
+- id: encode-justice
+  stableId: etCe7rcH1g
+  wikiId: E1932
+  type: organization
+  orgType: safety-org
+  title: Encode Justice
+  website: https://encodejustice.org
+  description: >-
+    Youth-led AI accountability organization. Co-source of California SB 1047.
+    Supported California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-governance
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: imbue
+  stableId: hCtMHcUWaw
+  wikiId: E1933
+  type: organization
+  orgType: startup
+  title: Imbue
+  website: https://imbue.com
+  description: >-
+    AI safety-focused company building AI agents with robust reasoning.
+    Supported California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-safety
+    - ai-agents
+  lastUpdated: 2026-03
+
+- id: gladstone-ai
+  stableId: HkfUxsbBLQ
+  wikiId: E1934
+  type: organization
+  orgType: startup
+  title: Gladstone AI
+  website: https://www.gladstone.ai
+  description: >-
+    AI safety advisory firm. Authors of RAND-commissioned report on catastrophic
+    AI risks. Supported California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: nonlinear
+  stableId: PfIAYFXC9Q
+  wikiId: E1935
+  type: organization
+  orgType: safety-org
+  title: Nonlinear
+  website: https://www.nonlinear.org
+  description: >-
+    EA-adjacent AI safety organization focused on field-building. Supported
+    California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-safety
+    - ea
+  lastUpdated: 2026-03
+
+- id: economic-security-project
+  stableId: 2ecnsQqcRg
+  wikiId: E1936
+  type: organization
+  orgType: generic
+  title: Economic Security Project
+  website: https://www.economicsecurityproject.org
+  description: >-
+    Economic policy organization. Co-source of California SB 1047. Supported
+    California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - policy
+    - economic-policy
+  lastUpdated: 2026-03
+
+- id: panoplia-labs
+  stableId: NY4i2W6IVA
+  wikiId: E1937
+  type: organization
+  orgType: startup
+  title: Panoplia Labs
+  description: >-
+    AI safety research lab. Supported California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: kira-center
+  stableId: oMgy3kQqOg
+  wikiId: E1938
+  type: organization
+  orgType: safety-org
+  title: Kira Center
+  description: >-
+    Center for AI Risks and Impacts. Supported California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: chamber-of-progress
+  stableId: IEav94hygQ
+  wikiId: E1939
+  type: organization
+  orgType: generic
+  title: Chamber of Progress
+  website: https://progresschamber.org
+  description: >-
+    Tech industry coalition. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: technet
+  stableId: 0PNw6yTH0g
+  wikiId: E1940
+  type: organization
+  orgType: generic
+  title: TechNet
+  website: https://www.technet.org
+  description: >-
+    Bipartisan network of technology CEOs and senior executives. Opposed
+    California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: consumer-technology-association
+  stableId: b89p7duRrQ
+  wikiId: E1941
+  type: organization
+  orgType: generic
+  title: Consumer Technology Association
+  website: https://www.cta.tech
+  description: >-
+    Trade association representing the consumer technology industry. Opposed
+    California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - tech-policy
+  lastUpdated: 2026-03
+
+- id: r-street-institute
+  stableId: yfAYuNTKxQ
+  wikiId: E1942
+  type: organization
+  orgType: generic
+  title: R Street Institute
+  website: https://www.rstreet.org
+  description: >-
+    Free-market think tank. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - policy
+    - free-market
+  lastUpdated: 2026-03
+
+- id: competitive-enterprise-institute
+  stableId: Le8eSvx8EQ
+  wikiId: E1943
+  type: organization
+  orgType: generic
+  title: Competitive Enterprise Institute
+  website: https://cei.org
+  description: >-
+    Free-market policy organization. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - policy
+    - free-market
   lastUpdated: 2026-03

@@ -1,9 +1,4 @@
-thing:
-  id: lesswrong
-  stableId: BEKEqQDmkQ
-  type: organization
-  name: LessWrong
-  wikiId: E538
+entity: BEKEqQDmkQ
 facts:
   - id: f_58FgydQFRQ
     property: description

@@ -22,7 +22,7 @@
 
 import fs from "fs";
 import path from "path";
-import { getDatabase } from "@data";
+import { getTableBase, getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
 import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 
@@ -49,12 +49,24 @@ export function getFactBase(): SerializedKB | undefined {
  * Resolve an entity identifier to the entity ID used as key in facts/records.
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
+ *
+ * Resolution chain: idRegistry stableIdBySlug → FactBase slugToEntityId (legacy fallback) → identity
  */
 function resolveEntityKey(entityOrSlug: string, fb?: SerializedKB): string {
+  // Primary: use idRegistry from TableBase (covers all entities)
+  try {
+    const registry = getIdRegistry();
+    const stableId = registry.stableIdBySlug?.[entityOrSlug];
+    if (stableId) return stableId;
+  } catch {
+    // database.json not available yet (during build) — ignore
+  }
+  // Legacy fallback: try FactBase's own slug map if it still exists
   const resolved = fb ?? getFactBase();
-  if (!resolved?.slugToEntityId) return entityOrSlug;
-  // If it's a slug, resolve to entity ID; otherwise return as-is (already an ID)
-  return resolved.slugToEntityId[entityOrSlug] ?? entityOrSlug;
+  if (resolved?.slugToEntityId?.[entityOrSlug]) {
+    return resolved.slugToEntityId[entityOrSlug];
+  }
+  return entityOrSlug;
 }
 
 /** Sort facts most-recent-first by asOf (undefined asOf sorts last). */
@@ -207,39 +219,65 @@ export function getFactBaseProperty(propertyId: string): Property | undefined {
   return propertyByIdIndex.get(propertyId);
 }
 
-/** Lazy-initialized index: entityId → Entity. Built once on first call. */
-let entityByIdIndex: Map<string, Entity> | undefined;
+/**
+ * Convert a TableBase AnyEntity to a FactBase Entity compat shim.
+ * Maps TypedEntity fields to the FactBase Entity interface so existing callers
+ * continue working without changes.
+ */
+function toFactBaseEntity(typed: { id: string; entityType: string; title: string; stableId?: string; wikiId?: string; [key: string]: unknown }): Entity {
+  return {
+    id: typed.stableId ?? typed.id,
+    type: typed.entityType,
+    name: typed.title,
+    stableId: typed.stableId ?? typed.id,
+    wikiPageId: typed.wikiId,
+    wikiId: typed.wikiId,
+  };
+}
 
 /**
- * Get an entity definition by ID or slug.
+ * Get a FactBase entity definition by ID or slug.
  * Accepts either an internal entity ID (e.g. "mK9pX3rQ7n") or a YAML slug
- * (e.g. "anthropic"). Uses a lazy-built index for O(1) lookups after initial build.
+ * (e.g. "anthropic"). Delegates to TableBase for entity data.
+ *
+ * Returns a compat shim mapping TableBase fields to the FactBase Entity interface.
  */
 export function getFactBaseEntity(entityId: string): Entity | undefined {
-  const fb = getFactBase();
-  if (!fb) return undefined;
+  // Resolve the entityId — it might be a slug, stableId, or wikiId
+  const resolvedId = resolveEntityKey(entityId);
 
-  if (!entityByIdIndex) {
-    entityByIdIndex = new Map();
-    for (const e of fb.entities) {
-      entityByIdIndex.set(e.id, e);
-    }
+  // Try to find in TableBase by stableId
+  const typed = getTypedEntityByStableId(resolvedId);
+  if (typed) return toFactBaseEntity(typed);
+
+  // If the original ID is different from resolved, also try original as stableId
+  if (resolvedId !== entityId) {
+    const typedDirect = getTypedEntityByStableId(entityId);
+    if (typedDirect) return toFactBaseEntity(typedDirect);
   }
-  // Try direct ID lookup first, then resolve as slug
-  const direct = entityByIdIndex.get(entityId);
-  if (direct) return direct;
-  const resolvedId = resolveEntityKey(entityId, fb);
-  return resolvedId !== entityId ? entityByIdIndex.get(resolvedId) : undefined;
+
+  // Legacy fallback: try FactBase entities if they still exist in the data
+  const fb = getFactBase();
+  if (fb?.entities) {
+    const found = fb.entities.find((e) => e.id === entityId || e.id === resolvedId);
+    if (found) return found;
+  }
+
+  return undefined;
 }
 
 /**
  * Get all FactBase entities.
+ * Delegates to TableBase's getTypedEntities() and returns compat shims.
  */
 export function getFactBaseEntities(): Entity[] {
-  const fb = getFactBase();
-  if (!fb) return [];
-
-  return fb.entities;
+  try {
+    return getTypedEntities().map(toFactBaseEntity);
+  } catch {
+    // Fallback: use FactBase entities if TableBase not available
+    const fb = getFactBase();
+    return fb?.entities ?? [];
+  }
 }
 
 /**
@@ -281,7 +319,7 @@ const VALID_VERDICTS: Set<string> = new Set([
  */
 export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
   try {
-    const db = getDatabase();
+    const db = getTableBase();
     const verdict = db.kbFactVerification?.[factId];
     if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
     return verdict as FactBaseVerdict;
@@ -304,7 +342,8 @@ export function getFactBaseFactsByProperty(
   const fb = getFactBase();
   if (!fb) return new Map();
 
-  const ids = entityIds ?? fb.entities.map((e) => e.id);
+  // Use provided entity IDs, or fall back to all entities that have facts
+  const ids = entityIds ?? Object.keys(fb.facts);
   const result = new Map<string, Fact>();
 
   for (const entityId of ids) {
@@ -329,7 +368,8 @@ export function getFactBaseAllFactsByProperty(
   const fb = getFactBase();
   if (!fb) return new Map();
 
-  const ids = entityIds ?? fb.entities.map((e) => e.id);
+  // Use provided entity IDs, or fall back to all entities that have facts
+  const ids = entityIds ?? Object.keys(fb.facts);
   const result = new Map<string, Fact[]>();
 
   for (const entityId of ids) {
@@ -525,10 +565,20 @@ export function getFactBaseRecordSchemas(): FactBaseRecordSchema[] {
 // ── Slug resolution (public) ─────────────────────────────────────
 
 /**
- * Resolve a YAML filename slug (e.g. "anthropic") to a FactBase entity ID.
+ * Resolve a YAML filename slug (e.g. "anthropic") to a FactBase entity ID (stableId).
+ * Uses idRegistry from TableBase as primary source.
  * Returns undefined if the slug is not in the mapping.
  */
 export function resolveFactBaseSlug(slug: string): string | undefined {
+  // Primary: idRegistry from TableBase
+  try {
+    const registry = getIdRegistry();
+    const stableId = registry.stableIdBySlug?.[slug];
+    if (stableId) return stableId;
+  } catch {
+    // database.json not available yet — fall through
+  }
+  // Legacy fallback
   const fb = getFactBase();
   if (!fb?.slugToEntityId) return undefined;
   return fb.slugToEntityId[slug];
@@ -536,9 +586,20 @@ export function resolveFactBaseSlug(slug: string): string | undefined {
 
 /**
  * Get the full slug→entityId mapping.
+ * Uses idRegistry from TableBase as primary source.
  * Useful for building static params or reverse lookups.
  */
 export function getFactBaseSlugMap(): Record<string, string> {
+  // Primary: idRegistry.stableIdBySlug from TableBase
+  try {
+    const registry = getIdRegistry();
+    if (registry.stableIdBySlug && Object.keys(registry.stableIdBySlug).length > 0) {
+      return registry.stableIdBySlug;
+    }
+  } catch {
+    // database.json not available yet — fall through
+  }
+  // Legacy fallback
   const fb = getFactBase();
   return fb?.slugToEntityId ?? {};
 }
@@ -554,27 +615,29 @@ export function resolveSlugAlias(slug: string): string | undefined {
   return fb.previousSlugToCurrentSlug[slug];
 }
 
-/** Lazy-initialized inverted index: entityId → slug. Built once on first call. */
-let entityIdToSlugIndex: Map<string, string> | undefined;
-
 /**
- * Reverse lookup: find the YAML slug for a given entity ID.
- * Uses a lazy-built inverted index for O(1) lookups.
+ * Reverse lookup: find the YAML slug for a given entity ID (stableId).
+ * Uses idRegistry from TableBase as primary source.
  */
 export function getFactBaseEntitySlug(entityId: string): string | undefined {
-  if (!entityIdToSlugIndex) {
-    const map = getFactBaseSlugMap();
-    entityIdToSlugIndex = new Map();
-    for (const [slug, id] of Object.entries(map)) {
-      entityIdToSlugIndex.set(id, slug);
-    }
+  // Primary: idRegistry.stableIdToSlug or byStableId from TableBase
+  try {
+    const registry = getIdRegistry();
+    const slug = registry.stableIdToSlug?.[entityId] ?? registry.byStableId?.[entityId];
+    if (slug) return slug;
+  } catch {
+    // database.json not available yet — fall through
   }
-  return entityIdToSlugIndex.get(entityId);
+  // Legacy fallback: invert the slug map from FactBase
+  const map = getFactBaseSlugMap();
+  for (const [slug, id] of Object.entries(map)) {
+    if (id === entityId) return slug;
+  }
+  return undefined;
 }
 
 // ── Backwards compatibility aliases ─────────────────────────────
 // These aliases allow consumers to migrate incrementally.
-// TODO: Remove after all call sites are updated.
 
 /** @deprecated Use getFactBase() */
 export const getKB = getFactBase;

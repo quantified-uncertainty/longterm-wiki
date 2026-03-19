@@ -115,6 +115,7 @@ import * as orgsCommands from './commands/orgs.ts';
 import * as researchAreasCommands from './commands/research-areas.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
+import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as matrixCommands from './commands/matrix.ts';
@@ -173,6 +174,7 @@ const domains = {
   'research-areas': researchAreasCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
+  'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,
   matrix: matrixCommands,

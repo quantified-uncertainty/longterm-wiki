@@ -65,10 +65,13 @@ export function similarity(a: string, b: string): number {
 }
 
 /**
- * Normalize a string to a slug for comparison
+ * Normalize a string to a slug for comparison. Transliterates Unicode (e.g. ü→u).
  */
 export function toSlug(str: string): string {
-  return str.toLowerCase()
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks (ü→u, ñ→n, etc.)
+    .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }

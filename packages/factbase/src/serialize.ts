@@ -5,11 +5,19 @@
 import type { Graph } from "./graph";
 
 export interface SerializedKB {
-  entities: ReturnType<Graph["getAllEntities"]>;
+  /**
+   * @deprecated Entities are now owned by TableBase. This field is no longer
+   * emitted by serialize() and will be removed in a future version.
+   * Use getTypedEntities() / getTypedEntityByStableId() from tablebase.ts instead.
+   */
+  entities?: ReturnType<Graph["getAllEntities"]>;
   facts: Record<string, ReturnType<Graph["getFacts"]>>;
   properties: ReturnType<Graph["getAllProperties"]>;
   schemas: ReturnType<Graph["getAllSchemas"]>;
-  /** Maps YAML filename/slug → entity ID, for resolving slug-based lookups */
+  /**
+   * @deprecated Slug resolution is now handled by idRegistry.stableIdBySlug
+   * in TableBase (database.json). This field is no longer emitted by serialize().
+   */
   slugToEntityId?: Record<string, string>;
   /** Maps previous slugs → current slug, for URL redirects when slugs change */
   previousSlugToCurrentSlug?: Record<string, string>;
@@ -44,13 +52,8 @@ export function serialize(
     }
   }
 
-  // Build slug → entity ID map for resolving slug-based lookups from MDX components
-  const slugToEntityId: Record<string, string> = {};
-  for (const [entityId, filename] of filenameMap) {
-    slugToEntityId[filename] = entityId;
-  }
-
   // Build previousSlug → currentSlug map for URL redirects
+  // (entities are still in the graph for fact iteration; we just don't emit them)
   const previousSlugToCurrentSlug: Record<string, string> = {};
   for (const entity of entities) {
     if (entity.previousSlugs) {
@@ -63,9 +66,11 @@ export function serialize(
     }
   }
 
+  // Note: entities array and slugToEntityId are no longer emitted.
+  // Entities are owned by TableBase (database.json typedEntities).
+  // Slug→entityId resolution uses idRegistry.stableIdBySlug from database.json.
   return {
-    entities, facts, properties, schemas,
-    slugToEntityId,
+    facts, properties, schemas,
     ...(Object.keys(previousSlugToCurrentSlug).length > 0 && { previousSlugToCurrentSlug }),
   };
 }

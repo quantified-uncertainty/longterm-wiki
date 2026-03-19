@@ -26,6 +26,8 @@ import { loadPathRegistry } from '../content-types.ts';
 /** Convert display name to likely entity slug: "Paul Christiano" → "paul-christiano" */
 function nameToSlug(name: string): string {
   return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks (ü→u, ñ→n, etc.)
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')

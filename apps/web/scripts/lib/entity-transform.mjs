@@ -131,7 +131,7 @@ function applyEntityOverrides(entities, pages) {
         id: page.id,
         type: 'project',
         title: page.title,
-        description: page.llmSummary || page.description || undefined,
+        description: page.summary || page.description || undefined,
         tags: page.tags || [],
         lastUpdated: page.lastUpdated || undefined,
       });
@@ -153,8 +153,10 @@ function transformEntity(raw, expertMap, orgMap) {
   const canonicalType = OLD_TYPE_MAP[oldType] || oldType;
 
   // Build base fields shared across all types
+  // Only include stableId when defined (synthetic entities from frontmatter may not have one)
   const base = {
     id: raw.id,
+    ...(raw.stableId != null ? { stableId: raw.stableId } : {}),
     title: raw.title,
     description: raw.description,
     tags: raw.tags || [],
@@ -277,6 +279,10 @@ function transformEntity(raw, expertMap, orgMap) {
         safetyLevel: raw.safetyLevel,
         benchmarks: raw.benchmarks || [],
         capabilities: raw.capabilities || [],
+        modality: raw.modality || [],
+        openWeight: raw.openWeight,
+        parameterCount: raw.parameterCount,
+        trainingCutoff: raw.trainingCutoff,
       };
 
     case 'benchmark':

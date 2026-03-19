@@ -16,17 +16,17 @@
     - label: Core Dispute
       value: Autonomous weapons and mass surveillance red lines
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: david-sacks
+    - id: JjyNWsA91A
       type: person
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: governance-policy
+    - id: khXUiwWtkg
       type: concept
   sources:
     - title: "Trump Orders US Government to Drop Anthropic After Pentagon Feud"
@@ -95,15 +95,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: openai-foundation
+    - id: GQuPhNkZbg
       type: organization
-    - id: musk-openai-lawsuit
+    - id: RQsF3N9BQA
       type: analysis
-    - id: long-term-benefit-trust
+    - id: eNJ3h95yWw
       type: analysis
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -127,13 +127,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: anthropic-ipo
+    - id: hPZbflFceQ
       type: analysis
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -157,21 +157,21 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: anthropic-valuation
+    - id: HrokCBSmBA
       type: analysis
-    - id: anthropic-ipo
+    - id: hPZbflFceQ
       type: analysis
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
-    - id: dustin-moskovitz
+    - id: Jtj6jHbuQ7
       type: person
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: daniela-amodei
+    - id: tKMznr07QA
       type: person
   lastUpdated: 2026-02
 
@@ -196,15 +196,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic-valuation
+    - id: HrokCBSmBA
       type: analysis
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: anthropic-ipo
+    - id: hPZbflFceQ
       type: analysis
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
-    - id: dustin-moskovitz
+    - id: Jtj6jHbuQ7
       type: person
   lastUpdated: 2026-02
 
@@ -227,15 +227,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: daniela-amodei
+    - id: tKMznr07QA
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
   lastUpdated: 2026-02
 
@@ -258,15 +258,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: openai-foundation-governance
+    - id: Hk7IvggnEA
       type: analysis
-    - id: openai-foundation
+    - id: GQuPhNkZbg
       type: organization
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: sam-altman
+    - id: JKsVHQ5stQ
       type: person
   lastUpdated: 2026-02
 
@@ -289,15 +289,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic-valuation
+    - id: HrokCBSmBA
       type: analysis
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: daniela-amodei
+    - id: tKMznr07QA
       type: person
   lastUpdated: 2026-02
 
@@ -321,15 +321,15 @@
     - community
     - governance
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: giving-pledge
+    - id: 3w5hW5liew
       type: concept
-    - id: dustin-moskovitz
+    - id: Jtj6jHbuQ7
       type: person
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
   lastUpdated: 2026-02
 
@@ -355,15 +355,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: anthropic-pre-ipo-daf-transfers
+    - id: 1DjpqfXwjA
       type: analysis
-    - id: long-term-benefit-trust
+    - id: eNJ3h95yWw
       type: analysis
-    - id: giving-pledge
+    - id: 3w5hW5liew
       type: concept
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
   lastUpdated: 2026-02
 
@@ -390,15 +390,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: anthropic-pledge-enforcement
+    - id: 3ljdV7I37g
       type: analysis
-    - id: anthropic-ipo
+    - id: hPZbflFceQ
       type: analysis
-    - id: giving-pledge
+    - id: 3w5hW5liew
       type: concept
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
   lastUpdated: 2026-02
 
@@ -422,15 +422,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: anthropic-valuation
+    - id: HrokCBSmBA
       type: analysis
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   lastUpdated: 2026-02
 
@@ -455,15 +455,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: concept
-    - id: epoch-ai
+    - id: cBPkzcVBBQ
       type: organization
   lastUpdated: 2026-02
 
@@ -488,13 +488,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: concept
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: concept
   lastUpdated: 2026-02
 
@@ -519,13 +519,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: capability-alignment-race
+    - id: CWaxxnWsDg
       type: analysis
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -549,11 +549,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: capability-alignment-race
+    - id: CWaxxnWsDg
       type: analysis
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: concept
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -578,11 +578,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: capability-alignment-race
+    - id: CWaxxnWsDg
       type: analysis
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -606,15 +606,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: evan-hubinger
+    - id: XnqqKHiNmw
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   lastUpdated: 2026-02
 
@@ -641,15 +641,15 @@
     - governance
     - community
   relatedEntries:
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: securebio
+    - id: QFIL8r7vPA
       type: organization
-    - id: securedna
+    - id: m4vhGiF5RQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: blueprint-biosecurity
+    - id: lZRKSfs5wg
       type: organization
   lastUpdated: 2026-02
 

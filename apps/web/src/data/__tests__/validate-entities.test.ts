@@ -22,6 +22,7 @@ const db = JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
 const ENTITIES_PATH = path.resolve(__dirname, "../entities.json");
 interface RawEntity {
   id: string;
+  stableId?: string;
   type: string;
   title?: string;
   entityType?: string;
@@ -253,7 +254,11 @@ describe("Entity data validation", () => {
 
   describe("relatedEntries reference existing entities", () => {
     it("every relatedEntries[].id resolves to an actual entity", () => {
+      // Build lookup set with both slugs and stableIds (relatedEntries may use either)
       const entityIds = new Set(entities.map((e) => e.id));
+      for (const e of entities) {
+        if (e.stableId) entityIds.add(e.stableId);
+      }
       const broken: string[] = [];
       for (const entity of entities) {
         for (const rel of entity.relatedEntries || []) {

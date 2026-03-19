@@ -1,9 +1,4 @@
-thing:
-  id: ai-watch
-  stableId: gDdFdUktjA
-  type: project
-  name: AI Watch
-  wikiId: E386
+entity: gDdFdUktjA
 facts:
   - id: f_vcpkgpw53g
     property: description

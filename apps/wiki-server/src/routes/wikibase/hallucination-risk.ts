@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, desc, sql } from "drizzle-orm";
-import { getDrizzleDb, getDb, type SqlQuery } from "../../db.js";
+import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
 import { hallucinationRiskSnapshots } from "../../schema.js";
 import {
   parseJsonBody,
@@ -103,18 +103,15 @@ export function clearMatViewCache(): void {
  * SET LOCAL scopes the override to this transaction only.
  */
 async function refreshMaterializedView(): Promise<void> {
-  const rawDb = getDb();
   try {
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
+    await beginTransaction(async (tx) => {
       await tx`SET LOCAL statement_timeout = '300000'`; // 5 minutes
       await tx`REFRESH MATERIALIZED VIEW CONCURRENTLY hallucination_risk_latest`;
     });
   } catch (err) {
     // CONCURRENTLY requires a unique index; fall back if not available
     logger.warn({ err }, "Concurrent refresh failed, trying non-concurrent");
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
+    await beginTransaction(async (tx) => {
       await tx`SET LOCAL statement_timeout = '300000'`; // 5 minutes
       await tx`REFRESH MATERIALIZED VIEW hallucination_risk_latest`;
     });

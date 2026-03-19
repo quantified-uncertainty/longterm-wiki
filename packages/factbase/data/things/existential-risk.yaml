@@ -1,9 +1,4 @@
-thing:
-  id: existential-risk
-  stableId: bQ9a5lwwlg
-  type: concept
-  name: Existential Risk from AI
-  wikiId: E131
+entity: bQ9a5lwwlg
 facts:
   - id: f_QovYblRFEg
     property: description

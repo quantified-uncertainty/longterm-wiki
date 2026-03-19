@@ -1,9 +1,4 @@
-thing:
-  id: treacherous-turn
-  stableId: tRj4bS6V8Q
-  type: risk
-  name: Treacherous Turn
-  wikiId: E359
+entity: tRj4bS6V8Q
 facts:
   - id: f_wwfOMgeSvQ
     property: description

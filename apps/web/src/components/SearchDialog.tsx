@@ -8,6 +8,7 @@ import {
   type MatchInfo,
 } from "@lib/search";
 import { ENTITY_TYPES, ENTITY_GROUPS } from "@data/entity-ontology";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 // ---------------------------------------------------------------------------
 // Sort types
@@ -385,7 +386,8 @@ export function SearchDialog() {
  * when available, falling back to client-side term highlighting.
  */
 function HighlightedSnippet({ result }: { result: SearchResult }) {
-  const { description, match, terms, snippet } = result;
+  const { description: rawDescription, match, terms, snippet } = result;
+  const description = rawDescription ? stripMdxEscapes(rawDescription) : rawDescription;
 
   // Prefer server-generated snippet with <mark> tags from ts_headline()
   if (snippet && snippet.includes("<mark>")) {
@@ -437,7 +439,7 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
   );
 }
 
-/** Extract the query terms that matched in the description or llmSummary field. */
+/** Extract the query terms that matched in the description or summary field. */
 function getDescriptionTerms(
   match: MatchInfo | undefined,
   terms: string[],
@@ -445,7 +447,7 @@ function getDescriptionTerms(
   if (!match) return [];
   const descTerms: string[] = [];
   for (const [term, fields] of Object.entries(match)) {
-    if (fields.includes("description") || fields.includes("llmSummary")) {
+    if (fields.includes("description") || fields.includes("summary")) {
       descTerms.push(term);
     }
   }

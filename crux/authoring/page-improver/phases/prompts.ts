@@ -278,7 +278,7 @@ usage and its import if no other usage remains.
 - Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
 - Do NOT change \`quality:\`, \`readerImportance:\`, \`researchImportance:\`, \`tacticalValue:\`, \`ratings:\`, \`clusters:\`, or \`balanceFlags:\` fields — these are managed by separate grading/editorial pipelines and will be force-restored to their original values.
 - Do NOT add new frontmatter fields that are not in the original (e.g., \`reviewNote\`).
-- You may update \`description:\` and \`llmSummary:\` to reflect content changes.
+- You may update \`description:\` and \`summary:\` to reflect content changes.
 ${isPolish ? `
 ### Polish Tier Constraints (CRITICAL)
 This is a POLISH-tier update. Your changes must be MINIMAL:

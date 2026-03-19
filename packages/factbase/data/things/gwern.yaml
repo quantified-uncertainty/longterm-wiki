@@ -1,9 +1,4 @@
-thing:
-  id: gwern
-  stableId: 25eyvY39Bw
-  type: person
-  name: Gwern Branwen
-  wikiId: E574
+entity: 25eyvY39Bw
 facts:
   - id: f_vHXRymjxzA
     property: description

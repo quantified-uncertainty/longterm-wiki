@@ -12,7 +12,7 @@
     Distinguishes AI-enabled lock-in from historical examples due to enforcement capabilities and estimates 10-30%
     probability of significant lock-in by 2050.
   relatedEntries:
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
   tags:
     - x-risk
@@ -36,10 +36,10 @@
     - label: Key Output
       value: Risk magnitude comparisons and allocation recommendations
   relatedEntries:
-    - id: compounding-risks-analysis
+    - id: uvscr74oPw
       type: analysis
       relationship: related
-    - id: flash-dynamics-threshold
+    - id: k9iTirUKxA
       type: analysis
       relationship: related
   tags:
@@ -65,10 +65,10 @@
     - label: Key Output
       value: Intervention priorities given different worldviews
   relatedEntries:
-    - id: ai-risk-portfolio-analysis
+    - id: d7FSglxSLA
       type: analysis
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: analysis
       relationship: related
   tags:
@@ -94,13 +94,13 @@
     - label: Key Output
       value: Prioritization based on closing vs stable windows
   relatedEntries:
-    - id: ai-risk-portfolio-analysis
+    - id: d7FSglxSLA
       type: analysis
       relationship: related
-    - id: worldview-intervention-mapping
+    - id: UgWUqHaGkg
       type: analysis
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: analysis
       relationship: related
   tags:
@@ -126,16 +126,16 @@
     - label: Base Rate Estimate
       value: 5-40% for advanced AI systems
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
       relationship: analyzes
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
       relationship: related
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
       relationship: prerequisite
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
       relationship: research
   tags:
@@ -162,13 +162,13 @@
     - label: Combined Estimate
       value: '>10% by 2070'
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
       relationship: analyzes
-    - id: power-seeking-conditions
+    - id: NdUO6rBKQQ
       type: analysis
       relationship: related
-    - id: deceptive-alignment-decomposition
+    - id: MKmyyGR3CA
       type: analysis
       relationship: related
   tags:
@@ -194,13 +194,13 @@
     - label: Key Factor
       value: Training complexity and optimization pressure
   relatedEntries:
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
       relationship: analyzes
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
       relationship: related
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
       relationship: related
   tags:
@@ -225,13 +225,13 @@
     - label: Base Rate
       value: 20-60% for significant distribution shifts
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
       relationship: analyzes
-    - id: distributional-shift
+    - id: qYk1BOLgqA
       type: risk
       relationship: related
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
       relationship: related
   tags:
@@ -254,16 +254,16 @@
     - label: Categories Identified
       value: 12 major failure modes
   relatedEntries:
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
       relationship: analyzes
     - id: sycophancy
       type: risk
       relationship: example
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: capability
       relationship: vulnerable-technique
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
       relationship: mitigation
   tags:
@@ -288,13 +288,13 @@
     - label: Key Result
       value: Optimal policies tend to seek power under broad conditions
   relatedEntries:
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
       relationship: analyzes
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
       relationship: related
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
       relationship: consequence
   tags:
@@ -319,16 +319,16 @@
     - label: Core Insight
       value: Many final goals share common instrumental subgoals
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
       relationship: analyzes
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
       relationship: example
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
       relationship: consequence
-    - id: miri
+    - id: puAffUjWSS
       type: organization
       relationship: research
   tags:
@@ -353,16 +353,16 @@
     - label: Conditional Probability
       value: 10-50% given situational awareness
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
       relationship: analyzes
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
       relationship: related
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
       relationship: prerequisite
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
       relationship: manifestation
   tags:
@@ -387,16 +387,16 @@
     - label: Pathways Identified
       value: 6 major failure modes
   relatedEntries:
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
       relationship: analyzes
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
       relationship: cause
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
       relationship: related
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
       relationship: mitigation
   tags:
@@ -489,10 +489,10 @@
     - label: Target Factor
       value: Racing Dynamics
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -515,10 +515,10 @@
     - label: Target Factor
       value: Multipolar Trap
   relatedEntries:
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -541,10 +541,10 @@
     - label: Target Factor
       value: Flash Dynamics
   relatedEntries:
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
       relationship: related
-    - id: irreversibility
+    - id: 7e3rvE5YgA
       type: risk
       relationship: related
   tags:
@@ -567,10 +567,10 @@
     - label: Target Factor
       value: Expertise Atrophy
   relatedEntries:
-    - id: expertise-atrophy
+    - id: ks0lqvZqUg
       type: risk
       relationship: related
-    - id: automation-bias
+    - id: 72cwRMbzMA
       type: risk
       relationship: related
   tags:
@@ -593,10 +593,10 @@
     - label: Target Factor
       value: Economic Disruption
   relatedEntries:
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
       relationship: related
-    - id: winner-take-all
+    - id: YOMDe574Ew
       type: risk
       relationship: related
   tags:
@@ -619,10 +619,10 @@
     - label: Target Factor
       value: AI Proliferation
   relatedEntries:
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -645,10 +645,10 @@
     - label: Target Factor
       value: Winner-Take-All Dynamics
   relatedEntries:
-    - id: winner-take-all
+    - id: YOMDe574Ew
       type: risk
       relationship: related
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
       relationship: related
   tags:
@@ -671,7 +671,7 @@
     - label: Target Risk
       value: Cyberweapons
   relatedEntries:
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
       relationship: related
   tags:
@@ -694,7 +694,7 @@
     - label: Target Risk
       value: Cyberweapons
   relatedEntries:
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
       relationship: related
   tags:
@@ -717,7 +717,7 @@
     - label: Target Risk
       value: Autonomous Weapons
   relatedEntries:
-    - id: autonomous-weapons
+    - id: cm5KEblCZg
       type: risk
       relationship: related
   tags:
@@ -740,7 +740,7 @@
     - label: Target Risk
       value: Autonomous Weapons
   relatedEntries:
-    - id: autonomous-weapons
+    - id: cm5KEblCZg
       type: risk
       relationship: related
   tags:
@@ -763,7 +763,7 @@
     - label: Target Risk
       value: Disinformation
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -786,7 +786,7 @@
     - label: Target Risk
       value: Disinformation
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -809,7 +809,7 @@
     - label: Target Risk
       value: Surveillance
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
       relationship: related
   tags:
@@ -832,7 +832,7 @@
     - label: Target Risk
       value: Surveillance
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
       relationship: related
   tags:
@@ -855,7 +855,7 @@
     - label: Target Risk
       value: Deepfakes
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
       relationship: related
   tags:
@@ -880,13 +880,13 @@
     - label: Key Insight
       value: Trust cascades exhibit catastrophic regime shifts with hysteresis
   relatedEntries:
-    - id: trust-cascade
+    - id: IQ4E6VkW9A
       type: risk
       relationship: analyzes
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
       relationship: related
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
       relationship: leads-to
   tags:
@@ -912,13 +912,13 @@
     - label: Key Finding
       value: Multiple reinforcing loops drive belief rigidity increase of 2-10x per year
   relatedEntries:
-    - id: epistemic-sycophancy
+    - id: zzLBCdjXEw
       type: risk
       relationship: analyzes
-    - id: reality-fragmentation
+    - id: 4Rz7XtP9Uw
       type: risk
       relationship: contributes-to
-    - id: learned-helplessness
+    - id: SFFrl4Pmag
       type: risk
       relationship: leads-to
   tags:
@@ -945,13 +945,13 @@
     - label: Critical Threshold
       value: Detection accuracy approaching random chance (50%) by 2027-2030
   relatedEntries:
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
       relationship: analyzes
-    - id: legal-evidence-crisis
+    - id: 52V4qNAQjw
       type: risk
       relationship: leads-to
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
       relationship: related
   tags:
@@ -977,13 +977,13 @@
     - label: Key Finding
       value: Complete knowledge loss within 15-30 years with high AI use
   relatedEntries:
-    - id: expertise-atrophy
+    - id: ks0lqvZqUg
       type: risk
       relationship: analyzes
-    - id: automation-bias
+    - id: 72cwRMbzMA
       type: risk
       relationship: related
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
       relationship: contributes-to
   tags:
@@ -1009,16 +1009,16 @@
     - label: Critical Threshold
       value: Epistemic health E < 0.35 leads to irreversible collapse
   relatedEntries:
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
       relationship: analyzes
-    - id: trust-cascade
+    - id: IQ4E6VkW9A
       type: risk
       relationship: component
-    - id: reality-fragmentation
+    - id: 4Rz7XtP9Uw
       type: risk
       relationship: component
-    - id: learned-helplessness
+    - id: SFFrl4Pmag
       type: risk
       relationship: outcome
   tags:
@@ -1044,13 +1044,13 @@
     - label: Key Metric
       value: Fragmentation index F projected to reach 0.75-0.85 by 2030
   relatedEntries:
-    - id: reality-fragmentation
+    - id: 4Rz7XtP9Uw
       type: risk
       relationship: analyzes
-    - id: epistemic-sycophancy
+    - id: zzLBCdjXEw
       type: risk
       relationship: mechanism
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
       relationship: leads-to
   tags:
@@ -1078,13 +1078,13 @@
         Individual rationality produces collectively suboptimal outcomes when safety investments reduce competitive
         advantage
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: analyzes
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: outcome
   tags:
@@ -1110,13 +1110,13 @@
     - label: Core Insight
       value: Local optimization plus competitive pressure creates global suboptimality that no individual actor can escape
   relatedEntries:
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: analyzes
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: manifestation
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: outcome
   tags:
@@ -1142,13 +1142,13 @@
     - label: Core Insight
       value: AI exhibits increasing returns and network effects creating extreme concentration
   relatedEntries:
-    - id: winner-take-all
+    - id: YOMDe574Ew
       type: risk
       relationship: analyzes
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: mechanism
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
       relationship: related
   tags:
@@ -1174,16 +1174,16 @@
     - label: Core Insight
       value: AI's cross-domain applicability enables unprecedented positive feedback loops in power accumulation
   relatedEntries:
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: analyzes
-    - id: winner-take-all
+    - id: YOMDe574Ew
       type: risk
       relationship: mechanism
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
       relationship: consequence
-    - id: authoritarian-takeover
+    - id: AV6AJU1FhQ
       type: risk
       relationship: scenario
   tags:
@@ -1209,16 +1209,16 @@
     - label: Core Insight
       value: Certain AI decisions create irreversible path dependencies faster than society can evaluate them
   relatedEntries:
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
       relationship: analyzes
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: mechanism
-    - id: authoritarian-takeover
+    - id: AV6AJU1FhQ
       type: risk
       relationship: scenario
-    - id: irreversibility
+    - id: 7e3rvE5YgA
       type: risk
       relationship: related
   tags:
@@ -1244,16 +1244,16 @@
     - label: Core Insight
       value: AI automation differs from previous transitions in scope, speed, and completeness of displacement
   relatedEntries:
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
       relationship: analyzes
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
       relationship: consequence
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
       relationship: related
-    - id: winner-take-all
+    - id: YOMDe574Ew
       type: risk
       relationship: mechanism
   tags:
@@ -1279,13 +1279,13 @@
     - label: Core Insight
       value: AI capabilities as information goods with near-zero marginal copying cost create unique containment challenges
   relatedEntries:
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
       relationship: analyzes
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -1311,13 +1311,13 @@
     - label: Key Insight
       value: Risks activate at different times based on capability thresholds
   relatedEntries:
-    - id: capability-threshold-model
+    - id: xQzokzppDA
       type: analysis
       relationship: related
-    - id: warning-signs-model
+    - id: QkcqOBokBg
       type: analysis
       relationship: related
-    - id: bioweapons-timeline
+    - id: 8Zg8YYt0zg
       type: analysis
       relationship: related
   tags:
@@ -1342,13 +1342,13 @@
     - label: Key Insight
       value: Many risks have threshold dynamics rather than gradual activation
   relatedEntries:
-    - id: risk-activation-timeline
+    - id: JHK2wwThGA
       type: analysis
       relationship: related
-    - id: warning-signs-model
+    - id: QkcqOBokBg
       type: analysis
       relationship: related
-    - id: scheming-likelihood-model
+    - id: jcOv2Lt2Pg
       type: analysis
       relationship: related
   tags:
@@ -1373,13 +1373,13 @@
     - label: Key Insight
       value: Leading indicators enable proactive response before risks materialize
   relatedEntries:
-    - id: risk-activation-timeline
+    - id: JHK2wwThGA
       type: analysis
       relationship: related
-    - id: capability-threshold-model
+    - id: xQzokzppDA
       type: analysis
       relationship: related
-    - id: scheming-likelihood-model
+    - id: jcOv2Lt2Pg
       type: analysis
       relationship: related
   tags:
@@ -1405,10 +1405,10 @@
     - label: Key Insight
       value: Technology diffusion creates dual-use challenges with limited control points
   relatedEntries:
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
       relationship: related
-    - id: proliferation-risk-model
+    - id: yEMy2noJAw
       type: analysis
       relationship: related
   tags:
@@ -1433,10 +1433,10 @@
     - label: Key Insight
       value: AI scales inauthentic consensus beyond detection capacity
   relatedEntries:
-    - id: consensus-manufacturing
+    - id: gMaUtaXGaw
       type: risk
       relationship: related
-    - id: disinformation-detection-race
+    - id: APP8lU9rZw
       type: analysis
       relationship: related
   tags:
@@ -1461,10 +1461,10 @@
     - label: Key Insight
       value: Reversal costs grow exponentially with time and lock-in depth
   relatedEntries:
-    - id: irreversibility
+    - id: 7e3rvE5YgA
       type: risk
       relationship: related
-    - id: lock-in-model
+    - id: AhDYUZ66ug
       type: analysis
       relationship: related
   tags:
@@ -1489,10 +1489,10 @@
     - label: Key Insight
       value: Preference drift is gradual, cumulative, and often invisible to those experiencing it
   relatedEntries:
-    - id: preference-manipulation
+    - id: eM6SuO5nUw
       type: risk
       relationship: related
-    - id: sycophancy-feedback-loop
+    - id: d6a4HCk56g
       type: analysis
       relationship: related
   tags:
@@ -1517,10 +1517,10 @@
     - label: Key Insight
       value: Trust erodes faster than it builds, with 3-10x asymmetry in speed
   relatedEntries:
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
       relationship: related
-    - id: trust-cascade-model
+    - id: lamh6ngDlg
       type: analysis
       relationship: related
   tags:
@@ -1546,10 +1546,10 @@
     - label: Key Insight
       value: Human-AI calibration failures create self-reinforcing patterns of over-reliance
   relatedEntries:
-    - id: expertise-atrophy
+    - id: ks0lqvZqUg
       type: risk
       relationship: related
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
       relationship: related
   tags:
@@ -1573,10 +1573,10 @@
     - label: Key Insight
       value: AI-generated content can trigger cascading psychological effects in vulnerable populations
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
       relationship: related
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -1600,10 +1600,10 @@
     - label: Key Insight
       value: AI democratizes sophisticated fraud techniques, shifting the capability curve
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
       relationship: related
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -1645,10 +1645,10 @@
     - label: Key Insight
       value: Lab incentives systematically diverge from social optimum under competition
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -1712,7 +1712,7 @@
     - label: Key Insight
       value: Capabilities researchers are the primary talent pool for safety work
   relatedEntries:
-    - id: safety-researcher-gap
+    - id: D7MbTQckMQ
       type: analysis
       relationship: related
   tags:
@@ -1736,10 +1736,10 @@
     - label: Key Insight
       value: Combined risks often exceed the sum of individual risks due to non-linear interactions
   relatedEntries:
-    - id: risk-interaction-matrix
+    - id: 823U6CJUOg
       type: analysis
       relationship: related
-    - id: risk-cascade-pathways
+    - id: Xa9TwOcnZA
       type: analysis
       relationship: related
   tags:
@@ -1783,7 +1783,7 @@
     - label: Key Insight
       value: Institutional adaptation typically lags technology by 5-15 years, creating persistent governance gaps
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1807,10 +1807,10 @@
     - label: Key Insight
       value: International AI coordination faces prisoner's dilemma dynamics with verification challenges
   relatedEntries:
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1874,7 +1874,7 @@
     - label: Key Insight
       value: Public opinion on AI risk follows event-driven cycles with gradual baseline shifts
   relatedEntries:
-    - id: media-policy-feedback-loop
+    - id: 9tyR64KDlw
       type: analysis
       relationship: related
   tags:
@@ -1898,10 +1898,10 @@
     - label: Key Insight
       value: Risks propagate through system interdependencies, often in non-obvious paths
   relatedEntries:
-    - id: compounding-risks-analysis
+    - id: uvscr74oPw
       type: analysis
       relationship: related
-    - id: risk-interaction-network
+    - id: yqx0nbJ4zg
       type: analysis
       relationship: related
   tags:
@@ -1925,10 +1925,10 @@
     - label: Key Insight
       value: Risk network structure reveals critical nodes and amplification pathways
   relatedEntries:
-    - id: risk-cascade-pathways
+    - id: Xa9TwOcnZA
       type: analysis
       relationship: related
-    - id: compounding-risks-analysis
+    - id: uvscr74oPw
       type: analysis
       relationship: related
   tags:
@@ -1952,7 +1952,7 @@
     - label: Key Insight
       value: Some safety measures reduce capabilities while others are complementary; distinguishing is crucial
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1977,16 +1977,16 @@
     - label: Key Insight
       value: The value of acceleration vs. deceleration depends critically on current safety readiness level
   relatedEntries:
-    - id: safety-capability-tradeoff
+    - id: CBUwMaOpbA
       type: analysis
       relationship: related
-    - id: capability-alignment-race
+    - id: CWaxxnWsDg
       type: analysis
       relationship: related
-    - id: intervention-timing-windows
+    - id: 0CW5Kkda3Q
       type: analysis
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -2011,10 +2011,10 @@
     - label: Key Insight
       value: Optimal allocation depends on problem tractability, neglectedness, and time-sensitivity
   relatedEntries:
-    - id: safety-research-value
+    - id: CSqf1iH5Xw
       type: analysis
       relationship: related
-    - id: intervention-effectiveness-matrix
+    - id: llilzxbUQw
       type: analysis
       relationship: related
   tags:
@@ -2038,7 +2038,7 @@
     - label: Key Insight
       value: Safety researcher demand is growing faster than supply, creating widening gaps
   relatedEntries:
-    - id: capabilities-to-safety-pipeline
+    - id: JnL68gw6lA
       type: analysis
       relationship: related
   tags:
@@ -2062,7 +2062,7 @@
     - label: Key Insight
       value: Current incentive structures strongly discourage whistleblowing, creating information asymmetries
   relatedEntries:
-    - id: lab-incentives-model
+    - id: nsm5rm03FQ
       type: analysis
       relationship: related
   tags:
@@ -2089,7 +2089,7 @@
         Epistemic and institutional parameters have highest downstream influence; interventions should target network
         hubs
   relatedEntries:
-    - id: risk-interaction-network
+    - id: yqx0nbJ4zg
       type: analysis
       relationship: related
   tags:
@@ -2116,10 +2116,10 @@
         Current industry sits in racing-dominant equilibrium; transition to safety-competitive requires coordination or
         forcing event
   relatedEntries:
-    - id: lab-incentives-model
+    - id: nsm5rm03FQ
       type: analysis
       relationship: related
-    - id: racing-dynamics-model
+    - id: NtsllJqplA
       type: analysis
       relationship: related
   tags:
@@ -2144,7 +2144,7 @@
     - label: Key Insight
       value: Gap between regulatory capacity and industry capability is widening; crisis-level investment needed
   relatedEntries:
-    - id: institutional-adaptation-speed
+    - id: cJxSLAJRSg
       type: analysis
       relationship: related
   tags:
@@ -2169,10 +2169,10 @@
     - label: Key Insight
       value: Critical zone at 10-30x current capability where techniques become insufficient; alignment valley problem
   relatedEntries:
-    - id: deceptive-alignment-decomposition
+    - id: MKmyyGR3CA
       type: analysis
       relationship: related
-    - id: safety-capability-tradeoff
+    - id: CBUwMaOpbA
       type: analysis
       relationship: related
   tags:
@@ -2199,10 +2199,10 @@
     - label: Key Finding
       value: $700B+ planned capex in 2026 requires $1T annual AI revenue for 10% returns
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: concept
       relationship: related
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -2255,19 +2255,19 @@
     safety, and implications for other organizations planning around AI lab
     scaling. Compute infrastructure absorbs 50-65%, safety gets 1-5%.
   relatedEntries:
-    - id: ai-megaproject-infrastructure
+    - id: p2g2NDKtPQ
       type: analysis
-    - id: safety-spending-at-scale
+    - id: 0aYHpbKEqw
       type: analysis
-    - id: frontier-lab-cost-structure
+    - id: gS4YxcslRg
       type: analysis
-    - id: ai-talent-market-dynamics
+    - id: ENKjvkrc2g
       type: analysis
-    - id: planning-for-frontier-lab-scaling
+    - id: CaNCZXKbig
       type: analysis
-    - id: safety-research-value
+    - id: CSqf1iH5Xw
       type: analysis
-    - id: winner-take-all-concentration
+    - id: Ja9HeRlQ2A
       type: analysis
   tags:
     - capital-deployment
@@ -2291,11 +2291,11 @@
     power constraints, chip supply chains, and the economics of AI-scale
     facilities. Individual campuses cost $10-50B and require 100MW-1GW+ power.
   relatedEntries:
-    - id: pre-tai-capital-deployment
+    - id: oeNG1pEkeg
       type: analysis
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: winner-take-all-concentration
+    - id: Ja9HeRlQ2A
       type: analysis
   tags:
     - data-centers
@@ -2319,13 +2319,13 @@
     what meaningful safety would require. Binding constraint below $10B/year
     is talent pipeline (~1,000 qualified safety researchers globally).
   relatedEntries:
-    - id: pre-tai-capital-deployment
+    - id: oeNG1pEkeg
       type: analysis
-    - id: safety-research-value
+    - id: CSqf1iH5Xw
       type: analysis
-    - id: ai-talent-market-dynamics
+    - id: ENKjvkrc2g
       type: analysis
-    - id: field-building-analysis
+    - id: R07X01PXQA
       type: approach
   tags:
     - safety-funding
@@ -2348,13 +2348,13 @@
     safety priorities. OpenAI burns ~$9B/year on $20B ARR; Anthropic ~$5-7B
     on $9B ARR. Safety receives 1-8% depending on the lab.
   relatedEntries:
-    - id: pre-tai-capital-deployment
+    - id: oeNG1pEkeg
       type: analysis
-    - id: anthropic-valuation
+    - id: HrokCBSmBA
       type: analysis
-    - id: openai-foundation
+    - id: GQuPhNkZbg
       type: organization
-    - id: racing-dynamics-impact
+    - id: QVDRWo8fEA
       type: analysis
   tags:
     - lab-finances
@@ -2376,13 +2376,13 @@
     globally can contribute to frontier AI, with 500-1,000 at the highest level.
     Safety workforce (~2,000-3,500) is an order of magnitude smaller.
   relatedEntries:
-    - id: pre-tai-capital-deployment
+    - id: oeNG1pEkeg
       type: analysis
-    - id: safety-spending-at-scale
+    - id: 0aYHpbKEqw
       type: analysis
-    - id: capabilities-to-safety-pipeline
+    - id: JnL68gw6lA
       type: analysis
-    - id: field-building-analysis
+    - id: R07X01PXQA
       type: approach
   tags:
     - talent
@@ -2405,13 +2405,13 @@
     pre-TAI. The 2025-2028 window is critical because spending patterns are
     being established and pre-IPO accountability mechanisms are still available.
   relatedEntries:
-    - id: pre-tai-capital-deployment
+    - id: oeNG1pEkeg
       type: analysis
-    - id: safety-spending-at-scale
+    - id: 0aYHpbKEqw
       type: analysis
-    - id: openai-foundation
+    - id: GQuPhNkZbg
       type: organization
-    - id: anthropic-investors
+    - id: sKOD0uMVGg
       type: analysis
   tags:
     - strategy
@@ -2433,9 +2433,9 @@
     A quantitative framework for comparing the expected value of different longtermist
     allocations on a common scale using GiveWell-Equivalent Units (GEUs) as the reference.
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: ltff
+    - id: yA12C1KcjQ
       type: organization
   tags:
     - value-comparison
@@ -2456,17 +2456,17 @@
     expenditure approaching $700B in 2026, the shift from training-dominant to
     inference-dominant workloads, and AI coding tool adoption rates.
   relatedEntries:
-    - id: scaling-laws
+    - id: eZJ1oAKS6A
       type: concept
-    - id: projecting-compute-spending
+    - id: cF7VgLKSpg
       type: analysis
-    - id: scaling-debate
+    - id: E2BOiahT9A
       type: concept
-    - id: compute-concentration
+    - id: MvImONf1YA
       type: risk
-    - id: ai-timelines
+    - id: URCXiRsX0w
       type: concept
-    - id: epoch-ai
+    - id: cBPkzcVBBQ
       type: organization
   tags:
     - compute

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntitySlug } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
@@ -161,9 +162,9 @@ function resolveRef(fact: Fact | undefined): { id: string; name: string } | null
   if (!fact) return null;
   if (fact.value.type !== "ref") return null;
   const refId = fact.value.value;
-  const entity = getKBEntity(refId);
+  const entity = getTypedEntityById(refId);
   if (!entity) return null;
-  return { id: entity.id, name: entity.name };
+  return { id: entity.stableId ?? entity.id, name: entity.title };
 }
 
 /** Properties already handled explicitly or not useful for search (URLs/handles). */
@@ -213,9 +214,9 @@ function loadFromLocal(): PersonRow[] {
       if (typeof fields.title === "string") searchParts.push(fields.title);
       if (typeof fields.organization === "string") {
         searchParts.push(fields.organization);
-        const org = getKBEntity(fields.organization);
-        if (org && org.name !== fields.organization) {
-          searchParts.push(org.name);
+        const org = getTypedEntityById(fields.organization);
+        if (org && org.title !== fields.organization) {
+          searchParts.push(org.title);
         }
       }
     }

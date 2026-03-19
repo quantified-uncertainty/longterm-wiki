@@ -22,12 +22,12 @@ export async function checkRefsExist(
   const placeholders = unique.map((id) => sql`${id}`);
   const inList = sql.join(placeholders, sql`, `);
 
-  const rows = await db.execute(
+  const rows = await db.execute<{ id: string }>(
     sql`SELECT ${column} AS id FROM ${table} WHERE ${column} IN (${inList})`
   );
 
   const found = new Set(
-    (rows as unknown as Array<{ id: string }>).map((r) => r.id)
+    rows.map((r) => r.id)
   );
   return unique.filter((id) => !found.has(id));
 }

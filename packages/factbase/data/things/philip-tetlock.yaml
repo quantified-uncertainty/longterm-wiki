@@ -1,11 +1,4 @@
-thing:
-  id: philip-tetlock
-  stableId: BCisPStEdQ
-  type: person
-  name: Philip Tetlock
-  aliases:
-    - "Philip Tetlock (Forecasting Pioneer)"
-  wikiId: E434
+entity: BCisPStEdQ
 facts:
   - id: f_gv0LsY9KoQ
     property: description

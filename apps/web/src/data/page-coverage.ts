@@ -2,7 +2,7 @@
  * Page coverage metrics and citation health data.
  */
 
-import { getDatabase, getPageById } from "./tablebase";
+import { getTableBase, getPageById } from "./tablebase";
 import type { ContentFormat } from "./tablebase";
 import type { ValidSubcategory } from "./valid-subcategories";
 
@@ -45,7 +45,7 @@ export interface PageCoverageItem {
   sectionCount: number;
   unconvertedLinkCount: number;
   // Boolean items
-  llmSummary: boolean;
+  summary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
@@ -77,7 +77,7 @@ export interface PageCoverageItem {
 }
 
 export function getPageCoverageItems(): PageCoverageItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pages = db.pages || [];
   const items: PageCoverageItem[] = [];
 
@@ -126,7 +126,7 @@ export function getPageCoverageItems(): PageCoverageItem[] {
       sectionCount: page.metrics?.sectionCount ?? 0,
       unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
       // Booleans
-      llmSummary: cov.items.llmSummary === "green",
+      summary: cov.items.summary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",

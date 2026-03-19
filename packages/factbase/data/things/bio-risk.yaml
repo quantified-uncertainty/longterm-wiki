@@ -1,9 +1,4 @@
-thing:
-  id: bio-risk
-  stableId: kZQP3vYrXA
-  type: risk
-  name: AI-Enabled Biological Risks
-  wikiId: E40
+entity: kZQP3vYrXA
 facts:
   - id: f_omvSZltcdg
     property: description

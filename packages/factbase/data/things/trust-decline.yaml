@@ -1,9 +1,4 @@
-thing:
-  id: trust-decline
-  stableId: 1NWLygwzGw
-  type: risk
-  name: AI-Driven Trust Decline
-  wikiId: E362
+entity: 1NWLygwzGw
 facts:
   - id: f_7lKP6cDdzA
     property: description

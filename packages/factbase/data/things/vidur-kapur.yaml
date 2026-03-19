@@ -1,9 +1,4 @@
-thing:
-  id: vidur-kapur
-  stableId: XqvdX3YisQ
-  type: person
-  name: Vidur Kapur
-  wikiId: E580
+entity: XqvdX3YisQ
 facts:
   - id: f_JqWDigPJnQ
     property: description

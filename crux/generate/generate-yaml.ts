@@ -177,7 +177,7 @@ function normalizeTopic(topic: string): string {
     'Primary Source of AI Catastrophic Risk': 'primary-risk-source',
     'How Difficult is Alignment?': 'alignment-difficulty',
   };
-  return mappings[topic] || topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return mappings[topic] || topic.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
 function normalizeOrgName(name: string | undefined): string | undefined {
@@ -192,7 +192,7 @@ function normalizeOrgName(name: string | undefined): string | undefined {
     'Alignment Research Center (ARC)': 'arc',
     'ARC': 'arc',
   };
-  return mappings[name] || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return mappings[name] || name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
 function parseKnownFor(knownFor: string | string[] | undefined): string[] | undefined {
@@ -241,6 +241,8 @@ function transformEstimates(rawEstimates: RawEstimate[]): TransformedEstimate[] 
 
 function normalizeEstimateVariable(variable: string): string {
   return variable
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')

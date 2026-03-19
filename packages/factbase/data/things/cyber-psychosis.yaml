@@ -1,9 +1,4 @@
-thing:
-  id: cyber-psychosis
-  stableId: lD6bPNfEEg
-  type: risk
-  name: AI-Induced Cyber Psychosis
-  wikiId: E83
+entity: lD6bPNfEEg
 facts:
   - id: f_ShaH1A9hAg
     property: description

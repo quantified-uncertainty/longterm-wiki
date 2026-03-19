@@ -1,9 +1,4 @@
-thing:
-  id: lighthaven
-  stableId: 7E2ylGl7Ug
-  type: organization
-  name: Lighthaven (Event Venue)
-  wikiId: E539
+entity: 7E2ylGl7Ug
 facts:
   - id: f_VOFvbODcSA
     property: description

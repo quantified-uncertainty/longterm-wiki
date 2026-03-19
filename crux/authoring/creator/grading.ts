@@ -27,7 +27,7 @@ interface GradingResult {
   readerImportance: number;
   tacticalValue?: number;
   ratings: GradingRatings;
-  llmSummary?: string;
+  summary?: string;
   balanceFlags?: string[];
   reasoning?: string;
 }
@@ -39,7 +39,7 @@ interface Frontmatter {
   tacticalValue?: number;
   ratings?: GradingRatings;
   quality?: number;
-  llmSummary?: string;
+  summary?: string;
   balanceFlags?: string[];
   metrics?: {
     wordCount: number;
@@ -56,7 +56,7 @@ const GRADING_SYSTEM_PROMPT = [
   '- readerImportance (0-100): How significant for understanding AI risk',
   '- tacticalValue (0-100): How time-sensitive and news-relevant this topic is — how much its content needs updating as events unfold',
   '- quality dimensions (0-10 each): novelty, rigor, actionability, completeness',
-  '- llmSummary: 1-2 sentence summary with key conclusions',
+  '- summary: 1-2 sentence summary with key conclusions',
   '- balanceFlags: Array of any balance/bias issues detected (see below)',
   '',
   'Be harsh but fair. Typical wiki content scores 3-5 on quality dimensions. 7+ is exceptional.',
@@ -83,7 +83,7 @@ const GRADING_SYSTEM_PROMPT = [
   'Respond with valid JSON only.',
 ].join('\n');
 
-export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; readerImportance?: number; tacticalValue?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
+export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; readerImportance?: number; tacticalValue?: number; quality?: number; ratings?: GradingRatings; summary?: string }> {
   log('grade', 'Running quality grading on temp file...');
 
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
@@ -143,7 +143,7 @@ Respond with JSON:
     "actionability": <0-10>,
     "completeness": <0-10>
   },
-  "llmSummary": "<1-2 sentences with conclusions>",
+  "summary": "<1-2 sentences with conclusions>",
   "balanceFlags": ["<flag-id>", ...] or [] if none,
   "reasoning": "<brief explanation>"
 }`;
@@ -190,7 +190,7 @@ Respond with JSON:
     }
     frontmatter.ratings = grades.ratings;
     frontmatter.quality = quality;
-    frontmatter.llmSummary = grades.llmSummary;
+    frontmatter.summary = grades.summary;
     if (balanceFlags.length > 0) {
       frontmatter.balanceFlags = balanceFlags;
     }
@@ -223,7 +223,7 @@ Respond with JSON:
     });
 
     log('grade', `Graded: readerImp=${grades.readerImportance}, qual=${quality}`);
-    log('grade', `  Summary: ${grades.llmSummary?.slice(0, 100)}...`);
+    log('grade', `  Summary: ${grades.summary?.slice(0, 100)}...`);
 
     return {
       success: true,
@@ -231,7 +231,7 @@ Respond with JSON:
       tacticalValue: grades.tacticalValue,
       quality,
       ratings: grades.ratings,
-      llmSummary: grades.llmSummary
+      summary: grades.summary
     };
 
   } catch (err: unknown) {

@@ -4,7 +4,7 @@ import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
 import { sessions, sessionPages } from "../../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery } from "../shared/utils.js";
+import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery, dbError } from "../shared/utils.js";
 import {
   CreateSessionSchema as SharedCreateSessionSchema,
   CreateSessionBatchSchema,
@@ -168,42 +168,47 @@ const sessionsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    const result = await db.transaction(async (tx) => {
-      const rows = await tx
-        .insert(sessions)
-        .values(sessionValues(d))
-        .onConflictDoUpdate({
-          target: [sessions.date, sessions.title],
-          set: sessionConflictSet,
-        })
-        .returning({
-          id: sessions.id,
-          date: sessions.date,
-          title: sessions.title,
-          createdAt: sessions.createdAt,
-        });
+    let result;
+    try {
+      result = await db.transaction(async (tx) => {
+        const rows = await tx
+          .insert(sessions)
+          .values(sessionValues(d))
+          .onConflictDoUpdate({
+            target: [sessions.date, sessions.title],
+            set: sessionConflictSet,
+          })
+          .returning({
+            id: sessions.id,
+            date: sessions.date,
+            title: sessions.title,
+            createdAt: sessions.createdAt,
+          });
 
-      const session = firstOrThrow(rows, "session upsert");
+        const session = firstOrThrow(rows, "session upsert");
 
-      // Replace page associations: delete old, insert new
-      await tx
-        .delete(sessionPages)
-        .where(eq(sessionPages.sessionId, session.id));
-
-      if (d.pages.length > 0) {
-        // Phase 4a: resolve page slugs to integer IDs for dual-write
-        const intIdMap = await resolvePageIntIds(tx, d.pages);
+        // Replace page associations: delete old, insert new
         await tx
-          .insert(sessionPages)
-          .values(d.pages.map((pageId) => ({
-            sessionId: session.id,
-            pageId,
-            pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
-          })));
-      }
+          .delete(sessionPages)
+          .where(eq(sessionPages.sessionId, session.id));
 
-      return { ...session, pages: d.pages };
-    });
+        if (d.pages.length > 0) {
+          // Phase 4a: resolve page slugs to integer IDs for dual-write
+          const intIdMap = await resolvePageIntIds(tx, d.pages);
+          await tx
+            .insert(sessionPages)
+            .values(d.pages.map((pageId) => ({
+              sessionId: session.id,
+              pageId,
+              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+            })));
+        }
+
+        return { ...session, pages: d.pages };
+      });
+    } catch (err) {
+      return dbError(c, "session create", err, { title: d.title });
+    }
 
     return c.json(result, 201);
   })
@@ -218,51 +223,56 @@ const sessionsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const results = await db.transaction(async (tx) => {
-      // Phase 4a: pre-collect all page IDs and resolve in one batch query
-      const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
-      const intIdMap = allPageIds.length > 0
-        ? await resolvePageIntIds(tx, allPageIds)
-        : new Map<string, number>();
+    let results;
+    try {
+      results = await db.transaction(async (tx) => {
+        // Phase 4a: pre-collect all page IDs and resolve in one batch query
+        const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
+        const intIdMap = allPageIds.length > 0
+          ? await resolvePageIntIds(tx, allPageIds)
+          : new Map<string, number>();
 
-      const created: Array<{ id: number; title: string; pageCount: number }> = [];
+        const created: Array<{ id: number; title: string; pageCount: number }> = [];
 
-      for (const d of items) {
-        const rows = await tx
-          .insert(sessions)
-          .values(sessionValues(d))
-          .onConflictDoUpdate({
-            target: [sessions.date, sessions.title],
-            set: sessionConflictSet,
-          })
-          .returning({ id: sessions.id, title: sessions.title });
+        for (const d of items) {
+          const rows = await tx
+            .insert(sessions)
+            .values(sessionValues(d))
+            .onConflictDoUpdate({
+              target: [sessions.date, sessions.title],
+              set: sessionConflictSet,
+            })
+            .returning({ id: sessions.id, title: sessions.title });
 
-        const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
+          const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
 
-        // Replace page associations: delete old, insert new
-        await tx
-          .delete(sessionPages)
-          .where(eq(sessionPages.sessionId, session.id));
-
-        if (d.pages.length > 0) {
+          // Replace page associations: delete old, insert new
           await tx
-            .insert(sessionPages)
-            .values(d.pages.map((pageId) => ({
-              sessionId: session.id,
-              pageId,
-              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
-            })));
+            .delete(sessionPages)
+            .where(eq(sessionPages.sessionId, session.id));
+
+          if (d.pages.length > 0) {
+            await tx
+              .insert(sessionPages)
+              .values(d.pages.map((pageId) => ({
+                sessionId: session.id,
+                pageId,
+                pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+              })));
+          }
+
+          created.push({
+            id: session.id,
+            title: session.title,
+            pageCount: d.pages.length,
+          });
         }
 
-        created.push({
-          id: session.id,
-          title: session.title,
-          pageCount: d.pages.length,
-        });
-      }
-
-      return created;
-    });
+        return created;
+      });
+    } catch (err) {
+      return dbError(c, "session batch", err, { itemCount: items.length });
+    }
 
     return c.json({ upserted: results.length, results }, 201);
   })

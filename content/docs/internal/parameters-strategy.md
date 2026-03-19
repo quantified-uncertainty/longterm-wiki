@@ -6,7 +6,7 @@ subcategory: research
 pageType: documentation
 lastEdited: 2026-02-17
 update_frequency: 90
-llmSummary: Internal project management document providing implementation instructions for creating parameter pages in a knowledge base. Outlines workflow, templates, and batch assignments for parallel development work.
+summary: Internal project management document providing implementation instructions for creating parameter pages in a knowledge base. Outlines workflow, templates, and batch assignments for parallel development work.
 ---
 # Key Parameters Implementation Strategy
 
@@ -81,7 +81,7 @@ description: "One sentence describing the parameter. Currently [trend]: [key sta
 sidebar:
   order: [next number]
 quality: 4
-llmSummary: "2-3 sentence summary for AI context. Include key statistics and the main factors that increase/decrease this parameter."
+summary: "2-3 sentence summary for AI context. Include key statistics and the main factors that increase/decrease this parameter."
 lastEdited: "2025-12-28"
 ---
 import {DataInfoBox, Mermaid, R} from '@components/wiki';
@@ -459,7 +459,7 @@ Before marking a parameter complete, verify:
 - [ ] At least one Mermaid diagram
 - [ ] At least 2 data tables
 - [ ] Quality rating of 4 or higher
-- [ ] llmSummary in frontmatter
+- [ ] summary in frontmatter
 - [ ] lastEdited date is current
 - [ ] All `$` signs escaped as `\$` in content
 - [ ] `npm run validate` passes

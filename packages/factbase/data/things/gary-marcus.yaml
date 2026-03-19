@@ -1,9 +1,4 @@
-thing:
-  id: gary-marcus
-  stableId: ILx7EzDqXQ
-  type: person
-  name: Gary Marcus
-  wikiId: E148
+entity: ILx7EzDqXQ
 facts:
   - id: f_zftBN1DOUQ
     property: description

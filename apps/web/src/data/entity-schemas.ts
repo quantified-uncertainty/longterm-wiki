@@ -32,6 +32,7 @@ const CustomField = z.object({
 
 const BaseEntity = z.object({
   id: z.string(),
+  stableId: z.string().optional(), // 10-char stable identifier for cross-system references
   title: z.string(),
   description: z.string().optional(),
   tags: z.array(z.string()).default([]),
@@ -147,6 +148,8 @@ const PolicyStakeholder = z.object({
   position: z.enum(["support", "oppose", "neutral", "mixed"]),
   reason: z.string().optional(),
   source: z.string().optional(),
+  /** Short notes on funding, affiliations, and connections to other stakeholders */
+  context: z.array(z.string()).optional(),
 });
 
 const PolicyProvision = z.object({
@@ -162,12 +165,17 @@ const PolicyVote = z.object({
   ayes: z.number().optional(),
   noes: z.number().optional(),
   abstain: z.number().optional(),
+  ayesDem: z.number().optional(),
+  ayesRep: z.number().optional(),
+  noesDem: z.number().optional(),
+  noesRep: z.number().optional(),
 });
 
 const PolicyAmendment = z.object({
   date: z.string(),
   description: z.string(),
   author: z.string().optional(),
+  url: z.string().optional(),
 });
 
 const PolicyEntitySchema = BaseEntity.extend({

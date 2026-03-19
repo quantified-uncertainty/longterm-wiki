@@ -1,9 +1,4 @@
-thing:
-  id: rogue-ai-scenarios
-  stableId: jfSHBPsKiA
-  type: risk
-  name: Rogue AI Scenarios
-  wikiId: E490
+entity: jfSHBPsKiA
 facts:
   - id: f_zXOHP7cdgw
     property: description

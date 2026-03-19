@@ -1,13 +1,4 @@
-thing:
-  id: geoffrey-hinton
-  stableId: 5N5UqXNkkg
-  type: person
-  name: "Geoffrey Hinton"
-  wikiId: "E149"
-  aliases:
-    - "Geoff Hinton"
-    - "Godfather of Deep Learning"
-
+entity: 5N5UqXNkkg
 facts:
   - id: f_CQptGEFesw
     property: employed-by

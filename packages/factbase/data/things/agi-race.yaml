@@ -1,9 +1,4 @@
-thing:
-  id: agi-race
-  stableId: QVsRgOaeUw
-  type: concept
-  name: AGI Race
-  wikiId: E3
+entity: QVsRgOaeUw
 facts:
   - id: f_eZDUSUGW6Q
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: metaforecast
-  stableId: 1tpQRlyyIQ
-  type: project
-  name: Metaforecast
-  wikiId: E200
+entity: 1tpQRlyyIQ
 facts:
   - id: f_3cJPlhlDBA
     property: description

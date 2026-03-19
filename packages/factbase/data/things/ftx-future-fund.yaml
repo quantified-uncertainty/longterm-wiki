@@ -1,9 +1,4 @@
-thing:
-  id: ftx-future-fund
-  stableId: JhIGCaI3Ng
-  type: organization
-  name: FTX Future Fund
-  wikiId: E855
+entity: JhIGCaI3Ng
 facts:
   - id: f_e6sqIlWDIQ
     property: description

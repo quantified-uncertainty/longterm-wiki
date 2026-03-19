@@ -1,9 +1,4 @@
-thing:
-  id: epistemic-sycophancy
-  stableId: zzLBCdjXEw
-  type: risk
-  name: Epistemic Sycophancy
-  wikiId: E124
+entity: zzLBCdjXEw
 facts:
   - id: f_N1toqonxxQ
     property: description

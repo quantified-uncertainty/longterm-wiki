@@ -1,10 +1,4 @@
-thing:
-  id: manifund
-  stableId: fFVOuFZCRf
-  type: organization
-  name: "Manifund"
-  wikiId: E547
-
+entity: fFVOuFZCRf
 facts:
   - id: f_9cmhuAHFrA
     property: total-funding

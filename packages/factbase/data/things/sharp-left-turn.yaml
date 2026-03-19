@@ -1,9 +1,4 @@
-thing:
-  id: sharp-left-turn
-  stableId: AMhUctK34Q
-  type: risk
-  name: Sharp Left Turn
-  wikiId: E281
+entity: AMhUctK34Q
 facts:
   - id: f_RnEBdisK9g
     property: description

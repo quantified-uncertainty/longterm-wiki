@@ -1,9 +1,4 @@
-thing:
-  id: adversarial-robustness
-  stableId: gWxL0U06oQ
-  type: concept
-  name: Adversarial Robustness
-  wikiId: E1
+entity: gWxL0U06oQ
 facts:
   - id: f_eOvbg9l9YQ
     property: description

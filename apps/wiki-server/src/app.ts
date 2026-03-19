@@ -23,6 +23,7 @@ import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
 import { recordVerificationsRoute } from "./routes/tablebase/record-verifications.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
+import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
 import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
 
 // FactBase routes — structured triples with temporal data
@@ -188,6 +189,7 @@ export function createApp() {
   // Cross-Base: unified things index
   app.route("/api/things", thingsRoute);
   app.route("/api/research-areas", researchAreasRoute);
+  app.route("/api/policy-stakeholders", policyStakeholdersRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);

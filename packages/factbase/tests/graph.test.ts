@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import type { Graph } from "../src/graph";
+import { Graph } from "../src/graph";
 import { loadTestKB } from "./test-helpers";
 
 describe("graph", () => {
@@ -224,5 +224,114 @@ describe("graph", () => {
     it("getSchema returns undefined for missing schema", () => {
       expect(graph.getSchema("nonexistent")).toBeUndefined();
     });
+  });
+
+  describe("previousIds resolution", () => {
+    it("resolves CAIS old stableId to current entity", () => {
+      // center-for-ai-safety was oa9A0OV0RX, now y4bieqSeag
+      const entity = graph.getEntity("oa9A0OV0RX");
+      expect(entity).toBeDefined();
+      expect(entity!.id).toBe("y4bieqSeag");
+      expect(entity!.name).toBe("Center for AI Safety");
+    });
+
+    it("resolves SFF old stableId to current entity", () => {
+      // survival-and-flourishing-fund was sIFjGbxVct, now pvJ50HupEQ
+      const entity = graph.getEntity("sIFjGbxVct");
+      expect(entity).toBeDefined();
+      expect(entity!.id).toBe("pvJ50HupEQ");
+      expect(entity!.name).toBe("Survival and Flourishing Fund");
+    });
+
+    it("still resolves current IDs directly", () => {
+      const cais = graph.getEntity("y4bieqSeag");
+      expect(cais).toBeDefined();
+      expect(cais!.name).toBe("Center for AI Safety");
+
+      const sff = graph.getEntity("pvJ50HupEQ");
+      expect(sff).toBeDefined();
+      expect(sff!.name).toBe("Survival and Flourishing Fund");
+    });
+  });
+});
+
+describe("Graph previousIds (unit)", () => {
+  it("resolves previousId to the entity", () => {
+    const g = new Graph();
+    g.addEntity({
+      id: "currentId01",
+      stableId: "currentId01",
+      type: "organization",
+      name: "Test Org",
+      previousIds: ["oldId00001"],
+    });
+
+    const byOld = g.getEntity("oldId00001");
+    expect(byOld).toBeDefined();
+    expect(byOld!.id).toBe("currentId01");
+    expect(byOld!.name).toBe("Test Org");
+  });
+
+  it("prefers primary ID over previousId alias", () => {
+    const g = new Graph();
+    g.addEntity({
+      id: "entityAAAA",
+      stableId: "entityAAAA",
+      type: "organization",
+      name: "Entity A",
+      previousIds: ["entityBBBB"],
+    });
+    g.addEntity({
+      id: "entityBBBB",
+      stableId: "entityBBBB",
+      type: "organization",
+      name: "Entity B",
+    });
+
+    // entityBBBB should resolve to Entity B (primary), not Entity A (previousId)
+    const result = g.getEntity("entityBBBB");
+    expect(result).toBeDefined();
+    expect(result!.name).toBe("Entity B");
+  });
+
+  it("returns undefined for unknown ID", () => {
+    const g = new Graph();
+    g.addEntity({
+      id: "entityAAAA",
+      stableId: "entityAAAA",
+      type: "organization",
+      name: "Entity A",
+    });
+
+    expect(g.getEntity("nonexistent")).toBeUndefined();
+  });
+
+  it("handles entity with no previousIds", () => {
+    const g = new Graph();
+    g.addEntity({
+      id: "entityAAAA",
+      stableId: "entityAAAA",
+      type: "organization",
+      name: "Entity A",
+    });
+
+    const result = g.getEntity("entityAAAA");
+    expect(result).toBeDefined();
+    expect(result!.name).toBe("Entity A");
+  });
+
+  it("handles multiple previousIds on one entity", () => {
+    const g = new Graph();
+    g.addEntity({
+      id: "currentId01",
+      stableId: "currentId01",
+      type: "organization",
+      name: "Test Org",
+      previousIds: ["oldId00001", "oldId00002"],
+    });
+
+    expect(g.getEntity("oldId00001")?.id).toBe("currentId01");
+    expect(g.getEntity("oldId00002")?.id).toBe("currentId01");
+    expect(g.getEntity("currentId01")?.id).toBe("currentId01");
   });
 });

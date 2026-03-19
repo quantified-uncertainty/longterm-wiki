@@ -7,7 +7,6 @@ import {
   getKBLatest,
   getKBFacts,
   getKBProperty,
-  getKBEntity,
   getKBEntities,
   getKBAllRecordCollections,
   resolveKBSlug,
@@ -20,6 +19,7 @@ import {
   getTypedEntityById,
   getTypedEntities,
   isOrganization,
+  isPerson,
   isAiModel,
   getAllResources,
   getResourcesForPage,
@@ -36,7 +36,7 @@ import {
   titleCase,
   sortKBRecords,
 } from "@/components/wiki/factbase/format";
-import { resolveRecipient } from "./org-shared";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
 
@@ -323,7 +323,7 @@ export function computeStakeValue(
 export function parseGrantRecord(record: KBRecordEntry): ParsedGrantRecord {
   const f = record.fields;
   const recipientId = (f.recipient as string) ?? null;
-  const resolved = recipientId ? resolveRecipient(recipientId) : { name: "", href: null };
+  const resolved = recipientId ? resolveEntityName(recipientId, record.displayName) : { name: "", href: null };
   return {
     key: record.key,
     name: (f.name as string) ?? record.key,
@@ -726,15 +726,25 @@ let _personNameIndex: Map<string, string> | null = null;
 function getPersonNameIndex(): Map<string, string> {
   if (_personNameIndex) return _personNameIndex;
   _personNameIndex = new Map();
+  // Primary: index from TableBase typed entities
+  for (const entity of getTypedEntities()) {
+    if (!isPerson(entity)) continue;
+    _personNameIndex.set(entity.title.toLowerCase(), entity.id);
+  }
+  // Also include FactBase entities for aliases (TableBase doesn't have aliases)
   for (const entity of getKBEntities()) {
     if (entity.type !== "person") continue;
     const slug = getKBEntitySlug(entity.id);
     if (!slug) continue;
-    _personNameIndex.set(entity.name.toLowerCase(), slug);
-    // Also index aliases
+    // Don't overwrite TableBase entries, just fill in missing names
+    if (!_personNameIndex.has(entity.name.toLowerCase())) {
+      _personNameIndex.set(entity.name.toLowerCase(), slug);
+    }
     if (entity.aliases) {
       for (const alias of entity.aliases) {
-        _personNameIndex.set(alias.toLowerCase(), slug);
+        if (!_personNameIndex.has(alias.toLowerCase())) {
+          _personNameIndex.set(alias.toLowerCase(), slug);
+        }
       }
     }
   }
@@ -1052,11 +1062,11 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     })
     .map((r) => {
       const parsed = parseGrantRecord(r);
-      const funderEntity = getKBEntity(r.ownerEntityId);
-      const funderSlug = funderEntity ? getKBEntitySlug(r.ownerEntityId) : null;
+      const funderEntity = getTypedEntityById(r.ownerEntityId);
+      const funderSlug = funderEntity?.id ?? null;
       return {
         ...parsed,
-        funderName: funderEntity?.name ?? r.ownerEntityId,
+        funderName: funderEntity?.title ?? r.ownerEntityId,
         funderHref: funderSlug ? `/organizations/${funderSlug}` : null,
         funderSlug: funderSlug ?? null,
       };
@@ -1089,10 +1099,9 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((parsed) => {
       // Resolve lead slug/stableId to human-readable name
       if (parsed.lead) {
-        // Try KB entity resolution first (handles both slugs and stableIds)
-        const entityId = resolveKBSlug(parsed.lead);
-        const leadEntity = entityId ? getKBEntity(entityId) : getKBEntity(parsed.lead);
-        parsed.lead = leadEntity?.name ?? titleCase(parsed.lead.replace(/-/g, " "));
+        // Try TableBase entity resolution (handles slugs, E-numbers, and stableIds)
+        const leadEntity = getTypedEntityById(parsed.lead);
+        parsed.lead = leadEntity?.title ?? titleCase(parsed.lead.replace(/-/g, " "));
       }
       return parsed;
     })
@@ -1116,7 +1125,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parsePersonnelRecord(r);
       const resolved = parsed.personId
-        ? resolveRecipient(parsed.personId)
+        ? resolveEntityName(parsed.personId, r.displayName)
         : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
       return {
         ...parsed,
@@ -1139,7 +1148,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseFundingRoundRecord(r);
       const resolved = parsed.leadInvestor
-        ? resolveRecipient(parsed.leadInvestor)
+        ? resolveEntityName(parsed.leadInvestor, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1160,7 +1169,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseInvestmentRecord(r);
       const resolved = parsed.investorId
-        ? resolveRecipient(parsed.investorId)
+        ? resolveEntityName(parsed.investorId, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1176,7 +1185,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseEquityPositionRecord(r);
       const resolved = parsed.holderId
-        ? resolveRecipient(parsed.holderId)
+        ? resolveEntityName(parsed.holderId, r.displayName)
         : { name: "", href: null };
       return {
         ...parsed,
@@ -1196,7 +1205,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     .map((r) => {
       const parsed = parseBoardSeatRecord(r);
       const resolved = parsed.personId
-        ? resolveRecipient(parsed.personId)
+        ? resolveEntityName(parsed.personId, r.displayName)
         : { name: titleCase(r.key.replace(/-/g, " ")), href: null };
       return {
         ...parsed,
@@ -1222,13 +1231,13 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     const partnerRef = sp.fields.partner != null ? String(sp.fields.partner) : undefined;
     if (!partnerRef) continue;
     const partnerEntityId = resolveKBSlug(partnerRef);
-    const partnerEntity = partnerEntityId ? getKBEntity(partnerEntityId) : null;
-    if (partnerEntity && partnerEntity.type === "organization" && partnerEntity.id !== entity.id && !seenOrgIds.has(partnerEntity.id)) {
+    const partnerEntity = partnerEntityId ? getTypedEntityById(partnerEntityId) : null;
+    if (partnerEntity && partnerEntity.entityType === "organization" && partnerEntity.id !== entity.id && !seenOrgIds.has(partnerEntity.id)) {
       seenOrgIds.add(partnerEntity.id);
       relatedOrgs.push({
         id: partnerEntity.id,
-        name: partnerEntity.name,
-        slug: getKBEntitySlug(partnerEntity.id) ?? null,
+        name: partnerEntity.title,
+        slug: partnerEntity.id,
         relationship: sp.fields.type != null ? String(sp.fields.type) : "Partner",
         date: sp.fields.date != null ? String(sp.fields.date) : null,
       });
@@ -1238,13 +1247,13 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   // From grants made — unique recipient orgs (excluding self)
   for (const g of grantsMade) {
     if (!g.recipient) continue;
-    const recipEntity = getKBEntity(g.recipient);
-    if (recipEntity && recipEntity.type === "organization" && recipEntity.id !== entity.id && !seenOrgIds.has(recipEntity.id)) {
+    const recipEntity = getTypedEntityById(g.recipient);
+    if (recipEntity && recipEntity.entityType === "organization" && recipEntity.id !== entity.id && !seenOrgIds.has(recipEntity.id)) {
       seenOrgIds.add(recipEntity.id);
       relatedOrgs.push({
         id: recipEntity.id,
-        name: recipEntity.name,
-        slug: getKBEntitySlug(recipEntity.id) ?? null,
+        name: recipEntity.title,
+        slug: recipEntity.id,
         relationship: "Grantee",
         date: g.date,
       });
@@ -1283,11 +1292,11 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
     for (const ref of foundedByFact.value.value) {
       const refStr = String(ref);
-      const resolved = resolveRecipient(refStr);
+      const resolved = resolveEntityName(refStr);
       founders.push(resolved);
     }
   } else if (foundedByFact?.value.type === "ref") {
-    const resolved = resolveRecipient(foundedByFact.value.value);
+    const resolved = resolveEntityName(foundedByFact.value.value);
     founders.push(resolved);
   }
 
@@ -1333,13 +1342,13 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const divisionLeadResolved = new Map<string, { name: string; href: string | null }>();
   for (const d of divisions) {
     if (d.lead) {
-      const leadEntityId = resolveKBSlug(d.lead);
-      const leadEntity = leadEntityId ? getKBEntity(leadEntityId) : null;
+      // Try TableBase directly (handles slugs, stableIds, E-numbers)
+      const leadEntity = getTypedEntityById(d.lead);
       if (leadEntity) {
-        const leadSlug = getKBEntitySlug(leadEntityId!);
+        const slug = leadEntity.id;
         divisionLeadResolved.set(d.key, {
-          name: leadEntity.name,
-          href: leadSlug && leadEntity.type === "person" ? `/people/${leadSlug}` : `/factbase/entity/${leadEntityId}`,
+          name: leadEntity.title,
+          href: leadEntity.entityType === "person" ? `/people/${slug}` : (leadEntity.wikiId ? `/wiki/${leadEntity.wikiId}` : null),
         });
       } else {
         divisionLeadResolved.set(d.key, { name: d.lead, href: null });

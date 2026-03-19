@@ -16,7 +16,7 @@ import {
   isUrl,
   shortDomain,
 } from "@/components/wiki/factbase/format";
-import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
+import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { STATUS_COLORS } from "@/app/grants/grants-constants";
 import {
   parseGrantDetail,
@@ -25,22 +25,11 @@ import {
   RelatedGrantsSection,
 } from "@/app/grants/grant-shared";
 
-// ── Static params ─────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  const allGrants = getAllKBRecords("grants");
-  const orgSlugs = getOrgSlugs();
-  const orgSlugSet = new Set(orgSlugs);
-
-  const params: { slug: string; grantId: string }[] = [];
-  for (const record of allGrants) {
-    const funderSlug = getKBEntitySlug(record.ownerEntityId);
-    if (funderSlug && orgSlugSet.has(funderSlug)) {
-      params.push({ slug: funderSlug, grantId: record.key });
-    }
-  }
-  return params;
-}
+// ── Rendering strategy ────────────────────────────────────────────────
+// Dynamic rendering with ISR — these detail pages are low-traffic and
+// pre-rendering all ~3500 grant×org combinations added ~15 min to builds.
+export const dynamicParams = true;
+export const revalidate = 3600; // 1 hour
 
 // ── Metadata ───────────────────────────────────────────────────────────
 
@@ -60,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const grant = parseGrantDetail(record);
   const org = resolveOrgBySlug(slug);
-  const orgName = org?.name ?? slug;
+  const orgName = org?.title ?? slug;
   const parts = [grant.name];
   if (grant.amount) parts.push(formatCompactCurrency(grant.amount));
 

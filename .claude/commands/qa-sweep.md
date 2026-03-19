@@ -213,13 +213,50 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 [Bullet list of areas checked and found clean]
 ```
 
-## Phase 4: Act on findings
+## Phase 4: File issues and persist the report
+
+### Issue filing — MANDATORY for all confirmed findings
+
+**QA sweeps override the normal conservative filing limits.** The whole purpose of a sweep is to find and file issues. Rules:
+
+- **File one GitHub issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
+- Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
+- Use `pnpm crux issues create` with `--model=haiku` for each.
+- **Expected volume:** 5-15 issues per deep sweep is normal. The daily cap of 5 from `proactive-github-filing.md` does NOT apply to QA sweeps.
+- Label all issues with the appropriate severity label if available.
+- **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue. If you compiled it into the report, file it.
+
+### Persist the full report to a GitHub Discussion
+
+After filing issues, post the **complete** Phase 3 report as a comment on a standing QA Sweep discussion. This creates a searchable archive of all sweep results over time.
+
+```bash
+# First run: create the discussion
+pnpm crux epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
+
+# Every run: post the report as a comment
+pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
+## QA Sweep — [DATE]
+### Focus: [focus] | Depth: [depth]
+[Full report here — copy the entire Phase 3 output]
+
+### Issues filed
+- #N: title
+- #N: title
+...
+REPORT
+)"
+```
+
+**To find the discussion number:** Search for "QA Sweep Reports" in discussions, or check the QA sweep discussion number stored in `.claude/memory/` if a previous sweep saved it. If no discussion exists yet, create one.
+
+### Fix P0s
 
 | Severity | Action |
 |----------|--------|
 | **P0** (active bug) | Fix it now in a branch, open a PR |
-| **P1** (latent bug) | File a GitHub issue with `pnpm crux issues create` |
-| **P2** (quality/UX) | File an issue if actionable, otherwise note in report |
+| **P1** (latent bug) | File a GitHub issue (already done above) |
+| **P2** (quality/UX) | File a GitHub issue (already done above) |
 
 After fixing P0s, run `/push-and-ensure-green` to ship.
 
@@ -227,8 +264,8 @@ After fixing P0s, run `/push-and-ensure-green` to ship.
 
 - **Do not fix P1/P2 issues during the sweep** unless they are one-line changes. File issues instead.
 - **Evidence over impressions.** Every finding must reference a specific file, line, or URL.
-- **Limit scope.** If you find >30 issues, report the top 15 by severity and batch the rest into an umbrella issue.
 - **No false positives.** Only report issues you have confirmed by fetching the actual page or reading the actual code.
 - **Prioritize recent changes.** Areas changed in the last 48 hours get 3x the attention.
 - **Time box.** Quick: ~5 min. Standard: ~10 min. Deep: ~30 min. Exhaustive: ~60 min.
 - **Parallelize aggressively.** Launch all independent agents in a single message. The subscription model means agent count is free — use it.
+- **File generously.** If you found it and confirmed it, file it. Do not leave confirmed issues unfiled just because they're P2.

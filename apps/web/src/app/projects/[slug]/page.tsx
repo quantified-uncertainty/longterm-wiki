@@ -8,7 +8,6 @@ import { getEntityHref, getWikiHref, getRelatedGraphFor } from "@/data/entity-na
 import {
   getKBLatest,
   getKBFacts,
-  getKBEntity,
   getKBProperty,
 } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";
@@ -129,7 +128,7 @@ export default async function ProjectDetailPage({
   const entity = resolveProjectBySlug(slug);
   if (!entity) return notFound();
 
-  const wikiHref = getWikiHref(entity.id);
+  const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
   const status = entity.projectStatus ?? entity.status;
 
   // KB facts
@@ -327,7 +326,7 @@ export default async function ProjectDetailPage({
             </section>
           )}
 
-          <RelatedPages entityId={entity.id} entity={{ type: "project" }} />
+          <RelatedPages entityId={entity.id} entity={{ entityType: "project" }} />
         </div>
 
         {/* Sidebar */}

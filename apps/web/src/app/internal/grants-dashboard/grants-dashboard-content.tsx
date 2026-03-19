@@ -9,7 +9,7 @@ import {
   type RpcGrantRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { getKBEntity } from "@data/factbase";
+import { getTypedEntityById } from "@data/tablebase";
 import { GrantsTable, type GrantRow } from "./grants-table";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -70,8 +70,8 @@ function emptyFallback(): DashboardData {
 
 /** Resolve an entity stableId to a display name via the KB data layer. */
 function resolveEntityName(stableId: string): string {
-  const entity = getKBEntity(stableId);
-  return entity?.name ?? stableId;
+  const entity = getTypedEntityById(stableId);
+  return entity?.title ?? stableId;
 }
 
 /** Enrich grant rows with resolved organization and grantee names for the client table. */

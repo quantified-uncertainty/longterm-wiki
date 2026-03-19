@@ -1,9 +1,4 @@
-thing:
-  id: deceptive-alignment
-  stableId: vc60Nthkcg
-  type: risk
-  name: Deceptive Alignment
-  wikiId: E93
+entity: vc60Nthkcg
 facts:
   - id: f_EkvWWzhRSA
     property: description

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 interface InfoBoxDescriptionProps {
   description: string;
@@ -45,7 +46,7 @@ export function InfoBoxDescription({ description }: InfoBoxDescriptionProps) {
         ref={textRef}
         className={`text-xs text-muted-foreground leading-relaxed m-0 ${expanded ? "" : "line-clamp-3"}`}
       >
-        {description}
+        {stripMdxEscapes(description)}
       </p>
       {(isClamped || expanded) && (
         <button

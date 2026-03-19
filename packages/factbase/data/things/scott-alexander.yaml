@@ -1,10 +1,4 @@
-thing:
-  id: scott-alexander
-  stableId: ykTqvdkiLQ
-  type: person
-  name: "Scott Alexander"
-  wikiId: "E1300"
-
+entity: ykTqvdkiLQ
 facts:
   - id: f_q6PPCnymgA
     property: role

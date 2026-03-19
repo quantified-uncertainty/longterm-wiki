@@ -1,9 +1,4 @@
-thing:
-  id: corrigibility
-  stableId: aUMeFdALrA
-  type: research-area
-  name: Corrigibility
-  wikiId: E79
+entity: aUMeFdALrA
 facts:
   - id: f_7N9ms2wIpA
     property: description

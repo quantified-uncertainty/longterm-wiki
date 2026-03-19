@@ -1,9 +1,4 @@
-thing:
-  id: language-models
-  stableId: MznJisvptw
-  type: capability
-  name: Large Language Models
-  wikiId: E186
+entity: MznJisvptw
 facts:
   - id: f_EWNGEbX6jA
     property: description

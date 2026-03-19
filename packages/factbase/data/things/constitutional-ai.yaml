@@ -1,9 +1,4 @@
-thing:
-  id: constitutional-ai
-  stableId: 6sdr78k9kQ
-  type: approach
-  name: Constitutional AI
-  wikiId: E451
+entity: 6sdr78k9kQ
 facts:
   - id: f_eRr3fA8yLA
     property: description

@@ -11,6 +11,7 @@ import {
   notFoundError,
   paginationQuery,
   escapeIlike,
+  dbError,
   zv,
 } from "../shared/utils.js";
 import {
@@ -663,69 +664,72 @@ const entitiesApp = new Hono()
 
     let upserted = 0;
 
-    await db.transaction(async (tx) => {
-      const allVals = items.map((e) => ({
-        id: e.id,
-        wikiId: e.wikiId ?? null,
-        stableId: e.stableId ?? null,
-        entityType: e.entityType,
-        title: e.title,
-        description: e.description ?? null,
-        website: e.website ?? null,
-        tags: e.tags ?? null,
-        clusters: e.clusters ?? null,
-        status: e.status ?? null,
-        lastUpdated: e.lastUpdated ?? null,
-        customFields: e.customFields ?? null,
-        relatedEntries: e.relatedEntries ?? null,
-        sources: e.sources ?? null,
-        metadata: e.metadata ?? null,
-      }));
-
-      await tx
-        .insert(entities)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: entities.id,
-          set: {
-            wikiId: sql`excluded.wiki_id`,
-            // Use incoming stableId when provided; fall back to existing.
-            stableId: sql`COALESCE(excluded.stable_id, "entities"."stable_id")`,
-            entityType: sql`excluded.entity_type`,
-            title: sql`excluded.title`,
-            description: sql`excluded.description`,
-            website: sql`excluded.website`,
-            tags: sql`excluded.tags`,
-            clusters: sql`excluded.clusters`,
-            status: sql`excluded.status`,
-            lastUpdated: sql`excluded.last_updated`,
-            customFields: sql`excluded.custom_fields`,
-            relatedEntries: sql`excluded.related_entries`,
-            sources: sql`excluded.sources`,
-            metadata: sql`excluded.metadata`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((e) => ({
-          id: e.stableId || e.id,
-          thingType: "entity" as const,
-          title: e.title,
-          sourceTable: "entities",
-          sourceId: e.id,
+    try {
+      await db.transaction(async (tx) => {
+        const allVals = items.map((e) => ({
+          id: e.id,
+          wikiId: e.wikiId ?? null,
+          stableId: e.stableId, // PK — always required
           entityType: e.entityType,
-          description: e.description,
-          wikiId: e.wikiId,
-          sourceUrl: e.website,
-        }))
-      );
+          title: e.title,
+          description: e.description ?? null,
+          website: e.website ?? null,
+          tags: e.tags ?? null,
+          clusters: e.clusters ?? null,
+          status: e.status ?? null,
+          lastUpdated: e.lastUpdated ?? null,
+          customFields: e.customFields ?? null,
+          relatedEntries: e.relatedEntries ?? null,
+          sources: e.sources ?? null,
+          metadata: e.metadata ?? null,
+        }));
 
-      upserted = allVals.length;
-    });
+        await tx
+          .insert(entities)
+          .values(allVals)
+          .onConflictDoUpdate({
+            target: entities.stableId, // PK is now stable_id
+            set: {
+              id: sql`excluded.id`, // slug may change
+              wikiId: sql`excluded.wiki_id`,
+              entityType: sql`excluded.entity_type`,
+              title: sql`excluded.title`,
+              description: sql`excluded.description`,
+              website: sql`excluded.website`,
+              tags: sql`excluded.tags`,
+              clusters: sql`excluded.clusters`,
+              status: sql`excluded.status`,
+              lastUpdated: sql`excluded.last_updated`,
+              customFields: sql`excluded.custom_fields`,
+              relatedEntries: sql`excluded.related_entries`,
+              sources: sql`excluded.sources`,
+              metadata: sql`excluded.metadata`,
+              syncedAt: sql`now()`,
+              updatedAt: sql`now()`,
+            },
+          });
+
+        // Dual-write to things table
+        await upsertThingsInTx(
+          tx,
+          items.map((e) => ({
+            id: e.stableId || e.id,
+            thingType: "entity" as const,
+            title: e.title,
+            sourceTable: "entities",
+            sourceId: e.id,
+            entityType: e.entityType,
+            description: e.description,
+            wikiId: e.wikiId,
+            sourceUrl: e.website,
+          }))
+        );
+
+        upserted = allVals.length;
+      });
+    } catch (err) {
+      return dbError(c, "entities sync", err, { entityCount: items.length });
+    }
 
     return c.json({ upserted });
   })
@@ -779,22 +783,26 @@ const entitiesApp = new Hono()
         `Deleting ${staleIds.length} stale ${entityType} entities`
       );
 
-      await db.transaction(async (tx) => {
-        // Delete from things table first (references entities via source_id)
-        await tx
-          .delete(things)
-          .where(
-            and(
-              eq(things.sourceTable, "entities"),
-              inArray(things.sourceId, staleIds),
-            )
-          );
+      try {
+        await db.transaction(async (tx) => {
+          // Delete from things table first (references entities via source_id)
+          await tx
+            .delete(things)
+            .where(
+              and(
+                eq(things.sourceTable, "entities"),
+                inArray(things.sourceId, staleIds),
+              )
+            );
 
-        // Delete stale entities
-        await tx
-          .delete(entities)
-          .where(inArray(entities.id, staleIds));
-      });
+          // Delete stale entities
+          await tx
+            .delete(entities)
+            .where(inArray(entities.id, staleIds));
+        });
+      } catch (err) {
+        return dbError(c, "entities prune", err, { entityType, count: staleIds.length });
+      }
 
       return c.json({ deleted: staleIds.length, ids: staleIds });
     }

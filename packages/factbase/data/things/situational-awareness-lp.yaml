@@ -1,9 +1,4 @@
-thing:
-  id: situational-awareness-lp
-  stableId: FxJ9jQ7SlA
-  type: organization
-  name: Situational Awareness LP
-  wikiId: E568
+entity: FxJ9jQ7SlA
 facts:
   - id: f_RBtEr426TQ
     property: description

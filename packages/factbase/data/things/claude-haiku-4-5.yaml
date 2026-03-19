@@ -1,9 +1,4 @@
-thing:
-  id: claude-haiku-4-5
-  stableId: y87VxEBBIA
-  type: ai-model
-  name: Claude Haiku 4.5
-  wikiId: E1037
+entity: y87VxEBBIA
 facts:
   - id: f_KcUpuzjuwg
     property: description

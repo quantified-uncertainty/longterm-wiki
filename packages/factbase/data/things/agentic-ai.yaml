@@ -1,9 +1,4 @@
-thing:
-  id: agentic-ai
-  stableId: 95ASV0XEwQ
-  type: capability
-  name: Agentic AI
-  wikiId: E2
+entity: 95ASV0XEwQ
 facts:
   - id: f_Oq8CcXaolg
     property: description

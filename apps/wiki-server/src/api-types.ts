@@ -483,7 +483,7 @@ export interface PageDetailRow {
   wikiId: string | null;
   title: string;
   description: string | null;
-  llmSummary: string | null;
+  summary: string | null;
   category: string | null;
   subcategory: string | null;
   entityType: string | null;
@@ -650,7 +650,7 @@ export interface ResourceListResult {
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   wikiId: z.string().max(20).nullable().optional(),
-  stableId: z.string().max(20).nullable().optional(),
+  stableId: z.string().min(1).max(20), // Required — PK of entities table
   entityType: z.string().min(1).max(100),
   title: z.string().min(1).max(500),
   description: z.string().max(50000).nullable().optional(),
@@ -872,7 +872,7 @@ export const SyncPageSchema = z.object({
   wikiId: z.string().max(20).nullable().optional(),
   title: z.string().min(1).max(500),
   description: z.string().max(5000).nullable().optional(),
-  llmSummary: z.string().max(10000).nullable().optional(),
+  summary: z.string().max(10000).nullable().optional(),
   category: z.string().max(100).nullable().optional(),
   subcategory: z.string().max(100).nullable().optional(),
   entityType: z.string().max(100).nullable().optional(),

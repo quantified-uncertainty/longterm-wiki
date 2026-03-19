@@ -1,9 +1,4 @@
-thing:
-  id: bridgewater-aia-labs
-  stableId: 19XMJpUWqQ
-  type: organization
-  name: Bridgewater AIA Labs
-  wikiId: E516
+entity: 19XMJpUWqQ
 facts:
   - id: f_ixBGJlJwLw
     property: description

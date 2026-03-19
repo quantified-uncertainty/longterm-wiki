@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, getDrizzleDb, type SqlQuery } from "../../db.js";
+import { getDb, getDrizzleDb, beginTransaction } from "../../db.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
+  zv,
 } from "../shared/utils.js";
 import { SyncLinksBatchSchema } from "../../api-types.js";
 import { resolvePageIntId } from "../shared/page-id-helpers.js";
@@ -152,23 +151,15 @@ interface UniqueCountRow {
 const PAGE_LINKS_SYNC_LOCK = 7_294_801;
 
 const linksApp = new Hono()
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { links, replace } = parsed.data;
-    const rawDb = getDb();
+  .post("/sync", zv("json", SyncBatchSchema), async (c) => {
+    const { links, replace } = c.req.valid("json");
 
     let upserted = 0;
 
     // Use a raw postgres transaction with an advisory lock to serialize concurrent
     // sync operations. Without this, two concurrent syncs deadlock on the unique
     // index when inserting overlapping rows.
-    await rawDb.begin(async (txRaw) => {
-      const tx = txRaw as unknown as SqlQuery;
+    await beginTransaction(async (tx) => {
       await tx`SELECT pg_advisory_xact_lock(${PAGE_LINKS_SYNC_LOCK})`;
 
       if (replace) {
@@ -203,14 +194,11 @@ const linksApp = new Hono()
 
   // ---- GET /backlinks/:id ----
 
-  .get("/backlinks/:id", async (c) => {
+  .get("/backlinks/:id", zv("query", BacklinksQuery), async (c) => {
     const targetId = c.req.param("id");
     if (!targetId) return validationError(c, "Entity ID is required");
 
-    const parsed = BacklinksQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit } = parsed.data;
+    const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
     // Phase 4b: resolve slug to integer and query by target_id_int
@@ -261,14 +249,11 @@ const linksApp = new Hono()
 
   // ---- GET /related/:id ----
 
-  .get("/related/:id", async (c) => {
+  .get("/related/:id", zv("query", RelatedQuery), async (c) => {
     const entityId = c.req.param("id");
     if (!entityId) return validationError(c, "Entity ID is required");
 
-    const parsed = RelatedQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit } = parsed.data;
+    const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
     // Phase 4b: resolve slug to integer and query by source_id_int / target_id_int

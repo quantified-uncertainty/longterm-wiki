@@ -59,7 +59,7 @@ export const FRONTMATTER_FIELD_ORDER: string[] = [
   'evergreen',
 
   // --- Group 5: Summaries ---
-  'llmSummary',
+  'summary',
 
   // --- Group 6: Ratings ---
   'ratings',

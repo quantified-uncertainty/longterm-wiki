@@ -1,9 +1,4 @@
-thing:
-  id: stampy-aisafety-info
-  stableId: 9f8eF0CObQ
-  type: project
-  name: Stampy / AISafety.info
-  wikiId: E382
+entity: 9f8eF0CObQ
 facts:
   - id: f_pO7q8RaK4A
     property: description

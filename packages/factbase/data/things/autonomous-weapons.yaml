@@ -1,9 +1,4 @@
-thing:
-  id: autonomous-weapons
-  stableId: cm5KEblCZg
-  type: risk
-  name: Autonomous Weapons
-  wikiId: E35
+entity: cm5KEblCZg
 facts:
   - id: f_MnfIYHQJ5g
     property: description

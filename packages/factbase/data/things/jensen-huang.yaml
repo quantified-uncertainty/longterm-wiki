@@ -1,10 +1,4 @@
-thing:
-  id: jensen-huang
-  stableId: So79iNy2sQ
-  type: person
-  name: "Jensen Huang"
-  wikiId: "E1292"
-
+entity: So79iNy2sQ
 facts:
   - id: f_DramxKdLqw
     property: employed-by

@@ -5,7 +5,7 @@ import {
   getPublicationById,
   getResourcesForPublication,
   getPagesForResource,
-  getEntityById,
+  getTypedEntityById,
   getPageById,
   getEntityHref,
 } from "@/data";
@@ -54,7 +54,7 @@ const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
 };
 
 function getPageTitle(pageId: string): string {
-  const entity = getEntityById(pageId);
+  const entity = getTypedEntityById(pageId);
   if (entity?.title) return entity.title;
   const page = getPageById(pageId);
   if (page?.title) return page.title;

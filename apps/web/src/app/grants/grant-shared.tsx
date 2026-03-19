@@ -4,13 +4,15 @@
  */
 import Link from "next/link";
 import {
-  getKBEntity,
   getKBEntitySlug,
 } from "@/data/factbase";
 import type { KBRecordEntry } from "@/data/factbase";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { formatKBDate } from "@/components/wiki/factbase/format";
-import { resolveEntityLink as resolveEntityLinkBase } from "@/lib/record-detail-ui";
+import {
+  formatKBDate,
+} from "@/components/wiki/factbase/format";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { buildProgramNameMap, resolveProgramName } from "./grants-utils";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -47,28 +49,16 @@ export function resolveEntityLink(entityId: string): {
   slug: string | null;
   href: string | null;
 } {
-  // Try FactBase first for slug extraction (slug is not in the base return type)
-  const entity = getKBEntity(entityId);
-  if (entity) {
-    const slug = getKBEntitySlug(entityId);
-    if (slug) {
-      if (entity.type === "organization")
-        return { name: entity.name, slug, href: `/organizations/${slug}` };
-      if (entity.type === "person")
-        return { name: entity.name, slug, href: `/people/${slug}` };
-    }
-    return { name: entity.name, slug: null, href: `/factbase/entity/${entityId}` };
-  }
+  const resolved = resolveEntityName(entityId);
+  const slug = getKBEntitySlug(entityId) ?? null;
+  return { name: resolved.name, slug, href: resolved.href };
+}
 
-  // Fall back to the shared resolution (handles bare numeric IDs and stableIds)
-  const base = resolveEntityLinkBase(entityId);
-  // Extract slug from href if it is a directory URL (e.g. /organizations/anthropic)
-  let slug: string | null = null;
-  if (base.href) {
-    const dirMatch = base.href.match(/^\/(organizations|people)\/(.+)$/);
-    if (dirMatch) slug = dirMatch[2];
-  }
-  return { name: base.name, slug, href: base.href };
+/** Module-level cache for the program name map (static data, built once). */
+let _programNameMap: Map<string, string> | undefined;
+function getProgramNameMap(): Map<string, string> {
+  if (!_programNameMap) _programNameMap = buildProgramNameMap();
+  return _programNameMap;
 }
 
 export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
@@ -76,8 +66,10 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
   const funder = resolveEntityLink(record.ownerEntityId);
   const recipientId = typeof f.recipient === "string" ? f.recipient : null;
   const recipient = recipientId
-    ? resolveEntityLink(recipientId)
+    ? { ...resolveEntityName(recipientId, record.displayName), slug: getKBEntitySlug(recipientId) ?? null }
     : { name: "", slug: null, href: null };
+
+  const programId = typeof f.programId === "string" ? f.programId : null;
 
   return {
     key: record.key,
@@ -95,8 +87,8 @@ export function parseGrantDetail(record: KBRecordEntry): ParsedGrantDetail {
     period: typeof f.period === "string" ? f.period : null,
     status: typeof f.status === "string" ? f.status : null,
     source: typeof f.source === "string" ? f.source : null,
-    program: typeof f.program === "string" ? f.program : null,
-    programId: typeof f.programId === "string" ? f.programId : null,
+    program: resolveProgramName(f, getProgramNameMap()),
+    programId,
     notes: typeof f.notes === "string" ? f.notes : null,
   };
 }

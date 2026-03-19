@@ -18,9 +18,9 @@
     - diversification
     - philanthropy
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: corporate-influence
+    - id: pxRqsPtwjg
       type: crux
   clusters:
     - community
@@ -45,13 +45,13 @@
     - label: Counterfactual Complexity
       value: Very High
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   sources:
     - title: Working at Frontier AI Labs
@@ -97,9 +97,9 @@
     - label: Entry Barrier
       value: Low to Medium
   relatedEntries:
-    - id: redwood-research
+    - id: dwMzc9WzPa
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: ARENA Program
@@ -142,13 +142,13 @@
     - label: Entry Paths
       value: Policy, law, international relations
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   sources:
     - title: The Governance of AI
@@ -188,13 +188,13 @@
     - label: Related To
       value: Alignment Difficulty, Timelines
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
-    - id: redwood-research
+    - id: dwMzc9WzPa
       type: organization
   sources:
     - title: Constitutional AI
@@ -244,13 +244,13 @@
     - label: Career Entry
       value: PhD or self-study + demonstrations
   relatedEntries:
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: redwood-research
+    - id: dwMzc9WzPa
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   sources:
     - title: AI Alignment Research Overview
@@ -316,9 +316,9 @@
     implement safety measures.
   status: stub
   relatedEntries:
-    - id: superintelligence
+    - id: 3fyHbDnHIQ
       type: concept
-    - id: self-improvement
+    - id: eUR0jvxO5A
       type: capability
   tags:
     - ai-timelines
@@ -333,9 +333,9 @@
   description: Hypothetical AI systems with cognitive abilities vastly exceeding those of humans across virtually all domains.
   status: stub
   relatedEntries:
-    - id: fast-takeoff
+    - id: fRYu1EXclA
       type: concept
-    - id: self-improvement
+    - id: eUR0jvxO5A
       type: capability
   tags:
     - superintelligence
@@ -364,7 +364,7 @@
     of safety.
   status: stub
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   tags:
     - competition
@@ -381,9 +381,9 @@
     autonomous operation.
   status: stub
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
   tags:
     - evaluations
@@ -398,7 +398,7 @@
   description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
   status: stub
   relatedEntries:
-    - id: superintelligence
+    - id: 3fyHbDnHIQ
       type: concept
   tags:
     - x-risk
@@ -427,7 +427,7 @@
     interpretability.
   status: stub
   relatedEntries:
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   tags:
     - interpretability
@@ -453,7 +453,7 @@
   description: AI systems capable of causing changes to society as significant as the industrial or agricultural revolutions.
   status: stub
   relatedEntries:
-    - id: superintelligence
+    - id: 3fyHbDnHIQ
       type: concept
   tags:
     - ai-timelines
@@ -467,7 +467,7 @@
   description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
   status: stub
   relatedEntries:
-    - id: epoch-ai
+    - id: cBPkzcVBBQ
       type: organization
   tags:
     - capabilities
@@ -482,7 +482,7 @@
   description: Predictions and analysis of when various AI capability milestones (AGI, transformative AI) might be reached.
   status: stub
   relatedEntries:
-    - id: epoch-ai
+    - id: cBPkzcVBBQ
       type: organization
   tags:
     - forecasting
@@ -497,7 +497,7 @@
   description: Limitations on AI training due to availability, quality, or accessibility of training data.
   status: stub
   relatedEntries:
-    - id: scaling-laws
+    - id: eZJ1oAKS6A
       type: concept
   tags:
     - training
@@ -728,13 +728,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rethink-priorities
+    - id: t0p43V5oLA
       type: organization
     - id: sycophancy
       type: risk
-    - id: alignment
+    - id: rt6jVH9yuA
       type: concept
   lastUpdated: 2026-02
 
@@ -760,15 +760,15 @@
     - cyber
     - governance
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
     - id: bioweapons
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: autonomous-weapons
+    - id: cm5KEblCZg
       type: risk
-    - id: solutions
+    - id: Ped7HAlI0A
       type: crux
   lastUpdated: 2026-02
 
@@ -793,11 +793,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: concept
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: epistemic-infrastructure
+    - id: pkCwkyxL0w
       type: concept
   lastUpdated: 2026-02
 
@@ -822,15 +822,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: concept
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: concept
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: miri
+    - id: puAffUjWSS
       type: organization
   lastUpdated: 2026-02
 
@@ -855,9 +855,9 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
@@ -882,13 +882,13 @@
     - epistemics
     - ai-safety
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: manifest
+    - id: KYKdAOzynA
       type: concept
-    - id: misuse-risks
+    - id: 9v7wxee33g
       type: crux
-    - id: solutions
+    - id: Ped7HAlI0A
       type: crux
   lastUpdated: 2026-02
 
@@ -914,11 +914,11 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -943,13 +943,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: ai-impacts
+    - id: TdbypiKyCw
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
-    - id: epoch-ai
+    - id: cBPkzcVBBQ
       type: organization
-    - id: agi-timeline
+    - id: zkYFTnzRLA
       type: concept
   lastUpdated: 2026-02
 
@@ -974,15 +974,15 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: prediction-markets
+    - id: l8ZPtVJdsA
       type: concept
-    - id: sam-altman
+    - id: JKsVHQ5stQ
       type: person
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
-    - id: ai-impacts
+    - id: TdbypiKyCw
       type: organization
   lastUpdated: 2026-02
 
@@ -1007,15 +1007,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: emergent-capabilities
+    - id: x19LcGDk6Q
       type: concept
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: concept
   lastUpdated: 2026-02
 
@@ -1040,13 +1040,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dense-transformers
+    - id: RScckMUC2g
       type: concept
-    - id: light-scaffolding
+    - id: BP0tsiccNw
       type: concept
   lastUpdated: 2026-02
 
@@ -1072,13 +1072,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: formal-verification
+    - id: DSSCdI8gLA
       type: concept
-    - id: neuro-symbolic
+    - id: d9OJFyUmjw
       type: concept
-    - id: dense-transformers
+    - id: RScckMUC2g
       type: concept
-    - id: heavy-scaffolding
+    - id: NCLlwmOTkg
       type: concept
   lastUpdated: 2026-02
 
@@ -1103,15 +1103,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: concept
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: emergent-capabilities
+    - id: x19LcGDk6Q
       type: concept
-    - id: heavy-scaffolding
+    - id: NCLlwmOTkg
       type: concept
   lastUpdated: 2026-02
 
@@ -1185,19 +1185,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: cooperative-ai
+    - id: LSqNo6FATg
       type: approach
-    - id: multi-agent
+    - id: N0ImU3ZcXA
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
-    - id: coordination-tech
+    - id: DnYQRsR1pw
       type: approach
-    - id: cirl
+    - id: SDvbPMOcQw
       type: approach
-    - id: cooperate-bot
+    - id: p7pqkvIWfw
       type: concept
-    - id: cooperative-funding-mechanisms
+    - id: XuunnMt8vQ
       type: concept
   lastUpdated: 2026-02
 
@@ -1219,13 +1219,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: autonomous-cooperative-agents
+    - id: qqM20Mquew
       type: concept
-    - id: cooperative-funding-mechanisms
+    - id: XuunnMt8vQ
       type: concept
-    - id: cooperative-ai
+    - id: LSqNo6FATg
       type: approach
-    - id: multi-agent
+    - id: N0ImU3ZcXA
       type: approach
   lastUpdated: 2026-02
 
@@ -1248,13 +1248,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: autonomous-cooperative-agents
+    - id: qqM20Mquew
       type: concept
-    - id: cooperate-bot
+    - id: p7pqkvIWfw
       type: concept
-    - id: cooperative-ai
+    - id: LSqNo6FATg
       type: approach
-    - id: coordination-tech
+    - id: DnYQRsR1pw
       type: approach
   lastUpdated: 2026-02
 

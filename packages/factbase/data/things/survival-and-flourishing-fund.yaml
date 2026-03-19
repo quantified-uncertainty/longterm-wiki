@@ -1,12 +1,4 @@
-thing:
-  id: survival-and-flourishing-fund
-  stableId: sIFjGbxVct
-  type: organization
-  name: "Survival and Flourishing Fund"
-  wikiId: E567
-  aliases:
-    - SFF
-
+entity: pvJ50HupEQ
 facts:
   - id: f_bw7KsUsLzQ
     property: revenue

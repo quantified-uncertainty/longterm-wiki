@@ -1,9 +1,4 @@
-thing:
-  id: anthropic-pledge-enforcement
-  stableId: 3ljdV7I37g
-  type: analysis
-  name: "Anthropic Founder Pledges: Interventions to Increase Follow-Through"
-  wikiId: E411
+entity: 3ljdV7I37g
 facts:
   - id: f_6htuAvtfyg
     property: description

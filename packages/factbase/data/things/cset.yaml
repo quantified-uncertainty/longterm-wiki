@@ -1,9 +1,4 @@
-thing:
-  id: cset
-  stableId: lvsDuyzPcg
-  type: organization
-  name: CSET (Center for Security and Emerging Technology)
-  wikiId: E524
+entity: lvsDuyzPcg
 facts:
   - id: f_5GrL7XHIjQ
     property: description

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { getRelatedGraphWithFallback, getPageById, getEntityById } from "@/data";
+import { getRelatedGraphWithFallback, getPageById } from "@/data";
 import { ENTITY_TYPES } from "@/data/entity-ontology";
 import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
 import { getTypeLabel, getTypeColor } from "./explore/explore-utils";
 import { EntityLink } from "./wiki/EntityLink";
 import { cn } from "@lib/utils";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 // Map entity types to display group names
 const TYPE_TO_GROUP: Record<string, string> = {
@@ -180,7 +181,7 @@ export async function RelatedPages({
   entity,
 }: {
   entityId: string;
-  entity?: { type?: string } | null;
+  entity?: { entityType?: string } | null;
 }) {
   const { data: relatedEntries } = await getRelatedGraphWithFallback(entityId);
   const allItems: RelatedPageItem[] = relatedEntries
@@ -189,7 +190,7 @@ export async function RelatedPages({
       const page = getPageById(entry.id);
       const desc =
         page?.description ||
-        page?.llmSummary ||
+        page?.summary ||
         undefined;
       return {
         id: entry.id,
@@ -198,13 +199,13 @@ export async function RelatedPages({
         type: entry.type,
         score: entry.score,
         label: entry.label,
-        description: desc ? truncate(desc, 150) : undefined,
+        description: desc ? truncate(stripMdxEscapes(desc), 150) : undefined,
       };
     });
 
   if (allItems.length === 0) return null;
 
-  const sourceType = entity?.type;
+  const sourceType = entity?.entityType;
   const bounded = allItems.slice(0, MAX_TOTAL);
 
   // Top items: highest-scored, shown as featured cards
