@@ -1,5 +1,25 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { validateDateValue, compareDates } from "./validate-temporal.ts";
+
+// For integration tests, we use vi.mock at the module level for ESM compat.
+// We mock fs so the check functions read controlled test data instead of real files.
+vi.mock("fs", async (importOriginal) => {
+  const actual = (await importOriginal()) as typeof import("fs");
+  return {
+    ...actual,
+    existsSync: vi.fn(actual.existsSync),
+    readFileSync: vi.fn(actual.readFileSync),
+    readdirSync: vi.fn(actual.readdirSync),
+  };
+});
+
+// Import after mock setup
+import { existsSync, readFileSync, readdirSync } from "fs";
+import { runTemporalValidation } from "./validate-temporal.ts";
+
+const mockExistsSync = vi.mocked(existsSync);
+const mockReadFileSync = vi.mocked(readFileSync);
+const mockReaddirSync = vi.mocked(readdirSync);
 
 describe("validateDateValue", () => {
   // ── Valid dates ──────────────────────────────────────────────────────
@@ -93,6 +113,7 @@ describe("validateDateValue", () => {
 });
 
 describe("compareDates", () => {
+  // ── Same precision ────────────────────────────────────────────────
   it("compares equal dates as 0", () => {
     expect(compareDates("2024", "2024")).toBe(0);
     expect(compareDates("2024-01", "2024-01")).toBe(0);
@@ -111,19 +132,225 @@ describe("compareDates", () => {
     expect(compareDates("2024-01-31", "2024-01-01")).toBeGreaterThan(0);
   });
 
-  it("handles mixed precision dates", () => {
-    // YYYY vs YYYY-MM: "2024" < "2024-01" lexicographically
-    expect(compareDates("2023", "2024-01")).toBeLessThan(0);
-    expect(compareDates("2024-12", "2025")).toBeLessThan(0);
+  // ── Mixed precision (the key fix) ─────────────────────────────────
+  it("treats year-only as encompassing all months in that year", () => {
+    expect(compareDates("2024", "2024-01")).toBe(0);
+    expect(compareDates("2024", "2024-06")).toBe(0);
+    expect(compareDates("2024", "2024-12")).toBe(0);
   });
 
+  it("treats year-month as encompassing all days in that month", () => {
+    expect(compareDates("2024-01", "2024-01-01")).toBe(0);
+    expect(compareDates("2024-01", "2024-01-15")).toBe(0);
+    expect(compareDates("2024-01", "2024-01-31")).toBe(0);
+  });
+
+  it("returns 0 when more-precise date is within less-precise date (reversed args)", () => {
+    expect(compareDates("2024-01", "2024")).toBe(0);
+    expect(compareDates("2024-06-15", "2024")).toBe(0);
+    expect(compareDates("2024-01-15", "2024-01")).toBe(0);
+  });
+
+  it("correctly orders different years even with mixed precision", () => {
+    expect(compareDates("2023", "2024-01")).toBeLessThan(0);
+    expect(compareDates("2024-12", "2025")).toBeLessThan(0);
+    expect(compareDates("2025", "2024-12")).toBeGreaterThan(0);
+  });
+
+  it("correctly orders different months with mixed precision", () => {
+    expect(compareDates("2024-03", "2024-04-01")).toBeLessThan(0);
+    expect(compareDates("2024-05-15", "2024-04")).toBeGreaterThan(0);
+  });
+
+  // ── Key use case: validEnd >= asOf with mixed precision ───────────
+  it("validEnd='2024' satisfies asOf='2024-01' (year encompasses month)", () => {
+    expect(compareDates("2024", "2024-01")).toBeGreaterThanOrEqual(0);
+  });
+
+  it("validEnd='2024' satisfies asOf='2024-12' (year encompasses last month)", () => {
+    expect(compareDates("2024", "2024-12")).toBeGreaterThanOrEqual(0);
+  });
+
+  it("validEnd='2024-01' does not satisfy asOf='2024-02' (Jan before Feb)", () => {
+    expect(compareDates("2024-01", "2024-02")).toBeLessThan(0);
+  });
+
+  // ── Specific bug cases from prior PRs ─────────────────────────────
   it("handles the specific bug case: validEnd before asOf", () => {
-    // From PR #2718: asOf=2025-10, validEnd=2025-03
     expect(compareDates("2025-03", "2025-10")).toBeLessThan(0);
   });
 
   it("handles the specific bug case: trainingCutoff after releaseDate", () => {
-    // From PR #2700: trainingCutoff=2023-04, releaseDate=2023-03-14
     expect(compareDates("2023-04", "2023-03-14")).toBeGreaterThan(0);
+  });
+});
+
+// ── Integration tests for check functions ─────────────────────────────────────
+
+describe("runTemporalValidation", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("detects invalid month 00 in entity date fields", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["test-models.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("test-models.yaml")) {
+        return `- id: bad-model\n  type: ai-model\n  releaseDate: "2024-00"\n`;
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    const result = runTemporalValidation();
+    expect(result.passed).toBe(false);
+    const dateViolations = result.violations.filter(v => v.rule === "date-value-validity");
+    expect(dateViolations.length).toBeGreaterThanOrEqual(1);
+    expect(dateViolations[0].message).toContain("invalid month");
+  });
+
+  it("detects model trainingCutoff after releaseDate", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities") || path.includes("ai-models.yaml");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["ai-models.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("ai-models.yaml")) {
+        return `- id: future-model\n  type: ai-model\n  releaseDate: "2023-03"\n  trainingCutoff: "2023-06"\n`;
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    const result = runTemporalValidation();
+    const cutoffViolations = result.violations.filter(v => v.rule === "model-cutoff-release");
+    expect(cutoffViolations).toHaveLength(1);
+    expect(cutoffViolations[0].message).toContain("trainingCutoff");
+  });
+
+  it("skips excepted models (gpt-4-turbo) in cutoff check", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities") || path.includes("ai-models.yaml");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["ai-models.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("ai-models.yaml")) {
+        return `- id: gpt-4-turbo\n  type: ai-model\n  releaseDate: "2023-11-06"\n  trainingCutoff: "2023-12"\n`;
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    const result = runTemporalValidation();
+    const cutoffViolations = result.violations.filter(v => v.rule === "model-cutoff-release");
+    expect(cutoffViolations).toHaveLength(0);
+  });
+
+  it("detects policy vote date before introduced date", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["policies.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("policies.yaml")) {
+        return [
+          "- id: bad-policy",
+          "  type: policy",
+          '  introduced: "2024-03"',
+          "  votes:",
+          '    - date: "2024-01"',
+          "      chamber: house",
+        ].join("\n");
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    const result = runTemporalValidation();
+    const policyViolations = result.violations.filter(v => v.rule === "policy-date-order");
+    expect(policyViolations).toHaveLength(1);
+    expect(policyViolations[0].message).toContain("vote date");
+  });
+
+  it("passes when all dates are valid and ordered correctly", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities") || path.includes("ai-models.yaml");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["ai-models.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("ai-models.yaml")) {
+        return `- id: good-model\n  type: ai-model\n  releaseDate: "2024-06"\n  trainingCutoff: "2024-03"\n`;
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    const result = runTemporalValidation();
+    expect(result.passed).toBe(true);
+    expect(result.violations).toHaveLength(0);
+  });
+
+  it("handles YAML parse errors gracefully without crashing", () => {
+    mockExistsSync.mockImplementation((p) => {
+      const path = String(p);
+      return path.includes("data/entities");
+    });
+
+    mockReaddirSync.mockImplementation(((p: string) => {
+      if (String(p).includes("data/entities")) return ["bad.yaml"];
+      return [];
+    }) as unknown as typeof readdirSync);
+
+    mockReadFileSync.mockImplementation(((p: string) => {
+      if (String(p).includes("bad.yaml")) {
+        return "{{invalid yaml::: [[[";
+      }
+      return "";
+    }) as unknown as typeof readFileSync);
+
+    // Should not throw, should return passed (no violations from unparseable files)
+    const result = runTemporalValidation();
+    expect(result.passed).toBe(true);
+  });
+
+  it("handles missing directories gracefully", () => {
+    mockExistsSync.mockReturnValue(false);
+
+    const result = runTemporalValidation();
+    expect(result.passed).toBe(true);
+    expect(result.violations).toHaveLength(0);
   });
 });

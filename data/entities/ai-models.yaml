@@ -945,14 +945,14 @@
   modality:
     - text
     - image
-  trainingCutoff: "2023-04"
+  trainingCutoff: "2023-12"
   capabilities:
     - tool-use
     - vision
   description: >-
     GPT-4 Turbo was announced at OpenAI DevDay on November 6, 2023. It featured a 128K context window
     (16x the original GPT-4), lower pricing (\$10/\$30 per MTok, 3x cheaper than GPT-4), multimodal
-    vision capabilities, and a training data cutoff of April 2023.
+    vision capabilities, and a knowledge cutoff of April 2023 (later updated to December 2023).
   relatedEntries:
     - id: gpt
       type: ai-model
