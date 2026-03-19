@@ -527,7 +527,10 @@ function ResultRow({
 // ── Utilities ────────────────────────────────────────────────────────
 
 function sanitizeSnippet(html: string): string {
-  return html.replace(/<(?!\/?mark\b)[^>]*>/gi, "");
+  return html
+    .replace(/<mark\b[^>]*>/gi, "<mark>")
+    .replace(/<\/mark\s*>/gi, "</mark>")
+    .replace(/<(?!\/?mark>)[^>]*>/gi, "");
 }
 
 function Highlight({ text, query }: { text: string; query: string }) {

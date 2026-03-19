@@ -496,9 +496,11 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
 
   // Prefer server-generated snippet with <mark> tags from ts_headline()
   if (snippet && snippet.includes("<mark>")) {
-    // Sanitize: strip all HTML except <mark> and </mark>
+    // Sanitize: strip all HTML except bare <mark> and </mark> (no attributes)
     const safe = snippet
-      .replace(/<(?!\/?mark\b)[^>]*>/gi, "");
+      .replace(/<mark\b[^>]*>/gi, "<mark>")
+      .replace(/<\/mark\s*>/gi, "</mark>")
+      .replace(/<(?!\/?mark>)[^>]*>/gi, "");
     return (
       <div
         className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_mark]:bg-yellow-200/70 dark:[&_mark]:bg-yellow-500/30 [&_mark]:text-foreground [&_mark]:rounded-sm [&_mark]:px-0.5"
