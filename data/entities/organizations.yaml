@@ -5194,3 +5194,371 @@
     - policy
     - free-market
   lastUpdated: 2026-03
+
+- id: rippling
+  stableId: wUdjStVKPg
+  type: organization
+  orgType: startup
+  title: Rippling
+  website: https://www.rippling.com
+  description: >-
+    HR and finance platform. YC W17. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: zapier
+  stableId: GkbMPevO4g
+  type: organization
+  orgType: startup
+  title: Zapier
+  website: https://zapier.com
+  description: >-
+    Automation platform. YC S12. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: retell-ai
+  stableId: ttZJitsMOg
+  type: organization
+  orgType: startup
+  title: Retell AI
+  website: https://www.retellai.com
+  description: >-
+    Voice AI platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: stack-ai
+  stableId: tXPmBsSdzA
+  type: organization
+  orgType: startup
+  title: Stack AI
+  website: https://www.stack-ai.com
+  description: >-
+    AI workflow builder. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: greptile
+  stableId: Th332GuuAA
+  type: organization
+  orgType: startup
+  title: Greptile
+  website: https://www.greptile.com
+  description: >-
+    Code search platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: keywords-ai
+  stableId: LHXmEcJMmA
+  type: organization
+  orgType: startup
+  title: Keywords AI
+  website: https://keywordsai.co
+  description: >-
+    LLM monitoring platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: reworkd-ai
+  stableId: wU79rY0aiw
+  type: organization
+  orgType: startup
+  title: Reworkd AI
+  website: https://reworkd.ai
+  description: >-
+    AI agents platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: ello-ai
+  stableId: aWLjauVMOw
+  type: organization
+  orgType: startup
+  title: Ello
+  website: https://www.ello.com
+  description: >-
+    AI reading tutor. YC W23. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: tracecat
+  stableId: F6I2v5gscw
+  type: organization
+  orgType: startup
+  title: Tracecat
+  website: https://tracecat.com
+  description: >-
+    Security automation platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: oneshop
+  stableId: 6KXyn6O0BQ
+  type: organization
+  orgType: startup
+  title: Oneshop
+  website: https://www.oneshop.com
+  description: >-
+    Resale platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: circle-medical
+  stableId: ucAYSllfeQ
+  type: organization
+  orgType: startup
+  title: Circle Medical
+  website: https://www.circlemedical.com
+  description: >-
+    Telehealth provider. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: algolia
+  stableId: p4zASaR2Tg
+  type: organization
+  orgType: startup
+  title: Algolia
+  website: https://www.algolia.com
+  description: >-
+    Search API provider. YC W14. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: cointracker
+  stableId: WMXMqF4tng
+  type: organization
+  orgType: startup
+  title: CoinTracker
+  website: https://www.cointracker.io
+  description: >-
+    Crypto tax and portfolio tracking. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: clerky
+  stableId: qaIhQ9Lj7g
+  type: organization
+  orgType: startup
+  title: Clerky
+  website: https://www.clerky.com
+  description: >-
+    Legal platform for startups. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: turing-labs
+  stableId: vo2hnOFgFg
+  type: organization
+  orgType: startup
+  title: Turing Labs
+  website: https://www.turinglabs.co
+  description: >-
+    CPG formulation AI. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: poll-everywhere
+  stableId: UX5soFbXEQ
+  type: organization
+  orgType: startup
+  title: Poll Everywhere
+  website: https://www.polleverywhere.com
+  description: >-
+    Audience engagement platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: picnichealth
+  stableId: i2KW9yCwOw
+  type: organization
+  orgType: startup
+  title: PicnicHealth
+  website: https://www.picnichealth.com
+  description: >-
+    Medical records platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: rootly
+  stableId: sVxaX8SsAA
+  type: organization
+  orgType: startup
+  title: Rootly
+  website: https://rootly.com
+  description: >-
+    Incident management platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: simplify-jobs
+  stableId: QDCltX6DyA
+  type: organization
+  orgType: startup
+  title: Simplify
+  website: https://simplify.jobs
+  description: >-
+    Job search platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: storyworth
+  stableId: kT85f91plA
+  type: organization
+  orgType: startup
+  title: StoryWorth
+  website: https://www.storyworth.com
+  description: >-
+    Family storytelling platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: firecrawl
+  stableId: vWTs3C8bnQ
+  type: organization
+  orgType: startup
+  title: Firecrawl
+  website: https://www.firecrawl.dev
+  description: >-
+    Web scraping platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: openmart
+  stableId: 3mRd96cKdw
+  type: organization
+  orgType: startup
+  title: Openmart
+  website: https://www.openmart.ai
+  description: >-
+    Local business AI platform. YC backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - yc-backed
+  lastUpdated: 2026-03
+
+- id: playground-ai
+  stableId: kh5x0eezrQ
+  type: organization
+  orgType: startup
+  title: Playground
+  website: https://playground.com
+  description: >-
+    AI image generation platform. a16z backed. Opposed California SB 1047.
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+  tags:
+    - startup
+    - a16z-backed
+  lastUpdated: 2026-03
