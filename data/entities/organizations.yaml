@@ -33,7 +33,19 @@
     - id: eQh3ZhWv8D
       type: person
       relationship: leads-to
-    - id: cMKB5i2WZQ
+    - id: evan-hubinger
+      type: person
+      relationship: research
+    - id: jack-clark
+      type: person
+      relationship: leads-to
+    - id: sam-mccandlish
+      type: person
+      relationship: research
+    - id: jared-kaplan
+      type: person
+      relationship: research
+    - id: claude
       type: ai-model
       relationship: composed-of
     - id: D8dD07y5oQ
@@ -110,6 +122,18 @@
       relationship: affects
     - id: XcGTez1oFw
       type: policy
+    - id: neel-nanda
+      type: person
+      relationship: research
+    - id: victoria-krakovna
+      type: person
+      relationship: research
+    - id: rohin-shah
+      type: person
+      relationship: research
+    - id: richard-ngo
+      type: person
+      relationship: research
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -285,6 +309,9 @@
       type: risk
     - id: aUMeFdALrA
       type: safety-agenda
+    - id: stuart-russell
+      type: person
+      relationship: leads-to
   sources:
     - title: CHAI Website
       url: https://humancompatible.ai
@@ -370,6 +397,9 @@
       type: risk
     - id: mK9pX3rQ7n
       type: organization
+    - id: dan-hendrycks
+      type: person
+      relationship: leads-to
   sources:
     - title: CAIS Website
       url: https://safe.ai
@@ -406,6 +436,9 @@
       type: safety-agenda
     - id: aX0jkoaekQ
       type: organization
+    - id: vidur-kapur
+      type: person
+      relationship: research
   sources:
     - title: Conjecture Website
       url: https://conjecture.dev
@@ -493,6 +526,9 @@
   relatedEntries:
     - id: A4XoubikkQ
       type: organization
+    - id: allan-dafoe
+      type: person
+      relationship: leads-to
   sources:
     - title: GovAI Website
       url: https://governance.ai
@@ -538,6 +574,12 @@
       type: organization
     - id: aX0jkoaekQ
       type: organization
+    - id: ajeya-cotra
+      type: person
+      relationship: research
+    - id: eli-lifland
+      type: person
+      relationship: research
   sources:
     - title: METR Website
       url: https://metr.org
@@ -817,6 +859,9 @@
       type: organization
     - id: 1LcLlMGLbw
       type: organization
+    - id: elizabeth-kelly
+      type: person
+      relationship: leads-to
   sources:
     - title: US AI Safety Institute Website
       url: https://www.nist.gov/aisi
@@ -986,6 +1031,9 @@
       type: person
     - id: bQ9a5lwwlg
       type: concept
+    - id: toby-ord
+      type: person
+      relationship: research
   tags:
     - research-org
     - existential-risk
@@ -1368,6 +1416,10 @@
     contributing valuable data to AI safety discourse. While their work provides
     useful evidence synthesis and expert opinion surveys, it faces inherent
     limitations in survey methodology and response bias.
+  relatedEntries:
+    - id: katja-grace
+      type: person
+      relationship: leads-to
   clusters:
     - ai-safety
     - community
@@ -1519,6 +1571,13 @@
     organization spent ~$50M on AI safety in 2024, with 68% going to
     evaluations/benchmarking, and launched a $40M Technical AI Safety RFP in
     2025 covering 8 research areas.
+  relatedEntries:
+    - id: nick-beckstead
+      type: person
+      relationship: leads-to
+    - id: luke-muehlhauser
+      type: person
+      relationship: leads-to
   clusters:
     - community
     - ai-safety
@@ -1573,6 +1632,10 @@
     policy research, particularly on U.S.-China competition and export controls.
     The center conducts hundreds of annual government briefings and operates the
     Emerging Technology Observatory with 10 public tools and 8 datasets.
+  relatedEntries:
+    - id: helen-toner
+      type: person
+      relationship: research
   clusters:
     - community
     - governance
@@ -2003,6 +2066,9 @@
   relatedEntries:
     - id: XcGTez1oFw
       type: policy
+    - id: mark-zuckerberg
+      type: person
+      relationship: leads-to
   lastUpdated: 2026-02
 - id: microsoft
   stableId: OIY5gaPpBA
@@ -2018,6 +2084,13 @@
     growth) and 16 percentage points of Azure's 39% growth. GitHub Copilot
     reached 20M users generating 46% of code, while responsible AI framework
     conducts hundreds of internal audits annually.
+  relatedEntries:
+    - id: mustafa-suleyman
+      type: person
+      relationship: leads-to
+    - id: satya-nadella
+      type: person
+      relationship: leads-to
   clusters:
     - community
     - ai-safety
@@ -2145,6 +2218,9 @@
       type: organization
     - id: XcGTez1oFw
       type: policy
+    - id: buck-shlegeris
+      type: person
+      relationship: leads-to
   sources:
     - title: Redwood Research Website
       url: https://redwoodresearch.org
@@ -2332,6 +2408,10 @@
     unique S-process mechanism where 6-12 recommenders express utility functions
     and an algorithm allocates grants favoring projects with enthusiastic
     champions, though the mechanism can produce volatile grant distributions year-to-year.
+  relatedEntries:
+    - id: jaan-tallinn
+      type: person
+      relationship: leads-to
   clusters:
     - community
     - ai-safety
@@ -2349,6 +2429,10 @@
     2024 that manages ~$2B in AI-focused public equities (semiconductors, energy
     infrastructure, data centers), delivering 47% gains in H1 2025. The fund's
     concentrated portfolio (100% in top 10 positions) includes major holdings in Nvidia, TSMC, and energy infrastructure companies.
+  relatedEntries:
+    - id: leopold-aschenbrenner
+      type: person
+      relationship: leads-to
   clusters:
     - community
     - ai-safety
@@ -2511,6 +2595,10 @@
     $130.5B in FY2025 (114% YoY growth), driven almost entirely by data center
     GPU sales. Its proprietary CUDA software ecosystem creates deep lock-in
     across the AI training stack.
+  relatedEntries:
+    - id: jensen-huang
+      type: person
+      relationship: leads-to
   clusters:
     - ai-safety
     - community
@@ -2535,6 +2623,9 @@
       type: organization
     - id: gNsqAes7Dw
       type: organization
+    - id: sam-bankman-fried
+      type: person
+      relationship: leads-to
   clusters:
     - ai-safety
     - community
@@ -2675,6 +2766,10 @@
   description: >-
     Major public research university and a leading center for AI safety research,
     home to CHAI (Center for Human-Compatible AI) and numerous AI alignment researchers.
+  relatedEntries:
+    - id: jacob-steinhardt
+      type: person
+      relationship: research
   tags:
     - academic
     - ai-safety
@@ -2691,6 +2786,13 @@
     Private research university in Stanford, California. Home to the Stanford
     Institute for Human-Centered Artificial Intelligence (HAI) and the Center for
     International Security and Cooperation (CISAC).
+  relatedEntries:
+    - id: andrew-ng
+      type: person
+      relationship: research
+    - id: fei-fei-li
+      type: person
+      relationship: research
   tags:
     - academic
     - ai-safety
@@ -2707,6 +2809,10 @@
   description: >-
     Historic UK research university, home to the Global Priorities Institute and
     formerly the Future of Humanity Institute.
+  relatedEntries:
+    - id: will-macaskill
+      type: person
+      relationship: research
   tags:
     - academic
     - ai-safety
@@ -2735,6 +2841,10 @@
   website: https://www.upenn.edu
   description: >-
     Private Ivy League research university in Philadelphia.
+  relatedEntries:
+    - id: philip-tetlock
+      type: person
+      relationship: research
   tags:
     - academic
   lastUpdated: 2026-03
@@ -2788,6 +2898,10 @@
   website: https://www.nyu.edu
   description: >-
     Private research university in New York City.
+  relatedEntries:
+    - id: gary-marcus
+      type: person
+      relationship: research
   tags:
     - academic
   lastUpdated: 2026-03
@@ -3071,6 +3185,10 @@
   website: https://www.cam.ac.uk
   description: >-
     Historic UK research university. Home to CSER.
+  relatedEntries:
+    - id: david-krueger
+      type: person
+      relationship: research
   tags:
     - academic
     - existential-risk
@@ -4489,6 +4607,9 @@
     - id: ULjDXpSLCI
       type: organization
       relationship: related
+    - id: dustin-moskovitz
+      type: person
+      relationship: leads-to
   tags:
     - ea-community
     - philanthropy
