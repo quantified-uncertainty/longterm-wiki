@@ -178,7 +178,8 @@ export function PeopleTable({
         r.role != null ||
         r.positionCount > 0 ||
         r.publicationCount > 0 ||
-        r.careerHistoryCount > 0,
+        r.careerHistoryCount > 0 ||
+        r.netWorthNum != null,
     ).length;
   }, [allRows, serverMode]);
 
@@ -267,7 +268,8 @@ export function PeopleTable({
           r.role != null ||
           r.positionCount > 0 ||
           r.publicationCount > 0 ||
-          r.careerHistoryCount > 0,
+          r.careerHistoryCount > 0 ||
+          r.netWorthNum != null,
       );
     }
 
@@ -399,8 +401,8 @@ export function PeopleTable({
             </button>
             {hasDataFilter && (
               <span className="text-xs text-muted-foreground/60">
-                Showing only people with role, position, publication, or career
-                data
+                Showing only people with role, position, publication, career,
+                or net worth data
               </span>
             )}
           </div>

@@ -29,10 +29,18 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
-  // Count rows that have no organizations and no papers
+  // Count rows (after cluster/status filters) that have no organizations and no papers.
+  // This must be post-filter so "(N hidden)" reflects the active view, not the full dataset.
   const emptyCount = useMemo(
-    () => rows.filter((r) => r.orgCount === 0 && r.paperCount === 0).length,
-    [rows]
+    () =>
+      rows
+        .filter((r) => {
+          if (clusterFilter !== "all" && r.cluster !== clusterFilter) return false;
+          if (statusFilter !== "all" && r.status !== statusFilter) return false;
+          return true;
+        })
+        .filter((r) => r.orgCount === 0 && r.paperCount === 0).length,
+    [rows, clusterFilter, statusFilter]
   );
 
   const clusters = useMemo(() => {
