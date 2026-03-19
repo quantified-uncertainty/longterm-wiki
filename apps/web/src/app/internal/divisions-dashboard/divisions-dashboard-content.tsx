@@ -62,7 +62,7 @@ function resolveEntityName(stableId: string): string {
 function enrichWithNames(divisions: RpcDivisionRow[]): DivisionRow[] {
   return divisions.map((d) => ({
     ...d,
-    parentOrgName: resolveEntityName(d.parentOrgId),
+    parentOrgName: d.parentOrgId ? resolveEntityName(d.parentOrgId) : undefined,
   }));
 }
 

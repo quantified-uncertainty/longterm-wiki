@@ -22,7 +22,7 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 export interface DivisionRow {
   id: string;
   slug: string | null;
-  parentOrgId: string;
+  parentOrgId: string | null;
   /** Resolved display name for the parent org (set by server component) */
   parentOrgName?: string;
   name: string;
