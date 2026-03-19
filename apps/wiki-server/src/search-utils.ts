@@ -23,13 +23,23 @@ export function buildPrefixTsquery(q: string): string {
 }
 
 /**
+ * Detect whether a query string looks like an acronym.
+ * An acronym is 2-4 characters, all uppercase letters (e.g. "ARC", "AI", "MIRI").
+ */
+export function isAcronymQuery(q: string): boolean {
+  return /^[A-Z]{2,4}$/.test(q.trim());
+}
+
+/**
  * Build a SQL expression that boosts the FTS rank for exact or prefix title matches.
  * - Exact match (case-insensitive): +1000 bonus (guarantees top result)
+ * - Acronym in parentheses (e.g. "(ARC)" in title): +500 bonus
  * - Title starts with query: +100 bonus
  * - Query found at a word boundary in title: +10 bonus
  *
  * This ensures that a page titled "Anthropic" ranks above "Anthropic IPO"
- * when the user searches for "Anthropic".
+ * when the user searches for "Anthropic", and "Alignment Research Center (ARC)"
+ * ranks above "System Architecture" when searching for "ARC".
  *
  * @param titleColumn - SQL column reference for the title (e.g. "title" or "wp.title")
  * @param queryParamRef - SQL parameter reference (e.g. "$1")
@@ -40,9 +50,12 @@ export function titleMatchBoostExpr(
 ): string {
   // Uses starts_with() and position() instead of LIKE to avoid
   // LIKE special characters (%, _) in user input affecting results.
+  // The acronym-in-parentheses boost uses position() to find "(QUERY)" in the title,
+  // matching case-sensitively since acronyms are uppercase by convention.
   return `(
     CASE
       WHEN lower(${titleColumn}) = lower(${queryParamRef}) THEN 1000
+      WHEN position('(' || upper(${queryParamRef}) || ')' in ${titleColumn}) > 0 THEN 500
       WHEN starts_with(lower(${titleColumn}), lower(${queryParamRef}) || ' ') THEN 100
       WHEN position(' ' || lower(${queryParamRef}) in lower(${titleColumn})) > 0 THEN 10
       ELSE 0
