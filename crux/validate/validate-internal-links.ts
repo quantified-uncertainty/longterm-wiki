@@ -25,7 +25,7 @@
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findMdxFiles, isValidWikiRoute } from '../lib/file-utils.ts';
 import { getColors, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, PROJECT_ROOT } from '../lib/content-types.ts';
 import { MARKDOWN_LINK_RE } from '../lib/patterns.ts';
@@ -152,6 +152,11 @@ function resolveLink(href: string, sourceFile: string): LinkResolution {
   // Skip placeholder links (contain ...)
   if (path.includes('...')) {
     return { exists: true, isPlaceholder: true };
+  }
+
+  // Check /wiki/E* dynamic routes against wikiId index
+  if (isValidWikiRoute(path)) {
+    return { exists: true };
   }
 
   // Remove trailing slash for file lookup
