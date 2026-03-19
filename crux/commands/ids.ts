@@ -4,9 +4,9 @@
  * Allocate and query numeric entity IDs from the wiki-server.
  *
  * Usage:
- *   crux ids allocate <slug> [--description="..."]   Allocate a wiki ID
- *   crux ids check <slug>                            Check if a slug has an ID
- *   crux ids list [--limit=50] [--offset=0]          List all allocated IDs
+ *   crux tb ids allocate <slug> [--description="..."]   Allocate a wiki ID
+ *   crux tb ids check <slug>                            Check if a slug has an ID
+ *   crux tb ids list [--limit=50] [--offset=0]          List all allocated IDs
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -38,14 +38,14 @@ async function allocateCommand(
   if (!slug) {
     return {
       exitCode: 1,
-      output: `Usage: crux ids allocate <slug> [--description="..."]
+      output: `Usage: crux tb ids allocate <slug> [--description="..."]
 
   Allocate a wiki ID (E##) for the given slug from the wiki-server.
   Idempotent: returns existing ID if slug is already registered.
 
 Examples:
-  crux ids allocate anthropic
-  crux ids allocate new-entity --description="A new entity"`,
+  crux tb ids allocate anthropic
+  crux tb ids allocate new-entity --description="A new entity"`,
     };
   }
 
@@ -91,13 +91,13 @@ async function checkCommand(
   if (!slug) {
     return {
       exitCode: 1,
-      output: `Usage: crux ids check <slug>
+      output: `Usage: crux tb ids check <slug>
 
   Check if a slug has a wiki ID allocated on the server.
 
 Examples:
-  crux ids check anthropic
-  crux ids check nonexistent-entity`,
+  crux tb ids check anthropic
+  crux tb ids check nonexistent-entity`,
     };
   }
 
@@ -205,9 +205,9 @@ Why use this:
   might both create entities without IDs and get conflicting assignments.
 
 Examples:
-  crux ids allocate anthropic                    # Get or create ID
-  crux ids allocate new-org --description="..."  # With description
-  crux ids check anthropic                       # Look up existing ID
-  crux ids list --limit=100                      # Browse all IDs
+  crux tb ids allocate anthropic                    # Get or create ID
+  crux tb ids allocate new-org --description="..."  # With description
+  crux tb ids check anthropic                       # Look up existing ID
+  crux tb ids list --limit=100                      # Browse all IDs
 `;
 }

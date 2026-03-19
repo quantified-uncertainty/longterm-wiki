@@ -6,9 +6,9 @@
  * program areas) for major AI safety and EA organizations.
  *
  * Usage:
- *   pnpm crux import-divisions list              # Show all divisions
- *   pnpm crux import-divisions sync              # Sync to wiki-server
- *   pnpm crux import-divisions sync --dry-run    # Preview without writing
+ *   pnpm crux tb import-divisions list              # Show all divisions
+ *   pnpm crux tb import-divisions sync              # Sync to wiki-server
+ *   pnpm crux tb import-divisions sync --dry-run    # Preview without writing
  */
 
 import { generateId } from "../lib/grant-import/id.ts";

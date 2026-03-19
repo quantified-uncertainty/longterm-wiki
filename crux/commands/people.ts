@@ -5,15 +5,15 @@
  * focused subcommand modules in `./people/`.
  *
  * Usage:
- *   crux people discover [--min-appearances=N] [--json]
- *   crux people create [--min-appearances=N]
- *   crux people link-resources [--apply] [--verbose]   Match resources/literature to person entities
- *   crux people enrich --source=wikidata --dry-run              Preview all enrichment
- *   crux people enrich --source=wikidata --apply                Write new facts to YAML
- *   crux people enrich --source=wikidata --entity=dario-amodei  Single entity
- *   crux people enrich --source=wikidata --dry-run --ci         JSON output
- *   crux people import-key-persons [--sync] [--dry-run] [--verbose]   Sync key-persons from YAML to PG
- *   crux people suggest-links [--apply] [--verbose]   Detect unlinked person mentions in MDX pages
+ *   crux tb people discover [--min-appearances=N] [--json]
+ *   crux tb people create [--min-appearances=N]
+ *   crux tb people link-resources [--apply] [--verbose]   Match resources/literature to person entities
+ *   crux tb people enrich --source=wikidata --dry-run              Preview all enrichment
+ *   crux tb people enrich --source=wikidata --apply                Write new facts to YAML
+ *   crux tb people enrich --source=wikidata --entity=dario-amodei  Single entity
+ *   crux tb people enrich --source=wikidata --dry-run --ci         JSON output
+ *   crux tb people import-key-persons [--sync] [--dry-run] [--verbose]   Sync key-persons from YAML to PG
+ *   crux tb people suggest-links [--apply] [--verbose]   Detect unlinked person mentions in MDX pages
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -95,24 +95,24 @@ export function getHelp(): string {
   --verbose        Show per-org details
 
 \x1b[1mExamples:\x1b[0m
-  crux people discover                     # List all candidates
-  crux people discover --min-appearances=2 # Only people in 2+ sources
-  crux people discover --json              # JSON output
-  crux people create                       # Generate YAML stubs (min 2 appearances)
-  crux people create --min-appearances=1   # Include single-mention candidates
-  crux people link-resources               # Preview matches (dry run)
-  crux people link-resources --apply       # Generate people-resources.yaml
-  crux people link-resources --verbose     # Show all match details
-  crux people enrich --source=wikidata --dry-run
-  crux people enrich --source=wikidata --apply
-  crux people enrich --source=wikidata --entity=dario-amodei --dry-run
-  crux people import-key-persons              # Preview extracted key-persons
-  crux people import-key-persons --verbose    # Show per-org details
-  crux people import-key-persons --sync       # Sync to wiki-server PG
-  crux people import-key-persons --sync --dry-run   # Preview sync (no writes)
-  crux people suggest-links                  # Preview unlinked person mentions
-  crux people suggest-links --verbose        # Show all mentions (linked and unlinked)
-  crux people suggest-links --apply          # Wrap first occurrence in EntityLink
+  crux tb people discover                     # List all candidates
+  crux tb people discover --min-appearances=2 # Only people in 2+ sources
+  crux tb people discover --json              # JSON output
+  crux tb people create                       # Generate YAML stubs (min 2 appearances)
+  crux tb people create --min-appearances=1   # Include single-mention candidates
+  crux tb people link-resources               # Preview matches (dry run)
+  crux tb people link-resources --apply       # Generate people-resources.yaml
+  crux tb people link-resources --verbose     # Show all match details
+  crux tb people enrich --source=wikidata --dry-run
+  crux tb people enrich --source=wikidata --apply
+  crux tb people enrich --source=wikidata --entity=dario-amodei --dry-run
+  crux tb people import-key-persons              # Preview extracted key-persons
+  crux tb people import-key-persons --verbose    # Show per-org details
+  crux tb people import-key-persons --sync       # Sync to wiki-server PG
+  crux tb people import-key-persons --sync --dry-run   # Preview sync (no writes)
+  crux tb people suggest-links                  # Preview unlinked person mentions
+  crux tb people suggest-links --verbose        # Show all mentions (linked and unlinked)
+  crux tb people suggest-links --apply          # Wrap first occurrence in EntityLink
 
 \x1b[1mSuggest-Links Options:\x1b[0m
   --apply          Wrap the first unlinked occurrence of each person in EntityLink

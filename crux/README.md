@@ -13,9 +13,9 @@ pnpm crux --help
 node crux/crux.mjs <domain> <command> [options]
 
 # Examples
-pnpm crux validate                          # Run all validation checks
-pnpm crux content improve far-ai --tier deep
-pnpm crux updates list --overdue
+pnpm crux w validate                          # Run all validation checks
+pnpm crux w content improve far-ai --tier deep
+pnpm crux w updates list --overdue
 ```
 
 ## Architecture
@@ -133,7 +133,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 
 1. Create a rule file in `lib/rules/` following the existing pattern
 2. Register it in the `ValidationEngine` (see `lib/validation-engine.ts`)
-3. The rule will be available via `crux validate unified --rules=<your-rule>`
+3. The rule will be available via `pnpm crux w validate unified --rules=<your-rule>`
 
 ## How to Add a CLI Command
 

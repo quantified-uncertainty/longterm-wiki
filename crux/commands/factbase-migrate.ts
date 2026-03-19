@@ -274,7 +274,7 @@ async function migrateCommand(
   if (!slug) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
+      output: `Usage: crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Migrate an entity from data/entities/*.yaml to packages/factbase/data/things/*.yaml.
 
@@ -284,9 +284,9 @@ Options:
   --force      Overwrite existing KB thing file if it already exists
 
 Examples:
-  crux kb migrate deepmind --dry-run
-  crux kb migrate ajeya-cotra --stub-old
-  crux kb migrate authentication-collapse`,
+  crux fb migrate deepmind --dry-run
+  crux fb migrate ajeya-cotra --stub-old
+  crux fb migrate authentication-collapse`,
     };
   }
 
@@ -295,7 +295,7 @@ Examples:
   if (existsSync(kbPath) && !force) {
     return {
       exitCode: 1,
-      output: `KB thing already exists at ${kbPath}\nUse 'crux kb show ${slug}' to inspect it, or pass --force to overwrite.`,
+      output: `KB thing already exists at ${kbPath}\nUse 'crux fb show ${slug}' to inspect it, or pass --force to overwrite.`,
     };
   }
 
@@ -372,8 +372,8 @@ Examples:
     lines.push('Next steps:');
     lines.push(`  1. Review and enrich: packages/factbase/data/things/${slug}.yaml`);
     lines.push('  2. Add facts (born-year, role, employed-by, etc.) with sources');
-    lines.push('  3. Validate: pnpm crux kb validate');
-    lines.push('  4. Check: pnpm crux kb show ' + slug);
+    lines.push('  3. Validate: pnpm crux fb validate');
+    lines.push('  4. Check: pnpm crux fb show ' + slug);
   }
 
   return { exitCode: 0, output: lines.join('\n') };
@@ -390,7 +390,7 @@ export function getHelp(): string {
 KB Migrate — Migrate entities from old system to KB
 
 Usage:
-  crux kb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
+  crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Reads an entity from data/entities/*.yaml and creates a new KB thing file
   at packages/factbase/data/things/<slug>.yaml with the mapped structure.
@@ -423,9 +423,9 @@ What gets skipped (with warnings):
   - Type-specific fields (severity, likelihood, timeframe, etc.)
 
 Examples:
-  crux kb migrate deepmind --dry-run        Preview migration
-  crux kb migrate ajeya-cotra               Create KB thing file
-  crux kb migrate ajeya-cotra --stub-old    Create KB thing + strip old entity
-  crux kb migrate deepmind --force          Overwrite existing KB thing
+  crux fb migrate deepmind --dry-run        Preview migration
+  crux fb migrate ajeya-cotra               Create KB thing file
+  crux fb migrate ajeya-cotra --stub-old    Create KB thing + strip old entity
+  crux fb migrate deepmind --force          Overwrite existing KB thing
 `;
 }

@@ -4,15 +4,15 @@
  * Track Claude Code work on GitHub issues: list, prioritize, search, signal start/done.
  *
  * Usage:
- *   crux issues                      List open issues ranked by priority
- *   crux issues list                 Same as above
- *   crux issues next                 Show the single next issue to work on
- *   crux issues search <query>       Search existing issues before filing a new one
- *   crux issues comment <N> <msg>    Post a comment on an existing issue
- *   crux issues start <N>            Signal start: comment + add agent:working label
- *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
- *   crux issues cleanup              Detect stale agent:working labels + potential duplicates
- *   crux issues close <N> [--reason] Close an issue with an optional comment
+ *   crux gh issues                      List open issues ranked by priority
+ *   crux gh issues list                 Same as above
+ *   crux gh issues next                 Show the single next issue to work on
+ *   crux gh issues search <query>       Search existing issues before filing a new one
+ *   crux gh issues comment <N> <msg>    Post a comment on an existing issue
+ *   crux gh issues start <N>            Signal start: comment + add agent:working label
+ *   crux gh issues done <N> [--pr=URL]  Signal completion: comment + remove label
+ *   crux gh issues cleanup              Detect stale agent:working labels + potential duplicates
+ *   crux gh issues close <N> [--reason] Close an issue with an optional comment
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -512,9 +512,9 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   output += `\n${c.dim}Commands:${c.reset}\n`;
-  output += `  ${c.dim}crux issues next        — show next issue to pick up${c.reset}\n`;
-  output += `  ${c.dim}crux issues start <N>   — announce start + add label${c.reset}\n`;
-  output += `  ${c.dim}crux issues done <N>    — announce completion + remove label${c.reset}\n`;
+  output += `  ${c.dim}crux gh issues next        — show next issue to pick up${c.reset}\n`;
+  output += `  ${c.dim}crux gh issues start <N>   — announce start + add label${c.reset}\n`;
+  output += `  ${c.dim}crux gh issues done <N>    — announce completion + remove label${c.reset}\n`;
 
   if (options.json) {
     return { output: JSON.stringify(ranked, null, 2), exitCode: 0 };
@@ -595,7 +595,7 @@ async function next(_args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   output += `${c.bold}To start work:${c.reset}\n`;
-  output += `  pnpm crux issues start ${top.number}\n`;
+  output += `  pnpm crux gh issues start ${top.number}\n`;
 
   if (options.json) {
     return { output: JSON.stringify(top, null, 2), exitCode: 0 };
@@ -713,7 +713,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args[0];
   if (!title) {
     return {
-      output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--file=<path>] [--evidence="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--file=<path>] [--evidence="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -878,7 +878,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     const missing = checkIssueSections(title, body);
     if (missing.length > 0) {
       output += `  ${c.yellow}⚠ Missing sections: ${missing.join(', ')}${c.reset}\n`;
-      output += `  ${c.dim}Fix with: crux issues update-body ${issue.number} --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
+      output += `  ${c.dim}Fix with: crux gh issues update-body ${issue.number} --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
     }
   }
   if (evidenceWarning) output += evidenceWarning;
@@ -898,7 +898,7 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues start <issue-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues start <issue-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -983,7 +983,7 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues done <issue-number> [--pr=URL]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues done <issue-number> [--pr=URL]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1262,8 +1262,8 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   const query = args.join(' ').trim();
   if (!query) {
     return {
-      output: `${c.red}Usage: crux issues search <query>${c.reset}\n` +
-        `${c.dim}Example: crux issues search "dollar sign escaping in MDX"${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues search <query>${c.reset}\n` +
+        `${c.dim}Example: crux gh issues search "dollar sign escaping in MDX"${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1408,7 +1408,7 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   if (matches.length === 0) {
     output += `\n${c.yellow}No keyword matches found.${c.reset}\n`;
     output += `${c.dim}This search is keyword-based and may miss issues phrased differently.\n`;
-    output += `If your topic is specific, also browse: crux issues list${c.reset}\n`;
+    output += `If your topic is specific, also browse: crux gh issues list${c.reset}\n`;
     if (!includeClosed) {
       output += `${c.dim}Tip: Use --closed to also search closed issues.${c.reset}\n`;
     }
@@ -1469,8 +1469,8 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues comment <issue-number> <message>${c.reset}\n` +
-        `${c.dim}Example: crux issues comment 42 "Found another instance in gate.ts:142"${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues comment <issue-number> <message>${c.reset}\n` +
+        `${c.dim}Example: crux gh issues comment 42 "Found another instance in gate.ts:142"${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1481,8 +1481,8 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
   if (!message) {
     return {
       output: `${c.red}No comment message provided.${c.reset}\n` +
-        `${c.dim}Usage: crux issues comment <N> "your message"${c.reset}\n` +
-        `${c.dim}   or: crux issues comment <N> --body-file=/tmp/comment.md${c.reset}\n`,
+        `${c.dim}Usage: crux gh issues comment <N> "your message"${c.reset}\n` +
+        `${c.dim}   or: crux gh issues comment <N> --body-file=/tmp/comment.md${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1533,7 +1533,7 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues close <issue-number> [--reason="..."] [--duplicate=N]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues close <issue-number> [--reason="..."] [--duplicate=N]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1662,7 +1662,7 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
 return {
-      output: `${c.red}Usage: crux issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1759,8 +1759,8 @@ return {
  * Checks: non-empty body, Problem section, Acceptance Criteria, Recommended Model.
  *
  * Usage:
- *   crux issues lint        Lint all open issues
- *   crux issues lint <N>    Lint a single issue
+ *   crux gh issues lint        Lint all open issues
+ *   crux gh issues lint <N>    Lint a single issue
  */
 async function lint(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1844,7 +1844,7 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
     output += ` (${total} total)\n`;
 
     if (failCount > 0) {
-      output += `\n${c.dim}Fix with: crux issues update-body <N> --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
+      output += `\n${c.dim}Fix with: crux gh issues update-body <N> --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
     }
   }
 
@@ -1865,7 +1865,7 @@ async function updateTitle(args: string[], options: CommandOptions): Promise<Com
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues update-title <issue-number> --title="New title"${c.reset}\n`,
+      output: `${c.red}Usage: crux gh issues update-title <issue-number> --title="New title"${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1873,7 +1873,7 @@ async function updateTitle(args: string[], options: CommandOptions): Promise<Com
   const newTitle = options.title as string | undefined;
   if (!newTitle) {
     return {
-      output: `${c.red}Missing --title flag. Usage: crux issues update-title <N> --title="New title"${c.reset}\n`,
+      output: `${c.red}Missing --title flag. Usage: crux gh issues update-title <N> --title="New title"${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1986,7 +1986,7 @@ Issue Formatting Standard:
     2. ## Acceptance Criteria section or - [ ] checkboxes
     3. Recommended model: **Haiku/Sonnet/Opus** in ## Recommended Model section,
        or [haiku/sonnet/opus] suffix in the issue title
-  Check compliance with: crux issues lint [N]
+  Check compliance with: crux gh issues lint [N]
 
 Scoring (weighted):
   Issues are ranked by a composite score combining:
@@ -2000,28 +2000,28 @@ Scoring (weighted):
   shown separately and excluded from the queue.
 
 Examples:
-  crux issues                        List all open issues
-  crux issues --scores               List with score breakdowns + formatting warnings
-  crux issues next                   Show next issue to pick up
-  crux issues search "MDX escaping"  Check if issue exists before filing
-  crux issues search "broken build" --closed   Also search closed issues
-  crux issues comment 42 "Found another instance in gate.ts:142"
-  crux issues lint                   Check all issues for formatting problems
-  crux issues lint 239               Check single issue #239
-  crux issues create "Add validation rule for X" --label=tooling \\
+  crux gh issues                        List all open issues
+  crux gh issues --scores               List with score breakdowns + formatting warnings
+  crux gh issues next                   Show next issue to pick up
+  crux gh issues search "MDX escaping"  Check if issue exists before filing
+  crux gh issues search "broken build" --closed   Also search closed issues
+  crux gh issues comment 42 "Found another instance in gate.ts:142"
+  crux gh issues lint                   Check all issues for formatting problems
+  crux gh issues lint 239               Check single issue #239
+  crux gh issues create "Add validation rule for X" --label=tooling \\
     --problem="X is not validated..." --model=haiku \\
     --criteria="Validation added|Tests pass|CI green" --cost="<$1"
   # For bodies with backticks/dollars/parens, use --problem-file or --body-file:
-  crux issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
-  crux issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
-  crux issues update-body 239 --body-file=/tmp/full-body.md  # Set raw body (no merge)
-  crux issues start 239              Announce start (blocks if another agent is active)
-  crux issues start 239 --force      Override conflict check
-  crux issues done 239 --pr=https://github.com/.../pull/42
-  crux issues cleanup                Check for stale labels and duplicates
-  crux issues cleanup --fix          Auto-remove stale agent:working labels
-  crux issues close 42 --duplicate=10
-  crux issues close 42 --reason="Already done in PR #100"
+  crux gh issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
+  crux gh issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
+  crux gh issues update-body 239 --body-file=/tmp/full-body.md  # Set raw body (no merge)
+  crux gh issues start 239              Announce start (blocks if another agent is active)
+  crux gh issues start 239 --force      Override conflict check
+  crux gh issues done 239 --pr=https://github.com/.../pull/42
+  crux gh issues cleanup                Check for stale labels and duplicates
+  crux gh issues cleanup --fix          Auto-remove stale agent:working labels
+  crux gh issues close 42 --duplicate=10
+  crux gh issues close 42 --reason="Already done in PR #100"
 
 Slash command:
   /next-issue    Claude Code command for the full "pick up next issue" workflow

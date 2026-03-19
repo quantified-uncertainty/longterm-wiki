@@ -18,10 +18,10 @@
 # frequency: how often to check (daily | weekly | biweekly | monthly)
 #
 # Workflow:
-#   pnpm crux audits list              # See what needs checking
-#   pnpm crux audits check <id>        # Record a check result
-#   pnpm crux audits run-auto          # Run automated checks
-#   pnpm crux audits report            # Full report for maintenance sweep
+#   pnpm crux sys audits list              # See what needs checking
+#   pnpm crux sys audits check <id>        # Record a check result
+#   pnpm crux sys audits run-auto          # Run automated checks
+#   pnpm crux sys audits report            # Full report for maintenance sweep
 
 audits:
   - id: groundskeeper-health
@@ -111,13 +111,13 @@ audits:
 
   - id: ci-gate-catches-regressions
     category: infrastructure
-    description: "CI gate (pnpm crux validate gate) catches real issues — not just passing silently"
+    description: "CI gate (pnpm crux w validate gate) catches real issues — not just passing silently"
     check_type: manual
     how_to_verify: |
       Review recent CI runs on main. Check if any had gate failures that were
       caught and fixed. If the gate has passed 100% of the time for weeks,
       verify it's still running all validators (not silently skipping).
-      Run `pnpm crux validate gate` locally and confirm it exercises all checks.
+      Run `pnpm crux w validate gate` locally and confirm it exercises all checks.
     frequency: monthly
     added: "2026-03-04"
     last_checked: "2026-03-05"
@@ -147,7 +147,7 @@ audits:
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
     check_type: manual
     how_to_verify: |
-      Run `pnpm crux audits list`. If most items show "never checked" or are
+      Run `pnpm crux sys audits list`. If most items show "never checked" or are
       overdue, the system is not being used. Consider integrating more tightly
       into the maintenance sweep or simplifying the workflow.
     frequency: biweekly
@@ -178,8 +178,8 @@ post_merge:
   - id: audits-system-post-merge
     pr: 1637
     merged: "2026-03-04"
-    claim: "The crux audits system works end-to-end after merge"
-    how_to_verify: "Run each crux audits subcommand on main branch and verify output is correct"
+    claim: "The crux sys audits system works end-to-end after merge"
+    how_to_verify: "Run each crux sys audits subcommand on main branch and verify output is correct"
     status: verified
     deadline: "2026-03-18"
     checked_date: "2026-03-05"

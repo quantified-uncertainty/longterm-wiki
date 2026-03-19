@@ -55,12 +55,12 @@ export function getHelp(): string {
 Check-Links Domain - External URL health checking
 
 Usage:
-  crux check-links                         Check all URLs across all sources
-  crux check-links --source=resources      Only check data/resources/*.yaml
-  crux check-links --source=external       Only check data/external-links.yaml
-  crux check-links --source=content        Only check MDX content URLs
-  crux check-links --report                Generate JSON report
-  crux check-links --fix                   Suggest archive.org replacements
+  crux w check-links                         Check all URLs across all sources
+  crux w check-links --source=resources      Only check data/resources/*.yaml
+  crux w check-links --source=external       Only check data/external-links.yaml
+  crux w check-links --source=content        Only check MDX content URLs
+  crux w check-links --report                Generate JSON report
+  crux w check-links --fix                   Suggest archive.org replacements
 
 Options:
   --source=<type>   Filter by source: resources, external, content, all (default: all)
@@ -71,8 +71,8 @@ Options:
   --clear-cache     Clear the link check cache before running
 
 Examples:
-  crux check-links --limit=100             Quick test with 100 URLs
-  crux check-links --source=resources --report --fix
-  crux check-links --verbose               Detailed output for all checks
+  crux w check-links --limit=100             Quick test with 100 URLs
+  crux w check-links --source=resources --report --fix
+  crux w check-links --verbose               Detailed output for all checks
 `;
 }

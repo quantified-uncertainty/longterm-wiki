@@ -5,18 +5,27 @@
  * and run LLM agents with web search to fill gaps.
  *
  * Usage:
- *   crux tablebase scan           Show per-table completeness scores
- *   crux tablebase gaps           Ranked list of missing data
- *   crux tablebase next-task      Single highest-impact task (JSON)
- *   crux tablebase improve        Run LLM agent for one task
- *   crux tablebase mark-done      Exclude from future picks
- *   crux tablebase loop           Autonomous multi-task loop
- *   crux tablebase sync-careers   Sync FactBase career data to personnel table
+ *   crux tb tablebase scan           Show per-table completeness scores
+ *   crux tb tablebase gaps           Ranked list of missing data
+ *   crux tb tablebase next-task      Single highest-impact task (JSON)
+ *   crux tb tablebase improve        Run LLM agent for one task
+ *   crux tb tablebase mark-done      Exclude from future picks
+ *   crux tb tablebase loop           Autonomous multi-task loop
+ *   crux tb tablebase sync-careers   Sync FactBase career data to personnel table
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import type { TaskType } from '../tablebase/types.ts';
 import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
+
+// Consolidated orphan domain imports
+import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
+import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
+import { commands as backfillStableIdsCommands } from './backfill-stable-ids.ts';
+import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stable-ids.ts';
+import { commands as importGrantsCommands } from './import-grants.ts';
+import { commands as importDivisionsCommands } from './import-divisions.ts';
+import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -107,7 +116,7 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
 async function improveCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
-    return { exitCode: 1, output: 'Usage: crux tablebase improve <task-id> [--dry-run]' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase improve <task-id> [--dry-run]' };
   }
 
   const { findTaskById } = await import('../tablebase/loop.ts');
@@ -115,7 +124,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
 
   const task = await findTaskById(taskId);
   if (!task) {
-    return { exitCode: 1, output: `Task not found: ${taskId}. Run 'crux tablebase gaps' to see available tasks.` };
+    return { exitCode: 1, output: `Task not found: ${taskId}. Run 'crux tb tablebase gaps' to see available tasks.` };
   }
 
   const dryRun = !!options.dryRun;
@@ -139,7 +148,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
 async function resolveCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const name = args.filter(a => !a.startsWith('--')).join(' ');
   if (!name) {
-    return { exitCode: 1, output: 'Usage: crux tablebase resolve <entity name>' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase resolve <entity name>' };
   }
 
   const { buildEntityMatcher, matchGrantee } = await import('../lib/grant-import/entity-matcher.ts');
@@ -167,7 +176,7 @@ async function resolveCommand(args: string[], options: CommandOptions): Promise<
 async function submitCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const table = options.table as string;
   if (!table) {
-    return { exitCode: 1, output: 'Usage: crux tablebase submit --table=<table> --records-file=<path>\n       echo \'[...]\' | crux tablebase submit --table=<table>' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase submit --table=<table> --records-file=<path>\n       echo \'[...]\' | crux tb tablebase submit --table=<table>' };
   }
 
   const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'];
@@ -250,7 +259,7 @@ async function existingCommand(args: string[], options: CommandOptions): Promise
   const entityId = args.find(a => !a.startsWith('--'));
 
   if (!table || !entityId) {
-    return { exitCode: 1, output: 'Usage: crux tablebase existing <entityId> --table=<table>' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase existing <entityId> --table=<table>' };
   }
 
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
@@ -272,7 +281,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   const nameArgs = args.filter(a => !a.startsWith('--'));
   const name = nameArgs.join(' ');
   if (!name) {
-    return { exitCode: 1, output: 'Usage: crux tablebase create-entity "Person Name" --type=person' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase create-entity "Person Name" --type=person' };
   }
 
   const entityType = (options.type as string) || 'person';
@@ -323,7 +332,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
 async function fetchPageCommand(args: string[], _options: CommandOptions): Promise<CommandResult> {
   const url = args.find(a => !a.startsWith('--'));
   if (!url) {
-    return { exitCode: 1, output: 'Usage: crux tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
   }
 
   const { execSync } = await import('child_process');
@@ -685,18 +694,18 @@ ${recordFields}
 ### Commands to use
 \`\`\`bash
 # Resolve a person/entity name to their ID:
-pnpm crux tablebase resolve "Person Name" --ci
+pnpm crux tb tablebase resolve "Person Name" --ci
 
 # If NOT_FOUND, create the entity first:
-pnpm crux tablebase create-entity "Person Name" --type=person --ci
+pnpm crux tb tablebase create-entity "Person Name" --type=person --ci
 
 # Submit records (pipe JSON array):
-cat <<'RECORDS' | pnpm crux tablebase submit --table=${submitTable}
+cat <<'RECORDS' | pnpm crux tb tablebase submit --table=${submitTable}
 [{"personId":"<ID>","organizationId":"${task.entityId}","role":"<ROLE>","roleType":"key-person","source":"<URL>"}]
 RECORDS
 
 # When done:
-pnpm crux tablebase mark-done ${task.id}
+pnpm crux tb tablebase mark-done ${task.id}
 \`\`\`
 ${existingRecords.length > 0 ? `\n### Existing records\n\`\`\`json\n${JSON.stringify(existingRecords.slice(0, 5), null, 2)}\n\`\`\`\n` : ''}${divisionsInfo}`;
 
@@ -712,7 +721,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   const chunks: Buffer[] = [];
   const stdin = process.stdin;
   if (stdin.isTTY) {
-    return { exitCode: 1, output: 'Usage: echo \'["Name 1","Name 2"]\' | crux tablebase ensure-entities --type=person' };
+    return { exitCode: 1, output: 'Usage: echo \'["Name 1","Name 2"]\' | crux tb tablebase ensure-entities --type=person' };
   }
   for await (const chunk of stdin) {
     chunks.push(chunk as Buffer);
@@ -800,7 +809,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
-    return { exitCode: 1, output: 'Usage: crux tablebase mark-done <task-id>' };
+    return { exitCode: 1, output: 'Usage: crux tb tablebase mark-done <task-id>' };
   }
 
   const { markTaskDone } = await import('../tablebase/task-ranker.ts');
@@ -953,6 +962,20 @@ export const commands = {
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
   default: scanCommand,
+  // Consolidated from backfill-* orphan domains
+  'backfill-grantee-ids': backfillGranteeIdsCommands.default,
+  'backfill-program-ids': backfillProgramIdsCommands.default,
+  'backfill-stable-ids': backfillStableIdsCommands.run,
+  'backfill-yaml-stable-ids': backfillYamlStableIdsCommands.run,
+  // Consolidated from import-* orphan domains
+  'import-grants': importGrantsCommands.default,
+  'import-grants-sync': importGrantsCommands.sync,
+  'import-grants-dedup': importGrantsCommands.dedup,
+  'import-grants-download': importGrantsCommands.download,
+  'import-divisions': importDivisionsCommands.default,
+  'import-divisions-sync': importDivisionsCommands.sync,
+  'import-funding-programs': importFundingProgramsCommands.default,
+  'import-funding-programs-sync': importFundingProgramsCommands.sync,
 };
 
 export function getHelp(): string {
@@ -972,6 +995,22 @@ Commands:
   existing       Query existing records for an entity (for Claude Code skill)
   sync-careers   Sync FactBase career data to the personnel table
 
+  Backfill (consolidated from backfill-* domains):
+  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+  backfill-program-ids [--dry-run]       Link grants to funding programs
+  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
+  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
+
+  Import (consolidated from import-* domains):
+  import-grants               Analyze grant import stats (default)
+  import-grants-sync          Import grants to wiki-server
+  import-grants-dedup         Remove cross-source duplicates
+  import-grants-download      Download grant data files
+  import-divisions            List known organizational divisions (default)
+  import-divisions-sync       Sync divisions to wiki-server
+  import-funding-programs     List known funding programs (default)
+  import-funding-programs-sync  Sync programs to wiki-server
+
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing
   --top=N, --limit=N        Number of gaps to show (default: 20)
@@ -985,7 +1024,7 @@ Options:
   --ci                      JSON output
 
 Modes:
-  API mode:          crux tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
   Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:
@@ -996,18 +1035,18 @@ Task Types:
   benchmark-result-fill      Add benchmark scores for AI models
 
 Examples:
-  crux tablebase scan                                   # Overview of all tables
-  crux tablebase gaps --top=10                          # Top 10 enrichment targets
-  crux tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
-  crux tablebase next-task --format=json                # JSON for scripting
-  crux tablebase improve abc123def --dry-run            # Test run without writing
-  crux tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
-  crux tablebase resolve "OpenAI"                       # Resolve name → stableId
-  crux tablebase resolve "OpenAI" --ci                  # JSON output
-  crux tablebase existing A4XoubikkQ --table=personnel  # Show existing records
-  echo '[{...}]' | crux tablebase submit --table=personnel  # Submit records via pipe
-  crux tablebase mark-done abc123def                    # Exclude from future runs
-  crux tablebase sync-careers                           # Populate personnel table from FactBase
-  crux tablebase sync-careers --dry-run                 # Preview extraction without writing
+  crux tb tablebase scan                                   # Overview of all tables
+  crux tb tablebase gaps --top=10                          # Top 10 enrichment targets
+  crux tb tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
+  crux tb tablebase next-task --format=json                # JSON for scripting
+  crux tb tablebase improve abc123def --dry-run            # Test run without writing
+  crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
+  crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId
+  crux tb tablebase resolve "OpenAI" --ci                  # JSON output
+  crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
+  echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
+  crux tb tablebase mark-done abc123def                    # Exclude from future runs
+  crux tb tablebase sync-careers                           # Populate personnel table from FactBase
+  crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing
 `;
 }

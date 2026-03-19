@@ -6,14 +6,14 @@
  * and auto-merges PRs labeled `stage:approved` when clean.
  *
  * Usage:
- *   crux pr-patrol run              Run the daemon (continuous)
- *   crux pr-patrol once             Single check cycle
- *   crux pr-patrol once --dry-run   Show what would be done
- *   crux pr-patrol status           Show recent patrol activity
- *   crux pr-patrol history          Browse full log with filters
- *   crux pr-patrol stats            Aggregated metrics
- *   crux pr-patrol merge-status     Show merge-eligible PRs
- *   crux pr-patrol explain          What PR Patrol does
+ *   crux gh pr-patrol run              Run the daemon (continuous)
+ *   crux gh pr-patrol once             Single check cycle
+ *   crux gh pr-patrol once --dry-run   Show what would be done
+ *   crux gh pr-patrol status           Show recent patrol activity
+ *   crux gh pr-patrol history          Browse full log with filters
+ *   crux gh pr-patrol stats            Aggregated metrics
+ *   crux gh pr-patrol merge-status     Show merge-eligible PRs
+ *   crux gh pr-patrol explain          What PR Patrol does
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
@@ -160,7 +160,7 @@ async function branchAgent(
   const prNumber = parseRequiredInt(prArg);
   if (!prNumber) {
     return {
-      output: 'Error: branch-agent requires a PR number\n  Usage: crux pr-patrol branch-agent <PR#>\n',
+      output: 'Error: branch-agent requires a PR number\n  Usage: crux gh pr-patrol branch-agent <PR#>\n',
       exitCode: 1,
     };
   }
@@ -235,9 +235,9 @@ Commands:
   merge-status     Show PRs labeled ${LABELS.STAGE_APPROVED} and their eligibility
 
 Branch Agent (phase 1 persistent watchdog):
-  crux pr-patrol branch-agent <PR#>     Watch and fix a specific PR continuously
-  crux pr-patrol branch-agent <PR#> --max-invocations=10   Cap at 10 fix sessions
-  crux pr-patrol branch-agent <PR#> --timeout=15           15-min per session timeout
+  crux gh pr-patrol branch-agent <PR#>     Watch and fix a specific PR continuously
+  crux gh pr-patrol branch-agent <PR#> --max-invocations=10   Cap at 10 fix sessions
+  crux gh pr-patrol branch-agent <PR#> --timeout=15           15-min per session timeout
 
   The branch-agent dedicates full attention to one PR, running multiple short
   fix sessions with CI waits between them. Unlike the daemon (which fixes one PR
@@ -254,12 +254,12 @@ Branch Agent Options:
   --skip-perms         Add --dangerously-skip-permissions to Claude CLI
 
 Parallel Patrol (dispatch fixes to agent slots concurrently):
-  crux pr-patrol parallel                    Continuous daemon
-  crux pr-patrol parallel --once             Single cycle
-  crux pr-patrol parallel --max-slots=5      Limit concurrency (default: 5)
-  crux pr-patrol parallel --slot-range=2-10  Restrict slot range (default: 2-15)
-  crux pr-patrol parallel --reserve-slots=2  Keep N slots free for manual use (default: 2)
-  crux pr-patrol parallel --dry-run          Preview dispatch plan
+  crux gh pr-patrol parallel                    Continuous daemon
+  crux gh pr-patrol parallel --once             Single cycle
+  crux gh pr-patrol parallel --max-slots=5      Limit concurrency (default: 5)
+  crux gh pr-patrol parallel --slot-range=2-10  Restrict slot range (default: 2-15)
+  crux gh pr-patrol parallel --reserve-slots=2  Keep N slots free for manual use (default: 2)
+  crux gh pr-patrol parallel --dry-run          Preview dispatch plan
 
   Uses lw/a2-a15 agent slots as isolated clones for parallel PR fixes.
   Shares cooldowns, failure tracking, and claim labels with the serial daemon.
@@ -318,20 +318,20 @@ Environment:
   PR_PATROL_REFLECTION_INTERVAL   Reflect every N cycles (default: 10)
 
 Examples:
-  crux pr-patrol once --dry-run                 Preview what would be fixed/merged
-  crux pr-patrol run --interval=120             Run with 2-minute cycles
-  crux pr-patrol branch-agent 1234              Watch PR #1234 until fixed/merged
-  crux pr-patrol branch-agent 1234 --dry-run    Preview what branch-agent would do
-  crux pr-patrol status                         Show recent activity
-  crux pr-patrol status --watch                 Live-refreshing dashboard
-  crux pr-patrol status --watch --interval=5    Faster refresh
-  crux pr-patrol status --pr=1234               Show activity for a specific PR
-  crux pr-patrol history --since=7d             Browse last 7 days of logs
-  crux pr-patrol stats --since=30d              Monthly performance stats
-  crux pr-patrol explain                        How PR Patrol works
-  crux pr-patrol merge-status                   Show merge-eligible PRs
-  crux pr-patrol parallel --once --dry-run     Preview parallel dispatch plan
-  crux pr-patrol parallel --once --max-slots=3 Run single cycle with 3 slots
-  crux pr-patrol parallel                       Continuous parallel daemon
+  crux gh pr-patrol once --dry-run                 Preview what would be fixed/merged
+  crux gh pr-patrol run --interval=120             Run with 2-minute cycles
+  crux gh pr-patrol branch-agent 1234              Watch PR #1234 until fixed/merged
+  crux gh pr-patrol branch-agent 1234 --dry-run    Preview what branch-agent would do
+  crux gh pr-patrol status                         Show recent activity
+  crux gh pr-patrol status --watch                 Live-refreshing dashboard
+  crux gh pr-patrol status --watch --interval=5    Faster refresh
+  crux gh pr-patrol status --pr=1234               Show activity for a specific PR
+  crux gh pr-patrol history --since=7d             Browse last 7 days of logs
+  crux gh pr-patrol stats --since=30d              Monthly performance stats
+  crux gh pr-patrol explain                        How PR Patrol works
+  crux gh pr-patrol merge-status                   Show merge-eligible PRs
+  crux gh pr-patrol parallel --once --dry-run     Preview parallel dispatch plan
+  crux gh pr-patrol parallel --once --max-slots=3 Run single cycle with 3 slots
+  crux gh pr-patrol parallel                       Continuous parallel daemon
 `.trim();
 }

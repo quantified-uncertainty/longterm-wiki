@@ -33,8 +33,8 @@ const SCRIPTS = {
  * Check whether the main branch CI is passing or failing.
  *
  * Usage:
- *   crux ci main-status          Is main branch CI green or red?
- *   crux ci main-status --json   Machine-readable output
+ *   crux gh ci main-status          Is main branch CI green or red?
+ *   crux gh ci main-status --json   Machine-readable output
  */
 async function mainStatus(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
@@ -94,12 +94,12 @@ Options:
   --json          JSON output (main-status)
 
 Examples:
-  crux ci status                  Show current CI status
-  crux ci status --wait           Poll until all checks complete
-  crux ci status --sha=abc123     Check a specific commit
-  crux ci main-status             Is main branch CI green or red?
-  crux ci main-status --json      Machine-readable output
-  crux ci pause-actions            Pause all automated workflows
-  crux ci resume-actions           Resume all automated workflows
+  crux gh ci status                  Show current CI status
+  crux gh ci status --wait           Poll until all checks complete
+  crux gh ci status --sha=abc123     Check a specific commit
+  crux gh ci main-status             Is main branch CI green or red?
+  crux gh ci main-status --json      Machine-readable output
+  crux gh ci pause-actions            Pause all automated workflows
+  crux gh ci resume-actions           Resume all automated workflows
 `;
 }

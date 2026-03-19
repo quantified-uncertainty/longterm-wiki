@@ -7,35 +7,35 @@ When a Claude Code session is assigned to work on a specific GitHub issue, it MU
 When the task description references a GitHub issue number (e.g., "resolve issue #239", "fix #239", "work on https://github.com/.../issues/239"), run this **before writing any code**:
 
 ```bash
-pnpm crux issues start <ISSUE_NUM>
+pnpm crux gh issues start <ISSUE_NUM>
 ```
 
 This posts a start comment on the issue and adds the `agent:working` label. The label is created automatically if it doesn't exist yet.
 
-**Do NOT use raw curl/GitHub API calls for issue tracking.** Always use `crux issues` commands — they route through `githubApi()` which validates request bodies for shell-expansion corruption before sending to GitHub.
+**Do NOT use raw curl/GitHub API calls for issue tracking.** Always use `crux gh issues` commands — they route through `githubApi()` which validates request bodies for shell-expansion corruption before sending to GitHub.
 
 ## At Session End (when shipping)
 
 After the work is committed and pushed (via `/push-and-ensure-green`), signal completion:
 
 ```bash
-pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
 This posts a completion comment and removes the `agent:working` label.
 
 ## PR Management
 
-Use `crux pr` commands instead of raw curl for all PR operations:
+Use `crux gh pr` commands instead of raw curl for all PR operations:
 
 ```bash
-pnpm crux pr detect              # Check if PR exists for current branch
-pnpm crux pr fix-body            # Auto-fix literal \n in PR body
+pnpm crux gh pr detect              # Check if PR exists for current branch
+pnpm crux gh pr fix-body            # Auto-fix literal \n in PR body
 
 # For multi-line PR bodies, use stdin or --body-file (NOT inline --body with heredoc):
-pnpm crux pr create --title="..." --body-file=/tmp/pr-body.md
+pnpm crux gh pr create --title="..." --body-file=/tmp/pr-body.md
 # or:
-pnpm crux pr create --title="..." <<'PRBODY'
+pnpm crux gh pr create --title="..." <<'PRBODY'
 ## Summary
 - key change 1
 PRBODY

@@ -6,10 +6,10 @@
  * and flags broken or suspicious citations.
  *
  * Usage:
- *   crux citations verify <page-id>         Verify citations for a page
- *   crux citations verify --all             Verify all pages with citations
- *   crux citations status <page-id>         Show verification status
- *   crux citations report                   Summary across all archived pages
+ *   crux w citations verify <page-id>         Verify citations for a page
+ *   crux w citations verify --all             Verify all pages with citations
+ *   crux w citations status <page-id>         Show verification status
+ *   crux w citations report                   Summary across all archived pages
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */
@@ -130,36 +130,36 @@ Options:
   --ci              JSON output for CI pipelines
 
 Examples:
-  crux citations verify existential-risk                    Verify one page
-  crux citations verify existential-risk --content-verify  Also check claim support
-  crux citations verify --all --limit=20                   Verify top 20 pages
-  crux citations status existential-risk           Show verification results
-  crux citations report                            Summary across all pages
-  crux citations report --broken                   List all broken citations
-  crux citations extract-quotes existential-risk   Extract quotes for a page
-  crux citations extract-quotes --all --limit=10   Batch extract quotes
-  crux citations quote-report                      Quote coverage stats
-  crux citations quote-report --broken             Show drifted/broken quotes
-  crux citations verify-quotes existential-risk    Re-verify stored quotes
-  crux citations check-accuracy existential-risk   Check claim accuracy vs sources
-  crux citations check-accuracy --all              Batch accuracy check
-  crux citations normalize-footnotes                Report footnote format issues
-  crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
-  crux citations normalize-footnotes --fix <id>     Fix one page
-  crux citations export-dashboard                  Export data for web dashboard (prefers PG)
-  crux citations export-dashboard --local-only     Force local data only (skip wiki-server)
-  crux citations backfill-resource-ids               Backfill resource_id for existing quotes
-  crux citations backfill-resource-ids --dry-run    Preview matches without writing
-  crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged
-  crux citations fix-inaccuracies --apply           Apply fixes to pages
-  crux citations fix-inaccuracies <id>              Fix one page
-  crux citations fix-inaccuracies --max-score=0.5   Only worst citations
-  crux citations audit existential-risk             Full audit pipeline for one page
-  crux citations audit existential-risk --apply     Audit and auto-fix one page
-  crux citations audit-check existential-risk       Independent verification (no DB, no fixes)
-  crux citations audit-check existential-risk --no-fetch  Use cached sources only
-  crux citations audit-check existential-risk --threshold=0.9  Require 90% verified
-  crux citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model
-  crux citations audit-check existential-risk --delay=500  Slow down between LLM calls
+  crux w citations verify existential-risk                    Verify one page
+  crux w citations verify existential-risk --content-verify  Also check claim support
+  crux w citations verify --all --limit=20                   Verify top 20 pages
+  crux w citations status existential-risk           Show verification results
+  crux w citations report                            Summary across all pages
+  crux w citations report --broken                   List all broken citations
+  crux w citations extract-quotes existential-risk   Extract quotes for a page
+  crux w citations extract-quotes --all --limit=10   Batch extract quotes
+  crux w citations quote-report                      Quote coverage stats
+  crux w citations quote-report --broken             Show drifted/broken quotes
+  crux w citations verify-quotes existential-risk    Re-verify stored quotes
+  crux w citations check-accuracy existential-risk   Check claim accuracy vs sources
+  crux w citations check-accuracy --all              Batch accuracy check
+  crux w citations normalize-footnotes                Report footnote format issues
+  crux w citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
+  crux w citations normalize-footnotes --fix <id>     Fix one page
+  crux w citations export-dashboard                  Export data for web dashboard (prefers PG)
+  crux w citations export-dashboard --local-only     Force local data only (skip wiki-server)
+  crux w citations backfill-resource-ids               Backfill resource_id for existing quotes
+  crux w citations backfill-resource-ids --dry-run    Preview matches without writing
+  crux w citations fix-inaccuracies                   Dry-run fix proposals for all flagged
+  crux w citations fix-inaccuracies --apply           Apply fixes to pages
+  crux w citations fix-inaccuracies <id>              Fix one page
+  crux w citations fix-inaccuracies --max-score=0.5   Only worst citations
+  crux w citations audit existential-risk             Full audit pipeline for one page
+  crux w citations audit existential-risk --apply     Audit and auto-fix one page
+  crux w citations audit-check existential-risk       Independent verification (no DB, no fixes)
+  crux w citations audit-check existential-risk --no-fetch  Use cached sources only
+  crux w citations audit-check existential-risk --threshold=0.9  Require 90% verified
+  crux w citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model
+  crux w citations audit-check existential-risk --delay=500  Slow down between LLM calls
 `;
 }

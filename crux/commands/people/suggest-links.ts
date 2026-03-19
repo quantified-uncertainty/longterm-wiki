@@ -167,7 +167,7 @@ export async function suggestLinksCommand(
     );
     if (totalApplied > 0) {
       lines.push(
-        '\nReminder: Run `pnpm crux fix escaping` and `pnpm crux fix markdown` after applying.',
+        '\nReminder: Run `pnpm crux w fix escaping` and `pnpm crux w fix markdown` after applying.',
       );
     }
   } else if (!apply && totalUnlinked > 0) {

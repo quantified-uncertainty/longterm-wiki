@@ -6,14 +6,14 @@
  * adversarial agents to hunt for hallucinations in the live wiki.
  *
  * Usage:
- *   crux evals run --suite=injection [--pages=id1,id2] [--verbose]
- *   crux evals run --suite=fake-entity [--verbose]
- *   crux evals run --suite=cross-ref [--limit=50]
- *   crux evals hunt --agent=reference-sniffer --page=anthropic [--no-llm]
- *   crux evals hunt --agent=description-auditor --page=miri [--no-llm]
- *   crux evals hunt --agent=cross-ref --limit=100
- *   crux evals inject <page-id> [--count=3] [--categories=wrong-number,exaggeration]
- *   crux evals report
+ *   crux w evals run --suite=injection [--pages=id1,id2] [--verbose]
+ *   crux w evals run --suite=fake-entity [--verbose]
+ *   crux w evals run --suite=cross-ref [--limit=50]
+ *   crux w evals hunt --agent=reference-sniffer --page=anthropic [--no-llm]
+ *   crux w evals hunt --agent=description-auditor --page=miri [--no-llm]
+ *   crux w evals hunt --agent=cross-ref --limit=100
+ *   crux w evals inject <page-id> [--count=3] [--categories=wrong-number,exaggeration]
+ *   crux w evals report
  */
 
 import { writeFile, mkdir } from 'node:fs/promises';
@@ -232,7 +232,7 @@ async function inject(args: string[], options: Record<string, unknown>): Promise
 
   const pageId = args.find((a: string) => !a.startsWith('-'));
   if (!pageId) {
-    return { output: `${c.red}Error: page ID required. Usage: crux evals inject <page-id>${c.reset}`, exitCode: 1 };
+    return { output: `${c.red}Error: page ID required. Usage: crux w evals inject <page-id>${c.reset}`, exitCode: 1 };
   }
 
   const { injectErrors } = await import('../evals/injectors/inject.ts');
@@ -267,7 +267,7 @@ async function inject(args: string[], options: Record<string, unknown>): Promise
 /**
  * Scan pages with hunting agents in batch.
  *
- * pnpm crux evals scan [--agents=reference-sniffer,description-auditor,cross-ref]
+ * pnpm crux w evals scan [--agents=reference-sniffer,description-auditor,cross-ref]
  *   [--pages=all|high-risk|zero-citations|id1,id2] [--no-llm] [--limit=N]
  *   [--output=path] [--verbose] [--json]
  */
@@ -374,7 +374,7 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-\x1b[1mcrux evals\x1b[0m — Hallucination detection evals & adversarial agents
+\x1b[1mcrux w evals\x1b[0m — Hallucination detection evals & adversarial agents
 
 \x1b[1mCommands:\x1b[0m
   run       Run an eval suite
@@ -383,26 +383,26 @@ export function getHelp(): string {
   inject    Inject errors into a page (for manual inspection)
 
 \x1b[1mBatch Scan (Phase 0 triage):\x1b[0m
-  crux evals scan                                          Scan high-risk pages (no LLM, free)
-  crux evals scan --pages=all --no-llm --limit=200         Scan top 200 pages
-  crux evals scan --pages=zero-citations --verbose         Scan pages with no citations
-  crux evals scan --agents=reference-sniffer,cross-ref     Multiple agents
-  crux evals scan --pages=anthropic,miri,openai            Scan specific pages
-  crux evals scan --json                                   Machine-readable output
+  crux w evals scan                                          Scan high-risk pages (no LLM, free)
+  crux w evals scan --pages=all --no-llm --limit=200         Scan top 200 pages
+  crux w evals scan --pages=zero-citations --verbose         Scan pages with no citations
+  crux w evals scan --agents=reference-sniffer,cross-ref     Multiple agents
+  crux w evals scan --pages=anthropic,miri,openai            Scan specific pages
+  crux w evals scan --json                                   Machine-readable output
 
 \x1b[1mEval Suites:\x1b[0m
-  crux evals run --suite=injection [--pages=id1,id2] [--verbose] [--expensive]
-  crux evals run --suite=fake-entity [--verbose]
-  crux evals run --suite=cross-ref [--limit=100]
+  crux w evals run --suite=injection [--pages=id1,id2] [--verbose] [--expensive]
+  crux w evals run --suite=fake-entity [--verbose]
+  crux w evals run --suite=cross-ref [--limit=100]
 
 \x1b[1mAdversarial Agents:\x1b[0m
-  crux evals hunt --agent=reference-sniffer --page=<id> [--no-llm]
-  crux evals hunt --agent=description-auditor --page=<id> [--no-llm]
-  crux evals hunt --agent=cross-ref [--limit=100]
+  crux w evals hunt --agent=reference-sniffer --page=<id> [--no-llm]
+  crux w evals hunt --agent=description-auditor --page=<id> [--no-llm]
+  crux w evals hunt --agent=cross-ref [--limit=100]
 
 \x1b[1mInject Errors:\x1b[0m
-  crux evals inject <page-id> [--count=2] [--categories=wrong-number,exaggeration]
-  crux evals inject <page-id> --output=/tmp/corrupted.mdx
+  crux w evals inject <page-id> [--count=2] [--categories=wrong-number,exaggeration]
+  crux w evals inject <page-id> --output=/tmp/corrupted.mdx
 
 \x1b[1mScan Options:\x1b[0m
   --agents=A,B       Agents: reference-sniffer, description-auditor, cross-ref (default: reference-sniffer)

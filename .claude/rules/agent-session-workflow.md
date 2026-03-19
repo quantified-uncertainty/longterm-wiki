@@ -12,11 +12,11 @@ Run `/agent-session-start` as the very first thing — before reading files, run
 
 ```bash
 # If working on a GitHub issue:
-pnpm crux agent-checklist init --issue=N
-pnpm crux issues start <N>
+pnpm crux sys agent-checklist init --issue=N
+pnpm crux gh issues start <N>
 
 # If not on an issue:
-pnpm crux agent-checklist init "Task description" --type=X
+pnpm crux sys agent-checklist init "Task description" --type=X
 ```
 
 Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`. Default: `infrastructure`.

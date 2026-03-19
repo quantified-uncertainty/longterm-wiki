@@ -2,12 +2,12 @@
  * Agents Command Handlers — Live agent coordination
  *
  * Usage:
- *   crux agents register --task="..." [--branch=X] [--issue=N]   Register this agent
- *   crux agents status                                           Show all active agents
- *   crux agents update <id> [--step="..."] [--status=X]          Update agent state
- *   crux agents heartbeat <id>                                   Send heartbeat
- *   crux agents complete <id>                                    Mark agent as completed
- *   crux agents sweep [--timeout=30]                             Mark stale agents
+ *   crux sys agents register --task="..." [--branch=X] [--issue=N]   Register this agent
+ *   crux sys agents status                                           Show all active agents
+ *   crux sys agents update <id> [--step="..."] [--status=X]          Update agent state
+ *   crux sys agents heartbeat <id>                                   Send heartbeat
+ *   crux sys agents complete <id>                                    Mark agent as completed
+ *   crux sys agents sweep [--timeout=30]                             Mark stale agents
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -93,7 +93,7 @@ async function registerCommand(
   if (!options.task) {
     return {
       exitCode: 1,
-      output: `Usage: crux agents register --task="description" [--branch=X] [--issue=N] [--model=X]
+      output: `Usage: crux sys agents register --task="description" [--branch=X] [--issue=N] [--model=X]
 
   Register this agent session with the coordination server.
   Returns the agent ID for subsequent updates.
@@ -208,7 +208,7 @@ async function updateCommand(
   if (!idStr) {
     return {
       exitCode: 1,
-      output: `Usage: crux agents update <id> [--step="..."] [--status=X] [--pr=N] [--files=a.ts,b.ts]
+      output: `Usage: crux sys agents update <id> [--step="..."] [--status=X] [--pr=N] [--files=a.ts,b.ts]
 
   Update the agent's current state. Any update also refreshes the heartbeat.
 
@@ -264,7 +264,7 @@ async function heartbeatCommand(
 ): Promise<CommandResult> {
   const idStr = args.find(a => !a.startsWith('--'));
   if (!idStr) {
-    return { exitCode: 1, output: 'Usage: crux agents heartbeat <id>' };
+    return { exitCode: 1, output: 'Usage: crux sys agents heartbeat <id>' };
   }
 
   const id = Number(idStr);
@@ -294,7 +294,7 @@ async function completeCommand(
 ): Promise<CommandResult> {
   const idStr = args.find(a => !a.startsWith('--'));
   if (!idStr) {
-    return { exitCode: 1, output: 'Usage: crux agents complete <id> [--pr=N]' };
+    return { exitCode: 1, output: 'Usage: crux sys agents complete <id> [--pr=N]' };
   }
 
   const id = Number(idStr);
@@ -406,11 +406,11 @@ Options:
   --ci             CI-compatible output
 
 Examples:
-  crux agents register --task="Fix escaping bug" --branch=claude/fix-escaping --issue=42
-  crux agents status
-  crux agents update 7 --step="Running tests" --files=src/app.ts,src/lib/utils.ts
-  crux agents heartbeat 7
-  crux agents complete 7 --pr=123
-  crux agents sweep --timeout=60
+  crux sys agents register --task="Fix escaping bug" --branch=claude/fix-escaping --issue=42
+  crux sys agents status
+  crux sys agents update 7 --step="Running tests" --files=src/app.ts,src/lib/utils.ts
+  crux sys agents heartbeat 7
+  crux sys agents complete 7 --pr=123
+  crux sys agents sweep --timeout=60
 `;
 }

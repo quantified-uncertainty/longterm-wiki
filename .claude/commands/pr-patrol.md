@@ -1,15 +1,15 @@
 # PR Patrol
 
-Scan all open PRs for issues and fix them in priority order. One-shot version of the `pnpm crux pr-patrol` daemon.
+Scan all open PRs for issues and fix them in priority order. One-shot version of the `pnpm crux gh pr-patrol` daemon.
 
-**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `pnpm crux pr-patrol`.
+**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `pnpm crux gh pr-patrol`.
 
 ## Branch Agent mode (Phase 1 — per-PR watchdog)
 
 For PRs needing sustained attention, use **branch-agent** instead of waiting for the daemon:
 
 ```bash
-pnpm crux pr-patrol branch-agent <PR#>   # Watch PR until fixed/merged
+pnpm crux gh pr-patrol branch-agent <PR#>   # Watch PR until fixed/merged
 ```
 
 This runs multiple short fix sessions (15 min each) with CI waits between them.
@@ -108,15 +108,15 @@ After processing, summarize:
 - **Use `--force-with-lease`** not `--force` when pushing rebased branches.
 - **Don't dismiss reviews.** Fix the requested changes and let the reviewer re-approve.
 - **If a conflict is too complex**, note it and move to the next PR.
-- **Run `pnpm crux validate gate --fix`** after any code changes.
+- **Run `pnpm crux w validate gate --fix`** after any code changes.
 
 ## Daemon mode
 
 For continuous monitoring, use the crux command:
 
 ```bash
-pnpm crux pr-patrol                       # 5-min interval, continuous
-pnpm crux pr-patrol once                  # Single pass
-pnpm crux pr-patrol once --dry-run        # Preview only
-pnpm crux pr-patrol --interval=120        # Custom interval
+pnpm crux gh pr-patrol                       # 5-min interval, continuous
+pnpm crux gh pr-patrol once                  # Single pass
+pnpm crux gh pr-patrol once --dry-run        # Preview only
+pnpm crux gh pr-patrol --interval=120        # Custom interval
 ```

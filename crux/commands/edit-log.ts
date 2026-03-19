@@ -5,9 +5,9 @@
  * via the wiki-server API.
  *
  * Usage:
- *   crux edit-log view <page-id>      Show edit history for a page
- *   crux edit-log list                List all pages with edit logs
- *   crux edit-log stats               Show edit log statistics
+ *   crux w edit-log view <page-id>      Show edit history for a page
+ *   crux w edit-log list                List all pages with edit logs
+ *   crux w edit-log stats               Show edit log statistics
  */
 
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
@@ -23,7 +23,7 @@ export async function view(args: string[], options: Record<string, unknown>): Pr
 
   const pageId = args[0];
   if (!pageId) {
-    return { output: `${c.red}Error: page ID required. Usage: crux edit-log view <page-id>${c.reset}`, exitCode: 1 };
+    return { output: `${c.red}Error: page ID required. Usage: crux w edit-log view <page-id>${c.reset}`, exitCode: 1 };
   }
 
   const result = await getEditLogsForPage(pageId);
@@ -238,9 +238,9 @@ Options:
   --limit=N            Number of results for list (default: 50)
 
 Examples:
-  crux edit-log view open-philanthropy
-  crux edit-log list --tool=crux-improve
-  crux edit-log stats
-  crux edit-log list --agency=human --limit=10
+  crux w edit-log view open-philanthropy
+  crux w edit-log list --tool=crux-improve
+  crux w edit-log stats
+  crux w edit-log list --agency=human --limit=10
 `;
 }

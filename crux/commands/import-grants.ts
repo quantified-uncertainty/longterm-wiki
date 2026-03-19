@@ -9,10 +9,10 @@
  *   5. Manifund projects API
  *
  * Usage:
- *   pnpm crux import-grants analyze                  # All 5 sources
- *   pnpm crux import-grants analyze --source=sff     # Just SFF
- *   pnpm crux import-grants sync --source=manifund   # Just Manifund
- *   pnpm crux import-grants sync --dry-run           # All, dry run
+ *   pnpm crux tb import-grants analyze                  # All 5 sources
+ *   pnpm crux tb import-grants analyze --source=sff     # Just SFF
+ *   pnpm crux tb import-grants sync --source=manifund   # Just Manifund
+ *   pnpm crux tb import-grants sync --dry-run           # All, dry run
  */
 
 import { buildEntityMatcher } from "../lib/grant-import/entity-matcher.ts";
@@ -245,7 +245,7 @@ async function dedupCommand(_args: string[], options: Record<string, unknown>): 
 
   return {
     exitCode: 0,
-    output: `\nDeleted ${totalDeleted} duplicate grants. Run 'crux import-grants sync' to re-sync clean data.`,
+    output: `\nDeleted ${totalDeleted} duplicate grants. Run 'crux tb import-grants sync' to re-sync clean data.`,
   };
 }
 

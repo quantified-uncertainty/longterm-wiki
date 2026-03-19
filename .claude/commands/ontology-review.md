@@ -121,7 +121,7 @@ Present the report to the user. Then, if they approve:
 
 1. **Create new entities** — For each approved sub-entity:
    ```bash
-   pnpm crux ids allocate <slug>
+   pnpm crux tb ids allocate <slug>
    ```
    Then sync via the API.
 
