@@ -439,6 +439,19 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'controlled-vocab',
+    name: 'Controlled vocabulary validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-controlled-vocab.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: reports free-text fields that don't match their expected
+    // controlled vocabulary (entityType, relationship, orgType, etc.).
+    // Informational for now — can be promoted to blocking once all
+    // existing values are cleaned up or added to the vocabulary.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass

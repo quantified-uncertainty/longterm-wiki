@@ -171,6 +171,11 @@ const SCRIPTS = {
     description: 'PG temporal consistency (startDate < endDate, date range validation)',
     passthrough: ['ci'],
   },
+  'controlled-vocab': {
+    script: 'validate/validate-controlled-vocab.ts',
+    description: 'Validate controlled vocabulary fields (entityType, relationship, orgType, etc.)',
+    passthrough: ['ci', 'verbose'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
