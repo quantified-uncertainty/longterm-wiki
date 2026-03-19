@@ -298,7 +298,7 @@ export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
   for (const r of orphans.resources) {
     sections.push({ kind: "orphan", resource: r, sortDate: r.publishedDate });
   }
-  sections.sort((a, b) => b.sortDate.localeCompare(a.sortDate));
+  sections.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
   const datedCount = resources.filter((r) => r.publishedDate).length;
   const totalCount = resources.length;
