@@ -204,6 +204,18 @@ describe("formatValue", () => {
     it("handles undefined unit", () => {
       expect(formatValue(1000, undefined)).toBe("1,000");
     });
+
+    it("uses scientific notation for very large numbers (>= 1e15)", () => {
+      expect(formatValue(1e26, "FLOP")).toBe("10^26");
+    });
+
+    it("includes mantissa when not exactly 1", () => {
+      expect(formatValue(2.5e20)).toBe("2.5 × 10^20");
+    });
+
+    it("omits mantissa when approximately 1", () => {
+      expect(formatValue(1e18)).toBe("10^18");
+    });
   });
 });
 
