@@ -25,37 +25,38 @@ import {
 } from "lucide-react";
 
 // ── Type styling ─────────────────────────────────────────────────────
+// Badge colors from entity-ontology.ts for cross-site consistency.
 
 interface TypeStyle {
   label: string;
   short: string;
   icon: LucideIcon;
   badge: string;
-  accent: string;
+  iconColor: string;
 }
 
 const TYPE_STYLES: Record<string, TypeStyle> = {
-  wiki:             { label: "Wiki Article",   short: "Wiki",     icon: FileText,   badge: "bg-slate-100 text-slate-600 dark:bg-slate-800/40 dark:text-slate-400",         accent: "border-l-slate-300 dark:border-l-slate-600" },
-  organization:     { label: "Organization",   short: "Org",      icon: Building2,  badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",         accent: "border-l-amber-400 dark:border-l-amber-500" },
-  person:           { label: "Person",         short: "Person",   icon: User,       badge: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",                 accent: "border-l-sky-400 dark:border-l-sky-500" },
-  "ai-model":       { label: "AI Model",       short: "Model",    icon: Cpu,        badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",             accent: "border-l-blue-400 dark:border-l-blue-500" },
-  policy:           { label: "Legislation",    short: "Law",      icon: Scale,      badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",     accent: "border-l-purple-400 dark:border-l-purple-500" },
-  project:          { label: "Project",        short: "Project",  icon: Package,    badge: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",             accent: "border-l-teal-400 dark:border-l-teal-500" },
-  approach:         { label: "Approach",       short: "Approach", icon: Compass,    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300", accent: "border-l-emerald-400 dark:border-l-emerald-500" },
-  event:            { label: "Event",          short: "Event",    icon: Calendar,   badge: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",             accent: "border-l-rose-400 dark:border-l-rose-500" },
-  benchmark:        { label: "Benchmark",      short: "Bench",    icon: Gauge,      badge: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",     accent: "border-l-indigo-400 dark:border-l-indigo-500" },
-  "research-area":  { label: "Research Area",  short: "Research", icon: Microscope, badge: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",             accent: "border-l-cyan-400 dark:border-l-cyan-500" },
-  grant:            { label: "Grant",          short: "Grant",    icon: Banknote,   badge: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",         accent: "border-l-green-300 dark:border-l-green-600" },
-  "funding-round":  { label: "Funding Round",  short: "Funding",  icon: TrendingUp, badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300", accent: "border-l-emerald-300 dark:border-l-emerald-600" },
-  "funding-program":{ label: "Funding Program",short: "Program",  icon: Wallet,     badge: "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",             accent: "border-l-lime-300 dark:border-l-lime-600" },
-  division:         { label: "Division",       short: "Division", icon: GitBranch,  badge: "bg-stone-100 text-stone-700 dark:bg-stone-800/40 dark:text-stone-300",         accent: "border-l-stone-300 dark:border-l-stone-600" },
-  resource:         { label: "Resource",       short: "Resource", icon: BookOpen,   badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",     accent: "border-l-orange-300 dark:border-l-orange-600" },
+  wiki:             { label: "Wiki Article",   short: "Wiki",     icon: FileText,   badge: "bg-slate-100 text-slate-600 dark:bg-slate-800/40 dark:text-slate-400",         iconColor: "text-slate-400 dark:text-slate-500" },
+  organization:     { label: "Organization",   short: "Org",      icon: Building2,  badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",         iconColor: "text-amber-500 dark:text-amber-400" },
+  person:           { label: "Person",         short: "Person",   icon: User,       badge: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",                 iconColor: "text-sky-500 dark:text-sky-400" },
+  "ai-model":       { label: "AI Model",       short: "Model",    icon: Cpu,        badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",             iconColor: "text-blue-500 dark:text-blue-400" },
+  policy:           { label: "Legislation",    short: "Law",      icon: Scale,      badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",     iconColor: "text-purple-500 dark:text-purple-400" },
+  project:          { label: "Project",        short: "Project",  icon: Package,    badge: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",             iconColor: "text-teal-500 dark:text-teal-400" },
+  approach:         { label: "Approach",       short: "Approach", icon: Compass,    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300", iconColor: "text-emerald-500 dark:text-emerald-400" },
+  event:            { label: "Event",          short: "Event",    icon: Calendar,   badge: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",             iconColor: "text-rose-500 dark:text-rose-400" },
+  benchmark:        { label: "Benchmark",      short: "Bench",    icon: Gauge,      badge: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",     iconColor: "text-indigo-500 dark:text-indigo-400" },
+  "research-area":  { label: "Research Area",  short: "Research", icon: Microscope, badge: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",             iconColor: "text-cyan-500 dark:text-cyan-400" },
+  grant:            { label: "Grant",          short: "Grant",    icon: Banknote,   badge: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",         iconColor: "text-green-500 dark:text-green-400" },
+  "funding-round":  { label: "Funding Round",  short: "Funding",  icon: TrendingUp, badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300", iconColor: "text-emerald-500 dark:text-emerald-400" },
+  "funding-program":{ label: "Funding Program",short: "Program",  icon: Wallet,     badge: "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",             iconColor: "text-lime-500 dark:text-lime-400" },
+  division:         { label: "Division",       short: "Division", icon: GitBranch,  badge: "bg-stone-100 text-stone-700 dark:bg-stone-800/40 dark:text-stone-300",         iconColor: "text-stone-400 dark:text-stone-500" },
+  resource:         { label: "Resource",       short: "Resource", icon: BookOpen,   badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",     iconColor: "text-orange-500 dark:text-orange-400" },
 };
 
 const FALLBACK_STYLE: TypeStyle = {
   label: "Item", short: "Item", icon: FileText,
   badge: "bg-gray-100 text-gray-600 dark:bg-gray-800/40 dark:text-gray-400",
-  accent: "border-l-gray-300 dark:border-l-gray-600",
+  iconColor: "text-gray-400 dark:text-gray-500",
 };
 
 // ── Directory route mapping ──────────────────────────────────────────
@@ -98,15 +99,10 @@ interface UnifiedResult {
   column: ResultColumn;
 }
 
-/** Classify a result into one of three columns. */
 function classifyColumn(type: string, source: "page" | "thing"): ResultColumn {
-  // Directory entity types → Entities column
   if (DIRECTORY_ROUTES[type]) return "entities";
-  // Resource things → Resources column
   if (type === "resource") return "resources";
-  // Data record things (grants, funding, etc.) → Entities column
   if (source === "thing") return "entities";
-  // Everything else (wiki articles) → Wiki column
   return "wiki";
 }
 
@@ -133,8 +129,6 @@ function fromPage(r: SearchResult): UnifiedResult[] {
     column,
   }];
 
-  // For directory entities that also have wiki pages, add a second
-  // result linking to the wiki article
   if (isDirectory && r.wikiId) {
     results.push({
       key: `pw:${r.id}`,
@@ -145,7 +139,7 @@ function fromPage(r: SearchResult): UnifiedResult[] {
       description: r.description || null,
       snippet: r.snippet,
       source: "page",
-      score: r.score * 0.8, // Slightly lower rank than the directory entry
+      score: r.score * 0.8,
       quality: r.quality,
       readerImportance: r.readerImportance,
       isInternal,
@@ -182,6 +176,17 @@ function blendedScore(r: UnifiedResult): number {
   return r.score + importance * 10;
 }
 
+/** Decode HTML entities from server-generated snippets. */
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, "/")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"');
+}
+
 // ── Component ────────────────────────────────────────────────────────
 
 export function SearchPageClient() {
@@ -194,6 +199,7 @@ export function SearchPageClient() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [errored, setErrored] = useState(false);
+  const [selected, setSelected] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const searchSeqRef = useRef(0);
@@ -240,6 +246,7 @@ export function SearchPageClient() {
 
     setResults(unified);
     setLoading(false);
+    setSelected(-1);
   }, []);
 
   useEffect(() => {
@@ -275,7 +282,7 @@ export function SearchPageClient() {
     performSearch(query);
   }, [query, performSearch, syncUrl]);
 
-  // ── Split results into three columns ───────────────────────────────
+  // ── Split into columns ─────────────────────────────────────────────
 
   const columns = useMemo(() => {
     const entities: UnifiedResult[] = [];
@@ -289,38 +296,78 @@ export function SearchPageClient() {
     return { entities, wiki, resources };
   }, [results]);
 
+  // Flat list for keyboard nav (entities → wiki → resources)
+  const flatResults = useMemo(() => [
+    ...columns.entities, ...columns.wiki, ...columns.resources,
+  ], [columns]);
+
   const totalCount = results.length;
   const hasResults = totalCount > 0;
-
-  // ── Render ─────────────────────────────────────────────────────────
-
   const hasQuery = query.trim().length > 0;
   const showEmpty = searched && !loading && !hasResults;
 
+  // Only render columns that have results
+  const visibleColumns = useMemo(() => {
+    const cols: { key: ResultColumn; title: string; icon: LucideIcon; items: UnifiedResult[]; showBadges: boolean }[] = [];
+    if (columns.entities.length > 0) cols.push({ key: "entities", title: "Entities", icon: Building2, items: columns.entities, showBadges: true });
+    if (columns.wiki.length > 0) cols.push({ key: "wiki", title: "Wiki", icon: FileText, items: columns.wiki, showBadges: false });
+    if (columns.resources.length > 0) cols.push({ key: "resources", title: "Resources", icon: ExternalLink, items: columns.resources, showBadges: false });
+    return cols;
+  }, [columns]);
+
+  // ── Keyboard nav ───────────────────────────────────────────────────
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelected((s) => Math.min(s + 1, flatResults.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelected((s) => {
+        const next = Math.max(s - 1, -1);
+        if (next === -1) inputRef.current?.focus();
+        return next;
+      });
+    } else if (e.key === "Enter" && selected >= 0 && flatResults[selected]?.href) {
+      e.preventDefault();
+      const r = flatResults[selected];
+      if (r.href!.startsWith("http")) {
+        window.open(r.href!, "_blank");
+      } else {
+        router.push(r.href!);
+      }
+    }
+  }, [selected, flatResults, router]);
+
+  // Scroll selected into view
+  useEffect(() => {
+    if (selected < 0) return;
+    const el = document.getElementById(`sr-${flatResults[selected]?.key}`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [selected, flatResults]);
+
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16">
+    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16" onKeyDown={handleKeyDown}>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Search
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Entities, wiki articles, grants, resources, and more
-        </p>
       </div>
 
       {/* Search bar */}
-      <form onSubmit={handleSubmit} className="relative mb-8 group max-w-2xl">
+      <form onSubmit={handleSubmit} className="relative mb-6 group max-w-2xl">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 group-focus-within:text-foreground/50 transition-colors">
-          <SearchIcon size={18} />
+          <SearchIcon size={16} />
         </div>
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => handleInput(e.target.value)}
-          placeholder="Search everything..."
-          className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-border bg-card text-foreground text-[15px] placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all shadow-sm"
+          onKeyDown={handleKeyDown}
+          placeholder="Search entities, articles, resources..."
+          className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all"
           autoComplete="off"
           spellCheck={false}
         />
@@ -331,132 +378,123 @@ export function SearchPageClient() {
         )}
       </form>
 
-      {/* Pre-search empty state */}
+      {/* Pre-search */}
       {!hasQuery && !searched && (
-        <div className="text-center py-16 max-w-2xl">
-          <div className="text-muted-foreground/20 mb-4">
-            <SearchIcon size={48} className="mx-auto" />
-          </div>
-          <p className="text-sm text-muted-foreground/50">
-            Search across the entire knowledge base
+        <div className="py-16 max-w-md">
+          <p className="text-sm text-muted-foreground/40">
+            Search across the knowledge base &mdash; entities, wiki articles, grants, and external resources.
           </p>
-          <p className="text-xs text-muted-foreground/30 mt-2">
-            Try &ldquo;Anthropic&rdquo;, &ldquo;MIRI grant&rdquo;, or &ldquo;MMLU&rdquo;
+          <p className="text-xs text-muted-foreground/25 mt-2">
+            Try &ldquo;Anthropic&rdquo;, &ldquo;MIRI grant&rdquo;, or &ldquo;alignment&rdquo;
           </p>
         </div>
       )}
 
-      {/* No results / error */}
+      {/* Error / empty */}
       {showEmpty && (
-        <div className="text-center py-16 max-w-2xl">
+        <div className="py-16 max-w-md">
           {errored ? (
             <>
-              <p className="text-sm text-muted-foreground">
-                Search may be temporarily unavailable
-              </p>
+              <p className="text-sm text-muted-foreground">Search unavailable</p>
               <p className="text-xs text-muted-foreground/60 mt-1">
-                Try again in a moment, or browse the{" "}
-                <Link href="/wiki" className="text-primary hover:underline">wiki</Link>,{" "}
-                <Link href="/grants" className="text-primary hover:underline">grants</Link>, or{" "}
-                <Link href="/organizations" className="text-primary hover:underline">organizations</Link>
+                Browse the{" "}
+                <Link href="/wiki" className="underline hover:text-foreground">wiki</Link>,{" "}
+                <Link href="/grants" className="underline hover:text-foreground">grants</Link>, or{" "}
+                <Link href="/organizations" className="underline hover:text-foreground">organizations</Link>
               </p>
             </>
           ) : (
-            <>
-              <p className="text-sm text-muted-foreground">
-                No results for &ldquo;<span className="font-medium text-foreground">{query}</span>&rdquo;
-              </p>
-              <p className="text-xs text-muted-foreground/60 mt-1">
-                Try broader terms or check spelling
-              </p>
-            </>
+            <p className="text-sm text-muted-foreground">
+              No results for &ldquo;<span className="font-medium text-foreground">{query}</span>&rdquo;
+            </p>
           )}
         </div>
       )}
 
       {/* Result count */}
       {searched && !loading && hasResults && (
-        <div className="text-[11px] text-muted-foreground/50 mb-4 tabular-nums">
+        <p className="text-xs text-muted-foreground/40 mb-4 tabular-nums">
           {totalCount} result{totalCount !== 1 ? "s" : ""}
+        </p>
+      )}
+
+      {/* Three-column grid — only render columns that have results */}
+      {hasResults && (
+        <div
+          className="grid gap-8"
+          style={{ gridTemplateColumns: `repeat(${visibleColumns.length}, minmax(0, 1fr))` }}
+        >
+          {visibleColumns.map((col) => (
+            <ResultColumnView
+              key={col.key}
+              title={col.title}
+              icon={col.icon}
+              items={col.items}
+              query={query}
+              showBadges={col.showBadges}
+              selectedKey={selected >= 0 ? flatResults[selected]?.key : null}
+            />
+          ))}
         </div>
       )}
 
-      {/* Three-column layout */}
+      {/* Keyboard hint */}
       {hasResults && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ResultColumn
-            title="Entities"
-            subtitle="Organizations, people, policies"
-            icon={Building2}
-            items={columns.entities}
-            query={query}
-            emptyText="No entity matches"
-          />
-          <ResultColumn
-            title="Wiki"
-            subtitle="Articles and analysis"
-            icon={FileText}
-            items={columns.wiki}
-            query={query}
-            emptyText="No wiki matches"
-          />
-          <ResultColumn
-            title="Resources"
-            subtitle="External links and references"
-            icon={ExternalLink}
-            items={columns.resources}
-            query={query}
-            emptyText="No resource matches"
-          />
+        <div className="flex items-center gap-4 mt-6 text-[10px] text-muted-foreground/30">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-muted/40 rounded border border-border/40 font-mono">↑↓</kbd>
+            Navigate
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 bg-muted/40 rounded border border-border/40 font-mono">↵</kbd>
+            Open
+          </span>
         </div>
       )}
     </div>
   );
 }
 
-// ── Column component ─────────────────────────────────────────────────
+// ── Column ───────────────────────────────────────────────────────────
 
-function ResultColumn({
+function ResultColumnView({
   title,
-  subtitle,
   icon: Icon,
   items,
   query,
-  emptyText,
+  showBadges,
+  selectedKey,
 }: {
   title: string;
-  subtitle: string;
   icon: LucideIcon;
   items: UnifiedResult[];
   query: string;
-  emptyText: string;
+  showBadges: boolean;
+  selectedKey: string | null;
 }) {
   return (
     <div className="min-w-0">
       {/* Column header */}
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
-        <Icon size={14} className="text-muted-foreground/50 shrink-0" />
-        <div>
-          <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-            {title}
-            {items.length > 0 && (
-              <span className="ml-1.5 text-muted-foreground/40 font-normal">{items.length}</span>
-            )}
-          </h2>
-          <p className="text-[10px] text-muted-foreground/40">{subtitle}</p>
-        </div>
+      <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/60">
+        <Icon size={13} className="text-muted-foreground/40 shrink-0" />
+        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+          {title}
+        </span>
+        <span className="text-[11px] text-muted-foreground/30 tabular-nums">{items.length}</span>
       </div>
 
       {/* Results */}
-      {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground/30 py-4 text-center">{emptyText}</p>
-      ) : (
-        <div className="space-y-0.5">
-          {items.map((r) => (
-            <ResultRow key={r.key} result={r} query={query} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-px">
+        {items.map((r) => (
+          <ResultRow
+            key={r.key}
+            result={r}
+            query={query}
+            showBadge={showBadges}
+            isSelected={r.key === selectedKey}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -466,54 +504,73 @@ function ResultColumn({
 function ResultRow({
   result: r,
   query,
+  showBadge,
+  isSelected,
 }: {
   result: UnifiedResult;
   query: string;
+  showBadge: boolean;
+  isSelected: boolean;
 }) {
   const style = TYPE_STYLES[r.type] ?? FALLBACK_STYLE;
   const Icon = style.icon;
+  const isExternal = r.href?.startsWith("http");
 
   const content = (
-    <div className={`border-l-[3px] rounded-r-md py-2 pl-3 pr-2 transition-colors hover:bg-muted/40 ${style.accent}`}>
-      {/* Title row with icon */}
-      <div className="flex items-center gap-1.5">
-        <Icon size={13} className="shrink-0 opacity-50" />
-        <span className="font-medium text-sm text-foreground leading-snug truncate">
-          <Highlight text={r.title} query={query} />
-        </span>
-        <span className={`shrink-0 inline-flex items-center px-1.5 py-0 text-[9px] font-semibold rounded ${style.badge}`}>
-          {style.short}
-        </span>
+    <div
+      id={`sr-${r.key}`}
+      className={`group flex items-start gap-2 py-2 px-2 -mx-1 rounded-md transition-colors ${
+        isSelected ? "bg-muted/60" : "hover:bg-muted/30"
+      }`}
+    >
+      {/* Type icon */}
+      <Icon size={14} className={`shrink-0 mt-0.5 ${style.iconColor}`} />
+
+      <div className="min-w-0 flex-1">
+        {/* Title + optional badge */}
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-medium text-[13px] text-foreground leading-tight truncate group-hover:text-primary transition-colors">
+            <Highlight text={decodeEntities(r.title)} query={query} />
+          </span>
+          {showBadge && (
+            <span className={`shrink-0 px-1.5 py-px text-[9px] font-semibold rounded ${style.badge}`}>
+              {style.short}
+            </span>
+          )}
+          {isExternal && (
+            <ExternalLink size={10} className="shrink-0 text-muted-foreground/25 mt-px" />
+          )}
+        </div>
+
+        {/* Context line */}
+        {r.context && (
+          <p className="text-[11px] text-muted-foreground/40 truncate leading-tight">
+            {r.context}
+          </p>
+        )}
+
+        {/* Description — 2 lines for entities, 1 line for others */}
+        {(r.snippet || r.description) && (
+          <>
+            {r.snippet ? (
+              <p
+                className={`text-[12px] text-muted-foreground/70 leading-snug mt-0.5 ${showBadge ? "line-clamp-2" : "line-clamp-1"} [&_mark]:bg-yellow-200/60 [&_mark]:dark:bg-yellow-500/25 [&_mark]:rounded-sm`}
+                dangerouslySetInnerHTML={{ __html: sanitizeSnippet(r.snippet) }}
+              />
+            ) : r.description ? (
+              <p className={`text-[12px] text-muted-foreground/70 leading-snug mt-0.5 ${showBadge ? "line-clamp-2" : "line-clamp-1"}`}>
+                <Highlight text={decodeEntities(r.description)} query={query} />
+              </p>
+            ) : null}
+          </>
+        )}
       </div>
-
-      {/* Context */}
-      {r.context && (
-        <div className="text-[11px] text-muted-foreground/45 mt-0.5 pl-[19px] truncate">
-          {r.context}
-        </div>
-      )}
-
-      {/* Description — compact, single line */}
-      {(r.snippet || r.description) && (
-        <div className="pl-[19px] mt-0.5">
-          {r.snippet ? (
-            <p
-              className="text-[11px] text-muted-foreground/60 leading-snug line-clamp-1 [&_mark]:bg-yellow-200/50 [&_mark]:dark:bg-yellow-500/20 [&_mark]:rounded-sm"
-              dangerouslySetInnerHTML={{ __html: sanitizeSnippet(r.snippet) }}
-            />
-          ) : r.description ? (
-            <p className="text-[11px] text-muted-foreground/60 leading-snug line-clamp-1">
-              <Highlight text={r.description} query={query} />
-            </p>
-          ) : null}
-        </div>
-      )}
     </div>
   );
 
   if (!r.href) return content;
 
-  if (r.href.startsWith("http")) {
+  if (isExternal) {
     return (
       <a href={r.href} target="_blank" rel="noopener noreferrer" className="block">
         {content}
@@ -544,7 +601,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
     <>
       {parts.map((part, i) =>
         i % 2 === 1 ? (
-          <mark key={i} className="bg-yellow-200/50 dark:bg-yellow-500/20 rounded-sm text-inherit">{part}</mark>
+          <mark key={i} className="bg-yellow-200/60 dark:bg-yellow-500/25 rounded-sm text-inherit">{part}</mark>
         ) : (
           <span key={i}>{part}</span>
         ),
