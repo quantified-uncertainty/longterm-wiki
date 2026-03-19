@@ -1,10 +1,4 @@
-thing:
-  id: sundar-pichai
-  stableId: APUqKVNaAA
-  type: person
-  name: "Sundar Pichai"
-  wikiId: "E1291"
-
+entity: APUqKVNaAA
 facts:
   - id: f_jlUhiO2JNg
     property: role

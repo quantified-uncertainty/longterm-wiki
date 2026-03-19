@@ -2,11 +2,12 @@
  * Explore page data: items from entities, pages, and diagrams.
  */
 
-import { getDatabase, getTypedEntities, isRisk } from "./tablebase";
+import { getTableBase, getTypedEntities, isRisk } from "./tablebase";
 import type { ContentFormat, RawEntity, AnyEntity } from "./tablebase";
 import { getEntityHref } from "./entity-nav";
 import { getKB } from "./factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
+import { stripMdxEscapes } from "@/lib/inline-markdown";
 
 export interface ExploreItem {
   id: string;
@@ -103,7 +104,7 @@ function resolvePageId(entity: AnyEntity, pageMap: Map<string, unknown>): string
 }
 
 export function getExploreItems(): ExploreItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const typedEntities = getTypedEntities();
   const pageMap = new Map((db.pages || []).map((p) => [p.id, p]));
   const kb = getKB();
@@ -129,12 +130,13 @@ export function getExploreItems(): ExploreItem[] {
     const pageId = entityPageIdMap.get(entity.id)!;
     const page = pageMap.get(pageId)!;
     const kbCounts = getKBCounts(entity.id, kb);
+    const rawDesc = page?.summary || page?.description || entity.description || null;
     return {
       id: entity.id,
       wikiId: (entity.wikiId || db.idRegistry?.bySlug[pageId])!,
       title: entity.title,
       type: page?.contentFormat === "table" ? "table" : page?.contentFormat === "diagram" ? "diagram" : entity.entityType,
-      description: page?.summary || page?.description || entity.description || null,
+      description: rawDesc ? stripMdxEscapes(rawDesc) : null,
       tags: entity.tags || [],
       clusters: entity.clusters?.length ? entity.clusters : (page?.clusters || []),
       wordCount: page?.wordCount ?? null,
@@ -161,12 +163,13 @@ export function getExploreItems(): ExploreItem[] {
     .filter((p) => db.idRegistry?.bySlug[p.id])
     .map((page) => {
       const kbCounts = getKBCounts(page.id, kb);
+      const rawPageDesc = page.summary || page.description || null;
       return {
         id: page.id,
         wikiId: db.idRegistry!.bySlug[page.id],
         title: page.title,
         type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
-        description: page.summary || page.description || null,
+        description: rawPageDesc ? stripMdxEscapes(rawPageDesc) : null,
         tags: page.tags || [],
         clusters: page.clusters || [],
         wordCount: page.wordCount ?? null,

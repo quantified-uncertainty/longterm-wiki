@@ -1,9 +1,4 @@
-thing:
-  id: coe-ai-convention
-  stableId: SrEFtBmBYg
-  type: policy
-  name: Council of Europe Framework Convention on Artificial Intelligence
-  wikiId: E587
+entity: SrEFtBmBYg
 facts:
   - id: f_ycxL5xOiuQ
     property: description

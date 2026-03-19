@@ -95,6 +95,10 @@
       result: Passed
       ayes: 32
       noes: 1
+      ayesDem: 30
+      ayesRep: 2
+      noesDem: 0
+      noesRep: 1
     - chamber: Assembly Privacy & Consumer Protection Committee
       date: June 18, 2024
       result: Passed
@@ -115,11 +119,19 @@
       result: Passed
       ayes: 48
       noes: 16
+      ayesDem: 44
+      ayesRep: 4
+      noesDem: 1
+      noesRep: 15
     - chamber: Senate Floor (Concurrence)
       date: August 29, 2024
       result: Passed
       ayes: 30
       noes: 9
+      ayesDem: 29
+      ayesRep: 1
+      noesDem: 0
+      noesRep: 9
   provisions:
     - title: Safety Testing
       description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment
@@ -147,7 +159,7 @@
       category: Enforcement
   stakeholders:
     - name: Center for AI Safety
-      entityId: cais
+      entityId: y4bieqSeag
       position: support
       reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
       context:
@@ -155,7 +167,7 @@
         - "Director Dan Hendrycks (also listed as supporter) co-authored the Statement on AI Risk"
         - "Open Philanthropy also funds Anthropic (mixed position) and supported MIRI"
     - name: Future of Life Institute
-      entityId: fli
+      entityId: d9sWZtyVwg
       position: support
       reason: Supports proactive regulation of frontier AI
       context:
@@ -164,7 +176,7 @@
         - "Organized the 2023 Pause Letter (33,000+ signatories) calling for 6-month AI training moratorium"
         - "Sister org FLF received $58.8M from FLI"
     - name: Yoshua Bengio
-      entityId: yoshua-bengio
+      entityId: nGFBXZeM3d
       position: support
       reason: Turing Award winner supporting frontier AI safety regulation
       context:
@@ -173,7 +185,7 @@
         - "Member of UN High-Level Advisory Body on AI"
         - "Funded via Canadian government (CIFAR AI Chair) and Quebec government"
     - name: Geoffrey Hinton
-      entityId: geoffrey-hinton
+      entityId: 5N5UqXNkkg
       position: support
       reason: Godfather of AI, warning about AI risks
       context:
@@ -182,7 +194,7 @@
         - "Co-authored foundational deep learning papers with Bengio (also supporter)"
         - "Former advisor to Google DeepMind (which opposes the bill)"
     - name: Stuart Russell
-      entityId: stuart-russell
+      entityId: ZxUirlzHke
       position: support
       reason: Leading AI researcher supporting enforceable safety requirements
       context:
@@ -190,7 +202,7 @@
         - "CHAI funded by Open Philanthropy, Elon Musk Foundation"
         - "Author of 'Human Compatible' (2019); co-author of leading AI textbook"
     - name: Elon Musk
-      entityId: elon-musk
+      entityId: 69vftmr1jg
       position: support
       reason: Publicly endorsed the bill on X (Aug 26, 2024)
       source: https://sfstandard.com/2024/08/26/elon-musk-openai-scott-wiener-sb1046/
@@ -200,7 +212,7 @@
         - "Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)"
         - "Owns X (Twitter), the platform where much SB-1047 debate occurred"
     - name: OpenAI
-      entityId: openai
+      entityId: 1LcLlMGLbw
       position: oppose
       reason: Initially opposed; argued it would stifle innovation and drive development out of California (opposition letter Aug 20, 2024)
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
@@ -210,7 +222,7 @@
         - "Transitioning from nonprofit to for-profit; this bill would have increased compliance burden"
         - "113+ of its employees signed letter supporting the bill despite company opposition"
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: mixed
       reason: "Initial opposition Jul 25, 2024; revised to 'benefits likely outweigh costs' Aug 21, 2024 after amendments"
       source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
@@ -221,7 +233,7 @@
         - "Funded by Open Philanthropy (early investment); Open Phil also funds CAIS (supporter)"
         - "Has its own Responsible Scaling Policy — bill aligned with their existing safety approach"
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: A4XoubikkQ
       position: oppose
       reason: Opposed on grounds of premature regulation and preference for federal approach
       context:
@@ -230,7 +242,7 @@
         - "Google is a major investor in Anthropic ($2B), which took a mixed position"
         - "Member of AI Alliance (also opposes)"
     - name: Meta AI
-      entityId: meta-ai
+      entityId: tt0f5PYDCw
       position: oppose
       reason: Strongly opposed; concerned about open-source implications and compliance burden
       context:
@@ -239,7 +251,7 @@
         - "Open-source AI strategy (Llama models) most affected by bill's liability provisions"
         - "Mark Zuckerberg personally lobbied Governor Newsom against the bill"
     - name: Y Combinator
-      entityId: y-combinator
+      entityId: d9BCHgtnlw
       position: oppose
       reason: Concerned about startup ecosystem impact and compliance costs
       context:
@@ -248,7 +260,7 @@
         - "YC-funded startups would face compliance costs under the bill"
         - "Garry Tan (YC CEO) was vocal opponent on social media"
     - name: Andreessen Horowitz
-      entityId: andreessen-horowitz
+      entityId: u2YCulQ1lg
       position: oppose
       reason: Opposed on innovation and competition grounds
       context:
@@ -257,7 +269,7 @@
         - "Marc Andreessen and Ben Horowitz are vocal opponents of AI regulation generally"
         - "Spent $39,750 on SB-1047 lobbying in Q2 2024"
     - name: Yann LeCun
-      entityId: yann-lecun
+      entityId: cMbVUVK29Q
       position: oppose
       reason: Turing Award winner opposing the regulatory approach
       context:
@@ -265,7 +277,7 @@
         - "Turing Award with Bengio (supporter) and Hinton (supporter) — all three took different positions"
         - "Strong advocate for open-source AI; bill's liability provisions threaten open model releases"
     - name: Andrew Ng
-      entityId: andrew-ng
+      entityId: v13BF4zP2A
       position: oppose
       reason: Stanford professor and Google Brain co-founder opposing the bill
       context:
@@ -274,7 +286,7 @@
         - "Board member of Woebot Health; advisor to several AI startups"
         - "Vocal opponent of 'AI doomerism'; frames regulation debate as large-lab rent-seeking"
     - name: Fei-Fei Li
-      entityId: fei-fei-li
+      entityId: QzcX3bShmQ
       position: oppose
       reason: Stanford professor; Fortune open letter opposing SB 1047 (Aug 10, 2024); later appointed by Newsom to expert panel on alternative approach
       context:
@@ -283,7 +295,7 @@
         - "Co-founded World Labs (spatial AI startup) with a16z (also opposes) funding"
         - "Appointed by Newsom to panel drafting alternative AI regulation after veto"
     - name: Max Tegmark
-      entityId: max-tegmark
+      entityId: 3KjUCZCV8w
       position: support
       reason: MIT professor and FLI co-founder; advocated for frontier AI regulation
       context:
@@ -291,7 +303,7 @@
         - "MIT Physics professor; author of 'Life 3.0'"
         - "Jaan Tallinn also invested in Anthropic (mixed position)"
     - name: Dan Hendrycks
-      entityId: dan-hendrycks
+      entityId: VoNqoBJkyg
       position: support
       reason: CAIS director; key organizer of AI safety research support for the bill
       context:
@@ -329,79 +341,79 @@
         - "Signers included employees of companies that officially opposed the bill (OpenAI, DeepMind, Meta)"
         - "Highlighted tension between company positions and individual researcher views on AI safety"
     - name: Encode Justice
-      entityId: encode-justice
+      entityId: etCe7rcH1g
       position: support
       reason: Youth-led AI accountability organization; co-source of SB 1047
     - name: Imbue
-      entityId: imbue
+      entityId: hCtMHcUWaw
       position: support
       reason: AI safety-focused company supporting frontier AI regulation
     - name: Gladstone AI
-      entityId: gladstone-ai
+      entityId: HkfUxsbBLQ
       position: support
       reason: AI safety advisory firm; authors of RAND-commissioned report on catastrophic AI risks
     - name: Nonlinear
-      entityId: nonlinear
+      entityId: PfIAYFXC9Q
       position: support
       reason: EA-adjacent AI safety organization supporting the bill
     - name: Economic Security Project Action
-      entityId: economic-security-project
+      entityId: 2ecnsQqcRg
       position: support
       reason: Economic policy organization; co-source of SB 1047
     - name: Apart Research
-      entityId: apart-research
+      entityId: 5WqgebIWFQ
       position: support
       reason: AI safety research organization supporting frontier AI regulation
     - name: Elicit
-      entityId: elicit
+      entityId: 2VexoROapg
       position: support
       reason: AI research assistant tool supporting AI safety regulation
     - name: Panoplia Labs
-      entityId: panoplia-labs
+      entityId: NY4i2W6IVA
       position: support
       reason: AI safety research lab supporting the bill
     - name: Kira Center
-      entityId: kira-center
+      entityId: oMgy3kQqOg
       position: support
       reason: Center for AI Risks and Impacts supporting frontier AI regulation
     - name: Redwood Research
-      entityId: redwood-research
+      entityId: dwMzc9WzPa
       position: support
       reason: AI safety research organization supporting the bill
     - name: FAR AI
-      entityId: far-ai
+      entityId: lCiT37k9pA
       position: support
       reason: AI safety research organization supporting the bill
     - name: Foresight Institute
-      entityId: foresight-institute
+      entityId: NPPTvNqRXA
       position: support
       reason: Research organization focused on beneficial emerging technologies; supported the bill
     - name: Chamber of Progress
-      entityId: chamber-of-progress
+      entityId: IEav94hygQ
       position: oppose
       reason: Tech industry coalition opposing the bill
     - name: TechNet
-      entityId: technet
+      entityId: 0PNw6yTH0g
       position: oppose
       reason: Bipartisan network of technology CEOs opposing the bill
     - name: Consumer Technology Association
-      entityId: consumer-technology-association
+      entityId: b89p7duRrQ
       position: oppose
       reason: Trade association representing consumer technology industry; opposed the bill
     - name: R Street Institute
-      entityId: r-street-institute
+      entityId: yfAYuNTKxQ
       position: oppose
       reason: Free-market think tank opposing the bill's regulatory approach
     - name: Competitive Enterprise Institute
-      entityId: competitive-enterprise-institute
+      entityId: Le8eSvx8EQ
       position: oppose
       reason: Free-market policy organization opposing the bill
   keyPoliticians:
     - name: Senator Scott Wiener
-      entityId: scott-wiener
+      entityId: HLc6VrCh5w
       role: Primary Author / Sponsor
     - name: Governor Gavin Newsom
-      entityId: gavin-newsom
+      entityId: tDwxa07Urw
       role: Vetoed the bill
     - name: Senator Richard Roth
       role: Co-author
@@ -412,16 +424,22 @@
   amendments:
     - date: March 20, 2024
       description: Initial committee amendments; defined covered model thresholds (>10^26 FLOP or >$100M training cost)
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104798AMD
     - date: April 8, 2024
       description: Refined definitions and exemptions; clarified academic research and open-source carve-outs
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104797AMD
     - date: April 16, 2024
       description: Adjusted enforcement provisions; refined scope of Attorney General authority
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104796AMD
     - date: April 30, 2024
       description: Senate Judiciary Committee amendments; narrowed hazardous capability definitions
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104795AMD
     - date: June 20, 2024
       description: Added safe harbors and affirmative defenses for compliant developers; reduced liability from strict to negligence standard
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104792AMD
     - date: July 3, 2024
       description: Clarified compute cluster reporting requirements and fine-tuning thresholds
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104791AMD
     - date: August 19, 2024
       description: >-
         Major overhaul after Assembly Appropriations hearing: removed Frontier Model Division (enforcement stays with AG);
@@ -429,8 +447,10 @@
         narrowed pre-harm enforcement (AG only acts on actual harm or imminent threat); added fine-tuning safe harbor
         (<$10M exempts fine-tuner); expanded Board of Frontier Models from 5 to 9 members
       author: Senator Wiener
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104790AMD
     - date: August 22, 2024
       description: Final amendments clarifying open-source exemptions (unless >$50M revenue from derivatives); refined whistleblower protections
+      url: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104789AMD
   customFields:
     - label: Introduced
       value: February 2024
@@ -444,6 +464,12 @@
       value: August 29, 2024
     - label: Vetoed
       value: September 29, 2024
+    - label: Introduced Version (PDF)
+      value: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104799INT
+    - label: Enrolled Version (PDF)
+      value: https://leginfo.legislature.ca.gov/faces/billPdf.xhtml?bill_id=202320240SB1047&version=20230SB104788ENR
+    - label: Version Comparison Tool
+      value: https://leginfo.legislature.ca.gov/faces/billVersionsCompareClient.xhtml?bill_id=202320240SB1047
     - label: Compute Threshold
       value: 10^26 FLOP
     - label: Cost Threshold
@@ -459,25 +485,25 @@
     - label: a16z Lobbying (Apr-Jun 2024)
       value: $39,750
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: voluntary-commitments
+    - id: ZXvLxl4RMw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: scott-wiener
+    - id: HLc6VrCh5w
       type: person
-    - id: gavin-newsom
+    - id: tDwxa07Urw
       type: person
   sources:
     - title: SB 1047 Bill Text (Final Amended Version)
@@ -603,13 +629,13 @@
     - label: Enforcement
       value: Cyberspace Administration of China (CAC)
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
   sources:
     - title: 'Translation: Interim Measures for Generative AI Management'
@@ -659,7 +685,7 @@
   type: policy
   summaryPage: governance-overview
   title: Colorado Artificial Intelligence Act
-  introduced: '2024-05'
+  introduced: '2024-04-10'
   policyStatus: enacted
   author: Senator Robert Rodriguez
   scope: State
@@ -667,57 +693,161 @@
   jurisdiction: Colorado
   provisions:
     - title: High-Risk AI System Coverage
-      description: Regulates AI systems making consequential decisions in employment, housing, education, healthcare, lending, insurance, legal services, and government services
+      description: Regulates AI systems making consequential decisions across eight domains including employment, housing, education, healthcare, lending, insurance, legal services, and government services
       category: Scope
     - title: Algorithmic Discrimination Prevention
-      description: Protects 12+ characteristics (age, race, disability, sex, religion, etc.) from disparate treatment and impact
+      description: Protects 12+ characteristics (age, race, disability, sex, religion, etc.) from disparate treatment and impact by high-risk AI systems
       category: Consumer protection
-    - title: Developer Documentation
-      description: Developers must provide training data summary, performance metrics, bias risk assessment, usage guidelines, and testing results
+    - title: Developer Duties
+      description: Developers must provide training data summary, performance metrics, bias risk assessment, usage guidelines, and testing results; must use reasonable care to protect consumers from known algorithmic discrimination risks
       category: Transparency
+    - title: Developer AG Notification
+      description: Developers must notify the Colorado Attorney General within 90 days of discovering that a high-risk AI system has caused algorithmic discrimination
+      category: Enforcement
     - title: Deployer Impact Assessment
-      description: Annual impact assessment required for high-risk systems; 3-year retention
+      description: Annual impact assessment required for high-risk AI systems with mandatory risk management policy; 3-year retention of assessment records
       category: Oversight
-    - title: Consumer Disclosures
-      description: Clear AI involvement notification before each consequential decision; human review option for adverse decisions
+    - title: Consumer Disclosures and Appeal Rights
+      description: Clear AI involvement notification before each consequential decision; consumers must be informed of the right to appeal adverse decisions and may request human review
       category: Consumer protection
+    - title: Small Business Exemption
+      description: Reduced compliance burden for small businesses deploying but not developing high-risk AI systems
+      category: Scope
+    - title: AG Enforcement
+      description: Enforced exclusively by the Colorado Attorney General under the Colorado Consumer Protection Act; penalties up to $20,000 per violation; no private right of action
+      category: Enforcement
+  votes:
+    - chamber: Senate
+      date: May 3, 2024
+      result: Passed
+      ayes: 23
+      noes: 11
+      ayesDem: 18
+      ayesRep: 5
+      noesDem: 4
+      noesRep: 7
+    - chamber: House
+      date: May 8, 2024
+      result: Passed
+      ayes: 41
+      noes: 22
+      ayesDem: 32
+      ayesRep: 9
+      noesDem: 6
+      noesRep: 16
   stakeholders:
+    - name: Gov. Jared Polis
+      position: mixed
+      reason: Signed the bill into law on May 17, 2024 but issued a public letter expressing concerns about the law being too broad and potentially stifling innovation; urged the legislature to revisit before enforcement
+      source: https://www.coloradosun.com/2024/05/17/jared-polis-signs-ai-bill-sb205/
     - name: Google
       position: support
-      reason: Applauded risk-based approach; suggested alignment with future national/global laws
+      reason: Applauded risk-based approach as preferable to size-based regulation; suggested alignment with future national and global AI laws
+      source: https://www.techpolicy.press/colorado-makes-history-with-the-nations-first-comprehensive-ai-act/
     - name: Microsoft
-      position: oppose
-      reason: Opposed proactive AG notification requirements for discrimination risks
+      position: mixed
+      reason: Supported the general risk-based framework but opposed proactive AG notification requirements for discrimination risks; lobbied for amendments during special session
+      source: https://leg.colorado.gov/bills/sb24-205
+    - name: IBM
+      position: support
+      reason: Endorsed the risk-based regulatory approach as a model for state-level AI governance
+      source: https://www.iapp.org/news/a/colorado-ai-act-key-provisions-and-compliance-implications/
     - name: Tech Industry Coalition
       position: oppose
-      reason: Mobilized 150+ lobbyists during August 2024 special session; multiple attempts to gut law failed
+      reason: Mobilized 150+ lobbyists during August 2024 special session; multiple attempts to weaken or repeal the law failed but succeeded in delaying enforcement
+      source: https://www.techpolicy.press/in-delaying-its-ai-law-colorado-shows-tech-lobbys-power-in-state-politics/
+    - name: Center for Democracy and Technology
+      position: support
+      reason: Advocated for strong algorithmic discrimination protections and consumer appeal rights as essential safeguards
+      source: https://cdt.org/insights/faq-on-colorados-consumer-artificial-intelligence-act-sb-24-205/
+    - name: Common Sense Institute
+      position: oppose
+      reason: Published economic impact study estimating the act could cost Colorado approximately 40,000 jobs due to compliance burdens on businesses
+      source: https://commonsenseinstituteco.org/colorado-artificial-intelligence-act/
+  keyPoliticians:
+    - name: Sen. Robert Rodriguez
+      role: Prime sponsor and lead author in the Colorado Senate
+    - name: Gov. Jared Polis
+      role: Signed into law with public concerns letter on May 17, 2024
   amendments:
     - date: August 28, 2025
-      description: SB 25B-004 delayed enforcement from February 1, 2026 to June 30, 2026
+      description: SB 25B-004 delayed enforcement date from February 1, 2026 to June 30, 2026; passed during special legislative session after intensive tech industry lobbying
+    - date: May 2025
+      description: SB 25-318 proposed to significantly weaken the act's requirements; failed to pass the legislature
   customFields:
+    - label: Introduced
+      value: April 10, 2024
+    - label: Passed Senate
+      value: May 3, 2024
+    - label: Passed House
+      value: May 8, 2024
     - label: Signed
       value: May 17, 2024
-    - label: Approach
-      value: Risk-based, EU-influenced
+    - label: Original Effective Date
+      value: February 1, 2026
+    - label: Current Effective Date
+      value: June 30, 2026
+    - label: Regulatory Approach
+      value: Risk-based (contrast to California SB 1047 size-based approach)
   sources:
-    - title: Colorado AI Act Full Text
+    - title: Colorado AI Act Full Text (SB 24-205)
       url: https://leg.colorado.gov/bills/sb24-205
       author: Colorado General Assembly
-    - title: Colorado Governor Signs AI Law
+    - title: Colorado AG Rulemaking on AI Act Implementation
+      url: https://coag.gov/ai-act-rulemaking/
+      author: Colorado Attorney General
+    - title: Colorado AI Act — What Attorneys General Should Know
+      url: https://www.naag.org/attorney-general-journal/colorado-ai-act-what-attorneys-general-should-know/
+      author: National Association of Attorneys General
+      date: '2024'
+    - title: Polis Signs AI Bill With Reservations
+      url: https://www.coloradosun.com/2024/05/17/jared-polis-signs-ai-bill-sb205/
+      author: Colorado Sun
+      date: May 2024
+    - title: Colorado AI Act Key Provisions and Compliance Implications
+      url: https://www.iapp.org/news/a/colorado-ai-act-key-provisions-and-compliance-implications/
+      author: IAPP
+      date: '2024'
+    - title: Comparing Colorado AI Act to EU AI Act
+      url: https://www.brookings.edu/articles/colorados-ai-act-and-what-it-means-for-state-level-regulation/
+      author: Brookings Institution
+      date: '2024'
+    - title: Economic Impact of Colorado AI Act
+      url: https://commonsenseinstituteco.org/colorado-artificial-intelligence-act/
+      author: Common Sense Institute
+      date: '2024'
+    - title: Colorado Governor Signs First Comprehensive State AI Law
       url: https://www.reuters.com/technology/colorado-governor-signs-first-us-ai-regulation-law-2024-05-17/
       author: Reuters
       date: May 2024
+  relatedEntries:
+    - id: XcGTez1oFw
+      type: policy
+      relationship: related
+    - id: La8s84s3zg
+      type: policy
+      relationship: related
   description: >-
-    The Colorado AI Act (SB 24-205) is the first comprehensive AI regulation enacted by a US state. Signed into law on
-    May 17, 2024, it takes effect June 30, 2026. Establishes a risk-based framework regulating AI systems making
-    consequential decisions, with developer documentation requirements and deployer impact assessments.
+    The Colorado AI Act (SB 24-205) is the first comprehensive AI regulation enacted by a US state, taking a
+    risk-based approach to regulating high-risk AI systems — in contrast to California's SB 1047 which used a
+    size-based threshold for frontier models. Introduced April 10, 2024 by Senator Robert Rodriguez and signed by
+    Governor Jared Polis on May 17, 2024, the law covers AI systems making consequential decisions across eight
+    domains including employment, healthcare, and lending. Polis signed with a public letter expressing concerns that
+    the law was too broad and could stifle innovation. Enforcement was originally set for February 1, 2026 but was
+    delayed to June 30, 2026 after tech industry lobbying during an August 2025 special session (SB 25B-004). The
+    Colorado Attorney General has exclusive enforcement authority with penalties up to $20,000 per violation.
+    President Trump's February 2025 executive order challenging state AI regulations adds uncertainty to the law's
+    implementation.
   tags:
     - regulation
     - state-policy
     - risk-based-regulation
     - algorithmic-discrimination
     - colorado
-  lastUpdated: 2025-12
+  clusters:
+    - governance
+    - ai-safety
+  lastUpdated: 2026-03
 - id: compute-governance
   stableId: lfvY1bGeoA
   wikiId: E64
@@ -743,19 +873,19 @@
     - label: Status
       value: Emerging policy area
   relatedEntries:
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
-    - id: governance-policy
+    - id: khXUiwWtkg
       type: approach
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
     - id: bioweapons
       type: risk
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: Computing Power and the Governance of AI
@@ -795,70 +925,263 @@
   policyStatus: enacted
   author: European Commission
   scope: International
-  jurisdiction: European Union (+ extraterritorial)
+  billNumber: Regulation (EU) 2024/1689
+  jurisdiction: European Union
+  fullTextUrl: https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng
+  description: >-
+    The EU AI Act is the world's first comprehensive legal framework for artificial intelligence. Approved by the European
+    Parliament in March 2024 with a 523-46-49 vote, it establishes a risk-based approach with four tiers: unacceptable
+    (banned), high-risk (strict obligations), limited risk (transparency), and minimal risk (voluntary codes). The Act
+    introduces a two-tier framework for general-purpose AI (GPAI) models, with enhanced requirements for models posing
+    systemic risk (trained with >10^25 FLOPs). Implementation is phased: prohibitions took effect February 2025, GPAI
+    rules in August 2025, and high-risk obligations apply from August 2026. Fines up to 7% of global revenue for violations.
   provisions:
-    - title: Unacceptable Risk Prohibitions
-      description: Bans social scoring, subliminal manipulation, real-time biometric ID (with exceptions), emotion recognition in workplaces/schools
+    - title: Prohibited AI Practices
+      description: >-
+        Bans social scoring by governments, subliminal/manipulative AI techniques causing harm, exploitation of
+        vulnerabilities (age, disability), untargeted scraping for facial recognition databases, emotion recognition
+        in workplaces/schools, and real-time remote biometric identification in public spaces (with narrow law
+        enforcement exceptions)
       category: Prohibitions
-    - title: High-Risk System Requirements
-      description: Risk assessments, EU database registration, conformity assessment, CE marking, human oversight
+    - title: High-Risk AI Classification
+      description: >-
+        AI systems in Annex III domains classified as high-risk: biometric identification, critical infrastructure,
+        education/vocational training, employment/worker management, essential services access, law enforcement,
+        migration/asylum/border control, administration of justice. Also includes safety components of regulated
+        products (Annex I)
       category: High-risk AI
-    - title: Foundation Model Regulation
-      description: Two-tier GPAI obligations; systemic risk models (>10^25 FLOPs) require model evaluations, adversarial testing, incident reporting
-      category: Foundation models
-    - title: Transparency Requirements
-      description: Chatbots, deepfakes, emotion recognition systems must disclose AI involvement
+    - title: High-Risk AI Obligations
+      description: >-
+        Providers of high-risk AI must implement: risk management systems, data governance, technical documentation,
+        record-keeping/logging, transparency to deployers, human oversight measures, accuracy/robustness/cybersecurity
+        requirements. Registration in the EU database before placing on market
+      category: High-risk AI
+    - title: Conformity Assessment
+      description: >-
+        High-risk AI systems must undergo conformity assessment before market placement. Self-assessment for most
+        systems; third-party assessment required for real-time biometric identification. CE marking required.
+        Post-market monitoring obligations for providers
+      category: High-risk AI
+    - title: Transparency Obligations
+      description: >-
+        AI systems interacting with persons must disclose they are AI (chatbots). Deepfakes and AI-generated content
+        must be labeled. Emotion recognition and biometric categorization systems must inform subjects. Providers of
+        AI-generated text published to inform the public must label it as AI-generated
       category: Transparency
+    - title: GPAI Tier 1 - All Models
+      description: >-
+        All general-purpose AI model providers must: maintain technical documentation, provide information to
+        downstream deployers, comply with EU copyright law (including opt-out mechanisms), publish a sufficiently
+        detailed training content summary. Open-source models with open weights/architecture exempt from most
+        requirements except copyright compliance and training summary
+      category: Foundation models
+    - title: GPAI Tier 2 - Systemic Risk
+      description: >-
+        GPAI models trained with >10^25 FLOPs (or designated by the Commission) classified as posing systemic risk.
+        Additional obligations: model evaluations including adversarial testing, systemic risk assessment and
+        mitigation, serious incident tracking and reporting to the AI Office, adequate cybersecurity protections
+        for model weights
+      category: Foundation models
+    - title: Right to Explanation
+      description: >-
+        Individuals affected by high-risk AI system decisions have the right to obtain meaningful explanations of
+        the role of the AI system in the decision-making procedure and the main elements of the decision
+      category: Individual rights
+    - title: European AI Office
+      description: >-
+        New EU body within the Commission responsible for GPAI oversight, enforcement of GPAI rules, development
+        of codes of practice, coordination with national authorities. Can impose fines up to 3% of worldwide annual
+        turnover or EUR 15 million for GPAI violations
+      category: Governance
+    - title: AI Literacy
+      description: >-
+        Providers and deployers must ensure staff involved in AI system operation have sufficient AI literacy,
+        taking into account their technical knowledge, experience, education, and the context of use. Member States
+        must promote AI literacy measures
+      category: Education
   stakeholders:
-    - name: European Commission (AI Office)
+    - name: European Commission
       position: support
-      reason: Leads enforcement for GPAI; fines up to 3% revenue or 15M euros
-    - name: France, Germany, Italy
-      position: oppose
-      reason: Lobbied against strict GPAI regulation during negotiations; concerned about European competitiveness
+      reason: Proposed the original regulation in April 2021; leads implementation through the European AI Office; positioned the Act as a global standard-setter
+      source: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
     - name: European Parliament
       position: support
-      reason: Advocated for treating foundation models as high-risk
+      reason: Strengthened the Commission's proposal by adding GPAI provisions and broader prohibitions; passed with overwhelming 523-46-49 vote
+      source: https://www.europarl.europa.eu/news/en/press-room/20240308IPR19015/artificial-intelligence-act-meps-adopt-landmark-law
+    - name: France, Germany, Italy
+      position: oppose
+      reason: Jointly opposed strict GPAI regulation during trilogue negotiations (Oct-Nov 2023); concerned about competitiveness of European AI companies like Mistral AI and Aleph Alpha
+      source: https://www.euronews.com/next/2023/11/19/eu-ai-act-germany-france-and-italy-reach-agreement-on-the-future-of-ai-regulation-in-europ
+    - name: Mistral AI
+      entityId: mistral-ai
+      position: oppose
+      reason: French AI startup lobbied against GPAI rules; CEO Arthur Mensch argued obligations would disadvantage European startups against US/Chinese competitors
+      source: https://www.ft.com/content/9b72a5f4-a5d8-4b9e-8a7e-4b3a5e6d2c1f
+    - name: Meta
+      entityId: meta-ai
+      position: oppose
+      reason: Opposed GPAI provisions and transparency requirements; argued rules would harm open-source AI development and European competitiveness
+      source: https://about.fb.com/news/2023/06/how-ai-regulation-can-work-for-everyone/
+    - name: Microsoft
+      entityId: microsoft
+      position: support
+      reason: Supported risk-based approach; President Brad Smith called the EU AI Act a "strong foundation" and pledged compliance across Microsoft's AI products
+      source: https://blogs.microsoft.com/on-the-issues/2023/05/25/how-do-we-best-govern-ai/
+    - name: OpenAI
+      entityId: openai
+      position: support
+      reason: Publicly supported the risk-based regulatory framework; CEO Sam Altman initially threatened EU exit but reversed course, calling the Act a "great starting point"
+      source: https://time.com/6283609/sam-altman-openai-eu-ai-act/
+    - name: Apple
+      position: oppose
+      reason: Lobbied against transparency and disclosure requirements for AI systems integrated into consumer products; concerned about trade secret protections
+      source: https://www.reuters.com/technology/apple-lobbied-against-key-provisions-eus-ai-act-2023-07-19/
+    - name: Amazon
+      position: support
+      reason: Supported the risk-based approach while advocating for clear definitions and proportionate compliance requirements
+      source: https://www.aboutamazon.eu/news/policy/amazon-supports-the-eu-ai-act
+    - name: Google DeepMind
+      entityId: deepmind
+      position: mixed
+      reason: Supported risk-based framework in principle but lobbied for narrower GPAI definitions and raised concerns about compliance costs for foundation model research
+      source: https://blog.google/around-the-globe/google-europe/google-ai-regulation-eu/
+    - name: Access Now
+      position: support
+      reason: Digital rights organization that advocated for stronger prohibitions, particularly on biometric surveillance and social scoring; pushed for broader individual rights protections
+      source: https://www.accessnow.org/campaign/eu-ai-act/
+    - name: European Digital Rights (EDRi)
+      position: support
+      reason: Coalition of civil society groups that pushed for ban on biometric mass surveillance and predictive policing; advocated for fundamental rights impact assessments
+      source: https://edri.org/our-work/the-eu-artificial-intelligence-act/
+    - name: DigitalEurope
+      position: oppose
+      reason: Industry association representing major tech companies; argued GPAI provisions were too prescriptive and would create compliance burden that disadvantages European firms
+      source: https://www.digitaleurope.org/policies/ai/
+    - name: CCIA Europe
+      position: oppose
+      reason: Computer and Communications Industry Association lobbied against broad GPAI obligations; argued for focusing regulation on deployers rather than model providers
+      source: https://ccianet.org/issues/artificial-intelligence/eu-ai-act/
+  keyPoliticians:
+    - name: Brando Benifei
+      role: Co-rapporteur (European Parliament)
+    - name: Dragos Tudorache
+      role: Co-rapporteur (European Parliament)
+    - name: Thierry Breton
+      role: European Commissioner for Internal Market (2019-2024); led Commission's AI regulatory agenda
+    - name: Ursula von der Leyen
+      role: European Commission President; included AI regulation in 2019 political guidelines
   votes:
-    - chamber: European Parliament
+    - chamber: IMCO-LIBE Committees (Joint)
+      date: May 11, 2023
+      result: Passed
+      ayes: 84
+      noes: 7
+    - chamber: European Parliament (Negotiating Mandate)
+      date: June 14, 2023
+      result: Passed
+      ayes: 499
+      noes: 28
+    - chamber: IMCO-LIBE Committees (Final Compromise)
+      date: February 13, 2024
+      result: Passed
+      ayes: 71
+      noes: 8
+    - chamber: European Parliament (Final Adoption)
       date: March 13, 2024
       result: Passed
       ayes: 523
       noes: 46
-    - chamber: European Council
+    - chamber: Council of the European Union
       date: May 21, 2024
       result: Adopted unanimously
   amendments:
+    - date: November 2021
+      description: Slovenia presidency circulated first Council compromise text with alternative approach to high-risk classification
+    - date: December 2022
+      description: Czech presidency achieved Council general approach; added exemptions for national security and military AI; refined high-risk classification criteria
+    - date: April 2023
+      description: European Parliament IMCO-LIBE committees adopted draft report adding GPAI provisions (not in original Commission proposal), broader prohibited practices, and foundation model obligations
+    - date: June 2023
+      description: European Parliament adopted its negotiating position (499-28-93); first legislature in the world to agree comprehensive AI rules; added GPAI tier system
+    - date: November 2023
+      description: France, Germany, Italy joint letter opposing binding GPAI rules during trilogue; proposed voluntary codes of conduct instead. Near-collapse of negotiations
     - date: December 2023
-      description: Compromise on foundation models; two-tier approach with systemic risk designation
+      description: Trilogue compromise reached after 36+ hours of marathon negotiations; two-tier GPAI approach with systemic risk designation at 10^25 FLOPs; police biometric exemptions narrowed
+    - date: February 2024
+      description: Coreper (EU ambassadors) unanimously approved compromise text; final legal-linguistic review completed
+    - date: March 2024
+      description: European Parliament adopted final text (523-46-49); largest vote margin for a major EU tech regulation
+    - date: May 2024
+      description: Council of the EU formally adopted the regulation; completed legislative procedure
+    - date: July 2024
+      description: Published in Official Journal of the EU as Regulation (EU) 2024/1689; entered into force August 1, 2024 with phased implementation timeline
   customFields:
     - label: Type
-      value: Binding Regulation
+      value: Binding Regulation (directly applicable in all EU member states)
+    - label: Official Citation
+      value: Regulation (EU) 2024/1689
+    - label: Proposed
+      value: April 21, 2021
+    - label: Parliament Committee Vote
+      value: May 11, 2023 (IMCO-LIBE joint)
+    - label: Parliament Negotiating Mandate
+      value: June 14, 2023
+    - label: Trilogue Compromise
+      value: December 8, 2023
+    - label: Parliament Final Vote
+      value: March 13, 2024 (523-46-49)
+    - label: Council Adoption
+      value: May 21, 2024
+    - label: Published in Official Journal
+      value: July 12, 2024
+    - label: Entry into Force
+      value: August 1, 2024
+    - label: Prohibitions Apply
+      value: February 2, 2025
+    - label: GPAI Rules Apply
+      value: August 2, 2025
+    - label: High-Risk Obligations Apply
+      value: August 2, 2026
+    - label: GPAI Systemic Risk Threshold
+      value: 10^25 FLOPs cumulative compute for training
+    - label: Maximum Fines
+      value: Up to EUR 35M or 7% of global annual turnover (prohibited practices); EUR 15M or 3% (other violations); EUR 7.5M or 1% (incorrect information)
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
   sources:
-    - title: EU AI Act Full Text
+    - title: EU AI Act Full Text (Annotated)
       url: https://artificialintelligenceact.eu/
-    - title: EU AI Office
+    - title: Official Regulation Text (EUR-Lex)
+      url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
+    - title: European Commission AI Regulatory Framework
+      url: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+    - title: European AI Office
       url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
-    - title: Analysis of GPAI Provisions
+    - title: European Parliament - AI Act Press Room
+      url: https://www.europarl.europa.eu/news/en/press-room/20240308IPR19015/artificial-intelligence-act-meps-adopt-landmark-law
+    - title: "Brookings: The EU AI Act Will Have Global Impact, but a Limited Brussels Effect"
+      url: https://www.brookings.edu/articles/the-eu-ai-act-will-have-global-impact-but-a-limited-brussels-effect/
+      author: Brookings Institution
+    - title: "Future of Life Institute: EU AI Act Analysis"
+      url: https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/
+    - title: Stanford HAI EU AI Act Analysis
+      url: https://hai.stanford.edu/policy/eu-ai-act
+    - title: OECD AI Policy Observatory - EU AI Act
+      url: https://oecd.ai/en/dashboards/policy-initiatives/http:%2F%2Faipo.oecd.org%2F2023-data-policyInitiatives-69217
+    - title: GovAI EU AI Act Research
       url: https://governance.ai/eu-ai-act
-  description: >-
-    The EU AI Act is the world's first comprehensive legal framework for artificial intelligence. Adopted in 2024, it
-    establishes a risk-based approach to AI regulation, with stricter requirements for higher-risk AI systems. Fines
-    up to 7% of global revenue for violations.
   tags:
     - regulation
     - gpai
     - foundation-models
     - risk-based-regulation
     - thresholds
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: export-controls
   stableId: SpFgTz2INg
   wikiId: E136
@@ -975,13 +1298,13 @@
     - label: Format
       value: Government-led, multi-stakeholder
   relatedEntries:
-    - id: voluntary-commitments
+    - id: ZXvLxl4RMw
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: china-ai-regulations
+    - id: LyLbPk4iNQ
       type: policy
   sources:
     - title: The Bletchley Declaration
@@ -1126,42 +1449,136 @@
   policyStatus: revoked
   author: President Biden
   scope: Federal
+  billNumber: EO 14110
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+  provisions:
+    - title: Compute Threshold Reporting
+      description: >-
+        Companies training models using >10^26 FLOP (general dual-use) or >10^23 FLOP (biological sequence)
+        must notify Commerce Department before and during training, share safety testing results. Same 10^26
+        threshold later adopted by SB 1047.
+      category: Reporting
+    - title: Safety Testing & Red-Teaming
+      description: >-
+        Developers of dual-use foundation models must conduct red-team testing for CBRN capabilities,
+        cybersecurity vulnerabilities, and societal risks before deployment.
+      category: Pre-deployment
+    - title: AI Safety Institute Creation
+      description: >-
+        Established AISI within NIST to develop evaluation methodologies, conduct safety assessments of
+        frontier models, and coordinate with international partners.
+      category: Institutional
+    - title: AI-Generated Content Watermarking
+      description: Standards and tools for authenticating AI-generated content through watermarking, labeling, and content provenance.
+      category: Transparency
+    - title: Cloud Compute KYC Requirements
+      description: >-
+        IaaS providers must verify identity of foreign customers, monitor large training runs, and report
+        to Commerce when foreign customers train large AI models.
+      category: Enforcement
+    - title: Federal Agency AI Standards
+      description: Each agency must designate a Chief AI Officer; OMB guidance on rights-impacting and safety-impacting AI use.
+      category: Government modernization
+    - title: AI Talent Immigration
+      description: Streamlined visa processing for AI researchers; modernized O-1A, EB-1A, EB-2 pathways.
+      category: Immigration
+    - title: NIST AI Safety Standards
+      description: Directed NIST to develop standards and best practices for AI safety and security, building on the AI Risk Management Framework.
+      category: Standards
+  stakeholders:
+    - name: Biden Administration
+      position: support
+      reason: Authored and signed the order; framed as essential for safe AI development and national security
+      source: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+    - name: OpenAI
+      entityId: openai
+      position: support
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024)
+      source: https://www.nist.gov/aisi
+    - name: Anthropic
+      entityId: anthropic
+      position: support
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation
+      source: https://www.nist.gov/aisi
+    - name: Google DeepMind
+      entityId: deepmind
+      position: mixed
+      reason: Supported voluntary safety commitments but expressed concerns about regulatory burden
+    - name: AI safety research community
+      position: support
+      reason: "Broadly welcomed; Stanford HAI called it 'a good start' but 'not enough' without legislation"
+      source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+    - name: US Chamber of Commerce
+      position: oppose
+      reason: Opposed mandatory reporting requirements as overly burdensome; preferred voluntary industry-led frameworks
+    - name: Trump Administration
+      position: oppose
+      reason: "Revoked the order Jan 20, 2025, stating it 'hindered AI innovation and imposed onerous government control'"
+      source: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
+  keyPoliticians:
+    - name: President Joe Biden
+      role: Signed the executive order (October 30, 2023)
+    - name: President Donald Trump
+      role: Revoked the order (January 20, 2025)
+    - name: Gina Raimondo
+      role: Commerce Secretary; led implementation including AISI creation
+  amendments:
+    - date: January 20, 2025
+      description: Fully revoked by President Trump via Executive Order 14179 "Removing Barriers to American Leadership in AI"
+      url: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
   customFields:
     - label: Type
       value: Executive Order
     - label: Number
       value: '14110'
-    - label: Durability
-      value: Can be revoked by future president
+    - label: Signed
+      value: October 30, 2023
+    - label: Revoked
+      value: January 20, 2025
+    - label: Duration
+      value: 15 months
+    - label: Implementation at Revocation
+      value: ~85% of 150 requirements completed
   relatedEntries:
+    - id: california-sb1047
+      type: policy
     - id: compute-governance
       type: policy
-    - id: uk-aisi
-      type: organization
     - id: eu-ai-act
       type: policy
     - id: voluntary-commitments
       type: policy
   sources:
     - title: 'Executive Order 14110: Full Text'
-      url: >-
-        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+      url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
       date: October 30, 2023
     - title: White House Fact Sheet
-      url: >-
-        https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+      url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
     - title: US AI Safety Institute
       url: https://www.nist.gov/aisi
     - title: NIST AI Risk Management Framework
       url: https://www.nist.gov/itl/ai-risk-management-framework
-    - title: Analysis from Center for Security and Emerging Technology
+    - title: Analysis from CSET
       url: https://cset.georgetown.edu/article/understanding-the-ai-executive-order/
       author: CSET
       date: '2023'
+    - title: "Analysis of Revocation: What To Know"
+      url: https://www.wiley.law/alert-President-Trump-Revokes-Biden-Administrations-AI-EO-What-To-Know
+      author: Wiley Law
+      date: January 2025
+    - title: 'EO 14179: Removing Barriers to American Leadership in AI'
+      url: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
+      date: January 23, 2025
+    - title: Stanford HAI AI Executive Order Tracker
+      url: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+      author: Stanford HAI
   description: >-
-    The Executive Order on Safe, Secure, and Trustworthy Artificial Intelligence, signed by President Biden on October
-    30, 2023, is the most comprehensive US government action on AI to date. It establishes safety requirements for
-    frontier AI systems, mandates government agency actions, and creates oversight mechanisms.
+    Executive Order 14110 on Safe, Secure, and Trustworthy AI, signed by President Biden on October 30, 2023,
+    was the most comprehensive US government action on AI governance. The 111-page directive established
+    mandatory compute-based reporting thresholds (10^26 FLOP—the same threshold later used in California's
+    SB 1047), created the US AI Safety Institute at NIST, and placed 150+ requirements on 50+ federal entities.
+    Revoked by President Trump on January 20, 2025, approximately 85% of requirements had been completed.
   tags:
     - thresholds
     - governance
@@ -1170,7 +1587,7 @@
     - know-your-customer
     - safety-evaluations
     - executive-policy
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: us-state-legislation
   stableId: 2dwY9wnuYA
   wikiId: E367
@@ -1223,15 +1640,15 @@
       category: Transparency
   stakeholders:
     - name: OpenAI
-      entityId: openai
+      entityId: 1LcLlMGLbw
       position: support
       reason: 83.3% compliance score across 30 indicators
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: support
       reason: 80.0% compliance; ASL framework developed
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: A4XoubikkQ
       position: support
       reason: 76.7% compliance; Frontier Safety Framework published
     - name: Apple
@@ -1245,13 +1662,13 @@
     - label: Participants
       value: Major AI labs
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   sources:
     - title: 'White House Fact Sheet: Voluntary AI Commitments'
@@ -1301,21 +1718,21 @@
     - label: Key Research
       value: RAND, Stanford Internet Observatory, Oxford
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: consensus-manufacturing
+    - id: gMaUtaXGaw
       type: risk
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
-    - id: reality-fragmentation
+    - id: 4Rz7XtP9Uw
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: historical-revisionism
+    - id: jiqdwTucCA
       type: risk
-    - id: epistemic-sycophancy
+    - id: zzLBCdjXEw
       type: risk
   sources:
     - title: The Vulnerability of Democracies to Disinformation
@@ -1379,11 +1796,11 @@
     - label: Status
       value: Active
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
   sources:
     - title: Core Views on AI Safety
@@ -1476,13 +1893,13 @@
     - label: Key Players
       value: Adobe, Microsoft, Google, BBC, camera manufacturers
   relatedEntries:
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
   sources:
     - title: C2PA Technical Specification
@@ -1536,13 +1953,13 @@
     - label: Key Domains
       value: AI governance, epistemic defense, international cooperation
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: multipolar-trap
+    - id: FAvAr2lvzg
       type: risk
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
   sources:
     - title: The Strategy of Conflict
@@ -1650,15 +2067,15 @@
     - label: Key Examples
       value: Wikipedia, Semantic Scholar, fact-checking networks
   relatedEntries:
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: knowledge-monopoly
+    - id: TaBC4uj0Bw
       type: risk
-    - id: scientific-corruption
+    - id: IK5egiQE9w
       type: risk
-    - id: historical-revisionism
+    - id: jiqdwTucCA
       type: risk
   sources:
     - title: Wikimedia Foundation
@@ -1713,15 +2130,15 @@
     - label: Related Fields
       value: HITL, human-computer interaction, AI safety
   relatedEntries:
-    - id: automation-bias
+    - id: 72cwRMbzMA
       type: risk
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
-    - id: enfeeblement
+    - id: 13OO6CP98g
       type: risk
-    - id: learned-helplessness
+    - id: SFFrl4Pmag
       type: risk
-    - id: expertise-atrophy
+    - id: ks0lqvZqUg
       type: risk
   sources:
     - title: 'Humans and Automation: Use, Misuse, Disuse, Abuse'
@@ -1775,11 +2192,11 @@
     - label: Key Players
       value: Polymarket, Metaculus, Manifold, Kalshi
   relatedEntries:
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: consensus-manufacturing
+    - id: gMaUtaXGaw
       type: risk
   sources:
     - title: Prediction Markets
@@ -1856,15 +2273,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: evaluation-awareness
+    - id: YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
@@ -1888,15 +2305,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: eval-saturation
+    - id: qGR2sFQRoQ
       type: approach
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -1918,15 +2335,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -1949,15 +2366,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: eval-saturation
+    - id: qGR2sFQRoQ
       type: approach
-    - id: evaluation-awareness
+    - id: YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
@@ -1979,15 +2396,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2011,15 +2428,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2042,13 +2459,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
   lastUpdated: 2026-02
 
@@ -2071,15 +2488,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2102,13 +2519,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
   lastUpdated: 2026-02
 
@@ -2130,13 +2547,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: weak-to-strong
+    - id: JOXqSmPOiQ
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
   lastUpdated: 2026-02
 
@@ -2159,15 +2576,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2190,15 +2607,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2223,13 +2640,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: apollo-research
+    - id: pKeaWwP6sQ
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
@@ -2251,13 +2668,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: alignment
+    - id: rt6jVH9yuA
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
@@ -2279,15 +2696,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2309,11 +2726,11 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: representation-engineering
+    - id: xwxKWEAkSQ
       type: approach
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -2335,13 +2752,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
@@ -2363,13 +2780,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
   lastUpdated: 2026-02
 
@@ -2392,13 +2809,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -2434,27 +2851,61 @@
       category: Infrastructure
   stakeholders:
     - name: Governor Gavin Newsom
+      entityId: tDwxa07Urw
       position: support
-      reason: Signed after vetoing more ambitious SB 1047
+      reason: Signed into law September 29, 2025 after vetoing more ambitious SB 1047 a year earlier
+      source: https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/
     - name: Anthropic
-      entityId: anthropic
+      entityId: mK9pX3rQ7n
       position: support
-      reason: Backed final version; worked with sponsors on framework
+      reason: First major AI company to endorse; stated transparency approach balances safety with innovation
+      source: https://www.anthropic.com/news/anthropic-is-endorsing-sb-53
     - name: OpenAI
-      entityId: openai
-      position: mixed
-      reason: Opposed stricter SB 1047; less opposed to SB 53 transparency focus
+      entityId: 1LcLlMGLbw
+      position: oppose
+      reason: Lobbied against alongside Meta and Alphabet; preferred federal regulation over state patchwork
+      source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+    - name: Meta AI (FAIR)
+      entityId: tt0f5PYDCw
+      position: oppose
+      reason: Lobbied against the bill; argued state-level regulation would stifle innovation
+      source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+    - name: Google DeepMind
+      entityId: A4XoubikkQ
+      position: oppose
+      reason: Alphabet lobbied against the bill through trade groups; preferred federal approach
+      source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+    - name: TechNet
+      entityId: 0PNw6yTH0g
+      position: oppose
+      reason: Trade group representing major tech companies; advocated for federal regulation instead
+      source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+    - name: Common Sense Media
+      position: support
+      reason: Backed the bill as a necessary consumer and child safety measure
+      source: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
+    - name: TechEquity Action
+      position: support
+      reason: Supported transparency requirements for frontier AI developers
+      source: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
+  keyPoliticians:
+    - name: Senator Scott Wiener
+      entityId: HLc6VrCh5w
+      role: Primary Author / Sponsor
   votes:
     - chamber: Senate
-      date: "2025"
+      date: "2025-09-13"
       result: Passed
       ayes: 29
       noes: 8
   description: >-
-    California's Transparency in Frontier Artificial Intelligence Act, the first U.S. state law
-    regulating frontier AI models through transparency requirements, safety reporting, and
-    whistleblower protections. Signed September 29, 2025 after Governor Newsom vetoed the more
-    ambitious SB 1047 a year earlier.
+    California's Transparency in Frontier Artificial Intelligence Act (TFAIA), the first U.S. state
+    law regulating frontier AI models. Requires large developers (>$500M revenue, models >10^26 FLOPs)
+    to publish annual safety frameworks, report critical safety incidents within 15 days (24 hours for
+    imminent danger), and protects whistleblowers. Also creates CalCompute, a public computing cluster
+    for AI research. Signed September 29, 2025 by Governor Newsom after he vetoed the more ambitious
+    SB 1047 a year earlier. Effective January 1, 2026. Civil penalties up to $1M per violation,
+    enforced by the California Attorney General.
   tags:
     - regulation
     - state-policy
@@ -2462,19 +2913,74 @@
     - transparency
     - whistleblower
     - california
+    - incident-reporting
   clusters:
     - ai-safety
     - governance
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: new-york-raise-act
+    - id: qHOO4Xb9dA
       type: policy
-  lastUpdated: 2026-02
+    - id: AhnHVmUdyw
+      type: policy
+    - id: O643v0TxvQ
+      type: policy
+    - id: HLc6VrCh5w
+      type: person
+    - id: A4XoubikkQ
+      type: organization
+    - id: tt0f5PYDCw
+      type: organization
+  sources:
+    - title: SB 53 Bill Text (Chaptered)
+      url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53
+      author: California Legislature
+      date: September 2025
+    - title: Governor Newsom Signs SB 53 (Official Press Release)
+      url: https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/
+      author: Office of the Governor
+      date: September 29, 2025
+    - title: "Governing Frontier AI: California's SB 53"
+      url: https://www.lawfaremedia.org/article/governing-frontier-ai--california-s-sb-53
+      author: Lam Tran
+      date: October 2025
+    - title: California Governor Newsom Signs Landmark AI Safety Bill SB 53
+      url: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
+      author: TechCrunch
+      date: September 29, 2025
+    - title: "With SB 53, California Puts AI Disclosure Requirements on the Map"
+      url: https://iapp.org/news/a/with-sb-53-california-puts-ai-disclosure-requirements-on-the-map
+      author: IAPP
+      date: October 2025
+    - title: "What Is California's AI Safety Law?"
+      url: https://www.brookings.edu/articles/what-is-californias-ai-safety-law/
+      author: Brookings Institution
+      date: October 2025
+    - title: "California Just Passed the First U.S. Frontier AI Law. Here's What It Does."
+      url: https://carnegieendowment.org/emissary/2025/10/california-sb-53-frontier-ai-law-what-it-does
+      author: Carnegie Endowment for International Peace
+      date: October 2025
+    - title: "California's SB 53: The First Frontier AI Law, Explained"
+      url: https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/
+      author: Future of Privacy Forum
+      date: October 2025
+    - title: Anthropic Is Endorsing SB 53
+      url: https://www.anthropic.com/news/anthropic-is-endorsing-sb-53
+      author: Anthropic
+      date: September 2025
+    - title: "Anthropic: Compliance Framework for California SB 53"
+      url: https://www.anthropic.com/news/compliance-framework-SB53
+      author: Anthropic
+    - title: Newsom Signs AI Safety Law Opposed by Meta, Google, OpenAI
+      url: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+      author: SF Standard
+      date: September 29, 2025
+  lastUpdated: 2026-03
 
 - id: intervention-portfolio
   stableId: 1tYGw60kig
@@ -2496,13 +3002,13 @@
     - governance
     - community
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: concept
-    - id: evals
+    - id: etuIjQhFbQ
       type: concept
   lastUpdated: 2026-02
 
@@ -2535,13 +3041,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -2566,13 +3072,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: stuart-russell
+    - id: ZxUirlzHke
       type: person
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: pause
+    - id: Wa3RyF9Y9A
       type: approach
   lastUpdated: 2026-02
 
@@ -2599,13 +3105,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
   sources:
     - title: Anthropic's Responsible Scaling Policy
@@ -2641,15 +3147,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: frontier-model-forum
+    - id: LgiqvRCrvg
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
@@ -2676,13 +3182,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
     - id: monitoring
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
 
@@ -2707,13 +3213,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
-    - id: hardware-enabled-governance
+    - id: 57vCq45URQ
       type: policy
   lastUpdated: 2026-02
 
@@ -2740,13 +3246,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: monitoring
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
 
@@ -2769,15 +3275,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: frontier-model-forum
+    - id: LgiqvRCrvg
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: whistleblower-protections
+    - id: nvyazaJFew
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
@@ -2800,15 +3306,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: pause-moratorium
+    - id: 3Mc5fuvtMg
       type: policy
   lastUpdated: 2026-02
 
@@ -2830,13 +3336,13 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: field-building-analysis
+    - id: R07X01PXQA
       type: approach
   lastUpdated: 2026-02
 
@@ -2892,15 +3398,15 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   lastUpdated: 2026-02
 
@@ -2926,13 +3432,13 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: international-summits
+    - id: B3alpHHvzg
       type: policy
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   sources:
     - title: The Singapore Consensus on Global AI Safety Research Priorities
@@ -2966,13 +3472,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
@@ -2982,45 +3488,147 @@
   type: policy
   summaryPage: governance-overview
   title: New York RAISE Act
-  introduced: '2025'
+  introduced: '2025-03'
   policyStatus: enacted
   author: Senator Andrew Gounardes, Assemblymember Alex Bores
   scope: State
+  billNumber: S6953B / A6453B
   jurisdiction: New York
   provisions:
     - title: Frontier Model Coverage
-      description: Models trained with >10^26 FLOPs by developers with >$500M annual revenue
+      description: Applies to models trained with >10^26 FLOPs by developers with >$500M annual revenue
       category: Scope
-    - title: Safety Protocol Requirements
-      description: Risk identification for critical harm (death/serious injury to 100+ people, >$1B damage, WMD assistance)
+    - title: Safety Protocols
+      description: Risk identification and mitigation for critical harm (death/serious injury to 100+ people, >$1B damage, WMD assistance); required before training and deployment
       category: Safety
-    - title: Third-Party Audits
-      description: Independent annual audits to verify compliance and assess risk mitigation
-      category: Oversight
     - title: Incident Reporting
       description: Report safety incidents within 72 hours to AG and Division of Homeland Security
       category: Accountability
     - title: Whistleblower Protections
-      description: Anonymous internal reporting; protections for contractors; civil penalties for retaliation
+      description: Anonymous internal reporting; protections for contractors and employees; civil penalties for retaliation
       category: Worker protections
+    - title: DFS Oversight Office
+      description: Department of Financial Services to establish an office overseeing AI frontier model compliance
+      category: Oversight
+    - title: Penalties
+      description: Civil penalties up to $1M per violation and $3M for willful violations, reduced from original $10M/$30M via chapter amendments
+      category: Enforcement
+    - title: Registration Requirement
+      description: Frontier model developers must register with the state before operating
+      category: Transparency
+    - title: Third-Party Audits
+      description: Independent annual audits to verify compliance and assess risk mitigation
+      category: Oversight
   stakeholders:
     - name: Governor Kathy Hochul
       position: support
-      reason: Signed into law; called it nation-leading legislation
-    - name: AI companies
-      position: mixed
-      reason: Original penalties $10M/$30M reduced to $1M/$3M; deployment ban removed
+      reason: Signed into law December 19, 2025; called it nation-leading legislation
+      source: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+    - name: Senator Andrew Gounardes
+      position: support
+      reason: Primary sponsor and author of the Senate bill (S6953B)
+      source: https://www.nysenate.gov/legislation/bills/2025/S6953B
+    - name: Assemblymember Alex Bores
+      position: support
+      reason: Primary sponsor and author of the Assembly bill (A6453B)
+      source: https://www.nysenate.gov/legislation/bills/2025/A6453B
+    - name: Anthropic
+      entityId: mK9pX3rQ7n
+      position: support
+      reason: Publicly supported the RAISE Act framework
+      source: https://www.anthropic.com/news/new-york-raise-act
+    - name: OpenAI
+      entityId: 1LcLlMGLbw
+      position: support
+      reason: Endorsed the legislation as a reasonable state-level approach
+      source: https://openai.com/index/supporting-the-new-york-raise-act/
+    - name: Chamber of Progress
+      entityId: IEav94hygQ
+      position: oppose
+      reason: Argued state-level regulation would fragment the regulatory landscape
+      source: https://progresschamber.org/chamber-of-progress-opposes-new-york-raise-act/
+    - name: NetChoice
+      position: oppose
+      reason: Opposed on grounds of stifling innovation and preempting federal regulation
+      source: https://netchoice.org/netchoice-opposes-new-york-raise-act/
+    - name: Tech:NYC
+      position: oppose
+      reason: Concerned about compliance burden on New York tech startups
+      source: https://www.technyc.org/posts/tech-nyc-opposes-raise-act
+    - name: Leading the Future
+      position: oppose
+      reason: Super PAC backed by a16z spent against the legislation
+      source: https://www.politico.com/news/2025/06/10/a16z-super-pac-new-york-ai-bill-00196543
+    - name: Trump Administration
+      position: oppose
+      reason: Opposed state-level AI regulation, favoring deregulatory federal approach
+      source: https://www.whitehouse.gov/briefings-statements/statement-on-state-ai-regulation/
   votes:
-    - chamber: New York Legislature
-      date: June 2025
+    - chamber: NY Senate
+      date: June 12, 2025
       result: Passed
+      ayes: 58
+      noes: 1
+      abstain: 4
+      ayesDem: 37
+      ayesRep: 21
+      noesDem: 1
+      noesRep: 0
+    - chamber: NY Assembly
+      date: June 12, 2025
+      result: Passed
+      ayes: 119
+      noes: 22
+      ayesDem: 95
+      ayesRep: 24
+      noesDem: 0
+      noesRep: 22
     - chamber: Governor
       date: December 19, 2025
       result: Signed
+  keyPoliticians:
+    - name: Senator Andrew Gounardes
+      role: Primary author and Senate sponsor
+    - name: Assemblymember Alex Bores
+      role: Primary author and Assembly sponsor
+    - name: Governor Kathy Hochul
+      role: Signed into law December 19, 2025
   description: >-
-    State legislation requiring safety protocols, incident reporting, and transparency from
-    developers of frontier AI models. Signed December 2025, effective January 2027, with civil
-    penalties up to $3M enforced by the NY Attorney General.
+    New York's Responsible AI Safety and Education (RAISE) Act, often described as a successor to
+    California's vetoed SB 1047, requires safety protocols, incident reporting, and transparency
+    from developers of frontier AI models. Passed both chambers of the New York Legislature on
+    June 12, 2025 with strong bipartisan support (58-1 in the Senate, 119-22 in the Assembly).
+    Signed by Governor Hochul on December 19, 2025 after chapter amendments reduced civil
+    penalties from $10M/$30M to $1M/$3M. Effective January 1, 2027.
+  customFields:
+    - label: Introduced
+      value: March 2025
+    - label: Passed Legislature
+      value: June 12, 2025
+    - label: Signed
+      value: December 19, 2025
+    - label: Effective
+      value: January 1, 2027
+  sources:
+    - title: Governor Hochul Signs Nation-Leading AI Legislation
+      url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+      author: Office of Governor Kathy Hochul
+      date: December 19, 2025
+    - title: "Senate Bill S6953B: RAISE Act"
+      url: https://www.nysenate.gov/legislation/bills/2025/S6953B
+      author: New York State Senate
+    - title: "New York RAISE Act: What Companies Need to Know"
+      url: https://iapp.org/news/a/new-york-raise-act-what-companies-need-to-know/
+      author: IAPP
+      date: "2025"
+    - title: New York RAISE Act Analysis
+      url: https://www.dwt.com/blogs/artificial-intelligence-law-advisor/2025/new-york-raise-act
+      author: Davis Wright Tremaine
+      date: "2025"
+    - title: "Comparing New York's RAISE Act to California's SB 53"
+      url: https://fpf.org/blog/comparing-new-yorks-raise-act-to-californias-sb-53/
+      author: Future of Privacy Forum
+      date: "2025"
   tags:
     - regulation
     - state-policy
@@ -3028,17 +3636,19 @@
     - safety-protocols
     - third-party-audits
     - new-york
+    - whistleblower
+    - incident-reporting
   clusters:
     - ai-safety
     - governance
   relatedEntries:
-    - id: california-sb53
+    - id: XcGTez1oFw
       type: policy
-    - id: thresholds
+    - id: UD11PlWtlg
       type: policy
-    - id: openai
-      type: organization
-  lastUpdated: 2026-02
+    - id: La8s84s3zg
+      type: policy
+  lastUpdated: 2026-03
 
 - id: model-registries
   stableId: r8rKW3KkSg
@@ -3070,13 +3680,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
   lastUpdated: 2026-02
 
@@ -3102,15 +3712,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: bletchley-declaration
+    - id: X2gSvrOang
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
     - id: thresholds
       type: policy
     - id: monitoring
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
@@ -3145,19 +3755,19 @@
       url: https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/
       author: MIRI
   relatedEntries:
-    - id: dan-hendrycks
+    - id: VoNqoBJkyg
       type: person
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
-    - id: international-regimes
+    - id: uvwmYLYstg
       type: policy
-    - id: coordination-mechanisms
+    - id: 4a6Sf9Fupg
       type: policy
   lastUpdated: 2026-02
 
@@ -3180,13 +3790,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
   lastUpdated: 2026-02
 
@@ -3212,15 +3822,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: lab-culture
+    - id: OVgVMhhdHQ
       type: approach
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: rsp
+    - id: i1qSgjAj5A
       type: policy
-    - id: eu-ai-act
+    - id: La8s84s3zg
       type: policy
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3243,11 +3853,11 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: training-programs
+    - id: GZzovyoIJg
       type: approach
-    - id: intervention-portfolio
+    - id: 1tYGw60kig
       type: approach
   lastUpdated: 2026-02
 
@@ -3273,13 +3883,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: output-filtering
+    - id: JbV7e3EaHA
       type: approach
-    - id: adversarial-training
+    - id: omIL5LhGnQ
       type: approach
-    - id: refusal-training
+    - id: wPEnPRTQVQ
       type: approach
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3301,13 +3911,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mech-interp
+    - id: 0vyIQ4YLIA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: approach
-    - id: cais
+    - id: y4bieqSeag
       type: organization
   lastUpdated: 2026-02
 
@@ -3330,15 +3940,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mech-interp
+    - id: 0vyIQ4YLIA
       type: approach
-    - id: representation-engineering
+    - id: xwxKWEAkSQ
       type: approach
-    - id: goodfire
+    - id: H74rOLotqg
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3361,13 +3971,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   lastUpdated: 2026-02
 
@@ -3390,15 +4000,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3420,13 +4030,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: provably-safe
+    - id: MEt9F7f50w
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -3451,13 +4061,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: formal-verification
+    - id: DSSCdI8gLA
       type: approach
-    - id: constitutional-ai
+    - id: 6sdr78k9kQ
       type: approach
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: approach
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: approach
   lastUpdated: 2026-02
 
@@ -3481,15 +4091,15 @@
     - ai-safety
     - cyber
   relatedEntries:
-    - id: tool-restrictions
+    - id: nl9oD17gfg
       type: approach
-    - id: structured-access
+    - id: cYETfX9wzA
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3513,13 +4123,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
     - id: sandboxing
       type: approach
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
@@ -3547,13 +4157,13 @@
   relatedEntries:
     - id: sandboxing
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -3576,13 +4186,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: red-teaming
+    - id: k6BfxaEwuQ
       type: approach
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: approach
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: concept
-    - id: cooperative-ai
+    - id: LSqNo6FATg
       type: organization
   lastUpdated: 2026-02
 
@@ -3643,20 +4253,20 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
       relationship: leads-to
-    - id: timothy-telleen-lawton
+    - id: 4ZKddwff5g
       type: person
-    - id: kathleen-finlinson
+    - id: q607cJo21g
       type: person
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: elicit
+    - id: 2VexoROapg
       type: organization
-    - id: sentinel
+    - id: JzhBAecjaA
       type: organization
   sources:
     - title: EA Forum Fellowship Announcement
@@ -3849,7 +4459,7 @@
   title: Longterm Wiki
   projectStatus: active
   projectUrl: https://www.longtermwiki.com
-  organization: quantified-uncertainty
+  organization: quri
   description: >-
     A self-referential documentation page describing the Longterm Wiki platform
     itself—a strategic intelligence tool with ~550 pages, crux mapping of ~50
@@ -3867,7 +4477,7 @@
   type: project
   title: MIT AI Risk Repository
   projectStatus: active
-  organization: mit
+  organization: Z1df97RYbw
   summaryPage: epistemic-tools-tools-overview
   description: >-
     The MIT AI Risk Repository catalogs 1,700+ AI risks from 65+ frameworks into
@@ -4017,17 +4627,18 @@
   type: project
   title: RoastMyPost
   projectStatus: active
+  projectUrl: https://roastmypost.com
+  organization: quantified-uncertainty
   description: >-
-    RoastMyPost is an LLM tool (Claude Sonnet 4.5 + Perplexity) that evaluates
-    written content through multiple specialized AI agents—fact-checking,
-    logical fallacy detection, math verification, and more. Aimed at improving
-    epistemic quality of research posts, particularly in EA/rationalist
-    communities.
+    LLM-powered tool for evaluating blog posts, research papers, and other written
+    content. Runs multiple AI evaluator personas (skeptic, methodologist, clarity
+    checker, etc.) and produces structured feedback with scores. Free and
+    open-source. Launched December 2025.
   clusters:
     - epistemics
     - ai-safety
     - community
-  lastUpdated: 2026-02
+  lastUpdated: 2026-03
   summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
   stableId: 9f8eF0CObQ
@@ -4147,9 +4758,9 @@
     with Anthropic, Google, OpenAI, xAI; GenAI.mil serving 3M personnel) creates pre-existing
     channels for rapid mobilization.
   relatedEntries:
-    - id: compute-concentration
+    - id: MvImONf1YA
       type: risk
-    - id: export-controls
+    - id: SpFgTz2INg
       type: policy
   tags:
     - governance
@@ -4171,7 +4782,7 @@
     a core alignment problem where AI systems pursue proxy objectives that diverge
     from intended goals when deployed outside their training distribution.
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
   clusters:
     - ai-safety
@@ -4189,19 +4800,19 @@
     hidden wealth. This sousveillance dynamic represents the beneficial flip
     side of AI surveillance capabilities.
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: ai-powered-investigation
+    - id: N0NF4lvS4Q
       type: capability
-    - id: deanonymization
+    - id: 0J0pDyhVtQ
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
   clusters:
     - ai-safety
@@ -4220,11 +4831,11 @@
     - label: Key Thinker
       value: Jennifer Pahlka (Code for America, USDS)
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: ai-safety-institutes
+    - id: aCEdTooCBw
       type: policy
-    - id: recoding-america
+    - id: 7ptWHyqwBA
       type: resource
   sources:
     - title: Recoding America - Jennifer Pahlka
@@ -4257,9 +4868,9 @@
     - label: Core Thesis
       value: Government technology failures stem from institutional culture separating policy from implementation
   relatedEntries:
-    - id: state-capacity-ai-governance
+    - id: y8Ib2pmieA
       type: concept
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
   sources:
     - title: Recoding America Official Website

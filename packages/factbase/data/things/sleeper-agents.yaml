@@ -1,9 +1,4 @@
-thing:
-  id: sleeper-agents
-  stableId: D8dD07y5oQ
-  type: risk
-  name: "Sleeper Agents: Training Deceptive LLMs"
-  wikiId: E489
+entity: D8dD07y5oQ
 facts:
   - id: f_agLLq1jGYg
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: anthropic-investors
-  stableId: sKOD0uMVGg
-  type: organization
-  name: Anthropic (Funder)
-  wikiId: E406
+entity: sKOD0uMVGg
 facts:
   - id: f_6EOi4oOMBQ
     property: description

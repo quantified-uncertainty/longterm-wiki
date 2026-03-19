@@ -1,9 +1,4 @@
-thing:
-  id: fli
-  stableId: d9sWZtyVwg
-  type: organization
-  name: Future of Life Institute (FLI)
-  wikiId: E528
+entity: d9sWZtyVwg
 facts:
   - id: f_5Tcn7xbvGQ
     property: description

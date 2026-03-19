@@ -1,9 +1,4 @@
-thing:
-  id: scaling-laws
-  stableId: eZJ1oAKS6A
-  type: concept
-  name: AI Scaling Laws
-  wikiId: E273
+entity: eZJ1oAKS6A
 facts:
   - id: f_TNxcLNKMiA
     property: description

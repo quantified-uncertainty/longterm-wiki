@@ -1,9 +1,4 @@
-thing:
-  id: situational-awareness
-  stableId: 5maTNr0PGA
-  type: capability
-  name: Situational Awareness
-  wikiId: E282
+entity: 5maTNr0PGA
 facts:
   - id: f_of328Ypg9A
     property: description

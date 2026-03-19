@@ -154,7 +154,7 @@ export default async function EventDetailPage({
             </section>
           )}
 
-          <RelatedPages entityId={entity.id} entity={{ type: "event" }} />
+          <RelatedPages entityId={entity.id} entity={{ entityType: "event" }} />
         </div>
 
         {/* Sidebar */}

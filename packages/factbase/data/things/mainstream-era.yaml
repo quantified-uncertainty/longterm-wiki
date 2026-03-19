@@ -1,9 +1,4 @@
-thing:
-  id: mainstream-era
-  stableId: G1XyCr76gw
-  type: event
-  name: Mainstream Era
-  wikiId: E195
+entity: G1XyCr76gw
 facts:
   - id: f_9VJuL1eVGQ
     property: description

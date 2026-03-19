@@ -1,9 +1,4 @@
-thing:
-  id: scheming-detection
-  stableId: bkQNjmsJoQ
-  type: approach
-  name: Scheming & Deception Detection
-  wikiId: E441
+entity: bkQNjmsJoQ
 facts:
   - id: f_DFvxmbKVJQ
     property: description

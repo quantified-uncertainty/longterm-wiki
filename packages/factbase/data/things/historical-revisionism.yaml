@@ -1,9 +1,4 @@
-thing:
-  id: historical-revisionism
-  stableId: jiqdwTucCA
-  type: risk
-  name: AI-Enabled Historical Revisionism
-  wikiId: E155
+entity: jiqdwTucCA
 facts:
   - id: f_Oy80LvZuBQ
     property: description

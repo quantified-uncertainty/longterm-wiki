@@ -1,9 +1,4 @@
-thing:
-  id: fast-takeoff
-  stableId: fRYu1EXclA
-  type: concept
-  name: Fast Takeoff
-  wikiId: E139
+entity: fRYu1EXclA
 facts:
   - id: f_fJfbHFw1aw
     property: description

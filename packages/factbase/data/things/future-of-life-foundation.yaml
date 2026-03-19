@@ -1,11 +1,4 @@
-thing:
-  id: future-of-life-foundation
-  stableId: 2V63hGITAw
-  type: organization
-  name: Future of Life Foundation (FLF)
-  wikiId: null
-  aliases:
-    - FLF
+entity: 2V63hGITAw
 facts:
   - id: Am1UqQs1Cw
     property: founded-date
@@ -95,9 +88,7 @@ facts:
 
   - id: 4Qv6Ekm99A
     property: headcount
-    value:
-      type: number
-      value: 5
+    value: 5
     asOf: !date 2025-06
     source: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
     notes: >-

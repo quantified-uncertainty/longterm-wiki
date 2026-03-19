@@ -1,9 +1,4 @@
-thing:
-  id: sparse-autoencoders
-  stableId: CUdfyx5Nkg
-  type: approach
-  name: Sparse Autoencoders (SAEs)
-  wikiId: E480
+entity: CUdfyx5Nkg
 facts:
   - id: f_NDpEN3h91g
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: openai-foundation
-  stableId: GQuPhNkZbg
-  type: organization
-  name: OpenAI Foundation
-  wikiId: E421
+entity: GQuPhNkZbg
 facts:
   - id: f_O77nrMaAKQ
     property: description

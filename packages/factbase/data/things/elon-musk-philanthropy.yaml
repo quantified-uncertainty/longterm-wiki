@@ -1,9 +1,4 @@
-thing:
-  id: elon-musk-philanthropy
-  stableId: aw8anZDbCg
-  type: organization
-  name: Elon Musk (Funder)
-  wikiId: E410
+entity: aw8anZDbCg
 facts:
   - id: f_lOKOPFyjWw
     property: description

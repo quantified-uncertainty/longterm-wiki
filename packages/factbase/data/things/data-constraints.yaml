@@ -1,9 +1,4 @@
-thing:
-  id: data-constraints
-  stableId: HLakK5zplg
-  type: concept
-  name: AI Training Data Constraints
-  wikiId: E92
+entity: HLakK5zplg
 facts:
   - id: f_ammPYMAfIg
     property: description

@@ -1,10 +1,4 @@
-thing:
-  id: mustafa-suleyman
-  stableId: DBq1ddu8Mg
-  type: person
-  name: "Mustafa Suleyman"
-  wikiId: "E1288"
-
+entity: DBq1ddu8Mg
 facts:
   - id: f_Q7BZ7C7buA
     property: employed-by

@@ -1,9 +1,4 @@
-thing:
-  id: claude-opus-4-1
-  stableId: dHgSM46fMw
-  type: ai-model
-  name: Claude Opus 4.1
-  wikiId: E1035
+entity: dHgSM46fMw
 facts:
   - id: f_UwIZf5fX0Q
     property: description

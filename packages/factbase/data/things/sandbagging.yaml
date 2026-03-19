@@ -1,9 +1,4 @@
-thing:
-  id: sandbagging
-  stableId: GzX9hnrzWw
-  type: risk
-  name: AI Capability Sandbagging
-  wikiId: E270
+entity: GzX9hnrzWw
 facts:
   - id: f_w74jgVyOHw
     property: description

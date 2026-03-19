@@ -1,9 +1,4 @@
-thing:
-  id: fhi
-  stableId: Zmw9nfUYWA
-  type: organization
-  name: Future of Humanity Institute
-  wikiId: E140
+entity: Zmw9nfUYWA
 facts:
   - id: f_FsaYQdKRwQ
     property: description

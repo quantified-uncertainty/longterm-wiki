@@ -1,9 +1,4 @@
-thing:
-  id: voluntary-commitments
-  stableId: ZXvLxl4RMw
-  type: policy
-  name: Voluntary AI Safety Commitments
-  wikiId: E369
+entity: ZXvLxl4RMw
 facts:
   - id: f_q1qmuJUkxA
     property: description

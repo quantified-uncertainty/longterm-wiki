@@ -1,13 +1,68 @@
-thing:
-  id: quri
-  stableId: Khej79OA8g
-  type: organization
-  name: QURI (Quantified Uncertainty Research Institute)
-  wikiId: E238
+entity: Khej79OA8g
 facts:
   - id: f_hdxXdOaXLg
     property: description
-    value: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle,
-      Metaforecast, and SquiggleAI.
-    asOf: 2026-03
-    notes: Migrated from old entity system
+    value: >-
+      Nonprofit research organization developing tools for probabilistic
+      reasoning, forecasting, and epistemic infrastructure. Key projects
+      include Squiggle, Squiggle Hub, Metaforecast, SquiggleAI, RoastMyPost,
+      and Guesstimate.
+    asOf: !date 2026-03
+
+  - id: f_xGX3C9m5Ee
+    property: founded-date
+    value: !date 2019
+    source: https://quantifieduncertainty.org
+    notes: Evolved from earlier Guesstimate work (2016)
+
+  - id: f_FNxcwwwO26
+    property: website
+    value: https://quantifieduncertainty.org
+
+  - id: f_TkRMfuBYog
+    property: headquarters
+    value: Berkeley, CA
+    notes: Primarily remote team
+
+  - id: f_Nl4IKIikMq
+    property: headcount
+    value:
+      type: range
+      low: 3
+      high: 5
+    asOf: !date 2026-03
+    notes: >-
+      ~3-5 core contributors including Ozzie Gooen, Slava Matyukhin (2022-2025),
+      Sam Nolan (2021-2023); previously Nuño Sempere (2020-2023)
+
+  - id: f_zwFMLRENMB
+    property: funding-received
+    value:
+      type: number
+      value: 650000
+      unit: USD
+    asOf: !date 2022
+    source: https://survivalandflourishing.fund
+    notes: Survival and Flourishing Fund (sff) grants 2019-2022
+    grantor: !ref pvJ50HupEQ
+
+  - id: f_AyrcCzn5aW
+    property: funding-received
+    value:
+      type: number
+      value: 200000
+      unit: USD
+    asOf: !date 2022
+    source: https://web.archive.org/web/20221212115231/https://ftxfuturefund.org/
+    notes: Future Fund grant 2022 (pre-FTX collapse)
+
+  - id: f_qduycirTr5
+    property: funding-received
+    value:
+      type: range
+      low: 50000
+      high: 150000
+      unit: USD
+    asOf: !date 2024
+    notes: Long-Term Future Fund (ltff) ongoing support (estimated annual ~$100K; not a sourced exact figure)
+    grantor: !ref yA12C1KcjQ

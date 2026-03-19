@@ -5,19 +5,17 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   firstOrThrow,
   dbError,
   paginationQuery,
+  zv,
 } from "../shared/utils.js";
 import {
   UpsertCitationQuoteSchema,
   UpsertCitationQuoteBatchSchema,
   MarkAccuracySchema as SharedMarkAccuracySchema,
-  MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
 } from "../../api-types.js";
@@ -51,11 +49,31 @@ const MarkVerifiedSchema = z.object({
 });
 
 const MarkAccuracySchema = SharedMarkAccuracySchema;
-const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
 
 const UpsertContentSchema = UpsertCitationContentSchema;
 
 const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
+
+// Query schemas for endpoints that accept only a limit param
+const QuotesLimitQuery = z.object({
+  page_id: z.string().min(1, "page_id query parameter is required").max(500),
+  limit: z.coerce.number().int().min(1).max(500).default(100).catch(100),
+});
+const TrendsLimitQuery = z.object({
+  page_id: z.string().min(1).max(500).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(50).catch(50),
+});
+const QuotesByUrlQuery = z.object({
+  url: z.string().min(1, "url query parameter is required").max(2000),
+  limit: z.coerce.number().int().min(1).max(500).default(100).catch(100),
+});
+const UnverifiedLimitQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100).catch(100),
+});
+const CleanupQuery = z.object({
+  keep: z.coerce.number().int().min(1).max(1000).default(30).catch(30),
+  dry_run: z.string().optional().transform((v) => v === "true" || v === "1"),
+});
 
 // ---- Helpers ----
 
@@ -188,33 +206,28 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/upsert ---- [DEPRECATED: use POST /api/claims + POST /api/claims/:id/sources]
-  .post("/quotes/upsert", async (c) => {
+  .post("/quotes/upsert", zv("json", UpsertQuoteSchema), async (c) => {
     deprecationWarning("POST /quotes/upsert");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertQuoteSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
+    const parsed = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate page reference
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.pageId]);
     if (missingPages.length > 0) {
       return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
     }
 
     // Validate resource reference (optional)
-    if (parsed.data.resourceId) {
-      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+    if (parsed.resourceId) {
+      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.resourceId]);
       if (missingRes.length > 0) {
         return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
       }
     }
 
     // Phase 4a: resolve page slug to integer ID for dual-write
-    const singlePageIdInt = await resolvePageIntId(db, parsed.data.pageId);
-    const rows = await upsertQuote(db, parsed.data, singlePageIdInt);
+    const singlePageIdInt = await resolvePageIntId(db, parsed.pageId);
+    const rows = await upsertQuote(db, parsed, singlePageIdInt);
 
     const row = firstOrThrow(rows, "citation quote upsert");
     return c.json({
@@ -227,15 +240,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/upsert-batch ---- [DEPRECATED: use POST /api/claims/batch]
-  .post("/quotes/upsert-batch", async (c) => {
+  .post("/quotes/upsert-batch", zv("json", UpsertBatchSchema), async (c) => {
     deprecationWarning("POST /quotes/upsert-batch");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
+    const { items } = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate page references
@@ -303,12 +310,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /quotes?page_id=X ----
-  .get("/quotes", async (c) => {
-    const pageId = c.req.query("page_id");
-    if (!pageId) return validationError(c, "page_id query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500) : 100;
+  .get("/quotes", zv("query", QuotesLimitQuery), async (c) => {
+    const { page_id: pageId, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
@@ -325,11 +328,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /quotes/all (paginated) ----
-  .get("/quotes/all", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset } = parsed.data;
+  .get("/quotes/all", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db
@@ -346,15 +346,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-verified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
-  .post("/quotes/mark-verified", async (c) => {
+  .post("/quotes/mark-verified", zv("json", MarkVerifiedSchema), async (c) => {
     deprecationWarning("POST /quotes/mark-verified");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkVerifiedSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, method, score } = parsed.data;
+    const { pageId, footnote, method, score } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -388,15 +382,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-unverified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
-  .post("/quotes/mark-unverified", async (c) => {
+  .post("/quotes/mark-unverified", zv("json", MarkVerifiedSchema), async (c) => {
     deprecationWarning("POST /quotes/mark-unverified");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkVerifiedSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, method, score } = parsed.data;
+    const { pageId, footnote, method, score } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -429,15 +417,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-accuracy ---- [DEPRECATED: update claims.claimVerdict instead]
-  .post("/quotes/mark-accuracy", async (c) => {
+  .post("/quotes/mark-accuracy", zv("json", MarkAccuracySchema), async (c) => {
     deprecationWarning("POST /quotes/mark-accuracy");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkAccuracySchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = parsed.data;
+    const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -512,7 +494,10 @@ const citationsApp = new Hono()
     })
       .from(citationQuotes)
       .groupBy(citationQuotes.pageId)
-      .orderBy(asc(citationQuotes.pageId));
+      .orderBy(asc(citationQuotes.pageId))
+      // Limit raised well above the ~700 page max so that sorting by inaccuracy
+      // rate on the client side (e.g. in the accuracy dashboard) sees all pages.
+      .limit(5000);
 
     return c.json({
       pages: rows.map((r) => ({
@@ -542,7 +527,8 @@ const citationsApp = new Hono()
       .from(citationQuotes)
       .groupBy(citationQuotes.pageId)
       .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`)
-      .orderBy(asc(citationQuotes.pageId));
+      .orderBy(asc(citationQuotes.pageId))
+      .limit(500);
 
     return c.json({
       pages: rows.map((r) => ({
@@ -579,7 +565,8 @@ const citationsApp = new Hono()
         asc(citationQuotes.verificationScore),
         asc(citationQuotes.pageId),
         asc(citationQuotes.footnote)
-      );
+      )
+      .limit(500);
 
     return c.json({ broken: rows });
   })
@@ -588,14 +575,8 @@ const citationsApp = new Hono()
   // BREAKING CHANGE (PR #476): This endpoint no longer accepts `pageId` or
   // `footnote` fields. Citation content is now keyed by URL only. External
   // scripts that previously sent pageId/footnote need updating.
-  .post("/content/upsert", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertContentSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const d = parsed.data;
+  .post("/content/upsert", zv("json", UpsertContentSchema), async (c) => {
+    const d = c.req.valid("json");
     const db = getDrizzleDb();
 
     const vals = {
@@ -621,61 +602,6 @@ const citationsApp = new Hono()
       });
 
     return c.json({ url: d.url });
-  })
-
-  // ---- POST /quotes/mark-accuracy-batch ---- [DEPRECATED: batch update claims.claimVerdict instead]
-  .post("/quotes/mark-accuracy-batch", async (c) => {
-    deprecationWarning("POST /quotes/mark-accuracy-batch");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkAccuracyBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-    // Phase 4b: resolve all page slugs to integer IDs upfront
-    const uniquePageIds = [...new Set(items.map((d) => d.pageId))];
-    const intIdMap = await resolvePageIntIds(db, uniquePageIds);
-    const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
-
-    try {
-      await db.transaction(async (tx) => {
-        for (const d of items) {
-          const intId = intIdMap.get(d.pageId);
-          if (intId == null) continue; // page absent from entity_ids, row cannot exist
-          const rows = await tx
-            .update(citationQuotes)
-            .set({
-              accuracyVerdict: d.verdict,
-              accuracyScore: d.score,
-              accuracyIssues: d.issues ?? null,
-              accuracySupportingQuotes: d.supportingQuotes ?? null,
-              verificationDifficulty: d.verificationDifficulty ?? null,
-              accuracyCheckedAt: sql`now()`,
-              updatedAt: sql`now()`,
-            })
-            .where(
-              and(
-                eq(citationQuotes.pageIdInt, intId),
-                eq(citationQuotes.footnote, d.footnote)
-              )
-            )
-            .returning({
-              pageId: citationQuotes.pageId,
-              footnote: citationQuotes.footnote,
-            });
-
-          if (rows.length > 0) {
-            results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
-          }
-        }
-      });
-    } catch (err) {
-      return dbError(c, "citation quotes mark-accuracy-batch", err, { itemCount: items.length });
-    }
-
-    return c.json({ updated: results.length, results });
   })
 
   // ---- POST /accuracy-snapshot ----
@@ -733,10 +659,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /accuracy-trends?page_id=X&limit=N ----
-  .get("/accuracy-trends", async (c) => {
-    const pageId = c.req.query("page_id");
-    const limitStr = c.req.query("limit");
-    const limit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || 50, 1), 500) : 50;
+  .get("/accuracy-trends", zv("query", TrendsLimitQuery), async (c) => {
+    const { page_id: pageId, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
 
@@ -791,137 +715,103 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /accuracy-dashboard ----
+  // Aggregation is pushed into SQL to avoid loading the full citation_quotes table
+  // into memory. Three queries replace the previous single full-scan + in-process loop.
   .get("/accuracy-dashboard", async (c) => {
     const db = getDrizzleDb();
 
-    // Get all quotes with accuracy data
-    const allQuotes = await db
-      .select()
+    // --- 1. Overall summary stats ---
+    const [summaryRow] = await db.select({
+      totalCitations: count(),
+      checkedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurateCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurateCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupportedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssueCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      // Only average scores for checked citations (those with a non-null verdict),
+      // matching the old JS-loop behaviour that guarded scoreSum inside `if (verdict)`.
+      averageScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
+    }).from(citationQuotes);
+
+    const totalCitations = summaryRow.totalCitations;
+    const checkedCitations = Number(summaryRow.checkedCitations);
+    const summary = {
+      totalCitations,
+      checkedCitations,
+      accurateCitations: Number(summaryRow.accurateCitations),
+      inaccurateCitations: Number(summaryRow.inaccurateCitations),
+      unsupportedCitations: Number(summaryRow.unsupportedCitations),
+      minorIssueCitations: Number(summaryRow.minorIssueCitations),
+      uncheckedCitations: totalCitations - checkedCitations,
+      averageScore: summaryRow.averageScore != null
+        ? Math.round(Number(summaryRow.averageScore) * 100) / 100
+        : null,
+    };
+
+    // --- 2. Verdict distribution (GROUP BY verdict, checked only) ---
+    const verdictRows = await db.select({
+      verdict: citationQuotes.accuracyVerdict,
+      cnt: count(),
+    })
       .from(citationQuotes)
-      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote));
+      .where(isNotNull(citationQuotes.accuracyVerdict))
+      .groupBy(citationQuotes.accuracyVerdict);
 
-    // Compute summary stats
-    let checkedCount = 0;
-    let accurateCount = 0;
-    let inaccurateCount = 0;
-    let unsupportedCount = 0;
-    let minorIssueCount = 0;
-    let scoreSum = 0;
-    let scoreCount = 0;
-
-    const verdictDist: Record<string, number> = {};
-    const difficultyDist: Record<string, number> = {};
-
-    // Page aggregation
-    const pageMap = new Map<string, {
-      total: number; checked: number; accurate: number;
-      inaccurate: number; unsupported: number; minorIssues: number;
-      scoreSum: number; scoreCount: number;
-    }>();
-
-    // Domain aggregation
-    const domainMap = new Map<string, {
-      total: number; checked: number; accurate: number;
-      inaccurate: number; unsupported: number; minorIssues: number;
-    }>();
-
-    // Flagged citations
-    const flagged: Array<{
-      pageId: string; footnote: number; claimText: string;
-      sourceTitle: string | null; url: string | null;
-      verdict: string; score: number | null;
-      issues: string | null; difficulty: string | null;
-      checkedAt: string | null;
-    }> = [];
-
-    for (const q of allQuotes) {
-      const pageId = q.pageId;
-      const verdict = q.accuracyVerdict;
-      const score = q.accuracyScore;
-      const difficulty = q.verificationDifficulty;
-      const url = q.url;
-
-      // Extract domain
-      let domain: string | null = null;
-      if (url) {
-        try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* invalid URL — safe to ignore */ }
-      }
-
-      // Page aggregation
-      if (!pageMap.has(pageId)) {
-        pageMap.set(pageId, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
-      }
-      const page = pageMap.get(pageId)!;
-      page.total++;
-
-      // Domain aggregation
-      if (domain) {
-        if (!domainMap.has(domain)) {
-          domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0 });
-        }
-        const d = domainMap.get(domain)!;
-        d.total++;
-      }
-
-      if (verdict) {
-        checkedCount++;
-        page.checked++;
-        verdictDist[verdict] = (verdictDist[verdict] || 0) + 1;
-
-        if (domain) domainMap.get(domain)!.checked++;
-
-        if (score !== null) {
-          scoreSum += score;
-          scoreCount++;
-          page.scoreSum += score;
-          page.scoreCount++;
-        }
-
-        if (difficulty) {
-          difficultyDist[difficulty] = (difficultyDist[difficulty] || 0) + 1;
-        }
-
-        if (verdict === 'accurate') {
-          accurateCount++; page.accurate++;
-          if (domain) domainMap.get(domain)!.accurate++;
-        } else if (verdict === 'inaccurate') {
-          inaccurateCount++; page.inaccurate++;
-          if (domain) domainMap.get(domain)!.inaccurate++;
-        } else if (verdict === 'unsupported') {
-          unsupportedCount++; page.unsupported++;
-          if (domain) domainMap.get(domain)!.unsupported++;
-        } else if (verdict === 'minor_issues') {
-          minorIssueCount++; page.minorIssues++;
-          if (domain) domainMap.get(domain)!.minorIssues++;
-        }
-
-        // Flag problematic citations
-        if (verdict === 'inaccurate' || verdict === 'unsupported') {
-          const claimText = q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText;
-          flagged.push({
-            pageId, footnote: q.footnote, claimText,
-            sourceTitle: q.sourceTitle, url,
-            verdict, score,
-            issues: q.accuracyIssues,
-            difficulty,
-            checkedAt: q.accuracyCheckedAt?.toISOString() ?? null,
-          });
-        }
-      }
+    const verdictDistribution: Record<string, number> = {};
+    for (const r of verdictRows) {
+      if (r.verdict) verdictDistribution[r.verdict] = r.cnt;
     }
 
-    // Build page summaries
-    const pages = Array.from(pageMap.entries()).map(([pageId, p]) => ({
-      pageId,
-      totalCitations: p.total,
-      checked: p.checked,
-      accurate: p.accurate,
-      inaccurate: p.inaccurate,
-      unsupported: p.unsupported,
-      minorIssues: p.minorIssues,
-      accuracyRate: p.checked > 0 ? Math.round(((p.accurate + p.minorIssues) / p.checked) * 100) / 100 : null,
-      avgScore: p.scoreCount > 0 ? Math.round((p.scoreSum / p.scoreCount) * 100) / 100 : null,
-    }));
+    // --- 3. Difficulty distribution ---
+    const difficultyRows = await db.select({
+      difficulty: citationQuotes.verificationDifficulty,
+      cnt: count(),
+    })
+      .from(citationQuotes)
+      .where(isNotNull(citationQuotes.verificationDifficulty))
+      .groupBy(citationQuotes.verificationDifficulty);
+
+    const difficultyDistribution: Record<string, number> = {};
+    for (const r of difficultyRows) {
+      if (r.difficulty) difficultyDistribution[r.difficulty] = r.cnt;
+    }
+
+    // --- 4. Per-page aggregation (GROUP BY pageId) ---
+    // No LIMIT here: JS sorts by inaccuracy rate afterward, so all pages must be
+    // fetched before slicing. The dataset is bounded by the number of wiki pages
+    // (~700), so this is safe.
+    const pageRows = await db.select({
+      pageId: citationQuotes.pageId,
+      totalCitations: count(),
+      checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+      // Only average scores for checked citations to match old JS-loop behaviour.
+      avgScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
+    })
+      .from(citationQuotes)
+      .groupBy(citationQuotes.pageId);
+
+    const pages = pageRows.map((r) => {
+      const checked = Number(r.checked);
+      const accurate = Number(r.accurate);
+      const inaccurate = Number(r.inaccurate);
+      const unsupported = Number(r.unsupported);
+      const minorIssues = Number(r.minorIssues);
+      return {
+        pageId: r.pageId,
+        totalCitations: r.totalCitations,
+        checked,
+        accurate,
+        inaccurate,
+        unsupported,
+        minorIssues,
+        accuracyRate: checked > 0 ? Math.round(((accurate + minorIssues) / checked) * 100) / 100 : null,
+        avgScore: r.avgScore != null ? Math.round(Number(r.avgScore) * 100) / 100 : null,
+      };
+    });
     pages.sort((a, b) => {
       const aInacc = a.checked > 0 ? (a.inaccurate + a.unsupported) / a.checked : 0;
       const bInacc = b.checked > 0 ? (b.inaccurate + b.unsupported) / b.checked : 0;
@@ -929,20 +819,39 @@ const citationsApp = new Hono()
       return b.totalCitations - a.totalCitations;
     });
 
-    // Build domain summaries
-    const MIN_DOMAIN_CITATIONS = 2;
-    const domainAnalysis = Array.from(domainMap.entries())
-      .filter(([, d]) => d.total >= MIN_DOMAIN_CITATIONS)
-      .map(([domain, d]) => ({
-        domain,
-        totalCitations: d.total,
-        checked: d.checked,
-        accurate: d.accurate,
-        inaccurate: d.inaccurate,
-        unsupported: d.unsupported,
-        minorIssues: d.minorIssues,
-        inaccuracyRate: d.checked > 0 ? Math.round(((d.inaccurate + d.unsupported) / d.checked) * 100) / 100 : null,
-      }));
+    // --- 5. Domain aggregation (GROUP BY extracted hostname) ---
+    // PostgreSQL regexp_replace strips scheme and www. prefix to yield the bare domain.
+    const domainRows = await db.select({
+      domain: sql<string>`regexp_replace(${citationQuotes.url}, '^https?://(www\\.)?([^/?#]+).*', '\\2')`,
+      totalCitations: count(),
+      checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+    })
+      .from(citationQuotes)
+      .where(isNotNull(citationQuotes.url))
+      .groupBy(sql`regexp_replace(${citationQuotes.url}, '^https?://(www\\.)?([^/?#]+).*', '\\2')`)
+      .having(sql`count(*) >= 2`)
+      .orderBy(desc(sql`count(*)`))
+      .limit(200);
+
+    const domainAnalysis = domainRows.map((r) => {
+      const checked = Number(r.checked);
+      const inaccurate = Number(r.inaccurate);
+      const unsupported = Number(r.unsupported);
+      return {
+        domain: r.domain,
+        totalCitations: r.totalCitations,
+        checked,
+        accurate: Number(r.accurate),
+        inaccurate,
+        unsupported,
+        minorIssues: Number(r.minorIssues),
+        inaccuracyRate: checked > 0 ? Math.round(((inaccurate + unsupported) / checked) * 100) / 100 : null,
+      };
+    });
     domainAnalysis.sort((a, b) => {
       const aRate = a.inaccuracyRate ?? 0;
       const bRate = b.inaccuracyRate ?? 0;
@@ -950,25 +859,44 @@ const citationsApp = new Hono()
       return b.totalCitations - a.totalCitations;
     });
 
-    // Sort flagged by score (worst first)
-    flagged.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
+    // --- 6. Flagged citations (inaccurate or unsupported, worst score first) ---
+    const flaggedRows = await db.select({
+      pageId: citationQuotes.pageId,
+      footnote: citationQuotes.footnote,
+      claimText: citationQuotes.claimText,
+      sourceTitle: citationQuotes.sourceTitle,
+      url: citationQuotes.url,
+      verdict: citationQuotes.accuracyVerdict,
+      score: citationQuotes.accuracyScore,
+      issues: citationQuotes.accuracyIssues,
+      difficulty: citationQuotes.verificationDifficulty,
+      checkedAt: citationQuotes.accuracyCheckedAt,
+    })
+      .from(citationQuotes)
+      .where(sql`${citationQuotes.accuracyVerdict} in ('inaccurate', 'unsupported')`)
+      .orderBy(asc(citationQuotes.accuracyScore))
+      .limit(500);
+
+    const flaggedCitations = flaggedRows.map((q) => ({
+      pageId: q.pageId,
+      footnote: q.footnote,
+      claimText: q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText,
+      sourceTitle: q.sourceTitle,
+      url: q.url,
+      verdict: q.verdict ?? '',
+      score: q.score,
+      issues: q.issues,
+      difficulty: q.difficulty,
+      checkedAt: q.checkedAt?.toISOString() ?? null,
+    }));
 
     return c.json({
       exportedAt: new Date().toISOString(),
-      summary: {
-        totalCitations: allQuotes.length,
-        checkedCitations: checkedCount,
-        accurateCitations: accurateCount,
-        inaccurateCitations: inaccurateCount,
-        unsupportedCitations: unsupportedCount,
-        minorIssueCitations: minorIssueCount,
-        uncheckedCitations: allQuotes.length - checkedCount,
-        averageScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
-      },
-      verdictDistribution: verdictDist,
-      difficultyDistribution: difficultyDist,
+      summary,
+      verdictDistribution,
+      difficultyDistribution,
       pages,
-      flaggedCitations: flagged,
+      flaggedCitations,
       domainAnalysis,
     });
   })
@@ -992,11 +920,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /content/list (paginated, metadata only — no full_text) ----
-  .get("/content/list", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset } = parsed.data;
+  .get("/content/list", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db
@@ -1088,14 +1013,8 @@ const citationsApp = new Hono()
   // ---- GET /quotes-by-url?url=X ----
   // Returns all citation quotes across all pages for a given source URL.
   // Used by resource pages to show cross-page citations.
-  .get("/quotes-by-url", async (c) => {
-    const url = c.req.query("url");
-    if (!url) return validationError(c, "url query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam
-      ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
-      : 100;
+  .get("/quotes-by-url", zv("query", QuotesByUrlQuery), async (c) => {
+    const { url, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const rows = await db
@@ -1205,9 +1124,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /unverified ----
-  .get("/unverified", async (c) => {
-    const limitParam = c.req.query("limit");
-    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), MAX_PAGE_SIZE) : 100;
+  .get("/unverified", zv("query", UnverifiedLimitQuery), async (c) => {
+    const { limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
 
@@ -1257,12 +1175,8 @@ const citationsApp = new Hono()
   })
 
   // ---- DELETE /accuracy-snapshots/cleanup (retention: keep latest N snapshots per page) ----
-  .delete("/accuracy-snapshots/cleanup", async (c) => {
-    const keepStr = c.req.query("keep");
-    const dryRunStr = c.req.query("dry_run");
-
-    const keep = keepStr ? Math.min(Math.max(parseInt(keepStr, 10) || 30, 1), 1000) : 30;
-    const dryRun = dryRunStr === "true" || dryRunStr === "1";
+  .delete("/accuracy-snapshots/cleanup", zv("query", CleanupQuery), async (c) => {
+    const { keep, dry_run: dryRun } = c.req.valid("query");
 
     const rawDb = getDb();
 

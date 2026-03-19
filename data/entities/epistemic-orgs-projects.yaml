@@ -8,9 +8,78 @@
   type: organization
   orgType: safety-org
   title: QURI (Quantified Uncertainty Research Institute)
-  description: Nonprofit research organization developing tools for probabilistic reasoning and forecasting, including Squiggle, Metaforecast, and SquiggleAI.
+  website: https://quantifieduncertainty.org
+  description: >-
+    Nonprofit research organization developing tools for probabilistic reasoning,
+    forecasting, and epistemic infrastructure. Key projects include Squiggle
+    (probabilistic programming language), Squiggle Hub (model sharing platform),
+    Metaforecast (forecast aggregation), SquiggleAI (LLM-powered estimation),
+    RoastMyPost (LLM-powered content evaluation), and Guesstimate (spreadsheet
+    for distributions). Founded in 2019 by Ozzie Gooen, evolved from earlier
+    Guesstimate work (2016). Based in Berkeley, CA; primarily remote team of
+    ~3-5 core contributors. Fiscally sponsored by Rethink Priorities. Funded by
+    Survival and Flourishing Fund ($650K through 2022), Future Fund ($200K, 2022),
+    and Long-Term Future Fund (ongoing). EIN 84-3847921.
   path: /knowledge-base/organizations/quri/
-  lastUpdated: 2026-01
+  tags:
+    - epistemic-tools
+    - forecasting
+    - probabilistic-reasoning
+    - open-source
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: squiggle
+      type: project
+      relationship: related
+    - id: squiggle-hub
+      type: project
+      relationship: related
+    - id: metaforecast
+      type: project
+      relationship: related
+    - id: squiggleai
+      type: project
+      relationship: related
+    - id: roastmypost
+      type: project
+      relationship: related
+    - id: guesstimate
+      type: project
+      relationship: related
+    - id: slava-matyukhin
+      type: person
+    - id: nuno-sempere
+      type: person
+    - id: rethink-priorities
+      type: organization
+      relationship: related
+    - id: survival-and-flourishing-fund
+      type: organization
+      relationship: supports
+    - id: long-term-future-fund
+      type: organization
+      relationship: supports
+  sources:
+    - title: QURI Website
+      url: https://quantifieduncertainty.org
+    - title: QURI GitHub
+      url: https://github.com/quantified-uncertainty
+  customFields:
+    - label: Founded
+      value: "2019"
+    - label: Founder
+      value: Ozzie Gooen
+    - label: Location
+      value: Berkeley, CA (primarily remote)
+    - label: EIN
+      value: 84-3847921
+    - label: Fiscal Sponsor
+      value: Rethink Priorities
+    - label: GitHub
+      value: github.com/quantified-uncertainty
+      link: https://github.com/quantified-uncertainty
+  lastUpdated: 2026-03
 
 - id: metaculus
   stableId: CUBiiyCfOA
@@ -21,10 +90,10 @@
   description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions. Created by Anthony Aguirre (FLI/FLF President).
   path: /knowledge-base/organizations/metaculus/
   relatedEntries:
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
       relationship: created-by
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   lastUpdated: 2026-03
 
@@ -46,7 +115,7 @@
   title: Squiggle
   projectStatus: active
   projectUrl: https://www.squiggle-language.com
-  organization: quantified-uncertainty
+  organization: quri
   description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
   path: /knowledge-base/responses/squiggle/
   lastUpdated: 2026-01
@@ -59,7 +128,7 @@
   title: Metaforecast
   projectStatus: maintained
   projectUrl: https://metaforecast.org
-  organization: quantified-uncertainty
+  organization: quri
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
   path: /knowledge-base/responses/metaforecast/
   lastUpdated: 2026-01
@@ -71,11 +140,48 @@
   type: project
   title: SquiggleAI
   projectStatus: active
-  organization: quantified-uncertainty
+  organization: quri
   description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
   path: /knowledge-base/responses/squiggleai/
   lastUpdated: 2026-01
   summaryPage: epistemic-tools-tools-overview
+
+- id: squiggle-hub
+  stableId: esASr3BOVQ
+  wikiId: E1944
+  type: project
+  title: Squiggle Hub
+  projectStatus: active
+  projectUrl: https://squigglehub.org
+  organization: quantified-uncertainty
+  description: >-
+    Web platform for creating, sharing, and discovering Squiggle models. Features
+    include model groups, version history, AI-assisted editing via SquiggleAI,
+    and a growing library of community-contributed probabilistic models. Successor
+    to Guesstimate's model sharing functionality.
+  relatedEntries:
+    - id: squiggle
+      type: project
+      relationship: related
+    - id: squiggleai
+      type: project
+      relationship: related
+  lastUpdated: 2026-03
+
+- id: guesstimate
+  stableId: MlKFIMTdRg
+  wikiId: E1945
+  type: project
+  title: Guesstimate
+  projectStatus: maintained
+  projectUrl: https://www.getguesstimate.com
+  organization: quantified-uncertainty
+  description: >-
+    Web-based spreadsheet for making estimates with probability distributions.
+    Precursor to Squiggle. Originally created by Ozzie Gooen in 2016.
+    Features a library of 17,000+ community models. Still maintained but
+    active development shifted to Squiggle and Squiggle Hub.
+  lastUpdated: 2026-03
 
 - id: xpt
   stableId: PnUBtoCeMw
@@ -84,7 +190,7 @@
   title: XPT (Existential Risk Persuasion Tournament)
   projectStatus: active
   projectUrl: https://xpt.forecastingresearch.org
-  organization: fri
+  organization: KslhqGaeJw
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
@@ -97,7 +203,7 @@
   title: ForecastBench
   projectStatus: active
   projectUrl: https://forecastbench.org
-  organization: fri
+  organization: KslhqGaeJw
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
@@ -109,7 +215,7 @@
   type: project
   title: AI Forecasting Benchmark Tournament
   projectStatus: active
-  organization: metaculus
+  organization: CUBiiyCfOA
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
@@ -132,7 +238,7 @@
   title: Grokipedia
   projectStatus: active
   projectUrl: https://grokipedia.com
-  organization: xai
+  organization: GLXKjYAEKw
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02

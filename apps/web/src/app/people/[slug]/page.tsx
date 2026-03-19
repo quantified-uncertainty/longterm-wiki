@@ -37,6 +37,7 @@ import { PublicationsSection } from "./publications-section";
 import { FundingConnections } from "./funding-connections";
 import { OrgRoles } from "./org-roles";
 import { BoardSeats } from "./board-seats";
+import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-positions";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
 // (e.g., entities created via tablebase enrichment in the wiki-server DB)
@@ -227,6 +228,9 @@ export default async function PersonProfilePage({
   // Funding connections
   const fundingConnections = getFundingConnectionsForPerson(entity.id);
 
+  // Policy positions (reverse lookup: find legislation where this person is a stakeholder)
+  const policyPositions = getPersonPolicyPositions(entity.id, entity.name);
+
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
     (f) => f.propertyId !== "description",
@@ -319,7 +323,7 @@ export default async function PersonProfilePage({
 
   // ── Build tabs from available data ──
   const overviewCount =
-    positions.length + sortedOrgRoles.length + sortedBoardSeats.length + (educationText ? 1 : 0);
+    positions.length + sortedOrgRoles.length + sortedBoardSeats.length + policyPositions.length + (educationText ? 1 : 0);
 
   const tabs: ProfileTab[] = [];
 
@@ -330,6 +334,7 @@ export default async function PersonProfilePage({
     content: (
       <div className="space-y-8">
         <ExpertPositions positions={positions} />
+        <PolicyPositionsSection positions={policyPositions} />
         <OrgRoles orgRoles={sortedOrgRoles} />
         <BoardSeats boardSeats={sortedBoardSeats} />
         {educationText && <EducationSection education={educationText} />}

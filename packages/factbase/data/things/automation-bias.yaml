@@ -1,9 +1,4 @@
-thing:
-  id: automation-bias
-  stableId: 72cwRMbzMA
-  type: risk
-  name: Automation Bias (AI Systems)
-  wikiId: E32
+entity: 72cwRMbzMA
 facts:
   - id: f_qeiiuaClaQ
     property: description

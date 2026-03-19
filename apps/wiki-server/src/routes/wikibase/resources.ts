@@ -15,13 +15,12 @@ import { resources, resourceCitations, wikiPages, citationContent } from "../../
 import { checkRefsExist } from "../shared/ref-check.js";
 import type * as schema from "../../schema.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   firstOrThrow,
   dbError,
   paginationQuery,
+  zv,
 } from "../shared/utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -111,6 +110,13 @@ const SearchQuery = z.object({
 
 const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   type: z.string().max(50).optional(),
+});
+
+const AuthorEntityIdsSchema = z.object({
+  items: z.array(z.object({
+    resourceId: z.string().min(1),
+    authorEntityIds: z.array(z.string().min(1)),
+  })).min(1).max(500),
 });
 
 // ---- Helpers ----
@@ -270,18 +276,13 @@ const resourcesApp = new Hono()
 
   // ---- POST / (upsert single resource) ----
 
-  .post("/", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertResourceSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
+  .post("/", zv("json", UpsertResourceSchema), async (c) => {
+    const data = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate citedBy page references (optional field)
-    if (parsed.data.citedBy && parsed.data.citedBy.length > 0) {
-      const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, parsed.data.citedBy);
+    if (data.citedBy && data.citedBy.length > 0) {
+      const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, data.citedBy);
       if (missingPages.length > 0) {
         return validationError(
           c,
@@ -291,27 +292,21 @@ const resourcesApp = new Hono()
     }
 
     try {
-      const result = await upsertResource(db, parsed.data);
+      const result = await upsertResource(db, data);
       return c.json(result, 201);
     } catch (err) {
       logger.error(
-        { err, resourceId: parsed.data.id },
+        { err, resourceId: data.id },
         "single resource upsert failed",
       );
-      return dbError(c, "resource upsert", err, { resourceId: parsed.data.id });
+      return dbError(c, "resource upsert", err, { resourceId: data.id });
     }
   })
 
   // ---- POST /batch (upsert multiple resources) ----
 
-  .post("/batch", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
+  .post("/batch", zv("json", UpsertBatchSchema), async (c) => {
+    const { items } = c.req.valid("json");
 
     const db = getDrizzleDb();
 
@@ -388,11 +383,8 @@ const resourcesApp = new Hono()
 
   // ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
 
-  .get("/search", async (c) => {
-    const parsed = SearchQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { q, limit } = parsed.data;
+  .get("/search", zv("query", SearchQuery), async (c) => {
+    const { q, limit } = c.req.valid("query");
     const rawDb = getDb();
 
     // Full-text search with prefix matching (same pattern as wiki_pages search)
@@ -573,11 +565,8 @@ const resourcesApp = new Hono()
 
   // ---- GET /all (paginated listing) ----
 
-  .get("/all", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset, type } = parsed.data;
+  .get("/all", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset, type } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions: SQL | undefined = type
@@ -649,13 +638,18 @@ const resourcesApp = new Hono()
   // ---- GET /citations/all (bulk citation index: resourceId → pageIds) ----
 
   .get("/citations/all", async (c) => {
+    const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
         pageId: resourceCitations.pageId,
       })
-      .from(resourceCitations);
+      .from(resourceCitations)
+      .limit(HARD_LIMIT + 1);
+
+    const truncated = rows.length > HARD_LIMIT;
+    if (truncated) rows.length = HARD_LIMIT; // discard the probe row
 
     // Group by resourceId
     const index: Record<string, string[]> = {};
@@ -664,22 +658,16 @@ const resourcesApp = new Hono()
       index[row.resourceId].push(row.pageId);
     }
 
-    return c.json({ citations: index, count: rows.length });
+    return c.json({ citations: index, count: rows.length, truncated });
   })
 
   // ---- PATCH /:id/fetch-status (update fetch status from source-fetcher) ----
 
-  .patch("/:id/fetch-status", async (c) => {
+  .patch("/:id/fetch-status", zv("json", UpdateResourceFetchStatusSchema), async (c) => {
     const id = c.req.param("id");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpdateResourceFetchStatusSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
     const db = getDrizzleDb();
 
-    const { fetchStatus, lastFetchedAt, fetchedTitle } = parsed.data;
+    const { fetchStatus, lastFetchedAt, fetchedTitle } = c.req.valid("json");
 
     const updateSet: Record<string, unknown> = {
       fetchStatus,
@@ -731,26 +719,13 @@ const resourcesApp = new Hono()
   // ---- PATCH /author-entity-ids ----
   // Batch update authorEntityIds for resources (used by crux people link-resources).
 
-  .patch("/author-entity-ids", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const schema = z.object({
-      items: z.array(z.object({
-        resourceId: z.string().min(1),
-        authorEntityIds: z.array(z.string().min(1)),
-      })).min(1).max(500),
-    });
-
-    const parsed = schema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
+  .patch("/author-entity-ids", zv("json", AuthorEntityIdsSchema), async (c) => {
     const db = getDrizzleDb();
     let updated = 0;
 
     // Batch update in a single transaction
     await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
+      for (const item of c.req.valid("json").items) {
         const jsonText = JSON.stringify(item.authorEntityIds);
         await tx
           .update(resources)

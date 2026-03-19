@@ -1,9 +1,4 @@
-thing:
-  id: eliciting-latent-knowledge
-  stableId: GJOgOYunnw
-  type: approach
-  name: Eliciting Latent Knowledge (ELK)
-  wikiId: E481
+entity: GJOgOYunnw
 facts:
   - id: f_YsTxWeOzSQ
     property: description

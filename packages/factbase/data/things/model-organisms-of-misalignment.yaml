@@ -1,9 +1,4 @@
-thing:
-  id: model-organisms-of-misalignment
-  stableId: OCU2M1tUnA
-  type: analysis
-  name: Model Organisms of Misalignment
-  wikiId: E419
+entity: OCU2M1tUnA
 facts:
   - id: f_YcvAhgeliQ
     property: description

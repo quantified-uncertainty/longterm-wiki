@@ -1,9 +1,4 @@
-thing:
-  id: kalshi
-  stableId: M7656wW5Bg
-  type: organization
-  name: Kalshi (Prediction Market)
-  wikiId: E537
+entity: M7656wW5Bg
 facts:
   - id: f_QNucBwZfpw
     property: description

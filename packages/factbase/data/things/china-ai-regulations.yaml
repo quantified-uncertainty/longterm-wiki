@@ -1,9 +1,4 @@
-thing:
-  id: china-ai-regulations
-  stableId: LyLbPk4iNQ
-  type: policy
-  name: China AI Regulatory Framework
-  wikiId: E58
+entity: LyLbPk4iNQ
 facts:
   - id: f_mGgihUKCOQ
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: government-authority-commercial-ai-infrastructure
-  stableId: 8f8b67vbgw
-  type: policy
-  name: US Government Authority Over Commercial AI Infrastructure
-  wikiId: E688
+entity: 8f8b67vbgw
 facts:
   - id: f_O6vGSNCGtw
     property: description

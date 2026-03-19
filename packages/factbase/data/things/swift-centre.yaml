@@ -1,9 +1,4 @@
-thing:
-  id: swift-centre
-  stableId: YlrwnKhMqQ
-  type: organization
-  name: Swift Centre
-  wikiId: E569
+entity: YlrwnKhMqQ
 facts:
   - id: f_gq0vpaWDHA
     property: description

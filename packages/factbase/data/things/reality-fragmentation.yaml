@@ -1,9 +1,4 @@
-thing:
-  id: reality-fragmentation
-  stableId: 4Rz7XtP9Uw
-  type: risk
-  name: AI-Accelerated Reality Fragmentation
-  wikiId: E244
+entity: 4Rz7XtP9Uw
 facts:
   - id: f_eT0Uh5YJqQ
     property: description

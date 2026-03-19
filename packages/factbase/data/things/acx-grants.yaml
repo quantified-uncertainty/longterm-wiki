@@ -1,12 +1,4 @@
-thing:
-  id: acx-grants
-  stableId: LBr3ocKKyQ
-  type: organization
-  name: "ACX Grants"
-  wikiId: E1057
-  aliases:
-    - Astral Codex Ten Grants
-
+entity: LBr3ocKKyQ
 facts:
   - id: f_grc0ej37ka
     property: description

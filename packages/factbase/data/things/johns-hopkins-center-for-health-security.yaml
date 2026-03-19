@@ -1,9 +1,4 @@
-thing:
-  id: johns-hopkins-center-for-health-security
-  stableId: vKC8BA9hHA
-  type: organization
-  name: Johns Hopkins Center for Health Security
-  wikiId: E423
+entity: vKC8BA9hHA
 facts:
   - id: f_35Bt5h7alQ
     property: description

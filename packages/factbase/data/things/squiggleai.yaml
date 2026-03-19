@@ -1,9 +1,4 @@
-thing:
-  id: squiggleai
-  stableId: 8slnDr4emg
-  type: project
-  name: SquiggleAI
-  wikiId: E287
+entity: 8slnDr4emg
 facts:
   - id: f_KaC6RqSuIw
     property: description

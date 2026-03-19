@@ -1,9 +1,4 @@
-thing:
-  id: anthropic-valuation
-  stableId: HrokCBSmBA
-  type: analysis
-  name: Anthropic Valuation Analysis
-  wikiId: E405
+entity: HrokCBSmBA
 facts:
   - id: f_0TUh4le5dQ
     property: description

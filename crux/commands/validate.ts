@@ -131,6 +131,11 @@ const SCRIPTS = {
     description: 'Check entity reference integrity across KB records',
     passthrough: ['ci', 'verbose', 'threshold'],
   },
+  'yaml-entity-refs': {
+    script: 'validate/validate-yaml-entity-refs.ts',
+    description: 'Check YAML entity cross-references (relatedEntries, developer, affiliation)',
+    passthrough: ['ci', 'verbose'],
+  },
   'directory-pages': {
     script: 'validate/validate-directory-pages.ts',
     description: 'Audit directory page data for display issues',

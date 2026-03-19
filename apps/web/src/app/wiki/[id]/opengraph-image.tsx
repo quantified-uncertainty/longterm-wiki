@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
-import { getEntityById, getPageById } from "@/data";
+import { getTypedEntityById, getPageById } from "@/data";
 import { wikiIdToSlug } from "@/lib/mdx";
+import { stripMdxEscapes } from "@/lib/inline-markdown";
 
 export const runtime = "nodejs";
 export const alt = "Longterm Wiki";
@@ -21,10 +22,11 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     slug = id;
   }
 
-  const entity = slug ? getEntityById(slug) : null;
+  const entity = slug ? getTypedEntityById(slug) : null;
   const pageData = slug ? getPageById(slug) : null;
   const title = entity?.title || pageData?.title || slug || id;
-  const description = entity?.description || pageData?.description || null;
+  const rawDescription = entity?.description || pageData?.description || null;
+  const description = rawDescription ? stripMdxEscapes(rawDescription) : null;
 
   return new ImageResponse(
     (

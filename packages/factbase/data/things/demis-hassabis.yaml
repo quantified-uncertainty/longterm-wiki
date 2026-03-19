@@ -1,12 +1,4 @@
-thing:
-  id: demis-hassabis
-  stableId: Aqcyu3onCA
-  type: person
-  name: "Demis Hassabis"
-  wikiId: "E101"
-  aliases:
-    - "Demis"
-
+entity: Aqcyu3onCA
 facts:
   - id: f_86Rr7EPOYw
     property: employed-by

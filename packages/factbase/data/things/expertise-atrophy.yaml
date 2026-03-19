@@ -1,9 +1,4 @@
-thing:
-  id: expertise-atrophy
-  stableId: ks0lqvZqUg
-  type: risk
-  name: AI-Induced Expertise Atrophy
-  wikiId: E133
+entity: ks0lqvZqUg
 facts:
   - id: f_12usfHLpZw
     property: description

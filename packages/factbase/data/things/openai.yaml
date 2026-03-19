@@ -1,14 +1,4 @@
-thing:
-  id: openai
-  stableId: 1LcLlMGLbw
-  type: organization
-  name: OpenAI
-  wikiId: "E218"
-  aliases:
-    - OpenAI Inc
-    - OpenAI LP
-    - OpenAI Global LLC
-
+entity: 1LcLlMGLbw
 facts:
   - id: f_1Y4HfGVOvA
     property: founded-date
@@ -59,15 +49,37 @@ facts:
   - id: f_HfB3WmNDFQ
     property: total-funding
     value: 1.79e+10
-    asOf: 2025-10
+    asOf: 2024-10
+    validEnd: 2025-03
     source: https://openai.com/index/openai-announces-a-new-funding-round/
-    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds"
+    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds. Superseded by SoftBank $40B round in March 2025."
+
+  - id: f_Sb4nW9mT7a
+    property: total-funding
+    value: 5.79e+10
+    asOf: 2025-03
+    source: https://openai.com/index/softbank-openai-joint-announcement/
+    notes: "Cumulative funding after SoftBank's $40B round (March 2025) at a $300B valuation, bringing total to approximately $57.9B. Round co-led by SoftBank ($15B from third parties, $15B from SoftBank directly, with additional participants)."
+
+  - id: f_m5b6R9pIby
+    property: total-funding
+    value: 5.79e+10
+    asOf: 2025-03
+    source: https://www.reuters.com/technology/openai-closes-40-billion-funding-round-softbank-2025-03-31/
+    notes: "Cumulative funding after $40B SoftBank-led round in March 2025 at $300B valuation, bringing total to ~$57.9B"
 
   - id: f_b56n3kcD2g
     property: valuation
     value: 1.57e+11
     asOf: 2024-12
     notes: "October 2024 funding round valuation"
+
+  - id: f_Qj7kR2pX9v
+    property: valuation
+    value: 3e+11
+    asOf: 2025-03
+    source: https://openai.com/index/softbank-openai-joint-announcement/
+    notes: "SoftBank $40B funding round valuation, March 2025"
 
   - id: f_YZ7zzKgBsA
     property: valuation
@@ -93,6 +105,13 @@ facts:
     asOf: 2023-02
     notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
       fastest-growing consumer application in history at that time"
+
+  - id: f_br0wYi0tog
+    property: user-count
+    value: 4e+8
+    asOf: 2025-02
+    source: https://openai.com/index/400-million-users/
+    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO Sam Altman"
 
   - id: f_o1tcwe2T0w
     property: headcount

@@ -1,9 +1,4 @@
-thing:
-  id: concentrated-compute-cybersecurity-risk
-  stableId: VP53MHxfEg
-  type: risk
-  name: Concentrated Compute as a Cybersecurity Risk
-  wikiId: E689
+entity: VP53MHxfEg
 facts:
   - id: f_DE00eu9iIw
     property: description

@@ -1,9 +1,4 @@
-thing:
-  id: capability-elicitation
-  stableId: PQgF6Ve9ZA
-  type: approach
-  name: Capability Elicitation
-  wikiId: E443
+entity: PQgF6Ve9ZA
 facts:
   - id: f_nzr39RC8aQ
     property: description

@@ -147,10 +147,6 @@ export const MarkAccuracySchema = z.object({
 });
 export type MarkAccuracy = z.infer<typeof MarkAccuracySchema>;
 
-export const MarkAccuracyBatchSchema = z.object({
-  items: z.array(MarkAccuracySchema).min(1).max(100),
-});
-
 export interface AccuracyDashboardData {
   exportedAt: string;
   summary: {

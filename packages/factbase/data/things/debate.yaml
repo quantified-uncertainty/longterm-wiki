@@ -1,9 +1,4 @@
-thing:
-  id: debate
-  stableId: kNfdvSgC2g
-  type: approach
-  name: AI Safety via Debate
-  wikiId: E482
+entity: kNfdvSgC2g
 facts:
   - id: f_nKjp92MKzA
     property: description

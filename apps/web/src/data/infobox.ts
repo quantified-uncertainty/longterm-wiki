@@ -3,7 +3,7 @@
  */
 
 import {
-  getDatabase,
+  getTableBase,
   getTypedEntities,
   getTypedEntityById,
   getPageById,

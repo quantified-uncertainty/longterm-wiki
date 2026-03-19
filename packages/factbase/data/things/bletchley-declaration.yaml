@@ -1,9 +1,4 @@
-thing:
-  id: bletchley-declaration
-  stableId: X2gSvrOang
-  type: policy
-  name: Bletchley Declaration
-  wikiId: E469
+entity: X2gSvrOang
 facts:
   - id: f_8JK2xkHdiA
     property: description

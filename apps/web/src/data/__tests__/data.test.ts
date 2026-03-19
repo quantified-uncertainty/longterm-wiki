@@ -271,18 +271,18 @@ describe("Data Layer", () => {
     vi.resetModules();
   });
 
-  describe("getEntityById", () => {
+  describe("getTypedEntityById", () => {
     it("returns entity by ID", async () => {
-      const { getEntityById } = await import("../../data/index");
-      const entity = getEntityById("test-entity");
+      const { getTypedEntityById } = await import("../../data/index");
+      const entity = getTypedEntityById("test-entity");
       expect(entity).toBeDefined();
       expect(entity?.title).toBe("Test Entity");
-      expect(entity?.type).toBe("risk");
+      expect(entity?.entityType).toBe("risk");
     });
 
     it("returns undefined for missing entity", async () => {
-      const { getEntityById } = await import("../../data/index");
-      expect(getEntityById("nonexistent")).toBeUndefined();
+      const { getTypedEntityById } = await import("../../data/index");
+      expect(getTypedEntityById("nonexistent")).toBeUndefined();
     });
   });
 

@@ -1,9 +1,4 @@
-thing:
-  id: formal-verification
-  stableId: DSSCdI8gLA
-  type: approach
-  name: Formal Verification (AI Safety)
-  wikiId: E483
+entity: DSSCdI8gLA
 facts:
   - id: f_9Kozt7eUyA
     property: description

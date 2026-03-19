@@ -1,9 +1,4 @@
-thing:
-  id: cea
-  stableId: gNsqAes7Dw
-  type: organization
-  name: Centre for Effective Altruism
-  wikiId: E517
+entity: gNsqAes7Dw
 facts:
   - id: f_GyKcbuIHcA
     property: description

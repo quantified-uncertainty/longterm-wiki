@@ -1,9 +1,4 @@
-thing:
-  id: claude-opus-4-5
-  stableId: tppPAkJqjQ
-  type: ai-model
-  name: Claude Opus 4.5
-  wikiId: E1038
+entity: tppPAkJqjQ
 facts:
   - id: f_FeCjS95oeQ
     property: description

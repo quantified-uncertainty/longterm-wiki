@@ -1,9 +1,4 @@
-thing:
-  id: hewlett-foundation
-  stableId: 9nUCGERzgQ
-  type: organization
-  name: William and Flora Hewlett Foundation
-  wikiId: E535
+entity: 9nUCGERzgQ
 facts:
   - id: f_lgHSlgia8Q
     property: description

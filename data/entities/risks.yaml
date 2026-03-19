@@ -76,11 +76,11 @@
     - label: Key Risk
       value: Stabilizing autocracy
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: The Road to Digital Unfreedom
@@ -136,9 +136,9 @@
   relatedEntries:
     - id: sycophancy
       type: risk
-    - id: enfeeblement
+    - id: 13OO6CP98g
       type: risk
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
   sources:
     - title: Automation Bias in Decision Making
@@ -176,9 +176,9 @@
     - label: Status
       value: Active military development
   relatedEntries:
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
   sources:
     - title: Campaign to Stop Killer Robots
@@ -230,9 +230,9 @@
     - label: Key Concern
       value: Lowering barriers to development
   relatedEntries:
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: The Precipice
@@ -289,11 +289,11 @@
     - label: Type
       value: Structural/Systemic
   relatedEntries:
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
   sources:
     - title: AI and the Future of Power
@@ -396,11 +396,11 @@
     confidence: low
   maturity: Growing
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
   sources:
     - title: Corrigibility
@@ -503,7 +503,7 @@
   relatedEntries:
     - id: bioweapons
       type: risk
-    - id: autonomous-weapons
+    - id: cm5KEblCZg
       type: risk
   sources:
     - title: CISA Artificial Intelligence
@@ -556,17 +556,17 @@
     - label: Key Concern
       value: AI hides misalignment during training
   relatedEntries:
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: ai-control
+    - id: sFjyY5xXZA
       type: safety-agenda
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: evals
+    - id: etuIjQhFbQ
       type: approach
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
   sources:
     - title: Risks from Learned Optimization
@@ -606,9 +606,9 @@
     - label: Key Risk
       value: Authenticity crisis
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
   sources:
     - title: Deepfakes and the New Disinformation War
@@ -662,9 +662,9 @@
     - label: Key Change
       value: Scale and personalization
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
   sources:
     - title: OpenAI Research on Influence Operations
@@ -712,9 +712,9 @@
     median: 2025
   maturity: Mature
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   sources:
     - title: A Survey on Distribution Shift
@@ -753,9 +753,9 @@
     - label: Status
       value: Beginning
   relatedEntries:
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
   sources:
     - title: The Rise of the Robots
@@ -809,11 +809,11 @@
     - label: Key Finding
       value: Capabilities appear suddenly at scale
   relatedEntries:
-    - id: sharp-left-turn
+    - id: AMhUctK34Q
       type: risk
-    - id: sandbagging
+    - id: GzX9hnrzWw
       type: risk
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
   sources:
     - title: Emergent Abilities of Large Language Models
@@ -855,9 +855,9 @@
     - label: Also Called
       value: Human atrophy, skill loss
   relatedEntries:
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
   sources:
     - title: What We Owe the Future
@@ -910,11 +910,11 @@
     - label: Status
       value: Early stages visible
   relatedEntries:
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
   sources:
     - title: Reality+
@@ -952,9 +952,9 @@
     - label: Status
       value: Already occurring
   relatedEntries:
-    - id: enfeeblement
+    - id: 13OO6CP98g
       type: risk
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
     - id: sycophancy
       type: risk
@@ -1067,9 +1067,9 @@
     - label: Key Risk
       value: Speed beyond oversight
   relatedEntries:
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
-    - id: irreversibility
+    - id: 7e3rvE5YgA
       type: risk
   sources:
     - title: 'Selling Spirals: Avoiding an AI Flash Crash (Lawfare)'
@@ -1118,9 +1118,9 @@
     - label: Key Risk
       value: Scale and personalization
   relatedEntries:
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
   sources:
     - title: FBI 2024 Internet Crime Report
@@ -1171,11 +1171,11 @@
     - label: Key Paper
       value: Langosco et al. 2022
   relatedEntries:
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
   sources:
     - title: Goal Misgeneralization in Deep RL
@@ -1332,11 +1332,11 @@
     - label: Coined By
       value: Nick Bostrom / Steve Omohundro
   relatedEntries:
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: corrigibility
+    - id: aUMeFdALrA
       type: safety-agenda
-    - id: miri
+    - id: puAffUjWSS
       type: organization
   sources:
     - title: The Basic AI Drives
@@ -1379,11 +1379,11 @@
     - label: Key Risk
       value: Permanent foreclosure of options
   relatedEntries:
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: flash-dynamics
+    - id: 0t2GLN0sBA
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: Existential Risk from AI (Wikipedia)
@@ -1608,11 +1608,11 @@
     - label: Key Feature
       value: Irreversibility
   relatedEntries:
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
   sources:
     - title: The Precipice
@@ -1667,13 +1667,13 @@
     - label: Key Feature
       value: Lock-in of oppressive systems
   relatedEntries:
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
   sources:
     - title: The Precipice
@@ -1712,11 +1712,11 @@
     - label: Key Paper
       value: Risks from Learned Optimization (2019)
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
-    - id: miri
+    - id: puAffUjWSS
       type: organization
   sources:
     - title: Risks from Learned Optimization
@@ -1756,9 +1756,9 @@
     - label: Also Called
       value: Collective action failure
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: Meditations on Moloch
@@ -1808,11 +1808,11 @@
     - label: Key Paper
       value: Turner et al. 2021
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: corrigibility
+    - id: aUMeFdALrA
       type: safety-agenda
-    - id: cais
+    - id: y4bieqSeag
       type: organization
   sources:
     - title: Optimal Policies Tend to Seek Power
@@ -1913,9 +1913,9 @@
   relatedEntries:
     - id: bioweapons
       type: risk
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
   sources:
     - title: Open-sourcing highly capable foundation models (arXiv)
@@ -1965,11 +1965,11 @@
     - label: Also Called
       value: Arms race dynamics
   relatedEntries:
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: govai
+    - id: XLLyzaEaCA
       type: organization
   sources:
     - title: 'Racing to the Precipice: A Model of AI Development'
@@ -2078,11 +2078,11 @@
     - label: Status
       value: Actively occurring
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
-    - id: rlhf
+    - id: rSE7kY5k4Q
       type: capability
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
     - id: sycophancy
       type: risk
@@ -2126,11 +2126,11 @@
     - label: Definition
       value: AI hiding capabilities during evaluation
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
   sources:
     - title: Evaluating Language-Model Agents on Realistic Autonomous Tasks
@@ -2167,11 +2167,11 @@
     - label: Also Called
       value: Strategic deception
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: capability
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
   sources:
     - title: 'Scheming AIs: Will AIs fake alignment during training in order to get power?'
@@ -2281,11 +2281,11 @@
     - label: Coined By
       value: Nate Soares / MIRI
   relatedEntries:
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: mesa-optimization
+    - id: 8Bv92x9G1A
       type: risk
   sources:
     - title: Sharp Left Turn
@@ -2325,9 +2325,9 @@
     - label: Key Change
       value: Automation of analysis
   relatedEntries:
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   sources:
     - title: The Global Expansion of AI Surveillance (Carnegie Endowment)
@@ -2383,13 +2383,13 @@
     - label: Key Trigger
       value: Anthropic-Pentagon standoff (Feb 2026)
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: authoritarian-takeover
+    - id: AV6AJU1FhQ
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: anthropic-government-standoff
+    - id: 27ay7L0VtY
       type: event
   sources:
     - title: "Center for American Progress: Digital Watchtower"
@@ -2434,11 +2434,11 @@
     - label: Status
       value: Actively occurring
   relatedEntries:
-    - id: reward-hacking
+    - id: 9XN9QMfecA
       type: risk
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
   sources:
     - title: Discovering Language Model Behaviors with Model-Written Evaluations
@@ -2537,11 +2537,11 @@
     - label: Source
       value: Superintelligence (2014)
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: corrigibility
+    - id: aUMeFdALrA
       type: safety-agenda
   sources:
     - title: 'Superintelligence: Paths, Dangers, Strategies'
@@ -2583,17 +2583,17 @@
     - label: Key Insight
       value: None require superhuman intelligence or explicit deception
   relatedEntries:
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: treacherous-turn
+    - id: tRj4bS6V8Q
       type: risk
-    - id: power-seeking
+    - id: hwDgNNDsDQ
       type: risk
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
     - id: sandboxing
       type: approach
@@ -2687,11 +2687,11 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
   sources:
     - title: 'Trust: The Social Virtues and the Creation of Prosperity'
@@ -2727,9 +2727,9 @@
     - label: Key Risk
       value: Extreme concentration
   relatedEntries:
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
   sources:
     - title: How to Prevent Winner-Take-Most AI (Brookings)
@@ -2774,7 +2774,7 @@
     latest: 2030
   maturity: Emerging
   relatedEntries:
-    - id: agentic-ai
+    - id: 95ASV0XEwQ
       type: capability
   tags:
     - dangerous-capabilities
@@ -2841,15 +2841,15 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: scheming
+    - id: JqMTO0YVEA
       type: risk
-    - id: evan-hubinger
+    - id: XnqqKHiNmw
       type: person
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: situational-awareness
+    - id: 5maTNr0PGA
       type: concept
   lastUpdated: 2026-02
 
@@ -2877,13 +2877,13 @@
     - label: Investment Scale
       value: $700B+ annual capex (2026)
   relatedEntries:
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
-    - id: lock-in
+    - id: nFwuCHi9qw
       type: risk
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: projecting-compute-spending
+    - id: cF7VgLKSpg
       type: analysis
   sources:
     - title: "Securing the Backbone of AI: Cyber Threats (New America)"
@@ -2944,9 +2944,9 @@
     of global frontier AI compute. The NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0)
     demonstrated this risk by affecting all major cloud providers simultaneously.
   relatedEntries:
-    - id: compute-concentration
+    - id: MvImONf1YA
       type: risk
-    - id: concentration-of-power
+    - id: KpMBQkdQ5g
       type: risk
   tags:
     - compute
@@ -2980,11 +2980,11 @@
     2024-2026 vs $1.2T telecom inflation-adjusted). Risks could transmit to broader markets
     through index fund concentration, credit contagion, and semiconductor supply chain cascades.
   relatedEntries:
-    - id: projecting-compute-spending
+    - id: cF7VgLKSpg
       type: analysis
-    - id: ai-revenue-sources
+    - id: B7uHMuvA0Q
       type: organization
-    - id: economic-disruption
+    - id: hRRC36tWDg
       type: risk
   tags:
     - economics
@@ -3038,21 +3038,21 @@
     - label: Key Risk
       value: Simultaneous capability amplification and attribution defeat
   relatedEntries:
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: cyberweapons
+    - id: 7c6UC46TWQ
       type: risk
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
-    - id: trust-cascade
+    - id: IQ4E6VkW9A
       type: risk
-    - id: dual-use
+    - id: CwBPBQAmxA
       type: concept
-    - id: proliferation
+    - id: Pr5xmThNfA
       type: risk
   sources:
     - title: Four Responsibility Gaps with Artificial Intelligence
@@ -3102,19 +3102,19 @@
     - label: Key Risk
       value: Erosion of privacy through obscurity as AI lowers discoverability threshold
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
-    - id: trust-decline
+    - id: 1NWLygwzGw
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: ai-enabled-untraceable-misuse
+    - id: 6c238j1BMw
       type: risk
   sources:
     - title: "AI is undermining OSINT's core assumptions (Reuters Institute)"
@@ -3172,17 +3172,17 @@
     - label: Key Concern
       value: Erosion of pseudonymity and practical obscurity
   relatedEntries:
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: erosion-of-agency
+    - id: 54ItAwh4QA
       type: risk
-    - id: epistemic-collapse
+    - id: GeYirWJrwA
       type: risk
-    - id: fraud
+    - id: GnUTRJhA4g
       type: risk
-    - id: ai-powered-investigation
+    - id: N0NF4lvS4Q
       type: capability
   sources:
     - title: "Beyond Memorization: Violating Privacy Via Inference with Large Language Models"
@@ -3214,19 +3214,19 @@
     Covers governance, misuse, epistemic, and technical risks that are no longer
     theoretical but producing observable real-world harms.
   relatedEntries:
-    - id: racing-dynamics
+    - id: SUZgWeZLNA
       type: risk
-    - id: authoritarian-tools
+    - id: eXd3Fe8Lzg
       type: risk
-    - id: surveillance
+    - id: 9ToBZjhsVg
       type: risk
-    - id: disinformation
+    - id: AaAOkTHkug
       type: risk
-    - id: authentication-collapse
+    - id: GvV1xPNXRw
       type: risk
-    - id: goal-misgeneralization
+    - id: nYPuaov1hA
       type: risk
-    - id: us-ai-surveillance-democratic-erosion
+    - id: Tnd9iuHdjw
       type: risk
   tags:
     - near-term

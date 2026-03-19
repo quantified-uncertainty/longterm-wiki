@@ -1,13 +1,4 @@
-thing:
-  id: anthropic-government-standoff
-  stableId: 27ay7L0VtY
-  type: incident
-  name: "Anthropic-Pentagon Standoff (2026)"
-  wikiId: "E924"
-  aliases:
-    - Anthropic Pentagon Standoff
-    - Anthropic Supply Chain Risk Designation
-
+entity: 27ay7L0VtY
 facts:
   # Migrated from data/facts/anthropic-government-standoff.yaml
 

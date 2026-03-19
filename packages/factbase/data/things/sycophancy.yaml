@@ -1,9 +1,4 @@
-thing:
-  id: sycophancy
-  stableId: 8BWfogRouw
-  type: risk
-  name: Sycophancy
-  wikiId: E295
+entity: 8BWfogRouw
 facts:
   - id: f_t6pnly6AdA
     property: description

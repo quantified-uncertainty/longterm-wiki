@@ -1,9 +1,4 @@
-thing:
-  id: turion
-  stableId: wixiIVSZdg
-  type: organization
-  name: Turion
-  wikiId: E571
+entity: wixiIVSZdg
 facts:
   - id: f_t6iCdIf3ow
     property: description

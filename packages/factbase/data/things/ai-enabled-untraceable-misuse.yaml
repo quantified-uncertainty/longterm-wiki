@@ -1,9 +1,4 @@
-thing:
-  id: ai-enabled-untraceable-misuse
-  stableId: 6c238j1BMw
-  type: risk
-  name: AI-Enabled Untraceable Misuse
-  wikiId: E691
+entity: 6c238j1BMw
 facts:
   - id: f_ZSXX1dxLhA
     property: description

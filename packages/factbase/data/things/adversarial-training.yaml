@@ -1,9 +1,4 @@
-thing:
-  id: adversarial-training
-  stableId: omIL5LhGnQ
-  type: approach
-  name: Adversarial Training
-  wikiId: E583
+entity: omIL5LhGnQ
 facts:
   - id: f_7AUTHQfMuQ
     property: description

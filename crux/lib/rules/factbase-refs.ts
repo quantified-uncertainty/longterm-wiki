@@ -27,8 +27,31 @@ let entityIdCache: Set<string> | null | undefined = undefined;
 let propertyIdCache: Set<string> | null | undefined = undefined;
 
 /**
+ * Extract stableId from a parsed YAML object. Handles both formats:
+ *   - Legacy `thing:` block: `parsed.thing.stableId`
+ *   - New `entity:` format: `parsed.entity` (the value IS the stableId)
+ */
+function extractStableId(parsed: unknown): string | null {
+  if (!parsed || typeof parsed !== 'object') return null;
+  const obj = parsed as Record<string, unknown>;
+
+  // New format: entity: <stableId>
+  if (typeof obj.entity === 'string' && obj.entity) {
+    return obj.entity;
+  }
+
+  // Legacy format: thing: { stableId: "..." }
+  const thing = obj.thing as Record<string, unknown> | undefined;
+  if (thing && typeof thing.stableId === 'string' && thing.stableId) {
+    return thing.stableId;
+  }
+
+  return null;
+}
+
+/**
  * Load all valid entity identifiers: both slugs (from filenames) and stableIds
- * (from thing.stableId inside each YAML file).
+ * (from thing.stableId or entity: <stableId> inside each YAML file).
  */
 export function loadEntitySlugs(): Set<string> | null {
   if (entityIdCache !== undefined) return entityIdCache;
@@ -44,15 +67,15 @@ export function loadEntitySlugs(): Set<string> | null {
         try {
           const raw = readFileSync(join(KB_THINGS_DIR, entry.name), 'utf-8');
           const parsed = parseYaml(raw);
-          const stableId = parsed?.thing?.stableId;
-          if (typeof stableId === 'string' && stableId) {
+          const stableId = extractStableId(parsed);
+          if (stableId) {
             loaded.add(stableId);
           }
         } catch {
           // Individual file parse failure — slug is still valid, skip stableId
         }
       } else if (entry.isDirectory()) {
-        // Per-entity directory: look for entity.yaml or any file with a thing: block
+        // Per-entity directory: look for entity.yaml or any file with an entity header
         const slug = entry.name;
         loaded.add(slug);
         try {
@@ -61,8 +84,8 @@ export function loadEntitySlugs(): Set<string> | null {
             try {
               const raw = readFileSync(join(KB_THINGS_DIR, entry.name, f), 'utf-8');
               const parsed = parseYaml(raw);
-              const stableId = parsed?.thing?.stableId;
-              if (typeof stableId === 'string' && stableId) {
+              const stableId = extractStableId(parsed);
+              if (stableId) {
                 loaded.add(stableId);
                 break; // Found the entity file, no need to check more
               }

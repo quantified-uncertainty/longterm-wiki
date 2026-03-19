@@ -1,12 +1,4 @@
-thing:
-  id: nick-bostrom
-  stableId: IQvWHA3OiF
-  type: person
-  name: "Nick Bostrom"
-  wikiId: "E215"
-  aliases:
-    - Niklas Bostr\u00F6m
-
+entity: IQvWHA3OiF
 facts:
   - id: f_1dHuIat2Xt
     property: employed-by

@@ -21,6 +21,7 @@ export default function EventsPage() {
       title: e.title,
       description: e.description ?? null,
       status: statusField?.value ?? null,
+      lastUpdated: e.lastUpdated ?? null,
       tags: e.tags ?? [],
       wikiId: e.wikiId ?? null,
     };

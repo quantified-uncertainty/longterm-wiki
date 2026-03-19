@@ -1,9 +1,4 @@
-thing:
-  id: agi-timeline
-  stableId: zkYFTnzRLA
-  type: concept
-  name: AGI Timeline
-  wikiId: E399
+entity: zkYFTnzRLA
 facts:
   - id: f_MjGVgIncSQ
     property: description

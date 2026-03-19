@@ -1,12 +1,4 @@
-thing:
-  id: ilya-sutskever
-  stableId: eYrBgMLJDw
-  type: person
-  name: "Ilya Sutskever"
-  wikiId: "E163"
-  aliases:
-    - "Ilya"
-
+entity: eYrBgMLJDw
 facts:
   - id: f_qfd3qL21HQ
     property: employed-by

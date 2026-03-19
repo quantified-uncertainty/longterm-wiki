@@ -1,9 +1,4 @@
-thing:
-  id: whistleblower-protections
-  stableId: nvyazaJFew
-  type: policy
-  name: AI Whistleblower Protections
-  wikiId: E475
+entity: nvyazaJFew
 facts:
   - id: f_9kQI00Ihkw
     property: description

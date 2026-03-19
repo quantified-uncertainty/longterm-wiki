@@ -1,12 +1,4 @@
-thing:
-  id: yoshua-bengio
-  stableId: nGFBXZeM3d
-  type: person
-  name: "Yoshua Bengio"
-  wikiId: "E380"
-  aliases:
-    - Bengio
-
+entity: nGFBXZeM3d
 facts:
   - id: f_ymkhC4xtr2
     property: employed-by

@@ -1,9 +1,4 @@
-thing:
-  id: community-notes
-  stableId: g75DdACthg
-  type: project
-  name: X Community Notes
-  wikiId: E381
+entity: g75DdACthg
 facts:
   - id: f_t0PiM5dVTA
     property: description

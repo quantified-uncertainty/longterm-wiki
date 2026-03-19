@@ -1,13 +1,4 @@
-thing:
-  id: eliezer-yudkowsky
-  stableId: fS1tEGKuNq
-  type: person
-  name: "Eliezer Yudkowsky"
-  wikiId: "E114"
-  aliases:
-    - Eliezer
-    - EY
-
+entity: fS1tEGKuNq
 facts:
   - id: f_pMYY3GyUXY
     property: employed-by

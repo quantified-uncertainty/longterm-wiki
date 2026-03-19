@@ -1,10 +1,4 @@
-thing:
-  id: jack-clark
-  stableId: YqSmRNVRAg
-  type: person
-  name: "Jack Clark"
-  wikiId: "E1248"
-
+entity: YqSmRNVRAg
 facts:
   - id: f_5QqO5k4Svg
     property: employed-by

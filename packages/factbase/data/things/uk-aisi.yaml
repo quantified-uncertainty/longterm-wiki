@@ -1,9 +1,4 @@
-thing:
-  id: uk-aisi
-  stableId: aX0jkoaekQ
-  type: organization
-  name: UK AI Safety Institute
-  wikiId: E364
+entity: aX0jkoaekQ
 facts:
   - id: f_S2fTBH9xxw
     property: description

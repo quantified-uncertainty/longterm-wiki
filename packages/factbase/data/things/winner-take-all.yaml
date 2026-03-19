@@ -1,9 +1,4 @@
-thing:
-  id: winner-take-all
-  stableId: YOMDe574Ew
-  type: risk
-  name: AI Winner-Take-All Dynamics
-  wikiId: E374
+entity: YOMDe574Ew
 facts:
   - id: f_PyILTBvltw
     property: description

@@ -14,6 +14,7 @@ import {
 } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { things, thingResourceVerifications, thingVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
   validationError,
@@ -98,6 +99,8 @@ function formatThing(t: typeof things.$inferSelect) {
     description: t.description,
     sourceUrl: t.sourceUrl,
     wikiId: t.wikiId,
+    href: thingHref(t),
+    parentTitle: t.parentTitle,
     verdict: t.verdict,
     verdictConfidence: t.verdictConfidence,
     verdictAt: t.verdictAt,
@@ -608,6 +611,7 @@ const thingsApp = new Hono()
       description: z.string().max(10000).optional(),
       sourceUrl: z.string().max(2048).optional(),
       wikiId: z.string().max(20).optional(),
+      parentTitle: z.string().max(500).optional(),
     });
 
     const SyncBatchSchema = z.object({

@@ -1,9 +1,4 @@
-thing:
-  id: compute-concentration
-  stableId: MvImONf1YA
-  type: risk
-  name: Compute Concentration
-  wikiId: E684
+entity: MvImONf1YA
 facts:
   - id: f_jXDsUg8Q3w
     property: description

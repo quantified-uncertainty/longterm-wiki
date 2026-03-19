@@ -9,17 +9,18 @@ export interface EventRow {
   title: string;
   description: string | null;
   status: string | null;
+  lastUpdated: string | null;
   tags: string[];
   wikiId: string | null;
 }
 
-type SortKey = "title" | "status";
+type SortKey = "title" | "status" | "lastUpdated";
 type SortDir = "asc" | "desc";
 
 export function EventsTable({ rows }: { rows: EventRow[] }) {
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("title");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortKey, setSortKey] = useState<SortKey>("lastUpdated");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -51,6 +52,8 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
           return a.title.localeCompare(b.title) * dir;
         case "status":
           return (a.status ?? "").localeCompare(b.status ?? "") * dir;
+        case "lastUpdated":
+          return (a.lastUpdated ?? "").localeCompare(b.lastUpdated ?? "") * dir;
       }
     });
 
@@ -87,6 +90,14 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                 className="text-left"
               />
               <SortHeader
+                label="Last Updated"
+                sortKey="lastUpdated"
+                currentSort={sortKey}
+                currentDir={sortDir}
+                onSort={handleSort}
+                className="text-left"
+              />
+              <SortHeader
                 label="Status"
                 sortKey="status"
                 currentSort={sortKey}
@@ -112,6 +123,10 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                   >
                     {row.title}
                   </Link>
+                </td>
+
+                <td className="py-2.5 px-3 whitespace-nowrap text-muted-foreground text-xs">
+                  {row.lastUpdated ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 <td className="py-2.5 px-3 whitespace-nowrap">

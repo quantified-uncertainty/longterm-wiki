@@ -1,9 +1,4 @@
-thing:
-  id: dual-use
-  stableId: CwBPBQAmxA
-  type: concept
-  name: Dual-Use AI Technology
-  wikiId: E106
+entity: CwBPBQAmxA
 facts:
   - id: f_LghEUK12nQ
     property: description

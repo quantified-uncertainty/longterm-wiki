@@ -1,9 +1,4 @@
-thing:
-  id: evals
-  stableId: etuIjQhFbQ
-  type: research-area
-  name: AI Evaluations
-  wikiId: E128
+entity: etuIjQhFbQ
 facts:
   - id: f_fj8uLG4jOg
     property: description

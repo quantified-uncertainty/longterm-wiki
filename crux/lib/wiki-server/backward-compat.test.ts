@@ -46,7 +46,6 @@ describe('wiki-server-client barrel exports', () => {
     expect(typeof client.upsertCitationQuote).toBe('function');
     expect(typeof client.upsertCitationQuoteBatch).toBe('function');
     expect(typeof client.markCitationAccuracy).toBe('function');
-    expect(typeof client.markCitationAccuracyBatch).toBe('function');
     expect(typeof client.createAccuracySnapshot).toBe('function');
     expect(typeof client.getAccuracyDashboard).toBe('function');
   });

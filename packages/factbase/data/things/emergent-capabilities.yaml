@@ -1,9 +1,4 @@
-thing:
-  id: emergent-capabilities
-  stableId: x19LcGDk6Q
-  type: risk
-  name: Emergent Capabilities
-  wikiId: E117
+entity: x19LcGDk6Q
 facts:
   - id: f_gv7ucetiKQ
     property: description

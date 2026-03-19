@@ -1,9 +1,4 @@
-thing:
-  id: ea-global
-  stableId: k4IPgRP98A
-  type: organization
-  name: EA Global
-  wikiId: E525
+entity: k4IPgRP98A
 facts:
   - id: f_tsumVdflJQ
     property: description

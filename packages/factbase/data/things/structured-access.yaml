@@ -1,9 +1,4 @@
-thing:
-  id: structured-access
-  stableId: cYETfX9wzA
-  type: approach
-  name: Structured Access / API-Only
-  wikiId: E486
+entity: cYETfX9wzA
 facts:
   - id: f_pQfRvtChwA
     property: description

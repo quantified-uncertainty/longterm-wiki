@@ -1,9 +1,4 @@
-thing:
-  id: giving-what-we-can
-  stableId: aKZsmUeuWg
-  type: organization
-  name: Giving What We Can
-  wikiId: E863
+entity: aKZsmUeuWg
 facts:
   - id: f_us5lFmzYgw
     property: description

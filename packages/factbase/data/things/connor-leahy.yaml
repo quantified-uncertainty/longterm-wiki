@@ -1,12 +1,4 @@
-thing:
-  id: connor-leahy
-  stableId: CrXoCsIucX
-  type: person
-  name: "Connor Leahy"
-  wikiId: "E71"
-  aliases:
-    - Connor
-
+entity: CrXoCsIucX
 facts:
   - id: f_6RTYYOtNHd
     property: employed-by

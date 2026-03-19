@@ -7,6 +7,7 @@ import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { buildProgramNameMap, resolveProgramName } from "./grants-utils";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -46,6 +47,9 @@ function resolveGrantRecipient(
 export default function GrantsPage() {
   const allGrants = getAllKBRecords("grants");
 
+  // Build a lookup from funding program key → display name
+  const programNameMap = buildProgramNameMap();
+
   // Build rows with resolved entity names and links
   const rows: GrantRow[] = allGrants.map((record) => {
     // Normalize CEA duplicate: map slug alias to canonical entity ID
@@ -80,10 +84,7 @@ export default function GrantsPage() {
       recipientSlug: resolved?.slug ?? null,
       recipientHref: resolved?.href ?? null,
       recipientWikiPageId: resolved?.wikiPageId ?? null,
-      program:
-        typeof record.fields.program === "string"
-          ? record.fields.program
-          : null,
+      program: resolveProgramName(record.fields, programNameMap),
       amount:
         typeof record.fields.amount === "number"
           ? record.fields.amount

@@ -20,11 +20,11 @@
   title: Chris Olah
   website: https://colah.github.io
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
   customFields:
     - label: Role
@@ -75,11 +75,11 @@
   title: Connor Leahy
   website: https://conjecture.dev
   relatedEntries:
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
-    - id: neel-nanda
+    - id: zaRXTCXPPk
       type: person
   customFields:
     - label: Role
@@ -127,11 +127,11 @@
   title: Dan Hendrycks
   website: https://hendrycks.com
   relatedEntries:
-    - id: cais
+    - id: y4bieqSeag
       type: organization
-    - id: compute-governance
+    - id: lfvY1bGeoA
       type: policy
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
   customFields:
     - label: Role
@@ -190,15 +190,15 @@
   title: Dario Amodei
   website: https://anthropic.com
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: anthropic-core-views
+    - id: CsWO4o3gZw
       type: safety-agenda
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
   customFields:
     - label: Role
@@ -256,13 +256,13 @@
   title: Eliezer Yudkowsky
   website: https://intelligence.org
   relatedEntries:
-    - id: miri
+    - id: puAffUjWSS
       type: organization
-    - id: deceptive-alignment
+    - id: vc60Nthkcg
       type: risk
-    - id: sharp-left-turn
+    - id: AMhUctK34Q
       type: risk
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -338,9 +338,9 @@
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
   customFields:
     - label: Role
@@ -390,13 +390,13 @@
   title: Ajeya Cotra
   website: https://metr.org
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: holden-karnofsky
+    - id: eQh3ZhWv8D
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -423,9 +423,9 @@
   title: Holden Karnofsky
   website: https://coefficientgiving.org
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -485,13 +485,13 @@
   title: Ilya Sutskever
   website: https://ssi.inc
   relatedEntries:
-    - id: ssi
+    - id: 1OSiYOaWVL
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
-    - id: geoffrey-hinton
+    - id: 5N5UqXNkkg
       type: person
   customFields:
     - label: Role
@@ -539,13 +539,13 @@
   title: Jan Leike
   website: https://anthropic.com
   relatedEntries:
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -600,11 +600,11 @@
   title: Neel Nanda
   website: https://www.neelnanda.io
   relatedEntries:
-    - id: deepmind
+    - id: A4XoubikkQ
       type: organization
-    - id: chris-olah
+    - id: Tz48rTriBg
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   customFields:
     - label: Role
@@ -654,11 +654,11 @@
   title: Nick Bostrom
   website: https://nickbostrom.com
   relatedEntries:
-    - id: instrumental-convergence
+    - id: BYKermZj1A
       type: risk
-    - id: treacherous-turn
+    - id: tRj4bS6V8Q
       type: risk
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -708,13 +708,13 @@
   title: Paul Christiano
   website: https://alignment.org
   relatedEntries:
-    - id: arc
+    - id: QsXVXtQ0zE
       type: organization
-    - id: scalable-oversight
+    - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: eliezer-yudkowsky
+    - id: fS1tEGKuNq
       type: person
-    - id: jan-leike
+    - id: hQ7mR2kN5p
       type: person
   customFields:
     - label: Role
@@ -790,11 +790,11 @@
   title: Stuart Russell
   website: https://people.eecs.berkeley.edu/~russell/
   relatedEntries:
-    - id: chai
+    - id: zMfgJqiEPQ
       type: organization
-    - id: corrigibility-failure
+    - id: aE60G9uLyA
       type: risk
-    - id: paul-christiano
+    - id: vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -845,9 +845,9 @@
   title: Toby Ord
   website: https://www.tobyord.com
   relatedEntries:
-    - id: nick-bostrom
+    - id: IQvWHA3OiF
       type: person
-    - id: holden-karnofsky
+    - id: eQh3ZhWv8D
       type: person
   customFields:
     - label: Role
@@ -898,9 +898,9 @@
   title: Yoshua Bengio
   website: https://yoshuabengio.org
   relatedEntries:
-    - id: geoffrey-hinton
+    - id: 5N5UqXNkkg
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
   customFields:
     - label: Role
@@ -952,11 +952,11 @@
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   status: stub
   relatedEntries:
-    - id: xai
+    - id: GLXKjYAEKw
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
   tags:
     - entrepreneur
@@ -970,9 +970,9 @@
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
   status: stub
   relatedEntries:
-    - id: metr
+    - id: rQEkFJxS5w
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
   tags:
     - evaluations
@@ -1000,15 +1000,15 @@
   clusters:
     - governance
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: dario-amodei
+    - id: zR4nW8xB2f
       type: person
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: openai
+    - id: 1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
@@ -1030,13 +1030,13 @@
   clusters:
     - governance
   relatedEntries:
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: alignment
+    - id: rt6jVH9yuA
       type: concept
     - id: bioweapons
       type: risk
-    - id: deepfakes
+    - id: MUGUxfl2YA
       type: risk
   lastUpdated: 2026-02
 
@@ -1060,19 +1060,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: elon-musk
+    - id: 69vftmr1jg
       type: person
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
-    - id: interpretability
+    - id: 73qTEkYyWA
       type: safety-agenda
-    - id: prediction-markets
+    - id: l8ZPtVJdsA
       type: concept
   lastUpdated: 2026-03
 
@@ -1095,11 +1095,11 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: good-judgment
+    - id: Zx7ckq6syw
       type: organization
-    - id: fri
+    - id: KslhqGaeJw
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
   lastUpdated: 2026-02
 
@@ -1123,15 +1123,15 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: ai-futures-project
+    - id: KDYvrwkgtw
       type: organization
     - id: samotsvety
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: organization
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: lesswrong
+    - id: BEKEqQDmkQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1157,13 +1157,11 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: coefficient-giving
+    - id: ULjDXpSLCI
       type: organization
-    - id: open-philanthropy
-      type: organization
-    - id: jaan-tallinn
+    - id: 6gjF5d3geg
       type: person
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
   lastUpdated: 2026-02
 
@@ -1225,19 +1223,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: cser
+    - id: Qns43S795w
       type: organization
-    - id: sff
+    - id: pvJ50HupEQ
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
   lastUpdated: 2026-03
 - id: leopold-aschenbrenner
@@ -1254,6 +1252,26 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: slava-matyukhin
+  stableId: 9TS0Cj5u5Q
+  wikiId: E1946
+  type: person
+  title: Slava Matyukhin
+  description: >-
+    Software engineer and key Squiggle contributor at QURI. Lead developer
+    of the Squiggle language rewrite (v0.8-0.10) and the Squiggle Hub platform.
+    Also known as berekuk on GitHub. Previously built Kocherga (EA community
+    space management in Moscow) and contributed to LessWrong/ForumMagnum
+    development. Active on Squiggle from 2022 to 2025.
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+    - id: squiggle-hub
+      type: project
+  lastUpdated: 2026-03
+
 - id: nuno-sempere
   stableId: AnFfbQlIog
   wikiId: E579
@@ -1325,11 +1343,11 @@
     estimated $8–9 billion in customer funds. His collapse severely damaged the
     EA community's reputation and disrupted AI safety funding pipelines.
   relatedEntries:
-    - id: ftx
+    - id: yevJm2XDsQ
       type: organization
-    - id: ftx-future-fund
+    - id: JhIGCaI3Ng
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
   clusters:
     - ai-safety
@@ -1343,11 +1361,11 @@
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries:
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
-    - id: ftx-future-fund
+    - id: JhIGCaI3Ng
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -1380,13 +1398,13 @@
   title: Will MacAskill
   website: https://www.willmacaskill.com/
   relatedEntries:
-    - id: giving-what-we-can
+    - id: aKZsmUeuWg
       type: organization
-    - id: cea
+    - id: gNsqAes7Dw
       type: organization
-    - id: toby-ord
+    - id: 8nmqy7vFiA
       type: person
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   customFields:
     - label: Role
@@ -1425,9 +1443,9 @@
     AI on October 30, 2023, the most comprehensive US government action on AI policy. The EO was revoked by
     President Trump on January 20, 2025.
   relatedEntries:
-    - id: us-executive-order
+    - id: pz3KSt33AA
       type: policy
-    - id: us-aisi
+    - id: fYyAxYlHDQ
       type: organization
   customFields:
     - label: Role
@@ -1821,15 +1839,15 @@
     - governance
     - epistemics
   relatedEntries:
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: metaculus
+    - id: CUBiiyCfOA
       type: project
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: wise-ancestors
+    - id: 518H1VpKLA
       type: organization
   customFields:
     - label: Role
@@ -1876,21 +1894,21 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: far-ai
+    - id: lCiT37k9pA
       type: organization
-    - id: quri
+    - id: Khej79OA8g
       type: organization
-    - id: oliver-sourbut
+    - id: sdM7KbGOGg
       type: person
-    - id: anthony-aguirre
+    - id: dVQzYIAN3A
       type: person
-    - id: max-tegmark
+    - id: 3KjUCZCV8w
       type: person
-    - id: yoshua-bengio
+    - id: nGFBXZeM3d
       type: person
   customFields:
     - label: Role
@@ -1928,15 +1946,15 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: arc-evals
+    - id: myeSKJXTMA
       type: organization
-    - id: far-ai
+    - id: lCiT37k9pA
       type: organization
-    - id: anthropic
+    - id: mK9pX3rQ7n
       type: organization
-    - id: fhi
+    - id: Zmw9nfUYWA
       type: organization
   customFields:
     - label: Role
@@ -1973,13 +1991,13 @@
     - epistemics
     - governance
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: uk-aisi
+    - id: aX0jkoaekQ
       type: organization
-    - id: ben-goldhaber
+    - id: 0tQftJKP4Q
       type: person
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
   customFields:
     - label: Role
@@ -2011,7 +2029,7 @@
   clusters:
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   customFields:
     - label: Role
@@ -2035,11 +2053,11 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: carma
+    - id: Vc6W6S1qMg
       type: organization
-    - id: fli
+    - id: d9sWZtyVwg
       type: organization
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
   customFields:
     - label: Role
@@ -2062,11 +2080,11 @@
   clusters:
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: givewell
+    - id: OwXl35e7bg
       type: organization
   customFields:
     - label: Role
@@ -2091,11 +2109,11 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: future-of-life-foundation
+    - id: 2V63hGITAw
       type: organization
-    - id: ai-for-human-reasoning-fellowship
+    - id: xPfsyJ9s4Q
       type: approach
-    - id: open-philanthropy
+    - id: ULjDXpSLCI
       type: organization
   customFields:
     - label: Role
@@ -2125,9 +2143,9 @@
     - label: Known For
       value: "SB 1047, SB 53, AI safety legislation"
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
   tags:
     - ai-governance
@@ -2151,14 +2169,364 @@
     - label: Known For
       value: "SB 1047 veto, signing 18 AI bills, SB 53"
   relatedEntries:
-    - id: california-sb1047
+    - id: XcGTez1oFw
       type: policy
-    - id: california-sb53
+    - id: UD11PlWtlg
       type: policy
   tags:
     - california
     - governance
     - ai-policy
+
+# Entries below fix garbled/missing person entries on org pages (issue #2602).
+# These stableIds must match exactly what was written to the PG entities table
+# by previous personnel enrichment runs.
+
+- id: josue-estrada
+  stableId: FeHrdAUKpQ
+  type: person
+  title: Josué Estrada
+  description: >-
+    Chief Operating Officer at the Center for AI Safety (CAIS). Previously served
+    as COO at the Chan Zuckerberg Initiative, where he led organizational operations
+    and advised co-founders on strategy. Joined CAIS in 2025 to guide organizational
+    strategy and operations as the nonprofit scales its research, policy, and
+    field-building work.
+  customFields:
+    - label: Role
+      value: Chief Operating Officer
+    - label: Organization
+      value: Center for AI Safety (CAIS)
+  tags:
+    - ai-safety
+
+- id: oliver-zhang
+  stableId: TnHMQ4cMOw
+  type: person
+  title: Oliver Zhang
+  description: >-
+    Co-founder and Managing Director of the Center for AI Safety (CAIS). Co-founded
+    CAIS in 2022 alongside Dan Hendrycks. Also co-founded ML Alignment Theory
+    Scholars (MATS). Oversees organizational operations and strategy at CAIS.
+  customFields:
+    - label: Role
+      value: Co-founder and Managing Director
+    - label: Organization
+      value: Center for AI Safety (CAIS)
+  tags:
+    - ai-safety
+
+- id: mark-nitzberg
+  stableId: 0bmt4zJZVg
+  type: person
+  title: Mark Nitzberg
+  description: >-
+    Executive Director of the Center for Human-Compatible AI (CHAI) at UC Berkeley.
+    Oversees CHAI's operations under the direction of founder Stuart Russell. CHAI
+    is the leading academic research center for human-compatible AI, developing
+    frameworks for AI systems that remain beneficial and deferential to humans.
+  customFields:
+    - label: Role
+      value: Executive Director
+    - label: Organization
+      value: Center for Human-Compatible AI (CHAI)
+  tags:
+    - ai-safety
+
+- id: mark-brakel
+  stableId: KG46JUejyg
+  type: person
+  title: Mark Brakel
+  description: >-
+    Global Director of Policy at the Future of Life Institute (FLI). Leads FLI's
+    advocacy and policy efforts globally, including the organization's engagement
+    with the EU AI Act and international AI governance initiatives. Previously led
+    FLI's response to the AI pause letter and government relations work.
+  website: https://futureoflife.org/person/mark-brakel/
+  customFields:
+    - label: Role
+      value: Global Director of Policy
+    - label: Organization
+      value: Future of Life Institute
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: emilia-javorsky
+  stableId: XvvppfgBPw
+  type: person
+  title: Emilia Javorsky
+  description: >-
+    Director of the Futures Program at the Future of Life Institute (FLI). A
+    scientist and inventor with extensive experience in biomedical research and
+    technology development. Leads FLI's work on guiding humanity toward beneficial
+    outcomes from transformative technologies. Represented FLI at the Vienna
+    Autonomous Weapons Conference in 2025.
+  website: https://futureoflife.org/
+  customFields:
+    - label: Role
+      value: Director, Futures Program
+    - label: Organization
+      value: Future of Life Institute
+  tags:
+    - ai-safety
+    - ai-governance
+
+- id: margrethe-vestager
+  stableId: LSLuPzY3vQ
+  type: person
+  title: Margrethe Vestager
+  description: >-
+    Executive Vice-President of the European Commission for A Europe Fit for the
+    Digital Age and EU Commissioner for Competition (2019–2024). Led EU competition
+    policy and antitrust enforcement against major tech companies. The EU AI Act
+    was primarily driven by Internal Market Commissioner Thierry Breton and MEPs
+    Dragos Tudorache and Brando Benifei; Vestager's role was in broader digital
+    and competition policy rather than leading the AI Act itself. Collaborated
+    with the US on developing a voluntary AI Code of Conduct in 2023.
+  customFields:
+    - label: Role
+      value: Executive Vice-President, European Commission (2019–2024)
+    - label: Known For
+      value: EU competition policy, tech antitrust enforcement, EU digital policy
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: julia-wise
+  stableId: OsJT0ukTmw
+  type: person
+  title: Julia Wise
+  description: >-
+    Manager of the Community Health team at the Centre for Effective Altruism (CEA),
+    where she has worked since 2015 as CEA's longest-serving employee. Serves as a
+    community liaison and contact person for problems or concerns in the EA community.
+    Work includes improving community members' access to mental health services and
+    handling welfare issues. Previously president of Giving What We Can (2017-2020).
+    Studied sociology at Bryn Mawr College and worked as a social worker before CEA.
+  customFields:
+    - label: Role
+      value: Community Health Lead
+    - label: Organization
+      value: Centre for Effective Altruism
+  tags:
+    - effective-altruism
+
+- id: zach-robinson
+  stableId: VBDv1fiH9g
+  type: person
+  title: Zach Robinson
+  description: >-
+    CEO of the Centre for Effective Altruism (CEA), appointed in February 2024.
+    Selected through a search process that considered hundreds of internal and
+    external candidates. Previously served as Chief of Staff at Coefficient Giving
+    (formerly Open Philanthropy). Leads CEA's work on EA community building, EA
+    Global conferences, the EA Forum, and the spinout from Effective Ventures.
+  customFields:
+    - label: Role
+      value: CEO
+    - label: Organization
+      value: Centre for Effective Altruism
+  tags:
+    - effective-altruism
+
+- id: huw-price
+  stableId: T6SowQJJbg
+  type: person
+  title: Huw Price
+  description: >-
+    Co-founder of the Centre for the Study of Existential Risk (CSER) at the
+    University of Cambridge, established in 2012 alongside Martin Rees and Jaan
+    Tallinn. Bertrand Russell Professor of Philosophy at Cambridge. Previously ARC
+    Federation Fellow and Challis Professor of Philosophy at the University of
+    Sydney (2002-2012). Also served as Academic Director of the Leverhulme Centre
+    for the Future of Intelligence.
+  customFields:
+    - label: Role
+      value: Co-founder
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - existential-risk
+
+- id: martin-rees
+  stableId: WlwcDX4nYA
+  type: person
+  title: Martin Rees
+  description: >-
+    Co-founder of the Centre for the Study of Existential Risk (CSER) at the
+    University of Cambridge, established in 2012. Astronomer Royal and Emeritus
+    Professor of Cosmology and Astrophysics at Cambridge. Former President of the
+    Royal Society. Co-organized workshops with the Vatican that influenced the 2015
+    Papal Encyclical on Climate Change. A prominent voice on existential risk from
+    advanced technology and climate change.
+  customFields:
+    - label: Role
+      value: Co-founder
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - existential-risk
+
+- id: sean-o-heigeartaigh
+  stableId: YsjgB5Gy0g
+  type: person
+  title: Seán Ó hÉigeartaigh
+  description: >-
+    Founding Executive Director of the Centre for the Study of Existential Risk
+    (CSER) at the University of Cambridge, leading CSER from its establishment in
+    2013 through 2020. Led the development of CSER from concept to physical centre,
+    securing funding and recruiting the research team. Currently Director of the
+    AI: Futures and Responsibility Programme, a joint initiative of CSER and the
+    Centre for the Future of Intelligence (CFI), focusing on foresight and
+    governance of frontier AI and geopolitical implications of advanced AI.
+  website: https://www.cser.ac.uk/team/sean-o-heigeartaigh/
+  customFields:
+    - label: Role
+      value: Founding Executive Director
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - ai-governance
+    - existential-risk
+
+- id: jacob-hilton
+  stableId: KKCwTYU4Zw
+  type: person
+  title: Jacob Hilton
+  description: >-
+    President and researcher at the Alignment Research Center (ARC). One of three
+    permanent researchers at ARC Theory (along with Paul Christiano and Mark Xu)
+    following the spin-out of ARC Evals as METR in December 2023. Sits on ARC's
+    board alongside Buck Shlegeris and Ben Hoskin. ARC focuses on theoretical
+    alignment research, including heuristic arguments for understanding neural
+    network behavior.
+  customFields:
+    - label: Role
+      value: President and Researcher
+    - label: Organization
+      value: Alignment Research Center (ARC)
+  tags:
+    - ai-safety
+    - alignment
+
+- id: jaime-sevilla
+  stableId: G7Hg6qBW6A
+  type: person
+  title: Jaime Sevilla
+  description: >-
+    Founder and Director of Epoch AI, a research institute tracking AI development
+    trends through comprehensive databases on training compute, model parameters,
+    and hardware capabilities. Founded Epoch in April 2022 after pausing his PhD
+    to systematically document inputs of significant AI models. Epoch's research
+    has directly informed the EU AI Act's compute threshold and US Executive Order
+    14110. The New York Times praised Epoch's work for bringing "rigorous empiricism
+    to an industry that often runs on hype and vibes."
+  website: https://epoch.ai/
+  customFields:
+    - label: Role
+      value: Founder and Director
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+    - epistemics
+
+- id: maria-de-la-lama
+  stableId: BoXCNeZK3w
+  type: person
+  title: María de la Lama Laviada
+  description: >-
+    Head of Operations at Epoch AI, based in London. Previously served as
+    Operations Coordinator at Epoch (2022-2023) and Special Projects Coordinator
+    at Rethink Priorities (2023-2024). Holds an MSc in Philosophy of the Social
+    Sciences from the London School of Economics and Political Science (2021-2022).
+    Manages operational functions as Epoch AI scaled to ~34 employees.
+  customFields:
+    - label: Role
+      value: Head of Operations
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+
+- id: yafah-edelman
+  stableId: ZrowXa4u4w
+  type: person
+  title: Yafah Edelman
+  description: >-
+    Head of Data & Trends at Epoch AI. Works closely with researchers to develop,
+    pitch, execute on, and deliver new research projects. Part of the team
+    maintaining Epoch's comprehensive databases tracking over 3,200 ML models from
+    1950 to present, enabling quantitative analysis of AI progress and development
+    trajectories.
+  customFields:
+    - label: Role
+      value: Head of Data & Trends
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+    - epistemics
+
+- id: avital-balwit
+  stableId: LWYBcu2iSQ
+  type: person
+  title: Avital Balwit
+  description: >-
+    Former member of the FTX Future Fund team. Graduated from the University of
+    Virginia with highest honors in Political and Social Thought. Joined the FTX
+    Future Fund full time in June 2022, becoming part of the team under Nick
+    Beckstead's leadership. Was one of five Future Fund officials who resigned on
+    November 10, 2022, following the FTX bankruptcy collapse, citing fundamental
+    questions about the legitimacy of the business operations funding the foundation.
+  customFields:
+    - label: Role
+      value: Team Member (2022)
+    - label: Organization
+      value: FTX Future Fund
+  tags:
+    - effective-altruism
+
+- id: ketan-ramakrishnan
+  stableId: Ma5lO6r5Fw
+  type: person
+  title: Ketan Ramakrishnan
+  description: >-
+    Former member of the FTX Future Fund team. Was one of five Future Fund
+    officials who resigned on November 10, 2022, following the FTX bankruptcy
+    collapse, signing the resignation statement alongside Nick Beckstead, Leopold
+    Aschenbrenner, Avital Balwit, and Will MacAskill. The team stated they had
+    been unaware of any wrongdoing and had believed they were doing good work
+    with legitimately earned funds.
+  customFields:
+    - label: Role
+      value: Team Member (2022)
+    - label: Organization
+      value: FTX Future Fund
+  tags:
+    - effective-altruism
+
+- id: caroline-ellison
+  stableId: U7QD93Xjug
+  type: person
+  title: Caroline Ellison
+  description: >-
+    Former CEO of Alameda Research, the crypto trading firm closely tied to FTX.
+    Alameda's commingling of customer funds with FTX was central to FTX's collapse
+    in November 2022. Pleaded guilty to fraud charges and cooperated with federal
+    prosecutors, providing key testimony against Sam Bankman-Fried in his trial.
+    Sentenced to two years in prison in September 2024.
+  customFields:
+    - label: Role
+      value: Former CEO, Alameda Research
+    - label: Known For
+      value: FTX collapse, Alameda Research
+  tags:
+    - effective-altruism
 
 - id: greg-brockman
   stableId: Yq4s2cI7ng
@@ -2172,6 +2540,70 @@
       value: Co-founder & President
     - label: Known For
       value: Co-founding OpenAI, Former CTO of Stripe
+  tags:
+    - ai
+
+# Entries below were created by personnel enrichment tasks. They are added here
+# explicitly so that the YAML sync keeps them with correct titles and prunes
+# the stale/garbled duplicates (askell-amanda, bowman-samuel-r, andrew-y-ng,
+# andreas-stuhlm-ller, alex-kaskasoli, ben-weinstein-raun, buck).
+
+- id: amanda-askell
+  stableId: 2qcak72NwQ
+  type: person
+  title: Amanda Askell
+  description: AI safety researcher at Anthropic, known for work on language model alignment and sycophancy.
+  customFields:
+    - label: Role
+      value: Researcher
+  tags:
+    - ai
+
+- id: samuel-r-bowman
+  stableId: DikTuUb39Q
+  type: person
+  title: Samuel R. Bowman
+  description: AI safety researcher and NLP professor, known for work on language model evaluation and safety.
+  customFields:
+    - label: Role
+      value: Professor and Researcher
+  tags:
+    - ai
+
+- id: alexandre-kaskasoli
+  stableId: KnHneaUKew
+  type: person
+  title: Alexandre Kaskasoli
+  description: AI safety researcher known for work on dangerous capability evaluations of frontier models.
+  customFields:
+    - label: Role
+      value: Researcher
+  tags:
+    - ai
+
+- id: benjamin-weinstein-raun
+  stableId: eg18B7rL4g
+  type: person
+  title: Benjamin Weinstein-Raun
+  description: Senior Researcher and acting director at Palisade Research, focused on AI safety.
+  customFields:
+    - label: Role
+      value: Senior Researcher
+  tags:
+    - ai
+
+- id: andreas-stuhlmuller
+  stableId: SqupPjf6AJ
+  type: person
+  title: Andreas Stuhlmüller
+  description: >-
+    Co-founder of Elicit (formerly Ought), an AI research tool focused on
+    language model assistance for research tasks. Pioneer in using ML to
+    assist human reasoning and decision-making.
+  website: https://elicit.com
+  customFields:
+    - label: Role
+      value: Co-founder, Elicit
   tags:
     - ai
 

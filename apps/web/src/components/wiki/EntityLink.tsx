@@ -1,9 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { getEntityById, getEntityHref, getPageById, getDirectoryHref } from "@data";
+import { getTypedEntityById, getEntityHref, getPageById, getDirectoryHref } from "@data";
 import { getEntityTypeIcon } from "./EntityTypeIcon";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 interface EntityLinkProps {
   id: string;
@@ -45,22 +46,22 @@ export function EntityLink({
   className = "",
   external = false,
 }: EntityLinkProps) {
-  const entity = getEntityById(id);
+  const entity = getTypedEntityById(id);
   const page = getPageById(id);
 
-  const href = getEntityHref(id, entity?.type);
+  const href = getEntityHref(id, entity?.entityType);
   // Check if a reachable page exists (either a directory page or a wiki page with MDX content)
   const hasReachablePage = !!getDirectoryHref(id) || !!page;
 
   const displayLabel = children || label || entity?.title || formatIdAsTitle(id);
-  const IconComponent = showIcon && entity ? getEntityTypeIcon(entity.type) : null;
+  const IconComponent = showIcon && entity ? getEntityTypeIcon(entity.entityType) : null;
   const externalProps = external
     ? { target: "_blank" as const, rel: "noopener noreferrer" }
     : {};
 
   const summary = page?.summary || page?.description || entity?.description;
-  const entityType = entity?.type;
-  const TypeIconComponent = entity ? getEntityTypeIcon(entity.type) : null;
+  const entityType = entity?.entityType;
+  const TypeIconComponent = entity ? getEntityTypeIcon(entity.entityType) : null;
 
   // If no reachable page exists, render as plain styled text (no link)
   if (!hasReachablePage) {
@@ -112,7 +113,7 @@ export function EntityLink({
           </span>
           {summary && (
             <span className="block text-muted-foreground text-[0.8rem] leading-snug">
-              {truncateText(summary, 200)}
+              {truncateText(stripMdxEscapes(summary), 200)}
             </span>
           )}
           {page?.quality && (

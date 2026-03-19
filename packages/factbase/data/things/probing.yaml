@@ -1,9 +1,4 @@
-thing:
-  id: probing
-  stableId: iEJPJoRsOQ
-  type: approach
-  name: Probing / Linear Probes
-  wikiId: E596
+entity: iEJPJoRsOQ
 facts:
   - id: f_9hXt00YmPA
     property: description

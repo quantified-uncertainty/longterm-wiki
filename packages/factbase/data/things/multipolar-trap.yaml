@@ -1,9 +1,4 @@
-thing:
-  id: multipolar-trap
-  stableId: FAvAr2lvzg
-  type: risk
-  name: Multipolar Trap (AI Development)
-  wikiId: E209
+entity: FAvAr2lvzg
 facts:
   - id: f_iCxLlqxUZw
     property: description

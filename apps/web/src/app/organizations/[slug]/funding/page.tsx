@@ -1,9 +1,7 @@
 import { permanentRedirect } from "next/navigation";
-import { getOrgSlugs } from "@/app/organizations/org-utils";
 
-export function generateStaticParams() {
-  return getOrgSlugs().map((slug) => ({ slug }));
-}
+// Dynamic rendering — this page only redirects, no need to pre-render 256 pages.
+export const dynamic = "force-dynamic";
 
 /**
  * The /organizations/[slug]/funding subpage is now handled by the Funding tab

@@ -1,9 +1,4 @@
-thing:
-  id: open-philanthropy
-  stableId: NifCYhN75w
-  type: organization
-  name: Open Philanthropy
-  wikiId: E552
+entity: NifCYhN75w
 facts:
   - id: f_n7p8kOo2Tw
     property: description

@@ -1,10 +1,4 @@
-thing:
-  id: rohin-shah
-  stableId: GAlcP90tvw
-  type: person
-  name: "Rohin Shah"
-  wikiId: "E1297"
-
+entity: GAlcP90tvw
 facts:
   - id: f_cvli2jAbQg
     property: role

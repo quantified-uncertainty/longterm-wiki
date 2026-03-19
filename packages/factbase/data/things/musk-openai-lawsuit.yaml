@@ -1,9 +1,4 @@
-thing:
-  id: musk-openai-lawsuit
-  stableId: RQsF3N9BQA
-  type: event
-  name: Musk v. OpenAI Lawsuit
-  wikiId: E408
+entity: RQsF3N9BQA
 facts:
   - id: f_F0wQ8h3QbA
     property: description

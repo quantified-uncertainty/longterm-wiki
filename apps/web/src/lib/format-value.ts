@@ -66,6 +66,14 @@ export function formatValue(n: number | null | undefined, unit?: string | null, 
     return n.toLocaleString("en-US");
   }
   // Fallback for unknown/missing units
+  // Use scientific notation for extremely large numbers (>= 1e15) where
+  // "trillion" labels produce unreadable results like "100000000000000 trillion"
+  if (Math.abs(n) >= 1e15) {
+    const exp = Math.floor(Math.log10(Math.abs(n)));
+    const mantissa = n / Math.pow(10, exp);
+    const mantissaStr = Math.abs(mantissa - 1) < 0.01 ? "" : `${cleanDecimal(mantissa)} × `;
+    return `${mantissaStr}10^${exp}`;
+  }
   if (Math.abs(n) >= 1e12) return `${cleanDecimal(n / 1e12)} trillion`;
   if (Math.abs(n) >= 1e9) return `${cleanDecimal(n / 1e9)} billion`;
   if (Math.abs(n) >= 1e6) return `${cleanDecimal(n / 1e6)} million`;

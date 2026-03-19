@@ -1,10 +1,4 @@
-thing:
-  id: andrew-ng
-  stableId: v13BF4zP2A
-  type: person
-  name: "Andrew Ng"
-  wikiId: "E1307"
-
+entity: v13BF4zP2A
 facts:
   - id: f_JQBegHV9Yg
     property: role

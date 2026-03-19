@@ -1,9 +1,4 @@
-thing:
-  id: california-sb1047
-  stableId: XcGTez1oFw
-  type: policy
-  name: Safe and Secure Innovation for Frontier Artificial Intelligence Models Act
-  wikiId: E48
+entity: XcGTez1oFw
 facts:
   - id: f_fIOdg7UWQA
     property: description

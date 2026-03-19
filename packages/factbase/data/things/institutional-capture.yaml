@@ -1,9 +1,4 @@
-thing:
-  id: institutional-capture
-  stableId: IqKOqHEKag
-  type: risk
-  name: AI-Driven Institutional Decision Capture
-  wikiId: E166
+entity: IqKOqHEKag
 facts:
   - id: f_WJGHH0UZmA
     property: description
