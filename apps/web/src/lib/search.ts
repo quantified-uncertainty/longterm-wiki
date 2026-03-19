@@ -110,18 +110,24 @@ export interface ThingSearchResult {
   title: string;
   description: string | null;
   parentTitle: string | null;
+  parentThingId: string | null;
   sourceTable: string;
   sourceId: string;
   entityType: string | null;
+  sourceUrl: string | null;
   wikiId: string | null;
   href: string | null;
+  verdict: string | null;
+  verdictConfidence: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 interface ThingsSearchResponse {
   results: Array<ThingSearchResult>;
   query: string;
   total: number;
-  searchMethod: "fts" | "ilike";
+  searchMethod: "fts" | "ilike" | "none";
 }
 
 /**
@@ -142,7 +148,7 @@ async function searchThingsServer(
 
     const url = `/api/things-search?${params}`;
     const res = await fetch(url, {
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(3500),
     });
 
     if (!res.ok) return null;

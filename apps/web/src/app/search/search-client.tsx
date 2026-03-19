@@ -153,6 +153,9 @@ export function SearchPageClient() {
   useEffect(() => {
     if (initialQuery) performSearch(initialQuery);
     inputRef.current?.focus();
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── URL sync ───────────────────────────────────────────────────────
@@ -223,8 +226,11 @@ export function SearchPageClient() {
       setSelected((s) => Math.min(s + 1, filtered.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelected((s) => Math.max(s - 1, -1));
-      if (selected <= 0) inputRef.current?.focus();
+      setSelected((s) => {
+        const next = Math.max(s - 1, -1);
+        if (next === -1) inputRef.current?.focus();
+        return next;
+      });
     } else if (e.key === "Enter" && selected >= 0 && filtered[selected]?.href) {
       e.preventDefault();
       const r = filtered[selected];
@@ -524,13 +530,14 @@ function Highlight({ text, query }: { text: string; query: string }) {
   const escaped = terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
   if (!escaped) return <>{text}</>;
 
+  // Split with a capturing group puts matches at odd indices (1, 3, 5, ...)
   const regex = new RegExp(`(${escaped})`, "gi");
   const parts = text.split(regex);
 
   return (
     <>
       {parts.map((part, i) =>
-        regex.test(part) ? (
+        i % 2 === 1 ? (
           <mark key={i} className="bg-yellow-200/50 dark:bg-yellow-500/20 rounded-sm text-inherit">
             {part}
           </mark>

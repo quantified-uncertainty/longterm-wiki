@@ -193,8 +193,11 @@ export function SearchDialog() {
     [router],
   );
 
+  /** Only show things when no entity-type filter is active (filter = "All"). */
+  const visibleThings = hasTypeFilter ? [] : thingResults;
+
   /** Total navigable items (wiki + things) for keyboard nav. */
-  const totalItems = results.length + thingResults.length;
+  const totalItems = results.length + visibleThings.length;
 
   // Scroll selected item into view
   useEffect(() => {
@@ -222,7 +225,8 @@ export function SearchDialog() {
         navigate(results[selected]);
       } else {
         const thingIdx = selected - results.length;
-        if (thingResults[thingIdx]) navigateThing(thingResults[thingIdx]);
+        const thing = visibleThings[thingIdx];
+        if (thing?.href) navigateThing(thing);
       }
     }
   }
@@ -230,7 +234,7 @@ export function SearchDialog() {
   if (!open) return null;
 
   const showChips = allResults.length > 0;
-  const showResults = results.length > 0 || thingResults.length > 0;
+  const showResults = results.length > 0 || visibleThings.length > 0;
 
   return (
     <div
@@ -319,7 +323,7 @@ export function SearchDialog() {
             !pendingQuery &&
             query.trim() &&
             allResults.length === 0 &&
-            thingResults.length === 0 && (
+            visibleThings.length === 0 && (
               <div className="px-4 py-6 text-sm text-muted-foreground text-center">
                 No results for &ldquo;{query}&rdquo;
               </div>
@@ -357,12 +361,12 @@ export function SearchDialog() {
                   </button>
                 </li>
               ))}
-              {thingResults.length > 0 && results.length > 0 && (
+              {visibleThings.length > 0 && results.length > 0 && (
                 <li className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">
                   Data Records
                 </li>
               )}
-              {thingResults.map((t, i) => {
+              {visibleThings.map((t, i) => {
                 const idx = results.length + i;
                 return (
                   <li key={`thing-${t.id}`} role="option" aria-selected={idx === selected}>
