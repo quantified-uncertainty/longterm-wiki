@@ -345,29 +345,34 @@ export async function runCheck(
           );
         }
       }
+    }
+  }
 
-      if (fixMode) {
+  // Prune logic runs regardless of ciMode — fix mode should always attempt pruning.
+  if (fixMode && orphans.length > 0) {
+    if (!ciMode) {
+      console.log(
+        `\n${colors.cyan}  Pruning orphan entities...${colors.reset}`,
+      );
+    }
+    const pruned = await pruneOrphans(orphans, yamlIds, pgEntities);
+    result.pruned = pruned;
+
+    if (!ciMode) {
+      if (pruned.deleted > 0) {
         console.log(
-          `\n${colors.cyan}  Pruning orphan entities...${colors.reset}`,
+          `\n${colors.green}  Pruned ${pruned.deleted} orphan entities${colors.reset}`,
         );
-        const pruned = await pruneOrphans(orphans, yamlIds, pgEntities);
-        result.pruned = pruned;
-
-        if (pruned.deleted > 0) {
-          console.log(
-            `\n${colors.green}  Pruned ${pruned.deleted} orphan entities${colors.reset}`,
-          );
-        } else {
-          console.log(
-            `\n${colors.yellow}  No entities were pruned (check warnings above)${colors.reset}`,
-          );
-        }
       } else {
         console.log(
-          `\n${colors.dim}  Run with --fix to prune orphan entities from PG${colors.reset}`,
+          `\n${colors.yellow}  No entities were pruned (check warnings above)${colors.reset}`,
         );
       }
     }
+  } else if (!fixMode && orphans.length > 0 && !ciMode) {
+    console.log(
+      `\n${colors.dim}  Run with --fix to prune orphan entities from PG${colors.reset}`,
+    );
   }
 
   const hasOrphans = orphans.length > 0 && !fixMode;
