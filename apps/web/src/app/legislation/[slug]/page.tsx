@@ -249,10 +249,10 @@ export default async function LegislationDetailPage({
       {timelineEvents.length > 0 && (
         <section>
           <h2 className="text-lg font-bold mb-4">Legislative Timeline</h2>
-          <div className="relative pl-6 border-l-2 border-border space-y-4">
+          <div className="relative pl-4 border-l-2 border-border space-y-1.5">
             {timelineEvents.map((event, i) => (
               <div key={i} className="relative">
-                <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
+                <div className={`absolute -left-[17px] w-2 h-2 rounded-full border-2 border-background ${
                   event.label === "Vetoed" ? "bg-red-500"
                     : event.label === "Enacted" || event.label === "Signed" ? "bg-green-500"
                     : event.label === "Introduced" ? "bg-blue-500"
@@ -300,20 +300,20 @@ export default async function LegislationDetailPage({
                     <td className="py-2 px-3 text-right tabular-nums text-green-700 dark:text-green-400">
                       <span className="font-semibold">{vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
                       {(vote.ayesDem != null || vote.ayesRep != null) && (
-                        <div className="text-[10px] text-muted-foreground font-normal">
-                          {vote.ayesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.ayesDem}D</span>}
-                          {vote.ayesDem != null && vote.ayesRep != null && " "}
-                          {vote.ayesRep != null && <span className="text-red-500 dark:text-red-400">{vote.ayesRep}R</span>}
+                        <div className="text-xs font-medium mt-0.5">
+                          {vote.ayesDem != null && <span className="text-blue-700 dark:text-blue-300">{vote.ayesDem}D</span>}
+                          {vote.ayesDem != null && vote.ayesRep != null && <span className="text-muted-foreground/50 mx-0.5">/</span>}
+                          {vote.ayesRep != null && <span className="text-red-600 dark:text-red-300">{vote.ayesRep}R</span>}
                         </div>
                       )}
                     </td>
                     <td className="py-2 px-3 text-right tabular-nums text-red-700 dark:text-red-400">
                       <span className="font-semibold">{vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
                       {(vote.noesDem != null || vote.noesRep != null) && (
-                        <div className="text-[10px] text-muted-foreground font-normal">
-                          {vote.noesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.noesDem}D</span>}
-                          {vote.noesDem != null && vote.noesRep != null && " "}
-                          {vote.noesRep != null && <span className="text-red-500 dark:text-red-400">{vote.noesRep}R</span>}
+                        <div className="text-xs font-medium mt-0.5">
+                          {vote.noesDem != null && <span className="text-blue-700 dark:text-blue-300">{vote.noesDem}D</span>}
+                          {vote.noesDem != null && vote.noesRep != null && <span className="text-muted-foreground/50 mx-0.5">/</span>}
+                          {vote.noesRep != null && <span className="text-red-600 dark:text-red-300">{vote.noesRep}R</span>}
                         </div>
                       )}
                     </td>
@@ -544,10 +544,10 @@ export default async function LegislationDetailPage({
                           )}
                         </div>
                         {stakeholder.context && stakeholder.context.length > 0 && (
-                          <ul className="mt-1.5 space-y-0.5 text-[11px] text-muted-foreground/70 list-none pl-0">
-                            {stakeholder.context.map((note, j) => (
-                              <li key={j} className="leading-relaxed">
-                                <span className="text-muted-foreground/40 mr-1">→</span>
+                          <ul className="mt-1 space-y-0 text-[10px] text-muted-foreground/60 list-none pl-0 max-h-[2.5rem] overflow-hidden">
+                            {stakeholder.context.slice(0, 2).map((note, j) => (
+                              <li key={j} className="leading-tight truncate">
+                                <span className="text-muted-foreground/30 mr-0.5 text-[9px]">-</span>
                                 {note}
                               </li>
                             ))}
@@ -577,10 +577,10 @@ export default async function LegislationDetailPage({
           {entity.amendments.length > 0 && (
             <section>
               <h2 className="text-lg font-bold mb-4">Amendment History</h2>
-              <div className="relative pl-6 border-l-2 border-border/60 space-y-4">
+              <div className="relative pl-4 border-l-2 border-border/60 space-y-2">
                 {entity.amendments.map((amendment, i) => (
                   <div key={i} className="relative">
-                    <div className="absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background bg-amber-500" />
+                    <div className="absolute -left-[17px] w-2 h-2 rounded-full border-2 border-background bg-amber-500" />
                     <div>
                       <div className="flex items-baseline gap-2 mb-0.5">
                         {amendment.url ? (
