@@ -619,6 +619,8 @@ export const resources = pgTable(
     lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
     /** Wayback Machine archive URL for this resource */
     archiveUrl: text("archive_url"),
+    /** Stance for legislation coverage: support, oppose, neutral, mixed, analysis */
+    stance: text("stance"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })

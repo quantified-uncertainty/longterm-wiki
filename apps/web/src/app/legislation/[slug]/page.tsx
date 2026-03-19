@@ -34,6 +34,7 @@ import {
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
+import { ResourceTimeline, parseDisplayDateToISO, type TimelineEvent, type TimelineResource } from "./resource-timeline";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -521,6 +522,7 @@ export default async function LegislationDetailPage({
       summary: r.summary ?? null,
       fetchStatus: r.fetch_status ?? null,
       archiveUrl: r.archive_url ?? null,
+      stance: r.stance ?? null,
     });
   }
 
@@ -591,6 +593,29 @@ export default async function LegislationDetailPage({
   const analysisResources = pressResources.filter((r) => categorizeResource(r) === "analysis");
   const pressCoverage = pressResources.filter((r) => categorizeResource(r) === "press");
 
+  // Build timeline data for the Coverage tab
+  const timelineEventsForTimeline: TimelineEvent[] = timelineEvents
+    .map((e) => {
+      const sortDate = parseDisplayDateToISO(e.value);
+      return sortDate
+        ? { label: e.label, date: e.value, sortDate, type: "event" as const }
+        : null;
+    })
+    .filter((e): e is TimelineEvent => e !== null);
+
+  const timelineResourceItems: TimelineResource[] = pressResources
+    .filter((r) => r.publishedDate)
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      url: r.url,
+      domain: r.domain,
+      publishedDate: r.publishedDate!,
+      type: "resource" as const,
+      resourceType: r.type,
+      category: categorizeResource(r),
+    }));
+
   if (pressResources.length > 0) {
     tabs.push({
       id: "press",
@@ -598,6 +623,14 @@ export default async function LegislationDetailPage({
       count: pressResources.length,
       content: (
         <div className="space-y-8">
+          {/* Timeline view */}
+          {(timelineEventsForTimeline.length > 0 || timelineResourceItems.length > 0) && (
+            <ResourceTimeline
+              events={timelineEventsForTimeline}
+              resources={timelineResourceItems}
+            />
+          )}
+
           {officialDocs.length > 0 && (
             <OrgResourcesSection
               resources={officialDocs}

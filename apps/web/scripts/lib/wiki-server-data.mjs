@@ -1019,6 +1019,7 @@ export async function fetchResourcesFromPG() {
           fetch_status: r.fetchStatus ?? undefined,
           archive_url: r.archiveUrl ?? undefined,
           author_entity_ids: r.authorEntityIds ?? undefined,
+          stance: r.stance ?? undefined,
         });
       }
 

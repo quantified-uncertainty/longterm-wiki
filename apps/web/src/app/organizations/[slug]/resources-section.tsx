@@ -47,21 +47,31 @@ function computeColumnVisibility(
   const withDate = resources.filter((r) => r.publishedDate).length;
   const withPub = resources.filter((r) => r.publicationName).length;
   const withCred = resources.filter((r) => r.credibility != null).length;
+  const withStance = resources.filter((r) => r.stance).length;
   const showPublication = alwaysShow?.publication || withPub / total >= 0.15;
-  // Always show source (domain) column — it's useful context even when publication is shown
   return {
     showDate: alwaysShow?.date || withDate / total >= 0.2,
     showPublication,
     showCredibility: alwaysShow?.credibility || withCred / total >= 0.15,
     showSource: !showPublication,
+    showStance: withStance > 0,
   };
 }
+
+const STANCE_COLORS: Record<string, string> = {
+  support: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+  oppose: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+  neutral: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  mixed: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  analysis: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+};
 
 function makeColumns(opts: {
   showDate: boolean;
   showPublication: boolean;
   showCredibility: boolean;
   showSource: boolean;
+  showStance: boolean;
 }): ColumnDef<OrgResourceRow>[] {
   const cols: ColumnDef<OrgResourceRow>[] = [
     {
@@ -136,6 +146,26 @@ function makeColumns(opts: {
       },
     },
   ];
+
+  if (opts.showStance) {
+    cols.push({
+      accessorKey: "stance",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Stance</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const s = row.original.stance;
+        if (!s) return <span className="text-muted-foreground/40 text-xs">-</span>;
+        const color = STANCE_COLORS[s] || DEFAULT_COLOR;
+        return (
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium whitespace-nowrap capitalize ${color}`}>
+            {s}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    });
+  }
 
   if (opts.showSource) {
     cols.push({

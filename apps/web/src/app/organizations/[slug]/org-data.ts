@@ -523,6 +523,7 @@ export interface OrgResourceRow {
   summary: string | null;
   fetchStatus: string | null;
   archiveUrl: string | null;
+  stance: string | null;
 }
 
 // extractDomain is imported from @/lib/resource-types
@@ -778,6 +779,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     summary: r.summary ?? null,
     fetchStatus: r.fetch_status ?? null,
     archiveUrl: r.archive_url ?? null,
+    stance: r.stance ?? null,
   };
 }
 
