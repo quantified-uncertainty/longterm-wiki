@@ -31,11 +31,11 @@ export const SAFETY_LEVEL_COLORS: Record<string, string> = {
 
 /**
  * Format a context window token count for display.
- * Values < 10,000 are shown as plain numbers with commas (e.g., "4,096").
- * Values >= 10,000 are shown with K/M suffix (e.g., "128K", "1M").
+ * Values < 1,000 are shown as plain numbers (e.g., "512").
+ * Values >= 1,000 are shown with K/M suffix (e.g., "8K", "128K", "1M").
  */
 export function formatContext(tokens: number): string {
   if (tokens >= 1_000_000) return `${Math.floor(tokens / 1_000_000)}M`;
-  if (tokens >= 10_000) return `${Math.floor(tokens / 1_000)}K`;
+  if (tokens >= 1_000) return `${Math.floor(tokens / 1_000)}K`;
   return tokens.toLocaleString("en-US");
 }
