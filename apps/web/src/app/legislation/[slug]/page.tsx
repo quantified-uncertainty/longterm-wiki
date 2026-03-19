@@ -269,8 +269,8 @@ export default async function LegislationDetailPage({
       {/* Votes */}
       {entity.votes.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Voting Record</h2>
-          <div className="rounded-xl border border-border overflow-hidden">
+          <h2 className="text-lg font-bold mb-3">Voting Record</h2>
+          <div className="rounded-xl border border-border overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
@@ -326,7 +326,7 @@ export default async function LegislationDetailPage({
       {/* Veto Reason */}
       {entity.vetoReason && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Veto Rationale</h2>
+          <h2 className="text-lg font-bold mb-3">Veto Rationale</h2>
           <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-4">
             <p className="text-sm leading-relaxed">{entity.vetoReason}</p>
           </div>
@@ -336,7 +336,7 @@ export default async function LegislationDetailPage({
       {/* Related Legislation */}
       {relatedPolicies.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Related Legislation</h2>
+          <h2 className="text-lg font-bold mb-3">Related Legislation</h2>
           <div className="rounded-xl border border-border overflow-hidden">
             <table className="w-full text-sm">
               <thead>
@@ -376,7 +376,7 @@ export default async function LegislationDetailPage({
       {/* Related Topics + Wiki Pages */}
       {relatedEntities.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Related Topics</h2>
+          <h2 className="text-lg font-bold mb-3">Related Topics</h2>
           <div className="flex flex-wrap gap-2">
             {relatedEntities.map((ref) => (
               <Link key={ref.href} href={ref.href} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 bg-card hover:bg-muted/50 text-sm transition-colors">
@@ -412,7 +412,7 @@ export default async function LegislationDetailPage({
                 {provisions.map((provision, i) => (
                   <div key={i} className="rounded-lg border border-border/60 bg-card p-3">
                     <div className="font-semibold text-sm mb-1">{provision.title}</div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{provision.description}</p>
+                    <p className="text-sm text-foreground/70 leading-relaxed">{provision.description}</p>
                   </div>
                 ))}
               </div>
@@ -497,8 +497,8 @@ export default async function LegislationDetailPage({
               {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
             </div>
           </div>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-xl border border-border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
                   <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
