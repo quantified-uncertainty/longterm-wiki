@@ -2,8 +2,8 @@
  * CLI: Fetch EA Forum / LessWrong posts for an author and create resources.
  *
  * Usage:
- *   pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri
- *   pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri --apply
+ *   WIKI_SERVER_ENV=prod pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri
+ *   WIKI_SERVER_ENV=prod pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri --apply
  */
 
 import 'dotenv/config';
@@ -51,6 +51,11 @@ async function main() {
   if (!apply) {
     console.log(`\n  Run with --apply to create ${posts.length} resources.`);
     return;
+  }
+
+  if (process.env.WIKI_SERVER_ENV !== 'prod') {
+    console.error('Error: --apply requires WIKI_SERVER_ENV=prod to prevent accidental writes to non-production.');
+    process.exit(1);
   }
 
   const { apiRequest } = await import('../lib/wiki-server/client.ts');

@@ -38,11 +38,15 @@ export const LESSWRONG: Forum = {
 export const ALL_FORUMS: Forum[] = [EA_FORUM, LESSWRONG];
 
 /** Execute a GraphQL query against a forum API. Throws on HTTP or GraphQL errors. */
-export async function forumGraphql(forumUrl: string, query: string): Promise<unknown> {
+export async function forumGraphql(
+  forumUrl: string,
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<unknown> {
   const resp = await fetch(forumUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, variables }),
   });
   if (!resp.ok) throw new Error(`GraphQL HTTP error: ${resp.status}`);
   const body = await resp.json() as { errors?: { message?: string }[] };
@@ -56,11 +60,11 @@ export async function forumGraphql(forumUrl: string, query: string): Promise<unk
 
 /** Look up a user's internal ID by their slug. Returns null if not found. */
 export async function getUserId(forum: Forum, slug: string): Promise<{ id: string; name: string } | null> {
-  const data = await forumGraphql(forum.graphqlUrl, `query {
-    user(input: { selector: { slug: "${slug}" } }) {
+  const data = await forumGraphql(forum.graphqlUrl, `query GetUser($slug: String!) {
+    user(input: { selector: { slug: $slug } }) {
       result { _id displayName slug }
     }
-  }`) as { data?: { user?: { result?: { _id: string; displayName: string } } } };
+  }`, { slug }) as { data?: { user?: { result?: { _id: string; displayName: string } } } };
 
   const user = data?.data?.user?.result;
   if (!user) return null;
@@ -73,12 +77,12 @@ export async function getUserPosts(forum: Forum, userId: string, pageSize = 100)
   let offset = 0;
 
   while (true) {
-    const data = await forumGraphql(forum.graphqlUrl, `query {
+    const data = await forumGraphql(forum.graphqlUrl, `query GetPosts($userId: String!, $limit: Int!, $offset: Int!) {
       posts(input: {
         terms: {
-          userId: "${userId}",
-          limit: ${pageSize},
-          offset: ${offset},
+          userId: $userId,
+          limit: $limit,
+          offset: $offset,
           sortedBy: "top"
         }
       }) {
@@ -89,7 +93,7 @@ export async function getUserPosts(forum: Forum, userId: string, pageSize = 100)
         }
         totalCount
       }
-    }`) as { data?: { posts?: { results?: ForumPost[]; totalCount?: number } } };
+    }`, { userId, limit: pageSize, offset }) as { data?: { posts?: { results?: ForumPost[]; totalCount?: number } } };
 
     const page = data?.data?.posts?.results ?? [];
     const totalCount = data?.data?.posts?.totalCount ?? 0;
@@ -140,12 +144,13 @@ export async function fetchAuthorPosts(
     }
   }
 
-  // Deduplicate by permalink
+  // Deduplicate by permalink, then sort by score descending
   const seen = new Set<string>();
-  return allPosts.filter(({ forum, post }) => {
+  const deduped = allPosts.filter(({ forum, post }) => {
     const url = postPermalink(forum, post);
     if (seen.has(url)) return false;
     seen.add(url);
     return true;
   });
+  return deduped.sort((a, b) => (b.post.baseScore ?? 0) - (a.post.baseScore ?? 0));
 }
