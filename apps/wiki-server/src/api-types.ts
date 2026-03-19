@@ -1128,3 +1128,37 @@ export type PageAssessment = z.infer<typeof PageAssessmentSchema>;
 export const PageAssessmentBatchSchema = z.object({
   items: z.array(PageAssessmentSchema).min(1).max(MAX_BATCH_SIZE),
 });
+
+// ---------------------------------------------------------------------------
+// QA Page Checks
+// ---------------------------------------------------------------------------
+
+export const RecordQaCheckSchema = z.object({
+  thingId: z.string().nullable().optional(),
+  pageUrl: z.string().min(1).max(500),
+  directory: z.string().max(100).nullable().optional(),
+  checkType: z
+    .enum(["index", "detail", "cross-consistency"])
+    .default("detail"),
+  result: z.enum(["clean", "issues_found", "error", "404"]),
+  findings: z
+    .array(
+      z.object({
+        severity: z.enum(["P0", "P1", "P2"]),
+        description: z.string(),
+        githubIssue: z.number().optional(),
+      })
+    )
+    .nullable()
+    .optional(),
+  depth: z
+    .enum(["quick", "standard", "deep", "exhaustive"])
+    .nullable()
+    .optional(),
+  sweepId: z.string().max(100).nullable().optional(),
+  checkedAt: z.string().datetime().optional(),
+});
+
+export const RecordQaCheckBatchSchema = z.object({
+  items: z.array(RecordQaCheckSchema).min(1).max(200),
+});

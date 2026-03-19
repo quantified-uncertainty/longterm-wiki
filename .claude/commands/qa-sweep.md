@@ -1,6 +1,8 @@
 # Adversarial QA Sweep
 
-Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions, and data integrity issues. Produces a prioritized findings report and files GitHub issues for real bugs.
+Live site audit of longtermwiki.com. Fetches real pages via WebFetch and checks for broken rendering, data quality issues, and cross-page inconsistencies. Produces a prioritized findings report and files GitHub issues for real bugs.
+
+This skill focuses **exclusively on the live production site**. Codebase checks are handled by `crux validate gate`, code review by `/review-pr` and `/audit`, and maintenance by `/maintain`.
 
 **Schedule:** `/loop 24h /qa-sweep` for daily runs using your Claude Code subscription.
 
@@ -17,21 +19,15 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 
 | Depth | Index pages | Detail pages per dir | Agents | Time |
 |-------|-------------|---------------------|--------|------|
-| `quick` | All directories, surface checks | 0 | 3 | ~5 min |
+| `quick` | All directories, surface checks | 0 | 2-3 | ~5 min |
 | `standard` (default) | All directories | 3-5 per focused dir | 4-5 | ~10 min |
 | `deep` | All directories | 10-15 per directory | 8-12 | ~30 min |
 | `exhaustive` | All directories | ALL detail pages (sampled in batches) | 15-25 | ~60 min |
 
-**How it works:**
-1. `pnpm crux w qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
-2. This skill adds LLM-driven agents on top (production site audit, code review of recent changes)
-3. Findings are compiled into a P0/P1/P2 report
-4. P0 bugs get fixed; P1/P2 get filed as GitHub issues
-
 **Relationship to other commands:**
-- `/maintain` — day-to-day cleanup (close issues, fix cruft)
-- `/audit` — strategic review (complexity trends, architecture)
-- `/qa-sweep` — adversarial (actively try to break things)
+- `/maintain` — day-to-day cleanup (close issues, fix cruft, triage)
+- `/audit` — strategic codebase review (complexity trends, architecture)
+- `/qa-sweep` — live site audit (actively try to break things by looking at real pages)
 
 ## Argument parsing
 
@@ -50,108 +46,93 @@ $ARGUMENTS = "--pages=/path1,/path2 --depth=deep"  → specific URLs + deep tab/
 
 **Directory name mapping** (argument → index route → entity type):
 
-| Argument | Index route | Entity type | Detail page pattern |
-|----------|-------------|-------------|---------------------|
-| `organizations` | `/organizations` | `organization` | `/organizations/<slug>` |
-| `people` | `/people` | `person` | `/people/<slug>` |
-| `legislation` | `/legislation` | `policy` | `/legislation/<slug>` |
-| `ai-models` | `/ai-models` | `ai-model` | `/ai-models/<slug>` |
-| `benchmarks` | `/benchmarks` | `benchmark` | `/benchmarks/<slug>` |
-| `projects` | `/projects` | `project` | `/projects/<slug>` |
-| `approaches` | `/approaches` | `approach` | `/approaches/<slug>` |
-| `events` | `/events` | `event` | `/events/<slug>` |
-| `grants` | `/grants` | — | `/grants/<id>` |
-| `publications` | `/publications` | — | `/publications/<slug>` |
-| `research-areas` | `/research-areas` | `research-area` | `/research-areas/<slug>` |
+| Argument | Index route | Detail page pattern |
+|----------|-------------|---------------------|
+| `organizations` | `/organizations` | `/organizations/<slug>` |
+| `people` | `/people` | `/people/<slug>` |
+| `legislation` | `/legislation` | `/legislation/<slug>` |
+| `ai-models` | `/ai-models` | `/ai-models/<slug>` |
+| `benchmarks` | `/benchmarks` | `/benchmarks/<slug>` |
+| `projects` | `/projects` | `/projects/<slug>` |
+| `approaches` | `/approaches` | `/approaches/<slug>` |
+| `events` | `/events` | `/events/<slug>` |
+| `grants` | `/grants` | `/grants/<id>` |
+| `publications` | `/publications` | `/publications/<slug>` |
+| `research-areas` | `/research-areas` | `/research-areas/<slug>` |
+| `funding-programs` | `/funding-programs` | `/funding-programs/<slug>` |
+| `funding-rounds` | `/funding-rounds` | `/funding-rounds/<id>` |
+| `divisions` | `/divisions` | `/divisions/<slug>` |
 
-## Phase 1: Deterministic checks
+## Phase 0: Initialize sweep tracking
 
-Run the crux command to get automated check results and recent change context:
+Before launching any agents, set up coverage tracking:
 
-```bash
-pnpm crux w qa-sweep
-```
+1. **Generate a sweep ID**: `sweep-YYYY-MM-DD-XXXX` (e.g., `sweep-2026-03-19-a1b2`)
+2. **Get pages from the queue** instead of picking ad-hoc:
+   ```bash
+   pnpm crux qa-checks queue --directory=X --limit=N --json
+   ```
+   This returns pages ordered by staleness (never-checked first, then oldest). Use these pages for detail page selection instead of picking randomly from index pages.
+3. **Show current coverage** for context:
+   ```bash
+   pnpm crux qa-checks coverage
+   ```
 
-If a focus area was specified, also run targeted checks:
+## Phase 1: Index page audit
 
-```bash
-# For each focused entity type:
-pnpm crux w validate directory-pages --type=<entityType> --verbose
-pnpm crux tb matrix scores --type=<entityType>
-```
-
-Read the output. Note:
-- Which checks failed or warned
-- Which areas had the most recent changes (these get priority in Phase 2)
-- Which entity types have the worst scores (these get extra detail page sampling)
-
-## Phase 2: LLM-driven audits
-
-Launch agents **in parallel** using the Agent tool. Each agent is research-only (no code changes).
+Launch agents **in parallel** using the Agent tool. Each agent fetches pages from `https://www.longtermwiki.com` using WebFetch and is research-only (no code changes).
 
 **Agent strategy by depth:**
 
 ### Quick depth
 - 1 agent: fetch all index pages, surface checks only
-- 1 agent: code quality on recent changes
-- 1 agent: wiki-server route audit
 
 ### Standard depth
-- 1 agent per focused directory (or 1 agent for all index pages if unfocused)
+- 1 agent per focused directory (or 1 agent covering all index pages if unfocused)
 - 1 agent: detail page sampling (3-5 pages per focused directory)
-- 1 agent: code quality on recent changes
-- 1 agent: wiki-server route audit
 
 ### Deep depth
 - **1 agent per directory**: each fetches the index page + 10-15 detail pages within that directory
-- **1 cross-consistency agent**: checks that data matches across directories (e.g., org page funding total matches grants page, person affiliations match org people tabs)
-- **1 agent per audit type**: code quality, wiki-server routes
-- **1 component code agent**: reads the actual React components for focused directories, checks for bugs in rendering logic
+- **1 cross-consistency agent**: checks that data matches across directories
 
 ### Exhaustive depth
 - **1 agent per directory** (same as deep, but samples ALL detail pages in batches of 10)
 - **2-3 cross-consistency agents**: one for financial data, one for people/org links, one for dates/timelines
-- **1 agent per audit type**: code quality, wiki-server routes, schema validation
-- **1 component code agent per directory**: reads rendering components
 - **1 accessibility agent**: checks for alt text, ARIA labels, keyboard navigation
-- **1 stale data agent**: checks for outdated dates, dead external links, references to old events
+- **1 stale data agent**: checks for outdated dates, references to past events described in future tense
 
-### 2a. Production site audit — Index pages
-
-Launch agents to fetch pages from `https://www.longtermwiki.com` using WebFetch.
-
-**For each index page, check:**
+### For each index page, check:
 - Does it load (not 404/500)?
 - Count consistency: does the filter badge total match the body count?
 - Column fill rates: what percentage of rows have data in each column? Flag columns with >80% empty.
-- Are there columns that should exist but don't? (e.g., tracked people count, completeness indicator, subentity counts)
-- Do any values show raw IDs or slugs instead of human-readable names?
+- Are there columns that should exist but don't? (e.g., tracked people count, completeness indicator)
+- Do any values show raw IDs, slugs, or stableIds instead of human-readable names?
 - Is the default sort order sensible?
 - Are filter tabs useful? Flag any with 0 or 1 entries.
 - Are descriptions truncated or missing?
-- Any visible error messages or raw HTML/MDX?
+- Any visible error messages, raw HTML/MDX, or rendering artifacts?
 
-### 2b. Production site audit — Detail pages
+## Phase 2: Detail page audit
 
 **Page selection strategy:**
+- **Use the queue**: `pnpm crux qa-checks queue --directory=X --limit=N --json` returns pages ordered by staleness. Prefer these over random selection.
 - Pick pages with diverse data states: one data-rich, one sparse, one mid-range
-- Pick from different parts of the alphabet
-- At `deep`/`exhaustive` depth, systematically cover the full list
+- At `deep`/`exhaustive` depth, systematically cover the full list using queue order
 
 To find slugs for detail pages, look at the index page content — it contains links. Pick from those.
 
 **For each detail page, check:**
+- Does it load (not 404/500)?
 - Do tabs use URLs (e.g., `/organizations/slug/people`) or are they JS-only?
-- Is the description placed under "Overview" or floating in the header?
-- Does "Related Pages" appear? Should it say "Related Wiki Pages"?
-- Do People references show names with links to `/people/<id>`, or raw IDs?
+- Do People references show names with links to `/people/<slug>`, or raw IDs?
 - Are tables sorted sensibly (most recent first for dates)?
-- Are any tabs/sections empty or nearly empty?
-- Is "Source" inline or its own column?
-- Are there sections that don't belong on the default tab?
-- Check **every tab** — Overview, People, Funding, Announcements, Press, etc. Each tab is a separate check.
+- Are any tabs/sections completely empty? Should they be hidden?
+- Any visible error messages, raw HTML/MDX, or rendering artifacts?
+- Check **every tab** — Overview, People, Funding, Announcements, Press, etc.
+- Do numbers/dates look plausible? (e.g., founding date before current year, funding amounts in reasonable range)
+- Are there stale claims? ("upcoming" events that already happened, "as of 2024" when it's 2026)
 
-### 2c. Cross-consistency checks (deep/exhaustive only)
+## Phase 3: Cross-consistency checks (deep/exhaustive only)
 
 Launch a dedicated agent to verify data consistency across pages:
 - Does an org's "Total Funding" on the org page match the sum of grants on `/grants`?
@@ -160,32 +141,7 @@ Launch a dedicated agent to verify data consistency across pages:
 - Do dates agree (founded date on org page vs. earliest grant date)?
 - Do entity counts on index pages match what detail pages show?
 
-### 2d. Code quality audit
-
-Launch an agent to read recently changed files (from Phase 1 output) and check for:
-- Logic errors, off-by-one, null safety
-- Silent error swallowing (`.catch(() => {})`)
-- Type safety issues (`as any`, `as unknown as T`)
-- Broken imports or stale references
-- Missing `"use client"` directives
-- SQL injection, XSS, or other security issues
-
-**In focused/deep mode**, also read the relevant component files for the targeted directory:
-- `apps/web/src/app/(directories)/<directory>/` — page components
-- `apps/web/src/components/entities/` — entity-specific components
-- `apps/web/src/data/entity-schemas.ts` — schema definitions
-
-### 2e. Wiki-server route audit
-
-Launch an agent to read wiki-server routes and check for:
-- Unbounded queries (no LIMIT)
-- Missing input validation
-- N+1 query patterns
-- Inconsistent response shapes
-
-**Skip this phase in focused quick/standard mode** unless the focus area involves server-side data.
-
-## Phase 3: Compile findings
+## Phase 4: Compile findings
 
 Wait for all agents to complete. Compile a deduplicated, prioritized report:
 
@@ -195,13 +151,13 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 ### Agents launched: N | Pages checked: N
 
 ### P0 — Active bugs (user-visible now)
-[Table: #, Bug, URL or File:Line, Fix]
+[Table: #, Bug, URL, Description]
 
 ### P1 — Latent bugs (will surface under conditions)
-[Table: #, Bug, URL or File:Line]
+[Table: #, Bug, URL, Description]
 
 ### P2 — UX improvements
-[Table: #, Issue, URL or Location]
+[Table: #, Issue, URL, Description]
 
 ### Data completeness
 [Per-column fill rates for each index page checked]
@@ -213,7 +169,28 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 [Bullet list of areas checked and found clean]
 ```
 
-## Phase 4: File issues and persist the report
+## Phase 5: Record results, file issues, and persist the report
+
+### Record check results — MANDATORY
+
+After compiling findings, record every page checked to the coverage tracking system. For each page that was checked:
+
+```bash
+pnpm crux qa-checks record --url=/organizations/anthropic --result=clean --directory=organizations --sweep-id=sweep-2026-03-19-a1b2 --depth=standard
+```
+
+Valid `--result` values: `clean`, `issues_found`, `error`, `404`
+
+For bulk recording, you can use `pnpm crux qa-checks record` for each page. This updates the coverage database so future sweeps avoid re-checking recently-audited pages.
+
+### Show updated coverage
+
+After recording all results:
+```bash
+pnpm crux qa-checks coverage
+```
+
+Include the coverage table in the report.
 
 ### Issue filing — MANDATORY for all confirmed findings
 
@@ -221,24 +198,19 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 
 - **File one GitHub issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
 - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
-- Use `pnpm crux gh issues create` with `--model=haiku` for each.
+- Use `pnpm crux issues create` with `--model=haiku` for each.
 - **Expected volume:** 5-15 issues per deep sweep is normal. The daily cap of 5 from `proactive-github-filing.md` does NOT apply to QA sweeps.
-- Label all issues with the appropriate severity label if available.
-- **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue. If you compiled it into the report, file it.
+- **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue.
 
 ### Persist the full report to a GitHub Discussion
 
-After filing issues, post the **complete** Phase 3 report as a comment on a standing QA Sweep discussion. This creates a searchable archive of all sweep results over time.
+After filing issues, post the **complete** Phase 4 report as a comment on Discussion #2650 (QA Sweep Reports).
 
 ```bash
-# First run: create the discussion
-pnpm crux gh epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
-
-# Every run: post the report as a comment
-pnpm crux gh epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
+pnpm crux epic comment 2650 "$(cat <<'REPORT'
 ## QA Sweep — [DATE]
 ### Focus: [focus] | Depth: [depth]
-[Full report here — copy the entire Phase 3 output]
+[Full report here — copy the entire Phase 4 output]
 
 ### Issues filed
 - #N: title
@@ -247,8 +219,6 @@ pnpm crux gh epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
 REPORT
 )"
 ```
-
-**To find the discussion number:** Search for "QA Sweep Reports" in discussions, or check the QA sweep discussion number stored in `.claude/memory/` if a previous sweep saved it. If no discussion exists yet, create one.
 
 ### Fix P0s
 
@@ -263,9 +233,8 @@ After fixing P0s, run `/push-and-ensure-green` to ship.
 ## Guardrails
 
 - **Do not fix P1/P2 issues during the sweep** unless they are one-line changes. File issues instead.
-- **Evidence over impressions.** Every finding must reference a specific file, line, or URL.
-- **No false positives.** Only report issues you have confirmed by fetching the actual page or reading the actual code.
-- **Prioritize recent changes.** Areas changed in the last 48 hours get 3x the attention.
+- **Evidence over impressions.** Every finding must reference a specific URL you actually fetched.
+- **No false positives.** Only report issues you have confirmed by fetching the actual page.
 - **Time box.** Quick: ~5 min. Standard: ~10 min. Deep: ~30 min. Exhaustive: ~60 min.
-- **Parallelize aggressively.** Launch all independent agents in a single message. The subscription model means agent count is free — use it.
-- **File generously.** If you found it and confirmed it, file it. Do not leave confirmed issues unfiled just because they're P2.
+- **Parallelize aggressively.** Launch all independent agents in a single message.
+- **File generously.** If you found it and confirmed it, file it.

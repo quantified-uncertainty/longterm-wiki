@@ -19,3 +19,4 @@ export { groundskeeperRunsRoute, type GroundskeeperRunsRoute } from "./groundske
 export { githubIssuesRoute, type GithubIssuesRoute } from "./github-issues.js";
 export { githubPullsRoute, type GithubPullsRoute, type OpenPR } from "./github-pulls.js";
 export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";
+export { qaChecksRoute, type QaChecksRoute } from "./qa-checks.js";

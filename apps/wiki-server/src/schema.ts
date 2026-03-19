@@ -2146,6 +2146,44 @@ export const thingVerdicts = pgTable(
   ]
 );
 
+// ── QA Page Checks ─────────────────────────────────────────────────────
+//
+// Records of QA sweep checks against live site pages. Tracks which pages
+// have been audited, when, and what was found. Used by the queue endpoint
+// to prioritize least-recently-checked pages.
+
+export const qaPageChecks = pgTable(
+  "qa_page_checks",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    thingId: text("thing_id").references(() => things.id, {
+      onDelete: "set null",
+    }),
+    pageUrl: text("page_url").notNull(),
+    directory: text("directory"),
+    checkType: text("check_type").notNull().default("detail"),
+    result: text("result").notNull(),
+    findings: jsonb("findings").$type<
+      { severity: string; description: string; githubIssue?: number }[]
+    >(),
+    depth: text("depth"),
+    sweepId: text("sweep_id"),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_qpc_thing").on(table.thingId),
+    index("idx_qpc_page_url").on(table.pageUrl),
+    index("idx_qpc_directory").on(table.directory),
+    index("idx_qpc_checked_at").on(table.checkedAt),
+    index("idx_qpc_sweep").on(table.sweepId),
+  ]
+);
+
 // ── Research Areas ──────────────────────────────────────────────────────
 //
 // Bodies of work with papers, organizations, and ongoing activity.
