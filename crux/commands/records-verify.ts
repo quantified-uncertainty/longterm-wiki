@@ -777,7 +777,7 @@ export async function recordsVerifyCommand(
     if (!mapped) {
       return {
         exitCode: 1,
-        output: `Unknown subcommand: ${subcommand}\nUsage: crux tb verify <type|stats> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
+        output: `Unknown subcommand: ${subcommand}\nUsage: crux tb verify <type|stats|sync-things> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
       };
     }
     typesToVerify = [mapped];

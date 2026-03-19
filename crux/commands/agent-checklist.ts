@@ -194,7 +194,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
   const c = log.colors;
 
   if (!existsSync(CHECKLIST_PATH)) {
-    return { output: `${c.yellow}No checklist found. Run \`crux sys agent-checklist init\` first.${c.reset}\n`, exitCode: 1 };
+    return { output: `${c.yellow}No checklist found. Run \`crux sys agent-checklist init --issue=N\` or \`crux sys agent-checklist init "task description"\` first.${c.reset}\n`, exitCode: 1 };
   }
 
   const markdown = readFileSync(CHECKLIST_PATH, 'utf-8');

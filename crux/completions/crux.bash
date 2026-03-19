@@ -148,7 +148,7 @@ _crux_complete() {
       w|wiki)
         COMPREPLY=( $(compgen -W "$wiki_domains $wiki_flattened" -- "$cur") )
         return ;;
-      fb)
+      fb|factbase)
         COMPREPLY=( $(compgen -W "$fb_domains $fb_flattened" -- "$cur") )
         return ;;
       tb)
