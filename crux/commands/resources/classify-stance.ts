@@ -45,13 +45,7 @@ function buildUserPrompt(resources: Array<{ id: string; title: string; summary: 
     id: r.id,
     title: r.title,
     summary: r.summary?.slice(0, 200) ?? null,
-    source: r.domain ?? (() => {
-      try {
-        return new URL(r.url).hostname;
-      } catch {
-        return 'unknown';
-      }
-    })(),
+    source: r.domain ?? extractDomain(r.url) ?? 'unknown',
   }));
   return JSON.stringify(items, null, 2);
 }
