@@ -93,6 +93,9 @@ crux/evals/results/
 # Semantic diff snapshots (audit trail — not source code, stored locally)
 .claude/snapshots/
 
+# QA sweep result history (local trend data — not source code)
+.claude/sweep-results/
+
 # Matrix score snapshots (local analysis, not source code)
 .matrix-snapshots/
 

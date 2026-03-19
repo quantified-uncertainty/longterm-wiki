@@ -20,6 +20,7 @@ export default defineConfig({
       'health/**/*.test.ts',
       'pr-patrol/**/*.test.ts',
       'tablebase/**/*.test.ts',
+      'qa-sweep/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

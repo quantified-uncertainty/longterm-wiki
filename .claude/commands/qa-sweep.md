@@ -210,9 +210,9 @@ Launch agents to fetch pages from `https://www.longtermwiki.com` using WebFetch.
 ### 2b. Production site audit — Detail pages
 
 **Page selection strategy:**
-- **Use the queue**: `pnpm crux qa-checks queue --directory=X --limit=N --json` returns pages ordered by staleness. Prefer these over random selection.
 - Pick pages with diverse data states: one data-rich, one sparse, one mid-range
-- At `deep`/`exhaustive` depth, systematically cover the full list using queue order
+- Pick from different parts of the alphabet
+- At `deep`/`exhaustive` depth, systematically cover the full list
 
 To find slugs for detail pages, look at the index page content — it contains links. Pick from those.
 
@@ -328,7 +328,11 @@ Include the coverage table in the report.
 After filing issues, post the **complete** Phase 3 report as a comment on Discussion #2650 (QA Sweep Reports).
 
 ```bash
-pnpm crux epic comment 2650 "$(cat <<'REPORT'
+# First run: create the discussion
+pnpm crux epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
+
+# Every run: post the report as a comment
+pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
 ## QA Sweep — [DATE]
 ### Focus: [focus] | Depth: [depth]
 [Full report here — copy the entire Phase 3 output]
@@ -340,6 +344,8 @@ pnpm crux epic comment 2650 "$(cat <<'REPORT'
 REPORT
 )"
 ```
+
+**To find the discussion number:** Search for "QA Sweep Reports" in discussions, or check the QA sweep discussion number stored in `.claude/memory/` if a previous sweep saved it. If no discussion exists yet, create one.
 
 ### Fix P0s
 
