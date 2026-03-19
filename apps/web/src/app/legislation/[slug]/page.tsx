@@ -114,9 +114,9 @@ export default async function LegislationDetailPage({
     .map((r) => {
       const ent = getTypedEntityById(r.id);
       if (!ent) return null;
-      return { name: ent.title, href: getEntityHref(r.id), relationship: r.relationship };
+      return { name: ent.title, href: getEntityHref(r.id), relationship: r.relationship, type: ent.entityType };
     })
-    .filter(Boolean) as Array<{ name: string; href: string; relationship?: string }>;
+    .filter(Boolean) as Array<{ name: string; href: string; relationship?: string; type?: string }>;
 
   const wikiHref = getPolicyWikiHref(entity);
 
@@ -211,7 +211,7 @@ export default async function LegislationDetailPage({
   // Overview tab (always present)
   const overviewContent = (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Description */}
         {entity.description && (
           <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">{entity.description}</p>
@@ -380,6 +380,7 @@ export default async function LegislationDetailPage({
           <div className="flex flex-wrap gap-2">
             {relatedEntities.map((ref) => (
               <Link key={ref.href} href={ref.href} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 bg-card hover:bg-muted/50 text-sm transition-colors">
+                {ref.type && <span className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-semibold">{ref.type === "organization" ? "org" : ref.type}</span>}
                 <span className="font-medium">{ref.name}</span>
               </Link>
             ))}
@@ -525,7 +526,7 @@ export default async function LegislationDetailPage({
                       <td className="py-1.5 px-3 text-foreground/70 text-sm">
                         <span className="line-clamp-2">{stakeholder.reason ?? "\u2014"}</span>
                         {stakeholder.source && (
-                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-[10px]">[source]</a>
+                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-xs">[source]</a>
                         )}
                       </td>
                     </tr>
@@ -541,11 +542,10 @@ export default async function LegislationDetailPage({
 
   // History tab (amendments + key politicians)
   if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0) {
-    const historyCount = entity.amendments.length + entity.keyPoliticians.length;
     tabs.push({
       id: "history",
       label: "History",
-      count: historyCount,
+      count: entity.amendments.length,
       content: (
         <div className="space-y-8">
           {/* Key Politicians first */}
