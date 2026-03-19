@@ -757,6 +757,13 @@
       "when": 1777881600000,
       "tag": "0107_mark_stub_entities",
       "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1777968000000,
+      "tag": "0108_natural_key_uniqueness",
+      "breakpoints": true
     }
   ]
 }

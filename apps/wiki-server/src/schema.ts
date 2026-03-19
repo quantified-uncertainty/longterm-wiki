@@ -1517,6 +1517,13 @@ export const personnel = pgTable(
     index("idx_personnel_person_entity").on(table.personEntityId),
     index("idx_personnel_org_entity").on(table.orgEntityId),
     index("idx_personnel_role_type").on(table.roleType),
+    // Natural key uniqueness: prevents duplicate role assignments.
+    // Partial index — only enforced when entity IDs are resolved (non-null).
+    uniqueIndex("uq_personnel_natural_key")
+      .on(table.personEntityId, table.orgEntityId, table.roleType, table.role)
+      .where(
+        sql`person_entity_id IS NOT NULL AND org_entity_id IS NOT NULL`
+      ),
   ]
 );
 
@@ -1686,6 +1693,10 @@ export const investments = pgTable(
     index("idx_inv_company_entity").on(table.companyEntityId),
     index("idx_inv_investor_entity").on(table.investorEntityId),
     index("idx_inv_date").on(table.date),
+    // Natural key uniqueness: uq_investments_natural_key
+    // Expression index on (investor_entity_id, company_entity_id, COALESCE(round_name, ''))
+    // WHERE investor_entity_id IS NOT NULL AND company_entity_id IS NOT NULL
+    // Managed in migration 0108_natural_key_uniqueness.sql (not representable in Drizzle API).
   ]
 );
 
@@ -1803,6 +1814,9 @@ export const divisionPersonnel = pgTable(
   (table) => [
     index("idx_dp_division").on(table.divisionId),
     index("idx_dp_person").on(table.personId),
+    // Natural key uniqueness: prevents duplicate person-division assignments.
+    uniqueIndex("uq_division_personnel_natural_key")
+      .on(table.divisionId, table.personId),
   ]
 );
 
