@@ -839,8 +839,40 @@
 
 - id: will-macaskill
   name: Will MacAskill
-  affiliation: university-of-oxford
-  role: Associate Professor of Philosophy
+  affiliation: forethought
+  role: Senior Research Fellow
+  website: https://www.forethought.org/people/william-macaskill
+  knownFor:
+    - Effective altruism (co-founder)
+    - Longtermism
+    - Moral uncertainty
+    - What We Owe the Future (2022)
+    - Giving What We Can (co-founder)
+    - 80,000 Hours (co-founder)
+  positions:
+    - topic: timelines
+      view: Short
+      estimate: Years to decade
+      confidence: medium
+      date: "2025"
+      source: Preparing for the Intelligence Explosion (2025)
+      sourceUrl: https://www.forethought.org/research/preparing-for-the-intelligence-explosion
+    - topic: p-doom
+      view: Significant
+      estimate: Non-trivial
+      confidence: low
+      date: "2022"
+      source: What We Owe the Future (2022)
+    - topic: how-hard-is-alignment
+      view: Hard but tractable
+      confidence: medium
+      date: "2025"
+      source: Preparing for the Intelligence Explosion (2025)
+    - topic: power-concentration-risk
+      view: One of the most critical risks from AGI transition
+      confidence: high
+      date: "2025"
+      source: Preparing for the Intelligence Explosion (2025)
 
 - id: joe-biden
   name: Joe Biden
