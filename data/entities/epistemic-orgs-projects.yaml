@@ -46,7 +46,7 @@
   title: Squiggle
   projectStatus: active
   projectUrl: https://www.squiggle-language.com
-  organization: quantified-uncertainty
+  organization: quri
   description: Domain-specific programming language for probabilistic estimation with native distribution types and Monte Carlo sampling.
   path: /knowledge-base/responses/squiggle/
   lastUpdated: 2026-01
@@ -59,7 +59,7 @@
   title: Metaforecast
   projectStatus: maintained
   projectUrl: https://metaforecast.org
-  organization: quantified-uncertainty
+  organization: quri
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
   path: /knowledge-base/responses/metaforecast/
   lastUpdated: 2026-01
@@ -71,7 +71,7 @@
   type: project
   title: SquiggleAI
   projectStatus: active
-  organization: quantified-uncertainty
+  organization: quri
   description: LLM-powered tool for generating probabilistic models in Squiggle from natural language descriptions.
   path: /knowledge-base/responses/squiggleai/
   lastUpdated: 2026-01

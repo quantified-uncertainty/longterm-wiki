@@ -377,6 +377,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'yaml-entity-refs',
+    name: 'YAML entity reference integrity (relatedEntries, developer, affiliation)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-yaml-entity-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: dangling entity references cause broken links and raw IDs
+    // displayed in the UI. All current references have been fixed to resolve.
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',
