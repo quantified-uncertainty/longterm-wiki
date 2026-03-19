@@ -1,5 +1,7 @@
 "use client";
 
+import { safeHref } from "@/lib/format-compact";
+
 // ── Types ───────────────────────────────────────────────────────────────
 
 export interface TimelineEvent {
@@ -224,7 +226,7 @@ function ResourceRow({ resource }: { resource: TimelineResource }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           <a
-            href={resource.url}
+            href={safeHref(resource.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline truncate max-w-[24rem]"
@@ -293,7 +295,7 @@ function OrphanResourceEntry({ resource }: { resource: TimelineResource }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           <a
-            href={resource.url}
+            href={safeHref(resource.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline truncate max-w-[24rem]"
@@ -389,7 +391,7 @@ export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20 shrink-0 mt-1.5" />
                   <a
-                    href={r.url}
+                    href={safeHref(r.url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline truncate max-w-[24rem]"

@@ -25,7 +25,7 @@ import {
 import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "./org-data";
 import { ResourceList } from "@/components/resources/ResourceList";
-import { RESOURCE_TYPE_COLORS, RESOURCE_TYPE_LABELS, STANCE_COLORS, CREDIBILITY_COLORS } from "@/components/resources/resource-constants";
+import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
 const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;

@@ -693,7 +693,9 @@ export default async function LegislationDetailPage({
   const ANALYSIS_TITLE_PATTERNS = [
     /\banalysis\b/i,
     /\bassessment\b/i,
-    /\breview\b/i,
+    /\blegal review\b/i,
+    /\bpolicy review\b/i,
+    /\bliterature review\b/i,
     /\bworking paper\b/i,
     /\bwhite paper\b/i,
     /\bpolicy brief\b/i,

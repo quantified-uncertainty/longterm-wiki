@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, ChevronLeft, ChevronRight, LayoutList, Table2 } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import { ResourceCard } from "./ResourceCard";
-
-type ViewMode = "card" | "table";
 
 /**
  * Resource list with card view, search, type filter, and pagination.
