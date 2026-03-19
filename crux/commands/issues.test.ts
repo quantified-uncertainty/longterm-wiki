@@ -420,7 +420,7 @@ describe('issues next', () => {
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('#1');
     expect(result.output).toContain('High priority');
-    expect(result.output).toContain('crux issues start 1');
+    expect(result.output).toContain('crux gh issues start 1');
   });
 
   it('excludes blocked issues from recommendation', async () => {

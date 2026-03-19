@@ -9,10 +9,10 @@
  * substantive messages", "agent sessions are being logged").
  *
  * Usage:
- *   crux audits list [--pending] [--category=X] [--json]
- *   crux audits check <id> [--pass|--fail] [--notes="..."]
- *   crux audits run-auto
- *   crux audits report
+ *   crux sys audits list [--pending] [--category=X] [--json]
+ *   crux sys audits check <id> [--pass|--fail] [--notes="..."]
+ *   crux sys audits run-auto
+ *   crux sys audits report
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -265,14 +265,14 @@ async function checkCommand(
   if (!id) {
     return {
       exitCode: 1,
-      output: `Usage: crux audits check <id> [--pass|--fail] [--notes="..."]
+      output: `Usage: crux sys audits check <id> [--pass|--fail] [--notes="..."]
 
   Record the result of checking an audit item or post-merge verification.
 
 Examples:
-  crux audits check groundskeeper-health --pass --notes="Messages look substantive"
-  crux audits check vercel-ignore-command-v2 --fail --notes="Still seeing PR deploys"
-  crux audits check agent-sessions-logged --pass`,
+  crux sys audits check groundskeeper-health --pass --notes="Messages look substantive"
+  crux sys audits check vercel-ignore-command-v2 --fail --notes="Still seeing PR deploys"
+  crux sys audits check agent-sessions-logged --pass`,
     };
   }
 
@@ -380,9 +380,9 @@ async function runAutoCommand(
 
     lines.push('');
     if (item.check_type === 'hybrid') {
-      lines.push('  \x1b[33m→ Requires interpretation. Use `crux audits check` to record result.\x1b[0m');
+      lines.push('  \x1b[33m→ Requires interpretation. Use `crux sys audits check` to record result.\x1b[0m');
     } else {
-      lines.push(`  \x1b[2m→ Use \`crux audits check ${item.id} --pass\` or \`--fail\` to record.\x1b[0m`);
+      lines.push(`  \x1b[2m→ Use \`crux sys audits check ${item.id} --pass\` or \`--fail\` to record.\x1b[0m`);
     }
     lines.push('');
   }
@@ -505,10 +505,10 @@ Options (check):
 Registry file: .claude/audits.yaml (checked into git)
 
 Examples:
-  crux audits                                     # List all, highlight overdue
-  crux audits list --pending                      # Only overdue items
-  crux audits check groundskeeper-health --pass   # Record a passing check
-  crux audits run-auto                            # Run automated checks
-  crux audits report                              # Summary for maintenance
+  crux sys audits                                     # List all, highlight overdue
+  crux sys audits list --pending                      # Only overdue items
+  crux sys audits check groundskeeper-health --pass   # Record a passing check
+  crux sys audits run-auto                            # Run automated checks
+  crux sys audits report                              # Summary for maintenance
 `;
 }

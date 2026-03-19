@@ -5,11 +5,11 @@
  * Produces structured reports that the /maintain Claude command acts on.
  *
  * Usage:
- *   crux maintain                    Run full report (all signals)
- *   crux maintain review-prs         Review PRs + session logs since last run
- *   crux maintain triage-issues      Triage open GitHub issues
- *   crux maintain detect-cruft       Find dead code, TODOs, large files
- *   crux maintain status             Show last maintenance run info
+ *   crux sys maintain                    Run full report (all signals)
+ *   crux sys maintain review-prs         Review PRs + session logs since last run
+ *   crux sys maintain triage-issues      Triage open GitHub issues
+ *   crux sys maintain detect-cruft       Find dead code, TODOs, large files
+ *   crux sys maintain status             Show last maintenance run info
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
@@ -710,7 +710,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
     output += `Last maintenance run: ${urgency}${lastRun} (${daysAgo} days ago)${c.reset}\n`;
   } else {
     output += `${c.yellow}No maintenance runs recorded yet.${c.reset}\n`;
-    output += `${c.dim}Run \`crux maintain\` to perform the first sweep.${c.reset}\n`;
+    output += `${c.dim}Run \`crux sys maintain\` to perform the first sweep.${c.reset}\n`;
   }
 
   // Count session logs since last run
@@ -725,9 +725,9 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
 
   output += '\n';
   output += `${c.bold}Recommended cadences:${c.reset}\n`;
-  output += `  ${c.dim}Daily:   crux maintain review-prs   (review new PRs + session logs)${c.reset}\n`;
-  output += `  ${c.dim}Weekly:  crux maintain               (full sweep + issue triage)${c.reset}\n`;
-  output += `  ${c.dim}Monthly: crux maintain detect-cruft  (deep cruft analysis + cleanup)${c.reset}\n`;
+  output += `  ${c.dim}Daily:   crux sys maintain review-prs   (review new PRs + session logs)${c.reset}\n`;
+  output += `  ${c.dim}Weekly:  crux sys maintain               (full sweep + issue triage)${c.reset}\n`;
+  output += `  ${c.dim}Monthly: crux sys maintain detect-cruft  (deep cruft analysis + cleanup)${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -803,7 +803,7 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
   output += `  ${c.cyan}P2${c.reset} — Propagate learnings (add recurring issues to common-issues.md/rules)\n`;
   output += `  P3 — Work actionable issues (fix small issues; file new issues for larger tasks)\n`;
   output += `  ${c.dim}P4 — Cruft cleanup (dead code, stale TODOs, file splitting)${c.reset}\n`;
-  output += `  ${c.dim}P5 — Page content updates (delegate to \`crux updates run\`)${c.reset}\n`;
+  output += `  ${c.dim}P5 — Page content updates (delegate to \`crux w updates run\`)${c.reset}\n`;
   output += '\n';
 
   // Update last-run timestamp
@@ -1188,7 +1188,7 @@ Priority order for maintenance work:
   P2 — Propagate learnings (common-issues.md, rules)
   P3 — Work actionable issues / file new issues for larger tasks
   P4 — Cruft cleanup (dead code, TODOs)
-  P5 — Page content updates (via crux updates)
+  P5 — Page content updates (via crux w updates)
 
 Recommended cadences:
   Daily   — review-prs (review new session logs, catch recurring issues)
@@ -1196,17 +1196,17 @@ Recommended cadences:
   Monthly — detect-cruft + cleanup (deep analysis, file splitting, dead code)
 
 Examples:
-  crux maintain                          Full maintenance report
-  crux maintain status                   Show when maintenance last ran
-  crux maintain review-prs               Just review PRs + session logs
-  crux maintain triage-issues            Just triage GitHub issues
-  crux maintain detect-cruft             Just find codebase cruft
-  crux maintain fix-chains               Detect fix chains (feature → fix → fix)
-  crux maintain fix-chains --json        JSON output for trend tracking
-  crux maintain health-snapshot          Code health metrics snapshot
-  crux maintain health-snapshot --json   JSON output for trend tracking
-  crux maintain review-prs --since=2026-02-10  Override start date
-  crux maintain --json                   Full report as JSON
+  crux sys maintain                          Full maintenance report
+  crux sys maintain status                   Show when maintenance last ran
+  crux sys maintain review-prs               Just review PRs + session logs
+  crux sys maintain triage-issues            Just triage GitHub issues
+  crux sys maintain detect-cruft             Just find codebase cruft
+  crux sys maintain fix-chains               Detect fix chains (feature → fix → fix)
+  crux sys maintain fix-chains --json        JSON output for trend tracking
+  crux sys maintain health-snapshot          Code health metrics snapshot
+  crux sys maintain health-snapshot --json   JSON output for trend tracking
+  crux sys maintain review-prs --since=2026-02-10  Override start date
+  crux sys maintain --json                   Full report as JSON
 
 Slash command:
   /maintain   Claude Code command for interactive maintenance sessions

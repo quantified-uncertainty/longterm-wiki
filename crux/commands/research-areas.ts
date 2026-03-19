@@ -2,10 +2,10 @@
  * Research Areas CLI — Link grants, backfill papers, discover orgs, and show stats.
  *
  * Usage:
- *   pnpm crux research-areas link-grants [--dry-run]
- *   pnpm crux research-areas backfill-papers [--dry-run]
- *   pnpm crux research-areas discover-orgs [--dry-run]
- *   pnpm crux research-areas stats
+ *   pnpm crux w research-areas link-grants [--dry-run]
+ *   pnpm crux w research-areas backfill-papers [--dry-run]
+ *   pnpm crux w research-areas discover-orgs [--dry-run]
+ *   pnpm crux w research-areas stats
  */
 
 import {
@@ -554,10 +554,10 @@ Commands:
   stats                        Show coverage stats (default)
 
 Examples:
-  pnpm crux research-areas stats
-  pnpm crux research-areas link-grants --dry-run
-  pnpm crux research-areas link-grants
-  pnpm crux research-areas backfill-papers
-  pnpm crux research-areas discover-orgs --dry-run
+  pnpm crux w research-areas stats
+  pnpm crux w research-areas link-grants --dry-run
+  pnpm crux w research-areas link-grants
+  pnpm crux w research-areas backfill-papers
+  pnpm crux w research-areas discover-orgs --dry-run
 `;
 }

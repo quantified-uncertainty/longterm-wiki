@@ -16,6 +16,7 @@ import {
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
 import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import { getAllKBRecords, type FactBaseRecordEntry } from "@/data/factbase";
 import {
   resolvePolicyBySlug,
   getPolicySlugs,
@@ -32,6 +33,7 @@ import {
   normalizeStatus,
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
+import { extractDomain } from "@/lib/resource-types";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -350,6 +352,61 @@ export default async function LegislationDetailPage({
     });
   }
 
+  // ── Precompute funding info for stakeholder badges ──────────
+  // Grants: ownerEntityId = funder, fields.recipient = recipient
+  // Investments: ownerEntityId = company, fields.investor = investor
+  const allGrants = getAllKBRecords("grants");
+  const allInvestments = getAllKBRecords("investments");
+
+  // Map: recipient entity ID → funder display names
+  const grantFundersByRecipient = new Map<string, string[]>();
+  for (const grant of allGrants) {
+    const recipientId = (grant.fields.recipient as string) ?? null;
+    if (!recipientId) continue;
+    // Resolve funder name from ownerEntityId
+    const funderEntity = getTypedEntityById(grant.ownerEntityId);
+    const funderName = funderEntity?.title ?? grant.displayName ?? grant.ownerEntityId;
+    const existing = grantFundersByRecipient.get(recipientId) ?? [];
+    if (!existing.includes(funderName)) existing.push(funderName);
+    grantFundersByRecipient.set(recipientId, existing);
+  }
+
+  // Map: company entity ID → investor display names
+  const investorsByCompany = new Map<string, string[]>();
+  for (const inv of allInvestments) {
+    const companyId = inv.ownerEntityId;
+    const investorId = (inv.fields.investor as string) ?? null;
+    if (!investorId) continue;
+    const investorEntity = getTypedEntityById(investorId);
+    const investorName = investorEntity?.title ?? inv.displayName ?? investorId;
+    const existing = investorsByCompany.get(companyId) ?? [];
+    if (!existing.includes(investorName)) existing.push(investorName);
+    investorsByCompany.set(companyId, existing);
+  }
+
+  // Helper to get funding badges for a stakeholder
+  function getFundingBadges(entityId: string | undefined): string[] {
+    if (!entityId) return [];
+    const badges: string[] = [];
+    // Check grants (by recipient ID — could be stableId, slug, or display name)
+    const grantFunders = grantFundersByRecipient.get(entityId);
+    if (grantFunders) badges.push(...grantFunders);
+    // Check investments (by company ownerEntityId — typically stableId)
+    const investors = investorsByCompany.get(entityId);
+    if (investors) badges.push(...investors);
+    // If nothing found, try resolving to stableId
+    if (badges.length === 0) {
+      const ent = getTypedEntityById(entityId);
+      if (ent?.stableId && ent.stableId !== entityId) {
+        const g = grantFundersByRecipient.get(ent.stableId);
+        if (g) badges.push(...g);
+        const i = investorsByCompany.get(ent.stableId);
+        if (i) badges.push(...i);
+      }
+    }
+    return [...new Set(badges)]; // deduplicate
+  }
+
   // Stakeholders tab
   if (entity.stakeholders.length > 0) {
     tabs.push({
@@ -381,14 +438,26 @@ export default async function LegislationDetailPage({
               <tbody className="divide-y divide-border/50">
                 {[...supporters, ...mixed, ...opponents].map((stakeholder, i) => {
                   const href = resolveEntityHref(stakeholder.entityId);
+                  const funders = getFundingBadges(stakeholder.entityId);
                   return (
                     <tr key={i} className="hover:bg-muted/20">
                       <td className="py-2 px-3">
-                        {href ? (
-                          <Link href={href} className="text-primary hover:underline font-medium">{stakeholder.name}</Link>
-                        ) : (
-                          <span className="font-medium">{stakeholder.name}</span>
-                        )}
+                        <div>
+                          {href ? (
+                            <Link href={href} className="text-primary hover:underline font-medium">{stakeholder.name}</Link>
+                          ) : (
+                            <span className="font-medium">{stakeholder.name}</span>
+                          )}
+                          {funders.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              {funders.map((funder) => (
+                                <span key={funder} className="inline-flex items-center px-1.5 py-0 rounded text-[9px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/30">
+                                  {funder}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="py-2 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
@@ -501,11 +570,15 @@ export default async function LegislationDetailPage({
       title: r.title ?? r.url,
       url: r.url,
       type: r.type ?? "web",
+      domain: extractDomain(r.url),
       publicationName: publication?.name ?? null,
       credibility: credibility ?? null,
       citingPageCount: citingPages.length,
       publishedDate: r.published_date ?? null,
       authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+      summary: r.summary ?? null,
+      fetchStatus: r.fetch_status ?? null,
+      archiveUrl: r.archive_url ?? null,
     });
   }
 

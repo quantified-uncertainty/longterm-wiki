@@ -9,8 +9,8 @@
  * Uses string manipulation (not parse+stringify) to preserve existing formatting.
  *
  * Usage:
- *   crux backfill-yaml-stable-ids run              Run the backfill
- *   crux backfill-yaml-stable-ids run --dry-run     Preview without writing
+ *   crux tb backfill-yaml-stable-ids run              Run the backfill
+ *   crux tb backfill-yaml-stable-ids run --dry-run     Preview without writing
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
@@ -233,8 +233,8 @@ KB thing files (packages/factbase/data/things/*.yaml) when available, otherwise
 a new random 10-char alphawiki ID is generated.
 
 Usage:
-  crux backfill-yaml-stable-ids run              Run the backfill
-  crux backfill-yaml-stable-ids run --dry-run     Preview without writing
+  crux tb backfill-yaml-stable-ids run              Run the backfill
+  crux tb backfill-yaml-stable-ids run --dry-run     Preview without writing
 
 The stableId is inserted as the second field after \`id:\`, matching the
 existing convention in the entity YAML files.

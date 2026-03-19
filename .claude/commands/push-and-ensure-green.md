@@ -16,7 +16,7 @@ Run all CI checks locally, push to GitHub, and monitor until green. Fix and retr
 
 ## Step 1: Run all local checks (be paranoid)
 
-Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all CI-blocking checks including TypeScript). The gate auto-escalates to include the full Next.js build when app page components or prerendered data files are in the diff. You can also force it with `--full`.
+Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs all CI-blocking checks including TypeScript). The gate auto-escalates to include the full Next.js build when app page components or prerendered data files are in the diff. You can also force it with `--full`.
 
 ### Handling failures
 
@@ -37,12 +37,12 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
    - Otherwise push normally with `git push -u origin HEAD`.
    - Check if a PR already exists using crux:
      ```bash
-     pnpm crux pr detect
+     pnpm crux gh pr detect
      ```
    - If no PR exists (exit code 1), create one using crux. **Always use `--body-file` or the stdin heredoc pattern** for multi-line bodies — inline `--body="$(cat <<'EOF'...)"` fails with `/bin/sh` (used by pnpm):
      ```bash
      # Option A: stdin heredoc (safe with pnpm/sh):
-     pnpm crux pr create --title="<descriptive title>" <<'PRBODY'
+     pnpm crux gh pr create --title="<descriptive title>" <<'PRBODY'
      ## Summary
 
      - <key change 1>
@@ -60,16 +60,16 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
      ## Summary
      ...
      PRBODY
-     pnpm crux pr create --title="<descriptive title>" --body-file=/tmp/pr-body.md
+     pnpm crux gh pr create --title="<descriptive title>" --body-file=/tmp/pr-body.md
      ```
-     **After creating, always run `pnpm crux pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
+     **After creating, always run `pnpm crux gh pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.
 
-**IMPORTANT:** Always use `crux pr create` and `crux pr detect` instead of raw curl commands. The crux commands route through `githubApi()` which validates request bodies for shell-expansion corruption (ANSI codes, dotenv output, etc.) before sending to GitHub.
+**IMPORTANT:** Always use `crux gh pr create` and `crux gh pr detect` instead of raw curl commands. The crux commands route through `githubApi()` which validates request bodies for shell-expansion corruption (ANSI codes, dotenv output, etc.) before sending to GitHub.
 
 ## Step 3: Verify GitHub is green
 
-1. Wait 15 seconds for checks to register, then run `pnpm crux ci status --wait` to poll until all checks complete.
+1. Wait 15 seconds for checks to register, then run `pnpm crux gh ci status --wait` to poll until all checks complete.
 2. **CRITICAL**: ALL check runs must show `conclusion: success`. Do NOT trust workflow-level conclusion alone — `continue-on-error: true` makes the workflow pass but individual check runs can still show as failed.
 3. Report the final status of each check run to the user.
 

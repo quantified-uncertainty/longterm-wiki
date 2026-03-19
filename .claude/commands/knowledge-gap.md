@@ -114,12 +114,12 @@ If the user approves, pick the highest-priority gaps and:
 
 1. **Create missing entities:**
    ```bash
-   pnpm crux ids allocate <slug>
+   pnpm crux tb ids allocate <slug>
    ```
 
 2. **Create wiki pages:**
    ```bash
-   pnpm crux content create "<Title>" --tier=standard
+   pnpm crux w content create "<Title>" --tier=standard
    ```
 
 3. **Fix relationships:** Update `relatedEntries` via entity sync.

@@ -20,12 +20,12 @@ WARNINGS=()
 
 # ─── 0. Clear stale checklist from previous session ─────────────────────────────
 # This hook only fires on fresh "startup" (not resume), so removing the checklist
-# forces the new session to run `crux agent-checklist init` before editing code.
+# forces the new session to run `crux sys agent-checklist init` before editing code.
 # The PreToolUse hook in require-checklist.sh enforces this.
 
 if [ -f ".claude/wip-checklist.md" ]; then
   rm -f ".claude/wip-checklist.md"
-  CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux agent-checklist init\` before editing code.")
+  CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux sys agent-checklist init\` before editing code.")
 fi
 
 # ─── 1. Verify environment (fast checks only) ──────────────────────────────────
@@ -90,8 +90,8 @@ fi
 
 if [ -n "$ISSUE_NUM" ]; then
   CONTEXT_LINES+=("Detected GitHub issue #${ISSUE_NUM} from branch name.")
-  CONTEXT_LINES+=("→ Remember to run: pnpm crux agent-checklist init --issue=${ISSUE_NUM}")
-  CONTEXT_LINES+=("→ Remember to run: pnpm crux issues start ${ISSUE_NUM}")
+  CONTEXT_LINES+=("→ Remember to run: pnpm crux sys agent-checklist init --issue=${ISSUE_NUM}")
+  CONTEXT_LINES+=("→ Remember to run: pnpm crux gh issues start ${ISSUE_NUM}")
 fi
 
 # ─── 5b. Tmux window naming from agent slot ───────────────────────────────────

@@ -4,14 +4,14 @@
  * Manage background job queue: create, list, status, cancel, retry, sweep, ping.
  *
  * Usage:
- *   crux jobs                                     List recent jobs
- *   crux jobs list [--status=X] [--type=X]        List jobs with filters
- *   crux jobs create <type> [--params='{}']       Create a job
- *   crux jobs status <id>                         Show single job details
- *   crux jobs cancel <id>                         Cancel a pending/claimed job
- *   crux jobs retry <id>                          Reset a failed job to pending
- *   crux jobs sweep                               Trigger stale job cleanup
- *   crux jobs ping                                Create a ping job (smoke test)
+ *   crux sys jobs                                     List recent jobs
+ *   crux sys jobs list [--status=X] [--type=X]        List jobs with filters
+ *   crux sys jobs create <type> [--params='{}']       Create a job
+ *   crux sys jobs status <id>                         Show single job details
+ *   crux sys jobs cancel <id>                         Cancel a pending/claimed job
+ *   crux sys jobs retry <id>                          Reset a failed job to pending
+ *   crux sys jobs sweep                               Trigger stale job cleanup
+ *   crux sys jobs ping                                Create a ping job (smoke test)
  */
 
 import { createLogger, type Colors } from '../lib/output.ts';
@@ -167,7 +167,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const type = args[0];
   if (!type) {
     return {
-      output: `${c.red}Usage: crux jobs create <type> [--params='{}'] [--priority=N]${c.reset}\n`,
+      output: `${c.red}Usage: crux sys jobs create <type> [--params='{}'] [--priority=N]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -215,7 +215,7 @@ async function status(args: string[], options: CommandOptions): Promise<CommandR
   const id = parseInt(args[0], 10);
   if (!id || isNaN(id)) {
     return {
-      output: `${c.red}Usage: crux jobs status <id>${c.reset}\n`,
+      output: `${c.red}Usage: crux sys jobs status <id>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -271,7 +271,7 @@ async function cancel(args: string[], options: CommandOptions): Promise<CommandR
   const id = parseInt(args[0], 10);
   if (!id || isNaN(id)) {
     return {
-      output: `${c.red}Usage: crux jobs cancel <id>${c.reset}\n`,
+      output: `${c.red}Usage: crux sys jobs cancel <id>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -296,7 +296,7 @@ async function retry(args: string[], options: CommandOptions): Promise<CommandRe
   const id = parseInt(args[0], 10);
   if (!id || isNaN(id)) {
     return {
-      output: `${c.red}Usage: crux jobs retry <id>${c.reset}\n`,
+      output: `${c.red}Usage: crux sys jobs retry <id>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -392,7 +392,7 @@ async function ping(_args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   output += `${c.yellow}⚠${c.reset} Timed out waiting for ping job #${jobId} to complete.\n`;
-  output += `${c.dim}The job may still be running. Check: crux jobs status ${jobId}${c.reset}\n`;
+  output += `${c.dim}The job may still be running. Check: crux sys jobs status ${jobId}${c.reset}\n`;
   return { output, exitCode: 1 };
 }
 
@@ -442,8 +442,8 @@ async function stats(_args: string[], options: CommandOptions): Promise<CommandR
  * Submit a batch of page-improve or page-create jobs.
  *
  * Usage:
- *   crux jobs batch improve <pageId1> <pageId2> ... [--tier=standard] [--batch-id=X]
- *   crux jobs batch create "Title 1" "Title 2" ... [--tier=standard] [--batch-id=X]
+ *   crux sys jobs batch improve <pageId1> <pageId2> ... [--tier=standard] [--batch-id=X]
+ *   crux sys jobs batch create "Title 1" "Title 2" ... [--tier=standard] [--batch-id=X]
  */
 async function batch(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -454,7 +454,7 @@ async function batch(args: string[], options: CommandOptions): Promise<CommandRe
 
   if (!subcommand || !['improve', 'create'].includes(subcommand)) {
     return {
-      output: `${c.red}Usage: crux jobs batch <improve|create> <item1> [item2...] [--tier=X] [--batch-id=X]${c.reset}\n`,
+      output: `${c.red}Usage: crux sys jobs batch <improve|create> <item1> [item2...] [--tier=X] [--batch-id=X]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -530,11 +530,11 @@ async function batch(args: string[], options: CommandOptions): Promise<CommandRe
   } else {
     output += `\n  ${c.yellow}⚠${c.reset} Failed to create batch-commit job: ${commitResult.message}\n`;
     output += `  You can create it manually:\n`;
-    output += `  ${c.dim}crux jobs create batch-commit --params='${JSON.stringify({ batchId, childJobIds, prTitle })}'${c.reset}\n`;
+    output += `  ${c.dim}crux sys jobs create batch-commit --params='${JSON.stringify({ batchId, childJobIds, prTitle })}'${c.reset}\n`;
   }
 
   output += `\n${c.bold}Batch "${batchId}" created with ${childJobIds.length} content jobs.${c.reset}\n`;
-  output += `${c.dim}Jobs will be processed by workers. Monitor: crux jobs list --type=page-improve${c.reset}\n`;
+  output += `${c.dim}Jobs will be processed by workers. Monitor: crux sys jobs list --type=page-improve${c.reset}\n`;
 
   if (options.json) {
     return {
@@ -550,7 +550,7 @@ async function batch(args: string[], options: CommandOptions): Promise<CommandRe
  * Run the worker inline (for local development/testing).
  *
  * Usage:
- *   crux jobs worker [--type=X] [--max-jobs=N] [--poll] [--verbose]
+ *   crux sys jobs worker [--type=X] [--max-jobs=N] [--poll] [--verbose]
  */
 async function worker(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -675,19 +675,19 @@ Job Types:
   citation-verify   Verify citations on a page
 
 Examples:
-  crux jobs                                     List recent jobs
-  crux jobs list --status=failed                List failed jobs
-  crux jobs create page-improve --params='{"pageId":"ai-safety","tier":"polish"}'
+  crux sys jobs                                     List recent jobs
+  crux sys jobs list --status=failed                List failed jobs
+  crux sys jobs create page-improve --params='{"pageId":"ai-safety","tier":"polish"}'
                                                 Create a page improve job
-  crux jobs batch improve ai-safety miri --tier=polish
+  crux sys jobs batch improve ai-safety miri --tier=polish
                                                 Batch improve two pages
-  crux jobs batch create "New Topic" "Another" --tier=budget
+  crux sys jobs batch create "New Topic" "Another" --tier=budget
                                                 Batch create two pages
-  crux jobs create auto-update-digest --params='{"budget":30,"maxPages":5}'
+  crux sys jobs create auto-update-digest --params='{"budget":30,"maxPages":5}'
                                                 Trigger auto-update via jobs
-  crux jobs worker --type=page-improve --verbose
+  crux sys jobs worker --type=page-improve --verbose
                                                 Run worker locally for page-improve jobs
-  crux jobs types                               List registered job types
-  crux jobs stats                               Show job statistics
+  crux sys jobs types                               List registered job types
+  crux sys jobs stats                               Show job statistics
 `;
 }

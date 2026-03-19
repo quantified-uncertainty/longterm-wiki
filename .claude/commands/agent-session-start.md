@@ -6,10 +6,10 @@ Run this at the start of a session, after understanding what the task is.
 
 ## Step 1: Generate the checklist
 
-Run `pnpm crux agent-checklist init` with the appropriate arguments:
+Run `pnpm crux sys agent-checklist init` with the appropriate arguments:
 
-- **If working on a GitHub issue**: `pnpm crux agent-checklist init --issue=N` (auto-detects type from labels)
-- **If not on an issue**: `pnpm crux agent-checklist init "Task description" --type=X`
+- **If working on a GitHub issue**: `pnpm crux sys agent-checklist init --issue=N` (auto-detects type from labels)
+- **If not on an issue**: `pnpm crux sys agent-checklist init "Task description" --type=X`
 
 Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`
 
@@ -20,7 +20,7 @@ If unsure about the type, `infrastructure` is the default.
 If this session is working on a specific GitHub issue and `--issue` was used in step 1, also run:
 
 ```bash
-pnpm crux issues start <ISSUE_NUM>
+pnpm crux gh issues start <ISSUE_NUM>
 ```
 
 ## Step 3: Assemble research context (optional but recommended)

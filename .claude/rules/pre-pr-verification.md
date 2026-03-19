@@ -31,7 +31,7 @@ Run `pnpm test` and confirm existing tests still pass. If you added new logic (h
 
 ## 3. Gate check (if modifying MDX, YAML, or validation code)
 
-Run `pnpm crux validate gate --fix` to catch CI-blocking issues.
+Run `pnpm crux w validate gate --fix` to catch CI-blocking issues.
 
 ## 4. Completeness check
 

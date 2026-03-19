@@ -30,7 +30,7 @@ If the subagent reports CRITICAL or HIGH findings (confidence >= 80), fix them b
 
 ## Phase 2: Test Plan Validation
 
-Run `pnpm crux pr validate-test-plan` on the current PR.
+Run `pnpm crux gh pr validate-test-plan` on the current PR.
 
 If the test plan fails validation:
 - Add missing test plan section to PR body
@@ -67,7 +67,7 @@ Based on what changed, do targeted verification:
 - **API routes**: If a wiki-server route changed, test it against the dev server if available.
 - **UI components**: If a React component changed, check that the dev server renders it (`pnpm dev` then describe what you see, or check for build errors).
 - **Data pipeline**: If build-data scripts changed, run `pnpm build-data:content` and verify output.
-- **Validation rules**: If validators changed, run `pnpm crux validate gate --fix` and verify the expected behavior.
+- **Validation rules**: If validators changed, run `pnpm crux w validate gate --fix` and verify the expected behavior.
 - **GitHub Actions**: Review the YAML carefully. Verify all referenced commands exist and work locally.
 
 ### 3d. Edge Case / Fuzz Testing
@@ -82,7 +82,7 @@ For new functions or significant logic changes:
 
 ```bash
 # Ensure nothing existing broke
-pnpm crux validate gate --fix
+pnpm crux w validate gate --fix
 ```
 
 ## Phase 4: Update Test Plan
@@ -91,7 +91,7 @@ After executing all verification steps:
 
 1. Update the PR body's test plan section with checked items reflecting what was actually verified
 2. Add any additional test items that were performed beyond the original plan
-3. Use `pnpm crux pr validate-test-plan` to confirm it passes
+3. Use `pnpm crux gh pr validate-test-plan` to confirm it passes
 
 ## Phase 5: Mark review complete
 

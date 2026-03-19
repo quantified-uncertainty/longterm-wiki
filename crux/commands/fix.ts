@@ -105,14 +105,14 @@ Options:
   --ci            JSON output for CI pipelines
 
 Examples:
-  crux fix                          Run all auto-fixers
-  crux fix --dry-run                Preview all fixes
-  crux fix entity-links             Convert markdown links to EntityLink
-  crux fix escaping                 Fix all escaping issues
-  crux fix markdown                 Fix markdown formatting
-  crux fix related-pages            Remove redundant Related Pages sections
-  crux fix orphaned-footnotes       Remove orphaned footnote definitions
-  crux fix frontmatter-order        Reorder frontmatter fields to canonical order
-  crux fix dollars                  Escape dollar signs only
+  crux w fix                          Run all auto-fixers
+  crux w fix --dry-run                Preview all fixes
+  crux w fix entity-links             Convert markdown links to EntityLink
+  crux w fix escaping                 Fix all escaping issues
+  crux w fix markdown                 Fix markdown formatting
+  crux w fix related-pages            Remove redundant Related Pages sections
+  crux w fix orphaned-footnotes       Remove orphaned footnote definitions
+  crux w fix frontmatter-order        Reorder frontmatter fields to canonical order
+  crux w fix dollars                  Escape dollar signs only
 `;
 }

@@ -23,7 +23,7 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 | `exhaustive` | All directories | ALL detail pages (sampled in batches) | 15-25 | ~60 min |
 
 **How it works:**
-1. `pnpm crux qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
+1. `pnpm crux w qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
 2. This skill adds LLM-driven agents on top (production site audit, code review of recent changes)
 3. Findings are compiled into a P0/P1/P2 report
 4. P0 bugs get fixed; P1/P2 get filed as GitHub issues
@@ -69,15 +69,15 @@ $ARGUMENTS = "--pages=/path1,/path2 --depth=deep"  → specific URLs + deep tab/
 Run the crux command to get automated check results and recent change context:
 
 ```bash
-pnpm crux qa-sweep
+pnpm crux w qa-sweep
 ```
 
 If a focus area was specified, also run targeted checks:
 
 ```bash
 # For each focused entity type:
-pnpm crux validate directory-pages --type=<entityType> --verbose
-pnpm crux matrix scores --type=<entityType>
+pnpm crux w validate directory-pages --type=<entityType> --verbose
+pnpm crux tb matrix scores --type=<entityType>
 ```
 
 Read the output. Note:
@@ -221,7 +221,7 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 
 - **File one GitHub issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
 - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
-- Use `pnpm crux issues create` with `--model=haiku` for each.
+- Use `pnpm crux gh issues create` with `--model=haiku` for each.
 - **Expected volume:** 5-15 issues per deep sweep is normal. The daily cap of 5 from `proactive-github-filing.md` does NOT apply to QA sweeps.
 - Label all issues with the appropriate severity label if available.
 - **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue. If you compiled it into the report, file it.
@@ -232,10 +232,10 @@ After filing issues, post the **complete** Phase 3 report as a comment on a stan
 
 ```bash
 # First run: create the discussion
-pnpm crux epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
+pnpm crux gh epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
 
 # Every run: post the report as a comment
-pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
+pnpm crux gh epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
 ## QA Sweep — [DATE]
 ### Focus: [focus] | Depth: [depth]
 [Full report here — copy the entire Phase 3 output]

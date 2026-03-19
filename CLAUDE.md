@@ -4,7 +4,7 @@ AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI t
 
 **Production URL**: `https://www.longtermwiki.com` — do NOT use `longterm.wiki`, `longtermwiki.org`, or any other domain.
 
-**This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux <domain> --help` for full CLI reference.
+**This is a routing document.** Detailed guides live in `content/docs/internal/` and `.claude/rules/`. Use `pnpm crux --help` for full CLI reference.
 
 **Agent memory**: Read `.claude/memory/MEMORY.md` at session start for cross-session facts and corrections. Update it when you learn stable new facts.
 
@@ -13,9 +13,9 @@ AI safety wiki with ~700 MDX pages, Next.js frontend, YAML data layer, and CLI t
 Before reading files, running commands, or writing any code, run:
 
 ```bash
-pnpm crux agent-checklist init --issue=N   # if working on a GitHub issue
+pnpm crux sys agent-checklist init --issue=N   # if working on a GitHub issue
 # or
-pnpm crux agent-checklist init "Task description" --type=X   # if not on an issue
+pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an issue
 ```
 
 **"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
@@ -24,36 +24,51 @@ At session end, run `/agent-session-ready-PR`. Always open a PR — never push d
 
 ## Quick Reference
 
+Commands are organized into groups by data layer. Use short prefixes for convenience:
+
 ```bash
 pnpm setup:quick                 # Install + build data (first-time)
 pnpm dev                         # Dev server on port 3001
 pnpm build                      # Production build
 pnpm test                        # Run vitest tests
 
-pnpm crux validate gate --fix    # Pre-push gate (CI-blocking checks)
-pnpm crux validate gate --scope=content --fix   # Fast content-only (~15s)
+# Wiki content (w = wiki)
+pnpm crux w validate gate --fix              # Pre-push gate (CI-blocking checks)
+pnpm crux w validate gate --scope=content --fix  # Fast content-only (~15s)
+pnpm crux w create "Title" --tier=standard   # Create a new page
+pnpm crux w improve <id> --tier=standard --apply  # Improve a page
+pnpm crux w fix escaping                     # After any page edit
+pnpm crux w fix markdown                     # After any page edit
 
-pnpm crux content create "Title" --tier=standard
-pnpm crux content improve <id> --tier=standard --apply
-pnpm crux fix escaping           # After any page edit
-pnpm crux fix markdown           # After any page edit
+# FactBase (fb = factbase)
+pnpm crux fb show <entity>                   # Show FactBase entity
+pnpm crux fb verify                          # Verify FactBase data
 
-pnpm crux query search "topic"   # Full-text search
-pnpm crux ids allocate <slug>    # Wiki entity: allocate numericId + stableId (for pages)
-pnpm crux tablebase ensure-entities --type=person  # Lightweight: stableId only (no wiki page)
-pnpm crux context for-page <id>  # Full context for a page
-pnpm crux context for-issue <N>  # Context for a GitHub issue
+# TableBase (tb = tablebase)
+pnpm crux tb ids allocate <slug>             # Wiki entity: allocate numericId + stableId
+pnpm crux tb ensure-entities --type=person   # Lightweight: stableId only (no wiki page)
+pnpm crux tb people discover                 # Discover people entities
 
-pnpm crux issues start <N>      # Signal work start on issue
-pnpm crux issues done <N> --pr=URL  # Signal completion
-pnpm crux ci status --wait       # Poll CI until green
+# GitHub (gh)
+pnpm crux gh issues start <N>               # Signal work start on issue
+pnpm crux gh issues done <N> --pr=URL       # Signal completion
+pnpm crux gh ci status --wait               # Poll CI until green
 
-pnpm crux audits list            # Show audit items, highlight overdue
-pnpm crux audits check <id> --pass  # Record a check result
-pnpm crux audits run-auto        # Run automated checks
+# System (sys = system)
+pnpm crux sys audits list                    # Show audit items, highlight overdue
+pnpm crux sys audits check <id> --pass       # Record a check result
+pnpm crux sys agent-checklist init --issue=N # Init session checklist
 
-pnpm crux --help                 # Full CLI reference
+# Cross-cutting (top-level)
+pnpm crux query search "topic"               # Full-text search
+pnpm crux context for-page <id>              # Full context for a page
+pnpm crux context for-issue <N>              # Context for a GitHub issue
+
+pnpm crux --help                             # Full CLI reference
+pnpm crux w --help                           # Wiki group help
 ```
+
+> **Legacy flat syntax still works**: `pnpm crux validate gate --fix` = `pnpm crux w validate gate --fix`
 
 ## Repository Structure
 
@@ -128,10 +143,10 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/things/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
-- **GitHub API**: Use `crux issues/pr/ci/epic` commands — never raw `curl`
+- **GitHub API**: Use `crux gh issues/pr/ci/epic` commands — never raw `curl`
 - **Entity IDs — two tiers**:
-  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux ids allocate <slug>` to get a `numericId` (E-number) + `stableId`. These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
-  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only. NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tablebase ensure-entities` or `crux tablebase create-entity` for these.
+  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux tb ids allocate <slug>` to get a `numericId` (E-number) + `stableId`. These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
+  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only. NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
   - **Never manually invent IDs** — use the functions above.
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.

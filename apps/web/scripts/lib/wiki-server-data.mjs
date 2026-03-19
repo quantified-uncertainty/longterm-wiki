@@ -1049,6 +1049,9 @@ export async function fetchResourcesFromPG() {
           fetched_at: r.fetchedAt ?? undefined,
           content_hash: r.contentHash ?? undefined,
           stable_id: r.stableId ?? undefined,
+          fetch_status: r.fetchStatus ?? undefined,
+          archive_url: r.archiveUrl ?? undefined,
+          author_entity_ids: r.authorEntityIds ?? undefined,
         });
       }
 

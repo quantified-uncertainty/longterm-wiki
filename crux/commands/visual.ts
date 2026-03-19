@@ -78,11 +78,11 @@ Options:
   --verbose        Detailed output
 
 Examples:
-  crux visual create existential-risk --type mermaid
-  crux visual create compute-governance --type squiggle --directions "model compute growth"
-  crux visual review alignment-problem --screenshot
-  crux visual audit --min-words=800
-  crux visual improve existential-risk --directions "simplify the flowchart"
-  crux visual embed existential-risk --visual ai-risk-taxonomy
+  crux w visual create existential-risk --type mermaid
+  crux w visual create compute-governance --type squiggle --directions "model compute growth"
+  crux w visual review alignment-problem --screenshot
+  crux w visual audit --min-words=800
+  crux w visual improve existential-risk --directions "simplify the flowchart"
+  crux w visual embed existential-risk --visual ai-risk-taxonomy
 `;
 }

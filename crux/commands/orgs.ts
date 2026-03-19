@@ -4,10 +4,10 @@
  * CLI tools for managing organization entity data.
  *
  * Usage:
- *   crux orgs enrich --source=wikidata --dry-run              Preview all enrichment
- *   crux orgs enrich --source=wikidata --apply                Write new facts to YAML
- *   crux orgs enrich --source=wikidata --entity=anthropic     Single entity
- *   crux orgs enrich --source=wikidata --dry-run --ci         JSON output
+ *   crux tb orgs enrich --source=wikidata --dry-run              Preview all enrichment
+ *   crux tb orgs enrich --source=wikidata --apply                Write new facts to YAML
+ *   crux tb orgs enrich --source=wikidata --entity=anthropic     Single entity
+ *   crux tb orgs enrich --source=wikidata --dry-run --ci         JSON output
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -734,14 +734,14 @@ async function enrichCommand(
   if (source !== 'wikidata') {
     return {
       exitCode: 1,
-      output: `Unknown source: "${source ?? '(none)'}". Currently supported: wikidata\n\nUsage:\n  crux orgs enrich --source=wikidata --dry-run\n  crux orgs enrich --source=wikidata --apply\n  crux orgs enrich --source=wikidata --entity=anthropic`,
+      output: `Unknown source: "${source ?? '(none)'}". Currently supported: wikidata\n\nUsage:\n  crux tb orgs enrich --source=wikidata --dry-run\n  crux tb orgs enrich --source=wikidata --apply\n  crux tb orgs enrich --source=wikidata --entity=anthropic`,
     };
   }
 
   if (!dryRun && !apply) {
     return {
       exitCode: 1,
-      output: `Must specify either --dry-run or --apply.\n\nUsage:\n  crux orgs enrich --source=wikidata --dry-run\n  crux orgs enrich --source=wikidata --apply`,
+      output: `Must specify either --dry-run or --apply.\n\nUsage:\n  crux tb orgs enrich --source=wikidata --dry-run\n  crux tb orgs enrich --source=wikidata --apply`,
     };
   }
 
@@ -965,9 +965,9 @@ export function getHelp(): string {
   P749  parent org      -> description (when no description exists)
 
 \x1b[1mExamples:\x1b[0m
-  crux orgs enrich --source=wikidata --dry-run
-  crux orgs enrich --source=wikidata --apply
-  crux orgs enrich --source=wikidata --entity=anthropic --dry-run
-  crux orgs enrich --source=wikidata --limit=10 --dry-run
+  crux tb orgs enrich --source=wikidata --dry-run
+  crux tb orgs enrich --source=wikidata --apply
+  crux tb orgs enrich --source=wikidata --entity=anthropic --dry-run
+  crux tb orgs enrich --source=wikidata --limit=10 --dry-run
 `;
 }

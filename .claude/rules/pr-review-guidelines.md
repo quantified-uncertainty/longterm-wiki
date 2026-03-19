@@ -8,7 +8,7 @@ Before considering any session complete, you MUST execute the review-and-ship wo
 
 ```bash
 # GOOD: pipe directly
-pnpm crux pr create --title="..." <<'PRBODY'
+pnpm crux gh pr create --title="..." <<'PRBODY'
 body here
 PRBODY
 
@@ -53,4 +53,4 @@ When a PR changes infrastructure, CI config, Vercel settings, GitHub Actions, DN
 - **One-time verification** (`post_merge` section): "After this merges, check that X actually happened." Include the PR number, what to verify, and a deadline.
 - **Ongoing audit** (`audits` section): If the property should be monitored permanently (e.g., "scheduled workflows keep running"), add it as an ongoing audit item.
 
-Run `pnpm crux audits list` to see current items. The maintenance sweep includes overdue audits in its report automatically.
+Run `pnpm crux sys audits list` to see current items. The maintenance sweep includes overdue audits in its report automatically.

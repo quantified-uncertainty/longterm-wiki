@@ -21,7 +21,7 @@ gh pr list --state merged --limit 50 --json number,title,additions,deletions,mer
 gh pr list --state merged --limit 50 --json number,title,additions,deletions,mergedAt --jq '.[] | select(.mergedAt > (now - 7*86400 | strftime("%Y-%m-%dT%H:%M:%SZ"))) | "\(.number)\t+\(.additions)/-\(.deletions)\t\(.title)"' 2>/dev/null
 
 # Session logs from the period
-pnpm crux maintain review-prs --since=$(date -v-7d +%Y-%m-%d) 2>/dev/null || echo "review-prs unavailable"
+pnpm crux sys maintain review-prs --since=$(date -v-7d +%Y-%m-%d) 2>/dev/null || echo "review-prs unavailable"
 
 # Recent commit classification (feature vs fix vs refactor)
 git log --since="7 days ago" --oneline | head -50
@@ -30,7 +30,7 @@ git log --since="7 days ago" --oneline | head -50
 gh issue list --limit 30 --json number,title,labels,createdAt --jq '.[] | "\(.number)\t\(.labels | map(.name) | join(","))\t\(.title)"' 2>/dev/null
 ```
 
-Also read the session log review from `crux maintain` output if available — it extracts issues and learnings from session logs and flags recurring problems.
+Also read the session log review from `crux sys maintain` output if available — it extracts issues and learnings from session logs and flags recurring problems.
 
 ## Phase 2: Analyze Patterns
 
@@ -48,7 +48,7 @@ Work through each of these lenses. Use the data from Phase 1 as evidence.
 
 ### 2b. Session Log Analysis
 
-Read the session log issues and learnings from the `crux maintain review-prs` output. Look for:
+Read the session log issues and learnings from the `crux sys maintain review-prs` output. Look for:
 
 **Recurring friction:** Problems that appear in 2+ session logs. These are systemic issues worth fixing at the root.
 

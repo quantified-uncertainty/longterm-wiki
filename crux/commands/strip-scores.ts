@@ -5,10 +5,10 @@
  * fields that have been migrated to PG assessments.
  *
  * Usage:
- *   pnpm crux content strip-scores --fields=quality,ratings --dry-run
- *   pnpm crux content strip-scores --fields=quality,ratings --apply
- *   pnpm crux content strip-scores --fields=readerImportance,researchImportance,tacticalValue --apply
- *   pnpm crux content strip-scores --fields=tractability,neglectedness --apply
+ *   pnpm crux w content strip-scores --fields=quality,ratings --dry-run
+ *   pnpm crux w content strip-scores --fields=quality,ratings --apply
+ *   pnpm crux w content strip-scores --fields=readerImportance,researchImportance,tacticalValue --apply
+ *   pnpm crux w content strip-scores --fields=tractability,neglectedness --apply
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -101,7 +101,7 @@ export async function run(args: string[]) {
   const apply = args.includes('--apply');
 
   if (!fieldsArg) {
-    console.error('Usage: pnpm crux content strip-scores --fields=quality,ratings [--apply|--dry-run]');
+    console.error('Usage: pnpm crux w content strip-scores --fields=quality,ratings [--apply|--dry-run]');
     console.error(`\nValid fields: ${VALID_FIELDS.join(', ')}`);
     process.exit(1);
   }

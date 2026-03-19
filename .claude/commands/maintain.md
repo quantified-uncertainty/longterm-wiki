@@ -4,19 +4,19 @@ Run a prioritized maintenance session: review recent PRs, analyze session logs, 
 
 ## Overview
 
-This command orchestrates a periodic maintenance sweep. It uses `crux maintain` for data gathering, then applies AI judgment for prioritization and execution. Run this after a batch of PRs merge, or on a regular cadence.
+This command orchestrates a periodic maintenance sweep. It uses `crux sys maintain` for data gathering, then applies AI judgment for prioritization and execution. Run this after a batch of PRs merge, or on a regular cadence.
 
 **Recommended cadences:**
-- **Daily:** `crux maintain review-prs` — catch recurring issues from session logs
-- **Weekly:** `crux maintain` — full sweep including issue triage
-- **Monthly:** `crux maintain detect-cruft` — deep cruft analysis + cleanup
+- **Daily:** `crux sys maintain review-prs` — catch recurring issues from session logs
+- **Weekly:** `crux sys maintain` — full sweep including issue triage
+- **Monthly:** `crux sys maintain detect-cruft` — deep cruft analysis + cleanup
 
 ## Phase 1: Gather Signals
 
 Run the full maintenance report to collect all signals:
 
 ```bash
-pnpm crux maintain
+pnpm crux sys maintain
 ```
 
 This produces a combined report covering:
@@ -26,8 +26,8 @@ This produces a combined report covering:
 
 Additionally, check page content health:
 ```bash
-pnpm crux updates list --overdue --limit=5
-pnpm crux validate
+pnpm crux w updates list --overdue --limit=5
+pnpm crux w validate
 ```
 
 Read the full report output carefully. It ends with a suggested priority order.
@@ -43,7 +43,7 @@ The report categorizes work into priority tiers. Review the output and decide wh
 | **P2** | Propagate learnings | ~5 min | Add recurring session log issues to `common-issues.md` or rules |
 | **P3** | Work actionable issues | Varies | Fix small issues directly; **file new GitHub issues** for larger tasks found during the sweep |
 | **P4** | Cruft cleanup | ~5 min each | Dead code removal, TODO resolution, file splitting |
-| **P5** | Page content updates | Delegate | Run `pnpm crux updates run` for content freshness |
+| **P5** | Page content updates | Delegate | Run `pnpm crux w updates run` for content freshness |
 
 **P0-P2 are always worth doing** (fast, high-value). Ask the user before spending time on P3-P5.
 
@@ -64,11 +64,11 @@ This is a key output of maintenance — converting discovered problems into trac
 
 Check for stale `agent:working` labels on issues where the session has ended:
 ```bash
-pnpm crux issues list   # shows "In Progress" section with agent:working issues
+pnpm crux gh issues list   # shows "In Progress" section with agent:working issues
 ```
 For each orphaned in-progress issue:
-- If work completed: `pnpm crux issues done <N> --pr=<URL>` (posts comment + removes label)
-- If work abandoned: post a comment explaining, then remove label via `crux issues done <N>`
+- If work completed: `pnpm crux gh issues done <N> --pr=<URL>` (posts comment + removes label)
+- If work abandoned: post a comment explaining, then remove label via `crux gh issues done <N>`
 
 ## Phase 3: Execute
 
@@ -102,7 +102,7 @@ Only remove things you're confident are unused — grep thoroughly before deleti
 
 ## Phase 4: Record & Ship
 
-1. The `crux maintain` report auto-updates `.claude/maintain-last-run.txt`.
+1. The `crux sys maintain` report auto-updates `.claude/maintain-last-run.txt`.
 2. Write a session log summarizing what was done.
 3. Commit all changes.
 4. Run `/push-and-ensure-green`.
@@ -111,6 +111,6 @@ Only remove things you're confident are unused — grep thoroughly before deleti
 
 - **Be conservative with issue closures.** When in doubt, comment with status rather than closing. The triage report's "potentially resolved" classification uses heuristic matching and can have false positives.
 - **For cruft removal**, only remove things you're confident are unused. Grep thoroughly before deleting.
-- **Don't modify wiki content directly.** Page updates go through the Crux pipeline (`crux updates run` or `crux content improve`).
+- **Don't modify wiki content directly.** Page updates go through the Crux pipeline (`crux w updates run` or `crux w content improve`).
 - **If the sweep finds many items (>10 actionable)**, work on the top 5 and file the rest as GitHub issues.
 - **If a maintenance run takes >5 actions**, prefer multiple focused commits over one large commit.

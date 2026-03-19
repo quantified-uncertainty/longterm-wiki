@@ -12,7 +12,7 @@ Any feature that:
 
 All dashboards **must** use the MDX wiki page pattern (Pattern A). Do not create raw `/internal/<name>` App Router pages without entity IDs.
 
-1. **Allocate an entity ID**: `pnpm crux ids allocate <slug>-dashboard`
+1. **Allocate an entity ID**: `pnpm crux tb ids allocate <slug>-dashboard`
 2. **Create content component**: `apps/web/src/app/internal/<name>/<name>-content.tsx`
    - Export a named function (e.g., `MyFeatureContent`)
    - No `<article>` wrapper, no `<h1>`, no `metadata` export — the wiki page shell handles those

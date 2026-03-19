@@ -79,16 +79,16 @@ Environment:
   LONGTERMWIKI_SERVER_API_KEY Bearer token for authentication
 
 Examples:
-  crux wiki-server sync                      Sync all pages
-  crux wiki-server sync --dry-run            Preview page sync
-  crux wiki-server sync --batch-size=25      Use smaller batches
-  crux wiki-server sync-entities             Sync all entities
-  crux wiki-server sync-entities --dry-run   Preview entity sync
-  crux wiki-server sync-benchmarks             Sync benchmarks + results
-  crux wiki-server sync-benchmarks --dry-run   Preview benchmark sync
-  crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
-  crux wiki-server sync-sessions           Sync all session logs
-  crux wiki-server sync-auto-update-runs   Sync all auto-update runs
-  crux wiki-server snapshot-resources      Export PG resources to snapshot JSON
+  crux sys wiki-server sync                      Sync all pages
+  crux sys wiki-server sync --dry-run            Preview page sync
+  crux sys wiki-server sync --batch-size=25      Use smaller batches
+  crux sys wiki-server sync-entities             Sync all entities
+  crux sys wiki-server sync-entities --dry-run   Preview entity sync
+  crux sys wiki-server sync-benchmarks             Sync benchmarks + results
+  crux sys wiki-server sync-benchmarks --dry-run   Preview benchmark sync
+  crux sys wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
+  crux sys wiki-server sync-sessions           Sync all session logs
+  crux sys wiki-server sync-auto-update-runs   Sync all auto-update runs
+  crux sys wiki-server snapshot-resources      Export PG resources to snapshot JSON
 `;
 }

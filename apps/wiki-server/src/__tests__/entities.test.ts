@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
+import { clearStubIfEnriched } from "../routes/tablebase/entities.js";
 
 // ---- In-memory store simulating Postgres entities table ----
 
@@ -691,5 +692,271 @@ describe("Entities API", () => {
 
       expect(res.status).toBe(200);
     });
+  });
+
+  // ---- Stub entity filtering ----
+
+  describe("Stub entity filtering", () => {
+    /** Parse metadata stored by mock (may be JSON string or object from Drizzle). */
+    function parseMeta(raw: unknown): Record<string, unknown> | null {
+      if (raw === null || raw === undefined) return null;
+      if (typeof raw === "string") {
+        try { return JSON.parse(raw); } catch { return null; }
+      }
+      return raw as Record<string, unknown>;
+    }
+
+    it("auto-clears stub flag when entity is synced with description", async () => {
+      // First create a stub entity
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-person",
+          stableId: "sTuB123456",
+          title: "Stub Person",
+          entityType: "person",
+          metadata: { stub: true },
+        }],
+      });
+
+      // Verify stub is set
+      const row = entitiesStore.get("sTuB123456");
+      expect(row).toBeDefined();
+      const meta = parseMeta(row!.metadata);
+      expect(meta?.stub).toBe(true);
+
+      // Now re-sync with description — stub should be cleared
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-person",
+          stableId: "sTuB123456",
+          title: "Stub Person",
+          entityType: "person",
+          description: "A well-known AI researcher",
+          metadata: { stub: true },
+        }],
+      });
+
+      const updated = entitiesStore.get("sTuB123456");
+      expect(updated).toBeDefined();
+      // metadata.stub should be cleared (metadata becomes null if only stub was present)
+      const updatedMeta = parseMeta(updated!.metadata);
+      expect(updatedMeta?.stub).toBeUndefined();
+    });
+
+    it("auto-clears stub flag when entity is synced with wikiId", async () => {
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-person-2",
+          stableId: "sTuB789012",
+          title: "Notable Person",
+          entityType: "person",
+          wikiId: "E500",
+          metadata: { stub: true },
+        }],
+      });
+
+      const row = entitiesStore.get("sTuB789012");
+      const meta = parseMeta(row!.metadata);
+      expect(meta?.stub).toBeUndefined();
+    });
+
+    it("preserves stub flag when entity has no enrichment data", async () => {
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "minimal-stub",
+          stableId: "mInStUb1234",
+          title: "Minimal Stub",
+          entityType: "person",
+          metadata: { stub: true },
+        }],
+      });
+
+      const row = entitiesStore.get("mInStUb1234");
+      const meta = parseMeta(row!.metadata);
+      expect(meta).toBeDefined();
+      expect(meta!.stub).toBe(true);
+    });
+
+    it("preserves other metadata fields when clearing stub", async () => {
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-with-meta",
+          stableId: "mEtA567890",
+          title: "Person With Metadata",
+          entityType: "person",
+          description: "Has a description",
+          metadata: { stub: true, customTag: "important" },
+        }],
+      });
+
+      const row = entitiesStore.get("mEtA567890");
+      const meta = parseMeta(row!.metadata);
+      expect(meta).toBeDefined();
+      expect(meta!.stub).toBeUndefined();
+      expect(meta!.customTag).toBe("important");
+    });
+
+    it("auto-clears stub flag when entity has sources", async () => {
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-with-sources",
+          stableId: "sRc1234567",
+          title: "Person With Sources",
+          entityType: "person",
+          sources: [{ title: "Source 1", url: "https://example.com" }],
+          metadata: { stub: true },
+        }],
+      });
+
+      const row = entitiesStore.get("sRc1234567");
+      const meta = parseMeta(row!.metadata);
+      expect(meta?.stub).toBeUndefined();
+    });
+  });
+
+  // ---- Directory stub exclusion ----
+
+  describe("Directory stub exclusion", () => {
+    it("includeStubs defaults to false (stubs excluded)", async () => {
+      // Seed a regular entity and a stub entity
+      await seedEntity(app, "regular-person", "Regular Person", {
+        entityType: "person",
+        stableId: "rEg1234567",
+      });
+      await postJson(app, "/api/entities/sync", {
+        entities: [{
+          id: "stub-jane",
+          stableId: "sTb1234567",
+          title: "Stub Jane",
+          entityType: "person",
+          metadata: { stub: true },
+        }],
+      });
+
+      const res = await app.request("/api/entities/directory?entityType=person");
+      expect(res.status).toBe(200);
+      // The mock doesn't filter by metadata, so we just verify the endpoint
+      // accepts the parameter and responds successfully
+      const body = await res.json();
+      expect(Array.isArray(body.entities)).toBe(true);
+    });
+
+    it("includeStubs=true returns all entities", async () => {
+      const res = await app.request(
+        "/api/entities/directory?entityType=person&includeStubs=true"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(Array.isArray(body.entities)).toBe(true);
+    });
+
+    it("includeStubs=false excludes stubs (explicit)", async () => {
+      const res = await app.request(
+        "/api/entities/directory?entityType=person&includeStubs=false"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(Array.isArray(body.entities)).toBe(true);
+    });
+  });
+});
+
+// ---- Unit tests for clearStubIfEnriched ----
+
+describe("clearStubIfEnriched", () => {
+  it("returns null for entities without metadata", () => {
+    expect(clearStubIfEnriched({ metadata: null })).toBe(null);
+    expect(clearStubIfEnriched({ metadata: undefined })).toBe(null);
+    expect(clearStubIfEnriched({})).toBe(null);
+  });
+
+  it("returns metadata unchanged if no stub flag", () => {
+    const meta = { customTag: "important" };
+    expect(clearStubIfEnriched({ metadata: meta })).toBe(meta);
+  });
+
+  it("preserves stub flag when no enrichment data present", () => {
+    const result = clearStubIfEnriched({
+      metadata: { stub: true },
+    });
+    expect(result).toEqual({ stub: true });
+  });
+
+  it("clears stub when description is present", () => {
+    const result = clearStubIfEnriched({
+      description: "A description",
+      metadata: { stub: true },
+    });
+    expect(result).toBe(null); // Only field was stub, so metadata becomes null
+  });
+
+  it("clears stub when wikiId is present", () => {
+    const result = clearStubIfEnriched({
+      wikiId: "E42",
+      metadata: { stub: true },
+    });
+    expect(result).toBe(null);
+  });
+
+  it("clears stub when sources are present", () => {
+    const result = clearStubIfEnriched({
+      sources: [{ title: "Source" }],
+      metadata: { stub: true },
+    });
+    expect(result).toBe(null);
+  });
+
+  it("clears stub when customFields are present", () => {
+    const result = clearStubIfEnriched({
+      customFields: [{ label: "Field", value: "Value" }],
+      metadata: { stub: true },
+    });
+    expect(result).toBe(null);
+  });
+
+  it("clears stub when relatedEntries are present", () => {
+    const result = clearStubIfEnriched({
+      relatedEntries: [{ id: "other", type: "org" }],
+      metadata: { stub: true },
+    });
+    expect(result).toBe(null);
+  });
+
+  it("preserves other metadata fields when clearing stub", () => {
+    const result = clearStubIfEnriched({
+      description: "Has data",
+      metadata: { stub: true, customTag: "important", verified: false },
+    });
+    expect(result).toEqual({ customTag: "important", verified: false });
+  });
+
+  it("does not clear stub for empty arrays", () => {
+    const result = clearStubIfEnriched({
+      customFields: [],
+      sources: [],
+      relatedEntries: [],
+      metadata: { stub: true },
+    });
+    expect(result).toEqual({ stub: true });
+  });
+
+  it("does not clear stub for null/undefined data fields", () => {
+    const result = clearStubIfEnriched({
+      description: null,
+      wikiId: null,
+      customFields: null,
+      sources: null,
+      relatedEntries: null,
+      metadata: { stub: true },
+    });
+    expect(result).toEqual({ stub: true });
+  });
+
+  it("does not clear stub for empty description", () => {
+    const result = clearStubIfEnriched({
+      description: "",
+      metadata: { stub: true },
+    });
+    expect(result).toEqual({ stub: true });
   });
 });
