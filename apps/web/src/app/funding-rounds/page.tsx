@@ -33,7 +33,8 @@ export default function FundingRoundsPage() {
 
   const rows: FundingRoundRow[] = allRecords.map((record) => {
     const f = record.fields;
-    const company = resolveEntityLink(record.ownerEntityId);
+    const preResolvedCompanyName = typeof f.company_name === "string" ? f.company_name : null;
+    const company = resolveEntityLink(record.ownerEntityId, preResolvedCompanyName);
     const leadInvestorId =
       typeof f.lead_investor === "string" ? f.lead_investor : null;
     const leadInvestor = leadInvestorId
