@@ -1252,6 +1252,26 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: slava-matyukhin
+  stableId: 9TS0Cj5u5Q
+  wikiId: E1946
+  type: person
+  title: Slava Matyukhin
+  description: >-
+    Software engineer and key Squiggle contributor at QURI. Lead developer
+    of the Squiggle language rewrite (v0.8-0.10) and the Squiggle Hub platform.
+    Also known as berekuk on GitHub. Previously built Kocherga (EA community
+    space management in Moscow) and contributed to LessWrong/ForumMagnum
+    development. Active on Squiggle from 2022 to 2025.
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+    - id: squiggle-hub
+      type: project
+  lastUpdated: 2026-03
+
 - id: nuno-sempere
   stableId: AnFfbQlIog
   wikiId: E579
@@ -2170,6 +2190,70 @@
       value: Co-founder & President
     - label: Known For
       value: Co-founding OpenAI, Former CTO of Stripe
+  tags:
+    - ai
+
+# Entries below were created by personnel enrichment tasks. They are added here
+# explicitly so that the YAML sync keeps them with correct titles and prunes
+# the stale/garbled duplicates (askell-amanda, bowman-samuel-r, andrew-y-ng,
+# andreas-stuhlm-ller, alex-kaskasoli, ben-weinstein-raun, buck).
+
+- id: amanda-askell
+  stableId: 2qcak72NwQ
+  type: person
+  title: Amanda Askell
+  description: AI safety researcher at Anthropic, known for work on language model alignment and sycophancy.
+  customFields:
+    - label: Role
+      value: Researcher
+  tags:
+    - ai
+
+- id: samuel-r-bowman
+  stableId: DikTuUb39Q
+  type: person
+  title: Samuel R. Bowman
+  description: AI safety researcher and NLP professor, known for work on language model evaluation and safety.
+  customFields:
+    - label: Role
+      value: Professor and Researcher
+  tags:
+    - ai
+
+- id: alexandre-kaskasoli
+  stableId: KnHneaUKew
+  type: person
+  title: Alexandre Kaskasoli
+  description: AI safety researcher known for work on dangerous capability evaluations of frontier models.
+  customFields:
+    - label: Role
+      value: Researcher
+  tags:
+    - ai
+
+- id: benjamin-weinstein-raun
+  stableId: eg18B7rL4g
+  type: person
+  title: Benjamin Weinstein-Raun
+  description: Senior Researcher and acting director at Palisade Research, focused on AI safety.
+  customFields:
+    - label: Role
+      value: Senior Researcher
+  tags:
+    - ai
+
+- id: andreas-stuhlmuller
+  stableId: SqupPjf6AJ
+  type: person
+  title: Andreas Stuhlmüller
+  description: >-
+    Co-founder of Elicit (formerly Ought), an AI research tool focused on
+    language model assistance for research tasks. Pioneer in using ML to
+    assist human reasoning and decision-making.
+  website: https://elicit.com
+  customFields:
+    - label: Role
+      value: Co-founder, Elicit
   tags:
     - ai
 
