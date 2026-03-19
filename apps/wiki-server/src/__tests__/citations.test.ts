@@ -237,7 +237,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Broken quotes (WHERE quote_verified AND verification_score IS NOT NULL AND < threshold) ---
-  if (q.includes("citation_quotes") && q.includes("is not null") && q.includes("where") && !q.includes("update") && !q.includes("insert")) {
+  // Note: !q.includes("group by") prevents this from matching the verdict/difficulty distribution queries.
+  if (q.includes("citation_quotes") && q.includes("is not null") && q.includes("where") && !q.includes("group by") && !q.includes("update") && !q.includes("insert")) {
     const threshold = (params[1] as number) ?? 0.5;
     return Array.from(quotesStore.values())
       .filter((r) => r.quoteVerified === true && r.verificationScore != null && (r.verificationScore as number) < threshold)
@@ -246,6 +247,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         page_id_old: r.pageId, page_id: r.pageId, footnote: r.footnote, url: r.url,
         claim_text: r.claimText, verification_score: r.verificationScore,
       }));
+  }
+
+  // --- citation_quotes: Flagged citations (WHERE accuracy_verdict IN ('inaccurate','unsupported') ORDER BY accuracy_score LIMIT) ---
+  // Distinguished by the inlined 'inaccurate' literal in the WHERE clause (not a parameterised intId lookup).
+  // Must come BEFORE the generic WHERE + ORDER BY handler which assumes page_id_int lookup.
+  if (q.includes("citation_quotes") && q.includes("'inaccurate'") && q.includes("where") && q.includes("order by") && q.includes("limit") && !q.includes("group by")) {
+    const all = Array.from(quotesStore.values());
+    const flagged = all
+      .filter((r) => r.accuracyVerdict === "inaccurate" || r.accuracyVerdict === "unsupported")
+      .sort((a, b) => ((a.accuracyScore ?? 0) as number) - ((b.accuracyScore ?? 0) as number));
+    return flagged.map(quoteToSqlRow);
   }
 
   // --- citation_quotes: SELECT * ... WHERE page_id_int ORDER BY footnote [LIMIT] ---
@@ -295,6 +307,24 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return all.slice(offset, offset + limit).map(quoteToSqlRow);
   }
 
+  // --- citation_quotes: Accuracy-dashboard summary (count + count(case when accuracy_verdict) without group by) ---
+  // Must come BEFORE the generic stats handler — distinguished by accuracy_verdict/accuracy_score in the query.
+  if (q.includes("citation_quotes") && q.includes("accuracy_verdict") && q.includes("count") && q.includes("case") && !q.includes("group by") && !q.includes("where")) {
+    const all = Array.from(quotesStore.values());
+    const checked = all.filter((r) => r.accuracyVerdict != null);
+    const checkedScores = checked.filter((r) => r.accuracyScore != null).map((r) => r.accuracyScore as number);
+    const avgScore = checkedScores.length > 0 ? checkedScores.reduce((a, b) => a + b, 0) / checkedScores.length : null;
+    return [{
+      count: all.length,
+      checked_citations: checked.length,
+      accurate_citations: all.filter((r) => r.accuracyVerdict === "accurate").length,
+      inaccurate_citations: all.filter((r) => r.accuracyVerdict === "inaccurate").length,
+      unsupported_citations: all.filter((r) => r.accuracyVerdict === "unsupported").length,
+      minor_issue_citations: all.filter((r) => r.accuracyVerdict === "minor_issues").length,
+      avg: avgScore,
+    }];
+  }
+
   // --- citation_quotes: Stats aggregation (count + count(case) without group by) ---
   if (q.includes("citation_quotes") && q.includes("count") && q.includes("case") && !q.includes("group by")) {
     const all = Array.from(quotesStore.values());
@@ -336,6 +366,61 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         inaccurate: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
         unsupported: rows.filter((r) => r.accuracyVerdict === "unsupported").length,
       }))
+      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
+  }
+
+  // --- citation_quotes: Verdict distribution (WHERE accuracy_verdict IS NOT NULL + GROUP BY accuracy_verdict) ---
+  // accuracy-dashboard query 2: SELECT accuracy_verdict, count(*) ... WHERE accuracy_verdict IS NOT NULL GROUP BY accuracy_verdict
+  // Note: accuracy_verdict is in the query; verification_difficulty is NOT.
+  if (q.includes("citation_quotes") && q.includes("accuracy_verdict") && q.includes("where") && q.includes("group by") && !q.includes("having") && !q.includes("verification_difficulty")) {
+    const verdictCounts = new Map<string, number>();
+    for (const r of quotesStore.values()) {
+      if (r.accuracyVerdict != null) {
+        verdictCounts.set(r.accuracyVerdict as string, (verdictCounts.get(r.accuracyVerdict as string) || 0) + 1);
+      }
+    }
+    return Array.from(verdictCounts.entries()).map(([verdict, cnt]) => ({ accuracy_verdict: verdict, cnt }));
+  }
+
+  // --- citation_quotes: Difficulty distribution (WHERE verification_difficulty IS NOT NULL + GROUP BY verification_difficulty) ---
+  // accuracy-dashboard query 3. Returns { verification_difficulty, cnt } to match extractColumns mapping.
+  if (q.includes("citation_quotes") && q.includes("verification_difficulty") && q.includes("where") && q.includes("group by") && !q.includes("having")) {
+    const diffCounts = new Map<string, number>();
+    for (const r of quotesStore.values()) {
+      if (r.verificationDifficulty != null) {
+        diffCounts.set(r.verificationDifficulty as string, (diffCounts.get(r.verificationDifficulty as string) || 0) + 1);
+      }
+    }
+    // Key must be "verification_difficulty" to match the column name extractColumns extracts from
+    // SELECT "citation_quotes"."verification_difficulty". Drizzle maps this to the `difficulty` JS field.
+    return Array.from(diffCounts.entries()).map(([d, cnt]) => ({ verification_difficulty: d, cnt }));
+  }
+
+  // --- citation_quotes: Accuracy-dashboard per-page aggregation (GROUP BY pageId, no HAVING, with minor_issues col) ---
+  // Distinguished from /page-stats by the presence of 'minor_issues' in the query (minor_issues verdict count).
+  if (q.includes("citation_quotes") && q.includes("minor_issues") && q.includes("group by") && !q.includes("having") && !q.includes("where")) {
+    const byPage = new Map<string, QuoteRow[]>();
+    for (const r of quotesStore.values()) {
+      const arr = byPage.get(r.pageId as string) || [];
+      arr.push(r);
+      byPage.set(r.pageId as string, arr);
+    }
+    return Array.from(byPage.entries())
+      .map(([pageId, rows]) => {
+        const checked = rows.filter((r) => r.accuracyVerdict != null);
+        const checkedScores = checked.filter((r) => r.accuracyScore != null).map((r) => r.accuracyScore as number);
+        const avgScore = checkedScores.length > 0 ? checkedScores.reduce((a, b) => a + b, 0) / checkedScores.length : null;
+        return {
+          page_id_old: pageId,
+          count: rows.length,
+          checked: checked.length,
+          accurate: rows.filter((r) => r.accuracyVerdict === "accurate").length,
+          inaccurate: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
+          unsupported: rows.filter((r) => r.accuracyVerdict === "unsupported").length,
+          minor_issues: rows.filter((r) => r.accuracyVerdict === "minor_issues").length,
+          avg_score: avgScore,
+        };
+      })
       .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
   }
 
