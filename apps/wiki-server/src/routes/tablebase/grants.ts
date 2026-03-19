@@ -13,7 +13,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 
 // ---- Constants ----
 
@@ -610,6 +610,13 @@ const grantsApp = new Hono()
           },
         });
 
+      // Resolve org + grantee slugs to human-readable titles for search
+      const orgSlugs = [...new Set(items.map((g) => g.organizationId))];
+      const granteeSlugs = items
+        .map((g) => g.granteeId)
+        .filter((id): id is string => id != null);
+      const titleMap = await resolveEntityTitles(tx, [...orgSlugs, ...granteeSlugs]);
+
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
@@ -620,9 +627,11 @@ const grantsApp = new Hono()
           sourceTable: "grants",
           sourceId: g.id,
           sourceUrl: g.source,
-          parentTitle: g.organizationId,
+          parentTitle: titleMap.get(g.organizationId) ?? g.organizationId,
           description: [
-            g.granteeId ? `to ${g.granteeId}` : null,
+            g.granteeId
+              ? `to ${titleMap.get(g.granteeId) ?? g.granteeId}`
+              : null,
             g.amount != null ? `$${Number(g.amount).toLocaleString()}` : null,
             g.date,
           ].filter(Boolean).join(", ") || null,

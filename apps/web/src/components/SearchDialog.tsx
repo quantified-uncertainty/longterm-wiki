@@ -56,7 +56,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 // ---------------------------------------------------------------------------
 
 const SEARCH_FILTER_GROUPS = ENTITY_GROUPS.filter(
-  (g) => !["Tables", "Diagrams", "Insights"].includes(g.label)
+  (g) => !["Tables", "Diagrams", "Insights", "Internal"].includes(g.label)
 );
 
 // ---------------------------------------------------------------------------
@@ -142,7 +142,11 @@ export function SearchDialog() {
           searchThings(query, 10),
         ]);
         if (cancelled) return;
-        setAllResults(wikiR);
+        // Filter out internal pages from search results
+        const filteredWiki = wikiR.filter(
+          (r) => r.type !== "internal" && !r.id.startsWith("internal/"),
+        );
+        setAllResults(filteredWiki);
         const pageWikiIds = new Set(wikiR.map((r) => r.wikiId).filter(Boolean));
         const deduped = thingsR.filter(
           (t) => t.href && !(t.thingType === "entity" && t.wikiId && pageWikiIds.has(t.wikiId)),

@@ -11,7 +11,7 @@ import {
   zv,
   parseRange,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
@@ -252,6 +252,10 @@ const fundingRoundsApp = new Hono()
           },
         });
 
+      // Resolve company slugs to human-readable titles for search
+      const companySlugs = [...new Set(items.map((fr) => fr.companyId))];
+      const titleMap = await resolveEntityTitles(tx, companySlugs);
+
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
@@ -262,7 +266,7 @@ const fundingRoundsApp = new Hono()
           sourceTable: "funding_rounds",
           sourceId: fr.id,
           sourceUrl: fr.source,
-          parentTitle: fr.companyId,
+          parentTitle: titleMap.get(fr.companyId) ?? fr.companyId,
           description: [
             fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
             fr.instrument,
