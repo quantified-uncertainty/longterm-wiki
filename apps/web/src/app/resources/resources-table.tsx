@@ -43,6 +43,14 @@ export interface ResourceRow {
   citingPageCount: number;
   tags: string[];
   publishedDate: string | null;
+  contextNote: string | null;
+  resourceSubtype: string | null;
+  importanceScore: number | null;
+  enrichmentStatus: string | null;
+  // Paper-specific
+  citationCount: number | null;
+  // Forum-specific
+  karma: number | null;
 }
 
 const RESOURCE_TYPE_COLORS: Record<string, string> = {
@@ -208,6 +216,97 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
       },
     },
     {
+      accessorKey: "contextNote",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Context</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const note = row.original.contextNote;
+        if (!note)
+          return (
+            <span className="text-muted-foreground/40 text-xs">-</span>
+          );
+        return (
+          <span
+            className="text-xs text-muted-foreground max-w-[200px] truncate block"
+            title={note}
+          >
+            {note}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    },
+    {
+      accessorKey: "importanceScore",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Importance</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const score = row.original.importanceScore;
+        if (score == null)
+          return (
+            <span className="text-muted-foreground/40 text-xs">-</span>
+          );
+        const pct = Math.round(score * 100);
+        const color =
+          pct >= 70
+            ? "text-emerald-600"
+            : pct >= 40
+              ? "text-blue-500"
+              : "text-muted-foreground";
+        return (
+          <span className={`text-xs font-medium tabular-nums ${color}`}>
+            {pct}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    },
+    {
+      accessorKey: "citationCount",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Cites</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const c = row.original.citationCount;
+        const k = row.original.karma;
+        // Show citation count for papers, karma for forum posts
+        if (c != null) {
+          return (
+            <span className="text-xs tabular-nums text-muted-foreground" title={`${c} citations`}>
+              {c >= 1000 ? `${(c / 1000).toFixed(1)}k` : c}
+            </span>
+          );
+        }
+        if (k != null) {
+          return (
+            <span className="text-xs tabular-nums text-muted-foreground" title={`${k} karma`}>
+              {k}
+            </span>
+          );
+        }
+        return <span className="text-muted-foreground/40 text-xs">-</span>;
+      },
+      sortUndefined: "last",
+    },
+    {
+      accessorKey: "resourceSubtype",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Subtype</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const st = row.original.resourceSubtype;
+        if (!st) return <span className="text-muted-foreground/40 text-xs">-</span>;
+        return (
+          <span className="text-xs text-muted-foreground">
+            {st.replace(/_/g, " ")}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    },
+    {
       accessorKey: "id",
       header: ({ column }) => (
         <SortableHeader column={column}>ID</SortableHeader>
@@ -227,6 +326,8 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
 const INITIAL_COLUMN_VISIBILITY: Record<string, boolean> = {
   id: false,
   tags: false,
+  resourceSubtype: false,
+  enrichmentStatus: false,
 };
 
 export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {

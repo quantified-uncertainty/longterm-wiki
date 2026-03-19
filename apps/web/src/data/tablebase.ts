@@ -184,6 +184,55 @@ export interface Resource {
   archive_url?: string;
   author_entity_ids?: string[];
   stance?: string;
+  // Enrichment fields
+  context_note?: string;
+  resource_purpose?: string;
+  resource_subtype?: string;
+  type_metadata?: Record<string, unknown>;
+  publisher_entity_id?: string;
+  related_entity_ids?: string[];
+  enrichment_status?: string;
+  importance_score?: number;
+  // Sub-table data
+  paper?: ResourcePaper;
+  forum_post?: ResourceForumPost;
+  policy_doc?: ResourcePolicyDoc;
+}
+
+export interface ResourcePaper {
+  arxiv_id?: string;
+  doi?: string;
+  semantic_scholar_id?: string;
+  abstract?: string;
+  citation_count?: number;
+  influential_citation_count?: number;
+  categories?: string[];
+  methodology?: string;
+  year?: number;
+}
+
+export interface ResourceForumPost {
+  forum: string;
+  forum_post_id?: string;
+  forum_slug?: string;
+  karma?: number;
+  comment_count?: number;
+  author_username?: string;
+  forum_tags?: string[];
+  sequence_title?: string;
+  curated?: boolean;
+  cross_posted_from?: string;
+  canonical_forum?: string;
+}
+
+export interface ResourcePolicyDoc {
+  document_type?: string;
+  jurisdiction_entity_id?: string;
+  agency_entity_id?: string;
+  policy_entity_id?: string;
+  effective_date?: string;
+  document_status?: string;
+  reference_number?: string;
 }
 
 export interface Publication {

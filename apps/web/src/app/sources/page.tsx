@@ -37,6 +37,12 @@ export default function SourcesPage() {
       citingPageCount: citingPages.length,
       tags: r.tags ?? [],
       publishedDate: r.published_date ?? null,
+      contextNote: r.context_note ?? null,
+      resourceSubtype: r.resource_subtype ?? null,
+      importanceScore: r.importance_score ?? null,
+      enrichmentStatus: r.enrichment_status ?? null,
+      citationCount: r.paper?.citation_count ?? null,
+      karma: r.forum_post?.karma ?? null,
     };
   });
 

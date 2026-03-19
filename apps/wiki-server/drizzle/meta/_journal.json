@@ -806,6 +806,20 @@
       "when": 1779523200000,
       "tag": "0114_add_page_id_int_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1779609600000,
+      "tag": "0115_resource_enrichment_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1779696000000,
+      "tag": "0116_resource_sub_tables",
+      "breakpoints": true
     }
   ]
 }
