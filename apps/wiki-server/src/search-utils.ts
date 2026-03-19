@@ -63,6 +63,17 @@ export function titleMatchBoostExpr(
   )`;
 }
 
+/**
+ * Normalize a search query by inserting spaces at letter/digit boundaries.
+ * "sb1047" → "sb 1047", "gpt4" → "gpt 4", "AI2" → "AI 2".
+ * Returns the original query if no normalization is needed.
+ */
+export function normalizeSearchQuery(q: string): string {
+  return q
+    .replace(/([a-zA-Z])(\d)/g, "$1 $2")
+    .replace(/(\d)([a-zA-Z])/g, "$1 $2");
+}
+
 /** Minimum pg_trgm similarity score to include in trigram fallback results. */
 export const TRIGRAM_SIMILARITY_THRESHOLD = 0.15;
 

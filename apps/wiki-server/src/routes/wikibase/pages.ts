@@ -18,6 +18,7 @@ import {
 import {
   buildPrefixTsquery,
   titleMatchBoostExpr,
+  normalizeSearchQuery,
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
   TS_HEADLINE_OPTIONS,
@@ -63,12 +64,17 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 const pagesApp = new Hono()
   // ---- GET /search?q=...&limit=20 ----
   .get("/search", zv("query", SearchQuery), async (c) => {
-    const { q, limit } = c.req.valid("query");
+    const { q: rawQ, limit } = c.req.valid("query");
     const rawDb = getDb();
+
+    // Normalize query: insert spaces at letter/digit boundaries
+    // so "sb1047" → "sb 1047" matches FTS tokens.
+    const q = normalizeSearchQuery(rawQ);
 
     // Phase 1: Prefix search with to_tsquery — supports search-as-you-type.
     // Each word gets a :* suffix for prefix matching, ANDed together.
     // Weighted ranking: title (A=1.0), description (B=0.4), summary (C=0.2), tags+entityType (D=0.1).
+    // Internal pages (entity_type = 'internal') are excluded from public search.
     const prefixQuery = buildPrefixTsquery(q);
 
     let results: PageSearchRow[] = [];
@@ -87,6 +93,7 @@ const pagesApp = new Hono()
       FROM wiki_pages
       WHERE search_vector @@ to_tsquery('english', $1)
         AND wiki_id IS NOT NULL
+        AND (entity_type IS NULL OR entity_type != 'internal')
       ORDER BY rank DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [prefixQuery, limit, q],
@@ -105,6 +112,7 @@ const pagesApp = new Hono()
       FROM wiki_pages
       WHERE word_count > 0
         AND wiki_id IS NOT NULL
+        AND (entity_type IS NULL OR entity_type != 'internal')
         AND similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
         AND id NOT IN (SELECT unnest($3::text[]))
       ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
