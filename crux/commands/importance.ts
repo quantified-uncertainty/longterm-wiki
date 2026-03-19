@@ -64,11 +64,11 @@ Commands:
 ${commandList}
 
 Workflow:
-  1. crux importance rerank --all --apply                       # Readership ranking
-  2. crux importance rerank --dimension=research --all --apply  # Research ranking
-  3. crux importance show --top=30                              # Review readership
-  4. crux importance show --dimension=research --top=30         # Review research
-  5. crux importance sync --apply                               # Write both to frontmatter
+  1. crux w importance rerank --all --apply                       # Readership ranking
+  2. crux w importance rerank --dimension=research --all --apply  # Research ranking
+  3. crux w importance show --top=30                              # Review readership
+  4. crux w importance show --dimension=research --top=30         # Review research
+  5. crux w importance sync --apply                               # Write both to frontmatter
 
 Files:
   data/importance-ranking.yaml   Readership ranking
@@ -86,12 +86,12 @@ Options:
   --apply           Write changes
 
 Examples:
-  crux importance show --top=20
-  crux importance show --dimension=research --top=20
-  crux importance rerank --sample=20
-  crux importance rerank --dimension=research --sample=20
-  crux importance rerank --all --apply
-  crux importance rerank --verify --apply
-  crux importance sync --apply
+  crux w importance show --top=20
+  crux w importance show --dimension=research --top=20
+  crux w importance rerank --sample=20
+  crux w importance rerank --dimension=research --sample=20
+  crux w importance rerank --all --apply
+  crux w importance rerank --verify --apply
+  crux w importance sync --apply
 `;
 }

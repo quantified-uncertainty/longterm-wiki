@@ -743,6 +743,20 @@
       "when": 1777708800000,
       "tag": "0105_add_href_parent_title_to_things",
       "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1777795200000,
+      "tag": "0106_fix_stale_entity_ids",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1777881600000,
+      "tag": "0107_mark_stub_entities",
+      "breakpoints": true
     }
   ]
 }

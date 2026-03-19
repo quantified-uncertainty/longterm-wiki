@@ -13,7 +13,7 @@ Repeat this cycle up to 5 times:
 ### Step 1: Get next task
 
 ```bash
-pnpm crux tablebase prepare
+pnpm crux tb prepare
 ```
 
 If output is `NO_TASKS`, stop. Otherwise, read the task details, search queries, and record template.
@@ -26,7 +26,7 @@ Follow the **research strategy** from the prepare output:
 
 2. **If WebFetch returns empty/404**, the page may be JS-rendered. Use Playwright:
    ```bash
-   pnpm crux tablebase fetch-page "https://example.com/team"
+   pnpm crux tb fetch-page "https://example.com/team"
    ```
    This renders the page with a real browser and returns the text content.
 
@@ -41,16 +41,16 @@ Follow the **research strategy** from the prepare output:
 Collect all person names found in research into a JSON array and run:
 
 ```bash
-echo '["Jaime Sevilla","Ben Cottier","David Owen"]' | pnpm crux tablebase ensure-entities --type=person --ci
+echo '["Jaime Sevilla","Ben Cottier","David Owen"]' | pnpm crux tb ensure-entities --type=person --ci
 ```
 
 This resolves existing entities and creates new ones in a single batch call. Output is a JSON array of `{name, stableId, created}` — use each `stableId` in your records.
 
 For a single entity, you can also use:
 ```bash
-pnpm crux tablebase resolve "Person Name" --ci
+pnpm crux tb resolve "Person Name" --ci
 # If not found:
-pnpm crux tablebase create-entity "Person Name" --type=person --ci
+pnpm crux tb create-entity "Person Name" --type=person --ci
 ```
 
 ### Step 3b: Research dates
@@ -67,7 +67,7 @@ If you can't find a start date, that's OK — be honest in the notes field.
 Pipe a JSON array of records using the template from Step 1:
 
 ```bash
-cat <<'RECORDS' | pnpm crux tablebase submit --table=<table>
+cat <<'RECORDS' | pnpm crux tb submit --table=<table>
 [
   {"personId":"<stableId>","organizationId":"<entityId>","role":"CEO","roleType":"key-person","startDate":"2021","source":"https://...","notes":"Confirmed on team page as of 2026-03-16."}
 ]
@@ -82,7 +82,7 @@ Every record **must** have:
 ### Step 5: Mark done and continue
 
 ```bash
-pnpm crux tablebase mark-done <taskId>
+pnpm crux tb mark-done <taskId>
 ```
 
 Go back to Step 1.

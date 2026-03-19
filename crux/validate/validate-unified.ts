@@ -61,7 +61,7 @@ async function main(): Promise<void> {
       console.log(`    ${colors.dim}${rule.description}${colors.reset}`);
       console.log(`    Scope: ${rule.scope || 'file'}\n`);
     }
-    process.exit(0);
+    return;
   }
 
   const startTime: number = Date.now();
@@ -126,7 +126,7 @@ async function main(): Promise<void> {
 
     if (fixableIssues.length === 0) {
       console.log(`${colors.green}✓ No fixable issues found${colors.reset}`);
-      process.exit(0);
+      return;
     }
 
     const { filesFixed, issuesFixed } = engine.applyFixes(fixableIssues);
@@ -136,7 +136,7 @@ async function main(): Promise<void> {
       console.log(`${colors.yellow}⚠ ${unfixableIssues.length} issues require manual fixes${colors.reset}`);
     }
 
-    process.exit(0);
+    return;
   }
 
   // Output results
@@ -176,14 +176,14 @@ async function main(): Promise<void> {
     }
   }
 
-  // Exit with error if there were errors
+  // Set exit code based on whether there were errors
   const summary = engine.getSummary(issues);
-  process.exit(summary.hasErrors ? 1 : 0);
+  process.exitCode = summary.hasErrors ? 1 : 0;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((err: unknown) => {
     console.error('Validation failed:', err);
-    process.exit(1);
+    process.exitCode = 1;
   });
 }

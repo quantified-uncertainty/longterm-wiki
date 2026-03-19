@@ -5,11 +5,11 @@
  * high-impact improvement targets for automated content loops.
  *
  * Usage:
- *   crux matrix scores [--type=<entityType>] [--sort=gap|score|pages] [--weights=quality:30,...]
- *   crux matrix pages  [--type=<entityType>] [--dimension=content|coverage|quality]
+ *   crux tb matrix scores [--type=<entityType>] [--sort=gap|score|pages] [--weights=quality:30,...]
+ *   crux tb matrix pages  [--type=<entityType>] [--dimension=content|coverage|quality]
  *                       [--limit=20] [--min-words=100] [--exclude=file] [--include-stubs]
- *   crux matrix next-task [--dimension=content|coverage|quality] [--format=prompt|json]
- *   crux matrix mark-done <pageId>  Mark a page as improved (add to exclusion list)
+ *   crux tb matrix next-task [--dimension=content|coverage|quality] [--format=prompt|json]
+ *   crux tb matrix mark-done <pageId>  Mark a page as improved (add to exclusion list)
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -267,8 +267,8 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
   if (format === 'json') return { exitCode: 0, output: JSON.stringify(top, null, 2) };
   const isCreate = top.action === 'create';
   const cmd = isCreate
-    ? `pnpm crux content create "${top.title}" --tier=standard`
-    : `pnpm crux content improve ${top.wikiId} --tier=standard --apply`;
+    ? `pnpm crux w content create "${top.title}" --tier=standard`
+    : `pnpm crux w content improve ${top.wikiId} --tier=standard --apply`;
   return { exitCode: 0, output: `## Task: ${isCreate ? 'Create' : 'Improve'} "${top.title}" (${top.wikiId})
 
 **Action**: \`${top.action}\`${top.isStub ? ' (stub — needs full content creation)' : ''}
@@ -283,18 +283,18 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
 
 ### Steps
 
-1. Run \`pnpm crux agent-checklist init "${isCreate ? 'Create' : 'Improve'} ${top.title}" --type=content\`
+1. Run \`pnpm crux sys agent-checklist init "${isCreate ? 'Create' : 'Improve'} ${top.title}" --type=content\`
 2. Run \`${cmd}\`
-3. Run \`pnpm crux fix escaping && pnpm crux fix markdown\`
-4. Run \`pnpm crux validate gate --fix\`
-5. Run \`pnpm crux matrix mark-done ${top.wikiId}\`
+3. Run \`pnpm crux w fix escaping && pnpm crux w fix markdown\`
+4. Run \`pnpm crux w validate gate --fix\`
+5. Run \`pnpm crux tb matrix mark-done ${top.wikiId}\`
 6. Commit changes
 7. Open PR via \`/agent-session-ready-PR\`` };
 }
 
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const pageId = args.find(a => !a.startsWith('--'));
-  if (!pageId) return { exitCode: 1, output: 'Usage: crux matrix mark-done <pageId>' };
+  if (!pageId) return { exitCode: 1, output: 'Usage: crux tb matrix mark-done <pageId>' };
   const excludePath = (options.exclude as string) || EXCLUSION_FILE;
   appendToExclusionList(pageId, excludePath);
   if (options.ci) return { exitCode: 0, output: JSON.stringify({ marked: pageId, file: excludePath }) };
@@ -333,13 +333,13 @@ Options:
   --ci                    JSON output
 
 Examples:
-  crux matrix                                    # Entity type scorecard
-  crux matrix scores --weights=quality:50,coverage:50  # Custom weights
-  crux matrix pages --include-stubs              # Show stub pages too
-  crux matrix pages --format=ids --limit=10      # IDs for batch piping
-  crux matrix next-task                          # Prompt for next improve task
-  crux matrix next-task --include-stubs          # Include stub pages (create tasks)
-  crux matrix next-task --type=person            # Only person pages
-  crux matrix mark-done E357                     # Exclude from future picks
+  crux tb matrix                                    # Entity type scorecard
+  crux tb matrix scores --weights=quality:50,coverage:50  # Custom weights
+  crux tb matrix pages --include-stubs              # Show stub pages too
+  crux tb matrix pages --format=ids --limit=10      # IDs for batch piping
+  crux tb matrix next-task                          # Prompt for next improve task
+  crux tb matrix next-task --include-stubs          # Include stub pages (create tasks)
+  crux tb matrix next-task --type=person            # Only person pages
+  crux tb matrix mark-done E357                     # Exclude from future picks
 `;
 }

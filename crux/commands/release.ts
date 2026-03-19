@@ -6,8 +6,8 @@
  * deploys (Vercel frontend + wiki-server via wiki-server-docker.yml).
  *
  * Usage:
- *   crux release create             Create or update a release PR
- *   crux release create --dry-run   Preview without creating
+ *   crux gh release create             Create or update a release PR
+ *   crux gh release create --dry-run   Preview without creating
  */
 
 import { execFileSync } from 'child_process';
@@ -329,7 +329,7 @@ The release PR includes:
   - Idempotent: updates existing open release PR instead of creating duplicates
 
 Examples:
-  pnpm crux release create               # Create or update release PR
-  pnpm crux release create --dry-run     # Preview without creating
+  pnpm crux gh release create               # Create or update release PR
+  pnpm crux gh release create --dry-run     # Preview without creating
 `.trim();
 }

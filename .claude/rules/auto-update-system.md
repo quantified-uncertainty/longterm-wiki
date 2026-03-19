@@ -5,11 +5,11 @@ News-driven automatic wiki updates. Fetches from RSS feeds and web searches, rou
 ## Key commands
 
 ```bash
-pnpm crux auto-update plan                    # Preview what would be updated
-pnpm crux auto-update run --budget=30         # Run with $30 budget cap
-pnpm crux auto-update digest                  # Just fetch and show news digest
-pnpm crux auto-update sources                 # List configured sources
-pnpm crux auto-update history                 # Show past runs
+pnpm crux w auto-update plan                    # Preview what would be updated
+pnpm crux w auto-update run --budget=30         # Run with $30 budget cap
+pnpm crux w auto-update digest                  # Just fetch and show news digest
+pnpm crux w auto-update sources                 # List configured sources
+pnpm crux w auto-update history                 # Show past runs
 ```
 
 ## Architecture

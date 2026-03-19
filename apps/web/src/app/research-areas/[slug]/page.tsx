@@ -62,11 +62,13 @@ interface AreaDetailResponse {
 // ---------------------------------------------------------------------------
 
 function getAreaBySlug(slug: string) {
-  return getResearchAreasFromPG().find((a) => a.id === slug) ?? null;
+  // Include empty areas so detail pages work for all research areas
+  return getResearchAreasFromPG({ includeEmpty: true }).find((a) => a.id === slug) ?? null;
 }
 
 function getAllSlugs(): string[] {
-  return getResearchAreasFromPG().map((a) => a.id);
+  // Include empty areas so generateStaticParams covers all research areas
+  return getResearchAreasFromPG({ includeEmpty: true }).map((a) => a.id);
 }
 
 function resolveEntityName(id: string): string {
@@ -116,8 +118,8 @@ export default async function ResearchAreaDetailPage({
   const area = getAreaBySlug(slug);
   if (!area) return notFound();
 
-  // Find child areas from build-time data
-  const allAreas = getResearchAreasFromPG();
+  // Find child areas from build-time data (include empty for complete hierarchy)
+  const allAreas = getResearchAreasFromPG({ includeEmpty: true });
   const children = allAreas.filter((a) => a.parentAreaId === area.id);
   const parent = area.parentAreaId
     ? allAreas.find((a) => a.id === area.parentAreaId)

@@ -119,25 +119,25 @@ Options:
   --verbose         Detailed output
 
 Examples:
-  crux content improve far-ai --tier deep --directions "add recent papers"
-  crux content improve anthropic --engine=v2 --tier standard --apply
-  crux content create "SecureBio" --tier standard
-  crux content review anthropic                     # review single page
-  crux content review --batch --limit=20            # review lowest-quality pages
-  crux content regrade --batch 10
-  crux content grade
-  crux content grade-content --page my-page --warnings-only
-  crux content grade-content --page my-page --apply
-  crux content polish
-  crux content suggest-links --type=organization
-  crux content suggest-links --type=organization --min-score=3 --apply
-  crux content improve --batch=anthropic,miri,far-ai --engine=v2 --tier=standard --apply
-  crux content improve --batch-file=pages.txt --engine=v2 --batch-budget=500 --apply
-  crux content improve --engine=v2 --dry-run --limit=10            # preview 10 pages (no API calls)
-  crux content improve --batch=anthropic,miri --engine=v2 --dry-run  # preview specific pages
-  crux content improve --engine=v2 --dry-run --output=batch-plan.json  # save plan to file
-  crux content iterate anthropic --apply                              # iterate until quality stabilizes
-  crux content iterate anthropic --max-rounds=5 --tier=deep --apply   # deep iteration, up to 5 rounds
-  crux content iterate --pages=anthropic,miri,far-ai --apply          # iterate multiple pages
+  crux w content improve far-ai --tier deep --directions "add recent papers"
+  crux w content improve anthropic --engine=v2 --tier standard --apply
+  crux w content create "SecureBio" --tier standard
+  crux w content review anthropic                     # review single page
+  crux w content review --batch --limit=20            # review lowest-quality pages
+  crux w content regrade --batch 10
+  crux w content grade
+  crux w content grade-content --page my-page --warnings-only
+  crux w content grade-content --page my-page --apply
+  crux w content polish
+  crux w content suggest-links --type=organization
+  crux w content suggest-links --type=organization --min-score=3 --apply
+  crux w content improve --batch=anthropic,miri,far-ai --engine=v2 --tier=standard --apply
+  crux w content improve --batch-file=pages.txt --engine=v2 --batch-budget=500 --apply
+  crux w content improve --engine=v2 --dry-run --limit=10            # preview 10 pages (no API calls)
+  crux w content improve --batch=anthropic,miri --engine=v2 --dry-run  # preview specific pages
+  crux w content improve --engine=v2 --dry-run --output=batch-plan.json  # save plan to file
+  crux w content iterate anthropic --apply                              # iterate until quality stabilizes
+  crux w content iterate anthropic --max-rounds=5 --tier=deep --apply   # deep iteration, up to 5 rounds
+  crux w content iterate --pages=anthropic,miri,far-ai --apply          # iterate multiple pages
 `;
 }

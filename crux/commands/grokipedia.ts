@@ -5,9 +5,9 @@
  * Grokipedia external links.
  *
  * Usage:
- *   pnpm crux grokipedia match              # Find matching Grokipedia articles (dry run)
- *   pnpm crux grokipedia match --apply      # Find and write to external-links.yaml
- *   pnpm crux grokipedia match --verbose    # Show slug details
+ *   pnpm crux w grokipedia match              # Find matching Grokipedia articles (dry run)
+ *   pnpm crux w grokipedia match --apply      # Find and write to external-links.yaml
+ *   pnpm crux w grokipedia match --verbose    # Show slug details
  */
 
 import type { CommandResult } from "../lib/cli.ts";
@@ -273,8 +273,8 @@ Options:
   --verbose       Show slug details for each match
 
 Examples:
-  crux grokipedia match              Preview matches (dry run)
-  crux grokipedia match --apply      Find and write matches
-  crux grokipedia match --verbose    Show detailed slug info
+  crux w grokipedia match              Preview matches (dry run)
+  crux w grokipedia match --apply      Find and write matches
+  crux w grokipedia match --verbose    Show detailed slug info
 `;
 }

@@ -6,8 +6,8 @@
  * to retroactively link grantees to their entity pages.
  *
  * Usage:
- *   pnpm crux backfill-grantee-ids run                # Apply updates
- *   pnpm crux backfill-grantee-ids run --dry-run      # Preview without writing
+ *   pnpm crux tb backfill-grantee-ids run                # Apply updates
+ *   pnpm crux tb backfill-grantee-ids run --dry-run      # Preview without writing
  */
 
 import {

@@ -6,9 +6,9 @@ This command assumes `/agent-session-start` was run earlier and `.claude/wip-che
 
 ## Step 1: Check progress
 
-Run `pnpm crux agent-checklist status` to see what remains.
+Run `pnpm crux sys agent-checklist status` to see what remains.
 
-If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux agent-checklist init "Task description" --type=X` and work through ALL items before proceeding.
+If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux sys agent-checklist init "Task description" --type=X` and work through ALL items before proceeding.
 
 ## Step 2: Build + test verification (MANDATORY)
 
@@ -16,7 +16,7 @@ Run these before anything else — a PR that doesn't build is not worth reviewin
 
 1. **`pnpm build`** — must exit 0. If it fails, fix the issue before proceeding.
 2. **`pnpm test`** — existing tests must pass. If you added new logic (helpers, utilities, transformations), write tests for it.
-3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux validate gate --fix`
+3. **Gate check** (if MDX/YAML/validation changed): `pnpm crux w validate gate --fix`
 
 See `.claude/rules/pre-pr-verification.md` for full details on when tests are required.
 
@@ -90,7 +90,7 @@ Pay special attention to:
 
 ## Step 4: Write / update PR description
 
-Check if a PR exists using `pnpm crux pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux pr create`.
+Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux gh pr create`.
 
 ## Step 4b: Consider post-merge verification
 
@@ -105,14 +105,14 @@ Skip this step if the PR only changes code, content, or styling that is fully ve
 
 If working on a GitHub issue:
 ```bash
-pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
 ## Step 6: Session log
 
-Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
+Run `pnpm crux sys agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
 
-Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
+Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux sys agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
 
 **Record review status**: Check for the marker file, verify both the SHA and diff hash match, and set the `reviewed` field in the session log payload accordingly:
 
@@ -137,7 +137,7 @@ Include `reviewed: true` or `reviewed: false` in the session log payload sent to
 
 ## Step 7: Validate completion
 
-Run `pnpm crux agent-checklist complete` — must exit 0 (all items checked or N/A).
+Run `pnpm crux sys agent-checklist complete` — must exit 0 (all items checked or N/A).
 
 ## Step 8: Ship
 

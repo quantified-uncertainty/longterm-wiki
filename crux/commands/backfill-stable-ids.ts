@@ -6,7 +6,7 @@
  * don't have KB entries.
  *
  * Usage:
- *   crux backfill-stable-ids run [--dry-run]
+ *   crux tb backfill-stable-ids run [--dry-run]
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
@@ -125,8 +125,8 @@ writes them to the wiki-server entity_ids table. Then generates new stableIds
 for any entities that don't have KB entries.
 
 Usage:
-  crux backfill-stable-ids run              Run the backfill
-  crux backfill-stable-ids run --dry-run    Preview without writing
+  crux tb backfill-stable-ids run              Run the backfill
+  crux tb backfill-stable-ids run --dry-run    Preview without writing
 
 This is a one-time migration command. After running, all entities in the
 entity_ids table will have a stable_id column populated.

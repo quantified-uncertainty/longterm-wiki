@@ -129,11 +129,11 @@ Options:
   --json            JSON output
 
 Examples:
-  crux resources list --limit 20
-  crux resources show bioweapons
-  crux resources process bioweapons --apply
-  crux resources create "https://arxiv.org/abs/..."
-  crux resources metadata arxiv --batch 50
-  crux resources validate all
+  crux w resources list --limit 20
+  crux w resources show bioweapons
+  crux w resources process bioweapons --apply
+  crux w resources create "https://arxiv.org/abs/..."
+  crux w resources metadata arxiv --batch 50
+  crux w resources validate all
 `;
 }

@@ -497,7 +497,7 @@
 
 - id: yann-lecun
   name: Yann LeCun
-  affiliation: ami-labs
+  affiliation: meta-ai
   role: Founder (formerly Chief AI Scientist at Meta)
   website: https://yann.lecun.com
   knownFor:
@@ -849,6 +849,7 @@
     - What We Owe the Future (2022)
     - Giving What We Can (co-founder)
     - 80,000 Hours (co-founder)
+    - Global Priorities Institute (co-founder)
   positions:
     - topic: timelines
       view: Short

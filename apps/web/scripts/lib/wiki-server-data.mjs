@@ -760,6 +760,39 @@ function divisionPersonnelRowToRecordEntry(row) {
  * For collections that exist in both YAML and PG, PG records replace YAML.
  * Falls back gracefully if the wiki-server is unavailable (YAML records remain).
  */
+
+/**
+ * Mapping from stale FactBase entity IDs to their canonical TableBase stableIds.
+ *
+ * These IDs exist in the PG database because records were imported before the
+ * entity was unified into the TableBase. The frontend resolves names via
+ * getTypedEntityById(stableId), which only knows the canonical ID.
+ *
+ * Add entries here whenever a FactBase ID is retired and superseded by a
+ * TableBase stableId (i.e. after running `pnpm crux ids allocate`).
+ *
+ * Entries are applied by normalizePGEntityId() during the PG→KB merge.
+ */
+const STALE_ENTITY_ID_MAP = {
+  // SFF: old FactBase ID → TableBase stableId (pvJ50HupEQ = "sff" entity).
+  // Grants/funding-programs in PG were imported with organizationId = "sIFjGbxVct"
+  // before Entity Unification. See crux/lib/grant-import/constants.ts.
+  // Fix tracked in: https://github.com/quantified-uncertainty/longterm-wiki/issues/2681
+  sIFjGbxVct: 'pvJ50HupEQ',
+};
+
+/**
+ * Normalize a PG entity ID by mapping any stale FactBase IDs to their
+ * canonical TableBase stableIds. Returns the input unchanged if not stale.
+ *
+ * @param {string | null | undefined} id - raw entity ID from PG
+ * @returns {string | null | undefined}
+ */
+function normalizePGEntityId(id) {
+  if (!id) return id;
+  return STALE_ENTITY_ID_MAP[id] ?? id;
+}
+
 export async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
@@ -856,7 +889,7 @@ export async function mergePGRecordsIntoKB(kb) {
 
     let count = 0;
     for (const row of rows) {
-      const entityKey = getEntityKey(row);
+      const entityKey = normalizePGEntityId(getEntityKey(row));
       const collectionName = getCollectionName(row);
       if (!entityKey || !collectionName) continue;
 

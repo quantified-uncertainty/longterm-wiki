@@ -5,9 +5,9 @@
  * RFPs, fellowships, prizes, and solicitations from AI safety and EA funders.
  *
  * Usage:
- *   pnpm crux import-funding-programs list              # Show all programs
- *   pnpm crux import-funding-programs sync              # Sync to wiki-server
- *   pnpm crux import-funding-programs sync --dry-run    # Preview without writing
+ *   pnpm crux tb import-funding-programs list              # Show all programs
+ *   pnpm crux tb import-funding-programs sync              # Sync to wiki-server
+ *   pnpm crux tb import-funding-programs sync --dry-run    # Preview without writing
  */
 
 import { generateId } from "../lib/grant-import/id.ts";
@@ -795,6 +795,45 @@ function cmdList() {
   }
 }
 
+async function cmdDelete(ids: string[], dryRun: boolean) {
+  if (ids.length === 0) {
+    console.error("No IDs provided. Usage: import-funding-programs delete <id1> [id2 ...]");
+    process.exit(1);
+  }
+
+  console.log(`\nDeleting ${ids.length} funding program(s):`);
+  for (const id of ids) {
+    console.log(`  - ${id}`);
+  }
+
+  if (dryRun) {
+    console.log("  (dry run -- no data deleted)");
+    return;
+  }
+
+  const serverUrl = getServerUrl();
+
+  if (!serverUrl) {
+    throw new Error(
+      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+    );
+  }
+
+  console.log(`  Sending delete request to ${serverUrl}...`);
+
+  const result = await apiRequest<{ deleted: number }>(
+    "POST",
+    "/api/funding-programs/delete-batch",
+    { ids }
+  );
+
+  if (result.ok) {
+    console.log(`Deleted ${result.data.deleted} funding program(s)`);
+  } else {
+    throw new Error(`Funding program delete failed: ${result.message}`);
+  }
+}
+
 async function cmdSync(dryRun: boolean) {
   const items = PROGRAMS.map(toSyncProgram);
   const serverUrl = getServerUrl();
@@ -851,9 +890,21 @@ async function syncCommand(
   return { exitCode: 0 };
 }
 
+async function deleteCommand(
+  args: string[],
+  options: Record<string, unknown>
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options["dry-run"];
+  // Filter out flag args (--flag or --key=value) — only IDs are positional
+  const ids = args.filter((a) => !a.startsWith("--"));
+  await cmdDelete(ids, dryRun);
+  return { exitCode: 0 };
+}
+
 export const commands = {
   list: listCommand,
   sync: syncCommand,
+  delete: deleteCommand,
   default: listCommand,
 };
 
@@ -865,6 +916,8 @@ Commands:
   list               Show all known funding programs (default)
   sync               Sync programs to wiki-server Postgres
   sync --dry-run     Preview what would be synced without writing
+  delete <id...>     Delete funding programs by ID (for deduplication)
+  delete <id...> --dry-run  Preview deletion without writing
 
 Program Types:
   rfp            Request for proposals

@@ -573,7 +573,7 @@ export async function triage(args: string[], options: CommandOptions): Promise<C
     output += `  ${c.green}Savings: ~$${saved.toFixed(0)}${c.reset}\n`;
   }
 
-  output += `\n${c.dim}To run with triage: crux updates run --triage --count=${count}${c.reset}\n`;
+  output += `\n${c.dim}To run with triage: crux w updates run --triage --count=${count}${c.reset}\n`;
 
   if (options.ci || options.json) {
     return { output: JSON.stringify(results, null, 2), exitCode: 0 };
@@ -638,12 +638,12 @@ Cost-aware updating:
   cost drops to ~$26 + $0.80 triage = ~$27.
 
 Examples:
-  crux updates list                       Show top 10 update priorities
-  crux updates list --overdue --limit=20  All overdue pages
-  crux updates triage --count=10          Preview triage for top 10 overdue
-  crux updates run --count=5              Run with triage (default)
-  crux updates run --count=3 --no-triage --tier=polish  Skip triage, force polish
-  crux updates run --dry-run              Preview without executing
-  crux updates stats                      Show coverage stats
+  crux w updates list                       Show top 10 update priorities
+  crux w updates list --overdue --limit=20  All overdue pages
+  crux w updates triage --count=10          Preview triage for top 10 overdue
+  crux w updates run --count=5              Run with triage (default)
+  crux w updates run --count=3 --no-triage --tier=polish  Skip triage, force polish
+  crux w updates run --dry-run              Preview without executing
+  crux w updates stats                      Show coverage stats
 `;
 }

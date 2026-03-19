@@ -51,12 +51,12 @@ Environment:
   WIKI_PUBLIC_URL                Public wiki URL (optional, enables frontend check)
 
 Examples:
-  crux health                    Run all wellness checks
-  crux health --check=server     Check server & DB only
-  crux health --check=actions    Check GitHub Actions workflows only
-  crux health --check=job-queue  Check job queue health
-  crux health --json             JSON output for scripting
-  crux health --report           Full markdown report
-  crux health --report --auto-issue --cleanup-labels   CI mode (full report + issue management)
+  crux sys health                    Run all wellness checks
+  crux sys health --check=server     Check server & DB only
+  crux sys health --check=actions    Check GitHub Actions workflows only
+  crux sys health --check=job-queue  Check job queue health
+  crux sys health --json             JSON output for scripting
+  crux sys health --report           Full markdown report
+  crux sys health --report --auto-issue --cleanup-labels   CI mode (full report + issue management)
 `;
 }

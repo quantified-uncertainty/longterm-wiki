@@ -60,9 +60,9 @@ Usage with Claude Code:
   /loop 24h /qa-sweep      Schedule daily runs using your subscription
 
 Examples:
-  crux qa-sweep                  Full report
-  crux qa-sweep checks           Fast checks only
-  crux qa-sweep checks --json    JSON output for CI
-  crux qa-sweep recent           What changed recently
+  crux w qa-sweep                  Full report
+  crux w qa-sweep checks           Fast checks only
+  crux w qa-sweep checks --json    JSON output for CI
+  crux w qa-sweep recent           What changed recently
 `;
 }

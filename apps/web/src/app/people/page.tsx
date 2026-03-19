@@ -248,10 +248,25 @@ function loadFromLocal(): PersonRow[] {
     };
   });
 
-  // Merge in typed entity people that aren't in KB
+  // Merge in typed entity people that aren't in KB.
+  // Filter out stub entities (reference-only, no rich data) — these are
+  // lightweight FK targets that should not appear in the directory listing.
+  // An entity is considered a stub if it has no description, no wikiId,
+  // no customFields, no sources, and no relatedEntries.
   const typedPeople = getTypedEntities().filter(isPerson);
   for (const tp of typedPeople) {
     if (kbSlugs.has(tp.id)) continue;
+
+    // Skip stub entities: no description and no wiki page = reference-only
+    const hasDescription = !!tp.description;
+    const hasWikiId = !!tp.wikiId;
+    const hasCustomFields = Array.isArray(tp.customFields) && tp.customFields.length > 0;
+    const hasSources = Array.isArray(tp.sources) && tp.sources.length > 0;
+    const hasRelatedEntries = Array.isArray(tp.relatedEntries) && tp.relatedEntries.length > 0;
+    if (!hasDescription && !hasWikiId && !hasCustomFields && !hasSources && !hasRelatedEntries) {
+      continue;
+    }
+
     rows.push({
       id: tp.id,
       slug: tp.id,

@@ -4,9 +4,9 @@
  * Migration tools for claim reference footnote markers in MDX files.
  *
  * Usage:
- *   crux footnotes migrate-cr                Dry-run: show what would change
- *   crux footnotes migrate-cr --apply        Apply changes to MDX files
- *   crux footnotes migrate-cr --page=<id>    Process a single page
+ *   crux w footnotes migrate-cr                Dry-run: show what would change
+ *   crux w footnotes migrate-cr --apply        Apply changes to MDX files
+ *   crux w footnotes migrate-cr --page=<id>    Process a single page
  */
 
 import { basename } from 'path';
@@ -432,10 +432,10 @@ How it works:
 The command is idempotent — running it twice won't double-convert.
 
 Examples:
-  crux footnotes migrate-cr                  Preview all changes (dry run)
-  crux footnotes migrate-cr --page=anthropic Preview changes for one page
-  crux footnotes migrate-cr --apply          Apply changes to all files
-  crux footnotes migrate-cr --apply --offline Apply without wiki-server
-  crux footnotes migrate-cr --ci             JSON output for scripting
+  crux w footnotes migrate-cr                  Preview all changes (dry run)
+  crux w footnotes migrate-cr --page=anthropic Preview changes for one page
+  crux w footnotes migrate-cr --apply          Apply changes to all files
+  crux w footnotes migrate-cr --apply --offline Apply without wiki-server
+  crux w footnotes migrate-cr --ci             JSON output for scripting
 `;
 }

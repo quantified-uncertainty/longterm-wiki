@@ -25,23 +25,8 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
   const [search, setSearch] = useState("");
   const [clusterFilter, setClusterFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [hasDataOnly, setHasDataOnly] = useState(true);
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
-
-  // Count rows (after cluster/status filters) that have no organizations and no papers.
-  // This must be post-filter so "(N hidden)" reflects the active view, not the full dataset.
-  const emptyCount = useMemo(
-    () =>
-      rows
-        .filter((r) => {
-          if (clusterFilter !== "all" && r.cluster !== clusterFilter) return false;
-          if (statusFilter !== "all" && r.status !== statusFilter) return false;
-          return true;
-        })
-        .filter((r) => r.orgCount === 0 && r.paperCount === 0).length,
-    [rows, clusterFilter, statusFilter]
-  );
 
   const clusters = useMemo(() => {
     const set = new Set<string>();
@@ -64,8 +49,6 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
     const q = search.toLowerCase();
     return rows
       .filter((r) => {
-        // Hide entries with no organizations and no papers when filter is active
-        if (hasDataOnly && r.orgCount === 0 && r.paperCount === 0) return false;
         if (clusterFilter !== "all" && r.cluster !== clusterFilter) return false;
         if (statusFilter !== "all" && r.status !== statusFilter) return false;
         if (q) {
@@ -88,7 +71,7 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
         };
         return compareByValue(a, b, getValue, sortDir);
       });
-  }, [rows, search, clusterFilter, statusFilter, hasDataOnly, sortKey, sortDir]);
+  }, [rows, search, clusterFilter, statusFilter, sortKey, sortDir]);
 
   const handleSort = (key: string) => {
     const k = key as SortKey;
@@ -123,18 +106,6 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
           <option value="declining">Declining</option>
           <option value="archived">Archived</option>
         </select>
-        {emptyCount > 0 && (
-          <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-muted-foreground whitespace-nowrap">
-            <input
-              type="checkbox"
-              checked={hasDataOnly}
-              onChange={(e) => setHasDataOnly(e.target.checked)}
-              className="rounded border-border"
-            />
-            Has data
-            <span className="text-xs">({emptyCount} hidden)</span>
-          </label>
-        )}
       </div>
 
       {/* Cluster filter pills */}

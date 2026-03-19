@@ -865,7 +865,7 @@ Rather than building a new table system, extend what exists:
 - Entity explosion: 15 funding rounds * 5 orgs = 75 new entities just for funding
 - YAML file management: where do these mini-entities live?
 - Overhead: creating an entity with ID allocation, YAML entry, facts file — heavy for "Series A raised $124M"
-- Currently entity creation requires `crux ids allocate` — not designed for bulk sub-items
+- Currently entity creation requires `crux tb ids allocate` — not designed for bulk sub-items
 
 **Assessment**: This is conceptually clean but operationally heavy. Creating 75 entities for funding rounds feels like using a sledgehammer. The Ken Standard handles this gracefully because entities are lightweight (just a section header in a TOML file). Our entities are heavyweight (YAML entry, numeric ID, build-data processing, potential wiki page).
 
@@ -980,7 +980,7 @@ These overlap (Anthropic's valuation exists in both). Ken would say: pick one.
 **2. Heavyweight entities vs. lightweight things**
 
 Creating a Ken Thing: add a `[section-header]` to a TOML file. Done.
-Creating our entity: `pnpm crux ids allocate <slug>`, add to `data/entities/*.yaml` with `wikiId`, `type`, `relatedEntries`, build-data processes it.
+Creating our entity: `pnpm crux tb ids allocate <slug>`, add to `data/entities/*.yaml` with `wikiId`, `type`, `relatedEntries`, build-data processes it.
 
 This matters for the "sub-item" question. Should a funding round be an entity? In Ken, yes — it's just a section header. In our system, it's a heavyweight operation. This is why the "items" proposal felt necessary — we need something lighter than entities for sub-items.
 

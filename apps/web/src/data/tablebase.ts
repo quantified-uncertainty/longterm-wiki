@@ -904,9 +904,27 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 
 export type PGResearchArea = NonNullable<TableBaseShape["researchAreas"]>[number];
 
-/** Get all enriched research areas from PG. Returns empty array if not available. */
-export function getResearchAreasFromPG(): PGResearchArea[] {
-  return getTableBase().researchAreas ?? [];
+/**
+ * Get enriched research areas from PG.
+ *
+ * By default, excludes empty stub areas (0 orgs AND 0 papers) since they add
+ * noise to the directory without providing browseable content. Pass
+ * `includeEmpty: true` to get all areas (e.g., for internal dashboards).
+ *
+ * NOTE: Research areas use data-presence filtering (orgCount/paperCount > 0)
+ * rather than the `metadata.stub` flag used for person/org entities.
+ * This is intentional — research areas have inherent relational counts that
+ * directly indicate whether an area has browseable content. Person/org
+ * entities use the metadata flag because stubs are created programmatically
+ * by `ensure-entities`/`create-entity` CLI commands as lightweight FK targets,
+ * and the flag is auto-cleared when the entity is enriched with data.
+ */
+export function getResearchAreasFromPG(
+  options: { includeEmpty?: boolean } = {},
+): PGResearchArea[] {
+  const all = getTableBase().researchAreas ?? [];
+  if (options.includeEmpty) return all;
+  return all.filter((a) => a.orgCount > 0 || a.paperCount > 0);
 }
 
 // ============================================================================

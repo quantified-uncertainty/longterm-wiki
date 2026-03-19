@@ -6,8 +6,8 @@
  * of what the import pipeline does for new grants.
  *
  * Usage:
- *   pnpm crux backfill-program-ids run                # Apply updates
- *   pnpm crux backfill-program-ids run --dry-run      # Preview without writing
+ *   pnpm crux tb backfill-program-ids run                # Apply updates
+ *   pnpm crux tb backfill-program-ids run --dry-run      # Preview without writing
  */
 
 import {

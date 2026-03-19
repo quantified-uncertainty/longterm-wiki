@@ -5562,3 +5562,17 @@
     - startup
     - a16z-backed
   lastUpdated: 2026-03
+
+- id: forethought
+  stableId: tdb16DLlLb
+  type: organization
+  orgType: safety-org
+  title: Forethought Foundation
+  website: https://www.forethought.org
+  description: >-
+    Research foundation co-founded by Will MacAskill, focused on longtermism and improving long-run outcomes for humanity. Produces research on AI and existential risk.
+  tags:
+    - ea-community
+    - longtermism
+    - existential-risk
+  lastUpdated: 2026-03
