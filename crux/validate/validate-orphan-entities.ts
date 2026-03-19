@@ -96,16 +96,21 @@ export function loadYamlEntityIds(): Set<string> {
 /**
  * Fetch all entity records from PG via the wiki-server API.
  * Paginates through all results since the API has a max page size of 500.
+ *
+ * Note: Uses getServerUrl() internally (via apiRequest) for the server URL.
+ * Offset-based pagination may skip or duplicate entities if rows are inserted
+ * mid-pagination, but this is acceptable for a read-only gate check.
  */
-export async function fetchAllPgEntities(
-  serverUrl: string,
-): Promise<ApiResult<PgEntityRecord[]>> {
+export async function fetchAllPgEntities(): Promise<ApiResult<PgEntityRecord[]>> {
   const PAGE_SIZE = 500;
+  const MAX_PAGES = 100; // Safety cap: 50,000 entities should be plenty
   const allEntities: PgEntityRecord[] = [];
   let offset = 0;
   let total = Infinity;
+  let pageCount = 0;
 
-  while (offset < total) {
+  while (offset < total && pageCount < MAX_PAGES) {
+    pageCount++;
     const result = await apiRequest<PgListResponse>(
       "GET",
       `/api/entities?limit=${PAGE_SIZE}&offset=${offset}`,
@@ -118,6 +123,12 @@ export async function fetchAllPgEntities(
     allEntities.push(...result.data.entities);
     total = result.data.total;
     offset += PAGE_SIZE;
+  }
+
+  if (pageCount >= MAX_PAGES) {
+    console.warn(
+      `  WARN: Pagination capped at ${MAX_PAGES} pages (${allEntities.length} entities fetched, server reports ${total} total)`,
+    );
   }
 
   return { ok: true, data: allEntities };
@@ -144,10 +155,16 @@ export function detectOrphans(
 // Prune logic
 // ---------------------------------------------------------------------------
 
+/** Maximum fraction of PG entities that can be pruned in one run. */
+export const PRUNE_SAFETY_THRESHOLD = 0.2;
+
 /**
  * Prune orphan entities via the wiki-server API.
  * Groups by entity type and calls the prune endpoint for each type.
+ * Aborts if the orphan ratio exceeds PRUNE_SAFETY_THRESHOLD to prevent
+ * mass deletion when YAML loading fails partially.
  */
+
 async function pruneOrphans(
   orphans: OrphanEntity[],
   yamlIds: Set<string>,
@@ -156,6 +173,21 @@ async function pruneOrphans(
   const serverUrl = getServerUrl();
   if (!serverUrl) {
     return { deleted: 0, ids: [] };
+  }
+
+  // Safety threshold: abort if the orphan ratio is suspiciously high.
+  // This protects against mass deletion when YAML loading fails partially
+  // (e.g., data/entities/ directory missing, parse errors on most files).
+  if (pgEntities.length > 0) {
+    const orphanRatio = orphans.length / pgEntities.length;
+    if (orphanRatio > PRUNE_SAFETY_THRESHOLD) {
+      console.error(
+        `  SAFETY: ${orphans.length}/${pgEntities.length} (${(orphanRatio * 100).toFixed(0)}%) would be pruned. ` +
+          `This exceeds the ${(PRUNE_SAFETY_THRESHOLD * 100).toFixed(0)}% safety threshold. ` +
+          `Aborting prune. This usually indicates YAML loading failed.`,
+      );
+      return { deleted: 0, ids: [] };
+    }
   }
 
   // Group all YAML IDs by entity type (from PG records, since we need the types)
@@ -256,7 +288,7 @@ export async function runCheck(
   }
 
   // 2. Fetch all PG entities
-  const pgResult = await fetchAllPgEntities(serverUrl);
+  const pgResult = await fetchAllPgEntities();
 
   if (!pgResult.ok) {
     // Fail-open: wiki-server is unreachable or errored.

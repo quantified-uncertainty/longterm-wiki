@@ -3,6 +3,7 @@ import {
   detectOrphans,
   fetchAllPgEntities,
   runCheck,
+  PRUNE_SAFETY_THRESHOLD,
   type PgEntityRecord,
   type OrphanEntity,
 } from "./validate-orphan-entities.ts";
@@ -142,7 +143,7 @@ describe("fetchAllPgEntities", () => {
       ),
     );
 
-    const result = await fetchAllPgEntities("http://localhost:3000");
+    const result = await fetchAllPgEntities();
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toHaveLength(2);
@@ -188,7 +189,7 @@ describe("fetchAllPgEntities", () => {
       ),
     );
 
-    const result = await fetchAllPgEntities("http://localhost:3000");
+    const result = await fetchAllPgEntities();
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toHaveLength(700);
@@ -203,7 +204,7 @@ describe("fetchAllPgEntities", () => {
       new Error("Connection refused"),
     );
 
-    const result = await fetchAllPgEntities("http://localhost:3000");
+    const result = await fetchAllPgEntities();
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe("unavailable");
@@ -215,7 +216,7 @@ describe("fetchAllPgEntities", () => {
       new Response("Internal Server Error", { status: 500 }),
     );
 
-    const result = await fetchAllPgEntities("http://localhost:3000");
+    const result = await fetchAllPgEntities();
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe("server_error");
@@ -235,7 +236,7 @@ describe("fetchAllPgEntities", () => {
       ),
     );
 
-    const result = await fetchAllPgEntities("http://localhost:3000");
+    const result = await fetchAllPgEntities();
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toEqual([]);
@@ -315,7 +316,7 @@ describe("runCheck", () => {
     expect(result.errors).toBeGreaterThan(0);
   });
 
-  it("passes after fix mode prunes orphans", async () => {
+  it("passes in fix mode even when prune is skipped (no YAML entities for orphan type)", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
 
     // First call: list entities — return a fake orphan
@@ -337,9 +338,52 @@ describe("runCheck", () => {
       ),
     );
 
-    // Second call: prune endpoint — but since the orphan type has no YAML entities,
-    // the prune is skipped with a warning. The check still passes because --fix was used.
+    // The orphan type "policy" has no YAML entities in the PG response,
+    // so prune is skipped with a warning. The check still passes because
+    // --fix was used (fix mode unconditionally sets passed=true).
     const result = await runCheck({ ci: true, fix: true });
     expect(result.passed).toBe(true);
+  });
+
+  it("aborts prune when orphan ratio exceeds safety threshold", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    // Return 10 PG entities, all orphans (100% orphan ratio, well above 20% threshold).
+    // We need to include enough real YAML entities in PG so keepIdsByType
+    // has entries and the prune path would normally execute.
+    const fakeOrphans = Array.from({ length: 10 }, (_, i) => ({
+      id: `orphan-entity-${i}`,
+      entityType: "concept",
+      title: `Orphan ${i}`,
+    }));
+
+    // First call: list entities
+    fetchSpy.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          entities: fakeOrphans,
+          total: fakeOrphans.length,
+          limit: 500,
+          offset: 0,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // With fix=true, the prune should be attempted but blocked by safety threshold.
+    // No second fetch call (prune endpoint) should happen.
+    const result = await runCheck({ ci: true, fix: true });
+    expect(result.passed).toBe(true); // fix mode still sets passed=true
+
+    // Verify the safety message was logged
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("SAFETY"),
+    );
+
+    // Verify no prune API call was made (only the initial list call)
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
   });
 });
