@@ -23,13 +23,13 @@ Model IDs like `google/gemini-flash-1.5` get removed from OpenRouter. When a pip
 ## Page Authoring
 
 ### Always use the Crux pipeline, never write pages manually
-If `pnpm crux content create` or `pnpm crux content improve` fails, fix the pipeline — don't bypass it. See CLAUDE.md for details.
+If `pnpm crux w content create` or `pnpm crux w content improve` fails, fix the pipeline — don't bypass it. See CLAUDE.md for details.
 
 ### Run escaping fixes after any page edit
 ```bash
-pnpm crux fix escaping
-pnpm crux fix markdown
-pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
+pnpm crux w fix escaping
+pnpm crux w fix markdown
+pnpm crux w validate unified --rules=comparison-operators,dollar-signs --errors-only
 ```
 
 ---
@@ -119,7 +119,7 @@ Some pages list sources as `[^N]: [Title](URL)` at the bottom but never referenc
 When reading files from Next.js server components using relative paths, `process.cwd()` resolves to `apps/web/`, not the workspace root. So `../../data/` reaches the root `data/` directory and `../../.cache/` reaches the root `.cache/` directory. Keep this in mind when constructing paths in server components.
 
 ### Sandbox blocks most external URL fetches
-Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citation pipeline runs (`crux citations verify`, `crux citations extract-quotes`), you may need `dangerouslyDisableSandbox: true` when using the Bash tool. This is expected — the sandbox prevents web access by default.
+Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citation pipeline runs (`crux w citations verify`, `crux w citations extract-quotes`), you may need `dangerouslyDisableSandbox: true` when using the Bash tool. This is expected — the sandbox prevents web access by default.
 
 ---
 
@@ -138,7 +138,7 @@ When the LLM improve pipeline rewrites large, complex pages (e.g. `language-mode
 When auto-update generates directions for future runs, the LLM may produce more than 5000 characters. The artifact save call returns `400: String must contain at most 5000 character(s)` for the `directions` field. **Fixed** in PR #2194: truncation added in `page-router.ts`, `orchestrator.ts`, and `pipeline.ts`.
 
 ### Pre-push hook blocks CI auto-update push
-The `.githooks/pre-push` hook runs `crux validate gate`, which re-runs the full gate check on push. In CI auto-update, the gate already runs in Step 3, so re-running it at push time adds 5+ minutes and can fail on pre-existing issues in unrelated files. **Fixed** in PR #2206: CI orchestrator uses `--no-verify` on push and a Step 3b reverts pages with unresolvable validation errors.
+The `.githooks/pre-push` hook runs `crux w validate gate`, which re-runs the full gate check on push. In CI auto-update, the gate already runs in Step 3, so re-running it at push time adds 5+ minutes and can fail on pre-existing issues in unrelated files. **Fixed** in PR #2206: CI orchestrator uses `--no-verify` on push and a Step 3b reverts pages with unresolvable validation errors.
 
 ---
 

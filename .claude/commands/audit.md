@@ -12,10 +12,10 @@ Gather quantitative signals. Run all of these — the report needs hard numbers,
 
 ```bash
 # Health metrics snapshot
-pnpm crux maintain health-snapshot --json
+pnpm crux sys maintain health-snapshot --json
 
 # Cruft detection
-pnpm crux maintain detect-cruft
+pnpm crux sys maintain detect-cruft
 
 # Code size by top-level directory (quick proxy for complexity distribution)
 find . -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' | grep -v node_modules | grep -v .next | xargs wc -l | sort -rn | head -40
@@ -126,7 +126,7 @@ Produce a structured report. Be specific and evidence-based — include line cou
 
 For each recommendation:
 - **Quick wins** (< 30 min, safe): Do them in this session if time allows
-- **Medium items**: File a GitHub issue with the evidence from the report (`pnpm crux issues create`)
+- **Medium items**: File a GitHub issue with the evidence from the report (`pnpm crux gh issues create`)
 - **Architectural decisions**: Note them for the user to discuss — don't file issues for things that need human judgment
 
 ## Guardrails

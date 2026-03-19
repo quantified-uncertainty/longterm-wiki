@@ -11,7 +11,7 @@ This replaces the CI-based auto-update pipeline (~$6.50/page via Opus API) with 
 Run the digest and routing pipeline to determine which pages need updating:
 
 ```bash
-pnpm crux auto-update plan --count=3
+pnpm crux w auto-update plan --count=3
 ```
 
 Parse the output to identify:
@@ -70,9 +70,9 @@ Use the Edit tool to make surgical additions:
 After editing all pages:
 
 ```bash
-pnpm crux fix escaping
-pnpm crux fix markdown
-pnpm crux validate gate --scope=content --fix
+pnpm crux w fix escaping
+pnpm crux w fix markdown
+pnpm crux w validate gate --scope=content --fix
 ```
 
 Fix any issues the gate reports. Re-run until clean.

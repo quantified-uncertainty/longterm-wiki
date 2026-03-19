@@ -61,7 +61,7 @@ Based on your assessment, take action in priority order:
 2. **Fill critical gaps** — Add missing FactBase facts to `packages/factbase/data/things/`
 3. **Fix relationships** — Update `relatedEntries` to add missing connections
 4. **Update stale content** — Fix outdated information with current data
-5. **Improve the wiki page** — If the MDX page is thin, run `pnpm crux content improve $ENTITY_ID --tier=standard --apply`
+5. **Improve the wiki page** — If the MDX page is thin, run `pnpm crux w improve $ENTITY_ID --tier=standard --apply`
 
 ## Phase 4: Report
 

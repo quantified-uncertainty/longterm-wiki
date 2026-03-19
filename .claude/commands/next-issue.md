@@ -9,7 +9,7 @@ This command helps you start a focused session on the most important open issue.
 ## Phase 1: Fetch and rank open issues
 
 ```bash
-pnpm crux issues next
+pnpm crux gh issues next
 ```
 
 This will output a ranked list of open issues — highest priority first — with their labels, age, and a brief description. The ranking uses:
@@ -25,7 +25,7 @@ Review the list. If the top issue looks right, proceed. If not, pick a different
 Once you've chosen an issue, use the crux CLI to announce work:
 
 ```bash
-pnpm crux issues start <ISSUE_NUM>
+pnpm crux gh issues start <ISSUE_NUM>
 ```
 
 This will:
@@ -51,7 +51,7 @@ Work through the issue using the standard development workflow:
 
 1. Use TodoWrite to plan the implementation steps
 2. Make changes, following all relevant rules in `.claude/rules/`
-3. Run validation: `pnpm crux validate gate`
+3. Run validation: `pnpm crux w validate gate`
 4. Create a session log entry
 
 ## Phase 5: Ship and close the loop
@@ -59,7 +59,7 @@ Work through the issue using the standard development workflow:
 After the work is done:
 
 ```bash
-pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
 Then run `/push-and-ensure-green` as usual.
@@ -67,8 +67,8 @@ Then run `/push-and-ensure-green` as usual.
 ## Quick reference
 
 ```bash
-pnpm crux issues next              # Show next priority issue
-pnpm crux issues list              # List all open issues with priority order
-pnpm crux issues start <N>         # Announce start + add agent:working label
-pnpm crux issues done <N> --pr=URL # Announce completion + remove label
+pnpm crux gh issues next              # Show next priority issue
+pnpm crux gh issues list              # List all open issues with priority order
+pnpm crux gh issues start <N>         # Announce start + add agent:working label
+pnpm crux gh issues done <N> --pr=URL # Announce completion + remove label
 ```
