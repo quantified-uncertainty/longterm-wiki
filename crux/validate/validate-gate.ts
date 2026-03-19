@@ -463,6 +463,18 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'resource-refs',
+    name: 'Resource reference validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-resource-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires wiki-server access. Validates that authorEntityIds
+    // and publicationId fields in the resources table reference valid entities
+    // and publications. Informational for now.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
