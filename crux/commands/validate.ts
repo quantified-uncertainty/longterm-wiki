@@ -161,6 +161,11 @@ const SCRIPTS = {
     description: 'Detect PG entity records without YAML source (ghost entities)',
     passthrough: ['ci', 'fix'],
   },
+  'soft-fks': {
+    script: 'validate/validate-soft-fks.ts',
+    description: 'Check that soft FK fields in PG tables resolve to entities (advisory, requires wiki-server)',
+    passthrough: ['ci', 'verbose'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
