@@ -629,6 +629,8 @@ export default async function LegislationDetailPage({
   // ── Press / Documents tab ──────────────────────────────────
   const resourceIds = getResourcesForPage(entity.id);
   const pressResources: OrgResourceRow[] = [];
+  /** Map resource id → publication type (e.g. "government", "think_tank", "news") for categorization. */
+  const pubTypeByResourceId = new Map<string, string>();
   for (const rid of resourceIds) {
     const r = getResourceById(rid);
     if (!r) continue;
@@ -639,6 +641,9 @@ export default async function LegislationDetailPage({
     const effectivePub = publication ?? domainPub;
     const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
     const citingPages = getPagesForResource(rid);
+    if (effectivePub?.type) {
+      pubTypeByResourceId.set(rid, effectivePub.type);
+    }
     pressResources.push({
       id: rid,
       title: r.title ?? r.url,
@@ -656,18 +661,105 @@ export default async function LegislationDetailPage({
     });
   }
 
+  // Categorize resources into Official Documents, Analysis & Research, and Press Coverage
+  type ResourceCategory = "official" | "analysis" | "press";
+
+  const GOV_DOMAIN_PATTERNS = [
+    /\.gov$/,
+    /\.gov\./,          // e.g. gov.uk, gov.au
+    /legislature\./,
+    /congress\./,
+    /parliament\./,
+  ];
+
+  const ACADEMIC_DOMAIN_PATTERNS = [
+    /\.edu$/,
+    /\.edu\./,          // e.g. .edu.au
+    /\.ac\./,           // e.g. .ac.uk
+  ];
+
+  const OFFICIAL_TITLE_PATTERNS = [
+    /bill text/i,
+    /committee report/i,
+    /executive order/i,
+    /federal register/i,
+    /public law/i,
+    /enrolled bill/i,
+    /congressional record/i,
+  ];
+
+  const ANALYSIS_TITLE_PATTERNS = [
+    /\banalysis\b/i,
+    /\bassessment\b/i,
+    /\breview\b/i,
+    /\bworking paper\b/i,
+    /\bwhite paper\b/i,
+    /\bpolicy brief\b/i,
+  ];
+
+  function categorizeResource(r: OrgResourceRow): ResourceCategory {
+    const pubType = pubTypeByResourceId.get(r.id) ?? null;
+    const domain = r.domain ?? "";
+
+    // ── Official Documents ──
+    if (r.type === "government" || pubType === "government") return "official";
+    if (GOV_DOMAIN_PATTERNS.some((p) => p.test(domain))) return "official";
+    if (OFFICIAL_TITLE_PATTERNS.some((p) => p.test(r.title))) return "official";
+
+    // ── Analysis & Research ──
+    if (r.type === "paper" || r.type === "report" || r.type === "book") return "analysis";
+    if (
+      pubType === "think_tank" ||
+      pubType === "academic_journal" ||
+      pubType === "preprint_server" ||
+      pubType === "academic" ||
+      pubType === "academic_search"
+    ) {
+      return "analysis";
+    }
+    if (ACADEMIC_DOMAIN_PATTERNS.some((p) => p.test(domain))) return "analysis";
+    if (ANALYSIS_TITLE_PATTERNS.some((p) => p.test(r.title))) return "analysis";
+
+    // ── Press Coverage (default) ──
+    return "press";
+  }
+
+  const officialDocs = pressResources.filter((r) => categorizeResource(r) === "official");
+  const analysisResources = pressResources.filter((r) => categorizeResource(r) === "analysis");
+  const pressCoverage = pressResources.filter((r) => categorizeResource(r) === "press");
+
   if (pressResources.length > 0) {
     tabs.push({
       id: "press",
-      label: "Documents & Press",
+      label: "Coverage",
       count: pressResources.length,
       content: (
-        <OrgResourcesSection
-          resources={pressResources}
-          title="Official Documents, Analysis & Press Coverage"
-          emptyMessage=""
-          alwaysShowColumns={{ date: true, publication: true }}
-        />
+        <div className="space-y-8">
+          {officialDocs.length > 0 && (
+            <OrgResourcesSection
+              resources={officialDocs}
+              title="Official Documents"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true }}
+            />
+          )}
+          {analysisResources.length > 0 && (
+            <OrgResourcesSection
+              resources={analysisResources}
+              title="Analysis & Research"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true, publication: true }}
+            />
+          )}
+          {pressCoverage.length > 0 && (
+            <OrgResourcesSection
+              resources={pressCoverage}
+              title="Press Coverage"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true, publication: true }}
+            />
+          )}
+        </div>
       ),
     });
   }
