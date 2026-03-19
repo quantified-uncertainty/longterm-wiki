@@ -5,7 +5,7 @@ import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things, entities } from "../../schema.js";
+import { grants, things, entities, fundingPrograms } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -140,6 +140,26 @@ function formatRow(r: JoinedRow) {
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
   };
+}
+
+/**
+ * Validate that all non-null programIds exist in the funding_programs table.
+ * Returns the list of invalid programIds, or an empty array if all are valid.
+ */
+async function findInvalidProgramIds(
+  db: ReturnType<typeof getDrizzleDb>,
+  programIds: string[],
+): Promise<string[]> {
+  const uniqueIds = [...new Set(programIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+
+  const rows = await db
+    .select({ id: fundingPrograms.id })
+    .from(fundingPrograms)
+    .where(inArray(fundingPrograms.id, uniqueIds));
+
+  const found = new Set(rows.map((r) => r.id));
+  return uniqueIds.filter((id) => !found.has(id));
 }
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -442,6 +462,20 @@ const grantsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    // Validate programId references
+    const skipValidation = c.req.query("skipEntityValidation") === "true";
+    if (!skipValidation) {
+      const programIds = items.map((item) => item.programId);
+      const invalid = await findInvalidProgramIds(db, programIds);
+      if (invalid.length > 0) {
+        return validationError(
+          c,
+          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
+          `Use ?skipEntityValidation=true to bypass.`,
+        );
+      }
+    }
+
     logger.info(`batch-update-program: updating ${items.length} grants`);
 
     // Build bulk UPDATE using VALUES pattern instead of sequential per-row updates
@@ -519,6 +553,22 @@ const grantsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate programId references (skip if skipEntityValidation is set)
+    const skipValidation = c.req.query("skipEntityValidation") === "true";
+    if (!skipValidation) {
+      const programIds = items
+        .map((item) => item.programId)
+        .filter((id): id is string => id != null);
+      const invalid = await findInvalidProgramIds(db, programIds);
+      if (invalid.length > 0) {
+        return validationError(
+          c,
+          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
+          `Use ?skipEntityValidation=true to bypass.`,
+        );
+      }
+    }
 
     let upserted = 0;
 
