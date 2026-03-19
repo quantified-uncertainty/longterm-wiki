@@ -2277,17 +2277,18 @@
   type: person
   title: Margrethe Vestager
   description: >-
-    Executive Vice-President of the European Commission and EU Commissioner for
-    Competition. Led European Union digital policy including the EU AI Act, which
-    established the world's first comprehensive AI regulatory framework. Defended
-    the AI Act against industry criticism, emphasizing it would enhance rather than
-    hinder innovation. Collaborated with the US on developing a voluntary AI Code
-    of Conduct in 2023 ahead of formal regulation.
+    Executive Vice-President of the European Commission for A Europe Fit for the
+    Digital Age and EU Commissioner for Competition (2019–2024). Led EU competition
+    policy and antitrust enforcement against major tech companies. The EU AI Act
+    was primarily driven by Internal Market Commissioner Thierry Breton and MEPs
+    Dragos Tudorache and Brando Benifei; Vestager's role was in broader digital
+    and competition policy rather than leading the AI Act itself. Collaborated
+    with the US on developing a voluntary AI Code of Conduct in 2023.
   customFields:
     - label: Role
-      value: Executive Vice-President, European Commission
+      value: Executive Vice-President, European Commission (2019–2024)
     - label: Known For
-      value: EU AI Act, EU digital policy, competition regulation
+      value: EU competition policy, tech antitrust enforcement, EU digital policy
   tags:
     - ai-governance
     - ai-policy
@@ -2514,11 +2515,11 @@
   type: person
   title: Caroline Ellison
   description: >-
-    Former CEO of Alameda Research and one of the executives who provided funding
-    for the FTX Future Fund alongside Sam Bankman-Fried, Gary Wang, and Nishad
-    Singh. Pleaded guilty to fraud charges following FTX's collapse in November
-    2022. Cooperated with federal prosecutors, providing testimony against Sam
-    Bankman-Fried in his trial.
+    Former CEO of Alameda Research, the crypto trading firm closely tied to FTX.
+    Alameda's commingling of customer funds with FTX was central to FTX's collapse
+    in November 2022. Pleaded guilty to fraud charges and cooperated with federal
+    prosecutors, providing key testimony against Sam Bankman-Fried in his trial.
+    Sentenced to two years in prison in September 2024.
   customFields:
     - label: Role
       value: Former CEO, Alameda Research
