@@ -70,7 +70,7 @@ const VALIDATORS: ValidatorDef[] = [
     id: "cross-base",
     name: "Cross-Base Consistency",
     script: "crux/validate/validate-cross-base.ts",
-    blocking: false,
+    blocking: true,
     requiresServer: false,
   },
   {
@@ -114,7 +114,7 @@ const VALIDATORS: ValidatorDef[] = [
     id: "controlled-vocab",
     name: "Controlled Vocabulary",
     script: "crux/validate/validate-controlled-vocab.ts",
-    blocking: false,
+    blocking: true,
     requiresServer: true,
   },
   {
@@ -153,13 +153,13 @@ function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
         name: validator.name,
         blocking: validator.blocking,
         requiresServer: validator.requiresServer,
-        passed: true,
-        skipped: true,
-        exitCode: null,
+        passed: false,
+        skipped: false,
+        exitCode: 1,
         stdout: "",
         stderr: "",
         durationMs: 0,
-        error: `Script not found: ${validator.script}`,
+        error: `Script not found: ${validator.script} — this is a bug, the validator definition references a missing file`,
       });
       return;
     }
@@ -178,14 +178,22 @@ function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
       }
     }
 
+    const VALIDATOR_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
     const child: ChildProcess = spawn("node", childArgs, {
       cwd: PROJECT_ROOT,
-      stdio: ["inherit", "pipe", "pipe"],
+      stdio: ["ignore", "pipe", "pipe"],
       env,
     });
 
     let stdout = "";
     let stderr = "";
+    let killed = false;
+
+    const timeoutId = setTimeout(() => {
+      killed = true;
+      child.kill("SIGKILL");
+    }, VALIDATOR_TIMEOUT_MS);
 
     child.stdout!.on("data", (data: Buffer) => {
       stdout += data.toString();
@@ -202,21 +210,39 @@ function runValidator(validator: ValidatorDef): Promise<ValidatorResult> {
     });
 
     child.on("close", (code: number | null) => {
-      resolve({
-        id: validator.id,
-        name: validator.name,
-        blocking: validator.blocking,
-        requiresServer: validator.requiresServer,
-        passed: code === 0,
-        skipped: false,
-        exitCode: code,
-        stdout,
-        stderr,
-        durationMs: Date.now() - startTime,
-      });
+      clearTimeout(timeoutId);
+      if (killed) {
+        resolve({
+          id: validator.id,
+          name: validator.name,
+          blocking: validator.blocking,
+          requiresServer: validator.requiresServer,
+          passed: false,
+          skipped: false,
+          exitCode: code,
+          stdout,
+          stderr,
+          durationMs: Date.now() - startTime,
+          error: `Timed out after ${VALIDATOR_TIMEOUT_MS / 1000}s`,
+        });
+      } else {
+        resolve({
+          id: validator.id,
+          name: validator.name,
+          blocking: validator.blocking,
+          requiresServer: validator.requiresServer,
+          passed: code === 0,
+          skipped: false,
+          exitCode: code,
+          stdout,
+          stderr,
+          durationMs: Date.now() - startTime,
+        });
+      }
     });
 
     child.on("error", (err: Error) => {
+      clearTimeout(timeoutId);
       resolve({
         id: validator.id,
         name: validator.name,

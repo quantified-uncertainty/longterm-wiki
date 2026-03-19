@@ -25,26 +25,9 @@ jobs:
   paused-notice:
     uses: ./.github/workflows/_paused-notice.yml
 
-  preflight:
+  validate:
     # Global circuit breaker — skip when automation is paused.
     if: vars.AUTOMATION_PAUSED != 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check wiki-server health
-        env:
-          SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
-        run: |
-          if [ -z "$SERVER_URL" ]; then
-            echo "::warning::PROD_LONGTERMWIKI_SERVER_URL secret is not set — server-dependent checks will fail gracefully"
-          else
-            curl -sf --max-time 10 "${SERVER_URL}/health" || {
-              echo "::warning::Wiki-server unreachable — server-dependent checks will fail gracefully"
-            }
-          fi
-          echo "Preflight complete"
-
-  validate:
-    needs: [preflight]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -64,9 +47,10 @@ jobs:
       - name: Build data layer
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
         env:
+          WIKI_SERVER_ENV: prod
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
-          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
+          PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
 
       # Run all validators via the unified daily runner.
       # WIKI_SERVER_ENV=prod causes validators to read PROD_LONGTERMWIKI_*
