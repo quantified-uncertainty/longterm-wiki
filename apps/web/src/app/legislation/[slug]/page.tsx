@@ -12,10 +12,11 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
+  getPublicationByDomain,
   getPagesForResource,
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
-import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import { resolveResourceAuthors, type OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import {
   resolvePolicyBySlug,
   getPolicySlugs,
@@ -32,7 +33,7 @@ import {
   normalizeStatus,
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
-import { extractDomain } from "@/lib/resource-types";
+import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -495,19 +496,23 @@ export default async function LegislationDetailPage({
     const r = getResourceById(rid);
     if (!r) continue;
     const publication = getResourcePublication(r);
-    const credibility = getResourceCredibility(r);
+    const domain = extractDomain(r.url);
+    // Fall back to domain-based publication lookup when resource has no publication_id
+    const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
+    const effectivePub = publication ?? domainPub;
+    const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
     const citingPages = getPagesForResource(rid);
     pressResources.push({
       id: rid,
       title: r.title ?? r.url,
       url: r.url,
       type: r.type ?? "web",
-      domain: extractDomain(r.url),
-      publicationName: publication?.name ?? null,
-      credibility: credibility ?? null,
+      domain,
+      publicationName: effectivePub?.name ?? null,
+      credibility,
       citingPageCount: citingPages.length,
-      publishedDate: r.published_date ?? null,
-      authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+      publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
+      authors: resolveResourceAuthors(r),
       summary: r.summary ?? null,
       fetchStatus: r.fetch_status ?? null,
       archiveUrl: r.archive_url ?? null,
