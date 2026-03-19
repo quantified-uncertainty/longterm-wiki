@@ -176,6 +176,11 @@ const SCRIPTS = {
     description: 'Validate controlled vocabulary fields (entityType, relationship, orgType, etc.)',
     passthrough: ['ci', 'verbose'],
   },
+  'numeric-ranges': {
+    script: 'validate/validate-numeric-ranges.ts',
+    description: 'Validate low <= high for paired range columns (requires wiki-server)',
+    passthrough: ['ci'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
