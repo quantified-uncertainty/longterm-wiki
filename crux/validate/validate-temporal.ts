@@ -24,7 +24,8 @@ import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
 
 const verbose = process.argv.includes("--verbose");
-const c = getColors();
+const ciMode = process.argv.includes("--ci") || process.env.CI === "true";
+const c = getColors(ciMode);
 
 // ── Date Validation Helpers ──────────────────────────────────────────────────
 
@@ -101,6 +102,25 @@ export function compareDates(a: string, b: string): number {
   if (a < b) return -1;
   if (a > b) return 1;
   return 0;
+}
+
+/**
+ * Parse a date string to ISO format (YYYY-MM-DD).
+ * Handles both ISO dates ("2024-04-02") and natural-language dates ("April 2, 2024").
+ * Returns null if the date cannot be parsed.
+ */
+export function parseToIsoDate(dateStr: string): string | null {
+  // If already in ISO format, return as-is
+  if (DATE_FORMAT_RE.test(dateStr)) return dateStr;
+
+  // Try parsing natural-language dates via Date constructor
+  const parsed = new Date(dateStr);
+  if (isNaN(parsed.getTime())) return null;
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // ── Violation Types ──────────────────────────────────────────────────────────
@@ -351,7 +371,10 @@ function checkPolicyDateOrder(): Violation[] {
         for (const vote of votes) {
           if (vote.date) {
             const voteDate = String(vote.date);
-            if (compareDates(voteDate, introduced) < 0) {
+            // Vote dates may use natural-language format ("April 2, 2024").
+            // Parse to ISO before comparing against the introduced date.
+            const voteDateIso = parseToIsoDate(voteDate);
+            if (voteDateIso && compareDates(voteDateIso, introduced) < 0) {
               violations.push({
                 rule: "policy-date-order",
                 location: `${file}/${itemId}`,
@@ -372,7 +395,9 @@ function checkPolicyDateOrder(): Violation[] {
 export function runTemporalValidation(): { passed: boolean; violations: Violation[] } {
   const allViolations: Violation[] = [];
 
-  console.log(`${c.blue}Running temporal invariant checks...${c.reset}\n`);
+  if (!ciMode) {
+    console.log(`${c.blue}Running temporal invariant checks...${c.reset}\n`);
+  }
 
   // Run all checks
   const entityDateErrors = checkEntityDateValidity();
@@ -386,6 +411,15 @@ export function runTemporalValidation(): { passed: boolean; violations: Violatio
 
   const policyErrors = checkPolicyDateOrder();
   allViolations.push(...policyErrors);
+
+  // CI mode: output JSON and return
+  if (ciMode) {
+    console.log(JSON.stringify({
+      passed: allViolations.length === 0,
+      violations: allViolations,
+    }));
+    return { passed: allViolations.length === 0, violations: allViolations };
+  }
 
   // Group by rule for summary
   const byRule = new Map<string, Violation[]>();
@@ -415,15 +449,17 @@ export function runTemporalValidation(): { passed: boolean; violations: Violatio
 
   if (allViolations.length === 0) {
     console.log(`${c.green}All temporal invariant checks passed${c.reset}`);
-    for (const check of checkCounts) {
-      console.log(`  ${c.green}${check.name}: 0 violations${c.reset}`);
+    if (verbose) {
+      for (const check of checkCounts) {
+        console.log(`  ${c.green}${check.name}: 0 violations${c.reset}`);
+      }
     }
   } else {
     console.log(`${c.red}Temporal invariant check failed: ${allViolations.length} violation(s)${c.reset}`);
     for (const check of checkCounts) {
       if (check.count > 0) {
         console.log(`  ${c.red}${check.name}: ${check.count} violation(s)${c.reset}`);
-      } else {
+      } else if (verbose) {
         console.log(`  ${c.green}${check.name}: 0 violations${c.reset}`);
       }
     }
