@@ -324,6 +324,7 @@ const grantsApp = new Hono()
   // Returns all grant IDs and their current granteeId values.
   // Used by the backfill command to identify grants needing entity linking.
   .get("/all-grantee-ids", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -332,7 +333,8 @@ const grantsApp = new Hono()
         granteeId: grants.granteeId,
         name: grants.name,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -341,6 +343,7 @@ const grantsApp = new Hono()
         name: r.name,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 
@@ -397,6 +400,7 @@ const grantsApp = new Hono()
   // source, name, and notes. Used by backfill-program-ids to match grants
   // to funding programs.
   .get("/all-program-ids", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -408,7 +412,8 @@ const grantsApp = new Hono()
         name: grants.name,
         notes: grants.notes,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -420,6 +425,7 @@ const grantsApp = new Hono()
         notes: r.notes,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 
@@ -474,6 +480,7 @@ const grantsApp = new Hono()
   // ---- GET /all-for-matching ----
   // Returns lightweight grant data for research area matching.
   .get("/all-for-matching", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -485,7 +492,8 @@ const grantsApp = new Hono()
         organizationId: grants.organizationId,
         granteeId: grants.granteeId,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -497,6 +505,7 @@ const grantsApp = new Hono()
         granteeId: r.granteeId,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 

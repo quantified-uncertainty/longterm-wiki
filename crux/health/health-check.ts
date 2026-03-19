@@ -53,8 +53,10 @@ const MIN_ENTITIES = 500;
 const MIN_FACTS = 40; // Currently ~54; alert if drops dramatically
 
 // Workflow staleness thresholds (hours)
+// auto-update.yml schedule is disabled — it runs only via manual workflow_dispatch,
+// so the threshold must be generous to avoid false alarms.
 const MAX_AGE: Record<string, number> = {
-  'auto-update.yml': 36,
+  'auto-update.yml': 336, // 14 days — schedule disabled, manual runs only
   'database-backup.yml': 36,
   'scheduled-maintenance.yml': 216, // 9 days
   'server-health-monitor.yml': 192, // weekly dead-man-switch (8 days)
@@ -258,7 +260,8 @@ interface WorkflowRunsResponse {
 // Workflows that are inherently flaky — depends on LLMs, external URLs,
 // citation verification. For these, we check if ANY of the last 5 runs
 // succeeded rather than requiring the most recent one to succeed.
-const FLAKY_WORKFLOWS = new Set(['auto-update.yml']);
+// scheduled-maintenance.yml uses Claude Code which can fail transiently.
+const FLAKY_WORKFLOWS = new Set(['auto-update.yml', 'scheduled-maintenance.yml']);
 
 // Workflows that only run on schedule or workflow_dispatch (not push).
 // For these, we filter out push-triggered runs which can be spurious

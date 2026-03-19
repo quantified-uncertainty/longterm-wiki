@@ -777,9 +777,10 @@ const citationsApp = new Hono()
     }
 
     // --- 4. Per-page aggregation (GROUP BY pageId) ---
-    // No LIMIT here: JS sorts by inaccuracy rate afterward, so all pages must be
-    // fetched before slicing. The dataset is bounded by the number of wiki pages
-    // (~700), so this is safe.
+    // GROUP BY pageId — bounded by number of wiki pages (~700) but a safety LIMIT
+    // prevents unbounded result sets if data grows unexpectedly.
+    // JS sorts by inaccuracy rate afterward, so all pages must be fetched before slicing.
+    const PAGES_HARD_LIMIT = 5000;
     const pageRows = await db.select({
       pageId: citationQuotes.pageId,
       totalCitations: count(),
@@ -792,7 +793,8 @@ const citationsApp = new Hono()
       avgScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
     })
       .from(citationQuotes)
-      .groupBy(citationQuotes.pageId);
+      .groupBy(citationQuotes.pageId)
+      .limit(PAGES_HARD_LIMIT);
 
     const pages = pageRows.map((r) => {
       const checked = Number(r.checked);
