@@ -9,17 +9,17 @@ export interface EventRow {
   title: string;
   description: string | null;
   status: string | null;
-  date: string | null;
+  lastUpdated: string | null;
   tags: string[];
   wikiId: string | null;
 }
 
-type SortKey = "title" | "status" | "date";
+type SortKey = "title" | "status" | "lastUpdated";
 type SortDir = "asc" | "desc";
 
 export function EventsTable({ rows }: { rows: EventRow[] }) {
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [sortKey, setSortKey] = useState<SortKey>("lastUpdated");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const handleSort = (key: SortKey) => {
@@ -52,8 +52,8 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
           return a.title.localeCompare(b.title) * dir;
         case "status":
           return (a.status ?? "").localeCompare(b.status ?? "") * dir;
-        case "date":
-          return (a.date ?? "").localeCompare(b.date ?? "") * dir;
+        case "lastUpdated":
+          return (a.lastUpdated ?? "").localeCompare(b.lastUpdated ?? "") * dir;
       }
     });
 
@@ -90,8 +90,8 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                 className="text-left"
               />
               <SortHeader
-                label="Date"
-                sortKey="date"
+                label="Last Updated"
+                sortKey="lastUpdated"
                 currentSort={sortKey}
                 currentDir={sortDir}
                 onSort={handleSort}
@@ -126,7 +126,7 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                 </td>
 
                 <td className="py-2.5 px-3 whitespace-nowrap text-muted-foreground text-xs">
-                  {row.date ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                  {row.lastUpdated ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 <td className="py-2.5 px-3 whitespace-nowrap">
