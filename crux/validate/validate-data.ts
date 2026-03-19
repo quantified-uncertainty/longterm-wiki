@@ -30,6 +30,8 @@ import type { Colors } from '../lib/output.ts';
 
 interface EntityData {
   id: string;
+  stableId?: string;
+  wikiId?: string;
   type?: string;
   title?: string;
   relatedEntries?: Array<{ id: string; [key: string]: unknown }>;
@@ -146,6 +148,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
 
   // Build ID sets for quick lookups
   const entityIds = new Set<string>(entities.map((e: EntityData) => e.id));
+  // stableIds are the 10-char IDs used in relatedEntries (e.g. "mK9pX3rQ7n")
+  // entity.id is the slug form (e.g. "anthropic") — both must be checked
+  const entityStableIds = new Set<string>(
+    entities.flatMap((e: EntityData) => (e.stableId ? [e.stableId] : []))
+  );
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
   const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
 
@@ -183,8 +190,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     for (const related of entity.relatedEntries) {
       const relatedId = related.id;
 
-      // Check if it exists in entities, experts, or organizations
-      const exists = entityIds.has(relatedId) ||
+      // relatedEntries use stableId values (10-char IDs like "mK9pX3rQ7n"),
+      // not slug IDs — check entityStableIds first, then fall back to slug IDs
+      // for legacy entries and expert/org lookups (which only have slug IDs).
+      const exists = entityStableIds.has(relatedId) ||
+                    entityIds.has(relatedId) ||
                     expertIds.has(relatedId) ||
                     orgIds.has(relatedId);
 
@@ -200,8 +210,29 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   // ==========================================================================
   if (!ciMode) console.log(`\n${colors.blue}Checking entity-to-file mapping...${colors.reset}`);
 
+  // Entity types that are PG-primary / directory-only. These have structured
+  // directory pages (e.g. /organizations, /people, /ai-models) and intentionally
+  // do NOT have MDX prose articles. Warn only for types where a missing MDX file
+  // indicates a real gap (e.g. analysis, concept, risk, capability).
+  const DIRECTORY_ONLY_TYPES = new Set([
+    'organization',
+    'person',
+    'ai-model',
+    'benchmark',
+    'project',
+    'event',
+    'approach',
+    'policy',
+  ]);
+
   const entitiesWithoutFiles: EntityData[] = [];
   for (const entity of entities) {
+    // Skip directory-only entity types — they use structured directory pages, not MDX articles.
+    if (DIRECTORY_ONLY_TYPES.has(entity.type ?? '')) continue;
+    // Skip entities without a wikiId — lightweight reference records (e.g. minor
+    // organizations, personnel) that are intentionally MDX-less.
+    if (!entity.wikiId) continue;
+
     if (!mdxIds.has(entity.id)) {
       entitiesWithoutFiles.push(entity);
     }
