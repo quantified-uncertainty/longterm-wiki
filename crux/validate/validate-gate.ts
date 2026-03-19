@@ -452,6 +452,17 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'numeric-ranges',
+    name: 'Numeric range validation (low <= high)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-numeric-ranges.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open).
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
