@@ -151,6 +151,11 @@ const SCRIPTS = {
     description: 'Cross-check people roles between YAML entities and FactBase (advisory)',
     passthrough: ['ci', 'verbose'],
   },
+  temporal: {
+    script: 'validate/validate-temporal.ts',
+    description: 'Temporal invariant validation (date validity, ordering, consistency)',
+    passthrough: ['ci', 'verbose'],
+  },
   'orphan-entities': {
     script: 'validate/validate-orphan-entities.ts',
     description: 'Detect PG entity records without YAML source (ghost entities)',

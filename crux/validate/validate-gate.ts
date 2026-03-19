@@ -386,6 +386,13 @@ const PARALLEL_STEPS: Step[] = [
     // displayed in the UI. All current references have been fixed to resolve.
   },
   {
+    id: 'temporal-invariants',
+    name: 'Temporal invariant validation (date validity, ordering)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-temporal.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',
@@ -603,8 +610,9 @@ async function main(): Promise<void> {
     }
 
     // Phase 3 (subset): Only content-relevant checks
+    // temporal-invariants inspects only YAML/data files, so it belongs here
     const contentSteps = PARALLEL_STEPS.filter(s =>
-      s.id === 'unified-blocking' || s.id === 'yaml-schema'
+      s.id === 'unified-blocking' || s.id === 'yaml-schema' || s.id === 'temporal-invariants'
     );
     const contentResults = await runParallel(contentSteps);
     allResults.push(...contentResults);
