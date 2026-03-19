@@ -38,119 +38,41 @@ import { join, basename } from "path";
 import { parse as parseYaml } from "yaml";
 import { getColors } from "../lib/output.ts";
 import { PROJECT_ROOT, DATA_DIR } from "../lib/content-types.ts";
-import { apiRequest } from "../lib/wiki-server/client.ts";
+import { fetchAllRecords } from "./validate-soft-fks.ts";
 import type { ValidatorResult } from "./types.ts";
 import type { Colors } from "../lib/output.ts";
 
+// Canonical sources for vocabulary lists
+import {
+  ALL_ENTITY_TYPE_NAMES,
+} from "../../apps/web/src/data/entity-type-names.ts";
+import {
+  RelationshipType as RelationshipTypeEnum,
+  EntityStatus as EntityStatusEnum,
+  ResearchMaturity as ResearchMaturityEnum,
+} from "../../data/schema.ts";
+
 // ---------------------------------------------------------------------------
-// Controlled vocabularies — single source of truth references
+// Controlled vocabularies — derived from canonical sources
 // ---------------------------------------------------------------------------
 
 /**
- * Canonical entity types from data/schema.ts EntityType enum.
+ * Canonical entity types — imported from apps/web/src/data/entity-type-names.ts.
  * Includes both canonical types and known aliases.
  */
-const VALID_ENTITY_TYPES = new Set([
-  // Canonical
-  "risk",
-  "risk-factor",
-  "capability",
-  "safety-agenda",
-  "approach",
-  "project",
-  "policy",
-  "organization",
-  "crux",
-  "concept",
-  "case-study",
-  "person",
-  "scenario",
-  "resource",
-  "funder",
-  "historical",
-  "analysis",
-  "model",
-  "parameter",
-  "metric",
-  "argument",
-  "table",
-  "diagram",
-  "insight",
-  "event",
-  "debate",
-  "overview",
-  "intelligence-paradigm",
-  "internal",
-  "ai-model",
-  "benchmark",
-  "research-area",
-  // Aliases (legacy/plural forms)
-  "researcher",
-  "lab",
-  "lab-frontier",
-  "lab-research",
-  "lab-startup",
-  "lab-academic",
-  "safety-approaches",
-  "policies",
-  "concepts",
-  "events",
-  "models",
-]);
+export const VALID_ENTITY_TYPES = new Set<string>(ALL_ENTITY_TYPE_NAMES);
 
 /**
- * Valid relationship types from data/schema.ts RelationshipType enum.
+ * Valid relationship types — imported from data/schema.ts RelationshipType enum.
  */
-const VALID_RELATIONSHIPS = new Set([
-  "related",
-  "causes",
-  "cause",
-  "mitigates",
-  "mitigated-by",
-  "mitigation",
-  "requires",
-  "enables",
-  "blocks",
-  "supersedes",
-  "increases",
-  "decreases",
-  "supports",
-  "measures",
-  "measured-by",
-  "analyzed-by",
-  "analyzes",
-  "child-of",
-  "composed-of",
-  "component",
-  "part-of",
-  "created-by",
-  "addresses",
-  "affects",
-  "amplifies",
-  "contributes-to",
-  "driven-by",
-  "driver",
-  "drives",
-  "leads-to",
-  "shaped-by",
-  "consequence",
-  "example",
-  "key-factor",
-  "manifestation",
-  "mechanism",
-  "outcome",
-  "prerequisite",
-  "research",
-  "scenario",
-  "sub-scenario",
-  "vulnerable-technique",
-  "models",
-]);
+export const VALID_RELATIONSHIPS = new Set<string>(RelationshipTypeEnum.options);
 
 /**
- * Valid orgType values from entity-schemas.ts OrganizationEntitySchema.
+ * Valid orgType values — extracted from data/schema.ts Entity schema.
+ * Canonical source: Entity.shape.orgType in data/schema.ts (also matches
+ * entity-schemas.ts OrganizationEntitySchema.orgType).
  */
-const VALID_ORG_TYPES = new Set([
+export const VALID_ORG_TYPES = new Set([
   "frontier-lab",
   "safety-org",
   "academic",
@@ -159,12 +81,12 @@ const VALID_ORG_TYPES = new Set([
   "startup",
   "generic",
   "other",
-]);
+] as const);
 
 /**
- * Valid severity values from data/schema.ts Entity schema.
+ * Valid severity values — extracted from data/schema.ts Entity.severity enum.
  */
-const VALID_SEVERITIES = new Set([
+export const VALID_SEVERITIES = new Set([
   "low",
   "medium",
   "medium-high",
@@ -176,35 +98,37 @@ const VALID_SEVERITIES = new Set([
   "Medium",
   "High",
   "Catastrophic",
-]);
+] as const);
 
 /**
- * Valid maturity values from data/schema.ts ResearchMaturity enum.
+ * Valid maturity values — imported from data/schema.ts ResearchMaturity enum.
  */
-const VALID_MATURITIES = new Set(["Neglected", "Emerging", "Growing", "Mature"]);
+export const VALID_MATURITIES = new Set<string>(ResearchMaturityEnum.options);
 
 /**
- * Valid entity status values from data/schema.ts EntityStatus enum.
+ * Valid entity status values — imported from data/schema.ts EntityStatus enum.
  */
-const VALID_STATUSES = new Set(["stub", "draft", "published", "verified"]);
+export const VALID_STATUSES = new Set<string>(EntityStatusEnum.options);
 
 /**
- * Valid cluster values from data/schema.ts Entity schema.
+ * Valid cluster values — extracted from data/schema.ts Entity.clusters enum.
  */
-const VALID_CLUSTERS = new Set([
+export const VALID_CLUSTERS = new Set([
   "ai-safety",
   "biorisks",
   "cyber",
   "epistemics",
   "governance",
   "community",
-]);
+] as const);
 
 /**
  * De facto policy status values. These are not formally enum'd in the
  * schema but follow a consistent pattern in the data.
+ * Canonical source: manual audit of data/entities/*.yaml policy entities.
+ * Last synced: 2026-03-19.
  */
-const VALID_POLICY_STATUSES = new Set([
+export const VALID_POLICY_STATUSES = new Set([
   "active",
   "proposed",
   "enacted",
@@ -214,45 +138,62 @@ const VALID_POLICY_STATUSES = new Set([
   "expired",
   "pending",
   "signed",
-]);
+] as const);
 
 /**
- * Valid project status values from entity-schemas.ts ProjectEntitySchema.
+ * Valid project status values — extracted from entity-schemas.ts
+ * ProjectEntitySchema.projectStatus enum.
+ * Canonical source: apps/web/src/data/entity-schemas.ts ProjectEntitySchema.
+ * Last synced: 2026-03-19.
  */
-const VALID_PROJECT_STATUSES = new Set([
+export const VALID_PROJECT_STATUSES = new Set([
   "active",
   "maintained",
   "archived",
   "abandoned",
   "beta",
-]);
+] as const);
 
 /**
- * Valid personnel roleType values from wiki-server personnel route.
+ * Valid personnel roleType values.
+ * Canonical source: apps/wiki-server/src/routes/tablebase/personnel.ts VALID_ROLE_TYPES.
+ * Last synced: 2026-03-19.
  */
-const VALID_ROLE_TYPES = new Set(["key-person", "board", "career"]);
+export const VALID_ROLE_TYPES = new Set([
+  "key-person",
+  "board",
+  "career",
+] as const);
 
 /**
- * Valid division type values from wiki-server divisions route.
+ * Valid division type values.
+ * Canonical source: apps/wiki-server/src/routes/tablebase/divisions.ts VALID_DIVISION_TYPES.
+ * Last synced: 2026-03-19.
  */
-const VALID_DIVISION_TYPES = new Set([
+export const VALID_DIVISION_TYPES = new Set([
   "fund",
   "team",
   "department",
   "lab",
   "program-area",
-]);
+] as const);
 
 /**
- * Valid division status values from wiki-server divisions route.
+ * Valid division status values.
+ * Canonical source: apps/wiki-server/src/routes/tablebase/divisions.ts VALID_STATUSES.
+ * Last synced: 2026-03-19.
  */
-const VALID_DIVISION_STATUSES = new Set(["active", "inactive", "dissolved"]);
+export const VALID_DIVISION_STATUSES = new Set([
+  "active",
+  "inactive",
+  "dissolved",
+] as const);
 
 // ---------------------------------------------------------------------------
 // Interfaces
 // ---------------------------------------------------------------------------
 
-interface VocabIssue {
+export interface VocabIssue {
   field: string;
   value: string;
   entityId: string;
@@ -260,7 +201,7 @@ interface VocabIssue {
   suggestion?: string;
 }
 
-interface EntityData {
+export interface EntityData {
   id: string;
   type?: string;
   orgType?: string;
@@ -379,7 +320,7 @@ function loadYamlEntities(): Array<EntityData & { _sourceFile: string }> {
 /**
  * Check a value against a vocabulary and record issues.
  */
-function checkValue(
+export function checkValue(
   field: string,
   value: string | undefined | null,
   vocab: Set<string>,
@@ -399,7 +340,7 @@ function checkValue(
 // YAML entity checks
 // ---------------------------------------------------------------------------
 
-function checkYamlEntities(entities: Array<EntityData & { _sourceFile: string }>): VocabIssue[] {
+export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: string }>): VocabIssue[] {
   const issues: VocabIssue[] = [];
 
   for (const entity of entities) {
@@ -486,34 +427,26 @@ function checkYamlEntities(entities: Array<EntityData & { _sourceFile: string }>
 // PG-primary data checks (via wiki-server API)
 // ---------------------------------------------------------------------------
 
-interface PersonnelListResponse {
-  items: PersonnelRow[];
-  total: number;
-}
-
-interface DivisionsListResponse {
-  items: DivisionRow[];
-  total: number;
-}
-
-async function checkPersonnel(): Promise<VocabIssue[]> {
+export async function checkPersonnel(): Promise<VocabIssue[]> {
   const issues: VocabIssue[] = [];
 
-  const result = await apiRequest<PersonnelListResponse>(
-    "GET",
-    "/api/tablebase/personnel?limit=200"
+  const records = await fetchAllRecords(
+    "/api/tablebase/personnel",
+    "items",
+    200
   );
-  if (!result.ok) {
+  if (!records) {
     // Wiki-server unavailable — skip PG checks gracefully
     return issues;
   }
 
-  for (const row of result.data.items) {
+  for (const row of records) {
+    const r = row as unknown as PersonnelRow;
     checkValue(
       "personnel.roleType",
-      row.roleType,
+      r.roleType,
       VALID_ROLE_TYPES,
-      `personnel:${row.personId}@${row.organizationId}`,
+      `personnel:${r.personId}@${r.organizationId}`,
       "wiki-server:personnel",
       issues
     );
@@ -522,32 +455,34 @@ async function checkPersonnel(): Promise<VocabIssue[]> {
   return issues;
 }
 
-async function checkDivisions(): Promise<VocabIssue[]> {
+export async function checkDivisions(): Promise<VocabIssue[]> {
   const issues: VocabIssue[] = [];
 
-  const result = await apiRequest<DivisionsListResponse>(
-    "GET",
-    "/api/tablebase/divisions?limit=200"
+  const records = await fetchAllRecords(
+    "/api/tablebase/divisions",
+    "items",
+    200
   );
-  if (!result.ok) {
+  if (!records) {
     return issues;
   }
 
-  for (const row of result.data.items) {
+  for (const row of records) {
+    const r = row as unknown as DivisionRow;
     checkValue(
       "divisions.divisionType",
-      row.divisionType,
+      r.divisionType,
       VALID_DIVISION_TYPES,
-      `division:${row.name}@${row.parentOrgId}`,
+      `division:${r.name}@${r.parentOrgId}`,
       "wiki-server:divisions",
       issues
     );
-    if (row.status != null) {
+    if (r.status != null) {
       checkValue(
         "divisions.status",
-        row.status,
+        r.status,
         VALID_DIVISION_STATUSES,
-        `division:${row.name}@${row.parentOrgId}`,
+        `division:${r.name}@${r.parentOrgId}`,
         "wiki-server:divisions",
         issues
       );
