@@ -115,10 +115,19 @@ commands['classify-stance'] = async function (args: string[], options: Record<st
   if (!page) {
     return { output: 'Usage: pnpm crux resources classify-stance --page=<slug>\n  Options: --apply, --limit=N, --verbose', exitCode: 1 };
   }
+  let limit: number | undefined;
+  if (options.limit !== undefined) {
+    const parsedLimit = Number(options.limit);
+    if (!Number.isInteger(parsedLimit) || parsedLimit <= 0) {
+      return { output: '--limit must be a positive integer', exitCode: 1 };
+    }
+    limit = parsedLimit;
+  }
+
   await classifyStance({
     page,
     apply: !!options.apply,
-    limit: options.limit ? Number(options.limit) : undefined,
+    limit,
     verbose: !!options.verbose,
   });
   return { output: '', exitCode: 0 };

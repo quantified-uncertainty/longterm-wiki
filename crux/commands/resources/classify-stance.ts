@@ -45,7 +45,13 @@ function buildUserPrompt(resources: Array<{ id: string; title: string; summary: 
     id: r.id,
     title: r.title,
     summary: r.summary?.slice(0, 200) ?? null,
-    source: r.domain ?? new URL(r.url).hostname,
+    source: r.domain ?? (() => {
+      try {
+        return new URL(r.url).hostname;
+      } catch {
+        return 'unknown';
+      }
+    })(),
   }));
   return JSON.stringify(items, null, 2);
 }
@@ -64,8 +70,7 @@ export async function classifyStance(args: {
   // Load resources for the page
   const result = await getResourcesByPage(page);
   if (!result.ok) {
-    console.error(`Failed to load resources for page "${page}": ${result.error}`);
-    return;
+    throw new Error(`Failed to load resources for page "${page}": ${result.error}`);
   }
 
   let resources = result.data.resources;
@@ -139,10 +144,14 @@ export async function classifyStance(args: {
           continue;
         }
         const matchedItem = items.find((r) => r.id === item.id);
+        if (!matchedItem) {
+          if (verbose) console.log(`  ⚠ Unknown resource id "${item.id}", skipping`);
+          continue;
+        }
         allResults.push({
           resourceId: item.id,
-          title: matchedItem?.title ?? item.id,
-          url: matchedItem?.url ?? '',
+          title: matchedItem.title,
+          url: matchedItem.url,
           stance: item.stance,
           confidence: item.confidence ?? 'medium',
           reasoning: item.reasoning ?? '',
