@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
@@ -54,8 +54,8 @@ export default async function ApproachDetailPage({
   //
   // We check getPageById to confirm that an MDX page actually exists in the
   // build (avoiding redirecting to /wiki/E* for wikiId-only stubs with no .mdx file).
-  if (entity.wikiId && getPageById(slug)) {
-    redirect(getWikiHref(entity.wikiId));
+  if (entity.wikiId && getPageById(entity.id)) {
+    permanentRedirect(getWikiHref(entity.wikiId));
   }
 
   const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
