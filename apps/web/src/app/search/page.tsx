@@ -42,15 +42,19 @@ function buildBrowseData(): BrowseData {
     }))
     .sort((a, b) => b.count - a.count);
 
-  // Top entities by readerImportance (exclude internal)
+  // Top entities by recommendedScore (pre-computed at build time),
+  // falling back to readerImportance. Exclude internal pages.
   const featured = items
     .filter((item) =>
       item.type !== "internal" &&
-      item.readerImportance != null &&
-      item.readerImportance > 0 &&
-      item.wikiId
+      item.wikiId &&
+      ((item.recommendedScore ?? 0) > 0 || (item.readerImportance ?? 0) > 0)
     )
-    .sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0))
+    .sort((a, b) => {
+      const scoreA = a.recommendedScore ?? (a.readerImportance ?? 0);
+      const scoreB = b.recommendedScore ?? (b.readerImportance ?? 0);
+      return scoreB - scoreA;
+    })
     .slice(0, 12)
     .map((item) => ({
       id: item.id,

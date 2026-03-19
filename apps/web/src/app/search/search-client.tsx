@@ -639,11 +639,18 @@ function BrowseState({ data }: { data: BrowseData }) {
           </Link>
           <Link
             href="/wiki"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
           >
-            <FileText size={13} />
-            <span>All wiki pages</span>
+            <FileText size={13} className="text-slate-400" />
+            <span>Wiki pages</span>
             <span className="text-xs text-muted-foreground/40 tabular-nums">{data.totalPages}</span>
+          </Link>
+          <Link
+            href="/resources"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ExternalLink size={13} className="text-orange-500" />
+            <span>Resources</span>
           </Link>
         </div>
       </section>
