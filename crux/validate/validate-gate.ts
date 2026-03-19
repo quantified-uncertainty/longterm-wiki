@@ -383,7 +383,7 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-yaml-entity-refs.ts'],
     cwd: PROJECT_ROOT,
     // Blocking: dangling entity references cause broken links and raw IDs
-    // displayed in the UI. All current references have been fixed to resolve.
+    // displayed in the UI. Regressions should be caught immediately.
   },
   {
     id: 'temporal-invariants',
@@ -391,6 +391,8 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-temporal.ts'],
     cwd: PROJECT_ROOT,
+    // Blocking: invalid or misordered dates (e.g., endDate before startDate,
+    // future dates on historical events) should be caught immediately.
   },
   {
     id: 'directory-pages',
@@ -441,16 +443,13 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'controlled-vocab',
-    name: 'Controlled vocabulary validation (advisory)',
+    name: 'Controlled vocabulary validation',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-controlled-vocab.ts'],
     cwd: PROJECT_ROOT,
-    // Advisory: reports free-text fields that don't match their expected
-    // controlled vocabulary (entityType, relationship, orgType, etc.).
-    // Informational for now — can be promoted to blocking once all
-    // existing values are cleaned up or added to the vocabulary.
-    advisory: true,
-    emitOutputInCi: true,
+    // Blocking: all entity fields now conform to their controlled vocabularies
+    // (entityType, relationship, orgType, etc.). Regressions should be caught
+    // immediately to prevent free-text drift.
   },
   {
     id: 'numeric-ranges',
@@ -481,11 +480,9 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-cross-base.ts'],
     cwd: PROJECT_ROOT,
-    // Advisory: new validator that checks WikiBase pages match TableBase entity
-    // declarations and FactBase entities have TableBase entries. Will be promoted
-    // to blocking once all existing mismatches are resolved.
-    advisory: true,
-    emitOutputInCi: true,
+    // Blocking: validates that WikiBase pages match TableBase entity declarations
+    // and FactBase entities have corresponding TableBase entries. All existing
+    // mismatches have been resolved — regressions should be caught immediately.
   },
 ];
 
