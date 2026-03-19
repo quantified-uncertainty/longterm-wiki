@@ -68,6 +68,7 @@ interface JoinedRow {
 }
 
 function cleanId(id: string): string | null {
+  if (/^\d+$/.test(id)) return null;
   if (STABLE_ID_PATTERN.test(id)) return null;
   return id;
 }
