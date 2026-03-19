@@ -260,16 +260,22 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
     setSearched(true);
     setErrored(false);
 
-    const [pageResults, thingResults] = await Promise.all([
-      searchWiki(q, 40),
-      searchThings(q, 60),
-    ]);
+    let pageResults: SearchResult[] = [];
+    let thingResults: ThingSearchResult[] = [];
+    try {
+      [pageResults, thingResults] = await Promise.all([
+        searchWiki(q, 40),
+        searchThings(q, 60),
+      ]);
+    } catch {
+      if (seq === searchSeqRef.current) {
+        setErrored(true);
+        setLoading(false);
+      }
+      return;
+    }
 
     if (seq !== searchSeqRef.current) return;
-
-    if (pageResults.length === 0 && thingResults.length === 0 && q.trim().length > 2) {
-      setErrored(true);
-    }
 
     const pageWikiIds = new Set(pageResults.map((r) => r.wikiId).filter(Boolean));
     const dedupedThings = thingResults.filter((t) => {
@@ -388,7 +394,7 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
   }, [selected, flatResults]);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16" onKeyDown={handleKeyDown}>
+    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -397,7 +403,7 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
       </div>
 
       {/* Search bar */}
-      <form onSubmit={handleSubmit} className="relative mb-6 group max-w-2xl">
+      <form onSubmit={handleSubmit} role="search" className="relative mb-6 group max-w-2xl">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 group-focus-within:text-foreground/50 transition-colors">
           <SearchIcon size={16} />
         </div>
@@ -407,6 +413,7 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
           value={query}
           onChange={(e) => handleInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          aria-label="Search"
           placeholder="Search entities, articles, resources..."
           className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all"
           autoComplete="off"
@@ -452,12 +459,13 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
         </p>
       )}
 
-      {/* Three-column grid — only render columns that have results */}
+      {/* Results grid — responsive: stack on mobile, columns on desktop */}
       {hasResults && (
-        <div
-          className="grid gap-8"
-          style={{ gridTemplateColumns: `repeat(${visibleColumns.length}, minmax(0, 1fr))` }}
-        >
+        <div className={`grid gap-8 grid-cols-1 ${
+          visibleColumns.length === 1 ? "md:grid-cols-1" :
+          visibleColumns.length === 2 ? "md:grid-cols-2" :
+          "md:grid-cols-2 lg:grid-cols-3"
+        }`}>
           {visibleColumns.map((col) => (
             <ResultColumnView
               key={col.key}
