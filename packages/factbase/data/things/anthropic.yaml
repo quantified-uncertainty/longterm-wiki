@@ -135,9 +135,11 @@ facts:
     value: 6.7e+10
     asOf: 2026-02
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
-    notes: "Total funding raised including $30B Series G. Lower than individual round
-      sum ($75.2B) because some amounts overlap (FTX investment was part of Series B)
-      and strategic partnership amounts are 'up to' commitments not fully deployed."
+    notes: "Total funding raised as of Series G (Feb 2026), per Reuters. Includes
+      Series A-G equity rounds plus Amazon's $10.75B and Google's $3.3B strategic
+      investments. Excludes Microsoft/Nvidia 'up to $15B' commitment (not fully
+      deployed). The FTX ~$500M investment (2022) was sold to creditors after FTX's
+      collapse and is not counted in the live total."
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_zBoko30S4g
