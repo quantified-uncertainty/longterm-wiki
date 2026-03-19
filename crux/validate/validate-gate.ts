@@ -377,6 +377,13 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'temporal-invariants',
+    name: 'Temporal invariant validation (date validity, ordering)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-temporal.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',
