@@ -882,7 +882,7 @@
   openWeight: false
   modality:
     - text
-  trainingCutoff: "2023-04"
+  trainingCutoff: "2021-09"
   benchmarks:
     - name: MMLU
       score: 86.4
