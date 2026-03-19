@@ -351,7 +351,7 @@ export default async function LegislationDetailPage({
                   return (
                     <tr key={rel.id} className="hover:bg-muted/20">
                       <td className="py-2 px-3">
-                        <Link href={`/legislation/${rel.id}`} className="text-primary hover:underline font-medium">
+                        <Link href={getEntityHref(rel.id)} className="text-primary hover:underline font-medium">
                           {rel.title}
                         </Link>
                       </td>
