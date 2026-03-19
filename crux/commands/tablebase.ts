@@ -18,6 +18,15 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import type { TaskType } from '../tablebase/types.ts';
 import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
 
+// Consolidated orphan domain imports
+import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
+import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
+import { commands as backfillStableIdsCommands } from './backfill-stable-ids.ts';
+import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stable-ids.ts';
+import { commands as importGrantsCommands } from './import-grants.ts';
+import { commands as importDivisionsCommands } from './import-divisions.ts';
+import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
+
 interface CommandOptions extends BaseOptions {
   top?: string;
   limit?: string;
@@ -953,6 +962,20 @@ export const commands = {
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
   default: scanCommand,
+  // Consolidated from backfill-* orphan domains
+  'backfill-grantee-ids': backfillGranteeIdsCommands.default,
+  'backfill-program-ids': backfillProgramIdsCommands.default,
+  'backfill-stable-ids': backfillStableIdsCommands.run,
+  'backfill-yaml-stable-ids': backfillYamlStableIdsCommands.run,
+  // Consolidated from import-* orphan domains
+  'import-grants': importGrantsCommands.default,
+  'import-grants-sync': importGrantsCommands.sync,
+  'import-grants-dedup': importGrantsCommands.dedup,
+  'import-grants-download': importGrantsCommands.download,
+  'import-divisions': importDivisionsCommands.default,
+  'import-divisions-sync': importDivisionsCommands.sync,
+  'import-funding-programs': importFundingProgramsCommands.default,
+  'import-funding-programs-sync': importFundingProgramsCommands.sync,
 };
 
 export function getHelp(): string {
@@ -971,6 +994,22 @@ Commands:
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
   sync-careers   Sync FactBase career data to the personnel table
+
+  Backfill (consolidated from backfill-* domains):
+  backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
+  backfill-program-ids [--dry-run]       Link grants to funding programs
+  backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
+  backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
+
+  Import (consolidated from import-* domains):
+  import-grants               Analyze grant import stats (default)
+  import-grants-sync          Import grants to wiki-server
+  import-grants-dedup         Remove cross-source duplicates
+  import-grants-download      Download grant data files
+  import-divisions            List known organizational divisions (default)
+  import-divisions-sync       Sync divisions to wiki-server
+  import-funding-programs     List known funding programs (default)
+  import-funding-programs-sync  Sync programs to wiki-server
 
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing

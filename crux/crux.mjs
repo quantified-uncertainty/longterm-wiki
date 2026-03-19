@@ -42,11 +42,7 @@
  *   ids         Entity ID allocation and lookup (allocate, check, list)
  *   audits      System-level behavioral verification (ongoing + post-merge)
  *   release     Production release management (create release PRs from main → production)
- *   import-grants Import external grant databases (Coefficient Giving, EA Funds)
- *   backfill-grantee-ids Backfill granteeId with matched entity stableIds
- *   backfill-program-ids Backfill programId linking grants to funding programs
- *   import-divisions Import curated organizational divisions
- *   import-funding-programs Import curated funding programs
+ *   tablebase     Structured data enrichment via LLM agents (scan, gaps, improve, loop, backfill-*, import-*)
  *   people       Person discovery and data tools (discover, create, link-resources, enrich)
  *   orgs         Organization data tools (enrich from Wikidata)
  *   research-areas Research area linking (link-grants, backfill-papers, discover-orgs, stats)
@@ -161,6 +157,7 @@ const domains = {
   release: releaseCommands,
   'pr-patrol': prPatrolCommands,
   factbase: factbaseCommands,
+  fb: factbaseCommands, // short alias
   kb: factbaseCommands, // deprecated alias
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
@@ -179,6 +176,7 @@ const domains = {
   'qa-sweep': qaSweepCommands,
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
+  tb: tablebaseCommands, // short alias
   pages: pagesCommands,
 };
 
@@ -266,17 +264,12 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   kb          Knowledge base readability tools (show, list, lookup)
   footnotes        Footnote migration tools (migrate-cr)
   agent-workspace  Multi-agent directory management (setup, sync-env, list, clean)
-  import-grants    Import external grant databases (Coefficient Giving, EA Funds)
-  backfill-grantee-ids  Backfill granteeId with matched entity stableIds
-  backfill-program-ids  Backfill programId linking grants to funding programs
-  import-divisions Import curated organizational divisions
-  import-funding-programs Import curated funding programs
   people           Person discovery and data tools (discover, create, link-resources, enrich)
   orgs             Organization data tools (enrich from Wikidata)
   research-areas   Research area linking (link-grants, backfill-papers, discover-orgs, stats)
   verify           Verify structured data records against source URLs (grants, personnel, etc.)
   matrix           Entity matrix analysis and improvement targeting
-  tablebase        Structured data enrichment via LLM agents (scan, gaps, improve, loop)
+  tablebase        Structured data enrichment (scan, gaps, improve, backfill-*, import-*)
   pages            Page prioritization (next-action: NBA scoring for editorial attention)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
