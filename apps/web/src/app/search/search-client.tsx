@@ -24,6 +24,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+// ── Browse data (passed from server component) ──────────────────────
+
+export interface BrowseData {
+  directories: { type: string; label: string; href: string; count: number }[];
+  featured: { id: string; wikiId: string; title: string; type: string; description: string | null; readerImportance: number | null; href: string }[];
+  recent: { id: string; wikiId: string; title: string; type: string; lastUpdated: string | null; href: string }[];
+  totalPages: number;
+}
+
 // ── Type styling ─────────────────────────────────────────────────────
 // Badge colors from entity-ontology.ts for cross-site consistency.
 
@@ -210,7 +219,7 @@ function decodeEntities(text: string): string {
 
 // ── Component ────────────────────────────────────────────────────────
 
-export function SearchPageClient() {
+export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "";
@@ -399,16 +408,9 @@ export function SearchPageClient() {
         )}
       </form>
 
-      {/* Pre-search */}
+      {/* Browse state — shown when no query */}
       {!hasQuery && !searched && (
-        <div className="py-16 max-w-md">
-          <p className="text-sm text-muted-foreground/40">
-            Search across the knowledge base &mdash; entities, wiki articles, grants, and external resources.
-          </p>
-          <p className="text-xs text-muted-foreground/25 mt-2">
-            Try &ldquo;Anthropic&rdquo;, &ldquo;MIRI grant&rdquo;, or &ldquo;alignment&rdquo;
-          </p>
-        </div>
+        <BrowseState data={browseData} />
       )}
 
       {/* Error / empty */}
@@ -600,6 +602,134 @@ function ResultRow({
   }
 
   return <Link href={r.href} className="block">{content}</Link>;
+}
+
+// ── Browse state ─────────────────────────────────────────────────────
+
+function BrowseState({ data }: { data: BrowseData }) {
+  return (
+    <div className="space-y-8">
+      {/* Directory quick links */}
+      <section>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+          Browse by type
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {data.directories.map((dir) => {
+            const style = TYPE_STYLES[dir.type] ?? FALLBACK_STYLE;
+            const Icon = style.icon;
+            return (
+              <Link
+                key={dir.type}
+                href={dir.href}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <Icon size={13} className={style.iconColor} />
+                <span>{dir.label}</span>
+                <span className="text-xs text-muted-foreground/40 tabular-nums">{dir.count}</span>
+              </Link>
+            );
+          })}
+          <Link
+            href="/grants"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Banknote size={13} className="text-green-500" />
+            <span>Grants</span>
+          </Link>
+          <Link
+            href="/wiki"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+          >
+            <FileText size={13} />
+            <span>All wiki pages</span>
+            <span className="text-xs text-muted-foreground/40 tabular-nums">{data.totalPages}</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* Two-column: Featured + Recent */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Featured entities */}
+        <section>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Key entities
+          </h2>
+          <div className="space-y-px">
+            {data.featured.map((item) => {
+              const style = TYPE_STYLES[item.type] ?? FALLBACK_STYLE;
+              const Icon = style.icon;
+              return (
+                <Link key={item.id} href={item.href} className="block">
+                  <div className="flex items-start gap-2 py-2 px-2 -mx-1 rounded-md hover:bg-muted/30 transition-colors">
+                    <Icon size={14} className={`shrink-0 mt-0.5 ${style.iconColor}`} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="font-medium text-[13px] text-foreground truncate">
+                          {item.title}
+                        </span>
+                        <span className={`shrink-0 px-1.5 py-px text-[9px] font-semibold rounded ${style.badge}`}>
+                          {style.short}
+                        </span>
+                      </div>
+                      {item.description && (
+                        <p className="text-[12px] text-muted-foreground/60 leading-snug mt-0.5 line-clamp-1">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Recently updated */}
+        <section>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Recently updated
+          </h2>
+          <div className="space-y-px">
+            {data.recent.map((item) => {
+              const style = TYPE_STYLES[item.type] ?? FALLBACK_STYLE;
+              const Icon = style.icon;
+              return (
+                <Link key={`recent-${item.id}`} href={item.href} className="block">
+                  <div className="flex items-start gap-2 py-2 px-2 -mx-1 rounded-md hover:bg-muted/30 transition-colors">
+                    <Icon size={14} className={`shrink-0 mt-0.5 ${style.iconColor}`} />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-medium text-[13px] text-foreground truncate block">
+                        {item.title}
+                      </span>
+                      {item.lastUpdated && (
+                        <span className="text-[11px] text-muted-foreground/40">
+                          {formatRelativeDate(item.lastUpdated)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+  return `${Math.floor(diffDays / 365)}y ago`;
 }
 
 // ── Utilities ────────────────────────────────────────────────────────
