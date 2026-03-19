@@ -409,6 +409,18 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'soft-fks',
+    name: 'Soft FK entity reference validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-soft-fks.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires wiki-server access. Reports legacy text FK fields
+    // in PG tables (personnel, grants, investments, etc.) that don't resolve
+    // to known entities. Informational for now.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
