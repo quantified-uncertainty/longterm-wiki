@@ -53,17 +53,6 @@ function getGitRemoteUrl(): string {
   }
 }
 
-/** Read the slot number from a directory's .agent-slot file */
-function readSlot(dir: string): number | null {
-  try {
-    const raw = readFileSync(join(dir, '.agent-slot'), 'utf-8').trim();
-    const n = parseInt(raw, 10);
-    return Number.isInteger(n) && n > 0 ? n : null;
-  } catch {
-    return null;
-  }
-}
-
 /** Find all agent slot directories under lw/ */
 function findSlotDirs(lwDir: string): Array<{ dir: string; slot: number }> {
   if (!existsSync(lwDir)) return [];
@@ -74,10 +63,11 @@ function findSlotDirs(lwDir: string): Array<{ dir: string; slot: number }> {
   for (const name of entries) {
     const dir = join(lwDir, name);
     if (!statSync(dir).isDirectory()) continue;
-    const slot = readSlot(dir);
-    if (slot !== null) {
-      results.push({ dir, slot });
-    }
+    // Derive slot from directory name — .agent-slot files can be corrupted
+    const match = name.match(/^a(\d+)$/);
+    if (!match) continue;
+    const slot = parseInt(match[1], 10);
+    results.push({ dir, slot });
   }
 
   return results.sort((a, b) => a.slot - b.slot);
@@ -173,14 +163,13 @@ Options:
   // Clone if needed
   if (existsSync(slotDir)) {
     if (!options.force) {
-      const existingSlot = readSlot(slotDir);
-      if (existingSlot !== null) {
-        return {
-          exitCode: 0,
-          output: `Slot a${slot} already exists at ${slotDir}. Use --force to re-initialize .env and .agent-slot.`,
-        };
-      }
+      // Directory exists — no need to read .agent-slot, the dir name is enough
+      return {
+        exitCode: 0,
+        output: `Slot a${slot} already exists at ${slotDir}. Use --force to re-initialize .env and .agent-slot.`,
+      };
     }
+    // --force: fall through to regenerate .env and repair .agent-slot below
   } else {
     const remote = getGitRemoteUrl();
     console.error(`Cloning ${remote} → ${slotDir}...`);
@@ -228,6 +217,9 @@ async function syncEnv(_args: string[], _options: CommandOptions): Promise<Comma
   for (const { dir, slot } of slots) {
     const envContent = generateEnv(envBasePath, slot);
     writeFileSync(join(dir, '.env'), envContent);
+    // Repair .agent-slot — the directory name is the source of truth, so
+    // overwrite whatever (possibly corrupted) value was there before.
+    writeFileSync(join(dir, '.agent-slot'), String(slot) + '\n');
     lines.push(`  ✓ a${slot}/.env regenerated (ports ${3010 + slot}/${3110 + slot})`);
   }
 
