@@ -35,7 +35,8 @@ import {
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
-import { ResourceTimeline, parseDisplayDateToISO, type TimelineEvent, type TimelineResource } from "./resource-timeline";
+import { ResourceTimeline, type TimelineEvent, type TimelineResource } from "./resource-timeline";
+import { parseDisplayDateToISO } from "./date-utils";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
