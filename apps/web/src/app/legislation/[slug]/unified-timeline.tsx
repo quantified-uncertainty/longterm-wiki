@@ -99,7 +99,7 @@ function ResourceList({ resources }: { resources: TimelineResourceChild[] }) {
   );
 }
 
-// ── Child items (amendments, votes, resources under a milestone) ────────
+// ── Child items ─────────────────────────────────────────────────────────
 
 function AmendmentEntry({
   child,
@@ -108,35 +108,36 @@ function AmendmentEntry({
 }) {
   return (
     <div className="relative pl-5">
-      {/* Pencil icon for amendments */}
-      <svg className="absolute left-0 top-[5px] w-3 h-3 text-amber-500/60 dark:text-amber-400/50" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5z" />
-      </svg>
+      <div className="absolute left-0 top-[6px] w-2 h-2 rounded-full bg-amber-400/60 dark:bg-amber-500/40" />
       <div>
-        {/* Header row: description left, date right */}
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-sm text-foreground/80 leading-relaxed">
-            {child.description}
+          <div className="flex-1 min-w-0">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-amber-600/70 dark:text-amber-400/60 mr-1.5">
+              Amended
+            </span>
+            <span className="text-sm text-foreground/80">
+              {child.description}
+            </span>
             {child.url && (
               <a
                 href={child.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center ml-1.5 text-[12px] text-primary/60 hover:text-primary transition-colors"
+                className="inline-flex items-center ml-1.5 text-[11px] text-primary/50 hover:text-primary transition-colors"
               >
                 PDF &#8599;
               </a>
             )}
-          </p>
-          <span className="text-[13px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
+            {child.author && (
+              <span className="text-[12px] text-muted-foreground/40 ml-1.5">
+                by {child.author}
+              </span>
+            )}
+          </div>
+          <span className="text-[12px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
             {child.date}
           </span>
         </div>
-        {child.author && (
-          <span className="text-[12px] text-muted-foreground/40 mt-0.5 block">
-            by {child.author}
-          </span>
-        )}
       </div>
       <ResourceList resources={child.resources} />
     </div>
@@ -150,23 +151,21 @@ function VoteEntry({
 }) {
   return (
     <div className="relative pl-5">
-      {/* Ballot/check icon for votes */}
-      <svg className="absolute left-0 top-[5px] w-3 h-3 text-blue-500/60 dark:text-blue-400/50" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-      </svg>
-      {/* Header row: chamber + tally left, date right */}
+      <div className="absolute left-0 top-[6px] w-2 h-2 rounded-full bg-blue-400/60 dark:bg-blue-500/40" />
       <div className="flex items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-baseline gap-1.5 flex-wrap">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-blue-600/70 dark:text-blue-400/60">
+            Vote
+          </span>
           <span className="text-sm font-medium">{child.chamber}</span>
           {child.ayes != null && child.noes != null && (
-            <span className="text-[13px] text-muted-foreground/60 tabular-nums">
+            <span className="text-[13px] text-muted-foreground/50 tabular-nums">
               {child.ayes}&ndash;{child.noes}
             </span>
           )}
         </div>
         {child.date && (
-          <span className="text-[13px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
+          <span className="text-[12px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
             {child.date}
           </span>
         )}
@@ -187,31 +186,42 @@ function MilestoneEntry({
 }) {
   const dotColor = getMilestoneDotColor(milestone.label);
   const ringColor = getMilestoneRingColor(milestone.label);
-  const voteStr = milestone.vote ? formatVoteSummary(milestone.vote) : null;
+  const vote = milestone.vote;
+  const voteStr = vote ? formatVoteSummary(vote) : null;
   const hasChildren = milestone.children.length > 0;
+
+  // Show chamber name from merged vote if it adds specificity
+  // e.g. "Passed Committee" + vote.chamber="Senate Judiciary Committee" → show the chamber
+  const chamberDetail =
+    vote?.chamber && !milestone.label.toLowerCase().includes(vote.chamber.toLowerCase())
+      ? vote.chamber
+      : null;
 
   return (
     <div className="relative">
-      {/* Vertical connector line — from this milestone down to the next */}
+      {/* Vertical connector line */}
       {!isLast && (
         <div className="absolute left-[9px] top-[20px] bottom-0 w-px bg-border" />
       )}
 
       {/* Milestone header row */}
       <div className="flex items-start gap-3">
-        {/* Dot */}
         <div className="relative shrink-0 mt-0.5">
           <div className={`w-[20px] h-[20px] rounded-full ${dotColor} ring-4 ${ringColor}`} />
         </div>
 
-        {/* Label left, date right */}
         <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2 pb-1">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className="font-semibold text-[15px] text-foreground">
               {milestone.label}
             </span>
+            {chamberDetail && (
+              <span className="text-[13px] text-muted-foreground/50">
+                {chamberDetail}
+              </span>
+            )}
             {voteStr && (
-              <span className="text-[13px] text-muted-foreground/50 tabular-nums">
+              <span className="text-[13px] text-muted-foreground/40 tabular-nums">
                 {voteStr}
               </span>
             )}
@@ -224,7 +234,7 @@ function MilestoneEntry({
 
       {/* Children */}
       {hasChildren && (
-        <div className="ml-[9px] pl-[22px] border-l border-border space-y-2.5 pb-2 pt-1">
+        <div className="ml-[9px] pl-[22px] border-l border-border space-y-2 pb-2 pt-1">
           {milestone.children.map((child, i) => {
             if (child.type === "amendment") {
               return (
@@ -247,7 +257,6 @@ function MilestoneEntry({
         </div>
       )}
 
-      {/* Spacer when no children but not last */}
       {!hasChildren && !isLast && <div className="h-2" />}
     </div>
   );
@@ -269,7 +278,6 @@ export function UnifiedTimelineView({ timeline }: UnifiedTimelineViewProps) {
 
   return (
     <div>
-      {/* Early coverage */}
       {earlyCoverage.length > 0 && (
         <div className="mb-6 ml-8">
           <p className="text-xs font-medium text-muted-foreground/50 uppercase tracking-widest mb-2">
@@ -283,7 +291,6 @@ export function UnifiedTimelineView({ timeline }: UnifiedTimelineViewProps) {
         </div>
       )}
 
-      {/* Timeline */}
       {milestones.length > 0 && (
         <div className="space-y-1">
           {milestones.map((milestone, i) => (
