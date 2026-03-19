@@ -9,22 +9,22 @@ facts:
       and Guesstimate.
     asOf: !date 2026-03
 
-  - id: f_quri_founded
+  - id: f_xGX3C9m5Ee
     property: founded-date
     value: !date 2019
     source: https://quantifieduncertainty.org
     notes: Evolved from earlier Guesstimate work (2016)
 
-  - id: f_quri_website
+  - id: f_FNxcwwwO26
     property: website
     value: https://quantifieduncertainty.org
 
-  - id: f_quri_hq
+  - id: f_TkRMfuBYog
     property: headquarters
     value: Berkeley, CA
     notes: Primarily remote team
 
-  - id: f_quri_headcount
+  - id: f_Nl4IKIikMq
     property: headcount
     value:
       type: range
@@ -35,7 +35,7 @@ facts:
       ~3-5 core contributors including Ozzie Gooen, Slava Matyukhin (2022-2025),
       Sam Nolan (2021-2023); previously Nuño Sempere (2020-2023)
 
-  - id: f_quri_sff_funding
+  - id: f_zwFMLRENMB
     property: funding-received
     value:
       type: number
@@ -46,17 +46,17 @@ facts:
     notes: Survival and Flourishing Fund (sff) grants 2019-2022
     grantor: !ref pvJ50HupEQ
 
-  - id: f_quri_ff_funding
+  - id: f_AyrcCzn5aW
     property: funding-received
     value:
       type: number
       value: 200000
       unit: USD
     asOf: !date 2022
-    source: https://ftxfuturefund.org
+    source: https://web.archive.org/web/20221212115231/https://ftxfuturefund.org/
     notes: Future Fund grant 2022 (pre-FTX collapse)
 
-  - id: f_quri_ltff_funding
+  - id: f_qduycirTr5
     property: funding-received
     value:
       type: range
