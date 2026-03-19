@@ -183,6 +183,7 @@ export interface Resource {
   fetch_status?: string;
   archive_url?: string;
   author_entity_ids?: string[];
+  stance?: string;
 }
 
 export interface Publication {
@@ -828,6 +829,46 @@ export function getAllPages(): Page[] {
 // ============================================================================
 // RESOURCE HELPERS
 // ============================================================================
+
+/** Lazily-built map from domain → publication (includes subdomain matching). */
+let _domainToPublication: Map<string, Publication> | null = null;
+
+function domainToPublicationIndex(): Map<string, Publication> {
+  if (!_domainToPublication) {
+    _domainToPublication = new Map();
+    for (const pub of getAllPublications()) {
+      for (const domain of pub.domains) {
+        // Store the exact domain (lowercased, www-stripped) for lookup
+        const normalized = domain.toLowerCase().replace(/^www\./, "");
+        _domainToPublication.set(normalized, pub);
+      }
+    }
+  }
+  return _domainToPublication;
+}
+
+/**
+ * Look up a publication by resource domain.
+ * Handles subdomain matching: a publication with domain "nytimes.com"
+ * matches "www.nytimes.com" and "cooking.nytimes.com" too.
+ */
+export function getPublicationByDomain(domain: string): Publication | undefined {
+  if (!domain) return undefined;
+  const idx = domainToPublicationIndex();
+  const normalized = domain.toLowerCase().replace(/^www\./, "");
+
+  // Exact match first
+  const exact = idx.get(normalized);
+  if (exact) return exact;
+
+  // Subdomain match: check if the resource domain ends with ".{pubDomain}"
+  for (const [pubDomain, pub] of idx) {
+    if (normalized.endsWith(`.${pubDomain}`)) {
+      return pub;
+    }
+  }
+  return undefined;
+}
 
 export function getResourceCredibility(
   resource: Resource
