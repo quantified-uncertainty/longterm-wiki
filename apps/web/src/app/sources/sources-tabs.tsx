@@ -28,7 +28,7 @@ export function SourcesTabs({
         },
         {
           id: "publications",
-          label: "Publications",
+          label: "Publication Venues",
           count: publicationCount,
           content: <PublicationsTable publications={publicationRows} />,
         },

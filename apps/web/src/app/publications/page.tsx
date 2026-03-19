@@ -8,7 +8,7 @@ import { ProfileStatCard } from "@/components/directory";
 import { PublicationsTable, type PublicationRow } from "./publications-table";
 
 export const metadata: Metadata = {
-  title: "Publications",
+  title: "Publication Venues",
   description:
     "Directory of publication venues tracked in the wiki, with credibility ratings, peer-review status, and resource counts.",
 };
@@ -49,7 +49,7 @@ export default function PublicationsPage() {
       : "-";
 
   const stats = [
-    { label: "Publications", value: String(rows.length) },
+    { label: "Venues", value: String(rows.length) },
     { label: "Resources", value: String(totalResources) },
     { label: "Peer-Reviewed", value: String(peerReviewedCount) },
     { label: "Avg Credibility", value: String(avgCredibility) },
@@ -59,7 +59,7 @@ export default function PublicationsPage() {
     <div className="max-w-[90rem] mx-auto px-6 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-          Publications
+          Publication Venues
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
           Publication venues tracked in the wiki, with credibility ratings and
