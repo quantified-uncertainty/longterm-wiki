@@ -180,6 +180,9 @@ export interface Resource {
   publication_id?: string;
   credibility_override?: number;
   stable_id?: string;
+  fetch_status?: string;
+  archive_url?: string;
+  author_entity_ids?: string[];
 }
 
 export interface Publication {
