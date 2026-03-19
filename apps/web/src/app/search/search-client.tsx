@@ -8,23 +8,33 @@ import { searchWiki, searchThings, type SearchResult, type ThingSearchResult } f
 // ── Type config ──────────────────────────────────────────────────────
 
 const TYPE_META: Record<string, { label: string; short: string; icon: string }> = {
-  page: { label: "Wiki Page", short: "Page", icon: "W" },
+  // Wiki articles (non-directory entity types)
+  wiki: { label: "Wiki Article", short: "Wiki", icon: "W" },
+  // Directory entity types
+  organization: { label: "Organization", short: "Org", icon: "O" },
+  person: { label: "Person", short: "Person", icon: "P" },
+  "ai-model": { label: "AI Model", short: "Model", icon: "M" },
+  policy: { label: "Legislation", short: "Law", icon: "L" },
+  project: { label: "Project", short: "Proj", icon: "J" },
+  approach: { label: "Approach", short: "Appr", icon: "A" },
+  event: { label: "Event", short: "Event", icon: "E" },
+  benchmark: { label: "Benchmark", short: "Bench", icon: "B" },
+  "research-area": { label: "Research Area", short: "RA", icon: "RA" },
+  // Things (data records)
   grant: { label: "Grant", short: "Grant", icon: "G" },
   "funding-round": { label: "Funding Round", short: "Round", icon: "F" },
-  "funding-program": { label: "Funding Program", short: "Program", icon: "P" },
+  "funding-program": { label: "Funding Program", short: "Program", icon: "$" },
   division: { label: "Division", short: "Div", icon: "D" },
-  benchmark: { label: "Benchmark", short: "Bench", icon: "B" },
   resource: { label: "Resource", short: "Res", icon: "R" },
-  "research-area": { label: "Research Area", short: "RA", icon: "A" },
 };
 
 // ── Filters ──────────────────────────────────────────────────────────
 
-type FilterKey = "all" | "page" | "grant" | "funding-round" | "funding-program" | "division" | "benchmark" | "resource" | "research-area";
+type FilterKey = "all" | "wiki" | "grant" | "funding-round" | "funding-program" | "division" | "benchmark" | "resource" | "research-area";
 
 const FILTER_DEFS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "page", label: "Pages" },
+  { key: "wiki", label: "Wiki" },
   { key: "grant", label: "Grants" },
   { key: "funding-round", label: "Funding" },
   { key: "benchmark", label: "Benchmarks" },
@@ -83,11 +93,17 @@ interface UnifiedResult {
 }
 
 function fromPage(r: SearchResult): UnifiedResult {
+  const isDirectory = !!DIRECTORY_ROUTES[r.type];
+  // Directory entities use their entity type; other wiki pages use "wiki"
+  const type = isDirectory ? r.type : "wiki";
+  // For directory entities the badge already shows the type, so context
+  // would be redundant. For wiki articles, show the entity type as context.
+  const context = isDirectory ? null : (r.type || null);
   return {
     key: `p:${r.id}`,
     title: r.title,
-    context: r.type || null,
-    type: "page",
+    context,
+    type,
     href: pageHref(r),
     description: r.description || null,
     snippet: r.snippet,
@@ -98,11 +114,16 @@ function fromPage(r: SearchResult): UnifiedResult {
 }
 
 function fromThing(r: ThingSearchResult): UnifiedResult {
+  // For entity-type things, use the specific entity type (person, organization, etc.)
+  // so they get the same icon/label as wiki page results of that type.
+  const type = r.thingType === "entity" && r.entityType && DIRECTORY_ROUTES[r.entityType]
+    ? r.entityType
+    : r.thingType;
   return {
     key: `t:${r.id}`,
     title: r.title,
     context: r.parentTitle || null,
-    type: r.thingType,
+    type,
     href: r.href,
     description: r.description || null,
     source: "thing",
@@ -222,7 +243,10 @@ export function SearchPageClient() {
 
   const filtered = useMemo(() => {
     let items = results;
-    if (filter !== "all") {
+    if (filter === "wiki") {
+      // "Wiki" filter catches all wiki-sourced results (articles + directory entities)
+      items = items.filter((r) => r.source === "page");
+    } else if (filter !== "all") {
       items = items.filter((r) => r.type === filter);
     }
 
@@ -242,6 +266,10 @@ export function SearchPageClient() {
     const counts: Record<string, number> = {};
     for (const r of results) {
       counts[r.type] = (counts[r.type] ?? 0) + 1;
+      // "wiki" filter counts all wiki-sourced results
+      if (r.source === "page") {
+        counts["wiki"] = (counts["wiki"] ?? 0) + 1;
+      }
     }
     return counts;
   }, [results]);
