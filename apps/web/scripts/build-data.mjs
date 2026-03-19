@@ -243,18 +243,27 @@ function warnIfSnapshotStale(snapshotPath) {
 /**
  * Compute backlinks for all entities
  * Returns a map: entityId -> array of entities that link to it
+ *
+ * @param {Array} entities
+ * @param {Record<string, string>} [byStableId] - stableId → slug mapping
+ *   Used to resolve relatedEntries refs that use stableIds (10-char alphanum)
+ *   instead of slugs. Without this, backlinks are keyed by stableId and never
+ *   found when looking up by slug — the root cause of ghost stableID titles
+ *   on wiki pages (see GitHub #2679).
  */
-function computeBacklinks(entities) {
+function computeBacklinks(entities, byStableId) {
   const backlinks = {};
 
   for (const entity of entities) {
     // Check relatedEntries
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        if (!backlinks[ref.id]) {
-          backlinks[ref.id] = [];
+        // Resolve stableId references to canonical slug IDs
+        const targetId = (byStableId && byStableId[ref.id]) || ref.id;
+        if (!backlinks[targetId]) {
+          backlinks[targetId] = [];
         }
-        backlinks[ref.id].push({
+        backlinks[targetId].push({
           id: entity.id,
           type: entity.type,
           title: entity.title,
@@ -577,7 +586,7 @@ function buildTagIndex(entities) {
  *   4. Content similarity (weight 0-3, scaled)
  *   5. Shared tags (weight varies by specificity)
  */
-function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
+function collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId) {
   const links = [];
   const seen = new Set(); // Deduplicate (source, target, type)
 
@@ -589,11 +598,12 @@ function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
     links.push({ sourceId, targetId, linkType, weight, relationship: relationship || null });
   }
 
-  // 1. Explicit YAML relatedEntries
+  // 1. Explicit YAML relatedEntries (resolve stableId refs to slugs)
   for (const entity of entities) {
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        addLink(entity.id, ref.id, 'yaml_related', 10, ref.relationship);
+        const targetId = (byStableId && byStableId[ref.id]) || ref.id;
+        addLink(entity.id, targetId, 'yaml_related', 10, ref.relationship);
       }
     }
   }
@@ -936,8 +946,9 @@ async function main() {
 
   console.log('\nComputing derived data...');
 
-  // Compute backlinks
-  const backlinks = computeBacklinks(entities);
+  // Compute backlinks (pass byStableId so relatedEntries refs using stableIds
+  // are resolved to canonical slug keys — see GitHub #2679)
+  const backlinks = computeBacklinks(entities, byStableId);
   database.backlinks = backlinks;
   console.log(`  backlinks: ${Object.keys(backlinks).length} entities have incoming links`);
 
@@ -1286,7 +1297,7 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('  linkSync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
+    const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId);
     await syncLinksAndRefreshGraph(linkSignals);
   }
 
