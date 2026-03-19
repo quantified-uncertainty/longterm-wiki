@@ -10,9 +10,9 @@ facts:
   - id: 3SeNHyi3JA
     property: headcount
     value: 109
-    asOf: 2024-00
+    asOf: 2024
     source: https://www.wikidata.org/wiki/Q58844186
-    notes: From Wikidata Q58844186 (as of 2024-00)
+    notes: From Wikidata Q58844186 (as of 2024, month unknown)
   - id: vrQK8e7bPQ
     property: website
     value: https://www.centreforeffectivealtruism.org
