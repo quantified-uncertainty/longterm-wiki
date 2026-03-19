@@ -16,6 +16,16 @@ import { findUnconvertedLinks, countConvertedLinks } from './unconverted-links.m
 import { CONTENT_DIR, DATA_DIR, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './content-types.mjs';
 import { buildRatingsFromAssessment } from './wiki-server-data.mjs';
 
+// ---------------------------------------------------------------------------
+// YAML parse error tracking — exposed via getYamlParseErrorCount()
+// ---------------------------------------------------------------------------
+let yamlParseErrorCount = 0;
+
+/** Return the number of YAML parse errors encountered by this module. */
+export function getYamlParseErrorCount() {
+  return yamlParseErrorCount;
+}
+
 /**
  * Normalize a YAML date value (string or Date object) to a YYYY-MM-DD string.
  * Returns null if the value is falsy.
@@ -63,14 +73,16 @@ export function resolveLastUpdated(fm, editLogDate, gitDate) {
  * Extract frontmatter from MDX/MD content using YAML parser
  * Properly handles nested objects like ratings
  */
-export function extractFrontmatter(content) {
+export function extractFrontmatter(content, filePath) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return {};
 
   try {
     return parse(match[1]) || {};
   } catch (e) {
-    console.warn('Failed to parse frontmatter:', e.message);
+    const location = filePath || 'unknown file';
+    console.error(`YAML PARSE ERROR (frontmatter): ${location}: ${e.message}`);
+    yamlParseErrorCount++;
     return {};
   }
 }
@@ -99,7 +111,7 @@ export function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, ear
       } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
         const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
         const content = readFileSync(fullPath, 'utf-8');
-        const fm = extractFrontmatter(content);
+        const fm = extractFrontmatter(content, fullPath);
 
         // Index files use __index__ slug and are marked for ID registration only
         const isIndexFile = (id === 'index');
@@ -263,8 +275,8 @@ export function buildPathRegistry() {
       try {
         entities = parse(content);
       } catch (e) {
-        console.error(`Failed to parse YAML ${join(entityDir, file)}: ${e.message}`);
-        process.exitCode = 1;
+        console.error(`YAML PARSE ERROR: ${join(entityDir, file)}: ${e.message}`);
+        yamlParseErrorCount++;
         continue;
       }
       if (!Array.isArray(entities)) continue;

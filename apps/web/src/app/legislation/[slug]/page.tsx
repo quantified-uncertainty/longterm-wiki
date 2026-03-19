@@ -12,10 +12,11 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
+  getPublicationByDomain,
   getPagesForResource,
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
-import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import { resolveResourceAuthors, type OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import { getAllKBRecords, type FactBaseRecordEntry } from "@/data/factbase";
 import {
   resolvePolicyBySlug,
@@ -33,6 +34,9 @@ import {
   normalizeStatus,
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
+import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
+import { ResourceTimeline, type TimelineEvent, type TimelineResource } from "./resource-timeline";
+import { parseDisplayDateToISO } from "./date-utils";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -142,11 +146,78 @@ export default async function LegislationDetailPage({
   // ── Build tabs ────────────────────────────────────────────
   const tabs: ProfileTab[] = [];
 
+  // ── Sidebar content (only rendered inside Overview tab) ──────
+  const sidebarContent = (
+    <div className="space-y-6">
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <h3 className="text-sm font-bold">Quick Facts</h3>
+        <dl className="space-y-2 text-sm">
+          {billNumber && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Bill Number</dt><dd className="font-semibold">{billNumber}</dd></div>}
+          {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
+          {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
+          {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
+          {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
+          {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
+          {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
+        </dl>
+      </section>
+      {entity.stakeholders.length > 0 && (
+        <section className="rounded-xl border border-border p-4">
+          <h3 className="text-sm font-bold mb-3">Position Summary</h3>
+          <div className="space-y-2">
+            {supporters.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-green-700 dark:text-green-400 font-medium">Support</span><span className="tabular-nums font-semibold">{supporters.length}</span></div>}
+            {opponents.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-red-700 dark:text-red-400 font-medium">Oppose</span><span className="tabular-nums font-semibold">{opponents.length}</span></div>}
+            {mixed.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-amber-700 dark:text-amber-400 font-medium">Mixed</span><span className="tabular-nums font-semibold">{mixed.length}</span></div>}
+            <div className="flex rounded-full overflow-hidden h-2 mt-1">
+              {supporters.length > 0 && <div className="bg-green-500" style={{ width: `${(supporters.length / entity.stakeholders.length) * 100}%` }} />}
+              {mixed.length > 0 && <div className="bg-amber-500" style={{ width: `${(mixed.length / entity.stakeholders.length) * 100}%` }} />}
+              {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
+            </div>
+          </div>
+        </section>
+      )}
+      {entity.sources.length > 0 && (
+        <section className="rounded-xl border border-border p-4">
+          <h3 className="text-sm font-bold mb-3">Sources</h3>
+          <ul className="space-y-2.5">
+            {entity.sources.map((source, si) => (
+              <li key={si} className="text-sm">
+                {source.url ? (
+                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{source.title}</a>
+                ) : (
+                  <span>{source.title}</span>
+                )}
+                {(source.author || source.date) && (
+                  <span className="text-xs text-muted-foreground ml-1">{[source.author, source.date].filter(Boolean).join(", ")}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {entity.tags.length > 0 && (
+        <section className="rounded-xl border border-border p-4">
+          <h3 className="text-sm font-bold mb-3">Tags</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {entity.tags.map((tag) => (
+              <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">{tag}</span>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+
   // Overview tab (always present)
   const overviewContent = (
-    <div className="space-y-8">
-      {/* Status pipeline */}
-      {showPipelineBar && (
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
+      <div className="space-y-8">
+        {/* Description */}
+        {entity.description && (
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">{entity.description}</p>
+        )}
+        {/* Status pipeline */}
+        {showPipelineBar && (
         <div className="flex items-center gap-1 overflow-x-auto pb-2">
           {PIPELINE_STAGES.map((stage, i) => {
             const reached = i <= reachedStage;
@@ -321,6 +392,8 @@ export default async function LegislationDetailPage({
       <FBAutoFacts entityId={entity.id} />
 
       <RelatedPages entityId={entity.id} entity={{ entityType: "policy" }} />
+      </div>
+      {sidebarContent}
     </div>
   );
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
@@ -558,37 +631,171 @@ export default async function LegislationDetailPage({
   // ── Press / Documents tab ──────────────────────────────────
   const resourceIds = getResourcesForPage(entity.id);
   const pressResources: OrgResourceRow[] = [];
+  /** Map resource id → publication type (e.g. "government", "think_tank", "news") for categorization. */
+  const pubTypeByResourceId = new Map<string, string>();
   for (const rid of resourceIds) {
     const r = getResourceById(rid);
     if (!r) continue;
     const publication = getResourcePublication(r);
-    const credibility = getResourceCredibility(r);
+    const domain = extractDomain(r.url);
+    // Fall back to domain-based publication lookup when resource has no publication_id
+    const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
+    const effectivePub = publication ?? domainPub;
+    const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
     const citingPages = getPagesForResource(rid);
+    if (effectivePub?.type) {
+      pubTypeByResourceId.set(rid, effectivePub.type);
+    }
     pressResources.push({
       id: rid,
       title: r.title ?? r.url,
       url: r.url,
       type: r.type ?? "web",
-      publicationName: publication?.name ?? null,
-      credibility: credibility ?? null,
+      domain,
+      publicationName: effectivePub?.name ?? null,
+      credibility,
       citingPageCount: citingPages.length,
-      publishedDate: r.published_date ?? null,
-      authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+      publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
+      authors: resolveResourceAuthors(r),
+      summary: r.summary ?? null,
+      fetchStatus: r.fetch_status ?? null,
+      archiveUrl: r.archive_url ?? null,
+      stance: r.stance ?? null,
     });
   }
+
+  // Categorize resources into Official Documents, Analysis & Research, and Press Coverage
+  type ResourceCategory = "official" | "analysis" | "press";
+
+  const GOV_DOMAIN_PATTERNS = [
+    /\.gov$/,
+    /\.gov\./,          // e.g. gov.uk, gov.au
+    /legislature\./,
+    /congress\./,
+    /parliament\./,
+  ];
+
+  const ACADEMIC_DOMAIN_PATTERNS = [
+    /\.edu$/,
+    /\.edu\./,          // e.g. .edu.au
+    /\.ac\./,           // e.g. .ac.uk
+  ];
+
+  const OFFICIAL_TITLE_PATTERNS = [
+    /bill text/i,
+    /committee report/i,
+    /executive order/i,
+    /federal register/i,
+    /public law/i,
+    /enrolled bill/i,
+    /congressional record/i,
+  ];
+
+  const ANALYSIS_TITLE_PATTERNS = [
+    /\banalysis\b/i,
+    /\bassessment\b/i,
+    /\blegal review\b/i,
+    /\bpolicy review\b/i,
+    /\bliterature review\b/i,
+    /\bworking paper\b/i,
+    /\bwhite paper\b/i,
+    /\bpolicy brief\b/i,
+  ];
+
+  function categorizeResource(r: OrgResourceRow): ResourceCategory {
+    const pubType = pubTypeByResourceId.get(r.id) ?? null;
+    const domain = r.domain ?? "";
+
+    // ── Official Documents ──
+    if (r.type === "government" || pubType === "government") return "official";
+    if (GOV_DOMAIN_PATTERNS.some((p) => p.test(domain))) return "official";
+    if (OFFICIAL_TITLE_PATTERNS.some((p) => p.test(r.title))) return "official";
+
+    // ── Analysis & Research ──
+    if (r.type === "paper" || r.type === "report" || r.type === "book") return "analysis";
+    if (
+      pubType === "think_tank" ||
+      pubType === "academic_journal" ||
+      pubType === "preprint_server" ||
+      pubType === "academic" ||
+      pubType === "academic_search"
+    ) {
+      return "analysis";
+    }
+    if (ACADEMIC_DOMAIN_PATTERNS.some((p) => p.test(domain))) return "analysis";
+    if (ANALYSIS_TITLE_PATTERNS.some((p) => p.test(r.title))) return "analysis";
+
+    // ── Press Coverage (default) ──
+    return "press";
+  }
+
+  const officialDocs = pressResources.filter((r) => categorizeResource(r) === "official");
+  const analysisResources = pressResources.filter((r) => categorizeResource(r) === "analysis");
+  const pressCoverage = pressResources.filter((r) => categorizeResource(r) === "press");
+
+  // Build timeline data for the Coverage tab
+  const timelineEventsForTimeline: TimelineEvent[] = timelineEvents
+    .map((e) => {
+      const sortDate = parseDisplayDateToISO(e.value);
+      return sortDate
+        ? { label: e.label, date: e.value, sortDate, type: "event" as const }
+        : null;
+    })
+    .filter((e): e is TimelineEvent => e !== null);
+
+  const timelineResourceItems: TimelineResource[] = pressResources
+    .filter((r) => r.publishedDate)
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      url: r.url,
+      domain: r.domain,
+      publishedDate: r.publishedDate!,
+      type: "resource" as const,
+      resourceType: r.type,
+      category: categorizeResource(r),
+    }));
 
   if (pressResources.length > 0) {
     tabs.push({
       id: "press",
-      label: "Documents & Press",
+      label: "Coverage",
       count: pressResources.length,
       content: (
-        <OrgResourcesSection
-          resources={pressResources}
-          title="Official Documents, Analysis & Press Coverage"
-          emptyMessage=""
-          alwaysShowColumns={{ date: true, publication: true }}
-        />
+        <div className="space-y-8">
+          {/* Timeline view */}
+          {(timelineEventsForTimeline.length > 0 || timelineResourceItems.length > 0) && (
+            <ResourceTimeline
+              events={timelineEventsForTimeline}
+              resources={timelineResourceItems}
+            />
+          )}
+
+          {officialDocs.length > 0 && (
+            <OrgResourcesSection
+              resources={officialDocs}
+              title="Official Documents"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true }}
+            />
+          )}
+          {analysisResources.length > 0 && (
+            <OrgResourcesSection
+              resources={analysisResources}
+              title="Analysis & Research"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true, publication: true }}
+            />
+          )}
+          {pressCoverage.length > 0 && (
+            <OrgResourcesSection
+              resources={pressCoverage}
+              title="Press Coverage"
+              emptyMessage=""
+              alwaysShowColumns={{ date: true, publication: true }}
+            />
+          )}
+        </div>
       ),
     });
   }
@@ -632,7 +839,16 @@ export default async function LegislationDetailPage({
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
               {jurisdiction && <span>{jurisdiction}</span>}
-              {author && <span>by {author}</span>}
+              {author && (() => {
+                // Try to resolve author to a clickable entity link
+                const authorPolitician = entity.keyPoliticians.find((p) => author.includes(p.name) || p.role?.toLowerCase().includes("author"));
+                const authorHref = authorPolitician ? resolveEntityHref(authorPolitician.entityId) : null;
+                return authorHref ? (
+                  <span>by <Link href={authorHref} className="text-primary hover:underline">{author}</Link></span>
+                ) : (
+                  <span>by {author}</span>
+                );
+              })()}
               {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
               {entity.fullTextUrl && (
                 <a href={entity.fullTextUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
@@ -645,84 +861,12 @@ export default async function LegislationDetailPage({
                 </Link>
               )}
             </div>
-            {entity.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-prose">
-                {entity.description}
-              </p>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Sidebar + Tabs layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
-        <div>
-          <ProfileTabs tabs={tabs} />
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          <section className="rounded-xl border border-border p-4 space-y-3">
-            <h3 className="text-sm font-bold">Quick Facts</h3>
-            <dl className="space-y-2 text-sm">
-              {billNumber && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Bill Number</dt><dd className="font-semibold">{billNumber}</dd></div>}
-              {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
-              {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
-              {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
-              {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
-              {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
-              {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
-            </dl>
-          </section>
-
-          {entity.stakeholders.length > 0 && (
-            <section className="rounded-xl border border-border p-4">
-              <h3 className="text-sm font-bold mb-3">Position Summary</h3>
-              <div className="space-y-2">
-                {supporters.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-green-700 dark:text-green-400 font-medium">Support</span><span className="tabular-nums font-semibold">{supporters.length}</span></div>}
-                {opponents.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-red-700 dark:text-red-400 font-medium">Oppose</span><span className="tabular-nums font-semibold">{opponents.length}</span></div>}
-                {mixed.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-amber-700 dark:text-amber-400 font-medium">Mixed</span><span className="tabular-nums font-semibold">{mixed.length}</span></div>}
-                <div className="flex rounded-full overflow-hidden h-2 mt-1">
-                  {supporters.length > 0 && <div className="bg-green-500" style={{ width: `${(supporters.length / entity.stakeholders.length) * 100}%` }} />}
-                  {mixed.length > 0 && <div className="bg-amber-500" style={{ width: `${(mixed.length / entity.stakeholders.length) * 100}%` }} />}
-                  {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {entity.sources.length > 0 && (
-            <section className="rounded-xl border border-border p-4">
-              <h3 className="text-sm font-bold mb-3">Sources</h3>
-              <ul className="space-y-2.5">
-                {entity.sources.map((source, i) => (
-                  <li key={i} className="text-sm">
-                    {source.url ? (
-                      <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{source.title}</a>
-                    ) : (
-                      <span>{source.title}</span>
-                    )}
-                    {(source.author || source.date) && (
-                      <span className="text-xs text-muted-foreground ml-1">{[source.author, source.date].filter(Boolean).join(", ")}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {entity.tags.length > 0 && (
-            <section className="rounded-xl border border-border p-4">
-              <h3 className="text-sm font-bold mb-3">Tags</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {entity.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">{tag}</span>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-      </div>
+      {/* Tabs — full width; sidebar is inside Overview tab only */}
+      <ProfileTabs tabs={tabs} />
     </div>
   );
 }

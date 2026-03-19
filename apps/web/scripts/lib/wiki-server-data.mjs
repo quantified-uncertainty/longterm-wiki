@@ -9,6 +9,26 @@
  * Extracted from build-data.mjs for modularity.
  */
 
+// ---------------------------------------------------------------------------
+// Wiki-server warning tracking — exposed via getWikiServerWarningCount()
+// Counts actual API failures (not "URL not set" which is expected for local dev).
+// ---------------------------------------------------------------------------
+let wikiServerWarningCount = 0;
+
+/** Return the number of wiki-server API warnings encountered by this module. */
+export function getWikiServerWarningCount() {
+  return wikiServerWarningCount;
+}
+
+/**
+ * Log a wiki-server API failure and increment the warning counter.
+ * These are non-fatal: the build continues with fallback data.
+ */
+function logWikiServerWarning(context, reason) {
+  console.log(`  ${context}: skipped (${reason})`);
+  wikiServerWarningCount++;
+}
+
 /** Build headers for wiki-server API requests, including auth if configured. */
 export function buildHeaders() {
   const headers = { 'Content-Type': 'application/json' };
@@ -37,7 +57,7 @@ export async function buildEditLogDateMap() {
     });
 
     if (!res.ok) {
-      console.log(`  editLogDates: skipped (server returned ${res.status})`);
+      logWikiServerWarning('editLogDates', `server returned ${res.status}`);
       return new Map();
     }
 
@@ -49,7 +69,7 @@ export async function buildEditLogDateMap() {
     console.log(`  editLogDates: ${dateMap.size} pages fetched from API`);
     return dateMap;
   } catch (err) {
-    console.log(`  editLogDates: skipped (${err.message || 'server unavailable'})`);
+    logWikiServerWarning('editLogDates', err.message || 'server unavailable');
     return new Map();
   }
 }
@@ -76,7 +96,7 @@ export async function buildEarliestEditLogDateMap() {
     });
 
     if (!res.ok) {
-      console.log(`  earliestEditLogDates: skipped (server returned ${res.status})`);
+      logWikiServerWarning('earliestEditLogDates', `server returned ${res.status}`);
       return new Map();
     }
 
@@ -88,7 +108,7 @@ export async function buildEarliestEditLogDateMap() {
     console.log(`  earliestEditLogDates: ${dateMap.size} pages fetched from API`);
     return dateMap;
   } catch (err) {
-    console.log(`  earliestEditLogDates: skipped (${err.message || 'server unavailable'})`);
+    logWikiServerWarning('earliestEditLogDates', err.message || 'server unavailable');
     return new Map();
   }
 }
@@ -114,7 +134,7 @@ export async function buildCitationStatsMap() {
     });
 
     if (!res.ok) {
-      console.log(`  citationStats: skipped (server returned ${res.status})`);
+      logWikiServerWarning('citationStats', `server returned ${res.status}`);
       return new Map();
     }
 
@@ -134,7 +154,7 @@ export async function buildCitationStatsMap() {
     console.log(`  citationStats: ${statsMap.size} pages fetched from API`);
     return statsMap;
   } catch (err) {
-    console.log(`  citationStats: skipped (${err.message || 'server unavailable'})`);
+    logWikiServerWarning('citationStats', err.message || 'server unavailable');
     return new Map();
   }
 }
@@ -166,7 +186,7 @@ export async function buildCitationQuotesBundle() {
         { headers, signal: AbortSignal.timeout(30_000) }
       );
       if (!res.ok) {
-        console.log(`  citationQuotes: skipped (server returned ${res.status})`);
+        logWikiServerWarning('citationQuotes', `server returned ${res.status}`);
         return {};
       }
       const data = await res.json();
@@ -202,7 +222,7 @@ export async function buildCitationQuotesBundle() {
     console.log(`  citationQuotes: ${allQuotes.length} quotes across ${Object.keys(byPage).length} pages`);
     return byPage;
   } catch (err) {
-    console.log(`  citationQuotes: skipped (${err.message || 'server unavailable'})`);
+    logWikiServerWarning('citationQuotes', err.message || 'server unavailable');
     return {};
   }
 }
@@ -261,7 +281,7 @@ export async function fetchAssessments() {
       const url = `${serverUrl}/api/assessments/latest?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) });
       if (!resp.ok) {
-        console.log(`  assessments: skipped (HTTP ${resp.status})`);
+        logWikiServerWarning('assessments', `HTTP ${resp.status}`);
         return new Map();
       }
       const data = await resp.json();
@@ -309,7 +329,7 @@ export async function fetchAssessments() {
     }
     return byPage;
   } catch (err) {
-    console.log(`  assessments: skipped (${err instanceof Error ? err.message : err})`);
+    logWikiServerWarning('assessments', err instanceof Error ? err.message : String(err));
     return new Map();
   }
 }
@@ -360,7 +380,7 @@ export async function fetchBenchmarkResults() {
       const url = `${serverUrl}/api/benchmark-results/all?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, resultsFetchOpts);
       if (!resp.ok) {
-        console.log(`  benchmark-results: skipped (HTTP ${resp.status})`);
+        logWikiServerWarning('benchmark-results', `HTTP ${resp.status}`);
         return {};
       }
       const data = await resp.json();
@@ -392,7 +412,7 @@ export async function fetchBenchmarkResults() {
     }
     return byModel;
   } catch (err) {
-    console.log(`  benchmark-results: skipped (${err instanceof Error ? err.message : err})`);
+    logWikiServerWarning('benchmark-results', err instanceof Error ? err.message : String(err));
     return {};
   }
 }
@@ -420,7 +440,7 @@ export async function fetchResearchAreas() {
       const url = `${serverUrl}/api/research-areas/enriched?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, fetchOpts);
       if (!resp.ok) {
-        console.log(`  research-areas: skipped (HTTP ${resp.status})`);
+        logWikiServerWarning('research-areas', `HTTP ${resp.status}`);
         return [];
       }
       const data = await resp.json();
@@ -435,7 +455,7 @@ export async function fetchResearchAreas() {
     }
     return allItems;
   } catch (err) {
-    console.log(`  research-areas: skipped (${err instanceof Error ? err.message : err})`);
+    logWikiServerWarning('research-areas', err instanceof Error ? err.message : String(err));
     return [];
   }
 }
@@ -461,7 +481,7 @@ export async function fetchRecordVerdicts() {
       const url = `${serverUrl}/api/record-verifications/verdicts?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
       if (!resp.ok) {
-        console.log(`  record-verdicts: skipped (HTTP ${resp.status})`);
+        logWikiServerWarning('record-verdicts', `HTTP ${resp.status}`);
         return {};
       }
       const data = await resp.json();
@@ -487,7 +507,7 @@ export async function fetchRecordVerdicts() {
     }
     return verdicts;
   } catch (err) {
-    console.log(`  record-verdicts: skipped (${err instanceof Error ? err.message : err})`);
+    logWikiServerWarning('record-verdicts', err instanceof Error ? err.message : String(err));
     return {};
   }
 }
@@ -870,7 +890,7 @@ export async function mergePGRecordsIntoKB(kb) {
     const rows = result.status === 'fulfilled' ? result.value : null;
     if (!rows) {
       const reason = result.status === 'rejected' ? result.reason?.message : 'no data';
-      console.log(`  kb-pg ${label}: skipped (${reason || 'server unavailable'})`);
+      logWikiServerWarning(`kb-pg ${label}`, reason || 'server unavailable');
       return 0;
     }
     if (rows.length === 0) return 0;
@@ -1049,6 +1069,10 @@ export async function fetchResourcesFromPG() {
           fetched_at: r.fetchedAt ?? undefined,
           content_hash: r.contentHash ?? undefined,
           stable_id: r.stableId ?? undefined,
+          fetch_status: r.fetchStatus ?? undefined,
+          archive_url: r.archiveUrl ?? undefined,
+          author_entity_ids: r.authorEntityIds ?? undefined,
+          stance: r.stance ?? undefined,
         });
       }
 
@@ -1079,7 +1103,7 @@ export async function fetchResourcesFromPG() {
 
     return allResources;
   } catch (err) {
-    console.log(`  resources-pg: fetch failed (${err instanceof Error ? err.message : String(err)})`);
+    logWikiServerWarning('resources-pg', err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -1111,6 +1135,7 @@ export async function buildPageReferenceIndex() {
         console.log(`  pageReferenceIndex: server returned ${res.status} (attempt ${i + 1}/${retryTimeouts.length})`);
         if (i < retryTimeouts.length - 1) continue;
         console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+        wikiServerWarningCount++;
         return {};
       }
 
@@ -1128,6 +1153,7 @@ export async function buildPageReferenceIndex() {
       console.log(`  pageReferenceIndex: ${err.message || 'server unavailable'} (attempt ${i + 1}/${retryTimeouts.length})`);
       if (i < retryTimeouts.length - 1) continue;
       console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+      wikiServerWarningCount++;
       return {};
     }
   }

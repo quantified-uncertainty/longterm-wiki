@@ -16,18 +16,24 @@ const SCRIPTS = {
   run: {
     script: 'qa-sweep/sweep.ts',
     description: 'Full QA sweep (recent changes + automated checks)',
-    passthrough: ['json'],
+    passthrough: ['json', 'save', 'compare'],
   },
   recent: {
     script: 'qa-sweep/sweep.ts',
     description: 'Show recent changes to prioritize',
-    defaultArgs: ['recent'],
+    extraArgs: ['recent'],
     passthrough: ['json'],
   },
   checks: {
     script: 'qa-sweep/sweep.ts',
     description: 'Run automated checks only (fast)',
-    defaultArgs: ['checks'],
+    extraArgs: ['checks'],
+    passthrough: ['json', 'save', 'compare'],
+  },
+  diff: {
+    script: 'qa-sweep/sweep.ts',
+    description: 'Compare the latest two saved sweep results',
+    extraArgs: ['diff'],
     passthrough: ['json'],
   },
 };
@@ -36,15 +42,22 @@ export const commands = buildCommands(SCRIPTS, 'run');
 
 export function getHelp() {
   return `
-QA Sweep — Adversarial quality assurance
+QA Sweep — Adversarial quality assurance with result persistence
 
 Commands:
   run             Full sweep: recent changes + all checks (default)
   recent          Show recent PRs and changed files only
-  checks          Run automated checks only (no change listing)
+  checks          Run automated checks only (fast)
+  diff            Compare the latest two saved sweep results
 
 Options:
+  --save          Save results to .claude/sweep-results/ after the sweep
+  --compare       Run sweep, save results, then diff against previous run
   --json          JSON output for scripting
+
+Result persistence:
+  Results are stored in .claude/sweep-results/ (gitignored).
+  Each run creates a timestamped JSON file plus latest.json.
 
 Automated checks:
   - Duplicate wikiIds across YAML + MDX
@@ -60,9 +73,13 @@ Usage with Claude Code:
   /loop 24h /qa-sweep      Schedule daily runs using your subscription
 
 Examples:
-  crux w qa-sweep                  Full report
-  crux w qa-sweep checks           Fast checks only
-  crux w qa-sweep checks --json    JSON output for CI
-  crux w qa-sweep recent           What changed recently
+  crux w qa-sweep                       Full report
+  crux w qa-sweep --save                Full report + save results
+  crux w qa-sweep --compare             Full report + save + show diff vs previous
+  crux w qa-sweep checks --save         Fast checks + save
+  crux w qa-sweep diff                  Show what changed since last saved run
+  crux w qa-sweep diff --json           JSON diff output for CI
+  crux w qa-sweep checks --json         JSON output for CI
+  crux w qa-sweep recent                What changed recently
 `;
 }

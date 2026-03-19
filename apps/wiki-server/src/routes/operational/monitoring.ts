@@ -33,7 +33,7 @@ const SERVICES = [
 
 // Expected migration count — update this when adding new drizzle migrations.
 // Read from apps/wiki-server/drizzle/meta/_journal.json entries length.
-const EXPECTED_MIGRATION_COUNT = 98;
+const EXPECTED_MIGRATION_COUNT = 108;
 
 // ── Typed row interfaces for raw SQL results ────────────────────────────
 interface DbCountsRow {

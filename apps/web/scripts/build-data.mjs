@@ -53,12 +53,14 @@ import {
   fetchRecordVerdicts,
   fetchResourcesFromPG,
   buildPageReferenceIndex,
+  getWikiServerWarningCount,
 } from './lib/wiki-server-data.mjs';
 import {
   buildPagesRegistry,
   buildPathRegistry,
   computeHallucinationRisk,
   extractPrNumber,
+  getYamlParseErrorCount as getPagesBuilderYamlErrors,
 } from './lib/pages-builder.mjs';
 import { syncBuildMetrics, syncLinksAndRefreshGraph } from './lib/metrics-sync.mjs';
 import {
@@ -81,6 +83,13 @@ if (CONTENT_ONLY) {
 }
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
+
+// ---------------------------------------------------------------------------
+// Build error/warning counters
+// YAML parse errors are fatal — the build exits non-zero if any occur.
+// Wiki-server API failures are non-fatal (fail-open for local dev).
+// ---------------------------------------------------------------------------
+let yamlParseErrorCount = 0;
 
 // Entity type alias map: legacy YAML type names → canonical types
 // Keep in sync with apps/web/src/data/entity-type-names.ts
@@ -168,8 +177,8 @@ function loadYaml(filename) {
     const content = readFileSync(filepath, 'utf-8');
     return parse(content) || [];
   } catch (e) {
-    console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
-    process.exitCode = 1;
+    console.error(`YAML PARSE ERROR: ${filepath}: ${e.message}`);
+    yamlParseErrorCount++;
     return [];
   }
 }
@@ -194,8 +203,8 @@ function loadYamlDir(dirname) {
       const data = parse(content) || [];
       merged.push(...data);
     } catch (e) {
-      console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
-      process.exitCode = 1;
+      console.error(`YAML PARSE ERROR: ${filepath}: ${e.message}`);
+      yamlParseErrorCount++;
     }
   }
 
@@ -243,18 +252,27 @@ function warnIfSnapshotStale(snapshotPath) {
 /**
  * Compute backlinks for all entities
  * Returns a map: entityId -> array of entities that link to it
+ *
+ * @param {Array} entities
+ * @param {Record<string, string>} [byStableId] - stableId → slug mapping
+ *   Used to resolve relatedEntries refs that use stableIds (10-char alphanum)
+ *   instead of slugs. Without this, backlinks are keyed by stableId and never
+ *   found when looking up by slug — the root cause of ghost stableID titles
+ *   on wiki pages (see GitHub #2679).
  */
-function computeBacklinks(entities) {
+function computeBacklinks(entities, byStableId) {
   const backlinks = {};
 
   for (const entity of entities) {
     // Check relatedEntries
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        if (!backlinks[ref.id]) {
-          backlinks[ref.id] = [];
+        // Resolve stableId references to canonical slug IDs
+        const targetId = (byStableId && byStableId[ref.id]) || ref.id;
+        if (!backlinks[targetId]) {
+          backlinks[targetId] = [];
         }
-        backlinks[ref.id].push({
+        backlinks[targetId].push({
           id: entity.id,
           type: entity.type,
           title: entity.title,
@@ -577,7 +595,7 @@ function buildTagIndex(entities) {
  *   4. Content similarity (weight 0-3, scaled)
  *   5. Shared tags (weight varies by specificity)
  */
-function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
+function collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId) {
   const links = [];
   const seen = new Set(); // Deduplicate (source, target, type)
 
@@ -589,11 +607,12 @@ function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
     links.push({ sourceId, targetId, linkType, weight, relationship: relationship || null });
   }
 
-  // 1. Explicit YAML relatedEntries
+  // 1. Explicit YAML relatedEntries (resolve stableId refs to slugs)
   for (const entity of entities) {
     if (entity.relatedEntries) {
       for (const ref of entity.relatedEntries) {
-        addLink(entity.id, ref.id, 'yaml_related', 10, ref.relationship);
+        const targetId = (byStableId && byStableId[ref.id]) || ref.id;
+        addLink(entity.id, targetId, 'yaml_related', 10, ref.relationship);
       }
     }
   }
@@ -936,8 +955,9 @@ async function main() {
 
   console.log('\nComputing derived data...');
 
-  // Compute backlinks
-  const backlinks = computeBacklinks(entities);
+  // Compute backlinks (pass byStableId so relatedEntries refs using stableIds
+  // are resolved to canonical slug keys — see GitHub #2679)
+  const backlinks = computeBacklinks(entities, byStableId);
   database.backlinks = backlinks;
   console.log(`  backlinks: ${Object.keys(backlinks).length} entities have incoming links`);
 
@@ -1286,7 +1306,7 @@ async function main() {
   if (CONTENT_ONLY) {
     console.log('  linkSync: skipped (content-only scope)');
   } else if (process.env.LONGTERMWIKI_SERVER_URL) {
-    const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
+    const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId);
     await syncLinksAndRefreshGraph(linkSignals);
   }
 
@@ -1544,6 +1564,28 @@ async function main() {
   console.log('\n--- Zod Schema Validation ---');
   console.log('Run `npm run validate:schema` to validate data against Zod schemas');
   console.log('Or run `npm run validate` for all validators');
+
+  // ==========================================================================
+  // BUILD HEALTH REPORT
+  // ==========================================================================
+  const totalYamlErrors = yamlParseErrorCount + getPagesBuilderYamlErrors();
+  const totalWikiServerWarnings = getWikiServerWarningCount();
+
+  console.log('\n--- Build Health ---');
+  console.log(`  Entities loaded:  ${stats.totalEntities}`);
+  console.log(`  Pages processed:  ${pages.length}`);
+  console.log(`  YAML parse errors:        ${totalYamlErrors}`);
+  console.log(`  Wiki-server warnings:     ${totalWikiServerWarnings}`);
+
+  if (totalYamlErrors > 0) {
+    console.error(`\nFATAL: ${totalYamlErrors} YAML parse error(s) occurred. The output data is incomplete.`);
+    console.error('Fix the malformed YAML files listed above and re-run build-data.');
+    process.exit(1);
+  }
+
+  if (totalWikiServerWarnings > 0) {
+    console.warn(`\nNote: ${totalWikiServerWarnings} wiki-server API call(s) failed (non-fatal). Some dashboard data may be missing.`);
+  }
 }
 
 main().catch(err => {

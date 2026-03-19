@@ -14,6 +14,7 @@ import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } 
 import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from '../mdx-utils.ts';
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../content-types.ts';
+import { isValidWikiRoute } from '../file-utils.ts';
 
 const APP_DIR = join(PROJECT_ROOT, 'apps/web/src/app');
 
@@ -25,6 +26,9 @@ function linkTargetExists(href: string): boolean {
 
   // Skip placeholder/template links
   if (path.includes('${') || path.includes('...')) return true;
+
+  // Check /wiki/E* dynamic routes against wikiId index
+  if (isValidWikiRoute(path)) return true;
 
   path = path.replace(/\/$/, '');
   if (path.startsWith('/')) path = path.slice(1);

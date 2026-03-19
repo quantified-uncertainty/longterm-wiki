@@ -386,6 +386,13 @@ const PARALLEL_STEPS: Step[] = [
     // displayed in the UI. All current references have been fixed to resolve.
   },
   {
+    id: 'temporal-invariants',
+    name: 'Temporal invariant validation (date validity, ordering)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-temporal.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',
@@ -406,6 +413,77 @@ const PARALLEL_STEPS: Step[] = [
     // Advisory: depends on wiki-server being reachable. The check skips
     // gracefully when the server is unavailable (fail-open). Promotes to
     // blocking once orphan entities are consistently zero.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'soft-fks',
+    name: 'Soft FK entity reference validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-soft-fks.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires wiki-server access. Reports legacy text FK fields
+    // in PG tables (personnel, grants, investments, etc.) that don't resolve
+    // to known entities. Informational for now.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'pg-temporal',
+    name: 'PG temporal consistency (startDate < endDate, date ranges)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-pg-temporal.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open).
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'controlled-vocab',
+    name: 'Controlled vocabulary validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-controlled-vocab.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: reports free-text fields that don't match their expected
+    // controlled vocabulary (entityType, relationship, orgType, etc.).
+    // Informational for now — can be promoted to blocking once all
+    // existing values are cleaned up or added to the vocabulary.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'numeric-ranges',
+    name: 'Numeric range validation (low <= high)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-numeric-ranges.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open).
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'resource-refs',
+    name: 'Resource reference validation (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-resource-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires wiki-server access. Validates that authorEntityIds
+    // and publicationId fields in the resources table reference valid entities
+    // and publications. Informational for now.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'cross-base',
+    name: 'Cross-base consistency (WikiBase/TableBase/FactBase alignment)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-cross-base.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: new validator that checks WikiBase pages match TableBase entity
+    // declarations and FactBase entities have TableBase entries. Will be promoted
+    // to blocking once all existing mismatches are resolved.
     advisory: true,
     emitOutputInCi: true,
   },
@@ -603,8 +681,9 @@ async function main(): Promise<void> {
     }
 
     // Phase 3 (subset): Only content-relevant checks
+    // temporal-invariants inspects only YAML/data files, so it belongs here
     const contentSteps = PARALLEL_STEPS.filter(s =>
-      s.id === 'unified-blocking' || s.id === 'yaml-schema'
+      s.id === 'unified-blocking' || s.id === 'yaml-schema' || s.id === 'temporal-invariants'
     );
     const contentResults = await runParallel(contentSteps);
     allResults.push(...contentResults);

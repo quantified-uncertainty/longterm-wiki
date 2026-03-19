@@ -81,9 +81,16 @@ function apiEntityToRow(e: DirectoryEntity): ProjectRow {
   if (!orgName && meta.organization) {
     const orgId = meta.organization as string;
     // The directory API includes resolvedRefs for fact-based refs but not YAML fields,
-    // so we use the orgId as a display name fallback and link to the entity page
-    orgName = orgId;
-    orgHref = getEntityHref(orgId);
+    // so resolve the entity title from the slug using local data.
+    const orgEntity = getTypedEntityById(orgId);
+    if (orgEntity) {
+      orgName = orgEntity.title;
+      orgHref = getEntityHref(orgEntity.id);
+    } else {
+      // Fallback: use the slug as display name if entity not found locally
+      orgName = orgId;
+      orgHref = getEntityHref(orgId);
+    }
   }
 
   return {

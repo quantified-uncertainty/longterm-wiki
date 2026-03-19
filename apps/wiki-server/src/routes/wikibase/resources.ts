@@ -55,6 +55,7 @@ interface ResourceSearchRow {
   fetch_status: string | null;
   last_fetched_at: string | null;
   archive_url: string | null;
+  stance: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -144,6 +145,7 @@ function resourceValues(d: ResourceInput) {
     contentHash: d.contentHash ?? null,
     stableId: d.stableId ?? null,
     archiveUrl: d.archiveUrl ?? null,
+    stance: d.stance ?? null,
   };
 }
 
@@ -265,6 +267,7 @@ function formatResource(r: typeof resources.$inferSelect) {
     fetchStatus: r.fetchStatus,
     lastFetchedAt: r.lastFetchedAt,
     archiveUrl: r.archiveUrl,
+    stance: r.stance,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -430,6 +433,7 @@ const resourcesApp = new Hono()
         fetchStatus: r.fetch_status,
         lastFetchedAt: r.last_fetched_at,
         archiveUrl: r.archive_url,
+        stance: r.stance,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),

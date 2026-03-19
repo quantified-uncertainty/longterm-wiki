@@ -5,7 +5,7 @@ import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things, entities } from "../../schema.js";
+import { grants, things, entities, fundingPrograms } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -140,6 +140,26 @@ function formatRow(r: JoinedRow) {
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
   };
+}
+
+/**
+ * Validate that all non-null programIds exist in the funding_programs table.
+ * Returns the list of invalid programIds, or an empty array if all are valid.
+ */
+async function findInvalidProgramIds(
+  db: ReturnType<typeof getDrizzleDb>,
+  programIds: string[],
+): Promise<string[]> {
+  const uniqueIds = [...new Set(programIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+
+  const rows = await db
+    .select({ id: fundingPrograms.id })
+    .from(fundingPrograms)
+    .where(inArray(fundingPrograms.id, uniqueIds));
+
+  const found = new Set(rows.map((r) => r.id));
+  return uniqueIds.filter((id) => !found.has(id));
 }
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -324,6 +344,7 @@ const grantsApp = new Hono()
   // Returns all grant IDs and their current granteeId values.
   // Used by the backfill command to identify grants needing entity linking.
   .get("/all-grantee-ids", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -332,7 +353,8 @@ const grantsApp = new Hono()
         granteeId: grants.granteeId,
         name: grants.name,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -341,6 +363,7 @@ const grantsApp = new Hono()
         name: r.name,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 
@@ -397,6 +420,7 @@ const grantsApp = new Hono()
   // source, name, and notes. Used by backfill-program-ids to match grants
   // to funding programs.
   .get("/all-program-ids", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -408,7 +432,8 @@ const grantsApp = new Hono()
         name: grants.name,
         notes: grants.notes,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -420,6 +445,7 @@ const grantsApp = new Hono()
         notes: r.notes,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 
@@ -435,6 +461,20 @@ const grantsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate programId references
+    const skipValidation = c.req.query("skipEntityValidation") === "true";
+    if (!skipValidation) {
+      const programIds = items.map((item) => item.programId);
+      const invalid = await findInvalidProgramIds(db, programIds);
+      if (invalid.length > 0) {
+        return validationError(
+          c,
+          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
+          `Use ?skipEntityValidation=true to bypass.`,
+        );
+      }
+    }
 
     logger.info(`batch-update-program: updating ${items.length} grants`);
 
@@ -474,6 +514,7 @@ const grantsApp = new Hono()
   // ---- GET /all-for-matching ----
   // Returns lightweight grant data for research area matching.
   .get("/all-for-matching", async (c) => {
+    const HARD_LIMIT = 10000;
     const db = getDrizzleDb();
 
     const rows = await db
@@ -485,7 +526,8 @@ const grantsApp = new Hono()
         organizationId: grants.organizationId,
         granteeId: grants.granteeId,
       })
-      .from(grants);
+      .from(grants)
+      .limit(HARD_LIMIT);
 
     return c.json({
       grants: rows.map((r) => ({
@@ -497,6 +539,7 @@ const grantsApp = new Hono()
         granteeId: r.granteeId,
       })),
       total: rows.length,
+      truncated: rows.length >= HARD_LIMIT,
     });
   })
 
@@ -510,6 +553,22 @@ const grantsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate programId references (skip if skipEntityValidation is set)
+    const skipValidation = c.req.query("skipEntityValidation") === "true";
+    if (!skipValidation) {
+      const programIds = items
+        .map((item) => item.programId)
+        .filter((id): id is string => id != null);
+      const invalid = await findInvalidProgramIds(db, programIds);
+      if (invalid.length > 0) {
+        return validationError(
+          c,
+          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
+          `Use ?skipEntityValidation=true to bypass.`,
+        );
+      }
+    }
 
     let upserted = 0;
 

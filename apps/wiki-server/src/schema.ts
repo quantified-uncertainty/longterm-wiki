@@ -619,6 +619,8 @@ export const resources = pgTable(
     lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
     /** Wayback Machine archive URL for this resource */
     archiveUrl: text("archive_url"),
+    /** Stance for legislation coverage: support, oppose, neutral, mixed, analysis */
+    stance: text("stance"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -1517,6 +1519,13 @@ export const personnel = pgTable(
     index("idx_personnel_person_entity").on(table.personEntityId),
     index("idx_personnel_org_entity").on(table.orgEntityId),
     index("idx_personnel_role_type").on(table.roleType),
+    // Natural key uniqueness: prevents duplicate role assignments.
+    // Partial index — only enforced when entity IDs are resolved (non-null).
+    uniqueIndex("uq_personnel_natural_key")
+      .on(table.personEntityId, table.orgEntityId, table.roleType, table.role)
+      .where(
+        sql`person_entity_id IS NOT NULL AND org_entity_id IS NOT NULL`
+      ),
   ]
 );
 
@@ -1553,7 +1562,10 @@ export const grants = pgTable(
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
     notes: text("notes"),
-    programId: text("program_id"), // soft ref to funding_programs.id (nullable)
+    programId: text("program_id").references(
+      () => fundingPrograms.id,
+      { onDelete: "set null" }
+    ),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1686,6 +1698,10 @@ export const investments = pgTable(
     index("idx_inv_company_entity").on(table.companyEntityId),
     index("idx_inv_investor_entity").on(table.investorEntityId),
     index("idx_inv_date").on(table.date),
+    // Natural key uniqueness: uq_investments_natural_key
+    // Expression index on (investor_entity_id, company_entity_id, COALESCE(round_name, ''))
+    // WHERE investor_entity_id IS NOT NULL AND company_entity_id IS NOT NULL
+    // Managed in migration 0108_natural_key_uniqueness.sql (not representable in Drizzle API).
   ]
 );
 
@@ -1748,7 +1764,9 @@ export const divisions = pgTable(
   {
     id: varchar("id", { length: 10 }).primaryKey(),
     slug: text("slug").unique(), // entity slug for entity system integration
-    parentOrgId: text("parent_org_id").notNull(), // parent org stableId (10-char)
+    parentOrgId: text("parent_org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }), // parent org stableId (10-char)
     name: text("name").notNull(),
     divisionType: text("division_type").notNull(), // fund | team | department | lab | program-area
     lead: text("lead"), // person stableId or display name
@@ -1783,8 +1801,14 @@ export const divisionPersonnel = pgTable(
   "division_personnel",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    divisionId: text("division_id").notNull(), // divisions.id
-    personId: text("person_id").notNull(), // person stableId or display name
+    divisionId: text("division_id")
+      .notNull()
+      .references(() => divisions.id, { onDelete: "cascade" }), // divisions.id
+    personId: text("person_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }), // person stableId
+    /** Display name fallback when person doesn't have a matching entity. */
+    personDisplayName: text("person_display_name"),
     role: text("role").notNull(),
     startDate: text("start_date"),
     endDate: text("end_date"),
@@ -1803,6 +1827,9 @@ export const divisionPersonnel = pgTable(
   (table) => [
     index("idx_dp_division").on(table.divisionId),
     index("idx_dp_person").on(table.personId),
+    // Natural key uniqueness: prevents duplicate person-division assignments.
+    uniqueIndex("uq_division_personnel_natural_key")
+      .on(table.divisionId, table.personId),
   ]
 );
 
@@ -2129,6 +2156,44 @@ export const thingVerdicts = pgTable(
   (table) => [
     index("idx_tvd_verdict").on(table.verdict),
     index("idx_tvd_recheck").on(table.needsRecheck),
+  ]
+);
+
+// ── QA Page Checks ─────────────────────────────────────────────────────
+//
+// Records of QA sweep checks against live site pages. Tracks which pages
+// have been audited, when, and what was found. Used by the queue endpoint
+// to prioritize least-recently-checked pages.
+
+export const qaPageChecks = pgTable(
+  "qa_page_checks",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    thingId: text("thing_id").references(() => things.id, {
+      onDelete: "set null",
+    }),
+    pageUrl: text("page_url").notNull(),
+    directory: text("directory"),
+    checkType: text("check_type").notNull().default("detail"),
+    result: text("result").notNull(),
+    findings: jsonb("findings").$type<
+      { severity: string; description: string; githubIssue?: number }[]
+    >(),
+    depth: text("depth"),
+    sweepId: text("sweep_id"),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_qpc_thing").on(table.thingId),
+    index("idx_qpc_page_url").on(table.pageUrl),
+    index("idx_qpc_directory").on(table.directory),
+    index("idx_qpc_checked_at").on(table.checkedAt),
+    index("idx_qpc_sweep").on(table.sweepId),
   ]
 );
 

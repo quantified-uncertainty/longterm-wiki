@@ -23,7 +23,7 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 | `exhaustive` | All directories | ALL detail pages (sampled in batches) | 15-25 | ~60 min |
 
 **How it works:**
-1. `pnpm crux w qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
+1. `pnpm crux qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
 2. This skill adds LLM-driven agents on top (production site audit, code review of recent changes)
 3. Findings are compiled into a P0/P1/P2 report
 4. P0 bugs get fixed; P1/P2 get filed as GitHub issues
@@ -63,21 +63,39 @@ $ARGUMENTS = "--pages=/path1,/path2 --depth=deep"  → specific URLs + deep tab/
 | `grants` | `/grants` | — | `/grants/<id>` |
 | `publications` | `/publications` | — | `/publications/<slug>` |
 | `research-areas` | `/research-areas` | `research-area` | `/research-areas/<slug>` |
+| `funding-programs` | `/funding-programs` | — | `/funding-programs/<slug>` |
+| `funding-rounds` | `/funding-rounds` | — | `/funding-rounds/<id>` |
+| `divisions` | `/divisions` | — | `/divisions/<slug>` |
+
+## Phase 0: Initialize sweep tracking
+
+Before launching any agents, set up coverage tracking:
+
+1. **Generate a sweep ID**: `sweep-YYYY-MM-DD-XXXX` (e.g., `sweep-2026-03-19-a1b2`)
+2. **Get pages from the queue** instead of picking ad-hoc:
+   ```bash
+   pnpm crux qa-checks queue --directory=X --limit=N --json
+   ```
+   This returns pages ordered by staleness (never-checked first, then oldest). Use these pages for detail page selection instead of picking randomly from index pages.
+3. **Show current coverage** for context:
+   ```bash
+   pnpm crux qa-checks coverage
+   ```
 
 ## Phase 1: Deterministic checks
 
 Run the crux command to get automated check results and recent change context:
 
 ```bash
-pnpm crux w qa-sweep
+pnpm crux qa-sweep
 ```
 
 If a focus area was specified, also run targeted checks:
 
 ```bash
 # For each focused entity type:
-pnpm crux w validate directory-pages --type=<entityType> --verbose
-pnpm crux tb matrix scores --type=<entityType>
+pnpm crux validate directory-pages --type=<entityType> --verbose
+pnpm crux matrix scores --type=<entityType>
 ```
 
 Read the output. Note:
@@ -85,36 +103,94 @@ Read the output. Note:
 - Which areas had the most recent changes (these get priority in Phase 2)
 - Which entity types have the worst scores (these get extra detail page sampling)
 
+## Phase 1.5: Parse deterministic results and extract leads
+
+Run the deep deterministic sweep with JSON output to get structured findings:
+
+```bash
+pnpm crux qa-sweep deep --json
+```
+
+Parse the JSON output and extract leads by category. Store these leads — they will be injected directly into agent prompts in Phase 2.
+
+**Lead routing by finding type:**
+
+| Finding type | Route to | Example |
+|---|---|---|
+| `yaml_field_consistency` / `relatedEntry` type mismatches | Cross-consistency agent | Which specific entity IDs have mismatched `relatedEntry` types |
+| `people_role_mismatches` | People agent | Which specific people have conflicting role/affiliation data |
+| `broken_internal_links` | Code agent | Which specific files have broken internal links |
+| `financial_staleness` | Financial agent | Which specific entity slugs have stale funding data |
+| `schema_violations` | Code agent | Which entity types have invalid YAML field values |
+| `duplicate_ids` | Code agent | Which IDs appear more than once across files |
+| `orphaned_references` | Cross-consistency agent | Which references point to nonexistent targets |
+
+If `pnpm crux qa-sweep deep --json` fails or returns no leads (command not yet implemented), fall back to running `pnpm crux qa-sweep` and treating the plain-text output as unstructured context to pass to agents.
+
+**After extracting leads:**
+- Group leads by the agent type that should receive them
+- Format each group as a concise bullet list: entity ID, file path, and the specific discrepancy found
+- If a lead category is empty, that agent still runs but without targeted context
+
 ## Phase 2: LLM-driven audits
 
 Launch agents **in parallel** using the Agent tool. Each agent is research-only (no code changes).
 
 **Agent strategy by depth:**
 
+All depths now use a **leads-driven** approach: deterministic findings from Phase 1.5 are injected into agent prompts as specific targets. This replaces blind directory exploration at lower depths.
+
 ### Quick depth
-- 1 agent: fetch all index pages, surface checks only
-- 1 agent: code quality on recent changes
-- 1 agent: wiki-server route audit
+- **1 leads agent**: given all deterministic leads, verify each finding (confirm or refute). No broad exploration.
+- 1 agent: code quality on recently changed files only (from Phase 1 output)
+- 1 agent: wiki-server route audit (focused on routes touched by recent commits)
+
+No broad index-page fetching at this depth — the deterministic leads are the entire scope.
 
 ### Standard depth
-- 1 agent per focused directory (or 1 agent for all index pages if unfocused)
-- 1 agent: detail page sampling (3-5 pages per focused directory)
+- **1 leads agent**: given all deterministic leads from Phase 1.5, verify each finding in detail
+- 1 agent per focused directory (or 1 agent for all index pages if unfocused), seeded with any relevant leads for that directory
+- 1 agent: detail page sampling (3-5 pages per focused directory), prioritizing pages flagged in leads
 - 1 agent: code quality on recent changes
 - 1 agent: wiki-server route audit
 
 ### Deep depth
-- **1 agent per directory**: each fetches the index page + 10-15 detail pages within that directory
-- **1 cross-consistency agent**: checks that data matches across directories (e.g., org page funding total matches grants page, person affiliations match org people tabs)
+- **1 leads verification agent**: works through the full deterministic lead list systematically
+- **1 agent per directory**: each fetches the index page + 10-15 detail pages within that directory, **starting with pages named in the leads**
+- **1 cross-consistency agent**: given any cross-entity leads from Phase 1.5, plus its own checks that data matches across directories (e.g., org page funding total matches grants page, person affiliations match org people tabs)
 - **1 agent per audit type**: code quality, wiki-server routes
 - **1 component code agent**: reads the actual React components for focused directories, checks for bugs in rendering logic
 
 ### Exhaustive depth
 - **1 agent per directory** (same as deep, but samples ALL detail pages in batches of 10)
-- **2-3 cross-consistency agents**: one for financial data, one for people/org links, one for dates/timelines
+- **2-3 cross-consistency agents**: one for financial data, one for people/org links, one for dates/timelines — each seeded with relevant leads
 - **1 agent per audit type**: code quality, wiki-server routes, schema validation
 - **1 component code agent per directory**: reads rendering components
 - **1 accessibility agent**: checks for alt text, ARIA labels, keyboard navigation
 - **1 stale data agent**: checks for outdated dates, dead external links, references to old events
+
+### Leads-driven agent prompt template
+
+When launching any agent that has deterministic leads assigned to it, prepend the following to the agent's task:
+
+```
+The deterministic sweep found these specific issues for you to investigate:
+
+[paste the relevant leads here as a bullet list, e.g.:]
+- Entity E042 (openai): relatedEntry "E099" typed as "organization" but target is type "person"
+- Entity E107 (sam-altman): role listed as "CEO" on people page but "board member" in org people tab
+- File apps/web/src/components/entities/org-card.tsx line 84: link to /organizations/nonexistent-slug
+
+For each finding:
+1. Fetch or read the relevant page/file to confirm or refute
+2. If confirmed: note the exact discrepancy with URLs/line numbers
+3. If refuted: note what you found instead (the deterministic check may be stale)
+4. If needs more context: fetch additional related pages and document what you found
+
+After working through the leads, [continue with your normal exploration task below...]
+```
+
+If no leads were extracted for a particular agent, omit the leads block entirely and run the normal exploration task.
 
 ### 2a. Production site audit — Index pages
 
@@ -213,7 +289,28 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 [Bullet list of areas checked and found clean]
 ```
 
-## Phase 4: File issues and persist the report
+## Phase 4: Record results, file issues, and persist the report
+
+### Record check results — MANDATORY
+
+After compiling findings, record every page checked to the coverage tracking system. For each page that was checked:
+
+```bash
+pnpm crux qa-checks record --url=/organizations/anthropic --result=clean --directory=organizations --sweep-id=sweep-2026-03-19-a1b2 --depth=standard
+```
+
+Valid `--result` values: `clean`, `issues_found`, `error`, `404`
+
+For bulk recording, you can use `pnpm crux qa-checks record` for each page. This updates the coverage database so future sweeps avoid re-checking recently-audited pages.
+
+### Show updated coverage
+
+After recording all results:
+```bash
+pnpm crux qa-checks coverage
+```
+
+Include the coverage table in the report.
 
 ### Issue filing — MANDATORY for all confirmed findings
 
@@ -221,21 +318,21 @@ Wait for all agents to complete. Compile a deduplicated, prioritized report:
 
 - **File one GitHub issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
 - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
-- Use `pnpm crux gh issues create` with `--model=haiku` for each.
+- Use `pnpm crux issues create` with `--model=haiku` for each.
 - **Expected volume:** 5-15 issues per deep sweep is normal. The daily cap of 5 from `proactive-github-filing.md` does NOT apply to QA sweeps.
 - Label all issues with the appropriate severity label if available.
 - **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue. If you compiled it into the report, file it.
 
 ### Persist the full report to a GitHub Discussion
 
-After filing issues, post the **complete** Phase 3 report as a comment on a standing QA Sweep discussion. This creates a searchable archive of all sweep results over time.
+After filing issues, post the **complete** Phase 3 report as a comment on Discussion #2650 (QA Sweep Reports).
 
 ```bash
 # First run: create the discussion
-pnpm crux gh epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
+pnpm crux epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
 
 # Every run: post the report as a comment
-pnpm crux gh epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
+pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
 ## QA Sweep — [DATE]
 ### Focus: [focus] | Depth: [depth]
 [Full report here — copy the entire Phase 3 output]

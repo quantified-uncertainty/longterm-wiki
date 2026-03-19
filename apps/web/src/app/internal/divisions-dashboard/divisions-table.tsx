@@ -22,7 +22,7 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 export interface DivisionRow {
   id: string;
   slug: string | null;
-  parentOrgId: string;
+  parentOrgId: string | null;
   /** Resolved display name for the parent org (set by server component) */
   parentOrgName?: string;
   name: string;
@@ -84,11 +84,13 @@ const columns: ColumnDef<DivisionRow>[] = [
         Parent Org
       </SortableHeader>
     ),
-    cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {row.original.parentOrgName ?? row.original.parentOrgId}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const label =
+        row.original.parentOrgName ?? row.original.parentOrgId ?? "-";
+      return (
+        <span className="text-xs text-muted-foreground">{label}</span>
+      );
+    },
     size: 160,
   },
   {

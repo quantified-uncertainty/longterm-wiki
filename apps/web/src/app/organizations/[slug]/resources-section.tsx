@@ -12,7 +12,7 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, AlertTriangle, Lock, Archive, LayoutList, Table2 } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import {
   Table,
@@ -23,20 +23,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { safeHref } from "@/lib/format-compact";
-import type { OrgResourceRow, AuthorRef } from "./org-data";
+import type { OrgResourceRow } from "./org-data";
+import { ResourceList } from "@/components/resources/ResourceList";
+import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
 
-const TYPE_COLORS: Record<string, string> = {
-  paper: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  blog: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-  report: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
-  book: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  web: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  government: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
-  talk: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
-  podcast: "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
-};
-
-const DEFAULT_COLOR = "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+const TYPE_COLORS = RESOURCE_TYPE_COLORS;
+const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;
 
 /** Compute which optional columns have enough data to be worth showing. */
 function computeColumnVisibility(
@@ -47,29 +39,25 @@ function computeColumnVisibility(
   const withDate = resources.filter((r) => r.publishedDate).length;
   const withPub = resources.filter((r) => r.publicationName).length;
   const withCred = resources.filter((r) => r.credibility != null).length;
+  const withStance = resources.filter((r) => r.stance).length;
   const showPublication = alwaysShow?.publication || withPub / total >= 0.15;
   return {
     showDate: alwaysShow?.date || withDate / total >= 0.2,
     showPublication,
     showCredibility: alwaysShow?.credibility || withCred / total >= 0.15,
     showSource: !showPublication,
+    showStance: withStance > 0,
   };
 }
 
-/** Extract bare domain from a URL, stripping www. prefix. */
-function extractDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
-  } catch {
-    return null;
-  }
-}
+// STANCE_COLORS imported from resource-constants
 
 function makeColumns(opts: {
   showDate: boolean;
   showPublication: boolean;
   showCredibility: boolean;
   showSource: boolean;
+  showStance: boolean;
 }): ColumnDef<OrgResourceRow>[] {
   const cols: ColumnDef<OrgResourceRow>[] = [
     {
@@ -77,35 +65,55 @@ function makeColumns(opts: {
       header: ({ column }) => (
         <SortableHeader column={column}>Title</SortableHeader>
       ),
-      cell: ({ row }) => (
-        <div className="min-w-[200px] max-w-[400px]">
-          <Link
-            href={`/resources/${row.original.id}`}
-            className="text-primary hover:underline text-xs font-medium line-clamp-2"
-            title={row.original.title}
-          >
-            {row.original.title}
-          </Link>
-          {row.original.authors.length > 0 && (
-            <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
-              {row.original.authors.slice(0, 3).map((a, i) => (
-                <span key={i}>
-                  {i > 0 && ", "}
-                  {a.href ? (
-                    <Link href={a.href} className="hover:text-primary hover:underline">
-                      {a.name}
-                    </Link>
-                  ) : (
-                    a.name
-                  )}
+      cell: ({ row }) => {
+        const r = row.original;
+        return (
+          <div className="min-w-[200px] max-w-[400px]">
+            <div className="flex items-start gap-1.5">
+              <Link
+                href={`/resources/${r.id}`}
+                className="text-primary hover:underline text-xs font-medium line-clamp-2"
+                title={r.title}
+              >
+                {r.title}
+              </Link>
+              {r.fetchStatus === "dead" && (
+                <span title="Link may be broken">
+                  <AlertTriangle className="h-3 w-3 text-red-400 shrink-0 mt-0.5" />
                 </span>
-              ))}
-              {row.original.authors.length > 3 &&
-                ` +${row.original.authors.length - 3}`}
+              )}
+              {r.fetchStatus === "paywall" && (
+                <span title="Behind paywall">
+                  <Lock className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
+                </span>
+              )}
             </div>
-          )}
-        </div>
-      ),
+            {r.authors.length > 0 && (
+              <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
+                {r.authors.slice(0, 3).map((a, i) => (
+                  <span key={i}>
+                    {i > 0 && ", "}
+                    {a.href ? (
+                      <Link href={a.href} className="hover:text-primary hover:underline">
+                        {a.name}
+                      </Link>
+                    ) : (
+                      a.name
+                    )}
+                  </span>
+                ))}
+                {r.authors.length > 3 &&
+                  ` +${r.authors.length - 3}`}
+              </div>
+            )}
+            {r.summary && (
+              <div className="text-[11px] text-muted-foreground/60 mt-0.5 line-clamp-1">
+                {r.summary}
+              </div>
+            )}
+          </div>
+        );
+      },
       filterFn: "includesString",
     },
     {
@@ -125,15 +133,35 @@ function makeColumns(opts: {
     },
   ];
 
+  if (opts.showStance) {
+    cols.push({
+      accessorKey: "stance",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Stance</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const s = row.original.stance;
+        if (!s) return <span className="text-muted-foreground/40 text-xs">-</span>;
+        const color = STANCE_COLORS[s] || DEFAULT_COLOR;
+        return (
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium whitespace-nowrap capitalize ${color}`}>
+            {s}
+          </span>
+        );
+      },
+      sortUndefined: "last",
+    });
+  }
+
   if (opts.showSource) {
     cols.push({
       id: "source",
-      accessorFn: (row) => extractDomain(row.url),
+      accessorFn: (row) => row.domain,
       header: ({ column }) => (
         <SortableHeader column={column}>Source</SortableHeader>
       ),
       cell: ({ row }) => {
-        const domain = extractDomain(row.original.url);
+        const domain = row.original.domain;
         if (!domain) return <span className="text-muted-foreground/40 text-xs">-</span>;
         return (
           <span className="text-xs text-muted-foreground max-w-[140px] truncate block" title={domain}>
@@ -153,12 +181,23 @@ function makeColumns(opts: {
       ),
       cell: ({ row }) => {
         const p = row.original.publicationName;
-        if (!p) return <span className="text-muted-foreground/40 text-xs">-</span>;
-        return (
-          <span className="text-xs text-muted-foreground italic max-w-[140px] truncate block" title={p}>
-            {p}
-          </span>
-        );
+        const domain = row.original.domain;
+        if (p) {
+          return (
+            <span className="text-xs text-muted-foreground italic max-w-[140px] truncate block" title={p}>
+              {p}
+            </span>
+          );
+        }
+        // Fallback: show domain when no publication is linked
+        if (domain) {
+          return (
+            <span className="text-xs text-muted-foreground/60 max-w-[140px] truncate block" title={domain}>
+              {domain}
+            </span>
+          );
+        }
+        return <span className="text-muted-foreground/40 text-xs">-</span>;
       },
       sortUndefined: "last",
     });
@@ -222,17 +261,35 @@ function makeColumns(opts: {
     {
       id: "link",
       header: "",
-      cell: ({ row }) => (
-        <a
-          href={safeHref(row.original.url)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-primary hover:text-primary/80"
-          title={row.original.url}
-        >
-          &#8599;
-        </a>
-      ),
+      cell: ({ row }) => {
+        const r = row.original;
+        const isDead = r.fetchStatus === "dead";
+        const archiveHref = isDead && r.archiveUrl ? safeHref(r.archiveUrl) : null;
+        return (
+          <div className="flex items-center gap-1">
+            {archiveHref && (
+              <a
+                href={archiveHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary"
+                title="View archived version"
+              >
+                <Archive className="h-3.5 w-3.5" />
+              </a>
+            )}
+            <a
+              href={safeHref(r.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xs ${isDead ? "text-muted-foreground/40" : "text-primary hover:text-primary/80"}`}
+              title={isDead ? `Link may be broken: ${r.url}` : r.url}
+            >
+              &#8599;
+            </a>
+          </div>
+        );
+      },
       enableSorting: false,
     },
   );
@@ -240,17 +297,23 @@ function makeColumns(opts: {
   return cols;
 }
 
+type ViewMode = "table" | "card";
+
 export function OrgResourcesSection({
   resources,
   title,
   emptyMessage,
   alwaysShowColumns,
+  defaultView = "table",
 }: {
   resources: OrgResourceRow[];
   title: string;
   emptyMessage: string;
   alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
+  defaultView?: ViewMode;
 }) {
+  const [view, setView] = useState<ViewMode>(defaultView);
+
   if (resources.length === 0) {
     return (
       <section>
@@ -260,10 +323,46 @@ export function OrgResourcesSection({
     );
   }
 
+  if (view === "card") {
+    return (
+      <section>
+        <div className="flex items-center justify-between mb-2">
+          <div /> {/* spacer — ResourceList renders its own header */}
+          <ViewToggle view={view} onChange={setView} />
+        </div>
+        <ResourceList resources={resources} title={title} emptyMessage={emptyMessage} />
+      </section>
+    );
+  }
+
   return (
     <section>
+      <div className="flex items-center justify-end mb-1">
+        <ViewToggle view={view} onChange={setView} />
+      </div>
       <OrgResourcesTable resources={resources} title={title} alwaysShowColumns={alwaysShowColumns} />
     </section>
+  );
+}
+
+function ViewToggle({ view, onChange }: { view: ViewMode; onChange: (v: ViewMode) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 border border-border rounded-md p-0.5">
+      <button
+        onClick={() => onChange("table")}
+        className={`p-1 rounded transition-colors ${view === "table" ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
+        title="Table view"
+      >
+        <Table2 className="h-3.5 w-3.5" />
+      </button>
+      <button
+        onClick={() => onChange("card")}
+        className={`p-1 rounded transition-colors ${view === "card" ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
+        title="Card view"
+      >
+        <LayoutList className="h-3.5 w-3.5" />
+      </button>
+    </div>
   );
 }
 

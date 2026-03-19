@@ -89,13 +89,13 @@ const peopleApp = new Hono()
         OR EXISTS (
           SELECT 1 FROM facts f_s
           WHERE f_s.entity_id = t.id
-          AND f_s.fact_id = 'role'
+          AND f_s.measure = 'role'
           AND f_s.value ILIKE ${pattern}
         )
         OR EXISTS (
           SELECT 1 FROM facts f_s2
           WHERE f_s2.entity_id = t.id
-          AND f_s2.fact_id = 'employed-by'
+          AND f_s2.measure = 'employed-by'
           AND (
             f_s2.value ILIKE ${pattern}
             OR EXISTS (
@@ -112,7 +112,7 @@ const peopleApp = new Hono()
       extraConditions.push(sql`EXISTS (
         SELECT 1 FROM facts f_aff
         WHERE f_aff.entity_id = t.id
-        AND f_aff.fact_id = 'employed-by'
+        AND f_aff.measure = 'employed-by'
         AND (
           f_aff.value = ${affiliation}
           OR EXISTS (
@@ -134,10 +134,10 @@ const peopleApp = new Hono()
     const { field, dir } = parseSort(sort, SORT_ALLOWED, "name", "asc");
 
     // Define sort expressions as parameterized SQL fragments
-    const roleSubquery = sql`(SELECT f_r.value FROM facts f_r WHERE f_r.entity_id = t.id AND f_r.fact_id = 'role' LIMIT 1)`;
-    const employerSubquery = sql`(SELECT COALESCE(emp.title, f_e.value) FROM facts f_e LEFT JOIN entities emp ON emp.stable_id = f_e.value WHERE f_e.entity_id = t.id AND f_e.fact_id = 'employed-by' LIMIT 1)`;
-    const bornYearSubquery = sql`(SELECT f_b.numeric FROM facts f_b WHERE f_b.entity_id = t.id AND f_b.fact_id = 'born-year' LIMIT 1)`;
-    const netWorthSubquery = sql`(SELECT f_n.numeric FROM facts f_n WHERE f_n.entity_id = t.id AND f_n.fact_id = 'net-worth' LIMIT 1)`;
+    const roleSubquery = sql`(SELECT f_r.value FROM facts f_r WHERE f_r.entity_id = t.id AND f_r.measure = 'role' LIMIT 1)`;
+    const employerSubquery = sql`(SELECT COALESCE(emp.title, f_e.value) FROM facts f_e LEFT JOIN entities emp ON emp.stable_id = f_e.value WHERE f_e.entity_id = t.id AND f_e.measure = 'employed-by' LIMIT 1)`;
+    const bornYearSubquery = sql`(SELECT f_b.numeric FROM facts f_b WHERE f_b.entity_id = t.id AND f_b.measure = 'born-year' LIMIT 1)`;
+    const netWorthSubquery = sql`(SELECT f_n.numeric FROM facts f_n WHERE f_n.entity_id = t.id AND f_n.measure = 'net-worth' LIMIT 1)`;
 
     const sortExprMap: Record<string, ReturnType<typeof sql>> = {
       name: sql`t.title`,
@@ -171,7 +171,7 @@ const peopleApp = new Hono()
         t.wiki_id AS "wikiId",
         t.description,
         ${roleSubquery} AS role,
-        (SELECT f_e.value FROM facts f_e WHERE f_e.entity_id = t.id AND f_e.fact_id = 'employed-by' LIMIT 1) AS "employerId",
+        (SELECT f_e.value FROM facts f_e WHERE f_e.entity_id = t.id AND f_e.measure = 'employed-by' LIMIT 1) AS "employerId",
         ${employerSubquery} AS "employerName",
         ${bornYearSubquery} AS "bornYear",
         ${netWorthSubquery} AS "netWorth"
@@ -202,7 +202,7 @@ const peopleApp = new Hono()
         COALESCE(emp.title, f.value) AS "employerName",
         COUNT(DISTINCT t.id)::int AS count
       FROM things t
-      JOIN facts f ON f.entity_id = t.id AND f.fact_id = 'employed-by'
+      JOIN facts f ON f.entity_id = t.id AND f.measure = 'employed-by'
       LEFT JOIN entities emp ON emp.stable_id = f.value
       WHERE t.thing_type = 'entity' AND t.entity_type = 'person'
       GROUP BY COALESCE(emp.title, f.value)

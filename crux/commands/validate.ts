@@ -151,10 +151,45 @@ const SCRIPTS = {
     description: 'Cross-check people roles between YAML entities and FactBase (advisory)',
     passthrough: ['ci', 'verbose'],
   },
+  temporal: {
+    script: 'validate/validate-temporal.ts',
+    description: 'Temporal invariant validation (date validity, ordering, consistency)',
+    passthrough: ['ci', 'verbose'],
+  },
+  'cross-base': {
+    script: 'validate/validate-cross-base.ts',
+    description: 'Cross-base consistency (WikiBase pages match TableBase entities, FactBase coverage)',
+    passthrough: ['ci', 'verbose'],
+  },
   'orphan-entities': {
     script: 'validate/validate-orphan-entities.ts',
     description: 'Detect PG entity records without YAML source (ghost entities)',
     passthrough: ['ci', 'fix'],
+  },
+  'soft-fks': {
+    script: 'validate/validate-soft-fks.ts',
+    description: 'Check that soft FK fields in PG tables resolve to entities (advisory, requires wiki-server)',
+    passthrough: ['ci', 'verbose'],
+  },
+  'pg-temporal': {
+    script: 'validate/validate-pg-temporal.ts',
+    description: 'PG temporal consistency (startDate < endDate, date range validation)',
+    passthrough: ['ci'],
+  },
+  'controlled-vocab': {
+    script: 'validate/validate-controlled-vocab.ts',
+    description: 'Validate controlled vocabulary fields (entityType, relationship, orgType, etc.)',
+    passthrough: ['ci', 'verbose'],
+  },
+  'numeric-ranges': {
+    script: 'validate/validate-numeric-ranges.ts',
+    description: 'Validate low <= high for paired range columns (requires wiki-server)',
+    passthrough: ['ci'],
+  },
+  'resource-refs': {
+    script: 'validate/validate-resource-refs.ts',
+    description: 'Validate resource authorEntityIds and publicationId references (advisory)',
+    passthrough: ['ci', 'verbose'],
   },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',

@@ -62,6 +62,12 @@ const VALID_DIRECTORY_ENTITY_TYPES = new Set([
   "ai-model",
   "benchmark",
   "research-area",
+  // TMC (AI Transition Model) types — bulk-imported, no YAML source
+  "ai-transition-model-factor",
+  "ai-transition-model-parameter",
+  "ai-transition-model-scenario",
+  "ai-transition-model-metric",
+  "ai-transition-model-subitem",
   // Aliases (legacy / alternate names)
   "researcher",
   "lab",
@@ -265,32 +271,34 @@ const entitiesApp = new Hono()
 
     const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
 
-    // Subquery for latest fact value by factId
-    const latestFact = (factId: string) => sql`(
+    // Subquery for latest fact value by measure (property name).
+    // Note: fact_id is the unique fact ID (e.g. "f_qR5tY9wE1a"),
+    // measure is the property name (e.g. "revenue", "headcount").
+    const latestFact = (measureName: string) => sql`(
       SELECT f.numeric
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
         AND f.numeric IS NOT NULL
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
 
-    const latestFactAsOf = (factId: string) => sql`(
+    const latestFactAsOf = (measureName: string) => sql`(
       SELECT f.as_of
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
         AND f.numeric IS NOT NULL
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
 
-    const latestFactText = (factId: string) => sql`(
+    const latestFactText = (measureName: string) => sql`(
       SELECT COALESCE(f.value, CAST(f.numeric AS TEXT))
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
@@ -812,7 +820,7 @@ const entitiesApp = new Hono()
       "json",
       z.object({
         entityType: z.string().min(1).max(100),
-        keepIds: z.array(z.string().min(1).max(500)).min(1).max(5000),
+        keepIds: z.array(z.string().min(1).max(500)).min(0).max(5000),
       })
     ),
     async (c) => {
@@ -827,15 +835,18 @@ const entitiesApp = new Hono()
 
       const db = getDrizzleDb();
 
-      // Find stale entities: same type but ID not in the keep list
+      // Find stale entities: same type but ID not in the keep list.
+      // When keepIds is empty, all entities of this type are stale.
       const staleRows = await db
         .select({ id: entities.id })
         .from(entities)
         .where(
-          and(
-            eq(entities.entityType, entityType),
-            notInArray(entities.id, keepIds),
-          )
+          keepIds.length > 0
+            ? and(
+                eq(entities.entityType, entityType),
+                notInArray(entities.id, keepIds),
+              )
+            : eq(entities.entityType, entityType)
         );
 
       if (staleRows.length === 0) {

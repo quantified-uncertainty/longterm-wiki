@@ -18,6 +18,7 @@ import type { Fact } from "@longterm-wiki/factbase";
 import {
   getTypedEntityById,
   getTypedEntities,
+  getTypedEntityByStableId,
   isOrganization,
   isPerson,
   isAiModel,
@@ -26,6 +27,7 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
+  getPublicationByDomain,
   getPagesForResource,
   getLiteraturePapers,
   type Resource,
@@ -37,6 +39,7 @@ import {
   sortKBRecords,
 } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
 
@@ -511,21 +514,19 @@ export interface OrgResourceRow {
   title: string;
   url: string;
   type: string;
+  domain: string | null;
   publicationName: string | null;
   credibility: number | null;
   citingPageCount: number;
   publishedDate: string | null;
   authors: AuthorRef[];
+  summary: string | null;
+  fetchStatus: string | null;
+  archiveUrl: string | null;
+  stance: string | null;
 }
 
-/** Extract the bare domain (no www) from a URL. Returns null on parse failure. */
-function extractDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
-  } catch {
-    return null;
-  }
-}
+// extractDomain is imported from @/lib/resource-types
 
 /** Well-known news/media source names that aren't real titles. */
 const SOURCE_NAMES = new Set([
@@ -659,50 +660,6 @@ function cleanTitle(title: string, orgName: string): string {
   return t.trim();
 }
 
-/**
- * Extract a publication date from common URL patterns.
- * Returns an ISO date string (YYYY-MM-DD) or null.
- * Only recognizes years in 2000-2030 to avoid false positives from version numbers.
- */
-export function extractDateFromUrl(url: string): string | null {
-  try {
-    const urlPath = new URL(url).pathname;
-    const fullDate = urlPath.match(
-      /(?:^|\/)(\d{4})[-/](\d{2})[-/](\d{2})(?:\/|$|-)/
-    );
-    if (fullDate) {
-      const [, y, m, d] = fullDate;
-      const year = Number(y);
-      const month = Number(m);
-      const day = Number(d);
-      if (
-        year >= 2000 &&
-        year <= 2030 &&
-        month >= 1 &&
-        month <= 12 &&
-        day >= 1 &&
-        day <= 31
-      ) {
-        return `${y}-${m}-${d}`;
-      }
-      // Full date pattern matched but values were invalid — don't fall through
-      // to partial date which would incorrectly truncate (e.g. 2024/03/32 → 2024-03-01)
-      return null;
-    }
-    const partialDate = urlPath.match(/(?:^|\/)(\d{4})\/(\d{2})(?:\/|$)/);
-    if (partialDate) {
-      const [, y, m] = partialDate;
-      const year = Number(y);
-      const month = Number(m);
-      if (year >= 2000 && year <= 2030 && month >= 1 && month <= 12) {
-        return `${y}-${m}-01`;
-      }
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 /** Derive a human-readable title from a URL path when the DB title is junk. */
 function titleFromUrl(url: string): string | null {
@@ -757,21 +714,72 @@ export function resolveAuthor(name: string): AuthorRef {
   return { name, href: slug ? `/people/${slug}` : null };
 }
 
+/**
+ * Resolve an author by entity stable ID. Returns an AuthorRef with href
+ * if the stable ID maps to a person entity, otherwise returns null.
+ */
+function resolveAuthorByEntityId(stableId: string, name: string): AuthorRef | null {
+  const entity = getTypedEntityByStableId(stableId);
+  if (!entity) return null;
+  if (isPerson(entity)) {
+    return { name, href: `/people/${entity.id}` };
+  }
+  // Non-person entities (e.g., organizations) — still link if they have a directory page
+  if (isOrganization(entity)) {
+    return { name, href: `/organizations/${entity.id}` };
+  }
+  return null;
+}
+
+/**
+ * Resolve authors for a resource, preferring entity stable IDs when available.
+ * Falls back to name-based matching for authors without a matching entity ID.
+ */
+export function resolveResourceAuthors(r: Resource): AuthorRef[] {
+  const authors = r.authors ?? [];
+  const entityIds = r.author_entity_ids;
+  // author_entity_ids is positional (same order as authors) only when ALL authors
+  // matched an entity. The producer (crux link-resources) skips unmatched authors,
+  // so a length mismatch means some authors are missing — fall back entirely.
+  const hasParallelIds =
+    entityIds != null &&
+    entityIds.length === authors.length;
+
+  return authors.map((name, i) => {
+    // Try entity-ID-based resolution first (more accurate)
+    if (hasParallelIds && entityIds[i]) {
+      const ref = resolveAuthorByEntityId(entityIds[i], name);
+      if (ref) return ref;
+    }
+    // Fall back to name-based resolution
+    return resolveAuthor(name);
+  });
+}
+
 /** Convert a Resource to an OrgResourceRow. */
 function toOrgResourceRow(r: Resource): OrgResourceRow {
   const publication = getResourcePublication(r);
-  const credibility = getResourceCredibility(r);
+  const domain = extractDomain(r.url);
+  // Fall back to domain-based publication lookup when resource has no publication_id
+  const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
+  const effectivePub = publication ?? domainPub;
+  const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
   const citingPages = getPagesForResource(r.id);
   return {
     id: r.id,
     title: r.title ?? "(untitled)",
     url: r.url,
     type: r.type,
-    publicationName: publication?.name ?? null,
-    credibility: credibility ?? null,
+    domain,
+    publicationName: effectivePub?.name ?? null,
+    credibility,
     citingPageCount: citingPages.length,
     publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
-    authors: (r.authors ?? []).map(resolveAuthor),
+    authors: resolveResourceAuthors(r),
+    summary: r.summary ?? null,
+    fetchStatus: r.fetch_status ?? null,
+    archiveUrl: r.archive_url ?? null,
+    stance: r.stance ?? null,
   };
 }
 
@@ -1054,6 +1062,12 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     entity.id.toLowerCase(),
     ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
   ]);
+  // Also match by stableId — imported grants store the entity stableId as the
+  // recipient field, not the slug or display name. Without this, orgs like MIRI
+  // show 0 grants received despite having matched grants in the import pipeline.
+  const kbStableId = resolveKBSlug(slug);
+  if (kbStableId) recipientMatchNames.add(kbStableId.toLowerCase());
+  if (typedEntity?.stableId) recipientMatchNames.add(typedEntity.stableId.toLowerCase());
   const grantsReceived: ReceivedGrant[] = allGrantRecords
     .filter((r) => {
       const recipientRaw = r.fields.recipient as string | undefined;
