@@ -55,6 +55,7 @@ interface ResourceSearchRow {
   fetch_status: string | null;
   last_fetched_at: string | null;
   archive_url: string | null;
+  stance: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
