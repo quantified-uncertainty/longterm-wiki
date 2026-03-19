@@ -36,7 +36,7 @@ facts:
     value: 5e+10
     asOf: 2024-12
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
-    notes: "Post-money valuation at Series B close"
+    notes: "Post-money valuation at Series C close (December 2024). Earlier Series B in May 2024 was at $24B."
 
   - id: f_CvDHaporPw
     property: valuation

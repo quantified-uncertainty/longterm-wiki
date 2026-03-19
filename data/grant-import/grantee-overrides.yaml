@@ -193,6 +193,7 @@ overrides:
 
   # --- EA Orgs ---
   "Centre for Effective Altruism": "cea"
+  "Centre for Effective Altruism, Oxford": "cea"
   CEA: "cea"
   "Centre for Effective Altruism (CEA)": "cea"
   "Effective Ventures Foundation": "cea"
