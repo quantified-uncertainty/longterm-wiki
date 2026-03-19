@@ -58,7 +58,77 @@ const nextConfig: NextConfig = {
         destination: "/research-areas/evals",
         permanent: true,
       },
-      // Publication title-slug → canonical short-ID redirects (#2635)
+      {
+        source: "/research-areas/direct-preference-optimization",
+        destination: "/research-areas/preference-optimization",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/eliciting-latent-knowledge",
+        destination: "/research-areas/elk",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/ai-safety-via-debate",
+        destination: "/research-areas/debate",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/responsible-scaling-policies",
+        destination: "/research-areas/responsible-scaling",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/scheming-deception-detection",
+        destination: "/research-areas/scheming-detection",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/toy-models-for-interpretability",
+        destination: "/research-areas/toy-models-interp",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/finding-feature-representations",
+        destination: "/research-areas/feature-representations",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/ai-scaling-laws",
+        destination: "/research-areas/scaling-laws",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/weak-to-strong-generalization",
+        destination: "/research-areas/weak-to-strong",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/sandboxing-containment",
+        destination: "/research-areas/sandboxing",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/theoretical-study-of-inductive-biases",
+        destination: "/research-areas/inductive-bias-theory",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/open-source-ai-governance",
+        destination: "/research-areas/open-source-governance",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/recursive-self-improvement",
+        destination: "/research-areas/self-improvement",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/supervised-fine-tuning-instruction-tuning",
+        destination: "/research-areas/sft-instruction-tuning",
+        permanent: true,
+      },
+      // Publication title-slug → canonical short-ID redirects (#2635, #2686)
       {
         source: "/publications/future-of-life-institute",
         destination: "/publications/fli",
@@ -72,6 +142,21 @@ const nextConfig: NextConfig = {
       {
         source: "/publications/world-economic-forum",
         destination: "/publications/wef",
+        permanent: true,
+      },
+      {
+        source: "/publications/rand-corporation",
+        destination: "/publications/rand",
+        permanent: true,
+      },
+      {
+        source: "/publications/epoch-ai",
+        destination: "/publications/epoch",
+        permanent: true,
+      },
+      {
+        source: "/publications/google-deepmind",
+        destination: "/publications/deepmind",
         permanent: true,
       },
     ];
