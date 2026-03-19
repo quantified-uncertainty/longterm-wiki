@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SearchPageClient } from "./search-client";
 
 export const metadata: Metadata = {
@@ -8,12 +9,16 @@ export const metadata: Metadata = {
 
 export default function SearchPage() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-extrabold tracking-tight mb-1">Search</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Search across wiki pages, grants, funding rounds, divisions, benchmarks, and more.
-      </p>
+    <Suspense fallback={<SearchSkeleton />}>
       <SearchPageClient />
+    </Suspense>
+  );
+}
+
+function SearchSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto px-6 pt-12 pb-8">
+      <div className="h-12 rounded-xl bg-muted/30 animate-pulse" />
     </div>
   );
 }
