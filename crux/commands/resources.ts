@@ -153,12 +153,14 @@ commands['cross-reference'] = crossReferenceCommand;
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
   console.log('Running all free enrichment commands...\n');
-  await enrichPapersCommand(args, options);
+  const results = [];
+  results.push(await enrichPapersCommand(args, options));
   console.log();
-  await enrichForumsCommand(args, options);
+  results.push(await enrichForumsCommand(args, options));
   console.log();
-  await fetchAllCommand(args, options);
-  return { exitCode: 0, output: 'Free enrichment complete' };
+  results.push(await fetchAllCommand(args, options));
+  const maxExit = Math.max(...results.map((r) => r.exitCode ?? 0));
+  return { exitCode: maxExit, output: 'Free enrichment complete' };
 };
 
 // Default to list

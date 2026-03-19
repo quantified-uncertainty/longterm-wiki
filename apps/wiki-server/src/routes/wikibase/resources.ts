@@ -238,6 +238,10 @@ async function upsertResource(
         publisherEntityId: sql`COALESCE(${vals.publisherEntityId}, ${resources.publisherEntityId})`,
         relatedEntityIds: jsonbCoalesce(vals.relatedEntityIds, resources.relatedEntityIds),
         enrichmentStatus: sql`COALESCE(${vals.enrichmentStatus}, ${resources.enrichmentStatus})`,
+        // Auto-set enrichmentDate when enrichmentStatus changes
+        enrichmentDate: vals.enrichmentStatus
+          ? sql`now()`
+          : sql`COALESCE(null::timestamptz, ${resources.enrichmentDate})`,
         importanceScore: sql`COALESCE(${vals.importanceScore}, ${resources.importanceScore})`,
         updatedAt: sql`now()`,
       },

@@ -327,7 +327,6 @@ const INITIAL_COLUMN_VISIBILITY: Record<string, boolean> = {
   id: false,
   tags: false,
   resourceSubtype: false,
-  enrichmentStatus: false,
 };
 
 export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {

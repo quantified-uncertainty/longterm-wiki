@@ -214,6 +214,7 @@ async function downloadAndApplyEnrichment(batchId: string, dryRun: boolean): Pro
       applied++;
     } catch (err) {
       errors++;
+      console.warn(`  ✗ Parse error for ${item.custom_id}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 

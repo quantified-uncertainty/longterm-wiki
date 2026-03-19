@@ -11,7 +11,7 @@
 
 import { loadResourcesPGFirst } from '../resource-io.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { fetchSource, type FetchResult } from '../lib/search/source-fetcher.ts';
+import { fetchSource, type FetchedSource } from '../lib/search/source-fetcher.ts';
 import { sleep } from '../resource-utils.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
@@ -67,7 +67,7 @@ export async function fetchAllCommand(
     const results = await processWithConcurrency(
       batch,
       concurrency,
-      async (r: Resource): Promise<{ resource: Resource; result: FetchResult | null }> => {
+      async (r: Resource): Promise<{ resource: Resource; result: FetchedSource | null }> => {
         try {
           const result = await fetchSource({
             url: r.url,
