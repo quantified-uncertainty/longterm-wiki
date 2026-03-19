@@ -24,7 +24,6 @@ type RpcClient = ReturnType<typeof hc<CitationsRoute>>;
 type UpsertCitationQuoteResult = InferResponseType<RpcClient['quotes']['upsert']['$post'], 200>;
 type UpsertCitationQuoteBatchResult = InferResponseType<RpcClient['quotes']['upsert-batch']['$post'], 200>;
 type MarkAccuracyResult = InferResponseType<RpcClient['quotes']['mark-accuracy']['$post'], 200>;
-type MarkAccuracyBatchResult = InferResponseType<RpcClient['quotes']['mark-accuracy-batch']['$post'], 200>;
 type SnapshotResult = InferResponseType<RpcClient['accuracy-snapshot']['$post'], 201>;
 type AccuracyDashboardData = InferResponseType<RpcClient['accuracy-dashboard']['$get'], 200>;
 type CitationHealthResult = InferResponseType<RpcClient['health'][':pageId']['$get'], 200>;
@@ -85,7 +84,7 @@ export type MarkAccuracyItem = MarkAccuracy;
 // Citation Accuracy Types — response (re-exported for consumers)
 // ---------------------------------------------------------------------------
 
-export type { MarkAccuracyResult, MarkAccuracyBatchResult, SnapshotResult, AccuracyDashboardData, CitationHealthResult };
+export type { MarkAccuracyResult, SnapshotResult, AccuracyDashboardData, CitationHealthResult };
 
 // ---------------------------------------------------------------------------
 // Citation Quotes API functions
@@ -128,16 +127,6 @@ export async function markCitationAccuracy(
   item: MarkAccuracyItem,
 ): Promise<ApiResult<MarkAccuracyResult>> {
   return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
-}
-
-export async function markCitationAccuracyBatch(
-  items: MarkAccuracyItem[],
-): Promise<ApiResult<MarkAccuracyBatchResult>> {
-  return apiRequest<MarkAccuracyBatchResult>(
-    'POST',
-    '/api/citations/quotes/mark-accuracy-batch',
-    { items }
-  );
 }
 
 export async function createAccuracySnapshot(): Promise<ApiResult<SnapshotResult>> {

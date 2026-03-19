@@ -1005,45 +1005,6 @@ describe("Citation Server API", () => {
     });
   });
 
-  // ---- Mark Accuracy Batch ----
-
-  describe("POST /api/citations/quotes/mark-accuracy-batch", () => {
-    it("marks accuracy for multiple citations", async () => {
-      await upsertQuote(app, "batch-acc", 1);
-      await upsertQuote(app, "batch-acc", 2);
-      await upsertQuote(app, "batch-acc", 3);
-
-      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
-        items: [
-          { pageId: "batch-acc", footnote: 1, verdict: "accurate", score: 0.95 },
-          { pageId: "batch-acc", footnote: 2, verdict: "inaccurate", score: 0.3, issues: "Wrong number" },
-          { pageId: "batch-acc", footnote: 3, verdict: "minor_issues", score: 0.7, verificationDifficulty: "easy" },
-        ],
-      });
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body.updated).toBe(3);
-      expect(body.results).toHaveLength(3);
-      expect(body.results[1].verdict).toBe("inaccurate");
-    });
-
-    it("rejects invalid verdict in batch", async () => {
-      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
-        items: [
-          { pageId: "batch-acc", footnote: 1, verdict: "maybe", score: 0.5 },
-        ],
-      });
-      expect(res.status).toBe(400);
-    });
-
-    it("rejects empty batch", async () => {
-      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
-        items: [],
-      });
-      expect(res.status).toBe(400);
-    });
-  });
-
   // ---- Accuracy Snapshot ----
 
   describe("POST /api/citations/accuracy-snapshot", () => {

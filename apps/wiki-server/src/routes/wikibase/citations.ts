@@ -16,7 +16,6 @@ import {
   UpsertCitationQuoteSchema,
   UpsertCitationQuoteBatchSchema,
   MarkAccuracySchema as SharedMarkAccuracySchema,
-  MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
 } from "../../api-types.js";
@@ -50,7 +49,6 @@ const MarkVerifiedSchema = z.object({
 });
 
 const MarkAccuracySchema = SharedMarkAccuracySchema;
-const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
 
 const UpsertContentSchema = UpsertCitationContentSchema;
 
@@ -604,55 +602,6 @@ const citationsApp = new Hono()
       });
 
     return c.json({ url: d.url });
-  })
-
-  // ---- POST /quotes/mark-accuracy-batch ---- [DEPRECATED: batch update claims.claimVerdict instead]
-  .post("/quotes/mark-accuracy-batch", zv("json", MarkAccuracyBatchSchema), async (c) => {
-    deprecationWarning("POST /quotes/mark-accuracy-batch");
-    const { items } = c.req.valid("json");
-    const db = getDrizzleDb();
-    // Phase 4b: resolve all page slugs to integer IDs upfront
-    const uniquePageIds = [...new Set(items.map((d) => d.pageId))];
-    const intIdMap = await resolvePageIntIds(db, uniquePageIds);
-    const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
-
-    try {
-      await db.transaction(async (tx) => {
-        for (const d of items) {
-          const intId = intIdMap.get(d.pageId);
-          if (intId == null) continue; // page absent from entity_ids, row cannot exist
-          const rows = await tx
-            .update(citationQuotes)
-            .set({
-              accuracyVerdict: d.verdict,
-              accuracyScore: d.score,
-              accuracyIssues: d.issues ?? null,
-              accuracySupportingQuotes: d.supportingQuotes ?? null,
-              verificationDifficulty: d.verificationDifficulty ?? null,
-              accuracyCheckedAt: sql`now()`,
-              updatedAt: sql`now()`,
-            })
-            .where(
-              and(
-                eq(citationQuotes.pageIdInt, intId),
-                eq(citationQuotes.footnote, d.footnote)
-              )
-            )
-            .returning({
-              pageId: citationQuotes.pageId,
-              footnote: citationQuotes.footnote,
-            });
-
-          if (rows.length > 0) {
-            results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
-          }
-        }
-      });
-    } catch (err) {
-      return dbError(c, "citation quotes mark-accuracy-batch", err, { itemCount: items.length });
-    }
-
-    return c.json({ updated: results.length, results });
   })
 
   // ---- POST /accuracy-snapshot ----
