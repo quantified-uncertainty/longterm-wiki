@@ -11,6 +11,8 @@
  *     - organization → org slug (projects)
  *     - summaryPage → page slug (informational, not blocking)
  *     - parentOrg → org slug
+ *     - stakeholders[].entityId → entity slug (policy responses)
+ *     - keyPoliticians[].entityId → entity slug (policy responses)
  *   - data/experts.yaml:
  *     - affiliation → org/entity slug
  *   - data/organizations.yaml:
@@ -69,6 +71,8 @@ interface ParsedEntity {
   summaryPage?: string;
   parentOrg?: string;
   relatedEntries?: Array<{ id?: string; type?: string }>;
+  stakeholders?: Array<{ entityId?: string; name?: string; [key: string]: unknown }>;
+  keyPoliticians?: Array<{ entityId?: string; name?: string; [key: string]: unknown }>;
   [key: string]: unknown;
 }
 
@@ -142,6 +146,7 @@ export function loadExpertSlugs(expertsPath: string): Set<string> {
   try {
     parsed = parseYaml(content);
   } catch {
+    // Skip unparseable file — schema validation will catch YAML syntax errors
     return slugs;
   }
 
@@ -168,6 +173,7 @@ export function loadOrgSlugs(orgsPath: string): Set<string> {
   try {
     parsed = parseYaml(content);
   } catch {
+    // Skip unparseable file — schema validation will catch YAML syntax errors
     return slugs;
   }
 
@@ -216,6 +222,7 @@ function checkEntityFiles(
     try {
       parsed = parseYaml(content);
     } catch {
+      // Skip unparseable files — schema validation will catch YAML syntax errors
       continue;
     }
 
@@ -320,6 +327,50 @@ function checkEntityFiles(
           });
         }
       }
+
+      // Check stakeholders[].entityId (policy response entities)
+      if (Array.isArray(entity.stakeholders)) {
+        for (const stakeholder of entity.stakeholders) {
+          if (stakeholder && typeof stakeholder === "object" && typeof stakeholder.entityId === "string") {
+            fileStats.checked++;
+            totalChecked++;
+            if (!allSlugs.has(stakeholder.entityId)) {
+              fileStats.dangling++;
+              danglingRefs.push({
+                sourceFile: relPath,
+                sourceId: entityId,
+                sourceTitle: entityTitle,
+                fieldName: "stakeholders[].entityId",
+                refValue: stakeholder.entityId,
+                severity: "error",
+                expectedType: "entity",
+              });
+            }
+          }
+        }
+      }
+
+      // Check keyPoliticians[].entityId (policy response entities)
+      if (Array.isArray(entity.keyPoliticians)) {
+        for (const politician of entity.keyPoliticians) {
+          if (politician && typeof politician === "object" && typeof politician.entityId === "string") {
+            fileStats.checked++;
+            totalChecked++;
+            if (!allSlugs.has(politician.entityId)) {
+              fileStats.dangling++;
+              danglingRefs.push({
+                sourceFile: relPath,
+                sourceId: entityId,
+                sourceTitle: entityTitle,
+                fieldName: "keyPoliticians[].entityId",
+                refValue: politician.entityId,
+                severity: "error",
+                expectedType: "person",
+              });
+            }
+          }
+        }
+      }
     }
 
     byFile[relPath] = fileStats;
@@ -346,6 +397,7 @@ function checkExpertsFile(
   try {
     parsed = parseYaml(content);
   } catch {
+    // Skip unparseable file — schema validation will catch YAML syntax errors
     return { refs: danglingRefs, checked };
   }
 
@@ -397,6 +449,7 @@ function checkOrganizationsFile(
   try {
     parsed = parseYaml(content);
   } catch {
+    // Skip unparseable file — schema validation will catch YAML syntax errors
     return { refs: danglingRefs, checked };
   }
 
@@ -432,7 +485,7 @@ function checkOrganizationsFile(
     // Check parentOrg
     if (typeof org.parentOrg === "string") {
       checked++;
-      if (!allSlugs.has(org.parentOrg) && !new Set(Array.isArray(parsed) ? parsed.map((o: ParsedOrganization) => o.id).filter(Boolean) : []).has(org.parentOrg)) {
+      if (!allSlugs.has(org.parentOrg)) {
         danglingRefs.push({
           sourceFile: relPath,
           sourceId: orgId,

@@ -571,6 +571,157 @@ this is not: valid: yaml: [[[
     });
   });
 
+  describe("dangling stakeholders[].entityId reference", () => {
+    let tempDir: string;
+    beforeAll(() => {
+      tempDir = createTempProject();
+      writeYaml(
+        tempDir,
+        "data/entities/orgs.yaml",
+        `
+- id: real-org
+  type: organization
+  title: Real Org
+`
+      );
+      writeYaml(
+        tempDir,
+        "data/entities/responses.yaml",
+        `
+- id: sb-1047
+  type: policy
+  title: SB 1047
+  stakeholders:
+    - name: Real Org
+      entityId: real-org
+      position: support
+    - name: Ghost Org
+      entityId: ghost-org
+      position: oppose
+    - name: No Entity Link
+      position: neutral
+`
+      );
+    });
+
+    afterAll(() => rmSync(tempDir, { recursive: true, force: true }));
+
+    it("detects dangling stakeholder entityId but ignores entries without entityId", () => {
+      const result = validateYamlEntityRefs(tempDir);
+      const errors = result.danglingRefs.filter((r) => r.severity === "error");
+      expect(errors).toHaveLength(1);
+      expect(errors[0].refValue).toBe("ghost-org");
+      expect(errors[0].fieldName).toBe("stakeholders[].entityId");
+      expect(errors[0].sourceId).toBe("sb-1047");
+    });
+
+    it("counts valid stakeholder entityId references", () => {
+      const result = validateYamlEntityRefs(tempDir);
+      // relatedEntries: 0, developer: 0, stakeholders: 2 (real-org valid, ghost-org dangling)
+      // The "No Entity Link" entry has no entityId so it's not checked
+      expect(result.stats.totalRefsChecked).toBe(2);
+      expect(result.stats.validRefs).toBe(1);
+    });
+  });
+
+  describe("dangling keyPoliticians[].entityId reference", () => {
+    let tempDir: string;
+    beforeAll(() => {
+      tempDir = createTempProject();
+      writeYaml(
+        tempDir,
+        "data/entities/people.yaml",
+        `
+- id: scott-wiener
+  type: person
+  title: Scott Wiener
+`
+      );
+      writeYaml(
+        tempDir,
+        "data/entities/responses.yaml",
+        `
+- id: sb-1047
+  type: policy
+  title: SB 1047
+  keyPoliticians:
+    - name: Senator Scott Wiener
+      entityId: scott-wiener
+      role: Primary Author
+    - name: Governor Unknown
+      entityId: nonexistent-politician
+      role: Vetoed
+    - name: Senator No Link
+      role: Co-author
+`
+      );
+    });
+
+    afterAll(() => rmSync(tempDir, { recursive: true, force: true }));
+
+    it("detects dangling keyPoliticians entityId", () => {
+      const result = validateYamlEntityRefs(tempDir);
+      const errors = result.danglingRefs.filter((r) => r.severity === "error");
+      expect(errors).toHaveLength(1);
+      expect(errors[0].refValue).toBe("nonexistent-politician");
+      expect(errors[0].fieldName).toBe("keyPoliticians[].entityId");
+      expect(errors[0].expectedType).toBe("person");
+    });
+  });
+
+  describe("valid stakeholders and keyPoliticians pass", () => {
+    let tempDir: string;
+    beforeAll(() => {
+      tempDir = createTempProject();
+      writeYaml(
+        tempDir,
+        "data/entities/orgs.yaml",
+        `
+- id: anthropic
+  type: organization
+  title: Anthropic
+`
+      );
+      writeYaml(
+        tempDir,
+        "data/entities/people.yaml",
+        `
+- id: gavin-newsom
+  type: person
+  title: Gavin Newsom
+`
+      );
+      writeYaml(
+        tempDir,
+        "data/entities/responses.yaml",
+        `
+- id: sb-1047
+  type: policy
+  title: SB 1047
+  stakeholders:
+    - name: Anthropic
+      entityId: anthropic
+      position: mixed
+  keyPoliticians:
+    - name: Governor Gavin Newsom
+      entityId: gavin-newsom
+      role: Vetoed
+`
+      );
+    });
+
+    afterAll(() => rmSync(tempDir, { recursive: true, force: true }));
+
+    it("reports no errors when all entityId references are valid", () => {
+      const result = validateYamlEntityRefs(tempDir);
+      const errors = result.danglingRefs.filter((r) => r.severity === "error");
+      expect(errors).toHaveLength(0);
+      // 2 entityId checks: anthropic (stakeholder) + gavin-newsom (keyPolitician)
+      expect(result.stats.totalRefsChecked).toBe(2);
+      expect(result.stats.validRefs).toBe(2);
+    });
+  });
+
   describe("multiple errors across files", () => {
     let tempDir: string;
     beforeAll(() => {
