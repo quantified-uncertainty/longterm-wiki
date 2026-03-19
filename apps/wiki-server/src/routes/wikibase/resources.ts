@@ -133,6 +133,18 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   type: z.string().max(50).optional(),
 });
 
+const BatchDetailsSchema = z.object({
+  papers: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourcePaperSchema)).max(200).optional(),
+  forumPosts: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourceForumPostSchema)).max(200).optional(),
+  policyDocs: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourcePolicyDocSchema)).max(200).optional(),
+});
+
 const AuthorEntityIdsSchema = z.object({
   items: z.array(z.object({
     resourceId: z.string().min(1),
@@ -885,13 +897,9 @@ const resourcesApp = new Hono()
 
   // ---- POST /:id/paper (upsert resource_papers row) ----
 
-  .post("/:id/paper", async (c) => {
+  .post("/:id/paper", zv("json", UpsertResourcePaperSchema), async (c) => {
     const id = c.req.param("id");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertResourcePaperSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+    const data = c.req.valid("json");
 
     const db = getDrizzleDb();
 
@@ -904,24 +912,24 @@ const resourcesApp = new Hono()
         .insert(resourcePapers)
         .values({
           resourceId: id,
-          ...parsed.data,
-          categories: parsed.data.categories ?? null,
+          ...data,
+          categories: data.categories ?? null,
           updatedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: resourcePapers.resourceId,
           set: {
-            arxivId: sql`COALESCE(${parsed.data.arxivId ?? null}, ${resourcePapers.arxivId})`,
-            doi: sql`COALESCE(${parsed.data.doi ?? null}, ${resourcePapers.doi})`,
-            semanticScholarId: sql`COALESCE(${parsed.data.semanticScholarId ?? null}, ${resourcePapers.semanticScholarId})`,
-            abstract: sql`COALESCE(${parsed.data.abstract ?? null}, ${resourcePapers.abstract})`,
-            citationCount: sql`COALESCE(${parsed.data.citationCount ?? null}, ${resourcePapers.citationCount})`,
-            influentialCitationCount: sql`COALESCE(${parsed.data.influentialCitationCount ?? null}, ${resourcePapers.influentialCitationCount})`,
-            categories: parsed.data.categories
-              ? sql`COALESCE(${JSON.stringify(parsed.data.categories)}::jsonb, ${resourcePapers.categories})`
+            arxivId: sql`COALESCE(${data.arxivId ?? null}, ${resourcePapers.arxivId})`,
+            doi: sql`COALESCE(${data.doi ?? null}, ${resourcePapers.doi})`,
+            semanticScholarId: sql`COALESCE(${data.semanticScholarId ?? null}, ${resourcePapers.semanticScholarId})`,
+            abstract: sql`COALESCE(${data.abstract ?? null}, ${resourcePapers.abstract})`,
+            citationCount: sql`COALESCE(${data.citationCount ?? null}, ${resourcePapers.citationCount})`,
+            influentialCitationCount: sql`COALESCE(${data.influentialCitationCount ?? null}, ${resourcePapers.influentialCitationCount})`,
+            categories: data.categories
+              ? sql`COALESCE(${JSON.stringify(data.categories)}::jsonb, ${resourcePapers.categories})`
               : sql`COALESCE(null::jsonb, ${resourcePapers.categories})`,
-            methodology: sql`COALESCE(${parsed.data.methodology ?? null}, ${resourcePapers.methodology})`,
-            year: sql`COALESCE(${parsed.data.year ?? null}, ${resourcePapers.year})`,
+            methodology: sql`COALESCE(${data.methodology ?? null}, ${resourcePapers.methodology})`,
+            year: sql`COALESCE(${data.year ?? null}, ${resourcePapers.year})`,
             updatedAt: sql`now()`,
           },
         });
@@ -935,13 +943,9 @@ const resourcesApp = new Hono()
 
   // ---- POST /:id/forum-post (upsert resource_forum_posts row) ----
 
-  .post("/:id/forum-post", async (c) => {
+  .post("/:id/forum-post", zv("json", UpsertResourceForumPostSchema), async (c) => {
     const id = c.req.param("id");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertResourceForumPostSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+    const data = c.req.valid("json");
 
     const db = getDrizzleDb();
 
@@ -953,26 +957,26 @@ const resourcesApp = new Hono()
         .insert(resourceForumPosts)
         .values({
           resourceId: id,
-          ...parsed.data,
-          forumTags: parsed.data.forumTags ?? null,
+          ...data,
+          forumTags: data.forumTags ?? null,
           updatedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: resourceForumPosts.resourceId,
           set: {
-            forum: parsed.data.forum,
-            forumPostId: sql`COALESCE(${parsed.data.forumPostId ?? null}, ${resourceForumPosts.forumPostId})`,
-            forumSlug: sql`COALESCE(${parsed.data.forumSlug ?? null}, ${resourceForumPosts.forumSlug})`,
-            karma: sql`COALESCE(${parsed.data.karma ?? null}, ${resourceForumPosts.karma})`,
-            commentCount: sql`COALESCE(${parsed.data.commentCount ?? null}, ${resourceForumPosts.commentCount})`,
-            authorUsername: sql`COALESCE(${parsed.data.authorUsername ?? null}, ${resourceForumPosts.authorUsername})`,
-            forumTags: parsed.data.forumTags
-              ? sql`COALESCE(${JSON.stringify(parsed.data.forumTags)}::jsonb, ${resourceForumPosts.forumTags})`
+            forum: data.forum,
+            forumPostId: sql`COALESCE(${data.forumPostId ?? null}, ${resourceForumPosts.forumPostId})`,
+            forumSlug: sql`COALESCE(${data.forumSlug ?? null}, ${resourceForumPosts.forumSlug})`,
+            karma: sql`COALESCE(${data.karma ?? null}, ${resourceForumPosts.karma})`,
+            commentCount: sql`COALESCE(${data.commentCount ?? null}, ${resourceForumPosts.commentCount})`,
+            authorUsername: sql`COALESCE(${data.authorUsername ?? null}, ${resourceForumPosts.authorUsername})`,
+            forumTags: data.forumTags
+              ? sql`COALESCE(${JSON.stringify(data.forumTags)}::jsonb, ${resourceForumPosts.forumTags})`
               : sql`COALESCE(null::jsonb, ${resourceForumPosts.forumTags})`,
-            sequenceTitle: sql`COALESCE(${parsed.data.sequenceTitle ?? null}, ${resourceForumPosts.sequenceTitle})`,
-            curated: parsed.data.curated != null ? parsed.data.curated : sql`${resourceForumPosts.curated}`,
-            crossPostedFrom: sql`COALESCE(${parsed.data.crossPostedFrom ?? null}, ${resourceForumPosts.crossPostedFrom})`,
-            canonicalForum: sql`COALESCE(${parsed.data.canonicalForum ?? null}, ${resourceForumPosts.canonicalForum})`,
+            sequenceTitle: sql`COALESCE(${data.sequenceTitle ?? null}, ${resourceForumPosts.sequenceTitle})`,
+            curated: data.curated != null ? data.curated : sql`${resourceForumPosts.curated}`,
+            crossPostedFrom: sql`COALESCE(${data.crossPostedFrom ?? null}, ${resourceForumPosts.crossPostedFrom})`,
+            canonicalForum: sql`COALESCE(${data.canonicalForum ?? null}, ${resourceForumPosts.canonicalForum})`,
             updatedAt: sql`now()`,
           },
         });
@@ -986,13 +990,9 @@ const resourcesApp = new Hono()
 
   // ---- POST /:id/policy-doc (upsert resource_policy_docs row) ----
 
-  .post("/:id/policy-doc", async (c) => {
+  .post("/:id/policy-doc", zv("json", UpsertResourcePolicyDocSchema), async (c) => {
     const id = c.req.param("id");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertResourcePolicyDocSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+    const data = c.req.valid("json");
 
     const db = getDrizzleDb();
 
@@ -1004,19 +1004,19 @@ const resourcesApp = new Hono()
         .insert(resourcePolicyDocs)
         .values({
           resourceId: id,
-          ...parsed.data,
+          ...data,
           updatedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: resourcePolicyDocs.resourceId,
           set: {
-            documentType: sql`COALESCE(${parsed.data.documentType ?? null}, ${resourcePolicyDocs.documentType})`,
-            jurisdictionEntityId: sql`COALESCE(${parsed.data.jurisdictionEntityId ?? null}, ${resourcePolicyDocs.jurisdictionEntityId})`,
-            agencyEntityId: sql`COALESCE(${parsed.data.agencyEntityId ?? null}, ${resourcePolicyDocs.agencyEntityId})`,
-            policyEntityId: sql`COALESCE(${parsed.data.policyEntityId ?? null}, ${resourcePolicyDocs.policyEntityId})`,
-            effectiveDate: sql`COALESCE(${parsed.data.effectiveDate ?? null}, ${resourcePolicyDocs.effectiveDate})`,
-            documentStatus: sql`COALESCE(${parsed.data.documentStatus ?? null}, ${resourcePolicyDocs.documentStatus})`,
-            referenceNumber: sql`COALESCE(${parsed.data.referenceNumber ?? null}, ${resourcePolicyDocs.referenceNumber})`,
+            documentType: sql`COALESCE(${data.documentType ?? null}, ${resourcePolicyDocs.documentType})`,
+            jurisdictionEntityId: sql`COALESCE(${data.jurisdictionEntityId ?? null}, ${resourcePolicyDocs.jurisdictionEntityId})`,
+            agencyEntityId: sql`COALESCE(${data.agencyEntityId ?? null}, ${resourcePolicyDocs.agencyEntityId})`,
+            policyEntityId: sql`COALESCE(${data.policyEntityId ?? null}, ${resourcePolicyDocs.policyEntityId})`,
+            effectiveDate: sql`COALESCE(${data.effectiveDate ?? null}, ${resourcePolicyDocs.effectiveDate})`,
+            documentStatus: sql`COALESCE(${data.documentStatus ?? null}, ${resourcePolicyDocs.documentStatus})`,
+            referenceNumber: sql`COALESCE(${data.referenceNumber ?? null}, ${resourcePolicyDocs.referenceNumber})`,
             updatedAt: sql`now()`,
           },
         });
@@ -1030,24 +1030,8 @@ const resourcesApp = new Hono()
 
   // ---- POST /batch-details (batch upsert sub-table rows) ----
 
-  .post("/batch-details", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const BatchDetailsSchema = z.object({
-      papers: z.array(z.object({
-        resourceId: z.string().min(1).max(200),
-      }).merge(UpsertResourcePaperSchema)).max(200).optional(),
-      forumPosts: z.array(z.object({
-        resourceId: z.string().min(1).max(200),
-      }).merge(UpsertResourceForumPostSchema)).max(200).optional(),
-      policyDocs: z.array(z.object({
-        resourceId: z.string().min(1).max(200),
-      }).merge(UpsertResourcePolicyDocSchema)).max(200).optional(),
-    });
-
-    const parsed = BatchDetailsSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+  .post("/batch-details", zv("json", BatchDetailsSchema), async (c) => {
+    const batchData = c.req.valid("json");
 
     const db = getDrizzleDb();
     const results = { papers: 0, forumPosts: 0, policyDocs: 0 };
@@ -1055,8 +1039,8 @@ const resourcesApp = new Hono()
     try {
       await db.transaction(async (tx) => {
         // Batch upsert papers
-        if (parsed.data.papers) {
-          for (const item of parsed.data.papers) {
+        if (batchData.papers) {
+          for (const item of batchData.papers) {
             const { resourceId, ...data } = item;
             await tx
               .insert(resourcePapers)
@@ -1083,8 +1067,8 @@ const resourcesApp = new Hono()
         }
 
         // Batch upsert forum posts
-        if (parsed.data.forumPosts) {
-          for (const item of parsed.data.forumPosts) {
+        if (batchData.forumPosts) {
+          for (const item of batchData.forumPosts) {
             const { resourceId, ...data } = item;
             await tx
               .insert(resourceForumPosts)
@@ -1113,8 +1097,8 @@ const resourcesApp = new Hono()
         }
 
         // Batch upsert policy docs
-        if (parsed.data.policyDocs) {
-          for (const item of parsed.data.policyDocs) {
+        if (batchData.policyDocs) {
+          for (const item of batchData.policyDocs) {
             const { resourceId, ...data } = item;
             await tx
               .insert(resourcePolicyDocs)
