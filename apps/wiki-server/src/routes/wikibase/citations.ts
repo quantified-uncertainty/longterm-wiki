@@ -513,7 +513,9 @@ const citationsApp = new Hono()
       .from(citationQuotes)
       .groupBy(citationQuotes.pageId)
       .orderBy(asc(citationQuotes.pageId))
-      .limit(1000);
+      // Limit raised well above the ~700 page max so that sorting by inaccuracy
+      // rate on the client side (e.g. in the accuracy dashboard) sees all pages.
+      .limit(5000);
 
     return c.json({
       pages: rows.map((r) => ({
@@ -807,7 +809,9 @@ const citationsApp = new Hono()
       inaccurateCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
       unsupportedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
       minorIssueCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
-      averageScore: avg(citationQuotes.accuracyScore),
+      // Only average scores for checked citations (those with a non-null verdict),
+      // matching the old JS-loop behaviour that guarded scoreSum inside `if (verdict)`.
+      averageScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
     }).from(citationQuotes);
 
     const totalCitations = summaryRow.totalCitations;
@@ -854,6 +858,9 @@ const citationsApp = new Hono()
     }
 
     // --- 4. Per-page aggregation (GROUP BY pageId) ---
+    // No LIMIT here: JS sorts by inaccuracy rate afterward, so all pages must be
+    // fetched before slicing. The dataset is bounded by the number of wiki pages
+    // (~700), so this is safe.
     const pageRows = await db.select({
       pageId: citationQuotes.pageId,
       totalCitations: count(),
@@ -862,11 +869,11 @@ const citationsApp = new Hono()
       inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
       unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
       minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
-      avgScore: avg(citationQuotes.accuracyScore),
+      // Only average scores for checked citations to match old JS-loop behaviour.
+      avgScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
     })
       .from(citationQuotes)
-      .groupBy(citationQuotes.pageId)
-      .limit(1000);
+      .groupBy(citationQuotes.pageId);
 
     const pages = pageRows.map((r) => {
       const checked = Number(r.checked);
