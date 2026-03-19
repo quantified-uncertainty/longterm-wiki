@@ -151,6 +151,11 @@ const SCRIPTS = {
     description: 'Cross-check people roles between YAML entities and FactBase (advisory)',
     passthrough: ['ci', 'verbose'],
   },
+  'orphan-entities': {
+    script: 'validate/validate-orphan-entities.ts',
+    description: 'Detect PG entity records without YAML source (ghost entities)',
+    passthrough: ['ci', 'fix'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',

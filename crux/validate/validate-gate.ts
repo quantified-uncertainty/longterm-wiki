@@ -397,6 +397,18 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'orphan-entities',
+    name: 'Orphan entity detection (PG records without YAML source)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-orphan-entities.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open). Promotes to
+    // blocking once orphan entities are consistently zero.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
