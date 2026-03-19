@@ -48,12 +48,12 @@ export const COLUMN_DESCRIPTIONS: Record<string, Record<string, string>> = {
     valid_end: "When this position expired",
   },
   divisions: {
-    parent_org_id: "Parent org stableId (10-char)",
+    parent_org_id: "FK to entities.stable_id for the parent org (SET NULL on delete)",
     division_type: "fund | team | department | lab | program-area",
   },
   division_personnel: {
-    division_id: "FK to divisions.id",
-    person_id: "Person stableId or display name",
+    division_id: "FK to divisions.id (CASCADE on delete)",
+    person_id: "FK to entities.stable_id for the person (SET NULL on delete)",
   },
   funding_programs: {
     org_id: "Org stableId (10-char)",

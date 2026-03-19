@@ -51,6 +51,11 @@ pg_version = "16"
 #   Intentional column renames are coordinated in the same PR that updates all consumers
 #   (TypeScript types, Drizzle schema, queries). The rename is metadata-only (no data
 #   movement) and all references are updated atomically in the deploy.
+#
+# ban-drop-not-null:
+#   Intentional DROP NOT NULL operations are used to make FK columns nullable for
+#   ON DELETE SET NULL behavior. These changes are coordinated with TypeScript type
+#   updates (making fields optional) in the same PR, so clients are updated atomically.
 excluded_rules = [
   "prefer-bigint-over-int",
   "prefer-identity",
@@ -68,4 +73,5 @@ excluded_rules = [
   "ban-drop-column",
   "changing-column-type",
   "adding-field-with-default",
+  "ban-drop-not-null",
 ]

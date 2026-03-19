@@ -1764,7 +1764,9 @@ export const divisions = pgTable(
   {
     id: varchar("id", { length: 10 }).primaryKey(),
     slug: text("slug").unique(), // entity slug for entity system integration
-    parentOrgId: text("parent_org_id").notNull(), // parent org stableId (10-char)
+    parentOrgId: text("parent_org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }), // parent org stableId (10-char)
     name: text("name").notNull(),
     divisionType: text("division_type").notNull(), // fund | team | department | lab | program-area
     lead: text("lead"), // person stableId or display name
@@ -1799,8 +1801,14 @@ export const divisionPersonnel = pgTable(
   "division_personnel",
   {
     id: varchar("id", { length: 10 }).primaryKey(),
-    divisionId: text("division_id").notNull(), // divisions.id
-    personId: text("person_id").notNull(), // person stableId or display name
+    divisionId: text("division_id")
+      .notNull()
+      .references(() => divisions.id, { onDelete: "cascade" }), // divisions.id
+    personId: text("person_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }), // person stableId
+    /** Display name fallback when person doesn't have a matching entity. */
+    personDisplayName: text("person_display_name"),
     role: text("role").notNull(),
     startDate: text("start_date"),
     endDate: text("end_date"),
