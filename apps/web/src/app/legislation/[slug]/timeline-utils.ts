@@ -182,16 +182,40 @@ export function buildUnifiedTimeline(
     claimedMilestoneIndices.add(mi);
   }
 
-  // Pass 1: match by label similarity
+  // Pass 1: match by label similarity, prefer closest in time to avoid grabbing
+  // the wrong milestone when multiple votes share the same chamber label.
   for (let vi = 0; vi < rawVotes.length; vi++) {
     if (matchedVoteIndices.has(vi)) continue;
     const vote = rawVotes[vi];
+    const voteDate = vote.date
+      ? parseDisplayDateToISO(vote.date) ?? vote.date
+      : undefined;
+
+    let bestMi = -1;
+    let bestDiff = Infinity;
+
     for (let mi = 0; mi < milestones.length; mi++) {
       if (claimedMilestoneIndices.has(mi)) continue;
       if (voteLabelMatch(vote.chamber, milestones[mi].label)) {
-        assignVoteToMilestone(vi, mi);
-        break;
+        if (voteDate) {
+          const vd = new Date(voteDate).getTime();
+          const md = new Date(milestones[mi].sortDate).getTime();
+          const diff =
+            !isNaN(vd) && !isNaN(md) ? Math.abs(vd - md) : Infinity;
+          if (diff < bestDiff) {
+            bestDiff = diff;
+            bestMi = mi;
+          }
+        } else {
+          // No vote date available — take the first label match
+          bestMi = mi;
+          break;
+        }
       }
+    }
+
+    if (bestMi >= 0) {
+      assignVoteToMilestone(vi, bestMi);
     }
   }
 
@@ -226,43 +250,58 @@ export function buildUnifiedTimeline(
     sortDate: v.date ? parseDisplayDateToISO(v.date) ?? v.date : "",
   }));
 
-  // Step 4: Assign amendments and unmatched votes to milestones
-  // Everything between milestone N and milestone N+1 goes under milestone N
+  // Step 4: Assign amendments and unmatched votes to milestones.
+  // Everything between milestone N and milestone N+1 goes under milestone N.
+  // Items that fall before the first milestone (or when there are no milestones
+  // at all) are collected into orphanChildren and surfaced via a synthetic
+  // milestone, so they are not silently dropped.
+  const orphanChildren: TimelineChild[] = [];
+
   for (const amendment of parsedAmendments) {
     const milestoneIdx = findMilestoneIndex(milestones, amendment.sortDate);
-    if (milestoneIdx >= 0) {
-      milestones[milestoneIdx].children.push({
-        type: "amendment",
-        sortDate: amendment.sortDate,
-        date: amendment.date,
-        description: amendment.description,
-        url: amendment.url,
-        author: amendment.author,
-        resources: [],
-      });
-    }
-    // amendments before first milestone are dropped (they shouldn't exist logically)
+    const target =
+      milestoneIdx >= 0 ? milestones[milestoneIdx].children : orphanChildren;
+    target.push({
+      type: "amendment",
+      sortDate: amendment.sortDate,
+      date: amendment.date,
+      description: amendment.description,
+      url: amendment.url,
+      author: amendment.author,
+      resources: [],
+    });
   }
 
   for (const vote of parsedVotes) {
     if (!vote.sortDate) continue;
     const milestoneIdx = findMilestoneIndex(milestones, vote.sortDate);
-    if (milestoneIdx >= 0) {
-      milestones[milestoneIdx].children.push({
-        type: "vote",
-        sortDate: vote.sortDate,
-        chamber: vote.chamber,
-        date: vote.date ?? "",
-        result: vote.result,
-        ayes: vote.ayes,
-        noes: vote.noes,
-        ayesDem: vote.ayesDem,
-        ayesRep: vote.ayesRep,
-        noesDem: vote.noesDem,
-        noesRep: vote.noesRep,
-        resources: [],
-      });
-    }
+    const target =
+      milestoneIdx >= 0 ? milestones[milestoneIdx].children : orphanChildren;
+    target.push({
+      type: "vote",
+      sortDate: vote.sortDate,
+      chamber: vote.chamber,
+      date: vote.date ?? "",
+      result: vote.result,
+      ayes: vote.ayes,
+      noes: vote.noes,
+      ayesDem: vote.ayesDem,
+      ayesRep: vote.ayesRep,
+      noesDem: vote.noesDem,
+      noesRep: vote.noesRep,
+      resources: [],
+    });
+  }
+
+  // Insert a synthetic milestone at the front for any unmatched items
+  if (orphanChildren.length > 0) {
+    milestones.unshift({
+      sortDate: "0000-01-01",
+      displayDate: "",
+      label: "Unmatched events",
+      color: "bg-gray-500",
+      children: orphanChildren,
+    });
   }
 
   // Sort children within each milestone by date
