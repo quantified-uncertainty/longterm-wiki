@@ -1,4 +1,4 @@
-import { parseDisplayDateToISO } from "./date-utils";
+import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 
 // ── Types ───────────────────────────────────────────────────────────────
 

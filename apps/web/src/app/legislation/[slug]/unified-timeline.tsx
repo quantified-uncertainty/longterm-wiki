@@ -4,7 +4,7 @@ import type {
   TimelineMilestone,
   TimelineChild,
   TimelineResourceChild,
-} from "./timeline-utils";
+} from "@/app/legislation/[slug]/timeline-utils";
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -55,8 +55,12 @@ function formatVoteSummary(vote: NonNullable<TimelineMilestone["vote"]>): string
   if (vote.ayesRep != null) ayeParts.push(`${vote.ayesRep}R`);
   if (vote.noesDem != null) noeParts.push(`${vote.noesDem}D`);
   if (vote.noesRep != null) noeParts.push(`${vote.noesRep}R`);
-  if (ayeParts.length > 0 || noeParts.length > 0) {
+  if (ayeParts.length > 0 && noeParts.length > 0) {
     parts.push(`${ayeParts.join("+")} / ${noeParts.join("+")}`);
+  } else if (ayeParts.length > 0) {
+    parts.push(ayeParts.join("+"));
+  } else if (noeParts.length > 0) {
+    parts.push(noeParts.join("+"));
   }
   return parts.join(", ");
 }
@@ -112,7 +116,7 @@ function AmendmentEntry({
             </span>
             {child.url && (
               <a
-                href={child.url}
+                href={safeHref(child.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center ml-1.5 text-[11px] text-primary/50 hover:text-primary transition-colors"

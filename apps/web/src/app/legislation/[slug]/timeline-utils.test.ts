@@ -5,7 +5,7 @@ import {
   type RawVote,
   type RawAmendment,
   type RawResource,
-} from "./timeline-utils";
+} from "@/app/legislation/[slug]/timeline-utils";
 
 function makeMilestones(...items: Array<[string, string]>): RawMilestone[] {
   return items.map(([label, value]) => ({ label, value }));

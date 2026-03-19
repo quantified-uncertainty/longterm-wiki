@@ -35,12 +35,12 @@ import {
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
-import { UnifiedTimelineView } from "./unified-timeline";
+import { UnifiedTimelineView } from "@/app/legislation/[slug]/unified-timeline";
 import {
   buildUnifiedTimeline,
   type RawResource,
-} from "./timeline-utils";
-import { parseDisplayDateToISO } from "./date-utils";
+} from "@/app/legislation/[slug]/timeline-utils";
+import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));

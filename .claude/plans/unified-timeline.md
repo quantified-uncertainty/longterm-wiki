@@ -16,7 +16,7 @@ The old Coverage Timeline used a 30-day window to attach press to events. This i
 ### Nested: milestones are parents, everything else nests under them
 The bill's lifecycle has natural phases defined by milestones (Introduced → Committee → Floor → Executive). Amendments, votes, and resources that happen *between* two milestones are logically *about* that phase. Nesting makes causal relationships visible:
 
-```
+```text
 ● Introduced                                February 2024
   ◆ Amendment: March 20 — defined thresholds
   ◆ Amendment: April 8 — refined definitions
@@ -111,7 +111,7 @@ interface UnifiedTimeline {
 - `pressResources` from `getResourcesForPage()` → attached to sections
 
 ### Merge Algorithm
-```
+```text
 1. Parse milestones from customFields (sorted oldest-first):
    - "Introduced" → milestone { label: "Introduced", date: "February 2024", color: "blue" }
    - "Passed Committee" → milestone { label: "Passed Committee", date: "April 2024", color: "violet" }
@@ -138,13 +138,13 @@ interface UnifiedTimeline {
 - OR label similarity ("Passed Senate" ↔ "Senate Floor", "Passed Assembly" ↔ "Assembly Floor")
 
 When matched: use the customField label (it's more readable) but attach the vote data (ayes, noes, party breakdown). The merged milestone shows both:
-```
+```text
 ● Passed Assembly (48-16, 44D+4R / 1D+15R)    August 28, 2024
 ```
 
 ## Visual Design
 
-```
+```text
 ● Introduced                                    February 2024
   ○ DLA Piper: Understanding SB-1047            Feb 1 · press
 
