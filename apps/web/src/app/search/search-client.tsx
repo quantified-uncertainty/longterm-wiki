@@ -5,27 +5,119 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { searchWiki, searchThings, type SearchResult, type ThingSearchResult } from "@lib/search";
 
-// ── Type config ──────────────────────────────────────────────────────
+// ── Type styling ─────────────────────────────────────────────────────
+// Colors drawn from entity-ontology.ts badge palette for consistency.
 
-const TYPE_META: Record<string, { label: string; short: string; icon: string }> = {
+interface TypeStyle {
+  label: string;
+  short: string;
+  /** Tailwind classes for the colored badge */
+  badge: string;
+  /** Tailwind classes for the left accent border */
+  accent: string;
+}
+
+const TYPE_STYLES: Record<string, TypeStyle> = {
   // Wiki articles (non-directory entity types)
-  wiki: { label: "Wiki Article", short: "Wiki", icon: "W" },
+  wiki: {
+    label: "Wiki Article",
+    short: "Wiki",
+    badge: "bg-slate-100 text-slate-600 dark:bg-slate-800/40 dark:text-slate-400",
+    accent: "border-l-slate-300 dark:border-l-slate-600",
+  },
   // Directory entity types
-  organization: { label: "Organization", short: "Org", icon: "O" },
-  person: { label: "Person", short: "Person", icon: "P" },
-  "ai-model": { label: "AI Model", short: "Model", icon: "M" },
-  policy: { label: "Legislation", short: "Law", icon: "L" },
-  project: { label: "Project", short: "Proj", icon: "J" },
-  approach: { label: "Approach", short: "Appr", icon: "A" },
-  event: { label: "Event", short: "Event", icon: "E" },
-  benchmark: { label: "Benchmark", short: "Bench", icon: "B" },
-  "research-area": { label: "Research Area", short: "RA", icon: "RA" },
+  organization: {
+    label: "Organization",
+    short: "Org",
+    badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+    accent: "border-l-amber-400 dark:border-l-amber-500",
+  },
+  person: {
+    label: "Person",
+    short: "Person",
+    badge: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+    accent: "border-l-sky-400 dark:border-l-sky-500",
+  },
+  "ai-model": {
+    label: "AI Model",
+    short: "Model",
+    badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    accent: "border-l-blue-400 dark:border-l-blue-500",
+  },
+  policy: {
+    label: "Legislation",
+    short: "Law",
+    badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    accent: "border-l-purple-400 dark:border-l-purple-500",
+  },
+  project: {
+    label: "Project",
+    short: "Project",
+    badge: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+    accent: "border-l-teal-400 dark:border-l-teal-500",
+  },
+  approach: {
+    label: "Approach",
+    short: "Approach",
+    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+    accent: "border-l-emerald-400 dark:border-l-emerald-500",
+  },
+  event: {
+    label: "Event",
+    short: "Event",
+    badge: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+    accent: "border-l-rose-400 dark:border-l-rose-500",
+  },
+  benchmark: {
+    label: "Benchmark",
+    short: "Bench",
+    badge: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+    accent: "border-l-indigo-400 dark:border-l-indigo-500",
+  },
+  "research-area": {
+    label: "Research Area",
+    short: "Research",
+    badge: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+    accent: "border-l-cyan-400 dark:border-l-cyan-500",
+  },
   // Things (data records)
-  grant: { label: "Grant", short: "Grant", icon: "G" },
-  "funding-round": { label: "Funding Round", short: "Round", icon: "F" },
-  "funding-program": { label: "Funding Program", short: "Program", icon: "$" },
-  division: { label: "Division", short: "Div", icon: "D" },
-  resource: { label: "Resource", short: "Res", icon: "R" },
+  grant: {
+    label: "Grant",
+    short: "Grant",
+    badge: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    accent: "border-l-green-300 dark:border-l-green-600",
+  },
+  "funding-round": {
+    label: "Funding Round",
+    short: "Funding",
+    badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+    accent: "border-l-emerald-300 dark:border-l-emerald-600",
+  },
+  "funding-program": {
+    label: "Funding Program",
+    short: "Program",
+    badge: "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",
+    accent: "border-l-lime-300 dark:border-l-lime-600",
+  },
+  division: {
+    label: "Division",
+    short: "Division",
+    badge: "bg-stone-100 text-stone-700 dark:bg-stone-800/40 dark:text-stone-300",
+    accent: "border-l-stone-300 dark:border-l-stone-600",
+  },
+  resource: {
+    label: "Resource",
+    short: "Resource",
+    badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+    accent: "border-l-orange-300 dark:border-l-orange-600",
+  },
+};
+
+const FALLBACK_STYLE: TypeStyle = {
+  label: "Item",
+  short: "Item",
+  badge: "bg-gray-100 text-gray-600 dark:bg-gray-800/40 dark:text-gray-400",
+  accent: "border-l-gray-300 dark:border-l-gray-600",
 };
 
 // ── Filters ──────────────────────────────────────────────────────────
@@ -90,15 +182,15 @@ interface UnifiedResult {
   source: "page" | "thing";
   score: number;
   quality: number | null;
+  readerImportance: number | null;
+  isInternal: boolean;
 }
 
 function fromPage(r: SearchResult): UnifiedResult {
   const isDirectory = !!DIRECTORY_ROUTES[r.type];
-  // Directory entities use their entity type; other wiki pages use "wiki"
   const type = isDirectory ? r.type : "wiki";
-  // For directory entities the badge already shows the type, so context
-  // would be redundant. For wiki articles, show the entity type as context.
   const context = isDirectory ? null : (r.type || null);
+  const isInternal = r.type === "internal" || r.id.startsWith("internal/");
   return {
     key: `p:${r.id}`,
     title: r.title,
@@ -110,12 +202,12 @@ function fromPage(r: SearchResult): UnifiedResult {
     source: "page",
     score: r.score,
     quality: r.quality,
+    readerImportance: r.readerImportance,
+    isInternal,
   };
 }
 
 function fromThing(r: ThingSearchResult): UnifiedResult {
-  // For entity-type things, use the specific entity type (person, organization, etc.)
-  // so they get the same icon/label as wiki page results of that type.
   const type = r.thingType === "entity" && r.entityType && DIRECTORY_ROUTES[r.entityType]
     ? r.entityType
     : r.thingType;
@@ -127,9 +219,24 @@ function fromThing(r: ThingSearchResult): UnifiedResult {
     href: r.href,
     description: r.description || null,
     source: "thing",
-    score: 0, // things don't expose score yet
+    score: 0,
     quality: null,
+    readerImportance: null,
+    isInternal: false,
   };
+}
+
+/**
+ * Compute a blended relevance score that factors in reader importance.
+ * FTS score is the primary signal, but reader importance breaks ties
+ * and boosts genuinely important results above similarly-scored ones.
+ */
+function blendedScore(r: UnifiedResult): number {
+  // Normalize importance to 0-1 range (max observed is ~55)
+  const importance = (r.readerImportance ?? 0) / 60;
+  // FTS score already ranges from ~0.01 to ~1000+
+  // Add a fraction of importance to break ties among similar scores
+  return r.score + importance * 10;
 }
 
 // ── Component ────────────────────────────────────────────────────────
@@ -154,7 +261,6 @@ export function SearchPageClient() {
   const searchSeqRef = useRef(0);
   const filterRef = useRef<FilterKey>(initialFilter);
 
-  // Keep filterRef in sync with state so debounce callbacks read the latest value
   filterRef.current = filter;
 
   // ── Search ─────────────────────────────────────────────────────────
@@ -177,7 +283,6 @@ export function SearchPageClient() {
       searchThings(q, 60),
     ]);
 
-    // Discard stale response if a newer search was started
     if (seq !== searchSeqRef.current) return;
 
     if (pageResults.length === 0 && thingResults.length === 0 && q.trim().length > 2) {
@@ -191,10 +296,16 @@ export function SearchPageClient() {
       return true;
     });
 
-    setResults([
+    // Build unified results, filter out internal pages, then sort by blended score
+    const unified = [
       ...pageResults.map(fromPage),
       ...dedupedThings.map(fromThing),
-    ]);
+    ].filter((r) => !r.isInternal);
+
+    // Re-sort by blended score (FTS rank + importance)
+    unified.sort((a, b) => blendedScore(b) - blendedScore(a));
+
+    setResults(unified);
     setLoading(false);
     setSelected(-1);
   }, []);
@@ -244,7 +355,6 @@ export function SearchPageClient() {
   const filtered = useMemo(() => {
     let items = results;
     if (filter === "wiki") {
-      // "Wiki" filter catches all wiki-sourced results (articles + directory entities)
       items = items.filter((r) => r.source === "page");
     } else if (filter !== "all") {
       items = items.filter((r) => r.type === filter);
@@ -255,7 +365,6 @@ export function SearchPageClient() {
     } else if (sort === "type") {
       items = [...items].sort((a, b) => a.type.localeCompare(b.type) || a.title.localeCompare(b.title));
     }
-    // "relevance" keeps server order
 
     return items;
   }, [results, filter, sort]);
@@ -266,8 +375,9 @@ export function SearchPageClient() {
     const counts: Record<string, number> = {};
     for (const r of results) {
       counts[r.type] = (counts[r.type] ?? 0) + 1;
-      // "wiki" filter counts all wiki-sourced results
-      if (r.source === "page") {
+      // Count all page-sourced results under "wiki" filter, but avoid
+      // double-counting results that already have type === "wiki"
+      if (r.source === "page" && r.type !== "wiki") {
         counts["wiki"] = (counts["wiki"] ?? 0) + 1;
       }
     }
@@ -298,7 +408,6 @@ export function SearchPageClient() {
     }
   }, [selected, filtered, router]);
 
-  // Scroll selected into view
   useEffect(() => {
     if (selected < 0 || !listRef.current) return;
     const el = listRef.current.children[selected] as HTMLElement | undefined;
@@ -318,7 +427,7 @@ export function SearchPageClient() {
           Search
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Wiki pages, grants, funding rounds, divisions, benchmarks, and more
+          Wiki pages, organizations, people, grants, and more
         </p>
       </div>
 
@@ -377,7 +486,6 @@ export function SearchPageClient() {
             })}
           </div>
 
-          {/* Sort toggle */}
           <div className="flex items-center gap-0.5 shrink-0">
             {SORT_OPTIONS.map((opt) => (
               <button
@@ -455,7 +563,7 @@ export function SearchPageClient() {
           id="search-results"
           role="listbox"
           aria-label="Search results"
-          className="divide-y divide-border/60"
+          className="space-y-1"
           onKeyDown={handleKeyDown}
         >
           {filtered.map((r, i) => (
@@ -503,9 +611,7 @@ function ResultRow({
   onHover: () => void;
   id: string;
 }) {
-  const meta = TYPE_META[r.type];
-  const label = meta?.short ?? r.type;
-  const icon = meta?.icon ?? r.type[0]?.toUpperCase() ?? "?";
+  const style = TYPE_STYLES[r.type] ?? FALLBACK_STYLE;
 
   const content = (
     <div
@@ -513,53 +619,50 @@ function ResultRow({
       role="option"
       aria-selected={isSelected}
       onMouseEnter={onHover}
-      className={`flex items-start gap-3.5 py-3.5 px-2 -mx-2 rounded-lg transition-colors ${
+      className={`border-l-[3px] rounded-r-lg py-3 pl-4 pr-3 transition-colors ${style.accent} ${
         isSelected ? "bg-muted/60" : "hover:bg-muted/30"
       }`}
     >
-      {/* Type indicator */}
-      <div
-        className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold mt-0.5 transition-colors ${
-          isSelected
-            ? "bg-foreground/10 text-foreground"
-            : "bg-muted/60 text-muted-foreground/60"
-        }`}
-        title={meta?.label ?? r.type}
-      >
-        {icon}
-      </div>
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          {/* Title + type badge */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`font-semibold text-[15px] leading-snug transition-colors ${
+              isSelected ? "text-primary" : "text-foreground"
+            }`}>
+              <Highlight text={r.title} query={query} />
+            </span>
+            <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold rounded ${style.badge}`}>
+              {style.short}
+            </span>
+          </div>
 
-      <div className="min-w-0 flex-1">
-        {/* Title + type label */}
-        <div className="flex items-baseline gap-2">
-          <span className={`font-semibold text-[15px] leading-snug transition-colors ${
-            isSelected ? "text-primary" : "text-foreground"
-          }`}>
-            <Highlight text={r.title} query={query} />
-          </span>
-          <span className="text-[10px] font-medium text-muted-foreground/40 uppercase tracking-wider shrink-0">
-            {label}
-          </span>
+          {/* Context / parent */}
+          {r.context && (
+            <div className="text-xs text-muted-foreground/55 mt-0.5">
+              <Highlight text={r.context} query={query} />
+            </div>
+          )}
+
+          {/* Snippet or description */}
+          {r.snippet ? (
+            <p
+              className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2 [&_mark]:bg-yellow-200/50 [&_mark]:dark:bg-yellow-500/20 [&_mark]:rounded-sm"
+              dangerouslySetInnerHTML={{ __html: sanitizeSnippet(r.snippet) }}
+            />
+          ) : r.description ? (
+            <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2">
+              <Highlight text={r.description} query={query} />
+            </p>
+          ) : null}
         </div>
 
-        {/* Context / parent */}
-        {r.context && (
-          <div className="text-xs text-muted-foreground/55 mt-0.5">
-            <Highlight text={r.context} query={query} />
-          </div>
+        {/* External link indicator */}
+        {r.href?.startsWith("http") && (
+          <span className="shrink-0 mt-1 text-muted-foreground/30" title="Opens in new tab">
+            <ExternalIcon />
+          </span>
         )}
-
-        {/* Snippet or description */}
-        {r.snippet ? (
-          <p
-            className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2 [&_mark]:bg-yellow-200/50 [&_mark]:dark:bg-yellow-500/20 [&_mark]:rounded-sm"
-            dangerouslySetInnerHTML={{ __html: sanitizeSnippet(r.snippet) }}
-          />
-        ) : r.description ? (
-          <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2">
-            <Highlight text={r.description} query={query} />
-          </p>
-        ) : null}
       </div>
     </div>
   );
@@ -579,7 +682,6 @@ function ResultRow({
 
 // ── Sanitize ─────────────────────────────────────────────────────────
 
-/** Strip all HTML tags except <mark> and </mark> to prevent XSS from ts_headline output. */
 function sanitizeSnippet(html: string): string {
   return html.replace(/<(?!\/?mark\b)[^>]*>/gi, "");
 }
@@ -593,7 +695,6 @@ function Highlight({ text, query }: { text: string; query: string }) {
   const escaped = terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
   if (!escaped) return <>{text}</>;
 
-  // Split with a capturing group puts matches at odd indices (1, 3, 5, ...)
   const regex = new RegExp(`(${escaped})`, "gi");
   const parts = text.split(regex);
 
@@ -629,6 +730,16 @@ function SearchIcon({ size = 24, className }: { size?: number; className?: strin
     >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function ExternalIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
     </svg>
   );
 }
