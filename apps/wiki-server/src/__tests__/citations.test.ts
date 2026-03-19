@@ -370,20 +370,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Verdict distribution (WHERE accuracy_verdict IS NOT NULL + GROUP BY accuracy_verdict) ---
-  // accuracy-dashboard query 2: SELECT accuracy_verdict, count(*) ... GROUP BY accuracy_verdict
-  if (q.includes("citation_quotes") && q.includes("accuracy_verdict") && q.includes("where") && q.includes("group by") && !q.includes("having")) {
-    // Check if this is a verdict distribution (grouping by accuracy_verdict) vs difficulty (grouping by verification_difficulty)
-    if (q.includes("verification_difficulty")) {
-      // Difficulty distribution query
-      const diffCounts = new Map<string, number>();
-      for (const r of quotesStore.values()) {
-        if (r.verificationDifficulty != null) {
-          diffCounts.set(r.verificationDifficulty as string, (diffCounts.get(r.verificationDifficulty as string) || 0) + 1);
-        }
-      }
-      return Array.from(diffCounts.entries()).map(([difficulty, cnt]) => ({ difficulty, cnt }));
-    }
-    // Verdict distribution query
+  // accuracy-dashboard query 2: SELECT accuracy_verdict, count(*) ... WHERE accuracy_verdict IS NOT NULL GROUP BY accuracy_verdict
+  // Note: accuracy_verdict is in the query; verification_difficulty is NOT.
+  if (q.includes("citation_quotes") && q.includes("accuracy_verdict") && q.includes("where") && q.includes("group by") && !q.includes("having") && !q.includes("verification_difficulty")) {
     const verdictCounts = new Map<string, number>();
     for (const r of quotesStore.values()) {
       if (r.accuracyVerdict != null) {
@@ -391,6 +380,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
     }
     return Array.from(verdictCounts.entries()).map(([verdict, cnt]) => ({ accuracy_verdict: verdict, cnt }));
+  }
+
+  // --- citation_quotes: Difficulty distribution (WHERE verification_difficulty IS NOT NULL + GROUP BY verification_difficulty) ---
+  // accuracy-dashboard query 3. Returns { verification_difficulty, cnt } to match extractColumns mapping.
+  if (q.includes("citation_quotes") && q.includes("verification_difficulty") && q.includes("where") && q.includes("group by") && !q.includes("having")) {
+    const diffCounts = new Map<string, number>();
+    for (const r of quotesStore.values()) {
+      if (r.verificationDifficulty != null) {
+        diffCounts.set(r.verificationDifficulty as string, (diffCounts.get(r.verificationDifficulty as string) || 0) + 1);
+      }
+    }
+    // Key must be "verification_difficulty" to match the column name extractColumns extracts from
+    // SELECT "citation_quotes"."verification_difficulty". Drizzle maps this to the `difficulty` JS field.
+    return Array.from(diffCounts.entries()).map(([d, cnt]) => ({ verification_difficulty: d, cnt }));
   }
 
   // --- citation_quotes: Accuracy-dashboard per-page aggregation (GROUP BY pageId, no HAVING, with minor_issues col) ---
