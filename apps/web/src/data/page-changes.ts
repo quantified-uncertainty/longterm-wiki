@@ -2,7 +2,7 @@
  * Page change history: individual change items and session groupings.
  */
 
-import { getDatabase } from "./tablebase";
+import { getTableBase } from "./tablebase";
 
 export interface PageChangeItem {
   pageId: string;
@@ -45,7 +45,7 @@ export interface PageChangesSession {
 }
 
 export function getPageChanges(): PageChangeItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pages = db.pages || [];
   const items: PageChangeItem[] = [];
 
@@ -77,7 +77,7 @@ export function getPageChanges(): PageChangeItem[] {
 }
 
 export function getPageChangeSessions(): PageChangesSession[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pages = db.pages || [];
   const sessionMap = new Map<string, PageChangesSession>();
 

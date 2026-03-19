@@ -36,6 +36,38 @@ const nextConfig: NextConfig = {
         destination: "/resources",
         permanent: true,
       },
+      // Research area title-slug → canonical short-ID redirects (#2634)
+      {
+        source: "/research-areas/mechanistic-interpretability",
+        destination: "/research-areas/mech-interp",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/dangerous-capability-evaluations",
+        destination: "/research-areas/dangerous-capability-evals",
+        permanent: true,
+      },
+      {
+        source: "/research-areas/ai-evaluations",
+        destination: "/research-areas/evals",
+        permanent: true,
+      },
+      // Publication title-slug → canonical short-ID redirects (#2635)
+      {
+        source: "/publications/future-of-life-institute",
+        destination: "/publications/fli",
+        permanent: true,
+      },
+      {
+        source: "/publications/future-of-humanity-institute",
+        destination: "/publications/fhi",
+        permanent: true,
+      },
+      {
+        source: "/publications/world-economic-forum",
+        destination: "/publications/wef",
+        permanent: true,
+      },
     ];
   },
 };

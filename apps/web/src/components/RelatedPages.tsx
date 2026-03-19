@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getRelatedGraphWithFallback, getPageById, getEntityById } from "@/data";
+import { getRelatedGraphWithFallback, getPageById } from "@/data";
 import { ENTITY_TYPES } from "@/data/entity-ontology";
 import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
 import { getTypeLabel, getTypeColor } from "./explore/explore-utils";
@@ -180,7 +180,7 @@ export async function RelatedPages({
   entity,
 }: {
   entityId: string;
-  entity?: { type?: string } | null;
+  entity?: { entityType?: string } | null;
 }) {
   const { data: relatedEntries } = await getRelatedGraphWithFallback(entityId);
   const allItems: RelatedPageItem[] = relatedEntries
@@ -204,7 +204,7 @@ export async function RelatedPages({
 
   if (allItems.length === 0) return null;
 
-  const sourceType = entity?.type;
+  const sourceType = entity?.entityType;
   const bounded = allItems.slice(0, MAX_TOTAL);
 
   // Top items: highest-scored, shown as featured cards

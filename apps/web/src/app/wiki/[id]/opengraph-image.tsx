@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getEntityById, getPageById } from "@/data";
+import { getTypedEntityById, getPageById } from "@/data";
 import { wikiIdToSlug } from "@/lib/mdx";
 
 export const runtime = "nodejs";
@@ -21,7 +21,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     slug = id;
   }
 
-  const entity = slug ? getEntityById(slug) : null;
+  const entity = slug ? getTypedEntityById(slug) : null;
   const pageData = slug ? getPageById(slug) : null;
   const title = entity?.title || pageData?.title || slug || id;
   const description = entity?.description || pageData?.description || null;

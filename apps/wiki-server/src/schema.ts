@@ -2358,3 +2358,49 @@ export const wikibasePageAssessments = pgTable(
     index("idx_wpa_assessor").on(table.assessor),
   ]
 );
+
+// ── Policy Stakeholders ──────────────────────────────────────────────────
+//
+// Cross-entity join table tracking organization/person positions on policy entities.
+// Enables queries like "which orgs oppose AI regulation?" and
+// "what policies has Anthropic taken positions on?"
+
+export const policyStakeholders = pgTable(
+  "policy_stakeholders",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the policy/legislation entity */
+    policyEntityId: text("policy_entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** FK to entities.stable_id for the stakeholder. Null when unresolved. */
+    stakeholderEntityId: text("stakeholder_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name (always present — used when stakeholder has no entity) */
+    stakeholderDisplayName: text("stakeholder_display_name").notNull(),
+    /** Position: support | oppose | neutral | mixed */
+    position: text("position").notNull(),
+    /** Reason for the position */
+    reason: text("reason"),
+    /** Source URL */
+    source: text("source"),
+    /** Array of contextual notes (funding connections, conflicts, etc.) */
+    context: jsonb("context").$type<string[]>(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ps_policy").on(table.policyEntityId),
+    index("idx_ps_stakeholder").on(table.stakeholderEntityId),
+    index("idx_ps_position").on(table.position),
+  ]
+);

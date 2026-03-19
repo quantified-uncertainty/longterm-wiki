@@ -2,7 +2,7 @@
  * Page coverage metrics and citation health data.
  */
 
-import { getDatabase, getPageById } from "./tablebase";
+import { getTableBase, getPageById } from "./tablebase";
 import type { ContentFormat } from "./tablebase";
 import type { ValidSubcategory } from "./valid-subcategories";
 
@@ -77,7 +77,7 @@ export interface PageCoverageItem {
 }
 
 export function getPageCoverageItems(): PageCoverageItem[] {
-  const db = getDatabase();
+  const db = getTableBase();
   const pages = db.pages || [];
   const items: PageCoverageItem[] = [];
 

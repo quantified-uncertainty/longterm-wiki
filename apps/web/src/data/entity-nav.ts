@@ -2,7 +2,7 @@
  * Entity navigation: URL resolution, backlinks, and related graph.
  */
 
-import { getDatabase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./tablebase";
+import { getTableBase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./tablebase";
 import type { WithSource } from "./tablebase";
 import { getKBEntitySlug } from "./factbase";
 
@@ -55,7 +55,7 @@ export function getDirectoryHref(id: string): string | null {
 
 export function getEntityPath(id: string): string | null {
   const slug = resolveId(id);
-  const db = getDatabase();
+  const db = getTableBase();
   return db.pathRegistry?.[slug] || db.pathRegistry?.[`__index__/${slug}`] || null;
 }
 
@@ -115,7 +115,7 @@ export function getBacklinksFor(
   const slug = resolveId(entityId);
   // Try per-entity bundle first (avoids loading full database.json)
   const bundle = getEntityBundle(slug);
-  const links = bundle?.backlinks ?? getDatabase().backlinks?.[slug] ?? [];
+  const links = bundle?.backlinks ?? getTableBase().backlinks?.[slug] ?? [];
   return links.map((link: BacklinkEntry) => ({
     ...link,
     href: getEntityHref(link.id, link.type),
@@ -152,7 +152,7 @@ export function getRelatedGraphFor(
   const slug = resolveId(entityId);
   // Try per-entity bundle first (avoids loading full database.json)
   const bundle = getEntityBundle(slug);
-  const entries = bundle?.relatedGraph ?? getDatabase().relatedGraph?.[slug] ?? [];
+  const entries = bundle?.relatedGraph ?? getTableBase().relatedGraph?.[slug] ?? [];
   return entries.map((entry) => ({
     ...entry,
     href: getEntityHref(entry.id, entry.type),
