@@ -323,19 +323,39 @@ WHERE person_id = 'oa9A0OV0RX';
 -- FACTS (FactBase mirror)
 -- ============================================================
 
--- entity_id is FK to entities.stable_id. If the stale entity row
--- exists in the entities table, facts might reference it.
--- The facts table has ON DELETE CASCADE, so if the stale entity is
--- later deleted, these facts would be lost. Fix them now.
+-- entity_id is FK to entities.stable_id with a unique index on
+-- (entity_id, fact_id). If facts were synced both before and after
+-- Entity Unification, rows with both old and new entity_id values
+-- may exist for the same fact_id. A plain UPDATE would violate the
+-- unique constraint. Delete the stale duplicate first (the canonical
+-- row already has the correct data), then update any remaining stale rows.
+
+-- SFF: delete stale rows where canonical already exists for the same fact_id
+DELETE FROM facts
+WHERE entity_id = 'sIFjGbxVct'
+  AND fact_id IN (
+    SELECT fact_id FROM facts
+    WHERE entity_id = 'pvJ50HupEQ'
+  );
+
 UPDATE facts
 SET entity_id = 'pvJ50HupEQ', updated_at = now()
 WHERE entity_id = 'sIFjGbxVct';
+
+-- CAIS: delete stale rows where canonical already exists for the same fact_id
+DELETE FROM facts
+WHERE entity_id = 'oa9A0OV0RX'
+  AND fact_id IN (
+    SELECT fact_id FROM facts
+    WHERE entity_id = 'y4bieqSeag'
+  );
 
 UPDATE facts
 SET entity_id = 'y4bieqSeag', updated_at = now()
 WHERE entity_id = 'oa9A0OV0RX';
 
--- subject column also references entities.stable_id
+-- subject column also references entities.stable_id (no unique constraint,
+-- so a plain UPDATE is safe here)
 UPDATE facts
 SET subject = 'pvJ50HupEQ', updated_at = now()
 WHERE subject = 'sIFjGbxVct';
@@ -343,3 +363,40 @@ WHERE subject = 'sIFjGbxVct';
 UPDATE facts
 SET subject = 'y4bieqSeag', updated_at = now()
 WHERE subject = 'oa9A0OV0RX';
+
+-- ============================================================
+-- SUMMARIES
+-- ============================================================
+
+-- entity_id is the PRIMARY KEY and FK to entities.stable_id.
+-- If a summary already exists for the canonical ID, delete the stale
+-- one (the canonical row is authoritative). Then update any remaining.
+DELETE FROM summaries
+WHERE entity_id = 'sIFjGbxVct'
+  AND EXISTS (SELECT 1 FROM summaries WHERE entity_id = 'pvJ50HupEQ');
+
+UPDATE summaries
+SET entity_id = 'pvJ50HupEQ', updated_at = now()
+WHERE entity_id = 'sIFjGbxVct';
+
+DELETE FROM summaries
+WHERE entity_id = 'oa9A0OV0RX'
+  AND EXISTS (SELECT 1 FROM summaries WHERE entity_id = 'y4bieqSeag');
+
+UPDATE summaries
+SET entity_id = 'y4bieqSeag', updated_at = now()
+WHERE entity_id = 'oa9A0OV0RX';
+
+-- ============================================================
+-- THINGS TABLE — source_id (no action needed)
+-- ============================================================
+-- The things table has source_id values derived from entity IDs
+-- (e.g., for facts: "entityId:factId"). These stale source_id values
+-- are NOT updated here because:
+-- 1. The things upsert uses ON CONFLICT (source_table, source_id),
+--    so the next facts/entities sync will create new rows with the
+--    canonical IDs and the old orphan rows are harmless (no FKs).
+-- 2. Entity things use stableId as source_id — these are already
+--    correct since the entities table has the canonical IDs.
+-- The next build-data + sync cycle will naturally replace the stale
+-- things entries.
