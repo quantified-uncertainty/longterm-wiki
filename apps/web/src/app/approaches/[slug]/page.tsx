@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
@@ -7,6 +7,7 @@ import {
   getTypedEntities,
   getTypedEntityById,
   isApproach,
+  getPageById,
   type ApproachEntity,
 } from "@/data";
 import { getEntityHref, getWikiHref } from "@/data/entity-nav";
@@ -45,6 +46,17 @@ export default async function ApproachDetailPage({
   const { slug } = await params;
   const entity = resolveApproachBySlug(slug);
   if (!entity) return notFound();
+
+  // If this approach has a wiki article with MDX content, redirect there.
+  // The wiki page (/wiki/E*) renders the full article body, including all
+  // sections, footnotes, and structured data — the approach directory page
+  // only shows sparse entity metadata.
+  //
+  // We check getPageById to confirm that an MDX page actually exists in the
+  // build (avoiding redirecting to /wiki/E* for wikiId-only stubs with no .mdx file).
+  if (entity.wikiId && getPageById(entity.id)) {
+    permanentRedirect(getWikiHref(entity.wikiId));
+  }
 
   const wikiHref = entity.wikiId ? getWikiHref(entity.wikiId) : null;
 
@@ -113,12 +125,6 @@ export default async function ApproachDetailPage({
                   Wiki article &rarr;
                 </Link>
               )}
-              <Link
-                href={`/approaches/${slug}/db`}
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
-              >
-                DB records &rarr;
-              </Link>
             </div>
             {entity.description && (
               <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-prose">

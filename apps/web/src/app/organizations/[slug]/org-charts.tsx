@@ -133,6 +133,24 @@ export function TimeSeriesChart({
   // X-axis labels: use unique years
   const years = [...new Set(allPoints.map((p) => p.date.split("-")[0]))].sort();
 
+  // Build accessible label from series data
+  const ariaLabel = (() => {
+    const parts: string[] = [`${title} chart.`];
+    for (const s of series) {
+      const sorted = [...s.data].sort((a, b) => parseDate(a.date) - parseDate(b.date));
+      if (sorted.length < 2) continue;
+      const first = sorted[0];
+      const last = sorted[sorted.length - 1];
+      const firstVal = formatter(first.value);
+      const lastVal = formatter(last.value);
+      const trend = last.value > first.value ? "increasing" : last.value < first.value ? "decreasing" : "flat";
+      parts.push(
+        `${s.label}: ${firstVal} in ${first.date.slice(0, 4)} to ${lastVal} in ${last.date.slice(0, 4)} (${trend}).`
+      );
+    }
+    return parts.join(" ");
+  })();
+
   return (
     <div className="border border-border rounded-xl p-4 bg-card">
       <h3 className="text-sm font-semibold mb-3">{title}</h3>
@@ -140,7 +158,10 @@ export function TimeSeriesChart({
         viewBox={`0 0 ${chartWidth} ${height}`}
         className="w-full"
         style={{ maxHeight: `${height}px` }}
+        role="img"
+        aria-label={ariaLabel}
       >
+        <title>{ariaLabel}</title>
         {/* Grid lines */}
         {yTicks.map((tick, i) => (
           <g key={i}>
@@ -395,12 +416,33 @@ export function EquityBreakdownChart({
   const totalShown = sorted.reduce((s, h) => s + h.stakePercent, 0);
   const otherPercent = Math.max(0, 100 - totalShown);
 
+  // Build accessible label summarizing equity holders
+  const equityAriaLabel = (() => {
+    const holderSummaries = sorted.map((h) => {
+      const stake =
+        h.stakeLow != null && h.stakeHigh != null
+          ? `${h.stakeLow}–${h.stakeHigh}%`
+          : `~${h.stakePercent.toFixed(1)}%`;
+      const value =
+        valuation != null
+          ? ` (${formatCompactCurrency((h.stakePercent / 100) * valuation)})`
+          : "";
+      return `${h.name} ${stake}${value}`;
+    });
+    if (otherPercent > 2) holderSummaries.push(`Other ~${otherPercent.toFixed(0)}%`);
+    return `${title}: ${holderSummaries.join(", ")}.`;
+  })();
+
   return (
     <div className="border border-border rounded-xl p-4 bg-card">
       <h3 className="text-sm font-semibold mb-3">{title}</h3>
 
       {/* Stacked horizontal bar */}
-      <div className="relative h-8 rounded-lg overflow-hidden flex mb-4">
+      <div
+        className="relative h-8 rounded-lg overflow-hidden flex mb-4"
+        role="img"
+        aria-label={equityAriaLabel}
+      >
         {sorted.map((h, i) => (
           <div
             key={i}
@@ -516,6 +558,14 @@ export function DilutionWaterfallChart({
 
   const totalHeight = stages.length * (barHeight + gap) + 50;
 
+  // Build accessible label summarizing the dilution waterfall
+  const dilutionAriaLabel = (() => {
+    const roundSummaries = stages.map((s) =>
+      `${s.round}: founders ${s.foundersPercent.toFixed(0)}%, employees ${s.employeesPercent.toFixed(0)}%, investors ${s.investorsPercent.toFixed(0)}%${s.valuation ? ` (${formatCompactCurrency(s.valuation)})` : ""}`
+    );
+    return `${title}. ${roundSummaries.join("; ")}.`;
+  })();
+
   return (
     <div className="border border-border rounded-xl p-4 bg-card">
       <h3 className="text-sm font-semibold mb-3">{title}</h3>
@@ -523,7 +573,10 @@ export function DilutionWaterfallChart({
       <svg
         viewBox={`0 0 ${chartWidth} ${totalHeight}`}
         className="w-full"
+        role="img"
+        aria-label={dilutionAriaLabel}
       >
+        <title>{dilutionAriaLabel}</title>
         {stages.map((stage, si) => {
           const y = si * (barHeight + gap);
           let xOffset = labelWidth;
@@ -619,8 +672,19 @@ export function MarketShareChart({
 
   const sorted = [...data].sort((a, b) => b.share - a.share);
 
+  // Build accessible label summarizing market share entries
+  const marketShareAriaLabel = (() => {
+    const entrySummaries = sorted.map((e) => `${e.company} ${e.share}%`);
+    const label = `${title}${subtitle ? ` (${subtitle})` : ""}. ${entrySummaries.join(", ")}.`;
+    return label;
+  })();
+
   return (
-    <div className="border border-border rounded-xl p-4 bg-card">
+    <div
+      className="border border-border rounded-xl p-4 bg-card"
+      role="img"
+      aria-label={marketShareAriaLabel}
+    >
       <h3 className="text-sm font-semibold">{title}</h3>
       {subtitle && (
         <p className="text-[10px] text-muted-foreground mb-3">{subtitle}</p>

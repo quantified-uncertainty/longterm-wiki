@@ -37,7 +37,7 @@ facts:
     property: total-funding
     value: 1.5e+7
     asOf: "2025"
-    notes: "Estimated cumulative SFF grants to MIRI; lower bound"
+    notes: "Estimated total from SFF grants only; actual total funding raised (including Open Philanthropy, individual donors, crypto donations) is significantly higher. SFF grants are the largest trackable component."
 
   - id: f_DgTzpJumMg
     property: revenue

@@ -170,12 +170,6 @@ export default async function BenchmarkDetailPage({
               Website &rarr;
             </a>
           )}
-          <Link
-            href={`/benchmarks/${slug}/db`}
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            DB records &rarr;
-          </Link>
         </div>
       </div>
 

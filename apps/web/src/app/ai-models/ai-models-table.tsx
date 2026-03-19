@@ -41,8 +41,7 @@ type SortKey =
   | "safetyLevel"
   | "sweBench"
   | "mmlu"
-  | "gpqa"
-  | "params";
+  | "gpqa";
 
 const PAGE_SIZE = 50;
 
@@ -132,8 +131,6 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
           return row.mmluScore;
         case "gpqa":
           return row.gpqaScore;
-        case "params":
-          return row.parameterCount ? parseParamCount(row.parameterCount) : null;
       }
     };
     result = [...result].sort((a, b) =>
@@ -176,8 +173,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                   : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
               }`}
             >
-              All
-              <span className="ml-1 text-[10px] opacity-60">{developerCounts.all}</span>
+              All{" "}
+              <span className="text-[10px] opacity-60">{developerCounts.all}</span>
             </button>
             {developers.map(([devId, devName]) => (
               <button
@@ -193,15 +190,15 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                     : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
                 }`}
               >
-                {devName}
-                <span className="ml-1 text-[10px] opacity-60">
+                {devName}{" "}
+                <span className="text-[10px] opacity-60">
                   {developerCounts[devId] ?? 0}
                 </span>
               </button>
             ))}
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
@@ -271,7 +268,6 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <SortHeader label="Model" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Developer" sortKey="developer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Released" sortKey="releaseDate" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
-              <SortHeader label="Params" sortKey="params" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Input $/MTok" sortKey="inputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Output $/MTok" sortKey="outputPrice" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Context" sortKey="contextWindow" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -322,11 +318,6 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 {/* Release Date */}
                 <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
                   {row.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-
-                {/* Parameter Count */}
-                <td className="py-2.5 px-3 text-right tabular-nums text-muted-foreground">
-                  {row.parameterCount ?? <span className="text-muted-foreground/40">&mdash;</span>}
                 </td>
 
                 {/* Input Price */}
@@ -399,7 +390,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={11} className="text-center py-12 text-muted-foreground">
+                <td colSpan={10} className="text-center py-12 text-muted-foreground">
                   No models match your search.
                 </td>
               </tr>
@@ -422,12 +413,3 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   );
 }
 
-/** Parse a parameter count string like "70B" or "1.8T" to a numeric value for sorting. */
-function parseParamCount(s: string): number {
-  const match = s.match(/^([\d.]+)\s*([KMBT])?$/i);
-  if (!match) return 0;
-  const num = parseFloat(match[1]);
-  const suffix = (match[2] ?? "").toUpperCase();
-  const multipliers: Record<string, number> = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 };
-  return num * (multipliers[suffix] ?? 1);
-}

@@ -106,6 +106,13 @@ facts:
     notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
       fastest-growing consumer application in history at that time"
 
+  - id: f_br0wYi0tog
+    property: user-count
+    value: 4e+8
+    asOf: 2025-02
+    source: https://openai.com/index/400-million-users/
+    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO Sam Altman"
+
   - id: f_o1tcwe2T0w
     property: headcount
     value: 3500

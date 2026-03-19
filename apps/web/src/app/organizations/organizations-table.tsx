@@ -231,13 +231,17 @@ export function OrganizationsTable({
     if (serverMode) {
       const serverField = SORT_KEY_TO_SERVER_FIELD[key];
       if (serverField) {
-        const { dir } = toggleSort(urlSort, key, ["name"]);
+        // Read from server.sort (not urlSort) so toggling the same column correctly
+        // flips direction. urlSort is never updated in server mode, so using it
+        // always produces the same direction for repeated clicks on the same column.
+        const currentServerSort = { field: server.sort.field as SortKey, dir: server.sort.dir };
+        const { dir } = toggleSort(currentServerSort, key, ["name"]);
         serverSetSort(serverField, dir);
       }
     } else {
       urlSetSort(toggleSort(urlSort, key, ["name"]));
     }
-  }, [serverMode, serverSetSort, urlSetSort, urlSort]);
+  }, [serverMode, server.sort, serverSetSort, urlSetSort, urlSort]);
 
   // ── Enrich server data with orgType from static map ──
   const enrichedServerData = useMemo(() => {

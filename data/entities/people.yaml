@@ -2178,6 +2178,356 @@
     - governance
     - ai-policy
 
+# Entries below fix garbled/missing person entries on org pages (issue #2602).
+# These stableIds must match exactly what was written to the PG entities table
+# by previous personnel enrichment runs.
+
+- id: josue-estrada
+  stableId: FeHrdAUKpQ
+  type: person
+  title: Josué Estrada
+  description: >-
+    Chief Operating Officer at the Center for AI Safety (CAIS). Previously served
+    as COO at the Chan Zuckerberg Initiative, where he led organizational operations
+    and advised co-founders on strategy. Joined CAIS in 2025 to guide organizational
+    strategy and operations as the nonprofit scales its research, policy, and
+    field-building work.
+  customFields:
+    - label: Role
+      value: Chief Operating Officer
+    - label: Organization
+      value: Center for AI Safety (CAIS)
+  tags:
+    - ai-safety
+
+- id: oliver-zhang
+  stableId: TnHMQ4cMOw
+  type: person
+  title: Oliver Zhang
+  description: >-
+    Co-founder and Managing Director of the Center for AI Safety (CAIS). Co-founded
+    CAIS in 2022 alongside Dan Hendrycks. Also co-founded ML Alignment Theory
+    Scholars (MATS). Oversees organizational operations and strategy at CAIS.
+  customFields:
+    - label: Role
+      value: Co-founder and Managing Director
+    - label: Organization
+      value: Center for AI Safety (CAIS)
+  tags:
+    - ai-safety
+
+- id: mark-nitzberg
+  stableId: 0bmt4zJZVg
+  type: person
+  title: Mark Nitzberg
+  description: >-
+    Executive Director of the Center for Human-Compatible AI (CHAI) at UC Berkeley.
+    Oversees CHAI's operations under the direction of founder Stuart Russell. CHAI
+    is the leading academic research center for human-compatible AI, developing
+    frameworks for AI systems that remain beneficial and deferential to humans.
+  customFields:
+    - label: Role
+      value: Executive Director
+    - label: Organization
+      value: Center for Human-Compatible AI (CHAI)
+  tags:
+    - ai-safety
+
+- id: mark-brakel
+  stableId: KG46JUejyg
+  type: person
+  title: Mark Brakel
+  description: >-
+    Global Director of Policy at the Future of Life Institute (FLI). Leads FLI's
+    advocacy and policy efforts globally, including the organization's engagement
+    with the EU AI Act and international AI governance initiatives. Previously led
+    FLI's response to the AI pause letter and government relations work.
+  website: https://futureoflife.org/person/mark-brakel/
+  customFields:
+    - label: Role
+      value: Global Director of Policy
+    - label: Organization
+      value: Future of Life Institute
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: emilia-javorsky
+  stableId: XvvppfgBPw
+  type: person
+  title: Emilia Javorsky
+  description: >-
+    Director of the Futures Program at the Future of Life Institute (FLI). A
+    scientist and inventor with extensive experience in biomedical research and
+    technology development. Leads FLI's work on guiding humanity toward beneficial
+    outcomes from transformative technologies. Represented FLI at the Vienna
+    Autonomous Weapons Conference in 2025.
+  website: https://futureoflife.org/
+  customFields:
+    - label: Role
+      value: Director, Futures Program
+    - label: Organization
+      value: Future of Life Institute
+  tags:
+    - ai-safety
+    - ai-governance
+
+- id: margrethe-vestager
+  stableId: LSLuPzY3vQ
+  type: person
+  title: Margrethe Vestager
+  description: >-
+    Executive Vice-President of the European Commission for A Europe Fit for the
+    Digital Age and EU Commissioner for Competition (2019–2024). Led EU competition
+    policy and antitrust enforcement against major tech companies. The EU AI Act
+    was primarily driven by Internal Market Commissioner Thierry Breton and MEPs
+    Dragos Tudorache and Brando Benifei; Vestager's role was in broader digital
+    and competition policy rather than leading the AI Act itself. Collaborated
+    with the US on developing a voluntary AI Code of Conduct in 2023.
+  customFields:
+    - label: Role
+      value: Executive Vice-President, European Commission (2019–2024)
+    - label: Known For
+      value: EU competition policy, tech antitrust enforcement, EU digital policy
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: julia-wise
+  stableId: OsJT0ukTmw
+  type: person
+  title: Julia Wise
+  description: >-
+    Manager of the Community Health team at the Centre for Effective Altruism (CEA),
+    where she has worked since 2015 as CEA's longest-serving employee. Serves as a
+    community liaison and contact person for problems or concerns in the EA community.
+    Work includes improving community members' access to mental health services and
+    handling welfare issues. Previously president of Giving What We Can (2017-2020).
+    Studied sociology at Bryn Mawr College and worked as a social worker before CEA.
+  customFields:
+    - label: Role
+      value: Community Health Lead
+    - label: Organization
+      value: Centre for Effective Altruism
+  tags:
+    - effective-altruism
+
+- id: zach-robinson
+  stableId: VBDv1fiH9g
+  type: person
+  title: Zach Robinson
+  description: >-
+    CEO of the Centre for Effective Altruism (CEA), appointed in February 2024.
+    Selected through a search process that considered hundreds of internal and
+    external candidates. Previously served as Chief of Staff at Coefficient Giving
+    (formerly Open Philanthropy). Leads CEA's work on EA community building, EA
+    Global conferences, the EA Forum, and the spinout from Effective Ventures.
+  customFields:
+    - label: Role
+      value: CEO
+    - label: Organization
+      value: Centre for Effective Altruism
+  tags:
+    - effective-altruism
+
+- id: huw-price
+  stableId: T6SowQJJbg
+  type: person
+  title: Huw Price
+  description: >-
+    Co-founder of the Centre for the Study of Existential Risk (CSER) at the
+    University of Cambridge, established in 2012 alongside Martin Rees and Jaan
+    Tallinn. Bertrand Russell Professor of Philosophy at Cambridge. Previously ARC
+    Federation Fellow and Challis Professor of Philosophy at the University of
+    Sydney (2002-2012). Also served as Academic Director of the Leverhulme Centre
+    for the Future of Intelligence.
+  customFields:
+    - label: Role
+      value: Co-founder
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - existential-risk
+
+- id: martin-rees
+  stableId: WlwcDX4nYA
+  type: person
+  title: Martin Rees
+  description: >-
+    Co-founder of the Centre for the Study of Existential Risk (CSER) at the
+    University of Cambridge, established in 2012. Astronomer Royal and Emeritus
+    Professor of Cosmology and Astrophysics at Cambridge. Former President of the
+    Royal Society. Co-organized workshops with the Vatican that influenced the 2015
+    Papal Encyclical on Climate Change. A prominent voice on existential risk from
+    advanced technology and climate change.
+  customFields:
+    - label: Role
+      value: Co-founder
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - existential-risk
+
+- id: sean-o-heigeartaigh
+  stableId: YsjgB5Gy0g
+  type: person
+  title: Seán Ó hÉigeartaigh
+  description: >-
+    Founding Executive Director of the Centre for the Study of Existential Risk
+    (CSER) at the University of Cambridge, leading CSER from its establishment in
+    2013 through 2020. Led the development of CSER from concept to physical centre,
+    securing funding and recruiting the research team. Currently Director of the
+    AI: Futures and Responsibility Programme, a joint initiative of CSER and the
+    Centre for the Future of Intelligence (CFI), focusing on foresight and
+    governance of frontier AI and geopolitical implications of advanced AI.
+  website: https://www.cser.ac.uk/team/sean-o-heigeartaigh/
+  customFields:
+    - label: Role
+      value: Founding Executive Director
+    - label: Organization
+      value: Centre for the Study of Existential Risk (CSER)
+  tags:
+    - ai-safety
+    - ai-governance
+    - existential-risk
+
+- id: jacob-hilton
+  stableId: KKCwTYU4Zw
+  type: person
+  title: Jacob Hilton
+  description: >-
+    President and researcher at the Alignment Research Center (ARC). One of three
+    permanent researchers at ARC Theory (along with Paul Christiano and Mark Xu)
+    following the spin-out of ARC Evals as METR in December 2023. Sits on ARC's
+    board alongside Buck Shlegeris and Ben Hoskin. ARC focuses on theoretical
+    alignment research, including heuristic arguments for understanding neural
+    network behavior.
+  customFields:
+    - label: Role
+      value: President and Researcher
+    - label: Organization
+      value: Alignment Research Center (ARC)
+  tags:
+    - ai-safety
+    - alignment
+
+- id: jaime-sevilla
+  stableId: G7Hg6qBW6A
+  type: person
+  title: Jaime Sevilla
+  description: >-
+    Founder and Director of Epoch AI, a research institute tracking AI development
+    trends through comprehensive databases on training compute, model parameters,
+    and hardware capabilities. Founded Epoch in April 2022 after pausing his PhD
+    to systematically document inputs of significant AI models. Epoch's research
+    has directly informed the EU AI Act's compute threshold and US Executive Order
+    14110. The New York Times praised Epoch's work for bringing "rigorous empiricism
+    to an industry that often runs on hype and vibes."
+  website: https://epoch.ai/
+  customFields:
+    - label: Role
+      value: Founder and Director
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+    - epistemics
+
+- id: maria-de-la-lama
+  stableId: BoXCNeZK3w
+  type: person
+  title: María de la Lama Laviada
+  description: >-
+    Head of Operations at Epoch AI, based in London. Previously served as
+    Operations Coordinator at Epoch (2022-2023) and Special Projects Coordinator
+    at Rethink Priorities (2023-2024). Holds an MSc in Philosophy of the Social
+    Sciences from the London School of Economics and Political Science (2021-2022).
+    Manages operational functions as Epoch AI scaled to ~34 employees.
+  customFields:
+    - label: Role
+      value: Head of Operations
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+
+- id: yafah-edelman
+  stableId: ZrowXa4u4w
+  type: person
+  title: Yafah Edelman
+  description: >-
+    Head of Data & Trends at Epoch AI. Works closely with researchers to develop,
+    pitch, execute on, and deliver new research projects. Part of the team
+    maintaining Epoch's comprehensive databases tracking over 3,200 ML models from
+    1950 to present, enabling quantitative analysis of AI progress and development
+    trajectories.
+  customFields:
+    - label: Role
+      value: Head of Data & Trends
+    - label: Organization
+      value: Epoch AI
+  tags:
+    - ai-safety
+    - epistemics
+
+- id: avital-balwit
+  stableId: LWYBcu2iSQ
+  type: person
+  title: Avital Balwit
+  description: >-
+    Former member of the FTX Future Fund team. Graduated from the University of
+    Virginia with highest honors in Political and Social Thought. Joined the FTX
+    Future Fund full time in June 2022, becoming part of the team under Nick
+    Beckstead's leadership. Was one of five Future Fund officials who resigned on
+    November 10, 2022, following the FTX bankruptcy collapse, citing fundamental
+    questions about the legitimacy of the business operations funding the foundation.
+  customFields:
+    - label: Role
+      value: Team Member (2022)
+    - label: Organization
+      value: FTX Future Fund
+  tags:
+    - effective-altruism
+
+- id: ketan-ramakrishnan
+  stableId: Ma5lO6r5Fw
+  type: person
+  title: Ketan Ramakrishnan
+  description: >-
+    Former member of the FTX Future Fund team. Was one of five Future Fund
+    officials who resigned on November 10, 2022, following the FTX bankruptcy
+    collapse, signing the resignation statement alongside Nick Beckstead, Leopold
+    Aschenbrenner, Avital Balwit, and Will MacAskill. The team stated they had
+    been unaware of any wrongdoing and had believed they were doing good work
+    with legitimately earned funds.
+  customFields:
+    - label: Role
+      value: Team Member (2022)
+    - label: Organization
+      value: FTX Future Fund
+  tags:
+    - effective-altruism
+
+- id: caroline-ellison
+  stableId: U7QD93Xjug
+  type: person
+  title: Caroline Ellison
+  description: >-
+    Former CEO of Alameda Research, the crypto trading firm closely tied to FTX.
+    Alameda's commingling of customer funds with FTX was central to FTX's collapse
+    in November 2022. Pleaded guilty to fraud charges and cooperated with federal
+    prosecutors, providing key testimony against Sam Bankman-Fried in his trial.
+    Sentenced to two years in prison in September 2024.
+  customFields:
+    - label: Role
+      value: Former CEO, Alameda Research
+    - label: Known For
+      value: FTX collapse, Alameda Research
+  tags:
+    - effective-altruism
+
 - id: greg-brockman
   stableId: Yq4s2cI7ng
   type: person
