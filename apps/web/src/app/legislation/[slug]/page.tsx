@@ -248,20 +248,18 @@ export default async function LegislationDetailPage({
       {/* Timeline */}
       {timelineEvents.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Legislative Timeline</h2>
-          <div className="relative pl-4 border-l-2 border-border space-y-1.5">
+          <h2 className="text-lg font-bold mb-3">Legislative Timeline</h2>
+          <div className="space-y-0.5">
             {timelineEvents.map((event, i) => (
-              <div key={i} className="relative">
-                <div className={`absolute -left-[17px] w-2 h-2 rounded-full border-2 border-background ${
+              <div key={i} className="flex items-center gap-2 py-0.5">
+                <div className={`shrink-0 w-1.5 h-1.5 rounded-full ${
                   event.label === "Vetoed" ? "bg-red-500"
                     : event.label === "Enacted" || event.label === "Signed" ? "bg-green-500"
                     : event.label === "Introduced" ? "bg-blue-500"
                     : "bg-violet-500"
                 }`} />
-                <div className="flex items-baseline gap-2">
-                  <span className="font-semibold text-sm">{event.label}</span>
-                  <span className="text-sm text-muted-foreground">{event.value}</span>
-                </div>
+                <span className="font-medium text-sm min-w-[140px]">{event.label}</span>
+                <span className="text-sm text-muted-foreground">{event.value}</span>
               </div>
             ))}
           </div>
@@ -502,56 +500,32 @@ export default async function LegislationDetailPage({
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
-                  <th className="text-left py-2 px-3 font-medium">Name</th>
-                  <th className="text-left py-2 px-3 font-medium">Position</th>
-                  <th className="text-left py-2 px-3 font-medium">Reason</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[80px]">Position</th>
+                  <th className="text-left py-1.5 px-3 font-medium">Reason</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {[...supporters, ...mixed, ...opponents].map((stakeholder, i) => {
                   const href = resolveEntityHref(stakeholder.entityId);
-                  const funders = getFundingBadges(stakeholder.entityId);
                   return (
-                    <tr key={i} className="hover:bg-muted/20">
-                      <td className="py-2 px-3">
-                        <div>
-                          {href ? (
-                            <Link href={href} className="text-primary hover:underline font-medium">{stakeholder.name}</Link>
-                          ) : (
-                            <span className="font-medium">{stakeholder.name}</span>
-                          )}
-                          {funders.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-0.5">
-                              {funders.map((funder) => (
-                                <span key={funder} className="inline-flex items-center px-1.5 py-0 rounded text-[9px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/30">
-                                  {funder}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                    <tr key={i} className="hover:bg-muted/20 align-top">
+                      <td className="py-1.5 px-3">
+                        {href ? (
+                          <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
+                        ) : (
+                          <span className="font-medium text-sm">{stakeholder.name}</span>
+                        )}
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="py-1.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
                           {stakeholder.position}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-lg">
-                        <div>
-                          {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          {stakeholder.source && (
-                            <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
-                          )}
-                        </div>
-                        {stakeholder.context && stakeholder.context.length > 0 && (
-                          <ul className="mt-1 space-y-0 text-[10px] text-muted-foreground/60 list-none pl-0 max-h-[2.5rem] overflow-hidden">
-                            {stakeholder.context.slice(0, 2).map((note, j) => (
-                              <li key={j} className="leading-tight truncate">
-                                <span className="text-muted-foreground/30 mr-0.5 text-[9px]">-</span>
-                                {note}
-                              </li>
-                            ))}
-                          </ul>
+                      <td className="py-1.5 px-3 text-foreground/70 text-sm">
+                        <span className="line-clamp-2">{stakeholder.reason ?? "\u2014"}</span>
+                        {stakeholder.source && (
+                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-[10px]">[source]</a>
                         )}
                       </td>
                     </tr>
@@ -574,48 +548,25 @@ export default async function LegislationDetailPage({
       count: historyCount,
       content: (
         <div className="space-y-8">
-          {entity.amendments.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold mb-4">Amendment History</h2>
-              <div className="relative pl-4 border-l-2 border-border/60 space-y-2">
-                {entity.amendments.map((amendment, i) => (
-                  <div key={i} className="relative">
-                    <div className="absolute -left-[17px] w-2 h-2 rounded-full border-2 border-background bg-amber-500" />
-                    <div>
-                      <div className="flex items-baseline gap-2 mb-0.5">
-                        {amendment.url ? (
-                          <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
-                        ) : (
-                          <span className="font-semibold text-sm">{amendment.date}</span>
-                        )}
-                        {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{amendment.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
+          {/* Key Politicians first */}
           {entity.keyPoliticians.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold mb-4">Key Politicians</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <h2 className="text-lg font-bold mb-3">Key Politicians</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {entity.keyPoliticians.map((politician, i) => {
                   const href = resolveEntityHref(politician.entityId);
                   return (
-                    <div key={i} className="rounded-lg border border-border/60 bg-card p-3 flex items-center gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-sm font-bold text-violet-600 dark:text-violet-400">
+                    <div key={i} className="rounded-lg border border-border/60 bg-card px-3 py-2 flex items-center gap-2.5">
+                      <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
                         {politician.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         {href ? (
-                          <Link href={href} className="font-medium text-sm text-primary hover:underline">{politician.name}</Link>
+                          <Link href={href} className="font-medium text-sm text-primary hover:underline truncate block">{politician.name}</Link>
                         ) : (
-                          <span className="font-medium text-sm">{politician.name}</span>
+                          <span className="font-medium text-sm truncate block">{politician.name}</span>
                         )}
-                        <div className="text-xs text-muted-foreground">{politician.role}</div>
+                        <div className="text-[11px] text-muted-foreground truncate">{politician.role}</div>
                       </div>
                     </div>
                   );
@@ -623,6 +574,30 @@ export default async function LegislationDetailPage({
               </div>
             </section>
           )}
+
+          {entity.amendments.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3">Amendment History</h2>
+              <div className="divide-y divide-border/40">
+                {entity.amendments.map((amendment, i) => (
+                  <div key={i} className="py-2 first:pt-0">
+                    <div className="flex items-baseline gap-2">
+                      <div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5" />
+                      {amendment.url ? (
+                        <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
+                      ) : (
+                        <span className="font-semibold text-sm">{amendment.date}</span>
+                      )}
+                      {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground ml-3.5 mt-0.5 leading-relaxed">{amendment.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Key Politicians rendered above amendments */}
         </div>
       ),
     });
