@@ -200,6 +200,7 @@ async function upsertResource(
         // stableId is generate-once: preserve existing, only set if row didn't have one
         stableId: sql`COALESCE(${resources.stableId}, ${vals.stableId})`,
         archiveUrl: sql`COALESCE(${vals.archiveUrl}, ${resources.archiveUrl})`,
+        stance: sql`COALESCE(${vals.stance}, ${resources.stance})`,
         updatedAt: sql`now()`,
       },
     })
@@ -521,6 +522,8 @@ const resourcesApp = new Hono()
         publicationId: resources.publicationId,
         authors: resources.authors,
         publishedDate: resources.publishedDate,
+        summary: resources.summary,
+        stance: resources.stance,
       })
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
