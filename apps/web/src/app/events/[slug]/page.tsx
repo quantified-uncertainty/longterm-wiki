@@ -104,12 +104,6 @@ export default async function EventDetailPage({
                   Wiki article &rarr;
                 </Link>
               )}
-              <Link
-                href={`/events/${slug}/db`}
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
-              >
-                DB records &rarr;
-              </Link>
             </div>
             {entity.description && (
               <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-prose">

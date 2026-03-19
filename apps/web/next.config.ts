@@ -36,7 +36,13 @@ const nextConfig: NextConfig = {
         destination: "/resources",
         permanent: true,
       },
-      // Research area title-slug → canonical short-ID redirects (#2634, #2686)
+      // Deprecated stub E8 redirects to the canonical full page E366 (#2688)
+      {
+        source: "/legislation/ai-executive-order",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      // Research area title-slug → canonical short-ID redirects (#2634)
       {
         source: "/research-areas/mechanistic-interpretability",
         destination: "/research-areas/mech-interp",

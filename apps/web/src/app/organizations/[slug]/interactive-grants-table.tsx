@@ -190,12 +190,17 @@ export function InteractiveGrantsTable({
 }) {
   const serverMode = !!entityId;
 
+  // Memoize the transform function so its reference is stable across renders.
+  // Without this, makeTransform(orgSlug) would produce a new function each render,
+  // which could cause unnecessary re-fetches if useServerTable ever checks referential equality.
+  const transform = useMemo(() => makeTransform(orgSlug), [orgSlug]);
+
   // ── Server-side state (hook always called for consistent hook order) ──
   const server = useServerTable<GrantRow>({
     endpoint: `/api/grants/by-entity/${entityId ?? ""}`,
     defaultPageSize: PAGE_SIZE,
     defaultSort: { field: "date", dir: "desc" },
-    transform: makeTransform(orgSlug),
+    transform,
     enabled: serverMode,
   });
 

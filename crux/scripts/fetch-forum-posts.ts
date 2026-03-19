@@ -1,101 +1,14 @@
 /**
- * Fetch EA Forum / LessWrong posts for an author and create resources.
+ * CLI: Fetch EA Forum / LessWrong posts for an author and create resources.
  *
  * Usage:
- *   pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri
- *   pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri --apply
+ *   WIKI_SERVER_ENV=prod pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri
+ *   WIKI_SERVER_ENV=prod pnpm tsx crux/scripts/fetch-forum-posts.ts --slug=ozziegooen --entity=quri --apply
  */
 
 import 'dotenv/config';
-
-interface ForumPost {
-  _id: string;
-  title: string;
-  slug: string;
-  postedAt: string;
-  baseScore: number;
-  voteCount: number;
-  url?: string;
-  user?: { displayName: string; slug: string };
-  coauthors?: { displayName: string; slug: string }[];
-}
-
-interface Forum {
-  name: string;
-  url: string;
-  baseUrl: string;
-}
-
-const FORUMS: Forum[] = [
-  { name: 'EA Forum', url: 'https://forum.effectivealtruism.org/graphql', baseUrl: 'https://forum.effectivealtruism.org' },
-  { name: 'LessWrong', url: 'https://www.lesswrong.com/graphql', baseUrl: 'https://www.lesswrong.com' },
-];
-
-async function graphql(forumUrl: string, query: string): Promise<unknown> {
-  const resp = await fetch(forumUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
-  });
-  if (!resp.ok) throw new Error(`GraphQL error: ${resp.status}`);
-  const body = await resp.json() as { errors?: { message?: string }[] };
-  if (body.errors?.length) {
-    throw new Error(
-      body.errors.map((err) => err.message ?? 'Unknown GraphQL error').join('; ')
-    );
-  }
-  return body;
-}
-
-async function getUserId(forum: Forum, slug: string): Promise<{ id: string; name: string } | null> {
-  const data = await graphql(forum.url, `query {
-    user(input: { selector: { slug: "${slug}" } }) {
-      result { _id displayName slug }
-    }
-  }`) as { data?: { user?: { result?: { _id: string; displayName: string } } } };
-
-  const user = data?.data?.user?.result;
-  if (!user) return null;
-  return { id: user._id, name: user.displayName };
-}
-
-async function getUserPosts(forum: Forum, userId: string, pageSize = 100): Promise<ForumPost[]> {
-  const allPosts: ForumPost[] = [];
-  let offset = 0;
-
-  while (true) {
-    const data = await graphql(forum.url, `query {
-      posts(input: {
-        terms: {
-          userId: "${userId}",
-          limit: ${pageSize},
-          offset: ${offset},
-          sortedBy: "top"
-        }
-      }) {
-        results {
-          _id title slug postedAt baseScore voteCount url
-          user { displayName slug }
-          coauthors { displayName slug }
-        }
-        totalCount
-      }
-    }`) as { data?: { posts?: { results?: ForumPost[]; totalCount?: number } } };
-
-    const page = data?.data?.posts?.results ?? [];
-    const totalCount = data?.data?.posts?.totalCount ?? 0;
-    allPosts.push(...page);
-
-    if (page.length === 0 || allPosts.length >= totalCount) break;
-    offset += pageSize;
-  }
-
-  return allPosts;
-}
-
-function postToResourceUrl(forum: Forum, post: ForumPost): string {
-  return `${forum.baseUrl}/posts/${post._id}/${post.slug}`;
-}
+import { fetchAuthorPosts, postPermalink, postAuthors } from '../lib/forum-api.ts';
+import type { Forum, ForumPost } from '../lib/forum-api.ts';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -122,70 +35,40 @@ async function main() {
   console.log(`Min score: ${minScore}`);
   console.log(`Mode: ${apply ? 'APPLY' : 'DRY RUN'}\n`);
 
-  const allPosts: { forum: Forum; post: ForumPost }[] = [];
+  const posts = await fetchAuthorPosts(authorSlug, { minScore });
 
-  for (const forum of FORUMS) {
-    const user = await getUserId(forum, authorSlug);
-    if (!user) {
-      console.log(`  ${forum.name}: user "${authorSlug}" not found`);
-      continue;
-    }
-    console.log(`  ${forum.name}: found ${user.name} (${user.id})`);
+  console.log(`  Total unique posts: ${posts.length}\n`);
 
-    const posts = await getUserPosts(forum, user.id);
-    const filtered = posts.filter(p => p.baseScore >= minScore);
-    console.log(`  ${forum.name}: ${posts.length} total posts, ${filtered.length} with score >= ${minScore}\n`);
-
-    for (const post of filtered) {
-      allPosts.push({ forum, post });
-    }
-  }
-
-  // Deduplicate by URL (cross-posted content)
-  const seen = new Set<string>();
-  const unique = allPosts.filter(({ forum, post }) => {
-    const url = postToResourceUrl(forum, post);
-    if (seen.has(url)) return false;
-    seen.add(url);
-    return true;
-  });
-
-  console.log(`\n  Total unique posts: ${unique.length}\n`);
-
-  // Display them
-  for (const { forum, post } of unique) {
-    const url = postToResourceUrl(forum, post);
+  for (const { forum, post } of posts) {
+    const url = postPermalink(forum, post);
     const date = post.postedAt?.substring(0, 10) || '?';
-    const authors = [
-      post.user?.displayName,
-      ...(post.coauthors?.map(c => c.displayName) || []),
-    ].filter(Boolean);
+    const authors = postAuthors(post);
     console.log(`  [${post.baseScore}] ${date} ${post.title}`);
     console.log(`    ${url}`);
-    console.log(`    Authors: ${authors.join(', ')}`);
-    console.log();
+    console.log(`    Authors: ${authors.join(', ')}\n`);
   }
 
   if (!apply) {
-    console.log(`\n  Run with --apply to create ${unique.length} resources.`);
+    console.log(`\n  Run with --apply to create ${posts.length} resources.`);
     return;
   }
 
-  // Create resources via wiki-server API
+  if (process.env.WIKI_SERVER_ENV !== 'prod') {
+    console.error('Error: --apply requires WIKI_SERVER_ENV=prod to prevent accidental writes to non-production.');
+    process.exit(1);
+  }
+
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
-  const { hashId, guessResourceType } = await import('../resource-utils.ts');
+  const { hashId } = await import('../resource-utils.ts');
 
   let created = 0;
   let errors = 0;
 
-  for (const { forum, post } of unique) {
-    const url = postToResourceUrl(forum, post);
+  for (const { forum, post } of posts) {
+    const url = postPermalink(forum, post);
     const id = hashId(url);
     const date = post.postedAt?.substring(0, 10) || undefined;
-    const authors = [
-      post.user?.displayName,
-      ...(post.coauthors?.map(c => c.displayName) || []),
-    ].filter(Boolean);
+    const authors = postAuthors(post);
 
     const resource = {
       id,
@@ -217,7 +100,6 @@ async function main() {
         errors++;
         console.warn(`  ✗ ${post.title}: ${result.message}`);
       }
-      // Rate limit
       await new Promise(r => setTimeout(r, 100));
     } catch (err) {
       errors++;

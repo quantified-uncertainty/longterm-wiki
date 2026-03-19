@@ -47,6 +47,8 @@
     - id: guesstimate
       type: project
       relationship: related
+    - id: slava-matyukhin
+      type: person
     - id: nuno-sempere
       type: person
     - id: rethink-priorities

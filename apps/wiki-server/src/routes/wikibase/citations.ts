@@ -5,13 +5,12 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
-  parseJsonBody,
   validationError,
-  invalidJsonError,
   notFoundError,
   firstOrThrow,
   dbError,
   paginationQuery,
+  zv,
 } from "../shared/utils.js";
 import {
   UpsertCitationQuoteSchema,
@@ -56,6 +55,27 @@ const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
 const UpsertContentSchema = UpsertCitationContentSchema;
 
 const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: 100 });
+
+// Query schemas for endpoints that accept only a limit param
+const QuotesLimitQuery = z.object({
+  page_id: z.string().min(1).max(500),
+  limit: z.coerce.number().int().min(1).max(500).default(100),
+});
+const TrendsLimitQuery = z.object({
+  page_id: z.string().min(1).max(500).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(50),
+});
+const QuotesByUrlQuery = z.object({
+  url: z.string().min(1).max(2000),
+  limit: z.coerce.number().int().min(1).max(500).default(100),
+});
+const UnverifiedLimitQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+});
+const CleanupQuery = z.object({
+  keep: z.coerce.number().int().min(1).max(1000).default(30),
+  dry_run: z.string().optional().transform((v) => v === "true" || v === "1"),
+});
 
 // ---- Helpers ----
 
@@ -188,33 +208,28 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/upsert ---- [DEPRECATED: use POST /api/claims + POST /api/claims/:id/sources]
-  .post("/quotes/upsert", async (c) => {
+  .post("/quotes/upsert", zv("json", UpsertQuoteSchema), async (c) => {
     deprecationWarning("POST /quotes/upsert");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertQuoteSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
+    const parsed = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate page reference
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.data.pageId]);
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.pageId]);
     if (missingPages.length > 0) {
       return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
     }
 
     // Validate resource reference (optional)
-    if (parsed.data.resourceId) {
-      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.data.resourceId]);
+    if (parsed.resourceId) {
+      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.resourceId]);
       if (missingRes.length > 0) {
         return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
       }
     }
 
     // Phase 4a: resolve page slug to integer ID for dual-write
-    const singlePageIdInt = await resolvePageIntId(db, parsed.data.pageId);
-    const rows = await upsertQuote(db, parsed.data, singlePageIdInt);
+    const singlePageIdInt = await resolvePageIntId(db, parsed.pageId);
+    const rows = await upsertQuote(db, parsed, singlePageIdInt);
 
     const row = firstOrThrow(rows, "citation quote upsert");
     return c.json({
@@ -227,15 +242,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/upsert-batch ---- [DEPRECATED: use POST /api/claims/batch]
-  .post("/quotes/upsert-batch", async (c) => {
+  .post("/quotes/upsert-batch", zv("json", UpsertBatchSchema), async (c) => {
     deprecationWarning("POST /quotes/upsert-batch");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
+    const { items } = c.req.valid("json");
     const db = getDrizzleDb();
 
     // Validate page references
@@ -303,12 +312,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /quotes?page_id=X ----
-  .get("/quotes", async (c) => {
-    const pageId = c.req.query("page_id");
-    if (!pageId) return validationError(c, "page_id query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500) : 100;
+  .get("/quotes", zv("query", QuotesLimitQuery), async (c) => {
+    const { page_id: pageId, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
@@ -325,11 +330,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /quotes/all (paginated) ----
-  .get("/quotes/all", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset } = parsed.data;
+  .get("/quotes/all", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db
@@ -346,15 +348,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-verified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
-  .post("/quotes/mark-verified", async (c) => {
+  .post("/quotes/mark-verified", zv("json", MarkVerifiedSchema), async (c) => {
     deprecationWarning("POST /quotes/mark-verified");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkVerifiedSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, method, score } = parsed.data;
+    const { pageId, footnote, method, score } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -388,15 +384,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-unverified ---- [DEPRECATED: update claim_sources.sourceVerdict instead]
-  .post("/quotes/mark-unverified", async (c) => {
+  .post("/quotes/mark-unverified", zv("json", MarkVerifiedSchema), async (c) => {
     deprecationWarning("POST /quotes/mark-unverified");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkVerifiedSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, method, score } = parsed.data;
+    const { pageId, footnote, method, score } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -429,15 +419,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-accuracy ---- [DEPRECATED: update claims.claimVerdict instead]
-  .post("/quotes/mark-accuracy", async (c) => {
+  .post("/quotes/mark-accuracy", zv("json", MarkAccuracySchema), async (c) => {
     deprecationWarning("POST /quotes/mark-accuracy");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkAccuracySchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = parsed.data;
+    const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
@@ -588,14 +572,8 @@ const citationsApp = new Hono()
   // BREAKING CHANGE (PR #476): This endpoint no longer accepts `pageId` or
   // `footnote` fields. Citation content is now keyed by URL only. External
   // scripts that previously sent pageId/footnote need updating.
-  .post("/content/upsert", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = UpsertContentSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const d = parsed.data;
+  .post("/content/upsert", zv("json", UpsertContentSchema), async (c) => {
+    const d = c.req.valid("json");
     const db = getDrizzleDb();
 
     const vals = {
@@ -624,15 +602,9 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-accuracy-batch ---- [DEPRECATED: batch update claims.claimVerdict instead]
-  .post("/quotes/mark-accuracy-batch", async (c) => {
+  .post("/quotes/mark-accuracy-batch", zv("json", MarkAccuracyBatchSchema), async (c) => {
     deprecationWarning("POST /quotes/mark-accuracy-batch");
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = MarkAccuracyBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
+    const { items } = c.req.valid("json");
     const db = getDrizzleDb();
     // Phase 4b: resolve all page slugs to integer IDs upfront
     const uniquePageIds = [...new Set(items.map((d) => d.pageId))];
@@ -733,10 +705,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /accuracy-trends?page_id=X&limit=N ----
-  .get("/accuracy-trends", async (c) => {
-    const pageId = c.req.query("page_id");
-    const limitStr = c.req.query("limit");
-    const limit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || 50, 1), 500) : 50;
+  .get("/accuracy-trends", zv("query", TrendsLimitQuery), async (c) => {
+    const { page_id: pageId, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
 
@@ -992,11 +962,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /content/list (paginated, metadata only — no full_text) ----
-  .get("/content/list", async (c) => {
-    const parsed = PaginationQuery.safeParse(c.req.query());
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { limit, offset } = parsed.data;
+  .get("/content/list", zv("query", PaginationQuery), async (c) => {
+    const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db
@@ -1088,14 +1055,8 @@ const citationsApp = new Hono()
   // ---- GET /quotes-by-url?url=X ----
   // Returns all citation quotes across all pages for a given source URL.
   // Used by resource pages to show cross-page citations.
-  .get("/quotes-by-url", async (c) => {
-    const url = c.req.query("url");
-    if (!url) return validationError(c, "url query parameter is required");
-
-    const limitParam = c.req.query("limit");
-    const limit = limitParam
-      ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
-      : 100;
+  .get("/quotes-by-url", zv("query", QuotesByUrlQuery), async (c) => {
+    const { url, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const rows = await db
@@ -1205,9 +1166,8 @@ const citationsApp = new Hono()
   })
 
   // ---- GET /unverified ----
-  .get("/unverified", async (c) => {
-    const limitParam = c.req.query("limit");
-    const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), MAX_PAGE_SIZE) : 100;
+  .get("/unverified", zv("query", UnverifiedLimitQuery), async (c) => {
+    const { limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
 
@@ -1257,12 +1217,8 @@ const citationsApp = new Hono()
   })
 
   // ---- DELETE /accuracy-snapshots/cleanup (retention: keep latest N snapshots per page) ----
-  .delete("/accuracy-snapshots/cleanup", async (c) => {
-    const keepStr = c.req.query("keep");
-    const dryRunStr = c.req.query("dry_run");
-
-    const keep = keepStr ? Math.min(Math.max(parseInt(keepStr, 10) || 30, 1), 1000) : 30;
-    const dryRun = dryRunStr === "true" || dryRunStr === "1";
+  .delete("/accuracy-snapshots/cleanup", zv("query", CleanupQuery), async (c) => {
+    const { keep, dry_run: dryRun } = c.req.valid("query");
 
     const rawDb = getDb();
 

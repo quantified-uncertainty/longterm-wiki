@@ -4,6 +4,7 @@ import { getTypedEntityById, getEntityHref, getPageById, getDirectoryHref } from
 import { getEntityTypeIcon } from "./EntityTypeIcon";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 interface EntityLinkProps {
   id: string;
@@ -112,7 +113,7 @@ export function EntityLink({
           </span>
           {summary && (
             <span className="block text-muted-foreground text-[0.8rem] leading-snug">
-              {truncateText(summary, 200)}
+              {truncateText(stripMdxEscapes(summary), 200)}
             </span>
           )}
           {page?.quality && (

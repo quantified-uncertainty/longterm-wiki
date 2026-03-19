@@ -2,9 +2,9 @@ entity: GLXKjYAEKw
 facts:
   - id: f_3rNHFIucqQ
     property: founded-date
-    value: 2023-03
+    value: 2023-07
     source: https://x.ai/about
-    notes: "Founded March 2023 by Elon Musk; announced publicly in July 2023"
+    notes: "Publicly launched and commonly cited as founded July 2023; incorporated earlier (March 2023) but operated in stealth until public announcement"
 
   - id: f_8UM2NKwdUA
     property: headquarters
