@@ -575,9 +575,6 @@ export default async function LegislationDetailPage({
                   Wiki article &rarr;
                 </Link>
               )}
-              <Link href={`/legislation/${slug}/db`} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                DB records &rarr;
-              </Link>
             </div>
             {entity.description && (
               <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-prose">
