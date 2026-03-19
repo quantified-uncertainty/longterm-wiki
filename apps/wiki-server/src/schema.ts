@@ -1864,7 +1864,9 @@ export const benchmarkResults = pgTable(
     benchmarkId: text("benchmark_id")
       .notNull()
       .references(() => benchmarks.id),
-    modelId: text("model_id").notNull(), // entity slug of the ai-model
+    modelId: text("model_id")
+      .notNull()
+      .references(() => entities.id, { onDelete: "cascade" }), // entity slug of the ai-model
     score: doublePrecision("score").notNull(),
     unit: text("unit"),
     date: text("date"),

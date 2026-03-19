@@ -365,7 +365,46 @@ describe("Entity FK validation", () => {
       expect(body.message).toContain("nonexistent-benchmark");
     });
 
-    it("accepts when both benchmarkId and modelId exist", async () => {
+    it("rejects when modelId does not exist in entities", async () => {
+      seedEntity("benchmark-mmlu", "stb_bench01");
+
+      const res = await postJson(app, "/api/benchmark-results/sync", {
+        items: [
+          {
+            id: "B_12345678",
+            benchmarkId: "benchmark-mmlu",
+            modelId: "nonexistent-model",
+            score: 0.95,
+          },
+        ],
+      });
+
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("validation_error");
+      expect(body.message).toContain("modelId");
+      expect(body.message).toContain("nonexistent-model");
+    });
+
+    it("accepts modelId by stableId", async () => {
+      seedEntity("benchmark-mmlu", "stb_bench01");
+      seedEntity("model-gpt4", "stb_model01");
+
+      const res = await postJson(app, "/api/benchmark-results/sync", {
+        items: [
+          {
+            id: "B_12345678",
+            benchmarkId: "benchmark-mmlu",
+            modelId: "stb_model01",
+            score: 0.95,
+          },
+        ],
+      });
+
+      expect(res.status).toBe(200);
+    });
+
+    it("accepts when both benchmarkId and modelId exist by slug", async () => {
       seedEntity("benchmark-mmlu", "stb_bench01");
       seedEntity("model-gpt4", "stb_model01");
 
