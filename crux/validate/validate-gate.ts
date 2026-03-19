@@ -475,6 +475,18 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'cross-base',
+    name: 'Cross-base consistency (WikiBase/TableBase/FactBase alignment)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-cross-base.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: new validator that checks WikiBase pages match TableBase entity
+    // declarations and FactBase entities have TableBase entries. Will be promoted
+    // to blocking once all existing mismatches are resolved.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
