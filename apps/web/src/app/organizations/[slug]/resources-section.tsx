@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { safeHref } from "@/lib/format-compact";
-import type { OrgResourceRow, AuthorRef } from "./org-data";
+import type { OrgResourceRow } from "./org-data";
 
 const TYPE_COLORS: Record<string, string> = {
   paper: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",

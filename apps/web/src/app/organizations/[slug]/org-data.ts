@@ -737,6 +737,9 @@ function resolveAuthorByEntityId(stableId: string, name: string): AuthorRef | nu
 export function resolveResourceAuthors(r: Resource): AuthorRef[] {
   const authors = r.authors ?? [];
   const entityIds = r.author_entity_ids;
+  // author_entity_ids is positional (same order as authors) only when ALL authors
+  // matched an entity. The producer (crux link-resources) skips unmatched authors,
+  // so a length mismatch means some authors are missing — fall back entirely.
   const hasParallelIds =
     entityIds != null &&
     entityIds.length === authors.length;
