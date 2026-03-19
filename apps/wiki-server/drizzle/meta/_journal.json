@@ -771,6 +771,13 @@
       "when": 1778054400000,
       "tag": "0109_create_qa_page_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1778140800000,
+      "tag": "0110_add_stance_to_resources",
+      "breakpoints": true
     }
   ]
 }
