@@ -125,7 +125,7 @@ export function PeopleTable({
   // ── Local (static) state via URL-synced hook ──
   const url = useDirectoryUrl({
     defaultSort: { field: "name", dir: "asc" },
-    filters: ["affiliation", "topic"],
+    filters: ["affiliation", "topic", "hasData"],
   });
   const {
     search: urlSearch, setSearch: urlSetSearch,
@@ -135,6 +135,7 @@ export function PeopleTable({
   } = url;
   const affiliationFilter = url.filters.affiliation ?? "all";
   const topicFilter = url.filters.topic ?? "all";
+  const hasDataFilter = url.filters.hasData === "true";
 
   const allRows = staticRows ?? EMPTY_ROWS;
 
@@ -167,6 +168,18 @@ export function PeopleTable({
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .map(([slug, count]) => ({ key: slug, label: topicLabel(slug), count }));
+  }, [allRows, serverMode]);
+
+  // Count people with any structured data (static mode only)
+  const withDataCount = useMemo(() => {
+    if (serverMode) return 0;
+    return allRows.filter(
+      (r) =>
+        r.role != null ||
+        r.positionCount > 0 ||
+        r.publicationCount > 0 ||
+        r.careerHistoryCount > 0,
+    ).length;
   }, [allRows, serverMode]);
 
   // ── Unified search handler ──
@@ -248,6 +261,16 @@ export function PeopleTable({
       result = result.filter((r) => r.topics.includes(topicFilter));
     }
 
+    if (hasDataFilter) {
+      result = result.filter(
+        (r) =>
+          r.role != null ||
+          r.positionCount > 0 ||
+          r.publicationCount > 0 ||
+          r.careerHistoryCount > 0,
+      );
+    }
+
     if (urlSearch.trim()) {
       const q = urlSearch.toLowerCase();
       result = result.filter((r) => r.searchText.includes(q));
@@ -263,7 +286,7 @@ export function PeopleTable({
     );
 
     return result;
-  }, [serverMode, allRows, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
+  }, [serverMode, allRows, affiliationFilter, topicFilter, hasDataFilter, urlSearch, urlSort.field, urlSort.dir]);
 
   const localTotalPages = Math.max(
     1,
@@ -347,6 +370,39 @@ export function PeopleTable({
               onSelect={(key) => urlSetFilter("topic", key)}
               allLabel="All Topics"
             />
+          </div>
+        )}
+
+        {/* Has data toggle (static mode only) */}
+        {!serverMode && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                urlSetFilter("hasData", hasDataFilter ? "all" : "true")
+              }
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                hasDataFilter
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+              }`}
+              aria-pressed={hasDataFilter}
+            >
+              Has data
+              {withDataCount > 0 && (
+                <span
+                  className={`text-[10px] ${hasDataFilter ? "opacity-80" : "text-muted-foreground/60"}`}
+                >
+                  ({withDataCount})
+                </span>
+              )}
+            </button>
+            {hasDataFilter && (
+              <span className="text-xs text-muted-foreground/60">
+                Showing only people with role, position, publication, or career
+                data
+              </span>
+            )}
           </div>
         )}
       </div>
