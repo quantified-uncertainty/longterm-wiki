@@ -57,12 +57,18 @@ export interface OrphanEntity {
   stableId?: string | null;
 }
 
+export interface PruneResult {
+  deleted: number;
+  ids: string[];
+  abortedTypes?: string[];
+}
+
 export interface OrphanDetectionResult {
   orphans: OrphanEntity[];
   yamlCount: number;
   pgCount: number;
   serverAvailable: boolean;
-  pruned?: { deleted: number; ids: string[] };
+  pruned?: PruneResult;
 }
 
 interface PgListResponse {
@@ -155,44 +161,37 @@ export function detectOrphans(
 // Prune logic
 // ---------------------------------------------------------------------------
 
-/** Maximum fraction of PG entities that can be pruned in one run. */
+/**
+ * Safety threshold: if more than this fraction of PG entities for any single
+ * entity type would be pruned, abort the prune for that type. This prevents
+ * catastrophic data loss if YAML loading partially fails (e.g., returns 5
+ * entities instead of 800).
+ */
 export const PRUNE_SAFETY_THRESHOLD = 0.2;
 
 /**
  * Prune orphan entities via the wiki-server API.
  * Groups by entity type and calls the prune endpoint for each type.
- * Aborts if the orphan ratio exceeds PRUNE_SAFETY_THRESHOLD to prevent
- * mass deletion when YAML loading fails partially.
+ *
+ * Safety: If more than 20% of PG entities for any type would be pruned,
+ * that type is skipped and an error is logged. This guards against partial
+ * YAML loading failures causing mass deletion.
  */
-
 async function pruneOrphans(
   orphans: OrphanEntity[],
   yamlIds: Set<string>,
   pgEntities: PgEntityRecord[],
-): Promise<{ deleted: number; ids: string[] }> {
+): Promise<PruneResult> {
   const serverUrl = getServerUrl();
   if (!serverUrl) {
     return { deleted: 0, ids: [] };
   }
 
-  // Safety threshold: abort if the orphan ratio is suspiciously high.
-  // This protects against mass deletion when YAML loading fails partially
-  // (e.g., data/entities/ directory missing, parse errors on most files).
-  if (pgEntities.length > 0) {
-    const orphanRatio = orphans.length / pgEntities.length;
-    if (orphanRatio > PRUNE_SAFETY_THRESHOLD) {
-      console.error(
-        `  SAFETY: ${orphans.length}/${pgEntities.length} (${(orphanRatio * 100).toFixed(0)}%) would be pruned. ` +
-          `This exceeds the ${(PRUNE_SAFETY_THRESHOLD * 100).toFixed(0)}% safety threshold. ` +
-          `Aborting prune. This usually indicates YAML loading failed.`,
-      );
-      return { deleted: 0, ids: [] };
-    }
-  }
-
-  // Group all YAML IDs by entity type (from PG records, since we need the types)
+  // Count PG entities per type and group YAML keep-IDs per type
+  const pgCountByType = new Map<string, number>();
   const keepIdsByType = new Map<string, string[]>();
   for (const pg of pgEntities) {
+    pgCountByType.set(pg.entityType, (pgCountByType.get(pg.entityType) ?? 0) + 1);
     if (yamlIds.has(pg.id)) {
       const ids = keepIdsByType.get(pg.entityType) ?? [];
       ids.push(pg.id);
@@ -200,14 +199,17 @@ async function pruneOrphans(
     }
   }
 
-  // Also include orphan entity types that might not have any YAML entities
-  const orphanTypes = new Set(orphans.map((o) => o.entityType));
+  // Count orphans per type
+  const orphanCountByType = new Map<string, number>();
+  const orphanTypes = new Set<string>();
+  for (const o of orphans) {
+    orphanTypes.add(o.entityType);
+    orphanCountByType.set(o.entityType, (orphanCountByType.get(o.entityType) ?? 0) + 1);
+  }
+
+  // Check for types with no YAML entities at all
   for (const t of orphanTypes) {
     if (!keepIdsByType.has(t)) {
-      // This type only has orphans — we need at least one keepId for the API
-      // The prune endpoint requires keepIds.min(1), so we handle this case
-      // by collecting all YAML IDs of this type (which is 0) and sending
-      // a direct delete instead. For safety, skip types with no YAML entries.
       console.warn(
         `  WARN: Entity type "${t}" has orphans but no YAML entities — skipping prune (manual review needed)`,
       );
@@ -216,9 +218,22 @@ async function pruneOrphans(
 
   let totalDeleted = 0;
   const allDeletedIds: string[] = [];
+  const abortedTypes: string[] = [];
 
   for (const [entityType, keepIds] of keepIdsByType) {
     if (!orphanTypes.has(entityType)) continue; // No orphans of this type
+
+    // Per-type safety threshold check: if >20% of PG entities of this type
+    // would be pruned, something is probably wrong with YAML loading — abort.
+    const pgCount = pgCountByType.get(entityType) ?? 0;
+    const orphanCount = orphanCountByType.get(entityType) ?? 0;
+    if (pgCount > 0 && orphanCount / pgCount > PRUNE_SAFETY_THRESHOLD) {
+      console.error(
+        `  ABORT: ${orphanCount}/${pgCount} (${Math.round((orphanCount / pgCount) * 100)}%) of "${entityType}" entities would be pruned — exceeds ${PRUNE_SAFETY_THRESHOLD * 100}% safety threshold. This likely indicates a partial YAML loading failure. Skipping prune for this type.`,
+      );
+      abortedTypes.push(entityType);
+      continue;
+    }
 
     try {
       const result = await apiRequest<{ deleted: number; ids: string[] }>(
@@ -248,7 +263,11 @@ async function pruneOrphans(
     }
   }
 
-  return { deleted: totalDeleted, ids: allDeletedIds };
+  return {
+    deleted: totalDeleted,
+    ids: allDeletedIds,
+    ...(abortedTypes.length > 0 ? { abortedTypes } : {}),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -359,11 +378,17 @@ export async function runCheck(
     result.pruned = pruned;
 
     if (!ciMode) {
+      if (pruned.abortedTypes && pruned.abortedTypes.length > 0) {
+        console.log(
+          `\n${colors.red}  Safety threshold blocked pruning for: ${pruned.abortedTypes.join(", ")}${colors.reset}`,
+        );
+      }
+
       if (pruned.deleted > 0) {
         console.log(
           `\n${colors.green}  Pruned ${pruned.deleted} orphan entities${colors.reset}`,
         );
-      } else {
+      } else if (!pruned.abortedTypes?.length) {
         console.log(
           `\n${colors.yellow}  No entities were pruned (check warnings above)${colors.reset}`,
         );
@@ -375,7 +400,17 @@ export async function runCheck(
     );
   }
 
-  const hasOrphans = orphans.length > 0 && !fixMode;
+  if (fixMode) {
+    // In fix mode, pass only if pruning was not blocked by safety thresholds
+    const hasAbortedTypes = result.pruned?.abortedTypes && result.pruned.abortedTypes.length > 0;
+    return {
+      passed: !hasAbortedTypes,
+      errors: hasAbortedTypes ? orphans.length : 0,
+      warnings: 0,
+    };
+  }
+
+  const hasOrphans = orphans.length > 0;
   return {
     passed: !hasOrphans,
     errors: hasOrphans ? orphans.length : 0,
