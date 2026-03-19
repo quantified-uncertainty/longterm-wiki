@@ -180,6 +180,13 @@ export async function fetchAllRecords(
     offset += PAGE_SIZE;
   }
 
+  if (allRecords.length < total) {
+    return {
+      ok: false,
+      message: `Pagination safety limit reached for ${config.recordsKey} (fetched ${allRecords.length} of ${total} records, MAX_PAGES=${MAX_PAGES}). Increase MAX_PAGES or PAGE_SIZE to scan all records.`,
+    };
+  }
+
   return { ok: true, records: allRecords };
 }
 

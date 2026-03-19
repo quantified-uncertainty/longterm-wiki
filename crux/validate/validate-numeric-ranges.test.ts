@@ -276,6 +276,39 @@ describe("fetchAllRecords", () => {
     }
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
+
+  it("returns error when pagination cap is hit before all records are fetched", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+    // Mock MAX_PAGES (100) consecutive pages of 200 records each, all reporting
+    // total=20001 so offset never reaches total before the cap fires.
+    for (let i = 0; i < 100; i++) {
+      fetchSpy.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            investments: Array.from({ length: 200 }, (_, j) => ({
+              id: `inv${i * 200 + j}`,
+              amountLow: 1,
+              amountHigh: 2,
+            })),
+            total: 20001,
+            limit: 200,
+            offset: i * 200,
+          }),
+          { status: 200 },
+        ),
+      );
+    }
+
+    const result = await fetchAllRecords(testConfig);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toContain("Pagination safety limit reached");
+      expect(result.message).toContain("investments");
+      expect(result.message).toContain("MAX_PAGES=100");
+    }
+    expect(fetchSpy).toHaveBeenCalledTimes(100);
+  });
 });
 
 // ---------------------------------------------------------------------------
