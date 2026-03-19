@@ -265,32 +265,34 @@ const entitiesApp = new Hono()
 
     const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
 
-    // Subquery for latest fact value by factId
-    const latestFact = (factId: string) => sql`(
+    // Subquery for latest fact value by measure (property name).
+    // Note: fact_id is the unique fact ID (e.g. "f_qR5tY9wE1a"),
+    // measure is the property name (e.g. "revenue", "headcount").
+    const latestFact = (measureName: string) => sql`(
       SELECT f.numeric
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
         AND f.numeric IS NOT NULL
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
 
-    const latestFactAsOf = (factId: string) => sql`(
+    const latestFactAsOf = (measureName: string) => sql`(
       SELECT f.as_of
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
         AND f.numeric IS NOT NULL
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
 
-    const latestFactText = (factId: string) => sql`(
+    const latestFactText = (measureName: string) => sql`(
       SELECT COALESCE(f.value, CAST(f.numeric AS TEXT))
       FROM facts f
       WHERE f.entity_id = ${entities.stableId}
-        AND f.fact_id = ${factId}
+        AND f.measure = ${measureName}
       ORDER BY f.as_of DESC NULLS LAST, f.id DESC
       LIMIT 1
     )`;
