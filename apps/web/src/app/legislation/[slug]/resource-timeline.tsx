@@ -243,30 +243,32 @@ function OrphanResourceEntry({ resource }: { resource: TimelineResource }) {
   const shortDate = formatShortDate(resource.publishedDate);
 
   return (
-    <div className="relative flex items-start gap-2 py-1 group">
-      <div
-        className="absolute -left-[13px] top-2 w-1.5 h-1.5 rounded-full bg-muted-foreground/20 group-hover:bg-muted-foreground/40 transition-colors"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <a
-            href={safeHref(resource.url)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline truncate max-w-[24rem]"
-            title={resource.title}
-          >
-            {resource.title}
-          </a>
-          <span
-            className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
-          >
-            {badge.label}
-          </span>
+    <div className="ml-1 border-l border-border/40 pl-2">
+      <div className="flex items-start gap-2 py-1 group">
+        <div className="relative flex items-center justify-center mt-1.5 shrink-0 w-4">
+          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-muted-foreground/50 transition-colors" />
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
-          {resource.domain && <span>{resource.domain}</span>}
-          <span>{shortDate}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <a
+              href={safeHref(resource.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline truncate max-w-[24rem]"
+              title={resource.title}
+            >
+              {resource.title}
+            </a>
+            <span
+              className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
+            >
+              {badge.label}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
+            {resource.domain && <span>{resource.domain}</span>}
+            <span>{shortDate}</span>
+          </div>
         </div>
       </div>
     </div>
