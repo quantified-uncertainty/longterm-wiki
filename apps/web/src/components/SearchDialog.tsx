@@ -106,6 +106,7 @@ export function SearchDialog() {
       return;
     }
 
+    let cancelled = false;
     setPendingQuery(true);
     const timer = setTimeout(async () => {
       setLoading(true);
@@ -115,8 +116,8 @@ export function SearchDialog() {
           searchWiki(query, UNFILTERED_LIMIT),
           searchThings(query, 10),
         ]);
+        if (cancelled) return;
         setAllResults(wikiR);
-        // Deduplicate: remove things that already appear as wiki pages
         const pageWikiIds = new Set(wikiR.map((r) => r.wikiId).filter(Boolean));
         const deduped = thingsR.filter(
           (t) => t.href && !(t.thingType === "entity" && t.wikiId && pageWikiIds.has(t.wikiId)),
@@ -124,14 +125,16 @@ export function SearchDialog() {
         setThingResults(deduped);
         setSelected(0);
       } catch {
-        setAllResults([]);
-        setThingResults([]);
+        if (!cancelled) {
+          setAllResults([]);
+          setThingResults([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }, 200);
 
-    return () => clearTimeout(timer);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
   // ---- Phase 1: Entity type filtering ----
@@ -202,7 +205,7 @@ export function SearchDialog() {
   // Scroll selected item into view
   useEffect(() => {
     if (!listRef.current) return;
-    const item = listRef.current.children[selected] as HTMLElement | undefined;
+    const item = listRef.current.querySelector('[aria-selected="true"]') as HTMLElement | null;
     item?.scrollIntoView({ block: "nearest" });
   }, [selected]);
 
@@ -470,8 +473,7 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
   if (snippet && snippet.includes("<mark>")) {
     // Sanitize: strip all HTML except <mark> and </mark>
     const safe = snippet
-      .replace(/<(?!\/?mark>)[^>]*>/g, "")
-      .replace(/&(?!amp;|lt;|gt;|quot;)/g, "&amp;");
+      .replace(/<(?!\/?mark\b)[^>]*>/gi, "");
     return (
       <div
         className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_mark]:bg-yellow-200/70 dark:[&_mark]:bg-yellow-500/30 [&_mark]:text-foreground [&_mark]:rounded-sm [&_mark]:px-0.5"

@@ -107,6 +107,11 @@ export function SearchPageClient() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchSeqRef = useRef(0);
+  const filterRef = useRef<FilterKey>(initialFilter);
+
+  // Keep filterRef in sync with state so debounce callbacks read the latest value
+  filterRef.current = filter;
 
   // ── Search ─────────────────────────────────────────────────────────
 
@@ -118,6 +123,7 @@ export function SearchPageClient() {
       return;
     }
 
+    const seq = ++searchSeqRef.current;
     setLoading(true);
     setSearched(true);
     setErrored(false);
@@ -127,9 +133,9 @@ export function SearchPageClient() {
       searchThings(q, 60),
     ]);
 
-    // Both returned empty — could be error or genuinely no results
-    // searchWiki returns [] on error (not null), so we can't distinguish perfectly.
-    // But if both are empty for a non-trivial query, flag it.
+    // Discard stale response if a newer search was started
+    if (seq !== searchSeqRef.current) return;
+
     if (pageResults.length === 0 && thingResults.length === 0 && q.trim().length > 2) {
       setErrored(true);
     }
@@ -141,7 +147,6 @@ export function SearchPageClient() {
       return true;
     });
 
-    // Interleave: pages first (they have relevance scores), then things
     setResults([
       ...pageResults.map(fromPage),
       ...dedupedThings.map(fromThing),
@@ -172,10 +177,10 @@ export function SearchPageClient() {
     setQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      syncUrl(value, filter);
+      syncUrl(value, filterRef.current);
       performSearch(value);
     }, 200);
-  }, [performSearch, syncUrl, filter]);
+  }, [performSearch, syncUrl]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -497,7 +502,7 @@ function ResultRow({
         {r.snippet ? (
           <p
             className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2 [&_mark]:bg-yellow-200/50 [&_mark]:dark:bg-yellow-500/20 [&_mark]:rounded-sm"
-            dangerouslySetInnerHTML={{ __html: r.snippet }}
+            dangerouslySetInnerHTML={{ __html: sanitizeSnippet(r.snippet) }}
           />
         ) : r.description ? (
           <p className="text-[13px] text-muted-foreground leading-relaxed mt-1 line-clamp-2">
@@ -519,6 +524,13 @@ function ResultRow({
   }
 
   return <Link href={r.href} className="block">{content}</Link>;
+}
+
+// ── Sanitize ─────────────────────────────────────────────────────────
+
+/** Strip all HTML tags except <mark> and </mark> to prevent XSS from ts_headline output. */
+function sanitizeSnippet(html: string): string {
+  return html.replace(/<(?!\/?mark\b)[^>]*>/gi, "");
 }
 
 // ── Highlight ────────────────────────────────────────────────────────
