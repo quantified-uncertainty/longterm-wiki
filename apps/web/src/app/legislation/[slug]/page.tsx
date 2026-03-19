@@ -31,6 +31,7 @@ import {
   SCOPE_COLORS,
   normalizeStatus,
 } from "../legislation-constants";
+import { formatIntroducedDate } from "@/lib/format-compact";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -564,7 +565,7 @@ export default async function LegislationDetailPage({
             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
               {jurisdiction && <span>{jurisdiction}</span>}
               {author && <span>by {author}</span>}
-              {introduced && <span>Introduced {introduced}</span>}
+              {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
               {entity.fullTextUrl && (
                 <a href={entity.fullTextUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Full text &#8599;
@@ -603,8 +604,8 @@ export default async function LegislationDetailPage({
               {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
               {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
               {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
-              {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{introduced}</dd></div>}
-              {rawStatus && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd>{rawStatus}</dd></div>}
+              {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
+              {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
               {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
             </dl>
           </section>
