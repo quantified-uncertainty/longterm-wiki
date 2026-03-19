@@ -181,6 +181,11 @@ const SCRIPTS = {
     description: 'Validate low <= high for paired range columns (requires wiki-server)',
     passthrough: ['ci'],
   },
+  'resource-refs': {
+    script: 'validate/validate-resource-refs.ts',
+    description: 'Validate resource authorEntityIds and publicationId references (advisory)',
+    passthrough: ['ci', 'verbose'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
