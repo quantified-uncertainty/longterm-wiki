@@ -4628,7 +4628,7 @@
   title: RoastMyPost
   projectStatus: active
   projectUrl: https://roastmypost.com
-  organization: quantified-uncertainty
+  organization: quri
   description: >-
     LLM-powered tool for evaluating blog posts, research papers, and other written
     content. Runs multiple AI evaluator personas (skeptic, methodologist, clarity
