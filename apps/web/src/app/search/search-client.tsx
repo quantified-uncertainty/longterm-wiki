@@ -171,9 +171,30 @@ function fromThing(r: ThingSearchResult): UnifiedResult {
   };
 }
 
-function blendedScore(r: UnifiedResult): number {
+/**
+ * Compute a blended relevance score.
+ * - FTS score is the primary signal
+ * - Title match boosts results whose title IS or closely matches the query
+ * - Reader importance breaks ties among similarly-scored results
+ */
+function blendedScore(r: UnifiedResult, query: string): number {
+  const q = query.trim().toLowerCase();
+  const title = r.title.toLowerCase();
   const importance = (r.readerImportance ?? 0) / 60;
-  return r.score + importance * 10;
+
+  let titleBoost = 0;
+  if (title === q) {
+    // Exact title match (e.g. "MIRI" → "MIRI")
+    titleBoost = 500;
+  } else if (title.startsWith(q + " ") || title.startsWith(q + ":")) {
+    // Title starts with query
+    titleBoost = 200;
+  } else if (title.includes(`(${q})`) || title.includes(` ${q} `) || title.endsWith(` ${q}`)) {
+    // Query appears as a distinct word/acronym in title
+    titleBoost = 100;
+  }
+
+  return r.score + titleBoost + importance * 10;
 }
 
 /** Decode HTML entities from server-generated snippets. */
@@ -242,7 +263,7 @@ export function SearchPageClient() {
       ...dedupedThings.map(fromThing),
     ].filter((r) => !r.isInternal);
 
-    unified.sort((a, b) => blendedScore(b) - blendedScore(a));
+    unified.sort((a, b) => blendedScore(b, q) - blendedScore(a, q));
 
     setResults(unified);
     setLoading(false);
