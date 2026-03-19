@@ -566,6 +566,8 @@ export const UpsertResourceSchema = z.object({
   citedBy: z.array(z.string().min(1).max(200)).max(500).nullable().optional(),
   /** Wayback Machine archive URL */
   archiveUrl: z.string().url().max(2000).nullable().optional(),
+  /** Stance for legislation coverage */
+  stance: z.enum(["support", "oppose", "neutral", "mixed", "analysis"]).nullable().optional(),
 });
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 

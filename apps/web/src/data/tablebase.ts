@@ -183,6 +183,7 @@ export interface Resource {
   fetch_status?: string;
   archive_url?: string;
   author_entity_ids?: string[];
+  stance?: string;
 }
 
 export interface Publication {
