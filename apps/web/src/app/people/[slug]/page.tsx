@@ -429,12 +429,6 @@ export default async function PersonProfilePage({
             >
               KB data &rarr;
             </Link>
-            <Link
-              href={`/people/${slug}/db`}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              DB records &rarr;
-            </Link>
           </div>
         </div>
       </div>

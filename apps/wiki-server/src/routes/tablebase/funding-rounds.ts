@@ -262,6 +262,12 @@ const fundingRoundsApp = new Hono()
           sourceTable: "funding_rounds",
           sourceId: fr.id,
           sourceUrl: fr.source,
+          parentTitle: fr.companyId,
+          description: [
+            fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
+            fr.instrument,
+            fr.leadInvestor ? `led by ${fr.leadInvestor}` : null,
+          ].filter(Boolean).join(", ") || null,
         }))
       );
 

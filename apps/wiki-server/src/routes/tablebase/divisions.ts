@@ -277,6 +277,8 @@ const divisionsApp = new Hono()
           sourceTable: "divisions",
           sourceId: d.id,
           sourceUrl: d.website,
+          parentTitle: d.parentOrgId,
+          description: d.divisionType || null,
         }))
       );
 

@@ -450,6 +450,7 @@ const researchAreasApp = new Hono()
           sourceId: ra.id,
           description: ra.description,
           sourceUrl: ra.source,
+          href: `/research-areas/${ra.id}`,
         }))
       );
     });
