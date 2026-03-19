@@ -101,6 +101,60 @@ async function searchServer(
 }
 
 // ---------------------------------------------------------------------------
+// Things search (grants, funding-rounds, benchmarks, etc.)
+// ---------------------------------------------------------------------------
+
+export interface ThingSearchResult {
+  id: string;
+  thingType: string;
+  title: string;
+  description: string | null;
+  parentTitle: string | null;
+  sourceTable: string;
+  sourceId: string;
+  entityType: string | null;
+  wikiId: string | null;
+  href: string | null;
+}
+
+interface ThingsSearchResponse {
+  results: Array<ThingSearchResult>;
+  query: string;
+  total: number;
+  searchMethod: "fts" | "ilike";
+}
+
+/**
+ * Search the things table via server-side PostgreSQL FTS.
+ * Returns null if the server is unavailable.
+ */
+async function searchThingsServer(
+  query: string,
+  limit: number,
+  thingType?: string,
+): Promise<ThingSearchResult[] | null> {
+  try {
+    const params = new URLSearchParams({
+      q: query,
+      limit: String(limit),
+    });
+    if (thingType) params.set("thing_type", thingType);
+
+    const url = `/api/things-search?${params}`;
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+    });
+
+    if (!res.ok) return null;
+
+    const data: ThingsSearchResponse = await res.json();
+    return data.results;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -115,5 +169,20 @@ export async function searchWiki(
   if (!query.trim()) return [];
 
   const results = await searchServer(query, limit);
+  return results ?? [];
+}
+
+/**
+ * Search the things table (grants, funding-rounds, benchmarks, etc.).
+ * Returns an empty array if the server is unreachable.
+ */
+export async function searchThings(
+  query: string,
+  limit = 20,
+  thingType?: string,
+): Promise<ThingSearchResult[]> {
+  if (!query.trim()) return [];
+
+  const results = await searchThingsServer(query, limit, thingType);
   return results ?? [];
 }
