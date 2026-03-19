@@ -58,22 +58,22 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 // Query schemas for endpoints that accept only a limit param
 const QuotesLimitQuery = z.object({
-  page_id: z.string().min(1).max(500),
-  limit: z.coerce.number().int().min(1).max(500).default(100),
+  page_id: z.string().min(1, "page_id query parameter is required").max(500),
+  limit: z.coerce.number().int().min(1).max(500).default(100).catch(100),
 });
 const TrendsLimitQuery = z.object({
   page_id: z.string().min(1).max(500).optional(),
-  limit: z.coerce.number().int().min(1).max(500).default(50),
+  limit: z.coerce.number().int().min(1).max(500).default(50).catch(50),
 });
 const QuotesByUrlQuery = z.object({
-  url: z.string().min(1).max(2000),
-  limit: z.coerce.number().int().min(1).max(500).default(100),
+  url: z.string().min(1, "url query parameter is required").max(2000),
+  limit: z.coerce.number().int().min(1).max(500).default(100).catch(100),
 });
 const UnverifiedLimitQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100).catch(100),
 });
 const CleanupQuery = z.object({
-  keep: z.coerce.number().int().min(1).max(1000).default(30),
+  keep: z.coerce.number().int().min(1).max(1000).default(30).catch(30),
   dry_run: z.string().optional().transform((v) => v === "true" || v === "1"),
 });
 
