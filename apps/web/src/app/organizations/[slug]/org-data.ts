@@ -1056,6 +1056,12 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     entity.id.toLowerCase(),
     ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
   ]);
+  // Also match by stableId — imported grants store the entity stableId as the
+  // recipient field, not the slug or display name. Without this, orgs like MIRI
+  // show 0 grants received despite having matched grants in the import pipeline.
+  const kbStableId = resolveKBSlug(slug);
+  if (kbStableId) recipientMatchNames.add(kbStableId.toLowerCase());
+  if (typedEntity?.stableId) recipientMatchNames.add(typedEntity.stableId.toLowerCase());
   const grantsReceived: ReceivedGrant[] = allGrantRecords
     .filter((r) => {
       const recipientRaw = r.fields.recipient as string | undefined;
