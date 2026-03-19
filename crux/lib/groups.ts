@@ -140,6 +140,60 @@ export function buildDomainToGroupMap(): Record<string, string> {
  * Unsafe collision: a domain key matching a shortcut it doesn't belong to
  * (e.g. a domain called 'w' would shadow the wiki group shortcut).
  */
+export interface GroupRouteResult {
+  groupName: string;
+  domain: string | null;
+  command: string | null;
+  argsStart: number;
+  unknownArg?: string;
+}
+
+/**
+ * Resolve group routing from positional args.
+ *
+ * @param positional - Raw positional args from the CLI
+ * @param shortcutMap - Map from group name/shortcut → group name
+ * @param domainHasCommand - Callback to check if a domain has a specific command
+ *   (decouples routing from the actual domains object)
+ * @returns Routing result or null if p0 is not a group
+ */
+export function resolveGroupRouting(
+  positional: string[],
+  shortcutMap: Record<string, string>,
+  domainHasCommand: (domain: string, command: string) => boolean,
+): GroupRouteResult | null {
+  const p0 = positional[0];
+  const p1 = positional[1];
+  const p2 = positional[2];
+
+  if (!p0 || !shortcutMap[p0]) return null;
+
+  const groupName = shortcutMap[p0];
+  const group = GROUPS[groupName];
+
+  // crux w --help (no p1 or p1 is a flag)
+  if (!p1 || p1.startsWith('-')) {
+    return { groupName, domain: null, command: null, argsStart: 1 };
+  }
+
+  // Check if p1 is a known domain in this group
+  if (group.domains.includes(p1)) {
+    return { groupName, domain: p1, command: p2 || null, argsStart: 3 };
+  }
+
+  // Check flattened domains: p1 might be a command name in a flattened domain
+  if (group.flattened) {
+    for (const flatDomain of group.flattened) {
+      if (domainHasCommand(flatDomain, p1)) {
+        return { groupName, domain: flatDomain, command: p1, argsStart: 2 };
+      }
+    }
+  }
+
+  // p1 is not a recognized domain or flattened command in this group
+  return { groupName, domain: null, command: null, argsStart: 1, unknownArg: p1 };
+}
+
 export function checkGroupDomainCollisions(domainKeys: string[]): string[] {
   const shortcutMap = buildShortcutMap();
   const domainToGroup = buildDomainToGroupMap();

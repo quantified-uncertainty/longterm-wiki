@@ -49,12 +49,12 @@ _crux_complete() {
   local wiki_flattened="improve iterate create regrade grade grade-content polish review suggest-links strip-scores"
 
   # factbase group (fb/factbase): factbase domains + flattened factbase commands
-  local fb_domains="factbase factbase-migrate-entities"
-  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact"
+  local fb_domains="factbase"
+  local fb_flattened="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
 
   # tablebase group (tb/tablebase): tablebase-related domains + flattened commands
-  local tb_domains="tablebase matrix entity ids people orgs research-areas import-grants import-divisions import-funding-programs verify"
-  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers"
+  local tb_domains="tablebase matrix entity ids people orgs research-areas verify"
+  local tb_flattened="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
 
   # github group (gh): GitHub-related domains + flattened issues commands
   local gh_domains="issues pr ci epic release review pr-patrol"
@@ -72,8 +72,8 @@ _crux_complete() {
   local cmds_issues="list next search create comment update-body update-title lint start done cleanup close"
   local cmds_pr="create ready detect check overlaps fix-body rebase-all validate-test-plan resolve-conflicts"
   local cmds_agent_checklist="init check verify status complete snapshot pre-push-check"
-  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact"
-  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers"
+  local cmds_factbase="show list lookup validate properties search coverage fact stale needs-update migrate sync-sources verify add-fact migrate-entities migrate-entities-status"
+  local cmds_tablebase="scan gaps next-task improve mark-done loop resolve submit existing create-entity ensure-entities fetch-page verify prepare sync-careers backfill-grantee-ids backfill-program-ids backfill-stable-ids backfill-yaml-stable-ids import-grants import-grants-sync import-grants-dedup import-grants-download import-divisions import-divisions-sync import-funding-programs import-funding-programs-sync"
   local cmds_query="search entity facts related backlinks page recent-changes recent-edits citations risk stats blocks"
   local cmds_context="for-issue for-page for-entity for-topic"
   local cmds_ci="status pause-actions resume-actions main-status"
@@ -112,7 +112,7 @@ _crux_complete() {
   local cmds_qa_sweep="run recent checks"
   local cmds_pr_patrol="run once parallel status history stats explain merge-status branch-agent"
   local cmds_analyze="all links entity-links quality scan"
-  local cmds_records_verify="stats"
+  local cmds_verify="default stats"
   local cmds_import_grants="analyze sync download dedup"
   local cmds_import_divisions="list sync"
   local cmds_import_funding_programs="list sync"
@@ -151,7 +151,7 @@ _crux_complete() {
       fb|factbase)
         COMPREPLY=( $(compgen -W "$fb_domains $fb_flattened" -- "$cur") )
         return ;;
-      tb)
+      tb|tablebase)
         COMPREPLY=( $(compgen -W "$tb_domains $tb_flattened" -- "$cur") )
         return ;;
       gh)
@@ -167,7 +167,7 @@ _crux_complete() {
   local domain="$arg1"
   local completing_command=false
   case "$arg1" in
-    w|wiki|fb|tb|gh|sys|system)
+    w|wiki|fb|factbase|tb|tablebase|gh|sys|system)
       if [[ $effective_cword -eq 1 ]]; then
         # Already handled above
         return

@@ -36,7 +36,7 @@
 
 import { createLogger } from './lib/output.ts';
 import { parseCliArgs as _parseCliArgs, kebabToCamel } from './lib/cli.ts';
-import { GROUPS, buildShortcutMap, checkGroupDomainCollisions } from './lib/groups.ts';
+import { GROUPS, buildShortcutMap, checkGroupDomainCollisions, resolveGroupRouting } from './lib/groups.ts';
 
 // Domain handlers
 import * as validateCommands from './commands/validate.ts';
@@ -298,46 +298,9 @@ function showGroupHelp(groupName) {
   console.log(output);
 }
 
-/**
- * Resolve group routing.
- *
- * Given the positional args, determines if the first arg is a group
- * name/shortcut. If so, resolves the domain and command within that group.
- *
- * Returns { domain, command, argsStartIndex } or null if not a group.
- */
-function resolveGroupRouting(positional) {
-  const p0 = positional[0];
-  const p1 = positional[1];
-  const p2 = positional[2];
-
-  if (!p0 || !shortcutMap[p0]) return null;
-
-  const groupName = shortcutMap[p0];
-  const group = GROUPS[groupName];
-
-  // crux w --help (no p1 or p1 is a flag)
-  if (!p1 || p1.startsWith('-')) {
-    return { groupName, domain: null, command: null, argsStart: 1 };
-  }
-
-  // Check if p1 is a known domain in this group
-  if (group.domains.includes(p1)) {
-    return { groupName, domain: p1, command: p2 || null, argsStart: 3 };
-  }
-
-  // Check flattened domains: p1 might be a command name in a flattened domain
-  if (group.flattened) {
-    for (const flatDomain of group.flattened) {
-      const handler = domains[flatDomain];
-      if (handler?.commands?.[p1]) {
-        return { groupName, domain: flatDomain, command: p1, argsStart: 2 };
-      }
-    }
-  }
-
-  // p1 is not a recognized domain or flattened command in this group
-  return { groupName, domain: null, command: null, argsStart: 1, unknownArg: p1 };
+/** Adapter: check if a domain has a specific command (used by group routing) */
+function domainHasCommand(domainName, commandName) {
+  return !!domains[domainName]?.commands?.[commandName];
 }
 
 /**
@@ -358,7 +321,7 @@ async function main() {
   }
 
   // --- Group routing ---
-  const groupResult = resolveGroupRouting(positional);
+  const groupResult = resolveGroupRouting(positional, shortcutMap, domainHasCommand);
 
   let domain, command, args;
 

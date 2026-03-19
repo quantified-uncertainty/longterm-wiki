@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GROUPS, buildShortcutMap, buildDomainToGroupMap, checkGroupDomainCollisions } from './groups.ts';
+import { GROUPS, buildShortcutMap, buildDomainToGroupMap, checkGroupDomainCollisions, resolveGroupRouting } from './groups.ts';
 
 describe('GROUPS', () => {
   it('every group has a shortcut', () => {
@@ -132,5 +132,93 @@ describe('checkGroupDomainCollisions', () => {
   it('detects multiple collisions', () => {
     const result = checkGroupDomainCollisions(['w', 'fb', 'validate']);
     expect(result.length).toBe(2);
+  });
+});
+
+describe('resolveGroupRouting', () => {
+  const shortcuts = buildShortcutMap();
+  // Mock: content has 'improve' and 'create'; factbase has 'show' and 'list'
+  const mockHasCommand = (domain: string, cmd: string) => {
+    const cmds: Record<string, string[]> = {
+      content: ['improve', 'create', 'grade'],
+      factbase: ['show', 'list', 'verify'],
+      tablebase: ['scan', 'gaps', 'backfill-grantee-ids'],
+      issues: ['search', 'start', 'done'],
+    };
+    return cmds[domain]?.includes(cmd) ?? false;
+  };
+
+  it('returns null for non-group first arg', () => {
+    expect(resolveGroupRouting(['validate', 'gate'], shortcuts, mockHasCommand)).toBeNull();
+    expect(resolveGroupRouting(['query', 'search'], shortcuts, mockHasCommand)).toBeNull();
+  });
+
+  it('routes group + domain + command', () => {
+    const r = resolveGroupRouting(['w', 'validate', 'gate'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: 'validate', command: 'gate', argsStart: 3 });
+  });
+
+  it('routes group + domain (no command)', () => {
+    const r = resolveGroupRouting(['w', 'validate'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: 'validate', command: null, argsStart: 3 });
+  });
+
+  it('routes flattened command', () => {
+    const r = resolveGroupRouting(['w', 'improve', 'far-ai'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: 'content', command: 'improve', argsStart: 2 });
+  });
+
+  it('routes shortcut + flattened', () => {
+    const r = resolveGroupRouting(['fb', 'show', 'anthropic'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'factbase', domain: 'factbase', command: 'show', argsStart: 2 });
+  });
+
+  it('routes full group name', () => {
+    const r = resolveGroupRouting(['wiki', 'fix', 'escaping'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: 'fix', command: 'escaping', argsStart: 3 });
+  });
+
+  it('explicit domain wins over flattened command', () => {
+    // 'content' is both a domain in wiki AND could be a flattened command name
+    // Domain should take priority
+    const r = resolveGroupRouting(['w', 'content', 'improve'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: 'content', command: 'improve', argsStart: 3 });
+  });
+
+  it('returns group help for bare group', () => {
+    const r = resolveGroupRouting(['w'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: null, command: null, argsStart: 1 });
+  });
+
+  it('returns group help for group + flag', () => {
+    const r = resolveGroupRouting(['w', '--help'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'wiki', domain: null, command: null, argsStart: 1 });
+  });
+
+  it('returns unknownArg for unrecognized subdomain', () => {
+    const r = resolveGroupRouting(['w', 'bogus'], shortcuts, mockHasCommand);
+    expect(r?.unknownArg).toBe('bogus');
+    expect(r?.domain).toBeNull();
+  });
+
+  it('handles factbase group name collision correctly', () => {
+    // 'factbase' is both a group name and a domain within that group
+    const r = resolveGroupRouting(['factbase', 'show', 'anthropic'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'factbase', domain: 'factbase', command: 'show', argsStart: 2 });
+  });
+
+  it('routes tb + consolidated command', () => {
+    const r = resolveGroupRouting(['tb', 'backfill-grantee-ids'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'tablebase', domain: 'tablebase', command: 'backfill-grantee-ids', argsStart: 2 });
+  });
+
+  it('routes gh + explicit domain', () => {
+    const r = resolveGroupRouting(['gh', 'pr', 'create'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'gh', domain: 'pr', command: 'create', argsStart: 3 });
+  });
+
+  it('routes gh + flattened issues command', () => {
+    const r = resolveGroupRouting(['gh', 'search', 'topic'], shortcuts, mockHasCommand);
+    expect(r).toEqual({ groupName: 'gh', domain: 'issues', command: 'search', argsStart: 2 });
   });
 });
