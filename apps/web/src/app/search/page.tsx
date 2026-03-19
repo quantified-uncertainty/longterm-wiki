@@ -63,6 +63,9 @@ function buildBrowseData(): BrowseData {
       type: item.type,
       description: item.description,
       readerImportance: item.readerImportance,
+      wordCount: item.wordCount,
+      kbFactCount: item.kbFactCount ?? 0,
+      kbItemCount: item.kbItemCount ?? 0,
       href: item.href ?? (DIRECTORY_TYPES[item.type]
         ? `${DIRECTORY_TYPES[item.type].href}/${item.id}`
         : `/wiki/${item.wikiId}`),
@@ -83,6 +86,9 @@ function buildBrowseData(): BrowseData {
       title: item.title,
       type: item.type,
       lastUpdated: item.lastUpdated,
+      wordCount: item.wordCount,
+      kbFactCount: item.kbFactCount ?? 0,
+      kbItemCount: item.kbItemCount ?? 0,
       href: item.href ?? (DIRECTORY_TYPES[item.type]
         ? `${DIRECTORY_TYPES[item.type].href}/${item.id}`
         : `/wiki/${item.wikiId}`),

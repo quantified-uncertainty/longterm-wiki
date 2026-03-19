@@ -26,10 +26,21 @@ import {
 
 // ── Browse data (passed from server component) ──────────────────────
 
+interface BrowseItem {
+  id: string;
+  wikiId: string;
+  title: string;
+  type: string;
+  href: string;
+  wordCount?: number | null;
+  kbFactCount: number;
+  kbItemCount: number;
+}
+
 export interface BrowseData {
   directories: { type: string; label: string; href: string; count: number }[];
-  featured: { id: string; wikiId: string; title: string; type: string; description: string | null; readerImportance: number | null; href: string }[];
-  recent: { id: string; wikiId: string; title: string; type: string; lastUpdated: string | null; href: string }[];
+  featured: (BrowseItem & { description: string | null; readerImportance: number | null })[];
+  recent: (BrowseItem & { lastUpdated: string | null })[];
   totalPages: number;
 }
 
@@ -679,11 +690,14 @@ function BrowseState({ data }: { data: BrowseData }) {
                           {style.short}
                         </span>
                       </div>
-                      {item.description && (
-                        <p className="text-[12px] text-muted-foreground/60 leading-snug mt-0.5 line-clamp-1">
-                          {item.description}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {item.description && (
+                          <p className="text-[12px] text-muted-foreground/60 leading-snug line-clamp-1 flex-1 min-w-0">
+                            {item.description}
+                          </p>
+                        )}
+                        <DataBadges item={item} />
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -709,11 +723,14 @@ function BrowseState({ data }: { data: BrowseData }) {
                       <span className="font-medium text-[13px] text-foreground truncate block">
                         {item.title}
                       </span>
-                      {item.lastUpdated && (
-                        <span className="text-[11px] text-muted-foreground/40">
-                          {formatRelativeDate(item.lastUpdated)}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {item.lastUpdated && (
+                          <span className="text-[11px] text-muted-foreground/40">
+                            {formatRelativeDate(item.lastUpdated)}
+                          </span>
+                        )}
+                        <DataBadges item={item} />
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -723,6 +740,28 @@ function BrowseState({ data }: { data: BrowseData }) {
         </section>
       </div>
     </div>
+  );
+}
+
+/** Compact data-richness indicators for browse items. */
+function DataBadges({ item }: { item: BrowseItem }) {
+  const parts: string[] = [];
+  if (item.wordCount && item.wordCount > 0) {
+    parts.push(item.wordCount >= 1000
+      ? `${(item.wordCount / 1000).toFixed(1)}k words`
+      : `${item.wordCount} words`);
+  }
+  if (item.kbFactCount > 0) {
+    parts.push(`${item.kbFactCount} facts`);
+  }
+  if (item.kbItemCount > 0) {
+    parts.push(`${item.kbItemCount} items`);
+  }
+  if (parts.length === 0) return null;
+  return (
+    <span className="shrink-0 text-[10px] text-muted-foreground/30 tabular-nums">
+      {parts.join(" · ")}
+    </span>
   );
 }
 
