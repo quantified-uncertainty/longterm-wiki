@@ -327,6 +327,25 @@
   modality:
     - text
     - image
+  benchmarks:
+    - name: MMLU
+      score: 80.9
+      unit: "%"
+    - name: GPQA Diamond
+      score: 41.6
+      unit: "%"
+    - name: HumanEval
+      score: 88.1
+      unit: "%"
+    - name: MATH
+      score: 69.2
+      unit: "%"
+    - name: MGSM
+      score: 85.6
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 40.6
+      unit: "%"
   capabilities:
     - tool-use
   description: >-
@@ -343,6 +362,8 @@
   sources:
     - title: Updated Claude 3.5 Sonnet and Claude 3.5 Haiku
       url: https://www.anthropic.com/news/3-5-models-and-computer-use
+    - title: "Model Card Addendum: Claude 3.5 Haiku and Upgraded Claude 3.5 Sonnet"
+      url: https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf
   tags:
     - claude
     - claude-3-5
@@ -946,6 +967,19 @@
     - text
     - image
   trainingCutoff: "2023-12"
+  benchmarks:
+    - name: MMLU
+      score: 86.7
+      unit: "%"
+    - name: GPQA Diamond
+      score: 49.3
+      unit: "%"
+    - name: MATH
+      score: 73.4
+      unit: "%"
+    - name: HumanEval
+      score: 88.2
+      unit: "%"
   capabilities:
     - tool-use
     - vision
@@ -963,6 +997,8 @@
   sources:
     - title: New models and developer products announced at DevDay
       url: https://openai.com/blog/new-models-and-developer-products-announced-at-devday
+    - title: OpenAI simple-evals (gpt-4-turbo-2024-04-09 results)
+      url: https://github.com/openai/simple-evals
   tags:
     - gpt
     - gpt-4
@@ -1849,6 +1885,25 @@
     - image
     - audio
     - video
+  benchmarks:
+    - name: MMLU
+      score: 78.9
+      unit: "%"
+    - name: HumanEval
+      score: 74.3
+      unit: "%"
+    - name: MATH
+      score: 77.9
+      unit: "%"
+    - name: BBH
+      score: 85.5
+      unit: "%"
+    - name: MGSM
+      score: 82.6
+      unit: "%"
+    - name: MMLU-Pro
+      score: 67.3
+      unit: "%"
   capabilities:
     - tool-use
     - vision
@@ -1868,6 +1923,8 @@
   sources:
     - title: Google I/O 2024 Gemini Announcements
       url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
+    - title: "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context (technical report)"
+      url: https://arxiv.org/abs/2403.05530
   tags:
     - gemini
     - google
@@ -2042,6 +2099,22 @@
     - image
     - audio
     - video
+  benchmarks:
+    - name: GPQA Diamond
+      score: 82.8
+      unit: "%"
+    - name: AIME 2025
+      score: 72.0
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 60.4
+      unit: "%"
+    - name: "Humanity's Last Exam"
+      score: 11.0
+      unit: "%"
+    - name: MMLU
+      score: 86.6
+      unit: "%"
   capabilities:
     - reasoning
     - tool-use
@@ -2063,6 +2136,10 @@
   sources:
     - title: Google I/O 2025 Gemini Updates
       url: https://blog.google/technology/ai/io-2025-keynote/
+    - title: Gemini 2.5 Flash Model Card
+      url: https://storage.googleapis.com/model-cards/documents/gemini-2.5-flash.pdf
+    - title: Gemini 2.5 Flash — Google DeepMind
+      url: https://deepmind.google/en/models/gemini/flash/
   tags:
     - gemini
     - google

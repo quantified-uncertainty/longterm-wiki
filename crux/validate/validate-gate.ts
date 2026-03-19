@@ -377,6 +377,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'yaml-entity-refs',
+    name: 'YAML entity reference integrity (relatedEntries, developer, affiliation)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-yaml-entity-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: dangling entity references cause broken links and raw IDs
+    // displayed in the UI. All current references have been fixed to resolve.
+  },
+  {
     id: 'directory-pages',
     name: 'Directory page data quality (advisory)',
     command: 'pnpm',
@@ -385,6 +394,18 @@ const PARALLEL_STEPS: Step[] = [
     // Advisory: reports sparse directories, missing fields, and display issues
     // in entity directory pages. Informational for now — can be promoted to
     // blocking once all existing issues are resolved.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'orphan-entities',
+    name: 'Orphan entity detection (PG records without YAML source)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-orphan-entities.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open). Promotes to
+    // blocking once orphan entities are consistently zero.
     advisory: true,
     emitOutputInCi: true,
   },

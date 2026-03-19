@@ -77,7 +77,6 @@ export {
   upsertCitationQuote,
   upsertCitationQuoteBatch,
   markCitationAccuracy,
-  markCitationAccuracyBatch,
   createAccuracySnapshot,
   getAccuracyDashboard,
 } from './citations.ts';

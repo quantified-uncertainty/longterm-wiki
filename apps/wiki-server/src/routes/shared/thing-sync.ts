@@ -72,7 +72,8 @@ export function thingHref(t: {
     case "division":
       return `/divisions/${t.sourceId}`;
     case "benchmark":
-      return `/benchmarks/${t.sourceId}`;
+      // wikiId stores the benchmark slug (sourceId is a content hash)
+      return `/benchmarks/${t.wikiId || t.sourceId}`;
     case "research-area":
       return `/research-areas/${t.sourceId}`;
     case "resource":

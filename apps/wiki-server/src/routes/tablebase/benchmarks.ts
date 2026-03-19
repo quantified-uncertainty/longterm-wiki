@@ -203,6 +203,7 @@ const benchmarksApp = new Hono()
           sourceId: b.id,
           description: b.description,
           sourceUrl: b.website,
+          wikiId: b.slug,
         }))
       );
     });

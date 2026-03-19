@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   searchWiki,
+  searchThings,
   type SearchResult,
+  type ThingSearchResult,
   type MatchInfo,
 } from "@lib/search";
 import { ENTITY_TYPES, ENTITY_GROUPS } from "@data/entity-ontology";
@@ -48,6 +50,7 @@ export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [allResults, setAllResults] = useState<SearchResult[]>([]);
+  const [thingResults, setThingResults] = useState<ThingSearchResult[]>([]);
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(false);
   const [pendingQuery, setPendingQuery] = useState(false);
@@ -81,6 +84,7 @@ export function SearchDialog() {
     } else {
       setQuery("");
       setAllResults([]);
+      setThingResults([]);
       setSelected(0);
       setPendingQuery(false);
       setActiveGroup(0);
@@ -96,27 +100,41 @@ export function SearchDialog() {
   useEffect(() => {
     if (!query.trim()) {
       setAllResults([]);
+      setThingResults([]);
       setSelected(0);
       setPendingQuery(false);
       return;
     }
 
+    let cancelled = false;
     setPendingQuery(true);
     const timer = setTimeout(async () => {
       setLoading(true);
       setPendingQuery(false);
       try {
-        const r = await searchWiki(query, UNFILTERED_LIMIT);
-        setAllResults(r);
+        const [wikiR, thingsR] = await Promise.all([
+          searchWiki(query, UNFILTERED_LIMIT),
+          searchThings(query, 10),
+        ]);
+        if (cancelled) return;
+        setAllResults(wikiR);
+        const pageWikiIds = new Set(wikiR.map((r) => r.wikiId).filter(Boolean));
+        const deduped = thingsR.filter(
+          (t) => t.href && !(t.thingType === "entity" && t.wikiId && pageWikiIds.has(t.wikiId)),
+        );
+        setThingResults(deduped);
         setSelected(0);
       } catch {
-        setAllResults([]);
+        if (!cancelled) {
+          setAllResults([]);
+          setThingResults([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }, 200);
 
-    return () => clearTimeout(timer);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
   // ---- Phase 1: Entity type filtering ----
@@ -165,10 +183,29 @@ export function SearchDialog() {
     [router],
   );
 
+  const navigateThing = useCallback(
+    (result: ThingSearchResult) => {
+      if (!result.href) return;
+      setOpen(false);
+      if (result.href.startsWith("http")) {
+        window.open(result.href, "_blank");
+      } else {
+        router.push(result.href);
+      }
+    },
+    [router],
+  );
+
+  /** Only show things when no entity-type filter is active (filter = "All"). */
+  const visibleThings = hasTypeFilter ? [] : thingResults;
+
+  /** Total navigable items (wiki + things) for keyboard nav. */
+  const totalItems = results.length + visibleThings.length;
+
   // Scroll selected item into view
   useEffect(() => {
     if (!listRef.current) return;
-    const item = listRef.current.children[selected] as HTMLElement | undefined;
+    const item = listRef.current.querySelector('[aria-selected="true"]') as HTMLElement | null;
     item?.scrollIntoView({ block: "nearest" });
   }, [selected]);
 
@@ -181,20 +218,26 @@ export function SearchDialog() {
   function onInputKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelected((s) => Math.min(s + 1, results.length - 1));
+      setSelected((s) => Math.min(s + 1, totalItems - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelected((s) => Math.max(s - 1, 0));
-    } else if (e.key === "Enter" && results[selected]) {
+    } else if (e.key === "Enter") {
       e.preventDefault();
-      navigate(results[selected]);
+      if (selected < results.length && results[selected]) {
+        navigate(results[selected]);
+      } else {
+        const thingIdx = selected - results.length;
+        const thing = visibleThings[thingIdx];
+        if (thing?.href) navigateThing(thing);
+      }
     }
   }
 
   if (!open) return null;
 
   const showChips = allResults.length > 0;
-  const showResults = results.length > 0;
+  const showResults = results.length > 0 || visibleThings.length > 0;
 
   return (
     <div
@@ -221,7 +264,7 @@ export function SearchDialog() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onInputKeyDown}
-            placeholder="Search wiki..."
+            placeholder="Search pages, grants, funding..."
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             autoComplete="off"
             spellCheck={false}
@@ -282,7 +325,8 @@ export function SearchDialog() {
           {!loading &&
             !pendingQuery &&
             query.trim() &&
-            allResults.length === 0 && (
+            allResults.length === 0 &&
+            visibleThings.length === 0 && (
               <div className="px-4 py-6 text-sm text-muted-foreground text-center">
                 No results for &ldquo;{query}&rdquo;
               </div>
@@ -320,12 +364,48 @@ export function SearchDialog() {
                   </button>
                 </li>
               ))}
+              {visibleThings.length > 0 && results.length > 0 && (
+                <li className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">
+                  Data Records
+                </li>
+              )}
+              {visibleThings.map((t, i) => {
+                const idx = results.length + i;
+                return (
+                  <li key={`thing-${t.id}`} role="option" aria-selected={idx === selected}>
+                    <button
+                      className={`w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors ${
+                        idx === selected ? "bg-muted" : "hover:bg-muted/50"
+                      }`}
+                      onClick={() => navigateThing(t)}
+                      onMouseEnter={() => setSelected(idx)}
+                    >
+                      <ThingBadge thingType={t.thingType} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-foreground truncate">
+                          {t.title}
+                        </div>
+                        {t.parentTitle && (
+                          <div className="text-[11px] text-muted-foreground/70 truncate">
+                            {t.parentTitle}
+                          </div>
+                        )}
+                        {t.description && (
+                          <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                            {t.description}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
 
           {!query.trim() && (
             <div className="px-4 py-6 text-sm text-muted-foreground text-center">
-              Type to search across all wiki pages and entities
+              Type to search across pages, grants, funding rounds, and more
             </div>
           )}
         </div>
@@ -393,8 +473,7 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
   if (snippet && snippet.includes("<mark>")) {
     // Sanitize: strip all HTML except <mark> and </mark>
     const safe = snippet
-      .replace(/<(?!\/?mark>)[^>]*>/g, "")
-      .replace(/&(?!amp;|lt;|gt;|quot;)/g, "&amp;");
+      .replace(/<(?!\/?mark\b)[^>]*>/gi, "");
     return (
       <div
         className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_mark]:bg-yellow-200/70 dark:[&_mark]:bg-yellow-500/30 [&_mark]:text-foreground [&_mark]:rounded-sm [&_mark]:px-0.5"
@@ -548,6 +627,27 @@ function TypeBadge({ type }: { type: string }) {
       className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded flex-shrink-0 mt-0.5 ${color}`}
     >
       {label}
+    </span>
+  );
+}
+
+const THING_TYPE_BADGES: Record<string, { label: string; color: string }> = {
+  grant: { label: "Grant", color: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" },
+  "funding-round": { label: "Round", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+  "funding-program": { label: "Program", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
+  division: { label: "Division", color: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300" },
+  benchmark: { label: "Benchmark", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300" },
+  resource: { label: "Resource", color: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300" },
+  "research-area": { label: "Research", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300" },
+};
+
+function ThingBadge({ thingType }: { thingType: string }) {
+  const cfg = THING_TYPE_BADGES[thingType] ?? { label: thingType, color: "bg-gray-100 text-gray-600" };
+  return (
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded flex-shrink-0 mt-0.5 ${cfg.color}`}
+    >
+      {cfg.label}
     </span>
   );
 }

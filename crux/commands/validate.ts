@@ -131,6 +131,11 @@ const SCRIPTS = {
     description: 'Check entity reference integrity across KB records',
     passthrough: ['ci', 'verbose', 'threshold'],
   },
+  'yaml-entity-refs': {
+    script: 'validate/validate-yaml-entity-refs.ts',
+    description: 'Check YAML entity cross-references (relatedEntries, developer, affiliation)',
+    passthrough: ['ci', 'verbose'],
+  },
   'directory-pages': {
     script: 'validate/validate-directory-pages.ts',
     description: 'Audit directory page data for display issues',
@@ -145,6 +150,11 @@ const SCRIPTS = {
     script: 'validate/cross-check-people.ts',
     description: 'Cross-check people roles between YAML entities and FactBase (advisory)',
     passthrough: ['ci', 'verbose'],
+  },
+  'orphan-entities': {
+    script: 'validate/validate-orphan-entities.ts',
+    description: 'Detect PG entity records without YAML source (ghost entities)',
+    passthrough: ['ci', 'fix'],
   },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
