@@ -32,6 +32,7 @@ import {
   normalizeStatus,
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
+import { extractDomain } from "@/lib/resource-types";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -501,11 +502,15 @@ export default async function LegislationDetailPage({
       title: r.title ?? r.url,
       url: r.url,
       type: r.type ?? "web",
+      domain: extractDomain(r.url),
       publicationName: publication?.name ?? null,
       credibility: credibility ?? null,
       citingPageCount: citingPages.length,
       publishedDate: r.published_date ?? null,
       authors: (r.authors ?? []).map((a) => ({ name: a, href: null })),
+      summary: r.summary ?? null,
+      fetchStatus: r.fetch_status ?? null,
+      archiveUrl: r.archive_url ?? null,
     });
   }
 

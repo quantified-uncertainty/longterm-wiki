@@ -37,6 +37,7 @@ import {
   sortKBRecords,
 } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { extractDomain } from "@/lib/resource-types";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
 
@@ -511,21 +512,18 @@ export interface OrgResourceRow {
   title: string;
   url: string;
   type: string;
+  domain: string | null;
   publicationName: string | null;
   credibility: number | null;
   citingPageCount: number;
   publishedDate: string | null;
   authors: AuthorRef[];
+  summary: string | null;
+  fetchStatus: string | null;
+  archiveUrl: string | null;
 }
 
-/** Extract the bare domain (no www) from a URL. Returns null on parse failure. */
-function extractDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
-  } catch {
-    return null;
-  }
-}
+// extractDomain is imported from @/lib/resource-types
 
 /** Well-known news/media source names that aren't real titles. */
 const SOURCE_NAMES = new Set([
@@ -767,11 +765,15 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     title: r.title ?? "(untitled)",
     url: r.url,
     type: r.type,
+    domain: extractDomain(r.url),
     publicationName: publication?.name ?? null,
     credibility: credibility ?? null,
     citingPageCount: citingPages.length,
     publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
     authors: (r.authors ?? []).map(resolveAuthor),
+    summary: r.summary ?? null,
+    fetchStatus: r.fetch_status ?? null,
+    archiveUrl: r.archive_url ?? null,
   };
 }
 
