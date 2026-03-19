@@ -79,14 +79,12 @@ describe('buildDomainToGroupMap', () => {
 
   it('maps factbase domains correctly', () => {
     expect(map['factbase']).toBe('factbase');
-    expect(map['factbase-migrate-entities']).toBe('factbase');
   });
 
   it('maps tablebase domains correctly', () => {
     expect(map['tablebase']).toBe('tablebase');
     expect(map['people']).toBe('tablebase');
     expect(map['ids']).toBe('tablebase');
-    expect(map['import-grants']).toBe('tablebase');
   });
 
   it('maps gh domains correctly', () => {

@@ -18,6 +18,7 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { verifyCommand } from './factbase-verify.ts';
+import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
 import { loadGraphFull, loadGraph, resolveEntity, KB_DATA_DIR } from '../lib/factbase-loader.ts';
@@ -1110,6 +1111,9 @@ export const commands = {
   'sync-sources': syncSourcesCommand,
   verify: verifyCommand,
   'add-fact': addFactCommand,
+  // Consolidated from factbase-migrate-entities domain
+  'migrate-entities': migrateEntitiesCommands.run,
+  'migrate-entities-status': migrateEntitiesCommands.status,
 };
 
 export function getHelp(): string {
@@ -1131,6 +1135,8 @@ Commands:
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   verify                Verify KB facts against source URLs using LLM
+  migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
+  migrate-entities-status       Show migration status (files in each format)
 
 Options:
   --type=X              Filter list/search/coverage by entity type (e.g. organization, person)
