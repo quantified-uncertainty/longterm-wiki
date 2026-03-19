@@ -120,14 +120,12 @@ export function loadEntitySlugs(entitiesDir: string): Set<string> {
       continue;
     }
 
-    if (Array.isArray(parsed)) {
-      for (const entity of parsed) {
-        if (entity && typeof entity === "object" && typeof entity.id === "string") {
-          slugs.add(entity.id);
-        }
+    const items = Array.isArray(parsed) ? parsed : [parsed];
+    for (const entity of items) {
+      if (entity && typeof entity === "object") {
+        if (typeof entity.id === "string") slugs.add(entity.id);
+        if (typeof entity.stableId === "string") slugs.add(entity.stableId);
       }
-    } else if (parsed && typeof parsed === "object" && typeof (parsed as ParsedEntity).id === "string") {
-      slugs.add((parsed as ParsedEntity).id!);
     }
   }
 
