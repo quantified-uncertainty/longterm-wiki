@@ -53,12 +53,14 @@ import {
   fetchRecordVerdicts,
   fetchResourcesFromPG,
   buildPageReferenceIndex,
+  getWikiServerWarningCount,
 } from './lib/wiki-server-data.mjs';
 import {
   buildPagesRegistry,
   buildPathRegistry,
   computeHallucinationRisk,
   extractPrNumber,
+  getYamlParseErrorCount as getPagesBuilderYamlErrors,
 } from './lib/pages-builder.mjs';
 import { syncBuildMetrics, syncLinksAndRefreshGraph } from './lib/metrics-sync.mjs';
 import {
@@ -81,6 +83,13 @@ if (CONTENT_ONLY) {
 }
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
+
+// ---------------------------------------------------------------------------
+// Build error/warning counters
+// YAML parse errors are fatal — the build exits non-zero if any occur.
+// Wiki-server API failures are non-fatal (fail-open for local dev).
+// ---------------------------------------------------------------------------
+let yamlParseErrorCount = 0;
 
 // Entity type alias map: legacy YAML type names → canonical types
 // Keep in sync with apps/web/src/data/entity-type-names.ts
@@ -168,8 +177,8 @@ function loadYaml(filename) {
     const content = readFileSync(filepath, 'utf-8');
     return parse(content) || [];
   } catch (e) {
-    console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
-    process.exitCode = 1;
+    console.error(`YAML PARSE ERROR: ${filepath}: ${e.message}`);
+    yamlParseErrorCount++;
     return [];
   }
 }
@@ -194,8 +203,8 @@ function loadYamlDir(dirname) {
       const data = parse(content) || [];
       merged.push(...data);
     } catch (e) {
-      console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
-      process.exitCode = 1;
+      console.error(`YAML PARSE ERROR: ${filepath}: ${e.message}`);
+      yamlParseErrorCount++;
     }
   }
 
@@ -1544,6 +1553,28 @@ async function main() {
   console.log('\n--- Zod Schema Validation ---');
   console.log('Run `npm run validate:schema` to validate data against Zod schemas');
   console.log('Or run `npm run validate` for all validators');
+
+  // ==========================================================================
+  // BUILD HEALTH REPORT
+  // ==========================================================================
+  const totalYamlErrors = yamlParseErrorCount + getPagesBuilderYamlErrors();
+  const totalWikiServerWarnings = getWikiServerWarningCount();
+
+  console.log('\n--- Build Health ---');
+  console.log(`  Entities loaded:  ${stats.totalEntities}`);
+  console.log(`  Pages processed:  ${pages.length}`);
+  console.log(`  YAML parse errors:        ${totalYamlErrors}`);
+  console.log(`  Wiki-server warnings:     ${totalWikiServerWarnings}`);
+
+  if (totalYamlErrors > 0) {
+    console.error(`\nFATAL: ${totalYamlErrors} YAML parse error(s) occurred. The output data is incomplete.`);
+    console.error('Fix the malformed YAML files listed above and re-run build-data.');
+    process.exit(1);
+  }
+
+  if (totalWikiServerWarnings > 0) {
+    console.warn(`\nNote: ${totalWikiServerWarnings} wiki-server API call(s) failed (non-fatal). Some dashboard data may be missing.`);
+  }
 }
 
 main().catch(err => {
