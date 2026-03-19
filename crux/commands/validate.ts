@@ -166,6 +166,11 @@ const SCRIPTS = {
     description: 'Check that soft FK fields in PG tables resolve to entities (advisory, requires wiki-server)',
     passthrough: ['ci', 'verbose'],
   },
+  'pg-temporal': {
+    script: 'validate/validate-pg-temporal.ts',
+    description: 'PG temporal consistency (startDate < endDate, date range validation)',
+    passthrough: ['ci'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',

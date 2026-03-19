@@ -428,6 +428,17 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'pg-temporal',
+    name: 'PG temporal consistency (startDate < endDate, date ranges)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-pg-temporal.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: depends on wiki-server being reachable. The check skips
+    // gracefully when the server is unavailable (fail-open).
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
