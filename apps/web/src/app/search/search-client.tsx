@@ -106,7 +106,7 @@ export function SearchPageClient() {
   const [selected, setSelected] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const searchSeqRef = useRef(0);
   const filterRef = useRef<FilterKey>(initialFilter);
 
