@@ -217,7 +217,7 @@ function EventEntry({
     <div className="relative">
       {/* Event dot on the timeline line */}
       <div
-        className={`absolute -left-[25px] top-1 w-3 h-3 rounded-full border-2 border-background ${dotColor}`}
+        className={`absolute -left-[13px] top-1.5 w-2 h-2 rounded-full border border-background ${dotColor}`}
       />
       <div className="flex items-baseline justify-between gap-3">
         <span className={`font-bold text-sm ${textColor}`}>
@@ -245,7 +245,7 @@ function OrphanResourceEntry({ resource }: { resource: TimelineResource }) {
   return (
     <div className="relative flex items-start gap-2 py-1 group">
       <div
-        className="absolute -left-[23px] top-2 w-2 h-2 rounded-full bg-muted-foreground/20 group-hover:bg-muted-foreground/40 transition-colors"
+        className="absolute -left-[13px] top-2 w-1.5 h-1.5 rounded-full bg-muted-foreground/20 group-hover:bg-muted-foreground/40 transition-colors"
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
@@ -311,7 +311,7 @@ export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
         </span>
       </div>
 
-      <div className="relative pl-6 border-l-2 border-border space-y-4">
+      <div className="relative pl-4 border-l border-border/60 space-y-2">
         {sections.map((section, i) => {
           if (section.kind === "event-group") {
             return (
