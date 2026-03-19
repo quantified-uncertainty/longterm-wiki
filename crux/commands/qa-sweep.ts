@@ -21,13 +21,13 @@ const SCRIPTS = {
   recent: {
     script: 'qa-sweep/sweep.ts',
     description: 'Show recent changes to prioritize',
-    defaultArgs: ['recent'],
+    extraArgs: ['recent'],
     passthrough: ['json'],
   },
   checks: {
     script: 'qa-sweep/sweep.ts',
     description: 'Run automated checks only (fast)',
-    defaultArgs: ['checks'],
+    extraArgs: ['checks'],
     passthrough: ['json'],
   },
 };

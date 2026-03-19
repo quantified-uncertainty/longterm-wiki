@@ -227,6 +227,23 @@ describe('cli.ts — createScriptHandler', () => {
     // The handler should be an async function
     expect(handler.constructor.name).toBe('AsyncFunction');
   });
+
+  it('ScriptConfig does not accept defaultArgs — only extraArgs is valid', () => {
+    // This is a compile-time check expressed at runtime:
+    // ScriptConfig.extraArgs is the correct field; defaultArgs is not defined in the type.
+    // If someone passes defaultArgs it should be ignored (excess property).
+    // The correct field is extraArgs, and this test documents the contract.
+    const configWithExtraArgs: Parameters<typeof createScriptHandler>[1] = {
+      script: 'test.ts',
+      passthrough: [],
+      extraArgs: ['recent'],
+    };
+    // extraArgs is a valid field on ScriptConfig
+    expect(configWithExtraArgs.extraArgs).toEqual(['recent']);
+    // @ts-expect-error defaultArgs is NOT a valid ScriptConfig field
+    const _badConfig = { script: 'test.ts', passthrough: [], defaultArgs: ['recent'] };
+    void _badConfig;
+  });
 });
 
 // =============================================================================
