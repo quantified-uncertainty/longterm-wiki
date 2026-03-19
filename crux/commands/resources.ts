@@ -54,6 +54,10 @@ const COMMANDS: Record<string, ResourceCommandConfig> = {
     description: 'Fetch real page titles and fix bad ones',
     passthrough: ['apply', 'limit', 'domain', 'verbose', 'force-all'],
   },
+  'classify-stance': {
+    description: 'Classify resource stance via LLM (--page=<slug>)',
+    passthrough: ['apply', 'limit', 'verbose', 'page'],
+  },
 };
 
 /**
@@ -103,6 +107,22 @@ export const commands: Record<string, (args: string[], options: Record<string, u
 for (const [name, config] of Object.entries(COMMANDS)) {
   commands[name] = createCommandHandler(name, config);
 }
+
+// classify-stance: direct command (not routed through resource-manager.ts)
+commands['classify-stance'] = async function (args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const { classifyStance } = await import('./resources/classify-stance.ts');
+  const page = (options.page as string) || args[0];
+  if (!page) {
+    return { output: 'Usage: pnpm crux resources classify-stance --page=<slug>\n  Options: --apply, --limit=N, --verbose', exitCode: 1 };
+  }
+  await classifyStance({
+    page,
+    apply: !!options.apply,
+    limit: options.limit ? Number(options.limit) : undefined,
+    verbose: !!options.verbose,
+  });
+  return { output: '', exitCode: 0 };
+};
 
 // Default to list
 commands.default = commands.list;
