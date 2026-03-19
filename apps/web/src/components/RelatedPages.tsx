@@ -5,6 +5,7 @@ import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
 import { getTypeLabel, getTypeColor } from "./explore/explore-utils";
 import { EntityLink } from "./wiki/EntityLink";
 import { cn } from "@lib/utils";
+import { stripMdxEscapes } from "@lib/inline-markdown";
 
 // Map entity types to display group names
 const TYPE_TO_GROUP: Record<string, string> = {
@@ -198,7 +199,7 @@ export async function RelatedPages({
         type: entry.type,
         score: entry.score,
         label: entry.label,
-        description: desc ? truncate(desc, 150) : undefined,
+        description: desc ? truncate(stripMdxEscapes(desc), 150) : undefined,
       };
     });
 

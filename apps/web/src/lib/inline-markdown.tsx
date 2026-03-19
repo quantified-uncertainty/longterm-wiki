@@ -1,5 +1,10 @@
 import React from "react";
 
+/** Strip MDX escape sequences for plain-text rendering contexts */
+export function stripMdxEscapes(text: string): string {
+  return text.replace(/\\([\$<>\{\}])/g, "$1");
+}
+
 /**
  * Render basic inline markdown: **bold**, *italic*, `code`, and
  * `<EntityLink id="...">text</EntityLink>` tags as styled spans.
