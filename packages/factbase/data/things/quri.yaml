@@ -31,7 +31,9 @@ facts:
       low: 3
       high: 5
     asOf: !date 2026-03
-    notes: ~3-5 core contributors including Ozzie Gooen, Sam Nolan; previously Nuño Sempere
+    notes: >-
+      ~3-5 core contributors including Ozzie Gooen, Slava Matyukhin (2022-2025),
+      Sam Nolan (2021-2023); previously Nuño Sempere (2020-2023)
 
   - id: f_quri_sff_funding
     property: funding-received
@@ -41,7 +43,8 @@ facts:
       unit: USD
     asOf: !date 2022
     source: https://survivalandflourishing.fund
-    notes: Survival and Flourishing Fund grants 2019-2022
+    notes: Survival and Flourishing Fund (sff) grants 2019-2022
+    grantor: !ref pvJ50HupEQ
 
   - id: f_quri_ff_funding
     property: funding-received
@@ -61,4 +64,5 @@ facts:
       high: 150000
       unit: USD
     asOf: !date 2024
-    notes: Long-Term Future Fund ongoing support (estimated annual ~$100K; not a sourced exact figure)
+    notes: Long-Term Future Fund (ltff) ongoing support (estimated annual ~$100K; not a sourced exact figure)
+    grantor: !ref yA12C1KcjQ

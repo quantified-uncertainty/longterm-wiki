@@ -1252,6 +1252,26 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+- id: slava-matyukhin
+  stableId: 9TS0Cj5u5Q
+  wikiId: E1946
+  type: person
+  title: Slava Matyukhin
+  description: >-
+    Software engineer and key Squiggle contributor at QURI. Lead developer
+    of the Squiggle language rewrite (v0.8-0.10) and the Squiggle Hub platform.
+    Also known as berekuk on GitHub. Previously built Kocherga (EA community
+    space management in Moscow) and contributed to LessWrong/ForumMagnum
+    development. Active on Squiggle from 2022 to 2025.
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+    - id: squiggle-hub
+      type: project
+  lastUpdated: 2026-03
+
 - id: nuno-sempere
   stableId: AnFfbQlIog
   wikiId: E579
