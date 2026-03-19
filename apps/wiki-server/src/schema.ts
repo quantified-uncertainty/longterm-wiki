@@ -1562,7 +1562,10 @@ export const grants = pgTable(
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
     notes: text("notes"),
-    programId: text("program_id"), // soft ref to funding_programs.id (nullable)
+    programId: text("program_id").references(
+      () => fundingPrograms.id,
+      { onDelete: "set null" }
+    ),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

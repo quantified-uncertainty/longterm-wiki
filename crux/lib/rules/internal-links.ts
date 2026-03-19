@@ -13,6 +13,7 @@ import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } 
 import { isInCodeBlock } from '../mdx-utils.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, PROJECT_ROOT } from '../content-types.ts';
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
+import { isValidWikiRoute } from '../file-utils.ts';
 
 const APP_DIR = join(PROJECT_ROOT, 'apps/web/src/app');
 
@@ -26,6 +27,11 @@ function resolveLink(href: string, sourceFile: string): { exists: boolean; isPla
   // Skip placeholder links
   if (path.includes('...')) {
     return { exists: true, isPlaceholder: true };
+  }
+
+  // Check /wiki/E* dynamic routes against wikiId index
+  if (isValidWikiRoute(path, CONTENT_DIR)) {
+    return { exists: true };
   }
 
   // Remove trailing slash for file lookup
