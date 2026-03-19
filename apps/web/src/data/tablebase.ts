@@ -634,6 +634,7 @@ export function getIdRegistry(): IdRegistryMaps {
 // ============================================================================
 
 let _typedEntityIndex: Map<string, AnyEntity> | null = null;
+let _entityStableIdIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
@@ -647,15 +648,33 @@ function typedEntityIndex() {
   return _typedEntityIndex;
 }
 
+/** Lazy index: entity.stableId → entity. Covers all typed entities. */
+function entityStableIdIndex(): Map<string, AnyEntity> {
+  if (!_entityStableIdIndex) {
+    _entityStableIdIndex = new Map();
+    for (const e of getTypedEntities()) {
+      if (e.stableId) {
+        _entityStableIdIndex.set(e.stableId, e);
+      }
+    }
+  }
+  return _entityStableIdIndex;
+}
+
 /**
  * Get a typed entity by stableId (10-char alphanumeric).
  * Resolves stableId → slug via idRegistry, then looks up the entity by slug.
+ * Falls back to scanning the entity stableId index if the registry lookup fails.
  */
 export function getTypedEntityByStableId(stableId: string): AnyEntity | undefined {
   const registry = getIdRegistry();
   const slug = registry.byStableId?.[stableId];
-  if (!slug) return undefined;
-  return typedEntityIndex().get(slug);
+  if (slug) {
+    const entity = typedEntityIndex().get(slug);
+    if (entity) return entity;
+  }
+  // Fallback: scan entities by their stableId field
+  return entityStableIdIndex().get(stableId);
 }
 
 function resourceIndex() {
