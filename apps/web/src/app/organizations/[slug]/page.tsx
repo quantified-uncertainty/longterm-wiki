@@ -721,9 +721,6 @@ export default async function OrgProfilePage({
               <Link href={`/factbase/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
                 KB data &rarr;
               </Link>
-              <Link href={`/organizations/${slug}/db`} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                DB records &rarr;
-              </Link>
             </div>
 
             {data.founders.length > 0 && (
