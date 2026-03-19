@@ -26,9 +26,9 @@ facts:
   - id: iGoAcq36Rg
     property: headcount
     value: 500
-    asOf: 2024-00
+    asOf: "2024"
     source: https://www.wikidata.org/wiki/Q116758847
-    notes: From Wikidata Q116758847 (as of 2024-00)
+    notes: From Wikidata Q116758847 (as of 2024)
   - id: dcLEbK812Q
     property: website
     value: https://www.anthropic.com/
