@@ -156,6 +156,11 @@ const SCRIPTS = {
     description: 'Temporal invariant validation (date validity, ordering, consistency)',
     passthrough: ['ci', 'verbose'],
   },
+  'cross-base': {
+    script: 'validate/validate-cross-base.ts',
+    description: 'Cross-base consistency (WikiBase pages match TableBase entities, FactBase coverage)',
+    passthrough: ['ci', 'verbose'],
+  },
   'orphan-entities': {
     script: 'validate/validate-orphan-entities.ts',
     description: 'Detect PG entity records without YAML source (ghost entities)',
