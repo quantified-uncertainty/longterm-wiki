@@ -19,6 +19,9 @@
  *   crux qa-sweep recent       Show recent changes only
  *   crux qa-sweep checks       Basic checks only (fast)
  *   crux qa-sweep deep         Basic + data integrity (no tests/gate)
+ *   crux qa-sweep diff         Compare latest two saved results
+ *   crux qa-sweep --save       Save results after the sweep
+ *   crux qa-sweep --compare    Run sweep + save + show diff vs previous
  *   crux qa-sweep --json       JSON output for scripting
  */
 
@@ -28,6 +31,17 @@ import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import {
+  saveResult,
+  loadLatest,
+  diffResults,
+  formatDiff,
+  listResultFiles,
+  loadResult,
+  type CheckResult,
+  type RecentChange,
+  type SweepReport,
+} from './sweep-persistence.ts';
 
 // Validator imports
 import { runCheck as checkData } from '../validate/validate-data.ts';
@@ -40,6 +54,8 @@ import { runTemporalValidation } from '../validate/validate-temporal.ts';
 
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json');
+const SAVE_MODE = args.includes('--save') || args.includes('--compare');
+const COMPARE_MODE = args.includes('--compare');
 const SUB_COMMAND = args.find((a) => !a.startsWith('--')) ?? 'full';
 
 const c = getColors();
@@ -67,13 +83,7 @@ function silenced<T>(fn: () => T): T {
   try { return fn(); } finally { console.log = origLog; console.warn = origWarn; }
 }
 
-interface CheckResult {
-  name: string;
-  status: 'pass' | 'fail' | 'warn' | 'skip';
-  message: string;
-  details?: string[];
-  tier: 'basic' | 'data-integrity' | 'slow';
-}
+// CheckResult, RecentChange, and SweepReport are imported from ./sweep-persistence.ts
 
 function wrapValidator(name: string, result: { passed: boolean; errors: number; warnings: number; infos?: number }, tier: CheckResult['tier']): CheckResult {
   const parts: string[] = [];
@@ -90,8 +100,6 @@ function safeCheck(name: string, tier: CheckResult['tier'], fn: () => CheckResul
 }
 
 // ─── Recent changes ──────────────────────────────────────────────────────────
-
-interface RecentChange { type: 'pr' | 'commit'; id: string; title: string; date: string }
 
 function getRecentChanges(): RecentChange[] {
   const changes: RecentChange[] = [];
@@ -323,7 +331,7 @@ function checkOrphanEntities(): CheckResult {
 
 // ─── Report ──────────────────────────────────────────────────────────────────
 
-interface SweepReport { timestamp: string; recentChanges: RecentChange[]; changedFiles: string[]; checks: CheckResult[] }
+// SweepReport is imported from sweep-persistence.ts (shared type definition).
 
 function printReport(report: SweepReport): void {
   if (JSON_MODE) { console.log(JSON.stringify(report, null, 2)); return; }
@@ -374,8 +382,57 @@ function printReport(report: SweepReport): void {
 
 async function main() {
   const timestamp = new Date().toISOString().slice(0, 10);
-  if (SUB_COMMAND === 'recent') { printReport({ timestamp, recentChanges: getRecentChanges(), changedFiles: getChangedFiles(), checks: [] }); return; }
 
+  // ── diff subcommand: compare the two most recently saved results ──────────
+  if (SUB_COMMAND === 'diff') {
+    const files = listResultFiles();
+
+    if (files.length === 0) {
+      console.error(
+        `${c.red}No saved sweep results found.${c.reset}\n` +
+        `Run a sweep with ${c.bold}--save${c.reset} first:\n` +
+        `  pnpm crux qa-sweep --save\n` +
+        `  pnpm crux qa-sweep checks --save`,
+      );
+      process.exit(1);
+    }
+
+    if (files.length === 1) {
+      console.error(
+        `${c.yellow}Only one saved result found — need at least two to diff.${c.reset}\n` +
+        `Run another sweep with ${c.bold}--save${c.reset} to get a second result.`,
+      );
+      process.exit(1);
+    }
+
+    const prevResult = loadResult(files[files.length - 2]);
+    const currResult = loadResult(files[files.length - 1]);
+
+    if (!prevResult || !currResult) {
+      console.error(`${c.red}Could not read saved results.${c.reset}`);
+      process.exit(1);
+    }
+
+    const diff = diffResults(prevResult, currResult);
+
+    if (JSON_MODE) {
+      console.log(JSON.stringify(diff, null, 2));
+    } else {
+      console.log(formatDiff(diff));
+    }
+
+    // Exit with failure if there are regressions
+    if (diff.regressions.length > 0) process.exit(1);
+    return;
+  }
+
+  // ── recent subcommand ─────────────────────────────────────────────────────
+  if (SUB_COMMAND === 'recent') {
+    printReport({ timestamp, recentChanges: getRecentChanges(), changedFiles: getChangedFiles(), checks: [] });
+    return;
+  }
+
+  // ── checks / deep / full subcommands ──────────────────────────────────────
   const checks: CheckResult[] = [];
   const runData = SUB_COMMAND === 'deep' || SUB_COMMAND === 'full';
   const runSlow = SUB_COMMAND === 'full';
@@ -411,7 +468,40 @@ async function main() {
 
   const recentChanges = runData ? getRecentChanges() : [];
   const changedFiles = runData ? getChangedFiles() : [];
-  printReport({ timestamp, recentChanges, changedFiles, checks });
+  const report: SweepReport = { timestamp, recentChanges, changedFiles, checks };
+  printReport(report);
+
+  // ── persistence ──────────────────────────────────────────────────────────
+  if (SAVE_MODE) {
+    const previousResult = COMPARE_MODE ? loadLatest() : null;
+
+    const savedPath = saveResult(report);
+    if (!JSON_MODE) {
+      console.log(`\n${c.dim}Results saved: ${savedPath}${c.reset}`);
+    }
+
+    if (COMPARE_MODE) {
+      if (previousResult) {
+        const currentResult = loadLatest();
+        if (currentResult) {
+          const diff = diffResults(previousResult, currentResult);
+          if (JSON_MODE) {
+            console.log(JSON.stringify(diff, null, 2));
+          } else {
+            console.log('\n' + formatDiff(diff));
+          }
+          const hasFail = checks.some((ch) => ch.status === 'fail') || diff.regressions.length > 0;
+          if (hasFail) process.exit(1);
+          return;
+        }
+      } else if (!JSON_MODE) {
+        console.log(
+          `${c.dim}No previous result to compare against — this is the first saved run.${c.reset}`,
+        );
+      }
+    }
+  }
+
   if (checks.some((ch) => ch.status === 'fail')) process.exit(1);
 }
 
