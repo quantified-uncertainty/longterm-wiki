@@ -6,48 +6,23 @@ import type {
   TimelineResourceChild,
 } from "./timeline-utils";
 
-// ── Color helpers ───────────────────────────────────────────────────────
+// ── Helpers ─────────────────────────────────────────────────────────────
 
-function getMilestoneTextColor(label: string): string {
-  if (label === "Introduced") return "text-blue-700 dark:text-blue-400";
-  if (
-    label === "Signed" ||
-    label === "Enacted" ||
-    label === "Effective" ||
-    label === "In Force"
-  )
-    return "text-green-700 dark:text-green-400";
-  if (label === "Vetoed") return "text-red-700 dark:text-red-400";
-  return "text-violet-700 dark:text-violet-400";
+function getMilestoneDotColor(label: string): string {
+  if (label === "Introduced") return "bg-blue-500";
+  if (label === "Signed" || label === "Enacted" || label === "Effective" || label === "In Force")
+    return "bg-green-500";
+  if (label === "Vetoed") return "bg-red-500";
+  return "bg-violet-500";
 }
 
-function getCategoryBadge(category: "official" | "analysis" | "press"): {
-  label: string;
-  className: string;
-} {
-  switch (category) {
-    case "official":
-      return {
-        label: "Official",
-        className:
-          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-      };
-    case "analysis":
-      return {
-        label: "Analysis",
-        className:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-      };
-    case "press":
-      return {
-        label: "Press",
-        className:
-          "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
-      };
-  }
+function getMilestoneRingColor(label: string): string {
+  if (label === "Introduced") return "ring-blue-500/20";
+  if (label === "Signed" || label === "Enacted" || label === "Effective" || label === "In Force")
+    return "ring-green-500/20";
+  if (label === "Vetoed") return "ring-red-500/20";
+  return "ring-violet-500/20";
 }
-
-// ── Format helpers ──────────────────────────────────────────────────────
 
 const MONTH_NAMES: Record<string, string> = {
   "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
@@ -69,12 +44,11 @@ function formatShortDate(iso: string): string {
   return iso;
 }
 
-function formatVoteInline(vote: NonNullable<TimelineMilestone["vote"]>): string {
+function formatVoteSummary(vote: NonNullable<TimelineMilestone["vote"]>): string {
   const parts: string[] = [];
   if (vote.ayes != null && vote.noes != null) {
-    parts.push(`${vote.ayes}-${vote.noes}`);
+    parts.push(`${vote.ayes}\u2013${vote.noes}`);
   }
-  // Party breakdown
   const ayeParts: string[] = [];
   const noeParts: string[] = [];
   if (vote.ayesDem != null) ayeParts.push(`${vote.ayesDem}D`);
@@ -87,217 +61,194 @@ function formatVoteInline(vote: NonNullable<TimelineMilestone["vote"]>): string 
   return parts.join(", ");
 }
 
-// ── Sub-components ──────────────────────────────────────────────────────
+// ── Resource link ───────────────────────────────────────────────────────
 
-function ResourceItem({ resource }: { resource: TimelineResourceChild }) {
-  const badge = getCategoryBadge(resource.category);
+function ResourceLink({ resource }: { resource: TimelineResourceChild }) {
   const shortDate = formatShortDate(resource.publishedDate);
   return (
-    <div className="flex items-start gap-2 py-0.5 group">
-      <div className="relative flex items-center justify-center mt-1.5 shrink-0 w-4">
-        <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/25 group-hover:bg-muted-foreground/50 transition-colors" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <a
-            href={safeHref(resource.url)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline truncate max-w-[28rem]"
-            title={resource.title}
-          >
-            {resource.title}
-          </a>
-          <span
-            className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
-          >
-            {badge.label}
+    <div className="group flex items-baseline gap-1.5 py-0.5 min-w-0">
+      <span className="text-muted-foreground/30 shrink-0 text-[10px] leading-none mt-px select-none">&bull;</span>
+      <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2">
+        <a
+          href={safeHref(resource.url)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors truncate"
+          title={resource.title}
+        >
+          {resource.title}
+        </a>
+        {(resource.domain || shortDate) && (
+          <span className="text-[11px] text-muted-foreground/40 whitespace-nowrap shrink-0">
+            {[resource.domain, shortDate].filter(Boolean).join(" \u00b7 ")}
           </span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground/60 mt-0.5">
-          {resource.domain && <span>{resource.domain}</span>}
-          {shortDate && <span>{shortDate}</span>}
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-function ChildResources({
-  resources,
-}: {
-  resources: TimelineResourceChild[];
-}) {
+function ResourceList({ resources }: { resources: TimelineResourceChild[] }) {
   if (resources.length === 0) return null;
   return (
-    <div className="mt-0.5 ml-3 border-l border-border/30 pl-2 space-y-0">
+    <div className="mt-1 space-y-0 ml-0.5">
       {resources.map((r) => (
-        <ResourceItem key={r.id} resource={r} />
+        <ResourceLink key={r.id} resource={r} />
       ))}
     </div>
   );
 }
 
-function AmendmentItem({
+// ── Child items (amendments, votes, resources under a milestone) ────────
+
+function AmendmentEntry({
   child,
 }: {
   child: Extract<TimelineChild, { type: "amendment" }>;
 }) {
   return (
-    <div className="relative">
-      <div className="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rotate-45 bg-amber-500 border-2 border-background" />
+    <div className="relative pl-5">
+      {/* Pencil icon for amendments */}
+      <svg className="absolute left-0 top-[5px] w-3 h-3 text-amber-500/60 dark:text-amber-400/50" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5z" />
+      </svg>
       <div>
-        <div className="flex items-baseline gap-2 mb-0.5 flex-wrap">
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-            Amendment
+        {/* Header row: description left, date right */}
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-sm text-foreground/80 leading-relaxed">
+            {child.description}
+            {child.url && (
+              <a
+                href={child.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center ml-1.5 text-[12px] text-primary/60 hover:text-primary transition-colors"
+              >
+                PDF &#8599;
+              </a>
+            )}
+          </p>
+          <span className="text-[13px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
+            {child.date}
           </span>
-          {child.url ? (
-            <a
-              href={child.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-sm text-primary hover:underline"
-            >
-              {child.date}
-            </a>
-          ) : (
-            <span className="font-semibold text-sm">{child.date}</span>
-          )}
-          {child.author && (
-            <span className="text-xs text-muted-foreground">
-              by {child.author}
-            </span>
-          )}
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {child.description}
-        </p>
+        {child.author && (
+          <span className="text-[12px] text-muted-foreground/40 mt-0.5 block">
+            by {child.author}
+          </span>
+        )}
       </div>
-      <ChildResources resources={child.resources} />
+      <ResourceList resources={child.resources} />
     </div>
   );
 }
 
-function VoteItem({
+function VoteEntry({
   child,
 }: {
   child: Extract<TimelineChild, { type: "vote" }>;
 }) {
-  const isPass =
-    child.result.toLowerCase().includes("pass") ||
-    child.result.toLowerCase().includes("sign") ||
-    child.result.toLowerCase().includes("adopt");
   return (
-    <div className="relative">
-      <div
-        className={`absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-sm ${
-          isPass ? "bg-blue-500" : "bg-red-400"
-        } border-2 border-background`}
-      />
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="font-semibold text-sm">{child.chamber}</span>
-        <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-            isPass
-              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-          }`}
-        >
-          {child.result}
-        </span>
-        {child.ayes != null && child.noes != null && (
-          <span className="text-sm text-muted-foreground tabular-nums">
-            {child.ayes}-{child.noes}
-          </span>
-        )}
-        {child.date && (
-          <span className="text-sm text-muted-foreground">{child.date}</span>
-        )}
-      </div>
-      {/* Party breakdown */}
-      {(child.ayesDem != null || child.ayesRep != null) && (
-        <div className="text-xs text-muted-foreground/70 mt-0.5 ml-0.5">
-          {child.ayesDem != null && (
-            <span className="text-blue-600 dark:text-blue-400">
-              {child.ayesDem}D
-            </span>
-          )}
-          {child.ayesDem != null && child.ayesRep != null && "+"}
-          {child.ayesRep != null && (
-            <span className="text-red-500 dark:text-red-400">
-              {child.ayesRep}R
-            </span>
-          )}
-          {" / "}
-          {child.noesDem != null && (
-            <span className="text-blue-600 dark:text-blue-400">
-              {child.noesDem}D
-            </span>
-          )}
-          {child.noesDem != null && child.noesRep != null && "+"}
-          {child.noesRep != null && (
-            <span className="text-red-500 dark:text-red-400">
-              {child.noesRep}R
+    <div className="relative pl-5">
+      {/* Ballot/check icon for votes */}
+      <svg className="absolute left-0 top-[5px] w-3 h-3 text-blue-500/60 dark:text-blue-400/50" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+      </svg>
+      {/* Header row: chamber + tally left, date right */}
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm font-medium">{child.chamber}</span>
+          {child.ayes != null && child.noes != null && (
+            <span className="text-[13px] text-muted-foreground/60 tabular-nums">
+              {child.ayes}&ndash;{child.noes}
             </span>
           )}
         </div>
-      )}
-      <ChildResources resources={child.resources} />
+        {child.date && (
+          <span className="text-[13px] text-muted-foreground/40 whitespace-nowrap shrink-0 tabular-nums">
+            {child.date}
+          </span>
+        )}
+      </div>
+      <ResourceList resources={child.resources} />
     </div>
   );
 }
 
-function MilestoneEntry({ milestone }: { milestone: TimelineMilestone }) {
-  const textColor = getMilestoneTextColor(milestone.label);
-  const voteStr = milestone.vote ? formatVoteInline(milestone.vote) : null;
+// ── Milestone ───────────────────────────────────────────────────────────
+
+function MilestoneEntry({
+  milestone,
+  isLast,
+}: {
+  milestone: TimelineMilestone;
+  isLast: boolean;
+}) {
+  const dotColor = getMilestoneDotColor(milestone.label);
+  const ringColor = getMilestoneRingColor(milestone.label);
+  const voteStr = milestone.vote ? formatVoteSummary(milestone.vote) : null;
+  const hasChildren = milestone.children.length > 0;
 
   return (
     <div className="relative">
-      {/* Milestone dot */}
-      <div
-        className={`absolute -left-[27px] top-0.5 w-4 h-4 rounded-full border-2 border-background ${milestone.color}`}
-      />
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className={`font-bold text-base ${textColor}`}>
-            {milestone.label}
-          </span>
-          {voteStr && (
-            <span className="text-sm text-muted-foreground tabular-nums">
-              ({voteStr})
-            </span>
-          )}
+      {/* Vertical connector line — from this milestone down to the next */}
+      {!isLast && (
+        <div className="absolute left-[9px] top-[20px] bottom-0 w-px bg-border" />
+      )}
+
+      {/* Milestone header row */}
+      <div className="flex items-start gap-3">
+        {/* Dot */}
+        <div className="relative shrink-0 mt-0.5">
+          <div className={`w-[20px] h-[20px] rounded-full ${dotColor} ring-4 ${ringColor}`} />
         </div>
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {milestone.displayDate}
-        </span>
+
+        {/* Label left, date right */}
+        <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2 pb-1">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="font-semibold text-[15px] text-foreground">
+              {milestone.label}
+            </span>
+            {voteStr && (
+              <span className="text-[13px] text-muted-foreground/50 tabular-nums">
+                {voteStr}
+              </span>
+            )}
+          </div>
+          <span className="text-[13px] text-muted-foreground/40 whitespace-nowrap tabular-nums">
+            {milestone.displayDate}
+          </span>
+        </div>
       </div>
 
       {/* Children */}
-      {milestone.children.length > 0 && (
-        <div className="mt-2 ml-1 border-l border-border/40 pl-4 space-y-3">
+      {hasChildren && (
+        <div className="ml-[9px] pl-[22px] border-l border-border space-y-2.5 pb-2 pt-1">
           {milestone.children.map((child, i) => {
             if (child.type === "amendment") {
               return (
-                <AmendmentItem
-                  key={`amend-${child.sortDate}-${i}`}
+                <AmendmentEntry
+                  key={`a-${child.sortDate}-${i}`}
                   child={child}
                 />
               );
             }
             if (child.type === "vote") {
               return (
-                <VoteItem
-                  key={`vote-${child.chamber}-${i}`}
+                <VoteEntry
+                  key={`v-${child.chamber}-${i}`}
                   child={child}
                 />
               );
             }
-            // resource
-            return <ResourceItem key={child.id} resource={child} />;
+            return <ResourceLink key={child.id} resource={child} />;
           })}
         </div>
       )}
+
+      {/* Spacer when no children but not last */}
+      {!hasChildren && !isLast && <div className="h-2" />}
     </div>
   );
 }
@@ -309,52 +260,39 @@ interface UnifiedTimelineViewProps {
 }
 
 export function UnifiedTimelineView({ timeline }: UnifiedTimelineViewProps) {
-  const { earlyCoverage, milestones, undatedResources } = timeline;
+  const { earlyCoverage, milestones } = timeline;
   const totalEvents =
     milestones.length +
     milestones.reduce((sum, m) => sum + m.children.length, 0);
 
-  if (totalEvents === 0 && earlyCoverage.length === 0 && undatedResources.length === 0) return null;
+  if (totalEvents === 0 && earlyCoverage.length === 0) return null;
 
   return (
     <div>
-      {/* Early coverage (resources before first milestone) */}
+      {/* Early coverage */}
       {earlyCoverage.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
-            Early Coverage
-          </h3>
-          <div className="space-y-1 pl-2">
+        <div className="mb-6 ml-8">
+          <p className="text-xs font-medium text-muted-foreground/50 uppercase tracking-widest mb-2">
+            Before first milestone
+          </p>
+          <div className="space-y-0">
             {earlyCoverage.map((r) => (
-              <ResourceItem key={r.id} resource={r} />
+              <ResourceLink key={r.id} resource={r} />
             ))}
           </div>
         </div>
       )}
 
-      {/* Main timeline */}
+      {/* Timeline */}
       {milestones.length > 0 && (
-        <div className="relative pl-7 border-l-2 border-border space-y-6">
+        <div className="space-y-1">
           {milestones.map((milestone, i) => (
             <MilestoneEntry
               key={`${milestone.label}-${i}`}
               milestone={milestone}
+              isLast={i === milestones.length - 1}
             />
           ))}
-        </div>
-      )}
-
-      {/* Undated resources */}
-      {undatedResources.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
-            Undated Resources
-          </h3>
-          <div className="space-y-1 pl-2">
-            {undatedResources.map((r) => (
-              <ResourceItem key={r.id} resource={r} />
-            ))}
-          </div>
         </div>
       )}
     </div>

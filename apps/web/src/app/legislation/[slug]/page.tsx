@@ -624,8 +624,7 @@ export default async function LegislationDetailPage({
       (sum, m) => sum + m.children.length,
       0
     ) +
-    unifiedTimeline.earlyCoverage.length +
-    unifiedTimeline.undatedResources.length;
+    unifiedTimeline.earlyCoverage.length;
 
   if (timelineItemCount > 0) {
     tabs.push({
