@@ -13,6 +13,31 @@ import { ENTITY_TYPES, ENTITY_GROUPS } from "@data/entity-ontology";
 import { stripMdxEscapes } from "@lib/inline-markdown";
 
 // ---------------------------------------------------------------------------
+// Directory route mapping — entity types with dedicated directory pages
+// get directory URLs instead of /wiki/E<id>. Must stay in sync with
+// ENTITY_TYPE_ROUTE in thing-sync.ts.
+// ---------------------------------------------------------------------------
+
+const DIRECTORY_ROUTES: Record<string, string> = {
+  organization: "/organizations",
+  person: "/people",
+  "ai-model": "/ai-models",
+  benchmark: "/benchmarks",
+  policy: "/legislation",
+  project: "/projects",
+  approach: "/approaches",
+  event: "/events",
+  "research-area": "/research-areas",
+};
+
+/** Compute the best href for a page search result. */
+function pageHref(r: SearchResult): string {
+  const prefix = DIRECTORY_ROUTES[r.type];
+  if (prefix) return `${prefix}/${r.id}`;
+  return `/wiki/${r.wikiId}`;
+}
+
+// ---------------------------------------------------------------------------
 // Sort types
 // ---------------------------------------------------------------------------
 
@@ -178,7 +203,7 @@ export function SearchDialog() {
   const navigate = useCallback(
     (result: SearchResult) => {
       setOpen(false);
-      router.push(`/wiki/${result.wikiId}`);
+      router.push(pageHref(result));
     },
     [router],
   );

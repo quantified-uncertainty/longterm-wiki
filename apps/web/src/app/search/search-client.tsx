@@ -44,6 +44,29 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "type", label: "By type" },
 ];
 
+// ── Directory route mapping ───────────────────────────────────────────
+// Entity types with dedicated directory pages get directory URLs instead
+// of /wiki/E<id>. Must stay in sync with ENTITY_TYPE_ROUTE in thing-sync.ts.
+
+const DIRECTORY_ROUTES: Record<string, string> = {
+  organization: "/organizations",
+  person: "/people",
+  "ai-model": "/ai-models",
+  benchmark: "/benchmarks",
+  policy: "/legislation",
+  project: "/projects",
+  approach: "/approaches",
+  event: "/events",
+  "research-area": "/research-areas",
+};
+
+/** Compute the best href for a page search result. */
+function pageHref(r: SearchResult): string {
+  const prefix = DIRECTORY_ROUTES[r.type];
+  if (prefix) return `${prefix}/${r.id}`;
+  return `/wiki/${r.wikiId}`;
+}
+
 // ── Unified result ───────────────────────────────────────────────────
 
 interface UnifiedResult {
@@ -65,7 +88,7 @@ function fromPage(r: SearchResult): UnifiedResult {
     title: r.title,
     context: r.type || null,
     type: "page",
-    href: `/wiki/${r.wikiId}`,
+    href: pageHref(r),
     description: r.description || null,
     snippet: r.snippet,
     source: "page",
