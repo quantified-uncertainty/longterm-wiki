@@ -706,7 +706,16 @@ export default async function LegislationDetailPage({
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
               {jurisdiction && <span>{jurisdiction}</span>}
-              {author && <span>by {author}</span>}
+              {author && (() => {
+                // Try to resolve author to a clickable entity link
+                const authorPolitician = entity.keyPoliticians.find((p) => author.includes(p.name) || p.role?.toLowerCase().includes("author"));
+                const authorHref = authorPolitician ? resolveEntityHref(authorPolitician.entityId) : null;
+                return authorHref ? (
+                  <span>by <Link href={authorHref} className="text-primary hover:underline">{author}</Link></span>
+                ) : (
+                  <span>by {author}</span>
+                );
+              })()}
               {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
               {entity.fullTextUrl && (
                 <a href={entity.fullTextUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
