@@ -1807,6 +1807,8 @@ export const divisionPersonnel = pgTable(
     personId: text("person_id").references(() => entities.stableId, {
       onDelete: "set null",
     }), // person stableId
+    /** Display name fallback when person doesn't have a matching entity. */
+    personDisplayName: text("person_display_name"),
     role: text("role").notNull(),
     startDate: text("start_date"),
     endDate: text("end_date"),

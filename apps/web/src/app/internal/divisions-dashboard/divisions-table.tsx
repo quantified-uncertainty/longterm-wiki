@@ -84,11 +84,13 @@ const columns: ColumnDef<DivisionRow>[] = [
         Parent Org
       </SortableHeader>
     ),
-    cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {row.original.parentOrgName ?? row.original.parentOrgId}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const label =
+        row.original.parentOrgName ?? row.original.parentOrgId ?? "-";
+      return (
+        <span className="text-xs text-muted-foreground">{label}</span>
+      );
+    },
     size: 160,
   },
   {

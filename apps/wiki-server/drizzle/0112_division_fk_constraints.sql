@@ -21,11 +21,25 @@ WHERE NOT EXISTS (
   SELECT 1 FROM divisions d WHERE d.id = dp.division_id
 );
 
--- Null out person_id values that don't exist in entities.stable_id
--- (these are display names rather than entity references)
--- First, make person_id nullable so SET NULL on delete can work
+-- Add a display-name fallback column to preserve person names that don't
+-- resolve to an entity stable_id. This mirrors the pattern in the
+-- `personnel` table (personDisplayName column).
+ALTER TABLE division_personnel
+  ADD COLUMN IF NOT EXISTS person_display_name TEXT;
+
+-- Copy non-matching person_id values into person_display_name before
+-- nulling them out, so the human-readable name is not lost.
+UPDATE division_personnel dp
+SET person_display_name = dp.person_id
+WHERE dp.person_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM entities e WHERE e.stable_id = dp.person_id
+  );
+
+-- Make person_id nullable so SET NULL on delete can work
 ALTER TABLE division_personnel ALTER COLUMN person_id DROP NOT NULL;
 
+-- Null out person_id values that don't exist in entities.stable_id
 UPDATE division_personnel dp
 SET person_id = NULL
 WHERE NOT EXISTS (
