@@ -31,6 +31,12 @@ function formatEntityType(type: string): string {
 }
 
 function formatIdAsTitle(id: string): string {
+  // Detect stableIds (10-char alphanumeric strings like "Khej79OA8g")
+  // and wiki IDs (E<number>). These should not be shown as titles since
+  // they are opaque identifiers, not human-readable slugs.
+  if (/^[A-Za-z0-9]{10}$/.test(id) || /^E\d+$/.test(id)) {
+    return id;
+  }
   return id
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
