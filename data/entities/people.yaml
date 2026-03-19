@@ -2233,27 +2233,6 @@
   tags:
     - ai-safety
 
-- id: anthony-aguirre
-  stableId: 9Siz0momEQ
-  type: person
-  title: Anthony Aguirre
-  description: >-
-    Co-founder and Executive Director of the Future of Life Institute (FLI). Also
-    serves as President of the Future of Life Foundation. Faggin Presidential
-    Professor for the Physics of Information at UC Santa Cruz. Co-founder of the
-    Foundational Questions Institute (FQXi, 2006) and Metaculus (2015). Author of
-    "Cosmological Koans" (2019) and "Keep The Future Human" (2025). Shifted FLI's
-    focus toward direct policy engagement and advocacy in recent years.
-  website: https://futureoflife.org/person/anthony-aguirre/
-  customFields:
-    - label: Role
-      value: Co-founder and Executive Director
-    - label: Organization
-      value: Future of Life Institute
-  tags:
-    - ai-safety
-    - ai-governance
-
 - id: mark-brakel
   stableId: KG46JUejyg
   type: person
