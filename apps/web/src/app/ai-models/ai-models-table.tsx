@@ -176,8 +176,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                   : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
               }`}
             >
-              All
-              <span className="ml-1 text-[10px] opacity-60">{developerCounts.all}</span>
+              All{" "}
+              <span className="text-[10px] opacity-60">{developerCounts.all}</span>
             </button>
             {developers.map(([devId, devName]) => (
               <button
@@ -193,15 +193,15 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                     : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
                 }`}
               >
-                {devName}
-                <span className="ml-1 text-[10px] opacity-60">
+                {devName}{" "}
+                <span className="text-[10px] opacity-60">
                   {developerCounts[devId] ?? 0}
                 </span>
               </button>
             ))}
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input
               type="checkbox"
