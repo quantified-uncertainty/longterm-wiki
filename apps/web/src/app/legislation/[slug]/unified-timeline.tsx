@@ -67,7 +67,10 @@ function ResourceLink({ resource }: { resource: TimelineResourceChild }) {
   const shortDate = formatShortDate(resource.publishedDate);
   return (
     <div className="group flex items-baseline gap-1.5 py-0.5 min-w-0">
-      <span className="text-muted-foreground/30 shrink-0 text-[10px] leading-none mt-px select-none">&bull;</span>
+      {/* Link icon */}
+      <svg className="shrink-0 w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors mt-px" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M6.5 9.5l3-3M7.5 11.5l-1.3 1.3a2.12 2.12 0 01-3-3L4.5 8.5M8.5 4.5l1.3-1.3a2.12 2.12 0 013 3L11.5 7.5" />
+      </svg>
       <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2">
         <a
           href={safeHref(resource.url)}
@@ -88,17 +91,6 @@ function ResourceLink({ resource }: { resource: TimelineResourceChild }) {
   );
 }
 
-function ResourceList({ resources }: { resources: TimelineResourceChild[] }) {
-  if (resources.length === 0) return null;
-  return (
-    <div className="mt-1 space-y-0 ml-0.5">
-      {resources.map((r) => (
-        <ResourceLink key={r.id} resource={r} />
-      ))}
-    </div>
-  );
-}
-
 // ── Child items ─────────────────────────────────────────────────────────
 
 function AmendmentEntry({
@@ -112,7 +104,7 @@ function AmendmentEntry({
       <div>
         <div className="flex items-baseline justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-amber-600/70 dark:text-amber-400/60 mr-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mr-1.5">
               Amended
             </span>
             <span className="text-sm text-foreground/80">
@@ -139,7 +131,6 @@ function AmendmentEntry({
           </span>
         </div>
       </div>
-      <ResourceList resources={child.resources} />
     </div>
   );
 }
@@ -154,7 +145,7 @@ function VoteEntry({
       <div className="absolute left-0 top-[6px] w-2 h-2 rounded-full bg-blue-400/60 dark:bg-blue-500/40" />
       <div className="flex items-baseline justify-between gap-3">
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-blue-600/70 dark:text-blue-400/60">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Vote
           </span>
           <span className="text-sm font-medium">{child.chamber}</span>
@@ -170,7 +161,6 @@ function VoteEntry({
           </span>
         )}
       </div>
-      <ResourceList resources={child.resources} />
     </div>
   );
 }

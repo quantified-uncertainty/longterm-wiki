@@ -159,7 +159,7 @@ describe("buildUnifiedTimeline", () => {
     expect(result.earlyCoverage[0].id).toBe("r1");
   });
 
-  it("nests resources under nearest preceding event (amendment)", () => {
+  it("places resources as flat children of milestones alongside amendments", () => {
     const milestones = makeMilestones(
       ["Introduced", "February 2024"],
       ["Passed Committee", "August 2024"]
@@ -169,13 +169,13 @@ describe("buildUnifiedTimeline", () => {
     ];
     const resources = [makeResource("r1", "2024-07-01")];
     const result = buildUnifiedTimeline(milestones, [], amendments, resources);
-    // r1 (July 1) should be nested under the June 20 amendment
+    // r1 (July 1) should be a flat child of the Introduced milestone
     const introChildren = result.milestones[0].children;
-    const amendment = introChildren.find((c) => c.type === "amendment");
-    expect(amendment).toBeDefined();
-    if (amendment?.type === "amendment") {
-      expect(amendment.resources).toHaveLength(1);
-      expect(amendment.resources[0].id).toBe("r1");
+    expect(introChildren).toHaveLength(2); // 1 amendment + 1 resource
+    const resourceChild = introChildren.find((c) => c.type === "resource");
+    expect(resourceChild).toBeDefined();
+    if (resourceChild?.type === "resource") {
+      expect(resourceChild.id).toBe("r1");
     }
   });
 

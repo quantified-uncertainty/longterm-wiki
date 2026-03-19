@@ -28,7 +28,6 @@ export type TimelineChild =
       description: string;
       url?: string;
       author?: string;
-      resources: TimelineResourceChild[];
     }
   | {
       type: "vote";
@@ -42,7 +41,6 @@ export type TimelineChild =
       ayesRep?: number;
       noesDem?: number;
       noesRep?: number;
-      resources: TimelineResourceChild[];
     }
   | TimelineResourceChild;
 
@@ -268,7 +266,6 @@ export function buildUnifiedTimeline(
       description: amendment.description,
       url: amendment.url,
       author: amendment.author,
-      resources: [],
     });
   }
 
@@ -289,7 +286,6 @@ export function buildUnifiedTimeline(
       ayesRep: vote.ayesRep,
       noesDem: vote.noesDem,
       noesRep: vote.noesRep,
-      resources: [],
     });
   }
 
@@ -309,12 +305,12 @@ export function buildUnifiedTimeline(
     m.children.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
   }
 
-  // Step 5: Assign resources to the nearest preceding event of any type
+  // Step 5: Assign resources as flat children of milestones (sorted chronologically)
   const datedResources = rawResources
     .filter((r) => r.publishedDate)
     .map((r) => ({
       ...r,
-      publishedDate: r.publishedDate!, // asserted non-null by filter
+      publishedDate: r.publishedDate!,
       sortDate: r.publishedDate!,
     }));
 
@@ -332,35 +328,15 @@ export function buildUnifiedTimeline(
       category: resource.category,
     };
 
-    // Find which milestone this resource falls under
     const milestoneIdx = findMilestoneIndex(milestones, resource.sortDate);
     if (milestoneIdx < 0) {
-      // Before the first milestone
       earlyCoverage.push(resChild);
-      continue;
-    }
-
-    const milestone = milestones[milestoneIdx];
-
-    // Find the nearest preceding event (amendment or vote) within this milestone
-    let attachedToChild = false;
-    for (let ci = milestone.children.length - 1; ci >= 0; ci--) {
-      const child = milestone.children[ci];
-      if (child.type !== "resource" && child.sortDate <= resource.sortDate) {
-        // Attach to this child (amendment or vote)
-        child.resources.push(resChild);
-        attachedToChild = true;
-        break;
-      }
-    }
-
-    if (!attachedToChild) {
-      // No preceding child event — attach directly to milestone as a child
-      milestone.children.push(resChild);
+    } else {
+      milestones[milestoneIdx].children.push(resChild);
     }
   }
 
-  // Re-sort children (resources may have been added out of order)
+  // Re-sort children (resources interleaved with amendments/votes by date)
   for (const m of milestones) {
     m.children.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
   }
