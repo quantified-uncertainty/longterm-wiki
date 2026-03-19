@@ -88,6 +88,7 @@ export const citationQuotes = pgTable(
       table.footnote
     ),
     index("idx_cq_page_id").on(table.pageId),
+    index("idx_cq_page_id_int").on(table.pageIdInt),
     index("idx_cq_url").on(table.url),
     index("idx_cq_verified").on(table.quoteVerified),
     index("idx_cq_accuracy").on(table.accuracyVerdict),
@@ -228,6 +229,7 @@ export const citationAccuracySnapshots = pgTable(
   },
   (table) => [
     index("idx_cas_page_id").on(table.pageId),
+    index("idx_cas_page_id_int").on(table.pageIdInt),
     index("idx_cas_snapshot_at").on(table.snapshotAt),
   ]
 );
@@ -250,6 +252,7 @@ export const editLogs = pgTable(
   },
   (table) => [
     index("idx_el_page_id").on(table.pageId),
+    index("idx_el_page_id_int").on(table.pageIdInt),
     index("idx_el_date").on(table.date),
     index("idx_el_tool").on(table.tool),
   ]
@@ -272,6 +275,7 @@ export const hallucinationRiskSnapshots = pgTable(
   },
   (table) => [
     index("idx_hrs_page_id").on(table.pageId),
+    index("idx_hrs_page_id_int").on(table.pageIdInt),
     index("idx_hrs_computed_at").on(table.computedAt),
     index("idx_hrs_level").on(table.level),
   ]
@@ -321,6 +325,7 @@ export const sessionPages = pgTable(
   (table) => [
     primaryKey({ columns: [table.sessionId, table.pageId] }),
     index("idx_sp_page_id").on(table.pageId),
+    index("idx_sp_page_id_int").on(table.pageIdInt),
   ]
 );
 
@@ -657,6 +662,7 @@ export const resourceCitations = pgTable(
   (table) => [
     primaryKey({ columns: [table.resourceId, table.pageId] }),
     index("idx_rc_page_id").on(table.pageId),
+    index("idx_rc_page_id_int").on(table.pageIdInt),
   ]
 );
 
@@ -917,6 +923,7 @@ export const autoUpdateNewsItems = pgTable(
     index("idx_auni_source_id").on(table.sourceId),
     index("idx_auni_relevance").on(table.relevanceScore),
     index("idx_auni_routed_page").on(table.routedToPageId),
+    index("idx_auni_routed_page_id_int").on(table.routedToPageIdInt),
     index("idx_auni_published_at").on(table.publishedAt),
   ]
 );

@@ -799,6 +799,13 @@
       "when": 1779436800000,
       "tag": "0113_things_search_vector_add_type",
       "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1779523200000,
+      "tag": "0114_add_page_id_int_indexes",
+      "breakpoints": true
     }
   ]
 }
