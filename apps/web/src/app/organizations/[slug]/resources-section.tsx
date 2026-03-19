@@ -12,7 +12,7 @@ import {
   type ColumnDef,
   type SortingState,
 } from "@tanstack/react-table";
-import { Search, ChevronLeft, ChevronRight, AlertTriangle, Lock, Archive } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, AlertTriangle, Lock, Archive, LayoutList, Table2 } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import {
   Table,
@@ -24,19 +24,11 @@ import {
 } from "@/components/ui/table";
 import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "./org-data";
+import { ResourceList } from "@/components/resources/ResourceList";
+import { RESOURCE_TYPE_COLORS, RESOURCE_TYPE_LABELS, STANCE_COLORS, CREDIBILITY_COLORS } from "@/components/resources/resource-constants";
 
-const TYPE_COLORS: Record<string, string> = {
-  paper: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-  blog: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-  report: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
-  book: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  web: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  government: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
-  talk: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
-  podcast: "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
-};
-
-const DEFAULT_COLOR = "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+const TYPE_COLORS = RESOURCE_TYPE_COLORS;
+const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;
 
 /** Compute which optional columns have enough data to be worth showing. */
 function computeColumnVisibility(
@@ -58,13 +50,7 @@ function computeColumnVisibility(
   };
 }
 
-const STANCE_COLORS: Record<string, string> = {
-  support: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-  oppose: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-  neutral: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
-  mixed: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  analysis: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-};
+// STANCE_COLORS imported from resource-constants
 
 function makeColumns(opts: {
   showDate: boolean;
@@ -311,17 +297,23 @@ function makeColumns(opts: {
   return cols;
 }
 
+type ViewMode = "table" | "card";
+
 export function OrgResourcesSection({
   resources,
   title,
   emptyMessage,
   alwaysShowColumns,
+  defaultView = "table",
 }: {
   resources: OrgResourceRow[];
   title: string;
   emptyMessage: string;
   alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
+  defaultView?: ViewMode;
 }) {
+  const [view, setView] = useState<ViewMode>(defaultView);
+
   if (resources.length === 0) {
     return (
       <section>
@@ -331,10 +323,46 @@ export function OrgResourcesSection({
     );
   }
 
+  if (view === "card") {
+    return (
+      <section>
+        <div className="flex items-center justify-between mb-2">
+          <div /> {/* spacer — ResourceList renders its own header */}
+          <ViewToggle view={view} onChange={setView} />
+        </div>
+        <ResourceList resources={resources} title={title} emptyMessage={emptyMessage} />
+      </section>
+    );
+  }
+
   return (
     <section>
+      <div className="flex items-center justify-end mb-1">
+        <ViewToggle view={view} onChange={setView} />
+      </div>
       <OrgResourcesTable resources={resources} title={title} alwaysShowColumns={alwaysShowColumns} />
     </section>
+  );
+}
+
+function ViewToggle({ view, onChange }: { view: ViewMode; onChange: (v: ViewMode) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 border border-border rounded-md p-0.5">
+      <button
+        onClick={() => onChange("table")}
+        className={`p-1 rounded transition-colors ${view === "table" ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
+        title="Table view"
+      >
+        <Table2 className="h-3.5 w-3.5" />
+      </button>
+      <button
+        onClick={() => onChange("card")}
+        className={`p-1 rounded transition-colors ${view === "card" ? "bg-muted text-foreground" : "text-muted-foreground/50 hover:text-muted-foreground"}`}
+        title="Card view"
+      >
+        <LayoutList className="h-3.5 w-3.5" />
+      </button>
+    </div>
   );
 }
 
