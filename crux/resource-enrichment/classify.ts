@@ -47,7 +47,7 @@ export async function classifyCommand(
     console.log(`  Succeeded: ${status.request_counts.succeeded}`);
     console.log(`  Errored: ${status.request_counts.errored}`);
     console.log(`  Processing: ${status.request_counts.processing}`);
-    return { exitCode: 0 };
+    return { exitCode: 0, output: '' };
   }
 
   if (subcommand === 'submit' || subcommand === 'dry-run') {
@@ -63,7 +63,7 @@ export async function classifyCommand(
     if (status.processing_status === 'ended') {
       return await downloadAndApplyClassification(batchId, dryRun);
     }
-    return { exitCode: 0 };
+    return { exitCode: 0, output: '' };
   }
 
   console.log(`Usage:
@@ -71,7 +71,7 @@ export async function classifyCommand(
   crux resources classify status --batch-id=ID              Check batch status
   crux resources classify poll --batch-id=ID                Poll until complete, then apply
   crux resources classify download --batch-id=ID            Download and apply results`);
-  return { exitCode: 0 };
+  return { exitCode: 0, output: '' };
 }
 
 async function submitClassification(limit: number, dryRun: boolean): Promise<CommandResult> {
