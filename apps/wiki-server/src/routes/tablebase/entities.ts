@@ -107,6 +107,8 @@ const DirectoryQuery = z.object({
   entityType: z.string().min(1).max(100),
   /** Comma-separated list of fact measures to include (e.g., "revenue,headcount") */
   measures: z.string().max(500).optional(),
+  /** When "true", include stub entities (reference-only, no rich data). Default: exclude stubs. */
+  includeStubs: z.enum(["true", "false"]).default("false").optional(),
 });
 
 // ---- Helpers ----
@@ -342,7 +344,7 @@ const entitiesApp = new Hono()
   // ---- GET /directory?entityType=organization&measures=revenue,headcount ----
   // Returns all entities of a type with their latest facts for directory pages.
   .get("/directory", zv("query", DirectoryQuery), async (c) => {
-    const { entityType, measures } = c.req.valid("query");
+    const { entityType, measures, includeStubs } = c.req.valid("query");
 
     // Reject unknown entity types to prevent arbitrary string injection and
     // to surface misconfigured callers early.
@@ -355,20 +357,39 @@ const entitiesApp = new Hono()
 
     const db = getDrizzleDb();
 
+    // Build metadata exclusion conditions:
+    // - Always exclude deprecated entities
+    // - Exclude stub entities by default (reference-only entities created by
+    //   ensure-entities/create-entity that lack rich data). Stubs are needed as
+    //   FK targets (personnel records) but should not appear in directory listings.
+    const metadataConditions = [
+      or(
+        sql`${entities.metadata} IS NULL`,
+        sql`${entities.metadata}->>'deprecated' IS NULL`,
+        sql`${entities.metadata}->>'deprecated' != 'true'`,
+      ),
+    ];
+
+    if (includeStubs !== "true") {
+      metadataConditions.push(
+        or(
+          sql`${entities.metadata} IS NULL`,
+          sql`${entities.metadata}->>'stub' IS NULL`,
+          sql`${entities.metadata}->>'stub' != 'true'`,
+        ),
+      );
+    }
+
     // 1. Get all entities of the requested type (capped to prevent unbounded scans).
-    //    Exclude deprecated entities — they should not appear in directory listings.
-    //    The deprecated flag is stored in the metadata JSONB column.
+    //    Exclude deprecated and stub entities from directory listings by default.
+    //    Both flags are stored in the metadata JSONB column.
     const entityRows = await db
       .select()
       .from(entities)
       .where(
         and(
           eq(entities.entityType, entityType),
-          or(
-            sql`${entities.metadata} IS NULL`,
-            sql`${entities.metadata}->>'deprecated' IS NULL`,
-            sql`${entities.metadata}->>'deprecated' != 'true'`,
-          ),
+          ...metadataConditions,
         ),
       )
       .orderBy(asc(entities.title))

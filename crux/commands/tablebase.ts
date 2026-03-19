@@ -297,6 +297,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
   const stableId = generateId(`${entityType}:${slug}`);
 
   // Sync entity to wiki-server (no wikiId — not a full wiki entity)
+  // Mark as stub so directory pages can exclude these reference-only entities
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const description = (options.description as string) || undefined;
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
@@ -306,6 +307,7 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
       entityType,
       title: name,
       ...(description && { description }),
+      metadata: { stub: true },
     }],
   });
 
@@ -769,6 +771,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   }
 
   // Batch sync all new entities (lightweight — no wikiId)
+  // Mark as stub so directory pages can exclude these reference-only entities
   if (toCreate.length > 0 && !dryRun) {
     const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
       entities: toCreate.map(e => ({
@@ -776,6 +779,7 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
         stableId: e.stableId,
         entityType,
         title: e.name,
+        metadata: { stub: true },
       })),
     });
     if (!syncResult.ok) {

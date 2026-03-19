@@ -904,9 +904,19 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 
 export type PGResearchArea = NonNullable<TableBaseShape["researchAreas"]>[number];
 
-/** Get all enriched research areas from PG. Returns empty array if not available. */
-export function getResearchAreasFromPG(): PGResearchArea[] {
-  return getTableBase().researchAreas ?? [];
+/**
+ * Get enriched research areas from PG.
+ *
+ * By default, excludes empty stub areas (0 orgs AND 0 papers) since they add
+ * noise to the directory without providing browseable content. Pass
+ * `includeEmpty: true` to get all areas (e.g., for internal dashboards).
+ */
+export function getResearchAreasFromPG(
+  options: { includeEmpty?: boolean } = {},
+): PGResearchArea[] {
+  const all = getTableBase().researchAreas ?? [];
+  if (options.includeEmpty) return all;
+  return all.filter((a) => a.orgCount > 0 || a.paperCount > 0);
 }
 
 // ============================================================================
