@@ -92,6 +92,7 @@ import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-i
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
+import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
 import * as pagesCommands from './commands/pages.ts';
@@ -151,6 +152,7 @@ const domains = {
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,
+  'qa-checks': qaChecksCommands,
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
   pages: pagesCommands,

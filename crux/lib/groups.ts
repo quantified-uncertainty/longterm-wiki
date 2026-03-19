@@ -47,6 +47,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'resources',
       'check-links',
       'qa-sweep',
+      'qa-checks',
       'evals',
       'research',
       'grokipedia',
