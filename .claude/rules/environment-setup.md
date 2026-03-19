@@ -16,6 +16,23 @@ ln -sf ../../../apps/wiki-server/node_modules apps/wiki-server/node_modules  # w
 
 Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with missing package errors. The root `node_modules` is needed for `tsx`. The wiki-server `node_modules` is needed because `apps/web/tsconfig.json` has `@wiki-server/*` path aliases that pull in wiki-server routes, and TypeScript resolves their dependencies (like `drizzle-orm`) from the wiki-server's `node_modules`.
 
+## Dev server ports — NEVER use localhost:3001 from agent slots
+
+Port 3001 belongs to the user's main dev server (`lw/main`). Agents must use their own port.
+
+| Location | Port | Notes |
+|----------|------|-------|
+| `lw/main` | 3001 | User's main dev server — **do not touch** |
+| `lw/a1` – `lw/a15` | 3011–3025 | `3010 + slot number` |
+| Worktrees | Pick unused | Use `npx next dev -p <port>` with a free port |
+
+**Rules:**
+- **Never `pkill -f "next dev"`** — that kills ALL dev servers including the user's
+- **Never start a dev server on port 3001** from a slot or worktree
+- **Never browse to localhost:3001** from a slot agent — you'll see the wrong branch
+- Worktree agents generally don't need dev servers (they're for quick fixes like rebases)
+- If you need to verify UI changes, start on your slot's port: `npx next dev -p 3011`
+
 ## LSP support (recommended)
 
 Enable LSP in Claude Code for IDE-quality code navigation — go-to-definition, find-references, and type-aware search instead of grep.
