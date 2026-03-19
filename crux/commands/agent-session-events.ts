@@ -2,8 +2,8 @@
  * Agent Session Events Command Handlers — Activity timeline for agent sessions
  *
  * Usage:
- *   crux agent-session-events log "message" [--type=note] [--agent=ID]   Append an event
- *   crux agent-session-events list [--agent=ID] [--limit=50]             Show event timeline
+ *   crux sys agent-session-events log "message" [--type=note] [--agent=ID]   Append an event
+ *   crux sys agent-session-events list [--agent=ID] [--limit=50]             Show event timeline
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -117,7 +117,7 @@ async function logCommand(
   if (!message) {
     return {
       exitCode: 1,
-      output: `${c.red}Usage: crux agent-session-events log "message" [--type=note] [--agent=ID]${c.reset}
+      output: `${c.red}Usage: crux sys agent-session-events log "message" [--type=note] [--agent=ID]${c.reset}
 
   Append an event to the agent's activity timeline.
 
@@ -238,9 +238,9 @@ Options:
   --ci             CI-compatible output
 
 Examples:
-  crux agent-session-events log "Starting implementation of issue #42"
-  crux agent-session-events log "Tests failing: 3 errors in auth module" --type=error
-  crux agent-session-events list
-  crux agent-session-events list --agent=7 --limit=100
+  crux sys agent-session-events log "Starting implementation of issue #42"
+  crux sys agent-session-events log "Tests failing: 3 errors in auth module" --type=error
+  crux sys agent-session-events list
+  crux sys agent-session-events list --agent=7 --limit=100
 `;
 }

@@ -4,8 +4,8 @@
  * Tools for managing entity IDs and references.
  *
  * Usage:
- *   crux entity rename <old-id> <new-id>           # Preview rename
- *   crux entity rename <old-id> <new-id> --apply   # Apply rename
+ *   crux tb entity rename <old-id> <new-id>           # Preview rename
+ *   crux tb entity rename <old-id> <new-id> --apply   # Apply rename
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -32,7 +32,7 @@ async function renameCommand(
   if (!oldId || !newId) {
     return {
       exitCode: 1,
-      output: `Usage: crux entity rename <old-id> <new-id> [--apply] [--verbose]
+      output: `Usage: crux tb entity rename <old-id> <new-id> [--apply] [--verbose]
 
   Safely renames entity IDs across all MDX and YAML files.
   Uses word-boundary matching so "E6" never matches "E64".
@@ -43,9 +43,9 @@ Options:
   --dry-run   Alias for preview (default behaviour)
 
 Examples:
-  crux entity rename E6 ai-control           # Preview
-  crux entity rename E6 ai-control --apply   # Apply
-  crux entity rename old-slug new-slug --apply --verbose`,
+  crux tb entity rename E6 ai-control           # Preview
+  crux tb entity rename E6 ai-control --apply   # Apply
+  crux tb entity rename old-slug new-slug --apply --verbose`,
     };
   }
 
@@ -80,8 +80,8 @@ Why "rename" instead of find-replace:
   This command uses word-boundary regex (\\b) to match only exact IDs.
 
 Examples:
-  crux entity rename E6 ai-control              Preview changes
-  crux entity rename E6 ai-control --apply      Apply changes
-  crux entity rename old-slug new-slug --apply  Rename a slug
+  crux tb entity rename E6 ai-control              Preview changes
+  crux tb entity rename E6 ai-control --apply      Apply changes
+  crux tb entity rename old-slug new-slug --apply  Rename a slug
 `;
 }

@@ -180,21 +180,21 @@ Options:
   --scope=content Content-only gate: skip build-data/tests/typechecks (gate only)
 
 Examples:
-  crux validate                           Run all checks
-  crux validate gate                      Run CI-blocking checks (with triage)
-  crux validate gate --full               Include full Next.js build
-  crux validate gate --no-triage          Skip LLM triage, run all checks
-  crux validate gate --no-cache           Force re-run even if stamp matches HEAD
-  crux validate gate --full-gate          Force all checks (implies --no-triage, --no-cache)
-  crux validate gate --scope=content      Content-only checks (~15s vs ~5min)
-  crux validate compile --quick           Quick compile check
-  crux validate unified --rules=dollar-signs,markdown-lists
-  crux validate unified --fix             Auto-fix unified rule issues
-  crux validate entity-links --fix        Convert markdown links to EntityLink
-  crux validate entity-refs              Check KB record entity references
-  crux validate entity-refs --threshold=90  Fail if link rate < 90%
-  crux validate all --skip=mermaid,style  Skip specific checks
-  crux validate directory-pages            Audit directory page data quality
-  crux validate directory-pages --type=person  Check one entity type
+  crux w validate                           Run all checks
+  crux w validate gate                      Run CI-blocking checks (with triage)
+  crux w validate gate --full               Include full Next.js build
+  crux w validate gate --no-triage          Skip LLM triage, run all checks
+  crux w validate gate --no-cache           Force re-run even if stamp matches HEAD
+  crux w validate gate --full-gate          Force all checks (implies --no-triage, --no-cache)
+  crux w validate gate --scope=content      Content-only checks (~15s vs ~5min)
+  crux w validate compile --quick           Quick compile check
+  crux w validate unified --rules=dollar-signs,markdown-lists
+  crux w validate unified --fix             Auto-fix unified rule issues
+  crux w validate entity-links --fix        Convert markdown links to EntityLink
+  crux w validate entity-refs              Check KB record entity references
+  crux w validate entity-refs --threshold=90  Fail if link rate < 90%
+  crux w validate all --skip=mermaid,style  Skip specific checks
+  crux w validate directory-pages            Audit directory page data quality
+  crux w validate directory-pages --type=person  Check one entity type
 `;
 }

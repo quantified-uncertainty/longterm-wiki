@@ -63,10 +63,10 @@ Options:
   --stats         Show statistics (scan)
 
 Examples:
-  crux analyze                         Full health report
-  crux analyze --brief                 Summary only
-  crux analyze links --orphans         Find orphaned pages
-  crux analyze links --top-linked      Find most linked pages
-  crux analyze entity-links sam-altman Check linking for an entity
+  crux w analyze                         Full health report
+  crux w analyze --brief                 Summary only
+  crux w analyze links --orphans         Find orphaned pages
+  crux w analyze links --top-linked      Find most linked pages
+  crux w analyze entity-links sam-altman Check linking for an entity
 `;
 }

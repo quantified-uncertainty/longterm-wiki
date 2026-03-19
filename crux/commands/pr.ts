@@ -4,12 +4,12 @@
  * Utilities for managing GitHub Pull Requests associated with the current branch.
  *
  * Usage:
- *   crux pr create             Create a PR for the current branch (corruption-safe)
- *   crux pr detect             Detect open PR for current branch (returns PR URL + number)
- *   crux pr fix-body           Detect and repair literal \n in the current branch's PR body
- *   crux pr fix-body --pr=N    Target a specific PR number instead of auto-detecting
- *   crux pr rebase-all         Rebase all open non-draft PRs onto main (CI usage)
- *   crux pr resolve-conflicts  Find and resolve all conflicted PRs
+ *   crux gh pr create             Create a PR for the current branch (corruption-safe)
+ *   crux gh pr detect             Detect open PR for current branch (returns PR URL + number)
+ *   crux gh pr fix-body           Detect and repair literal \n in the current branch's PR body
+ *   crux gh pr fix-body --pr=N    Target a specific PR number instead of auto-detecting
+ *   crux gh pr rebase-all         Rebase all open non-draft PRs onto main (CI usage)
+ *   crux gh pr resolve-conflicts  Find and resolve all conflicted PRs
  */
 
 import { readFileSync } from 'fs';
@@ -261,7 +261,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
           `  Provide a body using one of:\n` +
           `    --body-file=<path>          (recommended for multi-line)\n` +
           `    --body="short description"  (single line)\n` +
-          `    stdin heredoc:  pnpm crux pr create --title="..." <<'PRBODY'\\n## Summary\\nPRBODY\n` +
+          `    stdin heredoc:  pnpm crux gh pr create --title="..." <<'PRBODY'\\n## Summary\\nPRBODY\n` +
           `  Or pass --allow-empty-body to force creation without a description.\n`,
         exitCode: 1,
       };
@@ -270,7 +270,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
 
   if (!title) {
     return {
-      output: `${c.red}Usage: crux pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -343,7 +343,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
       output:
         `${c.yellow}PR already exists for branch ${branch}:${c.reset}\n` +
         `  PR #${pr.number}: ${pr.html_url}\n` +
-        `  ${c.dim}Use \`crux pr fix-body\` to update the body if needed.${c.reset}\n`,
+        `  ${c.dim}Use \`crux gh pr fix-body\` to update the body if needed.${c.reset}\n`,
       exitCode: 0,
     };
   }
@@ -707,9 +707,9 @@ async function ready(_args: string[], options: CommandOptions): Promise<CommandR
  * Check a single PR or all open PRs for issues and merge eligibility.
  *
  * Usage:
- *   crux pr check 1837           Single PR: issues + merge eligibility report
- *   crux pr check --all          All open PRs: ranked by issue score
- *   crux pr check --all --json   Machine-readable output
+ *   crux gh pr check 1837           Single PR: issues + merge eligibility report
+ *   crux gh pr check --all          All open PRs: ranked by issue score
+ *   crux gh pr check --all --json   Machine-readable output
  */
 async function check(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
@@ -798,7 +798,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
   const prNum = parseInt(args[0], 10);
   if (!prNum || isNaN(prNum)) {
     return {
-      output: `${c.red}Usage: crux pr check <N> or crux pr check --all${c.reset}\n`,
+      output: `${c.red}Usage: crux gh pr check <N> or crux pr check --all${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -870,8 +870,8 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
  * Detect file-level overlaps across open PRs.
  *
  * Usage:
- *   crux pr overlaps            Show file overlaps across open PRs
- *   crux pr overlaps --json     Machine-readable
+ *   crux gh pr overlaps            Show file overlaps across open PRs
+ *   crux gh pr overlaps --json     Machine-readable
  */
 async function overlaps(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
@@ -975,7 +975,7 @@ Options (resolve-conflicts):
 
 Examples:
   # Multi-line body via heredoc (recommended — avoids sh/dash heredoc issues):
-  pnpm crux pr create --title="Add feature X" <<'EOF'
+  pnpm crux gh pr create --title="Add feature X" <<'EOF'
   ## Summary
   - Added X
 
@@ -984,25 +984,25 @@ Examples:
   EOF
 
   # Multi-line body via file (also recommended):
-  pnpm crux pr create --title="Add feature X" --body-file=/tmp/pr-body.md
+  pnpm crux gh pr create --title="Add feature X" --body-file=/tmp/pr-body.md
 
   # Short single-line body inline:
-  pnpm crux pr create --title="Fix typo" --body="Fix typo in docs"
+  pnpm crux gh pr create --title="Fix typo" --body="Fix typo in docs"
 
-  pnpm crux pr detect                    # Check if PR exists for this branch
-  pnpm crux pr detect --ci               # JSON output for scripts
-  pnpm crux pr fix-body                  # Fix PR for current branch
-  pnpm crux pr fix-body --pr=42          # Fix a specific PR
-  pnpm crux pr validate-test-plan        # Check test plan on current PR
-  pnpm crux pr validate-test-plan --pr=42 --json  # Check specific PR (JSON)
-  pnpm crux pr rebase-all                 # Rebase all open PRs onto main
-  pnpm crux pr rebase-all --verbose       # With detailed output
-  pnpm crux pr check 1837                # Check single PR for issues
-  pnpm crux pr check --all               # Check all open PRs, ranked
-  pnpm crux pr check --all --json        # Machine-readable output
-  pnpm crux pr overlaps                  # Detect file overlaps across PRs
-  pnpm crux pr overlaps --json           # Machine-readable output
-  pnpm crux pr resolve-conflicts         # Resolve all conflicted PRs
-  pnpm crux pr resolve-conflicts --verbose  # With detailed output
+  pnpm crux gh pr detect                    # Check if PR exists for this branch
+  pnpm crux gh pr detect --ci               # JSON output for scripts
+  pnpm crux gh pr fix-body                  # Fix PR for current branch
+  pnpm crux gh pr fix-body --pr=42          # Fix a specific PR
+  pnpm crux gh pr validate-test-plan        # Check test plan on current PR
+  pnpm crux gh pr validate-test-plan --pr=42 --json  # Check specific PR (JSON)
+  pnpm crux gh pr rebase-all                 # Rebase all open PRs onto main
+  pnpm crux gh pr rebase-all --verbose       # With detailed output
+  pnpm crux gh pr check 1837                # Check single PR for issues
+  pnpm crux gh pr check --all               # Check all open PRs, ranked
+  pnpm crux gh pr check --all --json        # Machine-readable output
+  pnpm crux gh pr overlaps                  # Detect file overlaps across PRs
+  pnpm crux gh pr overlaps --json           # Machine-readable output
+  pnpm crux gh pr resolve-conflicts         # Resolve all conflicted PRs
+  pnpm crux gh pr resolve-conflicts --verbose  # With detailed output
 `.trim();
 }

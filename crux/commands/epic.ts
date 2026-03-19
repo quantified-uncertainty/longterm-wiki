@@ -17,16 +17,16 @@
  * Requires: GITHUB_TOKEN with `discussion` scope, Discussions enabled on the repo.
  *
  * Usage:
- *   crux epic list                         List open epics
- *   crux epic create <title> [--body=...]  Create a new epic discussion
- *   crux epic view <N>                     View epic with task status + comments
- *   crux epic comment <N> <message>        Post a status update comment
- *   crux epic update <N> --body=...        Update the epic body (living document)
- *   crux epic link <N> --issue=M           Link an issue to the epic
- *   crux epic unlink <N> --issue=M         Unlink an issue from the epic
- *   crux epic status <N>                   Show progress summary (open/closed linked issues)
- *   crux epic close <N>                    Close a completed epic
- *   crux epic categories                   List available discussion categories
+ *   crux gh epic list                         List open epics
+ *   crux gh epic create <title> [--body=...]  Create a new epic discussion
+ *   crux gh epic view <N>                     View epic with task status + comments
+ *   crux gh epic comment <N> <message>        Post a status update comment
+ *   crux gh epic update <N> --body=...        Update the epic body (living document)
+ *   crux gh epic link <N> --issue=M           Link an issue to the epic
+ *   crux gh epic unlink <N> --issue=M         Unlink an issue from the epic
+ *   crux gh epic status <N>                   Show progress summary (open/closed linked issues)
+ *   crux gh epic close <N>                    Close a completed epic
+ *   crux gh epic categories                   List available discussion categories
  */
 
 import { readFileSync } from 'fs';
@@ -378,7 +378,7 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
     if (category) {
       output += `${c.dim}Category: ${category.name}${c.reset}\n`;
     }
-    output += `\nCreate one with: ${c.cyan}crux epic create "Epic title"${c.reset}\n`;
+    output += `\nCreate one with: ${c.cyan}crux gh epic create "Epic title"${c.reset}\n`;
     return { output, exitCode: 0 };
   }
 
@@ -406,7 +406,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args.filter((a) => !a.startsWith('--'))[0];
   if (!title) {
     return {
-      output: `${c.red}Usage: crux epic create <title> [--body=...] [--body-file=...] [--pin]${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic create <title> [--body=...] [--body-file=...] [--pin]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -478,7 +478,7 @@ function buildDefaultEpicBody(title: string): string {
     ``,
     `## Tasks`,
     ``,
-    `<!-- Link issues with: crux epic link <epic-num> --issue=N -->`,
+    `<!-- Link issues with: crux gh epic link <epic-num> --issue=N -->`,
     ``,
     `## Decisions`,
     ``,
@@ -501,7 +501,7 @@ async function view(args: string[], options: CommandOptions): Promise<CommandRes
   const num = parseRequiredInt(args.filter((a) => !a.startsWith('--'))[0]);
   if (!num) {
     return {
-      output: `${c.red}Usage: crux epic view <discussion-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic view <discussion-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -544,7 +544,7 @@ async function view(args: string[], options: CommandOptions): Promise<CommandRes
   // Linked issues summary
   if (linkedIssues.length > 0) {
     output += `${c.bold}Linked Issues:${c.reset} ${linkedIssues.map((n) => `#${n}`).join(', ')}\n`;
-    output += `${c.dim}Run 'crux epic status ${d.number}' for detailed issue status.${c.reset}\n\n`;
+    output += `${c.dim}Run 'crux gh epic status ${d.number}' for detailed issue status.${c.reset}\n\n`;
   }
 
   // Recent comments
@@ -594,8 +594,8 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
 
   if (!num || !message) {
     return {
-      output: `${c.red}Usage: crux epic comment <discussion-number> <message>${c.reset}\n` +
-        `${c.dim}Or: crux epic comment <N> --body-file=<path>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic comment <discussion-number> <message>${c.reset}\n` +
+        `${c.dim}Or: crux gh epic comment <N> --body-file=<path>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -651,7 +651,7 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
   const num = parseRequiredInt(args.filter((a) => !a.startsWith('--'))[0]);
   if (!num) {
     return {
-      output: `${c.red}Usage: crux epic update <discussion-number> --body=... | --body-file=<path>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic update <discussion-number> --body=... | --body-file=<path>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -698,7 +698,7 @@ async function link(args: string[], options: CommandOptions): Promise<CommandRes
 
   if (!num || !issueNum) {
     return {
-      output: `${c.red}Usage: crux epic link <epic-number> --issue=<issue-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic link <epic-number> --issue=<issue-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -759,7 +759,7 @@ async function unlink(args: string[], options: CommandOptions): Promise<CommandR
 
   if (!num || !issueNum) {
     return {
-      output: `${c.red}Usage: crux epic unlink <epic-number> --issue=<issue-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic unlink <epic-number> --issue=<issue-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -803,7 +803,7 @@ async function status(args: string[], options: CommandOptions): Promise<CommandR
   const num = parseRequiredInt(args.filter((a) => !a.startsWith('--'))[0]);
   if (!num) {
     return {
-      output: `${c.red}Usage: crux epic status <discussion-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic status <discussion-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -825,7 +825,7 @@ async function status(args: string[], options: CommandOptions): Promise<CommandR
   if (linkedIssueNums.length === 0) {
     let output = `${c.bold}Epic #${num}: ${d.title}${c.reset}\n`;
     output += `${c.yellow}No linked issues found.${c.reset}\n`;
-    output += `Link issues with: ${c.cyan}crux epic link ${num} --issue=N${c.reset}\n`;
+    output += `Link issues with: ${c.cyan}crux gh epic link ${num} --issue=N${c.reset}\n`;
     return { output, exitCode: 0 };
   }
 
@@ -911,7 +911,7 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
   const num = parseRequiredInt(args.filter((a) => !a.startsWith('--'))[0]);
   if (!num) {
     return {
-      output: `${c.red}Usage: crux epic close <discussion-number>${c.reset}\n`,
+      output: `${c.red}Usage: crux gh epic close <discussion-number>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1003,17 +1003,17 @@ with a structured body (task list, decisions, blockers) and a comment timeline
 of agent activity.
 
 \x1b[1mUsage:\x1b[0m
-  crux epic                                  List open epics
-  crux epic list                             Same as above
-  crux epic create <title> [--pin]           Create a new epic discussion
-  crux epic view <N>                         View epic body + recent comments
-  crux epic comment <N> <message>            Post a status update comment
-  crux epic update <N> --body-file=<path>    Replace the epic body
-  crux epic link <N> --issue=M               Link an issue to the epic
-  crux epic unlink <N> --issue=M             Unlink an issue from the epic
-  crux epic status <N>                       Progress bar + linked issue status
-  crux epic close <N> [--reason=outdated]    Close a completed epic
-  crux epic categories                       List discussion categories
+  crux gh epic                                  List open epics
+  crux gh epic list                             Same as above
+  crux gh epic create <title> [--pin]           Create a new epic discussion
+  crux gh epic view <N>                         View epic body + recent comments
+  crux gh epic comment <N> <message>            Post a status update comment
+  crux gh epic update <N> --body-file=<path>    Replace the epic body
+  crux gh epic link <N> --issue=M               Link an issue to the epic
+  crux gh epic unlink <N> --issue=M             Unlink an issue from the epic
+  crux gh epic status <N>                       Progress bar + linked issue status
+  crux gh epic close <N> [--reason=outdated]    Close a completed epic
+  crux gh epic categories                       List discussion categories
 
 \x1b[1mOptions:\x1b[0m
   --body=<text>          Inline body text
@@ -1024,16 +1024,16 @@ of agent activity.
   --ci                   JSON output
 
 \x1b[1mExamples:\x1b[0m
-  crux epic create "Auth System Overhaul" --pin
-  crux epic link 42 --issue=123
-  crux epic comment 42 "Starting work on OAuth provider support"
-  crux epic status 42
+  crux gh epic create "Auth System Overhaul" --pin
+  crux gh epic link 42 --issue=123
+  crux gh epic comment 42 "Starting work on OAuth provider support"
+  crux gh epic status 42
 
 \x1b[1mWorkflow:\x1b[0m
-  1. Create an epic:     crux epic create "Project Name" --pin
-  2. Link issues to it:  crux epic link <epic> --issue=<N>
-  3. Track progress:     crux epic status <epic>
-  4. Post updates:       crux epic comment <epic> "Status update..."
-  5. Close when done:    crux epic close <epic>
+  1. Create an epic:     crux gh epic create "Project Name" --pin
+  2. Link issues to it:  crux gh epic link <epic> --issue=<N>
+  3. Track progress:     crux gh epic status <epic>
+  4. Post updates:       crux gh epic comment <epic> "Status update..."
+  5. Close when done:    crux gh epic close <epic>
 `;
 }

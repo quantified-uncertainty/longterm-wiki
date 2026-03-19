@@ -106,7 +106,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   if (!task) {
-    return { output: `${c.red}Usage: crux agent-checklist init "Task" --type=X | --issue=N${c.reset}\n`, exitCode: 1 };
+    return { output: `${c.red}Usage: crux sys agent-checklist init "Task" --type=X | --issue=N${c.reset}\n`, exitCode: 1 };
   }
 
   const branch = currentBranch();
@@ -184,7 +184,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
-  output += `\n${c.dim}Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
+  output += `\n${c.dim}Run \`crux sys agent-checklist status\` to check progress.${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -194,7 +194,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
   const c = log.colors;
 
   if (!existsSync(CHECKLIST_PATH)) {
-    return { output: `${c.yellow}No checklist found. Run \`crux agent-checklist init\` first.${c.reset}\n`, exitCode: 1 };
+    return { output: `${c.yellow}No checklist found. Run \`crux sys agent-checklist init\` first.${c.reset}\n`, exitCode: 1 };
   }
 
   const markdown = readFileSync(CHECKLIST_PATH, 'utf-8');
@@ -272,7 +272,7 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
   const ids = args.filter(a => !a.startsWith('--'));
   if (typeof options.na === 'string') ids.push(options.na as string);
   if (ids.length === 0) {
-    return { output: `${c.red}Usage: crux agent-checklist check <id> [id2 ...]${c.reset}\n`, exitCode: 1 };
+    return { output: `${c.red}Usage: crux sys agent-checklist check <id> [id2 ...]${c.reset}\n`, exitCode: 1 };
   }
 
   const marker = options.na ? '~' as const : 'x' as const;
@@ -460,10 +460,10 @@ Options:
   --ci             JSON output
 
 Examples:
-  crux agent-checklist init "Add feature" --type=infrastructure
-  crux agent-checklist init --issue=42
-  crux agent-checklist check tests-written security
-  crux agent-checklist check --na fix-escaping --reason "no MDX changes"
-  crux agent-checklist verify
+  crux sys agent-checklist init "Add feature" --type=infrastructure
+  crux sys agent-checklist init --issue=42
+  crux sys agent-checklist check tests-written security
+  crux sys agent-checklist check --na fix-escaping --reason "no MDX changes"
+  crux sys agent-checklist verify
 `;
 }

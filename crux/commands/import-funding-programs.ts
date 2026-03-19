@@ -5,9 +5,9 @@
  * RFPs, fellowships, prizes, and solicitations from AI safety and EA funders.
  *
  * Usage:
- *   pnpm crux import-funding-programs list              # Show all programs
- *   pnpm crux import-funding-programs sync              # Sync to wiki-server
- *   pnpm crux import-funding-programs sync --dry-run    # Preview without writing
+ *   pnpm crux tb import-funding-programs list              # Show all programs
+ *   pnpm crux tb import-funding-programs sync              # Sync to wiki-server
+ *   pnpm crux tb import-funding-programs sync --dry-run    # Preview without writing
  */
 
 import { generateId } from "../lib/grant-import/id.ts";

@@ -7,11 +7,11 @@
  * the record's data.
  *
  * Usage:
- *   crux verify grants                       Verify all grants with source URLs
- *   crux verify personnel --entity=anthropic  Verify personnel for one org
- *   crux verify stats                        Show verification coverage report
- *   crux verify --type=grant --limit=10       Verify 10 grants
- *   crux verify --dry-run                     Show what would be checked
+ *   crux tb verify grants                       Verify all grants with source URLs
+ *   crux tb verify personnel --entity=anthropic  Verify personnel for one org
+ *   crux tb verify stats                        Show verification coverage report
+ *   crux tb verify --type=grant --limit=10       Verify 10 grants
+ *   crux tb verify --dry-run                     Show what would be checked
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -777,7 +777,7 @@ export async function recordsVerifyCommand(
     if (!mapped) {
       return {
         exitCode: 1,
-        output: `Unknown subcommand: ${subcommand}\nUsage: crux verify <type|stats> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
+        output: `Unknown subcommand: ${subcommand}\nUsage: crux tb verify <type|stats> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
       };
     }
     typesToVerify = [mapped];
@@ -983,16 +983,16 @@ export function getHelp(): string {
 Record Verification — verify structured data against source URLs
 
 Usage:
-  crux verify <type>              Verify all records of a type with source URLs
-  crux verify stats               Show verification coverage report
-  crux verify sync-things         Sync existing verdicts to the Things dashboard
-  crux verify grants              Verify all grants
-  crux verify personnel           Verify all personnel records
-  crux verify divisions           Verify all divisions
-  crux verify funding-programs    Verify funding programs
-  crux verify funding-rounds      Verify funding rounds
-  crux verify investments         Verify investments
-  crux verify equity-positions    Verify equity positions
+  crux tb verify <type>              Verify all records of a type with source URLs
+  crux tb verify stats               Show verification coverage report
+  crux tb verify sync-things         Sync existing verdicts to the Things dashboard
+  crux tb verify grants              Verify all grants
+  crux tb verify personnel           Verify all personnel records
+  crux tb verify divisions           Verify all divisions
+  crux tb verify funding-programs    Verify funding programs
+  crux tb verify funding-rounds      Verify funding rounds
+  crux tb verify investments         Verify investments
+  crux tb verify equity-positions    Verify equity positions
 
 Options:
   --type=X            Filter by record type
@@ -1002,11 +1002,11 @@ Options:
   --ci                JSON output
 
 Examples:
-  crux verify grants --dry-run             Preview which grants would be checked
-  crux verify personnel --entity=anthropic Verify Anthropic personnel records
-  crux verify stats                        Show verification coverage
-  crux verify grants --limit=5             Verify 5 grants
-  crux verify --dry-run                    Preview all record types
-  crux verify sync-things                  Push all verdicts to Things dashboard
+  crux tb verify grants --dry-run             Preview which grants would be checked
+  crux tb verify personnel --entity=anthropic Verify Anthropic personnel records
+  crux tb verify stats                        Show verification coverage
+  crux tb verify grants --limit=5             Verify 5 grants
+  crux tb verify --dry-run                    Preview all record types
+  crux tb verify sync-things                  Push all verdicts to Things dashboard
 `;
 }

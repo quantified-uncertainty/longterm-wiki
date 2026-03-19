@@ -4,9 +4,9 @@
  * Create and manage agent session log YAML files.
  *
  * Usage:
- *   crux sessions write "Session title"               Write a session log YAML
- *   crux sessions write --title="Session title"       Alternative flag form
- *   crux sessions write "Title" --sync                Write + sync to wiki-server
+ *   crux sys sessions write "Session title"               Write a session log YAML
+ *   crux sys sessions write --title="Session title"       Alternative flag form
+ *   crux sys sessions write "Title" --sync                Write + sync to wiki-server
  */
 
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
@@ -102,7 +102,7 @@ function buildSessionYaml(fields: {
     '#   - "Something learned"',
     '# recommendations:',
     '#   - "Suggested follow-up action"',
-    '# checks: (paste output of: pnpm crux agent-checklist snapshot)',
+    '# checks: (paste output of: pnpm crux sys agent-checklist snapshot)',
   );
 
   return lines.join('\n') + '\n';
@@ -132,8 +132,8 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
     return {
       output:
         `${c.red}Error: title is required.${c.reset}\n` +
-        `  Usage: pnpm crux sessions write "Session title" [options]\n` +
-        `  Or:    pnpm crux sessions write --title="Session title" [options]\n`,
+        `  Usage: pnpm crux sys sessions write "Session title" [options]\n` +
+        `  Or:    pnpm crux sys sessions write --title="Session title" [options]\n`,
       exitCode: 1,
     };
   }
@@ -189,7 +189,7 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
     out += `  ${c.yellow}⚠ Wiki server unreachable — constraints field added to session log.${c.reset}\n`;
   }
   out += `\n  Edit the file to add summary, issues, learnings, recommendations and checks, then:\n`;
-  out += `  ${c.cyan}pnpm crux wiki-server sync-session ${outputPath}${c.reset}\n`;
+  out += `  ${c.cyan}pnpm crux sys wiki-server sync-session ${outputPath}${c.reset}\n`;
 
   // Optionally sync immediately
   if (options.sync) {
@@ -232,8 +232,8 @@ Options:
   --output=<path>           Custom output path (default: .claude/sessions/<date>_<branch>.yaml)
 
 Examples:
-  pnpm crux sessions write "Fix citation parser bug"
-  pnpm crux sessions write "Add dark mode" --model=claude-sonnet-4-6 --duration="~45min"
-  pnpm crux sessions write "Update AI timelines page" --pages=ai-timelines,ai-forecasting --sync
+  pnpm crux sys sessions write "Fix citation parser bug"
+  pnpm crux sys sessions write "Add dark mode" --model=claude-sonnet-4-6 --duration="~45min"
+  pnpm crux sys sessions write "Update AI timelines page" --pages=ai-timelines,ai-forecasting --sync
 `.trim();
 }

@@ -5,9 +5,9 @@
  * Resolves opaque stableId references and formats KB data human-readably.
  *
  * Usage:
- *   crux kb show <entity-id>       Show a single entity with all its data
- *   crux kb list [--type=X]        List all entities
- *   crux kb lookup <stableId>      Look up entity by stableId
+ *   crux fb show <entity-id>       Show a single entity with all its data
+ *   crux fb list [--type=X]        List all entities
+ *   crux fb lookup <stableId>      Look up entity by stableId
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -56,13 +56,13 @@ async function showCommand(
   if (!entityId) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb show <entity-id>
+      output: `Usage: crux fb show <entity-id>
 
   Show a single entity with all its data, resolving !ref stableIds to names.
 
 Examples:
-  crux kb show anthropic
-  crux kb show dario-amodei`,
+  crux fb show anthropic
+  crux fb show dario-amodei`,
     };
   }
 
@@ -72,7 +72,7 @@ Examples:
   if (!entity) {
     return {
       exitCode: 1,
-      output: `Entity not found: ${entityId}\n  Try: crux kb list`,
+      output: `Entity not found: ${entityId}\n  Try: crux fb list`,
     };
   }
 
@@ -223,13 +223,13 @@ async function lookupCommand(
   if (!stableId) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb lookup <stableId>
+      output: `Usage: crux fb lookup <stableId>
 
   Look up an entity by its stableId.
 
 Examples:
-  crux kb lookup mK9pX3rQ7n
-  crux kb lookup zR4nW8xB2f`,
+  crux fb lookup mK9pX3rQ7n
+  crux fb lookup zR4nW8xB2f`,
     };
   }
 
@@ -433,14 +433,14 @@ async function searchCommand(
   if (!query) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb search <query> [--type=X]
+      output: `Usage: crux fb search <query> [--type=X]
 
   Search KB entities by name, ID, or alias (case-insensitive substring match).
 
 Examples:
-  crux kb search anthropic
-  crux kb search "open ai"
-  crux kb search amodei --type=person`,
+  crux fb search anthropic
+  crux fb search "open ai"
+  crux fb search amodei --type=person`,
     };
   }
 
@@ -585,12 +585,12 @@ async function factCommand(
   if (!factId) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb fact <fact-id>
+      output: `Usage: crux fb fact <fact-id>
 
   Show a single fact with full metadata.
 
 Examples:
-  crux kb fact f_dW5cR9mJ8q`,
+  crux fb fact f_dW5cR9mJ8q`,
     };
   }
 
@@ -715,13 +715,13 @@ async function needsUpdateCommand(
   if (!entityId) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb needs-update <entity-id>
+      output: `Usage: crux fb needs-update <entity-id>
 
   Show what data is missing or stale for an entity.
 
 Examples:
-  crux kb needs-update anthropic
-  crux kb needs-update openai`,
+  crux fb needs-update anthropic
+  crux fb needs-update openai`,
     };
   }
 
@@ -941,7 +941,7 @@ async function resolveEntityFile(entityArg: string): Promise<
 
   const entity = resolveEntityArg(entityArg, kb);
   if (!entity) {
-    return { ok: false, result: { exitCode: 1, output: `Entity not found: "${entityArg}"\n  Try: crux kb search ${entityArg}` } };
+    return { ok: false, result: { exitCode: 1, output: `Entity not found: "${entityArg}"\n  Try: crux fb search ${entityArg}` } };
   }
 
   const slug = filenameMap.get(entity.id);
@@ -1002,16 +1002,16 @@ async function addFactCommand(
   if (positionalArgs.length < 3) {
     return {
       exitCode: 1,
-      output: `Usage: crux kb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD] [--force]
+      output: `Usage: crux fb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD] [--force]
 
   Add a fact to a KB entity's YAML file.
   Detects duplicates by (property, value, asOf) and errors if a match exists.
   Use --force to skip the duplicate check.
 
 Examples:
-  crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
-  crux kb add-fact dario-amodei employed-by mK9pX3rQ7n
-  crux kb add-fact openai headcount 3700 --asOf=2025-01 --notes="Approximate count"`,
+  crux fb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
+  crux fb add-fact dario-amodei employed-by mK9pX3rQ7n
+  crux fb add-fact openai headcount 3700 --asOf=2025-01 --notes="Approximate count"`,
     };
   }
 
@@ -1026,7 +1026,7 @@ Examples:
   if (!property) {
     return {
       exitCode: 1,
-      output: `Property not found: "${propertyArg}"\n  Try: crux kb properties`,
+      output: `Property not found: "${propertyArg}"\n  Try: crux fb properties`,
     };
   }
 
@@ -1147,16 +1147,16 @@ Options:
   --currency=USD         (add-fact) ISO 4217 currency code
 
 Examples:
-  crux kb show anthropic              Show Anthropic with all facts and items
-  crux kb list --type=person          List only person entities
-  crux kb search anthropic            Find entities matching "anthropic"
-  crux kb fact f_dW5cR9mJ8q           Show fact details
-  crux kb stale 90                    Facts older than 90 days
-  crux kb needs-update anthropic      What's missing for Anthropic
-  crux kb coverage --type=organization Organizations property coverage
-  crux kb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
-  crux kb sync-sources                Sync source URLs to wiki-server resources
-  crux kb verify --entity=anthropic   Verify Anthropic facts against sources
-  crux kb verify --dry-run --limit=5  Preview 5 facts that would be checked
+  crux fb show anthropic              Show Anthropic with all facts and items
+  crux fb list --type=person          List only person entities
+  crux fb search anthropic            Find entities matching "anthropic"
+  crux fb fact f_dW5cR9mJ8q           Show fact details
+  crux fb stale 90                    Facts older than 90 days
+  crux fb needs-update anthropic      What's missing for Anthropic
+  crux fb coverage --type=organization Organizations property coverage
+  crux fb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
+  crux fb sync-sources                Sync source URLs to wiki-server resources
+  crux fb verify --entity=anthropic   Verify Anthropic facts against sources
+  crux fb verify --dry-run --limit=5  Preview 5 facts that would be checked
 `;
 }

@@ -5,10 +5,10 @@
  * content from human-verified content with a review history per page.
  *
  * Usage:
- *   crux review mark <page-id> --reviewer="name"    Mark page as reviewed
- *   crux review status <page-id>                     Show review status
- *   crux review list                                 List reviewed pages
- *   crux review stats                                Review coverage statistics
+ *   crux gh review mark <page-id> --reviewer="name"    Mark page as reviewed
+ *   crux gh review status <page-id>                     Show review status
+ *   crux gh review list                                 List reviewed pages
+ *   crux gh review stats                                Review coverage statistics
  *
  * Part of the hallucination risk reduction initiative (issue #200, Phase 4).
  */
@@ -31,7 +31,7 @@ export async function mark(args: string[], options: Record<string, unknown>): Pr
   const pageId = args.find((a: string) => !a.startsWith('-'));
   if (!pageId) {
     return {
-      output: `${c.red}Error: page ID required. Usage: crux review mark <page-id> --reviewer="name"${c.reset}`,
+      output: `${c.red}Error: page ID required. Usage: crux gh review mark <page-id> --reviewer="name"${c.reset}`,
       exitCode: 1,
     };
   }
@@ -39,7 +39,7 @@ export async function mark(args: string[], options: Record<string, unknown>): Pr
   const reviewer = options.reviewer as string;
   if (!reviewer) {
     return {
-      output: `${c.red}Error: --reviewer is required. Usage: crux review mark <page-id> --reviewer="name"${c.reset}`,
+      output: `${c.red}Error: --reviewer is required. Usage: crux gh review mark <page-id> --reviewer="name"${c.reset}`,
       exitCode: 1,
     };
   }
@@ -73,7 +73,7 @@ export async function status(args: string[], options: Record<string, unknown>): 
   const pageId = args.find((a: string) => !a.startsWith('-'));
   if (!pageId) {
     return {
-      output: `${c.red}Error: page ID required. Usage: crux review status <page-id>${c.reset}`,
+      output: `${c.red}Error: page ID required. Usage: crux gh review status <page-id>${c.reset}`,
       exitCode: 1,
     };
   }
@@ -89,7 +89,7 @@ export async function status(args: string[], options: Record<string, unknown>): 
 
   if (!reviewStatus.reviewed) {
     output += `  ${c.yellow}Not yet reviewed by a human${c.reset}\n`;
-    output += `\n  ${c.dim}Mark as reviewed: crux review mark ${pageId} --reviewer="your-name"${c.reset}\n`;
+    output += `\n  ${c.dim}Mark as reviewed: crux gh review mark ${pageId} --reviewer="your-name"${c.reset}\n`;
   } else {
     output += `  ${c.green}Reviewed${c.reset}\n`;
     output += `  Last review:  ${c.bold}${reviewStatus.lastReviewDate}${c.reset}`;
@@ -125,7 +125,7 @@ export async function list(_args: string[], options: Record<string, unknown>): P
 
   if (reviews.length === 0) {
     let output = `${c.dim}No reviews recorded yet.${c.reset}\n`;
-    output += `\n${c.dim}Mark a page: crux review mark <page-id> --reviewer="your-name"${c.reset}\n`;
+    output += `\n${c.dim}Mark a page: crux gh review mark <page-id> --reviewer="your-name"${c.reset}\n`;
     return { output, exitCode: 0 };
   }
 
@@ -221,9 +221,9 @@ Options:
   --limit=N            Number of results for list (default: 50)
 
 Examples:
-  crux review mark open-philanthropy --reviewer="ozzie" --note="Verified funding data"
-  crux review status dan-hendrycks
-  crux review list
-  crux review stats
+  crux gh review mark open-philanthropy --reviewer="ozzie" --note="Verified funding data"
+  crux gh review status dan-hendrycks
+  crux gh review list
+  crux gh review stats
 `;
 }

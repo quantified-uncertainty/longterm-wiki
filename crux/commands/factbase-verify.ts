@@ -7,10 +7,10 @@
  * whether the source confirms, contradicts, or doesn't address the claim.
  *
  * Usage:
- *   crux kb verify --entity=anthropic         Verify all facts for Anthropic
- *   crux kb verify --fact=f_dW5cR9mJ8q        Verify a single fact
- *   crux kb verify --dry-run                   Show what would be checked
- *   crux kb verify --limit=10                  Check at most 10 facts
+ *   crux fb verify --entity=anthropic         Verify all facts for Anthropic
+ *   crux fb verify --fact=f_dW5cR9mJ8q        Verify a single fact
+ *   crux fb verify --dry-run                   Show what would be checked
+ *   crux fb verify --limit=10                  Check at most 10 facts
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';

@@ -66,9 +66,9 @@ Options:
   --verbose          Detailed output
 
 Examples:
-  crux generate yaml content/docs/risks/
-  crux generate summaries --batch 50 --model haiku
-  crux generate diagrams
-  crux generate schema-docs
+  crux w generate yaml content/docs/risks/
+  crux w generate summaries --batch 50 --model haiku
+  crux w generate diagrams
+  crux w generate schema-docs
 `;
 }

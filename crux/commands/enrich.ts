@@ -5,13 +5,13 @@
  * These can run independently or be called from the agentic orchestrator.
  *
  * Usage:
- *   crux enrich entity-links <page-id>           Preview EntityLink insertions
- *   crux enrich entity-links <page-id> --apply   Write EntityLinks to file
- *   crux enrich entity-links --all [--limit=N]   Batch across wiki
+ *   crux w enrich entity-links <page-id>           Preview EntityLink insertions
+ *   crux w enrich entity-links <page-id> --apply   Write EntityLinks to file
+ *   crux w enrich entity-links --all [--limit=N]   Batch across wiki
  *
- *   crux enrich fact-refs <page-id>              Preview <F> tag insertions
- *   crux enrich fact-refs <page-id> --apply      Write <F> tags to file
- *   crux enrich fact-refs --all [--limit=N]      Batch across wiki
+ *   crux w enrich fact-refs <page-id>              Preview <F> tag insertions
+ *   crux w enrich fact-refs <page-id> --apply      Write <F> tags to file
+ *   crux w enrich fact-refs --all [--limit=N]      Batch across wiki
  */
 
 import { buildCommands } from '../lib/cli.ts';
@@ -61,16 +61,16 @@ Options (fact-refs):
 All tools are idempotent — running twice on the same page produces no extra changes.
 
 Examples:
-  crux enrich entity-links openai                 Preview EntityLinks for openai.mdx
-  crux enrich entity-links openai --apply         Insert EntityLinks into openai.mdx
-  crux enrich entity-links --all --limit=10       Preview for top 10 pages
-  crux enrich entity-links --all --apply          Apply EntityLinks across wiki
+  crux w enrich entity-links openai                 Preview EntityLinks for openai.mdx
+  crux w enrich entity-links openai --apply         Insert EntityLinks into openai.mdx
+  crux w enrich entity-links --all --limit=10       Preview for top 10 pages
+  crux w enrich entity-links --all --apply          Apply EntityLinks across wiki
 
-  crux enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
-  crux enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
-  crux enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
+  crux w enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
+  crux w enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
+  crux w enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
 
 Note: References are now auto-generated at build time (build-data.mjs → pageResources).
-The 'crux enrich references' command has been removed.
+The 'crux w enrich references' command has been removed.
 `;
 }

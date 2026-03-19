@@ -195,7 +195,7 @@ async function plan(args: string[], options: AutoUpdateOptions): Promise<Command
     output += `\n${c.dim}Skipped: ${updatePlan.skippedReasons.length} items${c.reset}\n`;
   }
 
-  output += `\n${c.dim}Run 'crux auto-update run' to execute this plan.${c.reset}\n`;
+  output += `\n${c.dim}Run 'crux w auto-update run' to execute this plan.${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -586,7 +586,7 @@ async function submit(args: string[], options: AutoUpdateOptions): Promise<Comma
   if (dryRun) output += `  ${c.yellow}Dry run mode${c.reset} — will plan but not create child jobs\n`;
   if (options.sources) output += `  Sources: ${options.sources}\n`;
   output += `\n${c.dim}The job will be claimed by a worker (GHA or local).${c.reset}\n`;
-  output += `${c.dim}Monitor progress: crux jobs status ${job.id}${c.reset}\n`;
+  output += `${c.dim}Monitor progress: crux sys jobs status ${job.id}${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -709,7 +709,7 @@ Pipeline stages:
   1. Fetch:   Pull new items from RSS/Atom feeds and web searches
   2. Digest:  Deduplicate, classify relevance, extract topics (~$0.02-0.05)
   3. Route:   Map news items to wiki pages via entity matching + LLM (~$0.05-0.15)
-  4. Execute: Run page improvements via crux content improve (~$2-12/page)
+  4. Execute: Run page improvements via crux w content improve (~$2-12/page)
   5. Validate: Run validation gate (escaping, schema, frontmatter)
   6. Report:  Save run report to data/auto-update/runs/
 
@@ -723,19 +723,19 @@ Source configuration:
   Supported types: rss, atom, web-search
 
 Examples:
-  crux auto-update plan                          Preview what would be updated
-  crux auto-update run --budget=30               Run with $30 budget
-  crux auto-update run --count=3 --verbose       Update 3 pages with details
-  crux auto-update digest --sources=openai-blog  Check one source
-  crux auto-update sources                       List all sources
-  crux auto-update sources --check               Test all source URLs for reachability
-  crux auto-update history                       Show recent runs
-  crux auto-update run --dry-run                 Full pipeline without executing
-  crux auto-update audit-gate --diff --apply     Audit changed pages and fix issues
-  crux auto-update audit-gate existential-risk   Audit a specific page
-  crux auto-update submit --budget=30            Submit as parallel background jobs
-  crux auto-update submit --dry-run              Preview job plan without creating jobs
-  crux auto-update run-ci --budget=30 --count=5  Full CI pipeline (used by GitHub Actions)
+  crux w auto-update plan                          Preview what would be updated
+  crux w auto-update run --budget=30               Run with $30 budget
+  crux w auto-update run --count=3 --verbose       Update 3 pages with details
+  crux w auto-update digest --sources=openai-blog  Check one source
+  crux w auto-update sources                       List all sources
+  crux w auto-update sources --check               Test all source URLs for reachability
+  crux w auto-update history                       Show recent runs
+  crux w auto-update run --dry-run                 Full pipeline without executing
+  crux w auto-update audit-gate --diff --apply     Audit changed pages and fix issues
+  crux w auto-update audit-gate existential-risk   Audit a specific page
+  crux w auto-update submit --budget=30            Submit as parallel background jobs
+  crux w auto-update submit --dry-run              Preview job plan without creating jobs
+  crux w auto-update run-ci --budget=30 --count=5  Full CI pipeline (used by GitHub Actions)
 `;
 
 }

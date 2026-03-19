@@ -4,7 +4,7 @@
  * Page-level analysis and prioritization tools.
  *
  * Usage:
- *   crux pages next-action [--type=<entityType>] [--limit=20] [--all] [--ci]
+ *   crux w pages next-action [--type=<entityType>] [--limit=20] [--all] [--ci]
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -113,9 +113,9 @@ Options:
   --ci                  JSON output
 
 Examples:
-  crux pages                                  # Top 20 pages needing attention
-  crux pages next-action --type=person        # Top person pages
-  crux pages next-action --limit=50           # Top 50
-  crux pages next-action --ci                 # JSON output
+  crux w pages                                  # Top 20 pages needing attention
+  crux w pages next-action --type=person        # Top person pages
+  crux w pages next-action --limit=50           # Top 50
+  crux w pages next-action --ci                 # JSON output
 `;
 }

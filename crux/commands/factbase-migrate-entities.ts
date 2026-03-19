@@ -21,8 +21,8 @@
  *     - ...
  *
  * Usage:
- *   crux factbase-migrate-entities run [--dry-run]    Transform all YAML files
- *   crux factbase-migrate-entities status              Show migration status
+ *   crux fb factbase-migrate-entities run [--dry-run]    Transform all YAML files
+ *   crux fb factbase-migrate-entities status              Show migration status
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
@@ -230,8 +230,8 @@ Options:
   --dry-run           Preview changes without modifying files
 
 Examples:
-  crux factbase-migrate-entities run --dry-run    Preview migration
-  crux factbase-migrate-entities run              Apply migration
-  crux factbase-migrate-entities status           Check progress
+  crux fb factbase-migrate-entities run --dry-run    Preview migration
+  crux fb factbase-migrate-entities run              Apply migration
+  crux fb factbase-migrate-entities status           Check progress
 `;
 }
