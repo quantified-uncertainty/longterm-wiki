@@ -41,6 +41,7 @@ import {
   type RawResource,
 } from "@/app/legislation/[slug]/timeline-utils";
 import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
+import { StakeholderVerificationBadge } from "@/app/legislation/[slug]/stakeholder-verification-badge";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -472,8 +473,14 @@ export default async function LegislationDetailPage({
                         )}
                       </td>
                       <td className="py-1.5 px-3">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
-                          {stakeholder.position}
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
+                            {stakeholder.position}
+                          </span>
+                          <StakeholderVerificationBadge
+                            verification={stakeholder.verification}
+                            stakeholderName={stakeholder.name}
+                          />
                         </span>
                       </td>
                       <td className="py-1.5 px-3 text-foreground/70 text-sm">

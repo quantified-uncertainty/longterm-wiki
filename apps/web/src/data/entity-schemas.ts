@@ -142,6 +142,20 @@ const OrganizationEntitySchema = BaseEntity.extend({
   parentOrg: z.string().optional(),
 });
 
+const StakeholderEvidence = z.object({
+  type: z.enum(["primary-source", "news-report", "social-media", "official-statement", "inference"]),
+  url: z.string().optional(),
+  description: z.string(),
+  date: z.string().optional(),
+});
+
+const StakeholderVerification = z.object({
+  status: z.enum(["verified", "partially-verified", "unverified", "disputed"]).optional(),
+  verifiedDate: z.string().optional(),
+  evidence: z.array(StakeholderEvidence).optional(),
+  notes: z.string().optional(),
+});
+
 const PolicyStakeholder = z.object({
   name: z.string(),
   entityId: z.string().optional(),
@@ -150,6 +164,8 @@ const PolicyStakeholder = z.object({
   source: z.string().optional(),
   /** Short notes on funding, affiliations, and connections to other stakeholders */
   context: z.array(z.string()).optional(),
+  /** Verification status and evidence chain for this stakeholder's claimed position */
+  verification: StakeholderVerification.optional(),
 });
 
 const PolicyProvision = z.object({
@@ -412,6 +428,9 @@ export type ResearchAreaEntity = z.infer<typeof ResearchAreaEntitySchema>;
 export type ApproachEntity = z.infer<typeof ApproachEntitySchema>;
 export type EventEntity = z.infer<typeof EventEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
+export type PolicyStakeholderType = z.infer<typeof PolicyStakeholder>;
+export type StakeholderVerificationType = z.infer<typeof StakeholderVerification>;
+export type StakeholderEvidenceType = z.infer<typeof StakeholderEvidence>;
 
 // ============================================================================
 // TYPE GUARDS
