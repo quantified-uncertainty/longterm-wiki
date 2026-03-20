@@ -792,6 +792,34 @@
       "when": 1779350400000,
       "tag": "0112_division_fk_constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1779436800000,
+      "tag": "0113_things_search_vector_add_type",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1779523200000,
+      "tag": "0114_add_page_id_int_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1779609600000,
+      "tag": "0115_resource_enrichment_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1779696000000,
+      "tag": "0116_resource_sub_tables",
+      "breakpoints": true
     }
   ]
 }

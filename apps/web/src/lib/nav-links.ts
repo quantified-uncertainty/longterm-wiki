@@ -17,7 +17,7 @@ export function isDropdown(item: NavItem): item is NavDropdown {
 
 /** Header navigation — mix of standalone links and grouped dropdowns. */
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/wiki", label: "Explore" },
+  { href: "/search", label: "Search" },
   {
     label: "Entities",
     items: [

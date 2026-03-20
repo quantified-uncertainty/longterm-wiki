@@ -38,6 +38,7 @@ const DEFAULT_BATCH_SIZE = 100;
 
 interface YamlEntity {
   id: string;
+  stableId?: string;
   wikiId?: string;
   type: string;
   title: string;

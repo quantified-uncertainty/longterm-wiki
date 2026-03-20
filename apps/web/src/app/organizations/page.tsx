@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getKBLatest, getKBFacts, getKBRecords, getKBEntities } from "@/data/factbase";
+import { getKBLatest, getKBFacts, getKBRecords, getKBEntities, resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
 import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
+import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
@@ -151,7 +152,18 @@ async function loadFromApi(
 
   if (!result.ok) return result;
 
-  const { organizations } = result.data;
+  const { organizations: rawOrganizations } = result.data;
+
+  // Filter out API entities that don't have a valid detail page.
+  // The wiki-server DB may contain stale or aliased slugs (e.g., "center-for-ai-safety"
+  // instead of "cais", or "google" with no org entity page). Clicking these in the
+  // table would 404. Only keep entries that resolve via the same logic the detail
+  // page uses (resolveOrgBySlug or resolveSlugAlias).
+  const organizations = rawOrganizations.filter((org) => {
+    if (resolveOrgBySlug(org.id)) return true;
+    if (resolveSlugAlias(org.id)) return true;
+    return false;
+  });
 
   const rows: OrgRow[] = organizations.map((org) => {
     const orgType = orgTypeMap[org.id] ?? null;

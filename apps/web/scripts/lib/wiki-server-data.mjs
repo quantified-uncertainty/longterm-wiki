@@ -1041,7 +1041,7 @@ export async function fetchResourcesFromPG() {
     // Paginate through all resources
     while (true) {
       const resp = await fetch(
-        `${serverUrl}/api/resources/all?limit=${limit}&offset=${offset}`,
+        `${serverUrl}/api/resources/all-details?limit=${limit}&offset=${offset}`,
         { headers, signal: AbortSignal.timeout(30_000) }
       );
       if (!resp.ok) return null;
@@ -1073,6 +1073,49 @@ export async function fetchResourcesFromPG() {
           archive_url: r.archiveUrl ?? undefined,
           author_entity_ids: r.authorEntityIds ?? undefined,
           stance: r.stance ?? undefined,
+          // Enrichment fields
+          context_note: r.contextNote ?? undefined,
+          resource_purpose: r.resourcePurpose ?? undefined,
+          resource_subtype: r.resourceSubtype ?? undefined,
+          type_metadata: r.typeMetadata ?? undefined,
+          publisher_entity_id: r.publisherEntityId ?? undefined,
+          related_entity_ids: r.relatedEntityIds ?? undefined,
+          enrichment_status: r.enrichmentStatus ?? undefined,
+          importance_score: r.importanceScore ?? undefined,
+          // Sub-table data (if fetched via all-details endpoint)
+          paper: r.paper ? {
+            arxiv_id: r.paper.arxivId ?? undefined,
+            doi: r.paper.doi ?? undefined,
+            semantic_scholar_id: r.paper.semanticScholarId ?? undefined,
+            abstract: r.paper.abstract ?? undefined,
+            citation_count: r.paper.citationCount ?? undefined,
+            influential_citation_count: r.paper.influentialCitationCount ?? undefined,
+            categories: r.paper.categories ?? undefined,
+            methodology: r.paper.methodology ?? undefined,
+            year: r.paper.year ?? undefined,
+          } : undefined,
+          forum_post: r.forumPost ? {
+            forum: r.forumPost.forum,
+            forum_post_id: r.forumPost.forumPostId ?? undefined,
+            forum_slug: r.forumPost.forumSlug ?? undefined,
+            karma: r.forumPost.karma ?? undefined,
+            comment_count: r.forumPost.commentCount ?? undefined,
+            author_username: r.forumPost.authorUsername ?? undefined,
+            forum_tags: r.forumPost.forumTags ?? undefined,
+            sequence_title: r.forumPost.sequenceTitle ?? undefined,
+            curated: r.forumPost.curated ?? undefined,
+            cross_posted_from: r.forumPost.crossPostedFrom ?? undefined,
+            canonical_forum: r.forumPost.canonicalForum ?? undefined,
+          } : undefined,
+          policy_doc: r.policyDoc ? {
+            document_type: r.policyDoc.documentType ?? undefined,
+            jurisdiction_entity_id: r.policyDoc.jurisdictionEntityId ?? undefined,
+            agency_entity_id: r.policyDoc.agencyEntityId ?? undefined,
+            policy_entity_id: r.policyDoc.policyEntityId ?? undefined,
+            effective_date: r.policyDoc.effectiveDate ?? undefined,
+            document_status: r.policyDoc.documentStatus ?? undefined,
+            reference_number: r.policyDoc.referenceNumber ?? undefined,
+          } : undefined,
         });
       }
 

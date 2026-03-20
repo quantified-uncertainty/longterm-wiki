@@ -58,7 +58,7 @@ type SortMode = "score" | "name" | "developer";
 
 function formatScore(score: number, unit?: string): string {
   if (unit === "%" || unit === "percentage" || unit === "accuracy") {
-    return `${score}%`;
+    return `${parseFloat(score.toFixed(2))}%`;
   }
   if (score >= 1000) {
     return score.toLocaleString();

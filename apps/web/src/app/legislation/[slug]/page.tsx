@@ -35,8 +35,12 @@ import {
 } from "../legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
-import { ResourceTimeline, type TimelineEvent, type TimelineResource } from "./resource-timeline";
-import { parseDisplayDateToISO } from "./date-utils";
+import { UnifiedTimelineView } from "@/app/legislation/[slug]/unified-timeline";
+import {
+  buildUnifiedTimeline,
+  type RawResource,
+} from "@/app/legislation/[slug]/timeline-utils";
+import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -114,9 +118,9 @@ export default async function LegislationDetailPage({
     .map((r) => {
       const ent = getTypedEntityById(r.id);
       if (!ent) return null;
-      return { name: ent.title, href: getEntityHref(r.id), relationship: r.relationship };
+      return { name: ent.title, href: getEntityHref(r.id), relationship: r.relationship, type: ent.entityType };
     })
-    .filter(Boolean) as Array<{ name: string; href: string; relationship?: string }>;
+    .filter(Boolean) as Array<{ name: string; href: string; relationship?: string; type?: string }>;
 
   const wikiHref = getPolicyWikiHref(entity);
 
@@ -211,7 +215,7 @@ export default async function LegislationDetailPage({
   // Overview tab (always present)
   const overviewContent = (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Description */}
         {entity.description && (
           <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">{entity.description}</p>
@@ -245,90 +249,10 @@ export default async function LegislationDetailPage({
         </div>
       )}
 
-      {/* Timeline */}
-      {timelineEvents.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold mb-4">Legislative Timeline</h2>
-          <div className="relative pl-6 border-l-2 border-border space-y-4">
-            {timelineEvents.map((event, i) => (
-              <div key={i} className="relative">
-                <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
-                  event.label === "Vetoed" ? "bg-red-500"
-                    : event.label === "Enacted" || event.label === "Signed" ? "bg-green-500"
-                    : event.label === "Introduced" ? "bg-blue-500"
-                    : "bg-violet-500"
-                }`} />
-                <div className="flex items-baseline gap-2">
-                  <span className="font-semibold text-sm">{event.label}</span>
-                  <span className="text-sm text-muted-foreground">{event.value}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Votes */}
-      {entity.votes.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold mb-4">Voting Record</h2>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
-                  <th className="text-left py-2 px-3 font-medium">Chamber</th>
-                  <th className="text-left py-2 px-3 font-medium">Date</th>
-                  <th className="text-left py-2 px-3 font-medium">Result</th>
-                  <th className="text-right py-2 px-3 font-medium">Ayes</th>
-                  <th className="text-right py-2 px-3 font-medium">Noes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {entity.votes.map((vote, i) => (
-                  <tr key={i} className="hover:bg-muted/20">
-                    <td className="py-2 px-3 font-medium">{vote.chamber}</td>
-                    <td className="py-2 px-3 text-muted-foreground">{vote.date ?? <span className="text-muted-foreground/40">&mdash;</span>}</td>
-                    <td className="py-2 px-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        vote.result.toLowerCase().includes("pass") || vote.result.toLowerCase().includes("sign") || vote.result.toLowerCase().includes("adopt")
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                      }`}>
-                        {vote.result}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3 text-right tabular-nums text-green-700 dark:text-green-400">
-                      <span className="font-semibold">{vote.ayes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
-                      {(vote.ayesDem != null || vote.ayesRep != null) && (
-                        <div className="text-[10px] text-muted-foreground font-normal">
-                          {vote.ayesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.ayesDem}D</span>}
-                          {vote.ayesDem != null && vote.ayesRep != null && " "}
-                          {vote.ayesRep != null && <span className="text-red-500 dark:text-red-400">{vote.ayesRep}R</span>}
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2 px-3 text-right tabular-nums text-red-700 dark:text-red-400">
-                      <span className="font-semibold">{vote.noes ?? <span className="text-muted-foreground/40">&mdash;</span>}</span>
-                      {(vote.noesDem != null || vote.noesRep != null) && (
-                        <div className="text-[10px] text-muted-foreground font-normal">
-                          {vote.noesDem != null && <span className="text-blue-600 dark:text-blue-400">{vote.noesDem}D</span>}
-                          {vote.noesDem != null && vote.noesRep != null && " "}
-                          {vote.noesRep != null && <span className="text-red-500 dark:text-red-400">{vote.noesRep}R</span>}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
       {/* Veto Reason */}
       {entity.vetoReason && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Veto Rationale</h2>
+          <h2 className="text-lg font-bold mb-3">Veto Rationale</h2>
           <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-4">
             <p className="text-sm leading-relaxed">{entity.vetoReason}</p>
           </div>
@@ -338,7 +262,7 @@ export default async function LegislationDetailPage({
       {/* Related Legislation */}
       {relatedPolicies.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Related Legislation</h2>
+          <h2 className="text-lg font-bold mb-3">Related Legislation</h2>
           <div className="rounded-xl border border-border overflow-hidden">
             <table className="w-full text-sm">
               <thead>
@@ -353,7 +277,7 @@ export default async function LegislationDetailPage({
                   return (
                     <tr key={rel.id} className="hover:bg-muted/20">
                       <td className="py-2 px-3">
-                        <Link href={`/legislation/${rel.id}`} className="text-primary hover:underline font-medium">
+                        <Link href={getEntityHref(rel.id)} className="text-primary hover:underline font-medium">
                           {rel.title}
                         </Link>
                       </td>
@@ -378,13 +302,41 @@ export default async function LegislationDetailPage({
       {/* Related Topics + Wiki Pages */}
       {relatedEntities.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold mb-4">Related Topics</h2>
+          <h2 className="text-lg font-bold mb-3">Related Topics</h2>
           <div className="flex flex-wrap gap-2">
             {relatedEntities.map((ref) => (
               <Link key={ref.href} href={ref.href} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 bg-card hover:bg-muted/50 text-sm transition-colors">
+                {ref.type && <span className="text-[9px] uppercase tracking-wider text-muted-foreground/60 font-semibold">{ref.type === "organization" ? "org" : ref.type}</span>}
                 <span className="font-medium">{ref.name}</span>
               </Link>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Key Politicians */}
+      {entity.keyPoliticians.length > 0 && (
+        <section>
+          <h2 className="text-lg font-bold mb-4">Key Politicians</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {entity.keyPoliticians.map((politician, i) => {
+              const href = resolveEntityHref(politician.entityId);
+              return (
+                <div key={i} className="rounded-lg border border-border/60 bg-card p-3 flex items-center gap-3">
+                  <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-sm font-bold text-violet-600 dark:text-violet-400">
+                    {politician.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    {href ? (
+                      <Link href={href} className="font-medium text-sm text-primary hover:underline">{politician.name}</Link>
+                    ) : (
+                      <span className="font-medium text-sm">{politician.name}</span>
+                    )}
+                    <div className="text-xs text-muted-foreground">{politician.role}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
@@ -413,7 +365,7 @@ export default async function LegislationDetailPage({
                 {provisions.map((provision, i) => (
                   <div key={i} className="rounded-lg border border-border/60 bg-card p-3">
                     <div className="font-semibold text-sm mb-1">{provision.title}</div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{provision.description}</p>
+                    <p className="text-sm text-foreground/70 leading-relaxed">{provision.description}</p>
                   </div>
                 ))}
               </div>
@@ -498,60 +450,36 @@ export default async function LegislationDetailPage({
               {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
             </div>
           </div>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-xl border border-border overflow-x-auto">
+            <table className="w-full text-sm min-w-[500px]">
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
-                  <th className="text-left py-2 px-3 font-medium">Name</th>
-                  <th className="text-left py-2 px-3 font-medium">Position</th>
-                  <th className="text-left py-2 px-3 font-medium">Reason</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[80px]">Position</th>
+                  <th className="text-left py-1.5 px-3 font-medium">Reason</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {[...supporters, ...mixed, ...opponents].map((stakeholder, i) => {
                   const href = resolveEntityHref(stakeholder.entityId);
-                  const funders = getFundingBadges(stakeholder.entityId);
                   return (
-                    <tr key={i} className="hover:bg-muted/20">
-                      <td className="py-2 px-3">
-                        <div>
-                          {href ? (
-                            <Link href={href} className="text-primary hover:underline font-medium">{stakeholder.name}</Link>
-                          ) : (
-                            <span className="font-medium">{stakeholder.name}</span>
-                          )}
-                          {funders.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-0.5">
-                              {funders.map((funder) => (
-                                <span key={funder} className="inline-flex items-center px-1.5 py-0 rounded text-[9px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/30">
-                                  {funder}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                    <tr key={i} className="hover:bg-muted/20 align-top">
+                      <td className="py-1.5 px-3">
+                        {href ? (
+                          <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
+                        ) : (
+                          <span className="font-medium text-sm">{stakeholder.name}</span>
+                        )}
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="py-1.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
                           {stakeholder.position}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-muted-foreground text-xs max-w-lg">
-                        <div>
-                          {stakeholder.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          {stakeholder.source && (
-                            <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline">[source]</a>
-                          )}
-                        </div>
-                        {stakeholder.context && stakeholder.context.length > 0 && (
-                          <ul className="mt-1.5 space-y-0.5 text-[11px] text-muted-foreground/70 list-none pl-0">
-                            {stakeholder.context.map((note, j) => (
-                              <li key={j} className="leading-relaxed">
-                                <span className="text-muted-foreground/40 mr-1">→</span>
-                                {note}
-                              </li>
-                            ))}
-                          </ul>
+                      <td className="py-1.5 px-3 text-foreground/70 text-sm">
+                        <span className="line-clamp-2">{stakeholder.reason ?? "\u2014"}</span>
+                        {stakeholder.source && (
+                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-xs">[source]</a>
                         )}
                       </td>
                     </tr>
@@ -565,68 +493,7 @@ export default async function LegislationDetailPage({
     });
   }
 
-  // History tab (amendments + key politicians)
-  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0) {
-    const historyCount = entity.amendments.length + entity.keyPoliticians.length;
-    tabs.push({
-      id: "history",
-      label: "History",
-      count: historyCount,
-      content: (
-        <div className="space-y-8">
-          {entity.amendments.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold mb-4">Amendment History</h2>
-              <div className="relative pl-6 border-l-2 border-border/60 space-y-4">
-                {entity.amendments.map((amendment, i) => (
-                  <div key={i} className="relative">
-                    <div className="absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background bg-amber-500" />
-                    <div>
-                      <div className="flex items-baseline gap-2 mb-0.5">
-                        {amendment.url ? (
-                          <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
-                        ) : (
-                          <span className="font-semibold text-sm">{amendment.date}</span>
-                        )}
-                        {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{amendment.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {entity.keyPoliticians.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold mb-4">Key Politicians</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {entity.keyPoliticians.map((politician, i) => {
-                  const href = resolveEntityHref(politician.entityId);
-                  return (
-                    <div key={i} className="rounded-lg border border-border/60 bg-card p-3 flex items-center gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-sm font-bold text-violet-600 dark:text-violet-400">
-                        {politician.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                      </div>
-                      <div>
-                        {href ? (
-                          <Link href={href} className="font-medium text-sm text-primary hover:underline">{politician.name}</Link>
-                        ) : (
-                          <span className="font-medium text-sm">{politician.name}</span>
-                        )}
-                        <div className="text-xs text-muted-foreground">{politician.role}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-        </div>
-      ),
-    });
-  }
+  // ── Unified Timeline tab ────────────────────────────────────────────
 
   // ── Press / Documents tab ──────────────────────────────────
   const resourceIds = getResourcesForPage(entity.id);
@@ -733,44 +600,50 @@ export default async function LegislationDetailPage({
   const analysisResources = pressResources.filter((r) => categorizeResource(r) === "analysis");
   const pressCoverage = pressResources.filter((r) => categorizeResource(r) === "press");
 
-  // Build timeline data for the Coverage tab
-  const timelineEventsForTimeline: TimelineEvent[] = timelineEvents
-    .map((e) => {
-      const sortDate = parseDisplayDateToISO(e.value);
-      return sortDate
-        ? { label: e.label, date: e.value, sortDate, type: "event" as const }
-        : null;
-    })
-    .filter((e): e is TimelineEvent => e !== null);
+  // Build unified timeline data
+  const timelineResources: RawResource[] = pressResources.map((r) => ({
+    id: r.id,
+    title: r.title,
+    url: r.url,
+    domain: r.domain,
+    publishedDate: r.publishedDate,
+    category: categorizeResource(r),
+  }));
 
-  const timelineResourceItems: TimelineResource[] = pressResources
-    .filter((r) => r.publishedDate)
-    .map((r) => ({
-      id: r.id,
-      title: r.title,
-      url: r.url,
-      domain: r.domain,
-      publishedDate: r.publishedDate!,
-      type: "resource" as const,
-      resourceType: r.type,
-      category: categorizeResource(r),
-    }));
+  const unifiedTimeline = buildUnifiedTimeline(
+    timelineEvents,
+    entity.votes,
+    entity.amendments,
+    timelineResources
+  );
 
+  // Show Timeline tab if there's any timeline content
+  const timelineItemCount =
+    unifiedTimeline.milestones.length +
+    unifiedTimeline.milestones.reduce(
+      (sum, m) => sum + m.children.length,
+      0
+    ) +
+    unifiedTimeline.earlyCoverage.length +
+    unifiedTimeline.undatedResources.length;
+
+  if (timelineItemCount > 0) {
+    tabs.push({
+      id: "timeline",
+      label: "Timeline",
+      count: timelineItemCount,
+      content: <UnifiedTimelineView timeline={unifiedTimeline} />,
+    });
+  }
+
+  // Documents & Press tab (resource table only — timeline view is in the Timeline tab)
   if (pressResources.length > 0) {
     tabs.push({
       id: "press",
-      label: "Coverage",
+      label: "Documents & Press",
       count: pressResources.length,
       content: (
         <div className="space-y-8">
-          {/* Timeline view */}
-          {(timelineEventsForTimeline.length > 0 || timelineResourceItems.length > 0) && (
-            <ResourceTimeline
-              events={timelineEventsForTimeline}
-              resources={timelineResourceItems}
-            />
-          )}
-
           {officialDocs.length > 0 && (
             <OrgResourcesSection
               resources={officialDocs}

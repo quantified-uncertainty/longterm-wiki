@@ -190,7 +190,7 @@ export const architectures: Architecture[] = [
     sources: [
       {
         title: "Reframing Superintelligence",
-        url: "https://www.fhi.ox.ac.uk/reframing/",
+        url: "https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/reframing/",
         year: "2019",
       },
       {

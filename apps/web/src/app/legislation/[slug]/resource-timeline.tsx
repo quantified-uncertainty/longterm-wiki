@@ -217,7 +217,7 @@ function EventEntry({
     <div className="relative">
       {/* Event dot on the timeline line */}
       <div
-        className={`absolute -left-[25px] top-1 w-3 h-3 rounded-full border-2 border-background ${dotColor}`}
+        className={`absolute -left-[13px] top-1.5 w-2 h-2 rounded-full border border-background ${dotColor}`}
       />
       <div className="flex items-baseline justify-between gap-3">
         <span className={`font-bold text-sm ${textColor}`}>
@@ -243,30 +243,32 @@ function OrphanResourceEntry({ resource }: { resource: TimelineResource }) {
   const shortDate = formatShortDate(resource.publishedDate);
 
   return (
-    <div className="relative flex items-start gap-2 py-1 group">
-      <div
-        className="absolute -left-[23px] top-2 w-2 h-2 rounded-full bg-muted-foreground/20 group-hover:bg-muted-foreground/40 transition-colors"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <a
-            href={safeHref(resource.url)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline truncate max-w-[24rem]"
-            title={resource.title}
-          >
-            {resource.title}
-          </a>
-          <span
-            className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
-          >
-            {badge.label}
-          </span>
+    <div className="ml-1 border-l border-border/40 pl-2">
+      <div className="flex items-start gap-2 py-1 group">
+        <div className="relative flex items-center justify-center mt-1.5 shrink-0 w-4">
+          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-muted-foreground/50 transition-colors" />
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
-          {resource.domain && <span>{resource.domain}</span>}
-          <span>{shortDate}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <a
+              href={safeHref(resource.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline truncate max-w-[24rem]"
+              title={resource.title}
+            >
+              {resource.title}
+            </a>
+            <span
+              className={`inline-flex items-center px-1.5 py-0 rounded text-[9px] font-semibold uppercase tracking-wide ${badge.className}`}
+            >
+              {badge.label}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground/70 mt-0.5">
+            {resource.domain && <span>{resource.domain}</span>}
+            <span>{shortDate}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -296,7 +298,7 @@ export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
   for (const r of orphans.resources) {
     sections.push({ kind: "orphan", resource: r, sortDate: r.publishedDate });
   }
-  sections.sort((a, b) => b.sortDate.localeCompare(a.sortDate));
+  sections.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
   const datedCount = resources.filter((r) => r.publishedDate).length;
   const totalCount = resources.length;
@@ -311,7 +313,7 @@ export function ResourceTimeline({ events, resources }: ResourceTimelineProps) {
         </span>
       </div>
 
-      <div className="relative pl-6 border-l-2 border-border space-y-4">
+      <div className="relative pl-4 border-l border-border/60 space-y-2">
         {sections.map((section, i) => {
           if (section.kind === "event-group") {
             return (
