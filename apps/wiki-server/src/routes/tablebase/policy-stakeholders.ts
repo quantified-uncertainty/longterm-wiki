@@ -17,12 +17,15 @@ const VALID_POSITIONS = ["support", "oppose", "neutral", "mixed"] as const;
 
 // ---- Schemas ----
 
+const VALID_IMPORTANCE = ["high", "medium", "low"] as const;
+
 const SyncStakeholderItemSchema = z.object({
   id: z.string().length(10),
   policyEntityId: z.string().min(1).max(200),
   stakeholderEntityId: z.string().max(200).nullable().optional(),
   stakeholderDisplayName: z.string().min(1).max(500),
   position: z.enum(VALID_POSITIONS),
+  importance: z.enum(VALID_IMPORTANCE).nullable().optional(),
   reason: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   context: z.array(z.string()).nullable().optional(),
@@ -108,6 +111,7 @@ const policyStakeholdersApp = new Hono()
             stakeholderEntityId: item.stakeholderEntityId ?? null,
             stakeholderDisplayName: item.stakeholderDisplayName,
             position: item.position,
+            importance: item.importance ?? null,
             reason: item.reason ?? null,
             source: item.source ?? null,
             context: item.context ?? null,
@@ -121,6 +125,7 @@ const policyStakeholdersApp = new Hono()
               stakeholderEntityId: item.stakeholderEntityId ?? null,
               stakeholderDisplayName: item.stakeholderDisplayName,
               position: item.position,
+              importance: item.importance ?? null,
               reason: item.reason ?? null,
               source: item.source ?? null,
               context: item.context ?? null,
