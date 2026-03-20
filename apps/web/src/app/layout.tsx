@@ -50,6 +50,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-card focus:border focus:border-border focus:rounded-md focus:text-sm focus:font-medium focus:text-foreground focus:shadow-lg">
+          Skip to content
+        </a>
         {/* Top nav bar */}
         <header className="sticky top-0 z-40 border-b border-border bg-card">
           <div className="flex items-center max-w-full">
@@ -82,7 +85,7 @@ export default function RootLayout({
         <SearchDialog />
 
         {/* Main content */}
-        <main>
+        <main id="main-content">
           {children}
         </main>
       </body>

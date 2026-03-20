@@ -40,6 +40,14 @@ Classify based on the title, summary, and source. When uncertain, prefer "neutra
 
 Output valid JSON only — an array of objects with: id, stance, confidence ("high"/"medium"/"low"), reasoning (one sentence).`;
 
+function extractDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 function buildUserPrompt(resources: Array<{ id: string; title: string; summary: string | null; url: string; domain: string | null }>): string {
   const items = resources.map((r) => ({
     id: r.id,
@@ -81,15 +89,6 @@ export async function classifyStance(args: {
 
   let toClassify = unclassified;
   if (limit) toClassify = toClassify.slice(0, limit);
-
-  // Extract domain from URL for classification context
-  function extractDomain(url: string): string | null {
-    try {
-      return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-    } catch {
-      return null;
-    }
-  }
 
   const items = toClassify.map((r: any) => ({
     id: r.id,

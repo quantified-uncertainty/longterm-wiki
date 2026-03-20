@@ -41,7 +41,7 @@ export function MermaidDiagram({ chart, children }: MermaidProps) {
     const renderChart = async () => {
       try {
         const mermaid = await getMermaid();
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+        const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`;
         const { svg: renderedSvg } = await mermaid.render(id, chartText);
         if (!cancelled) {
           setSvg(renderedSvg);
@@ -72,10 +72,19 @@ export function MermaidDiagram({ chart, children }: MermaidProps) {
     );
   }
 
-  if (loading || !svg) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center my-6 p-8 bg-muted rounded-lg min-h-[100px] text-muted-foreground text-sm">
         Loading diagram...
+      </div>
+    );
+  }
+
+  if (!svg) {
+    return (
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm my-4">
+        <strong>Diagram:</strong> Could not render this diagram.
+        <pre className="mt-2 text-xs overflow-auto whitespace-pre-wrap">{chartText}</pre>
       </div>
     );
   }
