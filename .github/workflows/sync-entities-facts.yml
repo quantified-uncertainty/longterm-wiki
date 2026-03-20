@@ -3,9 +3,15 @@ run-name: "Sync Entities${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '
 
 on:
   push:
-    branches: [production]
+    branches: [main, production]
     paths:
       - "data/entities/**"
+
+  # Run weekly to catch stale entities that missed path-triggered syncs.
+  # Ghost entries can persist if entity YAML is deleted but the sync workflow
+  # doesn't trigger (e.g., production branch is stale). See #2796.
+  schedule:
+    - cron: "0 7 * * 1" # Every Monday at 07:00 UTC
 
   # Allow manual trigger for full re-sync
   workflow_dispatch:

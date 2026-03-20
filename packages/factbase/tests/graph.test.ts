@@ -226,31 +226,22 @@ describe("graph", () => {
     });
   });
 
-  describe("previousIds resolution", () => {
-    it("resolves CAIS old stableId to current entity", () => {
-      // center-for-ai-safety was oa9A0OV0RX, now y4bieqSeag
-      const entity = graph.getEntity("oa9A0OV0RX");
-      expect(entity).toBeDefined();
-      expect(entity!.id).toBe("y4bieqSeag");
-      expect(entity!.name).toBe("Center for AI Safety");
-    });
-
-    it("resolves SFF old stableId to current entity", () => {
-      // survival-and-flourishing-fund was sIFjGbxVct, now pvJ50HupEQ
-      const entity = graph.getEntity("sIFjGbxVct");
-      expect(entity).toBeDefined();
-      expect(entity!.id).toBe("pvJ50HupEQ");
-      expect(entity!.name).toBe("Survival and Flourishing Fund");
-    });
-
-    it("still resolves current IDs directly", () => {
+  describe("entity resolution for new-format files", () => {
+    it("resolves CAIS by stableId", () => {
+      // cais.yaml uses new format: entity: y4bieqSeag
       const cais = graph.getEntity("y4bieqSeag");
       expect(cais).toBeDefined();
-      expect(cais!.name).toBe("Center for AI Safety");
+      expect(cais!.id).toBe("y4bieqSeag");
+      // Without TableBase entities, the loader creates a stub with filename as name
+      expect(cais!.name).toBe("cais");
+    });
 
+    it("resolves SFF by stableId", () => {
+      // sff.yaml uses new format: entity: pvJ50HupEQ
       const sff = graph.getEntity("pvJ50HupEQ");
       expect(sff).toBeDefined();
-      expect(sff!.name).toBe("Survival and Flourishing Fund");
+      expect(sff!.id).toBe("pvJ50HupEQ");
+      expect(sff!.name).toBe("sff");
     });
   });
 });

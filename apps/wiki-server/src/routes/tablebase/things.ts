@@ -211,10 +211,12 @@ const thingsApp = new Hono()
       conditions.push(eq(things.thingType, thing_type));
     }
 
+    const ftsWhere = and(...conditions);
+
     const rows = await db
       .select()
       .from(things)
-      .where(and(...conditions))
+      .where(ftsWhere)
       .orderBy(
         prefixQuery
           ? sql`ts_rank(${things}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
@@ -236,18 +238,25 @@ const thingsApp = new Hono()
         ilikeConditions.push(eq(things.thingType, thing_type));
       }
 
+      const ilikeWhere = and(...ilikeConditions);
+
       const fallbackRows = await db
         .select()
         .from(things)
-        .where(and(...ilikeConditions))
+        .where(ilikeWhere)
         .orderBy(things.title)
         .limit(limit);
 
       if (fallbackRows.length > 0) {
+        const countResult = await db
+          .select({ count: count() })
+          .from(things)
+          .where(ilikeWhere);
+
         return c.json({
           results: fallbackRows.map(formatThing),
           query: q,
-          total: fallbackRows.length,
+          total: countResult[0].count,
           searchMethod: "ilike" as const,
         });
       }
@@ -321,19 +330,34 @@ const thingsApp = new Hono()
           ...rows.map(formatThing),
           ...trigramFormatted,
         ];
+
+        // Count FTS matches for a more accurate total; trigram matches are
+        // supplementary so their count is not separately queried.
+        const ftsCountResult = await db
+          .select({ count: count() })
+          .from(things)
+          .where(ftsWhere);
+        const ftsTotal = ftsCountResult[0].count;
+
         return c.json({
           results: combined,
           query: q,
-          total: combined.length,
+          total: Math.max(ftsTotal, combined.length),
           searchMethod: rows.length > 0 ? ("fts+trigram" as const) : ("trigram" as const),
         });
       }
     }
 
+    // Count total FTS matches (may exceed the returned page)
+    const ftsCountResult = await db
+      .select({ count: count() })
+      .from(things)
+      .where(ftsWhere);
+
     return c.json({
       results: rows.map(formatThing),
       query: q,
-      total: rows.length,
+      total: rows.length > 0 ? ftsCountResult[0].count : 0,
       searchMethod: rows.length > 0 ? ("fts" as const) : ("none" as const),
     });
   })

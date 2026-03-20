@@ -172,13 +172,17 @@ export default async function LegislationDetailPage({
   const reachedStage = getReachedStage(timelineEvents, statusKey);
 
   // Only show the pipeline bar if the entity has actual legislative process data.
-  // Frameworks, declarations, and voluntary commitments have policyStatus: active
-  // which maps to "in-effect", but they are not legislation and have no timeline
-  // events, votes, or amendments — so the pipeline would falsely show "Enacted".
+  // The pipeline stages (Introduced -> Committee -> Floor Vote -> Passed -> Executive)
+  // only apply to bills/acts that went through a legislature. Diplomatic declarations
+  // (e.g., Bletchley Declaration) may have "votes" (signings) and executive agency
+  // actions (e.g., export controls) may have "amendments" (revisions), but these are
+  // not legislative processes. We require either:
+  // 1. Timeline events from customFields (e.g., "Introduced", "Passed Committee"), OR
+  // 2. A billNumber (which indicates formal legislation/regulation with a tracked process)
+  // This prevents showing the pipeline for declarations, agency actions, and frameworks
+  // while preserving it for bills that have votes but no customField timeline labels.
   const hasLegislativeProcessData =
-    timelineEvents.length > 0 ||
-    entity.votes.length > 0 ||
-    entity.amendments.length > 0;
+    timelineEvents.length > 0 || !!billNumber;
   const showPipelineBar = reachedStage >= 0 && hasLegislativeProcessData;
 
   // ── Build tabs ────────────────────────────────────────────

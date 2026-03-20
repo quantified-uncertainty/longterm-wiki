@@ -488,6 +488,50 @@ const PARALLEL_STEPS: Step[] = [
     advisory: false,
     emitOutputInCi: true,
   },
+  {
+    id: 'related-entry-types',
+    name: 'Related entry type mismatches (relatedEntries[].type vs actual entity type)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-related-entry-types.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: a relatedEntries type mismatch means the UI may display wrong
+    // type icons, filter incorrectly, or render broken type-specific components.
+    // Auto-fixable with --fix.
+  },
+  {
+    id: 'numeric-consistency',
+    name: 'Cross-page numeric consistency (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-numeric-consistency.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: heuristic detection with false positives. Flags potential
+    // contradictions when the same entity has different numeric values
+    // across pages (funding amounts, employee counts, etc.).
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'stale-content',
+    name: 'Stale content detection (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-stale-content.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: flags pages that may contain outdated information based on
+    // entity departure dates, YAML modification times, and page age.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'cross-page-dates',
+    name: 'Cross-page date consistency (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-cross-page-dates.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: detects when the same entity has different dates (founding,
+    // departure, employment ranges) stated across multiple wiki pages.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
