@@ -74,6 +74,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'orgs',
       'research-areas',
       'verify',
+      'legislation',
     ],
     flattened: ['tablebase'],
   },
