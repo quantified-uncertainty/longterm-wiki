@@ -15,6 +15,7 @@ import { classifyCommand } from '../resource-enrichment/classify.ts';
 import { deepEnrichCommand } from '../resource-enrichment/enrich.ts';
 import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts';
 import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
+import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
 
 interface ResourceCommandConfig {
   description: string;
@@ -151,6 +152,7 @@ commands['deep-enrich'] = deepEnrichCommand;
 
 commands['cross-reference'] = crossReferenceCommand;
 commands['fetch-wayback'] = fetchWaybackCommand;
+commands['archive-pdfs'] = archivePdfsCommand;
 
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
@@ -187,6 +189,7 @@ Enrichment:
   enrich-forums     Enrich forum posts via LW/AF/EAF GraphQL (→ resource_forum_posts)
   fetch-all         Fetch all resource URLs and extract meta tags
   fetch-wayback     Retry failed URLs via Wayback Machine (archive.org)
+  archive-pdfs      Archive PDF files to DigitalOcean Spaces
   enrich-free       Run all free enrichment (papers + forums + fetch)
   classify          LLM classification via Anthropic Batch API (Haiku, ~\$15)
   deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~\$100)
