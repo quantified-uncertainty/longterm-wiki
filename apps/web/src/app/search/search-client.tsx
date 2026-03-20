@@ -413,9 +413,8 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
           value={query}
           onChange={(e) => handleInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          aria-label="Search"
-          placeholder="Search entities, articles, resources..."
           aria-label="Search entities, articles, resources"
+          placeholder="Search entities, articles, resources..."
           className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all"
           autoComplete="off"
           spellCheck={false}
