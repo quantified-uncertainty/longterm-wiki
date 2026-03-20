@@ -77,6 +77,11 @@ function cleanLeadInvestor(li: string | null): string | null {
   return li;
 }
 
+/** Returns true if the value looks like a raw numeric ID or stableId rather than a human-readable name. */
+function isRawId(value: string): boolean {
+  return /^\d+$/.test(value) || STABLE_ID_PATTERN.test(value);
+}
+
 function formatRow(r: JoinedRow) {
   const fr = r.fundingRound;
   return {
@@ -84,7 +89,7 @@ function formatRow(r: JoinedRow) {
     companyId: fr.companyId,
     companyEntityId: fr.companyEntityId,
     companyDisplayName: fr.companyDisplayName,
-    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? fr.companyId,
+    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? (isRawId(fr.companyId) ? null : fr.companyId),
     name: fr.name,
     date: fr.date,
     raised: fr.raised != null ? Number(fr.raised) : null,

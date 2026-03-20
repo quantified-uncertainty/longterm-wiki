@@ -246,6 +246,7 @@ export default async function OrgProfilePage({
     }>();
 
     // Add key persons first
+    const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
       // Resolve person ref through TableBase (handles slugs, E-numbers, stableIds)
@@ -261,7 +262,7 @@ export default async function OrgProfilePage({
       }
       // Build display name: prefer explicit display_name, then resolved title,
       // then humanized slug. Never display raw stableIds or numeric IDs.
-      const isStableId = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(personRef ?? "");
+      const isStableId = STABLE_ID_RE.test(personRef ?? "");
       const isNumericId = /^\d+$/.test(personRef ?? "");
       const fallbackName = (isStableId || isNumericId)
         ? "Unknown"

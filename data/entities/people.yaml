@@ -2533,9 +2533,10 @@
   type: person
   title: Greg Brockman
   description: >-
-    Greg Brockman is a co-founder and former President of OpenAI (2015–2024).
-    He departed in August 2024. He previously served as CTO of Stripe before
-    co-founding OpenAI in December 2015.
+    Greg Brockman is the co-founder and President of OpenAI. He previously
+    served as CTO of Stripe before co-founding OpenAI in December 2015.
+    He took a sabbatical from OpenAI in August 2024 and returned in
+    November 2024.
   customFields:
     - label: Role
       value: Co-founder & Former President, OpenAI
