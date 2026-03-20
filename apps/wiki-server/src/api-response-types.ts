@@ -292,6 +292,15 @@ export type GithubPullsResult = InferResponseType<GithubPullsRpc['index']['$get'
 /** A single open PR entry. */
 export type OpenPRRow = GithubPullsResult['pulls'][number];
 
+/** Patrol summary response. */
+export type PatrolSummaryResult = InferResponseType<GithubPullsRpc['patrol-summary']['$get'], 200>;
+
+/** A PR needing attention from the patrol summary. */
+export type PatrolAttentionItem = PatrolSummaryResult['needsAttention'][number];
+
+/** A PR waiting on human action from the patrol summary. */
+export type PatrolHumanItem = PatrolSummaryResult['waitingOnHuman'][number];
+
 // ---------------------------------------------------------------------------
 // Build Metrics
 // ---------------------------------------------------------------------------

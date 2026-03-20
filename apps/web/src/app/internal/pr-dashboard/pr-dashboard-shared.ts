@@ -6,6 +6,29 @@
  * board component.
  */
 
+// ── Enriched Check / CodeRabbit / Action Types ─────────────────────────
+
+export interface CheckResult {
+  name: string;
+  status: "success" | "failure" | "pending" | "neutral" | "unknown";
+  isGateCheck: boolean;
+}
+
+export interface CodeRabbitSummary {
+  critical: number;
+  major: number;
+  minor: number;
+  total: number;
+}
+
+export type ActionNeeded =
+  | "code-fix"
+  | "rebase"
+  | "human-label"
+  | "comment-response"
+  | "ready"
+  | "building";
+
 // ── Types (matches OpenPR from wiki-server github-pulls route) ──────────
 
 export interface PullData {
@@ -22,6 +45,10 @@ export interface PullData {
   mergeable: "mergeable" | "conflicting" | "unknown";
   labels: string[];
   unresolvedThreads: number;
+  // Enriched fields (optional — gracefully degrade when absent)
+  checks?: CheckResult[];
+  codeRabbitFindings?: CodeRabbitSummary;
+  actionNeeded?: ActionNeeded;
 }
 
 // ── Stats ────────────────────────────────────────────────────────────────
@@ -32,6 +59,8 @@ export interface PRStats {
   ciFailing: number;
   needsReview: number;
   conflicting: number;
+  gateBlocked: number;
+  codeRabbitIssues: number;
 }
 
 // ── Kanban Column Classification ────────────────────────────────────────
@@ -40,7 +69,8 @@ export type KanbanColumn = "draft" | "ci-issues" | "needs-review" | "approved";
 
 /**
  * Classify a PR into one of the Kanban columns.
- * Single source of truth: used by both stats computation and board grouping.
+ * When enriched `actionNeeded` data is available, use it for smarter placement.
+ * Falls back to the original heuristic when the field is absent.
  */
 export function classifyPR(pr: PullData): KanbanColumn {
   if (pr.isDraft) return "draft";
@@ -51,6 +81,22 @@ export function classifyPR(pr: PullData): KanbanColumn {
   );
   if (hasApproved) return "approved";
 
+  // Use enriched actionNeeded when available for smarter column assignment
+  if (pr.actionNeeded) {
+    switch (pr.actionNeeded) {
+      case "ready":
+        return "approved";
+      case "building":
+      case "code-fix":
+        return "ci-issues";
+      case "rebase":
+      case "human-label":
+      case "comment-response":
+        return "needs-review";
+    }
+  }
+
+  // Fallback: original heuristic when actionNeeded is not provided
   if (
     pr.ciStatus === "pending" ||
     pr.ciStatus === "failure" ||
@@ -83,5 +129,11 @@ export function computeStats(pulls: PullData[]): PRStats {
     ciFailing: pulls.filter((p) => p.ciStatus === "failure").length,
     needsReview: counts["needs-review"],
     conflicting: pulls.filter((p) => p.mergeable === "conflicting").length,
+    gateBlocked: pulls.filter(
+      (p) => p.checks?.some((c) => c.isGateCheck && c.status === "failure")
+    ).length,
+    codeRabbitIssues: pulls.filter(
+      (p) => p.codeRabbitFindings && p.codeRabbitFindings.total > 0
+    ).length,
   };
 }
