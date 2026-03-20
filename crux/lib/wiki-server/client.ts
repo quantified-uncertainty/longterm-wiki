@@ -164,6 +164,7 @@ async function tlsBypassFetch(
         clearTimeout(timer);
         let body = '';
         res.on('data', (chunk: Buffer) => (body += chunk.toString()));
+        res.on('error', (err) => reject(err));
         res.on('end', () => {
           const status = res.statusCode ?? 500;
           resolve({
@@ -270,8 +271,8 @@ export async function batchedRequest<T>(
 
 /**
  * Fetch a URL from the wiki-server, using TLS bypass when enabled.
- * This is the recommended way for any code outside this module to make
- * wiki-server requests when they can't use apiRequest() directly.
+ * TLS bypass only applies when the URL matches the configured wiki-server URL
+ * — other HTTPS URLs (e.g., public frontend) use standard fetch.
  */
 export async function serverFetch(
   url: string,
@@ -281,7 +282,8 @@ export async function serverFetch(
   const headers = init?.headers ?? {};
   const timeoutMs = init?.timeoutMs ?? TIMEOUT_MS;
 
-  if (isTlsBypassEnabled() && url.startsWith('https://')) {
+  const serverUrl = getServerUrl();
+  if (isTlsBypassEnabled() && url.startsWith('https://') && serverUrl && url.startsWith(serverUrl)) {
     return tlsBypassFetch(url, { method, headers, body: init?.body, timeoutMs });
   }
 
