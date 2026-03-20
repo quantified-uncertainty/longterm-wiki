@@ -156,7 +156,6 @@ export function findTypeMismatches(
  */
 function autoFixMismatches(
   mismatches: TypeMismatch[],
-  typeMap: Map<string, string>,
 ): number {
   // Group mismatches by source file
   const byFile = new Map<string, TypeMismatch[]>();
@@ -178,7 +177,9 @@ function autoFixMismatches(
       continue;
     }
 
-    if (!Array.isArray(parsed)) continue;
+    // Normalize to array for uniform handling (single-object YAML files are rare but possible)
+    const entityList = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+    if (entityList.length === 0) continue;
 
     // Build a lookup of which entries to fix
     const fixMap = new Map<string, Map<string, string>>(); // sourceEntityId → (refId → actualType)
@@ -189,7 +190,7 @@ function autoFixMismatches(
     }
 
     let modified = false;
-    for (const entity of parsed) {
+    for (const entity of entityList) {
       if (!entity?.id || !Array.isArray(entity.relatedEntries)) continue;
 
       const entityFixes = fixMap.get(entity.id);
@@ -206,7 +207,12 @@ function autoFixMismatches(
     }
 
     if (modified) {
-      writeFileSync(filePath, stringifyYaml(parsed, { lineWidth: 120 }));
+      // Note: stringifyYaml rewrites the file — comments and formatting may change.
+      // This is consistent with other --fix operations in the codebase.
+      const output = Array.isArray(parsed)
+        ? stringifyYaml(entityList, { lineWidth: 120 })
+        : stringifyYaml(entityList[0], { lineWidth: 120 });
+      writeFileSync(filePath, output);
     }
   }
 
@@ -224,7 +230,7 @@ export function runRelatedEntryTypeCheck(options?: {
   const mismatches = findTypeMismatches(entities, typeMap);
 
   if (options?.fix && mismatches.length > 0) {
-    autoFixMismatches(mismatches, typeMap);
+    autoFixMismatches(mismatches);
   }
 
   return {
@@ -245,7 +251,7 @@ function main(): void {
   const mismatches = findTypeMismatches(entities, typeMap);
 
   if (FIX_MODE && mismatches.length > 0) {
-    const fixCount = autoFixMismatches(mismatches, typeMap);
+    const fixCount = autoFixMismatches(mismatches);
     if (!CI_MODE) {
       console.log(`${c.green}Fixed ${fixCount} type mismatch(es) in entity YAML files.${c.reset}\n`);
     }

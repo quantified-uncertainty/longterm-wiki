@@ -103,6 +103,9 @@ function loadEntities(): Map<string, EntityInfo> {
       const endDates: Array<{ context: string; date: string }> = [];
 
       // Check for departure/end dates in entity data
+      // Note: yamlModified uses filesystem mtime which resets on git clone/checkout.
+      // This makes the "YAML modified after page edit" heuristic unreliable on fresh
+      // clones. It's acceptable for an advisory check but not suitable for blocking.
       if (entity.departureDate) {
         endDates.push({ context: 'departure', date: String(entity.departureDate) });
       }
@@ -229,12 +232,10 @@ export function detectStaleness(
       for (const { context, date } of entity.endDates) {
         if (date === 'unknown') {
           // Entity is inactive/dissolved — page may reference it as active
-          if (page.lastEditedDate) {
-            pageScore += 20;
-            reasons.push(
-              `References "${entity.title}" which has ${context} status — may describe it as active`,
-            );
-          }
+          pageScore += 20;
+          reasons.push(
+            `References "${entity.title}" which has ${context} status — may describe it as active`,
+          );
           continue;
         }
 

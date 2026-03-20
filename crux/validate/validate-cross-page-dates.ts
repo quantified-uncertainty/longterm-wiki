@@ -74,9 +74,11 @@ function extractDateMentions(
   const lines = text.split('\n');
 
   // Find lines that mention the entity
+  // Escape regex metacharacters in entity IDs for safe pattern construction
+  const escaped = entityId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const entityPatterns = [
-    new RegExp(`EntityLink[^>]*id=["']${entityId}["']`, 'i'),
-    new RegExp(`\\b${entityId.replace(/-/g, '[- ]')}\\b`, 'i'),
+    new RegExp(`EntityLink[^>]*id=["']${escaped}["']`, 'i'),
+    new RegExp(`\\b${escaped.replace(/\\-/g, '[- ]')}\\b`, 'i'),
   ];
 
   const entityLineNums = new Set<number>();
