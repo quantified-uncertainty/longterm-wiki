@@ -65,18 +65,11 @@ function buildDomainToOrgMap(entities: EntityEntry[]): Map<string, string> {
     map.set(domain, entityId);
   }
 
-  // Also try to match entity websites to domains
-  for (const entity of entities) {
-    if (entity.type === 'organization') {
-      // Use entity ID slug as a potential domain match
-      const slug = entity.stableId;
-      if (slug) {
-        // E.g., entity "anthropic" matches domain "anthropic.com"
-        map.set(`${slug}.com`, entity.stableId);
-        map.set(`${slug}.org`, entity.stableId);
-      }
-    }
-  }
+  // Note: Auto-generating domain mappings from entity slugs is intentionally
+  // not done here. The entity API returns stableIds (10-char hashes) not
+  // human-readable slugs, and even slug-based matching would produce false
+  // positives for short slugs (arc.com, meta.org, etc.). Extend the
+  // knownMappings object above for new publisher domains instead.
 
   return map;
 }
