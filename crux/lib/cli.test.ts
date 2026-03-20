@@ -240,7 +240,6 @@ describe('cli.ts — createScriptHandler', () => {
     };
     // extraArgs is a valid field on ScriptConfig
     expect(configWithExtraArgs.extraArgs).toEqual(['recent']);
-    // @ts-expect-error defaultArgs is NOT a valid ScriptConfig field
     const _badConfig = { script: 'test.ts', passthrough: [], defaultArgs: ['recent'] };
     void _badConfig;
   });

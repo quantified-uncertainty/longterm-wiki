@@ -147,8 +147,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- things: search_vector / plainto_tsquery (FTS search) ---
-  if (q.includes('"things"') && q.includes("plainto_tsquery")) {
+  // --- things: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
+  if (q.includes('"things"') && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
     // FTS: return empty to trigger ILIKE fallback (simulates no tsvector in memory)
     return [];
   }

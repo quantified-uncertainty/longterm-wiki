@@ -513,6 +513,65 @@ export async function fetchRecordVerdicts() {
 }
 
 /**
+ * Fetch policy stakeholder IDs from wiki-server.
+ * Returns a map keyed by "policyEntityId:stakeholderDisplayName" -> stakeholder PG ID.
+ * Used by the legislation page to look up verification verdicts for each stakeholder row.
+ *
+ * The policyEntityId key is the entity stableId (the FK in PG), so callers must use
+ * the entity stableId when looking up — not the slug.
+ */
+export async function fetchPolicyStakeholderIds() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  policy-stakeholder-ids: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    // Fetch all policy stakeholders from PG via the things table.
+    // Each thing row has sourceId = PG stakeholder ID, parentThingId = policy entity stableId.
+    const pageSize = 200;
+    const idMap = {};
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/things?thing_type=policy-stakeholder&limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+      if (!resp.ok) {
+        logWikiServerWarning('policy-stakeholder-ids', `HTTP ${resp.status}`);
+        return {};
+      }
+      const data = await resp.json();
+      const items = data.things || [];
+      for (const t of items) {
+        // title format: "Stakeholder Name on Policy Title"
+        // parentThingId is the policy entity's stableId
+        // sourceId is the PG stakeholder ID (same as the things row's sourceId)
+        if (t.sourceId && t.parentThingId) {
+          const onIdx = t.title?.indexOf(' on ');
+          if (onIdx > 0) {
+            const stakeholderName = t.title.substring(0, onIdx);
+            idMap[`${t.parentThingId}:${stakeholderName}`] = t.sourceId;
+          }
+        }
+      }
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    const count = Object.keys(idMap).length;
+    if (count > 0) {
+      console.log(`  policy-stakeholder-ids: ${count} stakeholder ID mappings fetched`);
+    }
+    return idMap;
+  } catch (err) {
+    logWikiServerWarning('policy-stakeholder-ids', err instanceof Error ? err.message : String(err));
+    return {};
+  }
+}
+
+/**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
  * PG stores canonical entity IDs in personId/organizationId.
  */
@@ -584,8 +643,8 @@ function grantRowToRecordEntry(row) {
     ownerEntityId: row.organizationId,
     fields,
   };
-  // Embed resolved grantee display name from API JOIN
-  if (row.granteeResolvedName) entry.displayName = row.granteeResolvedName;
+  // Embed resolved grantee display name from entity ref
+  if (row.grantee?.name) entry.displayName = row.grantee.name;
   return entry;
 }
 
@@ -600,23 +659,23 @@ function fundingRoundRowToRecordEntry(row) {
   if (row.raised != null) fields.raised = row.raised;
   if (row.valuation != null) fields.valuation = row.valuation;
   if (row.instrument) fields.instrument = row.instrument;
-  if (row.leadInvestor) fields.lead_investor = row.leadInvestor;
+  if (row.leadInvestorRaw) fields.lead_investor = row.leadInvestorRaw;
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
   // Embed the server-side-resolved company name so the frontend can display it
-  // even when companyEntityId is null (legacy numeric companyId rows).
-  if (row.companyResolvedName) fields.company_name = row.companyResolvedName;
+  // even when companyRef.entityId is null (legacy numeric companyId rows).
+  if (row.companyRef?.name) fields.company_name = row.companyRef.name;
 
   const entry = {
     key: row.id,
     schema: 'funding-round',
-    // Prefer companyEntityId (proper stableId FK) over legacy companyId for entity resolution.
+    // Prefer companyRef.entityId (proper stableId FK) over legacy companyId for entity resolution.
     // Falls back to companyId for backward compatibility.
-    ownerEntityId: row.companyEntityId ?? row.companyId,
+    ownerEntityId: row.companyRef?.entityId ?? row.companyId,
     fields,
   };
-  // Embed resolved lead investor display name from API JOIN
-  if (row.leadInvestorResolvedName) entry.displayName = row.leadInvestorResolvedName;
+  // Embed resolved lead investor display name from entity ref
+  if (row.leadInvestorRef?.name) entry.displayName = row.leadInvestorRef.name;
   return entry;
 }
 
@@ -655,8 +714,8 @@ function investmentRowToRecordEntry(row) {
     ownerEntityId: row.companyId,
     fields,
   };
-  // Embed resolved investor display name from API JOIN
-  if (row.investorResolvedName) entry.displayName = row.investorResolvedName;
+  // Embed resolved investor display name from entity ref
+  if (row.investor?.name) entry.displayName = row.investor.name;
   return entry;
 }
 
@@ -691,8 +750,8 @@ function equityPositionRowToRecordEntry(row) {
   };
   if (row.asOf) entry.asOf = row.asOf;
   if (row.validEnd) entry.validEnd = row.validEnd;
-  // Embed resolved holder display name from API JOIN
-  if (row.holderResolvedName) entry.displayName = row.holderResolvedName;
+  // Embed resolved holder display name from entity ref
+  if (row.holder?.name) entry.displayName = row.holder.name;
   return entry;
 }
 
@@ -955,7 +1014,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'funding-rounds',
     fundingRoundsResult,
     ['funding-rounds'],
-    (row) => row.companyId,
+    (row) => row.companyRef?.entityId ?? row.companyId,
     () => 'funding-rounds',
     fundingRoundRowToRecordEntry,
   );
@@ -1041,7 +1100,7 @@ export async function fetchResourcesFromPG() {
     // Paginate through all resources
     while (true) {
       const resp = await fetch(
-        `${serverUrl}/api/resources/all?limit=${limit}&offset=${offset}`,
+        `${serverUrl}/api/resources/all-details?limit=${limit}&offset=${offset}`,
         { headers, signal: AbortSignal.timeout(30_000) }
       );
       if (!resp.ok) return null;
@@ -1073,6 +1132,49 @@ export async function fetchResourcesFromPG() {
           archive_url: r.archiveUrl ?? undefined,
           author_entity_ids: r.authorEntityIds ?? undefined,
           stance: r.stance ?? undefined,
+          // Enrichment fields
+          context_note: r.contextNote ?? undefined,
+          resource_purpose: r.resourcePurpose ?? undefined,
+          resource_subtype: r.resourceSubtype ?? undefined,
+          type_metadata: r.typeMetadata ?? undefined,
+          publisher_entity_id: r.publisherEntityId ?? undefined,
+          related_entity_ids: r.relatedEntityIds ?? undefined,
+          enrichment_status: r.enrichmentStatus ?? undefined,
+          importance_score: r.importanceScore ?? undefined,
+          // Sub-table data (if fetched via all-details endpoint)
+          paper: r.paper ? {
+            arxiv_id: r.paper.arxivId ?? undefined,
+            doi: r.paper.doi ?? undefined,
+            semantic_scholar_id: r.paper.semanticScholarId ?? undefined,
+            abstract: r.paper.abstract ?? undefined,
+            citation_count: r.paper.citationCount ?? undefined,
+            influential_citation_count: r.paper.influentialCitationCount ?? undefined,
+            categories: r.paper.categories ?? undefined,
+            methodology: r.paper.methodology ?? undefined,
+            year: r.paper.year ?? undefined,
+          } : undefined,
+          forum_post: r.forumPost ? {
+            forum: r.forumPost.forum,
+            forum_post_id: r.forumPost.forumPostId ?? undefined,
+            forum_slug: r.forumPost.forumSlug ?? undefined,
+            karma: r.forumPost.karma ?? undefined,
+            comment_count: r.forumPost.commentCount ?? undefined,
+            author_username: r.forumPost.authorUsername ?? undefined,
+            forum_tags: r.forumPost.forumTags ?? undefined,
+            sequence_title: r.forumPost.sequenceTitle ?? undefined,
+            curated: r.forumPost.curated ?? undefined,
+            cross_posted_from: r.forumPost.crossPostedFrom ?? undefined,
+            canonical_forum: r.forumPost.canonicalForum ?? undefined,
+          } : undefined,
+          policy_doc: r.policyDoc ? {
+            document_type: r.policyDoc.documentType ?? undefined,
+            jurisdiction_entity_id: r.policyDoc.jurisdictionEntityId ?? undefined,
+            agency_entity_id: r.policyDoc.agencyEntityId ?? undefined,
+            policy_entity_id: r.policyDoc.policyEntityId ?? undefined,
+            effective_date: r.policyDoc.effectiveDate ?? undefined,
+            document_status: r.policyDoc.documentStatus ?? undefined,
+            reference_number: r.policyDoc.referenceNumber ?? undefined,
+          } : undefined,
         });
       }
 

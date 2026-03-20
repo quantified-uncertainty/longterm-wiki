@@ -6,11 +6,18 @@ vi.mock("@/data/factbase", () => ({
   getKBEntitySlug: vi.fn(),
 }));
 
+// Mock TableBase functions
+vi.mock("@/data/tablebase", () => ({
+  getTypedEntityById: vi.fn(),
+}));
+
 import { resolveEntityName } from "../resolve-entity-name";
 import { getKBEntity, getKBEntitySlug } from "@/data/factbase";
+import { getTypedEntityById } from "@/data/tablebase";
 
 const mockGetKBEntity = vi.mocked(getKBEntity);
 const mockGetKBEntitySlug = vi.mocked(getKBEntitySlug);
+const mockGetTypedEntityById = vi.mocked(getTypedEntityById);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -69,6 +76,7 @@ describe("resolveEntityName", () => {
 
   it("returns 'Unknown' for unknown stableId (uppercase, 10 chars)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     const result = resolveEntityName("3KjUCZCV8w");
     expect(result).toEqual({ name: "Unknown", href: null });
@@ -76,6 +84,7 @@ describe("resolveEntityName", () => {
 
   it("does NOT treat 10-char lowercase slug as stableId (no uppercase)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     const result = resolveEntityName("bioweapons");
     expect(result).toEqual({ name: "Bioweapons", href: null });
@@ -83,6 +92,7 @@ describe("resolveEntityName", () => {
 
   it("does NOT treat 'conjecture' as stableId (lowercase only)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     const result = resolveEntityName("conjecture");
     expect(result).toEqual({ name: "Conjecture", href: null });
@@ -90,6 +100,7 @@ describe("resolveEntityName", () => {
 
   it("strips 'new:' prefix and returns the name", () => {
     mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     const result = resolveEntityName("new:Charlotte Stix");
     expect(result).toEqual({ name: "Charlotte Stix", href: null });
@@ -97,6 +108,7 @@ describe("resolveEntityName", () => {
 
   it("humanizes slug-format IDs", () => {
     mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     const result = resolveEntityName("jan-leike");
     expect(result).toEqual({ name: "Jan Leike", href: null });
@@ -133,6 +145,7 @@ describe("resolveEntityName", () => {
       type: "organization",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("empty-name");
+    mockGetTypedEntityById.mockReturnValue(undefined);
 
     // Empty name in FactBase falls through to slug humanization
     const result = resolveEntityName("empty-name");
@@ -158,5 +171,66 @@ describe("resolveEntityName", () => {
     const result = resolveEntityName(null, "  ");
     // Empty after trim -> falls through
     expect(result).toEqual({ name: "Unknown", href: null });
+  });
+
+  it("returns 'Unknown' for pure numeric IDs (not valid slugs)", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    expect(resolveEntityName("335")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("1234")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("0")).toEqual({ name: "Unknown", href: null });
+  });
+
+  it("resolves entity via TableBase when FactBase lookup fails", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue({
+      id: "some-org",
+      stableId: "Abc1234567",
+      title: "Some Organization",
+      entityType: "organization",
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    });
+
+    const result = resolveEntityName("some-org");
+    expect(result).toEqual({
+      name: "Some Organization",
+      href: "/organizations/some-org",
+    });
+  });
+
+  it("resolves person entity via TableBase when FactBase lookup fails", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue({
+      id: "tom-brown",
+      stableId: "xY12345678",
+      title: "Tom Brown",
+      entityType: "person",
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    });
+
+    const result = resolveEntityName("tom-brown");
+    expect(result).toEqual({
+      name: "Tom Brown",
+      href: "/people/tom-brown",
+    });
+  });
+
+  it("falls through to slug humanization when both FactBase and TableBase fail", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    const result = resolveEntityName("jane-doe");
+    expect(result).toEqual({ name: "Jane Doe", href: null });
   });
 });

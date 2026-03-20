@@ -1,0 +1,195 @@
+/**
+ * Resource Enrichment — Forum Posts (LessWrong, AlignmentForum, EA Forum)
+ *
+ * Enriches forum post resources with karma, comment counts, tags, curated status,
+ * and writes to the resource_forum_posts sub-table.
+ */
+
+import { loadResourcesPGFirst } from '../resource-io.ts';
+import { extractForumSlug, sleep } from '../resource-utils.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
+import type { Resource } from '../resource-types.ts';
+import type { CommandResult } from '../lib/cli.ts';
+
+// ── Forum GraphQL queries ───────────────────────────────────────────────────
+
+interface ForumPostData {
+  _id: string;
+  title: string;
+  slug: string;
+  baseScore: number;
+  voteCount: number;
+  commentCount: number;
+  postedAt: string;
+  curatedDate: string | null;
+  user: { displayName: string; slug: string } | null;
+  coauthors: { displayName: string }[] | null;
+  tags: { tag: { name: string; slug: string } }[] | null;
+  sequence: { title: string } | null;
+}
+
+const FORUM_QUERY = `
+query PostBySlug($slug: String!) {
+  post(input: {selector: {slug: $slug}}) {
+    result {
+      _id
+      title
+      slug
+      baseScore
+      voteCount
+      commentCount
+      postedAt
+      curatedDate
+      user { displayName slug }
+      coauthors { displayName }
+      tags { tag { name slug } }
+      sequence { title }
+    }
+  }
+}
+`;
+
+function getForumEndpoint(url: string): { endpoint: string; forum: string } {
+  if (url.includes('forum.effectivealtruism.org')) {
+    return { endpoint: 'https://forum.effectivealtruism.org/graphql', forum: 'eaforum' };
+  }
+  if (url.includes('alignmentforum.org')) {
+    return { endpoint: 'https://www.alignmentforum.org/graphql', forum: 'alignmentforum' };
+  }
+  return { endpoint: 'https://www.lesswrong.com/graphql', forum: 'lesswrong' };
+}
+
+async function fetchForumPostExtended(
+  url: string,
+  slug: string,
+): Promise<{ forum: string; post: ForumPostData } | null> {
+  const { endpoint, forum } = getForumEndpoint(url);
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: FORUM_QUERY,
+      variables: { slug },
+    }),
+  });
+
+  if (!response.ok) return null;
+
+  const data = await response.json() as {
+    data?: { post?: { result?: ForumPostData } };
+  };
+
+  const post = data?.data?.post?.result;
+  if (!post) return null;
+
+  return { forum, post };
+}
+
+// ── Main enrichment ─────────────────────────────────────────────────────────
+
+export async function enrichForumsCommand(
+  args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const limit = (options.limit as number) || 200;
+  const dryRun = options['dry-run'] as boolean;
+  const verbose = options.verbose as boolean;
+
+  console.log('📝 Forum Post Enrichment (LW/AF/EAF → resource_forum_posts)\n');
+  if (dryRun) console.log('  DRY RUN — no changes will be written\n');
+
+  const resources = await loadResourcesPGFirst();
+
+  // Find forum post resources
+  const forumResources = resources.filter((r) => {
+    if (!r.url) return false;
+    return extractForumSlug(r.url) !== null;
+  });
+
+  console.log(`  Found ${forumResources.length} forum post resources`);
+
+  const toProcess = forumResources.slice(0, limit);
+  let enriched = 0;
+  let failed = 0;
+
+  const forumBatch: Array<{ resourceId: string } & Record<string, unknown>> = [];
+
+  for (const r of toProcess) {
+    const slug = extractForumSlug(r.url);
+    if (!slug) continue;
+
+    try {
+      const result = await fetchForumPostExtended(r.url, slug);
+      if (!result) {
+        failed++;
+        if (verbose) console.log(`  ✗ No data: ${r.title || r.url}`);
+        continue;
+      }
+
+      const { forum, post } = result;
+
+      const forumData: Record<string, unknown> = {
+        resourceId: r.id,
+        forum,
+        forumPostId: post._id,
+        forumSlug: post.slug,
+        karma: post.baseScore,
+        commentCount: post.commentCount,
+        curated: post.curatedDate != null,
+      };
+
+      if (post.user) {
+        forumData.authorUsername = post.user.slug;
+      }
+
+      if (post.tags && post.tags.length > 0) {
+        forumData.forumTags = post.tags.map((t) => t.tag.name);
+      }
+
+      if (post.sequence) {
+        forumData.sequenceTitle = post.sequence.title;
+      }
+
+      forumBatch.push(forumData as { resourceId: string } & Record<string, unknown>);
+      enriched++;
+
+      if (verbose) {
+        console.log(`  ✓ ${post.title} (karma: ${post.baseScore}, comments: ${post.commentCount})`);
+      }
+
+      // Rate limit — forums are generous but be polite
+      await sleep(200);
+    } catch (err) {
+      failed++;
+      if (verbose) {
+        console.log(`  ✗ ${r.title || r.url}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+  }
+
+  console.log(`\n  Results: ${enriched} enriched, ${failed} failed`);
+
+  // Write to sub-table via batch-details API
+  if (!dryRun && forumBatch.length > 0) {
+    console.log(`  Writing ${forumBatch.length} forum post records...`);
+
+    for (let i = 0; i < forumBatch.length; i += 200) {
+      const batch = forumBatch.slice(i, i + 200);
+      const result = await apiRequest<{ ok: boolean; upserted: { forumPosts: number } }>(
+        'POST',
+        '/api/resources/batch-details',
+        { forumPosts: batch },
+        30000,
+      );
+
+      if (result.ok) {
+        console.log(`  ✓ Batch ${Math.floor(i / 200) + 1}: ${result.data.upserted.forumPosts} forum posts written`);
+      } else {
+        console.error(`  ✗ Batch ${Math.floor(i / 200) + 1} failed: ${result.message}`);
+      }
+    }
+  }
+
+  return { exitCode: 0, output: `Enriched ${enriched} forum posts` };
+}

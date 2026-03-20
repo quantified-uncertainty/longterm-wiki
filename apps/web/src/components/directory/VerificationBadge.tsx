@@ -99,6 +99,7 @@ export function collectionToRecordType(
     "funding-rounds": "funding-round",
     investments: "investment",
     "equity-positions": "equity-position",
+    "policy-stakeholders": "policy-stakeholder",
   };
   return MAP[collection] ?? null;
 }

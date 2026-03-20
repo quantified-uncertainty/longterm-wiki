@@ -12,7 +12,7 @@ import {
   notFoundError,
   zv,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 
 // ---- Constants ----
 
@@ -267,6 +267,10 @@ const divisionsApp = new Hono()
           },
         });
 
+      // Resolve parent org slugs to human-readable titles for search
+      const orgSlugs = [...new Set(items.map((d) => d.parentOrgId))];
+      const titleMap = await resolveEntityTitles(tx, orgSlugs);
+
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
@@ -277,7 +281,7 @@ const divisionsApp = new Hono()
           sourceTable: "divisions",
           sourceId: d.id,
           sourceUrl: d.website,
-          parentTitle: d.parentOrgId,
+          parentTitle: titleMap.get(d.parentOrgId) ?? d.parentOrgId,
           description: d.divisionType || null,
         }))
       );

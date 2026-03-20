@@ -184,6 +184,55 @@ export interface Resource {
   archive_url?: string;
   author_entity_ids?: string[];
   stance?: string;
+  // Enrichment fields
+  context_note?: string;
+  resource_purpose?: string;
+  resource_subtype?: string;
+  type_metadata?: Record<string, unknown>;
+  publisher_entity_id?: string;
+  related_entity_ids?: string[];
+  enrichment_status?: string;
+  importance_score?: number;
+  // Sub-table data
+  paper?: ResourcePaper;
+  forum_post?: ResourceForumPost;
+  policy_doc?: ResourcePolicyDoc;
+}
+
+export interface ResourcePaper {
+  arxiv_id?: string;
+  doi?: string;
+  semantic_scholar_id?: string;
+  abstract?: string;
+  citation_count?: number;
+  influential_citation_count?: number;
+  categories?: string[];
+  methodology?: string;
+  year?: number;
+}
+
+export interface ResourceForumPost {
+  forum: string;
+  forum_post_id?: string;
+  forum_slug?: string;
+  karma?: number;
+  comment_count?: number;
+  author_username?: string;
+  forum_tags?: string[];
+  sequence_title?: string;
+  curated?: boolean;
+  cross_posted_from?: string;
+  canonical_forum?: string;
+}
+
+export interface ResourcePolicyDoc {
+  document_type?: string;
+  jurisdiction_entity_id?: string;
+  agency_entity_id?: string;
+  policy_entity_id?: string;
+  effective_date?: string;
+  document_status?: string;
+  reference_number?: string;
 }
 
 export interface Publication {
@@ -457,6 +506,9 @@ interface TableBaseShape {
   }>;
   /** Record verification verdicts, keyed by "recordType:recordId" */
   recordVerdicts?: Record<string, RecordVerdict>;
+  /** Policy stakeholder PG IDs, keyed by "policyEntityStableId:stakeholderDisplayName" -> stakeholder 10-char ID.
+   *  Used to look up verification verdicts for stakeholder rows on legislation pages. */
+  policyStakeholderIds?: Record<string, string>;
 }
 
 // ============================================================================
@@ -634,6 +686,7 @@ export function getIdRegistry(): IdRegistryMaps {
 // ============================================================================
 
 let _typedEntityIndex: Map<string, AnyEntity> | null = null;
+let _entityStableIdIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
@@ -647,15 +700,33 @@ function typedEntityIndex() {
   return _typedEntityIndex;
 }
 
+/** Lazy index: entity.stableId → entity. Covers all typed entities. */
+function entityStableIdIndex(): Map<string, AnyEntity> {
+  if (!_entityStableIdIndex) {
+    _entityStableIdIndex = new Map();
+    for (const e of getTypedEntities()) {
+      if (e.stableId) {
+        _entityStableIdIndex.set(e.stableId, e);
+      }
+    }
+  }
+  return _entityStableIdIndex;
+}
+
 /**
  * Get a typed entity by stableId (10-char alphanumeric).
  * Resolves stableId → slug via idRegistry, then looks up the entity by slug.
+ * Falls back to scanning the entity stableId index if the registry lookup fails.
  */
 export function getTypedEntityByStableId(stableId: string): AnyEntity | undefined {
   const registry = getIdRegistry();
   const slug = registry.byStableId?.[stableId];
-  if (!slug) return undefined;
-  return typedEntityIndex().get(slug);
+  if (slug) {
+    const entity = typedEntityIndex().get(slug);
+    if (entity) return entity;
+  }
+  // Fallback: scan entities by their stableId field
+  return entityStableIdIndex().get(stableId);
 }
 
 function resourceIndex() {
@@ -1015,6 +1086,22 @@ export function getRecordVerdictStats(recordType: string): {
     }
   }
   return stats;
+}
+
+// ============================================================================
+// POLICY STAKEHOLDER IDS
+// Maps "policyEntityStableId:stakeholderDisplayName" -> PG stakeholder ID.
+// Used by legislation pages to look up verification verdicts for stakeholder rows.
+// ============================================================================
+
+/** Get the PG stakeholder ID for a YAML stakeholder on a specific policy entity. */
+export function getPolicyStakeholderId(
+  policyEntityStableId: string,
+  stakeholderDisplayName: string,
+): string | null {
+  const map = getTableBase().policyStakeholderIds;
+  if (!map) return null;
+  return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
 // Re-export loadYaml for use in domain modules

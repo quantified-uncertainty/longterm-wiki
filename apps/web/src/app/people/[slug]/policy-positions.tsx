@@ -12,7 +12,7 @@ export interface PersonPolicyPosition {
 }
 
 /**
- * Find all policy entities where a person appears as a stakeholder.
+ * Find all policy entities where a person appears as a stakeholder or key politician.
  * Matches by entity ID or name (case-insensitive).
  */
 export function getPersonPolicyPositions(
@@ -21,13 +21,17 @@ export function getPersonPolicyPositions(
 ): PersonPolicyPosition[] {
   const allEntities = getTypedEntities();
   const policies = allEntities.filter(isPolicy);
+  const nameLower = personName.toLowerCase();
 
   const positions: PersonPolicyPosition[] = [];
   for (const policy of policies) {
+    let found = false;
+
+    // Check stakeholders first (has position + reason)
     for (const stakeholder of policy.stakeholders) {
       if (
         stakeholder.entityId === personEntityId ||
-        stakeholder.name.toLowerCase() === personName.toLowerCase()
+        stakeholder.name.toLowerCase() === nameLower
       ) {
         positions.push({
           policyId: policy.id,
@@ -36,7 +40,28 @@ export function getPersonPolicyPositions(
           reason: stakeholder.reason,
           statusKey: normalizeStatus(deriveStatus(policy)),
         });
-        break; // Don't double-count
+        found = true;
+        break;
+      }
+    }
+
+    // Also check keyPoliticians (has role but no position/reason)
+    if (!found) {
+      for (const politician of policy.keyPoliticians) {
+        if (
+          politician.entityId === personEntityId ||
+          politician.name.toLowerCase() === nameLower
+        ) {
+          positions.push({
+            policyId: policy.id,
+            policyTitle: policy.title,
+            position: "key role",
+            reason: politician.role,
+            statusKey: normalizeStatus(deriveStatus(policy)),
+          });
+          found = true;
+          break;
+        }
       }
     }
   }
@@ -49,6 +74,7 @@ const POSITION_COLORS: Record<string, string> = {
   oppose: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   neutral: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
   mixed: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  "key role": "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
 };
 
 export function PolicyPositionsSection({

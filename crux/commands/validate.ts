@@ -16,6 +16,11 @@ const SCRIPTS = {
     description: 'Run all validation checks',
     passthrough: ['ci', 'failFast', 'skip', 'fix'],
   },
+  daily: {
+    script: 'validate/validate-daily.ts',
+    description: 'Run daily validation suite (local + server checks with unified report)',
+    passthrough: ['ci', 'localOnly'],
+  },
   unified: {
     script: 'validate/validate-unified.ts',
     description: 'Run unified rule engine',
@@ -239,6 +244,8 @@ Examples:
   crux w validate entity-refs              Check KB record entity references
   crux w validate entity-refs --threshold=90  Fail if link rate < 90%
   crux w validate all --skip=mermaid,style  Skip specific checks
+  crux w validate daily                      Daily validation suite (local + server)
+  crux w validate daily --local-only         Skip server-dependent checks
   crux w validate directory-pages            Audit directory page data quality
   crux w validate directory-pages --type=person  Check one entity type
 `;

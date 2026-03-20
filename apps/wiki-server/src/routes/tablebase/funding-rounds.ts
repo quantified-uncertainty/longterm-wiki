@@ -11,15 +11,14 @@ import {
   zv,
   parseRange,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
-
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -57,34 +56,30 @@ const SyncFundingRoundsBatchSchema = z.object({
 const leadInvestorEntity = alias(entities, "lead_investor_entity");
 const companyEntity = alias(entities, "company_entity");
 
-/** Selection shape for funding_rounds + joined entity titles. */
+/** Selection shape for funding_rounds + joined entity titles + slugs. */
 const joinedSelect = {
   fundingRound: fundingRounds,
   leadInvestorTitle: leadInvestorEntity.title,
+  leadInvestorSlug: leadInvestorEntity.id,
   companyTitle: companyEntity.title,
+  companySlug: companyEntity.id,
 };
 
 interface JoinedRow {
   fundingRound: typeof fundingRounds.$inferSelect;
   leadInvestorTitle: string | null;
+  leadInvestorSlug: string | null;
   companyTitle: string | null;
-}
-
-function cleanLeadInvestor(li: string | null): string | null {
-  if (!li) return null;
-  if (li.startsWith("new:")) return li.slice(4).trim();
-  if (STABLE_ID_PATTERN.test(li)) return null;
-  return li;
+  companySlug: string | null;
 }
 
 function formatRow(r: JoinedRow) {
   const fr = r.fundingRound;
+  // Strip "new:" prefix from leadInvestor raw ID before passing to formatEntityRef
+  const rawLI = fr.leadInvestor?.startsWith("new:") ? fr.leadInvestor.slice(4).trim() : fr.leadInvestor;
   return {
     id: fr.id,
     companyId: fr.companyId,
-    companyEntityId: fr.companyEntityId,
-    companyDisplayName: fr.companyDisplayName,
-    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? fr.companyId,
     name: fr.name,
     date: fr.date,
     raised: fr.raised != null ? Number(fr.raised) : null,
@@ -94,10 +89,18 @@ function formatRow(r: JoinedRow) {
     valuationLow: fr.valuationLow != null ? Number(fr.valuationLow) : null,
     valuationHigh: fr.valuationHigh != null ? Number(fr.valuationHigh) : null,
     instrument: fr.instrument,
+    leadInvestorRaw: fr.leadInvestor,
+    // Structured entity refs
+    leadInvestorRef: formatEntityRef(fr.leadInvestorEntityId, r.leadInvestorSlug, r.leadInvestorTitle, fr.leadInvestorDisplayName, rawLI ?? null),
+    companyRef: formatEntityRef(fr.companyEntityId, r.companySlug, r.companyTitle, fr.companyDisplayName, fr.companyId),
+    // Legacy flat fields (for backward compat)
     leadInvestor: fr.leadInvestor,
     leadInvestorEntityId: fr.leadInvestorEntityId,
     leadInvestorDisplayName: fr.leadInvestorDisplayName,
-    leadInvestorResolvedName: r.leadInvestorTitle ?? fr.leadInvestorDisplayName ?? cleanLeadInvestor(fr.leadInvestor),
+    leadInvestorResolvedName: (r.leadInvestorTitle ?? fr.leadInvestorDisplayName ?? rawLI) as string | null,
+    companyEntityId: fr.companyEntityId,
+    companyDisplayName: fr.companyDisplayName,
+    companyResolvedName: (r.companyTitle ?? fr.companyDisplayName ?? fr.companyId) as string | null,
     source: fr.source,
     notes: fr.notes,
     syncedAt: fr.syncedAt,
@@ -108,7 +111,7 @@ function formatRow(r: JoinedRow) {
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const fundingRoundsApp = new Hono()
+const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -157,17 +160,16 @@ const fundingRoundsApp = new Hono()
   })
 
   // ---- GET /by-entity/:entityId ----
-  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
-
     const rows = await db
       .select(joinedSelect)
       .from(fundingRounds)
       .leftJoin(companyEntity, eq(fundingRounds.companyEntityId, companyEntity.stableId))
       .leftJoin(leadInvestorEntity, eq(fundingRounds.leadInvestorEntityId, leadInvestorEntity.stableId))
-      .where(eq(fundingRounds.companyId, entityId))
+      .where(eq(fundingRounds.companyId, resolvedId))
       .orderBy(desc(fundingRounds.syncedAt), fundingRounds.id)
       .limit(limit)
       .offset(offset);
@@ -175,11 +177,11 @@ const fundingRoundsApp = new Hono()
     const countResult = await db
       .select({ count: count() })
       .from(fundingRounds)
-      .where(eq(fundingRounds.companyId, entityId));
+      .where(eq(fundingRounds.companyId, resolvedId));
     const total = countResult[0].count;
 
     return c.json({
-      entityId,
+      entityId: resolvedId,
       fundingRounds: rows.map(formatRow),
       total,
       limit,
@@ -252,6 +254,10 @@ const fundingRoundsApp = new Hono()
           },
         });
 
+      // Resolve company slugs to human-readable titles for search
+      const companySlugs = [...new Set(items.map((fr) => fr.companyId))];
+      const titleMap = await resolveEntityTitles(tx, companySlugs);
+
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
@@ -262,7 +268,7 @@ const fundingRoundsApp = new Hono()
           sourceTable: "funding_rounds",
           sourceId: fr.id,
           sourceUrl: fr.source,
-          parentTitle: fr.companyId,
+          parentTitle: titleMap.get(fr.companyId) ?? fr.companyId,
           description: [
             fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
             fr.instrument,

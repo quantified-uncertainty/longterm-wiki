@@ -806,6 +806,34 @@
       "when": 1779523200000,
       "tag": "0114_add_page_id_int_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1779609600000,
+      "tag": "0115_resource_enrichment_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1779696000000,
+      "tag": "0116_resource_sub_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1779782400000,
+      "tag": "0117_policy_stakeholder_importance",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1779868800000,
+      "tag": "0118_populate_things_policy_stakeholders",
+      "breakpoints": true
     }
   ]
 }

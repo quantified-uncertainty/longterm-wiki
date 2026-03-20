@@ -23,6 +23,8 @@ import {
   escapeIlike,
 } from "../shared/utils.js";
 import {
+  normalizeSearchQuery,
+  buildPrefixTsquery,
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
 } from "../../search-utils.js";
@@ -185,15 +187,25 @@ const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
   .get("/search", zv("query", SearchQuery), async (c) => {
-    const { q, thing_type, limit } = c.req.valid("query");
+    const { q: rawQ, thing_type, limit } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    // Normalize: insert spaces at letter/digit boundaries ("sb1047" → "sb 1047")
+    const q = normalizeSearchQuery(rawQ);
 
     const conditions = [];
 
-    // Use full-text search if available, fall back to ILIKE
-    conditions.push(
-      sql`${things}.search_vector @@ plainto_tsquery('english', ${q})`
-    );
+    // Use full-text search with prefix matching (anth → anth:* matches Anthropic)
+    const prefixQuery = buildPrefixTsquery(q);
+    if (prefixQuery) {
+      conditions.push(
+        sql`${things}.search_vector @@ to_tsquery('english', ${prefixQuery})`
+      );
+    } else {
+      conditions.push(
+        sql`${things}.search_vector @@ plainto_tsquery('english', ${q})`
+      );
+    }
 
     if (thing_type) {
       conditions.push(eq(things.thingType, thing_type));
@@ -204,7 +216,9 @@ const thingsApp = new Hono()
       .from(things)
       .where(and(...conditions))
       .orderBy(
-        sql`ts_rank(${things}.search_vector, plainto_tsquery('english', ${q})) DESC`
+        prefixQuery
+          ? sql`ts_rank(${things}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
+          : sql`ts_rank(${things}.search_vector, plainto_tsquery('english', ${q})) DESC`
       )
       .limit(limit);
 

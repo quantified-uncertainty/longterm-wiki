@@ -3,6 +3,7 @@ import {
   buildPrefixTsquery,
   titleMatchBoostExpr,
   isAcronymQuery,
+  normalizeSearchQuery,
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
   TS_HEADLINE_OPTIONS,
@@ -117,5 +118,34 @@ describe("search constants", () => {
   it("ts_headline options include mark tags", () => {
     expect(TS_HEADLINE_OPTIONS).toContain("<mark>");
     expect(TS_HEADLINE_OPTIONS).toContain("</mark>");
+  });
+});
+
+describe("normalizeSearchQuery", () => {
+  it("inserts space between letters and digits", () => {
+    expect(normalizeSearchQuery("sb1047")).toBe("sb 1047");
+    expect(normalizeSearchQuery("gpt4")).toBe("gpt 4");
+    expect(normalizeSearchQuery("AI2")).toBe("AI 2");
+  });
+
+  it("inserts space between digits and letters", () => {
+    expect(normalizeSearchQuery("4chan")).toBe("4 chan");
+    expect(normalizeSearchQuery("3Blue1Brown")).toBe("3 Blue 1 Brown");
+  });
+
+  it("leaves already-spaced queries unchanged", () => {
+    expect(normalizeSearchQuery("sb 1047")).toBe("sb 1047");
+    expect(normalizeSearchQuery("gpt 4")).toBe("gpt 4");
+    expect(normalizeSearchQuery("Anthropic")).toBe("Anthropic");
+  });
+
+  it("leaves pure text or pure numbers unchanged", () => {
+    expect(normalizeSearchQuery("alignment")).toBe("alignment");
+    expect(normalizeSearchQuery("12345")).toBe("12345");
+    expect(normalizeSearchQuery("")).toBe("");
+  });
+
+  it("handles multiple transitions", () => {
+    expect(normalizeSearchQuery("a1b2c3")).toBe("a 1 b 2 c 3");
   });
 });

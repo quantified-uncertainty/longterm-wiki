@@ -24,6 +24,26 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+// ── Browse data (passed from server component) ──────────────────────
+
+interface BrowseItem {
+  id: string;
+  wikiId: string;
+  title: string;
+  type: string;
+  href: string;
+  wordCount?: number | null;
+  kbFactCount: number;
+  kbItemCount: number;
+}
+
+export interface BrowseData {
+  directories: { type: string; label: string; href: string; count: number }[];
+  featured: (BrowseItem & { description: string | null; readerImportance: number | null })[];
+  recent: (BrowseItem & { lastUpdated: string | null })[];
+  totalPages: number;
+}
+
 // ── Type styling ─────────────────────────────────────────────────────
 // Badge colors from entity-ontology.ts for cross-site consistency.
 
@@ -210,7 +230,7 @@ function decodeEntities(text: string): string {
 
 // ── Component ────────────────────────────────────────────────────────
 
-export function SearchPageClient() {
+export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "";
@@ -240,16 +260,22 @@ export function SearchPageClient() {
     setSearched(true);
     setErrored(false);
 
-    const [pageResults, thingResults] = await Promise.all([
-      searchWiki(q, 40),
-      searchThings(q, 60),
-    ]);
+    let pageResults: SearchResult[] = [];
+    let thingResults: ThingSearchResult[] = [];
+    try {
+      [pageResults, thingResults] = await Promise.all([
+        searchWiki(q, 40),
+        searchThings(q, 60),
+      ]);
+    } catch {
+      if (seq === searchSeqRef.current) {
+        setErrored(true);
+        setLoading(false);
+      }
+      return;
+    }
 
     if (seq !== searchSeqRef.current) return;
-
-    if (pageResults.length === 0 && thingResults.length === 0 && q.trim().length > 2) {
-      setErrored(true);
-    }
 
     const pageWikiIds = new Set(pageResults.map((r) => r.wikiId).filter(Boolean));
     const dedupedThings = thingResults.filter((t) => {
@@ -368,7 +394,7 @@ export function SearchPageClient() {
   }, [selected, flatResults]);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16" onKeyDown={handleKeyDown}>
+    <div className="max-w-7xl mx-auto px-6 pt-10 pb-16">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -377,7 +403,7 @@ export function SearchPageClient() {
       </div>
 
       {/* Search bar */}
-      <form onSubmit={handleSubmit} className="relative mb-6 group max-w-2xl">
+      <form onSubmit={handleSubmit} role="search" className="relative mb-6 group max-w-2xl">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 group-focus-within:text-foreground/50 transition-colors">
           <SearchIcon size={16} />
         </div>
@@ -387,6 +413,7 @@ export function SearchPageClient() {
           value={query}
           onChange={(e) => handleInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          aria-label="Search"
           placeholder="Search entities, articles, resources..."
           className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all"
           autoComplete="off"
@@ -399,16 +426,9 @@ export function SearchPageClient() {
         )}
       </form>
 
-      {/* Pre-search */}
+      {/* Browse state — shown when no query */}
       {!hasQuery && !searched && (
-        <div className="py-16 max-w-md">
-          <p className="text-sm text-muted-foreground/40">
-            Search across the knowledge base &mdash; entities, wiki articles, grants, and external resources.
-          </p>
-          <p className="text-xs text-muted-foreground/25 mt-2">
-            Try &ldquo;Anthropic&rdquo;, &ldquo;MIRI grant&rdquo;, or &ldquo;alignment&rdquo;
-          </p>
-        </div>
+        <BrowseState data={browseData} />
       )}
 
       {/* Error / empty */}
@@ -439,12 +459,13 @@ export function SearchPageClient() {
         </p>
       )}
 
-      {/* Three-column grid — only render columns that have results */}
+      {/* Results grid — responsive: stack on mobile, columns on desktop */}
       {hasResults && (
-        <div
-          className="grid gap-8"
-          style={{ gridTemplateColumns: `repeat(${visibleColumns.length}, minmax(0, 1fr))` }}
-        >
+        <div className={`grid gap-8 grid-cols-1 ${
+          visibleColumns.length === 1 ? "md:grid-cols-1" :
+          visibleColumns.length === 2 ? "md:grid-cols-2" :
+          "md:grid-cols-2 lg:grid-cols-3"
+        }`}>
           {visibleColumns.map((col) => (
             <ResultColumnView
               key={col.key}
@@ -600,6 +621,169 @@ function ResultRow({
   }
 
   return <Link href={r.href} className="block">{content}</Link>;
+}
+
+// ── Browse state ─────────────────────────────────────────────────────
+
+function BrowseState({ data }: { data: BrowseData }) {
+  return (
+    <div className="space-y-8">
+      {/* Directory quick links */}
+      <section>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+          Browse by type
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {data.directories.map((dir) => {
+            const style = TYPE_STYLES[dir.type] ?? FALLBACK_STYLE;
+            const Icon = style.icon;
+            return (
+              <Link
+                key={dir.type}
+                href={dir.href}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <Icon size={13} className={style.iconColor} />
+                <span>{dir.label}</span>
+                <span className="text-xs text-muted-foreground/40 tabular-nums">{dir.count}</span>
+              </Link>
+            );
+          })}
+          <Link
+            href="/grants"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Banknote size={13} className="text-green-500" />
+            <span>Grants</span>
+          </Link>
+          <Link
+            href="/wiki"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <FileText size={13} className="text-slate-400" />
+            <span>Wiki pages</span>
+            <span className="text-xs text-muted-foreground/40 tabular-nums">{data.totalPages}</span>
+          </Link>
+          <Link
+            href="/resources"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ExternalLink size={13} className="text-orange-500" />
+            <span>Resources</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* Two-column: Featured + Recent */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Featured entities */}
+        <section>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Key entities
+          </h2>
+          <div className="space-y-px">
+            {data.featured.map((item) => {
+              const style = TYPE_STYLES[item.type] ?? FALLBACK_STYLE;
+              const Icon = style.icon;
+              return (
+                <Link key={item.id} href={item.href} className="block">
+                  <div className="flex items-start gap-2 py-2 px-2 -mx-1 rounded-md hover:bg-muted/30 transition-colors">
+                    <Icon size={14} className={`shrink-0 mt-0.5 ${style.iconColor}`} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="font-medium text-[13px] text-foreground truncate">
+                          {item.title}
+                        </span>
+                        <span className={`shrink-0 px-1.5 py-px text-[9px] font-semibold rounded ${style.badge}`}>
+                          {style.short}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {item.description && (
+                          <p className="text-[12px] text-muted-foreground/60 leading-snug line-clamp-1 flex-1 min-w-0">
+                            {item.description}
+                          </p>
+                        )}
+                        <DataBadges item={item} />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Recently updated */}
+        <section>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Recently updated
+          </h2>
+          <div className="space-y-px">
+            {data.recent.map((item) => {
+              const style = TYPE_STYLES[item.type] ?? FALLBACK_STYLE;
+              const Icon = style.icon;
+              return (
+                <Link key={`recent-${item.id}`} href={item.href} className="block">
+                  <div className="flex items-start gap-2 py-2 px-2 -mx-1 rounded-md hover:bg-muted/30 transition-colors">
+                    <Icon size={14} className={`shrink-0 mt-0.5 ${style.iconColor}`} />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-medium text-[13px] text-foreground truncate block">
+                        {item.title}
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {item.lastUpdated && (
+                          <span className="text-[11px] text-muted-foreground/40">
+                            {formatRelativeDate(item.lastUpdated)}
+                          </span>
+                        )}
+                        <DataBadges item={item} />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+/** Compact data-richness indicators for browse items. */
+function DataBadges({ item }: { item: BrowseItem }) {
+  const parts: string[] = [];
+  if (item.wordCount && item.wordCount > 0) {
+    parts.push(item.wordCount >= 1000
+      ? `${(item.wordCount / 1000).toFixed(1)}k words`
+      : `${item.wordCount} words`);
+  }
+  if (item.kbFactCount > 0) {
+    parts.push(`${item.kbFactCount} facts`);
+  }
+  if (item.kbItemCount > 0) {
+    parts.push(`${item.kbItemCount} items`);
+  }
+  if (parts.length === 0) return null;
+  return (
+    <span className="shrink-0 text-[10px] text-muted-foreground/30 tabular-nums">
+      {parts.join(" · ")}
+    </span>
+  );
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+  return `${Math.floor(diffDays / 365)}y ago`;
 }
 
 // ── Utilities ────────────────────────────────────────────────────────
