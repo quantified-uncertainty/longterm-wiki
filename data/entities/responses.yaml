@@ -1632,7 +1632,7 @@
     - id: california-sb1047
       type: policy
     - id: compute-governance
-      type: policy
+      type: concept
     - id: eu-ai-act
       type: policy
     - id: voluntary-commitments
@@ -3273,9 +3273,9 @@
     - id: SpFgTz2INg
       type: policy
     - id: thresholds
-      type: policy
+      type: concept
     - id: monitoring
-      type: policy
+      type: approach
     - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
@@ -3304,7 +3304,7 @@
     - id: SpFgTz2INg
       type: policy
     - id: thresholds
-      type: policy
+      type: concept
     - id: uvwmYLYstg
       type: policy
     - id: 57vCq45URQ
@@ -3339,7 +3339,7 @@
     - id: SpFgTz2INg
       type: policy
     - id: monitoring
-      type: policy
+      type: approach
     - id: uvwmYLYstg
       type: policy
   lastUpdated: 2026-02
@@ -3806,9 +3806,9 @@
     - id: SpFgTz2INg
       type: policy
     - id: thresholds
-      type: policy
+      type: concept
     - id: monitoring
-      type: policy
+      type: approach
     - id: aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
