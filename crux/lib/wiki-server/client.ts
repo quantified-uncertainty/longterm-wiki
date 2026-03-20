@@ -145,9 +145,19 @@ async function tlsBypassFetch(
   const port = parsed.port ? parseInt(parsed.port, 10) : 443;
 
   return new Promise((resolve, reject) => {
+    let settled = false;
+    const settle = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn();
+    };
+
     const timer = setTimeout(() => {
       req.destroy();
-      reject(new DOMException('The operation was aborted', 'AbortError'));
+      settle(() =>
+        reject(new DOMException('The operation was aborted', 'AbortError')),
+      );
     }, init.timeoutMs);
 
     const req = https.request(
@@ -161,25 +171,23 @@ async function tlsBypassFetch(
         headers: { ...init.headers, Host: hostname },
       },
       (res) => {
-        clearTimeout(timer);
         let body = '';
         res.on('data', (chunk: Buffer) => (body += chunk.toString()));
-        res.on('error', (err) => reject(err));
+        res.on('error', (err) => settle(() => reject(err)));
         res.on('end', () => {
           const status = res.statusCode ?? 500;
-          resolve({
-            ok: status >= 200 && status < 300,
-            status,
-            text: async () => body,
-            json: async () => JSON.parse(body),
-          });
+          settle(() =>
+            resolve({
+              ok: status >= 200 && status < 300,
+              status,
+              text: async () => body,
+              json: async () => JSON.parse(body),
+            }),
+          );
         });
       },
     );
-    req.on('error', (err) => {
-      clearTimeout(timer);
-      reject(err);
-    });
+    req.on('error', (err) => settle(() => reject(err)));
     if (init.body) req.write(init.body);
     req.end();
   });
@@ -311,25 +319,7 @@ export async function isServerAvailable(): Promise<boolean> {
   if (!serverUrl) return false;
 
   try {
-    const fullUrl = `${serverUrl}/health`;
-    const useTlsBypass = isTlsBypassEnabled() && serverUrl.startsWith('https://');
-
-    let res: { ok: boolean; json: () => Promise<unknown> };
-
-    if (useTlsBypass) {
-      res = await tlsBypassFetch(fullUrl, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        timeoutMs: TIMEOUT_MS,
-      });
-    } else {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-      const fetchRes = await fetch(fullUrl, { signal: controller.signal });
-      clearTimeout(timer);
-      res = fetchRes;
-    }
-
+    const res = await serverFetch(`${serverUrl}/health`, { timeoutMs: TIMEOUT_MS });
     if (!res.ok) return false;
 
     const body = (await res.json()) as { status?: string };
