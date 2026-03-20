@@ -51,6 +51,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'evals',
       'research',
       'grokipedia',
+      'auto-verify-stakeholders',
     ],
     flattened: ['content'],
   },
