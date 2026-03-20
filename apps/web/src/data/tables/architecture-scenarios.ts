@@ -669,7 +669,7 @@ export const scenarios: Scenario[] = [
     keyPapers: [
       {
         title: "Whole Brain Emulation Roadmap (Sandberg 2008)",
-        url: "https://www.fhi.ox.ac.uk/brain-emulation-roadmap-report.pdf",
+        url: "https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/brain-emulation-roadmap-report.pdf",
       },
     ],
     safetyPros: ["Human values by default", "Understood entity type"],

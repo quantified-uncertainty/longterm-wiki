@@ -846,7 +846,7 @@
   # parentOrg: nist — changed to nist-ai (valid entity ID)
   parentOrg: Eac7pHF06Q
   summaryPage: government-orgs-overview
-  title: US AI Safety Institute
+  title: US AI Safety Institute (now CAISI)
   website: https://www.nist.gov/aisi
   relatedEntries:
     - id: aX0jkoaekQ
@@ -876,9 +876,9 @@
       url: >-
         https://www.commerce.gov/news/press-releases/2023/11/biden-harris-administration-announces-key-ai-actions-following-president
   description: >-
-    The US AI Safety Institute (US AISI) is a government agency within the National Institute of Standards and
-    Technology (NIST) established in 2023 to develop standards, evaluations, and guidelines for safe and trustworthy
-    artificial intelligence.
+    The US AI Safety Institute (US AISI), renamed to the Center for AI Standards and Innovation (CAISI) in June 2025,
+    is a government agency within the National Institute of Standards and Technology (NIST) established in 2023 to
+    develop standards, evaluations, and guidelines for safe and trustworthy artificial intelligence.
   tags:
     - governance
     - government-oversight
@@ -891,7 +891,7 @@
     - public-interest
     - regulatory-capture
     - standard-setting
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: japan-aisi
   stableId: Nc5G0HG5nA
   wikiId: E1013
