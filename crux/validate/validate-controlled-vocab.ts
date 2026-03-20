@@ -669,9 +669,6 @@ async function main(): Promise<void> {
 
   const result = await validateControlledVocab({ ci, verbose });
 
-  // Advisory: exit 0 even with warnings (soft enforcement)
-  // Remove this when promoting to blocking
-  process.exitCode = 0;
 }
 
 main().catch((err) => {

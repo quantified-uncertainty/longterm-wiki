@@ -18,6 +18,6 @@ facts:
     notes: From Wikidata Q5510826
   - id: wF7Rkbxkbg
     property: website
-    value: http://www.fhi.ox.ac.uk/
+    value: https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826

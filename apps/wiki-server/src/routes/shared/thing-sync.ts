@@ -5,12 +5,12 @@
  * transaction to keep the things table in sync without duplicating upsert logic.
  */
 
-import { sql } from "drizzle-orm";
+import { sql, inArray, or } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "../../schema.js";
-import { things } from "../../schema.js";
+import { things, entities } from "../../schema.js";
 
 type DbOrTx =
   | import("drizzle-orm/postgres-js").PostgresJsDatabase<typeof schema>
@@ -19,6 +19,39 @@ type DbOrTx =
       typeof schema,
       ExtractTablesWithRelations<typeof schema>
     >;
+
+// ── Entity title resolution ──────────────────────────────────────────
+
+/**
+ * Resolve entity identifiers to their display titles.
+ * Accepts both slugs (entities.id, e.g. "open-philanthropy") and stableIds
+ * (10-char alphanumeric, e.g. "ULjDXpSLCI"). Used by sync handlers to
+ * populate `parentTitle` with human-readable names instead of raw identifiers,
+ * so the things search_vector includes org names.
+ *
+ * Returns a Map<identifier, title> keyed by both slug and stableId for each
+ * matched entity. Missing identifiers are omitted (callers should fall back
+ * to the raw identifier).
+ */
+export async function resolveEntityTitles(
+  tx: DbOrTx,
+  identifiers: string[]
+): Promise<Map<string, string>> {
+  const unique = [...new Set(identifiers.filter(Boolean))];
+  if (unique.length === 0) return new Map();
+
+  const rows = await tx
+    .select({ id: entities.id, stableId: entities.stableId, title: entities.title })
+    .from(entities)
+    .where(or(inArray(entities.id, unique), inArray(entities.stableId, unique)));
+
+  const map = new Map<string, string>();
+  for (const r of rows) {
+    map.set(r.id, r.title);
+    if (r.stableId) map.set(r.stableId, r.title);
+  }
+  return map;
+}
 
 // ── href computation (single source of truth for URL patterns) ──────
 

@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntityById, getTypedEntities, isOrganization, isProject } from "@/data";
+import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 import {
   getKBLatest,
   getKBProperty,
@@ -246,6 +246,7 @@ export default async function OrgProfilePage({
     }>();
 
     // Add key persons first
+    const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
       // Resolve person ref through TableBase (handles slugs, E-numbers, stableIds)
@@ -255,10 +256,21 @@ export default async function OrgProfilePage({
         const resolvedId = resolveKBSlug(personRef);
         if (resolvedId) typedPerson = getTypedEntityById(resolvedId);
       }
+      if (!typedPerson && personRef) {
+        // Try direct stableId lookup (covers entities not in idRegistry.byStableId)
+        typedPerson = getTypedEntityByStableId(personRef);
+      }
+      // Build display name: prefer explicit display_name, then resolved title,
+      // then humanized slug. Never display raw stableIds or numeric IDs.
+      const isStableId = STABLE_ID_RE.test(personRef ?? "");
+      const isNumericId = /^\d+$/.test(personRef ?? "");
+      const fallbackName = (isStableId || isNumericId)
+        ? "Unknown"
+        : titleCase(personRef ?? person.key);
       const name =
         field(person, "display_name") ??
         typedPerson?.title ??
-        titleCase(personRef ?? person.key);
+        fallbackName;
       // Resolve slug for linking — typedPerson.id is the slug
       const personSlug = typedPerson?.id ?? personRef;
       const personEntityId = typedPerson?.stableId ?? typedPerson?.id;

@@ -276,12 +276,198 @@ export default async function ResourcePage({ params }: PageProps) {
         </section>
       )}
 
+      {/* Context Note */}
+      {resource.context_note && (
+        <section className="mb-6 p-4 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30">
+          <p className="text-sm text-blue-700 dark:text-blue-300 italic">
+            {resource.context_note}
+          </p>
+        </section>
+      )}
+
+      {/* Paper-specific section */}
+      {resource.paper && (
+        <section className="mb-6 p-4 rounded-lg border border-border bg-card">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            Paper Details
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            {resource.paper.citation_count != null && (
+              <div>
+                <div className="text-xs text-muted-foreground">Citations</div>
+                <div className="font-semibold tabular-nums">{resource.paper.citation_count.toLocaleString()}</div>
+                {resource.paper.influential_citation_count != null && (
+                  <div className="text-xs text-muted-foreground">
+                    {resource.paper.influential_citation_count} influential
+                  </div>
+                )}
+              </div>
+            )}
+            {resource.paper.year != null && (
+              <div>
+                <div className="text-xs text-muted-foreground">Year</div>
+                <div className="font-semibold tabular-nums">{resource.paper.year}</div>
+              </div>
+            )}
+            {resource.paper.methodology && (
+              <div>
+                <div className="text-xs text-muted-foreground">Methodology</div>
+                <div className="capitalize">{resource.paper.methodology}</div>
+              </div>
+            )}
+            {resource.paper.categories && resource.paper.categories.length > 0 && (
+              <div>
+                <div className="text-xs text-muted-foreground">Categories</div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {resource.paper.categories.map((cat) => (
+                    <span key={cat} className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3 mt-3">
+            {resource.paper.arxiv_id && (
+              <a
+                href={`https://arxiv.org/abs/${resource.paper.arxiv_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline"
+              >
+                arXiv:{resource.paper.arxiv_id}
+              </a>
+            )}
+            {resource.paper.doi && (
+              <a
+                href={`https://doi.org/${resource.paper.doi}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline"
+              >
+                DOI:{resource.paper.doi}
+              </a>
+            )}
+            {resource.paper.semantic_scholar_id && (
+              <a
+                href={`https://www.semanticscholar.org/paper/${resource.paper.semantic_scholar_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline"
+              >
+                Semantic Scholar
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Forum post-specific section */}
+      {resource.forum_post && (
+        <section className="mb-6 p-4 rounded-lg border border-border bg-card">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            Forum Post Details
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            {resource.forum_post.karma != null && (
+              <div>
+                <div className="text-xs text-muted-foreground">Karma</div>
+                <div className="font-semibold tabular-nums">{resource.forum_post.karma}</div>
+              </div>
+            )}
+            {resource.forum_post.comment_count != null && (
+              <div>
+                <div className="text-xs text-muted-foreground">Comments</div>
+                <div className="font-semibold tabular-nums">{resource.forum_post.comment_count}</div>
+              </div>
+            )}
+            <div>
+              <div className="text-xs text-muted-foreground">Forum</div>
+              <div className="capitalize">{resource.forum_post.forum}</div>
+            </div>
+            {resource.forum_post.curated && (
+              <div>
+                <div className="text-xs text-muted-foreground">Status</div>
+                <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  Curated
+                </span>
+              </div>
+            )}
+          </div>
+          {resource.forum_post.forum_tags && resource.forum_post.forum_tags.length > 0 && (
+            <div className="mt-3">
+              <div className="text-xs text-muted-foreground mb-1">Forum Tags</div>
+              <div className="flex flex-wrap gap-1">
+                {resource.forum_post.forum_tags.map((tag) => (
+                  <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {resource.forum_post.sequence_title && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Part of sequence: <span className="font-medium text-foreground">{resource.forum_post.sequence_title}</span>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Policy doc-specific section */}
+      {resource.policy_doc && (
+        <section className="mb-6 p-4 rounded-lg border border-border bg-card">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            Policy Document Details
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            {resource.policy_doc.document_type && (
+              <div>
+                <div className="text-xs text-muted-foreground">Document Type</div>
+                <div className="capitalize">{resource.policy_doc.document_type.replace(/_/g, " ")}</div>
+              </div>
+            )}
+            {resource.policy_doc.document_status && (
+              <div>
+                <div className="text-xs text-muted-foreground">Status</div>
+                <div className="capitalize">{resource.policy_doc.document_status}</div>
+              </div>
+            )}
+            {resource.policy_doc.reference_number && (
+              <div>
+                <div className="text-xs text-muted-foreground">Reference</div>
+                <div className="font-mono">{resource.policy_doc.reference_number}</div>
+              </div>
+            )}
+            {resource.policy_doc.effective_date && (
+              <div>
+                <div className="text-xs text-muted-foreground">Effective Date</div>
+                <div>{resource.policy_doc.effective_date}</div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Data Status Banner */}
       <section className="mb-6 p-4 rounded-lg border border-border bg-card">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
           Data Status
         </h2>
         <div className="flex flex-wrap gap-3">
+          {/* Enrichment status */}
+          {resource.enrichment_status && (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              {resource.enrichment_status}
+            </span>
+          )}
+          {/* Importance score */}
+          {resource.importance_score != null && (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+              Importance: {Math.round(resource.importance_score * 100)}/100
+            </span>
+          )}
           {/* Fetch status */}
           {resource.local_filename ? (
             <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">

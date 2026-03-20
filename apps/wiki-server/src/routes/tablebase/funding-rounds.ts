@@ -11,7 +11,7 @@ import {
   zv,
   parseRange,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
@@ -77,6 +77,11 @@ function cleanLeadInvestor(li: string | null): string | null {
   return li;
 }
 
+/** Returns true if the value looks like a raw numeric ID or stableId rather than a human-readable name. */
+function isRawId(value: string): boolean {
+  return /^\d+$/.test(value) || STABLE_ID_PATTERN.test(value);
+}
+
 function formatRow(r: JoinedRow) {
   const fr = r.fundingRound;
   return {
@@ -84,7 +89,7 @@ function formatRow(r: JoinedRow) {
     companyId: fr.companyId,
     companyEntityId: fr.companyEntityId,
     companyDisplayName: fr.companyDisplayName,
-    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? fr.companyId,
+    companyResolvedName: r.companyTitle ?? fr.companyDisplayName ?? (isRawId(fr.companyId) ? null : fr.companyId),
     name: fr.name,
     date: fr.date,
     raised: fr.raised != null ? Number(fr.raised) : null,
@@ -252,6 +257,10 @@ const fundingRoundsApp = new Hono()
           },
         });
 
+      // Resolve company slugs to human-readable titles for search
+      const companySlugs = [...new Set(items.map((fr) => fr.companyId))];
+      const titleMap = await resolveEntityTitles(tx, companySlugs);
+
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
@@ -262,7 +271,7 @@ const fundingRoundsApp = new Hono()
           sourceTable: "funding_rounds",
           sourceId: fr.id,
           sourceUrl: fr.source,
-          parentTitle: fr.companyId,
+          parentTitle: titleMap.get(fr.companyId) ?? fr.companyId,
           description: [
             fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
             fr.instrument,

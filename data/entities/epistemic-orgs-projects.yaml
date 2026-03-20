@@ -54,10 +54,10 @@
     - id: rethink-priorities
       type: organization
       relationship: related
-    - id: survival-and-flourishing-fund
+    - id: sff
       type: organization
       relationship: supports
-    - id: long-term-future-fund
+    - id: ltff
       type: organization
       relationship: supports
   sources:
@@ -153,7 +153,7 @@
   title: Squiggle Hub
   projectStatus: active
   projectUrl: https://squigglehub.org
-  organization: quantified-uncertainty
+  organization: quri
   description: >-
     Web platform for creating, sharing, and discovering Squiggle models. Features
     include model groups, version history, AI-assisted editing via SquiggleAI,
@@ -175,7 +175,7 @@
   title: Guesstimate
   projectStatus: maintained
   projectUrl: https://www.getguesstimate.com
-  organization: quantified-uncertainty
+  organization: quri
   description: >-
     Web-based spreadsheet for making estimates with probability distributions.
     Precursor to Squiggle. Originally created by Ozzie Gooen in 2016.

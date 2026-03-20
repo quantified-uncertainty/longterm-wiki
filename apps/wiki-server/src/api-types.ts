@@ -568,6 +568,15 @@ export const UpsertResourceSchema = z.object({
   archiveUrl: z.string().url().max(2000).nullable().optional(),
   /** Stance for legislation coverage */
   stance: z.enum(["support", "oppose", "neutral", "mixed", "analysis"]).nullable().optional(),
+  // Enrichment fields (Phase 1)
+  contextNote: z.string().max(500).nullable().optional(),
+  resourcePurpose: z.string().max(100).nullable().optional(),
+  resourceSubtype: z.string().max(100).nullable().optional(),
+  typeMetadata: z.record(z.unknown()).nullable().optional(),
+  publisherEntityId: z.string().max(200).nullable().optional(),
+  relatedEntityIds: z.array(z.string().max(200)).max(50).nullable().optional(),
+  enrichmentStatus: z.string().max(50).nullable().optional(),
+  importanceScore: z.number().min(0).max(1).nullable().optional(),
 });
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 
@@ -602,8 +611,103 @@ export interface ResourceRow {
   fetchStatus: "ok" | "dead" | "paywall" | "error" | null;
   lastFetchedAt: string | null;
   archiveUrl: string | null;
+  contextNote: string | null;
+  resourcePurpose: string | null;
+  resourceSubtype: string | null;
+  typeMetadata: Record<string, unknown> | null;
+  publisherEntityId: string | null;
+  relatedEntityIds: string[] | null;
+  enrichmentStatus: string | null;
+  enrichmentDate: string | null;
+  importanceScore: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+// -- Resources: Sub-table schemas -----------------------------------------------
+
+export const UpsertResourcePaperSchema = z.object({
+  arxivId: z.string().max(50).nullable().optional(),
+  doi: z.string().max(200).nullable().optional(),
+  semanticScholarId: z.string().max(200).nullable().optional(),
+  abstract: z.string().max(50000).nullable().optional(),
+  citationCount: z.number().int().min(0).nullable().optional(),
+  influentialCitationCount: z.number().int().min(0).nullable().optional(),
+  categories: z.array(z.string().max(50)).max(20).nullable().optional(),
+  methodology: z.string().max(100).nullable().optional(),
+  year: z.number().int().min(1900).max(2100).nullable().optional(),
+});
+export type UpsertResourcePaper = z.infer<typeof UpsertResourcePaperSchema>;
+
+export const UpsertResourceForumPostSchema = z.object({
+  forum: z.enum(["lesswrong", "alignmentforum", "eaforum"]),
+  forumPostId: z.string().max(200).nullable().optional(),
+  forumSlug: z.string().max(500).nullable().optional(),
+  karma: z.number().int().nullable().optional(),
+  commentCount: z.number().int().min(0).nullable().optional(),
+  authorUsername: z.string().max(200).nullable().optional(),
+  forumTags: z.array(z.string().max(200)).max(50).nullable().optional(),
+  sequenceTitle: z.string().max(500).nullable().optional(),
+  curated: z.boolean().nullable().optional(),
+  crossPostedFrom: z.string().max(200).nullable().optional(),
+  canonicalForum: z.string().max(50).nullable().optional(),
+});
+export type UpsertResourceForumPost = z.infer<typeof UpsertResourceForumPostSchema>;
+
+export const UpsertResourcePolicyDocSchema = z.object({
+  documentType: z.string().max(100).nullable().optional(),
+  jurisdictionEntityId: z.string().max(200).nullable().optional(),
+  agencyEntityId: z.string().max(200).nullable().optional(),
+  policyEntityId: z.string().max(200).nullable().optional(),
+  effectiveDate: z.string().max(100).nullable().optional(),
+  documentStatus: z.string().max(100).nullable().optional(),
+  referenceNumber: z.string().max(200).nullable().optional(),
+});
+export type UpsertResourcePolicyDoc = z.infer<typeof UpsertResourcePolicyDocSchema>;
+
+// -- Resources: Sub-table response types ----------------------------------------
+
+export interface ResourcePaperRow {
+  arxivId: string | null;
+  doi: string | null;
+  semanticScholarId: string | null;
+  abstract: string | null;
+  citationCount: number | null;
+  influentialCitationCount: number | null;
+  categories: string[] | null;
+  methodology: string | null;
+  year: number | null;
+}
+
+export interface ResourceForumPostRow {
+  forum: string;
+  forumPostId: string | null;
+  forumSlug: string | null;
+  karma: number | null;
+  commentCount: number | null;
+  authorUsername: string | null;
+  forumTags: string[] | null;
+  sequenceTitle: string | null;
+  curated: boolean | null;
+  crossPostedFrom: string | null;
+  canonicalForum: string | null;
+}
+
+export interface ResourcePolicyDocRow {
+  documentType: string | null;
+  jurisdictionEntityId: string | null;
+  agencyEntityId: string | null;
+  policyEntityId: string | null;
+  effectiveDate: string | null;
+  documentStatus: string | null;
+  referenceNumber: string | null;
+}
+
+/** Resource with all sub-table data merged in. */
+export interface ResourceDetailRow extends ResourceRow {
+  paper: ResourcePaperRow | null;
+  forumPost: ResourceForumPostRow | null;
+  policyDoc: ResourcePolicyDocRow | null;
 }
 
 export interface ResourceStatsResult {

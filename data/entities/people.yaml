@@ -313,10 +313,10 @@
   wikiId: E115
   type: person
   title: Elizabeth Kelly
-  description: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
+  description: Former Director of the US AI Safety Institute (AISI), who led federal AI safety evaluation and policy efforts until her departure in February 2025.
   customFields:
     - label: Role
-      value: Director
+      value: Former Director, US AI Safety Institute (departed February 2025)
     - label: Known For
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
@@ -429,7 +429,7 @@
       type: person
   customFields:
     - label: Role
-      value: Former Co-CEO (now at Anthropic)
+      value: Member of Technical Staff, Anthropic
     - label: Known For
       value: Directing billions toward AI safety, effective altruism leadership, AI timelines work
   sources:
@@ -608,7 +608,7 @@
       type: safety-agenda
   customFields:
     - label: Role
-      value: Alignment Researcher
+      value: Research Scientist, Google DeepMind
     - label: Known For
       value: Mechanistic interpretability, TransformerLens library, educational content
   sources:
@@ -662,7 +662,7 @@
       type: person
   customFields:
     - label: Role
-      value: Founding Director (until FHI closure in 2024)
+      value: Professor of Philosophy, University of Oxford
     - label: Known For
       value: Superintelligence, existential risk research, simulation hypothesis
   sources:
@@ -671,7 +671,7 @@
     - title: Superintelligence (book)
       url: https://www.superintelligence.com/
     - title: FHI Publications
-      url: https://www.fhi.ox.ac.uk/publications/
+      url: https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/publications/
     - title: Existential Risk Prevention as Global Priority
       url: https://www.existential-risk.org/concept.html
   description: >
@@ -718,7 +718,7 @@
       type: person
   customFields:
     - label: Role
-      value: Founder
+      value: Head of AI Safety, US AI Safety Institute
     - label: Known For
       value: Iterated amplification, AI safety via debate, scalable oversight
   sources:
@@ -1408,7 +1408,7 @@
       type: organization
   customFields:
     - label: Role
-      value: Associate Professor of Philosophy at Oxford, co-founder of effective altruism movement
+      value: Senior Research Fellow, Forethought
     - label: Known For
       value: Effective altruism, longtermism, "What We Owe the Future", Giving What We Can
   sources:
@@ -2535,9 +2535,11 @@
   description: >-
     Greg Brockman is the co-founder and President of OpenAI. He previously
     served as CTO of Stripe before co-founding OpenAI in December 2015.
+    He took a sabbatical from OpenAI in August 2024 and returned in
+    November 2024.
   customFields:
     - label: Role
-      value: Co-founder & President
+      value: Co-founder & Former President, OpenAI
     - label: Known For
       value: Co-founding OpenAI, Former CTO of Stripe
   tags:

@@ -243,14 +243,22 @@ export function OrganizationsTable({
     }
   }, [serverMode, server.sort, serverSetSort, urlSetSort, urlSort]);
 
+  // Build set of valid org IDs from static rows — used to filter out
+  // server-returned entities that don't have a valid detail page (e.g.,
+  // stale slugs like "center-for-ai-safety" or entities without org pages
+  // like "google"). Without this filter, clicking them would 404.
+  const validOrgIds = useMemo(() => new Set(rows.map((r) => r.id)), [rows]);
+
   // ── Enrich server data with orgType from static map ──
   const enrichedServerData = useMemo(() => {
     if (!serverMode) return [];
-    return server.data.map((row) => ({
-      ...row,
-      orgType: orgTypeMap?.[row.id] ?? null,
-    }));
-  }, [serverMode, server.data, orgTypeMap]);
+    return server.data
+      .filter((row) => validOrgIds.has(row.id))
+      .map((row) => ({
+        ...row,
+        orgType: orgTypeMap?.[row.id] ?? null,
+      }));
+  }, [serverMode, server.data, orgTypeMap, validOrgIds]);
 
   // ── Client-side type/stat filtering (applied on both modes) ──
   const applyClientFilters = useCallback((data: OrgRow[]): OrgRow[] => {

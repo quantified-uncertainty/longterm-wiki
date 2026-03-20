@@ -12,7 +12,7 @@ import {
   isNull,
   isNotNull,
 } from "drizzle-orm";
-import { getDrizzleDb } from "../../db.js";
+import { getDrizzleDb, getDb } from "../../db.js";
 import { things, thingResourceVerifications, thingVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
@@ -22,6 +22,11 @@ import {
   invalidJsonError,
   escapeIlike,
 } from "../shared/utils.js";
+import {
+  normalizeSearchQuery,
+  TRIGRAM_SIMILARITY_THRESHOLD,
+  TRIGRAM_FALLBACK_THRESHOLD,
+} from "../../search-utils.js";
 
 // ---- Constants ----
 
@@ -84,6 +89,30 @@ const PostVerdictSchema = z.object({
   sourcesChecked: z.number().int().min(0).optional(),
   needsRecheck: z.boolean().optional(),
 });
+
+// ---- Raw SQL row types ----
+
+/** Row shape returned by the trigram search fallback query. */
+interface ThingSearchRow {
+  id: string;
+  thing_type: string;
+  title: string;
+  parent_thing_id: string | null;
+  source_table: string;
+  source_id: string;
+  entity_type: string | null;
+  description: string | null;
+  source_url: string | null;
+  wiki_id: string | null;
+  parent_title: string | null;
+  verdict: string | null;
+  verdict_confidence: number | null;
+  verdict_at: string | null;
+  created_at: string;
+  updated_at: string;
+  synced_at: string | null;
+  similarity: number;
+}
 
 // ---- Helpers ----
 
@@ -157,8 +186,11 @@ const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
   .get("/search", zv("query", SearchQuery), async (c) => {
-    const { q, thing_type, limit } = c.req.valid("query");
+    const { q: rawQ, thing_type, limit } = c.req.valid("query");
     const db = getDrizzleDb();
+
+    // Normalize: insert spaces at letter/digit boundaries ("sb1047" → "sb 1047")
+    const q = normalizeSearchQuery(rawQ);
 
     const conditions = [];
 
@@ -180,7 +212,7 @@ const thingsApp = new Hono()
       )
       .limit(limit);
 
-    // Fall back to ILIKE if FTS returned nothing
+    // Phase 2: ILIKE fallback if FTS returned nothing
     if (rows.length === 0) {
       const pattern = `%${escapeIlike(q)}%`;
       const ilikeConditions = [
@@ -201,19 +233,98 @@ const thingsApp = new Hono()
         .orderBy(things.title)
         .limit(limit);
 
-      return c.json({
-        results: fallbackRows.map(formatThing),
-        query: q,
-        total: fallbackRows.length,
-        searchMethod: "ilike" as const,
-      });
+      if (fallbackRows.length > 0) {
+        return c.json({
+          results: fallbackRows.map(formatThing),
+          query: q,
+          total: fallbackRows.length,
+          searchMethod: "ilike" as const,
+        });
+      }
+    }
+
+    // Phase 3: Trigram similarity fallback for typo tolerance
+    // (e.g. "Antrhopic" -> "Anthropic"). Only triggered when FTS + ILIKE
+    // returned few results and query is >= 2 chars (short queries produce
+    // too many low-quality trigram matches).
+    if (rows.length < TRIGRAM_FALLBACK_THRESHOLD && q.trim().length >= 2) {
+      const rawDb = getDb();
+      const existingIds = rows.map((r) => r.id);
+      const thingTypeFilter = thing_type
+        ? `AND thing_type = $4`
+        : "";
+      const params: (string | number | string[])[] = [
+        q,
+        limit - rows.length,
+        existingIds.length > 0 ? existingIds : ["__none__"],
+      ];
+      if (thing_type) {
+        params.push(thing_type);
+      }
+
+      const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
+        `SELECT
+          id, thing_type, title, parent_thing_id, source_table, source_id,
+          entity_type, description, source_url, wiki_id, parent_title,
+          verdict, verdict_confidence, verdict_at,
+          created_at, updated_at, synced_at,
+          similarity(title, $1) AS similarity
+        FROM things
+        WHERE similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
+          AND id NOT IN (SELECT unnest($3::text[]))
+          ${thingTypeFilter}
+        ORDER BY similarity(title, $1) DESC
+        LIMIT $2`,
+        params,
+      );
+
+      if (trigramRows.length > 0) {
+        // Convert raw SQL rows to the same shape as Drizzle results
+        const trigramFormatted = trigramRows.map((r) => ({
+          id: r.id,
+          thingType: r.thing_type,
+          title: r.title,
+          parentThingId: r.parent_thing_id,
+          sourceTable: r.source_table,
+          sourceId: r.source_id,
+          entityType: r.entity_type,
+          description: r.description,
+          sourceUrl: r.source_url,
+          wikiId: r.wiki_id,
+          href: thingHref({
+            thingType: r.thing_type,
+            sourceTable: r.source_table,
+            sourceId: r.source_id,
+            wikiId: r.wiki_id,
+            entityType: r.entity_type,
+          }),
+          parentTitle: r.parent_title,
+          verdict: r.verdict,
+          verdictConfidence: r.verdict_confidence,
+          verdictAt: r.verdict_at,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          syncedAt: r.synced_at,
+        }));
+
+        const combined = [
+          ...rows.map(formatThing),
+          ...trigramFormatted,
+        ];
+        return c.json({
+          results: combined,
+          query: q,
+          total: combined.length,
+          searchMethod: rows.length > 0 ? ("fts+trigram" as const) : ("trigram" as const),
+        });
+      }
     }
 
     return c.json({
       results: rows.map(formatThing),
       query: q,
       total: rows.length,
-      searchMethod: "fts" as const,
+      searchMethod: rows.length > 0 ? ("fts" as const) : ("none" as const),
     });
   })
 

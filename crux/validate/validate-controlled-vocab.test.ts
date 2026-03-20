@@ -413,7 +413,8 @@ describe("checkPersonnel", () => {
   it("returns empty issues when wiki-server is unavailable", async () => {
     mockApiRequest.mockResolvedValueOnce({
       ok: false,
-      error: "Connection refused",
+      error: "server_error" as const,
+      message: "Connection refused",
     } as ApiResult<Record<string, unknown>>);
 
     const issues = await checkPersonnel();
@@ -563,7 +564,8 @@ describe("checkDivisions", () => {
   it("returns empty issues when wiki-server is unavailable", async () => {
     mockApiRequest.mockResolvedValueOnce({
       ok: false,
-      error: "Connection refused",
+      error: "server_error" as const,
+      message: "Connection refused",
     } as ApiResult<Record<string, unknown>>);
 
     const issues = await checkDivisions();

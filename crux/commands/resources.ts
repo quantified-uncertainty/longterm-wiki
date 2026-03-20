@@ -2,10 +2,18 @@
  * Resources Command Handlers
  *
  * Unified interface for resource management (wraps resource-manager.ts).
+ * Enrichment commands (enrich-papers, enrich-forums, fetch-all, classify, deep-enrich)
+ * are implemented directly in crux/resource-enrichment/.
  */
 
 import type { CommandResult } from '../lib/cli.ts';
 import { runScript, optionsToArgs } from '../lib/cli.ts';
+import { enrichPapersCommand } from '../resource-enrichment/enrich-papers.ts';
+import { enrichForumsCommand } from '../resource-enrichment/enrich-forums.ts';
+import { fetchAllCommand } from '../resource-enrichment/fetch-all.ts';
+import { classifyCommand } from '../resource-enrichment/classify.ts';
+import { deepEnrichCommand } from '../resource-enrichment/enrich.ts';
+import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts';
 
 interface ResourceCommandConfig {
   description: string;
@@ -53,6 +61,10 @@ const COMMANDS: Record<string, ResourceCommandConfig> = {
   'refresh-titles': {
     description: 'Fetch real page titles and fix bad ones',
     passthrough: ['apply', 'limit', 'domain', 'verbose', 'force-all'],
+  },
+  'classify-stance': {
+    description: 'Classify resource stance via LLM (--page=<slug>)',
+    passthrough: ['apply', 'limit', 'verbose', 'page'],
   },
 };
 
@@ -104,6 +116,53 @@ for (const [name, config] of Object.entries(COMMANDS)) {
   commands[name] = createCommandHandler(name, config);
 }
 
+// classify-stance: direct command (not routed through resource-manager.ts)
+commands['classify-stance'] = async function (args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const { classifyStance } = await import('./resources/classify-stance.ts');
+  const page = (options.page as string) || args[0];
+  if (!page) {
+    return { output: 'Usage: pnpm crux resources classify-stance --page=<slug>\n  Options: --apply, --limit=N, --verbose', exitCode: 1 };
+  }
+  let limit: number | undefined;
+  if (options.limit !== undefined) {
+    const parsedLimit = Number(options.limit);
+    if (!Number.isInteger(parsedLimit) || parsedLimit <= 0) {
+      return { output: '--limit must be a positive integer', exitCode: 1 };
+    }
+    limit = parsedLimit;
+  }
+
+  await classifyStance({
+    page,
+    apply: !!options.apply,
+    limit,
+    verbose: !!options.verbose,
+  });
+  return { output: '', exitCode: 0 };
+};
+
+// Direct enrichment command handlers (not routed through resource-manager.ts)
+commands['enrich-papers'] = enrichPapersCommand;
+commands['enrich-forums'] = enrichForumsCommand;
+commands['fetch-all'] = fetchAllCommand;
+commands['classify'] = classifyCommand;
+commands['deep-enrich'] = deepEnrichCommand;
+
+commands['cross-reference'] = crossReferenceCommand;
+
+// Convenience aliases
+commands['enrich-free'] = async (args, options) => {
+  console.log('Running all free enrichment commands...\n');
+  const results = [];
+  results.push(await enrichPapersCommand(args, options));
+  console.log();
+  results.push(await enrichForumsCommand(args, options));
+  console.log();
+  results.push(await fetchAllCommand(args, options));
+  const maxExit = Math.max(...results.map((r) => r.exitCode ?? 0));
+  return { exitCode: maxExit, output: 'Free enrichment complete' };
+};
+
 // Default to list
 commands.default = commands.list;
 
@@ -121,19 +180,36 @@ Resources Domain - External resource management
 Commands:
 ${commandList}
 
+Enrichment:
+  enrich-papers     Enrich papers via Semantic Scholar API (→ resource_papers)
+  enrich-forums     Enrich forum posts via LW/AF/EAF GraphQL (→ resource_forum_posts)
+  fetch-all         Fetch all resource URLs and extract meta tags
+  enrich-free       Run all free enrichment (papers + forums + fetch)
+  classify          LLM classification via Anthropic Batch API (Haiku, ~\$15)
+  deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~\$100)
+
 Options:
   --limit=<n>       Limit results
-  --batch=<n>       Batch size (metadata)
+  --batch=<n>       Batch size (metadata/fetch-all)
   --apply           Apply changes (process)
   --dry-run         Preview without changes
   --json            JSON output
+  --verbose         Verbose output
+  --concurrency=<n> Concurrency for fetch-all (default 5)
+  --batch-id=<id>   Batch ID for classify/deep-enrich status/poll/download
 
 Examples:
-  crux w resources list --limit 20
-  crux w resources show bioweapons
-  crux w resources process bioweapons --apply
-  crux w resources create "https://arxiv.org/abs/..."
-  crux w resources metadata arxiv --batch 50
-  crux w resources validate all
+  crux resources list --limit 20
+  crux resources show bioweapons
+  crux resources process bioweapons --apply
+  crux resources create "https://arxiv.org/abs/..."
+  crux resources metadata arxiv --batch 50
+  crux resources validate all
+  crux resources classify-stance --page=sb-1047 --apply
+  crux resources enrich-papers --limit 100 --verbose
+  crux resources enrich-forums --limit 200
+  crux resources fetch-all --batch 50 --concurrency 5
+  crux resources classify submit --dry-run
+  crux resources deep-enrich submit --limit 1000
 `;
 }

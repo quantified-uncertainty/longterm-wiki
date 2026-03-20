@@ -49,8 +49,8 @@
       date: "2023"
 - id: paul-christiano
   name: Paul Christiano
-  affiliation: arc
-  role: Founder
+  affiliation: us-aisi
+  role: Head of AI Safety, US AI Safety Institute
   website: https://alignment.org
   knownFor:
     - Iterated amplification
@@ -249,7 +249,7 @@
 - id: jan-leike
   name: Jan Leike
   affiliation: anthropic
-  role: Head of Alignment
+  role: VP of Alignment Science, Anthropic
   website: https://anthropic.com
   knownFor:
     - Alignment research
@@ -400,7 +400,7 @@
 - id: holden-karnofsky
   name: Holden Karnofsky
   affiliation: anthropic
-  role: Member of Technical Staff
+  role: Member of Technical Staff, Anthropic
   website: https://www.cold-takes.com
   knownFor:
     - Directing billions toward AI safety
@@ -446,7 +446,7 @@
 - id: neel-nanda
   name: Neel Nanda
   affiliation: deepmind
-  role: Alignment Researcher
+  role: Research Scientist, Google DeepMind
   website: https://www.neelnanda.io
   knownFor:
     - Mechanistic interpretability
@@ -466,7 +466,7 @@
 - id: nick-bostrom
   name: Nick Bostrom
   affiliation: fhi
-  role: Founding Director (until FHI closure in 2024)
+  role: Professor of Philosophy, University of Oxford
   website: https://nickbostrom.com
   knownFor:
     - Superintelligence
@@ -498,7 +498,7 @@
 - id: yann-lecun
   name: Yann LeCun
   affiliation: meta-ai
-  role: Founder (formerly Chief AI Scientist at Meta)
+  role: Chief AI Scientist, Meta
   website: https://yann.lecun.com
   knownFor:
     - Convolutional neural networks
@@ -803,7 +803,7 @@
 - id: helen-toner
   name: Helen Toner
   affiliation: cset
-  role: Former Director of Strategy, Georgetown CSET
+  role: Interim Executive Director, Georgetown CSET
 
 - id: issa-rice
   name: Issa Rice
@@ -840,7 +840,7 @@
 - id: will-macaskill
   name: Will MacAskill
   affiliation: forethought
-  role: Senior Research Fellow
+  role: Senior Research Fellow, Forethought
   website: https://www.forethought.org/people/william-macaskill
   knownFor:
     - Effective altruism (co-founder)
@@ -933,8 +933,8 @@
 
 - id: allan-dafoe
   name: Allan Dafoe
-  affiliation: govai
-  role: Founding Director, GovAI
+  affiliation: deepmind
+  role: VP of AI Policy, Google DeepMind
 
 - id: victoria-krakovna
   name: Victoria Krakovna
