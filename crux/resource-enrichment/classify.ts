@@ -177,7 +177,9 @@ async function downloadAndApplyClassification(batchId: string, dryRun: boolean):
     }
 
     try {
-      const text = item.result.message.content[0]?.text || '';
+      let text = item.result.message.content[0]?.text || '';
+      // Strip markdown code fences if present (LLMs sometimes wrap JSON in ```json ... ```)
+      text = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
       const parsed = JSON.parse(text) as ClassificationResult;
       const resource = resourceMap.get(item.custom_id);
       if (!resource) continue;
