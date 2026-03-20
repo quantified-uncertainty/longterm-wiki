@@ -415,13 +415,15 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
           onKeyDown={handleKeyDown}
           aria-label="Search"
           placeholder="Search entities, articles, resources..."
+          aria-label="Search entities, articles, resources"
           className="w-full pl-11 pr-4 py-3 rounded-lg border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-transparent transition-all"
           autoComplete="off"
           spellCheck={false}
         />
         {loading && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2" role="status">
             <div className="h-4 w-4 border-2 border-muted-foreground/20 border-t-foreground/60 rounded-full animate-spin" />
+            <span className="sr-only">Loading search results</span>
           </div>
         )}
       </form>
@@ -454,7 +456,7 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
 
       {/* Result count */}
       {searched && !loading && hasResults && (
-        <p className="text-xs text-muted-foreground/40 mb-4 tabular-nums">
+        <p className="text-xs text-muted-foreground/40 mb-4 tabular-nums" aria-live="polite">
           {totalCount} result{totalCount !== 1 ? "s" : ""}
         </p>
       )}

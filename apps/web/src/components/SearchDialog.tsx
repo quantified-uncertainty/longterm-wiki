@@ -263,6 +263,29 @@ export function SearchDialog() {
     }
   }
 
+  // Focus trap: cycle focus within the dialog on Tab / Shift+Tab
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const handleDialogKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== "Tab" || !dialogRef.current) return;
+    const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+      'input, button, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, []);
+
   if (!open) return null;
 
   const showChips = allResults.length > 0;
@@ -278,11 +301,13 @@ export function SearchDialog() {
 
       {/* Dialog */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Search wiki"
         className="relative w-full max-w-lg mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleDialogKeyDown}
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
@@ -295,6 +320,7 @@ export function SearchDialog() {
             onKeyDown={onInputKeyDown}
             aria-label="Search"
             placeholder="Search pages, grants, funding..."
+            aria-label="Search"
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             autoComplete="off"
             spellCheck={false}
