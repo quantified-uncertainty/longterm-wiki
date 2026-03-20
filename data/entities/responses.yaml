@@ -834,6 +834,41 @@
         https://ised-isde.canada.ca/site/innovation-better-canada/en/artificial-intelligence-and-data-act-aida-companion-document
       author: Government of Canada
       date: November 2023
+  stakeholders:
+    - name: Government of Canada (ISED)
+      position: support
+      importance: high
+      reason: Introduced AIDA as Part 3 of Bill C-27; proposed amendments in November 2023 to address criticisms but failed to satisfy opponents
+      source: https://ised-isde.canada.ca/site/innovation-better-canada/en/artificial-intelligence-and-data-act-aida-companion-document
+      context:
+        - "Innovation, Science and Economic Development Canada (ISED) would have been both regulator and enforcer — a conflict of interest flagged by critics"
+        - "137 witnesses appeared before the INDU committee; 113 briefs submitted during study"
+        - "November 2023 amendments added specificity but were seen as insufficient by civil society"
+    - name: Civil society coalition (45 organizations)
+      position: oppose
+      importance: high
+      reason: Coalition of 45 civil society organizations, experts, and academics called for AIDA to be removed from Bill C-27 and considered separately; argued requirements were vague and insufficient
+      source: https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/
+      context:
+        - "September 2023 letter argued shoehorning AI regulation into a privacy bill prevented adequate scrutiny"
+        - "Concerned about ISED's dual role as economic development body and AI regulator"
+        - "Criticized vague definitions of 'high-impact' AI systems and weak enforcement mechanisms"
+    - name: CIGI (Centre for International Governance Innovation)
+      position: oppose
+      importance: medium
+      reason: Published analysis arguing proposed amendments 'do little to mitigate AI harms'; called for stronger, standalone AI legislation
+      source: https://www.cigionline.org/articles/proposed-changes-to-canadas-bill-c-27-do-little-to-mitigate-ai-harms/
+      context:
+        - "Canadian think tank specializing in technology governance"
+        - "Argued AIDA's principles-based approach lacked concrete enforcement teeth"
+    - name: International Civil Liberties Monitoring Group
+      position: oppose
+      importance: medium
+      reason: Argued Canadians deserve protection from AI overreach but that AIDA was 'not up to the task'; criticized the lack of robust rights protections
+      source: https://iclmg.ca/aida-not-up-to-task/
+      context:
+        - "Coalition of 45 member organizations focused on civil liberties in Canada"
+        - "Called for fundamental rights impact assessments and stronger transparency obligations"
   description: >-
     The Artificial Intelligence and Data Act (AIDA) was Canada's proposed federal AI legislation, introduced as Part 3
     of Bill C-27 (the Digital Charter Implementation Act, 2022). Despite years of debate and amendment, the bill died on
@@ -907,6 +942,34 @@
       url: https://carnegieendowment.org/research/2024/01/regulating-ai-in-china-and-the-united-states
       author: Carnegie Endowment
       date: '2024'
+  stakeholders:
+    - name: Cyberspace Administration of China (CAC)
+      position: support
+      importance: high
+      reason: Primary enforcement agency for AI regulations; requires pre-deployment approval and model registration for generative AI services with public opinion attributes
+      source: https://digichina.stanford.edu/work/translation-interim-measures-for-the-management-of-generative-artificial-intelligence-services-effective-august-15-2023/
+      context:
+        - "Joint issuer of Generative AI Interim Measures with six other government agencies"
+        - "Maintains the algorithm registry where companies must file their AI models"
+        - "Has approved and registered hundreds of generative AI platforms including DeepSeek and Ernie Bot"
+    - name: Baidu
+      position: support
+      importance: high
+      reason: First company to launch approved generative AI service (Ernie Bot) after Interim Measures took effect in August 2023; quietly lobbied for modifications to draft regulations
+      source: https://fpf.org/blog/chinas-interim-measures-for-the-management-of-generative-ai-services-a-comparison-between-the-final-and-draft-versions-of-the-text/
+      context:
+        - "Released invite-only Ernie Bot in March 2023, months before draft regulations were published"
+        - "One of the first 11 companies approved to offer generative AI to the public (August 2023)"
+        - "Industry feedback from Baidu and others appeared to influence revisions between draft and final versions"
+    - name: Chinese AI companies (Alibaba, SenseTime, Zhipu AI)
+      position: support
+      importance: high
+      reason: Major Chinese AI companies complied with and supported the regulatory framework; among the first batch of 11 companies approved to offer generative AI publicly
+      source: https://securiti.ai/china-ai-regulatory-landscape/
+      context:
+        - "Companies including SenseTime, Baichuan, and Zhipu AI among first approved under the framework"
+        - "Industry stakeholder input played a documented role in softening final Interim Measures from the harsher draft version"
+        - "Compliance with framework seen as necessary for market access rather than optional"
   description: >-
     China has developed one of the world's most comprehensive AI regulatory frameworks through a series of targeted
     regulations addressing specific AI applications and risks. Unlike the EU's comprehensive AI Act, China's approach is
@@ -980,32 +1043,71 @@
   stakeholders:
     - name: Gov. Jared Polis
       position: mixed
-      reason: Signed the bill into law on May 17, 2024 but issued a public letter expressing concerns about the law being too broad and potentially stifling innovation; urged the legislature to revisit before enforcement
+      importance: high
+      reason: Signed the bill into law on May 17, 2024 but issued a public letter expressing concerns about the law being too broad and potentially stifling innovation; urged the legislature to revisit before enforcement and called for federal preemption
       source: https://www.coloradosun.com/2024/05/17/jared-polis-signs-ai-bill-sb205/
+      context:
+        - "In signing statement, explicitly encouraged federal legislation to preempt this state law"
+        - "Called an August 2025 special session partly in response to industry pressure to delay enforcement"
+        - "Signed SB 25B-004 delaying enforcement from February 1 to June 30, 2026"
     - name: Google
       position: support
-      reason: Applauded risk-based approach as preferable to size-based regulation; suggested alignment with future national and global AI laws
+      importance: medium
+      reason: Applauded risk-based approach as preferable to size-based regulation like California's SB 1047; suggested alignment with future national and global AI laws
       source: https://www.techpolicy.press/colorado-makes-history-with-the-nations-first-comprehensive-ai-act/
+      context:
+        - "Preferred Colorado's risk-based framework over California's compute-threshold approach"
+        - "Major AI deployer whose products (Search, Workspace, Cloud) would be covered as high-risk in multiple domains"
     - name: Microsoft
       position: mixed
-      reason: Supported the general risk-based framework but opposed proactive AG notification requirements for discrimination risks; lobbied for amendments during special session
+      importance: high
+      reason: Supported the general risk-based framework but opposed proactive AG notification requirements for discrimination risks; lobbied for amendments during August 2025 special session
       source: https://leg.colorado.gov/bills/sb24-205
+      context:
+        - "Major AI deployer (Copilot, Azure AI) with products spanning all eight covered high-risk domains"
+        - "Invested $13B in OpenAI; supports regulation that aligns with its existing responsible AI practices"
+        - "Active lobbyist during August 2025 special session alongside 150+ other industry lobbyists"
     - name: IBM
       position: support
-      reason: Endorsed the risk-based regulatory approach as a model for state-level AI governance
+      importance: medium
+      reason: Endorsed the risk-based regulatory approach as a model for state-level AI governance; aligned with IBM's own AI ethics framework
       source: https://www.iapp.org/news/a/colorado-ai-act-key-provisions-and-compliance-implications/
+      context:
+        - "Long-standing advocate for risk-based AI regulation; published AI ethics principles in 2018"
+        - "Co-founded the AI Alliance with Meta (took different positions on this law)"
+        - "IBM's Watson and watsonx products used in healthcare and HR decisions covered by the act"
     - name: Tech Industry Coalition
       position: oppose
-      reason: Mobilized 150+ lobbyists during August 2024 special session; multiple attempts to weaken or repeal the law failed but succeeded in delaying enforcement
+      importance: high
+      reason: Mobilized 150+ lobbyists and 127 groups during August 2025 special session; four competing repeal/replacement bills introduced; ultimately succeeded only in delaying enforcement to June 30, 2026
       source: https://www.techpolicy.press/in-delaying-its-ai-law-colorado-shows-tech-lobbys-power-in-state-politics/
+      context:
+        - "127 different groups paid lobbyists during the special session — many from tech and healthcare industries"
+        - "Multiple attempts to repeal or substantially weaken the law failed in the legislature"
+        - "Compromise deal collapsed over disagreements about developer/deployer liability for algorithmic discrimination"
     - name: Center for Democracy and Technology
       position: support
-      reason: Advocated for strong algorithmic discrimination protections and consumer appeal rights as essential safeguards
+      importance: medium
+      reason: Advocated for strong algorithmic discrimination protections and consumer appeal rights as essential safeguards; published detailed FAQ on the act's provisions
       source: https://cdt.org/insights/faq-on-colorados-consumer-artificial-intelligence-act-sb-24-205/
+      context:
+        - "Leading digital rights nonprofit focused on civil liberties in technology policy"
+        - "Advocated for the consumer right to human review of adverse AI decisions"
     - name: Common Sense Institute
       position: oppose
+      importance: medium
       reason: Published economic impact study estimating the act could cost Colorado approximately 40,000 jobs due to compliance burdens on businesses
       source: https://commonsenseinstituteco.org/colorado-artificial-intelligence-act/
+      context:
+        - "Colorado-based free-market think tank; study widely cited by industry opponents during special session"
+        - "Job loss estimate contested by act supporters as based on speculative assumptions"
+    - name: US Chamber of Commerce
+      position: oppose
+      importance: medium
+      reason: Argued the law may hamper small business AI adoption; preferred a gap-filling approach over the broad application to all high-risk AI systems
+      context:
+        - "Largest US business advocacy organization; lobbied alongside state-level industry groups"
+        - "Advocated for strengthening existing consumer protection and civil rights laws instead"
   keyPoliticians:
     - name: Sen. Robert Rodriguez
       role: Prime sponsor and lead author in the Colorado Senate
@@ -1244,65 +1346,132 @@
   stakeholders:
     - name: European Commission
       position: support
-      reason: Proposed the original regulation in April 2021; leads implementation through the European AI Office; positioned the Act as a global standard-setter
+      importance: high
+      reason: Proposed the original regulation in April 2021; leads implementation through the European AI Office; positioned the Act as a global standard-setter for AI governance
       source: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+      context:
+        - "Commissioner Thierry Breton led the regulatory agenda; Ursula von der Leyen included AI regulation in 2019 political guidelines"
+        - "European AI Office established within the Commission to oversee GPAI enforcement"
+        - "Can impose fines up to 3% of worldwide annual turnover for GPAI violations"
     - name: European Parliament
       position: support
-      reason: Strengthened the Commission's proposal by adding GPAI provisions and broader prohibitions; passed with overwhelming 523-46-49 vote
+      importance: high
+      reason: Strengthened the Commission's proposal by adding GPAI provisions and broader prohibitions; passed with overwhelming 523-46-49 vote on March 13, 2024
       source: https://www.europarl.europa.eu/news/en/press-room/20240308IPR19015/artificial-intelligence-act-meps-adopt-landmark-law
+      context:
+        - "Co-rapporteurs Brando Benifei (S&D) and Dragos Tudorache (Renew) led negotiations"
+        - "GPAI tiered approach was Parliament's addition — not in original Commission proposal"
+        - "Resisted last-minute EPP attempt to water down biometric surveillance bans"
     - name: France, Germany, Italy
       position: oppose
-      reason: Jointly opposed strict GPAI regulation during trilogue negotiations (Oct-Nov 2023); concerned about competitiveness of European AI companies like Mistral AI and Aleph Alpha
+      importance: high
+      reason: Jointly opposed strict GPAI regulation during trilogue negotiations (Nov 2023); pushed for self-regulation via codes of conduct without sanctions, citing competitiveness of Mistral AI and Aleph Alpha
       source: https://www.euronews.com/next/2023/11/19/eu-ai-act-germany-france-and-italy-reach-agreement-on-the-future-of-ai-regulation-in-europ
+      context:
+        - "Joint non-paper proposed mandatory self-regulation for foundation models with no sanctions"
+        - "Near-collapse of trilogue negotiations; compromise reached after 36+ hours of marathon talks"
+        - "Under pressure from national AI companies: Mistral AI (France) and Aleph Alpha (Germany)"
+        - "Final outcome: tiered GPAI approach was a compromise — binding rules with systemic risk threshold at 10^25 FLOPs"
     - name: Mistral AI
       entityId: mistral-ai
       position: oppose
-      reason: French AI startup lobbied against GPAI rules; CEO Arthur Mensch argued obligations would disadvantage European startups against US/Chinese competitors
-      source: https://www.ft.com/content/9b72a5f4-a5d8-4b9e-8a7e-4b3a5e6d2c1f
+      importance: high
+      reason: Led lobbying against GPAI rules; opened Brussels lobby office with former French digital secretary Cedric O; CEO Arthur Mensch argued obligations would disadvantage European startups
+      source: https://techcrunch.com/2023/11/16/mistral-eu-ai-act/
+      context:
+        - "Cedric O, former French secretary of state for digital transition, hired to lead EU relations; had direct access to President Macron"
+        - "Argued for regulating AI applications, not model providers — deployer-focused approach"
+        - "Called for a two-year delay in implementing GPAI rules alongside Airbus and BNP Paribas"
+        - "Raised $415M Series B during negotiations, making it Europe's most valuable AI startup"
     - name: Meta
       entityId: meta-ai
       position: oppose
-      reason: Opposed GPAI provisions and transparency requirements; argued rules would harm open-source AI development and European competitiveness
+      importance: high
+      reason: Opposed GPAI provisions and transparency requirements; argued rules would harm open-source AI development (Llama models) and European competitiveness
       source: https://about.fb.com/news/2023/06/how-ai-regulation-can-work-for-everyone/
+      context:
+        - "Open-source AI strategy (Llama models) most affected by GPAI transparency and documentation obligations"
+        - "Co-founded AI Alliance with IBM — lobbying vehicle against prescriptive GPAI rules"
+        - "Open-source models with open weights exempt from most GPAI Tier 1 requirements except copyright compliance"
     - name: Microsoft
       entityId: microsoft
       position: support
-      reason: Supported risk-based approach; President Brad Smith called the EU AI Act a "strong foundation" and pledged compliance across Microsoft's AI products
+      importance: high
+      reason: Supported risk-based approach; President Brad Smith called the EU AI Act a 'strong foundation' and pledged compliance across Microsoft's AI products
       source: https://blogs.microsoft.com/on-the-issues/2023/05/25/how-do-we-best-govern-ai/
+      context:
+        - "Major investor in OpenAI ($13B); both took supportive positions on the Act"
+        - "Azure AI and Copilot products span multiple high-risk domains covered by the Act"
+        - "Existing responsible AI governance practices largely aligned with Act requirements"
     - name: OpenAI
       entityId: openai
       position: support
-      reason: Publicly supported the risk-based regulatory framework; CEO Sam Altman initially threatened EU exit but reversed course, calling the Act a "great starting point"
+      importance: high
+      reason: Publicly supported the risk-based regulatory framework; CEO Sam Altman initially threatened EU exit (May 2023) but reversed course within days, calling the Act 'a great starting point'
       source: https://time.com/6283609/sam-altman-openai-eu-ai-act/
+      context:
+        - "GPT-4 would be classified as GPAI with systemic risk under the 10^25 FLOP threshold"
+        - "Altman's EU exit threat drew widespread criticism and was quickly walked back"
+        - "Signed voluntary pre-deployment testing agreement with EU AI Office"
     - name: Apple
       position: oppose
+      importance: medium
       reason: Lobbied against transparency and disclosure requirements for AI systems integrated into consumer products; concerned about trade secret protections
       source: https://www.reuters.com/technology/apple-lobbied-against-key-provisions-eus-ai-act-2023-07-19/
+      context:
+        - "Siri, Apple Intelligence, and on-device ML features would face transparency obligations"
+        - "Historically secretive about product internals; disclosure requirements conflict with business model"
     - name: Amazon
       position: support
-      reason: Supported the risk-based approach while advocating for clear definitions and proportionate compliance requirements
+      importance: medium
+      reason: Supported the risk-based approach while advocating for clear definitions and proportionate compliance requirements for AI deployers
       source: https://www.aboutamazon.eu/news/policy/amazon-supports-the-eu-ai-act
+      context:
+        - "AWS cloud services used to train and deploy many GPAI models that would be regulated"
+        - "Alexa and Amazon hiring/logistics AI systems could be classified as high-risk"
     - name: Google DeepMind
       entityId: deepmind
       position: mixed
+      importance: high
       reason: Supported risk-based framework in principle but lobbied for narrower GPAI definitions and raised concerns about compliance costs for foundation model research
       source: https://blog.google/around-the-globe/google-europe/google-ai-regulation-eu/
+      context:
+        - "Gemini models would be classified as GPAI with systemic risk under 10^25 FLOP threshold"
+        - "Google's $2B investment in Anthropic and broad AI portfolio means extensive compliance obligations"
+        - "DeepMind's London HQ means close proximity to UK AISI, a potential competing regulatory framework"
     - name: Access Now
       position: support
+      importance: medium
       reason: Digital rights organization that advocated for stronger prohibitions, particularly on biometric surveillance and social scoring; pushed for broader individual rights protections
       source: https://www.accessnow.org/campaign/eu-ai-act/
+      context:
+        - "Co-drafted key amendment proposals on prohibiting biometric identification with EDRi, ARTICLE19, and others"
+        - "Part of the Reclaim Your Face campaign (80+ organizations, 250,000+ supporters) pushing for biometric mass surveillance ban"
     - name: European Digital Rights (EDRi)
       position: support
-      reason: Coalition of civil society groups that pushed for ban on biometric mass surveillance and predictive policing; advocated for fundamental rights impact assessments
+      importance: medium
+      reason: Coalition of 40+ civil society groups that pushed for ban on biometric mass surveillance and predictive policing; co-led Reclaim Your Face campaign
       source: https://edri.org/our-work/the-eu-artificial-intelligence-act/
+      context:
+        - "Campaigned for over three years for biometric mass surveillance ban via the Reclaim Your Face initiative"
+        - "Successfully opposed EPP's last-minute attempt to water down facial recognition bans in June 2023 plenary vote"
+        - "Published practical legal guide for fighting biometric mass surveillance after the Act passed"
     - name: DigitalEurope
       position: oppose
+      importance: medium
       reason: Industry association representing major tech companies; argued GPAI provisions were too prescriptive and would create compliance burden that disadvantages European firms
       source: https://www.digitaleurope.org/policies/ai/
+      context:
+        - "Members include Apple, Google, Microsoft, Samsung, and major European tech firms"
+        - "Joined Airbus, BNP Paribas, and Mistral in calling for a two-year delay in GPAI rules implementation"
     - name: CCIA Europe
       position: oppose
+      importance: medium
       reason: Computer and Communications Industry Association lobbied against broad GPAI obligations; argued for focusing regulation on deployers rather than model providers
       source: https://ccianet.org/issues/artificial-intelligence/eu-ai-act/
+      context:
+        - "Members include Amazon, Google, Meta, and other major US tech firms"
+        - "Argued deployer-focused regulation would be more effective than regulating general-purpose model providers"
   keyPoliticians:
     - name: Brando Benifei
       role: Co-rapporteur (European Parliament)
@@ -1451,13 +1620,58 @@
   stakeholders:
     - name: Netherlands (ASML)
       position: support
-      reason: EUV equipment restrictions; expanded DUV licensing requirements
+      importance: high
+      reason: Implemented EUV and expanded DUV equipment export licensing requirements under US pressure; restrictions effective September 2023
+      source: https://www.cnbc.com/2023/06/30/netherlands-follows-us-with-semiconductor-export-restrictions-.html
+      context:
+        - "ASML is the sole global provider of EUV lithography machines needed for cutting-edge chip fabrication"
+        - "29% of ASML's 2023 sales went to Chinese customers, creating strong financial disincentive to restrict exports"
+        - "Dutch government did not fully align with US on threshold levels — disagreed on setting the line at 16/14nm"
+        - "Delay between March 2023 announcement and September 2023 enforcement allowed Chinese firms to stockpile equipment"
     - name: Japan (Tokyo Electron, Nikon)
       position: support
-      reason: Equipment restrictions aligned with US
+      importance: high
+      reason: Aligned semiconductor equipment export controls with US after bilateral negotiations; restrictions effective July 2023
+      context:
+        - "Tokyo Electron is the world's third-largest semiconductor equipment maker; Nikon provides DUV lithography"
+        - "Japan's restrictions took effect July 2023, two months before Dutch rules"
+        - "Coordinated via US-Japan-Netherlands trilateral negotiations since early 2023"
     - name: Chinese AI companies
       position: oppose
-      reason: Disrupted procurement; forced domestic alternatives
+      importance: high
+      reason: Controls disrupted access to advanced AI training hardware; forced investment in domestic alternatives like Huawei's Ascend chips
+      source: https://www.cfr.org/article/chinas-ai-chip-deficit-why-huawei-cant-catch-nvidia-and-us-export-controls-should-remain
+      context:
+        - "Major Chinese cloud providers (Alibaba, Baidu, Tencent) stockpiled Nvidia A100/H100 chips before restrictions took effect"
+        - "Huawei's Ascend 910B positioned as domestic alternative but significantly underperforms Nvidia equivalents"
+        - "600+ Chinese entities added to BIS Entity List with presumption of denial"
+    - name: Nvidia
+      position: oppose
+      importance: high
+      reason: Opposed controls as harmful to US competitiveness; CEO Jensen Huang called export controls 'a failure' and estimated $15B in lost revenue; lobbied Washington extensively
+      source: https://fortune.com/2025/01/13/nvidia-lashes-out-at-biden-administration-sweeping-last-minute-export-controls-on-ai-chips/
+      context:
+        - "Created China-specific chips (A800, H800) to comply with initial thresholds; BIS closed loopholes in October 2023"
+        - "China previously accounted for 20-25% of Nvidia's data center revenue; dropped to effectively 0%"
+        - "Lobbying spend surged from $90K (2022) to $500K+ (2023); CEO Huang met with White House officials and Trump personally"
+        - "H20 chip designed for Chinese market banned in April 2025, triggering $4.5B revenue impact"
+    - name: Bureau of Industry and Security (BIS)
+      position: support
+      importance: high
+      reason: Designed and enforced the controls; iteratively expanded restrictions in October 2022, October 2023, December 2024, and January 2025
+      source: https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/china-prc
+      context:
+        - "Part of US Department of Commerce; primary enforcement agency for export controls"
+        - "Added 140+ entities to China Entity List in December 2024 update alone"
+        - "January 2025 AI Diffusion Rule established global performance thresholds for chip exports"
+    - name: Semiconductor Industry Association (SIA)
+      position: mixed
+      importance: medium
+      reason: Supported national security goals but warned overly broad controls could harm US chip industry competitiveness and push customers to foreign alternatives
+      context:
+        - "Trade association representing 99% of US semiconductor industry by revenue"
+        - "Members include Nvidia, Intel, AMD, Qualcomm — companies directly affected by revenue losses"
+        - "Advocated for narrower, more targeted controls rather than broad technology restrictions"
   amendments:
     - date: October 2023
       description: First expansion; lower thresholds; A800/H800 banned
@@ -1733,33 +1947,88 @@
   stakeholders:
     - name: Biden Administration
       position: support
-      reason: Authored and signed the order; framed as essential for safe AI development and national security
+      importance: high
+      reason: Authored and signed the order on October 30, 2023; framed as essential for safe AI development and national security; implemented ~85% of 150 requirements before revocation
       source: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
+      context:
+        - "111-page directive placing 150+ requirements on 50+ federal entities"
+        - "Commerce Secretary Gina Raimondo led implementation including AISI creation"
+        - "Secured voluntary commitments from 15 AI companies in July 2023 as a precursor"
     - name: OpenAI
       entityId: openai
       position: support
-      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024)
+      importance: high
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in White House commitments from July 2023; scored 83.3% compliance across 30 indicators
       source: https://www.nist.gov/aisi
+      context:
+        - "One of the original seven companies to sign White House voluntary commitments in July 2023"
+        - "GPT-4 and subsequent models above the 10^26 FLOP threshold triggering mandatory reporting"
+        - "Later quietly removed some Biden-era AI policy commitments from its website (March 2025)"
     - name: Anthropic
       entityId: anthropic
       position: support
-      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation
+      importance: high
+      reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model evaluation; scored 80.0% compliance across 30 indicators
       source: https://www.nist.gov/aisi
+      context:
+        - "One of the original seven companies to sign White House voluntary commitments in July 2023"
+        - "Claude models above 10^26 FLOP threshold; existing Responsible Scaling Policy aligned with EO requirements"
+        - "Quietly removed Biden-era policy commitments from website after Trump revocation (March 2025)"
     - name: Google DeepMind
       entityId: deepmind
       position: mixed
-      reason: Supported voluntary safety commitments but expressed concerns about regulatory burden
+      importance: high
+      reason: Supported voluntary safety commitments and signed AISI testing agreement but expressed concerns about regulatory burden; scored 76.7% compliance
+      source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+      context:
+        - "Gemini models above 10^26 FLOP threshold requiring mandatory reporting to Commerce Department"
+        - "Published Frontier Safety Framework aligned with EO safety testing requirements"
+        - "One of the original seven companies to sign July 2023 voluntary commitments"
     - name: AI safety research community
       position: support
-      reason: "Broadly welcomed; Stanford HAI called it 'a good start' but 'not enough' without legislation"
+      importance: medium
+      reason: "Broadly welcomed as first comprehensive federal AI safety action; Stanford HAI called it 'a good start' but 'not enough' without legislation"
       source: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
+      context:
+        - "Stanford HAI created a detailed tracker monitoring implementation of each requirement"
+        - "CSET Georgetown published extensive analysis of the order's scope and implications"
+        - "Many researchers noted the 10^26 FLOP threshold was the same later adopted by California SB 1047"
     - name: US Chamber of Commerce
       position: oppose
-      reason: Opposed mandatory reporting requirements as overly burdensome; preferred voluntary industry-led frameworks
+      importance: high
+      reason: "Raised concerns about mandatory reporting requirements; said 'substantive and process problems still exist' with 'short, overlapping timelines' endangering stakeholder input"
+      source: https://fedscoop.com/tech-groups-push-back-on-biden-ai-executive-order-raising-concerns-that-it-could-crush-innovation/
+      context:
+        - "Largest US business lobby; Tom Quaadman (EVP Technology Engagement Center) led criticism"
+        - "Disappointed in OMB's unwillingness to extend comment periods on Draft Guidance"
+        - "Preferred voluntary industry-led frameworks over mandatory government reporting"
     - name: Trump Administration
       position: oppose
-      reason: "Revoked the order Jan 20, 2025, stating it 'hindered AI innovation and imposed onerous government control'"
+      importance: high
+      reason: "Revoked the order on January 20, 2025 (day one of presidency) via EO 14179, stating it 'hindered AI innovation and imposed onerous government control'"
       source: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
+      context:
+        - "Revocation removed mandatory compute reporting thresholds and AISI mandate"
+        - "US AISI continued operating within NIST but with reduced authority and uncertain funding"
+        - "February 2025 executive order further challenged state-level AI regulations as 'onerous'"
+    - name: Meta
+      entityId: tt0f5PYDCw
+      position: support
+      importance: medium
+      reason: Signed voluntary commitments in July 2023 and supported AISI engagement; scored 67% compliance across 30 indicators
+      source: https://www.nist.gov/aisi
+      context:
+        - "One of the original seven companies to sign White House voluntary commitments"
+        - "Open-source Llama models raised questions about how reporting requirements apply to open-weight releases"
+    - name: Apple
+      position: mixed
+      importance: medium
+      reason: Joined voluntary commitments late (July 2024); minimal engagement with AISI; scored lowest among signatories at 13.3% compliance across 30 indicators
+      source: https://www.fastcompany.com/91389117/biden-era-ai-safety-promises-arent-holding-up-and-apples-the-weakest-link
+      context:
+        - "Signed commitments a full year after the original seven companies"
+        - "Brown/Harvard/Stanford study found Apple met only 4 of 30 compliance indicators"
+        - "Apple Intelligence launch proceeded with minimal public safety testing or disclosure"
   keyPoliticians:
     - name: President Joe Biden
       role: Signed the executive order (October 30, 2023)
@@ -1887,18 +2156,64 @@
     - name: OpenAI
       entityId: 1LcLlMGLbw
       position: support
-      reason: 83.3% compliance score across 30 indicators
+      importance: high
+      reason: Highest compliance score (83.3%) across 30 indicators; developed Preparedness Framework; one of the original seven signatories in July 2023
+      source: https://www.fastcompany.com/91389117/biden-era-ai-safety-promises-arent-holding-up-and-apples-the-weakest-link
+      context:
+        - "One of seven companies in the initial July 21, 2023 commitment ceremony at the White House"
+        - "Published Preparedness Framework (Dec 2023) aligning with commitment to pre-deployment testing"
+        - "Strong on safety testing and cybersecurity commitments; weaker on information sharing (20-35% sector average)"
     - name: Anthropic
       entityId: mK9pX3rQ7n
       position: support
-      reason: 80.0% compliance; ASL framework developed
+      importance: high
+      reason: Second-highest compliance (80.0%); developed ASL framework (Responsible Scaling Policy) as direct implementation of safety commitments
+      source: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+      context:
+        - "Published Responsible Scaling Policy (Sep 2023), one of the most detailed safety frameworks among signatories"
+        - "One of the original seven signatories; strong on pre-deployment testing and cybersecurity"
+        - "Quietly removed Biden-era policy commitment page from website in March 2025 after Trump revocation"
     - name: Google DeepMind
       entityId: A4XoubikkQ
       position: support
-      reason: 76.7% compliance; Frontier Safety Framework published
+      importance: high
+      reason: Third-highest compliance (76.7%); published Frontier Safety Framework (May 2024) detailing capability evaluation and response protocols
+      source: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
+      context:
+        - "One of the original seven signatories; published Frontier Safety Framework May 2024"
+        - "Strong on safety testing commitments; weaker on information sharing and watermarking"
     - name: Apple
       position: mixed
-      reason: 13.3% compliance (joined July 2024); minimal engagement
+      importance: medium
+      reason: Lowest compliance score (13.3%) among all 16 signatories; joined a full year late (July 2024); minimal public engagement with safety testing or disclosure commitments
+      source: https://www.fastcompany.com/91389117/biden-era-ai-safety-promises-arent-holding-up-and-apples-the-weakest-link
+      context:
+        - "Met only 4 of 30 compliance indicators per Brown/Harvard/Stanford study (Dec 2024)"
+        - "Signed commitments just before launching Apple Intelligence — timing suggested strategic motivation"
+        - "Historically minimal public disclosure about AI safety testing or model evaluations"
+    - name: Microsoft
+      position: support
+      importance: high
+      reason: Scored 73.3% compliance; one of the original seven signatories; strong on cybersecurity and safety testing commitments
+      source: https://www.fastcompany.com/91389117/biden-era-ai-safety-promises-arent-holding-up-and-apples-the-weakest-link
+      context:
+        - "Major investor in OpenAI ($13B); both companies among original signatories"
+        - "Existing responsible AI governance practices predated the commitments"
+    - name: Amazon
+      position: support
+      importance: medium
+      reason: Scored 66.7% compliance; one of the original seven signatories; focused on AWS AI safety and Bedrock guardrails
+      context:
+        - "AWS hosts many frontier model providers; compliance with commitments affects broader ecosystem"
+        - "Invested $4B in Anthropic (also a signatory)"
+    - name: Meta
+      entityId: tt0f5PYDCw
+      position: support
+      importance: medium
+      reason: Scored 66.7% compliance; one of the original seven signatories; open-source Llama releases raised unique transparency questions
+      context:
+        - "Open-weight Llama model releases provide a form of transparency not captured by standard indicators"
+        - "Weaker on watermarking commitments (0% text watermarking across all signatories)"
   customFields:
     - label: Nature
       value: Non-binding voluntary pledges
@@ -3615,16 +3930,54 @@
   stakeholders:
     - name: United Kingdom
       position: support
-      reason: Hosted summit; established AISI with 100M pounds funding
+      importance: high
+      reason: Hosted the summit at Bletchley Park; PM Rishi Sunak made AI safety a signature policy; established the world's first national AI Safety Institute
+      source: https://techcrunch.com/2023/11/02/at-bletchley-rishi-sunak-confirms-ai-safety-institute-but-delays-regulations-for-another-day/
+      context:
+        - "Tripled AI Research Resource investment to 300M pounds (up from 100M announced March 2023)"
+        - "UK AISI became first national institute dedicated to evaluating frontier AI models"
+        - "Sunak positioned AI safety as a post-Brexit UK leadership area in international policy"
     - name: United States
       position: support
-      reason: VP Kamala Harris attended; committed to NIST AI Safety Institute
+      importance: high
+      reason: VP Kamala Harris attended and announced US commitment to establish AI Safety Institute within NIST; signed the declaration alongside 27 other countries
+      source: https://carnegieendowment.org/posts/2023/11/the-uk-ai-safety-summit-opened-a-new-chapter-in-ai-diplomacy
+      context:
+        - "US AISI established within NIST following the summit commitment"
+        - "Biden administration had issued EO 14110 one week before the summit (Oct 30, 2023)"
+        - "VP Harris used the summit to announce US AI safety commitments to multilateral audience"
     - name: China
       position: support
-      reason: Signed declaration despite US tensions
+      importance: high
+      reason: Signed the declaration despite ongoing US-China tensions over AI chip export controls and broader technology competition
+      source: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
+      context:
+        - "China's participation was considered a major diplomatic achievement by the UK hosts"
+        - "Vice Minister of Science and Technology Wu Zhaohui led the Chinese delegation"
+        - "China had implemented its own Generative AI Interim Measures just three months earlier (Aug 2023)"
+        - "Did not participate in follow-up Seoul summit's voluntary company commitments"
     - name: European Union
       position: support
-      reason: Commission President Von der Leyen attended
+      importance: high
+      reason: Commission President Ursula von der Leyen attended; positioned the EU AI Act as complementary to summit commitments
+      source: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
+      context:
+        - "EU AI Act was in final trilogue negotiations during the summit (December 2023 compromise)"
+        - "Von der Leyen used the summit to advocate for the EU's risk-based regulatory approach"
+        - "EU subsequently established its own AI Office as the institutional follow-up"
+    - name: Frontier AI companies
+      position: support
+      importance: high
+      reason: Major AI labs including OpenAI, Google DeepMind, Anthropic, and Meta participated and agreed to pre-deployment safety testing
+      source: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
+      context:
+        - "Companies agreed to give UK AISI early access to frontier models for safety evaluation"
+        - "Commitments were voluntary and non-binding; enforcement purely reputational"
+        - "Seoul summit (May 2024) expanded to 16 company signatories with more specific commitments"
+  votes:
+    - chamber: Summit
+      date: November 2, 2023
+      result: Signed by 28 countries + EU
   customFields:
     - label: Signed on
       value: November 2, 2023 — by 28 countries + EU
@@ -3769,47 +4122,97 @@
   stakeholders:
     - name: Governor Kathy Hochul
       position: support
-      reason: Signed into law December 19, 2025; called it nation-leading legislation
+      importance: high
+      reason: Signed into law December 19, 2025 after negotiating chapter amendments that reduced civil penalties from $10M/$30M to $1M/$3M; called it nation-leading legislation
       source: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+      context:
+        - "Negotiated weaker penalties in chapter amendments before signing (original $10M/$30M reduced to $1M/$3M)"
+        - "Final signed text dialed back developer requirements compared to legislature-passed version"
+        - "Described by American Prospect as 'caving to Big Tech' on enforcement provisions"
     - name: Senator Andrew Gounardes
       position: support
-      reason: Primary sponsor and author of the Senate bill (S6953B)
+      importance: high
+      reason: Primary sponsor and author of the Senate bill (S6953B); shepherded it through with 58-1 bipartisan vote
       source: https://www.nysenate.gov/legislation/bills/2025/S6953B
+      context:
+        - "Framed the RAISE Act as a successor to California's vetoed SB 1047"
+        - "Faced political opposition from a16z-backed super PAC targeting his legislative allies"
     - name: Assemblymember Alex Bores
       position: support
-      reason: Primary sponsor and author of the Assembly bill (A6453B)
+      importance: high
+      reason: Primary sponsor and author of the Assembly bill (A6453B); secured 119-22 bipartisan passage
       source: https://www.nysenate.gov/legislation/bills/2025/A6453B
+      context:
+        - "Targeted by Leading the Future super PAC (a16z-backed) for his role in the bill"
+        - "Co-sponsored with Gounardes to ensure coordinated bicameral passage"
     - name: Anthropic
       entityId: mK9pX3rQ7n
       position: support
-      reason: Publicly supported the RAISE Act framework
+      importance: high
+      reason: Publicly endorsed the RAISE Act; head of external affairs Sarah Heck stated that two large states enacting AI transparency legislation 'signals the critical importance of safety'
       source: https://www.anthropic.com/news/new-york-raise-act
+      context:
+        - "Also endorsed California's SB 53 — supported both major state AI safety laws"
+        - "Noted the legislation should 'inspire Congress to build on them' for federal action"
+        - "Claude models above 10^26 FLOP threshold covered by the Act's frontier model definition"
     - name: OpenAI
       entityId: 1LcLlMGLbw
       position: support
-      reason: Endorsed the legislation as a reasonable state-level approach
+      importance: high
+      reason: Endorsed the legislation as a reasonable state-level approach; indicated similar legislation in two large state economies is beneficial for the policy landscape
       source: https://openai.com/index/supporting-the-new-york-raise-act/
+      context:
+        - "Notably supported this bill while opposing California's SB 53 and earlier SB 1047"
+        - "GPT-4 and subsequent models above the 10^26 FLOP threshold covered by the Act"
+        - "OpenAI insiders' super PAC networks poured over $125M into 2026 midterms with mixed stances on AI regulation"
     - name: Chamber of Progress
       entityId: IEav94hygQ
       position: oppose
-      reason: Argued state-level regulation would fragment the regulatory landscape
+      importance: medium
+      reason: "Argued the bill's passage would be tantamount to 'an eviction notice' for New York's AI startups; advocated for federal regulation instead"
       source: https://progresschamber.org/chamber-of-progress-opposes-new-york-raise-act/
+      context:
+        - "Center-left tech industry coalition; also opposed California's SB 1047"
+        - "Positioned as pro-tech but supporting moderate regulation — opposed RAISE Act as overreach"
     - name: NetChoice
       position: oppose
-      reason: Opposed on grounds of stifling innovation and preempting federal regulation
+      importance: medium
+      reason: Opposed on grounds of stifling innovation, creating a patchwork of state regulations, and preempting federal regulation
       source: https://netchoice.org/netchoice-opposes-new-york-raise-act/
+      context:
+        - "Trade association representing major internet companies; has challenged state tech regulations in courts"
     - name: Tech:NYC
       position: oppose
-      reason: Concerned about compliance burden on New York tech startups
+      importance: medium
+      reason: Concerned about compliance burden on New York tech startups; argued the act would drive AI development to other states
       source: https://www.technyc.org/posts/tech-nyc-opposes-raise-act
+      context:
+        - "New York-focused tech industry group representing 1,000+ member companies"
+        - "Particular concern about impact on startups lacking compliance resources of larger firms"
     - name: Leading the Future
       position: oppose
-      reason: Super PAC backed by a16z spent against the legislation
+      importance: medium
+      reason: Super PAC backed by a16z (Andreessen Horowitz) and OpenAI president Greg Brockman; spent against the legislation and targeted co-sponsor Assemblymember Bores
       source: https://www.politico.com/news/2025/06/10/a16z-super-pac-new-york-ai-bill-00196543
+      context:
+        - "Part of broader a16z campaign against state-level AI regulation"
+        - "Targeted Bores specifically as a political pressure tactic against the bill's sponsors"
     - name: Trump Administration
       position: oppose
-      reason: Opposed state-level AI regulation, favoring deregulatory federal approach
-      source: https://www.whitehouse.gov/briefings-statements/statement-on-state-ai-regulation/
+      importance: high
+      reason: Opposed state-level AI regulation via December 2025 executive order directing federal agencies to challenge 'onerous' state AI laws
+      source: https://www.cnbc.com/2025/11/24/raise-act-new-york-faces-opposition-from-trump-ai-industry-super-pac.html
+      context:
+        - "Federal preemption threat creates legal uncertainty around the act's enforceability"
+        - "December 2025 executive order specifically targeted state-level AI regulations"
+    - name: Global AI researchers
+      position: support
+      importance: medium
+      reason: 100+ global AI researchers signed letter urging state-level action, warning of a 'race to the bottom' if companies cut corners to compete
+      source: https://techcrunch.com/2025/12/20/new-york-governor-kathy-hochul-signs-raise-act-to-regulate-ai-safety/
+      context:
+        - "Letter argued federal inaction necessitated state-level regulation"
+        - "Signatories included researchers from major universities and AI labs"
   votes:
     - chamber: NY Senate
       date: June 12, 2025
@@ -4937,10 +5340,56 @@
   stakeholders:
     - name: Governor Greg Abbott
       position: support
-      reason: Signed into law June 22, 2025
+      importance: high
+      reason: Signed HB 149 into law on June 22, 2025; positioned Texas as a model for pro-innovation AI regulation
+      source: https://iapp.org/news/a/governor-signs-texas-responsible-artificial-intelligence-governance-act
+      context:
+        - "Signed alongside broader Texas tech-friendly legislative agenda"
+        - "Texas hosts 1,500+ tech firms and 17% of US AI startups — significant business constituency"
+    - name: Rep. Giovanni Capriglione
+      position: support
+      importance: high
+      reason: Primary author; spent two years gathering stakeholder input from hundreds of groups to develop the intent-based regulatory approach
+      source: https://www.texaspolicy.com/press/tppf-celebrates-passage-of-hb-149-out-of-the-texas-house-of-representatives
+      context:
+        - "Filed original TRAIGA concept on December 23, 2024; HB 149 filed March 14, 2025"
+        - "Worked closely with Texas Public Policy Foundation to convene stakeholders"
+        - "Chose intent-based liability approach rather than comprehensive compliance requirements"
+    - name: Texas Public Policy Foundation
+      position: support
+      importance: high
+      reason: "Collaborated with Rep. Capriglione to convene stakeholders; TPPF director David Dunmoyer called it 'the culmination of years of work committed to securing Texas as the nationwide model for AI policy'"
+      source: https://www.texaspolicy.com/press/tppf-celebrates-passage-of-hb-149-out-of-the-texas-house-of-representatives
+      context:
+        - "Conservative think tank that helped shape the bill's light-touch regulatory approach"
+        - "Frames TRAIGA as a contrast to California and New York's more prescriptive AI laws"
+        - "David Dunmoyer (Director for Better Tech for Tomorrow) was lead policy advocate"
     - name: Tech industry
       position: support
-      reason: Preferred simplified intent-based approach vs comprehensive requirements
+      importance: medium
+      reason: Preferred simplified intent-based approach over comprehensive compliance requirements; regulatory sandbox provision attractive for AI companies
+      source: https://www.biometricupdate.com/202506/texas-charts-independent-path-on-ai-regulation-awaits-governors-okay
+      context:
+        - "Near-unanimous legislative passage (House 146-3, Senate unanimous) reflected broad industry support"
+        - "36-month regulatory sandbox allows testing AI systems with waivers of certain laws"
+        - "Intent-based liability seen as lower compliance burden than risk-based approaches (Colorado) or safety protocol mandates (New York)"
+    - name: R Street Institute coalition
+      position: oppose
+      importance: medium
+      reason: Coalition of free-market groups argued TRAIGA imposes restrictive regulations and burdensome compliance costs that risk stifling innovation despite its light-touch framing
+      source: https://www.rstreet.org/outreach/coalition-urges-texas-lawmakers-against-heavy-handed-regulation-of-ai/
+      context:
+        - "Joined by Americans for Tax Reform and other anti-regulation organizations"
+        - "Argued compliance mandates particularly hurt small businesses lacking resources of larger tech firms"
+        - "Opposed any state-level AI regulation, not just TRAIGA specifically"
+    - name: Transparency Coalition
+      position: mixed
+      importance: low
+      reason: Raised concerns about the law's effectiveness while acknowledging its scope; published detailed analysis noting TRAIGA's approach hinges on paperwork rather than accountability
+      source: https://www.transparencycoalition.ai/news/faq-for-texas-traiga-skeptics-hard-questions-answered-here
+      context:
+        - "Published FAQ addressing common skeptic concerns about the bill"
+        - "Questioned whether the Attorney General has resources to meaningfully enforce compliance"
   votes:
     - chamber: House
       date: April 23, 2025
