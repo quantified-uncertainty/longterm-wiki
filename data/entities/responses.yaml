@@ -6,6 +6,7 @@
   wikiId: E13
   type: policy
   scope: International
+  jurisdiction: International
   policyStatus: active
   introduced: "2023-11"
   summaryPage: governance-overview
@@ -41,6 +42,7 @@
   wikiId: E8
   type: policy
   scope: Federal
+  jurisdiction: United States
   summaryPage: governance-overview
   title: AI Executive Order
   policyStatus: revoked
@@ -1440,6 +1442,7 @@
   policyStatus: active
   author: NIST
   scope: Federal
+  jurisdiction: United States
   provisions:
     - title: Four-Function Framework
       description: GOVERN, MAP, MEASURE, MANAGE lifecycle risk management structure
@@ -1482,6 +1485,7 @@
   introduced: '2024-05-22'
   policyStatus: active
   scope: International
+  jurisdiction: International
   customFields:
     - label: Predecessor
       value: Bletchley Declaration (Nov 2023)
@@ -1713,6 +1717,7 @@
   policyStatus: active
   author: White House
   scope: International
+  jurisdiction: United States
   provisions:
     - title: Security Testing
       description: Pre-deployment adversarial testing for safety, security, and societal risks (70-85% compliance)
@@ -3444,7 +3449,7 @@
   policyStatus: active
   author: UK government (Rishi Sunak)
   scope: International
-  jurisdiction: International (28 countries + EU)
+  jurisdiction: International
   provisions:
     - title: Shared Risk Understanding
       description: Evidence-based understanding of frontier AI safety risks including misuse, loss of control, catastrophic consequences
@@ -3502,11 +3507,12 @@
 - id: singapore-consensus
   stableId: NLSUTzzH5g
   wikiId: E701
-  type: concept
+  type: policy
   title: Singapore Consensus on AI Safety Research Priorities
   introduced: '2025'
   policyStatus: active
   scope: International
+  jurisdiction: International
   description: >-
     Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers
     from 11 countries, organizing AI safety research into a defence-in-depth framework across three
@@ -3894,7 +3900,10 @@
   wikiId: E475
   type: policy
   scope: Federal
+  jurisdiction: United States
   policyStatus: proposed
+  introduced: '2025-05'
+  billNumber: S.1792
   title: AI Whistleblower Protections
   description: >-
     Legal and institutional frameworks for protecting AI researchers and employees who report
@@ -4400,6 +4409,7 @@
   introduced: '2024'
   policyStatus: enacted
   scope: International
+  jurisdiction: International
   description: >-
     The Council of Europe's AI Framework Convention represents the first legally
     binding international AI treaty, establishing human rights-focused

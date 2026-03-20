@@ -15,12 +15,13 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@longterm-wiki/factbase": "workspace:*",
     "@dagrejs/dagre": "^1.1.8",
+    "@longterm-wiki/factbase": "workspace:*",
     "@quri/squiggle-components": "^0.10.0",
     "@quri/squiggle-lang": "^0.10.0",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
