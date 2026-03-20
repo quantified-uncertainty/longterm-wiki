@@ -106,7 +106,7 @@ export async function classifyStance(args: {
     batches.push(items.slice(i, i + BATCH_SIZE));
   }
 
-  const client = createClient();
+  const client = createClient({ required: true })!;
   const tracker = new CostTracker();
   const allResults: ClassificationResult[] = [];
 

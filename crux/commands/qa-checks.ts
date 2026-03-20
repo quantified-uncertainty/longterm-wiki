@@ -39,18 +39,18 @@ async function queue(_args: string[], options: CommandOptions): Promise<CommandR
   const res = await getQaQueue(options.directory, options.limit);
   if (!res.ok) {
     console.error(`Failed to fetch queue: ${res.message}`);
-    return { success: false, message: res.message };
+    return { exitCode: 1, output: res.message };
   }
 
   if (options.json) {
     console.log(JSON.stringify(res.data, null, 2));
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   const { pages } = res.data;
   if (pages.length === 0) {
     console.log('No pages in queue.');
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   console.log(`\n  QA Check Queue — ${pages.length} pages (least-recently-checked first)\n`);
@@ -71,7 +71,7 @@ async function queue(_args: string[], options: CommandOptions): Promise<CommandR
   }
   console.log();
 
-  return { success: true };
+  return { exitCode: 0, output: '' };
 }
 
 // ---------------------------------------------------------------------------
@@ -82,18 +82,18 @@ async function coverage(_args: string[], options: CommandOptions): Promise<Comma
   const res = await getQaCoverage();
   if (!res.ok) {
     console.error(`Failed to fetch coverage: ${res.message}`);
-    return { success: false, message: res.message };
+    return { exitCode: 1, output: res.message };
   }
 
   if (options.json) {
     console.log(JSON.stringify(res.data, null, 2));
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   const { directories } = res.data;
   if (directories.length === 0) {
     console.log('No coverage data yet. Run a QA sweep to start tracking.');
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   console.log('\n  QA Coverage by Directory\n');
@@ -120,7 +120,7 @@ async function coverage(_args: string[], options: CommandOptions): Promise<Comma
   }
   console.log();
 
-  return { success: true };
+  return { exitCode: 0, output: '' };
 }
 
 // ---------------------------------------------------------------------------
@@ -130,17 +130,17 @@ async function coverage(_args: string[], options: CommandOptions): Promise<Comma
 async function record(_args: string[], options: CommandOptions): Promise<CommandResult> {
   if (!options.url) {
     console.error('--url is required');
-    return { success: false, message: '--url is required' };
+    return { exitCode: 1, output: '--url is required' };
   }
   if (!options.result) {
     console.error('--result is required (clean | issues_found | error | 404)');
-    return { success: false, message: '--result is required' };
+    return { exitCode: 1, output: '--result is required' };
   }
 
   const validResults = ['clean', 'issues_found', 'error', '404'] as const;
   if (!validResults.includes(options.result as typeof validResults[number])) {
     console.error(`Invalid --result: ${options.result}. Must be one of: ${validResults.join(', ')}`);
-    return { success: false, message: `Invalid result: ${options.result}` };
+    return { exitCode: 1, output: `Invalid result: ${options.result}` };
   }
 
   const res = await recordQaCheck({
@@ -155,11 +155,11 @@ async function record(_args: string[], options: CommandOptions): Promise<Command
 
   if (!res.ok) {
     console.error(`Failed to record check: ${res.message}`);
-    return { success: false, message: res.message };
+    return { exitCode: 1, output: res.message };
   }
 
   console.log(`Recorded QA check for ${options.url} → ${options.result}`);
-  return { success: true };
+  return { exitCode: 0, output: '' };
 }
 
 // ---------------------------------------------------------------------------
@@ -176,18 +176,18 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
 
   if (!res.ok) {
     console.error(`Failed to list checks: ${res.message}`);
-    return { success: false, message: res.message };
+    return { exitCode: 1, output: res.message };
   }
 
   if (options.json) {
     console.log(JSON.stringify(res.data, null, 2));
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   const { checks } = res.data;
   if (checks.length === 0) {
     console.log('No QA checks recorded yet.');
-    return { success: true };
+    return { exitCode: 0, output: '' };
   }
 
   console.log(`\n  Recent QA Checks — ${checks.length} records\n`);
@@ -208,7 +208,7 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
   }
   console.log();
 
-  return { success: true };
+  return { exitCode: 0, output: '' };
 }
 
 // ---------------------------------------------------------------------------
