@@ -143,9 +143,7 @@ async function loadFromApi(): Promise<FetchResult<LegislationPageData>> {
 
 function loadFromLocal(): LegislationPageData {
   const allEntities = getTypedEntities();
-  const policies = allEntities.filter(
-    (entity) => isPolicy(entity) && !entity.deprecated,
-  );
+  const policies = allEntities.filter(isPolicy).filter((e) => !e.deprecated);
 
   const rows: LegislationRow[] = policies.map((entity) => {
     const effectiveStatus = deriveStatus(entity);
