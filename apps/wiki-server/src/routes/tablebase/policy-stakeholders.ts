@@ -10,6 +10,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 
 // ---- Constants ----
 
@@ -103,6 +104,10 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     let upserted = 0;
 
     await db.transaction(async (tx) => {
+      // Resolve policy entity titles for thing titles
+      const policyIds = [...new Set(items.map((i) => i.policyEntityId))];
+      const titleMap = await resolveEntityTitles(tx, policyIds);
+
       for (const item of items) {
         await tx
           .insert(policyStakeholders)
@@ -136,6 +141,24 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
           });
         upserted++;
       }
+
+      // Dual-write to things table
+      const policyTitle = (policyId: string) =>
+        titleMap.get(policyId) ?? policyId;
+
+      await upsertThingsInTx(
+        tx,
+        items.map((i) => ({
+          id: i.id,
+          thingType: "policy-stakeholder" as const,
+          title: `${i.stakeholderDisplayName} on ${policyTitle(i.policyEntityId)}`,
+          sourceTable: "policy_stakeholders",
+          sourceId: i.id,
+          parentThingId: i.policyEntityId,
+          parentTitle: policyTitle(i.policyEntityId),
+          sourceUrl: i.source ?? null,
+        }))
+      );
     });
 
     return c.json({ upserted });

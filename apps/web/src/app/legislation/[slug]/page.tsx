@@ -42,6 +42,7 @@ import {
 } from "@/app/legislation/[slug]/timeline-utils";
 import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 import { StakeholderReasonCell } from "@/app/legislation/[slug]/stakeholder-detail";
+import { StakeholderVerificationBadge } from "@/components/directory/StakeholderVerificationBadge";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -435,6 +436,7 @@ export default async function LegislationDetailPage({
                   <th className="text-left py-1.5 px-3 font-medium w-[70px]">Position</th>
                   <th className="text-left py-1.5 px-3 font-medium">Reason</th>
                   <th className="text-left py-1.5 px-3 font-medium w-[40px]">Src</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[60px]">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -486,6 +488,14 @@ export default async function LegislationDetailPage({
                           </a>
                         ) : (
                           <span className="text-muted-foreground/30">&mdash;</span>
+                        )}
+                      </td>
+                      <td className="py-1.5 px-3 text-center">
+                        {entity.stableId && (
+                          <StakeholderVerificationBadge
+                            policyEntityStableId={entity.stableId}
+                            stakeholderName={stakeholder.name}
+                          />
                         )}
                       </td>
                     </tr>
