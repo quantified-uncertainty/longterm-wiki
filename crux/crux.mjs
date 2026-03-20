@@ -97,6 +97,7 @@ import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
 import * as pagesCommands from './commands/pages.ts';
+import * as legislationCommands from './commands/legislation.ts';
 
 const domains = {
   validate: validateCommands,
@@ -158,6 +159,7 @@ const domains = {
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
   pages: pagesCommands,
+  legislation: legislationCommands,
 };
 
 const shortcutMap = buildShortcutMap();
