@@ -247,7 +247,7 @@ function mapCheckStatus(
       case "SKIPPED":
         return "neutral";
       case "ACTION_REQUIRED":
-        return "pending";
+        return "failure";
       case null:
       case undefined:
         return "pending"; // still running
@@ -356,8 +356,11 @@ function classifyAction(pr: OpenPR): ActionNeeded {
     return "human-label";
   }
 
-  // 5. Comment response — unresolved review threads (non-bot)
-  if (pr.unresolvedThreads > 0) {
+  // 5. Comment response — unresolved review threads from human reviewers only.
+  //    Subtract CodeRabbit threads (already tracked via codeRabbitFindings).
+  const codeRabbitThreads = pr.codeRabbitFindings?.total ?? 0;
+  const humanUnresolvedThreads = pr.unresolvedThreads - codeRabbitThreads;
+  if (humanUnresolvedThreads > 0) {
     return "comment-response";
   }
 
@@ -528,20 +531,21 @@ function buildPatrolSummary(pulls: OpenPR[]): PatrolSummary {
         }
         waitingOnHuman.push({
           pr: pr.number,
-          labels: missingLabels.length > 0
-            ? missingLabels
-            : gateFailures.map((c) => c.name),
+          labels: missingLabels,
         });
         break;
       }
 
-      case "comment-response":
+      case "comment-response": {
+        const crThreads = pr.codeRabbitFindings?.total ?? 0;
+        const humanThreads = pr.unresolvedThreads - crThreads;
         needsAttention.push({
           pr: pr.number,
           action: "comment-response",
-          reason: `${pr.unresolvedThreads} unresolved review threads`,
+          reason: `${humanThreads} unresolved human review thread${humanThreads !== 1 ? "s" : ""}`,
         });
         break;
+      }
 
       case "ready":
         allGreen.push(pr.number);

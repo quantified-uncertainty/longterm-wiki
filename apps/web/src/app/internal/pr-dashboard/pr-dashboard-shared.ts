@@ -126,7 +126,15 @@ export function computeStats(pulls: PullData[]): PRStats {
   return {
     total: pulls.length,
     draft: counts.draft,
-    ciFailing: pulls.filter((p) => p.ciStatus === "failure").length,
+    ciFailing: pulls.filter((p) => {
+      // When enriched checks data is available, only count PRs where a
+      // non-gate check is failing (gate-only failures are tracked by gateBlocked).
+      if (p.checks) {
+        return p.checks.some((c) => c.status === "failure" && !c.isGateCheck);
+      }
+      // Fallback to raw ciStatus when checks aren't available
+      return p.ciStatus === "failure";
+    }).length,
     needsReview: counts["needs-review"],
     conflicting: pulls.filter((p) => p.mergeable === "conflicting").length,
     gateBlocked: pulls.filter(
