@@ -102,22 +102,11 @@ function loadEntities(): Map<string, EntityInfo> {
 
       const endDates: Array<{ context: string; date: string }> = [];
 
-      // Check for departure/end dates in entity data
-      // Note: yamlModified uses filesystem mtime which resets on git clone/checkout.
-      // This makes the "YAML modified after page edit" heuristic unreliable on fresh
-      // clones. It's acceptable for an advisory check but not suitable for blocking.
-      if (entity.departureDate) {
-        endDates.push({ context: 'departure', date: String(entity.departureDate) });
-      }
-      if (entity.endDate) {
-        endDates.push({ context: 'end', date: String(entity.endDate) });
-      }
-      if (entity.dissolvedDate) {
-        endDates.push({ context: 'dissolved', date: String(entity.dissolvedDate) });
-      }
-      if (entity.status === 'inactive' || entity.status === 'dissolved') {
-        endDates.push({ context: `status: ${entity.status}`, date: 'unknown' });
-      }
+      // Note: The entity YAML schema (data/schema.ts) does not currently include
+      // lifecycle fields like departureDate, endDate, dissolvedDate, or
+      // status: inactive|dissolved. The `endDates` array will remain empty until
+      // such fields are added to the schema. The staleness check still provides
+      // value via the other heuristics (page age, YAML mtime comparison).
 
       entities.set(entity.id as string, {
         id: entity.id as string,
@@ -160,6 +149,13 @@ function loadPages(entityFilter?: string): PageInfo[] {
       referencedEntities.push(m[1]);
     }
 
+    // Include the page's own entity (wikiId) in the referenced set so that
+    // --entity=<id> filtering also matches the page's own entity identity
+    const wikiId = (fm.wikiId as string) || null;
+    if (wikiId && !referencedEntities.includes(wikiId)) {
+      referencedEntities.push(wikiId);
+    }
+
     if (entityFilter && !referencedEntities.includes(entityFilter)) continue;
 
     const lastEdited = fm.lastEdited ? String(fm.lastEdited) : null;
@@ -176,7 +172,7 @@ function loadPages(entityFilter?: string): PageInfo[] {
       lastEdited,
       lastEditedDate,
       entityType: (fm.entityType as string) || null,
-      wikiId: (fm.wikiId as string) || null,
+      wikiId,
       referencedEntities: [...new Set(referencedEntities)],
     });
   }
@@ -198,6 +194,7 @@ const NOW = new Date();
 export function detectStaleness(
   pages: PageInfo[],
   entities: Map<string, EntityInfo>,
+  options?: { ciMode?: boolean },
 ): StalenessWarning[] {
   const warnings: StalenessWarning[] = [];
 
@@ -252,7 +249,9 @@ export function detectStaleness(
       }
 
       // Check 3: Entity YAML was modified more recently than the page
-      if (page.lastEditedDate && entity.yamlModified > page.lastEditedDate) {
+      // Skip in CI mode: statSync().mtime reflects checkout time on fresh clones,
+      // not the actual last semantic change time, producing false positives.
+      if (!options?.ciMode && page.lastEditedDate && entity.yamlModified > page.lastEditedDate) {
         const daysDiff = Math.round(
           (entity.yamlModified.getTime() - page.lastEditedDate.getTime()) / (24 * 60 * 60 * 1000),
         );
@@ -298,10 +297,11 @@ export function detectStaleness(
 export function runStalenessCheck(options?: {
   entityId?: string;
   limit?: number;
+  ciMode?: boolean;
 }): ValidatorResult & { warnings_list: StalenessWarning[] } {
   const entities = loadEntities();
   const pages = loadPages(options?.entityId);
-  const warnings = detectStaleness(pages, entities);
+  const warnings = detectStaleness(pages, entities, { ciMode: options?.ciMode });
 
   const limit = options?.limit ?? 50;
   const top = warnings.slice(0, limit);
@@ -327,7 +327,7 @@ function main(): void {
 
   const entities = loadEntities();
   const pages = loadPages(entityId);
-  const warnings = detectStaleness(pages, entities);
+  const warnings = detectStaleness(pages, entities, { ciMode: CI_MODE });
 
   if (CI_MODE) {
     console.log(
