@@ -27,11 +27,12 @@ export interface ResolvedEntityVars {
 export function resolveEntityId(paramName = "entityId"): MiddlewareHandler {
   return async (c, next) => {
     const raw = c.req.param(paramName);
-    if (raw) {
-      const db = getDrizzleDb();
-      const resolved = await resolveEntityStableId(db, raw);
-      c.set("resolvedEntityId", resolved);
+    if (!raw) {
+      return c.json({ error: `Missing required path param: ${paramName}` }, 400);
     }
+    const db = getDrizzleDb();
+    const resolved = await resolveEntityStableId(db, raw);
+    c.set("resolvedEntityId", resolved);
     await next();
   };
 }

@@ -604,19 +604,19 @@ function fundingRoundRowToRecordEntry(row) {
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
   // Embed the server-side-resolved company name so the frontend can display it
-  // even when company.entityId is null (legacy numeric companyId rows).
-  if (row.company?.name) fields.company_name = row.company.name;
+  // even when companyRef.entityId is null (legacy numeric companyId rows).
+  if (row.companyRef?.name) fields.company_name = row.companyRef.name;
 
   const entry = {
     key: row.id,
     schema: 'funding-round',
-    // Prefer company.entityId (proper stableId FK) over legacy companyId for entity resolution.
+    // Prefer companyRef.entityId (proper stableId FK) over legacy companyId for entity resolution.
     // Falls back to companyId for backward compatibility.
-    ownerEntityId: row.company?.entityId ?? row.companyId,
+    ownerEntityId: row.companyRef?.entityId ?? row.companyId,
     fields,
   };
   // Embed resolved lead investor display name from entity ref
-  if (row.leadInvestor?.name) entry.displayName = row.leadInvestor.name;
+  if (row.leadInvestorRef?.name) entry.displayName = row.leadInvestorRef.name;
   return entry;
 }
 
