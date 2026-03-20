@@ -77,6 +77,8 @@ interface JoinedRow {
 
 function formatRow(r: JoinedRow) {
   const inv = r.investments;
+  const investorRef = formatEntityRef(inv.investorEntityId, r.investorSlug, r.investorTitle, inv.investorDisplayName, inv.investorId);
+  const companyRef = formatEntityRef(inv.companyEntityId, r.companySlug, r.companyTitle, inv.companyDisplayName, inv.companyId);
   return {
     id: inv.id,
     companyId: inv.companyId,
@@ -95,15 +97,15 @@ function formatRow(r: JoinedRow) {
     source: inv.source,
     notes: inv.notes,
     // Structured entity refs
-    investor: formatEntityRef(inv.investorEntityId, r.investorSlug, r.investorTitle, inv.investorDisplayName, inv.investorId),
-    company: formatEntityRef(inv.companyEntityId, r.companySlug, r.companyTitle, inv.companyDisplayName, inv.companyId),
+    investor: investorRef,
+    company: companyRef,
     // Legacy flat fields (for backward compat)
     investorEntityId: inv.investorEntityId,
     investorDisplayName: inv.investorDisplayName,
-    investorResolvedName: (r.investorTitle ?? inv.investorDisplayName ?? inv.investorId) as string | null,
+    investorResolvedName: investorRef.name,
     companyEntityId: inv.companyEntityId,
     companyDisplayName: inv.companyDisplayName,
-    companyResolvedName: (r.companyTitle ?? inv.companyDisplayName ?? inv.companyId) as string | null,
+    companyResolvedName: companyRef.name,
     syncedAt: inv.syncedAt,
     createdAt: inv.createdAt,
     updatedAt: inv.updatedAt,

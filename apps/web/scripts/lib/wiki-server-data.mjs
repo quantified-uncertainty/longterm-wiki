@@ -955,7 +955,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'funding-rounds',
     fundingRoundsResult,
     ['funding-rounds'],
-    (row) => row.companyId,
+    (row) => row.companyRef?.entityId ?? row.companyId,
     () => 'funding-rounds',
     fundingRoundRowToRecordEntry,
   );

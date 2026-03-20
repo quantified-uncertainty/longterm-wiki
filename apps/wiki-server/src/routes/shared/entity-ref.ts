@@ -15,8 +15,11 @@ export interface EntityRef {
   name: string | null;
 }
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+/**
+ * Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
+ * Exported so other modules can use the same canonical pattern.
+ */
+export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 /**
  * Format an entity reference from joined query results.

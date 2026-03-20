@@ -58,7 +58,7 @@ function formatSlug(slug: string): string {
 }
 
 function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
-  const recipientSlug = g.grantee.slug ?? g.granteeId;
+  const recipientSlug = g.grantee.slug;
   return {
     key: g.id,
     name: g.name,

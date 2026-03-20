@@ -72,6 +72,8 @@ interface JoinedRow {
 
 function formatRow(r: JoinedRow) {
   const ep = r.equityPositions;
+  const holderRef = formatEntityRef(ep.holderEntityId, r.holderSlug, r.holderTitle, ep.holderDisplayName, ep.holderId);
+  const companyRef = formatEntityRef(ep.companyEntityId, r.companySlug, r.companyTitle, ep.companyDisplayName, ep.companyId);
   return {
     id: ep.id,
     companyId: ep.companyId,
@@ -84,15 +86,15 @@ function formatRow(r: JoinedRow) {
     asOf: ep.asOf,
     validEnd: ep.validEnd,
     // Structured entity refs
-    holder: formatEntityRef(ep.holderEntityId, r.holderSlug, r.holderTitle, ep.holderDisplayName, ep.holderId),
-    company: formatEntityRef(ep.companyEntityId, r.companySlug, r.companyTitle, ep.companyDisplayName, ep.companyId),
+    holder: holderRef,
+    company: companyRef,
     // Legacy flat fields (for backward compat)
     holderEntityId: ep.holderEntityId,
     holderDisplayName: ep.holderDisplayName,
-    holderResolvedName: (r.holderTitle ?? ep.holderDisplayName ?? ep.holderId) as string | null,
+    holderResolvedName: holderRef.name,
     companyEntityId: ep.companyEntityId,
     companyDisplayName: ep.companyDisplayName,
-    companyResolvedName: (r.companyTitle ?? ep.companyDisplayName ?? ep.companyId) as string | null,
+    companyResolvedName: companyRef.name,
     syncedAt: ep.syncedAt,
     createdAt: ep.createdAt,
     updatedAt: ep.updatedAt,
