@@ -320,7 +320,6 @@ export function SearchDialog() {
             onKeyDown={onInputKeyDown}
             aria-label="Search"
             placeholder="Search pages, grants, funding..."
-            aria-label="Search"
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             autoComplete="off"
             spellCheck={false}
