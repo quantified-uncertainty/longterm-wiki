@@ -87,6 +87,7 @@ import * as importFundingProgramsCommands from './commands/import-funding-progra
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
 import * as researchAreasCommands from './commands/research-areas.ts';
+import * as autoVerifyStakeholdersCommands from './commands/legislation/auto-verify-stakeholders.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
@@ -96,6 +97,7 @@ import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
 import * as pagesCommands from './commands/pages.ts';
+import * as legislationCommands from './commands/legislation.ts';
 
 const domains = {
   validate: validateCommands,
@@ -147,6 +149,7 @@ const domains = {
   people: peopleCommands,
   orgs: orgsCommands,
   'research-areas': researchAreasCommands,
+  'auto-verify-stakeholders': autoVerifyStakeholdersCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
@@ -156,6 +159,7 @@ const domains = {
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
   pages: pagesCommands,
+  legislation: legislationCommands,
 };
 
 const shortcutMap = buildShortcutMap();

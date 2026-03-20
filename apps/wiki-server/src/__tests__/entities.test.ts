@@ -170,6 +170,67 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
+  // --- prune: SELECT id FROM entities WHERE entity_type = ? AND id NOT IN (?) ---
+  if (
+    q.includes('"entities"') &&
+    q.includes("where") &&
+    q.includes("not in") &&
+    !q.includes("insert")
+  ) {
+    const entityType = params[0] as string;
+    const keepIds = new Set(params.slice(1));
+    const results: { id: string }[] = [];
+    for (const row of entitiesStore.values()) {
+      if (row.entity_type === entityType && !keepIds.has(row.id)) {
+        results.push({ id: row.id as string });
+      }
+    }
+    return results;
+  }
+
+  // --- prune: SELECT id WHERE entity_type = ? (no NOT IN — all entities of type) ---
+  // Matches when keepIds is empty (prune all of type)
+  if (
+    q.includes("select") &&
+    q.includes('"entities"') &&
+    q.includes("where") &&
+    !q.includes("not in") &&
+    !q.includes("or") &&
+    !q.includes("order by") &&
+    !q.includes("count(*)") &&
+    !q.includes("insert") &&
+    !q.includes("ilike") &&
+    !q.includes("group by") &&
+    params.length === 1
+  ) {
+    const entityType = params[0] as string;
+    const results: { id: string }[] = [];
+    for (const row of entitiesStore.values()) {
+      if (row.entity_type === entityType) {
+        results.push({ id: row.id as string });
+      }
+    }
+    return results;
+  }
+
+  // --- prune: DELETE FROM things WHERE source_table = 'entities' AND source_id IN (...) ---
+  if (q.includes("delete") && q.includes('"things"')) {
+    // No things store in this test — just acknowledge the delete
+    return [];
+  }
+
+  // --- prune: DELETE FROM entities WHERE id IN (...) ---
+  if (q.includes("delete") && q.includes('"entities"')) {
+    const idsToDelete = new Set(params);
+    for (const [stableId, row] of entitiesStore) {
+      if (idsToDelete.has(row.id)) {
+        slugIndex.delete(row.id as string);
+        entitiesStore.delete(stableId);
+      }
+    }
+    return [];
+  }
+
   // --- facts: DISTINCT ON query for directory endpoint ---
   if (q.includes("distinct on") && q.includes("facts")) {
     return []; // No facts in test — return empty
@@ -857,6 +918,83 @@ describe("Entities API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(Array.isArray(body.entities)).toBe(true);
+    });
+  });
+
+  // ---- Prune endpoint ----
+
+  describe("POST /api/entities/prune", () => {
+    it("deletes stale entities not in the keep list", async () => {
+      resetStores();
+      await seedEntity(app, "alice", "Alice", { entityType: "person" });
+      await seedEntity(app, "bob", "Bob", { entityType: "person" });
+      await seedEntity(app, "ghost-person", "Ghost Person", { entityType: "person" });
+
+      // Prune: keep alice and bob, ghost-person should be deleted
+      const res = await postJson(app, "/api/entities/prune", {
+        entityType: "person",
+        keepIds: ["alice", "bob"],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.ids).toContain("ghost-person");
+    });
+
+    it("returns 0 deleted when all entities are in the keep list", async () => {
+      resetStores();
+      await seedEntity(app, "alice", "Alice", { entityType: "person" });
+      await seedEntity(app, "bob", "Bob", { entityType: "person" });
+
+      const res = await postJson(app, "/api/entities/prune", {
+        entityType: "person",
+        keepIds: ["alice", "bob"],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(0);
+      expect(body.ids).toEqual([]);
+    });
+
+    it("only prunes entities of the specified type", async () => {
+      resetStores();
+      await seedEntity(app, "alice", "Alice", { entityType: "person" });
+      await seedEntity(app, "acme-org", "ACME", { entityType: "organization" });
+
+      // Prune person type with empty keep list (keep no persons)
+      // This should only affect person entities, not organization
+      const res = await postJson(app, "/api/entities/prune", {
+        entityType: "person",
+        keepIds: [],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.ids).toContain("alice");
+
+      // Organization should still exist
+      const orgStableId = testStableId("acme-org");
+      expect(entitiesStore.has(orgStableId)).toBe(true);
+    });
+
+    it("rejects unknown entity types", async () => {
+      const res = await postJson(app, "/api/entities/prune", {
+        entityType: "nonexistent-type",
+        keepIds: [],
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("validates request body shape", async () => {
+      // Missing entityType
+      const res = await postJson(app, "/api/entities/prune", {
+        keepIds: [],
+      });
+      expect(res.status).toBe(400);
     });
   });
 });

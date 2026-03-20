@@ -17,7 +17,7 @@ import {
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
 import { resolveResourceAuthors, type OrgResourceRow } from "@/app/organizations/[slug]/org-data";
-import { getAllKBRecords, type FactBaseRecordEntry } from "@/data/factbase";
+
 import {
   resolvePolicyBySlug,
   getPolicySlugs,
@@ -41,6 +41,9 @@ import {
   type RawResource,
 } from "@/app/legislation/[slug]/timeline-utils";
 import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
+import { StakeholderReasonCell } from "@/app/legislation/[slug]/stakeholder-detail";
+import { StakeholderVerificationBadge } from "@/components/directory/StakeholderVerificationBadge";
+import { ProvisionCard } from "./provision-card";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -67,6 +70,33 @@ const POSITION_COLORS: Record<string, string> = {
   neutral: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
   mixed: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
 };
+
+/** Compact circle indicator for stakeholder importance. */
+function ImportanceIndicator({ importance }: { importance: "high" | "medium" | "low" }) {
+  // high = filled circle, medium = half-filled circle, low = empty circle
+  const size = 10;
+  if (importance === "high") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="High importance">
+        <circle cx="5" cy="5" r="4" className="fill-foreground/70" />
+      </svg>
+    );
+  }
+  if (importance === "medium") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Medium importance">
+        <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/60" strokeWidth="1.2" />
+        <path d="M5,1 A4,4 0 0,0 5,9 Z" className="fill-foreground/60" />
+      </svg>
+    );
+  }
+  // low
+  return (
+    <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Low importance">
+      <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/40" strokeWidth="1.2" />
+    </svg>
+  );
+}
 
 /** Status pipeline stages for the visual timeline. */
 const PIPELINE_STAGES = [
@@ -124,9 +154,13 @@ export default async function LegislationDetailPage({
 
   const wikiHref = getPolicyWikiHref(entity);
 
-  const supporters = entity.stakeholders.filter((s) => s.position === "support");
-  const opponents = entity.stakeholders.filter((s) => s.position === "oppose");
-  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral");
+  const importanceOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
+    (importanceOrder[a.importance ?? ""] ?? 3) - (importanceOrder[b.importance ?? ""] ?? 3);
+
+  const supporters = entity.stakeholders.filter((s) => s.position === "support").sort(byImportance);
+  const opponents = entity.stakeholders.filter((s) => s.position === "oppose").sort(byImportance);
+  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral").sort(byImportance);
 
   const provisionsByCategory = new Map<string, typeof entity.provisions>();
   for (const p of entity.provisions) {
@@ -138,13 +172,17 @@ export default async function LegislationDetailPage({
   const reachedStage = getReachedStage(timelineEvents, statusKey);
 
   // Only show the pipeline bar if the entity has actual legislative process data.
-  // Frameworks, declarations, and voluntary commitments have policyStatus: active
-  // which maps to "in-effect", but they are not legislation and have no timeline
-  // events, votes, or amendments — so the pipeline would falsely show "Enacted".
+  // The pipeline stages (Introduced -> Committee -> Floor Vote -> Passed -> Executive)
+  // only apply to bills/acts that went through a legislature. Diplomatic declarations
+  // (e.g., Bletchley Declaration) may have "votes" (signings) and executive agency
+  // actions (e.g., export controls) may have "amendments" (revisions), but these are
+  // not legislative processes. We require either:
+  // 1. Timeline events from customFields (e.g., "Introduced", "Passed Committee"), OR
+  // 2. A billNumber (which indicates formal legislation/regulation with a tracked process)
+  // This prevents showing the pipeline for declarations, agency actions, and frameworks
+  // while preserving it for bills that have votes but no customField timeline labels.
   const hasLegislativeProcessData =
-    timelineEvents.length > 0 ||
-    entity.votes.length > 0 ||
-    entity.amendments.length > 0;
+    timelineEvents.length > 0 || !!billNumber;
   const showPipelineBar = reachedStage >= 0 && hasLegislativeProcessData;
 
   // ── Build tabs ────────────────────────────────────────────
@@ -357,78 +395,42 @@ export default async function LegislationDetailPage({
       label: "Provisions",
       count: entity.provisions.length,
       content: (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {[...provisionsByCategory.entries()].map(([category, provisions]) => (
             <div key={category}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">{category}</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1 px-4">
+                {category}
+              </h3>
+              <div className="space-y-0">
                 {provisions.map((provision, i) => (
-                  <div key={i} className="rounded-lg border border-border/60 bg-card p-3">
-                    <div className="font-semibold text-sm mb-1">{provision.title}</div>
-                    <p className="text-sm text-foreground/70 leading-relaxed">{provision.description}</p>
-                  </div>
+                  <ProvisionCard
+                    key={i}
+                    title={provision.title}
+                    description={provision.description}
+                    billSection={provision.billSection}
+                    billQuote={provision.billQuote}
+                    amendmentNotes={provision.amendmentNotes}
+                    fullTextUrl={entity.fullTextUrl}
+                  />
                 ))}
               </div>
             </div>
           ))}
+          {entity.fullTextUrl && (
+            <div className="px-4 pt-2 border-t border-border/30">
+              <a
+                href={entity.fullTextUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground/40 hover:text-primary transition-colors"
+              >
+                Full enrolled bill text &rarr;
+              </a>
+            </div>
+          )}
         </div>
       ),
     });
-  }
-
-  // ── Precompute funding info for stakeholder badges ──────────
-  // Grants: ownerEntityId = funder, fields.recipient = recipient
-  // Investments: ownerEntityId = company, fields.investor = investor
-  const allGrants = getAllKBRecords("grants");
-  const allInvestments = getAllKBRecords("investments");
-
-  // Map: recipient entity ID → funder display names
-  const grantFundersByRecipient = new Map<string, string[]>();
-  for (const grant of allGrants) {
-    const recipientId = (grant.fields.recipient as string) ?? null;
-    if (!recipientId) continue;
-    // Resolve funder name from ownerEntityId
-    const funderEntity = getTypedEntityById(grant.ownerEntityId);
-    const funderName = funderEntity?.title ?? grant.displayName ?? grant.ownerEntityId;
-    const existing = grantFundersByRecipient.get(recipientId) ?? [];
-    if (!existing.includes(funderName)) existing.push(funderName);
-    grantFundersByRecipient.set(recipientId, existing);
-  }
-
-  // Map: company entity ID → investor display names
-  const investorsByCompany = new Map<string, string[]>();
-  for (const inv of allInvestments) {
-    const companyId = inv.ownerEntityId;
-    const investorId = (inv.fields.investor as string) ?? null;
-    if (!investorId) continue;
-    const investorEntity = getTypedEntityById(investorId);
-    const investorName = investorEntity?.title ?? inv.displayName ?? investorId;
-    const existing = investorsByCompany.get(companyId) ?? [];
-    if (!existing.includes(investorName)) existing.push(investorName);
-    investorsByCompany.set(companyId, existing);
-  }
-
-  // Helper to get funding badges for a stakeholder
-  function getFundingBadges(entityId: string | undefined): string[] {
-    if (!entityId) return [];
-    const badges: string[] = [];
-    // Check grants (by recipient ID — could be stableId, slug, or display name)
-    const grantFunders = grantFundersByRecipient.get(entityId);
-    if (grantFunders) badges.push(...grantFunders);
-    // Check investments (by company ownerEntityId — typically stableId)
-    const investors = investorsByCompany.get(entityId);
-    if (investors) badges.push(...investors);
-    // If nothing found, try resolving to stableId
-    if (badges.length === 0) {
-      const ent = getTypedEntityById(entityId);
-      if (ent?.stableId && ent.stableId !== entityId) {
-        const g = grantFundersByRecipient.get(ent.stableId);
-        if (g) badges.push(...g);
-        const i = investorsByCompany.get(ent.stableId);
-        if (i) badges.push(...i);
-      }
-    }
-    return [...new Set(badges)]; // deduplicate
   }
 
   // Stakeholders tab
@@ -455,8 +457,10 @@ export default async function LegislationDetailPage({
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
                   <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
-                  <th className="text-left py-1.5 px-3 font-medium w-[80px]">Position</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[70px]">Position</th>
                   <th className="text-left py-1.5 px-3 font-medium">Reason</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[40px]">Src</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[60px]">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -465,11 +469,26 @@ export default async function LegislationDetailPage({
                   return (
                     <tr key={i} className="hover:bg-muted/20 align-top">
                       <td className="py-1.5 px-3">
-                        {href ? (
-                          <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
-                        ) : (
-                          <span className="font-medium text-sm">{stakeholder.name}</span>
-                        )}
+                        <span className="inline-flex items-center gap-1.5">
+                          {stakeholder.importance && (
+                            <span
+                              className="inline-block flex-shrink-0"
+                              title={`${stakeholder.importance} importance`}
+                            >
+                              <ImportanceIndicator importance={stakeholder.importance} />
+                            </span>
+                          )}
+                          {href ? (
+                            <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
+                          ) : (
+                            <span className="font-medium text-sm">{stakeholder.name}</span>
+                          )}
+                          {stakeholder.role && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 whitespace-nowrap">
+                              {stakeholder.role}
+                            </span>
+                          )}
+                        </span>
                       </td>
                       <td className="py-1.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
@@ -477,9 +496,35 @@ export default async function LegislationDetailPage({
                         </span>
                       </td>
                       <td className="py-1.5 px-3 text-foreground/70 text-sm">
-                        <span className="line-clamp-2">{stakeholder.reason ?? "\u2014"}</span>
-                        {stakeholder.source && (
-                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-xs">[source]</a>
+                        <StakeholderReasonCell
+                          reason={stakeholder.reason}
+                          context={stakeholder.context}
+                          source={stakeholder.source}
+                        />
+                      </td>
+                      <td className="py-1.5 px-3 text-center">
+                        {stakeholder.source ? (
+                          <a
+                            href={stakeholder.source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80"
+                            title="View source"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="inline-block">
+                              <path d="M6 3H3v10h10v-3M9 3h4v4M9 7l4-4" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground/30">&mdash;</span>
+                        )}
+                      </td>
+                      <td className="py-1.5 px-3 text-center">
+                        {entity.stableId && (
+                          <StakeholderVerificationBadge
+                            policyEntityStableId={entity.stableId}
+                            stakeholderName={stakeholder.name}
+                          />
                         )}
                       </td>
                     </tr>
@@ -488,6 +533,97 @@ export default async function LegislationDetailPage({
               </tbody>
             </table>
           </div>
+        </div>
+      ),
+    });
+  }
+
+  // History tab (amendments + key figures)
+  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0 || entity.keyFigures.length > 0) {
+    tabs.push({
+      id: "history",
+      label: "History",
+      count: entity.amendments.length,
+      content: (
+        <div className="space-y-8">
+          {/* Key Politicians */}
+          {entity.keyPoliticians.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3">Key Politicians</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {entity.keyPoliticians.map((politician, i) => {
+                  const href = resolveEntityHref(politician.entityId);
+                  return (
+                    <div key={i} className="rounded-lg border border-border/60 bg-card px-3 py-2 flex items-center gap-2.5">
+                      <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
+                        {politician.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                      </div>
+                      <div className="min-w-0">
+                        {href ? (
+                          <Link href={href} className="font-medium text-sm text-primary hover:underline truncate block">{politician.name}</Link>
+                        ) : (
+                          <span className="font-medium text-sm truncate block">{politician.name}</span>
+                        )}
+                        <div className="text-[11px] text-muted-foreground truncate">{politician.role}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Key Figures (non-political) */}
+          {entity.keyFigures.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3">Key Figures</h2>
+              <div className="space-y-2">
+                {entity.keyFigures.map((figure, i) => {
+                  const href = resolveEntityHref(figure.entityId);
+                  return (
+                    <div key={i} className="rounded-lg border border-border/60 bg-card px-3 py-2.5 flex items-start gap-2.5">
+                      <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                        {figure.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                      </div>
+                      <div className="min-w-0">
+                        {href ? (
+                          <Link href={href} className="font-medium text-sm text-primary hover:underline">{figure.name}</Link>
+                        ) : (
+                          <span className="font-medium text-sm">{figure.name}</span>
+                        )}
+                        <div className="text-[11px] text-muted-foreground">{figure.role}</div>
+                        {figure.description && (
+                          <p className="text-xs text-foreground/60 leading-relaxed mt-1">{figure.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {entity.amendments.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3">Amendment History</h2>
+              <div className="divide-y divide-border/40">
+                {entity.amendments.map((amendment, i) => (
+                  <div key={i} className="py-2 first:pt-0">
+                    <div className="flex items-baseline gap-2">
+                      <div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5" />
+                      {amendment.url ? (
+                        <a href={amendment.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-sm text-primary hover:underline">{amendment.date}</a>
+                      ) : (
+                        <span className="font-semibold text-sm">{amendment.date}</span>
+                      )}
+                      {amendment.author && <span className="text-xs text-muted-foreground">by {amendment.author}</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground ml-3.5 mt-0.5 leading-relaxed">{amendment.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       ),
     });

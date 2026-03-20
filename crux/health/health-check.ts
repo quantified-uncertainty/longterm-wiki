@@ -27,6 +27,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
+import { serverFetch, getServerUrl, getApiKey } from '../lib/wiki-server/client.ts';
 import { checkJobQueue } from './checks/job-queue.ts';
 import { checkPrQuality } from './checks/pr-quality.ts';
 import { checkCiMainHealth } from './checks/ci-main-health.ts';
@@ -43,8 +44,8 @@ const REPORT_MODE = args.includes('--report');
 const AUTO_ISSUE = args.includes('--auto-issue');
 const CLEANUP_LABELS = args.includes('--cleanup-labels');
 
-const SERVER_URL = process.env.LONGTERMWIKI_SERVER_URL ?? '';
-const API_KEY = process.env.LONGTERMWIKI_SERVER_API_KEY ?? '';
+const SERVER_URL = getServerUrl();
+const API_KEY = getApiKey();
 const WIKI_PUBLIC_URL = process.env.WIKI_PUBLIC_URL ?? '';
 
 // Count lower bounds — alert if DB drops significantly below these baselines
@@ -85,7 +86,7 @@ async function fetchJson(url: string, authHeader?: string): Promise<{ ok: boolea
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (authHeader) headers['Authorization'] = authHeader;
 
-    const res = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) });
+    const res = await serverFetch(url, { headers, timeoutMs: 15_000 });
     let data: unknown = null;
     try { data = await res.json(); } catch { /* body may not be JSON */ }
     return { ok: res.ok, status: res.status, data };

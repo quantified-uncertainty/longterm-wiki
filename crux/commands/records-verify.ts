@@ -194,63 +194,93 @@ function buildRecordToVerify(recordType: RecordType, item: Record<string, unknow
 
   const id = str(item, 'id');
 
+  // Use resolved/display names when available, falling back to IDs.
+  // API responses include *ResolvedName or *DisplayName fields that map
+  // stableIds to human-readable names (e.g., "Dario Amodei" instead of "zR4nW8xB2f").
+  // The LLM needs readable names to match against source page content.
+  const resolveName = (item: Record<string, unknown>, ...keys: string[]): string => {
+    for (const key of keys) {
+      const v = item[key];
+      if (typeof v === 'string' && v.length > 0) return v;
+    }
+    return '(unknown)';
+  };
+
   switch (recordType) {
-    case 'grant':
+    case 'grant': {
+      const funderName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
+      const granteeName = resolveName(item, 'granteeResolvedName', 'granteeDisplayName', 'granteeId');
       return {
         recordType,
         recordId: id,
-        description: `Grant: ${str(item, 'name')} (${str(item, 'organizationId')} → ${strOrNull(item, 'granteeId') ?? 'unknown'})`,
+        description: `Grant: ${str(item, 'name')} (${funderName} → ${granteeName})`,
         sourceUrl: source,
-        fields: { name: str(item, 'name'), amount: numOrNull(item, 'amount'), date: strOrNull(item, 'date'), grantee: strOrNull(item, 'granteeId'), funder: str(item, 'organizationId') },
+        fields: { name: str(item, 'name'), amount: numOrNull(item, 'amount'), date: strOrNull(item, 'date'), grantee: granteeName, funder: funderName },
       };
-    case 'personnel':
+    }
+    case 'personnel': {
+      const personName = resolveName(item, 'personResolvedName', 'personDisplayName', 'personId');
+      const orgName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
       return {
         recordType,
         recordId: id,
-        description: `Personnel: ${str(item, 'personId')} at ${str(item, 'organizationId')} (${str(item, 'role')})`,
+        description: `Personnel: ${personName} at ${orgName} (${str(item, 'role')})`,
         sourceUrl: source,
-        fields: { person: str(item, 'personId'), org: str(item, 'organizationId'), role: str(item, 'role'), roleType: str(item, 'roleType'), startDate: strOrNull(item, 'startDate'), endDate: strOrNull(item, 'endDate') },
+        fields: { person: personName, org: orgName, role: str(item, 'role'), roleType: str(item, 'roleType'), startDate: strOrNull(item, 'startDate'), endDate: strOrNull(item, 'endDate') },
       };
-    case 'division':
+    }
+    case 'division': {
+      const parentName = resolveName(item, 'parentOrgResolvedName', 'parentOrgDisplayName', 'parentOrgId');
       return {
         recordType,
         recordId: id,
-        description: `Division: ${str(item, 'name')} (${str(item, 'parentOrgId')})`,
+        description: `Division: ${str(item, 'name')} (${parentName})`,
         sourceUrl: source,
-        fields: { name: str(item, 'name'), parent: str(item, 'parentOrgId'), type: str(item, 'divisionType'), status: str(item, 'status'), lead: strOrNull(item, 'lead') },
+        fields: { name: str(item, 'name'), parent: parentName, type: str(item, 'divisionType'), status: str(item, 'status'), lead: strOrNull(item, 'lead') },
       };
-    case 'funding-program':
+    }
+    case 'funding-program': {
+      const orgName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'orgId');
       return {
         recordType,
         recordId: id,
-        description: `Funding Program: ${str(item, 'name')} (${str(item, 'orgId')})`,
+        description: `Funding Program: ${str(item, 'name')} (${orgName})`,
         sourceUrl: source,
-        fields: { name: str(item, 'name'), org: str(item, 'orgId'), type: str(item, 'programType'), budget: numOrNull(item, 'totalBudget'), deadline: strOrNull(item, 'deadline'), status: strOrNull(item, 'status') },
+        fields: { name: str(item, 'name'), org: orgName, type: str(item, 'programType'), budget: numOrNull(item, 'totalBudget'), deadline: strOrNull(item, 'deadline'), status: strOrNull(item, 'status') },
       };
-    case 'funding-round':
+    }
+    case 'funding-round': {
+      const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return {
         recordType,
         recordId: id,
-        description: `Funding Round: ${str(item, 'name')} (${str(item, 'companyId')})`,
+        description: `Funding Round: ${str(item, 'name')} (${companyName})`,
         sourceUrl: source,
-        fields: { name: str(item, 'name'), company: str(item, 'companyId'), raised: numOrNull(item, 'raised'), valuation: numOrNull(item, 'valuation'), date: strOrNull(item, 'date') },
+        fields: { name: str(item, 'name'), company: companyName, raised: numOrNull(item, 'raised'), valuation: numOrNull(item, 'valuation'), date: strOrNull(item, 'date') },
       };
-    case 'investment':
+    }
+    case 'investment': {
+      const investorName = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');
+      const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return {
         recordType,
         recordId: id,
-        description: `Investment: ${str(item, 'investorId')} → ${str(item, 'companyId')}`,
+        description: `Investment: ${investorName} → ${companyName}`,
         sourceUrl: source,
-        fields: { investor: str(item, 'investorId'), company: str(item, 'companyId'), amount: numOrNull(item, 'amount'), round: strOrNull(item, 'roundName'), role: strOrNull(item, 'role') },
+        fields: { investor: investorName, company: companyName, amount: numOrNull(item, 'amount'), round: strOrNull(item, 'roundName'), role: strOrNull(item, 'role') },
       };
-    case 'equity-position':
+    }
+    case 'equity-position': {
+      const holderName = resolveName(item, 'holderResolvedName', 'holderDisplayName', 'holderId');
+      const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return {
         recordType,
         recordId: id,
-        description: `Equity: ${str(item, 'holderId')} in ${str(item, 'companyId')} (${strOrNull(item, 'stake') ?? '?'}%)`,
+        description: `Equity: ${holderName} in ${companyName} (${strOrNull(item, 'stake') ?? '?'}%)`,
         sourceUrl: source,
-        fields: { holder: str(item, 'holderId'), company: str(item, 'companyId'), stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') },
+        fields: { holder: holderName, company: companyName, stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') },
       };
+    }
   }
 }
 

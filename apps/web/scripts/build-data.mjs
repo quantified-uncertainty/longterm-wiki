@@ -51,6 +51,7 @@ import {
   fetchBenchmarkResults,
   fetchResearchAreas,
   fetchRecordVerdicts,
+  fetchPolicyStakeholderIds,
   fetchResourcesFromPG,
   buildPageReferenceIndex,
   getWikiServerWarningCount,
@@ -1018,18 +1019,20 @@ async function main() {
     }
   }
 
-  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments)
+  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments, stakeholder IDs)
   let assessmentMap = new Map();
   if (!CONTENT_ONLY) {
-    const [benchmarkResults, researchAreasData, recordVerdicts, assessments] = await Promise.all([
+    const [benchmarkResults, researchAreasData, recordVerdicts, assessments, policyStakeholderIds] = await Promise.all([
       fetchBenchmarkResults(),
       fetchResearchAreas(),
       fetchRecordVerdicts(),
       fetchAssessments(),
+      fetchPolicyStakeholderIds(),
     ]);
     database.benchmarkResults = benchmarkResults;
     database.researchAreas = researchAreasData;
     database.recordVerdicts = recordVerdicts;
+    database.policyStakeholderIds = policyStakeholderIds;
     assessmentMap = assessments;
   }
 

@@ -165,7 +165,14 @@ async function loadFromApi(
     return false;
   });
 
-  const rows: OrgRow[] = organizations.map((org) => {
+  // Filter out API-returned orgs that don't exist in local data.
+  // The wiki-server PG database may contain stale or phantom entities
+  // (e.g. "google", "inflection-ai", "magic") that have no corresponding
+  // YAML entity or wiki page. Showing them in the index creates 404 links.
+  const localOrgIds = new Set(localOrgs.map((o) => o.id));
+  const validOrganizations = organizations.filter((org) => localOrgIds.has(org.id));
+
+  const rows: OrgRow[] = validOrganizations.map((org) => {
     const orgType = orgTypeMap[org.id] ?? null;
     const searchParts = [org.title];
     if (org.description) searchParts.push(org.description);
@@ -205,7 +212,7 @@ async function loadFromApi(
   // Merge local-only orgs that the API didn't return (not yet synced to PG).
   // This prevents entities added to YAML but not yet synced from disappearing
   // in the directory. Without this, orgType filter tabs show incorrect counts.
-  const apiIds = new Set(organizations.map((o) => o.id));
+  const apiIds = new Set(validOrganizations.map((o) => o.id));
   for (const org of localOrgs) {
     if (apiIds.has(org.id)) continue;
     const orgType = org.orgType ?? null;

@@ -57,13 +57,15 @@ const CATEGORY_HEADER_COLORS: Record<string, string> = {
 type SortMode = "score" | "name" | "developer";
 
 function formatScore(score: number, unit?: string): string {
+  // Round to 2 decimal places to avoid IEEE 754 floating-point artifacts
+  const rounded = Number(score.toFixed(2));
   if (unit === "%" || unit === "percentage" || unit === "accuracy") {
     return `${parseFloat(score.toFixed(2))}%`;
   }
-  if (score >= 1000) {
-    return score.toLocaleString();
+  if (rounded >= 1000) {
+    return rounded.toLocaleString();
   }
-  return String(score);
+  return String(rounded);
 }
 
 /** Normalize a score to 0-1 within a benchmark column. */

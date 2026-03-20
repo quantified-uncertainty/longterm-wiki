@@ -7,11 +7,15 @@
  *   - `batchedRequest()` — batched fetch with configurable timeout
  *   - Configuration helpers (URL, API key, headers)
  *   - Health check
+ *   - TLS bypass for ISP-level SNI filtering (WIKI_SERVER_TLS_BYPASS)
  */
 
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
+
+import * as https from 'node:https';
+import * as dns from 'node:dns/promises';
 
 import {
   WIKI_SERVER_TIMEOUT_MS as TIMEOUT_MS,
@@ -93,6 +97,103 @@ function classifyStatus(status: number): ApiError {
 }
 
 // ---------------------------------------------------------------------------
+// TLS bypass for ISP SNI filtering
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether TLS bypass is enabled. When set, HTTPS requests to the wiki-server
+ * connect directly to the resolved IP with a dummy TLS servername, bypassing
+ * ISP-level SNI filtering (e.g., Comcast/Xfinity safebrowse.io interception).
+ *
+ * The real hostname is sent via the Host header so K8s nginx ingress routes
+ * correctly. Certificate verification is disabled since the K8s ingress
+ * serves a default cert that won't match the hostname.
+ */
+function isTlsBypassEnabled(): boolean {
+  return process.env.WIKI_SERVER_TLS_BYPASS === 'true';
+}
+
+/** DNS resolution cache to avoid repeated lookups. */
+let resolvedIpCache: { hostname: string; ip: string; expiry: number } | null = null;
+
+async function resolveHostnameToIp(hostname: string): Promise<string> {
+  const now = Date.now();
+  if (resolvedIpCache && resolvedIpCache.hostname === hostname && now < resolvedIpCache.expiry) {
+    return resolvedIpCache.ip;
+  }
+  const { address } = await dns.lookup(hostname);
+  resolvedIpCache = { hostname, ip: address, expiry: now + 5 * 60 * 1000 }; // 5-min TTL
+  return address;
+}
+
+/**
+ * Fetch via node:https with TLS bypass — connects to the resolved IP with
+ * a dummy SNI to avoid ISP-level domain blocking.
+ */
+async function tlsBypassFetch(
+  url: string,
+  init: {
+    method: string;
+    headers: Record<string, string>;
+    body?: string;
+    timeoutMs: number;
+  },
+): Promise<{ ok: boolean; status: number; text: () => Promise<string>; json: () => Promise<unknown> }> {
+  const parsed = new URL(url);
+  const hostname = parsed.hostname;
+  const ip = await resolveHostnameToIp(hostname);
+  const port = parsed.port ? parseInt(parsed.port, 10) : 443;
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const settle = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn();
+    };
+
+    const timer = setTimeout(() => {
+      req.destroy();
+      settle(() =>
+        reject(new DOMException('The operation was aborted', 'AbortError')),
+      );
+    }, init.timeoutMs);
+
+    const req = https.request(
+      {
+        hostname: ip,
+        port,
+        path: parsed.pathname + parsed.search,
+        method: init.method,
+        rejectUnauthorized: false,
+        servername: 'internal', // Dummy SNI to bypass ISP filtering
+        headers: { ...init.headers, Host: hostname },
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (chunk: Buffer) => (body += chunk.toString()));
+        res.on('error', (err) => settle(() => reject(err)));
+        res.on('end', () => {
+          const status = res.statusCode ?? 500;
+          settle(() =>
+            resolve({
+              ok: status >= 200 && status < 300,
+              status,
+              text: async () => body,
+              json: async () => JSON.parse(body),
+            }),
+          );
+        });
+      },
+    );
+    req.on('error', (err) => settle(() => reject(err)));
+    if (init.body) req.write(init.body);
+    req.end();
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Core request function
 // ---------------------------------------------------------------------------
 
@@ -112,22 +213,34 @@ export async function apiRequest<T>(
     return apiErr('unavailable', `${prefix}LONGTERMWIKI_SERVER_URL not set`);
   }
 
+  const fullUrl = `${serverUrl}${path}`;
+  const useTlsBypass = isTlsBypassEnabled() && serverUrl.startsWith('https://');
+
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const headers = buildHeaders();
+    const bodyStr = body !== undefined ? JSON.stringify(body) : undefined;
 
-    const options: RequestInit = {
-      method,
-      headers: buildHeaders(),
-      signal: controller.signal,
-    };
+    let res: { ok: boolean; status: number; text: () => Promise<string>; json: () => Promise<unknown> };
 
-    if (body !== undefined) {
-      options.body = JSON.stringify(body);
+    if (useTlsBypass) {
+      res = await tlsBypassFetch(fullUrl, {
+        method,
+        headers,
+        body: bodyStr,
+        timeoutMs,
+      });
+    } else {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const fetchRes = await fetch(fullUrl, {
+        method,
+        headers,
+        body: bodyStr,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      res = fetchRes;
     }
-
-    const res = await fetch(`${serverUrl}${path}`, options);
-    clearTimeout(timer);
 
     if (!res.ok) {
       const text = await res.text().catch(() => '');
@@ -161,6 +274,40 @@ export async function batchedRequest<T>(
 }
 
 // ---------------------------------------------------------------------------
+// Shared server fetch — exported for health-check.ts and other callers
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch a URL from the wiki-server, using TLS bypass when enabled.
+ * TLS bypass only applies when the URL matches the configured wiki-server URL
+ * — other HTTPS URLs (e.g., public frontend) use standard fetch.
+ */
+export async function serverFetch(
+  url: string,
+  init?: { method?: string; headers?: Record<string, string>; body?: string; timeoutMs?: number },
+): Promise<{ ok: boolean; status: number; text: () => Promise<string>; json: () => Promise<unknown> }> {
+  const method = init?.method ?? 'GET';
+  const headers = init?.headers ?? {};
+  const timeoutMs = init?.timeoutMs ?? TIMEOUT_MS;
+
+  const serverUrl = getServerUrl();
+  if (isTlsBypassEnabled() && url.startsWith('https://') && serverUrl && url.startsWith(serverUrl)) {
+    return tlsBypassFetch(url, { method, headers, body: init?.body, timeoutMs });
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: init?.body,
+    signal: controller.signal,
+  });
+  clearTimeout(timer);
+  return res;
+}
+
+// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 
@@ -172,17 +319,10 @@ export async function isServerAvailable(): Promise<boolean> {
   if (!serverUrl) return false;
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-    const res = await fetch(`${serverUrl}/health`, {
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-
+    const res = await serverFetch(`${serverUrl}/health`, { timeoutMs: TIMEOUT_MS });
     if (!res.ok) return false;
 
-    const body = await res.json();
+    const body = (await res.json()) as { status?: string };
     return body.status === 'healthy';
   } catch {
     return false;

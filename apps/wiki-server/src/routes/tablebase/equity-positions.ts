@@ -12,13 +12,12 @@ import {
   parseRange,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
-
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -54,27 +53,27 @@ const SyncEquityPositionsBatchSchema = z.object({
 const holderEntity = alias(entities, "holder_entity");
 const companyEntity = alias(entities, "company_entity");
 
-/** Selection shape for equity_positions + joined entity titles. */
+/** Selection shape for equity_positions + joined entity titles + slugs. */
 const joinedSelect = {
   equityPositions: equityPositions,
   holderTitle: holderEntity.title,
+  holderSlug: holderEntity.id,
   companyTitle: companyEntity.title,
+  companySlug: companyEntity.id,
 };
 
 interface JoinedRow {
   equityPositions: typeof equityPositions.$inferSelect;
   holderTitle: string | null;
+  holderSlug: string | null;
   companyTitle: string | null;
-}
-
-function cleanId(id: string): string | null {
-  if (/^\d+$/.test(id)) return null;
-  if (STABLE_ID_PATTERN.test(id)) return null;
-  return id;
+  companySlug: string | null;
 }
 
 function formatRow(r: JoinedRow) {
   const ep = r.equityPositions;
+  const holderRef = formatEntityRef(ep.holderEntityId, r.holderSlug, r.holderTitle, ep.holderDisplayName, ep.holderId);
+  const companyRef = formatEntityRef(ep.companyEntityId, r.companySlug, r.companyTitle, ep.companyDisplayName, ep.companyId);
   return {
     id: ep.id,
     companyId: ep.companyId,
@@ -86,13 +85,16 @@ function formatRow(r: JoinedRow) {
     notes: ep.notes,
     asOf: ep.asOf,
     validEnd: ep.validEnd,
+    // Structured entity refs
+    holder: holderRef,
+    company: companyRef,
+    // Legacy flat fields (for backward compat)
     holderEntityId: ep.holderEntityId,
     holderDisplayName: ep.holderDisplayName,
+    holderResolvedName: holderRef.name,
     companyEntityId: ep.companyEntityId,
     companyDisplayName: ep.companyDisplayName,
-    // Resolved names — prefer entity title, then display name, then cleaned raw ID
-    holderResolvedName: r.holderTitle ?? ep.holderDisplayName ?? cleanId(ep.holderId),
-    companyResolvedName: r.companyTitle ?? ep.companyDisplayName ?? cleanId(ep.companyId),
+    companyResolvedName: companyRef.name,
     syncedAt: ep.syncedAt,
     createdAt: ep.createdAt,
     updatedAt: ep.updatedAt,
@@ -101,7 +103,7 @@ function formatRow(r: JoinedRow) {
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const equityPositionsApp = new Hono()
+const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -150,17 +152,16 @@ const equityPositionsApp = new Hono()
   })
 
   // ---- GET /by-entity/:entityId (positions in a company) ----
-  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
-
     const rows = await db
       .select(joinedSelect)
       .from(equityPositions)
       .leftJoin(holderEntity, eq(equityPositions.holderEntityId, holderEntity.stableId))
       .leftJoin(companyEntity, eq(equityPositions.companyEntityId, companyEntity.stableId))
-      .where(eq(equityPositions.companyId, entityId))
+      .where(eq(equityPositions.companyId, resolvedId))
       .orderBy(desc(equityPositions.syncedAt), equityPositions.id)
       .limit(limit)
       .offset(offset);
@@ -168,11 +169,11 @@ const equityPositionsApp = new Hono()
     const countResult = await db
       .select({ count: count() })
       .from(equityPositions)
-      .where(eq(equityPositions.companyId, entityId));
+      .where(eq(equityPositions.companyId, resolvedId));
     const total = countResult[0].count;
 
     return c.json({
-      entityId,
+      entityId: resolvedId,
       equityPositions: rows.map(formatRow),
       total,
       limit,

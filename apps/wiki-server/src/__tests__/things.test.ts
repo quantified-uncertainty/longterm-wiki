@@ -147,10 +147,31 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- things: search_vector / plainto_tsquery (FTS search) ---
-  if (q.includes('"things"') && q.includes("plainto_tsquery")) {
-    // FTS: return empty to trigger ILIKE fallback (simulates no tsvector in memory)
-    return [];
+  // --- things: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
+  if (q.includes('"things"') && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
+    // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
+    if (q.includes("plainto_tsquery")) return [];
+
+    // to_tsquery prefix search: extract the prefix query and match against titles/descriptions.
+    // The prefixQuery param looks like "word:* & word2:*", so extract the word stems.
+    const prefixParam = params[0] as string;
+    const words = prefixParam
+      .split("&")
+      .map((w) => w.replace(/:?\*?\s*/g, "").trim().toLowerCase())
+      .filter(Boolean);
+
+    if (words.length === 0) return [];
+
+    const results: Record<string, unknown>[] = [];
+    for (const row of thingsStore.values()) {
+      const title = ((row.title as string) || "").toLowerCase();
+      const desc = ((row.description as string) || "").toLowerCase();
+      const text = `${title} ${desc}`;
+      if (words.every((w) => text.includes(w))) {
+        results.push(row);
+      }
+    }
+    return results;
   }
 
   // --- things: ILIKE search (fallback) ---
@@ -624,7 +645,7 @@ describe("Things API", () => {
       expect(body.results[0].title).toBe("Anthropic");
     });
 
-    it("falls back to ILIKE when FTS returns no results", async () => {
+    it("uses FTS with prefix matching for partial words", async () => {
       await seedThing(app, "thing-test", "Test Item", {
         sourceId: "test-1",
       });
@@ -632,7 +653,22 @@ describe("Things API", () => {
       const res = await app.request("/api/things/search?q=test");
       expect(res.status).toBe(200);
       const body = await res.json();
-      // FTS returns nothing in mock, so ILIKE fallback is used
+      // With prefix matching, "test" → "test:*" matches "Test Item" via FTS
+      expect(body.searchMethod).toBe("fts");
+      expect(body.results.length).toBeGreaterThan(0);
+    });
+
+    it("falls back to ILIKE when FTS returns no results", async () => {
+      await seedThing(app, "thing-nomatch", "Rare Quokka Animal", {
+        sourceId: "nomatch-1",
+      });
+
+      // The mock FTS checks title+description, not the id field.
+      // ILIKE checks title, id, and description. Since "thing-nomatch" appears
+      // only in the id, FTS returns nothing and ILIKE finds it.
+      const res = await app.request("/api/things/search?q=thing-nomatch");
+      expect(res.status).toBe(200);
+      const body = await res.json();
       expect(body.searchMethod).toBe("ilike");
       expect(body.results.length).toBeGreaterThan(0);
     });
