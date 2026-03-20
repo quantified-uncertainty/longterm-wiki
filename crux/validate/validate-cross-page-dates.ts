@@ -227,6 +227,34 @@ function findDateConflicts(
     }
   }
 
+  // Check month-year mentions for conflicts (e.g., "November 2023" vs "February 2024")
+  const monthYearMentions = byCategory.get('month-year') || [];
+  if (monthYearMentions.length >= 2) {
+    // Group by the action keyword in context to compare same-event mentions
+    // e.g., two "founded" mentions with different month-years are a conflict
+    const byAction = new Map<string, DateMention[]>();
+    const actionWords = ['founded', 'departed', 'left', 'joined', 'started', 'launched', 'announced', 'established', 'created', 'operational'];
+    for (const m of monthYearMentions) {
+      const lowerContext = m.context.toLowerCase();
+      const action = actionWords.find((w) => lowerContext.includes(w)) || 'general';
+      const existing = byAction.get(action) || [];
+      existing.push(m);
+      byAction.set(action, existing);
+    }
+
+    for (const [action, group] of byAction) {
+      if (group.length < 2) continue;
+      const normalizedDates = new Set(group.map((m) => m.normalized));
+      if (normalizedDates.size > 1 && hasCrossPageMentions(group)) {
+        conflicts.push({
+          entityId,
+          mentions: group,
+          reason: `Month-year dates for "${action}" disagree: ${[...normalizedDates].join(' vs ')}`,
+        });
+      }
+    }
+  }
+
   return conflicts;
 }
 
@@ -312,7 +340,8 @@ function main(): void {
   const entityArg = args.find((a) => a.startsWith('--entity='));
   const entityId = entityArg ? entityArg.split('=')[1] : undefined;
   const topArg = args.find((a) => a.startsWith('--top='));
-  const limit = topArg ? parseInt(topArg.split('=')[1], 10) : 20;
+  const parsedLimit = topArg ? Number.parseInt(topArg.split('=')[1], 10) : 20;
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20;
 
   const result = runCrossPageDates({ entityId, limit });
 
@@ -322,7 +351,7 @@ function main(): void {
         {
           passed: true,
           errors: 0,
-          warnings: result.conflicts.length,
+          warnings: result.warnings,
           conflicts: result.conflicts.map((c) => ({
             entity: c.entityId,
             reason: c.reason,
