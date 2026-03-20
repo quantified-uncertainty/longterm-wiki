@@ -3380,10 +3380,11 @@
     - name: European Union
       position: support
       reason: Commission President Von der Leyen attended
-  votes:
-    - chamber: Summit
-      date: November 2, 2023
-      result: Signed by 28 countries + EU
+  customFields:
+    - label: Signed
+      value: November 2, 2023 — by 28 countries + EU
+    - label: Type
+      value: International diplomatic declaration (non-legislative)
   description: >-
     World-first international agreement on AI safety signed by 28 countries at the November 2023
     AI Safety Summit, committing to cooperation on frontier AI risks. Follow-up summits in Seoul
