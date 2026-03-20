@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   zv,
 } from "../shared/utils.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 
 // ---- Constants ----
 
@@ -45,17 +46,17 @@ const ByStakeholderQuery = z.object({
 
 // ---- Route ----
 
-const policyStakeholdersApp = new Hono()
+const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // GET /by-policy/:entityId — stakeholders for a specific policy
-  .get("/by-policy/:entityId", zv("query", ByPolicyQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-policy/:entityId", resolveEntityId(), zv("query", ByPolicyQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { position, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const whereClause = position
-      ? and(eq(policyStakeholders.policyEntityId, entityId), eq(policyStakeholders.position, position))
-      : eq(policyStakeholders.policyEntityId, entityId);
+      ? and(eq(policyStakeholders.policyEntityId, resolvedId), eq(policyStakeholders.position, position))
+      : eq(policyStakeholders.policyEntityId, resolvedId);
 
     const rows = await db.select().from(policyStakeholders)
       .where(whereClause)
@@ -69,18 +70,18 @@ const policyStakeholdersApp = new Hono()
   })
 
   // GET /by-stakeholder/:entityId — policies where this entity is a stakeholder
-  .get("/by-stakeholder/:entityId", zv("query", ByStakeholderQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-stakeholder/:entityId", resolveEntityId(), zv("query", ByStakeholderQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db.select().from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, entityId))
+      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId))
       .limit(limit)
       .offset(offset);
 
     const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, entityId));
+      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId));
 
     return c.json({ positions: rows, total });
   })

@@ -13,13 +13,12 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
-
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 // ---- Query schemas ----
 
@@ -59,27 +58,27 @@ const SyncInvestmentsBatchSchema = z.object({
 const investorEntity = alias(entities, "investor_entity");
 const companyEntity = alias(entities, "company_entity");
 
-/** Selection shape for investments + joined entity titles. */
+/** Selection shape for investments + joined entity titles + slugs. */
 const joinedSelect = {
   investments: investments,
   investorTitle: investorEntity.title,
+  investorSlug: investorEntity.id,
   companyTitle: companyEntity.title,
+  companySlug: companyEntity.id,
 };
 
 interface JoinedRow {
   investments: typeof investments.$inferSelect;
   investorTitle: string | null;
+  investorSlug: string | null;
   companyTitle: string | null;
-}
-
-function cleanId(id: string): string | null {
-  if (/^\d+$/.test(id)) return null;
-  if (STABLE_ID_PATTERN.test(id)) return null;
-  return id;
+  companySlug: string | null;
 }
 
 function formatRow(r: JoinedRow) {
   const inv = r.investments;
+  const investorRef = formatEntityRef(inv.investorEntityId, r.investorSlug, r.investorTitle, inv.investorDisplayName, inv.investorId);
+  const companyRef = formatEntityRef(inv.companyEntityId, r.companySlug, r.companyTitle, inv.companyDisplayName, inv.companyId);
   return {
     id: inv.id,
     companyId: inv.companyId,
@@ -97,13 +96,16 @@ function formatRow(r: JoinedRow) {
     conditions: inv.conditions,
     source: inv.source,
     notes: inv.notes,
+    // Structured entity refs
+    investor: investorRef,
+    company: companyRef,
+    // Legacy flat fields (for backward compat)
     investorEntityId: inv.investorEntityId,
     investorDisplayName: inv.investorDisplayName,
+    investorResolvedName: investorRef.name,
     companyEntityId: inv.companyEntityId,
     companyDisplayName: inv.companyDisplayName,
-    // Resolved names — prefer entity title, then display name, then cleaned raw ID
-    investorResolvedName: r.investorTitle ?? inv.investorDisplayName ?? cleanId(inv.investorId),
-    companyResolvedName: r.companyTitle ?? inv.companyDisplayName ?? cleanId(inv.companyId),
+    companyResolvedName: companyRef.name,
     syncedAt: inv.syncedAt,
     createdAt: inv.createdAt,
     updatedAt: inv.updatedAt,
@@ -112,7 +114,7 @@ function formatRow(r: JoinedRow) {
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const investmentsApp = new Hono()
+const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -163,17 +165,16 @@ const investmentsApp = new Hono()
   })
 
   // ---- GET /by-entity/:entityId (investments in a company) ----
-  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
-
     const rows = await db
       .select(joinedSelect)
       .from(investments)
       .leftJoin(investorEntity, eq(investments.investorEntityId, investorEntity.stableId))
       .leftJoin(companyEntity, eq(investments.companyEntityId, companyEntity.stableId))
-      .where(eq(investments.companyId, entityId))
+      .where(eq(investments.companyId, resolvedId))
       .orderBy(desc(investments.syncedAt), investments.id)
       .limit(limit)
       .offset(offset);
@@ -181,11 +182,11 @@ const investmentsApp = new Hono()
     const countResult = await db
       .select({ count: count() })
       .from(investments)
-      .where(eq(investments.companyId, entityId));
+      .where(eq(investments.companyId, resolvedId));
     const total = countResult[0].count;
 
     return c.json({
-      entityId,
+      entityId: resolvedId,
       investments: rows.map(formatRow),
       total,
       limit,

@@ -955,6 +955,7 @@ function getOrgResources(
 
 export interface OrgEntity {
   id: string;
+  stableId?: string;
   name: string;
   wikiId?: string;
   wikiPageId?: string;
