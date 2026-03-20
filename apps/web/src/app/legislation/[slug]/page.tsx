@@ -17,7 +17,7 @@ import {
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
 import { resolveResourceAuthors, type OrgResourceRow } from "@/app/organizations/[slug]/org-data";
-import { getAllKBRecords, type FactBaseRecordEntry } from "@/data/factbase";
+
 import {
   resolvePolicyBySlug,
   getPolicySlugs,
@@ -41,6 +41,7 @@ import {
   type RawResource,
 } from "@/app/legislation/[slug]/timeline-utils";
 import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
+import { StakeholderReasonCell } from "@/app/legislation/[slug]/stakeholder-detail";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -376,61 +377,6 @@ export default async function LegislationDetailPage({
     });
   }
 
-  // ── Precompute funding info for stakeholder badges ──────────
-  // Grants: ownerEntityId = funder, fields.recipient = recipient
-  // Investments: ownerEntityId = company, fields.investor = investor
-  const allGrants = getAllKBRecords("grants");
-  const allInvestments = getAllKBRecords("investments");
-
-  // Map: recipient entity ID → funder display names
-  const grantFundersByRecipient = new Map<string, string[]>();
-  for (const grant of allGrants) {
-    const recipientId = (grant.fields.recipient as string) ?? null;
-    if (!recipientId) continue;
-    // Resolve funder name from ownerEntityId
-    const funderEntity = getTypedEntityById(grant.ownerEntityId);
-    const funderName = funderEntity?.title ?? grant.displayName ?? grant.ownerEntityId;
-    const existing = grantFundersByRecipient.get(recipientId) ?? [];
-    if (!existing.includes(funderName)) existing.push(funderName);
-    grantFundersByRecipient.set(recipientId, existing);
-  }
-
-  // Map: company entity ID → investor display names
-  const investorsByCompany = new Map<string, string[]>();
-  for (const inv of allInvestments) {
-    const companyId = inv.ownerEntityId;
-    const investorId = (inv.fields.investor as string) ?? null;
-    if (!investorId) continue;
-    const investorEntity = getTypedEntityById(investorId);
-    const investorName = investorEntity?.title ?? inv.displayName ?? investorId;
-    const existing = investorsByCompany.get(companyId) ?? [];
-    if (!existing.includes(investorName)) existing.push(investorName);
-    investorsByCompany.set(companyId, existing);
-  }
-
-  // Helper to get funding badges for a stakeholder
-  function getFundingBadges(entityId: string | undefined): string[] {
-    if (!entityId) return [];
-    const badges: string[] = [];
-    // Check grants (by recipient ID — could be stableId, slug, or display name)
-    const grantFunders = grantFundersByRecipient.get(entityId);
-    if (grantFunders) badges.push(...grantFunders);
-    // Check investments (by company ownerEntityId — typically stableId)
-    const investors = investorsByCompany.get(entityId);
-    if (investors) badges.push(...investors);
-    // If nothing found, try resolving to stableId
-    if (badges.length === 0) {
-      const ent = getTypedEntityById(entityId);
-      if (ent?.stableId && ent.stableId !== entityId) {
-        const g = grantFundersByRecipient.get(ent.stableId);
-        if (g) badges.push(...g);
-        const i = investorsByCompany.get(ent.stableId);
-        if (i) badges.push(...i);
-      }
-    }
-    return [...new Set(badges)]; // deduplicate
-  }
-
   // Stakeholders tab
   if (entity.stakeholders.length > 0) {
     tabs.push({
@@ -455,8 +401,9 @@ export default async function LegislationDetailPage({
               <thead>
                 <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
                   <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
-                  <th className="text-left py-1.5 px-3 font-medium w-[80px]">Position</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[70px]">Position</th>
                   <th className="text-left py-1.5 px-3 font-medium">Reason</th>
+                  <th className="text-left py-1.5 px-3 font-medium w-[40px]">Src</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -477,9 +424,27 @@ export default async function LegislationDetailPage({
                         </span>
                       </td>
                       <td className="py-1.5 px-3 text-foreground/70 text-sm">
-                        <span className="line-clamp-2">{stakeholder.reason ?? "\u2014"}</span>
-                        {stakeholder.source && (
-                          <a href={stakeholder.source} target="_blank" rel="noopener noreferrer" className="ml-1 text-primary hover:underline text-xs">[source]</a>
+                        <StakeholderReasonCell
+                          reason={stakeholder.reason}
+                          context={stakeholder.context}
+                          source={stakeholder.source}
+                        />
+                      </td>
+                      <td className="py-1.5 px-3 text-center">
+                        {stakeholder.source ? (
+                          <a
+                            href={stakeholder.source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80"
+                            title="View source"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="inline-block">
+                              <path d="M6 3H3v10h10v-3M9 3h4v4M9 7l4-4" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground/30">&mdash;</span>
                         )}
                       </td>
                     </tr>
