@@ -626,6 +626,24 @@ export const resources = pgTable(
     archiveUrl: text("archive_url"),
     /** Stance for legislation coverage: support, oppose, neutral, mixed, analysis */
     stance: text("stance"),
+    /** Short context note: "Foundational alignment paper from Anthropic" */
+    contextNote: text("context_note"),
+    /** High-level purpose: homepage, primary_source, commentary, dataset, tool */
+    resourcePurpose: text("resource_purpose"),
+    /** Fine-grained subtype: arxiv_preprint, blog_post, executive_order, etc. */
+    resourceSubtype: text("resource_subtype"),
+    /** Type-specific metadata for web pages, media, misc (JSONB bag) */
+    typeMetadata: jsonb("type_metadata").$type<Record<string, unknown>>(),
+    /** Authoring org entity stableId (distinct from publicationId which is the venue) */
+    publisherEntityId: text("publisher_entity_id"),
+    /** Entity stableIds this resource is about (approach, concept, policy, org entities) */
+    relatedEntityIds: jsonb("related_entity_ids").$type<string[]>(),
+    /** Enrichment pipeline status: pending | fetched | classified | enriched | reviewed */
+    enrichmentStatus: text("enrichment_status"),
+    /** When enrichment pipeline last ran */
+    enrichmentDate: timestamp("enrichment_date", { withTimezone: true }),
+    /** Computed composite importance score 0-1 */
+    importanceScore: real("importance_score"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -640,8 +658,13 @@ export const resources = pgTable(
     index("idx_res_type").on(table.type),
     index("idx_res_publication_id").on(table.publicationId),
     index("idx_res_created_at").on(table.createdAt),
-    // GIN indexes on tags, authors, and search_vector are created in migration SQL
-    // (Drizzle doesn't support GIN index declarations)
+    index("idx_res_enrichment_status").on(table.enrichmentStatus),
+    index("idx_res_importance_score").on(table.importanceScore),
+    index("idx_res_publisher_entity_id").on(table.publisherEntityId),
+    index("idx_res_resource_purpose").on(table.resourcePurpose),
+    index("idx_res_resource_subtype").on(table.resourceSubtype),
+    // GIN indexes on tags, authors, related_entity_ids, and search_vector
+    // are created in migration SQL (Drizzle doesn't support GIN index declarations)
   ]
 );
 
@@ -665,6 +688,76 @@ export const resourceCitations = pgTable(
     index("idx_rc_page_id_int").on(table.pageIdInt),
   ]
 );
+
+// ── Resource sub-tables ───────────────────────────────────────────────
+
+/** Type-specific metadata for academic papers (~800-2,000 resources). */
+export const resourcePapers = pgTable("resource_papers", {
+  resourceId: text("resource_id")
+    .primaryKey()
+    .references(() => resources.id, { onDelete: "cascade" }),
+  arxivId: text("arxiv_id"),
+  doi: text("doi"),
+  semanticScholarId: text("semantic_scholar_id"),
+  abstract: text("abstract"),
+  citationCount: integer("citation_count"),
+  influentialCitationCount: integer("influential_citation_count"),
+  categories: jsonb("categories").$type<string[]>(),
+  methodology: text("methodology"),
+  year: integer("year"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_rp_arxiv_id").on(table.arxivId),
+  index("idx_rp_doi").on(table.doi),
+  index("idx_rp_semantic_scholar_id").on(table.semanticScholarId),
+  index("idx_rp_year").on(table.year),
+]);
+
+/** Type-specific metadata for forum posts (~400-1,200 resources). */
+export const resourceForumPosts = pgTable("resource_forum_posts", {
+  resourceId: text("resource_id")
+    .primaryKey()
+    .references(() => resources.id, { onDelete: "cascade" }),
+  forum: text("forum").notNull(),
+  forumPostId: text("forum_post_id"),
+  forumSlug: text("forum_slug"),
+  karma: integer("karma"),
+  commentCount: integer("comment_count"),
+  authorUsername: text("author_username"),
+  forumTags: jsonb("forum_tags").$type<string[]>(),
+  sequenceTitle: text("sequence_title"),
+  curated: boolean("curated"),
+  crossPostedFrom: text("cross_posted_from"),
+  canonicalForum: text("canonical_forum"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_rfp_forum").on(table.forum),
+  index("idx_rfp_forum_post_id").on(table.forumPostId),
+  index("idx_rfp_cross_posted_from").on(table.crossPostedFrom),
+]);
+
+/** Type-specific metadata for policy/government documents (~100-300 resources). */
+export const resourcePolicyDocs = pgTable("resource_policy_docs", {
+  resourceId: text("resource_id")
+    .primaryKey()
+    .references(() => resources.id, { onDelete: "cascade" }),
+  documentType: text("document_type"),
+  jurisdictionEntityId: text("jurisdiction_entity_id"),
+  agencyEntityId: text("agency_entity_id"),
+  policyEntityId: text("policy_entity_id"),
+  effectiveDate: text("effective_date"),
+  documentStatus: text("document_status"),
+  referenceNumber: text("reference_number"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_rpd_jurisdiction").on(table.jurisdictionEntityId),
+  index("idx_rpd_agency").on(table.agencyEntityId),
+  index("idx_rpd_policy").on(table.policyEntityId),
+  index("idx_rpd_document_type").on(table.documentType),
+]);
 
 // ── TableBase: Entity catalog (continued) ─────────────────────────────
 

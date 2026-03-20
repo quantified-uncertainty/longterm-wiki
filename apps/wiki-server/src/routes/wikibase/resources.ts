@@ -11,7 +11,15 @@ import {
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { resources, resourceCitations, wikiPages, citationContent } from "../../schema.js";
+import {
+  resources,
+  resourceCitations,
+  resourcePapers,
+  resourceForumPosts,
+  resourcePolicyDocs,
+  wikiPages,
+  citationContent,
+} from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import type * as schema from "../../schema.js";
 import {
@@ -26,6 +34,9 @@ import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
   UpsertResourceBatchSchema,
   UpdateResourceFetchStatusSchema,
+  UpsertResourcePaperSchema,
+  UpsertResourceForumPostSchema,
+  UpsertResourcePolicyDocSchema,
   type ResourceStatsResult,
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -56,6 +67,15 @@ interface ResourceSearchRow {
   last_fetched_at: string | null;
   archive_url: string | null;
   stance: string | null;
+  context_note: string | null;
+  resource_purpose: string | null;
+  resource_subtype: string | null;
+  type_metadata: Record<string, unknown> | null;
+  publisher_entity_id: string | null;
+  related_entity_ids: string[] | null;
+  enrichment_status: string | null;
+  enrichment_date: string | null;
+  importance_score: number | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -113,6 +133,18 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
   type: z.string().max(50).optional(),
 });
 
+const BatchDetailsSchema = z.object({
+  papers: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourcePaperSchema)).max(200).optional(),
+  forumPosts: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourceForumPostSchema)).max(200).optional(),
+  policyDocs: z.array(z.object({
+    resourceId: z.string().min(1).max(200),
+  }).merge(UpsertResourcePolicyDocSchema)).max(200).optional(),
+});
+
 const AuthorEntityIdsSchema = z.object({
   items: z.array(z.object({
     resourceId: z.string().min(1),
@@ -146,6 +178,14 @@ function resourceValues(d: ResourceInput) {
     stableId: d.stableId ?? null,
     archiveUrl: d.archiveUrl ?? null,
     stance: d.stance ?? null,
+    contextNote: d.contextNote ?? null,
+    resourcePurpose: d.resourcePurpose ?? null,
+    resourceSubtype: d.resourceSubtype ?? null,
+    typeMetadata: d.typeMetadata ?? null,
+    publisherEntityId: d.publisherEntityId ?? null,
+    relatedEntityIds: d.relatedEntityIds ?? null,
+    enrichmentStatus: d.enrichmentStatus ?? null,
+    importanceScore: d.importanceScore ?? null,
   };
 }
 
@@ -201,6 +241,20 @@ async function upsertResource(
         stableId: sql`COALESCE(${resources.stableId}, ${vals.stableId})`,
         archiveUrl: sql`COALESCE(${vals.archiveUrl}, ${resources.archiveUrl})`,
         stance: sql`COALESCE(${vals.stance}, ${resources.stance})`,
+        contextNote: sql`COALESCE(${vals.contextNote}, ${resources.contextNote})`,
+        resourcePurpose: sql`COALESCE(${vals.resourcePurpose}, ${resources.resourcePurpose})`,
+        resourceSubtype: sql`COALESCE(${vals.resourceSubtype}, ${resources.resourceSubtype})`,
+        typeMetadata: vals.typeMetadata
+          ? sql`COALESCE(${JSON.stringify(vals.typeMetadata)}::jsonb, ${resources.typeMetadata})`
+          : sql`COALESCE(null::jsonb, ${resources.typeMetadata})`,
+        publisherEntityId: sql`COALESCE(${vals.publisherEntityId}, ${resources.publisherEntityId})`,
+        relatedEntityIds: jsonbCoalesce(vals.relatedEntityIds, resources.relatedEntityIds),
+        enrichmentStatus: sql`COALESCE(${vals.enrichmentStatus}, ${resources.enrichmentStatus})`,
+        // Auto-set enrichmentDate when enrichmentStatus changes
+        enrichmentDate: vals.enrichmentStatus
+          ? sql`now()`
+          : sql`COALESCE(null::timestamptz, ${resources.enrichmentDate})`,
+        importanceScore: sql`COALESCE(${vals.importanceScore}, ${resources.importanceScore})`,
         updatedAt: sql`now()`,
       },
     })
@@ -269,8 +323,59 @@ function formatResource(r: typeof resources.$inferSelect) {
     lastFetchedAt: r.lastFetchedAt,
     archiveUrl: r.archiveUrl,
     stance: r.stance,
+    contextNote: r.contextNote,
+    resourcePurpose: r.resourcePurpose,
+    resourceSubtype: r.resourceSubtype,
+    typeMetadata: r.typeMetadata,
+    publisherEntityId: r.publisherEntityId,
+    relatedEntityIds: r.relatedEntityIds,
+    enrichmentStatus: r.enrichmentStatus,
+    enrichmentDate: r.enrichmentDate,
+    importanceScore: r.importanceScore,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
+  };
+}
+
+function formatPaper(r: typeof resourcePapers.$inferSelect) {
+  return {
+    arxivId: r.arxivId,
+    doi: r.doi,
+    semanticScholarId: r.semanticScholarId,
+    abstract: r.abstract,
+    citationCount: r.citationCount,
+    influentialCitationCount: r.influentialCitationCount,
+    categories: r.categories,
+    methodology: r.methodology,
+    year: r.year,
+  };
+}
+
+function formatForumPost(r: typeof resourceForumPosts.$inferSelect) {
+  return {
+    forum: r.forum,
+    forumPostId: r.forumPostId,
+    forumSlug: r.forumSlug,
+    karma: r.karma,
+    commentCount: r.commentCount,
+    authorUsername: r.authorUsername,
+    forumTags: r.forumTags,
+    sequenceTitle: r.sequenceTitle,
+    curated: r.curated,
+    crossPostedFrom: r.crossPostedFrom,
+    canonicalForum: r.canonicalForum,
+  };
+}
+
+function formatPolicyDoc(r: typeof resourcePolicyDocs.$inferSelect) {
+  return {
+    documentType: r.documentType,
+    jurisdictionEntityId: r.jurisdictionEntityId,
+    agencyEntityId: r.agencyEntityId,
+    policyEntityId: r.policyEntityId,
+    effectiveDate: r.effectiveDate,
+    documentStatus: r.documentStatus,
+    referenceNumber: r.referenceNumber,
   };
 }
 
@@ -401,7 +506,10 @@ const resourcesApp = new Hono()
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
           fetched_at, content_hash, stable_id,
-          fetch_status, last_fetched_at, archive_url,
+          fetch_status, last_fetched_at, archive_url, stance,
+          context_note, resource_purpose, resource_subtype,
+          type_metadata, publisher_entity_id, related_entity_ids,
+          enrichment_status, enrichment_date, importance_score,
           created_at, updated_at,
           ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
         FROM resources
@@ -435,6 +543,15 @@ const resourcesApp = new Hono()
         lastFetchedAt: r.last_fetched_at,
         archiveUrl: r.archive_url,
         stance: r.stance,
+        contextNote: r.context_note,
+        resourcePurpose: r.resource_purpose,
+        resourceSubtype: r.resource_subtype,
+        typeMetadata: r.type_metadata,
+        publisherEntityId: r.publisher_entity_id,
+        relatedEntityIds: r.related_entity_ids,
+        enrichmentStatus: r.enrichment_status,
+        enrichmentDate: r.enrichment_date,
+        importanceScore: r.importance_score,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),
@@ -745,6 +862,328 @@ const resourcesApp = new Hono()
     return c.json({ updated });
   })
 
+  // ---- GET /:id/details (resource + sub-table data) ----
+
+  .get("/:id/details", async (c) => {
+    const id = c.req.param("id");
+    const db = getDrizzleDb();
+
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.id, id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      return notFoundError(c, `Resource not found: ${id}`);
+    }
+
+    // Fetch sub-table data in parallel
+    const [paperRows, forumRows, policyRows, citations] = await Promise.all([
+      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
+      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
+      db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
+      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+    ]);
+
+    return c.json({
+      ...formatResource(rows[0]),
+      paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
+      forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
+      policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
+      citedBy: citations.map((row) => row.pageId),
+    });
+  })
+
+  // ---- POST /:id/paper (upsert resource_papers row) ----
+
+  .post("/:id/paper", zv("json", UpsertResourcePaperSchema), async (c) => {
+    const id = c.req.param("id");
+    const data = c.req.valid("json");
+
+    const db = getDrizzleDb();
+
+    // Verify resource exists
+    const resRows = await db.select({ id: resources.id }).from(resources).where(eq(resources.id, id)).limit(1);
+    if (resRows.length === 0) return notFoundError(c, `Resource not found: ${id}`);
+
+    try {
+      await db
+        .insert(resourcePapers)
+        .values({
+          resourceId: id,
+          ...data,
+          categories: data.categories ?? null,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: resourcePapers.resourceId,
+          set: {
+            arxivId: sql`COALESCE(${data.arxivId ?? null}, ${resourcePapers.arxivId})`,
+            doi: sql`COALESCE(${data.doi ?? null}, ${resourcePapers.doi})`,
+            semanticScholarId: sql`COALESCE(${data.semanticScholarId ?? null}, ${resourcePapers.semanticScholarId})`,
+            abstract: sql`COALESCE(${data.abstract ?? null}, ${resourcePapers.abstract})`,
+            citationCount: sql`COALESCE(${data.citationCount ?? null}, ${resourcePapers.citationCount})`,
+            influentialCitationCount: sql`COALESCE(${data.influentialCitationCount ?? null}, ${resourcePapers.influentialCitationCount})`,
+            categories: data.categories
+              ? sql`COALESCE(${JSON.stringify(data.categories)}::jsonb, ${resourcePapers.categories})`
+              : sql`COALESCE(null::jsonb, ${resourcePapers.categories})`,
+            methodology: sql`COALESCE(${data.methodology ?? null}, ${resourcePapers.methodology})`,
+            year: sql`COALESCE(${data.year ?? null}, ${resourcePapers.year})`,
+            updatedAt: sql`now()`,
+          },
+        });
+
+      return c.json({ ok: true, resourceId: id }, 201);
+    } catch (err) {
+      logger.error({ err, resourceId: id }, "paper upsert failed");
+      return dbError(c, "paper upsert", err, { resourceId: id });
+    }
+  })
+
+  // ---- POST /:id/forum-post (upsert resource_forum_posts row) ----
+
+  .post("/:id/forum-post", zv("json", UpsertResourceForumPostSchema), async (c) => {
+    const id = c.req.param("id");
+    const data = c.req.valid("json");
+
+    const db = getDrizzleDb();
+
+    const resRows = await db.select({ id: resources.id }).from(resources).where(eq(resources.id, id)).limit(1);
+    if (resRows.length === 0) return notFoundError(c, `Resource not found: ${id}`);
+
+    try {
+      await db
+        .insert(resourceForumPosts)
+        .values({
+          resourceId: id,
+          ...data,
+          forumTags: data.forumTags ?? null,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: resourceForumPosts.resourceId,
+          set: {
+            forum: data.forum,
+            forumPostId: sql`COALESCE(${data.forumPostId ?? null}, ${resourceForumPosts.forumPostId})`,
+            forumSlug: sql`COALESCE(${data.forumSlug ?? null}, ${resourceForumPosts.forumSlug})`,
+            karma: sql`COALESCE(${data.karma ?? null}, ${resourceForumPosts.karma})`,
+            commentCount: sql`COALESCE(${data.commentCount ?? null}, ${resourceForumPosts.commentCount})`,
+            authorUsername: sql`COALESCE(${data.authorUsername ?? null}, ${resourceForumPosts.authorUsername})`,
+            forumTags: data.forumTags
+              ? sql`COALESCE(${JSON.stringify(data.forumTags)}::jsonb, ${resourceForumPosts.forumTags})`
+              : sql`COALESCE(null::jsonb, ${resourceForumPosts.forumTags})`,
+            sequenceTitle: sql`COALESCE(${data.sequenceTitle ?? null}, ${resourceForumPosts.sequenceTitle})`,
+            curated: data.curated != null ? data.curated : sql`${resourceForumPosts.curated}`,
+            crossPostedFrom: sql`COALESCE(${data.crossPostedFrom ?? null}, ${resourceForumPosts.crossPostedFrom})`,
+            canonicalForum: sql`COALESCE(${data.canonicalForum ?? null}, ${resourceForumPosts.canonicalForum})`,
+            updatedAt: sql`now()`,
+          },
+        });
+
+      return c.json({ ok: true, resourceId: id }, 201);
+    } catch (err) {
+      logger.error({ err, resourceId: id }, "forum-post upsert failed");
+      return dbError(c, "forum-post upsert", err, { resourceId: id });
+    }
+  })
+
+  // ---- POST /:id/policy-doc (upsert resource_policy_docs row) ----
+
+  .post("/:id/policy-doc", zv("json", UpsertResourcePolicyDocSchema), async (c) => {
+    const id = c.req.param("id");
+    const data = c.req.valid("json");
+
+    const db = getDrizzleDb();
+
+    const resRows = await db.select({ id: resources.id }).from(resources).where(eq(resources.id, id)).limit(1);
+    if (resRows.length === 0) return notFoundError(c, `Resource not found: ${id}`);
+
+    try {
+      await db
+        .insert(resourcePolicyDocs)
+        .values({
+          resourceId: id,
+          ...data,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: resourcePolicyDocs.resourceId,
+          set: {
+            documentType: sql`COALESCE(${data.documentType ?? null}, ${resourcePolicyDocs.documentType})`,
+            jurisdictionEntityId: sql`COALESCE(${data.jurisdictionEntityId ?? null}, ${resourcePolicyDocs.jurisdictionEntityId})`,
+            agencyEntityId: sql`COALESCE(${data.agencyEntityId ?? null}, ${resourcePolicyDocs.agencyEntityId})`,
+            policyEntityId: sql`COALESCE(${data.policyEntityId ?? null}, ${resourcePolicyDocs.policyEntityId})`,
+            effectiveDate: sql`COALESCE(${data.effectiveDate ?? null}, ${resourcePolicyDocs.effectiveDate})`,
+            documentStatus: sql`COALESCE(${data.documentStatus ?? null}, ${resourcePolicyDocs.documentStatus})`,
+            referenceNumber: sql`COALESCE(${data.referenceNumber ?? null}, ${resourcePolicyDocs.referenceNumber})`,
+            updatedAt: sql`now()`,
+          },
+        });
+
+      return c.json({ ok: true, resourceId: id }, 201);
+    } catch (err) {
+      logger.error({ err, resourceId: id }, "policy-doc upsert failed");
+      return dbError(c, "policy-doc upsert", err, { resourceId: id });
+    }
+  })
+
+  // ---- POST /batch-details (batch upsert sub-table rows) ----
+
+  .post("/batch-details", zv("json", BatchDetailsSchema), async (c) => {
+    const batchData = c.req.valid("json");
+
+    const db = getDrizzleDb();
+    const results = { papers: 0, forumPosts: 0, policyDocs: 0 };
+
+    try {
+      await db.transaction(async (tx) => {
+        // Batch upsert papers
+        if (batchData.papers) {
+          for (const item of batchData.papers) {
+            const { resourceId, ...data } = item;
+            await tx
+              .insert(resourcePapers)
+              .values({ resourceId, ...data, categories: data.categories ?? null, updatedAt: new Date() })
+              .onConflictDoUpdate({
+                target: resourcePapers.resourceId,
+                set: {
+                  arxivId: sql`COALESCE(${data.arxivId ?? null}, ${resourcePapers.arxivId})`,
+                  doi: sql`COALESCE(${data.doi ?? null}, ${resourcePapers.doi})`,
+                  semanticScholarId: sql`COALESCE(${data.semanticScholarId ?? null}, ${resourcePapers.semanticScholarId})`,
+                  abstract: sql`COALESCE(${data.abstract ?? null}, ${resourcePapers.abstract})`,
+                  citationCount: sql`COALESCE(${data.citationCount ?? null}, ${resourcePapers.citationCount})`,
+                  influentialCitationCount: sql`COALESCE(${data.influentialCitationCount ?? null}, ${resourcePapers.influentialCitationCount})`,
+                  categories: data.categories
+                    ? sql`COALESCE(${JSON.stringify(data.categories)}::jsonb, ${resourcePapers.categories})`
+                    : sql`COALESCE(null::jsonb, ${resourcePapers.categories})`,
+                  methodology: sql`COALESCE(${data.methodology ?? null}, ${resourcePapers.methodology})`,
+                  year: sql`COALESCE(${data.year ?? null}, ${resourcePapers.year})`,
+                  updatedAt: sql`now()`,
+                },
+              });
+            results.papers++;
+          }
+        }
+
+        // Batch upsert forum posts
+        if (batchData.forumPosts) {
+          for (const item of batchData.forumPosts) {
+            const { resourceId, ...data } = item;
+            await tx
+              .insert(resourceForumPosts)
+              .values({ resourceId, ...data, forumTags: data.forumTags ?? null, updatedAt: new Date() })
+              .onConflictDoUpdate({
+                target: resourceForumPosts.resourceId,
+                set: {
+                  forum: data.forum,
+                  forumPostId: sql`COALESCE(${data.forumPostId ?? null}, ${resourceForumPosts.forumPostId})`,
+                  forumSlug: sql`COALESCE(${data.forumSlug ?? null}, ${resourceForumPosts.forumSlug})`,
+                  karma: sql`COALESCE(${data.karma ?? null}, ${resourceForumPosts.karma})`,
+                  commentCount: sql`COALESCE(${data.commentCount ?? null}, ${resourceForumPosts.commentCount})`,
+                  authorUsername: sql`COALESCE(${data.authorUsername ?? null}, ${resourceForumPosts.authorUsername})`,
+                  forumTags: data.forumTags
+                    ? sql`COALESCE(${JSON.stringify(data.forumTags)}::jsonb, ${resourceForumPosts.forumTags})`
+                    : sql`COALESCE(null::jsonb, ${resourceForumPosts.forumTags})`,
+                  sequenceTitle: sql`COALESCE(${data.sequenceTitle ?? null}, ${resourceForumPosts.sequenceTitle})`,
+                  curated: data.curated != null ? data.curated : sql`${resourceForumPosts.curated}`,
+                  crossPostedFrom: sql`COALESCE(${data.crossPostedFrom ?? null}, ${resourceForumPosts.crossPostedFrom})`,
+                  canonicalForum: sql`COALESCE(${data.canonicalForum ?? null}, ${resourceForumPosts.canonicalForum})`,
+                  updatedAt: sql`now()`,
+                },
+              });
+            results.forumPosts++;
+          }
+        }
+
+        // Batch upsert policy docs
+        if (batchData.policyDocs) {
+          for (const item of batchData.policyDocs) {
+            const { resourceId, ...data } = item;
+            await tx
+              .insert(resourcePolicyDocs)
+              .values({ resourceId, ...data, updatedAt: new Date() })
+              .onConflictDoUpdate({
+                target: resourcePolicyDocs.resourceId,
+                set: {
+                  documentType: sql`COALESCE(${data.documentType ?? null}, ${resourcePolicyDocs.documentType})`,
+                  jurisdictionEntityId: sql`COALESCE(${data.jurisdictionEntityId ?? null}, ${resourcePolicyDocs.jurisdictionEntityId})`,
+                  agencyEntityId: sql`COALESCE(${data.agencyEntityId ?? null}, ${resourcePolicyDocs.agencyEntityId})`,
+                  policyEntityId: sql`COALESCE(${data.policyEntityId ?? null}, ${resourcePolicyDocs.policyEntityId})`,
+                  effectiveDate: sql`COALESCE(${data.effectiveDate ?? null}, ${resourcePolicyDocs.effectiveDate})`,
+                  documentStatus: sql`COALESCE(${data.documentStatus ?? null}, ${resourcePolicyDocs.documentStatus})`,
+                  referenceNumber: sql`COALESCE(${data.referenceNumber ?? null}, ${resourcePolicyDocs.referenceNumber})`,
+                  updatedAt: sql`now()`,
+                },
+              });
+            results.policyDocs++;
+          }
+        }
+      });
+
+      return c.json({ ok: true, upserted: results }, 201);
+    } catch (err) {
+      logger.error({ err }, "batch-details upsert failed");
+      return dbError(c, "batch-details upsert", err);
+    }
+  })
+
+  // ---- GET /all-details (paginated listing with sub-table data) ----
+
+  .get("/all-details", async (c) => {
+    const parsed = PaginationQuery.safeParse(c.req.query());
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { limit, offset, type } = parsed.data;
+    const db = getDrizzleDb();
+
+    const conditions: SQL | undefined = type
+      ? eq(resources.type, type)
+      : undefined;
+
+    const rows = await db
+      .select()
+      .from(resources)
+      .where(conditions)
+      .orderBy(resources.id)
+      .limit(limit)
+      .offset(offset);
+
+    if (rows.length === 0) {
+      const countResult = await db.select({ count: count() }).from(resources).where(conditions);
+      return c.json({ resources: [], total: countResult[0].count, limit, offset });
+    }
+
+    const ids = rows.map((r) => r.id);
+    const idList = sql.join(ids.map((id) => sql`${id}`), sql`, `);
+
+    // Fetch all sub-table rows for this page of resources in parallel
+    const [paperRows, forumRows, policyRows] = await Promise.all([
+      db.select().from(resourcePapers).where(sql`${resourcePapers.resourceId} IN (${idList})`),
+      db.select().from(resourceForumPosts).where(sql`${resourceForumPosts.resourceId} IN (${idList})`),
+      db.select().from(resourcePolicyDocs).where(sql`${resourcePolicyDocs.resourceId} IN (${idList})`),
+    ]);
+
+    // Index by resourceId
+    const paperIndex = new Map(paperRows.map((r) => [r.resourceId, r]));
+    const forumIndex = new Map(forumRows.map((r) => [r.resourceId, r]));
+    const policyIndex = new Map(policyRows.map((r) => [r.resourceId, r]));
+
+    const countResult = await db.select({ count: count() }).from(resources).where(conditions);
+
+    return c.json({
+      resources: rows.map((r) => ({
+        ...formatResource(r),
+        paper: paperIndex.has(r.id) ? formatPaper(paperIndex.get(r.id)!) : null,
+        forumPost: forumIndex.has(r.id) ? formatForumPost(forumIndex.get(r.id)!) : null,
+        policyDoc: policyIndex.has(r.id) ? formatPolicyDoc(policyIndex.get(r.id)!) : null,
+      })),
+      total: countResult[0].count,
+      limit,
+      offset,
+    });
+  })
+
   // ---- GET /:id (get by ID) ----
 
   .get("/:id", async (c) => {
@@ -761,14 +1200,19 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // Also fetch citations
-    const citations = await db
-      .select({ pageId: resourceCitations.pageId })
-      .from(resourceCitations)
-      .where(eq(resourceCitations.resourceId, id));
+    // Also fetch citations and sub-table data
+    const [citations, paperRows, forumRows, policyRows] = await Promise.all([
+      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
+      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
+      db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
+    ]);
 
     return c.json({
       ...formatResource(rows[0]),
+      paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
+      forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
+      policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
       citedBy: citations.map((row) => row.pageId),
     });
   });

@@ -119,11 +119,33 @@ export function ResourceLink({
 
         <span className="block font-semibold text-foreground mb-1.5">{resource.title}</span>
 
+        {resource.context_note && (
+          <span className="block text-[0.75rem] text-blue-600 dark:text-blue-400 mb-1.5 italic leading-snug">
+            {resource.context_note}
+          </span>
+        )}
+
         {resource.authors && resource.authors.length > 0 && (
           <span className="block text-[0.8rem] text-muted-foreground mb-1.5">
             {resource.authors.slice(0, 3).join(", ")}
             {resource.authors.length > 3 && " et al."}
             {resource.published_date && ` (${resource.published_date.slice(0, 4)})`}
+          </span>
+        )}
+
+        {/* Type-specific metadata */}
+        {resource.paper?.citation_count != null && resource.paper.citation_count > 0 && (
+          <span className="block text-[0.7rem] text-muted-foreground mb-1">
+            {resource.paper.citation_count.toLocaleString()} citations
+            {resource.paper.categories && resource.paper.categories.length > 0 && (
+              <> &middot; {resource.paper.categories.slice(0, 2).join(", ")}</>
+            )}
+          </span>
+        )}
+        {resource.forum_post?.karma != null && (
+          <span className="block text-[0.7rem] text-muted-foreground mb-1">
+            {resource.forum_post.karma} karma &middot; {resource.forum_post.comment_count ?? 0} comments
+            {resource.forum_post.curated && <> &middot; Curated</>}
           </span>
         )}
 
