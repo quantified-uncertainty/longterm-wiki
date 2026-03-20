@@ -2139,6 +2139,7 @@ export const VALID_THING_TYPES = [
   "funding-program",
   "division-personnel",
   "research-area",
+  "policy-stakeholder",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];

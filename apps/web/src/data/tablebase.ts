@@ -506,6 +506,9 @@ interface TableBaseShape {
   }>;
   /** Record verification verdicts, keyed by "recordType:recordId" */
   recordVerdicts?: Record<string, RecordVerdict>;
+  /** Policy stakeholder PG IDs, keyed by "policyEntityStableId:stakeholderDisplayName" -> stakeholder 10-char ID.
+   *  Used to look up verification verdicts for stakeholder rows on legislation pages. */
+  policyStakeholderIds?: Record<string, string>;
 }
 
 // ============================================================================
@@ -1083,6 +1086,22 @@ export function getRecordVerdictStats(recordType: string): {
     }
   }
   return stats;
+}
+
+// ============================================================================
+// POLICY STAKEHOLDER IDS
+// Maps "policyEntityStableId:stakeholderDisplayName" -> PG stakeholder ID.
+// Used by legislation pages to look up verification verdicts for stakeholder rows.
+// ============================================================================
+
+/** Get the PG stakeholder ID for a YAML stakeholder on a specific policy entity. */
+export function getPolicyStakeholderId(
+  policyEntityStableId: string,
+  stakeholderDisplayName: string,
+): string | null {
+  const map = getTableBase().policyStakeholderIds;
+  if (!map) return null;
+  return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
 // Re-export loadYaml for use in domain modules

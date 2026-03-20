@@ -41,6 +41,7 @@ export const VALID_RECORD_TYPES = [
   "funding-round",
   "investment",
   "equity-position",
+  "policy-stakeholder",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];

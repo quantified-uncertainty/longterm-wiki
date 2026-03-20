@@ -513,6 +513,65 @@ export async function fetchRecordVerdicts() {
 }
 
 /**
+ * Fetch policy stakeholder IDs from wiki-server.
+ * Returns a map keyed by "policyEntityId:stakeholderDisplayName" -> stakeholder PG ID.
+ * Used by the legislation page to look up verification verdicts for each stakeholder row.
+ *
+ * The policyEntityId key is the entity stableId (the FK in PG), so callers must use
+ * the entity stableId when looking up — not the slug.
+ */
+export async function fetchPolicyStakeholderIds() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  policy-stakeholder-ids: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    // Fetch all policy stakeholders from PG via the things table.
+    // Each thing row has sourceId = PG stakeholder ID, parentThingId = policy entity stableId.
+    const pageSize = 200;
+    const idMap = {};
+    let offset = 0;
+    while (true) {
+      const url = `${serverUrl}/api/things?thing_type=policy-stakeholder&limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+      if (!resp.ok) {
+        logWikiServerWarning('policy-stakeholder-ids', `HTTP ${resp.status}`);
+        return {};
+      }
+      const data = await resp.json();
+      const items = data.things || [];
+      for (const t of items) {
+        // title format: "Stakeholder Name on Policy Title"
+        // parentThingId is the policy entity's stableId
+        // sourceId is the PG stakeholder ID (same as the things row's sourceId)
+        if (t.sourceId && t.parentThingId) {
+          const onIdx = t.title?.indexOf(' on ');
+          if (onIdx > 0) {
+            const stakeholderName = t.title.substring(0, onIdx);
+            idMap[`${t.parentThingId}:${stakeholderName}`] = t.sourceId;
+          }
+        }
+      }
+      if (items.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    const count = Object.keys(idMap).length;
+    if (count > 0) {
+      console.log(`  policy-stakeholder-ids: ${count} stakeholder ID mappings fetched`);
+    }
+    return idMap;
+  } catch (err) {
+    logWikiServerWarning('policy-stakeholder-ids', err instanceof Error ? err.message : String(err));
+    return {};
+  }
+}
+
+/**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
  * PG stores canonical entity IDs in personId/organizationId.
  */
