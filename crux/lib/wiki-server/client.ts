@@ -153,40 +153,46 @@ async function tlsBypassFetch(
       fn();
     };
 
+    let req: ReturnType<typeof https.request>;
     const timer = setTimeout(() => {
-      req.destroy();
+      req?.destroy();
       settle(() =>
         reject(new DOMException('The operation was aborted', 'AbortError')),
       );
     }, init.timeoutMs);
 
-    const req = https.request(
-      {
-        hostname: ip,
-        port,
-        path: parsed.pathname + parsed.search,
-        method: init.method,
-        rejectUnauthorized: false,
-        servername: 'internal', // Dummy SNI to bypass ISP filtering
-        headers: { ...init.headers, Host: hostname },
-      },
-      (res) => {
-        let body = '';
-        res.on('data', (chunk: Buffer) => (body += chunk.toString()));
-        res.on('error', (err) => settle(() => reject(err)));
-        res.on('end', () => {
-          const status = res.statusCode ?? 500;
-          settle(() =>
-            resolve({
-              ok: status >= 200 && status < 300,
-              status,
-              text: async () => body,
-              json: async () => JSON.parse(body),
-            }),
-          );
-        });
-      },
-    );
+    try {
+      req = https.request(
+        {
+          hostname: ip,
+          port,
+          path: parsed.pathname + parsed.search,
+          method: init.method,
+          rejectUnauthorized: false,
+          servername: 'internal', // Dummy SNI to bypass ISP filtering
+          headers: { ...init.headers, Host: hostname },
+        },
+        (res) => {
+          let body = '';
+          res.on('data', (chunk: Buffer) => (body += chunk.toString()));
+          res.on('error', (err) => settle(() => reject(err)));
+          res.on('end', () => {
+            const status = res.statusCode ?? 500;
+            settle(() =>
+              resolve({
+                ok: status >= 200 && status < 300,
+                status,
+                text: async () => body,
+                json: async () => JSON.parse(body),
+              }),
+            );
+          });
+        },
+      );
+    } catch (err) {
+      settle(() => reject(err));
+      return;
+    }
     req.on('error', (err) => settle(() => reject(err)));
     if (init.body) req.write(init.body);
     req.end();
