@@ -4232,13 +4232,18 @@
   stableId: u3Yf4JXH4Q
   wikiId: E1213
   type: organization
-  orgType: generic
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
   title: The Future Society
   website: https://thefuturesociety.org
   description: >-
-    International nonprofit working on AI governance.
+    International nonprofit founded in 2014 at Harvard Kennedy School, focused on AI governance
+    and policy. Convened 44 civil society organizations for AI governance priorities survey and
+    played a key role at the 2025 Paris AI Action Summit. Works across the UN, OECD, and EU on
+    responsible AI governance frameworks.
   tags:
     - ai-governance
+    - ai-policy
     - policy
   lastUpdated: 2026-03
 
@@ -5696,4 +5701,241 @@
     - ea-community
     - longtermism
     - existential-risk
+  lastUpdated: 2026-03
+
+- id: ada-lovelace-institute
+  stableId: BgSnHHzV6g
+  wikiId: E1979
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: Ada Lovelace Institute
+  website: https://www.adalovelaceinstitute.org
+  description: >-
+    Independent UK research institute established by the Nuffield Foundation in 2018, focused on
+    ensuring data and AI work for people and society. Produces influential research on algorithmic
+    accountability, facial recognition regulation, biometrics governance, and AI in the public
+    sector. A leading European voice bridging technical research with human rights-focused policy.
+  tags:
+    - ai-governance
+    - ai-policy
+    - uk-based
+    - algorithmic-accountability
+  lastUpdated: 2026-03
+
+- id: ai-now-institute
+  stableId: VJacG0VE2w
+  wikiId: E1980
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: AI Now Institute
+  website: https://ainowinstitute.org
+  description: >-
+    Research institute founded in 2017 at New York University, pioneering research on the social
+    implications of AI. Known for annual reports mapping AI industry power concentration,
+    algorithmic bias research, and advocacy against unregulated facial recognition and surveillance.
+    Founded by Meredith Whittaker and Kate Crawford.
+  tags:
+    - ai-governance
+    - ai-policy
+    - algorithmic-accountability
+    - ai-ethics
+  lastUpdated: 2026-03
+
+- id: partnership-on-ai
+  stableId: lG1LEx80wg
+  wikiId: E1981
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: Partnership on AI
+  website: https://partnershiponai.org
+  description: >-
+    Multi-stakeholder nonprofit founded in 2016 by Amazon, Apple, DeepMind, Google, IBM, Meta, and
+    Microsoft to advance responsible AI practices. Now includes 100+ partners across industry, civil
+    society, and academia. Develops best practices, guidelines, and frameworks for responsible AI
+    development and deployment, with major workstreams on synthetic media, AI and labor, and safety.
+  tags:
+    - ai-governance
+    - ai-policy
+    - industry-collaboration
+    - multi-stakeholder
+  lastUpdated: 2026-03
+
+- id: ai-policy-institute
+  stableId: w7mwNxGtCQ
+  wikiId: E1982
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: AI Policy Institute
+  website: https://theaipi.org
+  description: >-
+    Washington DC-based policy advocacy organization founded in 2023, focused on channeling public
+    concern about AI into effective governance. Conducts polling on AI attitudes, engages with
+    policymakers and media, and advocates for responsible AI development. Works on issues including
+    deepfakes, autonomous AI agents, and AI safety standards.
+  tags:
+    - ai-governance
+    - ai-policy
+    - advocacy
+  lastUpdated: 2026-03
+
+- id: americans-for-responsible-innovation
+  stableId: IFjdCevnFg
+  wikiId: E1983
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: Americans for Responsible Innovation
+  website: https://responsibleinnovation.org
+  description: >-
+    Washington DC-based AI policy organization founded in 2023 with significant funding from
+    effective altruism-aligned donors including Dustin Moskovitz. Focuses on building bipartisan
+    support for AI safety legislation in Congress. Has become one of the major players influencing
+    AI policy on Capitol Hill, with a focus on catastrophic risk prevention.
+  tags:
+    - ai-governance
+    - ai-policy
+    - advocacy
+    - ea-community
+  lastUpdated: 2026-03
+
+- id: brookings-ai
+  stableId: GrI1ZpreMg
+  wikiId: E1984
+  type: organization
+  orgType: generic
+  title: Brookings Institution AI and Emerging Technology Initiative
+  website: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
+  description: >-
+    The AI and Emerging Technology (AIET) Initiative at the Brookings Institution researches AI
+    governance, innovation policy, and democratic accountability. One of the most-cited think tank
+    programs on AI policy in Washington, producing influential reports on AI regulation, workforce
+    impacts, and US-China tech competition. Part of the broader Brookings Governance Studies program.
+  tags:
+    - ai-governance
+    - ai-policy
+    - think-tank
+  lastUpdated: 2026-03
+
+- id: rand-ai
+  stableId: hibH3GwFQA
+  wikiId: E1985
+  type: organization
+  orgType: generic
+  title: RAND Corporation AI Policy Research
+  website: https://www.rand.org/topics/artificial-intelligence.html
+  description: >-
+    RAND Corporation's AI research portfolio spans national security, defense, autonomous systems,
+    and strategic stability. RAND's AI policy work shapes Pentagon and NATO thinking on autonomous
+    weapons, escalation risk, and AI-enabled warfare. Also produces research on AI governance,
+    workforce impacts, and healthcare applications of AI.
+  tags:
+    - ai-governance
+    - ai-policy
+    - national-security
+    - think-tank
+  lastUpdated: 2026-03
+
+- id: stanford-hai
+  stableId: YPE80Sx2VA
+  wikiId: E1986
+  type: organization
+  orgType: academic
+  summaryPage: safety-orgs-overview
+  title: Stanford Institute for Human-Centered Artificial Intelligence (HAI)
+  website: https://hai.stanford.edu
+  description: >-
+    Interdisciplinary institute at Stanford University founded in 2019 by Fei-Fei Li and John
+    Etchemendy. Produces the widely cited annual AI Index Report tracking global AI trends.
+    Combines technical AI research with policy, economics, and ethics perspectives. Houses 200+
+    affiliated faculty across Stanford and influences AI policy through research, convenings, and
+    the AI Index which is regularly referenced by governments worldwide.
+  tags:
+    - ai-governance
+    - ai-policy
+    - academic
+    - ai-index
+  lastUpdated: 2026-03
+
+- id: center-for-ai-policy
+  stableId: V3NJg9djng
+  wikiId: E1987
+  type: organization
+  orgType: safety-org
+  summaryPage: safety-orgs-overview
+  title: Center for AI Policy
+  website: https://www.centeraipolicy.org
+  description: >-
+    Non-partisan nonprofit founded in 2023 that worked with Congress from June 2023 through May
+    2025 to promote legislative solutions to catastrophic risks from advanced AI. Focused on
+    bipartisan engagement with Congressional offices on AI safety policy. Ceased most active
+    operations in 2025 due to funding constraints.
+  tags:
+    - ai-governance
+    - ai-policy
+    - advocacy
+    - defunct
+  lastUpdated: 2026-03
+
+- id: center-for-democracy-and-technology
+  stableId: XkqcWk46oQ
+  wikiId: E1988
+  type: organization
+  orgType: generic
+  title: Center for Democracy and Technology
+  website: https://cdt.org
+  description: >-
+    Washington DC-based nonprofit founded in 1994, working to promote democratic values in
+    technology policy. CDT's AI Governance Lab focuses on algorithmic accountability, automated
+    decision-making in government, AI in education, and workers' rights. One of the oldest and
+    most established digital rights organizations engaging on AI policy, with direct influence on
+    US and EU regulatory processes.
+  tags:
+    - ai-governance
+    - ai-policy
+    - digital-rights
+    - civil-liberties
+  lastUpdated: 2026-03
+
+- id: carnegie-ai
+  stableId: 5RV1WNLBCg
+  wikiId: E1989
+  type: organization
+  orgType: generic
+  title: Carnegie Endowment for International Peace AI Program
+  website: https://carnegieendowment.org/programs/technology-and-international-affairs
+  description: >-
+    The Technology and International Affairs Program at the Carnegie Endowment for International
+    Peace researches how AI and other emerging technologies reshape global governance, geopolitics,
+    and democratic institutions. Focuses on AI governance across democracies and autocracies, AI in
+    warfare, and international AI cooperation frameworks. Operates globally through offices in
+    Washington, Beijing, Brussels, and other cities.
+  tags:
+    - ai-governance
+    - ai-policy
+    - international-affairs
+    - think-tank
+  lastUpdated: 2026-03
+
+- id: csis-ai
+  stableId: qu9klkdh5w
+  wikiId: E1990
+  type: organization
+  orgType: generic
+  title: CSIS Wadhwani Center for AI and Advanced Technologies
+  website: https://www.csis.org/programs/wadhwani-center-ai-and-advanced-technologies
+  description: >-
+    Research program at the Center for Strategic and International Studies (CSIS) in Washington DC,
+    established through a major gift from the Wadhwani Foundation. Publishes influential research
+    on AI's role in national security, military competition, autonomous weapons systems, and
+    US-China tech rivalry. Regularly convenes senior policymakers and produces widely-cited reports
+    on AI governance and strategic competition.
+  tags:
+    - ai-governance
+    - ai-policy
+    - national-security
+    - think-tank
   lastUpdated: 2026-03
