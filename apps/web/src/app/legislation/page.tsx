@@ -195,6 +195,9 @@ function buildSummary(rows: LegislationRow[]): string {
   if (countries.length > 0) parts.push(`national regulations (${countries.join(", ")})`);
   if (hasIntl) parts.push("international agreements and treaties");
 
+  if (parts.length === 0) {
+    return `AI-related legislation, policies, and regulatory frameworks across ${rows.length} entries.`;
+  }
   return `AI-related legislation, policies, and regulatory frameworks across ${rows.length} entries. Covers ${parts.join(", ")}.`;
 }
 
