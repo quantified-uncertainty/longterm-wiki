@@ -36,6 +36,7 @@ import {
 import { formatIntroducedDate } from "@/lib/format-compact";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
 import { ResourceTimeline, type TimelineEvent, type TimelineResource } from "./resource-timeline";
+import { ProvisionCard } from "./provision-card";
 import { parseDisplayDateToISO } from "./date-utils";
 
 export function generateStaticParams() {
@@ -404,20 +405,39 @@ export default async function LegislationDetailPage({
       label: "Provisions",
       count: entity.provisions.length,
       content: (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {[...provisionsByCategory.entries()].map(([category, provisions]) => (
             <div key={category}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">{category}</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-1 px-4">
+                {category}
+              </h3>
+              <div className="space-y-0">
                 {provisions.map((provision, i) => (
-                  <div key={i} className="rounded-lg border border-border/60 bg-card p-3">
-                    <div className="font-semibold text-sm mb-1">{provision.title}</div>
-                    <p className="text-sm text-foreground/70 leading-relaxed">{provision.description}</p>
-                  </div>
+                  <ProvisionCard
+                    key={i}
+                    title={provision.title}
+                    description={provision.description}
+                    billSection={provision.billSection}
+                    billQuote={provision.billQuote}
+                    amendmentNotes={provision.amendmentNotes}
+                    fullTextUrl={entity.fullTextUrl}
+                  />
                 ))}
               </div>
             </div>
           ))}
+          {entity.fullTextUrl && (
+            <div className="px-4 pt-2 border-t border-border/30">
+              <a
+                href={entity.fullTextUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground/40 hover:text-primary transition-colors"
+              >
+                Full enrolled bill text &rarr;
+              </a>
+            </div>
+          )}
         </div>
       ),
     });
@@ -512,11 +532,18 @@ export default async function LegislationDetailPage({
                   return (
                     <tr key={i} className="hover:bg-muted/20 align-top">
                       <td className="py-1.5 px-3">
-                        {href ? (
-                          <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
-                        ) : (
-                          <span className="font-medium text-sm">{stakeholder.name}</span>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {href ? (
+                            <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
+                          ) : (
+                            <span className="font-medium text-sm">{stakeholder.name}</span>
+                          )}
+                          {stakeholder.role && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 whitespace-nowrap">
+                              {stakeholder.role}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-1.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
@@ -540,15 +567,15 @@ export default async function LegislationDetailPage({
     });
   }
 
-  // History tab (amendments + key politicians)
-  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0) {
+  // History tab (amendments + key figures)
+  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0 || entity.keyFigures.length > 0) {
     tabs.push({
       id: "history",
       label: "History",
       count: entity.amendments.length,
       content: (
         <div className="space-y-8">
-          {/* Key Politicians first */}
+          {/* Key Politicians */}
           {entity.keyPoliticians.length > 0 && (
             <section>
               <h2 className="text-lg font-bold mb-3">Key Politicians</h2>
@@ -567,6 +594,36 @@ export default async function LegislationDetailPage({
                           <span className="font-medium text-sm truncate block">{politician.name}</span>
                         )}
                         <div className="text-[11px] text-muted-foreground truncate">{politician.role}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Key Figures (non-political) */}
+          {entity.keyFigures.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3">Key Figures</h2>
+              <div className="space-y-2">
+                {entity.keyFigures.map((figure, i) => {
+                  const href = resolveEntityHref(figure.entityId);
+                  return (
+                    <div key={i} className="rounded-lg border border-border/60 bg-card px-3 py-2.5 flex items-start gap-2.5">
+                      <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+                        {figure.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                      </div>
+                      <div className="min-w-0">
+                        {href ? (
+                          <Link href={href} className="font-medium text-sm text-primary hover:underline">{figure.name}</Link>
+                        ) : (
+                          <span className="font-medium text-sm">{figure.name}</span>
+                        )}
+                        <div className="text-[11px] text-muted-foreground">{figure.role}</div>
+                        {figure.description && (
+                          <p className="text-xs text-foreground/60 leading-relaxed mt-1">{figure.description}</p>
+                        )}
                       </div>
                     </div>
                   );
@@ -596,8 +653,6 @@ export default async function LegislationDetailPage({
               </div>
             </section>
           )}
-
-          {/* Key Politicians rendered above amendments */}
         </div>
       ),
     });

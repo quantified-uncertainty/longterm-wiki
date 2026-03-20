@@ -146,6 +146,8 @@ const PolicyStakeholder = z.object({
   name: z.string(),
   entityId: z.string().optional(),
   position: z.enum(["support", "oppose", "neutral", "mixed"]),
+  /** Distinguishes co-sponsors/drafters from general supporters/opponents */
+  role: z.string().optional(),
   reason: z.string().optional(),
   source: z.string().optional(),
   /** Short notes on funding, affiliations, and connections to other stakeholders */
@@ -156,6 +158,14 @@ const PolicyProvision = z.object({
   title: z.string(),
   description: z.string(),
   category: z.string().optional(),
+  /** Reference to specific bill section, e.g. "§ 22603(b)" */
+  billSection: z.string().optional(),
+  /** Extended detail text shown when the provision card is expanded */
+  details: z.string().optional(),
+  /** Key verbatim quote from the bill text */
+  billQuote: z.string().optional(),
+  /** How this provision changed through the amendment process */
+  amendmentNotes: z.string().optional(),
 });
 
 const PolicyVote = z.object({
@@ -197,6 +207,13 @@ const PolicyEntitySchema = BaseEntity.extend({
     name: z.string(),
     entityId: z.string().optional(),
     role: z.string(),
+  })).default([]),
+  /** Key non-political figures involved in drafting, advocacy, or shaping the legislation */
+  keyFigures: z.array(z.object({
+    name: z.string(),
+    entityId: z.string().optional(),
+    role: z.string(),
+    description: z.string().optional(),
   })).default([]),
 });
 

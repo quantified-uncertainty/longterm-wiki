@@ -136,31 +136,163 @@
     - title: Safety Testing
       description: Red-team testing for CBRN weapons, cyber attacks >$500M damage, autonomous operation before deployment
       category: Pre-deployment
+      billSection: "§ 22603(b)"
+      details: >-
+        Developers must conduct risk assessments (b)(1), perform testing and maintain records (b)(2),
+        implement safeguards based on test results (b)(3), and establish traceability for model copies (b)(4).
+        Testing must evaluate whether the model could be used to create CBRN weapons, execute cyberattacks
+        causing more than \$500M in damage, or act with limited human oversight in ways causing comparable harm.
+      billQuote: >-
+        "Assess whether the covered model is reasonably capable of causing or materially enabling a
+        critical harm... Record and retain test results providing sufficient detail for third-party
+        replication... Take reasonable care implementing appropriate safeguards preventing critical harm."
+      amendmentNotes: >-
+        Original bill (Feb 2024) used "reasonable assurance" standard. The August 19, 2024 amendment
+        changed this to "reasonable care," a well-established common law tort standard. The April 30, 2024
+        amendment narrowed "hazardous capability" definitions, later replaced entirely with "critical harm" framing.
     - title: Shutdown Capability
       description: Full shutdown of all model instances including during training, before beginning training
       category: Pre-deployment
+      billSection: "§ 22603(a)(2)"
+      details: >-
+        Developers must maintain the ability to promptly enact a full shutdown — defined as the
+        cessation of training, covered model operation, and all controlled derivatives.
+        This requirement applies before beginning training, not just before deployment.
+      billQuote: >-
+        "Implement capability to promptly enact full shutdown... consider shutdown risks to critical
+        infrastructure when enacting shutdown."
+      amendmentNotes: >-
+        The August 19, 2024 amendment clarified that shutdown applies only to models "controlled by a
+        developer," addressing concerns that open-source releases would be impossible. The August 22, 2024
+        amendment further refined open-source exemptions (unless >$50M revenue from derivatives).
     - title: Cybersecurity
       description: Protection of model weights from theft; secure infrastructure; incident response plans
       category: Security
+      billSection: "§ 22603(a)(1)"
+      details: >-
+        Requires cybersecurity protections to prevent unauthorized access to, misuse of, or unsafe
+        post-training modifications of the covered model. Protections must be appropriate to risk levels
+        including advanced persistent threats (defined as adversaries with sophisticated expertise and
+        significant resources enabling multiple attack vectors).
+      billQuote: >-
+        "Implement reasonable administrative, technical, physical cybersecurity protections preventing
+        unauthorized access, misuse, or unsafe modifications appropriate to risk levels including
+        advanced persistent threats."
+      amendmentNotes: >-
+        Substantively unchanged from original bill. The "advanced persistent threat" definition was
+        retained throughout, targeting nation-state-level adversaries.
+    - title: Safety & Security Protocol
+      description: Written protocol with objective compliance requirements and testing procedures
+      category: Pre-deployment
+      billSection: "§ 22603(a)(3)–(7)"
+      details: >-
+        Developers must create a written Safety and Security Protocol (SSP) before beginning training,
+        designate responsible senior personnel (a)(4), retain all documentation for at least 5 years (a)(5),
+        review and update the protocol annually (a)(6), and publish a redacted version publicly (a)(7).
+        The SSP must include objective criteria for determining compliance.
+      billQuote: >-
+        "Implement written, separate safety and security protocol [specifying] protections and procedures
+        for reasonable care avoiding critical harm risk [and] objective compliance requirements with
+        sufficient detail and specificity... Conspicuously publish redacted protocol; transmit redacted
+        copy to Attorney General."
+      amendmentNotes: >-
+        Earlier versions required protocols to be submitted to a new Frontier Model Division. The
+        August 19, 2024 amendment eliminated the Division entirely and transferred functions to the
+        Government Operations Agency. Also replaced "certifications" with "compliance statements" and
+        removed perjury penalties for false statements.
     - title: Third-Party Auditing
       description: Annual independent audits starting Jan 1, 2026; 5-year record retention
       category: Oversight
+      billSection: "§ 22603(e)"
+      details: >-
+        Beginning January 1, 2026, developers must retain independent auditors to assess compliance annually.
+        Audit reports must include detailed compliance assessments, noncompliance instances, improvement
+        recommendations, and internal controls assessments. Reports submitted to the Attorney General;
+        the Board of Frontier Models sets auditing standards and can approve or deny auditor qualifications.
+      billQuote: >-
+        "Beginning January 1, 2026, developers must annually retain third-party auditors for independent
+        compliance audits... [Reports must include] detailed compliance assessment, identified noncompliance
+        instances and improvement recommendations, [and] lead auditor signature certifying results."
+      amendmentNotes: >-
+        Earlier versions had auditors regulated by the Frontier Model Division. The August 19, 2024
+        amendment moved regulatory authority to the Government Operations Agency via the new Board of
+        Frontier Models (Government Code § 11547.6).
     - title: Incident Reporting
       description: Report AI safety incidents to Attorney General within 72 hours
       category: Oversight
+      billSection: "§ 22603(g)–(h)"
+      details: >-
+        Section (g) requires reporting AI safety incidents to the Attorney General within 72 hours.
+        Section (h) separately requires compliance statements within 30 days of first deployment.
+        Section (f) requires annual compliance statements signed by the CTO or senior officer.
+      billQuote: >-
+        "Developers report each AI safety incident to Attorney General within 72 hours of learning
+        about it... Developers submit compliance statements within 30 days of first deployment."
+      amendmentNotes: >-
+        Originally, incident reports went to the Frontier Model Division. The August 19, 2024 amendment
+        renamed annual "certifications under penalty of perjury" to "compliance statements" and removed
+        the perjury penalty entirely, replacing it with civil liability for false statements.
     - title: Whistleblower Protection
       description: Prohibit retaliation; anonymous reporting process; 7-year complaint retention
       category: Worker protections
+      billSection: "§ 22607"
+      details: >-
+        Employers may not retaliate against employees who disclose information about potential violations
+        to regulators or the public. Companies must establish an anonymous reporting process for employees
+        to flag safety concerns internally. "Employee" is defined broadly to include contractors,
+        subcontractors, unpaid advisors, and corporate officers assessing critical harm risk.
+      billQuote: >-
+        "Developers [may not] prevent employees from disclosing information to Attorney General or
+        Labor Commissioner about developer noncompliance... [or] retaliate against employees for
+        protected disclosures... Developers provide reasonable anonymous internal disclosure processes."
+      amendmentNotes: >-
+        Whistleblower protections were strengthened through the June 20, 2024 and August 19, 2024
+        amendments. The broad definition of "employee" including unpaid advisors and corporate officers
+        was refined. Reporting target changed from Frontier Model Division to AG/Labor Commissioner
+        in the August 19 amendment.
     - title: Compute Cluster Reporting
       description: Clusters >10^26 ops/second must report to state with customer information
       category: Transparency
+      billSection: "§ 22604"
+      details: >-
+        Operators of computing clusters (machines connected by 100+ Gbps networking with 10^20+ ops/second
+        capacity) must implement Know Your Customer (KYC) procedures, verify customer identities, retain
+        IP address logs for 7 years, assess whether customers intend to train covered models, and maintain
+        the ability to shut down customer access. Targets cloud compute providers like AWS, Google Cloud, Azure.
+      billQuote: >-
+        "Obtain prospective customer identifying information including identity, payment source details,
+        email, and contact information... Assess whether customers intend training covered models...
+        Retain customer IP addresses and access and administrative action dates and times."
+      amendmentNotes: >-
+        Records originally made available to Frontier Model Division rather than AG (changed August 19,
+        2024). The July 3, 2024 amendment clarified compute cluster reporting requirements. The
+        August 19, 2024 amendment added the \$10M fine-tuning threshold, reducing the number of cloud
+        compute customers triggering these obligations.
     - title: Liability Framework
       description: Affirmative defense for compliance; AG can sue for violations causing harm; penalties up to 10% of training costs
       category: Enforcement
+      billSection: "§ 22606"
+      details: >-
+        Penalties are 10% of training cost for a first violation, 30% for subsequent violations.
+        Compute cluster violations carry separate penalties of \$50K/\$100K per violation up to \$10M aggregate.
+        The AG can seek injunctive relief, actual damages, punitive damages, and attorney's fees.
+        Only the AG can bring enforcement actions — no private right of action.
+      billQuote: >-
+        "Civil penalties not exceeding 10% of model training cost (first violation) or 30% (subsequent
+        violations)... Liability-waiving contracts are void. Courts may disregard corporate formalities
+        imposing joint and several liability on affiliated entities if deliberately structured to
+        avoid liability."
+      amendmentNotes: >-
+        This section changed the most. The June 20, 2024 amendment reduced liability from strict to
+        negligence standard and added affirmative defenses. The August 19, 2024 amendment removed all
+        criminal penalties (including perjury for false certifications), narrowed pre-harm enforcement
+        (AG can only act when critical harm is imminent or has occurred), eliminated Frontier Model
+        Division enforcement, and changed the standard from "reasonable assurance" to "reasonable care."
   stakeholders:
     - name: Center for AI Safety
       entityId: y4bieqSeag
       position: support
+      role: Co-sponsor (via CAIS Action Fund)
       reason: Frontier models pose catastrophic risks; industry self-regulation is insufficient
       context:
         - "Funded by Open Philanthropy (~$15M total grants)"
@@ -343,7 +475,8 @@
     - name: Encode Justice
       entityId: etCe7rcH1g
       position: support
-      reason: Youth-led AI accountability organization; co-source of SB 1047
+      role: Co-sponsor
+      reason: Youth-led AI accountability organization; co-sponsor of SB 1047
     - name: Imbue
       entityId: hCtMHcUWaw
       position: support
@@ -359,7 +492,8 @@
     - name: Economic Security Project Action
       entityId: 2ecnsQqcRg
       position: support
-      reason: Economic policy organization; co-source of SB 1047
+      role: Co-sponsor
+      reason: Economic policy organization; co-sponsor of SB 1047
     - name: Apart Research
       entityId: 5WqgebIWFQ
       position: support
@@ -421,6 +555,24 @@
       role: Co-author
     - name: Senator Henry Stern
       role: Co-author
+  keyFigures:
+    - name: Dan Hendrycks
+      entityId: VoNqoBJkyg
+      role: Technical lead — CAIS director
+      description: >-
+        Director of CAIS, whose lobbying arm (CAIS Action Fund) co-sponsored the bill. The bill was
+        heavily inspired by CAIS technical work. Also co-authored the 2023 Statement on AI Risk.
+    - name: Nathan Calvin
+      role: Primary policy drafter — Senior Policy Counsel, CAIS Action Fund
+      description: >-
+        Spearheaded collaboration with Senator Wiener's office and Encode Justice on the bill's
+        legislative language. Appeared on 80,000 Hours podcast (ep. 199) to discuss the bill in detail.
+        Served as the primary policy operative shaping the bill through the legislative process.
+    - name: Sneha Revanur
+      role: Co-sponsor lead — Founder, Encode Justice
+      description: >-
+        Founded Encode Justice at age 15 in 2020. Coordinated Hollywood support for the bill, resulting
+        in 120+ celebrities signing a letter to Governor Newsom urging him to sign.
   amendments:
     - date: March 20, 2024
       description: Initial committee amendments; defined covered model thresholds (>10^26 FLOP or >$100M training cost)
