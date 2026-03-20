@@ -584,8 +584,8 @@ function grantRowToRecordEntry(row) {
     ownerEntityId: row.organizationId,
     fields,
   };
-  // Embed resolved grantee display name from API JOIN
-  if (row.granteeResolvedName) entry.displayName = row.granteeResolvedName;
+  // Embed resolved grantee display name from entity ref
+  if (row.grantee?.name) entry.displayName = row.grantee.name;
   return entry;
 }
 
@@ -600,23 +600,23 @@ function fundingRoundRowToRecordEntry(row) {
   if (row.raised != null) fields.raised = row.raised;
   if (row.valuation != null) fields.valuation = row.valuation;
   if (row.instrument) fields.instrument = row.instrument;
-  if (row.leadInvestor) fields.lead_investor = row.leadInvestor;
+  if (row.leadInvestorRaw) fields.lead_investor = row.leadInvestorRaw;
   if (row.source) fields.source = row.source;
   if (row.notes) fields.notes = row.notes;
   // Embed the server-side-resolved company name so the frontend can display it
-  // even when companyEntityId is null (legacy numeric companyId rows).
-  if (row.companyResolvedName) fields.company_name = row.companyResolvedName;
+  // even when company.entityId is null (legacy numeric companyId rows).
+  if (row.company?.name) fields.company_name = row.company.name;
 
   const entry = {
     key: row.id,
     schema: 'funding-round',
-    // Prefer companyEntityId (proper stableId FK) over legacy companyId for entity resolution.
+    // Prefer company.entityId (proper stableId FK) over legacy companyId for entity resolution.
     // Falls back to companyId for backward compatibility.
-    ownerEntityId: row.companyEntityId ?? row.companyId,
+    ownerEntityId: row.company?.entityId ?? row.companyId,
     fields,
   };
-  // Embed resolved lead investor display name from API JOIN
-  if (row.leadInvestorResolvedName) entry.displayName = row.leadInvestorResolvedName;
+  // Embed resolved lead investor display name from entity ref
+  if (row.leadInvestor?.name) entry.displayName = row.leadInvestor.name;
   return entry;
 }
 
@@ -655,8 +655,8 @@ function investmentRowToRecordEntry(row) {
     ownerEntityId: row.companyId,
     fields,
   };
-  // Embed resolved investor display name from API JOIN
-  if (row.investorResolvedName) entry.displayName = row.investorResolvedName;
+  // Embed resolved investor display name from entity ref
+  if (row.investor?.name) entry.displayName = row.investor.name;
   return entry;
 }
 
@@ -691,8 +691,8 @@ function equityPositionRowToRecordEntry(row) {
   };
   if (row.asOf) entry.asOf = row.asOf;
   if (row.validEnd) entry.validEnd = row.validEnd;
-  // Embed resolved holder display name from API JOIN
-  if (row.holderResolvedName) entry.displayName = row.holderResolvedName;
+  // Embed resolved holder display name from entity ref
+  if (row.holder?.name) entry.displayName = row.holder.name;
   return entry;
 }
 

@@ -29,9 +29,17 @@ export interface GrantRow {
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
 
+/** Structured entity reference from wiki-server API. */
+interface EntityRef {
+  entityId: string | null;
+  slug: string | null;
+  name: string | null;
+}
+
 interface ServerGrant {
   id: string;
   granteeId: string | null;
+  grantee: EntityRef;
   name: string;
   amount: number | null;
   period: string | null;
@@ -50,11 +58,12 @@ function formatSlug(slug: string): string {
 }
 
 function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
+  const recipientSlug = g.grantee.slug ?? g.granteeId;
   return {
     key: g.id,
     name: g.name,
-    recipientName: g.granteeId ? formatSlug(g.granteeId) : "Unknown",
-    recipientHref: g.granteeId ? `/organizations/${g.granteeId}` : null,
+    recipientName: g.grantee.name ?? (recipientSlug ? formatSlug(recipientSlug) : "Unknown"),
+    recipientHref: recipientSlug ? `/organizations/${recipientSlug}` : null,
     amount: g.amount,
     amountDisplay: g.amount != null ? formatCompactCurrency(g.amount) : null,
     date: g.date ?? g.period ?? null,

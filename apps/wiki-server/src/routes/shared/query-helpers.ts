@@ -5,10 +5,12 @@
  * Use these helpers to add search, sort, and filter to any
  * paginated Hono route.
  */
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import type { PgColumn } from "drizzle-orm/pg-core";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { escapeIlike } from "./utils.js";
+import { entities } from "../../schema.js";
 
 /**
  * Build an ILIKE OR search condition across multiple columns.
@@ -54,6 +56,27 @@ export interface PaginationMeta {
   page: number;
   pageSize: number;
   pageCount: number;
+}
+
+/**
+ * Resolve an entity identifier to a stableId.
+ * Accepts either a stableId (10-char alphanumeric, returned as-is) or a slug
+ * (looked up in the entities table). Returns the original value if no match.
+ */
+export async function resolveEntityStableId(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: PostgresJsDatabase<any>,
+  entityId: string,
+): Promise<string> {
+  // StableIds are exactly 10 alphanumeric chars
+  if (/^[A-Za-z0-9]{10}$/.test(entityId)) return entityId;
+  // Looks like a slug — try to resolve
+  const [entity] = await db
+    .select({ stableId: entities.stableId })
+    .from(entities)
+    .where(eq(entities.id, entityId))
+    .limit(1);
+  return entity?.stableId ?? entityId;
 }
 
 /** Build pagination metadata from a total count, page number, and page size. */

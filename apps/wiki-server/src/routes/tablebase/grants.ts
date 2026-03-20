@@ -14,6 +14,8 @@ import {
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
 
 // ---- Constants ----
 
@@ -84,38 +86,30 @@ const BatchUpdateProgramSchema = z.object({
 
 // ---- Helpers ----
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-
 const granteeEntity = alias(entities, "grantee_entity");
 const orgEntity = alias(entities, "org_entity");
 
-/** Selection shape for grants + joined entity titles. */
+/** Selection shape for grants + joined entity titles + slugs. */
 const joinedSelect = {
   grants: grants,
   granteeTitle: granteeEntity.title,
+  granteeSlug: granteeEntity.id,
   orgTitle: orgEntity.title,
+  orgSlug: orgEntity.id,
 };
 
 interface JoinedRow {
   grants: typeof grants.$inferSelect;
   granteeTitle: string | null;
+  granteeSlug: string | null;
   orgTitle: string | null;
-}
-
-function cleanGranteeId(gid: string | null): string | null {
-  if (!gid) return null;
-  if (STABLE_ID_PATTERN.test(gid)) return null;
-  return gid;
-}
-
-function cleanOrgId(oid: string): string | null {
-  if (STABLE_ID_PATTERN.test(oid)) return null;
-  return oid;
+  orgSlug: string | null;
 }
 
 function formatRow(r: JoinedRow) {
   const g = r.grants;
+  const granteeRef = formatEntityRef(g.granteeEntityId, r.granteeSlug, r.granteeTitle, g.granteeDisplayName, g.granteeId);
+  const orgRef = formatEntityRef(g.orgEntityId, r.orgSlug, r.orgTitle, g.orgDisplayName, g.organizationId);
   return {
     id: g.id,
     organizationId: g.organizationId,
@@ -129,13 +123,18 @@ function formatRow(r: JoinedRow) {
     source: g.source,
     notes: g.notes,
     programId: g.programId,
+    // Structured entity refs (slug + name for frontend URL/display)
+    grantee: granteeRef,
+    organization: orgRef,
+    // Legacy flat fields (for backward compat — use structured refs above in new code)
     granteeEntityId: g.granteeEntityId,
     granteeDisplayName: g.granteeDisplayName,
+    granteeSlug: granteeRef.slug,
+    granteeResolvedName: granteeRef.name,
     orgEntityId: g.orgEntityId,
     orgDisplayName: g.orgDisplayName,
-    // Resolved names — prefer entity title, then display name, then cleaned ID
-    granteeResolvedName: r.granteeTitle ?? g.granteeDisplayName ?? cleanGranteeId(g.granteeId),
-    orgResolvedName: r.orgTitle ?? g.orgDisplayName ?? cleanOrgId(g.organizationId),
+    orgSlug: orgRef.slug,
+    orgResolvedName: orgRef.name,
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
@@ -164,7 +163,7 @@ async function findInvalidProgramIds(
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const grantsApp = new Hono()
+const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -215,14 +214,14 @@ const grantsApp = new Hono()
   // ---- GET /by-entity/:entityId ----
   // Supports server-side search (?q=), sort (?sort=amount:desc),
   // and filters (?status=, ?amountMin=, ?amountMax=, ?program=).
-  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset, q, sort, status, amountMin, amountMax, program } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
     // Build WHERE conditions
-    const conditions: SQL[] = [eq(grants.organizationId, entityId)];
+    const conditions: SQL[] = [eq(grants.organizationId, resolvedId)];
 
     if (q) {
       const searchCond = buildSearchCondition(
@@ -280,7 +279,7 @@ const grantsApp = new Hono()
       .offset(offset);
 
     return c.json({
-      entityId,
+      entityId: resolvedId,
       grants: rows.map(formatRow),
       total,
       limit,
