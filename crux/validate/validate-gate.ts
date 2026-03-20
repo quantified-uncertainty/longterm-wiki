@@ -450,6 +450,8 @@ const PARALLEL_STEPS: Step[] = [
     // Blocking: all entity fields now conform to their controlled vocabularies
     // (entityType, relationship, orgType, etc.). Regressions should be caught
     // immediately to prevent free-text drift.
+    advisory: false,
+    emitOutputInCi: true,
   },
   {
     id: 'numeric-ranges',
@@ -483,6 +485,8 @@ const PARALLEL_STEPS: Step[] = [
     // Blocking: validates that WikiBase pages match TableBase entity declarations
     // and FactBase entities have corresponding TableBase entries. All existing
     // mismatches have been resolved — regressions should be caught immediately.
+    advisory: false,
+    emitOutputInCi: true,
   },
 ];
 
