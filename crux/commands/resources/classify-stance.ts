@@ -16,6 +16,14 @@ import { CostTracker } from '../../lib/cost-tracker.ts';
 import { getResourcesByPage, upsertResource } from '../../lib/wiki-server/resources.ts';
 import type { ResourceRow } from '../../lib/wiki-server/resources.ts';
 
+function extractDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 const VALID_STANCES = ['support', 'oppose', 'neutral', 'mixed', 'analysis'] as const;
 type Stance = typeof VALID_STANCES[number];
 
@@ -81,15 +89,6 @@ export async function classifyStance(args: {
 
   let toClassify = unclassified;
   if (limit) toClassify = toClassify.slice(0, limit);
-
-  // Extract domain from URL for classification context
-  function extractDomain(url: string): string | null {
-    try {
-      return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-    } catch {
-      return null;
-    }
-  }
 
   const items = toClassify.map((r: any) => ({
     id: r.id,
