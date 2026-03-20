@@ -25,7 +25,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { parse as parseYaml } from "yaml";
 
-const PROJECT_ROOT = join(import.meta.dirname!, "../..");
+const PROJECT_ROOT = join(import.meta.dirname!, "../../..");
 const PEOPLE_FILE = join(PROJECT_ROOT, "data/entities/people.yaml");
 
 interface YamlEntity {
@@ -78,8 +78,8 @@ async function main() {
       console.error(`Failed to fetch entities: HTTP ${res.status}`);
       process.exit(1);
     }
-    const data = await res.json() as { items?: Array<{ id: string; title: string }> } | Array<{ id: string; title: string }>;
-    const items = Array.isArray(data) ? data : (data.items ?? []);
+    const data = await res.json() as { entities?: Array<{ id: string; title: string }>; total?: number } | Array<{ id: string; title: string }>;
+    const items = Array.isArray(data) ? data : (data.entities ?? []);
     const keepSet = new Set(keepIds);
     const stale = items.filter((e) => !keepSet.has(e.id));
 
