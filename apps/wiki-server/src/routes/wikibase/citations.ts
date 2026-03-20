@@ -912,7 +912,8 @@ const citationsApp = new Hono()
     const rows = await db
       .select()
       .from(citationContent)
-      .where(eq(citationContent.url, url));
+      .where(eq(citationContent.url, url))
+      .limit(1);
 
     if (rows.length === 0) {
       return notFoundError(c, `No content for url: ${url}`);
@@ -1008,7 +1009,7 @@ const citationsApp = new Hono()
       return dbError(c, "citation content link-resources", err);
     }
 
-    const linked = Number((result as any).count ?? 0);
+    const linked = "rowCount" in result ? Number(result.rowCount) : 0;
     return c.json({ linked });
   })
 

@@ -217,7 +217,8 @@ const app = new Hono()
         pageSlug: sql<string | null>`coalesce(${pageCitations.pageId}, ${wikiPages.id})`,
       })
       .from(pageCitations)
-      .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol));
+      .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol))
+      .limit(10000);
 
     // Group by pageId (skip rows with no recoverable slug)
     const byPage: Record<
