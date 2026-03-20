@@ -1009,7 +1009,7 @@ const citationsApp = new Hono()
       return dbError(c, "citation content link-resources", err);
     }
 
-    const linked = "rowCount" in result ? Number(result.rowCount) : 0;
+    const linked = "count" in result ? Number(result.count) : 0;
     return c.json({ linked });
   })
 

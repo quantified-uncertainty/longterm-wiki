@@ -218,6 +218,7 @@ const app = new Hono()
       })
       .from(pageCitations)
       .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol))
+      // Safety bound: ~700 pages × ~10 refs each ≈ 7k rows; 10k is a generous cap.
       .limit(10000);
 
     // Group by pageId (skip rows with no recoverable slug)

@@ -41,7 +41,7 @@ export function MermaidDiagram({ chart, children }: MermaidProps) {
     const renderChart = async () => {
       try {
         const mermaid = await getMermaid();
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+        const id = `mermaid-${Math.random().toString(36).substring(2, 11)}`;
         const { svg: renderedSvg } = await mermaid.render(id, chartText);
         if (!cancelled) {
           setSvg(renderedSvg);
