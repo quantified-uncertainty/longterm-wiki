@@ -2548,6 +2548,8 @@ export const policyStakeholders = pgTable(
     stakeholderDisplayName: text("stakeholder_display_name").notNull(),
     /** Position: support | oppose | neutral | mixed */
     position: text("position").notNull(),
+    /** Importance/weight: high | medium | low */
+    importance: text("importance"),
     /** Reason for the position */
     reason: text("reason"),
     /** Source URL */

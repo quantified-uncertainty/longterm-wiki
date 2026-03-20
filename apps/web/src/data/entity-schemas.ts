@@ -146,6 +146,7 @@ const PolicyStakeholder = z.object({
   name: z.string(),
   entityId: z.string().optional(),
   position: z.enum(["support", "oppose", "neutral", "mixed"]),
+  importance: z.enum(["high", "medium", "low"]).optional(),
   reason: z.string().optional(),
   source: z.string().optional(),
   /** Short notes on funding, affiliations, and connections to other stakeholders */

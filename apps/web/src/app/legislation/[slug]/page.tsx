@@ -69,6 +69,33 @@ const POSITION_COLORS: Record<string, string> = {
   mixed: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
 };
 
+/** Compact circle indicator for stakeholder importance. */
+function ImportanceIndicator({ importance }: { importance: "high" | "medium" | "low" }) {
+  // high = filled circle, medium = half-filled circle, low = empty circle
+  const size = 10;
+  if (importance === "high") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="High importance">
+        <circle cx="5" cy="5" r="4" className="fill-foreground/70" />
+      </svg>
+    );
+  }
+  if (importance === "medium") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Medium importance">
+        <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/60" strokeWidth="1.2" />
+        <path d="M5,1 A4,4 0 0,0 5,9 Z" className="fill-foreground/60" />
+      </svg>
+    );
+  }
+  // low
+  return (
+    <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Low importance">
+      <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/40" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
 /** Status pipeline stages for the visual timeline. */
 const PIPELINE_STAGES = [
   { key: "introduced", label: "Introduced" },
@@ -125,9 +152,13 @@ export default async function LegislationDetailPage({
 
   const wikiHref = getPolicyWikiHref(entity);
 
-  const supporters = entity.stakeholders.filter((s) => s.position === "support");
-  const opponents = entity.stakeholders.filter((s) => s.position === "oppose");
-  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral");
+  const importanceOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
+    (importanceOrder[a.importance ?? ""] ?? 3) - (importanceOrder[b.importance ?? ""] ?? 3);
+
+  const supporters = entity.stakeholders.filter((s) => s.position === "support").sort(byImportance);
+  const opponents = entity.stakeholders.filter((s) => s.position === "oppose").sort(byImportance);
+  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral").sort(byImportance);
 
   const provisionsByCategory = new Map<string, typeof entity.provisions>();
   for (const p of entity.provisions) {
@@ -412,11 +443,21 @@ export default async function LegislationDetailPage({
                   return (
                     <tr key={i} className="hover:bg-muted/20 align-top">
                       <td className="py-1.5 px-3">
-                        {href ? (
-                          <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
-                        ) : (
-                          <span className="font-medium text-sm">{stakeholder.name}</span>
-                        )}
+                        <span className="inline-flex items-center gap-1.5">
+                          {stakeholder.importance && (
+                            <span
+                              className="inline-block flex-shrink-0"
+                              title={`${stakeholder.importance} importance`}
+                            >
+                              <ImportanceIndicator importance={stakeholder.importance} />
+                            </span>
+                          )}
+                          {href ? (
+                            <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
+                          ) : (
+                            <span className="font-medium text-sm">{stakeholder.name}</span>
+                          )}
+                        </span>
                       </td>
                       <td className="py-1.5 px-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
