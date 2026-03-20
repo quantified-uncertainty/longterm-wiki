@@ -14,6 +14,7 @@
 
 import { loadResourcesPGFirst } from '../resource-io.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import {
   createBatch,
   pollBatch,
@@ -21,6 +22,7 @@ import {
   type BatchRequest,
 } from './batch-client.ts';
 import { ENRICHMENT_SYSTEM, enrichmentPrompt } from './prompts.ts';
+import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 interface EnrichmentResult {
@@ -77,6 +79,55 @@ export async function deepEnrichCommand(
   return { exitCode: 0, output: '' };
 }
 
+/**
+ * Load fetched content from citation_content table for a list of resources.
+ * Uses concurrent API calls to fetch content by URL.
+ */
+async function loadContentForResources(
+  resources: Resource[],
+  concurrency = 20,
+): Promise<Map<string, string>> {
+  const contentMap = new Map<string, string>();
+  let idx = 0;
+  let loaded = 0;
+  let failed = 0;
+
+  async function worker(): Promise<void> {
+    while (idx < resources.length) {
+      const i = idx++;
+      const r = resources[i];
+      try {
+        const result = await getCitationContentByUrl(r.url);
+        if (result.ok && result.data) {
+          const text = (result.data as Record<string, unknown>).fullText as string
+            || (result.data as Record<string, unknown>).fullTextPreview as string
+            || '';
+          if (text) {
+            contentMap.set(r.id, text);
+            loaded++;
+          }
+        }
+      } catch {
+        failed++;
+      }
+
+      if ((loaded + failed) % 200 === 0) {
+        process.stdout.write(`\r  Content loading: ${loaded + failed}/${resources.length} (${loaded} with content)`);
+      }
+    }
+  }
+
+  console.log(`  Loading fetched content for ${resources.length} resources (concurrency: ${concurrency})...`);
+  const workers = Array.from(
+    { length: Math.min(concurrency, resources.length) },
+    () => worker(),
+  );
+  await Promise.all(workers);
+  console.log(`\r  Content loading: ${loaded} with content, ${failed} errors, ${resources.length - loaded - failed} no content cached`);
+
+  return contentMap;
+}
+
 async function submitEnrichment(limit: number, dryRun: boolean): Promise<CommandResult> {
   console.log('🔬 Deep Resource Enrichment (Sonnet batch)\n');
   if (dryRun) console.log('  DRY RUN — batch will not be submitted\n');
@@ -97,29 +148,38 @@ async function submitEnrichment(limit: number, dryRun: boolean): Promise<Command
     return { exitCode: 0, output: 'All resources already enriched' };
   }
 
+  // Load fetched content from citation_content table
+  const contentMap = await loadContentForResources(toEnrich);
+  console.log();
+
   // Build batch requests
-  const requests: BatchRequest[] = toEnrich.map((r) => ({
-    custom_id: r.id,
-    params: {
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1000,
-      system: ENRICHMENT_SYSTEM,
-      messages: [
-        {
-          role: 'user' as const,
-          content: enrichmentPrompt({
-            id: r.id,
-            url: r.url,
-            title: r.title || null,
-            type: r.type || null,
-            summary: r.summary || null,
-            content: (r.abstract || r.summary || '').slice(0, 4000) || null,
-            existing_tags: r.tags || null,
-          }),
-        },
-      ],
-    },
-  }));
+  const requests: BatchRequest[] = toEnrich.map((r) => {
+    // Use fetched content from citation_content, falling back to resource fields
+    const content = contentMap.get(r.id) || r.abstract || r.summary || '';
+
+    return {
+      custom_id: r.id,
+      params: {
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: ENRICHMENT_SYSTEM,
+        messages: [
+          {
+            role: 'user' as const,
+            content: enrichmentPrompt({
+              id: r.id,
+              url: r.url,
+              title: r.title || null,
+              type: r.type || null,
+              summary: r.summary || null,
+              content: content.slice(0, 4000) || null,
+              existing_tags: r.tags || null,
+            }),
+          },
+        ],
+      },
+    };
+  });
 
   // Estimate cost
   const avgInputTokens = 1500;
