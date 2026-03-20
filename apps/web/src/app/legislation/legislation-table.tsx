@@ -40,7 +40,7 @@ interface ColumnDef {
 }
 
 const COLUMNS: ColumnDef[] = [
-  { key: "billNumber", label: "Bill #", sortKey: "billNumber", defaultVisible: true },
+  { key: "billNumber", label: "Bill #", sortKey: "billNumber", defaultVisible: false },
   { key: "jurisdiction", label: "Jurisdiction", sortKey: "jurisdiction", defaultVisible: true },
   { key: "introduced", label: "Introduced", sortKey: "introduced", defaultVisible: true },
   { key: "status", label: "Status", sortKey: "status", defaultVisible: true },
@@ -174,21 +174,27 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
     return result;
   }, [rows, search, statusFilter, scopeFilter, sortKey, sortDir]);
 
-  /** Group rows by jurisdiction, ordered by scope level then jurisdiction name. */
+  /** Group rows by scope+jurisdiction, ordered by scope level then jurisdiction name. */
   const grouped = useMemo(() => {
     if (!groupByJurisdiction) return null;
     const groups = new Map<string, LegislationRow[]>();
     for (const row of filtered) {
-      const key = jurisdictionLabel(row) ?? "Unknown";
+      // Composite key prevents mixing e.g. "International" scope + "United States" jurisdiction
+      // with "Federal" scope + "United States" jurisdiction
+      const scope = row.scope?.toLowerCase() ?? "";
+      const jur = jurisdictionLabel(row) ?? "Unknown";
+      const key = `${scope}::${jur}`;
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(row);
     }
-    // Sort groups: by scope order, then alphabetically
-    return [...groups.entries()].sort(([aKey, aRows], [bKey, bRows]) => {
+    // Sort groups: by scope order, then alphabetically by jurisdiction
+    return [...groups.entries()].sort(([_aKey, aRows], [_bKey, bRows]) => {
       const aScope = SCOPE_ORDER[aRows[0].scope?.toLowerCase() ?? ""] ?? 99;
       const bScope = SCOPE_ORDER[bRows[0].scope?.toLowerCase() ?? ""] ?? 99;
       if (aScope !== bScope) return aScope - bScope;
-      return aKey.localeCompare(bKey);
+      const aJur = jurisdictionLabel(aRows[0]) ?? "";
+      const bJur = jurisdictionLabel(bRows[0]) ?? "";
+      return aJur.localeCompare(bJur);
     });
   }, [filtered, groupByJurisdiction]);
 
@@ -436,10 +442,10 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
           </thead>
           <tbody className="divide-y divide-border/50">
             {grouped
-              ? grouped.map(([jurisdiction, groupRows]) => (
+              ? grouped.map(([compositeKey, groupRows]) => (
                   <GroupSection
-                    key={jurisdiction}
-                    jurisdiction={jurisdiction}
+                    key={compositeKey}
+                    jurisdiction={jurisdictionLabel(groupRows[0]) ?? "Unknown"}
                     scope={groupRows[0].scope}
                     count={groupRows.length}
                     colSpan={1 + activeColumns.length}

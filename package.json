@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "export $(grep '^DEV_PORT=' .env 2>/dev/null) 2>/dev/null; pnpm --filter longterm-next dev",
+    "dev": "DEV_PORT=$(grep -m1 '^DEV_PORT=' .env 2>/dev/null | cut -d= -f2-) pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test && pnpm --filter discord-bot test && pnpm --filter wiki-server test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
