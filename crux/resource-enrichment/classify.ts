@@ -34,9 +34,9 @@ export async function classifyCommand(
   options: Record<string, unknown>,
 ): Promise<CommandResult> {
   const subcommand = args[0] || 'status';
-  const dryRun = options['dry-run'] as boolean;
+  const dryRun = !!(options['dry-run'] || options.dryRun);
   const limit = (options.limit as number) || 5000;
-  const batchId = options['batch-id'] as string;
+  const batchId = (options['batch-id'] || options.batchId) as string;
 
   if (subcommand === 'status' && batchId) {
     // Poll a running batch

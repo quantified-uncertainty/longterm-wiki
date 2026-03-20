@@ -16,6 +16,8 @@ import { deepEnrichCommand } from '../resource-enrichment/enrich.ts';
 import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts';
 import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
 import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
+import { fixEnrichmentStatusCommand } from '../resource-enrichment/fix-enrichment-status.ts';
+import { enrichCrossrefCommand } from '../resource-enrichment/enrich-crossref.ts';
 
 interface ResourceCommandConfig {
   description: string;
@@ -153,6 +155,8 @@ commands['deep-enrich'] = deepEnrichCommand;
 commands['cross-reference'] = crossReferenceCommand;
 commands['fetch-wayback'] = fetchWaybackCommand;
 commands['archive-pdfs'] = archivePdfsCommand;
+commands['fix-enrichment-status'] = fixEnrichmentStatusCommand;
+commands['enrich-crossref'] = enrichCrossrefCommand;
 
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
@@ -186,11 +190,13 @@ ${commandList}
 
 Enrichment:
   enrich-papers     Enrich papers via Semantic Scholar API (→ resource_papers)
+  enrich-crossref   Enrich papers via Crossref API (fills S2 gaps, no key needed)
   enrich-forums     Enrich forum posts via LW/AF/EAF GraphQL (→ resource_forum_posts)
   fetch-all         Fetch all resource URLs and extract meta tags
   fetch-wayback     Retry failed URLs via Wayback Machine (archive.org)
   archive-pdfs      Archive PDF files to DigitalOcean Spaces
   enrich-free       Run all free enrichment (papers + forums + fetch)
+  fix-enrichment-status  Backfill enrichment_status for resources with cached content
   classify          LLM classification via Anthropic Batch API (Haiku, ~\$15)
   deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~\$100)
 
@@ -213,6 +219,7 @@ Examples:
   crux resources validate all
   crux resources classify-stance --page=sb-1047 --apply
   crux resources enrich-papers --limit 100 --verbose
+  crux resources enrich-crossref --limit 50 --verbose --dry-run
   crux resources enrich-forums --limit 200
   crux resources fetch-all --batch 50 --concurrency 5
   crux resources classify submit --dry-run
