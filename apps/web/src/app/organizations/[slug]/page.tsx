@@ -119,6 +119,7 @@ export default async function OrgProfilePage({
   if (resolved) {
     entity = {
       id: resolved.id,
+      stableId: resolved.stableId,
       name: resolved.title,
       wikiId: resolved.wikiId,
       wikiPageId: resolved.wikiId,
@@ -134,6 +135,7 @@ export default async function OrgProfilePage({
 
     entity = {
       id: slug,
+      stableId: typedEntity.stableId,
       name: typedEntity.title,
       wikiId: typedEntity.wikiId,
       wikiPageId: typedEntity.wikiId,
@@ -409,7 +411,7 @@ export default async function OrgProfilePage({
             <GrantsSection
               grants={data.grantsMade}
               direction="given"
-              entityId={entity.id}
+              entityId={entity.stableId ?? entity.id}
               orgSlug={slug}
             />
           )}

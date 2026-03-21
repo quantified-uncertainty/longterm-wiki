@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter longterm-next dev",
+    "dev": "DEV_PORT=$(grep -m1 '^DEV_PORT=' .env 2>/dev/null | cut -d= -f2-) pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test && pnpm --filter discord-bot test && pnpm --filter wiki-server test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
@@ -21,6 +21,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
     "@aws-sdk/client-s3": "^3.1013.0",
+    "@radix-ui/react-popover": "^1.1.15",
     "dotenv": "^17.2.4",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",

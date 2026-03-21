@@ -324,8 +324,11 @@ export default async function BenchmarkDetailPage({
 }
 
 function formatScore(score: number, unit?: string): string {
+  // Round to 2 decimal places to avoid IEEE 754 floating-point artifacts
+  // (e.g., 89.30000000000001 → 89.3)
+  const rounded = Number(score.toFixed(2));
   if (unit === "%" || unit === "percentage" || unit === "accuracy") {
     return `${parseFloat(score.toFixed(2))}%`;
   }
-  return String(score);
+  return String(rounded);
 }

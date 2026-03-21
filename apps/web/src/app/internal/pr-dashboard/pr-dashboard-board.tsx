@@ -1,7 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { GITHUB_REPO_URL } from "@lib/site-config";
-import { classifyPR, type PullData, type PRStats, type KanbanColumn } from "./pr-dashboard-shared";
+import {
+  classifyPR,
+  type PullData,
+  type PRStats,
+  type KanbanColumn,
+  type CheckResult,
+  type ActionNeeded,
+} from "./pr-dashboard-shared";
 
 // ── Column Config ───────────────────────────────────────────────────────
 
@@ -99,6 +107,169 @@ function LabelPill({ name }: { name: string }) {
   );
 }
 
+// ── ActionNeeded Helpers ───────────────────────────────────────────────
+
+const ACTION_BORDER_COLORS: Record<ActionNeeded, string> = {
+  ready: "border-l-green-500",
+  building: "border-l-yellow-500",
+  "code-fix": "border-l-red-500",
+  rebase: "border-l-orange-500",
+  "human-label": "border-l-purple-500",
+  "comment-response": "border-l-blue-500",
+};
+
+const ACTION_LABELS: Record<ActionNeeded, string> = {
+  ready: "ready",
+  building: "building",
+  "code-fix": "needs code fix",
+  rebase: "needs rebase",
+  "human-label": "needs label",
+  "comment-response": "needs response",
+};
+
+const ACTION_LABEL_STYLES: Record<ActionNeeded, string> = {
+  ready: "text-green-600",
+  building: "text-yellow-600",
+  "code-fix": "text-red-500",
+  rebase: "text-orange-600",
+  "human-label": "text-purple-600",
+  "comment-response": "text-blue-600",
+};
+
+function ActionNeededLabel({ action }: { action: ActionNeeded }) {
+  return (
+    <span
+      className={`text-[10px] font-medium ${ACTION_LABEL_STYLES[action]}`}
+    >
+      {ACTION_LABELS[action]}
+    </span>
+  );
+}
+
+// ── CI / Gates Split Badges ───────────────────────────────────────────
+
+function summarizeCheckGroup(
+  checks: CheckResult[],
+): "success" | "failure" | "pending" | "unknown" {
+  if (checks.length === 0) return "unknown";
+  if (checks.some((c) => c.status === "failure")) return "failure";
+  if (checks.some((c) => c.status === "pending")) return "pending";
+  if (checks.every((c) => c.status === "success" || c.status === "neutral"))
+    return "success";
+  return "unknown";
+}
+
+function CiGatesBadges({ checks }: { checks: CheckResult[] }) {
+  const ciChecks = checks.filter((c) => !c.isGateCheck);
+  const gateChecks = checks.filter((c) => c.isGateCheck);
+
+  const ciStatus = summarizeCheckGroup(ciChecks);
+  const gateStatus = summarizeCheckGroup(gateChecks);
+
+  const ciStyle = CI_STYLES[ciStatus] ?? CI_STYLES.unknown;
+  const gateStyle = CI_STYLES[gateStatus] ?? CI_STYLES.unknown;
+
+  return (
+    <>
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${ciStyle.cls}`}
+      >
+        CI {ciStyle.label}
+      </span>
+      {gateChecks.length > 0 && (
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${gateStyle.cls}`}
+        >
+          Gates {gateStyle.label}
+        </span>
+      )}
+    </>
+  );
+}
+
+// ── CodeRabbit Badge ──────────────────────────────────────────────────
+
+function CodeRabbitBadge({
+  findings,
+}: {
+  findings: { critical: number; major: number; minor: number; total: number };
+}) {
+  if (findings.total === 0) return null;
+
+  // Pick the most severe label to display
+  let label: string;
+  let cls: string;
+  if (findings.critical > 0) {
+    label = `${findings.critical} critical`;
+    cls = "bg-red-500/15 text-red-500";
+  } else if (findings.major > 0) {
+    label = `${findings.major} major`;
+    cls = "bg-orange-500/15 text-orange-600";
+  } else {
+    label = `${findings.minor} minor`;
+    cls = "bg-yellow-500/15 text-yellow-600";
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${cls}`}
+      title={`CodeRabbit: ${findings.critical} critical, ${findings.major} major, ${findings.minor} minor`}
+    >
+      CR: {label}
+    </span>
+  );
+}
+
+// ── Expandable Check Details ──────────────────────────────────────────
+
+const CHECK_STATUS_ICONS: Record<string, string> = {
+  success: "\u2705",
+  failure: "\u274C",
+  pending: "\u23F3",
+  neutral: "\u25CB",
+  unknown: "\u2753",
+};
+
+function CheckDetailsPanel({ checks }: { checks: CheckResult[] }) {
+  const ciChecks = checks.filter((c) => !c.isGateCheck);
+  const gateChecks = checks.filter((c) => c.isGateCheck);
+
+  return (
+    <div className="mt-2 rounded border border-border/40 bg-muted/30 p-2 text-[11px]">
+      {ciChecks.length > 0 && (
+        <div className="mb-1.5">
+          <div className="font-semibold text-muted-foreground mb-0.5">
+            CI Checks
+          </div>
+          {ciChecks.map((c) => (
+            <div key={c.name} className="flex items-center gap-1 leading-relaxed">
+              <span>{CHECK_STATUS_ICONS[c.status] ?? CHECK_STATUS_ICONS.unknown}</span>
+              <span className="truncate" title={c.name}>
+                {c.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {gateChecks.length > 0 && (
+        <div>
+          <div className="font-semibold text-muted-foreground mb-0.5">
+            Gate Checks
+          </div>
+          {gateChecks.map((c) => (
+            <div key={c.name} className="flex items-center gap-1 leading-relaxed">
+              <span>{CHECK_STATUS_ICONS[c.status] ?? CHECK_STATUS_ICONS.unknown}</span>
+              <span className="truncate" title={c.name}>
+                {c.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Relative Time ──────────────────────────────────────────────────────
 
 function relativeTime(date: string): string {
@@ -114,6 +285,8 @@ function relativeTime(date: string): string {
 // ── PR Card ────────────────────────────────────────────────────────────
 
 function PRCard({ pr }: { pr: PullData }) {
+  const [checksExpanded, setChecksExpanded] = useState(false);
+
   // Filter labels that are purely workflow/stage markers from display
   const displayLabels = (pr.labels ?? []).filter(
     (l) =>
@@ -122,18 +295,28 @@ function PRCard({ pr }: { pr: PullData }) {
       l !== "agent:filed"
   );
 
+  // Left border color based on actionNeeded (defaults to transparent when absent)
+  const borderClass = pr.actionNeeded
+    ? ACTION_BORDER_COLORS[pr.actionNeeded]
+    : "border-l-transparent";
+
   return (
-    <div className="rounded-lg border border-border/60 bg-background p-3 shadow-sm">
-      {/* Header: PR number + author */}
+    <div
+      className={`rounded-lg border border-border/60 border-l-[3px] ${borderClass} bg-background p-3 shadow-sm`}
+    >
+      {/* Header: PR number + author + actionNeeded */}
       <div className="flex items-center justify-between mb-1">
-        <a
-          href={`${GITHUB_REPO_URL}/pull/${pr.number}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-blue-600 hover:underline tabular-nums font-medium"
-        >
-          #{pr.number}
-        </a>
+        <div className="flex items-center gap-1.5">
+          <a
+            href={`${GITHUB_REPO_URL}/pull/${pr.number}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 hover:underline tabular-nums font-medium"
+          >
+            #{pr.number}
+          </a>
+          {pr.actionNeeded && <ActionNeededLabel action={pr.actionNeeded} />}
+        </div>
         <span className="text-[11px] text-muted-foreground">{pr.author}</span>
       </div>
 
@@ -150,12 +333,20 @@ function PRCard({ pr }: { pr: PullData }) {
 
       {/* Badges row */}
       <div className="flex flex-wrap items-center gap-1.5 mb-2">
-        <CiStatusBadge status={pr.ciStatus} />
+        {/* Use split CI/Gates badges when check data is available, else fallback */}
+        {pr.checks && pr.checks.length > 0 ? (
+          <CiGatesBadges checks={pr.checks} />
+        ) : (
+          <CiStatusBadge status={pr.ciStatus} />
+        )}
         <MergeStatusBadge status={pr.mergeable} />
         {pr.unresolvedThreads > 0 && (
           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-purple-500/15 text-purple-600">
             {pr.unresolvedThreads} thread{pr.unresolvedThreads !== 1 ? "s" : ""}
           </span>
+        )}
+        {pr.codeRabbitFindings && pr.codeRabbitFindings.total > 0 && (
+          <CodeRabbitBadge findings={pr.codeRabbitFindings} />
         )}
       </div>
 
@@ -168,17 +359,32 @@ function PRCard({ pr }: { pr: PullData }) {
         </div>
       )}
 
-      {/* Footer: size + age */}
+      {/* Footer: size + age + check details toggle */}
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="tabular-nums">
           <span className="text-green-600">+{pr.additions}</span>
           {" / "}
           <span className="text-red-500">-{pr.deletions}</span>
         </span>
-        <span className="tabular-nums" suppressHydrationWarning>
-          {relativeTime(pr.createdAt)}
-        </span>
+        <div className="flex items-center gap-2">
+          {pr.checks && pr.checks.length > 0 && (
+            <button
+              onClick={() => setChecksExpanded(!checksExpanded)}
+              className="text-[10px] text-blue-500 hover:underline cursor-pointer"
+            >
+              {checksExpanded ? "hide checks" : `${pr.checks.length} checks`}
+            </button>
+          )}
+          <span className="tabular-nums" suppressHydrationWarning>
+            {relativeTime(pr.createdAt)}
+          </span>
+        </div>
       </div>
+
+      {/* Expandable check details */}
+      {checksExpanded && pr.checks && pr.checks.length > 0 && (
+        <CheckDetailsPanel checks={pr.checks} />
+      )}
     </div>
   );
 }
@@ -257,6 +463,22 @@ function StatsBar({ stats }: { stats: PRStats }) {
           {stats.conflicting}
         </span>
       </span>
+      {stats.gateBlocked > 0 && (
+        <span>
+          Gate Blocked:{" "}
+          <span className="font-semibold text-orange-600">
+            {stats.gateBlocked}
+          </span>
+        </span>
+      )}
+      {stats.codeRabbitIssues > 0 && (
+        <span>
+          CodeRabbit Issues:{" "}
+          <span className="font-semibold text-orange-600">
+            {stats.codeRabbitIssues}
+          </span>
+        </span>
+      )}
     </div>
   );
 }

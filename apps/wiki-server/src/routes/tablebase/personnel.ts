@@ -12,6 +12,8 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
 
 // ---- Constants ----
 
@@ -63,35 +65,39 @@ const SyncPersonnelBatchSchema = z.object({
 
 // ---- Helpers ----
 
-const personEntity = alias(entities, "person_entity");
-const orgEntity = alias(entities, "org_entity");
-
-/** Selection shape for personnel + joined entity titles. */
-const joinedSelect = {
-  personnel: personnel,
-  personTitle: personEntity.title,
-  orgTitle: orgEntity.title,
-};
-
-interface JoinedRow {
-  personnel: typeof personnel.$inferSelect;
-  personTitle: string | null;
-  orgTitle: string | null;
-}
-
+/** Clean a raw personId for display: strip "new:" prefix, hide bare stableIds. */
 function cleanPersonId(pid: string): string | null {
   if (pid.startsWith("new:")) return pid.slice(4).trim();
   if (STABLE_ID_PATTERN.test(pid)) return null;
   return pid;
 }
 
-function cleanOrgId(oid: string): string | null {
-  if (STABLE_ID_PATTERN.test(oid)) return null;
-  return oid;
+const personEntity = alias(entities, "person_entity");
+const orgEntity = alias(entities, "org_entity");
+
+/** Selection shape for personnel + joined entity titles + slugs. */
+const joinedSelect = {
+  personnel: personnel,
+  personTitle: personEntity.title,
+  personSlug: personEntity.id,
+  orgTitle: orgEntity.title,
+  orgSlug: orgEntity.id,
+};
+
+interface JoinedRow {
+  personnel: typeof personnel.$inferSelect;
+  personTitle: string | null;
+  personSlug: string | null;
+  orgTitle: string | null;
+  orgSlug: string | null;
 }
 
 function formatRow(r: JoinedRow) {
   const p = r.personnel;
+  // Strip "new:" prefix for raw personId fallback
+  const rawPersonId = p.personId.startsWith("new:") ? p.personId.slice(4).trim() : p.personId;
+  const personRef = formatEntityRef(p.personEntityId, r.personSlug, r.personTitle, p.personDisplayName, rawPersonId);
+  const orgRef = formatEntityRef(p.orgEntityId, r.orgSlug, r.orgTitle, p.orgDisplayName, p.organizationId);
   return {
     id: p.id,
     personId: p.personId,
@@ -105,13 +111,16 @@ function formatRow(r: JoinedRow) {
     background: p.background,
     source: p.source,
     notes: p.notes,
+    // Structured entity refs
+    person: personRef,
+    organization: orgRef,
+    // Legacy flat fields (for backward compat)
     personEntityId: p.personEntityId,
     personDisplayName: p.personDisplayName,
+    personResolvedName: personRef.name,
     orgEntityId: p.orgEntityId,
     orgDisplayName: p.orgDisplayName,
-    // Resolved names — the key fix:
-    personResolvedName: r.personTitle ?? p.personDisplayName ?? cleanPersonId(p.personId),
-    orgResolvedName: r.orgTitle ?? p.orgDisplayName ?? cleanOrgId(p.organizationId),
+    orgResolvedName: orgRef.name,
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
@@ -120,7 +129,7 @@ function formatRow(r: JoinedRow) {
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const personnelApp = new Hono()
+const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -179,12 +188,12 @@ const personnelApp = new Hono()
   })
 
   // ---- GET /by-entity/:entityId ----
-  .get("/by-entity/:entityId", zv("query", ByEntityQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { role_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const conditions = [eq(personnel.organizationId, entityId)];
+    const conditions = [eq(personnel.organizationId, resolvedId)];
     if (role_type) conditions.push(eq(personnel.roleType, role_type));
     const whereClause = and(...conditions);
 
@@ -205,7 +214,7 @@ const personnelApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({
-      entityId,
+      entityId: resolvedId,
       personnel: rows.map(formatRow),
       total,
       limit,

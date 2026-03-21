@@ -16,7 +16,7 @@ const ORG_SLUGS = [
   "astralis-foundation",
   "blueprint-biosecurity",
   "bridgewater-aia-labs",
-  "center-for-ai-safety",
+  "cais",
   "center-for-applied-rationality",
   "cea",
   "centre-for-long-term-resilience",
@@ -94,7 +94,7 @@ const ORG_SLUGS = [
   "sentinel",
   "situational-awareness-lp",
   "ssi",
-  "survival-and-flourishing-fund",
+  "sff",
   "swift-centre",
   "the-foundation-layer",
   "turion",
@@ -117,7 +117,7 @@ const KEY_ORGS = [
   "uk-aisi",
   "fhi",
   "coefficient-giving",
-  "survival-and-flourishing-fund",
+  "sff",
 ];
 
 test.describe("Organizations listing page", () => {
@@ -294,7 +294,7 @@ test.describe("Organization funding subpages", () => {
     "miri",
     "arc",
     "open-philanthropy",
-    "center-for-ai-safety",
+    "cais",
   ];
 
   for (const slug of orgsWithFunding) {

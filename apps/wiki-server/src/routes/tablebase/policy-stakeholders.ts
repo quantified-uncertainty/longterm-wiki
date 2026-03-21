@@ -9,6 +9,8 @@ import {
   invalidJsonError,
   zv,
 } from "../shared/utils.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 
 // ---- Constants ----
 
@@ -17,12 +19,15 @@ const VALID_POSITIONS = ["support", "oppose", "neutral", "mixed"] as const;
 
 // ---- Schemas ----
 
+const VALID_IMPORTANCE = ["high", "medium", "low"] as const;
+
 const SyncStakeholderItemSchema = z.object({
   id: z.string().length(10),
   policyEntityId: z.string().min(1).max(200),
   stakeholderEntityId: z.string().max(200).nullable().optional(),
   stakeholderDisplayName: z.string().min(1).max(500),
   position: z.enum(VALID_POSITIONS),
+  importance: z.enum(VALID_IMPORTANCE).nullable().optional(),
   reason: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   context: z.array(z.string()).nullable().optional(),
@@ -45,17 +50,17 @@ const ByStakeholderQuery = z.object({
 
 // ---- Route ----
 
-const policyStakeholdersApp = new Hono()
+const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
   // GET /by-policy/:entityId — stakeholders for a specific policy
-  .get("/by-policy/:entityId", zv("query", ByPolicyQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-policy/:entityId", resolveEntityId(), zv("query", ByPolicyQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { position, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const whereClause = position
-      ? and(eq(policyStakeholders.policyEntityId, entityId), eq(policyStakeholders.position, position))
-      : eq(policyStakeholders.policyEntityId, entityId);
+      ? and(eq(policyStakeholders.policyEntityId, resolvedId), eq(policyStakeholders.position, position))
+      : eq(policyStakeholders.policyEntityId, resolvedId);
 
     const rows = await db.select().from(policyStakeholders)
       .where(whereClause)
@@ -69,18 +74,18 @@ const policyStakeholdersApp = new Hono()
   })
 
   // GET /by-stakeholder/:entityId — policies where this entity is a stakeholder
-  .get("/by-stakeholder/:entityId", zv("query", ByStakeholderQuery), async (c) => {
-    const entityId = c.req.param("entityId");
+  .get("/by-stakeholder/:entityId", resolveEntityId(), zv("query", ByStakeholderQuery), async (c) => {
+    const resolvedId = c.get("resolvedEntityId");
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db.select().from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, entityId))
+      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId))
       .limit(limit)
       .offset(offset);
 
     const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders)
-      .where(eq(policyStakeholders.stakeholderEntityId, entityId));
+      .where(eq(policyStakeholders.stakeholderEntityId, resolvedId));
 
     return c.json({ positions: rows, total });
   })
@@ -99,6 +104,10 @@ const policyStakeholdersApp = new Hono()
     let upserted = 0;
 
     await db.transaction(async (tx) => {
+      // Resolve policy entity titles for thing titles
+      const policyIds = [...new Set(items.map((i) => i.policyEntityId))];
+      const titleMap = await resolveEntityTitles(tx, policyIds);
+
       for (const item of items) {
         await tx
           .insert(policyStakeholders)
@@ -108,6 +117,7 @@ const policyStakeholdersApp = new Hono()
             stakeholderEntityId: item.stakeholderEntityId ?? null,
             stakeholderDisplayName: item.stakeholderDisplayName,
             position: item.position,
+            importance: item.importance ?? null,
             reason: item.reason ?? null,
             source: item.source ?? null,
             context: item.context ?? null,
@@ -121,6 +131,7 @@ const policyStakeholdersApp = new Hono()
               stakeholderEntityId: item.stakeholderEntityId ?? null,
               stakeholderDisplayName: item.stakeholderDisplayName,
               position: item.position,
+              importance: item.importance ?? null,
               reason: item.reason ?? null,
               source: item.source ?? null,
               context: item.context ?? null,
@@ -130,6 +141,24 @@ const policyStakeholdersApp = new Hono()
           });
         upserted++;
       }
+
+      // Dual-write to things table
+      const policyTitle = (policyId: string) =>
+        titleMap.get(policyId) ?? policyId;
+
+      await upsertThingsInTx(
+        tx,
+        items.map((i) => ({
+          id: i.id,
+          thingType: "policy-stakeholder" as const,
+          title: `${i.stakeholderDisplayName} on ${policyTitle(i.policyEntityId)}`,
+          sourceTable: "policy_stakeholders",
+          sourceId: i.id,
+          parentThingId: i.policyEntityId,
+          parentTitle: policyTitle(i.policyEntityId),
+          sourceUrl: i.source ?? null,
+        }))
+      );
     });
 
     return c.json({ upserted });

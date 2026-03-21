@@ -605,11 +605,29 @@ export function getFactBaseSlugMap(): Record<string, string> {
 }
 
 /**
+ * Static slug aliases for FactBase filenames that differ from their
+ * canonical TableBase slug. These are checked by resolveSlugAlias()
+ * so that directory pages (e.g. /organizations/center-for-ai-safety)
+ * redirect to the canonical slug (/organizations/cais).
+ *
+ * Add entries here when a FactBase YAML filename doesn't match
+ * the TableBase entity id (the slug used in URLs).
+ */
+const STATIC_SLUG_ALIASES: Record<string, string> = {
+  "center-for-ai-safety": "cais",
+  "survival-and-flourishing-fund": "sff",
+};
+
+/**
  * Resolve a previous slug to the current canonical slug.
  * Returns the current slug if the input is a known previous slug, or undefined.
  * Used for URL redirect support when entity slugs change.
  */
 export function resolveSlugAlias(slug: string): string | undefined {
+  // Check static aliases first (FactBase filename → TableBase slug)
+  const staticAlias = STATIC_SLUG_ALIASES[slug];
+  if (staticAlias) return staticAlias;
+
   const fb = getFactBase();
   if (!fb?.previousSlugToCurrentSlug) return undefined;
   return fb.previousSlugToCurrentSlug[slug];

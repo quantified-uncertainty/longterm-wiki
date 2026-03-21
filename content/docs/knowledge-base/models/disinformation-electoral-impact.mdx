@@ -1,13 +1,13 @@
 ---
 wikiId: E104
 title: Electoral Impact Assessment Model
-description: This model estimates AI disinformation's marginal impact on elections. It finds AI increases reach by 1.5-3x over traditional methods, with potential 2-5% vote margin shifts in close elections.
+description: This model estimates AI's marginal impact on elections across three vectors — disinformation influence, infrastructure attacks, and voter suppression. Includes the Romania 2024 annulment case study, AI-enhanced election cyberattacks, voter roll manipulation, and targeted demobilization campaigns.
 sidebar:
   order: 26
 subcategory: impact-models
-lastEdited: 2026-01-28
+lastEdited: 2026-03-20
 update_frequency: 90
-summary: This model estimates AI disinformation's marginal electoral impact by decomposing the causal pathway from AI capability to vote shifts. Analysis finds 0.2-5% probability of flipping individual elections (1-3 elections globally per year), with 2-5% potential vote margin shifts in close races, though systemic trust erosion (2-5% annual decline) may matter more than specific election outcomes.
+summary: This model estimates AI's marginal electoral impact across three vectors — disinformation influence, infrastructure attacks, and voter suppression. Analysis finds 0.2-5% probability of flipping individual elections via influence alone (1-3 elections globally per year), with AI-powered voter roll manipulation, targeted demobilization, and election infrastructure cyberattacks creating compounding risks. Romania 2024 provides the first case of election annulment due to AI-enhanced interference. Systemic trust erosion (2-5% annual decline) may matter more than specific election outcomes.
 clusters:
   - ai-safety
   - governance
@@ -269,6 +269,32 @@ Despite being called the "AI election year," post-election analysis found limite
 
 **Most Likely:** Combination of #3, #4, and #5. AI disinformation had some impact but was not decisive in 2024.
 
+### Romania 2024: First Election Annulled Over AI Interference
+
+**Event:** Romania's Constitutional Court annulled the results of the first round of its presidential election on December 6, 2024 — the first time in any democracy that election results were voided specifically due to evidence of AI-powered foreign interference.
+
+**Background:** Călin Georgescu, a far-right, pro-Russia candidate polling at under 5%, surged to win the first round with 22.9% of the vote. Romanian intelligence services (SRI, SIE, STS) subsequently declassified evidence showing a coordinated campaign involving:
+
+- **TikTok manipulation**: Over 25,000 TikTok accounts activated simultaneously to promote Georgescu, many dormant accounts that suddenly became active. A [Global Witness investigation](https://globalwitness.org/en/campaigns/digital-threats/what-happened-on-tiktok-around-the-annulled-romanian-presidential-election-an-investigation-and-poll/) found systematic amplification through the platform's algorithm.
+- **AI-generated content**: AI tools used to create and optimize campaign messaging, with content designed to evade platform detection.
+- **Undisclosed foreign funding**: Approximately \$1 million in campaign spending routed through cryptocurrency and foreign accounts, violating Romanian campaign finance law.
+- **Coordinated inauthentic behavior**: Networks of accounts posting synchronized content across platforms, consistent with state-backed influence operations. Romanian intelligence attributed the campaign to Russian-linked actors.
+
+**Constitutional Court ruling:** The court found that the electoral process had been "vitiated" and that "the equality of chances of the candidates" had been compromised. The ruling cited both the undisclosed financing and the coordinated social media manipulation as grounds for annulment.
+
+**Aftermath:**
+- The EU opened a formal investigation into TikTok under the Digital Services Act for potential failure to mitigate election manipulation risks.
+- Romania held new elections in May 2025, with enhanced social media monitoring.
+- The case became a precedent — the first documented instance where AI-enhanced interference triggered institutional response (election annulment), not just post-hoc analysis.
+
+**Key lessons:**
+- **Institutional response is possible**: Unlike most AI interference cases where impact is debated after the fact, Romania's institutions acted. This required classified intelligence evidence, however — suggesting that democratic response depends on intelligence capabilities most countries lack.
+- **TikTok's algorithm was the amplifier**: The AI component was less about generating content and more about algorithmic amplification of coordinated accounts. Platform design can be as important as content generation.
+- **Low-profile elections are most vulnerable**: Georgescu was a marginal candidate in a multi-candidate first-round election — exactly the scenario where small interventions can be decisive.
+- **Cryptocurrency complicates attribution**: Foreign funding through crypto makes traditional campaign finance enforcement much harder.
+
+**Estimated impact:** Decisive — a candidate polling at \<5% won the first round, an outcome intelligence services attributed to the interference campaign.
+
 ### Slovakia 2023: Deepfake Audio Incident
 
 **Event:** Audio deepfake of liberal party leader discussing vote rigging surfaced days before election
@@ -511,6 +537,83 @@ Beyond individual elections, AI disinformation affects democratic health:
 - Dramatic increase in election security budgets
 - Consider election reforms (longer voting periods to allow fact-checking)
 
+## Beyond Influence: AI Threats to Election Infrastructure
+
+The model above focuses on AI disinformation's influence on voter beliefs and choices. But elections can also be "stolen" through attacks on election *infrastructure* — the systems that register voters, count ballots, and report results. AI enhances these attack vectors in ways that the influence-focused model doesn't capture.
+
+### AI-Enhanced Cyberattacks on Election Systems
+
+Election infrastructure presents a large attack surface: voter registration databases, electronic poll books, ballot marking devices, optical scanners, election management systems (EMS), and election night reporting (ENR) systems. AI enhances existing cyber threats in several ways:
+
+| Attack Vector | Pre-AI Capability | AI Enhancement | Assessed Risk |
+|---------------|-------------------|----------------|---------------|
+| **Voter registration database attacks** | Manual SQL injection, credential stuffing | AI-powered vulnerability discovery, automated exploitation at scale | Medium-High |
+| **Phishing of election officials** | Generic phishing emails | AI-generated spear phishing using officials' social media profiles, voice-cloned calls | High |
+| **Supply chain attacks on voting software** | Requires deep access and expertise | AI-assisted code analysis to find vulnerabilities in election software | Medium |
+| **Election night reporting manipulation** | DDoS, website defacement | AI-optimized timing of attacks for maximum confusion, deepfake "results" | Medium |
+| **Poll book corruption** | Data entry manipulation | AI-driven selective corruption targeting specific precincts | Low-Medium |
+
+**Key insight**: The most impactful infrastructure attacks may not change vote counts directly but rather create chaos and undermine confidence in results. An AI-generated deepfake of an election official announcing "irregularities" during vote counting could trigger a legitimacy crisis regardless of whether actual fraud occurred.
+
+**CISA assessment**: The Cybersecurity and Infrastructure Security Agency has identified election infrastructure as critical national infrastructure since 2017. Their [election security](https://www.cisa.gov/topics/election-security) work has hardened many systems, but the attack surface remains large — over 8,000 election jurisdictions in the US alone, many with limited cybersecurity budgets and staffing.
+
+**Historical precedent**: Russia's GRU targeted voter registration systems in all 50 US states in 2016 (per the Senate Intelligence Committee report), successfully breaching systems in at least two Florida counties. While no votes were changed, the intrusions demonstrated that state actors can access election infrastructure. AI could make such intrusions faster, harder to detect, and more precisely targeted.
+
+### AI-Powered Voter Roll Manipulation
+
+Voter roll accuracy is a legitimate concern — states must maintain accurate lists under the National Voter Registration Act (NVRA). But AI dramatically changes the scale and precision of potential manipulation:
+
+**Automated mass voter challenges**: AI can scan voter rolls and cross-reference them against commercial databases to generate mass challenges to voter eligibility. In Georgia, a single activist group challenged 364,000 voter registrations before the 2021 runoff elections. AI could automate and scale this process dramatically — generating thousands of challenges per day with superficially plausible justifications (address mismatches, name variations, etc.).
+
+**False-positive citizenship matching**: The national citizenship database being built by DHS (linking voter rolls with immigration, SSA, and driver's license data) creates risks of algorithmic disenfranchisement. Name-matching algorithms have well-documented error rates, particularly for:
+- Hispanic surnames (patronymic naming patterns create false matches)
+- Asian names (transliteration variations)
+- Hyphenated and compound names
+- Common names in minority communities
+
+Florida's 2000 voter purge (contracted to Database Technologies/DBT) erroneously flagged thousands of eligible voters as felons, disproportionately affecting Black voters. AI-powered matching at national scale could produce errors orders of magnitude larger.
+
+**Interstate Crosscheck problems as precedent**: The Interstate Voter Registration Crosscheck Program, which compared voter rolls across 27 participating states, produced a 99% false-positive rate according to research by Stanford, Harvard, and Microsoft. The program matched voters using only first name, last name, and date of birth — flagging people like "James Brown" or "Maria Garcia" across multiple states. AI-powered systems could be more sophisticated but would still face fundamental statistical challenges when applied to 150+ million registered voters.
+
+**Probability estimate**: AI-powered voter roll manipulation affecting election outcomes: 5-15% probability in any given US election cycle (higher in states with aggressive purge practices and limited judicial oversight).
+
+### AI-Powered Voter Suppression
+
+Beyond disinformation that changes minds, AI enables targeted *demobilization* — discouraging specific groups from voting at all. This is distinct from the influence model above because the goal is not to persuade but to suppress turnout.
+
+**Micro-targeted demobilization**: AI can identify persuadable non-voters in specific demographics and generate personalized content designed to depress turnout. Techniques include:
+- Messages emphasizing futility ("your vote doesn't matter in this district")
+- Targeted cynicism about specific candidates among their base
+- Confusion about voting logistics (wrong dates, locations, ID requirements)
+- AI-generated fake "official" communications about polling changes
+
+The 2016 Cambridge Analytica operation demonstrated targeted demobilization using Facebook data — what they internally called "deterrence" campaigns aimed at African-American voters. AI would make such operations cheaper, faster, and harder to trace.
+
+**AI-generated robocalls**: The January 2024 New Hampshire incident — where AI-cloned Biden voice urged 25,000 Democrats not to vote in the primary — demonstrated the basic capability. The FCC subsequently [ruled AI-generated voices in robocalls illegal](https://www.fcc.gov/document/fcc-makes-ai-generated-voices-robocalls-illegal) under the TCPA in February 2024, and the perpetrator (Steve Kramer, a political consultant) was fined \$6 million by the FCC and faced criminal charges in New Hampshire. But enforcement is reactive — the calls went out before anyone could stop them.
+
+**Automated poll worker harassment**: AI could automate campaigns to intimidate poll workers through personalized threatening messages, deepfake "evidence" of misconduct, or coordinated social media harassment. A [2024 Brennan Center survey](https://www.brennancenter.org/our-work/policy-solutions/election-officials-under-attack) found more than **1 in 3 election officials** have faced harassment, abuse, or threats, with **1 in 4 worried about being assaulted** at home or work. AI-powered harassment could accelerate the resulting attrition of experienced election staff.
+
+**Quantitative estimate**: A [2026 PNAS study](https://www.pnas.org/doi/10.1073/pnas.2519944123) tracked 10,000+ participants who installed an app capturing every ad viewed for six weeks before the 2016 election. Key findings:
+- Participants who saw vote-suppressing Facebook messages were **1.9% less likely to actually vote**
+- Nonwhite voters in battleground state minority counties were **14.2% less likely to vote** compared to white voters in non-battleground areas
+- Extrapolated nationally, **approximately 4.7 million people may have been kept from voting**
+- This was from crude, human-written 2016-era content — AI personalization would likely produce larger effects
+
+In close elections, even 1-2% turnout reductions in targeted demographics are decisive. Black and Latino voters, young voters, and voters in precincts with fewer polling locations are most vulnerable.
+
+### Combined Threat Assessment
+
+The influence model (previous sections) and infrastructure threats (this section) are not independent — they can compound:
+
+| Threat Type | Mechanism | Impact on Election | Detection Difficulty |
+|-------------|-----------|-------------------|---------------------|
+| **Influence only** | Changes voter preferences | 0.2-5% chance of flipping | Medium — detectable after the fact |
+| **Infrastructure only** | Disrupts voting/counting | Could disenfranchise thousands | Medium — leaves digital traces |
+| **Suppression only** | Reduces opposition turnout | 2-5% turnout reduction in targeted groups | Hard — looks like voluntary non-voting |
+| **Combined** | All of the above simultaneously | Multiplicative effects on close elections | Very Hard — multiple vectors obscure attribution |
+
+A sophisticated actor — particularly a state actor with intelligence capabilities — could deploy all three simultaneously: influence operations to shift preferences, infrastructure attacks to create chaos and undermine confidence, and suppression campaigns to reduce opposition turnout. The combined effect would be substantially larger than any single vector.
+
 ## Model Limitations
 
 This model faces fundamental measurement challenges that limit confidence in its estimates.
@@ -551,6 +654,13 @@ This model faces fundamental measurement challenges that limit confidence in its
 - Kalla, J. & Broockman, D. ["The Minimal Persuasive Effects of Campaign Contact in General Elections."](https://www.cambridge.org/core/journals/american-political-science-review/article/abs/minimal-persuasive-effects-of-campaign-contact-in-general-elections-evidence-from-49-field-experiments/753665A313C4AB433DBF7110299B7433) *American Political Science Review* (2018). Meta-analysis of 49 field experiments finding ~zero average effect.
 - Simon, F. & Camargo, C. ["We Looked at 78 Election Deepfakes."](https://knightcolumbia.org/blog/we-looked-at-78-election-deepfakes-political-misinformation-is-not-an-ai-problem) *Knight Columbia* (2024). Found cheap fakes 7x more common than AI deepfakes; 39 of 78 cases had no deceptive intent.
 - CIGI. ["Then and Now: How Does AI Electoral Interference Compare in 2025?"](https://www.cigionline.org/articles/then-and-now-how-does-ai-electoral-interference-compare-in-2025/) Comprehensive comparison including Romania 2024 annulment case.
+
+### Voter Suppression Research
+
+- ["Targeted digital voter suppression efforts likely decrease voter turnout."](https://www.pnas.org/doi/10.1073/pnas.2519944123) *PNAS* (2026). 10,000+ participants tracked over 6 weeks; found 1.9% turnout reduction from suppression ads, 14.2% for nonwhite voters in battleground minority counties. Estimated ~4.7 million kept from voting in 2016.
+- Brennan Center for Justice. ["Preparing to Fight AI-Backed Voter Suppression."](https://www.brennancenter.org/our-work/research-reports/preparing-fight-ai-backed-voter-suppression) Analysis of AI-powered suppression tactics and countermeasures.
+- ProPublica. ["Six Right-Wing Activists Filed 89,000 Georgia Voter Roll Challenges."](https://www.propublica.org/article/right-wing-activists-georgia-voter-challenges) (2023). Documenting approximately 100,000 automated voter challenges in Georgia by a small network of activists.
+- NPR. ["Voter registration mass challenges fueled by EagleAI."](https://www.npr.org/2024/06/04/nx-s1-4991945/voter-registration-mass-challenges-georgia) (2024). Documenting EagleAI-driven voter challenges in Georgia counties.
 
 ### Platform and Social Media Effects
 

@@ -2139,6 +2139,7 @@ export const VALID_THING_TYPES = [
   "funding-program",
   "division-personnel",
   "research-area",
+  "policy-stakeholder",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -2548,6 +2549,8 @@ export const policyStakeholders = pgTable(
     stakeholderDisplayName: text("stakeholder_display_name").notNull(),
     /** Position: support | oppose | neutral | mixed */
     position: text("position").notNull(),
+    /** Importance/weight: high | medium | low */
+    importance: text("importance"),
     /** Reason for the position */
     reason: text("reason"),
     /** Source URL */
