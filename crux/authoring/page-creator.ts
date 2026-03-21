@@ -50,6 +50,7 @@ import { shouldUseApiDirect } from '../lib/claude-cli.ts';
 import { inferEntityType } from '../lib/category-entity-types.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors, createPhaseLogger } from '../lib/output.ts';
+import { validatePipelineResources } from '../lib/validation/validate-resource-refs.ts';
 import type { CreatorContext } from './creator/types.ts';
 import { runOrchestratorCreate } from './orchestrator/index.ts';
 
@@ -547,6 +548,24 @@ async function main(): Promise<void> {
   }
 
   await runPipeline(topic, tier, directions, sourceFilePath, destPath, apiDirect);
+
+  // Resource ref validation on the generated content
+  const finalPath = path.join(getTopicDir(topic), 'final.mdx');
+  const draftPath = path.join(getTopicDir(topic), 'draft.mdx');
+  const contentPath = fs.existsSync(finalPath) ? finalPath : (fs.existsSync(draftPath) ? draftPath : null);
+  if (contentPath) {
+    try {
+      const generatedContent = fs.readFileSync(contentPath, 'utf-8');
+      const resourceValidation = await validatePipelineResources(generatedContent, { log });
+      if (resourceValidation.refs.changed) {
+        fs.writeFileSync(contentPath, resourceValidation.refs.fixedContent);
+        log('resource-validation', `Fixed content written to ${contentPath}`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('resource-validation', `Warning: resource ref validation failed (non-blocking): ${error.message}`);
+    }
+  }
 
   // Deploy to destination if --dest provided
   if (destPath) {
