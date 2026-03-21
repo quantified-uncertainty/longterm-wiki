@@ -67,8 +67,8 @@ describe("toSyncGrant", () => {
       focusArea: null,
       description: null,
     };
-    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
-    expect(sync.source).toBe("https://coefficientgiving.org/grants/");
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
+    expect(sync.source).toBe("https://coefficientgiving.org/funds/");
   });
 
   it("uses raw.sourceUrl when present (Manifund)", () => {
@@ -273,7 +273,7 @@ describe("toSyncGrant", () => {
       focusArea: null,
       description: null,
     };
-    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
     expect(sync.granteeId).toBeNull();
   });
 
@@ -289,7 +289,7 @@ describe("toSyncGrant", () => {
       focusArea: null,
       description: null,
     };
-    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
     expect(sync.granteeId).toBe("Some Real Organization");
   });
 
@@ -305,7 +305,7 @@ describe("toSyncGrant", () => {
       focusArea: null,
       description: null,
     };
-    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
     expect(sync.granteeId).toBe("aBcDeFgHiJ");
   });
 
@@ -322,7 +322,7 @@ describe("toSyncGrant", () => {
       focusArea: "Potential Risks from Advanced AI",
       description: "To support general research",
     };
-    const sync = toSyncGrant(raw, "https://coefficientgiving.org/grants/");
+    const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
     expect(sync.id).toBe("VvNfsbv6vA");
   });
 
