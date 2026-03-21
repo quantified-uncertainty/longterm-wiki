@@ -9,6 +9,8 @@
  * Extracted from build-data.mjs for modularity.
  */
 
+import { createHash } from 'node:crypto';
+
 // ---------------------------------------------------------------------------
 // Wiki-server warning tracking — exposed via getWikiServerWarningCount()
 // Counts actual API failures (not "URL not set" which is expected for local dev).
@@ -595,7 +597,11 @@ export async function syncPolicyStakeholders(typedEntities) {
   // Build sync items — generate deterministic 10-char IDs from policy+stakeholder
   const items = [];
   for (const policy of policies) {
-    const policyEntityId = policy.stableId || policy.id;
+    if (!policy.stableId) {
+      console.warn(`  policy-stakeholder-sync: policy "${policy.id}" has no stableId — skipping`);
+      continue;
+    }
+    const policyEntityId = policy.stableId;
     for (const s of policy.stakeholders) {
       // Deterministic ID: hash of policyId + stakeholder name
       const raw = `${policyEntityId}:${s.name}`;
@@ -636,15 +642,19 @@ export async function syncPolicyStakeholders(typedEntities) {
       } else {
         // Batch failed — try items individually to skip bad FK references
         for (const item of batch) {
-          const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ items: [item] }),
-            signal: AbortSignal.timeout(10_000),
-          });
-          if (r.ok) {
-            synced++;
-          } else {
+          try {
+            const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ items: [item] }),
+              signal: AbortSignal.timeout(10_000),
+            });
+            if (r.ok) {
+              synced++;
+            } else {
+              skipped++;
+            }
+          } catch {
             skipped++;
           }
         }
@@ -658,27 +668,11 @@ export async function syncPolicyStakeholders(typedEntities) {
 }
 
 /**
- * Generate a deterministic 10-char alphanumeric ID from a string.
- * Uses a simple hash to produce consistent IDs for the same input.
+ * Generate a deterministic 10-char ID from a string using SHA-256.
+ * Matches the pattern used by crux/lib/grant-import/id.ts:generateId().
  */
 function generateShortId(input) {
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const ch = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + ch;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  // Convert to base36 and pad/truncate to 10 chars
-  const base = Math.abs(hash).toString(36);
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = base;
-  // Extend with secondary hash if too short
-  let h2 = hash;
-  while (result.length < 10) {
-    h2 = ((h2 << 3) + h2 + input.charCodeAt(result.length % input.length)) & 0x7fffffff;
-    result += chars[h2 % chars.length];
-  }
-  return result.slice(0, 10);
+  return createHash('sha256').update(input).digest('base64url').substring(0, 10);
 }
 
 /**
