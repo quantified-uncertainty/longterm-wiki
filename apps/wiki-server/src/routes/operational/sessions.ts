@@ -232,43 +232,54 @@ const sessionsApp = new Hono()
           ? await resolvePageIntIds(tx, allPageIds)
           : new Map<string, number>();
 
-        const created: Array<{ id: number; title: string; pageCount: number }> = [];
+        // Bulk upsert all sessions in one query
+        const allVals = items.map((d) => sessionValues(d));
+        const upsertedRows = await tx
+          .insert(sessions)
+          .values(allVals)
+          .onConflictDoUpdate({
+            target: [sessions.date, sessions.title],
+            set: sessionConflictSet,
+          })
+          .returning({ id: sessions.id, title: sessions.title });
 
-        for (const d of items) {
-          const rows = await tx
-            .insert(sessions)
-            .values(sessionValues(d))
-            .onConflictDoUpdate({
-              target: [sessions.date, sessions.title],
-              set: sessionConflictSet,
-            })
-            .returning({ id: sessions.id, title: sessions.title });
+        const sessionIds = upsertedRows.map((r) => r.id);
 
-          const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
-
-          // Replace page associations: delete old, insert new
+        // Bulk delete old page associations for all affected sessions
+        if (sessionIds.length > 0) {
           await tx
             .delete(sessionPages)
-            .where(eq(sessionPages.sessionId, session.id));
-
-          if (d.pages.length > 0) {
-            await tx
-              .insert(sessionPages)
-              .values(d.pages.map((pageId) => ({
-                sessionId: session.id,
-                pageId,
-                pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
-              })));
-          }
-
-          created.push({
-            id: session.id,
-            title: session.title,
-            pageCount: d.pages.length,
-          });
+            .where(inArray(sessionPages.sessionId, sessionIds));
         }
 
-        return created;
+        // Bulk insert all new page associations
+        const allPageAssociations: Array<{
+          sessionId: number;
+          pageId: string;
+          pageIdInt: number | null;
+        }> = [];
+        for (let i = 0; i < items.length; i++) {
+          const d = items[i];
+          const sessionId = upsertedRows[i].id;
+          for (const pageId of d.pages) {
+            allPageAssociations.push({
+              sessionId,
+              pageId,
+              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
+            });
+          }
+        }
+        if (allPageAssociations.length > 0) {
+          await tx
+            .insert(sessionPages)
+            .values(allPageAssociations);
+        }
+
+        return upsertedRows.map((row, i) => ({
+          id: row.id,
+          title: row.title,
+          pageCount: items[i].pages.length,
+        }));
       });
     } catch (err) {
       return dbError(c, "session batch", err, { itemCount: items.length });
