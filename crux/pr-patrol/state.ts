@@ -118,8 +118,56 @@ export function resetFailCount(key: number | string): void {
   if (existsSync(legacyFile)) writeFileSync(legacyFile, '0');
 }
 
+/**
+ * Check if a PR is permanently abandoned. Uses a persistent file rather than
+ * deriving from fail count, so abandonment survives cooldown expiry.
+ * A new push to the PR branch (detected by SHA change) clears the flag.
+ */
 export function isAbandoned(key: number | string): boolean {
-  return getFailCount(key) >= 2;
+  const file = join(STATE_DIR, `abandoned-${key}`);
+  if (!existsSync(file)) {
+    // Fallback: also check fail count for backward compat with pre-migration state
+    return getFailCount(key) >= 2;
+  }
+  return true;
+}
+
+/**
+ * Mark a PR as permanently abandoned (persisted to disk).
+ * Stores the HEAD SHA at abandonment time so we can detect new pushes.
+ */
+export function markAbandoned(prNumber: number | string, headSha?: string): void {
+  const file = join(STATE_DIR, `abandoned-${prNumber}`);
+  writeFileSync(file, JSON.stringify({
+    abandonedAt: new Date().toISOString(),
+    headSha: headSha ?? '',
+  }));
+}
+
+/**
+ * Get the SHA that was HEAD when the PR was abandoned (for detecting new pushes).
+ */
+export function getAbandonedSha(prNumber: number | string): string | null {
+  const file = join(STATE_DIR, `abandoned-${prNumber}`);
+  if (!existsSync(file)) return null;
+  try {
+    const data = JSON.parse(readFileSync(file, 'utf-8'));
+    return data.headSha || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear abandoned state (used when a new push is detected on the PR).
+ */
+export function clearAbandoned(prNumber: number | string): void {
+  const file = join(STATE_DIR, `abandoned-${prNumber}`);
+  if (existsSync(file)) {
+    try { unlinkSync(file); } catch { /* best-effort */ }
+  }
+  // Also reset fail count so the PR gets a fresh start
+  resetFailCount(prNumber);
 }
 
 // ── Main branch cooldown (shorter than PR cooldown) ─────────────────────────
@@ -185,6 +233,99 @@ export function clearTrackedMainFixPr(): void {
     if (existsSync(TRACKED_FIX_FILE)) unlinkSync(TRACKED_FIX_FILE);
   } catch {
     // Best-effort cleanup — file may already be gone
+  }
+}
+
+// ── Circuit breaker for systematic spawn failures ────────────────────────────
+// When 3+ consecutive dispatches fail instantly (< 15s, exit code error),
+// pause all dispatching for 15 minutes to prevent cascade waste.
+
+const CIRCUIT_BREAKER_FILE = join(STATE_DIR, 'circuit-breaker');
+const CIRCUIT_THRESHOLD = 3; // consecutive instant failures to trip
+const CIRCUIT_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes
+const INSTANT_FAILURE_THRESHOLD_S = 15; // failures under this duration count
+
+interface CircuitBreakerState {
+  consecutiveInstantFailures: number;
+  trippedAt: string | null; // ISO timestamp when circuit was opened
+}
+
+function readCircuitState(): CircuitBreakerState {
+  if (!existsSync(CIRCUIT_BREAKER_FILE)) {
+    return { consecutiveInstantFailures: 0, trippedAt: null };
+  }
+  try {
+    return JSON.parse(readFileSync(CIRCUIT_BREAKER_FILE, 'utf-8'));
+  } catch {
+    return { consecutiveInstantFailures: 0, trippedAt: null };
+  }
+}
+
+function writeCircuitState(state: CircuitBreakerState): void {
+  writeFileSync(CIRCUIT_BREAKER_FILE, JSON.stringify(state));
+}
+
+/**
+ * Record an instant failure (outcome "error" with elapsed < 15s).
+ * Returns true if the circuit just tripped.
+ */
+export function recordInstantFailure(): boolean {
+  const state = readCircuitState();
+  state.consecutiveInstantFailures += 1;
+  if (state.consecutiveInstantFailures >= CIRCUIT_THRESHOLD && !state.trippedAt) {
+    state.trippedAt = new Date().toISOString();
+    writeCircuitState(state);
+    return true; // just tripped
+  }
+  writeCircuitState(state);
+  return false;
+}
+
+/**
+ * Reset the circuit breaker (called on any non-instant outcome).
+ */
+export function resetCircuit(): void {
+  const state = readCircuitState();
+  if (state.consecutiveInstantFailures > 0 || state.trippedAt) {
+    writeCircuitState({ consecutiveInstantFailures: 0, trippedAt: null });
+  }
+}
+
+/**
+ * Check if the circuit breaker is open (dispatching should be paused).
+ * The circuit auto-closes after CIRCUIT_COOLDOWN_MS.
+ */
+export function isCircuitOpen(): boolean {
+  const state = readCircuitState();
+  if (!state.trippedAt) return false;
+  const elapsed = Date.now() - new Date(state.trippedAt).getTime();
+  if (elapsed >= CIRCUIT_COOLDOWN_MS) {
+    // Auto-close the circuit after cooldown expires
+    writeCircuitState({ consecutiveInstantFailures: 0, trippedAt: null });
+    return false;
+  }
+  return true;
+}
+
+/** Threshold in seconds below which a failure is considered "instant". */
+export const INSTANT_FAILURE_THRESHOLD_SECONDS = INSTANT_FAILURE_THRESHOLD_S;
+
+// ── Pending CI verification (post-fix) ──────────────────────────────────────
+// After a "fixed" outcome, we don't reset the fail counter immediately.
+// Instead we mark the PR as "pending verification" and only reset when CI passes.
+
+export function markPendingVerification(prNumber: number): void {
+  writeFileSync(join(STATE_DIR, `pending-verify-${prNumber}`), new Date().toISOString());
+}
+
+export function isPendingVerification(prNumber: number): boolean {
+  return existsSync(join(STATE_DIR, `pending-verify-${prNumber}`));
+}
+
+export function clearPendingVerification(prNumber: number): void {
+  const file = join(STATE_DIR, `pending-verify-${prNumber}`);
+  if (existsSync(file)) {
+    try { unlinkSync(file); } catch { /* best-effort */ }
   }
 }
 

@@ -28,14 +28,19 @@ import {
   appendJsonl,
   cl,
   getFailCount,
+  INSTANT_FAILURE_THRESHOLD_SECONDS,
   isMainBranchAbandoned,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
   MAIN_BRANCH_ABANDON_THRESHOLD,
   MAIN_BRANCH_COOLDOWN_SECONDS,
+  markAbandoned,
+  markPendingVerification,
   markProcessed,
   recordFailure,
+  recordInstantFailure,
+  resetCircuit,
   resetFailCount,
   trackMainFixPr,
   getMainRedSince,
@@ -514,6 +519,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       log(`${cl.red}✗ PR #${pr.number} timed out after ${effectiveTimeout}m${cl.reset} (attempt ${failCount})`);
 
       if (failCount >= 2) {
+        markAbandoned(pr.number);
         reason = `Abandoned after ${failCount} failures (timeout)`;
         log(`${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`);
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
@@ -544,8 +550,10 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
         await postEventComment(pr.number, config.repo, buildNoOpComment(pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post no-op comment: ${e instanceof Error ? e.message : String(e)}`));
       } else {
-        resetFailCount(pr.number);
-        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s)`);
+        // Don't reset fail count immediately — mark as pending CI verification.
+        // The fail counter will be reset when CI passes on the next cycle.
+        markPendingVerification(pr.number);
+        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s) — pending CI verification`);
 
         // Post fix-complete summary comment
         const outputTail = result.output.slice(-500);
@@ -559,6 +567,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       log(`${cl.yellow}⚠ PR #${pr.number} hit max turns after ${elapsedS}s${cl.reset} (attempt ${failCount})`);
 
       if (failCount >= 2) {
+        markAbandoned(pr.number);
         reason = `Abandoned after ${failCount} failures`;
         log(
           `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
@@ -577,6 +586,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       // (previously missing — errored PRs would retry forever after cooldown expired)
       const failCount = recordFailure(pr.number);
       if (failCount >= 2) {
+        markAbandoned(pr.number);
         reason = `Abandoned after ${failCount} failures (last: exit code ${result.exitCode})`;
         log(
           `${cl.red}✗ PR #${pr.number} abandoned after ${failCount} consecutive failures${cl.reset}`,
@@ -584,6 +594,16 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(failCount, pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       }
+    }
+
+    // Circuit breaker: track instant failures (error + <15s) vs non-instant outcomes
+    if (outcome === 'error' && elapsedS < INSTANT_FAILURE_THRESHOLD_SECONDS) {
+      const tripped = recordInstantFailure();
+      if (tripped) {
+        log(`${cl.red}Circuit breaker TRIPPED — 3+ consecutive instant failures. Pausing dispatch for 15 min.${cl.reset}`);
+      }
+    } else {
+      resetCircuit();
     }
 
     appendJsonl(JSONL_FILE, {
