@@ -284,6 +284,87 @@ export async function renderMdxPage(slug: string): Promise<MdxResult | null> {
 }
 
 /**
+ * Extract the "intro section" from raw MDX source — everything from the start
+ * up to (but not including) the third level-2 heading (`## `).
+ *
+ * This captures the Quick Assessment table and the first prose section
+ * (typically "Overview") which together give a good summary of the person.
+ *
+ * If the content has fewer than 3 level-2 headings, returns all the content.
+ * Strips footnote references since footnote definitions won't be present
+ * in the excerpt.
+ */
+export function extractMdxIntroSection(source: string): string {
+  const lines = source.split("\n");
+  let h2Count = 0;
+  let cutIndex = lines.length;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (/^## /.test(lines[i])) {
+      h2Count++;
+      if (h2Count === 3) {
+        cutIndex = i;
+        break;
+      }
+    }
+  }
+
+  let excerpt = lines.slice(0, cutIndex).join("\n").trimEnd();
+
+  // Strip footnote references like [^rc-XXXX] since the definitions won't be
+  // present. Also strip [^fact:...] and [^kb-...] markers.
+  excerpt = excerpt.replace(/\[\^[^\]]+\]/g, "");
+
+  // Remove trailing blank lines
+  excerpt = excerpt.replace(/\n{3,}/g, "\n\n").trimEnd();
+
+  return excerpt;
+}
+
+/**
+ * Compile and render an excerpt (intro section) of an MDX page.
+ * Used for inline wiki previews on directory pages.
+ *
+ * Returns the compiled React element, or null if the page doesn't exist
+ * or compilation fails.
+ */
+export async function renderMdxExcerpt(slug: string): Promise<React.ReactElement | null> {
+  const filePath = resolveContentPath(slug);
+  if (!filePath) return null;
+
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const { content: mdxSource } = matter(raw);
+  const preprocessed = preprocessMdx(mdxSource);
+
+  // Extract just the intro section (up to the third ## heading)
+  const excerptSource = extractMdxIntroSection(preprocessed);
+  if (!excerptSource.trim()) return null;
+
+  try {
+    const { content } = await compileMDX({
+      source: excerptSource,
+      components: mdxComponents,
+      options: {
+        parseFrontmatter: false,
+        blockJS: false,
+        mdxOptions: {
+          remarkPlugins: [remarkGfm, remarkMath, remarkDirective, remarkCallouts],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- rehype plugin type incompatibility with next-mdx-remote
+          rehypePlugins: [rehypeSlug as any, rehypeKatex as any],
+        },
+      },
+    });
+
+    return content;
+  } catch (err) {
+    console.warn(
+      `[mdx] Failed to compile excerpt for "${slug}": ${err instanceof Error ? err.message : String(err)}`
+    );
+    return null;
+  }
+}
+
+/**
  * Get all entity wiki IDs for static generation.
  */
 export function getAllWikiIds(): string[] {

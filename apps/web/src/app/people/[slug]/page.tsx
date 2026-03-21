@@ -38,6 +38,7 @@ import { FundingConnections } from "./funding-connections";
 import { OrgRoles } from "./org-roles";
 import { BoardSeats } from "./board-seats";
 import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-positions";
+import { WikiOverview } from "./wiki-overview";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
 // (e.g., entities created via tablebase enrichment in the wiki-server DB)
@@ -291,9 +292,11 @@ export default async function PersonProfilePage({
   const overviewCount =
     positions.length + sortedOrgRoles.length + sortedBoardSeats.length + policyPositions.length + (educationText ? 1 : 0);
 
+  const hasWikiPage = !!entity.wikiId;
+
   const tabs: ProfileTab[] = [];
 
-  // Overview: expert positions, org roles, board seats, education
+  // Overview: expert positions, org roles, board seats, education, wiki excerpt
   tabs.push({
     id: "overview",
     label: "Overview",
@@ -304,13 +307,14 @@ export default async function PersonProfilePage({
         <OrgRoles orgRoles={sortedOrgRoles} />
         <BoardSeats boardSeats={sortedBoardSeats} />
         {educationText && <EducationSection education={educationText} />}
-        {overviewCount === 0 && (
+        {overviewCount === 0 && !hasWikiPage && (
           <div className="border border-border/40 border-dashed rounded-xl px-6 py-10 text-center">
             <p className="text-sm text-muted-foreground/60">
               No positions, roles, or education recorded yet.
             </p>
           </div>
         )}
+        {hasWikiPage && <WikiOverview wikiId={entity.wikiId!} />}
       </div>
     ),
   });
