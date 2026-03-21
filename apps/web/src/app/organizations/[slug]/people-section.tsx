@@ -7,7 +7,11 @@
  */
 import Link from "next/link";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { fetchFromWikiServer } from "@/lib/wiki-server";
+import {
+  fetchFromWikiServer,
+  type RpcPersonnelByEntityResult,
+  type RpcPersonnelRow,
+} from "@/lib/wiki-server";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -22,40 +26,13 @@ export interface PersonEntry {
   isCurrent: boolean;
   start?: string;
   end?: string;
-  /** Source of the data: "factbase" for KB data, "pg" for PG personnel table */
-  source?: "factbase" | "pg";
   roleType?: "key-person" | "board" | "career";
 }
 
-/** Shape of the entity ref returned by the personnel API */
-interface PersonnelEntityRef {
-  entityId: string | null;
-  slug: string | null;
-  name: string | null;
-}
+/** Max page size accepted by the wiki-server personnel endpoint */
+const MAX_PERSONNEL_LIMIT = 200;
 
-/** Shape of a personnel row from the wiki-server /api/personnel/by-entity/:entityId endpoint */
-interface PgPersonnelRow {
-  id: string;
-  personId: string;
-  organizationId: string;
-  role: string | null;
-  roleType: string;
-  startDate: string | null;
-  endDate: string | null;
-  isFounder: boolean;
-  person: PersonnelEntityRef;
-  personResolvedName: string | null;
-}
-
-/** Response shape from the wiki-server /api/personnel/by-entity/:entityId endpoint */
-interface PgPersonnelResponse {
-  entityId: string;
-  personnel: PgPersonnelRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+const VALID_ROLE_TYPES = new Set<string>(["key-person", "board", "career"]);
 
 // ── PG Data Fetching ──────────────────────────────────────────────────
 
@@ -63,11 +40,17 @@ interface PgPersonnelResponse {
  * Fetch personnel records for an organization from the wiki-server PG table.
  * Returns an empty array if the wiki-server is not configured or unavailable.
  */
-export async function fetchPgPersonnel(entityId: string): Promise<PgPersonnelRow[]> {
-  const data = await fetchFromWikiServer<PgPersonnelResponse>(
-    `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=100&offset=0`,
+export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRow[]> {
+  const data = await fetchFromWikiServer<RpcPersonnelByEntityResult>(
+    `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=${MAX_PERSONNEL_LIMIT}&offset=0`,
     { revalidate: 300, timeoutMs: 10_000 }
   );
+
+  if (data && data.total > data.personnel.length) {
+    console.warn(
+      `[people-section] Personnel data truncated for entity ${entityId}: showing ${data.personnel.length} of ${data.total} records`
+    );
+  }
 
   return data?.personnel ?? [];
 }
@@ -78,7 +61,7 @@ export async function fetchPgPersonnel(entityId: string): Promise<PgPersonnelRow
  * Convert PG personnel rows into PersonEntry format for merging with
  * existing FactBase key-persons and board-seats data.
  */
-export function pgPersonnelToEntries(rows: PgPersonnelRow[]): PersonEntry[] {
+export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PersonEntry[] {
   return rows.map((row) => {
     const personRef = row.person;
     const name = personRef?.name ?? row.personResolvedName ?? row.personId;
@@ -97,8 +80,9 @@ export function pgPersonnelToEntries(rows: PgPersonnelRow[]): PersonEntry[] {
       isCurrent,
       start: row.startDate ?? undefined,
       end: row.endDate ?? undefined,
-      source: "pg" as const,
-      roleType: row.roleType as PersonEntry["roleType"],
+      roleType: VALID_ROLE_TYPES.has(row.roleType)
+        ? (row.roleType as PersonEntry["roleType"])
+        : undefined,
     };
   });
 }
@@ -160,16 +144,14 @@ export function mergePgPersonnel(
  */
 export function PeopleSection({
   people,
-  totalCount,
 }: {
   people: PersonEntry[];
-  totalCount?: number;
 }) {
   if (people.length === 0) return null;
 
   return (
     <section>
-      <SectionHeader title="People" count={totalCount ?? people.length} />
+      <SectionHeader title="People" count={people.length} />
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
