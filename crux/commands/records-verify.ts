@@ -163,6 +163,7 @@ function getApiSegment(recordType: RecordType): string {
     case 'funding-round': return 'funding-rounds';
     case 'investment': return 'investments';
     case 'equity-position': return 'equity-positions';
+    case 'policy-stakeholder': return 'policy-stakeholders';
   }
 }
 
@@ -279,6 +280,16 @@ function buildRecordToVerify(recordType: RecordType, item: Record<string, unknow
         description: `Equity: ${holderName} in ${companyName} (${strOrNull(item, 'stake') ?? '?'}%)`,
         sourceUrl: source,
         fields: { holder: holderName, company: companyName, stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') },
+      };
+    }
+    case 'policy-stakeholder': {
+      const stakeholderName = resolveName(item, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId');
+      return {
+        recordType,
+        recordId: id,
+        description: `Policy Stakeholder: ${stakeholderName} (${strOrNull(item, 'stance') ?? 'unknown stance'})`,
+        sourceUrl: source,
+        fields: { stakeholder: stakeholderName, stance: strOrNull(item, 'stance'), role: strOrNull(item, 'role') },
       };
     }
   }
