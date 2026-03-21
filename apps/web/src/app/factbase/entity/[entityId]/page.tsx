@@ -110,6 +110,7 @@ export async function generateMetadata({
   const entity = getKBEntity(entityId);
   return {
     title: entity ? `KB: ${entity.name}` : `KB: ${entityId}`,
+    robots: { index: false },
   };
 }
 

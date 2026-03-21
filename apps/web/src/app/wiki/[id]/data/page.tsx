@@ -23,6 +23,8 @@ function isWikiId(id: string): boolean {
 
 // Opt out of static generation — these pages are debug/internal tools.
 export const dynamicParams = true;
+// Cache for 1 hour to reduce serverless function invocations from bots.
+export const revalidate = 3600;
 
 function Section({
   title,
