@@ -93,7 +93,10 @@ export function buildEntityMatcher(): EntityMatcher {
 
   for (const e of db.typedEntities || []) {
     const slug = e.id;
-    const stableId = e.stableId || slugToId[slug] || slug;
+    const stableId = e.stableId || slugToId[slug];
+    if (!stableId) {
+      continue; // Skip entities that cannot be resolved to a stableId
+    }
     const match: EntityMatch = {
       stableId,
       slug,

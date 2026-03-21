@@ -43,6 +43,7 @@ export function computeBacklinks(entities, byStableId) {
 export function scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableId) {
   const inbound = {};
   let totalLinks = 0;
+  const knownPageIds = new Set(pages.map(p => p.id));
 
   for (const page of pages) {
     if (!page.rawContent) continue;
@@ -62,6 +63,8 @@ export function scanContentEntityLinks(pages, entityMap, wikiIdToSlug, byStableI
         targetId = byStableId[targetId];
       }
       if (targetId === page.id) continue; // Skip self-links
+      // Drop unknown targets — scanBrokenEntityLinks() will report them later
+      if (!entityMap.has(targetId) && !knownPageIds.has(targetId)) continue;
       if (seen.has(targetId)) continue;
       seen.add(targetId);
 
@@ -262,7 +265,7 @@ export function computeRelatedGraph(entities, pages, contentInbound, tagIndex, b
       const tagEntities = tagIndex[tag] || [];
       const specificity = 1 / Math.log2(tagEntities.length + 2);
       for (const te of tagEntities) {
-        if (te.id !== entity.id) {
+        if (te.id !== entity.id && entity.id < te.id) {
           addEdge(entity.id, te.id, specificity * 2);
         }
       }
