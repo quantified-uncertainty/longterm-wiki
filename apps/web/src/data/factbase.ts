@@ -22,7 +22,7 @@
 
 import fs from "fs";
 import path from "path";
-import { getTableBase, getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
+import { getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
 import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 
@@ -314,18 +314,11 @@ const VALID_VERDICTS: Set<string> = new Set([
 
 /**
  * Get the citation verification status for a FactBase fact.
- * Returns the best verdict found by cross-referencing the fact's source URL
- * against citation quotes at build time, or undefined if no match.
+ * kbFactVerification is no longer baked into database.json — returns undefined.
+ * TODO: fetch from wiki-server API when available.
  */
 export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
-  try {
-    const db = getTableBase();
-    const verdict = db.kbFactVerification?.[factId];
-    if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
-    return verdict as FactBaseVerdict;
-  } catch {
-    return undefined;
-  }
+  return undefined;
 }
 
 /**

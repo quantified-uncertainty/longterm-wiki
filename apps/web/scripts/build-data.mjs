@@ -1502,7 +1502,7 @@ async function main() {
   // =========================================================================
   // WRITE OUTPUT FILES
   // =========================================================================
-  const { databaseForOutput } = writeMainOutputFiles({ database, outputFile: OUTPUT_FILE });
+  const { databaseForOutput, strippedFields } = writeMainOutputFiles({ database, outputFile: OUTPUT_FILE });
 
   writeIndividualFiles({
     database,
@@ -1522,6 +1522,7 @@ async function main() {
     backlinks,
     relatedGraph,
     databaseForOutput,
+    strippedFields,
   });
 
   // Generate link health data
