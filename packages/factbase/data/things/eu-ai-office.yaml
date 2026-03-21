@@ -14,10 +14,10 @@ facts:
 
   - id: f_uRZtWLDynr
     property: headcount
-    value: 140
-    asOf: 2025-12
+    value: 100
+    asOf: 2024-02
     source: https://www.euronews.com/next/2024/02/01/commissions-staffing-and-financing-of-ai-office-raises-eyebrows-in-capitals
-    notes: "Target of 140 employees; 60 existing Commission staff plus 80 new positions to be filled by end of 2025"
+    notes: "Planned ~100 staff: 80 new hires plus 20 transferred from within the Commission, per Feb 2024 announcement"
 
   - id: f_yhq1V8cJkV
     property: description

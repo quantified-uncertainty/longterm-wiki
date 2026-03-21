@@ -4,15 +4,15 @@ facts:
     property: founded-date
     value: "2024-11"
     source: https://www.canada.ca/en/innovation-science-economic-development/news/2024/11/canada-launches-canadian-artificial-intelligence-safety-institute.html
-    notes: "Launched at the Seoul AI Safety Summit in November 2024"
+    notes: "Announced November 12, 2024 in Montreal; first convened later that month in San Francisco as part of the International Network of AI Safety Institutes"
 
   - id: f_Gj4WwvIR8P
     property: total-funding
-    value: 3.7e+7
+    value: 5e+7
     asOf: 2024-11
     source: https://www.canada.ca/en/innovation-science-economic-development/news/2024/11/canada-launches-canadian-artificial-intelligence-safety-institute.html
-    notes: "C$50M (~$37M USD) over five years pledged by Canadian government as part of Budget 2024's $2.4B AI investment"
-    currency: USD
+    notes: "C$50M over five years pledged by Canadian government as part of Budget 2024's $2.4B AI investment (~US$37M)"
+    currency: CAD
     usdEquivalent: 37000000
 
   - id: f_wwmTADNlSB
