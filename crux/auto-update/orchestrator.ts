@@ -14,7 +14,7 @@ import { stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT, loadPages } from '../lib/content-types.ts';
 import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
 import { buildDigest, normalizeTitle } from './digest.ts';
-import { routeDigest } from './page-router.ts';
+import { routeDigest, COST_MAP, BATCH_COST_MAP } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
 import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server/auto-update.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
@@ -416,10 +416,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   console.log(`\n── Stage 4: Executing updates${useBatch ? ' (Batch API — 50% cost reduction)' : ''} ──`);
   const results: RunResult[] = [];
   let spent = 0;
-  // Batch API provides 50% discount on all token costs
-  const costMap: Record<string, number> = useBatch
-    ? { polish: 1.25, standard: 3.25, deep: 6.25 }
-    : { polish: 2.5, standard: 6.5, deep: 12.5 };
+  const costMap = useBatch ? BATCH_COST_MAP : COST_MAP;
 
   if (useBatch) {
     // ── Batch execution path ──────────────────────────────────────────────

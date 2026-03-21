@@ -19,7 +19,6 @@
  */
 
 import fs from 'fs';
-import Anthropic from '@anthropic-ai/sdk';
 import { createLlmClient } from '../lib/llm.ts';
 import { MODELS } from '../lib/anthropic.ts';
 import { buildCachedSystemPrompt, STATIC_IMPROVE_GUIDELINES } from '../lib/prompt-cache.ts';
@@ -27,20 +26,14 @@ import { runBatch, extractBatchResultText, type BatchRequest } from '../lib/anth
 import type { PageUpdate, RunResult } from './types.ts';
 import { analyzePhase } from '../authoring/page-improver/phases/analyze.ts';
 import { researchPhase } from '../authoring/page-improver/phases/research.ts';
-import { IMPROVE_PROMPT } from '../authoring/page-improver/phases/prompts.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../authoring/page-improver/types.ts';
 import {
-  ROOT, getFilePath, getImportPath, repairFrontmatter, ensureFrontmatterFields,
-  stripRelatedPagesSections, cleanEntityLinks, buildObjectivityContext, loadPages, findPage,
+  ROOT, getFilePath, getImportPath, loadPages, findPage,
 } from '../authoring/page-improver/utils.ts';
 import { setApiDirectMode } from '../authoring/page-improver/api.ts';
-import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
-import { buildKbContextForPage } from '../lib/factbase-context.ts';
-import { resolveTemplate, formatTemplateForPrompt } from '../lib/content/page-templates.ts';
-import { getPageType } from '../lib/page-analysis.ts';
-import { convertSlugsToWikiIds } from '../authoring/creator/deployment.ts';
-import { convertNewFootnotes } from '../lib/convert-new-footnotes.ts';
 import { resolveModel } from '../lib/anthropic.ts';
+import { buildImproveContext } from '../authoring/page-improver/build-context.ts';
+import { postProcessImproveResult } from '../authoring/page-improver/post-process.ts';
 
 interface PreparedPage {
   update: PageUpdate;
@@ -110,41 +103,20 @@ export async function executeBatchImprove(
         research = await researchPhase(page, analysis, { ...options, deep: false });
       }
 
-      // Build the improve prompt (same as improvePhase does)
+      // Build the improve prompt using shared context builder
       const filePath = getFilePath(page.path);
       const currentContent = fs.readFileSync(filePath, 'utf-8');
       const importPath = getImportPath();
-      const objectivityContext = buildObjectivityContext(page, analysis);
-      const entityLookup = buildEntityLookupForContent(currentContent, ROOT);
 
-      let kbContext: string | null = null;
-      try {
-        kbContext = await buildKbContextForPage(page.id, page.path);
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        if (verbose) console.log(`    ${update.pageTitle}: KB context failed: ${error.message}`);
-      }
+      const verboseLog = verbose
+        ? (phase: string, msg: string) => console.log(`    ${update.pageTitle}: [${phase}] ${msg}`)
+        : undefined;
 
-      const pageType = getPageType(page);
-      const fmMatch = currentContent.match(/^---\n([\s\S]*?)\n---/);
-      const pageTemplateMatch = fmMatch?.[1]?.match(/^pageTemplate:\s*(.+)$/m);
-      const pageTemplateValue = pageTemplateMatch?.[1]?.trim().replace(/^["']|["']$/g, '');
-      const template = resolveTemplate(pageTemplateValue, pageType);
-      let templateContext: string | null = null;
-      if (template) {
-        templateContext = formatTemplateForPrompt(template);
-      }
-
-      const prompt = IMPROVE_PROMPT({
-        page, filePath, importPath,
+      const { prompt } = await buildImproveContext({
+        page, currentContent, filePath, importPath,
         directions: update.directions,
-        analysis, research, objectivityContext,
-        currentContent, entityLookup,
-        claimsContext: null,
-        gapAnalysisContext: null,
-        kbContext,
-        tier: update.suggestedTier,
-        templateContext,
+        analysis, research, tier: update.suggestedTier,
+        log: verboseLog,
       });
 
       prepared.push({
@@ -281,7 +253,7 @@ export async function executeBatchImprove(
 
 /**
  * Apply a batch API result to a page file.
- * Mirrors the post-processing logic from improvePhase.
+ * Uses shared postProcessImproveResult for all post-processing.
  */
 async function applyBatchResult(
   p: PreparedPage,
@@ -290,117 +262,26 @@ async function applyBatchResult(
 ): Promise<RunResult> {
   const start = Date.now();
 
-  let improvedContent = rawResult;
+  const verboseLog = verbose
+    ? (phase: string, msg: string) => console.log(`    ${p.update.pageTitle}: [${phase}] ${msg}`)
+    : (_phase: string, _msg: string) => {};
 
-  // Extract MDX from code blocks if wrapped
-  if (!improvedContent.startsWith('---')) {
-    const codeBlocks = [...rawResult.matchAll(/```(?:\w+)?\n([\s\S]*?)```/g)];
-    const mdxBlock = codeBlocks.find(m => m[1].trimStart().startsWith('---'));
-    if (mdxBlock) {
-      improvedContent = mdxBlock[1];
-    } else if (codeBlocks.length > 0) {
-      const largest = codeBlocks.reduce((a, b) => a[1].length >= b[1].length ? a : b);
-      improvedContent = largest[1];
-    }
-
-    // Detect JSON-wrapped responses: {"content": "...", "claimMap": [...]}
-    // The LLM sometimes returns structured JSON instead of raw MDX.
-    const contentFieldMatch = improvedContent.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
-    if (contentFieldMatch) {
-      if (verbose) console.log(`    ${p.update.pageTitle}: detected JSON-wrapped response — extracting "content" field`);
-      try {
-        // Unescape JSON string: \n → newline, \" → ", \\ → \, \t → tab
-        const extracted = JSON.parse(`"${contentFieldMatch[1]}"`);
-        if (typeof extracted === 'string' && extracted.length > 100) {
-          improvedContent = extracted;
-        }
-      } catch {
-        // JSON.parse may fail on truncated strings — try manual unescaping
-        const raw = contentFieldMatch[1];
-        let manual = '';
-        for (let i = 0; i < raw.length; i++) {
-          if (raw[i] === '\\' && i + 1 < raw.length) {
-            const next = raw[i + 1];
-            if (next === 'n') { manual += '\n'; i++; }
-            else if (next === '"') { manual += '"'; i++; }
-            else if (next === '\\') { manual += '\\'; i++; }
-            else if (next === 't') { manual += '\t'; i++; }
-            else { manual += raw[i]; }
-          } else {
-            manual += raw[i];
-          }
-        }
-        if (manual.length > 100) {
-          if (verbose) console.log(`    ${p.update.pageTitle}: used manual unescaping for truncated JSON content string`);
-          improvedContent = manual;
-        }
-      }
-    }
-  }
-
-  // Validate: looks like MDX?
-  const trimmed = improvedContent.trim();
-  if (
-    !trimmed.startsWith('---') &&
-    !trimmed.startsWith('#') &&
-    !trimmed.startsWith('import ') &&
-    !trimmed.startsWith('<')
-  ) {
-    return {
-      pageId: p.update.pageId,
-      status: 'failed',
-      tier: p.update.suggestedTier,
-      error: `Response does not look like MDX (starts with "${trimmed.substring(0, 40)}...")`,
-      durationMs: Date.now() - start,
-    };
-  }
-
-  // Guard against truncation
-  const inputWords = p.currentContent.split(/\s+/).length;
-  const outputWords = improvedContent.split(/\s+/).length;
-  if (outputWords < inputWords * 0.5 && inputWords > 200) {
-    return {
-      pageId: p.update.pageId,
-      status: 'failed',
-      tier: p.update.suggestedTier,
-      error: `Truncation detected: output (${outputWords} words) < 50% of input (${inputWords} words)`,
-      durationMs: Date.now() - start,
-    };
-  }
-
-  // Update lastEdited
-  const today = new Date().toISOString().split('T')[0];
-  improvedContent = improvedContent.replace(
-    /lastEdited:\s*["']?\d{4}-\d{2}-\d{2}["']?/,
-    `lastEdited: "${today}"`,
+  const postProcessed = await postProcessImproveResult(
+    rawResult, p.currentContent, p.page.id, p.filePath, ROOT, verboseLog,
   );
 
-  // Post-processing (same as improvePhase)
-  improvedContent = repairFrontmatter(improvedContent);
-  improvedContent = ensureFrontmatterFields(p.currentContent, improvedContent);
-  improvedContent = cleanEntityLinks(improvedContent);
-  improvedContent = stripRelatedPagesSections(improvedContent);
-
-  const { content: convertedContent, converted: slugsConverted } = convertSlugsToWikiIds(improvedContent, ROOT);
-  if (slugsConverted > 0) {
-    improvedContent = convertedContent;
-  }
-
-  // Convert footnotes
-  try {
-    const fnResult = await convertNewFootnotes(improvedContent, p.page.id, {
-      createDbEntries: false,
-      entityId: p.page.id,
-    });
-    if (fnResult.convertedCount > 0) {
-      improvedContent = fnResult.content;
-    }
-  } catch (e: unknown) {
-    console.warn(`Footnote conversion failed: ${e instanceof Error ? e.message : String(e)}`);
+  if (postProcessed.failed) {
+    return {
+      pageId: p.update.pageId,
+      status: 'failed',
+      tier: p.update.suggestedTier,
+      error: postProcessed.failureReason,
+      durationMs: Date.now() - start,
+    };
   }
 
   // Write the result
-  fs.writeFileSync(p.filePath, improvedContent);
+  fs.writeFileSync(p.filePath, postProcessed.content);
   if (verbose) console.log(`    ${p.update.pageTitle}: applied`);
 
   return {
