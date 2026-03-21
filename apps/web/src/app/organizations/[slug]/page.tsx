@@ -85,6 +85,9 @@ import {
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
 
+// ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return getOrgSlugs().map((slug) => ({ slug }));
 }
@@ -296,7 +299,6 @@ export default async function OrgProfilePage({
         isCurrent: !person.fields.end,
         start: field(person, "start"),
         end: field(person, "end"),
-        source: "factbase",
       });
     }
 
@@ -335,7 +337,6 @@ export default async function OrgProfilePage({
           isCurrent: !bm.departed,
           start: bm.appointed ?? undefined,
           end: bm.departed ?? undefined,
-          source: "factbase",
         });
       }
     }
