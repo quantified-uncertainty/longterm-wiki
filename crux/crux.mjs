@@ -90,6 +90,7 @@ import * as researchAreasCommands from './commands/research-areas.ts';
 import * as autoVerifyStakeholdersCommands from './commands/legislation/auto-verify-stakeholders.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
+import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
@@ -152,6 +153,7 @@ const domains = {
   'auto-verify-stakeholders': autoVerifyStakeholdersCommands,
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
+  'backfill-pr-outcomes': backfillPrOutcomesCommands,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: recordsVerifyCommands,
   'qa-sweep': qaSweepCommands,

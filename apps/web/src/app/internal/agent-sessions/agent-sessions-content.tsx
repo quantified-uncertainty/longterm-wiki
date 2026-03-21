@@ -36,6 +36,15 @@ export async function AgentSessionsContent() {
   const sessionsWithCost = sessions.filter((s) => s.costCents != null).length;
   const totalCostDollars = (totalCostCents / 100).toFixed(2);
 
+  // Outcome stats
+  const withOutcome = sessions.filter((s) => s.prOutcome).length;
+  const merged = sessions.filter((s) => s.prOutcome === "merged").length;
+  const mergedWithRevisions = sessions.filter((s) => s.prOutcome === "merged_with_revisions").length;
+  const reverted = sessions.filter((s) => s.prOutcome === "reverted").length;
+  const closedWithoutMerge = sessions.filter((s) => s.prOutcome === "closed_without_merge").length;
+  const mergeRate = withOutcome > 0 ? Math.round(((merged + mergedWithRevisions) / withOutcome) * 100) : 0;
+  const cleanMergeRate = withOutcome > 0 ? Math.round((merged / withOutcome) * 100) : 0;
+
   return (
     <>
       <p className="text-muted-foreground">
@@ -63,6 +72,22 @@ export async function AgentSessionsContent() {
         <p className="text-sm text-muted-foreground">
           <span className="text-orange-600 font-medium">{fixSessions}</span> fix session{fixSessions !== 1 ? 's' : ''}{" "}
           ({fixRate}% fix rate) — sessions that fixed regressions from a previous PR.
+        </p>
+      )}
+      {withOutcome > 0 && (
+        <p className="text-sm text-muted-foreground">
+          PR outcomes ({withOutcome} tracked):{" "}
+          <span className="text-emerald-600 font-medium">{merged} merged</span>
+          {mergedWithRevisions > 0 && (
+            <>, <span className="text-blue-600 font-medium">{mergedWithRevisions} merged with revisions</span></>
+          )}
+          {reverted > 0 && (
+            <>, <span className="text-red-600 font-medium">{reverted} reverted</span></>
+          )}
+          {closedWithoutMerge > 0 && (
+            <>, <span className="text-gray-600 font-medium">{closedWithoutMerge} closed</span></>
+          )}
+          {" "}— {cleanMergeRate}% clean merge rate, {mergeRate}% overall merge rate.
         </p>
       )}
       <p className="text-sm text-muted-foreground">
