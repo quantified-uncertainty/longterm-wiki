@@ -13,6 +13,7 @@ import { topicLabel } from "@/data/topic-labels";
 import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
 import type { PeopleSortKey } from "./people-sort";
+import { isPersonMeaningful } from "./people-filter";
 
 export interface PersonRow {
   id: string;
@@ -125,7 +126,7 @@ export function PeopleTable({
   // ── Local (static) state via URL-synced hook ──
   const url = useDirectoryUrl({
     defaultSort: { field: "name", dir: "asc" },
-    filters: ["affiliation", "topic"],
+    filters: ["affiliation", "topic", "showAll"],
   });
   const {
     search: urlSearch, setSearch: urlSetSearch,
@@ -135,15 +136,22 @@ export function PeopleTable({
   } = url;
   const affiliationFilter = url.filters.affiliation ?? "all";
   const topicFilter = url.filters.topic ?? "all";
+  const showAll = url.filters.showAll === "true";
 
   const allRows = staticRows ?? EMPTY_ROWS;
+
+  // When stubs are hidden, chip counts should reflect the meaningful subset
+  const chipSourceRows = useMemo(() => {
+    if (serverMode) return EMPTY_ROWS;
+    if (showAll) return allRows;
+    return allRows.filter(isPersonMeaningful);
+  }, [serverMode, showAll, allRows]);
 
   // Collect top affiliations for filter (only those with 2+ people)
   // In server mode, affiliations will be empty (server filter uses text).
   const affiliationChips = useMemo(() => {
-    const dataSource = serverMode ? EMPTY_ROWS : allRows;
     const counts = new Map<string, number>();
-    for (const r of dataSource) {
+    for (const r of chipSourceRows) {
       if (r.employerName) {
         counts.set(r.employerName, (counts.get(r.employerName) ?? 0) + 1);
       }
@@ -153,13 +161,13 @@ export function PeopleTable({
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
       .map(([name, count]) => ({ key: name, label: name, count }));
-  }, [allRows, serverMode]);
+  }, [chipSourceRows]);
 
   // Collect all topics (static mode only — topics not available from server)
   const topicChips = useMemo(() => {
     if (serverMode) return [];
     const counts = new Map<string, number>();
-    for (const r of allRows) {
+    for (const r of chipSourceRows) {
       for (const t of r.topics) {
         counts.set(t, (counts.get(t) ?? 0) + 1);
       }
@@ -167,7 +175,7 @@ export function PeopleTable({
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .map(([slug, count]) => ({ key: slug, label: topicLabel(slug), count }));
-  }, [allRows, serverMode]);
+  }, [chipSourceRows, serverMode]);
 
   // ── Unified search handler ──
   const search = serverMode ? server.search : urlSearch;
@@ -236,9 +244,20 @@ export function PeopleTable({
 
   // ── Static-mode: filter, sort, paginate ──
 
+  // Count stubs before any filtering for the toggle label
+  const stubCount = useMemo(() => {
+    if (serverMode) return 0;
+    return allRows.filter((r) => !isPersonMeaningful(r)).length;
+  }, [serverMode, allRows]);
+
   const localFiltered = useMemo(() => {
     if (serverMode) return EMPTY_ROWS;
     let result = allRows;
+
+    // By default, hide publication-only stubs
+    if (!showAll) {
+      result = result.filter(isPersonMeaningful);
+    }
 
     if (affiliationFilter !== "all") {
       result = result.filter((r) => r.employerName === affiliationFilter);
@@ -263,7 +282,7 @@ export function PeopleTable({
     );
 
     return result;
-  }, [serverMode, allRows, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
+  }, [serverMode, allRows, showAll, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
 
   const localTotalPages = Math.max(
     1,
@@ -295,6 +314,12 @@ export function PeopleTable({
     if (serverMode) {
       if (isLoading) return "Loading...";
       return `${displayTotal} people`;
+    }
+    if (!showAll && stubCount > 0) {
+      const base = filteredTotal === (allRows.length - stubCount)
+        ? `${filteredTotal} people with detailed data`
+        : `${filteredTotal} of ${allRows.length - stubCount} people with detailed data`;
+      return `Showing ${base}. ${stubCount} stub entries hidden.`;
     }
     const filterCount =
       filteredTotal === allRows.length
@@ -330,7 +355,7 @@ export function PeopleTable({
               items={affiliationChips}
               selected={activeAffiliation}
               onSelect={handleAffiliationFilter}
-              allCount={allRows.length}
+              allCount={chipSourceRows.length}
             />
           )}
         </div>
@@ -352,8 +377,19 @@ export function PeopleTable({
 
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">{statusText}</div>
+      {/* Results count + show all toggle */}
+      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+        <span>{statusText}</span>
+        {!serverMode && stubCount > 0 && (
+          <button
+            type="button"
+            onClick={() => urlSetFilter("showAll", showAll ? "all" : "true")}
+            className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          >
+            {showAll ? "Hide stub entries" : "Show all"}
+          </button>
+        )}
+      </div>
 
       {/* Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
