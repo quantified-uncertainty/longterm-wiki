@@ -4,13 +4,13 @@ import type { PersonRow } from "./people-table";
  * Determines whether a person entry has enough meaningful data to display
  * by default in the people directory.
  *
- * A person is considered "meaningful" (not a publication-only stub) if they have
- * at least one of:
+ * A person is considered "meaningful" (not a stub) if they have at least one of:
  * - A role recorded
  * - An employer/affiliation recorded
  * - A wiki page
  * - Career history entries
  * - Expert positions
+ * - A net worth value (only recorded for notable people)
  *
  * People who only have publications (or nothing at all) are considered stubs
  * and hidden by default, with a toggle to show them.
@@ -21,6 +21,7 @@ export function isPersonMeaningful(row: PersonRow): boolean {
   if (row.wikiPageId != null) return true;
   if (row.careerHistoryCount > 0) return true;
   if (row.positionCount > 0) return true;
+  if (row.netWorthNum != null) return true;
   return false;
 }
 

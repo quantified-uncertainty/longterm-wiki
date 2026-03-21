@@ -303,7 +303,6 @@ export default async function PeoplePage() {
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
   const withNetWorth = rows.filter((r) => r.netWorthNum != null).length;
   const withPositions = rows.filter((r) => r.positionCount > 0).length;
-  const withPublications = rows.filter((r) => r.publicationCount > 0).length;
   const totalCareerEntries = rows.reduce((s, r) => s + r.careerHistoryCount, 0);
   const uniqueTopics = new Set(rows.flatMap((r) => r.topics)).size;
 

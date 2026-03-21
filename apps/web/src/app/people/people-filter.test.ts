@@ -76,8 +76,8 @@ describe("isPersonMeaningful", () => {
     ).toBe(false);
   });
 
-  it("returns false for person with only netWorth", () => {
-    expect(isPersonMeaningful(makeRow({ netWorthNum: 1e9 }))).toBe(false);
+  it("returns true for person with only netWorth", () => {
+    expect(isPersonMeaningful(makeRow({ netWorthNum: 1e9 }))).toBe(true);
   });
 });
 
