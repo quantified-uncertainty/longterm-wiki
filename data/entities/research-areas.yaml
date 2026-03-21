@@ -1,11 +1,9 @@
-# Research Area Entities — Minimal YAML stubs for EntityLink resolution.
+# Research Area Entities
 #
 # Rich data (orgs, papers, grants, risks) lives in PG research_areas table.
-# These stubs exist only so that EntityLink, explore page, and wiki page
+# These stubs exist so that EntityLink, explore page, and wiki page
 # routing work for research areas that have MDX pages.
-#
-# Do NOT add relatedEntries, sources, or customFields here — that data
-# lives in PG and is served via /api/research-areas.
+# sources and relatedEntries provide citation context and cross-entity links.
 
 # ── Alignment Training ─────────────────────────────────────────────────
 
@@ -21,6 +19,35 @@
     - alignment
   clusters:
     - ai-safety
+  sources:
+    - title: "Training Language Models to Follow Instructions with Human Feedback"
+      url: https://arxiv.org/abs/2203.02155
+      author: Ouyang et al.
+      date: '2022'
+    - title: "A Survey of Reinforcement Learning from Human Feedback"
+      url: https://arxiv.org/abs/2312.14925
+      author: Kaufmann et al.
+      date: '2023'
+    - title: "Open Problems and Fundamental Limitations of RLHF"
+      url: https://arxiv.org/abs/2307.15217
+      author: Casper et al.
+      date: '2023'
+  relatedEntries:
+    - id: 1LcLlMGLbw
+      type: organization
+      relationship: research
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: research
+    - id: A4XoubikkQ
+      type: organization
+      relationship: research
+    - id: vzxfzxBITd
+      type: person
+      relationship: research
+    - id: hQ7mR2kN5p
+      type: person
+      relationship: research
   lastUpdated: 2026-03
 
 # ── Interpretability ───────────────────────────────────────────────────
@@ -36,6 +63,30 @@
     - safety-research
   clusters:
     - ai-safety
+  sources:
+    - title: Anthropic Interpretability Research
+      url: https://www.anthropic.com/research/team/interpretability
+    - title: "A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models"
+      url: https://arxiv.org/abs/2407.02646
+      date: '2024'
+    - title: "Is Interpretability Sufficient for Safety? (Alignment Survey)"
+      url: https://alignmentsurvey.com/materials/assurance/redteam/
+  relatedEntries:
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: research
+    - id: A4XoubikkQ
+      type: organization
+      relationship: research
+    - id: Tz48rTriBg
+      type: person
+      relationship: research
+    - id: zaRXTCXPPk
+      type: person
+      relationship: research
+    - id: 0vyIQ4YLIA
+      type: research-area
+      relationship: composed-of
   lastUpdated: 2026-03
 
 - id: mech-interp
@@ -49,6 +100,34 @@
     - neural-network-analysis
   clusters:
     - ai-safety
+  sources:
+    - title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet"
+      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
+      author: Anthropic
+      date: '2024'
+    - title: "Open Problems in Mechanistic Interpretability"
+      url: https://arxiv.org/abs/2501.16496
+      author: Sharkey et al.
+      date: '2025'
+    - title: Transformer Circuits Thread
+      url: https://transformer-circuits.pub/
+      author: Anthropic
+  relatedEntries:
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: research
+    - id: Tz48rTriBg
+      type: person
+      relationship: research
+    - id: zaRXTCXPPk
+      type: person
+      relationship: research
+    - id: H74rOLotqg
+      type: organization
+      relationship: research
+    - id: 73qTEkYyWA
+      type: research-area
+      relationship: composed-of
   lastUpdated: 2026-03
 
 # ── Evaluation ─────────────────────────────────────────────────────────
@@ -64,6 +143,36 @@
     - safety-research
   clusters:
     - ai-safety
+  sources:
+    - title: "Holistic Safety and Responsibility Evaluations of Advanced AI Models"
+      url: https://arxiv.org/abs/2404.14068
+      author: Google DeepMind
+      date: '2024'
+    - title: "An AI System Evaluation Framework for Advancing AI Safety"
+      url: https://arxiv.org/abs/2404.05388
+      date: '2024'
+    - title: "Evaluating AI Evaluation: Perils and Prospects"
+      url: https://arxiv.org/abs/2407.09221
+      date: '2024'
+  relatedEntries:
+    - id: rQEkFJxS5w
+      type: organization
+      relationship: research
+    - id: pKeaWwP6sQ
+      type: organization
+      relationship: research
+    - id: aX0jkoaekQ
+      type: organization
+      relationship: research
+    - id: VoNqoBJkyg
+      type: person
+      relationship: research
+    - id: ZvfLhIm7pw
+      type: person
+      relationship: research
+    - id: CD9w0PDxvg
+      type: concept
+      relationship: composed-of
   lastUpdated: 2026-03
 
 - id: red-teaming
@@ -77,6 +186,23 @@
     - safety-testing
   clusters:
     - ai-safety
+  sources:
+    - title: "Against The Achilles' Heel: A Survey on Red Teaming for Generative Models"
+      url: https://arxiv.org/abs/2404.00629
+      date: '2024'
+    - title: "Red-Teaming for Generative AI: Silver Bullet or Security Theater?"
+      url: https://arxiv.org/abs/2401.15897
+      date: '2024'
+  relatedEntries:
+    - id: pKeaWwP6sQ
+      type: organization
+      relationship: research
+    - id: lCiT37k9pA
+      type: organization
+      relationship: research
+    - id: etuIjQhFbQ
+      type: research-area
+      relationship: composed-of
   lastUpdated: 2026-03
 
 # ── AI Control ─────────────────────────────────────────────────────────
@@ -92,6 +218,27 @@
     - safety-research
   clusters:
     - ai-safety
+  sources:
+    - title: "AI Control: Improving Safety Despite Intentional Subversion"
+      url: https://arxiv.org/abs/2312.06942
+      author: Greenblatt et al.
+      date: '2023'
+    - title: The Case for Ensuring That Powerful AIs Are Controlled
+      url: https://blog.redwoodresearch.org/p/the-case-for-ensuring-that-powerful
+      author: Redwood Research
+  relatedEntries:
+    - id: dwMzc9WzPa
+      type: organization
+      relationship: research
+    - id: Z62bQynY4g
+      type: person
+      relationship: research
+    - id: XnqqKHiNmw
+      type: person
+      relationship: research
+    - id: vc60Nthkcg
+      type: risk
+      relationship: addresses
   lastUpdated: 2026-03
 
 # ── Scalable Oversight ─────────────────────────────────────────────────
@@ -107,6 +254,31 @@
     - safety-research
   clusters:
     - ai-safety
+  sources:
+    - title: "AI Safety via Debate"
+      url: https://arxiv.org/abs/1805.00899
+      author: Irving, Christiano, Amodei
+      date: '2018'
+    - title: "Scalable AI Safety via Doubly-Efficient Debate"
+      url: https://arxiv.org/abs/2311.14125
+      author: Brown-Cohen et al.
+      date: '2023'
+    - title: "Scaling Laws for Scalable Oversight"
+      url: https://arxiv.org/abs/2504.18530
+      date: '2025'
+  relatedEntries:
+    - id: vzxfzxBITd
+      type: person
+      relationship: research
+    - id: 1LcLlMGLbw
+      type: organization
+      relationship: research
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: research
+    - id: QsXVXtQ0zE
+      type: organization
+      relationship: research
   lastUpdated: 2026-03
 
 - id: corrigibility
@@ -120,6 +292,31 @@
     - safety-research
   clusters:
     - ai-safety
+  sources:
+    - title: "Corrigibility"
+      url: https://intelligence.org/files/Corrigibility.pdf
+      author: Soares et al. (MIRI)
+      date: '2015'
+    - title: "Corrigibility with Utility Preservation"
+      url: https://arxiv.org/abs/1908.01695
+      date: '2019'
+    - title: "Core Safety Values for Provably Corrigible Agents"
+      url: https://arxiv.org/abs/2507.20964
+      author: Nayebi
+      date: '2025'
+  relatedEntries:
+    - id: puAffUjWSS
+      type: organization
+      relationship: research
+    - id: 5MVd90lzCg
+      type: person
+      relationship: research
+    - id: fS1tEGKuNq
+      type: person
+      relationship: research
+    - id: aE60G9uLyA
+      type: risk
+      relationship: addresses
   lastUpdated: 2026-03
 
 - id: value-learning
@@ -133,4 +330,29 @@
     - alignment
   clusters:
     - ai-safety
+  sources:
+    - title: "AI Alignment: A Comprehensive Survey"
+      url: https://arxiv.org/abs/2310.19852
+      author: Ji et al.
+      date: '2023'
+    - title: "Artificial Intelligence, Values, and Alignment"
+      url: https://arxiv.org/abs/2001.09768
+      author: Gabriel
+      date: '2020'
+    - title: The Value Alignment Problem (LCFI)
+      url: https://www.lcfi.ac.uk/research/project/value-alignment-problem
+      author: Leverhulme Centre for the Future of Intelligence
+  relatedEntries:
+    - id: ZxUirlzHke
+      type: person
+      relationship: research
+    - id: zMfgJqiEPQ
+      type: organization
+      relationship: research
+    - id: nYPuaov1hA
+      type: risk
+      relationship: addresses
+    - id: A4XoubikkQ
+      type: organization
+      relationship: research
   lastUpdated: 2026-03
