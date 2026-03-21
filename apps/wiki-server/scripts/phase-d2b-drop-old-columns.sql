@@ -8,6 +8,9 @@ BEGIN;
 -- 1. session_pages: must redefine PK before dropping column
 --    Old PK: (session_id, page_id_old)
 --    New PK: (session_id, page_id_int)
+--    First, clean up any rows with NULL page_id_int (cannot be part of a PK)
+DELETE FROM session_pages WHERE page_id_int IS NULL;
+ALTER TABLE session_pages ALTER COLUMN page_id_int SET NOT NULL;
 ALTER TABLE session_pages DROP CONSTRAINT IF EXISTS session_pages_pkey;
 ALTER TABLE session_pages ADD PRIMARY KEY (session_id, page_id_int);
 

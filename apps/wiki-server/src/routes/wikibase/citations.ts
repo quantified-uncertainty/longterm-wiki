@@ -902,7 +902,7 @@ const citationsApp = new Hono()
       .limit(500);
 
     const flaggedCitations = flaggedRows.map((q) => ({
-      pageId: q.pageSlug,
+      pageId: q.pageSlug ?? "",
       footnote: q.footnote,
       claimText: q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText,
       sourceTitle: q.sourceTitle,

@@ -197,6 +197,11 @@ const sessionsApp = new Hono()
           const resolvedPages = d.pages
             .map((pageId) => ({ sessionId: session.id, pageIdInt: intIdMap.get(pageId) }))
             .filter((r): r is { sessionId: number; pageIdInt: number } => r.pageIdInt != null);
+          const droppedCount = d.pages.length - resolvedPages.length;
+          if (droppedCount > 0) {
+            const droppedSlugs = d.pages.filter((p) => intIdMap.get(p) == null);
+            logger.warn({ droppedCount, droppedSlugs, sessionTitle: d.title }, "Dropped unresolvable page slugs from session");
+          }
           if (resolvedPages.length > 0) {
             await tx.insert(sessionPages).values(resolvedPages);
           }
@@ -250,11 +255,12 @@ const sessionsApp = new Hono()
             .where(inArray(sessionPages.sessionId, sessionIds));
         }
 
-        // Bulk insert all new page associations (skip unresolvable slugs)
+        // Bulk insert all new page associations (warn + skip unresolvable slugs)
         const allPageAssociations: Array<{
           sessionId: number;
           pageIdInt: number;
         }> = [];
+        const droppedSlugs: string[] = [];
         for (let i = 0; i < items.length; i++) {
           const d = items[i];
           const sessionId = upsertedRows[i].id;
@@ -262,8 +268,13 @@ const sessionsApp = new Hono()
             const pageIdInt = intIdMap.get(pageId);
             if (pageIdInt != null) {
               allPageAssociations.push({ sessionId, pageIdInt });
+            } else {
+              droppedSlugs.push(pageId);
             }
           }
+        }
+        if (droppedSlugs.length > 0) {
+          logger.warn({ droppedCount: droppedSlugs.length, droppedSlugs }, "Dropped unresolvable page slugs from session batch");
         }
         if (allPageAssociations.length > 0) {
           await tx

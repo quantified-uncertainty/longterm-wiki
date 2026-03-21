@@ -51,7 +51,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 /** Result row shape after JOIN with wiki_pages to recover slug. */
 type ResultWithSlug = {
   runId: number | bigint;
-  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
+  pageSlug: string | null; // from LEFT JOIN wiki_pages — null only if page_id_int has no matching wiki page
   status: string;
   tier: string | null;
   durationMs: number | null;
