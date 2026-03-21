@@ -25,3 +25,4 @@ export { policyStakeholdersRoute, type PolicyStakeholdersRoute } from "./policy-
 export { entityEventsRoute, type EntityEventsRoute } from "./entity-events.js";
 export { entityAssessmentsRoute, type EntityAssessmentsRoute } from "./entity-assessments.js";
 export { publicationsRoute, type PublicationsRoute } from "./publications.js";
+export { websiteSourcesRoute, type WebsiteSourcesRoute } from "./website-sources.js";

@@ -869,6 +869,13 @@
       "when": 1780300800000,
       "tag": "0123_phase_d2b_drop_old_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1780387200000,
+      "tag": "0124_website_sources_and_content_lifecycle",
+      "breakpoints": true
     }
   ]
 }
