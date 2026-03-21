@@ -43,7 +43,7 @@ interface ProbabilityIssueLocation {
   value: string;
 }
 
-interface ProbabilityIssue {
+export interface ProbabilityIssue {
   id: string;
   severity: 'warning' | 'info';
   topic: string;
@@ -58,7 +58,7 @@ interface TermVariantUsage {
   totalUses: number;
 }
 
-interface TerminologyIssue {
+export interface TerminologyIssue {
   id: string;
   severity: 'info';
   term: string;
@@ -67,7 +67,7 @@ interface TerminologyIssue {
   suggestion: string;
 }
 
-interface CausalIssue {
+export interface CausalIssue {
   id: string;
   severity: 'info';
   description: string;
@@ -422,6 +422,62 @@ function checkCausalConsistency(allContent: FileContent[], entities: Entity[]): 
     seen.add(key);
     return true;
   });
+}
+
+// ============================================================================
+// DETAILED RUNNER (for unified consistency command)
+// ============================================================================
+
+export interface ProseConsistencyResult {
+  probabilityIssues: ProbabilityIssue[];
+  terminologyIssues: TerminologyIssue[];
+  causalIssues: CausalIssue[];
+  stats: {
+    filesScanned: number;
+    probabilityClaims: number;
+    entitiesLoaded: number;
+  };
+}
+
+/**
+ * Run all prose consistency checks and return detailed results.
+ * Used by the unified verify-consistency command.
+ */
+export function runDetailedCheck(): ProseConsistencyResult {
+  const files = findMdxFiles(CONTENT_DIR);
+  const entities = loadEntities();
+
+  const allContent: FileContent[] = [];
+  const allClaims: ProbabilityClaim[] = [];
+
+  for (const file of files) {
+    if (file.includes('/style-guides/') || file.endsWith('index.mdx') || file.endsWith('index.md')) {
+      continue;
+    }
+    try {
+      const content = readFileSync(file, 'utf-8');
+      allContent.push({ content, filePath: file });
+      const claims = extractProbabilityClaims(content, file);
+      allClaims.push(...claims);
+    } catch {
+      // Skip files that can't be read
+    }
+  }
+
+  const probabilityIssues = checkProbabilityConsistency(allClaims);
+  const terminologyIssues = checkTerminologyConsistency(allContent);
+  const causalIssues = checkCausalConsistency(allContent, entities);
+
+  return {
+    probabilityIssues,
+    terminologyIssues,
+    causalIssues,
+    stats: {
+      filesScanned: allContent.length,
+      probabilityClaims: allClaims.length,
+      entitiesLoaded: entities.length,
+    },
+  };
 }
 
 // ============================================================================

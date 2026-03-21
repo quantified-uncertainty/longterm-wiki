@@ -31,6 +31,7 @@ import {
   type RecordType,
   type VerificationVerdict,
 } from '../../apps/wiki-server/src/api-types.ts';
+import { orchestrateCommand } from './verify-orchestrate.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -1017,6 +1018,7 @@ export async function recordsVerifyCommand(
 export const commands = {
   default: recordsVerifyCommand,
   stats: statsCommand,
+  orchestrate: orchestrateCommand,
 };
 
 export function getHelp(): string {
@@ -1027,6 +1029,7 @@ Usage:
   crux tb verify <type>              Verify all records of a type with source URLs
   crux tb verify stats               Show verification coverage report
   crux tb verify sync-things         Sync existing verdicts to the Things dashboard
+  crux tb verify orchestrate         Orchestrate verification across all data layers
   crux tb verify grants              Verify all grants
   crux tb verify personnel           Verify all personnel records
   crux tb verify divisions           Verify all divisions
@@ -1042,12 +1045,19 @@ Options:
   --dry-run           Show what would be checked without calling LLM
   --ci                JSON output
 
+Orchestrate options:
+  --budget=N          Max dollars to spend on LLM calls
+  --source=X          Source mode: existing | web-search | all
+  --entity-type=X     Filter by entity type (organization, person, ...)
+
 Examples:
-  crux tb verify grants --dry-run             Preview which grants would be checked
-  crux tb verify personnel --entity=anthropic Verify Anthropic personnel records
-  crux tb verify stats                        Show verification coverage
-  crux tb verify grants --limit=5             Verify 5 grants
-  crux tb verify --dry-run                    Preview all record types
-  crux tb verify sync-things                  Push all verdicts to Things dashboard
+  crux tb verify grants --dry-run                Preview which grants would be checked
+  crux tb verify personnel --entity=anthropic    Verify Anthropic personnel records
+  crux tb verify stats                           Show verification coverage
+  crux tb verify grants --limit=5                Verify 5 grants
+  crux tb verify --dry-run                       Preview all record types
+  crux tb verify sync-things                     Push all verdicts to Things dashboard
+  crux tb verify orchestrate --dry-run           Preview orchestrated verification plan
+  crux tb verify orchestrate --budget=5          Run with $5 budget cap
 `;
 }

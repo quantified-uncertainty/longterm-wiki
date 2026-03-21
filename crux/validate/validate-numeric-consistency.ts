@@ -38,7 +38,7 @@ interface NumericClaim {
   numbers: string[];
 }
 
-interface ContradictionReport {
+export interface ContradictionReport {
   entityId: string;
   claim1: NumericClaim;
   claim2: NumericClaim;
@@ -228,7 +228,101 @@ function findHeuristicContradictions(
 }
 
 // ============================================================================
-// MAIN RUNNER
+// DETAILED RUNNER (for unified consistency command)
+// ============================================================================
+
+export interface NumericConsistencyDetailedResult {
+  contradictions: ContradictionReport[];
+  stats: {
+    filesScanned: number;
+    entitiesWithClaims: number;
+    totalClaims: number;
+  };
+}
+
+/**
+ * Run numeric consistency checks and return detailed results without printing.
+ * Used by the unified verify-consistency command.
+ */
+export async function runNumericConsistencyDetailed(options: {
+  entityId?: string;
+  limit?: number;
+} = {}): Promise<NumericConsistencyDetailedResult> {
+  const files = findMdxFiles(CONTENT_DIR);
+  const entityClaims: Map<string, NumericClaim[]> = new Map();
+
+  for (const filePath of files) {
+    const rel = filePath.replace(/^.*content\/docs\//, '');
+    if (rel.startsWith('internal/')) continue;
+
+    let raw: string;
+    try {
+      raw = readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+
+    const body = getContentBody(raw);
+    const entityLinkPattern = /EntityLink[^>]*id=["']([^"']+)["']/g;
+    const entitiesInFile = new Set<string>();
+
+    let m: RegExpExecArray | null;
+    while ((m = entityLinkPattern.exec(body)) !== null) {
+      entitiesInFile.add(m[1]);
+    }
+
+    if (options.entityId) {
+      if (!entitiesInFile.has(options.entityId)) continue;
+      entitiesInFile.clear();
+      entitiesInFile.add(options.entityId);
+    }
+
+    for (const entityId of entitiesInFile) {
+      const claims = extractEntityContextClaims(body, entityId, filePath);
+      if (claims.length === 0) continue;
+      const existing = entityClaims.get(entityId) ?? [];
+      existing.push(...claims);
+      entityClaims.set(entityId, existing);
+    }
+  }
+
+  const allContradictions: ContradictionReport[] = [];
+  let totalClaims = 0;
+
+  for (const [entityId, claims] of entityClaims.entries()) {
+    totalClaims += claims.length;
+    if (claims.length < 2) continue;
+
+    const contradictions = findHeuristicContradictions(claims);
+    for (const c of contradictions) {
+      c.entityId = entityId;
+      allContradictions.push(c);
+    }
+  }
+
+  // Deduplicate
+  const seen = new Set<string>();
+  const deduped = allContradictions.filter(c => {
+    const key = `${c.entityId}|${c.claim1.pageId}|${c.claim2.pageId}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const limit = options.limit ?? 50;
+
+  return {
+    contradictions: deduped.slice(0, limit),
+    stats: {
+      filesScanned: files.length,
+      entitiesWithClaims: entityClaims.size,
+      totalClaims,
+    },
+  };
+}
+
+// ============================================================================
+// MAIN RUNNER (original, with console output)
 // ============================================================================
 
 export async function runNumericConsistency(options: {
