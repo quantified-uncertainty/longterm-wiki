@@ -15,6 +15,7 @@
  */
 
 import { type CommandResult } from '../lib/cli.ts';
+import { loadDatabase } from '../lib/content-types.ts';
 import { createLogger } from '../lib/output.ts';
 import { runResearch } from '../lib/search/research-agent.ts';
 import type { ResearchRequest } from '../lib/search/research-agent.ts';
@@ -67,9 +68,32 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   // --no-facts: skip Haiku fact extraction
   const extractFacts = options.noFacts ? false : undefined;
 
+  // Resolve entity type from database.json when --for-page is provided,
+  // so domain-specific providers (GitHub, Semantic Scholar, Federal Register)
+  // are activated based on the entity's actual type, not the hardcoded 'page'.
+  let pageContext: ResearchRequest['pageContext'];
+  if (forPage) {
+    let entityType = 'page';
+    let entityTitle = forPage;
+    try {
+      const db = loadDatabase();
+      const entities = (db as Record<string, unknown>).typedEntities as Array<Record<string, unknown>> | undefined;
+      const entity = entities?.find(
+        (e) => e.id === forPage || e.slug === forPage || e.stableId === forPage,
+      );
+      if (entity) {
+        if (typeof entity.entityType === 'string') entityType = entity.entityType;
+        if (typeof entity.title === 'string') entityTitle = entity.title;
+      }
+    } catch {
+      // database.json may not exist (e.g. first build) — fall back to 'page'
+    }
+    pageContext = { title: entityTitle, type: entityType, entityId: forPage };
+  }
+
   const request: ResearchRequest = {
     topic,
-    pageContext: forPage ? { title: forPage, type: 'page', entityId: forPage } : undefined,
+    pageContext,
     config: {
       ...(useExa !== undefined && { useExa }),
       ...(usePerplexity !== undefined && { usePerplexity }),

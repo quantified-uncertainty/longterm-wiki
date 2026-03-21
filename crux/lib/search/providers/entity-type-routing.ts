@@ -27,14 +27,35 @@ const ROUTING_TABLE: Record<string, DomainProvider[]> = {
 };
 
 /**
+ * Maps legacy/alias entity type names to canonical names used in ROUTING_TABLE.
+ * Kept in sync with ENTITY_TYPE_ALIASES from apps/web/src/data/entity-type-names.ts.
+ */
+const ENTITY_TYPE_ALIASES: Record<string, string> = {
+  researcher: 'person',
+  lab: 'organization',
+  'lab-frontier': 'organization',
+  'lab-research': 'organization',
+  'lab-startup': 'organization',
+  'lab-academic': 'organization',
+  funder: 'organization',
+  policies: 'policy',
+  concepts: 'concept',
+  events: 'event',
+  models: 'ai-model',
+  'research-area': 'approach',
+};
+
+/**
  * Get the set of domain-specific providers to activate for a given entity type.
+ * Normalizes legacy/alias entity type names to their canonical equivalents.
  *
- * @param entityType - The entity type string (e.g. 'organization', 'person')
+ * @param entityType - The entity type string (e.g. 'organization', 'person', 'lab')
  * @returns Array of provider names to activate (may be empty)
  */
 export function getActiveProviders(entityType?: string): DomainProvider[] {
   if (!entityType) return [];
-  return ROUTING_TABLE[entityType] ?? [];
+  const normalized = ENTITY_TYPE_ALIASES[entityType] ?? entityType;
+  return [...(ROUTING_TABLE[normalized] ?? [])];
 }
 
 /**
