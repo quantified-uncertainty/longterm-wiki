@@ -603,9 +603,17 @@ async function main() {
   // Merge PG-backed personnel and grants into KB records (overrides YAML for these collections)
   if (database.kb && !CONTENT_ONLY) {
     const pgRecordCounts = await mergePGRecordsIntoKB(database.kb);
-    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms + pgRecordCounts.divisionPersonnel;
+    const pgTotal = pgRecordCounts.personnel + pgRecordCounts.grants + pgRecordCounts.fundingRounds + pgRecordCounts.investments + pgRecordCounts.equityPositions + pgRecordCounts.divisions + pgRecordCounts.fundingPrograms + pgRecordCounts.divisionPersonnel + pgRecordCounts.entityEvents + pgRecordCounts.entityAssessments + pgRecordCounts.publications;
     if (pgTotal > 0) {
-      console.log(`  kb-pg: ${pgRecordCounts.personnel} personnel, ${pgRecordCounts.grants} grants, ${pgRecordCounts.fundingRounds} funding rounds, ${pgRecordCounts.investments} investments, ${pgRecordCounts.equityPositions} equity positions, ${pgRecordCounts.divisions} divisions, ${pgRecordCounts.fundingPrograms} funding programs, ${pgRecordCounts.divisionPersonnel} division personnel merged from PG`);
+      const parts = [
+        `${pgRecordCounts.personnel} personnel`, `${pgRecordCounts.grants} grants`,
+        `${pgRecordCounts.fundingRounds} funding rounds`, `${pgRecordCounts.investments} investments`,
+        `${pgRecordCounts.equityPositions} equity positions`, `${pgRecordCounts.divisions} divisions`,
+        `${pgRecordCounts.fundingPrograms} funding programs`, `${pgRecordCounts.divisionPersonnel} div-personnel`,
+        `${pgRecordCounts.entityEvents} events`, `${pgRecordCounts.entityAssessments} assessments`,
+        `${pgRecordCounts.publications} publications`,
+      ].filter(p => !p.startsWith('0 '));
+      console.log(`  kb-pg: ${parts.join(', ')} merged from PG`);
     }
   }
 

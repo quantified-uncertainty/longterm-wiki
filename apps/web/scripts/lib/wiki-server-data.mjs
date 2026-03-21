@@ -933,9 +933,81 @@ function divisionPersonnelRowToRecordEntry(row) {
 }
 
 /**
- * Fetch personnel, grants, funding rounds, investments, and equity positions
- * from the wiki-server PG tables and merge them into the serialized KB records
- * structure (same format as YAML-sourced records).
+ * Convert a PG entity event row to the RecordEntry format.
+ */
+function entityEventRowToRecordEntry(row) {
+  const fields = {
+    title: row.title,
+    date: row.date,
+    eventType: row.eventType,
+  };
+  if (row.description) fields.description = row.description;
+  if (row.significance) fields.significance = row.significance;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'entity-event',
+    ownerEntityId: row.entityId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG entity assessment row to the RecordEntry format.
+ */
+function entityAssessmentRowToRecordEntry(row) {
+  const fields = {
+    dimension: row.dimension,
+    rating: row.rating,
+  };
+  if (row.evidence) fields.evidence = row.evidence;
+  if (row.assessor) fields.assessor = row.assessor;
+  if (row.assessedAt) fields.assessedAt = row.assessedAt;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'entity-assessment',
+    ownerEntityId: row.entityId,
+    fields,
+  };
+}
+
+/**
+ * Convert a PG publication row to the RecordEntry format.
+ */
+function publicationRowToRecordEntry(row) {
+  const fields = {
+    title: row.title,
+    publicationType: row.publicationType,
+  };
+  if (row.authors) fields.authors = row.authors;
+  if (row.url) fields.url = row.url;
+  if (row.venue) fields.venue = row.venue;
+  if (row.publishedDate) fields.publishedDate = row.publishedDate;
+  if (row.citationCount != null) fields.citationCount = row.citationCount;
+  if (row.isFlagship) fields.isFlagship = row.isFlagship;
+  if (row.abstract) fields.abstract = row.abstract;
+  if (row.resourceId) fields.resourceId = row.resourceId;
+  if (row.source) fields.source = row.source;
+  if (row.notes) fields.notes = row.notes;
+
+  return {
+    key: row.id,
+    schema: 'publication',
+    ownerEntityId: row.entityId,
+    fields,
+  };
+}
+
+/**
+ * Fetch personnel, grants, funding rounds, investments, equity positions,
+ * entity events, entity assessments, and publications from the wiki-server
+ * PG tables and merge them into the serialized KB records structure
+ * (same format as YAML-sourced records).
  *
  * PG stores canonical entity IDs (10-char) in personId/organizationId fields,
  * which match the keys used in kb.records. No slug->entityId remapping needed.
@@ -980,7 +1052,7 @@ export async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
-    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0, divisionPersonnel: 0 };
+    return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0, divisionPersonnel: 0, entityEvents: 0, entityAssessments: 0, publications: 0 };
   }
 
   const headers = buildHeaders();
@@ -993,6 +1065,9 @@ export async function mergePGRecordsIntoKB(kb) {
   let divisionsCount = 0;
   let fundingProgramsCount = 0;
   let divisionPersonnelCount = 0;
+  let entityEventsCount = 0;
+  let entityAssessmentsCount = 0;
+  let publicationsCount = 0;
 
   if (!kb.records) kb.records = {};
 
@@ -1028,6 +1103,9 @@ export async function mergePGRecordsIntoKB(kb) {
     divisionsResult,
     fundingProgramsResult,
     divisionPersonnelResult,
+    entityEventsResult,
+    entityAssessmentsResult,
+    publicationsResult,
   ] = await Promise.allSettled([
     fetchAllPages('/api/personnel/all', 'personnel'),
     fetchAllPages('/api/grants/all', 'grants'),
@@ -1037,6 +1115,9 @@ export async function mergePGRecordsIntoKB(kb) {
     fetchAllPages('/api/divisions/all', 'divisions'),
     fetchAllPages('/api/funding-programs/all', 'fundingPrograms'),
     fetchAllPages('/api/division-personnel/all', 'divisionPersonnel'),
+    fetchAllPages('/api/entity-events/all', 'events'),
+    fetchAllPages('/api/entity-assessments/all', 'assessments'),
+    fetchAllPages('/api/publications/all', 'publications'),
   ]);
 
   /**
@@ -1174,6 +1255,36 @@ export async function mergePGRecordsIntoKB(kb) {
     divisionPersonnelRowToRecordEntry,
   );
 
+  // --- Process entity events ---
+  entityEventsCount = mergeCollection(
+    'entity-events',
+    entityEventsResult,
+    ['entity-events'],
+    (row) => row.entityId,
+    () => 'entity-events',
+    entityEventRowToRecordEntry,
+  );
+
+  // --- Process entity assessments ---
+  entityAssessmentsCount = mergeCollection(
+    'entity-assessments',
+    entityAssessmentsResult,
+    ['entity-assessments'],
+    (row) => row.entityId,
+    () => 'entity-assessments',
+    entityAssessmentRowToRecordEntry,
+  );
+
+  // --- Process publications ---
+  publicationsCount = mergeCollection(
+    'publications',
+    publicationsResult,
+    ['publications'],
+    (row) => row.entityId,
+    () => 'publications',
+    publicationRowToRecordEntry,
+  );
+
   return {
     personnel: personnelCount,
     grants: grantsCount,
@@ -1183,6 +1294,9 @@ export async function mergePGRecordsIntoKB(kb) {
     divisions: divisionsCount,
     fundingPrograms: fundingProgramsCount,
     divisionPersonnel: divisionPersonnelCount,
+    entityEvents: entityEventsCount,
+    entityAssessments: entityAssessmentsCount,
+    publications: publicationsCount,
   };
 }
 
