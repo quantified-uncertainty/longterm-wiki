@@ -98,9 +98,8 @@ export function getBacklinksFor(
   relationship?: string;
 }> {
   const slug = resolveId(entityId);
-  // Try per-entity bundle first (avoids loading full database.json)
+  // Per-entity bundle is the only source — backlinks removed from main database.json
   const bundle = getEntityBundle(slug);
-  // Per-entity bundles are the sole source for backlinks (removed from database.json to save ~500 KB)
   const links = bundle?.backlinks ?? [];
   return links.map((link: BacklinkEntry) => ({
     ...link,
@@ -136,9 +135,8 @@ export function getRelatedGraphFor(
   label?: string;
 }> {
   const slug = resolveId(entityId);
-  // Try per-entity bundle first (avoids loading full database.json)
+  // Per-entity bundle is the only source — relatedGraph removed from main database.json
   const bundle = getEntityBundle(slug);
-  // Per-entity bundles are the sole source for relatedGraph (removed from database.json to save ~1.4 MB)
   const entries = bundle?.relatedGraph ?? [];
   return entries.map((entry) => ({
     ...entry,

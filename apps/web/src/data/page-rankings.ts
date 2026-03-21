@@ -28,8 +28,8 @@ export async function getUpdateSchedule(): Promise<WithSource<UpdateScheduleItem
       );
       return data;
     },
-    // Local fallback: pre-computed at build time in build-data.mjs
-    () => getTableBase().updateSchedule || []
+    // updateSchedule is no longer baked into database.json — return empty for local fallback
+    () => []
   );
 }
 
