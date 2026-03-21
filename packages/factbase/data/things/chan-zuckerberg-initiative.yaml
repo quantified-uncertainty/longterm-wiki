@@ -37,11 +37,10 @@ facts:
 
   - id: f_60fN0AilQQ
     property: headcount
-    value: 70
+    value: 805
     asOf: "2026"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    notes: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical
-      research"
+    notes: "Approximately 805 employees after laying off ~70 (~8% of ~875 workforce) to refocus on AI-biomedical research"
   - id: m7Lq9YLiqw
     property: founded-date
     value: "2015"

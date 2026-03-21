@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
         destination: "/resources",
         permanent: true,
       },
+      // Open Philanthropy rebranded to Coefficient Giving (E521)
+      {
+        source: "/wiki/E552",
+        destination: "/wiki/E521",
+        permanent: true,
+      },
       // Deprecated stub E8 redirects to the canonical full page E366 (#2688)
       {
         source: "/legislation/ai-executive-order",
