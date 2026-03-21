@@ -2,11 +2,15 @@ entity: AnFfbQlIog
 facts:
   - id: f_xAJL18iX9A
     property: description
-    value: Nuño Sempere is a Spanish superforecaster who co-founded the highly successful Samotsvety forecasting group and
-      now runs Sentinel for global catastrophe early warning, while being known for skeptical views on high AI
-      existential risk estimates and critical perspectives on EA institutions. The articl
+    value: >-
+      Nuño Sempere is a Spanish superforecaster who co-founded the highly
+      successful Samotsvety forecasting group and now runs Sentinel for global
+      catastrophe early warning, while being known for skeptical views on high
+      AI existential risk estimates and critical perspectives on EA
+      institutions. Previously a Research Fellow at QURI (2020-2023) where he
+      built Metaforecast.
     asOf: 2026-03
-    notes: Migrated from old entity system
+    notes: Migrated from old entity system; description updated 2026-03
 
   - id: f_nP3rK7mW6x
     property: role
@@ -35,3 +39,9 @@ facts:
     property: education
     value: "Studied Mathematics and Philosophy (dropped out); subsequently studied development economics"
     notes: Enriched from wiki page
+
+  - id: f_nPkW7mR4xB
+    property: employed-by
+    value: !ref Khej79OA8g
+    asOf: !date 2023
+    notes: Research Fellow at QURI from 2020 to 2023; built Metaforecast

@@ -84,6 +84,8 @@ import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts'
 import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
+import * as importQuriPersonnelCommands from './commands/import-quri-personnel.ts';
+import * as importQuriResourcesCommands from './commands/import-quri-resources.ts';
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
 import * as researchAreasCommands from './commands/research-areas.ts';
@@ -150,6 +152,8 @@ const domains = {
   'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
+  'import-quri-personnel': importQuriPersonnelCommands,
+  'import-quri-resources': importQuriResourcesCommands,
   people: peopleCommands,
   orgs: orgsCommands,
   'research-areas': researchAreasCommands,

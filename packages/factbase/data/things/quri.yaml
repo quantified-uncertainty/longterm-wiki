@@ -66,3 +66,14 @@ facts:
     asOf: !date 2024
     notes: Long-Term Future Fund (ltff) ongoing support (estimated annual ~$100K; not a sourced exact figure)
     grantor: !ref yA12C1KcjQ
+
+  - id: f_QR8legal01
+    property: legal-structure
+    value: "501(c)(3) nonprofit; fiscally sponsored by Rethink Priorities"
+    asOf: !date 2026-03
+
+  - id: f_QR9fndby01
+    property: founded-by
+    value:
+      - !ref 24aX2Ru7Dg
+    notes: Founded by Ozzie Gooen in 2019
