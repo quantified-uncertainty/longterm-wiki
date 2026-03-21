@@ -19,7 +19,7 @@ jobs:
     permissions:
       contents: read
       checks: write
-      pull-requests: read
+      pull-requests: write
 
     steps:
       - name: Block PRs to production from non-main branches
@@ -176,19 +176,32 @@ jobs:
         run: |
           pnpm crux validate || echo "::warning::Validation has pre-existing failures (non-blocking)"
 
-      # --- Tests ---
+      # --- Tests (with coverage reporting) ---
 
-      - name: Run tests
-        run: cd apps/web && pnpm test
+      - name: Run tests (web)
+        run: cd apps/web && pnpm vitest run --coverage
 
-      - name: Run discord-bot tests
-        run: cd apps/discord-bot && pnpm test
+      - name: Run tests (discord-bot)
+        run: cd apps/discord-bot && pnpm vitest run --coverage
 
-      - name: Run wiki-server tests
-        run: cd apps/wiki-server && pnpm test
+      - name: Run tests (wiki-server)
+        run: cd apps/wiki-server && pnpm vitest run --coverage
 
-      - name: Run crux tests
-        run: pnpm test:crux
+      - name: Run tests (crux)
+        run: npx vitest run --config crux/vitest.config.ts --coverage
+
+      - name: Generate coverage report
+        if: "!cancelled() && github.event_name == 'pull_request'"
+        continue-on-error: true
+        run: npx tsx crux/ci/merge-coverage.ts --output=/tmp/coverage-report.md
+
+      - name: Post coverage comment on PR
+        if: "!cancelled() && github.event_name == 'pull_request'"
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: coverage-report
+          path: /tmp/coverage-report.md
 
       # --- Next.js build (most expensive step — runs last) ---
 
