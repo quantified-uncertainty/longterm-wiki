@@ -281,19 +281,25 @@ async function upsertResource(
 
   // Upsert citations (cited_by)
   if (d.citedBy && d.citedBy.length > 0) {
+    // Phase D2a: resolve slugs to integer IDs before touching existing rows
+    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
+    const unresolvedPageIds = d.citedBy.filter((pageId) => !citedByIntIdMap.has(pageId));
+    if (unresolvedPageIds.length > 0) {
+      throw new Error(
+        `Failed to resolve page_id_int for citedBy pages: ${unresolvedPageIds.join(", ")}`
+      );
+    }
     // Delete existing citations for this resource, then re-insert
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    // Phase 4a: use pre-resolved map if provided (batch path), else resolve per-resource (single path)
-    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
+    const citationValues = d.citedBy.map((slug) => ({
+      resourceId: d.id,
+      pageIdInt: citedByIntIdMap.get(slug) as number,
+    }));
     await db
       .insert(resourceCitations)
-      .values(d.citedBy.map((pageId) => ({
-        resourceId: d.id,
-        pageId,
-        pageIdInt: citedByIntIdMap.get(pageId) ?? null, // Phase 4a dual-write
-      })))
+      .values(citationValues)
       .onConflictDoNothing();
   }
 
@@ -500,17 +506,18 @@ const resourcesApp = new Hono()
 
           const allCitations: Array<{
             resourceId: string;
-            pageId: string;
-            pageIdInt: number | null;
+            pageIdInt: number;
           }> = [];
           for (const item of items) {
             if (item.citedBy && item.citedBy.length > 0) {
-              for (const pageId of item.citedBy) {
-                allCitations.push({
-                  resourceId: item.id,
-                  pageId,
-                  pageIdInt: intIdMap.get(pageId) ?? null,
-                });
+              for (const slug of item.citedBy) {
+                const intId = intIdMap.get(slug);
+                if (intId != null) {
+                  allCitations.push({
+                    resourceId: item.id,
+                    pageIdInt: intId,
+                  });
+                }
               }
             }
           }
@@ -571,8 +578,8 @@ const resourcesApp = new Hono()
     const prefixQuery = buildPrefixTsquery(q);
 
     const rows: ResourceSearchRow[] = prefixQuery
-      ? await rawDb.unsafe<ResourceSearchRow[]>(
-          `SELECT
+      ? await rawDb<ResourceSearchRow[]>`
+          SELECT
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
@@ -582,13 +589,11 @@ const resourcesApp = new Hono()
           type_metadata, publisher_entity_id, related_entity_ids,
           enrichment_status, enrichment_date, importance_score,
           created_at, updated_at,
-          ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
+          ts_rank_cd(search_vector, to_tsquery('english', ${prefixQuery}), 1) AS rank
         FROM resources
-        WHERE search_vector @@ to_tsquery('english', $1)
+        WHERE search_vector @@ to_tsquery('english', ${prefixQuery})
         ORDER BY rank DESC
-        LIMIT $2`,
-          [prefixQuery, limit],
-        )
+        LIMIT ${limit}`
       : [];
 
     return c.json({
@@ -643,7 +648,7 @@ const resourcesApp = new Hono()
         db.select({ count: count() }).from(resourceCitations),
         db
           .select({
-            count: sql<number>`count(distinct ${resourceCitations.pageId})`,
+            count: sql<number>`count(distinct ${resourceCitations.pageIdInt})`,
           })
           .from(resourceCitations),
         db
@@ -835,12 +840,14 @@ const resourcesApp = new Hono()
   .get("/citations/all", async (c) => {
     const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
+    // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
-        pageId: resourceCitations.pageId,
+        pageId: wikiPages.id,
       })
       .from(resourceCitations)
+      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
       .limit(HARD_LIMIT + 1);
 
     const truncated = rows.length > HARD_LIMIT;
@@ -850,7 +857,7 @@ const resourcesApp = new Hono()
     const index: Record<string, string[]> = {};
     for (const row of rows) {
       if (!index[row.resourceId]) index[row.resourceId] = [];
-      index[row.resourceId].push(row.pageId);
+      if (row.pageId) index[row.resourceId].push(row.pageId);
     }
 
     return c.json({ citations: index, count: rows.length, truncated });
@@ -954,7 +961,11 @@ const resourcesApp = new Hono()
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
-      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+      // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
+      db.select({ pageId: wikiPages.id })
+        .from(resourceCitations)
+        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
+        .where(eq(resourceCitations.resourceId, id)),
     ]);
 
     return c.json({
@@ -962,7 +973,7 @@ const resourcesApp = new Hono()
       paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
       forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
       policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
-      citedBy: citations.map((row) => row.pageId),
+      citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   })
 
@@ -1298,8 +1309,12 @@ const resourcesApp = new Hono()
     }
 
     // Also fetch citations and sub-table data
+    // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
     const [citations, paperRows, forumRows, policyRows] = await Promise.all([
-      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+      db.select({ pageId: wikiPages.id })
+        .from(resourceCitations)
+        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
+        .where(eq(resourceCitations.resourceId, id)),
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
@@ -1310,7 +1325,7 @@ const resourcesApp = new Hono()
       paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
       forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
       policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
-      citedBy: citations.map((row) => row.pageId),
+      citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   });
 

@@ -5,7 +5,7 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores ----
 
 let resourceStore: Map<string, Record<string, unknown>>;
-let citationStore: Array<{ resource_id: string; page_id: string; page_id_old: string; page_id_int: number | null; created_at: Date }>;
+let citationStore: Array<{ resource_id: string; page_id: string; page_id_int: number; created_at: Date }>;
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -20,6 +20,15 @@ function getIntIdForSlug(slug: string): number {
 /** Non-allocating lookup — returns undefined for slugs not yet in the map. */
 function lookupIntIdForSlug(slug: string): number | undefined {
   return slugIntIdMap.get(slug);
+}
+
+/** Reverse-lookup: recover slug from integer ID. */
+function slugFromIntId(intId: number | null): string | null {
+  if (intId === null) return null;
+  for (const [slug, id] of slugIntIdMap.entries()) {
+    if (id === intId) return slug;
+  }
+  return null;
 }
 
 function resetStores() {
@@ -121,22 +130,22 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- INSERT INTO resource_citations (supports multi-row) ----
+  // Phase D2a: page_id_old is no longer sent. Params: resource_id, page_id_int
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const COLS = 3; // Phase 4a: resource_id, page_id, page_id_int
+    const COLS = 2; // Phase D2a: resource_id, page_id_int
     const numRows = params.length / COLS;
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const resourceId = params[o] as string;
-      const pageId = params[o + 1] as string;
-      const pageIdInt = params[o + 2] as number | null;
+      const pageIdInt = params[o + 1] as number;
+      const slug = slugFromIntId(pageIdInt) ?? `page-${pageIdInt}`;
       const exists = citationStore.some(
-        (c) => c.resource_id === resourceId && c.page_id === pageId
+        (c) => c.resource_id === resourceId && c.page_id_int === pageIdInt
       );
       if (!exists) {
         citationStore.push({
           resource_id: resourceId,
-          page_id: pageId,
-          page_id_old: pageId,
+          page_id: slug,
           page_id_int: pageIdInt,
           created_at: new Date(),
         });
@@ -145,10 +154,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // ---- SELECT count(distinct page_id) FROM resource_citations ----
+  // ---- SELECT count(distinct page_id_int) FROM resource_citations ----
   if (q.includes("count(distinct") && q.includes("resource_citations")) {
-    const uniquePages = new Set(citationStore.map((c) => c.page_id));
-    return [{ page_id: uniquePages.size }];
+    const uniquePages = new Set(citationStore.map((c) => c.page_id_int));
+    return [{ page_id_int: uniquePages.size }];
   }
 
   // ---- SELECT count(*) FROM resource_citations (not GROUP BY) ----
@@ -203,21 +212,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results;
   }
 
-  // ---- SELECT page_id FROM resource_citations WHERE resource_id = $1 ----
+  // ---- SELECT wiki_pages.id FROM resource_citations LEFT JOIN wiki_pages WHERE resource_id = $1 ----
+  // Phase D2a: returns slug via LEFT JOIN wiki_pages (simulated by slugFromIntId)
   if (q.includes("resource_citations") && q.includes("where") && !q.includes("delete") && !q.includes("count")) {
     const resourceId = params[0] as string;
     return citationStore
       .filter((c) => c.resource_id === resourceId)
-      .map((c) => ({ page_id: c.page_id, page_id_old: c.page_id }));
+      .map((c) => ({ id: c.page_id })); // wiki_pages.id = slug
   }
 
   // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
-  // params: [prefixQuery, limit] for to_tsquery; [q, q, limit] for plainto_tsquery
+  // Tagged template: params = [prefixQuery, prefixQuery, limit] (interpolated values in order)
+  // unsafe(): params = [prefixQuery, limit]
   if ((q.includes("to_tsquery") || q.includes("plainto_tsquery")) && q.includes("resources")) {
     const rawQuery = (params[0] as string);
     // Strip :* suffixes and & operators to get plain search words
     const searchTerm = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim().toLowerCase();
-    const limit = (params[1] as number) || 20;
+    // The limit is always the last param (a number); earlier params are query strings.
+    const lastParam = params[params.length - 1];
+    const limit = (typeof lastParam === "number" ? lastParam : 20);
     const results: Record<string, unknown>[] = [];
     for (const r of resourceStore.values()) {
       const title = ((r.title as string) || "").toLowerCase();

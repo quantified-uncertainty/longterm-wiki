@@ -25,6 +25,9 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
+// Cache for 1 hour — on-demand rendered to reduce build size.
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

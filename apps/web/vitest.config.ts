@@ -33,6 +33,12 @@ export default defineConfig({
       "@lib": path.resolve(__dirname, "./src/lib"),
       "@wiki-server/api-response-types": path.resolve(__dirname, "../wiki-server/src/api-response-types.ts"),
       "@wiki-server/api-types": path.resolve(__dirname, "../wiki-server/src/api-types.ts"),
+      "@wiki-server/facts-route": path.resolve(__dirname, "../wiki-server/src/routes/factbase/facts.ts"),
+      "@wiki-server/factbase-verifications-route": path.resolve(__dirname, "../wiki-server/src/routes/factbase/factbase-verifications.ts"),
+      "@wiki-server/grants-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/grants.ts"),
+      "@wiki-server/divisions-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/divisions.ts"),
+      "@wiki-server/funding-programs-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/funding-programs.ts"),
+      "@wiki-server/personnel-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/personnel.ts"),
     },
   },
 });

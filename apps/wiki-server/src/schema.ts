@@ -45,10 +45,11 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int")
+      .notNull()
+      .references(() => wikiPages.integerIdCol),
     footnote: integer("footnote").notNull(),
     url: text("url"),
     resourceId: text("resource_id").references(() => resources.id, {
@@ -83,8 +84,10 @@ export const citationQuotes = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("citation_quotes_page_id_footnote_unique").on(
-      table.pageId,
+    // Legacy unique index on (page_id_old, footnote) still exists in DB for old rows.
+    // New unique index on (page_id_int, footnote) used for ON CONFLICT (created by phase-d2a-citations-predeploy.sql).
+    uniqueIndex("citation_quotes_page_id_int_footnote_unique").on(
+      table.pageIdInt,
       table.footnote
     ),
     index("idx_cq_page_id").on(table.pageId),
@@ -674,16 +677,17 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old")
-      .notNull()
+    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
       .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int")
+      .notNull()
+      .references(() => wikiPages.integerIdCol),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.resourceId, table.pageId] }),
+    primaryKey({ columns: [table.resourceId, table.pageIdInt] }),
     index("idx_rc_page_id").on(table.pageId),
     index("idx_rc_page_id_int").on(table.pageIdInt),
   ]
