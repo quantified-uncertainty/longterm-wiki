@@ -28,5 +28,21 @@ export default defineConfig({
     // Some test files share mocked module state; parallel execution can cause
     // flaky failures from mock setup/teardown racing.
     fileParallelism: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: './coverage',
+      include: [
+        'lib/**/*.ts',
+        'authoring/**/*.ts',
+        'auto-update/**/*.ts',
+        'commands/**/*.ts',
+        'validate/**/*.ts',
+      ],
+      exclude: [
+        '**/*.test.ts',
+        '**/__tests__/**',
+      ],
+    },
   },
 });

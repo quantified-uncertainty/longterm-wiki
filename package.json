@@ -8,6 +8,7 @@
     "build": "pnpm --filter longterm-next build",
     "test": "pnpm --filter longterm-next test && pnpm --filter discord-bot test && pnpm --filter wiki-server test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
+    "test:coverage": "pnpm --filter longterm-next exec vitest run --coverage && pnpm --filter discord-bot exec vitest run --coverage && pnpm --filter wiki-server exec vitest run --coverage && npx vitest run --config crux/vitest.config.ts --coverage && npx tsx crux/ci/merge-coverage.ts",
     "build-data:content": "pnpm --filter longterm-next run sync:data:content",
     "build-data:quick": "pnpm --filter longterm-next run sync:data:content",
     "validate": "DOTENV_CONFIG_QUIET=true NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.0",
+    "@vitest/coverage-v8": "4.0.18",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
     "@types/pdf-parse": "^1.1.5",

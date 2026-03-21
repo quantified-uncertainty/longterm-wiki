@@ -39,6 +39,7 @@ apps/web/public/search-index.json
 
 # Test results (Playwright / Vitest artifacts)
 test-results/
+coverage/
 
 # Knowledge cache
 .cache/
