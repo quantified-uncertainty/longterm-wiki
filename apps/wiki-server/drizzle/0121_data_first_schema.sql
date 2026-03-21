@@ -1,12 +1,6 @@
 -- Data-first architecture: new tables for entity events, assessments,
--- publications, and compensation fields on personnel.
+-- and publications.
 -- Part of Discussion #2905: Wiki Pages as Tabs + Structured Data Extraction.
-
--- ── Personnel: add compensation fields ──────────────────────────────
-
-ALTER TABLE "personnel" ADD COLUMN IF NOT EXISTS "compensation" NUMERIC;
-ALTER TABLE "personnel" ADD COLUMN IF NOT EXISTS "compensation_year" TEXT;
-ALTER TABLE "personnel" ADD COLUMN IF NOT EXISTS "compensation_source" TEXT;
 
 -- ── Entity Events ───────────────────────────────────────────────────
 

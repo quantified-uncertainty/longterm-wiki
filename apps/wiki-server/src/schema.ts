@@ -1607,9 +1607,6 @@ export const personnel = pgTable(
     background: text("background"), // board-seats only
     source: text("source"), // URL confirming the role
     notes: text("notes"),
-    compensation: numeric("compensation"), // annual compensation in USD (from 990s, proxy statements, etc.)
-    compensationYear: text("compensation_year"), // YYYY — fiscal year the compensation applies to
-    compensationSource: text("compensation_source"), // URL to 990, proxy statement, or other source
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
