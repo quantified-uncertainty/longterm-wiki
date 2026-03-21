@@ -59,7 +59,7 @@ facts:
 
   - id: f_h3HeIqbtpA
     property: employed-by
-    value: "Google Brain"
+    value: !ref AZmSQxCAlk
     asOf: 2012-11
     validEnd: 2015-12
     source: https://en.wikipedia.org/wiki/Ilya_Sutskever

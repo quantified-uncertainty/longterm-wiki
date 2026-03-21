@@ -22,8 +22,8 @@ facts:
     property: founded-by
     value:
       - !ref eYrBgMLJDw
-      - daniel-gross
-      - daniel-levy
+      - !ref "-kU8m3AFTq"
+      - !ref vIgoE1BeAk
     source: https://ssi.inc
 
   - id: f_Oa0nwGGdna

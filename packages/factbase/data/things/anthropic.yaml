@@ -215,11 +215,11 @@ facts:
     value:
       - !ref zR4nW8xB2f
       - !ref tKMznr07QA
-      - tom-brown
+      - !ref 4CY8YJCrM7
       - !ref Tz48rTriBg
-      - jared-kaplan
-      - sam-mccandlish
-      - jack-clark
+      - !ref x16GL4gP2A
+      - !ref ENl8sgChDQ
+      - !ref YqSmRNVRAg
     source: https://anthropic.com/company
     notes: "Seven former OpenAI researchers"
 

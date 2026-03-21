@@ -2,7 +2,7 @@ entity: Jtj6jHbuQ7
 facts:
   - id: f_KHaU3bGPmQ
     property: employed-by
-    value: "Asana"
+    value: !ref xakL6BzSla
     asOf: 2008-01
     source: https://asana.com/company
     notes: "Co-founded Asana in 2008 with Justin Rosenstein; serves as CEO"

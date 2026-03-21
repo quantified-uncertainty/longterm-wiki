@@ -28,8 +28,8 @@ facts:
     property: founded-by
     value:
       - !ref CrXoCsIucX
-      - sid-black
-      - gabriel-alfour
+      - !ref kLIpOZtU1n
+      - !ref n0d7I3OAej
     source: https://www.conjecture.dev/
   - id: x1hQfPpo8g
     property: website

@@ -31,7 +31,7 @@ facts:
 
   - id: f_wM3eBy7xZt
     property: employed-by
-    value: "Forethought"
+    value: !ref tdb16DLlLb
     asOf: "2024-01"
     source: https://www.forethought.org/people/william-macaskill
     notes: "Senior Research Fellow at Forethought since 2024; previously Associate Professor at University of Oxford"
