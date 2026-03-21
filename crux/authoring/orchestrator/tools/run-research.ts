@@ -15,7 +15,7 @@ export const tool: ToolRegistration = {
   definition: {
     name: 'run_research',
     description:
-      'Run multi-source research on a topic. Searches Exa, Perplexity, and SCRY (EA Forum/LessWrong), fetches source URLs, and extracts structured facts. Results are added to the source cache for use by rewrite_section. Cost: $1-3 per call.',
+      'Run multi-source research on a topic. Searches Exa, Perplexity, SCRY (EA Forum/LessWrong), and domain-specific providers (GitHub, Semantic Scholar, Federal Register) based on entity type. Fetches source URLs and extracts structured facts. Results are added to the source cache for use by rewrite_section. Cost: $1-3 per call.',
     input_schema: {
       type: 'object' as const,
       properties: {
