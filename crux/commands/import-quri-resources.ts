@@ -4,73 +4,37 @@
  * Usage:
  *   pnpm crux tb import-quri-resources sync --dry-run   # Preview what would be synced
  *   pnpm crux tb import-quri-resources sync             # Sync to wiki-server
+ *   pnpm crux tb import-quri-resources sync /path/to/resources.csv /path/to/videos.csv
  *
- * Expects two CSV files in ~/Downloads:
- *   - "Recommended Resources-Grid view.csv"  (books, textbooks, etc.)
- *   - "Videos-Gallery.csv"                    (video resources)
+ * Default CSV paths (when no args given):
+ *   ~/Downloads/Recommended Resources-Grid view.csv
+ *   ~/Downloads/Videos-Gallery.csv
  */
 
 import type { CommandResult } from '../lib/command-types.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
+import { parseCSVLine, reassembleCSVRows } from '../lib/grant-import/csv.ts';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const QURI_ENTITY_ID = 'Khej79OA8g';
 
 // ---------------------------------------------------------------------------
-// CSV Parsing
+// CSV Parsing (reuses grant-import csv utilities)
 // ---------------------------------------------------------------------------
 
 function parseCSV(content: string): Record<string, string>[] {
-  // Split into lines, respecting quoted fields that may contain newlines
-  const lines: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  for (const char of content) {
-    if (char === '"') {
-      inQuotes = !inQuotes;
-      current += char;
-    } else if (char === '\n' && !inQuotes) {
-      lines.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  if (current.trim()) lines.push(current);
-
-  if (lines.length < 2) return [];
-
-  const headers = parseCSVLine(lines[0]);
-  return lines
-    .slice(1)
-    .filter((line) => line.trim())
-    .map((line) => {
-      const values = parseCSVLine(line);
-      const obj: Record<string, string> = {};
-      headers.forEach((h, i) => {
-        obj[h.trim()] = (values[i] ?? '').trim();
-      });
-      return obj;
+  const headerLine = content.split('\n')[0];
+  if (!headerLine) return [];
+  const headers = parseCSVLine(headerLine);
+  return reassembleCSVRows(content).map((line) => {
+    const values = parseCSVLine(line);
+    const obj: Record<string, string> = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = (values[i] ?? '').trim();
     });
-}
-
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  for (const char of line) {
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current);
-  return result;
+    return obj;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -102,7 +66,7 @@ function mapTopics(topicsStr: string): string[] {
 // ---------------------------------------------------------------------------
 
 async function syncCommand(
-  _args: string[],
+  args: string[],
   options: Record<string, unknown>,
 ): Promise<CommandResult> {
   const dryRun = !!options['dry-run'];
@@ -119,11 +83,10 @@ async function syncCommand(
   lines.push('\n  QURI Recommended Resources Import');
   lines.push(`  ${'='.repeat(40)}`);
 
+  const defaultDir = resolve(process.env.HOME ?? '.', 'Downloads');
+
   // ---- Parse recommended resources CSV ----
-  const resourcesPath = resolve(
-    process.env.HOME ?? '',
-    'Downloads/Recommended Resources-Grid view.csv',
-  );
+  const resourcesPath = args[0] || resolve(defaultDir, 'Recommended Resources-Grid view.csv');
   let resourceItems: Record<string, unknown>[] = [];
   try {
     const csv = readFileSync(resourcesPath, 'utf-8');
@@ -146,10 +109,7 @@ async function syncCommand(
   }
 
   // ---- Parse videos CSV ----
-  const videosPath = resolve(
-    process.env.HOME ?? '',
-    'Downloads/Videos-Gallery.csv',
-  );
+  const videosPath = args[1] || resolve(defaultDir, 'Videos-Gallery.csv');
   let videoItems: Record<string, unknown>[] = [];
   try {
     const csv = readFileSync(videosPath, 'utf-8');
@@ -237,13 +197,13 @@ export function getHelp(): string {
 Import QURI Resources — Import recommended reading list and videos from CSV
 
 Commands:
-  sync          Sync resources to wiki-server (default)
+  sync [resources.csv] [videos.csv]   Sync resources to wiki-server (default)
 
 Options:
   --dry-run     Preview resources without writing
 
-Expects CSV files in ~/Downloads:
-  - "Recommended Resources-Grid view.csv"
-  - "Videos-Gallery.csv"
+Default CSV paths (when no args given):
+  ~/Downloads/Recommended Resources-Grid view.csv
+  ~/Downloads/Videos-Gallery.csv
 `;
 }

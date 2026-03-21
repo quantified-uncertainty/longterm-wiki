@@ -7,7 +7,6 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  zv,
 } from "../shared/utils.js";
 
 const SyncItemSchema = z.object({
@@ -28,6 +27,25 @@ const SyncItemSchema = z.object({
 const SyncBatchSchema = z.object({
   items: z.array(SyncItemSchema).min(1).max(500),
 });
+
+type SyncItem = z.infer<typeof SyncItemSchema>;
+
+function toRow(item: SyncItem) {
+  return {
+    entityId: item.entityId,
+    resourceId: item.resourceId ?? null,
+    title: item.title,
+    url: item.url ?? null,
+    authors: item.authors ?? null,
+    publishedDate: item.publishedDate ?? null,
+    category: item.category ?? null,
+    topics: item.topics ?? null,
+    importance: item.importance ?? null,
+    isSeminal: item.isSeminal,
+    sortOrder: item.sortOrder,
+    notes: item.notes ?? null,
+  };
+}
 
 const entityRecommendedResourcesApp = new Hono()
 
@@ -64,63 +82,49 @@ const entityRecommendedResourcesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const results = await db.transaction(async (tx) => {
-      const upserted: Array<{ id: number; title: string; created: boolean }> = [];
+    // Partition by URL presence: items with URLs can use bulk upsert,
+    // items without URLs need plain insert (partial unique index doesn't cover NULLs)
+    const withUrl = items.filter((i) => i.url);
+    const withoutUrl = items.filter((i) => !i.url);
 
-      for (const item of items) {
-        const values = {
-          entityId: item.entityId,
-          resourceId: item.resourceId ?? null,
-          title: item.title,
-          url: item.url ?? null,
-          authors: item.authors ?? null,
-          publishedDate: item.publishedDate ?? null,
-          category: item.category ?? null,
-          topics: item.topics ?? null,
-          importance: item.importance ?? null,
-          isSeminal: item.isSeminal,
-          sortOrder: item.sortOrder,
-          notes: item.notes ?? null,
-        };
+    const upserted = await db.transaction(async (tx) => {
+      const ids: number[] = [];
 
-        let row: { id: number };
-
-        if (item.url) {
-          // URL present — use upsert on the partial unique index
-          [row] = await tx
-            .insert(entityRecommendedResources)
-            .values(values)
-            .onConflictDoUpdate({
-              target: [entityRecommendedResources.entityId, entityRecommendedResources.url],
-              set: {
-                title: sql`EXCLUDED.title`,
-                authors: sql`EXCLUDED.authors`,
-                publishedDate: sql`EXCLUDED.published_date`,
-                category: sql`EXCLUDED.category`,
-                topics: sql`EXCLUDED.topics`,
-                importance: sql`EXCLUDED.importance`,
-                isSeminal: sql`EXCLUDED.is_seminal`,
-                sortOrder: sql`EXCLUDED.sort_order`,
-                notes: sql`EXCLUDED.notes`,
-                resourceId: sql`EXCLUDED.resource_id`,
-              },
-            })
-            .returning({ id: entityRecommendedResources.id });
-        } else {
-          // No URL — plain insert (partial index doesn't cover NULL urls)
-          [row] = await tx
-            .insert(entityRecommendedResources)
-            .values(values)
-            .returning({ id: entityRecommendedResources.id });
-        }
-
-        upserted.push({ id: row.id, title: item.title, created: true });
+      if (withUrl.length > 0) {
+        const rows = await tx
+          .insert(entityRecommendedResources)
+          .values(withUrl.map(toRow))
+          .onConflictDoUpdate({
+            target: [entityRecommendedResources.entityId, entityRecommendedResources.url],
+            set: {
+              title: sql`EXCLUDED.title`,
+              authors: sql`EXCLUDED.authors`,
+              publishedDate: sql`EXCLUDED.published_date`,
+              category: sql`EXCLUDED.category`,
+              topics: sql`EXCLUDED.topics`,
+              importance: sql`EXCLUDED.importance`,
+              isSeminal: sql`EXCLUDED.is_seminal`,
+              sortOrder: sql`EXCLUDED.sort_order`,
+              notes: sql`EXCLUDED.notes`,
+              resourceId: sql`EXCLUDED.resource_id`,
+            },
+          })
+          .returning({ id: entityRecommendedResources.id });
+        ids.push(...rows.map((r) => r.id));
       }
 
-      return upserted;
+      if (withoutUrl.length > 0) {
+        const rows = await tx
+          .insert(entityRecommendedResources)
+          .values(withoutUrl.map(toRow))
+          .returning({ id: entityRecommendedResources.id });
+        ids.push(...rows.map((r) => r.id));
+      }
+
+      return ids;
     });
 
-    return c.json({ results, total: results.length });
+    return c.json({ total: upserted.length });
   });
 
 export const entityRecommendedResourcesRoute = entityRecommendedResourcesApp;
