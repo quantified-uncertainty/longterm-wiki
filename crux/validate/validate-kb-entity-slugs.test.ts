@@ -182,6 +182,66 @@ describe("scanFactbaseRefs", () => {
     expect(result.entityStableIds.size).toBe(0);
     expect(result.totalRefs).toBe(0);
   });
+
+  it("does not extract nested type: values as entity type from entity: format", () => {
+    // Real-world pattern: entity: format files have nested `type: range` / `type: number`
+    // inside structured fact values. These must NOT be extracted as the entity type.
+    writeFileSync(
+      join(fixture.thingsDir, "quri.yaml"),
+      [
+        "entity: xQ1rT2sU3v",
+        "facts:",
+        "  - id: f_hc1234567a",
+        "    property: headcount",
+        "    value:",
+        "      type: range",
+        "      low: 3",
+        "      high: 5",
+        "    asOf: 2026-03",
+        "  - id: f_fr1234567a",
+        "    property: funding-received",
+        "    value:",
+        "      type: number",
+        "      value: 650000",
+        "      unit: USD",
+        "",
+      ].join("\n")
+    );
+
+    const result = scanFactbaseRefs(fixture.thingsDir);
+    expect(result.entityStableIds.size).toBe(1);
+    const info = result.entityStableIds.get("xQ1rT2sU3v");
+    expect(info).toBeDefined();
+    expect(info!.slug).toBe("quri");
+    // entity: format should NOT have type extracted from nested value types
+    expect(info!.type).toBeUndefined();
+    expect(info!.name).toBeUndefined();
+  });
+
+  it("extracts name and type from thing: format files", () => {
+    writeFileSync(
+      join(fixture.thingsDir, "test-thing.yaml"),
+      [
+        "thing:",
+        "  id: aB3cD4eF5g",
+        "  slug: test-thing",
+        "  type: organization",
+        "  name: Test Thing Org",
+        "facts:",
+        "  - id: f_abc1234567",
+        "    property: revenue",
+        "    value: 1e6",
+        "",
+      ].join("\n")
+    );
+
+    const result = scanFactbaseRefs(fixture.thingsDir);
+    expect(result.entityStableIds.size).toBe(1);
+    const info = result.entityStableIds.get("aB3cD4eF5g");
+    expect(info).toBeDefined();
+    expect(info!.type).toBe("organization");
+    expect(info!.name).toBe("Test Thing Org");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -238,6 +298,27 @@ describe("fixMissingEntities", () => {
     const fixed = fixMissingEntities(fixture.entitiesDir, []);
     expect(fixed).toBe(0);
   });
+
+  it("preserves YAML comments when appending entries", () => {
+    const originalContent =
+      "# Organizations Entities\n# Auto-generated\n\n- id: existing-org\n  stableId: ExStBlId02\n  type: organization\n  title: Existing Org\n";
+    writeFileSync(join(fixture.entitiesDir, "organizations.yaml"), originalContent);
+
+    fixMissingEntities(fixture.entitiesDir, [
+      { stableId: "NewOrgId001", slug: "new-org", entityType: "organization", name: "New Org" },
+    ]);
+
+    const result = readFileSync(join(fixture.entitiesDir, "organizations.yaml"), "utf-8");
+    // Comments must be preserved
+    expect(result).toContain("# Organizations Entities");
+    expect(result).toContain("# Auto-generated");
+    // Original and new entries must both be present
+    expect(result).toContain("ExStBlId02");
+    expect(result).toContain("NewOrgId001");
+    // Must be valid YAML that parses as an array
+    const parsed = parseYaml(result) as Array<Record<string, unknown>>;
+    expect(parsed.length).toBe(2);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -283,7 +364,7 @@ describe("validateKbEntitySlugs", () => {
     expect(result.uniqueMissing.has("aBcDeFgHiJ")).toBe(true);
   });
 
-  it("fixes missing entries with --fix mode", () => {
+  it("fixes missing entries with --fix mode (thing: format)", () => {
     writeFileSync(
       join(fixture.thingsDir, "test-org.yaml"),
       "thing:\n  id: TestOrg001\n  slug: test-org\n  type: organization\n  name: Test Organization\nfacts:\n  - id: f_rev1234567\n    property: revenue\n    value: 1e6\n"
@@ -292,6 +373,60 @@ describe("validateKbEntitySlugs", () => {
     const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, true);
     expect(result.stats.fixedCount).toBe(1);
     expect(existsSync(join(fixture.entitiesDir, "organizations.yaml"))).toBe(true);
+
+    // Verify the created entry has correct type from thing: format
+    const content = readFileSync(join(fixture.entitiesDir, "organizations.yaml"), "utf-8");
+    const parsed = parseYaml(content) as Array<Record<string, unknown>>;
+    expect(parsed[0].type).toBe("organization");
+  });
+
+  it("fixes missing entries with --fix mode (entity: format)", () => {
+    writeFileSync(
+      join(fixture.thingsDir, "test-entity.yaml"),
+      "entity: TestEnt001\nfacts:\n  - id: f_rev1234567\n    property: revenue\n    value: 1e6\n"
+    );
+
+    const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, true);
+    expect(result.stats.fixedCount).toBe(1);
+    // entity: format has no type metadata, so it defaults to "concept"
+    const entry = result.uniqueMissing.get("TestEnt001");
+    expect(entry).toBeDefined();
+    expect(entry!.entityType).toBe("concept");
+  });
+
+  it("does not misidentify nested type: values as entity type", () => {
+    // entity: format file with nested `type: range` in fact values
+    writeFileSync(
+      join(fixture.entitiesDir, "orgs.yaml"),
+      "- id: test-org\n  stableId: xQ1rT2sU3v\n  type: organization\n  title: Test Org\n"
+    );
+    writeFileSync(
+      join(fixture.thingsDir, "test-org.yaml"),
+      [
+        "entity: xQ1rT2sU3v",
+        "facts:",
+        "  - id: f_hc1234567a",
+        "    property: headcount",
+        "    value:",
+        "      type: range",
+        "      low: 3",
+        "      high: 5",
+        "  - id: f_emp1234567",
+        "    property: employed-by",
+        "    value: !ref MissngRef0",
+        "",
+      ].join("\n")
+    );
+
+    const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, false);
+    // xQ1rT2sU3v is in registry, so only MissngRef0 should be missing
+    expect(result.uniqueMissing.size).toBe(1);
+    expect(result.uniqueMissing.has("MissngRef0")).toBe(true);
+    // The missing ref should NOT have type "range" from the nested value
+    const missing = result.uniqueMissing.get("MissngRef0")!;
+    expect(missing.entityType).not.toBe("range");
+    // It should default to "concept" since entity: format has no type metadata
+    expect(missing.entityType).toBe("concept");
   });
 });
 

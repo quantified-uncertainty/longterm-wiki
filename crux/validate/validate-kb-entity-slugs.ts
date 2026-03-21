@@ -28,7 +28,7 @@
  *   1 = Missing entries found (and not all fixed)
  */
 
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, appendFileSync, existsSync } from "node:fs";
 import { join, extname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
@@ -95,6 +95,7 @@ export function loadEntityRegistry(
       (f) => extname(f) === ".yaml" || extname(f) === ".yml"
     );
   } catch {
+    // Expected: directory may not exist in test fixtures or fresh checkouts
     return { stableIds, slugToStableId, stableIdToSlug };
   }
 
@@ -104,6 +105,7 @@ export function loadEntityRegistry(
     try {
       parsed = parseYaml(content);
     } catch {
+      // Malformed YAML — skip this file and continue with others
       continue;
     }
 
@@ -215,6 +217,7 @@ export function scanFactbaseRefs(thingsDir: string): {
   try {
     entries = readdirSync(thingsDir);
   } catch {
+    // Expected: directory may not exist in test fixtures or fresh checkouts
     return { referencedStableIds, entityStableIds, totalRefs };
   }
 
@@ -231,10 +234,19 @@ export function scanFactbaseRefs(thingsDir: string): {
     if (entityId) {
       let name: string | undefined;
       let type: string | undefined;
-      const nameMatch = content.match(/^\s+name:\s*(.+)/m);
-      if (nameMatch) name = nameMatch[1].trim().replace(/^["']|["']$/g, "");
-      const typeMatch = content.match(/^\s+type:\s*(\S+)/m);
-      if (typeMatch) type = typeMatch[1];
+
+      // Only extract name/type from thing: format files (which have top-level
+      // metadata fields). For entity: format files (all current production files),
+      // indented name:/type: fields belong to nested fact values (e.g. type: range,
+      // type: number) and would produce wrong entity types.
+      const isThingFormat = /^thing:/m.test(content);
+      if (isThingFormat) {
+        const nameMatch = content.match(/^\s+name:\s*(.+)/m);
+        if (nameMatch) name = nameMatch[1].trim().replace(/^["']|["']$/g, "");
+        const typeMatch = content.match(/^\s+type:\s*(\S+)/m);
+        if (typeMatch) type = typeMatch[1];
+      }
+
       entityStableIds.set(entityId, { slug, name, type });
     }
 
@@ -322,7 +334,7 @@ export function fixMissingEntities(
       const parsed = parseYaml(content);
       if (Array.isArray(parsed)) existing = parsed;
     } catch {
-      // File doesn't exist or is unparseable
+      // File doesn't exist yet or is unparseable — will be created below
     }
 
     const existingStableIds = new Set(
@@ -342,14 +354,23 @@ export function fixMissingEntities(
 
     if (newEntries.length === 0) continue;
 
-    const combined = [...existing, ...newEntries];
-    const yamlContent = stringifyYaml(combined, {
+    // Append new entries as raw YAML to preserve existing comments and formatting.
+    // stringify() strips YAML comments during roundtrip, so we avoid re-serializing
+    // the entire file.
+    const newYaml = stringifyYaml(newEntries, {
       lineWidth: 0,
       defaultStringType: "PLAIN",
       defaultKeyType: "PLAIN",
     });
 
-    writeFileSync(filePath, yamlContent);
+    if (existsSync(filePath)) {
+      // Ensure we start on a new line before appending
+      const existingContent = readFileSync(filePath, "utf-8");
+      const separator = existingContent.endsWith("\n") ? "" : "\n";
+      appendFileSync(filePath, separator + newYaml);
+    } else {
+      writeFileSync(filePath, newYaml);
+    }
     fixed += newEntries.length;
   }
 
@@ -491,9 +512,11 @@ function main(): void {
     );
 
     if (uniqueMissing.size > 0) {
-      const remaining = [...uniqueMissing.values()];
+      // Skip the missing-entries list when all were successfully fixed
+      const allFixed = fixMode && stats.fixedCount === uniqueMissing.size;
 
-      if (remaining.length > 0) {
+      if (!allFixed) {
+        const remaining = [...uniqueMissing.values()];
         const label = fixMode ? "Remaining" : "Missing";
         console.log(
           `${c.red}${c.bold}${label} entity registry entries:${c.reset}`
