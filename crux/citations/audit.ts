@@ -19,7 +19,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { extractCitationsFromContent } from '../lib/citation/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
 import { DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';

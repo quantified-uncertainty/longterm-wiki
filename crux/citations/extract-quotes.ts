@@ -19,10 +19,8 @@ import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import {
-  extractCitationsFromContent,
-  extractClaimSentence,
-} from '../lib/citation/citation-archive.ts';
+import { extractClaimSentence } from '../lib/citation/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
 import { fetchSource } from '../lib/search/source-fetcher.ts';
 import {
   getQuote,

@@ -11,8 +11,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildAuditorSourceCache, citationAuditPhase } from './citation-audit.ts';
-import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation/citation-auditor.ts';
-import type { AuditResult } from '../../../lib/citation/citation-auditor.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation/citation-service.ts';
+import type { AuditResult } from '../../../lib/citation/citation-service.ts';
 import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
 import type { ResearchResult, PipelineOptions, PageData } from '../types.ts';
 

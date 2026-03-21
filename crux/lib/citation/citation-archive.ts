@@ -377,7 +377,7 @@ export function extractClaimSentence(body: string, footnoteNum: number): string 
 // Content fetching — delegates to source-fetcher.ts (single fetch layer)
 // ---------------------------------------------------------------------------
 
-export interface FetchResult {
+interface FetchResult {
   httpStatus: number;
   pageTitle: string | null;
   contentSnippet: string | null;
@@ -428,7 +428,7 @@ function sourceToFetchResult(source: FetchedSource): FetchResult {
  * Returns a FetchResult for backward compatibility with callers that
  * use the legacy interface.
  */
-export async function fetchCitationUrl(url: string): Promise<FetchResult> {
+async function fetchCitationUrl(url: string): Promise<FetchResult> {
   const source = await fetchSource({ url, extractMode: 'full' });
   return sourceToFetchResult(source);
 }

@@ -3,7 +3,7 @@
  */
 
 import type { SourceCacheEntry } from '../../lib/content/section-writer.ts';
-import type { AuditResult } from '../../lib/citation/citation-auditor.ts';
+import type { AuditResult } from '../../lib/citation/citation-service.ts';
 
 export interface TierConfig {
   name: string;
