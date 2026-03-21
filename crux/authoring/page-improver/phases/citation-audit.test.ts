@@ -200,32 +200,32 @@ describe('citationAuditPhase', () => {
     expect(getLogMessages().some(msg => msg.includes('Citation audit passed'))).toBe(true);
   });
 
-  it('logs [WARNING] in advisory mode when audit fails', async () => {
+  it('logs [GATE] by default when audit fails (gate is default-on)', async () => {
     vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
       summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
       pass: false,
     }));
 
-    const options: PipelineOptions = {};  // no citationGate → advisory mode
-    await citationAuditPhase(mockPage, 'content', undefined, options);
-
-    const messages = getLogMessages();
-    expect(messages.some(msg => msg.includes('[WARNING]'))).toBe(true);
-    expect(messages.some(msg => msg.includes('[GATE]'))).toBe(false);
-  });
-
-  it('logs [GATE] in gate mode when audit fails', async () => {
-    vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
-      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
-      pass: false,
-    }));
-
-    const options: PipelineOptions = { citationGate: true };
+    const options: PipelineOptions = {};  // default → gate mode
     await citationAuditPhase(mockPage, 'content', undefined, options);
 
     const messages = getLogMessages();
     expect(messages.some(msg => msg.includes('[GATE]'))).toBe(true);
     expect(messages.some(msg => msg.includes('[WARNING]'))).toBe(false);
+  });
+
+  it('logs [WARNING] in advisory mode when audit fails (--skip-citation-gate)', async () => {
+    vi.mocked(auditCitations).mockResolvedValueOnce(makeAuditResult({
+      summary: { total: 2, verified: 1, failed: 1, misattributed: 0, unchecked: 0, unsourcedTableCells: 0 },
+      pass: false,
+    }));
+
+    const options: PipelineOptions = { citationGate: false };  // --skip-citation-gate
+    await citationAuditPhase(mockPage, 'content', undefined, options);
+
+    const messages = getLogMessages();
+    expect(messages.some(msg => msg.includes('[WARNING]'))).toBe(true);
+    expect(messages.some(msg => msg.includes('[GATE]'))).toBe(false);
   });
 
   it('passes source cache to auditCitations when research includes sourceCache', async () => {

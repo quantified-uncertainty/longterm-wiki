@@ -127,7 +127,8 @@ export interface PipelineOptions {
   /**
    * When true, the citation audit phase blocks --apply when the verified
    * fraction falls below the passThreshold (gate mode).
-   * Default: false (advisory mode — warnings logged, apply not blocked).
+   * Default: true (gate mode — apply blocked on audit failure).
+   * Use --skip-citation-gate to disable.
    */
   citationGate?: boolean;
   /**

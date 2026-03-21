@@ -274,10 +274,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
             r.auditResult = await citationAuditPhase(page, r.improvedContent!, r.research, options);
           } catch (err: unknown) {
             const error = err instanceof Error ? err : new Error(String(err));
-            if (options.citationGate) {
-              throw new Error(`Citation audit failed with --citation-gate: ${error.message}`);
+            if (options.citationGate !== false) {
+              throw new Error(`Citation audit error (use --skip-citation-gate to bypass): ${error.message}`);
             }
-            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing without audit`);
+            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing (--skip-citation-gate)`);
           }
         }
         break;
@@ -363,21 +363,22 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       console.log(`Unsourced table cells: ${unsourcedTableCells} (numeric claims without citations)`);
     }
     if (!r.auditResult.pass) {
-      if (options.citationGate && dryRun) {
-        console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
-      } else if (options.citationGate && !dryRun) {
-        console.log(`⚠ Citation audit FAILED — blocking apply (--citation-gate)`);
+      const gateActive = options.citationGate !== false;
+      if (gateActive && dryRun) {
+        console.log(`⚠ Citation audit FAILED (would block --apply; use --skip-citation-gate to bypass)`);
+      } else if (gateActive && !dryRun) {
+        console.log(`⚠ Citation audit FAILED — blocking apply`);
       } else {
-        console.log(`⚠ Citation audit FAILED (advisory)`);
+        console.log(`⚠ Citation audit FAILED (gate disabled via --skip-citation-gate)`);
       }
     }
   }
 
-  // Gate mode: abort --apply when citation audit fails
-  if (options.citationGate && !dryRun && r.auditResult && !r.auditResult.pass) {
+  // Gate mode (default): abort --apply when citation audit fails
+  if (options.citationGate !== false && !dryRun && r.auditResult && !r.auditResult.pass) {
     const auditPath = path.join(TEMP_DIR, page.id, 'citation-audit.json');
-    console.error('\nApply blocked: citation audit failed and --citation-gate is set.');
-    console.error(`Review ${auditPath} for per-citation details.`);
+    console.error('\nApply blocked: citation audit failed.');
+    console.error(`Use --skip-citation-gate to apply anyway, or review ${auditPath} for per-citation details.`);
     process.exit(1);
   }
 
