@@ -1,0 +1,35 @@
+entity: aobKGolfow
+facts:
+  - id: f_LiC4sh77MD
+    property: founded-date
+    value: "2024-02"
+    source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
+    notes: "Commission Decision of 24 January 2024; published in Official Journal 14 February 2024; entered into force 21 February 2024"
+
+  - id: f_axGtTJnm8O
+    property: headquarters
+    value: "Brussels, Belgium"
+    source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+    notes: "Part of DG CNECT (Communications Networks, Content and Technology) within the European Commission"
+
+  - id: f_uRZtWLDynr
+    property: headcount
+    value: 140
+    asOf: 2025-12
+    source: https://www.euronews.com/next/2024/02/01/commissions-staffing-and-financing-of-ai-office-raises-eyebrows-in-capitals
+    notes: "Target of 140 employees; 60 existing Commission staff plus 80 new positions to be filled by end of 2025"
+
+  - id: f_yhq1V8cJkV
+    property: description
+    value: >-
+      The European Commission's dedicated office for AI governance, responsible for enforcing
+      the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI
+      policy. Consists of 6 units and 2 advisors. Part of DG CNECT within the Commission.
+    asOf: 2025-12
+    source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+
+  - id: f_EEhxxl3aOV
+    property: legal-structure
+    value: "EU Commission body (within DG CNECT)"
+    source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
+    notes: "Established by Commission Decision; funded through reshuffled Digital Europe Programme budget"

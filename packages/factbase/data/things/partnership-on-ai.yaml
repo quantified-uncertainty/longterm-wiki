@@ -1,0 +1,46 @@
+entity: lG1LEx80wg
+facts:
+  - id: f_VNbbMsi9Ep
+    property: founded-date
+    value: "2016-09"
+    source: https://en.wikipedia.org/wiki/Partnership_on_AI
+    notes: "Publicly announced September 28, 2016 by Amazon, Facebook, Google, DeepMind, Microsoft, and IBM"
+
+  - id: f_Ex1wQm9crb
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://www.cbinsights.com/company/partnership-on-ai
+    notes: "2261 Market Street, San Francisco"
+
+  - id: f_k2lCcbTk2W
+    property: headcount
+    value: 68
+    asOf: 2026-02
+    source: https://www.cbinsights.com/company/partnership-on-ai
+    notes: "Approximately 68 employees across 5 continents"
+
+  - id: f_WmbLSGpoGQ
+    property: description
+    value: >-
+      Multi-stakeholder nonprofit with 126+ partner organizations from academia, civil society,
+      and industry in 16 countries. Develops best practices and frameworks for responsible AI
+      development, with major workstreams on synthetic media, AI and labor, and safety.
+    asOf: 2025-12
+    source: https://partnershiponai.org/annual-report-2024/
+
+  - id: f_ZGSnyavADq
+    property: legal-structure
+    value: "Nonprofit organization"
+    source: https://en.wikipedia.org/wiki/Partnership_on_AI
+
+  - id: f_yqYspYZcbx
+    property: founded-by
+    value:
+      - amazon
+      - meta
+      - google
+      - deepmind
+      - microsoft
+      - ibm
+    source: https://en.wikipedia.org/wiki/Partnership_on_AI
+    notes: "Originally Amazon, Facebook (now Meta), Google, DeepMind, Microsoft, and IBM; Apple joined later"

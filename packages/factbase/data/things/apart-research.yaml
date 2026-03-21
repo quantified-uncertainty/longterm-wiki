@@ -1,0 +1,43 @@
+entity: 5WqgebIWFQ
+facts:
+  - id: f_jnMi5YScdW
+    property: founded-date
+    value: "2022"
+    source: https://apartresearch.com/
+    notes: "Founded by Esben Kran; approximately 2.5 years of operation referenced as of mid-2025"
+
+  - id: f_V6B3W78L6P
+    property: headquarters
+    value: "Copenhagen, Denmark"
+    source: https://kran.ai/
+    notes: "Founder Esben Kran is based in Copenhagen"
+
+  - id: f_FDyq9EZAbL
+    property: description
+    value: >-
+      AI safety research organization that accelerates safety research through hackathons,
+      fellowships, and collaborative sprints. Has organized 55+ research sprints with 6,000+
+      participants across 200+ global locations, producing 22+ peer-reviewed publications.
+    asOf: 2025-12
+    source: https://apartresearch.com/
+
+  - id: f_UFFN6omUo5
+    property: headcount
+    value:
+      - 5
+      - 15
+    asOf: 2025-06
+    notes: "Estimate; no published source. Small core team running global hackathon programs"
+
+  - id: f_dpUiLVq0nA
+    property: legal-structure
+    value: "Nonprofit research institute"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Operates as nonprofit; exploring for-profit AI safety models as of 2025"
+
+  - id: f_LMWMZbT6an
+    property: founded-by
+    value:
+      - esben-kran
+    source: https://apartresearch.com/person/esben-kran
+    notes: "Founded by Esben Kran at age 22 after leaving grad school"
