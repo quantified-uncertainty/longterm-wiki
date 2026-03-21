@@ -578,8 +578,8 @@ const resourcesApp = new Hono()
     const prefixQuery = buildPrefixTsquery(q);
 
     const rows: ResourceSearchRow[] = prefixQuery
-      ? await rawDb.unsafe<ResourceSearchRow[]>(
-          `SELECT
+      ? await rawDb<ResourceSearchRow[]>`
+          SELECT
           id, url, title, type, summary, review, abstract,
           key_points, publication_id, authors, published_date,
           tags, local_filename, credibility_override,
@@ -589,13 +589,11 @@ const resourcesApp = new Hono()
           type_metadata, publisher_entity_id, related_entity_ids,
           enrichment_status, enrichment_date, importance_score,
           created_at, updated_at,
-          ts_rank_cd(search_vector, to_tsquery('english', $1), 1) AS rank
+          ts_rank_cd(search_vector, to_tsquery('english', ${prefixQuery}), 1) AS rank
         FROM resources
-        WHERE search_vector @@ to_tsquery('english', $1)
+        WHERE search_vector @@ to_tsquery('english', ${prefixQuery})
         ORDER BY rank DESC
-        LIMIT $2`,
-          [prefixQuery, String(limit)],
-        )
+        LIMIT ${limit}`
       : [];
 
     return c.json({
