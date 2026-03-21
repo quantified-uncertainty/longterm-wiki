@@ -53,6 +53,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'grokipedia',
       'auto-verify-stakeholders',
       'extract-biographical-data',
+      'extract-structured-data',
     ],
     flattened: ['content'],
   },
