@@ -11,12 +11,24 @@ import type { PageData, AnalysisResult, PipelineOptions } from '../types.ts';
 import { log, getFilePath, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';
 import { parseJsonFromLlm } from './json-parsing.ts';
+import { resolveTemplate, formatTemplateForPrompt } from '../../../lib/content/page-templates.ts';
+import { getPageType } from '../../../lib/page-analysis.ts';
 
 export async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
   log('analyze', 'Starting analysis');
 
   const filePath = getFilePath(page.path);
   const currentContent = fs.readFileSync(filePath, 'utf-8');
+
+  // Resolve template for gap analysis
+  const pageType = getPageType(page);
+  const fmMatch = currentContent.match(/^---\n([\s\S]*?)\n---/);
+  const pageTemplateMatch = fmMatch?.[1]?.match(/^pageTemplate:\s*(.+)$/m);
+  const pageTemplateValue = pageTemplateMatch?.[1]?.trim().replace(/^["']|["']$/g, '');
+  const template = resolveTemplate(pageTemplateValue, pageType);
+  const templateSection = template
+    ? `\n## Template Requirements\nThis page should follow the **${template.name}** template. When analyzing gaps, check whether required sections are present.\n\n${formatTemplateForPrompt(template)}\n`
+    : '';
 
   const prompt = `Analyze this wiki page for improvement opportunities.
 
@@ -35,7 +47,7 @@ ${directions || 'No specific directions provided - do a general quality improvem
 ${currentContent}
 \`\`\`
 
-## Analysis Required
+${templateSection}## Analysis Required
 
 Analyze the page and output a JSON object with:
 
