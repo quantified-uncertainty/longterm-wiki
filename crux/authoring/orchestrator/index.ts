@@ -344,9 +344,7 @@ export async function runOrchestratorCreate(
           console.log(`  [${simPercent}%] ${match.title} — ${match.path}`);
         }
         if (exists) {
-          console.log('\nA page with this name likely already exists.');
-          console.log('   Use --force to create anyway.\n');
-          process.exit(1);
+          throw new Error(`A page similar to "${topic}" already exists. Use --force to create anyway.`);
         }
         console.log('\n   Partial matches only. Proceeding...\n');
       } else {
@@ -461,9 +459,13 @@ export async function runOrchestratorCreate(
       const draftPath = path.join(draftDir, 'final.mdx');
       fs.writeFileSync(draftPath, finalContent);
 
-      // Create a minimal context that deployment needs
-      const deployCtx = { getTopicDir: () => draftDir };
-      const deployResult = deployToDestination(topic, destPath, deployCtx as never);
+      // Build the context that deployToDestination requires
+      const deployCtx = {
+        ROOT,
+        getTopicDir: () => draftDir,
+        ensureDir: (dir: string) => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); },
+      };
+      const deployResult = deployToDestination(topic, destPath, deployCtx);
 
       if (deployResult.success) {
         console.log(`Deployed to: ${deployResult.deployedTo}`);
