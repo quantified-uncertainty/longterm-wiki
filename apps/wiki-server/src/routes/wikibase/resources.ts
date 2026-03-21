@@ -298,7 +298,7 @@ async function upsertResource(
       .values(
         d.citedBy.map((pageId) => ({
           resourceId: d.id,
-          pageIdInt: citedByIntIdMap.get(pageId)!,
+          pageIdInt: citedByIntIdMap.get(pageId) as number,
         }))
       )
       .onConflictDoNothing();
