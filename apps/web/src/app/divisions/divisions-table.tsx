@@ -4,6 +4,11 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
 import { titleCase } from "@/components/wiki/factbase/format";
+import {
+  DIVISION_TYPE_COLORS,
+  DIVISION_TYPE_LABELS,
+  STATUS_COLORS,
+} from "./division-constants";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -25,35 +30,6 @@ export interface TypeSummary {
   count: number;
 }
 
-// ── Color maps (duplicated from division-data to avoid importing server code) ──
-
-const DIVISION_TYPE_COLORS: Record<string, string> = {
-  fund: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  team: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  department:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  lab: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "program-area":
-    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-};
-
-const DIVISION_TYPE_LABELS: Record<string, string> = {
-  fund: "Fund",
-  team: "Team",
-  department: "Department",
-  lab: "Lab",
-  "program-area": "Program Area",
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  active:
-    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  inactive:
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  dissolved:
-    "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-};
-
 // ── Component ──────────────────────────────────────────────────────────
 
 export function DivisionsTable({
@@ -61,14 +37,12 @@ export function DivisionsTable({
   typeSummary,
   totalDivisions,
   uniqueOrgs,
-  activeCount,
   divisionsWithData,
 }: {
   rows: DivisionRow[];
   typeSummary: TypeSummary[];
   totalDivisions: number;
   uniqueOrgs: number;
-  activeCount: number;
   divisionsWithData: number;
 }) {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -116,7 +90,7 @@ export function DivisionsTable({
     },
     { label: "Total", value: totalDivisions.toLocaleString() },
     { label: "Organizations", value: String(uniqueOrgs) },
-    { label: "Types", value: String(typeSummary.length) },
+    { label: "Types", value: String(filteredTypeSummary.length) },
   ];
 
   return (
@@ -140,6 +114,7 @@ export function DivisionsTable({
             {/* "All" badge */}
             <button
               type="button"
+              aria-pressed={selectedType === null}
               onClick={() => setSelectedType(null)}
               className={`rounded-lg border px-4 py-2 flex items-center gap-2 transition-all cursor-pointer ${
                 selectedType === null
@@ -158,6 +133,7 @@ export function DivisionsTable({
               <button
                 type="button"
                 key={t.type}
+                aria-pressed={selectedType === t.type}
                 onClick={() =>
                   setSelectedType(selectedType === t.type ? null : t.type)
                 }

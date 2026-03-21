@@ -8,8 +8,8 @@ import {
   resolveEntityLink,
   getDivisionHref,
   getDivisionAltKeys,
-  DIVISION_TYPE_LABELS,
 } from "./[slug]/division-data";
+import { DIVISION_TYPE_LABELS } from "./division-constants";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { DivisionsTable, type DivisionRow, type TypeSummary } from "./divisions-table";
 
@@ -47,12 +47,21 @@ function divisionHasData(record: import("@/data/factbase").KBRecordEntry): boole
   }
 
   // Check grants (via parent org)
+  // Build the set of funding-program keys that belong to this division
+  // (grant.programId -> funding program -> funding program.divisionId -> division)
+  const divisionProgramKeys = new Set<string>();
+  for (const p of allPrograms) {
+    const divId = p.fields.divisionId;
+    if (typeof divId === "string" && allDivKeys.has(divId)) {
+      divisionProgramKeys.add(p.key);
+    }
+  }
   const parentGrants = getKBRecords(division.ownerEntityId, "grants");
   const allDivKeysLower = new Set([...allDivKeys].map((k) => k.toLowerCase()));
   const divisionNameLower = division.name.toLowerCase();
   for (const g of parentGrants) {
     const programId = g.fields.programId as string | undefined;
-    if (programId && allDivKeys.has(programId)) return true;
+    if (programId && divisionProgramKeys.has(programId)) return true;
     const gDiv = g.fields.divisionName as string | undefined;
     const gProgram = g.fields.program as string | undefined;
     if (gDiv && (gDiv.toLowerCase() === divisionNameLower || allDivKeysLower.has(gDiv.toLowerCase()))) return true;
@@ -106,7 +115,6 @@ export default function DivisionsPage() {
   // Summary stats
   const totalDivisions = rows.length;
   const uniqueOrgs = new Set(rows.map((r) => r.parentName)).size;
-  const activeCount = rows.filter((r) => r.status === "active").length;
   const divisionsWithData = rows.filter((r) => r.hasData).length;
 
   // Type breakdown (across all divisions)
@@ -139,7 +147,6 @@ export default function DivisionsPage() {
         typeSummary={typeSummary}
         totalDivisions={totalDivisions}
         uniqueOrgs={uniqueOrgs}
-        activeCount={activeCount}
         divisionsWithData={divisionsWithData}
       />
     </div>
