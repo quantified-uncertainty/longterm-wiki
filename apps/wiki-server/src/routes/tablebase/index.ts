@@ -22,3 +22,6 @@ export { recordVerificationsRoute, type RecordVerificationsRoute } from "./recor
 export { thingsRoute, type ThingsRoute } from "./things.js";
 export { researchAreasRoute, type ResearchAreasRoute } from "./research-areas.js";
 export { policyStakeholdersRoute, type PolicyStakeholdersRoute } from "./policy-stakeholders.js";
+export { entityEventsRoute, type EntityEventsRoute } from "./entity-events.js";
+export { entityAssessmentsRoute, type EntityAssessmentsRoute } from "./entity-assessments.js";
+export { publicationsRoute, type PublicationsRoute } from "./publications.js";
