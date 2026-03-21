@@ -27,7 +27,6 @@ import { RelatedPages } from "@/components/RelatedPages";
 import {
   StatCard,
   SectionHeader,
-  PeopleTable,
   field,
   safeHref,
 } from "./org-shared";
@@ -73,6 +72,15 @@ import {
 
 // Charts
 import { ChartsSection } from "./charts-section";
+
+// People section — PG personnel data integration
+import {
+  fetchPgPersonnel,
+  pgPersonnelToEntries,
+  mergePgPersonnel,
+  PeopleSection,
+  type PersonEntry,
+} from "./people-section";
 
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
@@ -229,25 +237,21 @@ export default async function OrgProfilePage({
 
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
 
-  // ── People tab: key personnel + board of directors ──
+  // ── People tab: key personnel + board + PG personnel data ──
+  // Fetch PG personnel data (ISR-compatible, returns [] if unavailable)
+  const pgPersonnelRows = await fetchPgPersonnel(entity.id);
+  const pgEntries = pgPersonnelToEntries(pgPersonnelRows);
+
   const hasPeopleData =
-    data.sortedPersons.length > 0 || data.boardMembers.length > 0;
+    data.sortedPersons.length > 0 ||
+    data.boardMembers.length > 0 ||
+    pgEntries.length > 0;
 
   if (hasPeopleData) {
-    // Build unified people list from key-persons + board members, deduplicating
-    const peopleByName = new Map<string, {
-      name: string;
-      title?: string;
-      slug?: string;
-      entityType?: string;
-      isFounder: boolean;
-      isBoard: boolean;
-      isCurrent: boolean;
-      start?: string;
-      end?: string;
-    }>();
+    // Build unified people list from key-persons + board members + PG personnel
+    const peopleByName = new Map<string, PersonEntry>();
 
-    // Add key persons first
+    // Add key persons first (from FactBase)
     const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
@@ -292,6 +296,7 @@ export default async function OrgProfilePage({
         isCurrent: !person.fields.end,
         start: field(person, "start"),
         end: field(person, "end"),
+        source: "factbase",
       });
     }
 
@@ -330,9 +335,13 @@ export default async function OrgProfilePage({
           isCurrent: !bm.departed,
           start: bm.appointed ?? undefined,
           end: bm.departed ?? undefined,
+          source: "factbase",
         });
       }
     }
+
+    // Merge PG personnel data (supplements FactBase data, deduplicates by slug/name)
+    mergePgPersonnel(peopleByName, pgEntries);
 
     const allPeople = [...peopleByName.values()].sort((a, b) => {
       // Current before former
@@ -347,12 +356,7 @@ export default async function OrgProfilePage({
       id: "people",
       label: "People",
       count: allPeople.length,
-      content: (
-        <section>
-          <SectionHeader title="People" count={allPeople.length} />
-          <PeopleTable people={allPeople} />
-        </section>
-      ),
+      content: <PeopleSection people={allPeople} />,
     });
   }
 
