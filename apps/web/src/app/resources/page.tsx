@@ -53,6 +53,8 @@ export default function ResourcesPage() {
   const withPublication = rows.filter((r) => r.publicationName != null).length;
   const withCredibility = rows.filter((r) => r.credibility != null).length;
   const citedByPages = rows.filter((r) => r.citingPageCount > 0).length;
+  const withSummaries = resources.filter((r) => r.summary && r.summary.trim() !== "").length;
+  const enriched = resources.filter((r) => r.enrichment_status === "enriched").length;
 
   const stats = [
     { label: "Total Resources", value: String(rows.length) },
@@ -63,6 +65,8 @@ export default function ResourcesPage() {
     { label: "With Publication", value: String(withPublication) },
     { label: "With Credibility", value: String(withCredibility) },
     { label: "Cited by Pages", value: String(citedByPages) },
+    { label: "With Summaries", value: String(withSummaries) },
+    { label: "Enriched", value: String(enriched) },
   ];
 
   return (
