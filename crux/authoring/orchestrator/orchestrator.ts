@@ -35,7 +35,7 @@ import {
 } from './types.ts';
 import { renumberFootnotes } from '../../lib/content/section-splitter.ts';
 import { buildToolDefinitions, buildToolHandlers, wrapWithTracking, extractQualityMetrics } from './tools/index.ts';
-import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
+import { buildImproveSystemPrompt, buildCreateSystemPrompt, buildRefinementPrompt } from './prompts.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
 
 const log = createPhaseLogger();
@@ -313,7 +313,7 @@ export async function runOrchestrator(
   const directions = options.directions || '';
   const orchestratorModel = options.orchestratorModel || MODELS.opus;
   const writerModel = options.writerModel || MODELS.sonnet;
-  const budget = TIER_BUDGETS[tier];
+  const budget = options.budgetOverride || TIER_BUDGETS[tier];
   const signal = options.signal;
 
   log('orchestrator', `Starting orchestrator for "${page.title}"`);
@@ -328,7 +328,10 @@ export async function runOrchestrator(
 
   const tracker = new CostTracker();
 
+  const mode = options.mode || 'improve';
+
   const ctx: OrchestratorContext = {
+    mode,
     page,
     filePath,
     currentContent: content,
@@ -356,8 +359,18 @@ export async function runOrchestrator(
 
   // ── Build prompts ─────────────────────────────────────────────────────────
 
-  const systemPrompt = buildImproveSystemPrompt(ctx);
-  const userMessage = `Please improve the wiki page "${page.title}" (ID: ${page.id}). Start by reading the page and assessing its current state.`;
+  const systemPrompt = mode === 'create'
+    ? buildCreateSystemPrompt(
+        options.topic || page.title,
+        page.entityType || 'concept',
+        budget,
+        directions,
+      )
+    : buildImproveSystemPrompt(ctx);
+
+  const userMessage = mode === 'create'
+    ? `Create a comprehensive, well-sourced wiki page about "${options.topic || page.title}". Start by using run_research to gather sources, then split_into_sections to see the template structure, then rewrite each section with real citations from your research.`
+    : `Please improve the wiki page "${page.title}" (ID: ${page.id}). Start by reading the page and assessing its current state.`;
 
   // ── Run main agent loop ───────────────────────────────────────────────────
 
