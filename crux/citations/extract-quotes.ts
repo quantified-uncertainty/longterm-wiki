@@ -22,15 +22,9 @@ import { parseCliArgs } from '../lib/cli.ts';
 import {
   extractCitationsFromContent,
   extractClaimSentence,
-  fetchCitationUrl,
-  saveFetchResultToPostgres,
 } from '../lib/citation/citation-archive.ts';
+import { fetchSource } from '../lib/search/source-fetcher.ts';
 import {
-  getCachedContent,
-  setCachedContent,
-} from '../lib/citation/citation-content-cache.ts';
-import {
-  getCitationContentByUrl,
   getQuote,
   getQuotesByPage,
   upsertCitationQuote,
@@ -52,56 +46,20 @@ function isBookReference(footnoteText: string): boolean {
 }
 
 /**
- * Get full-text content for a URL using multi-tier cache:
- *   1. In-memory cache (session-level, fast)
- *   2. PostgreSQL (cross-environment, durable)
- *   3. Network fetch (slowest, writes back to both caches)
+ * Get full-text content for a URL.
+ *
+ * Delegates to source-fetcher which handles multi-tier caching
+ * (session → PG → network) and writes back to both caches automatically.
+ *
+ * Returns both the content text and the source title (used for quote extraction).
  */
-async function getSourceText(
+async function getSourceContent(
   url: string,
-  _pageId: string,
-  _footnote: number,
-): Promise<string | null> {
-  // Tier 1: In-memory cache (session-level)
-  const cached = getCachedContent(url);
-  if (cached?.fullText) {
-    return cached.fullText;
-  }
-
-  // Tier 2: PostgreSQL (cross-environment cache)
-  const pgResult = await getCitationContentByUrl(url);
-  if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
-    // Store in memory cache so subsequent calls within this session are fast
-    setCachedContent(url, {
-      url,
-      fetchedAt: pgResult.data.fetchedAt,
-      httpStatus: pgResult.data.httpStatus,
-      contentType: pgResult.data.contentType,
-      pageTitle: pgResult.data.pageTitle,
-      fullText: pgResult.data.fullText,
-      contentLength: pgResult.data.contentLength,
-    });
-    return pgResult.data.fullText;
-  }
-
-  // Tier 3: Network fetch
-  const result = await fetchCitationUrl(url);
-  if (result.fullText) {
-    // Write to memory cache and PG
-    setCachedContent(url, {
-      url,
-      fetchedAt: new Date().toISOString(),
-      httpStatus: result.httpStatus,
-      contentType: result.contentType,
-      pageTitle: result.pageTitle,
-      fullText: result.fullText,
-      contentLength: result.contentLength,
-    });
-    saveFetchResultToPostgres(url, result);
-    return result.fullText;
-  }
-
-  return null;
+): Promise<{ text: string | null; title: string | null }> {
+  const source = await fetchSource({ url, extractMode: 'full' });
+  const text = source.content && source.content.length > 0 ? source.content : null;
+  const title = source.title || null;
+  return { text, title };
 }
 
 // ---------------------------------------------------------------------------
@@ -185,11 +143,7 @@ export async function extractQuotesForPage(
     try {
       if (cit.url) {
         // URL-based citation — fetch and extract quote
-        const sourceText = await getSourceText(
-          cit.url,
-          pageId,
-          cit.footnote,
-        );
+        const { text: sourceText, title: fetchedTitle } = await getSourceContent(cit.url);
 
         if (sourceText && sourceText.length > 100) {
           // Use LLM to extract the supporting quote
@@ -216,10 +170,9 @@ export async function extractQuotesForPage(
           sourceLocation = 'full document (short)';
         }
 
-        // Get page title from memory cache
-        const titleCached = getCachedContent(cit.url);
-        if (titleCached?.pageTitle) {
-          sourceTitle = titleCached.pageTitle;
+        // Use the fetched title if available
+        if (fetchedTitle) {
+          sourceTitle = fetchedTitle;
         }
       } else if (isBookReference(defText)) {
         // Book/paper reference — try to find online

@@ -51,6 +51,7 @@ export function buildAuditorSourceCache(entries: SourceCacheEntry[]): SourceCach
       // are marked 'error' so the auditor classifies them as 'unchecked'
       // rather than attempting LLM verification on empty text.
       status: hasContent ? 'ok' : 'error',
+      httpStatus: hasContent ? 200 : 0,
     };
     cache.set(entry.url, fetchedSource);
   }

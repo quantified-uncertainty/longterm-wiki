@@ -17,6 +17,7 @@ function makeFetchedSource(overrides: Partial<FetchedSource> = {}): FetchedSourc
     content: 'This is the full content of the article. It has enough characters to pass the threshold easily.',
     relevantExcerpts: [],
     status: 'ok',
+    httpStatus: 200,
     ...overrides,
   };
 }

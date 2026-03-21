@@ -474,6 +474,7 @@ export async function resolveSource(
         content: '',
         relevantExcerpts: [],
         status: 'error',
+        httpStatus: 0,
       };
     }
   }
@@ -490,6 +491,7 @@ export async function resolveSource(
       content: memoryCached.fullText,
       relevantExcerpts: [],
       status: 'ok',
+      httpStatus: memoryCached.httpStatus ?? 200,
     };
   }
 
@@ -503,6 +505,7 @@ export async function resolveSource(
         content: pgResult.data.fullText,
         relevantExcerpts: [],
         status: 'ok',
+        httpStatus: pgResult.data.httpStatus ?? 200,
       };
     }
   } catch {
