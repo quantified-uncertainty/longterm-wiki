@@ -56,7 +56,8 @@ export async function deepEnrichCommand(
   }
 
   if (subcommand === 'submit' || subcommand === 'dry-run') {
-    return await submitEnrichment(limit, subcommand === 'dry-run' || dryRun);
+    const force = !!(options['force'] || options.force);
+    return await submitEnrichment(limit, subcommand === 'dry-run' || dryRun, force);
   }
 
   if (subcommand === 'download' && batchId) {
@@ -72,7 +73,7 @@ export async function deepEnrichCommand(
   }
 
   console.log(`Usage:
-  crux resources deep-enrich submit [--limit=N] [--dry-run]    Submit enrichment batch
+  crux resources deep-enrich submit [--limit=N] [--dry-run] [--force]  Submit enrichment batch
   crux resources deep-enrich status --batch-id=ID              Check batch status
   crux resources deep-enrich poll --batch-id=ID                Poll until complete, then apply
   crux resources deep-enrich download --batch-id=ID            Download and apply results`);
@@ -159,7 +160,7 @@ async function loadContentForResources(
   return contentMap;
 }
 
-async function submitEnrichment(limit: number, dryRun: boolean): Promise<CommandResult> {
+async function submitEnrichment(limit: number, dryRun: boolean, force: boolean = false): Promise<CommandResult> {
   console.log('🔬 Deep Resource Enrichment (Sonnet batch)\n');
   if (dryRun) console.log('  DRY RUN — batch will not be submitted\n');
 
@@ -182,6 +183,19 @@ async function submitEnrichment(limit: number, dryRun: boolean): Promise<Command
   // Load fetched content from citation_content table
   const contentMap = await loadContentForResources(toEnrich);
   console.log();
+
+  // Guardrail: warn if content hit rate is unexpectedly low
+  const contentHitRate = contentMap.size / toEnrich.length;
+  if (contentHitRate < 0.5 && toEnrich.length >= 50) {
+    console.warn(`\n  ⚠ WARNING: Only ${(contentHitRate * 100).toFixed(0)}% of resources have cached content.`);
+    console.warn(`    This means the LLM will work from URL+title only for ${toEnrich.length - contentMap.size} resources.`);
+    console.warn(`    Consider running 'crux resources fetch-all' first to cache content.`);
+    console.warn(`    To proceed anyway, re-run with --force.\n`);
+
+    if (!force && !dryRun) {
+      return { exitCode: 1, output: `Aborted: content hit rate too low (${(contentHitRate * 100).toFixed(0)}%). Use --force to override.` };
+    }
+  }
 
   // Build batch requests
   const requests: BatchRequest[] = toEnrich.map((r) => {
