@@ -342,10 +342,19 @@ describe("Data Layer", () => {
   });
 
   describe("getBacklinksFor", () => {
-    it("returns empty array when no per-entity bundle exists", async () => {
-      // Backlinks are now only in per-entity bundles, not in main database.json
+    it("returns backlinks from per-entity bundle", async () => {
+      // Backlinks live in per-entity bundles (entities/<slug>.json), not in database.json
       const { getBacklinksFor } = await import("../../data/index");
-      expect(getBacklinksFor("test-entity")).toEqual([]);
+      const links = getBacklinksFor("test-entity");
+      expect(links).toHaveLength(1);
+      expect(links[0].title).toBe("Other Entity");
+      expect(links[0].href).toBe("/wiki/E2");
+    });
+
+    it("returns empty array when no per-entity bundle exists", async () => {
+      // other-entity has no entry in mockEntityBundles → readFileSync throws → returns []
+      const { getBacklinksFor } = await import("../../data/index");
+      expect(getBacklinksFor("other-entity")).toEqual([]);
     });
 
     it("returns empty array for entity with no backlinks", async () => {
