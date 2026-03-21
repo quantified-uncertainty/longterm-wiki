@@ -45,8 +45,6 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int")
       .notNull()
       .references(() => wikiPages.integerIdCol),
@@ -84,13 +82,10 @@ export const citationQuotes = pgTable(
       .defaultNow(),
   },
   (table) => [
-    // Legacy unique index on (page_id_old, footnote) still exists in DB for old rows.
-    // New unique index on (page_id_int, footnote) used for ON CONFLICT (created by phase-d2a-citations-predeploy.sql).
     uniqueIndex("citation_quotes_page_id_int_footnote_unique").on(
       table.pageIdInt,
       table.footnote
     ),
-    index("idx_cq_page_id").on(table.pageId),
     index("idx_cq_page_id_int").on(table.pageIdInt),
     index("idx_cq_url").on(table.url),
     index("idx_cq_verified").on(table.quoteVerified),
@@ -215,9 +210,7 @@ export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     totalCitations: integer("total_citations").notNull(),
     checkedCitations: integer("checked_citations").notNull(),
     accurateCount: integer("accurate_count").notNull().default(0),
@@ -231,7 +224,6 @@ export const citationAccuracySnapshots = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_cas_page_id").on(table.pageId),
     index("idx_cas_page_id_int").on(table.pageIdInt),
     index("idx_cas_snapshot_at").on(table.snapshotAt),
   ]
@@ -241,9 +233,7 @@ export const editLogs = pgTable(
   "edit_logs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     date: date("date").notNull(),
     tool: text("tool").notNull(),
     agency: text("agency").notNull(),
@@ -254,7 +244,6 @@ export const editLogs = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_el_page_id").on(table.pageId),
     index("idx_el_page_id_int").on(table.pageIdInt),
     index("idx_el_date").on(table.date),
     index("idx_el_tool").on(table.tool),
@@ -265,9 +254,7 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     score: integer("score").notNull(),
     level: text("level").notNull(), // 'low' | 'medium' | 'high'
     factors: jsonb("factors").$type<string[]>(),
@@ -277,7 +264,6 @@ export const hallucinationRiskSnapshots = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_hrs_page_id").on(table.pageId),
     index("idx_hrs_page_id_int").on(table.pageIdInt),
     index("idx_hrs_computed_at").on(table.computedAt),
     index("idx_hrs_level").on(table.level),
@@ -320,14 +306,12 @@ export const sessionPages = pgTable(
     sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old")
+    pageIdInt: integer("page_id_int")
       .notNull()
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+      .references(() => wikiPages.integerIdCol),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.pageId] }),
-    index("idx_sp_page_id").on(table.pageId),
+    primaryKey({ columns: [table.sessionId, table.pageIdInt] }),
     index("idx_sp_page_id_int").on(table.pageIdInt),
   ]
 );
@@ -370,9 +354,7 @@ export const autoUpdateResults = pgTable(
     runId: bigint("run_id", { mode: "number" })
       .notNull()
       .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     status: text("status").notNull(),
     tier: text("tier"),
     durationMs: integer("duration_ms"),
@@ -380,7 +362,7 @@ export const autoUpdateResults = pgTable(
   },
   (table) => [
     index("idx_aures_run_id").on(table.runId),
-    index("idx_aures_page_id").on(table.pageId),
+    index("idx_aures_page_id_int").on(table.pageIdInt),
     index("idx_aures_status").on(table.status),
   ]
 );
@@ -573,9 +555,7 @@ export const claimPageReferences = pgTable(
     claimId: bigint("claim_id", { mode: "number" })
       .notNull()
       .references(() => claims.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     footnote: integer("footnote"),
     section: text("section"),
     // --- Phase 3 fields (migration 0033) ---
@@ -587,17 +567,7 @@ export const claimPageReferences = pgTable(
   },
   (table) => [
     index("idx_cpr_claim_id").on(table.claimId),
-    index("idx_cpr_page_id").on(table.pageId),
-    // The real unique constraint is a COALESCE-based expression index in
-    // migration 0031_unify_claims_citations.sql:
-    //   CREATE UNIQUE INDEX idx_cpr_claim_page_footnote
-    //     ON claim_page_references (claim_id, page_id, COALESCE(footnote, -1));
-    // Drizzle doesn't support expression indexes, so we declare a plain
-    // index here for query-planning awareness only.
-    index("idx_cpr_claim_page_footnote").on(
-      table.claimId,
-      table.pageId,
-    ),
+    index("idx_cpr_page_id_int").on(table.pageIdInt),
   ]
 );
 
@@ -677,8 +647,6 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int")
       .notNull()
       .references(() => wikiPages.integerIdCol),
@@ -688,7 +656,6 @@ export const resourceCitations = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.resourceId, table.pageIdInt] }),
-    index("idx_rc_page_id").on(table.pageId),
     index("idx_rc_page_id_int").on(table.pageIdInt),
   ]
 );
@@ -888,10 +855,8 @@ export const pageLinks = pgTable(
   "page_links",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    sourceId: text("source_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
-    targetId: text("target_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
-    sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
-    targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol),
+    targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol),
     linkType: text("link_type").notNull(), // 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag'
     relationship: text("relationship"), // e.g. 'causes', 'mitigates' — only for yaml_related
     weight: real("weight").notNull().default(1.0),
@@ -900,13 +865,13 @@ export const pageLinks = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("idx_pl_source_target_type").on(
-      table.sourceId,
-      table.targetId,
+    uniqueIndex("idx_pl_source_target_type_int").on(
+      table.sourceIdInt,
+      table.targetIdInt,
       table.linkType
     ),
-    index("idx_pl_source_id").on(table.sourceId),
-    index("idx_pl_target_id").on(table.targetId),
+    index("idx_pl_source_id_int").on(table.sourceIdInt),
+    index("idx_pl_target_id_int").on(table.targetIdInt),
     index("idx_pl_link_type").on(table.linkType),
   ]
 );
@@ -1008,10 +973,7 @@ export const autoUpdateNewsItems = pgTable(
     relevanceScore: integer("relevance_score"),
     topicsJson: jsonb("topics_json").$type<string[]>(),
     entitiesJson: jsonb("entities_json").$type<string[]>(),
-    routedToPageId: text("routed_to_page_id_old").references(() => wikiPages.id, {
-      onDelete: "set null",
-    }),
-    routedToPageIdInt: integer("routed_to_page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    routedToPageIdInt: integer("routed_to_page_id_int").references(() => wikiPages.integerIdCol),
     routedToPageTitle: text("routed_to_page_title"),
     routedTier: text("routed_tier"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -1022,7 +984,6 @@ export const autoUpdateNewsItems = pgTable(
     index("idx_auni_run_id").on(table.runId),
     index("idx_auni_source_id").on(table.sourceId),
     index("idx_auni_relevance").on(table.relevanceScore),
-    index("idx_auni_routed_page").on(table.routedToPageId),
     index("idx_auni_routed_page_id_int").on(table.routedToPageIdInt),
     index("idx_auni_published_at").on(table.publishedAt),
   ]
@@ -1046,9 +1007,7 @@ export const pageImproveRuns = pgTable(
   "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     engine: text("engine").notNull(), // 'v1' | 'v2'
     tier: text("tier").notNull(), // 'polish' | 'standard' | 'deep'
     directions: text("directions"),
@@ -1086,10 +1045,10 @@ export const pageImproveRuns = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_pir_page_id").on(table.pageId),
+    index("idx_pir_page_id_int").on(table.pageIdInt),
     index("idx_pir_engine").on(table.engine),
     index("idx_pir_started_at").on(table.startedAt),
-    index("idx_pir_page_started").on(table.pageId, table.startedAt),
+    index("idx_pir_page_started_int").on(table.pageIdInt, table.startedAt),
   ]
 );
 
@@ -1487,9 +1446,7 @@ export const pageCitations = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     referenceId: varchar("reference_id").notNull().unique(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
@@ -1499,7 +1456,7 @@ export const pageCitations = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("idx_pc_page_id").on(table.pageId),
+    index("idx_pc_page_id_int").on(table.pageIdInt),
     index("idx_pc_reference_id").on(table.referenceId),
   ]
 );

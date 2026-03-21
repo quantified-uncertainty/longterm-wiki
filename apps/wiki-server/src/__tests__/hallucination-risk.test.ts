@@ -109,7 +109,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const pageSlug = slugFromIntId(pageIdInt);
       const row: HrsRow = {
         id: nextId++,
-        pageId: null, // D2a: not written on insert (maps to page_id_old column)
         pageIdInt: pageIdInt,
         pageSlug: pageSlug,
         score: params[off + 1] as number,
@@ -124,7 +123,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     // Return snake_case row objects so extractColumns() in test-utils maps correctly
     return results.map((r) => ({
       id: r.id,
-      page_id_old: r.pageId,
       page_id_int: r.pageIdInt,
       score: r.score,
       level: r.level,
@@ -185,7 +183,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const offset = numParams[1] || 0;
     return results.slice(offset, offset + limit).map((r) => ({
       id: r.id,
-      page_id_old: r.pageId,
       page_id_int: r.pageIdInt,
       score: r.score,
       level: r.level,
@@ -268,7 +265,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const offset = numParams[1] || 0;
     return results.slice(offset, offset + limit).map((r) => ({
       id: r.id,
-      page_id_old: r.pageId,
       page_id_int: r.pageIdInt,
       score: r.score,
       level: r.level,
@@ -294,7 +290,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .slice(0, limit)
       .map((r) => ({
         id: r.id,
-        page_id_old: r.pageId,
         page_id_int: r.pageIdInt,
         score: r.score,
         level: r.level,

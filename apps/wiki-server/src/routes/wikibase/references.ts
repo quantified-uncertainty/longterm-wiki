@@ -7,7 +7,7 @@
  */
 
 import { Hono } from "hono";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import {
   pageCitations,
@@ -214,7 +214,7 @@ const app = new Hono()
         url: pageCitations.url,
         note: pageCitations.note,
         resourceId: pageCitations.resourceId,
-        pageSlug: sql<string | null>`coalesce(${pageCitations.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageCitations)
       .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol))

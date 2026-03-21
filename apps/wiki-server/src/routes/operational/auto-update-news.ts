@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, inArray, sql } from "drizzle-orm";
+import { eq, desc, count, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { autoUpdateNewsItems, autoUpdateRuns, wikiPages } from "../../schema.js";
 import {
@@ -45,8 +45,7 @@ function mapNewsRow(r: typeof autoUpdateNewsItems.$inferSelect, routedToPageSlug
     relevanceScore: r.relevanceScore,
     topics: r.topicsJson ?? [],
     entities: r.entitiesJson ?? [],
-    // Phase D2a: use COALESCE slug from wiki_pages JOIN; new rows have page_id_old = null
-    routedToPageId: routedToPageSlug ?? r.routedToPageId ?? null,
+    routedToPageId: routedToPageSlug ?? null,
     routedToPageTitle: r.routedToPageTitle,
     routedTier: r.routedTier,
     createdAt: r.createdAt,
@@ -117,7 +116,7 @@ const autoUpdateNewsApp = new Hono()
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
-        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
+        routedToPageSlug: wikiPages.slug,
       })
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
@@ -140,7 +139,7 @@ const autoUpdateNewsApp = new Hono()
       .select({
         item: autoUpdateNewsItems,
         runDate: autoUpdateRuns.date,
-        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
+        routedToPageSlug: wikiPages.slug,
       })
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
@@ -219,7 +218,7 @@ const autoUpdateNewsApp = new Hono()
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
-        routedToPageSlug: sql<string | null>`coalesce(${autoUpdateNewsItems.routedToPageId}, ${wikiPages.id})`,
+        routedToPageSlug: wikiPages.slug,
       })
       .from(autoUpdateNewsItems)
       .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
