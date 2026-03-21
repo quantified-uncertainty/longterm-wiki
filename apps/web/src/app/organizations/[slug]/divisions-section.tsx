@@ -195,6 +195,8 @@ export function DivisionsSection({
 
   const hasSpending = spending && spending.size > 0;
   const hasMembers = members && members.size > 0;
+  // Only show Lead column if at least one division has lead data
+  const hasAnyLead = divisions.some((d) => d.lead) || (leadResolved && leadResolved.size > 0);
 
   return (
     <section>
@@ -205,7 +207,9 @@ export function DivisionsSection({
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Name</th>
               <th scope="col" className="text-left py-2.5 px-3 font-medium">Type</th>
-              <th scope="col" className="text-left py-2.5 px-3 font-medium">Lead</th>
+              {hasAnyLead && (
+                <th scope="col" className="text-left py-2.5 px-3 font-medium">Lead</th>
+              )}
               {hasMembers && (
                 <th scope="col" className="text-left py-2.5 px-3 font-medium">Key Members</th>
               )}
@@ -262,22 +266,24 @@ export function DivisionsSection({
                       {DIVISION_TYPE_LABELS[d.divisionType] ?? d.divisionType}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 text-xs text-muted-foreground">
-                    {resolvedLead ? (
-                      resolvedLead.href ? (
-                        <Link
-                          href={resolvedLead.href}
-                          className="text-primary hover:underline"
-                        >
-                          {resolvedLead.name}
-                        </Link>
+                  {hasAnyLead && (
+                    <td className="py-2.5 px-3 text-xs text-muted-foreground">
+                      {resolvedLead ? (
+                        resolvedLead.href ? (
+                          <Link
+                            href={resolvedLead.href}
+                            className="text-primary hover:underline"
+                          >
+                            {resolvedLead.name}
+                          </Link>
+                        ) : (
+                          resolvedLead.name
+                        )
                       ) : (
-                        resolvedLead.name
-                      )
-                    ) : (
-                      d.lead ?? ""
-                    )}
-                  </td>
+                        d.lead ?? ""
+                      )}
+                    </td>
+                  )}
                   {hasMembers && (
                     <td className="py-2.5 px-3 text-xs text-muted-foreground">
                       {divMembers.length > 0 ? (
