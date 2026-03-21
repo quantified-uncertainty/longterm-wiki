@@ -31,7 +31,7 @@ export interface IssueBudget {
 const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
   conflict:            { maxTurns: 60, timeoutMinutes: 60 },
   'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
-  'bot-review-major':  { maxTurns: 50, timeoutMinutes: 45 },
+  'bot-review-major':  { maxTurns: 15, timeoutMinutes: 10 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
   'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },

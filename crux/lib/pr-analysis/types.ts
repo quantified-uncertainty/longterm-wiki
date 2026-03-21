@@ -24,6 +24,7 @@ export type PrIssueType =
  *  missing-issue-ref consistently hits max-turns with no useful outcome). */
 export const ADVISORY_ISSUES: ReadonlySet<PrIssueType> = new Set([
   'missing-issue-ref',
+  'missing-testplan',
 ]);
 
 export interface BotComment {
