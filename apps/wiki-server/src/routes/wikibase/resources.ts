@@ -506,17 +506,18 @@ const resourcesApp = new Hono()
 
           const allCitations: Array<{
             resourceId: string;
-            pageId: string;
-            pageIdInt: number | null;
+            pageIdInt: number;
           }> = [];
           for (const item of items) {
             if (item.citedBy && item.citedBy.length > 0) {
-              for (const pageId of item.citedBy) {
-                allCitations.push({
-                  resourceId: item.id,
-                  pageId,
-                  pageIdInt: intIdMap.get(pageId) ?? null,
-                });
+              for (const slug of item.citedBy) {
+                const intId = intIdMap.get(slug);
+                if (intId != null) {
+                  allCitations.push({
+                    resourceId: item.id,
+                    pageIdInt: intId,
+                  });
+                }
               }
             }
           }
