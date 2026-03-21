@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function EventsPage() {
-  const events = getTypedEntities().filter(isEvent);
+  const events = getTypedEntities().filter(isEvent).filter((e) => !e.deprecated);
   const isSparse = events.length < 5;
 
   const rows: EventRow[] = events.map((e) => {

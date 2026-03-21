@@ -270,7 +270,7 @@ async function loadFromApi(
 /** Load organizations from local database.json + KB data. */
 function loadFromLocal(): OrgPageData {
   const allEntities = getTypedEntities();
-  const orgs = allEntities.filter(isOrganization);
+  const orgs = allEntities.filter(isOrganization).filter((e) => !e.deprecated);
 
   // Build reverse index: org slug → names of people employed there
   // People have "employed-by" facts referencing the org's KB entity ID
@@ -379,7 +379,7 @@ function buildStats(rows: OrgRow[]): OrgStatDef[] {
 export default async function OrganizationsPage() {
   // Always build orgTypeMap from local data — orgType is not in the wiki-server DB
   const allEntities = getTypedEntities();
-  const orgs = allEntities.filter(isOrganization);
+  const orgs = allEntities.filter(isOrganization).filter((e) => !e.deprecated);
   const orgTypeMap: Record<string, string> = {};
   for (const org of orgs) {
     if (org.orgType) {

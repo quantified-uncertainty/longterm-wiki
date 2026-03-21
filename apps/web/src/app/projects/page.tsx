@@ -126,7 +126,7 @@ async function loadFromApi(): Promise<FetchResult<ProjectsPageData>> {
 // ── Local data loading (fallback) ─────────────────────────────────────────
 
 function loadFromLocal(): ProjectsPageData {
-  const projects = getTypedEntities().filter(isProject);
+  const projects = getTypedEntities().filter(isProject).filter((e) => !e.deprecated);
 
   const rows: ProjectRow[] = projects.map((p) => {
     // Resolve org from founded-by KB fact, then YAML organization field

@@ -253,7 +253,7 @@ function loadFromLocal(): PersonRow[] {
   // lightweight FK targets that should not appear in the directory listing.
   // An entity is considered a stub if it has no description, no wikiId,
   // no customFields, no sources, and no relatedEntries.
-  const typedPeople = getTypedEntities().filter(isPerson);
+  const typedPeople = getTypedEntities().filter(isPerson).filter((e) => !e.deprecated);
   for (const tp of typedPeople) {
     if (kbSlugs.has(tp.id)) continue;
 

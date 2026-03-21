@@ -13,7 +13,7 @@ import {
 import { getEntityHref, getWikiHref } from "@/data/entity-nav";
 
 function getApproachSlugs(): string[] {
-  return getTypedEntities().filter(isApproach).map((e) => e.id);
+  return getTypedEntities().filter(isApproach).filter((e) => !e.deprecated).map((e) => e.id);
 }
 
 function resolveApproachBySlug(slug: string): ApproachEntity | undefined {
