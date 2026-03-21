@@ -943,11 +943,20 @@ export interface PGBenchmarkResult {
   sourceUrl: string | null;
 }
 
+let _benchmarkResults: Record<string, PGBenchmarkResult[]> | null = null;
+
 /** Get all PG benchmark results keyed by model ID.
- * Data is served from PG at runtime — no longer baked into database.json.
- * Returns empty object (directory pages fetch from wiki-server API). */
+ * Loaded from a separate benchmark-results.json (split from database.json). */
 export function getBenchmarkResults(): Record<string, PGBenchmarkResult[]> {
-  return {};
+  if (_benchmarkResults) return _benchmarkResults;
+  const filePath = path.join(LOCAL_DATA_DIR, "benchmark-results.json");
+  try {
+    _benchmarkResults = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _benchmarkResults!;
+  } catch {
+    _benchmarkResults = {};
+    return _benchmarkResults;
+  }
 }
 
 /** Get PG benchmark results for a specific model. Returns empty array if none. */
@@ -980,15 +989,34 @@ export interface PGResearchArea {
   riskCount: number;
 }
 
+let _researchAreas: PGResearchArea[] | null = null;
+
+function loadResearchAreas(): PGResearchArea[] {
+  if (_researchAreas) return _researchAreas;
+  const filePath = path.join(LOCAL_DATA_DIR, "research-areas.json");
+  try {
+    _researchAreas = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _researchAreas!;
+  } catch {
+    _researchAreas = [];
+    return _researchAreas;
+  }
+}
+
 /**
  * Get enriched research areas from PG.
- * Data is served from PG at runtime — no longer baked into database.json.
- * Returns empty array (directory pages fetch from wiki-server API).
+ * Loaded from a separate research-areas.json (split from database.json).
+ *
+ * By default, excludes empty stub areas (0 orgs AND 0 papers) since they add
+ * noise to the directory without providing browseable content. Pass
+ * `includeEmpty: true` to get all areas (e.g., for internal dashboards).
  */
 export function getResearchAreasFromPG(
   options: { includeEmpty?: boolean } = {},
 ): PGResearchArea[] {
-  return [];
+  const all = loadResearchAreas();
+  if (options.includeEmpty) return all;
+  return all.filter((a) => a.orgCount > 0 || a.paperCount > 0);
 }
 
 // ============================================================================
@@ -1004,11 +1032,20 @@ export interface RecordVerdict {
   lastComputedAt: string | null;
 }
 
+let _recordVerdicts: Record<string, RecordVerdict> | null = null;
+
 /** Get all record verdicts (keyed by "recordType:recordId").
- * Data is served from PG at runtime — no longer baked into database.json.
- * Returns empty object (directory pages fetch from wiki-server API). */
+ * Loaded from a separate record-verdicts.json (split from database.json). */
 export function getRecordVerdicts(): Record<string, RecordVerdict> {
-  return {};
+  if (_recordVerdicts) return _recordVerdicts;
+  const filePath = path.join(LOCAL_DATA_DIR, "record-verdicts.json");
+  try {
+    _recordVerdicts = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _recordVerdicts!;
+  } catch {
+    _recordVerdicts = {};
+    return _recordVerdicts;
+  }
 }
 
 /** Get the verification verdict for a specific record */

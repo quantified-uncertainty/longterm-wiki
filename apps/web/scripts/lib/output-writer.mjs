@@ -95,6 +95,25 @@ export function writeMainOutputFiles({ database, outputFile }) {
     console.log(`✓ Written: ${RESOURCES_OUTPUT_FILE} (${_resources.length} resources)`);
   }
 
+  // Write Phase-1 wiki-server-sourced data to separate lazy-loaded files.
+  // These were stripped from database.json (served from PG at runtime for
+  // directory pages) but are still needed by build-time functions in
+  // tablebase.ts and factbase.ts until the full runtime API migration.
+  const LAZY_FILES = [
+    { key: '_benchmarkResults', varRef: _benchmarkResults, name: 'benchmark-results.json', label: 'benchmark results' },
+    { key: '_researchAreas', varRef: _researchAreas, name: 'research-areas.json', label: 'research areas' },
+    { key: '_recordVerdicts', varRef: _recordVerdicts, name: 'record-verdicts.json', label: 'record verdicts' },
+    { key: '_kbFactVerification', varRef: _kbFactVerification, name: 'kb-fact-verification.json', label: 'KB fact verifications' },
+  ];
+  for (const { varRef, name, label } of LAZY_FILES) {
+    const filePath = join(OUTPUT_DIR, name);
+    if (varRef && (Array.isArray(varRef) ? varRef.length > 0 : Object.keys(varRef).length > 0)) {
+      writeFileSync(filePath, JSON.stringify(varRef));
+      const count = Array.isArray(varRef) ? varRef.length : Object.keys(varRef).length;
+      console.log(`✓ Written: ${filePath} (${count} ${label})`);
+    }
+  }
+
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
   if (_kbData) {
