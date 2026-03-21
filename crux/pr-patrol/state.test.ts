@@ -16,6 +16,10 @@ import {
   ensureDirs,
   markProcessed,
   isRecentlyProcessed,
+  getCodeRabbitRetryTime,
+  setCodeRabbitRetryTime,
+  clearCodeRabbitRetryTime,
+  CODERABBIT_DEFAULT_RETRY_DELAY_MS,
   STATE_DIR,
 } from './state.ts';
 
@@ -161,5 +165,42 @@ describe('clearProcessed', () => {
   it('is safe to call when no processed file exists', () => {
     // Should not throw
     clearProcessed(`nonexistent-key-${Date.now()}`);
+  });
+});
+
+// ── CodeRabbit retry tracking ────────────────────────────────────────────────
+
+describe('CodeRabbit retry state', () => {
+  const testPrNumber = 99990 + Math.floor(Math.random() * 1000);
+
+  afterEach(() => {
+    clearCodeRabbitRetryTime(testPrNumber);
+  });
+
+  it('returns null when no retry is scheduled', () => {
+    expect(getCodeRabbitRetryTime(testPrNumber)).toBeNull();
+  });
+
+  it('stores and retrieves a retry timestamp', () => {
+    const ts = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+    setCodeRabbitRetryTime(testPrNumber, ts);
+    expect(getCodeRabbitRetryTime(testPrNumber)).toBe(ts);
+  });
+
+  it('clears the retry timestamp', () => {
+    const ts = new Date().toISOString();
+    setCodeRabbitRetryTime(testPrNumber, ts);
+    expect(getCodeRabbitRetryTime(testPrNumber)).not.toBeNull();
+    clearCodeRabbitRetryTime(testPrNumber);
+    expect(getCodeRabbitRetryTime(testPrNumber)).toBeNull();
+  });
+
+  it('clear is safe when no retry file exists', () => {
+    // Should not throw
+    clearCodeRabbitRetryTime(testPrNumber + 1);
+  });
+
+  it('has a 30-minute default retry delay', () => {
+    expect(CODERABBIT_DEFAULT_RETRY_DELAY_MS).toBe(30 * 60 * 1000);
   });
 });

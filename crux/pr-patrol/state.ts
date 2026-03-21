@@ -329,6 +329,41 @@ export function clearPendingVerification(prNumber: number): void {
   }
 }
 
+// ── CodeRabbit review retry tracking ─────────────────────────────────────────
+// When CodeRabbit rate-limits a review, we schedule a retry after the cooldown.
+// Only retries once per rate-limit event to avoid spamming.
+
+/** Default wait time before retrying a CodeRabbit review (30 minutes). */
+export const CODERABBIT_DEFAULT_RETRY_DELAY_MS = 30 * 60 * 1000;
+
+/**
+ * Get the scheduled retry time for a CodeRabbit review on a PR.
+ * Returns the ISO timestamp when we should post `@coderabbitai review`, or null if not scheduled.
+ */
+export function getCodeRabbitRetryTime(prNumber: number): string | null {
+  const file = join(STATE_DIR, `coderabbit-retry-${prNumber}`);
+  if (!existsSync(file)) return null;
+  const content = readFileSync(file, 'utf-8').trim();
+  return content || null;
+}
+
+/**
+ * Schedule a CodeRabbit review retry at the given ISO timestamp.
+ */
+export function setCodeRabbitRetryTime(prNumber: number, isoTimestamp: string): void {
+  writeFileSync(join(STATE_DIR, `coderabbit-retry-${prNumber}`), isoTimestamp);
+}
+
+/**
+ * Clear the CodeRabbit retry state for a PR (after posting or if no longer needed).
+ */
+export function clearCodeRabbitRetryTime(prNumber: number): void {
+  const file = join(STATE_DIR, `coderabbit-retry-${prNumber}`);
+  if (existsSync(file)) {
+    try { unlinkSync(file); } catch { /* best-effort */ }
+  }
+}
+
 // ── Clear cooldown ──────────────────────────────────────────────────────────
 
 export function clearProcessed(key: number | string): void {
