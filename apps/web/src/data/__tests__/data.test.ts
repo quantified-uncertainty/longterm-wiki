@@ -153,11 +153,6 @@ const mockDatabase = {
       founded: "2020",
     },
   ],
-  backlinks: {
-    "test-entity": [
-      { id: "other-entity", type: "concept", title: "Other Entity" },
-    ],
-  },
   pathRegistry: {
     "test-entity": "/knowledge-base/risks/test-entity",
     "other-entity": "/knowledge-base/concepts/other-entity",
@@ -234,23 +229,6 @@ const mockDatabase = {
       category: "internal",
       wordCount: 500,
       updateFrequency: 90,
-    },
-  ],
-  // Pre-computed update schedule (mirrors build-data.mjs output)
-  updateSchedule: [
-    {
-      id: "internal-doc",
-      wikiId: "E6",
-      title: "Architecture Docs",
-      quality: 0,
-      readerImportance: null,
-      lastUpdated: "2025-02-01",
-      updateFrequency: 90,
-      daysSinceUpdate: 388,
-      daysUntilDue: -298,
-      staleness: 4.31,
-      priority: 2.16,
-      category: "internal",
     },
   ],
   stats: {},
@@ -364,12 +342,10 @@ describe("Data Layer", () => {
   });
 
   describe("getBacklinksFor", () => {
-    it("returns backlinks with hrefs", async () => {
+    it("returns empty array when no per-entity bundle exists", async () => {
+      // Backlinks are now only in per-entity bundles, not in main database.json
       const { getBacklinksFor } = await import("../../data/index");
-      const links = getBacklinksFor("test-entity");
-      expect(links).toHaveLength(1);
-      expect(links[0].title).toBe("Other Entity");
-      expect(links[0].href).toBe("/wiki/E2");
+      expect(getBacklinksFor("test-entity")).toEqual([]);
     });
 
     it("returns empty array for entity with no backlinks", async () => {
@@ -454,13 +430,12 @@ describe("Data Layer", () => {
   });
 
   describe("getUpdateSchedule", () => {
-    it("includes internal pages in update schedule", async () => {
+    it("returns empty array when no wiki-server available (data removed from database.json)", async () => {
       const { getUpdateSchedule } = await import("../../data/index");
       const result = await getUpdateSchedule();
-      const items = result.data;
-      const internalItem = items.find((i: { id: string }) => i.id === "internal-doc");
-      expect(internalItem).toBeDefined();
-      expect(internalItem!.category).toBe("internal");
+      // updateSchedule is no longer in database.json — local fallback returns []
+      expect(result.data).toEqual([]);
+      expect(result.source).toBe("local");
     });
   });
 

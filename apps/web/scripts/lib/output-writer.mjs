@@ -19,7 +19,7 @@ import { OUTPUT_DIR } from './content-types.mjs';
  * @param {object} opts
  * @param {object} opts.database - The full database object
  * @param {string} opts.outputFile - Path to database.json
- * @returns {{ databaseForOutput: object, kbData: object|null }}
+ * @returns {{ databaseForOutput: object, kbData: object|null, strippedFields: object }}
  */
 export function writeMainOutputFiles({ database, outputFile }) {
   // Ensure output directory exists
@@ -27,24 +27,37 @@ export function writeMainOutputFiles({ database, outputFile }) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // Write combined JSON — strip keys that are not needed at runtime:
-  // - entities, kb, experts: raw/internal data
-  // - backlinks, relatedGraph: served from per-entity bundles (100% coverage)
-  // - redundancyPairs, estimates, glossary, funders: computed/loaded but never read at runtime
+  // Write combined JSON — strip fields that aren't needed in the rendering cache:
+  // - Raw entities, KB data, experts: only typedEntities needed at runtime
+  // - Wiki-server-sourced fields: served from PG at runtime or via per-entity bundles
+  // - Operational data: prItems (build-only), redundancyPairs (dashboard-only)
   const {
     entities: _rawEntities,
     kb: _kbData,
     experts: _experts,
+    // Phase 1: Wiki-server-sourced data (served from PG at runtime)
+    benchmarkResults: _benchmarkResults,
+    citationQuotes: _citationQuotes,
+    recordVerdicts: _recordVerdicts,
+    kbFactVerification: _kbFactVerification,
+    researchAreas: _researchAreas,
+    pageReferenceIndex: _pageReferenceIndex,
+    // Phase 2: Operational/internal-only data (dashboards use wiki-server API)
+    prItems: _prItems,
+    updateSchedule: _updateSchedule,
+    redundancyPairs: _redundancyPairs,
+    // Phase 3: Relational data (already in per-entity bundles)
     backlinks: _backlinks,
     relatedGraph: _relatedGraph,
-    redundancyPairs: _redundancyPairs,
-    estimates: _estimates,
-    glossary: _glossary,
-    funders: _funders,
     ...databaseForOutput
   } = database;
   writeFileSync(outputFile, JSON.stringify(databaseForOutput, null, 2));
-  console.log(`\n✓ Written: ${outputFile} (stripped: raw entities, KB, experts, backlinks, relatedGraph, dead keys)`);
+  const strippedKeys = [
+    'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
+    'researchAreas', 'pageReferenceIndex', 'prItems', 'updateSchedule',
+    'redundancyPairs', 'backlinks', 'relatedGraph',
+  ];
+  console.log(`\n✓ Written: ${outputFile} (stripped: entities, KB, experts, ${strippedKeys.join(', ')})`);
 
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
@@ -55,7 +68,15 @@ export function writeMainOutputFiles({ database, outputFile }) {
     console.warn('⚠ FactBase data not available — factbase-data.json not written');
   }
 
-  return { databaseForOutput, kbData: _kbData };
+  return {
+    databaseForOutput,
+    kbData: _kbData,
+    // Pass stripped fields needed by per-entity bundle writer
+    strippedFields: {
+      citationQuotes: _citationQuotes,
+      pageReferenceIndex: _pageReferenceIndex,
+    },
+  };
 }
 
 /**
@@ -105,8 +126,9 @@ export function writeIndividualFiles({ database, dataFiles, backlinks, tagIndex,
  * @param {object} opts.backlinks
  * @param {object} opts.relatedGraph
  * @param {object} opts.databaseForOutput - The database minus raw entities/KB
+ * @param {object} opts.strippedFields - Fields stripped from databaseForOutput but needed for bundles
  */
-export function writePerEntityBundles({ typedEntities, pages, backlinks, relatedGraph, databaseForOutput }) {
+export function writePerEntityBundles({ typedEntities, pages, backlinks, relatedGraph, databaseForOutput, strippedFields }) {
   console.log('\nGenerating per-entity JSON files...');
   const ENTITY_DIR = join(OUTPUT_DIR, 'generated', 'entities');
   if (!existsSync(ENTITY_DIR)) {
@@ -149,12 +171,12 @@ export function writePerEntityBundles({ typedEntities, pages, backlinks, related
     const entityRelated = relatedGraph[entityId];
     if (entityRelated) bundle.relatedGraph = entityRelated;
 
-    // Citation quotes
-    const entityCitationQuotes = databaseForOutput.citationQuotes?.[entityId];
+    // Citation quotes (from strippedFields — not in databaseForOutput)
+    const entityCitationQuotes = strippedFields?.citationQuotes?.[entityId];
     if (entityCitationQuotes) bundle.citationQuotes = entityCitationQuotes;
 
-    // Page references
-    const entityPageRefs = databaseForOutput.pageReferenceIndex?.[entityId];
+    // Page references (from strippedFields — not in databaseForOutput)
+    const entityPageRefs = strippedFields?.pageReferenceIndex?.[entityId];
     if (entityPageRefs) bundle.pageReferences = entityPageRefs;
 
     // Page resources
