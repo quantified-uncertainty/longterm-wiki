@@ -266,6 +266,7 @@ export {
 } from './citation-archive.ts';
 
 export {
+  auditCitations,
   type AuditResult,
   type AuditVerdict,
   type CitationAudit,

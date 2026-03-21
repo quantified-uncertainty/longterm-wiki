@@ -8,7 +8,7 @@
 
 import type { SourceCacheEntry } from '../../lib/content/section-writer.ts';
 import type { ParsedSection, SplitPage } from '../../lib/content/section-splitter.ts';
-import type { CitationAudit } from '../../lib/citation/citation-auditor.ts';
+import type { CitationAudit } from '../../lib/citation/citation-service.ts';
 import type { CostTracker } from '../../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
