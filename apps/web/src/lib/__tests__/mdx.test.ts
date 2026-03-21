@@ -14,7 +14,7 @@ vi.mock("@data/factbase", () => ({
   getKBFactById: () => undefined,
 }));
 
-import { preprocessMdx } from "../mdx";
+import { preprocessMdx, extractMdxIntroSection } from "../mdx";
 
 describe("preprocessMdx", () => {
   it("strips single-line default imports", () => {
@@ -85,5 +85,100 @@ describe("preprocessMdx", () => {
   it("does not strip 'import' inside content text", () => {
     const input = `The import of goods increased.`;
     expect(preprocessMdx(input)).toBe(input);
+  });
+});
+
+describe("extractMdxIntroSection", () => {
+  it("extracts content up to the third h2 heading", () => {
+    const input = [
+      "## Quick Assessment",
+      "",
+      "| Col | Val |",
+      "|-----|-----|",
+      "| A   | B   |",
+      "",
+      "## Overview",
+      "",
+      "Some overview text.",
+      "",
+      "## Background",
+      "",
+      "Background details.",
+      "",
+      "## More Sections",
+      "",
+      "More content.",
+    ].join("\n");
+
+    const result = extractMdxIntroSection(input);
+    expect(result).toContain("## Quick Assessment");
+    expect(result).toContain("## Overview");
+    expect(result).toContain("Some overview text.");
+    expect(result).not.toContain("## Background");
+    expect(result).not.toContain("Background details.");
+  });
+
+  it("returns all content when fewer than 3 h2 headings", () => {
+    const input = [
+      "## Overview",
+      "",
+      "Some text.",
+      "",
+      "## Details",
+      "",
+      "More text.",
+    ].join("\n");
+
+    const result = extractMdxIntroSection(input);
+    expect(result).toContain("## Overview");
+    expect(result).toContain("## Details");
+    expect(result).toContain("More text.");
+  });
+
+  it("strips footnote references", () => {
+    const input = [
+      "## Assessment",
+      "",
+      "Text with a footnote[^rc-abc1] and another[^fact:xyz].",
+      "",
+      "## Overview",
+      "",
+      "More text[^kb-def].",
+      "",
+      "## Background",
+      "",
+      "Later.",
+    ].join("\n");
+
+    const result = extractMdxIntroSection(input);
+    expect(result).not.toContain("[^rc-abc1]");
+    expect(result).not.toContain("[^fact:xyz]");
+    expect(result).not.toContain("[^kb-def]");
+    expect(result).toContain("Text with a footnote and another.");
+  });
+
+  it("handles empty input", () => {
+    expect(extractMdxIntroSection("")).toBe("");
+  });
+
+  it("handles content with no headings", () => {
+    const input = "Just plain text.\n\nAnother paragraph.";
+    const result = extractMdxIntroSection(input);
+    expect(result).toBe(input);
+  });
+
+  it("collapses excessive blank lines", () => {
+    const input = [
+      "## Heading",
+      "",
+      "",
+      "",
+      "",
+      "Text after gaps.",
+    ].join("\n");
+
+    const result = extractMdxIntroSection(input);
+    expect(result).not.toMatch(/\n{3,}/);
+    expect(result).toContain("Text after gaps.");
   });
 });
