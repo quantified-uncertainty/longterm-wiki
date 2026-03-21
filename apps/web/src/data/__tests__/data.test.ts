@@ -256,10 +256,28 @@ const mockDatabase = {
   stats: {},
 };
 
-// Mock fs.readFileSync to return our mock database
+// Per-entity bundle mock (backlinks/relatedGraph live here, not in database.json)
+const mockEntityBundles: Record<string, object> = {
+  "test-entity": {
+    backlinks: [
+      { id: "other-entity", type: "concept", title: "Other Entity" },
+    ],
+  },
+};
+
+// Mock fs.readFileSync to return our mock database and per-entity bundles
 vi.mocked(fs.readFileSync).mockImplementation((filepath: any) => {
-  if (String(filepath).endsWith("database.json")) {
+  const fp = String(filepath);
+  if (fp.endsWith("database.json")) {
     return JSON.stringify(mockDatabase);
+  }
+  // Per-entity bundle files: generated/entities/<slug>.json
+  const entityMatch = fp.match(/entities\/(.+)\.json$/);
+  if (entityMatch) {
+    const slug = entityMatch[1];
+    if (mockEntityBundles[slug]) {
+      return JSON.stringify(mockEntityBundles[slug]);
+    }
   }
   throw new Error(`Unexpected file read: ${filepath}`);
 });
