@@ -33,6 +33,7 @@ export function SquiggleEstimate({
   showEditor: initialShowEditor = false,
 }: SquiggleEstimateProps) {
   const [showEditor, setShowEditor] = useState(initialShowEditor);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lazy-loaded third-party components with complex props
   const [SquiggleComponents, setSquiggleComponents] = useState<{
     SquiggleChart: React.ComponentType<any>;
     SquiggleEditor: React.ComponentType<any>;
@@ -45,9 +46,13 @@ export function SquiggleEstimate({
     if (children) {
       if (typeof children === "string") return children.trim();
 
-      const c = children as any;
-      if (c?.props?.children?.props?.children) {
-        return String(c.props.children.props.children).trim();
+      // MDX wraps code blocks in nested React elements; extract the text content.
+      const c = children as { props?: { children?: { props?: { children?: unknown } } | unknown } };
+      if (c?.props?.children && typeof c.props.children === "object" && c.props.children !== null) {
+        const inner = c.props.children as { props?: { children?: unknown } };
+        if (inner?.props?.children) {
+          return String(inner.props.children).trim();
+        }
       }
       if (c?.props?.children) {
         return String(c.props.children).trim();

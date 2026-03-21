@@ -70,52 +70,11 @@ export const MANUAL_GRANTEE_OVERRIDES: Record<string, string> = loadGranteeOverr
 export function buildEntityMatcher(): EntityMatcher {
   const nameMap = new Map<string, EntityMatch>();
 
-  // Load FactBase data from factbase-data.json (database.json strips the kb field)
-  let kbData: { slugToEntityId?: Record<string, string>; entities?: Array<{ id?: string; stableId?: string; name?: string; aliases?: string[] }> } = {};
-  const kbDataPath = resolve("apps/web/src/data/factbase-data.json");
-  try {
-    kbData = JSON.parse(readFileSync(kbDataPath, "utf8"));
-  } catch (e: unknown) {
-    if (e instanceof Error && "code" in e && (e as NodeJS.ErrnoException).code === "ENOENT") {
-      console.warn(
-        `factbase-data.json not found — run 'pnpm build-data:content' first. Entity matching will be limited to manual overrides.`
-      );
-    } else {
-      throw e;
-    }
-  }
-
-  const slugToId: Record<string, string> = kbData.slugToEntityId || {};
-  const idToSlug = new Map<string, string>();
-  for (const [slug, id] of Object.entries(slugToId)) {
-    idToSlug.set(id, slug);
-  }
-
-  // kbData.entities is an array of objects, each with .id/.stableId, .name, .aliases
-  const entitiesArr: Array<{ id?: string; stableId?: string; name?: string; aliases?: string[] }> =
-    Array.isArray(kbData.entities) ? kbData.entities : Object.values(kbData.entities ?? {});
-
-  for (const entity of entitiesArr) {
-    const eid = entity.stableId || entity.id || "";
-    if (!eid) continue;
-    const slug = idToSlug.get(eid) || "";
-    const match: EntityMatch = {
-      stableId: eid,
-      slug,
-      name: entity.name || slug,
-    };
-    if (entity.name)
-      nameMap.set(entity.name.toLowerCase().trim(), match);
-    if (entity.aliases) {
-      for (const alias of entity.aliases) {
-        nameMap.set(alias.toLowerCase().trim(), match);
-      }
-    }
-    if (slug) nameMap.set(slug.toLowerCase(), match);
-  }
-
-  // Also load typedEntities from database.json for non-KB entities
-  let db: { typedEntities?: Array<{ id: string; title?: string }> } = {};
+  // Load database.json for idRegistry (slug↔stableId) and typedEntities
+  let db: {
+    idRegistry?: { stableIdBySlug?: Record<string, string>; stableIdToSlug?: Record<string, string> };
+    typedEntities?: Array<{ id: string; stableId?: string; title?: string; aliases?: string[] }>;
+  } = {};
   const dbPath = resolve("apps/web/src/data/database.json");
   try {
     db = JSON.parse(readFileSync(dbPath, "utf8"));
@@ -129,20 +88,26 @@ export function buildEntityMatcher(): EntityMatcher {
     }
   }
 
+  const slugToId: Record<string, string> = db.idRegistry?.stableIdBySlug || {};
+  const idToSlug: Record<string, string> = db.idRegistry?.stableIdToSlug || {};
+
   for (const e of db.typedEntities || []) {
     const slug = e.id;
-    const stableId = slugToId[slug] || slug;
+    const stableId = e.stableId || slugToId[slug] || slug;
     const match: EntityMatch = {
       stableId,
       slug,
       name: e.title || slug,
     };
-    if (e.title && !nameMap.has(e.title.toLowerCase().trim())) {
+    if (e.title) {
       nameMap.set(e.title.toLowerCase().trim(), match);
     }
-    if (slug && !nameMap.has(slug.toLowerCase())) {
-      nameMap.set(slug.toLowerCase(), match);
+    if (e.aliases) {
+      for (const alias of e.aliases) {
+        nameMap.set(alias.toLowerCase().trim(), match);
+      }
     }
+    if (slug) nameMap.set(slug.toLowerCase(), match);
   }
 
   return {
