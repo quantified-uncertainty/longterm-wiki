@@ -160,6 +160,46 @@ export function detectIssues(
   return { issues, botComments, failingChecks };
 }
 
+// ── CodeRabbit rate-limit detection ──────────────────────────────────────────
+
+/**
+ * Check if CodeRabbit's status context indicates the review was skipped
+ * due to rate limiting.
+ *
+ * CodeRabbit adds a StatusContext with `context: "CodeRabbit"`. When rate-limited,
+ * the `state` will be "PENDING" or "ERROR" rather than "SUCCESS".
+ * We also check review thread comments from coderabbitai for rate-limit keywords.
+ */
+export function detectCodeRabbitRateLimited(pr: GqlPrNode): boolean {
+  // Check StatusContext entries for CodeRabbit with non-success state
+  const contexts =
+    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+  for (const ctx of contexts) {
+    if (
+      ctx.context?.toLowerCase() === 'coderabbit' &&
+      (ctx.state === 'PENDING' || ctx.state === 'ERROR' || ctx.state === 'FAILURE')
+    ) {
+      return true;
+    }
+  }
+
+  // Check review thread comments for rate-limit messages from coderabbitai
+  const threads = pr.reviewThreads?.nodes ?? [];
+  for (const thread of threads) {
+    if (thread.isResolved || thread.isOutdated) continue;
+    for (const comment of thread.comments.nodes) {
+      if (
+        comment.author?.login === 'coderabbitai' &&
+        /rate limit|review skipped/i.test(comment.body)
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 // ── PR fetching ──────────────────────────────────────────────────────────────
 
 /** Fetch all open PRs via GraphQL. No logging — callers handle their own. */

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { detectIssues, extractBotComments, detectAllPrIssuesFromNodes } from './detection.ts';
+import { detectCodeRabbitRateLimited } from '../lib/pr-analysis/detection.ts';
 import type { GqlPrNode, PatrolConfig } from './types.ts';
 
 function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
@@ -408,5 +409,192 @@ describe('detectAllPrIssuesFromNodes — bot/release PR skipping', () => {
     });
     const result = detectAllPrIssuesFromNodes([pr], verboseConfig);
     expect(result.find((r) => r.number === 41)).toBeUndefined();
+  });
+});
+
+// ── detectCodeRabbitRateLimited ──────────────────────────────────────────────
+
+describe('detectCodeRabbitRateLimited', () => {
+  it('returns true when CodeRabbit StatusContext is PENDING', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ context: 'CodeRabbit', state: 'PENDING' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
+  });
+
+  it('returns true when CodeRabbit StatusContext is ERROR', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ context: 'CodeRabbit', state: 'ERROR' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
+  });
+
+  it('returns true when CodeRabbit StatusContext is FAILURE', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ context: 'CodeRabbit', state: 'FAILURE' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
+  });
+
+  it('returns false when CodeRabbit StatusContext is SUCCESS', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ context: 'CodeRabbit', state: 'SUCCESS' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(false);
+  });
+
+  it('returns false when no CodeRabbit context exists', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ name: 'build', conclusion: 'SUCCESS' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(false);
+  });
+
+  it('returns true when coderabbitai comment mentions "rate limit"', () => {
+    const pr = makePrNode({
+      reviewThreads: {
+        nodes: [{
+          id: 'thread-rl',
+          isResolved: false,
+          isOutdated: false,
+          path: 'src/foo.ts',
+          line: 1,
+          startLine: null,
+          comments: {
+            nodes: [{ author: { login: 'coderabbitai' }, body: 'Rate limit exceeded. Please wait 30 minutes.' }],
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
+  });
+
+  it('returns true when coderabbitai comment mentions "Review skipped"', () => {
+    const pr = makePrNode({
+      reviewThreads: {
+        nodes: [{
+          id: 'thread-rs',
+          isResolved: false,
+          isOutdated: false,
+          path: 'src/bar.ts',
+          line: 5,
+          startLine: null,
+          comments: {
+            nodes: [{ author: { login: 'coderabbitai' }, body: 'Review skipped due to rate limiting.' }],
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
+  });
+
+  it('ignores resolved rate-limit threads', () => {
+    const pr = makePrNode({
+      reviewThreads: {
+        nodes: [{
+          id: 'thread-resolved',
+          isResolved: true,
+          isOutdated: false,
+          path: 'src/foo.ts',
+          line: 1,
+          startLine: null,
+          comments: {
+            nodes: [{ author: { login: 'coderabbitai' }, body: 'Rate limit exceeded.' }],
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(false);
+  });
+
+  it('ignores rate-limit comments from non-coderabbit authors', () => {
+    const pr = makePrNode({
+      reviewThreads: {
+        nodes: [{
+          id: 'thread-human',
+          isResolved: false,
+          isOutdated: false,
+          path: 'src/foo.ts',
+          line: 1,
+          startLine: null,
+          comments: {
+            nodes: [{ author: { login: 'humanuser' }, body: 'Rate limit exceeded on my local.' }],
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(false);
+  });
+
+  it('returns false for a clean PR with no rate-limit signals', () => {
+    const pr = makePrNode();
+    expect(detectCodeRabbitRateLimited(pr)).toBe(false);
+  });
+
+  it('is case-insensitive for CodeRabbit context name', () => {
+    const pr = makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [{ context: 'coderabbit', state: 'PENDING' }],
+              },
+            },
+          },
+        }],
+      },
+    });
+    expect(detectCodeRabbitRateLimited(pr)).toBe(true);
   });
 });
