@@ -17,7 +17,7 @@ facts:
 
   - id: f_OG3role001
     property: role
-    value: "Executive Director"
+    value: "Founder & Executive Director"
     asOf: !date 2026-03
 
   - id: f_OG4educa01
