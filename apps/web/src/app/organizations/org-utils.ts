@@ -36,6 +36,7 @@ export function getOrgSlugs(): string[] {
   const allEntitySlugs = new Set(
     getTypedEntities()
       .filter(isOrganization)
+      .filter((e) => !e.deprecated)
       .map((e) => e.id),
   );
 

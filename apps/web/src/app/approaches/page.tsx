@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function ApproachesPage() {
-  const approaches = getTypedEntities().filter(isApproach);
+  const approaches = getTypedEntities().filter(isApproach).filter((e) => !e.deprecated);
 
   const rows: ApproachRow[] = approaches.map((a) => ({
     id: a.id,

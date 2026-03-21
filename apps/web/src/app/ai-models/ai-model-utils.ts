@@ -7,7 +7,7 @@ import { getTypedEntities, getTypedEntityById, isAiModel, type AiModelEntity, ty
  * Get all AI model entities.
  */
 export function getAiModelEntities(): AiModelEntity[] {
-  return getTypedEntities().filter(isAiModel);
+  return getTypedEntities().filter(isAiModel).filter((e) => !e.deprecated);
 }
 
 /**
