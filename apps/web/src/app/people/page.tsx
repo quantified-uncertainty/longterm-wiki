@@ -7,6 +7,7 @@ import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
 import { getPublicationsForPerson, getTypedEntities, getPersonEntityById, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
+import { partitionPersonRows } from "./people-filter";
 
 export const metadata: Metadata = {
   title: "People",
@@ -295,6 +296,8 @@ function loadFromLocal(): PersonRow[] {
 export default async function PeoplePage() {
   const { rows, source } = await loadFromApi();
 
+  const { meaningful } = partitionPersonRows(rows);
+
   const withRole = rows.filter((r) => r.role != null).length;
   const withEmployer = rows.filter((r) => r.employerName != null).length;
   const withBornYear = rows.filter((r) => r.bornYear != null).length;
@@ -305,13 +308,13 @@ export default async function PeoplePage() {
   const uniqueTopics = new Set(rows.flatMap((r) => r.topics)).size;
 
   const stats = [
-    { label: "People", value: String(rows.length) },
+    { label: "With Detailed Data", value: String(meaningful.length) },
+    { label: "Total People", value: String(rows.length) },
     { label: "With Role Data", value: String(withRole) },
     { label: "With Employer", value: String(withEmployer) },
     { label: "With Birth Year", value: String(withBornYear) },
     { label: "With Net Worth", value: String(withNetWorth) },
     { label: "With Expert Positions", value: String(withPositions) },
-    { label: "With Publications", value: String(withPublications) },
     { label: "Career Entries", value: String(totalCareerEntries) },
     { label: "Topics Covered", value: String(uniqueTopics) },
   ];

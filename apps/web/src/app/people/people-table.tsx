@@ -13,6 +13,7 @@ import { topicLabel } from "@/data/topic-labels";
 import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
 import type { PeopleSortKey } from "./people-sort";
+import { isPersonMeaningful } from "./people-filter";
 
 export interface PersonRow {
   id: string;
@@ -125,7 +126,7 @@ export function PeopleTable({
   // ── Local (static) state via URL-synced hook ──
   const url = useDirectoryUrl({
     defaultSort: { field: "name", dir: "asc" },
-    filters: ["affiliation", "topic"],
+    filters: ["affiliation", "topic", "showAll"],
   });
   const {
     search: urlSearch, setSearch: urlSetSearch,
@@ -135,6 +136,7 @@ export function PeopleTable({
   } = url;
   const affiliationFilter = url.filters.affiliation ?? "all";
   const topicFilter = url.filters.topic ?? "all";
+  const showAll = url.filters.showAll === "true";
 
   const allRows = staticRows ?? EMPTY_ROWS;
 
@@ -236,9 +238,20 @@ export function PeopleTable({
 
   // ── Static-mode: filter, sort, paginate ──
 
+  // Count stubs before any filtering for the toggle label
+  const stubCount = useMemo(() => {
+    if (serverMode) return 0;
+    return allRows.filter((r) => !isPersonMeaningful(r)).length;
+  }, [serverMode, allRows]);
+
   const localFiltered = useMemo(() => {
     if (serverMode) return EMPTY_ROWS;
     let result = allRows;
+
+    // By default, hide publication-only stubs
+    if (!showAll) {
+      result = result.filter(isPersonMeaningful);
+    }
 
     if (affiliationFilter !== "all") {
       result = result.filter((r) => r.employerName === affiliationFilter);
@@ -263,7 +276,7 @@ export function PeopleTable({
     );
 
     return result;
-  }, [serverMode, allRows, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
+  }, [serverMode, allRows, showAll, affiliationFilter, topicFilter, urlSearch, urlSort.field, urlSort.dir]);
 
   const localTotalPages = Math.max(
     1,
@@ -295,6 +308,12 @@ export function PeopleTable({
     if (serverMode) {
       if (isLoading) return "Loading...";
       return `${displayTotal} people`;
+    }
+    if (!showAll && stubCount > 0) {
+      const base = filteredTotal === (allRows.length - stubCount)
+        ? `${filteredTotal} people with detailed data`
+        : `${filteredTotal} of ${allRows.length - stubCount} people with detailed data`;
+      return `Showing ${base}. ${stubCount} publication-only entries hidden.`;
     }
     const filterCount =
       filteredTotal === allRows.length
@@ -352,8 +371,19 @@ export function PeopleTable({
 
       </div>
 
-      {/* Results count */}
-      <div className="text-xs text-muted-foreground mb-3">{statusText}</div>
+      {/* Results count + show all toggle */}
+      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+        <span>{statusText}</span>
+        {!serverMode && stubCount > 0 && (
+          <button
+            type="button"
+            onClick={() => urlSetFilter("showAll", showAll ? "all" : "true")}
+            className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          >
+            {showAll ? "Hide publication-only entries" : "Show all"}
+          </button>
+        )}
+      </div>
 
       {/* Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
