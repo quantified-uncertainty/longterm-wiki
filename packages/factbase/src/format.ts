@@ -34,6 +34,58 @@ export function formatMoney(value: number, currencyCode: string = "USD"): string
   return `${sign}${cur.symbol}${num}`;
 }
 
+// ── Adaptive divisor helpers ─────────────────────────────────────────
+
+/** Scale steps: each entry is [divisor, suffix]. Order: largest first. */
+const SCALE_STEPS: [number, string][] = [
+  [1e12, "T"],
+  [1e9, "B"],
+  [1e6, "M"],
+  [1e3, "K"],
+];
+
+/**
+ * When the configured divisor produces a value that rounds to 0,
+ * step down to a smaller scale that produces a meaningful number.
+ *
+ * Only steps down through standard scales (T/B/M/K). If the suffix
+ * isn't a recognized scale suffix, returns the original values unchanged
+ * (non-standard display configs should not be silently rewritten).
+ */
+function adaptiveDivisor(
+  value: number,
+  originalDivisor: number,
+  originalSuffix: string,
+): { divided: number; suffix: string } {
+  const trimmedSuffix = originalSuffix.trim();
+
+  // Only adapt for recognized scale suffixes
+  const isScaleSuffix = SCALE_STEPS.some(([, s]) => s === trimmedSuffix);
+  if (!isScaleSuffix) {
+    return { divided: value / originalDivisor, suffix: originalSuffix };
+  }
+
+  // Find the first scale that produces a non-zero formatted value
+  for (const [div, suf] of SCALE_STEPS) {
+    if (div >= originalDivisor) continue; // skip same or larger scales
+    const divided = value / div;
+    if (Math.abs(divided) >= 0.1) {
+      return { divided, suffix: suf };
+    }
+  }
+
+  // No scale worked — return raw value with no suffix
+  return { divided: value, suffix: "" };
+}
+
+/** Format a divided numeric value with appropriate decimal places. */
+function formatDivided(divided: number): string {
+  if (Math.abs(divided) >= 100) {
+    return divided.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  }
+  return divided.toLocaleString("en-US", { maximumFractionDigits: 1 });
+}
+
 // ── Value formatting ────────────────────────────────────────────────
 
 /**
@@ -57,23 +109,26 @@ export function formatValue(value: unknown, property?: Property, currency?: stri
     }
 
     let formatted: string;
+    let effectiveSuffix = suffix ?? "";
     if (divisor && Number.isFinite(divisor)) {
       const divided = value / divisor;
-      if (divided >= 100) {
-        formatted = divided.toLocaleString("en-US", {
-          maximumFractionDigits: 0,
-        });
+      // If the divided value is too small to display meaningfully, fall back
+      // to a smaller scale. Threshold 0.1 catches both the "$0B" bug (values
+      // that round to zero) and marginal "$0.1B" cases that read better as "$50M".
+      const wouldBeZero = Math.abs(divided) > 0 && Math.abs(divided) < 0.1;
+      if (wouldBeZero) {
+        const result = adaptiveDivisor(value, divisor, effectiveSuffix);
+        formatted = formatDivided(result.divided);
+        effectiveSuffix = result.suffix;
       } else {
-        formatted = divided.toLocaleString("en-US", {
-          maximumFractionDigits: 1,
-        });
+        formatted = formatDivided(divided);
       }
     } else {
       // No divisor: use raw number without locale grouping separators.
       // This handles cases like "born-year: 1983" where commas would be wrong.
       formatted = String(value);
     }
-    return `${effectivePrefix}${formatted}${suffix ?? ""}`;
+    return `${effectivePrefix}${formatted}${effectiveSuffix}`;
   }
 
   if (typeof value === "number") {
