@@ -175,7 +175,7 @@ export async function VerificationCoverageContent() {
   const totalEntities = entities.length;
 
   // Compute verified entities from things stats (non-unchecked verdicts)
-  const thingsVerified = Object.entries(thingsStats.byVerdict)
+  const thingsVerified = Object.entries(thingsStats.byVerdict ?? {})
     .filter(([v]) => v !== "unchecked")
     .reduce((sum, [, c]) => sum + c, 0);
   const pctVerified =
@@ -185,13 +185,13 @@ export async function VerificationCoverageContent() {
 
   // Combine all verdicts across systems for overall distribution
   const combinedVerdicts = new Map<string, number>();
-  for (const [v, c] of Object.entries(thingsStats.byVerdict)) {
+  for (const [v, c] of Object.entries(thingsStats.byVerdict ?? {})) {
     combinedVerdicts.set(v, (combinedVerdicts.get(v) ?? 0) + c);
   }
-  for (const [v, c] of Object.entries(kbStats.by_verdict)) {
+  for (const [v, c] of Object.entries(kbStats.by_verdict ?? {})) {
     combinedVerdicts.set(v, (combinedVerdicts.get(v) ?? 0) + c);
   }
-  for (const [v, c] of Object.entries(recordStats.by_verdict)) {
+  for (const [v, c] of Object.entries(recordStats.by_verdict ?? {})) {
     combinedVerdicts.set(v, (combinedVerdicts.get(v) ?? 0) + c);
   }
   const combinedVerdictEntries = [...combinedVerdicts.entries()].sort(
@@ -238,7 +238,7 @@ export async function VerificationCoverageContent() {
   });
 
   // Record-type coverage
-  const recordTypeEntries = Object.entries(recordStats.by_record_type)
+  const recordTypeEntries = Object.entries(recordStats.by_record_type ?? {})
     .sort(([, a], [, b]) => b.total - a.total);
 
   // Priority entities — sorted by most entities without coverage
@@ -464,9 +464,9 @@ export async function VerificationCoverageContent() {
               <p className="text-xs text-muted-foreground mb-2">
                 {kbStats.total_facts} facts checked
               </p>
-              {Object.entries(kbStats.by_verdict).length > 0 ? (
+              {Object.entries(kbStats.by_verdict ?? {}).length > 0 ? (
                 <div className="space-y-1">
-                  {Object.entries(kbStats.by_verdict)
+                  {Object.entries(kbStats.by_verdict ?? {})
                     .sort(([, a], [, b]) => b - a)
                     .map(([verdict, count]) => (
                       <div
@@ -501,9 +501,9 @@ export async function VerificationCoverageContent() {
                 {recordStats.total_verdicts} verdicts across{" "}
                 {recordStats.total_records} records
               </p>
-              {Object.entries(recordStats.by_verdict).length > 0 ? (
+              {Object.entries(recordStats.by_verdict ?? {}).length > 0 ? (
                 <div className="space-y-1">
-                  {Object.entries(recordStats.by_verdict)
+                  {Object.entries(recordStats.by_verdict ?? {})
                     .sort(([, a], [, b]) => b - a)
                     .map(([verdict, count]) => (
                       <div
@@ -537,9 +537,9 @@ export async function VerificationCoverageContent() {
               <p className="text-xs text-muted-foreground mb-2">
                 {thingsStats.total} total things
               </p>
-              {Object.entries(thingsStats.byVerdict).length > 0 ? (
+              {Object.entries(thingsStats.byVerdict ?? {}).length > 0 ? (
                 <div className="space-y-1">
-                  {Object.entries(thingsStats.byVerdict)
+                  {Object.entries(thingsStats.byVerdict ?? {})
                     .sort(([, a], [, b]) => b - a)
                     .map(([verdict, count]) => (
                       <div
