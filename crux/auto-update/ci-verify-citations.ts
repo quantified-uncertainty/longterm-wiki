@@ -21,10 +21,8 @@ import { parse as parseYaml } from 'yaml';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import {
-  verifyCitationsForPage,
-  extractCitationsFromContent,
-} from '../lib/citation/citation-archive.ts';
+import { verifyCitationsForPage } from '../lib/citation/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

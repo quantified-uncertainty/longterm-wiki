@@ -64,6 +64,7 @@ function makeFetchedSource(overrides: Partial<FetchedSource> = {}): FetchedSourc
     content: 'This is the source content. It discusses AI safety at length and provides relevant context.',
     relevantExcerpts: [],
     status: 'ok',
+    httpStatus: 200,
     ...overrides,
   };
 }

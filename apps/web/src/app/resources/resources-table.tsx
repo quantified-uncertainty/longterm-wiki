@@ -327,6 +327,9 @@ const INITIAL_COLUMN_VISIBILITY: Record<string, boolean> = {
   id: false,
   tags: false,
   resourceSubtype: false,
+  citationCount: false, // 100% empty — sub-table data not in snapshot
+  publishedDate: false, // 91% empty
+  importanceScore: false, // 90% empty
 };
 
 export function ResourcesTable({ rows }: { rows: ResourceRow[] }) {

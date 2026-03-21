@@ -14,11 +14,6 @@ export interface SerializedKB {
   facts: Record<string, ReturnType<Graph["getFacts"]>>;
   properties: ReturnType<Graph["getAllProperties"]>;
   schemas: ReturnType<Graph["getAllSchemas"]>;
-  /**
-   * @deprecated Slug resolution is now handled by idRegistry.stableIdBySlug
-   * in TableBase (database.json). This field is no longer emitted by serialize().
-   */
-  slugToEntityId?: Record<string, string>;
   /** Maps previous slugs → current slug, for URL redirects when slugs change */
   previousSlugToCurrentSlug?: Record<string, string>;
 }

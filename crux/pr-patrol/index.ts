@@ -76,9 +76,12 @@ export { JSONL_FILE, REFLECTION_FILE, PARALLEL_STATE_FILE, getParallelState } fr
 import type { PatrolConfig } from './types.ts';
 import {
   appendJsonl,
+  clearCodeRabbitRetryTime,
   clearProcessed,
   clearTrackedMainFixPr,
+  CODERABBIT_DEFAULT_RETRY_DELAY_MS,
   ensureDirs,
+  getCodeRabbitRetryTime,
   getTrackedMainFixPr,
   isAbandoned,
   isCircuitOpen,
@@ -86,12 +89,14 @@ import {
   JSONL_FILE as JSONL_FILE_INTERNAL,
   log,
   logHeader,
+  setCodeRabbitRetryTime,
 } from './state.ts';
 import {
   detectAllPrIssuesFromNodes,
   detectPrOverlaps,
   fetchOpenPrs as daemonFetchOpenPrs,
 } from './detection.ts';
+import { detectCodeRabbitRateLimited } from '../lib/pr-analysis/detection.ts';
 import { rankPrs as daemonRankPrs } from './scoring.ts';
 import {
   findMergeCandidates as daemonFindMergeCandidates,
@@ -339,6 +344,70 @@ async function runCheckCycle(
     }
   }
 
+  // ── CodeRabbit review retry phase ────────────────────────────────────
+  // When CodeRabbit rate-limits a PR review, schedule a retry and post
+  // `@coderabbitai review` after the cooldown expires.
+
+  for (const pr of allPrs) {
+    const isRateLimited = detectCodeRabbitRateLimited(pr);
+
+    if (!isRateLimited) {
+      // Not rate-limited — clear any pending retry (review succeeded or not applicable)
+      clearCodeRabbitRetryTime(pr.number);
+      continue;
+    }
+
+    const existingRetry = getCodeRabbitRetryTime(pr.number);
+
+    if (!existingRetry) {
+      // First time seeing rate limit — schedule retry
+      const retryAt = new Date(Date.now() + CODERABBIT_DEFAULT_RETRY_DELAY_MS).toISOString();
+      setCodeRabbitRetryTime(pr.number, retryAt);
+      log(`  PR #${pr.number}: CodeRabbit rate-limited — scheduled retry at ${retryAt}`);
+      continue;
+    }
+
+    // Check if it's time to retry
+    const retryTime = new Date(existingRetry).getTime();
+    if (Date.now() < retryTime) {
+      const minutesLeft = Math.ceil((retryTime - Date.now()) / 60000);
+      if (config.verbose) {
+        log(`  ${cl.dim}PR #${pr.number}: CodeRabbit retry in ~${minutesLeft}min${cl.reset}`);
+      }
+      continue;
+    }
+
+    // Time to retry — post the review request comment
+    log(`  PR #${pr.number}: CodeRabbit retry time reached — requesting review`);
+    if (config.dryRun) {
+      log(`  ${cl.dim}[DRY RUN] Would post @coderabbitai review on PR #${pr.number}${cl.reset}`);
+    } else {
+      try {
+        await githubApi(`/repos/${config.repo}/issues/${pr.number}/comments`, {
+          method: 'POST',
+          body: { body: '@coderabbitai review' },
+        });
+        log(`  ${cl.green}Posted @coderabbitai review on PR #${pr.number}${cl.reset}`);
+        appendJsonl(JSONL_FILE_INTERNAL, {
+          type: 'coderabbit_retry',
+          pr_num: pr.number,
+          outcome: 'posted',
+        });
+      } catch (e) {
+        log(`  ${cl.yellow}Warning: could not post CodeRabbit retry on PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        appendJsonl(JSONL_FILE_INTERNAL, {
+          type: 'coderabbit_retry',
+          pr_num: pr.number,
+          outcome: 'error',
+          error: e instanceof Error ? e.message : String(e),
+        });
+      }
+    }
+
+    // Clear the retry state — only retry once per rate-limit event
+    clearCodeRabbitRetryTime(pr.number);
+  }
+
   // ── Undraft phase ──────────────────────────────────────────────────
   // Auto-undraft draft PRs that are otherwise eligible for merge.
   // A PR is auto-undrafted when its only block reason is 'is-draft'.
@@ -512,6 +581,10 @@ export function readRecentLogs(count: number): string {
       } else if (entry.type === 'main_branch_result') {
         output.push(
           `  Main branch: ${entry.outcome} (${entry.elapsed_s}s) — run #${entry.run_id}`,
+        );
+      } else if (entry.type === 'coderabbit_retry') {
+        output.push(
+          `  PR #${entry.pr_num}: coderabbit-retry-${entry.outcome}${entry.error ? ` (${entry.error})` : ''}`,
         );
       } else if (entry.type === 'overlap_warning') {
         output.push(

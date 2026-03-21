@@ -44,6 +44,7 @@ export { ADVISORY_ISSUES } from './types.ts';
 export {
   extractBotComments,
   detectIssues,
+  detectCodeRabbitRateLimited,
   fetchOpenPrs,
   fetchSinglePr,
   detectOverlaps,

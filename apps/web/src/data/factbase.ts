@@ -50,21 +50,16 @@ export function getFactBase(): SerializedKB | undefined {
  * Accepts either an entity ID (10-char alphanumeric) or a YAML filename/slug.
  * MDX components pass slugs like "anthropic"; entity pages pass IDs like "mK9pX3rQ7n".
  *
- * Resolution chain: idRegistry stableIdBySlug → FactBase slugToEntityId (legacy fallback) → identity
+ * Resolution: idRegistry stableIdBySlug → identity (pass-through if already a stableId).
  */
-function resolveEntityKey(entityOrSlug: string, fb?: SerializedKB): string {
-  // Primary: use idRegistry from TableBase (covers all entities)
+function resolveEntityKey(entityOrSlug: string): string {
+  // Use idRegistry from TableBase (covers all entities)
   try {
     const registry = getIdRegistry();
     const stableId = registry.stableIdBySlug?.[entityOrSlug];
     if (stableId) return stableId;
   } catch {
     // database.json not available yet (during build) — ignore
-  }
-  // Legacy fallback: try FactBase's own slug map if it still exists
-  const resolved = fb ?? getFactBase();
-  if (resolved?.slugToEntityId?.[entityOrSlug]) {
-    return resolved.slugToEntityId[entityOrSlug];
   }
   return entityOrSlug;
 }
@@ -109,7 +104,7 @@ export function getFactBaseFacts(entity: string, property?: string): Fact[] {
   const fb = getFactBase();
   if (!fb) return [];
 
-  const key = resolveEntityKey(entity, fb);
+  const key = resolveEntityKey(entity);
   const facts = fb.facts[key] ?? [];
   const filtered = property
     ? facts.filter((f) => f.propertyId === property)
@@ -412,7 +407,7 @@ export function getFactBaseRecords(entityId: string, collection: string): FactBa
   const fb = getFactBase();
   if (!fb) return [];
 
-  const key = resolveEntityKey(entityId, fb);
+  const key = resolveEntityKey(entityId);
   // records is added dynamically by build-data.mjs, not in SerializedKB type
   type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
   const records = "records" in fb
@@ -430,7 +425,7 @@ export function getFactBaseAllRecordCollections(entity: string): Record<string, 
   const fb = getFactBase();
   if (!fb) return {};
 
-  const key = resolveEntityKey(entity, fb);
+  const key = resolveEntityKey(entity);
   type RecordsMap = Record<string, Record<string, FactBaseRecordEntry[]>>;
   const records = "records" in fb
     ? (fb as { records?: RecordsMap }).records
@@ -570,18 +565,13 @@ export function getFactBaseRecordSchemas(): FactBaseRecordSchema[] {
  * Returns undefined if the slug is not in the mapping.
  */
 export function resolveFactBaseSlug(slug: string): string | undefined {
-  // Primary: idRegistry from TableBase
   try {
     const registry = getIdRegistry();
-    const stableId = registry.stableIdBySlug?.[slug];
-    if (stableId) return stableId;
+    return registry.stableIdBySlug?.[slug];
   } catch {
-    // database.json not available yet — fall through
+    // database.json not available yet
+    return undefined;
   }
-  // Legacy fallback
-  const fb = getFactBase();
-  if (!fb?.slugToEntityId) return undefined;
-  return fb.slugToEntityId[slug];
 }
 
 /**
@@ -590,18 +580,15 @@ export function resolveFactBaseSlug(slug: string): string | undefined {
  * Useful for building static params or reverse lookups.
  */
 export function getFactBaseSlugMap(): Record<string, string> {
-  // Primary: idRegistry.stableIdBySlug from TableBase
   try {
     const registry = getIdRegistry();
     if (registry.stableIdBySlug && Object.keys(registry.stableIdBySlug).length > 0) {
       return registry.stableIdBySlug;
     }
   } catch {
-    // database.json not available yet — fall through
+    // database.json not available yet
   }
-  // Legacy fallback
-  const fb = getFactBase();
-  return fb?.slugToEntityId ?? {};
+  return {};
 }
 
 /**

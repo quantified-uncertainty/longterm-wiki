@@ -27,11 +27,24 @@ export function writeMainOutputFiles({ database, outputFile }) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // Write combined JSON (strip raw entities, KB data, and experts — only typedEntities needed at runtime)
-  // Experts data is now consolidated into typedEntities (person entities include positions).
-  const { entities: _rawEntities, kb: _kbData, experts: _experts, ...databaseForOutput } = database;
+  // Write combined JSON — strip keys that are not needed at runtime:
+  // - entities, kb, experts: raw/internal data
+  // - backlinks, relatedGraph: served from per-entity bundles (100% coverage)
+  // - redundancyPairs, estimates, glossary, funders: computed/loaded but never read at runtime
+  const {
+    entities: _rawEntities,
+    kb: _kbData,
+    experts: _experts,
+    backlinks: _backlinks,
+    relatedGraph: _relatedGraph,
+    redundancyPairs: _redundancyPairs,
+    estimates: _estimates,
+    glossary: _glossary,
+    funders: _funders,
+    ...databaseForOutput
+  } = database;
   writeFileSync(outputFile, JSON.stringify(databaseForOutput, null, 2));
-  console.log(`\n✓ Written: ${outputFile} (raw entities stripped, KB split out, experts consolidated, typedEntities only)`);
+  console.log(`\n✓ Written: ${outputFile} (stripped: raw entities, KB, experts, backlinks, relatedGraph, dead keys)`);
 
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');

@@ -9,6 +9,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
 import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
+import { resolveTemplate, formatTemplateForPrompt } from '../../lib/content/page-templates.ts';
 import type { SynthesisPhaseContext, CreatorContext } from './types.ts';
 
 type LoadResultContext = Pick<Required<CreatorContext>, 'loadResult'>;
@@ -152,6 +153,13 @@ ${citationWarning}
 ${directionsSection}
 
 ${canonicalLinksSection}
+${(() => {
+    const entityType = destPath ? inferEntityType(destPath) : null;
+    const tmpl = resolveTemplate(undefined, entityType || undefined);
+    return tmpl
+      ? `## Template Structure\nThis page should follow the **${tmpl.name}** template. Structure your article to include the required sections.\n\n${formatTemplateForPrompt(tmpl)}\n`
+      : '';
+  })()}
 ## Requirements
 
 1. **CRITICAL: Use ONLY real URLs from the research data**

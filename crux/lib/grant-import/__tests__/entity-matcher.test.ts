@@ -239,79 +239,48 @@ vi.mock("fs", async () => {
 describe("buildEntityMatcher — entity array format", () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  it("reads stableId from entity objects, not array indices", () => {
+  it("reads stableId from typedEntities in database.json", () => {
     const readMock = vi.mocked(fs.readFileSync);
     readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
       if (pathStr.includes("grantee-overrides.yaml")) {
         return "overrides: {}";
       }
-      if (pathStr.includes("factbase-data.json")) {
+      if (pathStr.includes("database.json")) {
         return JSON.stringify({
-          slugToEntityId: { "dan-hendrycks": "VoNqoBJkyg" },
-          entities: [
-            { id: "aaa1111111", stableId: "aaa1111111", name: "First Person" },
-            { id: "VoNqoBJkyg", stableId: "VoNqoBJkyg", name: "Dan Hendrycks" },
+          idRegistry: {
+            stableIdBySlug: { "dan-hendrycks": "VoNqoBJkyg", "first-person": "aaa1111111" },
+            stableIdToSlug: { "VoNqoBJkyg": "dan-hendrycks", "aaa1111111": "first-person" },
+          },
+          typedEntities: [
+            { id: "first-person", stableId: "aaa1111111", title: "First Person" },
+            { id: "dan-hendrycks", stableId: "VoNqoBJkyg", title: "Dan Hendrycks" },
           ],
         });
-      }
-      if (pathStr.includes("database.json")) {
-        return JSON.stringify({ typedEntities: [] });
       }
       throw new Error(`Unexpected read: ${pathStr}`);
     });
 
     const matcher = buildEntityMatcher();
 
-    // Should match by name and return the entity's stableId, NOT the array index
+    // Should match by name and return the entity's stableId
     const match = matcher.match("Dan Hendrycks");
     expect(match).not.toBeNull();
     expect(match!.stableId).toBe("VoNqoBJkyg");
-    // Bug: previously returned "1" (the array index)
-    expect(match!.stableId).not.toBe("1");
 
     const firstMatch = matcher.match("First Person");
     expect(firstMatch).not.toBeNull();
     expect(firstMatch!.stableId).toBe("aaa1111111");
-    expect(firstMatch!.stableId).not.toBe("0");
   });
 });
 
 describe("buildEntityMatcher — missing files", () => {
   afterEach(() => { vi.restoreAllMocks(); });
 
-  it("handles missing factbase-data.json gracefully", () => {
-    const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
-      const pathStr = String(path);
-      if (pathStr.includes("factbase-data.json")) {
-        const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
-        err.code = "ENOENT";
-        throw err;
-      }
-      if (pathStr.includes("database.json")) {
-        return JSON.stringify({ typedEntities: [] });
-      }
-      throw new Error(`Unexpected read: ${pathStr}`);
-    });
-
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const matcher = buildEntityMatcher();
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("factbase-data.json not found")
-    );
-    expect(matcher.match("Nonexistent Org")).toBeNull();
-    expect(matcher.allNames.size).toBe(0);
-  });
-
   it("handles missing database.json gracefully", () => {
     const readMock = vi.mocked(fs.readFileSync);
     readMock.mockImplementation((path: fs.PathOrFileDescriptor) => {
       const pathStr = String(path);
-      if (pathStr.includes("factbase-data.json")) {
-        return JSON.stringify({ slugToEntityId: {}, entities: {} });
-      }
       if (pathStr.includes("database.json")) {
         const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
         err.code = "ENOENT";
@@ -327,22 +296,7 @@ describe("buildEntityMatcher — missing files", () => {
       expect.stringContaining("database.json not found")
     );
     expect(matcher.match("Nonexistent Org")).toBeNull();
-  });
-
-  it("handles both files missing gracefully", () => {
-    const readMock = vi.mocked(fs.readFileSync);
-    readMock.mockImplementation(() => {
-      const err = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
-      err.code = "ENOENT";
-      throw err;
-    });
-
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const matcher = buildEntityMatcher();
-
-    expect(warnSpy).toHaveBeenCalledTimes(2);
     expect(matcher.allNames.size).toBe(0);
-    expect(matcher.match("anything")).toBeNull();
   });
 
   it("re-throws non-ENOENT errors", () => {

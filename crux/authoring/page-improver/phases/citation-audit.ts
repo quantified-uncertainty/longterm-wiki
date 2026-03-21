@@ -18,7 +18,7 @@
  * See issue #670.
  */
 
-import { auditCitations, MIN_SOURCE_CONTENT_LENGTH, type AuditResult, type SourceCache } from '../../../lib/citation/citation-auditor.ts';
+import { auditCitations, MIN_SOURCE_CONTENT_LENGTH, type AuditResult, type SourceCache } from '../../../lib/citation/citation-service.ts';
 import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
 import type { FetchedSource } from '../../../lib/search/source-fetcher.ts';
 import type { PageData, ResearchResult, PipelineOptions } from '../types.ts';
@@ -51,6 +51,7 @@ export function buildAuditorSourceCache(entries: SourceCacheEntry[]): SourceCach
       // are marked 'error' so the auditor classifies them as 'unchecked'
       // rather than attempting LLM verification on empty text.
       status: hasContent ? 'ok' : 'error',
+      httpStatus: hasContent ? 200 : 0,
     };
     cache.set(entry.url, fetchedSource);
   }

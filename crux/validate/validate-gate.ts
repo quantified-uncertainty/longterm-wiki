@@ -486,6 +486,16 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
+    id: 'resource-quality',
+    name: 'Resource data quality (titles, authors, type contradictions)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-resource-quality.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking for errors (HTML in titles, URL-as-title, non-printable chars).
+    // Warnings (platform-name authors, type/subtype contradictions) are advisory.
+    // Gracefully skips if snapshot file is unavailable (fail-open).
+  },
+  {
     id: 'cross-base',
     name: 'Cross-base consistency (WikiBase/TableBase/FactBase alignment)',
     command: 'npx',

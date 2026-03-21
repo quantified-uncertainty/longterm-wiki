@@ -21,10 +21,10 @@ import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import {
   verifyCitationsForPage,
-  extractCitationsFromContent,
   readCitationArchive,
   type CitationArchiveFile,
 } from '../lib/citation/citation-archive.ts';
+import { extractCitationsFromContent } from '../lib/citation/citation-service.ts';
 import { fetchAndVerifyClaim } from '../lib/search/source-fetcher.ts';
 import { findPagesWithCitations } from './shared.ts';
 import { getResourceByUrl } from '../lib/search/resource-lookup.ts';

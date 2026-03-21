@@ -9,6 +9,8 @@ import fs from 'fs';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { buildEntityLookupForContent } from '../../../lib/entity-lookup.ts';
 import { buildKbContextForPage } from '../../../lib/factbase-context.ts';
+import { resolveTemplate, formatTemplateForPrompt } from '../../../lib/content/page-templates.ts';
+import { getPageType } from '../../../lib/page-analysis.ts';
 import { convertSlugsToWikiIds } from '../../creator/deployment.ts';
 import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
@@ -51,12 +53,25 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     log('improve', `  KB context load failed: ${error.message} — continuing without KB context`);
   }
 
+  // Resolve template for this page (explicit frontmatter > entity type inference)
+  const pageType = getPageType(page);
+  // Extract pageTemplate from frontmatter in the content
+  const fmMatch = currentContent.match(/^---\n([\s\S]*?)\n---/);
+  const pageTemplateMatch = fmMatch?.[1]?.match(/^pageTemplate:\s*(.+)$/m);
+  const pageTemplateValue = pageTemplateMatch?.[1]?.trim().replace(/^["']|["']$/g, '');
+  const template = resolveTemplate(pageTemplateValue, pageType);
+  let templateContext: string | null = null;
+  if (template) {
+    templateContext = formatTemplateForPrompt(template);
+    log('improve', `  Using template: ${template.name}`);
+  }
+
   const tier = options.tier || 'standard';
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
     currentContent, entityLookup, claimsContext: null,
-    gapAnalysisContext: null, kbContext, tier,
+    gapAnalysisContext: null, kbContext, tier, templateContext,
   });
 
   const result = await runAgent(prompt, {
