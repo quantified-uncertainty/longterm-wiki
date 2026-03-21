@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllPublications, getAllResources } from "@/data";
+import { getAllPublications, getAllResources, getPagesForResource } from "@/data";
 
 export function SourcesOverviewContent() {
   const publications = getAllPublications();
@@ -8,7 +8,7 @@ export function SourcesOverviewContent() {
   const peerReviewed = publications.filter((p) => p.peer_reviewed).length;
   const withSummary = resources.filter((r) => r.summary).length;
   const citedResources = resources.filter(
-    (r) => r.cited_by && r.cited_by.length > 0,
+    (r) => getPagesForResource(r.id).length > 0,
   ).length;
 
   const stats = [
