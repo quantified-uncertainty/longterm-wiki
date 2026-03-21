@@ -281,18 +281,26 @@ async function upsertResource(
 
   // Upsert citations (cited_by)
   if (d.citedBy && d.citedBy.length > 0) {
+    // Phase D2a: resolve slugs to integer IDs before touching existing rows
+    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
+    const unresolvedPageIds = d.citedBy.filter((pageId) => !citedByIntIdMap.has(pageId));
+    if (unresolvedPageIds.length > 0) {
+      throw new Error(
+        `Failed to resolve page_id_int for citedBy pages: ${unresolvedPageIds.join(", ")}`
+      );
+    }
     // Delete existing citations for this resource, then re-insert
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
-    const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
-      .values(d.citedBy.map((pageId) => ({
-        resourceId: d.id,
-        pageIdInt: citedByIntIdMap.get(pageId) ?? 0, // Phase D2a: integer only
-      })).filter(v => v.pageIdInt !== 0)) // Skip unresolved pages
+      .values(
+        d.citedBy.map((pageId) => ({
+          resourceId: d.id,
+          pageIdInt: citedByIntIdMap.get(pageId)!,
+        }))
+      )
       .onConflictDoNothing();
   }
 

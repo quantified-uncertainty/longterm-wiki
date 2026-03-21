@@ -49,7 +49,7 @@ ALTER TABLE citation_quotes ALTER COLUMN page_id_old DROP NOT NULL;
 -- 3a. Make page_id_int NOT NULL (required for PK)
 ALTER TABLE resource_citations ALTER COLUMN page_id_int SET NOT NULL;
 -- 3b. Drop existing PK
-ALTER TABLE resource_citations DROP CONSTRAINT resource_citations_pkey;
+ALTER TABLE resource_citations DROP CONSTRAINT resource_citations_resource_id_page_id_pk;
 -- 3c. Create new PK on integer column
 ALTER TABLE resource_citations ADD PRIMARY KEY (resource_id, page_id_int);
 -- 3d. Drop NOT NULL from page_id_old
