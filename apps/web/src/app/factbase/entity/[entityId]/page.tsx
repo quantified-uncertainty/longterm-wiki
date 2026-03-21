@@ -98,6 +98,8 @@ function verdictSummary(verdicts: Map<string, VerdictRow>): Record<string, numbe
 // ─── Rendering mode ──────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~724 pages × ~80KB each = ~56MB saved).
 // These are internal KB data pages with low traffic; SSG is unnecessary.
+// Cache for 1 hour to avoid expensive re-renders from bot crawlers.
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,

@@ -51,6 +51,7 @@ import { inferEntityType } from '../lib/category-entity-types.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors, createPhaseLogger } from '../lib/output.ts';
 import type { CreatorContext } from './creator/types.ts';
+import { runOrchestratorCreate } from './orchestrator/index.ts';
 
 dotenv.config();
 
@@ -432,6 +433,19 @@ async function main(): Promise<void> {
     console.error('Error: Topic required');
     printHelp();
     process.exit(1);
+  }
+
+  // V2 orchestrator engine — short-circuit before the V1 pipeline
+  const engine = parsed.engine as string | undefined;
+  if (engine === 'v2' && !singlePhase) {
+    await runOrchestratorCreate(topic, {
+      tier: (tier as 'budget' | 'standard' | 'premium') || 'standard',
+      directions: directions || '',
+      entityType: destPath ? inferEntityType(destPath) || undefined : undefined,
+      destPath,
+      force: forceCreate,
+    });
+    return;
   }
 
   // Check for existing pages with similar names (skip for single phases)

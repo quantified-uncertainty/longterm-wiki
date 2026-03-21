@@ -30,6 +30,7 @@ const mockMetrics = vi.mocked(extractQualityMetrics);
 
 function makeCtx(overrides: Partial<OrchestratorContext> = {}): OrchestratorContext {
   return {
+    mode: 'improve',
     page: { id: 'test-page', title: 'Test Page', path: '/test' },
     filePath: '/tmp/test.mdx',
     currentContent: '## Test\n\nImproved content.',
@@ -222,5 +223,65 @@ describe('gate pass/fail', () => {
     const result = evaluateQualityGate(ctx);
     expect(result.passed).toBe(false);
     expect(result.gaps.some(g => g.includes('No changes'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Create mode
+// ---------------------------------------------------------------------------
+
+describe('create mode', () => {
+  it('skips regression checks in create mode', () => {
+    const ctx = makeCtx({
+      mode: 'create',
+      budget: { ...TIER_BUDGETS.standard, name: 'Standard Create' },
+    });
+    // Metrics that would fail regression checks in improve mode:
+    // word count drop, citation drop, table drop
+    mockMetrics
+      .mockReturnValueOnce({
+        wordCount: 500, footnoteCount: 3, entityLinkCount: 2,
+        diagramCount: 0, tableCount: 1, sectionCount: 4, structuralScore: 25,
+      })
+      .mockReturnValueOnce({
+        wordCount: 1500, footnoteCount: 10, entityLinkCount: 8,
+        diagramCount: 1, tableCount: 5, sectionCount: 6, structuralScore: 35,
+      });
+
+    const result = evaluateQualityGate(ctx);
+    // Should NOT have regression gaps
+    expect(result.gaps.some(g => g.includes('Word count dropped'))).toBe(false);
+    expect(result.gaps.some(g => g.includes('Citation count dropped'))).toBe(false);
+    expect(result.gaps.some(g => g.includes('Table count dropped'))).toBe(false);
+  });
+
+  it('flags low word count in create mode', () => {
+    const ctx = makeCtx({
+      mode: 'create',
+      budget: { ...TIER_BUDGETS.standard, name: 'Standard Create' },
+    });
+    mockMetrics.mockImplementation(() => ({
+      wordCount: 200, footnoteCount: 2, entityLinkCount: 1,
+      diagramCount: 0, tableCount: 0, sectionCount: 3, structuralScore: 20,
+    }));
+
+    const result = evaluateQualityGate(ctx);
+    expect(result.gaps.some(g => g.includes('too low for a new page'))).toBe(true);
+  });
+
+  it('passes create mode with sufficient content', () => {
+    const ctx = makeCtx({
+      mode: 'create',
+      currentContent: '## Test\n\nNew page content.',
+      originalContent: '## Test\n\n{placeholder}',
+      budget: { ...TIER_BUDGETS.standard, name: 'Standard Create' },
+    });
+    mockMetrics.mockImplementation(() => ({
+      wordCount: 1500, footnoteCount: 12, entityLinkCount: 8,
+      diagramCount: 1, tableCount: 3, sectionCount: 6, structuralScore: 35,
+    }));
+
+    const result = evaluateQualityGate(ctx);
+    expect(result.passed).toBe(true);
   });
 });

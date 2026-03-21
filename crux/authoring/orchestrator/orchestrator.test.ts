@@ -53,6 +53,7 @@ The main challenges include alignment and interpretability.[^2]
 
 function makeContext(overrides: Partial<OrchestratorContext> = {}): OrchestratorContext {
   return {
+    mode: 'improve',
     page: {
       id: 'test-page',
       title: 'Test Page',

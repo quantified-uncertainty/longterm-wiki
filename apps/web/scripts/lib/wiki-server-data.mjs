@@ -572,6 +572,116 @@ export async function fetchPolicyStakeholderIds() {
 }
 
 /**
+ * Sync policy stakeholders from YAML entities to the wiki-server PG table.
+ * This populates `policy_stakeholders` and dual-writes to the `things` table.
+ * Must be called after typedEntities are built so we have access to policy data.
+ *
+ * @param {Array} typedEntities — the full typedEntities array from database
+ */
+export async function syncPolicyStakeholders(typedEntities) {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  policy-stakeholder-sync: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return;
+  }
+
+  const headers = buildHeaders();
+  const policies = typedEntities.filter(e => e.entityType === 'policy' && e.stakeholders?.length > 0);
+  if (policies.length === 0) {
+    console.log('  policy-stakeholder-sync: 0 policies with stakeholders');
+    return;
+  }
+
+  // Build sync items — generate deterministic 10-char IDs from policy+stakeholder
+  const items = [];
+  for (const policy of policies) {
+    const policyEntityId = policy.stableId || policy.id;
+    for (const s of policy.stakeholders) {
+      // Deterministic ID: hash of policyId + stakeholder name
+      const raw = `${policyEntityId}:${s.name}`;
+      const id = generateShortId(raw);
+      const item = {
+        id,
+        policyEntityId,
+        stakeholderEntityId: s.entityId || null,
+        stakeholderDisplayName: s.name,
+        position: s.position,
+        reason: s.reason || null,
+        source: s.source || null,
+        context: s.context || null,
+      };
+      // Only include importance if set (avoids schema errors if column doesn't exist yet)
+      if (s.importance) item.importance = s.importance;
+      items.push(item);
+    }
+  }
+
+  // Sync individually to handle FK errors gracefully (some entityIds may not exist in PG)
+  let synced = 0;
+  let skipped = 0;
+  try {
+    // Batch in groups of 50 for efficiency, fall back to individual on error
+    const batchSize = 50;
+    for (let i = 0; i < items.length; i += batchSize) {
+      const batch = items.slice(i, i + batchSize);
+      const resp = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ items: batch }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        synced += data.upserted || 0;
+      } else {
+        // Batch failed — try items individually to skip bad FK references
+        for (const item of batch) {
+          const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ items: [item] }),
+            signal: AbortSignal.timeout(10_000),
+          });
+          if (r.ok) {
+            synced++;
+          } else {
+            skipped++;
+          }
+        }
+      }
+    }
+    const msg = `${synced} stakeholders synced to PG (${policies.length} policies)`;
+    console.log(`  policy-stakeholder-sync: ${msg}${skipped ? `, ${skipped} skipped (FK errors)` : ''}`);
+  } catch (err) {
+    logWikiServerWarning('policy-stakeholder-sync', err instanceof Error ? err.message : String(err));
+  }
+}
+
+/**
+ * Generate a deterministic 10-char alphanumeric ID from a string.
+ * Uses a simple hash to produce consistent IDs for the same input.
+ */
+function generateShortId(input) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + ch;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  // Convert to base36 and pad/truncate to 10 chars
+  const base = Math.abs(hash).toString(36);
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = base;
+  // Extend with secondary hash if too short
+  let h2 = hash;
+  while (result.length < 10) {
+    h2 = ((h2 << 3) + h2 + input.charCodeAt(result.length % input.length)) & 0x7fffffff;
+    result += chars[h2 % chars.length];
+  }
+  return result.slice(0, 10);
+}
+
+/**
  * Convert a PG personnel row to the RecordEntry format used by frontend components.
  * PG stores canonical entity IDs in personId/organizationId.
  */
