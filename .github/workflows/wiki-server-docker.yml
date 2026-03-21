@@ -435,7 +435,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ghcr.io/quantified-uncertainty/longterm-wiki-server:sha-${{ github.sha }}
           format: sarif

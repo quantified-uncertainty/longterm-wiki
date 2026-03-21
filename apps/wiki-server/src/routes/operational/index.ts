@@ -17,6 +17,6 @@ export { autoUpdateRunsRoute, type AutoUpdateRunsRoute } from "./auto-update-run
 export { autoUpdateNewsRoute, type AutoUpdateNewsRoute } from "./auto-update-news.js";
 export { groundskeeperRunsRoute, type GroundskeeperRunsRoute } from "./groundskeeper-runs.js";
 export { githubIssuesRoute, type GithubIssuesRoute } from "./github-issues.js";
-export { githubPullsRoute, type GithubPullsRoute, type OpenPR } from "./github-pulls.js";
+export { githubPullsRoute, type GithubPullsRoute, type OpenPR, type CheckResult, type CodeRabbitSummary, type ActionNeeded, type PatrolSummary } from "./github-pulls.js";
 export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";
 export { qaChecksRoute, type QaChecksRoute } from "./qa-checks.js";

@@ -4,7 +4,14 @@ import { PRDashboardBoard } from "./pr-dashboard-board";
 import { computeStats, type PullData } from "./pr-dashboard-shared";
 
 // Re-export shared types so existing consumers (mdx-components) keep working
-export type { PullData, PRStats, KanbanColumn } from "./pr-dashboard-shared";
+export type {
+  PullData,
+  PRStats,
+  KanbanColumn,
+  CheckResult,
+  CodeRabbitSummary,
+  ActionNeeded,
+} from "./pr-dashboard-shared";
 export { classifyPR } from "./pr-dashboard-shared";
 
 // ── Data Loading ────────────────────────────────────────────────────────

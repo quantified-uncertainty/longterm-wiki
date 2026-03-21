@@ -24,13 +24,13 @@ interface ForumPostData {
   curatedDate: string | null;
   user: { displayName: string; slug: string } | null;
   coauthors: { displayName: string }[] | null;
-  tags: { tag: { name: string; slug: string } }[] | null;
+  tags: { name: string; slug: string }[] | null;
   sequence: { title: string } | null;
 }
 
 const FORUM_QUERY = `
-query PostBySlug($slug: String!) {
-  post(input: {selector: {slug: $slug}}) {
+query PostById($id: String!) {
+  post(input: {selector: {_id: $id}}) {
     result {
       _id
       title
@@ -42,7 +42,7 @@ query PostBySlug($slug: String!) {
       curatedDate
       user { displayName slug }
       coauthors { displayName }
-      tags { tag { name slug } }
+      tags { name slug }
       sequence { title }
     }
   }
@@ -61,7 +61,7 @@ function getForumEndpoint(url: string): { endpoint: string; forum: string } {
 
 async function fetchForumPostExtended(
   url: string,
-  slug: string,
+  postId: string,
 ): Promise<{ forum: string; post: ForumPostData } | null> {
   const { endpoint, forum } = getForumEndpoint(url);
 
@@ -70,7 +70,7 @@ async function fetchForumPostExtended(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       query: FORUM_QUERY,
-      variables: { slug },
+      variables: { id: postId },
     }),
   });
 
@@ -116,11 +116,11 @@ export async function enrichForumsCommand(
   const forumBatch: Array<{ resourceId: string } & Record<string, unknown>> = [];
 
   for (const r of toProcess) {
-    const slug = extractForumSlug(r.url);
-    if (!slug) continue;
+    const postId = extractForumSlug(r.url); // extracts post ID from URL (e.g., JPfJaXTDQKQQocc2f)
+    if (!postId) continue;
 
     try {
-      const result = await fetchForumPostExtended(r.url, slug);
+      const result = await fetchForumPostExtended(r.url, postId);
       if (!result) {
         failed++;
         if (verbose) console.log(`  ✗ No data: ${r.title || r.url}`);
@@ -144,7 +144,7 @@ export async function enrichForumsCommand(
       }
 
       if (post.tags && post.tags.length > 0) {
-        forumData.forumTags = post.tags.map((t) => t.tag.name);
+        forumData.forumTags = post.tags.map((t) => t.name);
       }
 
       if (post.sequence) {

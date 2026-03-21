@@ -6,7 +6,6 @@ const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
 const origWikiServer = process.env.WIKI_SERVER_ENV;
 const origProdUrl = process.env.PROD_LONGTERMWIKI_SERVER_URL;
 const origProdKey = process.env.PROD_LONGTERMWIKI_SERVER_API_KEY;
-const origTlsBypass = process.env.WIKI_SERVER_TLS_BYPASS;
 
 describe('wiki-server/client', () => {
   let client: typeof import('./client.ts');
@@ -27,8 +26,6 @@ describe('wiki-server/client', () => {
     else delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
     if (origProdKey !== undefined) process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = origProdKey;
     else delete process.env.PROD_LONGTERMWIKI_SERVER_API_KEY;
-    if (origTlsBypass !== undefined) process.env.WIKI_SERVER_TLS_BYPASS = origTlsBypass;
-    else delete process.env.WIKI_SERVER_TLS_BYPASS;
   });
 
   describe('getServerUrl', () => {
@@ -211,39 +208,6 @@ describe('wiki-server/client', () => {
       process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:19999';
       const result = await client.isServerAvailable();
       expect(result).toBe(false);
-    });
-  });
-
-  describe('TLS bypass (WIKI_SERVER_TLS_BYPASS)', () => {
-    it('uses standard fetch for HTTP URLs even when bypass is enabled', async () => {
-      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:19999';
-      process.env.WIKI_SERVER_TLS_BYPASS = 'true';
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-        new Response(JSON.stringify({ ok: true }), { status: 200 }),
-      );
-      await client.apiRequest('GET', '/api/test');
-      expect(fetchSpy).toHaveBeenCalled();
-    });
-
-    it('does not use standard fetch for HTTPS URLs when bypass is enabled', async () => {
-      process.env.LONGTERMWIKI_SERVER_URL = 'https://example.com';
-      process.env.WIKI_SERVER_TLS_BYPASS = 'true';
-      // tlsBypassFetch uses node:https, not global fetch
-      const fetchSpy = vi.spyOn(globalThis, 'fetch');
-      // This will fail to connect but should NOT call global fetch
-      const result = await client.apiRequest('GET', '/api/test', undefined, 1000);
-      expect(fetchSpy).not.toHaveBeenCalled();
-      expect(result.ok).toBe(false);
-    });
-
-    it('uses standard fetch when bypass is not enabled', async () => {
-      process.env.LONGTERMWIKI_SERVER_URL = 'https://example.com';
-      delete process.env.WIKI_SERVER_TLS_BYPASS;
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-        new Response(JSON.stringify({ ok: true }), { status: 200 }),
-      );
-      await client.apiRequest('GET', '/api/test');
-      expect(fetchSpy).toHaveBeenCalled();
     });
   });
 });
