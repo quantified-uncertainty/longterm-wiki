@@ -25,12 +25,10 @@ import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
 import { repairFrontmatter, stripRelatedPagesSections } from '../page-improver/utils.ts';
 import { checkForExistingPage } from '../creator/duplicate-detection.ts';
 import { deployToDestination, validateCrossLinks } from '../creator/deployment.ts';
-import { inferEntityType } from '../../lib/category-entity-types.ts';
 
 import { runOrchestrator, normalizeDollarEscaping } from './orchestrator.ts';
 import { generateCreateScaffold } from './scaffold.ts';
-import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier, CreateTier } from './types.ts';
-import { CREATE_TIER_BUDGETS } from './types.ts';
+import { CREATE_TIER_BUDGETS, type OrchestratorOptions, type OrchestratorResult, type OrchestratorTier, type CreateTier } from './types.ts';
 
 export type { OrchestratorOptions, OrchestratorResult, OrchestratorTier };
 
@@ -45,7 +43,7 @@ const log = createPhaseLogger();
 // ---------------------------------------------------------------------------
 
 function ensureDir(dir: string): void {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(dir, { recursive: true });
 }
 
 function writeTemp(pageId: string, filename: string, content: string | object): string {
@@ -333,6 +331,7 @@ export async function runOrchestratorCreate(
   // ── Duplicate check ──────────────────────────────────────────────────────
 
   if (!force) {
+    let duplicateExists = false;
     try {
       console.log(`\nChecking for existing pages similar to "${topic}"...`);
       const { exists, matches } = await checkForExistingPage(topic, ROOT);
@@ -343,16 +342,19 @@ export async function runOrchestratorCreate(
           const simPercent = Math.round(match.similarity * 100);
           console.log(`  [${simPercent}%] ${match.title} — ${match.path}`);
         }
-        if (exists) {
-          throw new Error(`A page similar to "${topic}" already exists. Use --force to create anyway.`);
+        duplicateExists = exists;
+        if (!exists) {
+          console.log('\n   Partial matches only. Proceeding...\n');
         }
-        console.log('\n   Partial matches only. Proceeding...\n');
       } else {
         console.log('   No similar pages found. Proceeding...\n');
       }
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
       console.warn(`Duplicate check failed (continuing): ${error.message}`);
+    }
+    if (duplicateExists) {
+      throw new Error(`A page similar to "${topic}" already exists. Use --force to create anyway.`);
     }
   }
 
@@ -408,11 +410,11 @@ export async function runOrchestratorCreate(
   );
 
   // ── Post-process content ───────────────────────────────────────────────
+  // normalizeDollarEscaping is already applied inside runOrchestrator()
 
   let finalContent = result.finalContent;
   finalContent = repairFrontmatter(finalContent);
   finalContent = stripRelatedPagesSections(finalContent);
-  finalContent = normalizeDollarEscaping(finalContent);
 
   // ── Write output ───────────────────────────────────────────────────────
 
@@ -460,10 +462,11 @@ export async function runOrchestratorCreate(
       fs.writeFileSync(draftPath, finalContent);
 
       // Build the context that deployToDestination requires
+      // (deployToDestination internally writes an edit-log entry)
       const deployCtx = {
         ROOT,
         getTopicDir: () => draftDir,
-        ensureDir: (dir: string) => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); },
+        ensureDir: (dir: string) => { fs.mkdirSync(dir, { recursive: true }); },
       };
       const deployResult = deployToDestination(topic, destPath, deployCtx);
 
@@ -471,14 +474,6 @@ export async function runOrchestratorCreate(
         console.log(`Deployed to: ${deployResult.deployedTo}`);
         const crossLinks = validateCrossLinks(deployResult.deployedTo!);
         console.log(`EntityLinks: ${crossLinks.outboundCount}`);
-
-        // Edit log
-        appendEditLog(slug, {
-          tool: 'crux-create',
-          agency: 'ai-directed',
-          requestedBy: getDefaultRequestedBy(),
-          note: `Orchestrator v2 create (${tier}): ${topic}`,
-        });
       } else {
         console.error(`Deployment failed: ${deployResult.error}`);
       }

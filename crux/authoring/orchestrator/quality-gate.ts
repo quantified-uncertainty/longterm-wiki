@@ -67,7 +67,8 @@ const TIER_THRESHOLDS: Record<OrchestratorTier, QualityThresholds> = {
  */
 export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult {
   const metrics = extractQualityMetrics(ctx.currentContent, ctx.filePath);
-  const originalMetrics = extractQualityMetrics(ctx.originalContent, ctx.filePath);
+  // Only compute original metrics in improve mode (used for regression checks)
+  const originalMetrics = ctx.mode === 'create' ? null : extractQualityMetrics(ctx.originalContent, ctx.filePath);
   // Map budget name to threshold tier. Create-mode names contain the base tier
   // (e.g., "Standard Create" → "standard", "Budget Create" → "standard").
   const budgetNameLower = ctx.budget.name.toLowerCase();
@@ -83,7 +84,7 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
   const isCreateMode = ctx.mode === 'create';
 
   // Check for regressions (content got worse) — only in improve mode
-  if (!isCreateMode) {
+  if (!isCreateMode && originalMetrics) {
     if (metrics.wordCount < originalMetrics.wordCount * 0.7) {
       gaps.push(
         `Word count dropped significantly: ${originalMetrics.wordCount} → ${metrics.wordCount} ` +

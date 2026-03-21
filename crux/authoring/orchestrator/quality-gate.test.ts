@@ -236,17 +236,12 @@ describe('create mode', () => {
       mode: 'create',
       budget: { ...TIER_BUDGETS.standard, name: 'Standard Create' },
     });
-    // Metrics that would fail regression checks in improve mode:
-    // word count drop, citation drop, table drop
-    mockMetrics
-      .mockReturnValueOnce({
-        wordCount: 500, footnoteCount: 3, entityLinkCount: 2,
-        diagramCount: 0, tableCount: 1, sectionCount: 4, structuralScore: 25,
-      })
-      .mockReturnValueOnce({
-        wordCount: 1500, footnoteCount: 10, entityLinkCount: 8,
-        diagramCount: 1, tableCount: 5, sectionCount: 6, structuralScore: 35,
-      });
+    // In create mode, originalMetrics is skipped — only one mock call needed.
+    // These metrics would trigger regression gaps in improve mode (low values).
+    mockMetrics.mockReturnValueOnce({
+      wordCount: 500, footnoteCount: 3, entityLinkCount: 2,
+      diagramCount: 0, tableCount: 1, sectionCount: 4, structuralScore: 25,
+    });
 
     const result = evaluateQualityGate(ctx);
     // Should NOT have regression gaps
