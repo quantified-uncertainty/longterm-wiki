@@ -156,9 +156,10 @@ export async function VerificationCoverageContent() {
     withApiFallback(loadRecordVerificationStats, emptyRecordStats),
   ]);
 
-  const thingsStats = thingsResult.data;
-  const kbStats = kbResult.data;
-  const recordStats = recordResult.data;
+  // Merge with defaults to guard against undefined fields from unavailable API
+  const thingsStats = { ...emptyThingsStats(), ...thingsResult.data };
+  const kbStats = { ...emptyKbStats(), ...kbResult.data };
+  const recordStats = { ...emptyRecordStats(), ...recordResult.data };
 
   // Determine overall source and error
   const source = thingsResult.source === "api" ? "api" as const : "local" as const;
@@ -179,7 +180,7 @@ export async function VerificationCoverageContent() {
     .filter(([v]) => v !== "unchecked")
     .reduce((sum, [, c]) => sum + c, 0);
   const pctVerified =
-    thingsStats.total > 0
+    (thingsStats.total ?? 0) > 0
       ? Math.round((thingsVerified / thingsStats.total) * 100)
       : 0;
 
@@ -221,7 +222,7 @@ export async function VerificationCoverageContent() {
     kbStats.needs_recheck + recordStats.needs_recheck;
 
   // Staleness data (from record verifications)
-  const staleness = recordStats.staleness;
+  const staleness = recordStats.staleness ?? { over_30_days: 0, over_90_days: 0, over_180_days: 0 };
 
   // Coverage by entity type — combine local entity counts with things byEntityType
   const entityTypes = [...entityCountByType.keys()].sort();
@@ -270,7 +271,7 @@ export async function VerificationCoverageContent() {
         <StatCard
           label="% Indexed in Things"
           value={`${pctVerified}%`}
-          sub={`${thingsVerified.toLocaleString()} of ${thingsStats.total.toLocaleString()} things`}
+          sub={`${(thingsVerified ?? 0).toLocaleString()} of ${(thingsStats.total ?? 0).toLocaleString()} things`}
           color={coverageColor(pctVerified)}
         />
         <StatCard
@@ -280,22 +281,22 @@ export async function VerificationCoverageContent() {
               ? `${Math.round(overallAvgConfidence * 100)}%`
               : "N/A"
           }
-          sub={`Across ${weightTotal.toLocaleString()} verdicts`}
+          sub={`Across ${(weightTotal ?? 0).toLocaleString()} verdicts`}
         />
         <StatCard
           label="Needs Recheck"
-          value={totalNeedsRecheck.toLocaleString()}
+          value={(totalNeedsRecheck ?? 0).toLocaleString()}
           color={totalNeedsRecheck > 0 ? "text-amber-600" : ""}
           sub={
             totalNeedsRecheck > 0
-              ? `${kbStats.needs_recheck} facts, ${recordStats.needs_recheck} records`
+              ? `${kbStats.needs_recheck ?? 0} facts, ${recordStats.needs_recheck ?? 0} records`
               : "All up to date"
           }
         />
         <StatCard
           label="FactBase Facts Checked"
-          value={kbStats.total_facts.toLocaleString()}
-          sub={`${recordStats.total_verdicts.toLocaleString()} record verdicts`}
+          value={(kbStats.total_facts ?? 0).toLocaleString()}
+          sub={`${(recordStats.total_verdicts ?? 0).toLocaleString()} record verdicts`}
         />
       </div>
 
