@@ -7,6 +7,7 @@ import {
   count,
   sql,
   desc,
+  inArray,
   type SQL,
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
@@ -433,7 +434,7 @@ const resourcesApp = new Hono()
       }
     }
 
-    const results: Array<{ id: string; url: string }> = [];
+    let results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
         // Phase 4a: pre-resolve all citedBy page IDs in one batch query
@@ -442,13 +443,83 @@ const resourcesApp = new Hono()
           ? await resolvePageIntIds(tx, allCitedByIds)
           : new Map<string, number>();
 
-        for (const item of items) {
-          // Skip per-row search_vector update; handled in bulk below
-          const result = await upsertResource(tx, item, {
-            skipSearchVector: true,
-            intIdMap,
+        // Bulk upsert all resources in one query
+        const allVals = items.map((d) => resourceValues(d));
+        const upsertedRows = await tx
+          .insert(resources)
+          .values(allVals)
+          .onConflictDoUpdate({
+            target: resources.id,
+            set: {
+              url: sql`excluded.url`,
+              title: sql`COALESCE(excluded.title, ${resources.title})`,
+              type: sql`COALESCE(excluded.type, ${resources.type})`,
+              summary: sql`COALESCE(excluded.summary, ${resources.summary})`,
+              review: sql`COALESCE(excluded.review, ${resources.review})`,
+              abstract: sql`COALESCE(excluded.abstract, ${resources.abstract})`,
+              keyPoints: sql`COALESCE(excluded.key_points, ${resources.keyPoints})`,
+              publicationId: sql`COALESCE(excluded.publication_id, ${resources.publicationId})`,
+              authors: sql`COALESCE(excluded.authors, ${resources.authors})`,
+              publishedDate: sql`COALESCE(excluded.published_date, ${resources.publishedDate})`,
+              tags: sql`COALESCE(excluded.tags, ${resources.tags})`,
+              localFilename: sql`COALESCE(excluded.local_filename, ${resources.localFilename})`,
+              credibilityOverride: sql`COALESCE(excluded.credibility_override, ${resources.credibilityOverride})`,
+              fetchedAt: sql`COALESCE(excluded.fetched_at, ${resources.fetchedAt})`,
+              contentHash: sql`COALESCE(excluded.content_hash, ${resources.contentHash})`,
+              stableId: sql`COALESCE(${resources.stableId}, excluded.stable_id)`,
+              archiveUrl: sql`COALESCE(excluded.archive_url, ${resources.archiveUrl})`,
+              stance: sql`COALESCE(excluded.stance, ${resources.stance})`,
+              contextNote: sql`COALESCE(excluded.context_note, ${resources.contextNote})`,
+              resourcePurpose: sql`COALESCE(excluded.resource_purpose, ${resources.resourcePurpose})`,
+              resourceSubtype: sql`COALESCE(excluded.resource_subtype, ${resources.resourceSubtype})`,
+              typeMetadata: sql`COALESCE(excluded.type_metadata, ${resources.typeMetadata})`,
+              publisherEntityId: sql`COALESCE(excluded.publisher_entity_id, ${resources.publisherEntityId})`,
+              relatedEntityIds: sql`COALESCE(excluded.related_entity_ids, ${resources.relatedEntityIds})`,
+              enrichmentStatus: sql`COALESCE(excluded.enrichment_status, ${resources.enrichmentStatus})`,
+              enrichmentDate: sql`CASE WHEN excluded.enrichment_status IS NOT NULL THEN now() ELSE COALESCE(null::timestamptz, ${resources.enrichmentDate}) END`,
+              importanceScore: sql`COALESCE(excluded.importance_score, ${resources.importanceScore})`,
+              updatedAt: sql`now()`,
+            },
+          })
+          .returning({
+            id: resources.id,
+            url: resources.url,
+            title: resources.title,
           });
-          results.push({ id: result.id, url: result.url });
+
+        results = upsertedRows.map((r) => ({ id: r.id, url: r.url }));
+
+        // Bulk replace citations: delete all old citations for batch resources, then insert new ones
+        const resourceIdsWithCitations = items
+          .filter((d) => d.citedBy && d.citedBy.length > 0)
+          .map((d) => d.id);
+        if (resourceIdsWithCitations.length > 0) {
+          await tx
+            .delete(resourceCitations)
+            .where(inArray(resourceCitations.resourceId, resourceIdsWithCitations));
+
+          const allCitations: Array<{
+            resourceId: string;
+            pageId: string;
+            pageIdInt: number | null;
+          }> = [];
+          for (const item of items) {
+            if (item.citedBy && item.citedBy.length > 0) {
+              for (const pageId of item.citedBy) {
+                allCitations.push({
+                  resourceId: item.id,
+                  pageId,
+                  pageIdInt: intIdMap.get(pageId) ?? null,
+                });
+              }
+            }
+          }
+          if (allCitations.length > 0) {
+            await tx
+              .insert(resourceCitations)
+              .values(allCitations)
+              .onConflictDoNothing();
+          }
         }
 
         // Bulk search_vector update for all upserted resources (one query)
@@ -1038,86 +1109,112 @@ const resourcesApp = new Hono()
 
     try {
       await db.transaction(async (tx) => {
-        // Batch upsert papers
-        if (batchData.papers) {
-          for (const item of batchData.papers) {
-            const { resourceId, ...data } = item;
-            await tx
-              .insert(resourcePapers)
-              .values({ resourceId, ...data, categories: data.categories ?? null, updatedAt: new Date() })
-              .onConflictDoUpdate({
-                target: resourcePapers.resourceId,
-                set: {
-                  arxivId: sql`COALESCE(${data.arxivId ?? null}, ${resourcePapers.arxivId})`,
-                  doi: sql`COALESCE(${data.doi ?? null}, ${resourcePapers.doi})`,
-                  semanticScholarId: sql`COALESCE(${data.semanticScholarId ?? null}, ${resourcePapers.semanticScholarId})`,
-                  abstract: sql`COALESCE(${data.abstract ?? null}, ${resourcePapers.abstract})`,
-                  citationCount: sql`COALESCE(${data.citationCount ?? null}, ${resourcePapers.citationCount})`,
-                  influentialCitationCount: sql`COALESCE(${data.influentialCitationCount ?? null}, ${resourcePapers.influentialCitationCount})`,
-                  categories: data.categories
-                    ? sql`COALESCE(${JSON.stringify(data.categories)}::jsonb, ${resourcePapers.categories})`
-                    : sql`COALESCE(null::jsonb, ${resourcePapers.categories})`,
-                  methodology: sql`COALESCE(${data.methodology ?? null}, ${resourcePapers.methodology})`,
-                  year: sql`COALESCE(${data.year ?? null}, ${resourcePapers.year})`,
-                  updatedAt: sql`now()`,
-                },
-              });
-            results.papers++;
-          }
+        // Bulk upsert papers in one query
+        if (batchData.papers && batchData.papers.length > 0) {
+          const paperVals = batchData.papers.map((item) => ({
+            resourceId: item.resourceId,
+            arxivId: item.arxivId ?? null,
+            doi: item.doi ?? null,
+            semanticScholarId: item.semanticScholarId ?? null,
+            abstract: item.abstract ?? null,
+            citationCount: item.citationCount ?? null,
+            influentialCitationCount: item.influentialCitationCount ?? null,
+            categories: item.categories ?? null,
+            methodology: item.methodology ?? null,
+            year: item.year ?? null,
+            updatedAt: new Date(),
+          }));
+          await tx
+            .insert(resourcePapers)
+            .values(paperVals)
+            .onConflictDoUpdate({
+              target: resourcePapers.resourceId,
+              set: {
+                arxivId: sql`COALESCE(excluded.arxiv_id, ${resourcePapers.arxivId})`,
+                doi: sql`COALESCE(excluded.doi, ${resourcePapers.doi})`,
+                semanticScholarId: sql`COALESCE(excluded.semantic_scholar_id, ${resourcePapers.semanticScholarId})`,
+                abstract: sql`COALESCE(excluded.abstract, ${resourcePapers.abstract})`,
+                citationCount: sql`COALESCE(excluded.citation_count, ${resourcePapers.citationCount})`,
+                influentialCitationCount: sql`COALESCE(excluded.influential_citation_count, ${resourcePapers.influentialCitationCount})`,
+                categories: sql`COALESCE(excluded.categories, ${resourcePapers.categories})`,
+                methodology: sql`COALESCE(excluded.methodology, ${resourcePapers.methodology})`,
+                year: sql`COALESCE(excluded.year, ${resourcePapers.year})`,
+                updatedAt: sql`now()`,
+              },
+            });
+          results.papers = batchData.papers.length;
         }
 
-        // Batch upsert forum posts
-        if (batchData.forumPosts) {
-          for (const item of batchData.forumPosts) {
-            const { resourceId, ...data } = item;
-            await tx
-              .insert(resourceForumPosts)
-              .values({ resourceId, ...data, forumTags: data.forumTags ?? null, updatedAt: new Date() })
-              .onConflictDoUpdate({
-                target: resourceForumPosts.resourceId,
-                set: {
-                  forum: data.forum,
-                  forumPostId: sql`COALESCE(${data.forumPostId ?? null}, ${resourceForumPosts.forumPostId})`,
-                  forumSlug: sql`COALESCE(${data.forumSlug ?? null}, ${resourceForumPosts.forumSlug})`,
-                  karma: sql`COALESCE(${data.karma ?? null}, ${resourceForumPosts.karma})`,
-                  commentCount: sql`COALESCE(${data.commentCount ?? null}, ${resourceForumPosts.commentCount})`,
-                  authorUsername: sql`COALESCE(${data.authorUsername ?? null}, ${resourceForumPosts.authorUsername})`,
-                  forumTags: data.forumTags
-                    ? sql`COALESCE(${JSON.stringify(data.forumTags)}::jsonb, ${resourceForumPosts.forumTags})`
-                    : sql`COALESCE(null::jsonb, ${resourceForumPosts.forumTags})`,
-                  sequenceTitle: sql`COALESCE(${data.sequenceTitle ?? null}, ${resourceForumPosts.sequenceTitle})`,
-                  curated: data.curated != null ? data.curated : sql`${resourceForumPosts.curated}`,
-                  crossPostedFrom: sql`COALESCE(${data.crossPostedFrom ?? null}, ${resourceForumPosts.crossPostedFrom})`,
-                  canonicalForum: sql`COALESCE(${data.canonicalForum ?? null}, ${resourceForumPosts.canonicalForum})`,
-                  updatedAt: sql`now()`,
-                },
-              });
-            results.forumPosts++;
-          }
+        // Bulk upsert forum posts in one query
+        if (batchData.forumPosts && batchData.forumPosts.length > 0) {
+          const forumVals = batchData.forumPosts.map((item) => ({
+            resourceId: item.resourceId,
+            forum: item.forum,
+            forumPostId: item.forumPostId ?? null,
+            forumSlug: item.forumSlug ?? null,
+            karma: item.karma ?? null,
+            commentCount: item.commentCount ?? null,
+            authorUsername: item.authorUsername ?? null,
+            forumTags: item.forumTags ?? null,
+            sequenceTitle: item.sequenceTitle ?? null,
+            curated: item.curated ?? null,
+            crossPostedFrom: item.crossPostedFrom ?? null,
+            canonicalForum: item.canonicalForum ?? null,
+            updatedAt: new Date(),
+          }));
+          await tx
+            .insert(resourceForumPosts)
+            .values(forumVals)
+            .onConflictDoUpdate({
+              target: resourceForumPosts.resourceId,
+              set: {
+                forum: sql`excluded.forum`,
+                forumPostId: sql`COALESCE(excluded.forum_post_id, ${resourceForumPosts.forumPostId})`,
+                forumSlug: sql`COALESCE(excluded.forum_slug, ${resourceForumPosts.forumSlug})`,
+                karma: sql`COALESCE(excluded.karma, ${resourceForumPosts.karma})`,
+                commentCount: sql`COALESCE(excluded.comment_count, ${resourceForumPosts.commentCount})`,
+                authorUsername: sql`COALESCE(excluded.author_username, ${resourceForumPosts.authorUsername})`,
+                forumTags: sql`COALESCE(excluded.forum_tags, ${resourceForumPosts.forumTags})`,
+                sequenceTitle: sql`COALESCE(excluded.sequence_title, ${resourceForumPosts.sequenceTitle})`,
+                curated: sql`COALESCE(excluded.curated, ${resourceForumPosts.curated})`,
+                crossPostedFrom: sql`COALESCE(excluded.cross_posted_from, ${resourceForumPosts.crossPostedFrom})`,
+                canonicalForum: sql`COALESCE(excluded.canonical_forum, ${resourceForumPosts.canonicalForum})`,
+                updatedAt: sql`now()`,
+              },
+            });
+          results.forumPosts = batchData.forumPosts.length;
         }
 
-        // Batch upsert policy docs
-        if (batchData.policyDocs) {
-          for (const item of batchData.policyDocs) {
-            const { resourceId, ...data } = item;
-            await tx
-              .insert(resourcePolicyDocs)
-              .values({ resourceId, ...data, updatedAt: new Date() })
-              .onConflictDoUpdate({
-                target: resourcePolicyDocs.resourceId,
-                set: {
-                  documentType: sql`COALESCE(${data.documentType ?? null}, ${resourcePolicyDocs.documentType})`,
-                  jurisdictionEntityId: sql`COALESCE(${data.jurisdictionEntityId ?? null}, ${resourcePolicyDocs.jurisdictionEntityId})`,
-                  agencyEntityId: sql`COALESCE(${data.agencyEntityId ?? null}, ${resourcePolicyDocs.agencyEntityId})`,
-                  policyEntityId: sql`COALESCE(${data.policyEntityId ?? null}, ${resourcePolicyDocs.policyEntityId})`,
-                  effectiveDate: sql`COALESCE(${data.effectiveDate ?? null}, ${resourcePolicyDocs.effectiveDate})`,
-                  documentStatus: sql`COALESCE(${data.documentStatus ?? null}, ${resourcePolicyDocs.documentStatus})`,
-                  referenceNumber: sql`COALESCE(${data.referenceNumber ?? null}, ${resourcePolicyDocs.referenceNumber})`,
-                  updatedAt: sql`now()`,
-                },
-              });
-            results.policyDocs++;
-          }
+        // Bulk upsert policy docs in one query
+        if (batchData.policyDocs && batchData.policyDocs.length > 0) {
+          const policyVals = batchData.policyDocs.map((item) => ({
+            resourceId: item.resourceId,
+            documentType: item.documentType ?? null,
+            jurisdictionEntityId: item.jurisdictionEntityId ?? null,
+            agencyEntityId: item.agencyEntityId ?? null,
+            policyEntityId: item.policyEntityId ?? null,
+            effectiveDate: item.effectiveDate ?? null,
+            documentStatus: item.documentStatus ?? null,
+            referenceNumber: item.referenceNumber ?? null,
+            updatedAt: new Date(),
+          }));
+          await tx
+            .insert(resourcePolicyDocs)
+            .values(policyVals)
+            .onConflictDoUpdate({
+              target: resourcePolicyDocs.resourceId,
+              set: {
+                documentType: sql`COALESCE(excluded.document_type, ${resourcePolicyDocs.documentType})`,
+                jurisdictionEntityId: sql`COALESCE(excluded.jurisdiction_entity_id, ${resourcePolicyDocs.jurisdictionEntityId})`,
+                agencyEntityId: sql`COALESCE(excluded.agency_entity_id, ${resourcePolicyDocs.agencyEntityId})`,
+                policyEntityId: sql`COALESCE(excluded.policy_entity_id, ${resourcePolicyDocs.policyEntityId})`,
+                effectiveDate: sql`COALESCE(excluded.effective_date, ${resourcePolicyDocs.effectiveDate})`,
+                documentStatus: sql`COALESCE(excluded.document_status, ${resourcePolicyDocs.documentStatus})`,
+                referenceNumber: sql`COALESCE(excluded.reference_number, ${resourcePolicyDocs.referenceNumber})`,
+                updatedAt: sql`now()`,
+              },
+            });
+          results.policyDocs = batchData.policyDocs.length;
         }
       });
 

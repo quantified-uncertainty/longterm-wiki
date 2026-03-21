@@ -69,44 +69,54 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // ---- INSERT INTO resources ... ON CONFLICT ----
+  // ---- INSERT INTO resources ... ON CONFLICT (supports multi-row) ----
   if (q.includes("insert into") && q.includes('"resources"') && !q.includes("resource_citations")) {
     const now = new Date();
-    const id = params[0] as string;
-    const existing = resourceStore.get(id);
+    const COLS = 27; // Number of columns in resourceValues()
+    const numRows = Math.max(1, Math.floor(params.length / COLS));
+    const results: Record<string, unknown>[] = [];
 
-    const row: Record<string, unknown> = {
-      id,
-      url: params[1],
-      // COALESCE(incoming, existing): non-null incoming overwrites; null preserves existing.
-      // Mirrors the server-side ON CONFLICT SET COALESCE() for enrichable fields.
-      title: params[2] ?? existing?.title ?? null,
-      type: params[3] ?? existing?.type ?? null,
-      summary: params[4] ?? existing?.summary ?? null,
-      review: params[5] ?? existing?.review ?? null,
-      abstract: params[6] ?? existing?.abstract ?? null,
-      key_points: params[7] ?? existing?.key_points ?? null,
-      publication_id: params[8] ?? existing?.publication_id ?? null,
-      authors: params[9] ?? existing?.authors ?? null,
-      published_date: params[10] ?? existing?.published_date ?? null,
-      tags: params[11] ?? existing?.tags ?? null,
-      local_filename: params[12] ?? existing?.local_filename ?? null,
-      credibility_override: params[13] ?? existing?.credibility_override ?? null,
-      fetched_at: params[14] ?? existing?.fetched_at ?? null,
-      content_hash: params[15] ?? existing?.content_hash ?? null,
-      // stableId is generate-once: preserve existing, only set if row didn't have one
-      stable_id: existing?.stable_id ?? params[16] ?? null,
-      created_at: existing?.created_at ?? now,
-      updated_at: now,
-    };
-    resourceStore.set(id, row);
-    return [row];
+    for (let r = 0; r < numRows; r++) {
+      const o = r * COLS;
+      const id = params[o] as string;
+      const existing = resourceStore.get(id);
+
+      const row: Record<string, unknown> = {
+        id,
+        url: params[o + 1],
+        // COALESCE(incoming, existing): non-null incoming overwrites; null preserves existing.
+        title: params[o + 2] ?? existing?.title ?? null,
+        type: params[o + 3] ?? existing?.type ?? null,
+        summary: params[o + 4] ?? existing?.summary ?? null,
+        review: params[o + 5] ?? existing?.review ?? null,
+        abstract: params[o + 6] ?? existing?.abstract ?? null,
+        key_points: params[o + 7] ?? existing?.key_points ?? null,
+        publication_id: params[o + 8] ?? existing?.publication_id ?? null,
+        authors: params[o + 9] ?? existing?.authors ?? null,
+        published_date: params[o + 10] ?? existing?.published_date ?? null,
+        tags: params[o + 11] ?? existing?.tags ?? null,
+        local_filename: params[o + 12] ?? existing?.local_filename ?? null,
+        credibility_override: params[o + 13] ?? existing?.credibility_override ?? null,
+        fetched_at: params[o + 14] ?? existing?.fetched_at ?? null,
+        content_hash: params[o + 15] ?? existing?.content_hash ?? null,
+        // stableId is generate-once: preserve existing, only set if row didn't have one
+        stable_id: existing?.stable_id ?? params[o + 16] ?? null,
+        created_at: existing?.created_at ?? now,
+        updated_at: now,
+      };
+      resourceStore.set(id, row);
+      results.push(row);
+    }
+    return results;
   }
 
-  // ---- DELETE FROM resource_citations WHERE resource_id = $1 ----
+  // ---- DELETE FROM resource_citations WHERE resource_id ... ----
   if (q.includes("delete") && q.includes("resource_citations") && q.includes("where")) {
-    const resourceId = params[0] as string;
-    citationStore = citationStore.filter((c) => c.resource_id !== resourceId);
+    // Supports both single-row (= $1) and bulk (IN ($1, $2, ...)) deletes
+    for (const p of params) {
+      const resourceId = p as string;
+      citationStore = citationStore.filter((c) => c.resource_id !== resourceId);
+    }
     return [];
   }
 
