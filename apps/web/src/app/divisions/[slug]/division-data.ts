@@ -134,11 +134,24 @@ function getOrgSlugForEntity(entityId: string): string | null {
   return getKBEntitySlug(entityId) ?? null;
 }
 
-/** Build the canonical href for a division: /organizations/[orgSlug]/divisions/[divId] */
-export function getDivisionHref(division: { key: string; ownerEntityId: string }): string | null {
+/**
+ * Derive a URL-safe slug from a division name.
+ * E.g. "Alignment Science" → "alignment-science"
+ */
+function nameToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** Build the canonical href for a division: /organizations/[orgSlug]/divisions/[divSlug] */
+export function getDivisionHref(division: { key: string; slug?: string | null; name?: string; ownerEntityId: string }): string | null {
   const orgSlug = getOrgSlugForEntity(division.ownerEntityId);
   if (!orgSlug) return null;
-  return `/organizations/${orgSlug}/divisions/${division.key}`;
+  // Prefer explicit slug, then name-derived slug, then opaque key as fallback
+  const divSlug = division.slug || (division.name ? nameToSlug(division.name) : null) || division.key;
+  return `/organizations/${orgSlug}/divisions/${divSlug}`;
 }
 
 // ── Deduplication ────────────────────────────────────────────────────
@@ -205,13 +218,23 @@ export function getDivisionAltKeys(record: KBRecordEntry): Set<string> {
 
 // ── Lookup helpers ────────────────────────────────────────────────────
 
-/** Find a division by org slug + division ID (record key). Returns merged record. */
+/**
+ * Find a division by org slug + division identifier.
+ * Matches by: record key, fields.slug, or name-derived slug.
+ * Returns merged record.
+ */
 export function findDivision(orgSlug: string, divId: string): KBRecordEntry | undefined {
   const allDivisions = getAllKBRecords("divisions");
   const match = allDivisions.find((d) => {
-    if (d.key !== divId) return false;
     const ownerOrgSlug = getOrgSlugForEntity(d.ownerEntityId);
-    return ownerOrgSlug === orgSlug;
+    if (ownerOrgSlug !== orgSlug) return false;
+    // Match by key, explicit slug, or name-derived slug
+    if (d.key === divId) return true;
+    const fieldSlug = d.fields.slug as string | undefined;
+    if (fieldSlug === divId) return true;
+    const divName = (d.fields.name as string) ?? '';
+    if (divName && nameToSlug(divName) === divId) return true;
+    return false;
   });
   if (!match) return undefined;
 
@@ -232,12 +255,14 @@ export function findDivision(orgSlug: string, divId: string): KBRecordEntry | un
   return match;
 }
 
-/** Legacy: find by old-style slug (key or fields.slug). Used for redirects. */
+/** Legacy: find by old-style slug (key, fields.slug, or name-derived slug). Used for redirects. */
 export function findDivisionByLegacySlug(slug: string): KBRecordEntry | undefined {
   const allDivisions = getAllKBRecords("divisions");
   return allDivisions.find((d) => {
     const divSlug = d.fields.slug as string | undefined;
-    return divSlug === slug || d.key === slug;
+    if (divSlug === slug || d.key === slug) return true;
+    const divName = (d.fields.name as string) ?? '';
+    return divName && nameToSlug(divName) === slug;
   });
 }
 
@@ -248,7 +273,9 @@ export function getAllDivisionParams(): Array<{ slug: string; divSlug: string }>
   for (const d of records) {
     const orgSlug = getOrgSlugForEntity(d.ownerEntityId);
     if (!orgSlug) continue;
-    params.push({ slug: orgSlug, divSlug: d.key });
+    const parsed = parseDivision(d);
+    const divSlug = parsed.slug || nameToSlug(parsed.name) || d.key;
+    params.push({ slug: orgSlug, divSlug });
   }
   return params;
 }
