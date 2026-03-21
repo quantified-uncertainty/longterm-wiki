@@ -51,7 +51,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
     relatedGraph: _relatedGraph,
     ...databaseForOutput
   } = database;
-  writeFileSync(outputFile, JSON.stringify(databaseForOutput, null, 2));
+  writeFileSync(outputFile, JSON.stringify(databaseForOutput));
   const strippedKeys = [
     'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
     'researchAreas', 'pageReferenceIndex', 'prItems', 'updateSchedule',
@@ -62,7 +62,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
   if (_kbData) {
-    writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData, null, 2));
+    writeFileSync(FACTBASE_OUTPUT_FILE, JSON.stringify(_kbData));
     console.log(`✓ Written: ${FACTBASE_OUTPUT_FILE} (FactBase facts, records, schemas — entities owned by TableBase)`);
   } else {
     console.warn('⚠ FactBase data not available — factbase-data.json not written');
