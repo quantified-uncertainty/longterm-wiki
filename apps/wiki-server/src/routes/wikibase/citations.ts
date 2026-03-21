@@ -81,7 +81,7 @@ const CleanupQuery = z.object({
 function quoteValues(d: UpsertQuoteData, pageIdInt: number) {
   return {
     // Phase D2a: no longer writing page_id_old; integer only
-    pageIdInt,
+    pageId: pageIdInt,
     footnote: d.footnote,
     url: d.url ?? null,
     resourceId: d.resourceId ?? null,
@@ -102,20 +102,20 @@ function quoteValues(d: UpsertQuoteData, pageIdInt: number) {
 function upsertQuote(
   db: ReturnType<typeof getDrizzleDb> | Parameters<Parameters<ReturnType<typeof getDrizzleDb>["transaction"]>[0]>[0],
   d: UpsertQuoteData,
-  pageIdInt: number
+  pageId: number
 ) {
-  const vals = quoteValues(d, pageIdInt);
+  const vals = quoteValues(d, pageId);
   return db
     .insert(citationQuotes)
     .values(vals)
     .onConflictDoUpdate({
-      // Phase D2a: ON CONFLICT on integer column (requires citation_quotes_page_id_int_footnote_unique index)
-      target: [citationQuotes.pageIdInt, citationQuotes.footnote],
+      // Phase D2a: ON CONFLICT on integer column (requires citation_quotes_page_id_footnote_unique index)
+      target: [citationQuotes.pageId, citationQuotes.footnote],
       set: { ...vals, updatedAt: sql`now()` },
     })
     .returning({
       id: citationQuotes.id,
-      pageIdInt: citationQuotes.pageIdInt,
+      pageId: citationQuotes.pageId,
       footnote: citationQuotes.footnote,
       createdAt: citationQuotes.createdAt,
       updatedAt: citationQuotes.updatedAt,
@@ -188,7 +188,7 @@ const citationsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id_int
+    // Phase 4b: resolve slug to integer and query by page_id
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json(computePageHealth(pageId, []));
 
@@ -201,7 +201,7 @@ const citationsApp = new Hono()
         accuracyScore: citationQuotes.accuracyScore,
       })
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageIdInt, intId));
+      .where(eq(citationQuotes.pageId, intId));
 
     return c.json(computePageHealth(pageId, rows));
   })
@@ -213,7 +213,7 @@ const citationsApp = new Hono()
     const db = getDrizzleDb();
 
     // Validate page reference
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, [parsed.pageId]);
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.slug, [parsed.pageId]);
     if (missingPages.length > 0) {
       return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
     }
@@ -251,7 +251,7 @@ const citationsApp = new Hono()
 
     // Validate page references
     const pageIds = [...new Set(items.map((d) => d.pageId))];
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.slug, pageIds);
     if (missingPages.length > 0) {
       return validationError(
         c,
@@ -288,7 +288,7 @@ const citationsApp = new Hono()
             return quoteValues(d, intId);
           }))
           .onConflictDoUpdate({
-            target: [citationQuotes.pageIdInt, citationQuotes.footnote],
+            target: [citationQuotes.pageId, citationQuotes.footnote],
             set: {
               url: sql`excluded.url`,
               resourceId: sql`excluded.resource_id`,
@@ -307,7 +307,7 @@ const citationsApp = new Hono()
           })
           .returning({
             id: citationQuotes.id,
-            pageIdInt: citationQuotes.pageIdInt,
+            pageId: citationQuotes.pageId,
             footnote: citationQuotes.footnote,
           });
       });
@@ -324,7 +324,7 @@ const citationsApp = new Hono()
     return c.json({
       results: results.map((r) => ({
         id: r.id,
-        pageId: intIdToSlug.get(r.pageIdInt!) ?? "unknown",
+        pageId: intIdToSlug.get(r.pageId!) ?? "unknown",
         footnote: r.footnote,
       })),
     });
@@ -341,7 +341,7 @@ const citationsApp = new Hono()
     const rows = await db
       .select()
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageIdInt, intId))
+      .where(eq(citationQuotes.pageId, intId))
       .orderBy(asc(citationQuotes.footnote))
       .limit(limit);
 
@@ -356,7 +356,7 @@ const citationsApp = new Hono()
     const rows = await db
       .select()
       .from(citationQuotes)
-      .orderBy(asc(citationQuotes.pageIdInt), asc(citationQuotes.footnote))
+      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
       .limit(limit)
       .offset(offset);
 
@@ -385,7 +385,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.pageId, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -419,7 +419,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.pageId, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -456,7 +456,7 @@ const citationsApp = new Hono()
       })
       .where(
         and(
-          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.pageId, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -481,7 +481,7 @@ const citationsApp = new Hono()
       withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null then 1 end)`,
       verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
       unverified: sql<number>`count(case when ${citationQuotes.quoteVerified} = false or ${citationQuotes.quoteVerified} is null then 1 end)`,
-      totalPages: sql<number>`count(distinct ${citationQuotes.pageIdInt})`,
+      totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
       averageScore: avg(citationQuotes.verificationScore),
     }).from(citationQuotes);
 
@@ -501,7 +501,7 @@ const citationsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db.select({
-      pageId: wikiPages.id,
+      pageId: wikiPages.slug,
       total: count(),
       withQuotes: sql<number>`count(case when ${citationQuotes.sourceQuote} is not null then 1 end)`,
       verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
@@ -511,9 +511,9 @@ const citationsApp = new Hono()
       inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
     })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
-      .groupBy(wikiPages.id)
-      .orderBy(asc(wikiPages.id))
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
+      .groupBy(wikiPages.slug)
+      .orderBy(asc(wikiPages.slug))
       // Limit raised well above the ~700 page max so that sorting by inaccuracy
       // rate on the client side (e.g. in the accuracy dashboard) sees all pages.
       .limit(5000);
@@ -537,17 +537,17 @@ const citationsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db.select({
-      pageId: wikiPages.id,
+      pageId: wikiPages.slug,
       checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
       accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
       inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
       unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
     })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
-      .groupBy(wikiPages.id)
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
+      .groupBy(wikiPages.slug)
       .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`)
-      .orderBy(asc(wikiPages.id))
+      .orderBy(asc(wikiPages.slug))
       .limit(500);
 
     return c.json({
@@ -567,14 +567,14 @@ const citationsApp = new Hono()
 
     const rows = await db
       .select({
-        pageId: wikiPages.id,
+        pageId: wikiPages.slug,
         footnote: citationQuotes.footnote,
         url: citationQuotes.url,
         claimText: citationQuotes.claimText,
         verificationScore: citationQuotes.verificationScore,
       })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
       .where(
         and(
           eq(citationQuotes.quoteVerified, true),
@@ -584,7 +584,7 @@ const citationsApp = new Hono()
       )
       .orderBy(
         asc(citationQuotes.verificationScore),
-        asc(wikiPages.id),
+        asc(wikiPages.slug),
         asc(citationQuotes.footnote)
       )
       .limit(500);
@@ -632,8 +632,8 @@ const citationsApp = new Hono()
     // Compute per-page accuracy stats from current citation_quotes data
     // Phase D2a: group by pageIdInt and LEFT JOIN wiki_pages to get slug
     const pageStats = await db.select({
-      pageIdInt: citationQuotes.pageIdInt,
-      pageId: wikiPages.id,
+      pageId: citationQuotes.pageId,
+      pageSlug: wikiPages.slug,
       totalCitations: count(),
       checkedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
       accurateCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
@@ -644,8 +644,8 @@ const citationsApp = new Hono()
       averageScore: avg(citationQuotes.accuracyScore),
     })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
-      .groupBy(citationQuotes.pageIdInt, wikiPages.id)
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
+      .groupBy(citationQuotes.pageId, wikiPages.slug)
       .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`);
 
     // Insert snapshots for all pages with accuracy data
@@ -655,7 +655,7 @@ const citationsApp = new Hono()
         .insert(citationAccuracySnapshots)
         .values(
           pageStats.map((ps) => ({
-            pageIdInt: ps.pageIdInt,
+            pageId: ps.pageId,
             totalCitations: ps.totalCitations,
             checkedCitations: Number(ps.checkedCitations),
             accurateCount: Number(ps.accurateCount),
@@ -673,7 +673,7 @@ const citationsApp = new Hono()
 
     return c.json({
       snapshotCount: inserted.length,
-      pages: pageStats.map((ps) => ps.pageId ?? "unknown"),
+      pages: pageStats.map((ps) => ps.pageSlug ?? "unknown"),
     }, 201);
   })
 
@@ -691,7 +691,7 @@ const citationsApp = new Hono()
       const rows = await db
         .select()
         .from(citationAccuracySnapshots)
-        .where(eq(citationAccuracySnapshots.pageIdInt, intId))
+        .where(eq(citationAccuracySnapshots.pageId, intId))
         .orderBy(desc(citationAccuracySnapshots.snapshotAt))
         .limit(limit);
 
@@ -702,7 +702,7 @@ const citationsApp = new Hono()
     const rows = await db
       .select({
         snapshotAt: citationAccuracySnapshots.snapshotAt,
-        totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageIdInt})`,
+        totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageId})`,
         totalCitations: sql<number>`sum(${citationAccuracySnapshots.totalCitations})`,
         checkedCitations: sql<number>`sum(${citationAccuracySnapshots.checkedCitations})`,
         accurateCount: sql<number>`sum(${citationAccuracySnapshots.accurateCount})`,
@@ -801,7 +801,7 @@ const citationsApp = new Hono()
     // JS sorts by inaccuracy rate afterward, so all pages must be fetched before slicing.
     const PAGES_HARD_LIMIT = 5000;
     const pageRows = await db.select({
-      pageIdSlug: wikiPages.id,
+      pageIdSlug: wikiPages.slug,
       totalCitations: count(),
       checked: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
       accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
@@ -812,9 +812,9 @@ const citationsApp = new Hono()
       avgScore: avg(sql`CASE WHEN ${citationQuotes.accuracyVerdict} IS NOT NULL THEN ${citationQuotes.accuracyScore} END`),
     })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
-      .groupBy(wikiPages.id)
-      .orderBy(asc(wikiPages.id))
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
+      .groupBy(wikiPages.slug)
+      .orderBy(asc(wikiPages.slug))
       .limit(PAGES_HARD_LIMIT);
 
     const pages = pageRows.map((r) => {
@@ -1046,13 +1046,13 @@ const citationsApp = new Hono()
       .select()
       .from(citationQuotes)
       .where(eq(citationQuotes.url, url))
-      .orderBy(asc(citationQuotes.pageIdInt), asc(citationQuotes.footnote))
+      .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
       .limit(limit);
 
     // Also get aggregate stats
     const stats = await db
       .select({
-        totalPages: sql<number>`count(distinct ${citationQuotes.pageIdInt})`,
+        totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
         totalQuotes: count(),
         verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
         accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
@@ -1127,18 +1127,18 @@ const citationsApp = new Hono()
 
     const rows = await db
       .select({
-        pageId: wikiPages.id,
+        pageId: wikiPages.slug,
         quoteCount: count(),
       })
       .from(citationQuotes)
-      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, citationQuotes.pageIdInt))
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
       .where(
         and(
           isNotNull(citationQuotes.sourceQuote),
           sql`${citationQuotes.sourceQuote} != ''`
         )
       )
-      .groupBy(wikiPages.id)
+      .groupBy(wikiPages.slug)
       .orderBy(desc(count()));
 
     return c.json({
@@ -1187,7 +1187,7 @@ const citationsApp = new Hono()
       .from(citationQuotes)
       .where(
         and(
-          eq(citationQuotes.pageIdInt, intId),
+          eq(citationQuotes.pageId, intId),
           eq(citationQuotes.footnote, footnote)
         )
       )
@@ -1213,8 +1213,8 @@ const citationsApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
-              PARTITION BY COALESCE(page_id_int, -1) ORDER BY snapshot_at DESC
+              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id, -1) ORDER BY snapshot_at DESC
             ) AS rn
             FROM citation_accuracy_snapshots
           ) ranked
@@ -1243,8 +1243,8 @@ const citationsApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
-            PARTITION BY COALESCE(page_id_int, -1) ORDER BY snapshot_at DESC
+            -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+            PARTITION BY COALESCE(page_id, -1) ORDER BY snapshot_at DESC
           ) AS rn
           FROM citation_accuracy_snapshots
         ) ranked

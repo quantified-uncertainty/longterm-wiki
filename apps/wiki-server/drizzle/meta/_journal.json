@@ -897,6 +897,13 @@
       "when": 1780646400000,
       "tag": "0127_unified_verification_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1780732800000,
+      "tag": "0128_phase_d3e_pk_swap",
+      "breakpoints": true
     }
   ]
 }

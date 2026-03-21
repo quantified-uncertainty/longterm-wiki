@@ -83,7 +83,7 @@ const pagesApp = new Hono()
       const titleBoost = titleMatchBoostExpr("title", "$3");
       results = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
-        id, wiki_id, title, description, entity_type, category,
+        slug AS id, wiki_id, title, description, entity_type, category,
         reader_importance, quality,
         ts_rank_cd(search_vector, to_tsquery('english', $1), 1) + ${titleBoost} AS rank,
         ts_headline('english', coalesce(description, ''),
@@ -105,7 +105,7 @@ const pagesApp = new Hono()
     if (results.length < TRIGRAM_FALLBACK_THRESHOLD) {
       const trigramResults = await rawDb.unsafe<PageSearchRow[]>(
         `SELECT
-        id, wiki_id, title, description, entity_type, category,
+        slug AS id, wiki_id, title, description, entity_type, category,
         reader_importance, quality,
         similarity(title, $1) AS rank,
         description AS snippet
@@ -114,7 +114,7 @@ const pagesApp = new Hono()
         AND wiki_id IS NOT NULL
         AND (entity_type IS NULL OR entity_type != 'internal')
         AND similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
-        AND id NOT IN (SELECT unnest($3::text[]))
+        AND slug NOT IN (SELECT unnest($3::text[]))
       ORDER BY similarity(title, $1) DESC, reader_importance DESC NULLS LAST
       LIMIT $2`,
         [q, limit - results.length, results.map((r) => r.id)],
@@ -168,7 +168,7 @@ const pagesApp = new Hono()
     const rows = await db
       .select()
       .from(wikiPages)
-      .where(or(eq(wikiPages.id, lookupSlug), eq(wikiPages.wikiId, id)));
+      .where(or(eq(wikiPages.slug, lookupSlug), eq(wikiPages.wikiId, id)));
 
     if (rows.length === 0) {
       return notFoundError(c, `No page found for id: ${id}`);
@@ -179,7 +179,7 @@ const pagesApp = new Hono()
     // falling back to whatever is stored in wiki_pages
     const wikiId = resolvedSlug ? id.toUpperCase() : page.wikiId;
     return c.json({
-      id: page.id,
+      id: page.slug,
       wikiId,
       title: page.title,
       description: page.description,
@@ -222,7 +222,7 @@ const pagesApp = new Hono()
 
     const rows = await db
       .select({
-        id: wikiPages.id,
+        id: wikiPages.slug,
         wikiId: wikiPages.wikiId,
         title: wikiPages.title,
         description: wikiPages.description,
@@ -237,7 +237,7 @@ const pagesApp = new Hono()
       })
       .from(wikiPages)
       .where(whereClause)
-      .orderBy(asc(wikiPages.id))
+      .orderBy(asc(wikiPages.slug))
       .limit(limit)
       .offset(offset);
 
@@ -261,9 +261,9 @@ const pagesApp = new Hono()
     // Fetch the page before deleting so we can log identifying info.
     // Per code-review-guidelines: destructive endpoints must log before executing.
     const existing = await db
-      .select({ id: wikiPages.id, wikiId: wikiPages.wikiId, title: wikiPages.title })
+      .select({ id: wikiPages.slug, wikiId: wikiPages.wikiId, title: wikiPages.title })
       .from(wikiPages)
-      .where(eq(wikiPages.id, id));
+      .where(eq(wikiPages.slug, id));
 
     if (existing.length === 0) {
       return notFoundError(c, `No page found for id: ${id}`);
@@ -272,7 +272,7 @@ const pagesApp = new Hono()
     const page = existing[0];
     logger.info({ pageId: page.id, wikiId: page.wikiId, title: page.title }, "Deleting page");
 
-    await db.delete(wikiPages).where(eq(wikiPages.id, id));
+    await db.delete(wikiPages).where(eq(wikiPages.slug, id));
 
     return c.json({ deleted: 1 });
   })
@@ -292,10 +292,9 @@ const pagesApp = new Hono()
       const intIdMap = await allocateAndResolvePageIntIds(tx, pageIds);
 
       const allVals = pages.map((page) => ({
-        id: page.id,
+        id: intIdMap.get(page.id)!,
         wikiId: page.wikiId ?? null,
-        slug: page.id, // Phase 4a: slug = id (the text slug)
-        integerIdCol: intIdMap.get(page.id) ?? null, // Phase 4a: integer ID from entity_ids (nullable until Phase 4b)
+        slug: page.id,
         title: page.title,
         description: page.description ?? null,
         summary: page.summary ?? null,
@@ -326,11 +325,10 @@ const pagesApp = new Hono()
         .insert(wikiPages)
         .values(allVals)
         .onConflictDoUpdate({
-          target: wikiPages.id,
+          target: wikiPages.slug,
           set: {
             wikiId: sql`excluded.wiki_id`,
-            slug: sql`excluded.slug`,
-            integerIdCol: sql`excluded.integer_id`,
+            id: sql`excluded.id`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
             summary: sql`excluded.summary`,
@@ -370,7 +368,7 @@ const pagesApp = new Hono()
           setweight(to_tsvector('english', coalesce(summary, '')), 'C') ||
           setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
           setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
-        WHERE id IN (${idList})
+        WHERE slug IN (${idList})
       `);
     });
     } catch (err) {

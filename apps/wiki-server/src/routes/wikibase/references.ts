@@ -7,7 +7,7 @@
  */
 
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import {
   pageCitations,
@@ -46,7 +46,7 @@ const app = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id_int
+    // Phase 4b: resolve slug to integer and query by page_id
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) {
       return c.json({ references: [], totalClaim: 0, totalCitation: 0 });
@@ -58,7 +58,7 @@ const app = new Hono()
     const citationRows = await db
       .select()
       .from(pageCitations)
-      .where(eq(pageCitations.pageIdInt, intId));
+      .where(eq(pageCitations.pageId, intId));
 
     const citations: CitationItem[] = citationRows.map((r) => ({
       type: "citation" as const,
@@ -124,7 +124,7 @@ const app = new Hono()
       .insert(pageCitations)
       .values({
         referenceId: parsed.data.referenceId,
-        pageIdInt: citPageIdInt,
+        pageId: citPageIdInt,
         title: parsed.data.title ?? null,
         url: parsed.data.url ?? null,
         note: parsed.data.note ?? null,
@@ -159,7 +159,7 @@ const app = new Hono()
 
     // Verify all pages exist
     const pageIds = [...new Set(parsed.data.items.map((i) => i.pageId))];
-    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+    const missingPages = await checkRefsExist(db, wikiPages, wikiPages.slug, pageIds);
     if (missingPages.length > 0) {
       return validationError(c, `Pages not found: ${missingPages.join(", ")}`);
     }
@@ -184,7 +184,7 @@ const app = new Hono()
 
     const values = parsed.data.items.map((item) => ({
       referenceId: item.referenceId,
-      pageIdInt: batchIntIdMap.get(item.pageId) ?? null,
+      pageId: batchIntIdMap.get(item.pageId) ?? null,
       title: item.title ?? null,
       url: item.url ?? null,
       note: item.note ?? null,
@@ -214,10 +214,10 @@ const app = new Hono()
         url: pageCitations.url,
         note: pageCitations.note,
         resourceId: pageCitations.resourceId,
-        pageSlug: wikiPages.id,
+        pageSlug: wikiPages.slug,
       })
       .from(pageCitations)
-      .leftJoin(wikiPages, eq(pageCitations.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(pageCitations.pageId, wikiPages.id))
       // Safety bound: ~700 pages × ~10 refs each ≈ 7k rows; 10k is a generous cap.
       .limit(10000);
 

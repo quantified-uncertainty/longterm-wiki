@@ -207,7 +207,7 @@ const hallucinationRiskApp = new Hono()
     const rows = await db
       .insert(hallucinationRiskSnapshots)
       .values({
-        pageIdInt,
+        pageId: pageIdInt,
         score: d.score,
         level: d.level,
         factors: d.factors ?? null,
@@ -242,7 +242,7 @@ const hallucinationRiskApp = new Hono()
     const intIdMap = await resolvePageIntIds(db, pageIds);
 
     const allVals = snapshots.map((d) => ({
-      pageIdInt: intIdMap.get(d.pageId) ?? null,
+      pageId: intIdMap.get(d.pageId) ?? null,
       score: d.score,
       level: d.level,
       factors: d.factors ?? null,
@@ -283,14 +283,14 @@ const hallucinationRiskApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id_int
+    // Phase 4b: resolve slug to integer and query by page_id
     const intId = await resolvePageIntId(db, page_id);
     if (intId === null) return c.json({ pageId: page_id, snapshots: [] });
 
     const rows = await db
       .select()
       .from(hallucinationRiskSnapshots)
-      .where(eq(hallucinationRiskSnapshots.pageIdInt, intId))
+      .where(eq(hallucinationRiskSnapshots.pageId, intId))
       .orderBy(desc(hallucinationRiskSnapshots.computedAt))
       .limit(limit);
 
@@ -352,7 +352,7 @@ const hallucinationRiskApp = new Hono()
     // Use pageIdInt (integer column) for consistency with the DISTINCT ON below
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${hallucinationRiskSnapshots.pageIdInt})`,
+        count: sql<number>`count(distinct ${hallucinationRiskSnapshots.pageId})`,
       })
       .from(hallucinationRiskSnapshots);
     const uniquePages = Number(pagesResult[0].count);
@@ -360,11 +360,11 @@ const hallucinationRiskApp = new Hono()
     const levelDist = await rawDb<LevelDistRow[]>`
       SELECT level, count(*)::int AS count
       FROM (
-        -- Exclude NULL page_id_int rows; DISTINCT ON NULLs would collapse all into one group
-        SELECT DISTINCT ON (page_id_int) level
+        -- Exclude NULL page_id rows; DISTINCT ON NULLs would collapse all into one group
+        SELECT DISTINCT ON (page_id) level
         FROM hallucination_risk_snapshots
-        WHERE page_id_int IS NOT NULL
-        ORDER BY page_id_int, computed_at DESC
+        WHERE page_id IS NOT NULL
+        ORDER BY page_id, computed_at DESC
       ) latest
       GROUP BY level
     `;
@@ -410,25 +410,25 @@ const hallucinationRiskApp = new Hono()
       // Fallback: DISTINCT ON on base table
       rows = level
         ? await rawDb<RiskPageDbRow[]>`
-            SELECT wp.id AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
+            SELECT wp.slug AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
             FROM (
-              SELECT DISTINCT ON (page_id_int) *
+              SELECT DISTINCT ON (page_id) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id_int, computed_at DESC
+              ORDER BY page_id, computed_at DESC
             ) hrs
-            JOIN wiki_pages wp ON wp.integer_id = hrs.page_id_int
+            JOIN wiki_pages wp ON wp.id = hrs.page_id
             WHERE hrs.level = ${level}
             ORDER BY hrs.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `
         : await rawDb<RiskPageDbRow[]>`
-            SELECT wp.id AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
+            SELECT wp.slug AS page_id, hrs.score, hrs.level, hrs.factors, hrs.integrity_issues, hrs.computed_at
             FROM (
-              SELECT DISTINCT ON (page_id_int) *
+              SELECT DISTINCT ON (page_id) *
               FROM hallucination_risk_snapshots
-              ORDER BY page_id_int, computed_at DESC
+              ORDER BY page_id, computed_at DESC
             ) hrs
-            JOIN wiki_pages wp ON wp.integer_id = hrs.page_id_int
+            JOIN wiki_pages wp ON wp.id = hrs.page_id
             ORDER BY hrs.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `;
@@ -463,8 +463,8 @@ const hallucinationRiskApp = new Hono()
         WHERE id NOT IN (
           SELECT id FROM (
             SELECT id, ROW_NUMBER() OVER (
-              -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
-              PARTITION BY COALESCE(page_id_int, -1) ORDER BY computed_at DESC
+              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
             ) AS rn
             FROM hallucination_risk_snapshots
           ) ranked
@@ -495,8 +495,8 @@ const hallucinationRiskApp = new Hono()
       WHERE id NOT IN (
         SELECT id FROM (
           SELECT id, ROW_NUMBER() OVER (
-            -- COALESCE to -1 so NULL page_id_int rows don't all collapse into one partition
-            PARTITION BY COALESCE(page_id_int, -1) ORDER BY computed_at DESC
+            -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+            PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
           ) AS rn
           FROM hallucination_risk_snapshots
         ) ranked

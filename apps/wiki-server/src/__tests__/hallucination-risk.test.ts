@@ -47,13 +47,13 @@ function resetStore() {
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
 function getLatestByPage() {
-  // Phase D2a: group by pageIdInt (integer) since pageId (page_id_old) is no longer written
+  // Phase D3+E: group by pageId (integer)
   const latestByPage = new Map<number, HrsRow>();
   for (const r of riskStore) {
-    if (r.pageIdInt == null) continue;
-    const existing = latestByPage.get(r.pageIdInt);
+    if (r.pageId == null) continue;
+    const existing = latestByPage.get(r.pageId);
     if (!existing || r.computedAt > existing.computedAt) {
-      latestByPage.set(r.pageIdInt, r);
+      latestByPage.set(r.pageId, r);
     }
   }
   return latestByPage;
@@ -98,18 +98,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    // Phase D2a: removed page_id_old — params: page_id_int, score, level, factors, integrity_issues
+    // Phase D3+E: params: page_id, score, level, factors, integrity_issues
     const PARAMS_PER_ROW = 5;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: HrsRow[] = [];
 
     for (let i = 0; i < rowCount; i++) {
       const off = i * PARAMS_PER_ROW;
-      const pageIdInt = params[off] as number | null;
-      const pageSlug = slugFromIntId(pageIdInt);
+      const pageId = params[off] as number | null;
+      const pageSlug = slugFromIntId(pageId);
       const row: HrsRow = {
         id: nextId++,
-        pageIdInt: pageIdInt,
+        pageId: pageId,
         pageSlug: pageSlug,
         score: params[off + 1] as number,
         level: params[off + 2] as string,
@@ -123,7 +123,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     // Return snake_case row objects so extractColumns() in test-utils maps correctly
     return results.map((r) => ({
       id: r.id,
-      page_id_int: r.pageIdInt,
+      page_id: r.pageId,
       score: r.score,
       level: r.level,
       factors: r.factors,
@@ -183,7 +183,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const offset = numParams[1] || 0;
     return results.slice(offset, offset + limit).map((r) => ({
       id: r.id,
-      page_id_int: r.pageIdInt,
+      page_id: r.pageId,
       score: r.score,
       level: r.level,
       factors: r.factors,
@@ -192,13 +192,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }));
   }
 
-  // ---- SELECT count(distinct page_id_int) FROM hallucination_risk_snapshots ----
+  // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
   if (
     q.includes("count(distinct") &&
-    q.includes("page_id_int") &&
+    q.includes("page_id") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const uniquePages = new Set(riskStore.filter((e) => e.pageIdInt != null).map((e) => e.pageIdInt));
+    const uniquePages = new Set(riskStore.filter((e) => e.pageId != null).map((e) => e.pageId));
     return [{ count: uniquePages.size }];
   }
 
@@ -265,7 +265,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const offset = numParams[1] || 0;
     return results.slice(offset, offset + limit).map((r) => ({
       id: r.id,
-      page_id_int: r.pageIdInt,
+      page_id: r.pageId,
       score: r.score,
       level: r.level,
       factors: r.factors,
@@ -274,23 +274,23 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }));
   }
 
-  // ---- SELECT ... WHERE page_id_int = $1 ORDER BY computed_at DESC LIMIT (Phase 4b) ----
+  // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT (Phase D3+E) ----
   if (
     q.includes("hallucination_risk_snapshots") &&
     q.includes("where") &&
-    q.includes("page_id_int") &&
+    q.includes("page_id") &&
     !q.includes("distinct on") &&
     !q.includes("not in")
   ) {
     const intId = params[0] as number;
     const limit = (params[1] as number) || 50;
     return riskStore
-      .filter((e) => e.pageIdInt === intId)
+      .filter((e) => e.pageId === intId)
       .sort((a, b) => b.computedAt.getTime() - a.computedAt.getTime())
       .slice(0, limit)
       .map((r) => ({
         id: r.id,
-        page_id_int: r.pageIdInt,
+        page_id: r.pageId,
         score: r.score,
         level: r.level,
         factors: r.factors,
@@ -306,10 +306,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    // Group by pageIdInt (Phase D2a: partition key is now COALESCE(page_id_int, -1))
+    // Group by pageId (Phase D3+E: partition key is now COALESCE(page_id, -1))
     const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const key = r.pageIdInt ?? -1;
+      const key = r.pageId ?? -1;
       const arr = byPage.get(key) || [];
       arr.push(r);
       byPage.set(key, arr);
@@ -336,7 +336,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const keep = params[0] as number;
     const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
-      const key = r.pageIdInt ?? -1;
+      const key = r.pageId ?? -1;
       const arr = byPage.get(key) || [];
       arr.push(r);
       byPage.set(key, arr);

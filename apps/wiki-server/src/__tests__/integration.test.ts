@@ -274,7 +274,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     const rows = await db
       .insert(citationQuotes)
       .values({
-        pageIdInt: 100, // Phase D2a: integer only (no page_id_old)
+        pageId: 100, // Phase D3+E: integer PK
         footnote: 1,
         claimText: "Test claim",
         url: "https://example.com",
@@ -282,24 +282,24 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
       .returning();
 
     expect(rows).toHaveLength(1);
-    expect(rows[0].pageIdInt).toBe(100);
+    expect(rows[0].pageId).toBe(100);
     expect(rows[0].footnote).toBe(1);
     expect(rows[0].claimText).toBe("Test claim");
     expect(rows[0].quoteVerified).toBe(false);
     expect(rows[0].id).toBeGreaterThan(0);
   });
 
-  it("upserts on (page_id_int, footnote) conflict", async () => {
+  it("upserts on (page_id, footnote) conflict", async () => {
     // First insert
     await db.insert(citationQuotes).values({
-      pageIdInt: 200,
+      pageId: 200,
       footnote: 1,
       claimText: "Original",
     });
 
     // Upsert with updated claim
     const vals = {
-      pageIdInt: 200,
+      pageId: 200,
       footnote: 1,
       claimText: "Updated",
       url: null,
@@ -319,8 +319,8 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
       .insert(citationQuotes)
       .values(vals)
       .onConflictDoUpdate({
-        // Phase D2a: ON CONFLICT on integer column
-        target: [citationQuotes.pageIdInt, citationQuotes.footnote],
+        // Phase D3+E: ON CONFLICT on integer column
+        target: [citationQuotes.pageId, citationQuotes.footnote],
         set: { ...vals, updatedAt: sql`now()` },
       })
       .returning();
@@ -332,13 +332,13 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     const all = await db
       .select()
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageIdInt, 200));
+      .where(eq(citationQuotes.pageId, 200));
     expect(all).toHaveLength(1);
   });
 
-  it("enforces unique (page_id_int, footnote) constraint", async () => {
+  it("enforces unique (page_id, footnote) constraint", async () => {
     await db.insert(citationQuotes).values({
-      pageIdInt: 300,
+      pageId: 300,
       footnote: 1,
       claimText: "First",
     });
@@ -346,7 +346,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     // Raw insert without ON CONFLICT should fail
     await expect(
       db.insert(citationQuotes).values({
-        pageIdInt: 300,
+        pageId: 300,
         footnote: 1,
         claimText: "Second",
       })
@@ -355,7 +355,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
 
   it("updates verification status", async () => {
     await db.insert(citationQuotes).values({
-      pageIdInt: 400,
+      pageId: 400,
       footnote: 1,
       claimText: "Claim",
     });
@@ -370,7 +370,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
         updatedAt: sql`now()`,
       })
       .where(
-        eq(citationQuotes.pageIdInt, 400)
+        eq(citationQuotes.pageId, 400)
       )
       .returning();
 

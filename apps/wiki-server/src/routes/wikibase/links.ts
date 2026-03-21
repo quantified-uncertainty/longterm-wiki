@@ -172,7 +172,7 @@ const linksApp = new Hono()
         const batch = links.slice(i, i + 500);
 
         await tx`
-        INSERT INTO page_links (link_type, relationship, weight, source_id_int, target_id_int)
+        INSERT INTO page_links (link_type, relationship, weight, source_id, target_id)
         SELECT t."linkType", t.relationship, t.weight,
                ei_src.wiki_id, ei_tgt.wiki_id
         FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb)
@@ -181,7 +181,7 @@ const linksApp = new Hono()
         JOIN entity_ids ei_tgt ON ei_tgt.slug = t."targetId"
         -- INNER JOIN: skip rows with unresolved slugs (prevents NULL-ID orphans bypassing conflict)
         -- Requires page_links_source_target_int_unique index (created in phase-d2a-predeploy.sql)
-        ON CONFLICT (source_id_int, target_id_int, link_type)
+        ON CONFLICT (source_id, target_id, link_type)
         DO UPDATE SET weight = EXCLUDED.weight, relationship = EXCLUDED.relationship
       `;
 
@@ -201,7 +201,7 @@ const linksApp = new Hono()
     const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
-    // Phase 4b: resolve slug to integer and query by target_id_int
+    // Phase 4b: resolve slug to integer and query by target_id
     const db = getDrizzleDb();
     const targetIntId = await resolvePageIntId(db, targetId);
     if (targetIntId === null) {
@@ -214,18 +214,18 @@ const linksApp = new Hono()
     // then order by weight descending (most relevant first).
     const results = await rawDb<BacklinkDbRow[]>`
     SELECT * FROM (
-      SELECT DISTINCT ON (pl.source_id_int)
-        wp.id AS source_id,
+      SELECT DISTINCT ON (pl.source_id)
+        wp.slug AS source_id,
         pl.link_type,
         pl.relationship,
         pl.weight,
         wp.title AS source_title,
         wp.entity_type AS source_type
       FROM page_links pl
-      LEFT JOIN wiki_pages wp ON wp.integer_id = pl.source_id_int
-      -- Filter NULL source_id_int: DISTINCT ON NULLs would collapse into one group with a NULL id
-      WHERE pl.target_id_int = ${targetIntId} AND pl.source_id_int IS NOT NULL
-      ORDER BY pl.source_id_int, pl.weight DESC
+      LEFT JOIN wiki_pages wp ON wp.id = pl.source_id
+      -- Filter NULL source_id: DISTINCT ON NULLs would collapse into one group with a NULL id
+      WHERE pl.target_id = ${targetIntId} AND pl.source_id IS NOT NULL
+      ORDER BY pl.source_id, pl.weight DESC
     ) sub
     ORDER BY sub.weight DESC
     LIMIT ${limit}
@@ -256,7 +256,7 @@ const linksApp = new Hono()
     const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
-    // Phase 4b: resolve slug to integer and query by source_id_int / target_id_int
+    // Phase 4b: resolve slug to integer and query by source_id / target_id
     const db = getDrizzleDb();
     const entityIntId = await resolvePageIntId(db, entityId);
     if (entityIntId === null) {
@@ -271,7 +271,7 @@ const linksApp = new Hono()
       SELECT
         rg.related_id,
         rg.total_score,
-        wp.id AS id,
+        wp.slug AS id,
         wp.title,
         wp.entity_type,
         wp.quality,
@@ -279,17 +279,17 @@ const linksApp = new Hono()
         -- Relationship label from the yaml_related link between these two entities
         (SELECT pl2.relationship
          FROM page_links pl2
-         WHERE ((pl2.source_id_int = ${entityIntId} AND pl2.target_id_int = rg.related_id)
-             OR (pl2.source_id_int = rg.related_id AND pl2.target_id_int = ${entityIntId}))
+         WHERE ((pl2.source_id = ${entityIntId} AND pl2.target_id = rg.related_id)
+             OR (pl2.source_id = rg.related_id AND pl2.target_id = ${entityIntId}))
            AND pl2.relationship IS NOT NULL
            AND pl2.link_type = 'yaml_related'
          LIMIT 1
         ) AS relationship,
         -- Track direction for label inversion
-        (SELECT pl2.source_id_int != ${entityIntId}
+        (SELECT pl2.source_id != ${entityIntId}
          FROM page_links pl2
-         WHERE ((pl2.source_id_int = ${entityIntId} AND pl2.target_id_int = rg.related_id)
-             OR (pl2.source_id_int = rg.related_id AND pl2.target_id_int = ${entityIntId}))
+         WHERE ((pl2.source_id = ${entityIntId} AND pl2.target_id = rg.related_id)
+             OR (pl2.source_id = rg.related_id AND pl2.target_id = ${entityIntId}))
            AND pl2.relationship IS NOT NULL
            AND pl2.link_type = 'yaml_related'
          LIMIT 1
@@ -298,7 +298,7 @@ const linksApp = new Hono()
         rg.total_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                               + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
       FROM wikibase_related_graph rg
-      LEFT JOIN wiki_pages wp ON wp.integer_id = rg.related_id
+      LEFT JOIN wiki_pages wp ON wp.id = rg.related_id
       WHERE rg.entity_id = ${entityIntId}
         AND rg.total_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                                   + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
@@ -326,13 +326,13 @@ const linksApp = new Hono()
 
       results = await rawDb<RelatedDbRow[]>`
       WITH bidirectional_links AS (
-        SELECT target_id_int AS neighbor_int_id, link_type, relationship, weight, false AS is_reverse
+        SELECT target_id AS neighbor_int_id, link_type, relationship, weight, false AS is_reverse
         FROM page_links
-        WHERE source_id_int = ${entityIntId}
+        WHERE source_id = ${entityIntId}
         UNION ALL
-        SELECT source_id_int AS neighbor_int_id, link_type, relationship, weight, true AS is_reverse
+        SELECT source_id AS neighbor_int_id, link_type, relationship, weight, true AS is_reverse
         FROM page_links
-        WHERE target_id_int = ${entityIntId}
+        WHERE target_id = ${entityIntId}
       ),
       aggregated AS (
         SELECT
@@ -357,7 +357,7 @@ const linksApp = new Hono()
         GROUP BY bl.neighbor_int_id
       )
       SELECT
-        wp.id AS id,
+        wp.slug AS id,
         a.raw_score,
         a.relationship,
         a.relationship_is_reverse,
@@ -368,7 +368,7 @@ const linksApp = new Hono()
         a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                            + COALESCE(wp.reader_importance, 50)::real / 400.0) AS score
       FROM aggregated a
-      LEFT JOIN wiki_pages wp ON wp.integer_id = a.neighbor_int_id
+      LEFT JOIN wiki_pages wp ON wp.id = a.neighbor_int_id
       WHERE a.raw_score * (1.0 + COALESCE(wp.quality, 5)::real / 40.0
                                + COALESCE(wp.reader_importance, 50)::real / 400.0) >= ${MIN_SCORE}
       ORDER BY score DESC
@@ -404,7 +404,7 @@ const linksApp = new Hono()
     const rawDb = getDb();
     const MAX_GRAPH_EDGES = 500;
 
-    // Phase 4b: resolve slug to integer and query by source_id_int / target_id_int
+    // Phase 4b: resolve slug to integer and query by source_id / target_id
     const graphDb = getDrizzleDb();
     const graphEntityIntId = await resolvePageIntId(graphDb, entityId);
     if (graphEntityIntId === null) {
@@ -415,8 +415,8 @@ const linksApp = new Hono()
     // This provides the raw graph data for visualization.
     const results = await rawDb<GraphEdgeDbRow[]>`
     SELECT
-      ws.id AS source_id,
-      wt.id AS target_id,
+      ws.slug AS source_id,
+      wt.slug AS target_id,
       pl.link_type,
       pl.relationship,
       pl.weight,
@@ -425,11 +425,11 @@ const linksApp = new Hono()
       wt.title AS target_title,
       wt.entity_type AS target_type
     FROM page_links pl
-    LEFT JOIN wiki_pages ws ON ws.integer_id = pl.source_id_int
-    LEFT JOIN wiki_pages wt ON wt.integer_id = pl.target_id_int
+    LEFT JOIN wiki_pages ws ON ws.id = pl.source_id
+    LEFT JOIN wiki_pages wt ON wt.id = pl.target_id
     -- Exclude rows where either endpoint lacks an integer ID (would produce NULL node ids)
-    WHERE pl.source_id_int IS NOT NULL AND pl.target_id_int IS NOT NULL
-      AND (pl.source_id_int = ${graphEntityIntId} OR pl.target_id_int = ${graphEntityIntId})
+    WHERE pl.source_id IS NOT NULL AND pl.target_id IS NOT NULL
+      AND (pl.source_id = ${graphEntityIntId} OR pl.target_id = ${graphEntityIntId})
     ORDER BY pl.weight DESC
     LIMIT ${MAX_GRAPH_EDGES}
   `;
@@ -495,8 +495,8 @@ const linksApp = new Hono()
   `;
 
     const uniquePagesResult = await rawDb<UniqueCountRow[]>`
-    SELECT COUNT(DISTINCT source_id_int)::int AS sources,
-           COUNT(DISTINCT target_id_int)::int AS targets
+    SELECT COUNT(DISTINCT source_id)::int AS sources,
+           COUNT(DISTINCT target_id)::int AS targets
     FROM page_links
   `;
 

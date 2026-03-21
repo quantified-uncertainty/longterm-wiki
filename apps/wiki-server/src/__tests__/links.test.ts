@@ -6,10 +6,10 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 interface LinkRow {
   id: number;
-  source_id: string;
-  source_id_int: number | null;
-  target_id: string;
-  target_id_int: number | null;
+  source_slug: string;  // synthetic — slug for convenience
+  source_id: number | null;  // Phase D3+E: integer FK (was source_id_int)
+  target_slug: string;  // synthetic — slug for convenience
+  target_id: number | null;  // Phase D3+E: integer FK (was target_id_int)
   link_type: string;
   relationship: string | null;
   weight: number;
@@ -115,16 +115,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     for (const link of batch) {
       const row: LinkRow = {
         id: nextId++,
-        source_id: link.sourceId,
-        source_id_int: getIntIdForSlug(link.sourceId),
-        target_id: link.targetId,
-        target_id_int: getIntIdForSlug(link.targetId),
+        source_slug: link.sourceId,
+        source_id: getIntIdForSlug(link.sourceId),
+        target_slug: link.targetId,
+        target_id: getIntIdForSlug(link.targetId),
         link_type: link.linkType,
         relationship: link.relationship || null,
         weight: link.weight,
         created_at: now,
       };
-      const key = linkKey(row.source_id, row.target_id, row.link_type);
+      const key = linkKey(row.source_slug, row.target_slug, row.link_type);
       const existing = linksStore.get(key);
       if (existing) {
         existing.weight = row.weight;
@@ -150,16 +150,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const tgt = params[o + 1] as string;
       const row: LinkRow = {
         id: nextId++,
-        source_id: src,
-        source_id_int: getIntIdForSlug(src),
-        target_id: tgt,
-        target_id_int: getIntIdForSlug(tgt),
+        source_slug: src,
+        source_id: getIntIdForSlug(src),
+        target_slug: tgt,
+        target_id: getIntIdForSlug(tgt),
         link_type: params[o + 2] as string,
         relationship: (params[o + 3] as string) || null,
         weight: params[o + 4] as number,
         created_at: now,
       };
-      const key = linkKey(row.source_id, row.target_id, row.link_type);
+      const key = linkKey(row.source_slug, row.target_slug, row.link_type);
       const existing = linksStore.get(key);
       if (existing) {
         // Update on conflict
@@ -174,7 +174,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- page_links: DISTINCT ON backlinks query (Phase 4b: filter by target_id_int) ---
+  // --- page_links: DISTINCT ON backlinks query (Phase D3+E: filter by target_id) ---
   if (
     q.includes("page_links") &&
     q.includes("distinct on") &&
@@ -186,11 +186,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const seen = new Set<string>();
 
     for (const row of linksStore.values()) {
-      if (row.target_id_int === targetIntId && !seen.has(row.source_id)) {
-        seen.add(row.source_id);
-        const page = pagesStore.get(row.source_id);
+      if (row.target_id === targetIntId && !seen.has(row.source_slug)) {
+        seen.add(row.source_slug);
+        const page = pagesStore.get(row.source_slug);
         results.push({
-          source_id: row.source_id,
+          source_id: row.source_slug,
           link_type: row.link_type,
           relationship: row.relationship,
           weight: row.weight,
@@ -231,49 +231,49 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const neighborIsReverse = new Map<string, boolean>();
 
     for (const row of linksStore.values()) {
-      let neighborId: string | null = null;
+      let neighborSlug: string | null = null;
       let isReverse = false;
-      if (row.source_id_int === entityIntId) {
-        neighborId = row.target_id;
+      if (row.source_id === entityIntId) {
+        neighborSlug = row.target_slug;
         isReverse = false;
-      } else if (row.target_id_int === entityIntId) {
-        neighborId = row.source_id;
+      } else if (row.target_id === entityIntId) {
+        neighborSlug = row.source_slug;
         isReverse = true;
       }
-      if (!neighborId || neighborId === entitySlug) continue;
+      if (!neighborSlug || neighborSlug === entitySlug) continue;
 
       neighborScores.set(
-        neighborId,
-        (neighborScores.get(neighborId) || 0) + row.weight
+        neighborSlug,
+        (neighborScores.get(neighborSlug) || 0) + row.weight
       );
       if (
         row.link_type === "yaml_related" &&
         row.relationship &&
-        !neighborRelationship.has(neighborId)
+        !neighborRelationship.has(neighborSlug)
       ) {
-        neighborRelationship.set(neighborId, row.relationship);
-        neighborIsReverse.set(neighborId, isReverse);
+        neighborRelationship.set(neighborSlug, row.relationship);
+        neighborIsReverse.set(neighborSlug, isReverse);
       }
     }
 
     const results: Record<string, unknown>[] = [];
-    for (const [neighborId, rawScore] of neighborScores) {
-      const page = pagesStore.get(neighborId);
+    for (const [neighborSlug, rawScore] of neighborScores) {
+      const page = pagesStore.get(neighborSlug);
       const q2 = page?.quality ?? 5;
       const imp = page?.reader_importance ?? 50;
       const score = rawScore * (1.0 + q2 / 40.0 + imp / 400.0);
       if (score < minScore) continue;
 
       results.push({
-        related_id: getIntIdForSlug(neighborId),
+        related_id: getIntIdForSlug(neighborSlug),
         total_score: rawScore,
-        id: neighborId,
+        id: neighborSlug,
         title: page?.title || null,
         entity_type: page?.entity_type || null,
         quality: page?.quality ?? null,
         reader_importance: page?.reader_importance ?? null,
-        relationship: neighborRelationship.get(neighborId) || null,
-        relationship_is_reverse: neighborIsReverse.get(neighborId) ?? null,
+        relationship: neighborRelationship.get(neighborSlug) || null,
+        relationship_is_reverse: neighborIsReverse.get(neighborSlug) ?? null,
         score,
       });
     }
@@ -297,37 +297,37 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const neighborRelationship = new Map<string, string | null>();
 
     for (const row of linksStore.values()) {
-      let neighborId: string | null = null;
-      if (row.source_id_int === entityIntId) neighborId = row.target_id;
-      else if (row.target_id_int === entityIntId) neighborId = row.source_id;
-      if (!neighborId || neighborId === entitySlug) continue;
+      let neighborSlug: string | null = null;
+      if (row.source_id === entityIntId) neighborSlug = row.target_slug;
+      else if (row.target_id === entityIntId) neighborSlug = row.source_slug;
+      if (!neighborSlug || neighborSlug === entitySlug) continue;
 
       neighborScores.set(
-        neighborId,
-        (neighborScores.get(neighborId) || 0) + row.weight
+        neighborSlug,
+        (neighborScores.get(neighborSlug) || 0) + row.weight
       );
       if (
         row.link_type === "yaml_related" &&
         row.relationship &&
-        !neighborRelationship.has(neighborId)
+        !neighborRelationship.has(neighborSlug)
       ) {
-        neighborRelationship.set(neighborId, row.relationship);
+        neighborRelationship.set(neighborSlug, row.relationship);
       }
     }
 
     // Apply quality boost and filter
     const results: Record<string, unknown>[] = [];
-    for (const [neighborId, rawScore] of neighborScores) {
-      const page = pagesStore.get(neighborId);
+    for (const [neighborSlug, rawScore] of neighborScores) {
+      const page = pagesStore.get(neighborSlug);
       const q2 = page?.quality ?? 5;
       const imp = page?.reader_importance ?? 50;
       const score = rawScore * (1.0 + q2 / 40.0 + imp / 400.0);
       if (score < minScore) continue;
 
       results.push({
-        id: neighborId,
+        id: neighborSlug,
         raw_score: rawScore,
-        relationship: neighborRelationship.get(neighborId) || null,
+        relationship: neighborRelationship.get(neighborSlug) || null,
         title: page?.title || null,
         entity_type: page?.entity_type || null,
         quality: page?.quality ?? null,
@@ -349,18 +349,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("distinct on") &&
     !q.includes("bidirectional")
   ) {
-    // Phase 4b: params are [graphEntityIntId, graphEntityIntId, MAX_GRAPH_EDGES]
+    // Phase D3+E: params are [graphEntityIntId, graphEntityIntId, MAX_GRAPH_EDGES]
     const entityIntId = params[0] as number;
     const maxEdges = (params[2] as number) || 500;
     const results: Record<string, unknown>[] = [];
 
     for (const row of linksStore.values()) {
-      if (row.source_id_int === entityIntId || row.target_id_int === entityIntId) {
-        const sourcePage = pagesStore.get(row.source_id);
-        const targetPage = pagesStore.get(row.target_id);
+      if (row.source_id === entityIntId || row.target_id === entityIntId) {
+        const sourcePage = pagesStore.get(row.source_slug);
+        const targetPage = pagesStore.get(row.target_slug);
         results.push({
-          source_id: row.source_id,
-          target_id: row.target_id,
+          source_id: row.source_slug,
+          target_id: row.target_slug,
           link_type: row.link_type,
           relationship: row.relationship,
           weight: row.weight,
@@ -411,27 +411,28 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const sources = new Set<string>();
     const targets = new Set<string>();
     for (const row of linksStore.values()) {
-      sources.add(row.source_id);
-      targets.add(row.target_id);
+      sources.add(row.source_slug);
+      targets.add(row.target_slug);
     }
     return [{ sources: sources.size, targets: targets.size }];
   }
 
   // --- wiki_pages: INSERT (for seeding) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 28; // Phase 4a: +2 for slug and integer_id
+    const COLS = 27; // Phase D3+E: id (integer PK), wiki_id, slug, title, ...
     const numRows = params.length / COLS;
     const rows: PageRow[] = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
+      const slug = params[o + 2] as string; // slug column
       const row: PageRow = {
-        id: params[o] as string,
-        title: params[o + 4] as string, // Phase 4a: shifted by 2
-        entity_type: (params[o + 9] as string) || null, // Phase 4a: shifted by 2
-        quality: (params[o + 11] as number) || null, // Phase 4a: shifted by 2
-        reader_importance: (params[o + 12] as number) || null, // Phase 4a: shifted by 2
+        id: slug, // use slug as display ID for pagesStore key
+        title: params[o + 3] as string, // Phase D3+E: shifted by 1 vs Phase 4a
+        entity_type: (params[o + 8] as string) || null, // Phase D3+E: entity_type at offset 8
+        quality: (params[o + 10] as number) || null, // Phase D3+E: quality at offset 10
+        reader_importance: (params[o + 11] as number) || null, // Phase D3+E: reader_importance at offset 11
       };
-      pagesStore.set(row.id, row);
+      pagesStore.set(slug, row);
       rows.push(row);
     }
     return rows;

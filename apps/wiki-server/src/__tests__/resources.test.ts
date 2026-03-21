@@ -5,7 +5,7 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores ----
 
 let resourceStore: Map<string, Record<string, unknown>>;
-let citationStore: Array<{ resource_id: string; page_id: string; page_id_int: number; created_at: Date }>;
+let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -130,23 +130,23 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- INSERT INTO resource_citations (supports multi-row) ----
-  // Phase D2a: page_id_old is no longer sent. Params: resource_id, page_id_int
+  // Phase D3+E: Params: resource_id, page_id (integer)
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const COLS = 2; // Phase D2a: resource_id, page_id_int
+    const COLS = 2; // Phase D3+E: resource_id, page_id
     const numRows = params.length / COLS;
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const resourceId = params[o] as string;
-      const pageIdInt = params[o + 1] as number;
-      const slug = slugFromIntId(pageIdInt) ?? `page-${pageIdInt}`;
+      const pageId = params[o + 1] as number;
+      const slug = slugFromIntId(pageId) ?? `page-${pageId}`;
       const exists = citationStore.some(
-        (c) => c.resource_id === resourceId && c.page_id_int === pageIdInt
+        (c) => c.resource_id === resourceId && c.page_id === pageId
       );
       if (!exists) {
         citationStore.push({
           resource_id: resourceId,
-          page_id: slug,
-          page_id_int: pageIdInt,
+          page_slug: slug,
+          page_id: pageId,
           created_at: new Date(),
         });
       }
@@ -154,10 +154,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // ---- SELECT count(distinct page_id_int) FROM resource_citations ----
+  // ---- SELECT count(distinct page_id) FROM resource_citations ----
   if (q.includes("count(distinct") && q.includes("resource_citations")) {
-    const uniquePages = new Set(citationStore.map((c) => c.page_id_int));
-    return [{ page_id_int: uniquePages.size }];
+    const uniquePages = new Set(citationStore.map((c) => c.page_id));
+    return [{ page_id: uniquePages.size }];
   }
 
   // ---- SELECT count(*) FROM resource_citations (not GROUP BY) ----
@@ -189,12 +189,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: resourceStore.size }];
   }
 
-  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page, Phase 4b) ----
+  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page, Phase D3+E) ----
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
     const intId = params[0] as number;
     const results: Record<string, unknown>[] = [];
     for (const c of citationStore) {
-      if (c.page_id_int === intId) {
+      if (c.page_id === intId) {
         const r = resourceStore.get(c.resource_id);
         if (r) {
           results.push({
@@ -212,13 +212,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results;
   }
 
-  // ---- SELECT wiki_pages.id FROM resource_citations LEFT JOIN wiki_pages WHERE resource_id = $1 ----
-  // Phase D2a: returns slug via LEFT JOIN wiki_pages (simulated by slugFromIntId)
+  // ---- SELECT wiki_pages.slug FROM resource_citations LEFT JOIN wiki_pages WHERE resource_id = $1 ----
+  // Phase D3+E: returns slug via LEFT JOIN wiki_pages
   if (q.includes("resource_citations") && q.includes("where") && !q.includes("delete") && !q.includes("count")) {
     const resourceId = params[0] as string;
     return citationStore
       .filter((c) => c.resource_id === resourceId)
-      .map((c) => ({ id: c.page_id })); // wiki_pages.id = slug
+      .map((c) => ({ slug: c.page_slug })); // wiki_pages.slug
   }
 
   // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
@@ -355,7 +355,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
       expect(citationStore).toHaveLength(2);
-      expect(citationStore[0].page_id).toBe("page-a");
+      expect(citationStore[0].page_slug).toBe("page-a");
     });
 
     it("updates existing resource on upsert (same id, different data)", async () => {

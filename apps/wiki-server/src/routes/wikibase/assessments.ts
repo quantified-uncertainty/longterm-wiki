@@ -24,7 +24,7 @@ const logger = rootLogger.child({ component: "assessments" });
 
 interface LatestAssessmentRow {
   id: number;
-  page_id_int: number;
+  page_id: number;
   page_slug: string;
   assessor: string;
   method: string | null;
@@ -96,7 +96,7 @@ const assessmentsApp = new Hono()
     const rows = await db
       .insert(wikibasePageAssessments)
       .values({
-        pageIdInt,
+        pageId: pageIdInt,
         assessor: d.assessor,
         method: d.method ?? null,
         model: d.model ?? null,
@@ -145,7 +145,7 @@ const assessmentsApp = new Hono()
     const allVals = items
       .filter((d) => intIdMap.has(d.pageId))
       .map((d) => ({
-        pageIdInt: intIdMap.get(d.pageId)!,
+        pageId: intIdMap.get(d.pageId)!,
         assessor: d.assessor,
         method: d.method ?? null,
         model: d.model ?? null,
@@ -199,24 +199,24 @@ const assessmentsApp = new Hono()
 
     const rows = assessor
       ? await rawDb<LatestAssessmentRow[]>`
-          SELECT id, page_id_int, assessor, method, model,
+          SELECT id, page_id, assessor, method, model,
                  quality, reader_importance, research_importance, tactical_value,
                  rating_focus, rating_novelty, rating_rigor, rating_completeness,
                  rating_concreteness, rating_actionability, rating_objectivity,
                  structural_score, word_count, note, assessed_at
           FROM wikibase_page_assessments
-          WHERE page_id_int = ${intId} AND assessor = ${assessor}
+          WHERE page_id = ${intId} AND assessor = ${assessor}
           ORDER BY assessed_at DESC
           LIMIT ${limit}
         `
       : await rawDb<LatestAssessmentRow[]>`
-          SELECT id, page_id_int, assessor, method, model,
+          SELECT id, page_id, assessor, method, model,
                  quality, reader_importance, research_importance, tactical_value,
                  rating_focus, rating_novelty, rating_rigor, rating_completeness,
                  rating_concreteness, rating_actionability, rating_objectivity,
                  structural_score, word_count, note, assessed_at
           FROM wikibase_page_assessments
-          WHERE page_id_int = ${intId}
+          WHERE page_id = ${intId}
           ORDER BY assessed_at DESC
           LIMIT ${limit}
         `;
@@ -235,31 +235,31 @@ const assessmentsApp = new Hono()
 
     const rows = assessor
       ? await rawDb<LatestAssessmentRow[]>`
-          SELECT DISTINCT ON (wpa.page_id_int)
-            wpa.id, wpa.page_id_int, ei.slug AS page_slug,
+          SELECT DISTINCT ON (wpa.page_id)
+            wpa.id, wpa.page_id, ei.slug AS page_slug,
             wpa.assessor, wpa.method, wpa.model,
             wpa.quality, wpa.reader_importance, wpa.research_importance, wpa.tactical_value,
             wpa.rating_focus, wpa.rating_novelty, wpa.rating_rigor, wpa.rating_completeness,
             wpa.rating_concreteness, wpa.rating_actionability, wpa.rating_objectivity,
             wpa.structural_score, wpa.word_count, wpa.note, wpa.assessed_at
           FROM wikibase_page_assessments wpa
-          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id_int
-          WHERE wpa.assessor = ${assessor} AND wpa.page_id_int IS NOT NULL
-          ORDER BY wpa.page_id_int, wpa.assessed_at DESC
+          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id
+          WHERE wpa.assessor = ${assessor} AND wpa.page_id IS NOT NULL
+          ORDER BY wpa.page_id, wpa.assessed_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
       : await rawDb<LatestAssessmentRow[]>`
-          SELECT DISTINCT ON (wpa.page_id_int, wpa.assessor)
-            wpa.id, wpa.page_id_int, ei.slug AS page_slug,
+          SELECT DISTINCT ON (wpa.page_id, wpa.assessor)
+            wpa.id, wpa.page_id, ei.slug AS page_slug,
             wpa.assessor, wpa.method, wpa.model,
             wpa.quality, wpa.reader_importance, wpa.research_importance, wpa.tactical_value,
             wpa.rating_focus, wpa.rating_novelty, wpa.rating_rigor, wpa.rating_completeness,
             wpa.rating_concreteness, wpa.rating_actionability, wpa.rating_objectivity,
             wpa.structural_score, wpa.word_count, wpa.note, wpa.assessed_at
           FROM wikibase_page_assessments wpa
-          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id_int
-          WHERE wpa.page_id_int IS NOT NULL
-          ORDER BY wpa.page_id_int, wpa.assessor, wpa.assessed_at DESC
+          JOIN entity_ids ei ON ei.wiki_id = wpa.page_id
+          WHERE wpa.page_id IS NOT NULL
+          ORDER BY wpa.page_id, wpa.assessor, wpa.assessed_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `;
 
@@ -281,7 +281,7 @@ const assessmentsApp = new Hono()
         SELECT count(*)::int AS count FROM wikibase_page_assessments
       `,
       rawDb<UniqueCountRow[]>`
-        SELECT count(DISTINCT page_id_int)::int AS count FROM wikibase_page_assessments
+        SELECT count(DISTINCT page_id)::int AS count FROM wikibase_page_assessments
       `,
       rawDb<AssessorCountRow[]>`
         SELECT assessor, count(*)::int AS count

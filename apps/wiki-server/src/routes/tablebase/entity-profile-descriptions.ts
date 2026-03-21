@@ -79,7 +79,7 @@ export const COLUMN_DESCRIPTIONS: Record<string, Record<string, string>> = {
   },
   wiki_pages: {
     slug: "URL-safe page identifier",
-    integer_id: "Phase 4a migration integer PK",
+    id: "Integer primary key (from entity_ids)",
     content_plaintext: "Full page text (for search)",
     coverage_items: "JSONB map of coverage check results",
     synced_from_branch: "Git branch this data was synced from",

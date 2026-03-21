@@ -625,7 +625,7 @@ const researchAreasApp = new Hono()
         0
       FROM research_areas ra
       JOIN wiki_pages wp ON ra.wiki_id = wp.wiki_id AND ra.wiki_id IS NOT NULL
-      JOIN resource_citations rc ON rc.page_id_int = wp.integer_id
+      JOIN resource_citations rc ON rc.page_id = wp.id
       JOIN resources r ON rc.resource_id = r.id
       WHERE r.url IS NOT NULL
       ON CONFLICT (research_area_id, url) WHERE url IS NOT NULL DO NOTHING

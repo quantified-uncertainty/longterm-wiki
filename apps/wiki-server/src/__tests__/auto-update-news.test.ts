@@ -17,7 +17,7 @@ let nextNewsId = 1;
 // Types derived from Drizzle schema — TypeScript will catch column renames.
 // pageSlug/routedToPageSlug are synthetic convenience fields (not real DB columns).
 type RunRow = typeof autoUpdateRuns.$inferSelect;
-// routedToPageSlug is synthetic — not a real DB column, derived from routed_to_page_id_int JOIN
+// routedToPageSlug is synthetic — not a real DB column, derived from routed_to_page_id JOIN
 type NewsRow = typeof autoUpdateNewsItems.$inferSelect & { routedToPageSlug: string | null };
 
 let runStore: RunRow[];
@@ -121,20 +121,20 @@ function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
     relevanceScore: 50,
     topicsJson: null,
     entitiesJson: null,
-    routedToPageIdInt: null,
+    routedToPageId: null,
     routedToPageSlug: null, // synthetic convenience field
     routedToPageTitle: null,
     routedTier: null,
     createdAt: new Date(),
     ...overrides,
   };
-  // Auto-populate routedToPageIdInt and routedToPageSlug from routedToPageSlug if not explicitly set
+  // Auto-populate routedToPageId and routedToPageSlug from routedToPageSlug if not explicitly set
   if (base.routedToPageSlug) {
-    if (base.routedToPageIdInt === null) {
-      base.routedToPageIdInt = getIntIdForSlug(base.routedToPageSlug);
+    if (base.routedToPageId === null) {
+      base.routedToPageId = getIntIdForSlug(base.routedToPageSlug);
     }
-  } else if (base.routedToPageIdInt !== null) {
-    base.routedToPageSlug = slugFromIntId(base.routedToPageIdInt);
+  } else if (base.routedToPageId !== null) {
+    base.routedToPageSlug = slugFromIntId(base.routedToPageId);
   }
   return base;
 }
@@ -152,7 +152,7 @@ function newsToSqlRow(r: NewsRow): Record<string, unknown> {
     relevance_score: r.relevanceScore,
     topics_json: r.topicsJson,
     entities_json: r.entitiesJson,
-    routed_to_page_id_int: r.routedToPageIdInt,
+    routed_to_page_id: r.routedToPageId,
     routed_to_page_title: r.routedToPageTitle,
     routed_tier: r.routedTier,
     created_at: r.createdAt,
@@ -165,11 +165,12 @@ function newsToSqlRow(r: NewsRow): Record<string, unknown> {
  * clause produces so that `extractColumns` + `values()` in test-utils
  * correctly maps positional arrays back to objects.
  */
-function joinNewsWithRun(news: NewsRow, run: RunRow, includeSlug = false) {
+function joinNewsWithRun(news: NewsRow, run: RunRow) {
   return {
     ...newsToSqlRow(news),
     date: run.date,
-    ...(includeSlug ? { slug: news.routedToPageSlug ?? slugFromIntId(news.routedToPageIdInt) ?? null } : {}),
+    // "slug" matches wikiPages.slug in the LEFT JOIN — extractColumns picks up "slug"
+    slug: news.routedToPageSlug ?? null,
   };
 }
 
@@ -206,9 +207,9 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_news_items ----
   if (q.includes("insert into") && q.includes("auto_update_news_items")) {
-    // Phase D2b: 11 columns (routed_to_page_id_old dropped):
+    // Phase D3+E: 12 columns:
     //   run_id, title, url, source_id, published_at, summary,
-    //   relevance_score, topics_json, entities_json, routed_to_page_id_int,
+    //   relevance_score, topics_json, entities_json, routed_to_page_id,
     //   routed_to_page_title, routed_tier
     const COLS = 12;
     const numRows = params.length / COLS;
@@ -228,7 +229,7 @@ const dispatch: SqlDispatcher = (query, params) => {
         relevanceScore: params[o + 6] as number | null,
         topicsJson: params[o + 7] as string[] | null,
         entitiesJson: params[o + 8] as string[] | null,
-        routedToPageIdInt: routedIntId,
+        routedToPageId: routedIntId,
         routedToPageSlug: routedSlug, // synthetic convenience field for tests
         routedToPageTitle: params[o + 10] as string | null,
         routedTier: params[o + 11] as string | null,
@@ -258,14 +259,11 @@ const dispatch: SqlDispatcher = (query, params) => {
     return newsStore
       .filter((r) => ids.includes(r.runId))
       .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
-      .map((r) => ({
-        ...newsToSqlRow(r),
-        slug: r.routedToPageSlug ?? slugFromIntId(r.routedToPageIdInt) ?? null,
-      }));
+      .map(newsToSqlRow);
   }
 
   // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
-  //      WHERE routed_to_page_id_int = $1  (GET /by-page, Phase 4b)  ----
+  //      WHERE routed_to_page_id = $1  (GET /by-page, Phase D3+E)  ----
   // The WHERE clause distinguishes this from /recent, which has no WHERE.
   if (
     q.includes("auto_update_news_items") &&
@@ -274,7 +272,7 @@ const dispatch: SqlDispatcher = (query, params) => {
   ) {
     const intId = params[0] as number;
     return newsStore
-      .filter((r) => r.routedToPageIdInt === intId)
+      .filter((r) => r.routedToPageId === intId)
       .map((r) => {
         const run = runStore.find((run) => run.id === r.runId);
         return run ? joinNewsWithRun(r, run) : null;
@@ -282,7 +280,7 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
   }
 
-  // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs LEFT JOIN wiki_pages
+  // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
   //      ORDER BY ... LIMIT ... OFFSET ...  (GET /recent)  ----
   // No standalone WHERE clause — the only ON clause is part of the JOIN.
   if (
@@ -296,17 +294,15 @@ const dispatch: SqlDispatcher = (query, params) => {
     const joined = newsStore
       .map((r) => {
         const run = runStore.find((run) => run.id === r.runId);
-        return run ? joinNewsWithRun(r, run, true) : null;
+        return run ? joinNewsWithRun(r, run) : null;
       })
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
     return joined.slice(offset, offset + limit);
   }
 
   // ---- SELECT FROM auto_update_news_items WHERE run_id = $1  (GET /by-run) ----
-  // Phase D2a: query now uses LEFT JOIN wiki_pages + COALESCE for routedToPageSlug.
-  // The SELECT expands all 15 schema columns + 1 COALESCE at position 15.
-  // extractColumns returns null for the COALESCE (identifiers inside parens),
-  // so .values() uses Object.values(row)[15] for that position.
+  // Phase D3+E: query uses LEFT JOIN wiki_pages; Drizzle selects wikiPages.slug
+  // as the routedToPageSlug column. extractColumns finds "slug" in the SELECT list.
   if (
     q.includes("auto_update_news_items") &&
     !q.includes("inner join") &&
@@ -320,10 +316,10 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => r.runId === runId)
       .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
       .map((r) => {
-        // Phase D2b: wiki_pages.slug from LEFT JOIN (extractColumns sees "slug")
+        // "slug" key matches the wikiPages.slug column that extractColumns extracts
         return {
           ...newsToSqlRow(r),
-          slug: slugFromIntId(r.routedToPageIdInt) ?? null,
+          slug: slugFromIntId(r.routedToPageId) ?? null,
         };
       });
   }

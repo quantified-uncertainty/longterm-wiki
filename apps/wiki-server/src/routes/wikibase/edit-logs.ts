@@ -38,7 +38,7 @@ const editLogsApp = new Hono()
     const db = getDrizzleDb();
 
     // Validate page reference
-    const missing = await checkRefsExist(db, wikiPages, wikiPages.id, [d.pageId]);
+    const missing = await checkRefsExist(db, wikiPages, wikiPages.slug, [d.pageId]);
     if (missing.length > 0) {
       return validationError(c, `Referenced page not found: ${missing.join(", ")}`);
     }
@@ -49,7 +49,7 @@ const editLogsApp = new Hono()
     const rows = await db
       .insert(editLogs)
       .values({
-        pageIdInt,
+        pageId: pageIdInt,
         date: d.date,
         tool: d.tool,
         agency: d.agency,
@@ -81,7 +81,7 @@ const editLogsApp = new Hono()
 
     // Validate page references
     const pageIds = [...new Set(items.map((d) => d.pageId))];
-    const missing = await checkRefsExist(db, wikiPages, wikiPages.id, pageIds);
+    const missing = await checkRefsExist(db, wikiPages, wikiPages.slug, pageIds);
     if (missing.length > 0) {
       return validationError(c, `Referenced pages not found: ${missing.join(", ")}`);
     }
@@ -93,7 +93,7 @@ const editLogsApp = new Hono()
         .insert(editLogs)
         .values(
           items.map((d) => ({
-            pageIdInt: intIdMap.get(d.pageId) ?? null,
+            pageId: intIdMap.get(d.pageId) ?? null,
             date: d.date,
             tool: d.tool,
             agency: d.agency,
@@ -124,7 +124,7 @@ const editLogsApp = new Hono()
     const rows = await db
       .select()
       .from(editLogs)
-      .where(eq(editLogs.pageIdInt, intId))
+      .where(eq(editLogs.pageId, intId))
       .orderBy(asc(editLogs.date), asc(editLogs.id));
 
     return c.json({
@@ -158,7 +158,7 @@ const editLogsApp = new Hono()
       db
         .select({
           id: editLogs.id,
-          pageId: wikiPages.id,
+          pageId: wikiPages.slug,
           date: editLogs.date,
           tool: editLogs.tool,
           agency: editLogs.agency,
@@ -167,7 +167,7 @@ const editLogsApp = new Hono()
           createdAt: editLogs.createdAt,
         })
         .from(editLogs)
-        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, editLogs.pageIdInt))
+        .leftJoin(wikiPages, eq(wikiPages.id, editLogs.pageId))
         .where(whereClause)
         .orderBy(desc(editLogs.date), desc(editLogs.id))
         .limit(limit)
@@ -191,10 +191,10 @@ const editLogsApp = new Hono()
     // JOIN wiki_pages to recover slug from page_id_int (page_id_old no longer written)
     const rawDb = getDb();
     const rows = await rawDb<{ page_id: string; latest_date: string }[]>`
-      SELECT wp.id AS page_id, max(el.date) AS latest_date
+      SELECT wp.slug AS page_id, max(el.date) AS latest_date
       FROM edit_logs el
-      JOIN wiki_pages wp ON wp.integer_id = el.page_id_int
-      GROUP BY wp.id
+      JOIN wiki_pages wp ON wp.id = el.page_id
+      GROUP BY wp.slug
     `;
 
     const dateMap: Record<string, string> = {};
@@ -211,10 +211,10 @@ const editLogsApp = new Hono()
     // JOIN wiki_pages to recover slug from page_id_int (page_id_old no longer written)
     const rawDb = getDb();
     const rows = await rawDb<{ page_id: string; earliest_date: string }[]>`
-      SELECT wp.id AS page_id, min(el.date) AS earliest_date
+      SELECT wp.slug AS page_id, min(el.date) AS earliest_date
       FROM edit_logs el
-      JOIN wiki_pages wp ON wp.integer_id = el.page_id_int
-      GROUP BY wp.id
+      JOIN wiki_pages wp ON wp.id = el.page_id
+      GROUP BY wp.slug
     `;
 
     const dateMap: Record<string, string> = {};
@@ -236,7 +236,7 @@ const editLogsApp = new Hono()
     // Use pageIdInt for count (page_id_old no longer written for new rows)
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${editLogs.pageIdInt})`,
+        count: sql<number>`count(distinct ${editLogs.pageId})`,
       })
       .from(editLogs);
     const pagesWithLogs = Number(pagesResult[0].count);
