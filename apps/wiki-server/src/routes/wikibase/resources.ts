@@ -293,14 +293,13 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
+    const citationValues = d.citedBy.map((slug) => ({
+      resourceId: d.id,
+      pageIdInt: citedByIntIdMap.get(slug) as number,
+    }));
     await db
       .insert(resourceCitations)
-      .values(
-        d.citedBy.map((pageId) => ({
-          resourceId: d.id,
-          pageIdInt: citedByIntIdMap.get(pageId) as number,
-        }))
-      )
+      .values(citationValues)
       .onConflictDoNothing();
   }
 
