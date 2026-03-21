@@ -32,7 +32,7 @@ export interface BudgetConfig {
   estimatedCost: string;
 }
 
-/** Budget configurations per tier. */
+/** Budget configurations per tier (improve mode). */
 export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
   polish: {
     name: 'Polish',
@@ -91,6 +91,55 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
   },
 };
 
+/** Create-mode tier names (maps to CLI --tier flag). */
+export type CreateTier = 'budget' | 'standard' | 'premium';
+
+/** Budget configurations for create mode (higher research budgets). */
+export const CREATE_TIER_BUDGETS: Record<CreateTier, BudgetConfig> = {
+  budget: {
+    name: 'Budget Create',
+    maxToolCalls: 20,
+    maxResearchQueries: 2,
+    enabledTools: [
+      'read_page', 'get_page_metrics', 'split_into_sections',
+      'run_research', 'rewrite_section', 'add_entity_links',
+      'add_fact_refs', 'add_references', 'validate_content',
+      'query_wiki_context', 'edit_frontmatter', 'create_visual',
+    ],
+    estimatedCost: '$3-6',
+  },
+  standard: {
+    name: 'Standard Create',
+    maxToolCalls: 35,
+    maxResearchQueries: 4,
+    enabledTools: [
+      'read_page', 'get_page_metrics', 'split_into_sections',
+      'run_research', 'rewrite_section', 'audit_citations',
+      'add_entity_links', 'add_fact_refs', 'add_references', 'validate_content',
+      'query_wiki_context', 'read_related_page', 'edit_frontmatter',
+      'view_edit_history', 'create_visual',
+      'check_cross_references', 'suggest_cross_links',
+      'deep_citation_check', 'adversarial_review',
+    ],
+    estimatedCost: '$5-12',
+  },
+  premium: {
+    name: 'Premium Create',
+    maxToolCalls: 55,
+    maxResearchQueries: 6,
+    enabledTools: [
+      'read_page', 'get_page_metrics', 'split_into_sections',
+      'run_research', 'rewrite_section', 'audit_citations',
+      'add_entity_links', 'add_fact_refs', 'add_references', 'validate_content',
+      'query_wiki_context', 'read_related_page', 'edit_frontmatter',
+      'view_edit_history', 'create_visual',
+      'check_cross_references', 'suggest_cross_links',
+      'deep_citation_check', 'adversarial_review',
+    ],
+    estimatedCost: '$10-20',
+  },
+};
+
 // ---------------------------------------------------------------------------
 // Orchestrator context — mutable state shared across tool calls
 // ---------------------------------------------------------------------------
@@ -126,6 +175,8 @@ export interface SectionDiff {
  * modifies the content, subsequent read_page calls see the update.
  */
 export interface OrchestratorContext {
+  /** Mode of operation: improve an existing page or create a new one. */
+  mode: 'improve' | 'create';
   /** Page metadata. */
   page: OrchestratorPageData;
   /** Absolute path to the MDX file on disk. */
@@ -196,6 +247,8 @@ export interface QualityGateResult {
 export interface OrchestratorOptions {
   /** Budget tier (default: 'standard'). */
   tier?: OrchestratorTier;
+  /** Override the budget config (bypasses TIER_BUDGETS lookup). */
+  budgetOverride?: BudgetConfig;
   /** Free-text improvement directions. */
   directions?: string;
   /** If true, write output to a temp file instead of modifying the page. */

@@ -23,9 +23,14 @@ import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
 import { repairFrontmatter, stripRelatedPagesSections } from '../page-improver/utils.ts';
+import { checkForExistingPage } from '../creator/duplicate-detection.ts';
+import { deployToDestination, validateCrossLinks } from '../creator/deployment.ts';
+import { inferEntityType } from '../../lib/category-entity-types.ts';
 
 import { runOrchestrator, normalizeDollarEscaping } from './orchestrator.ts';
-import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './types.ts';
+import { generateCreateScaffold } from './scaffold.ts';
+import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier, CreateTier } from './types.ts';
+import { CREATE_TIER_BUDGETS } from './types.ts';
 
 export type { OrchestratorOptions, OrchestratorResult, OrchestratorTier };
 
@@ -280,6 +285,208 @@ export async function runOrchestratorPipeline(
     if (!options.skipSessionLog) {
       await autoLogSession(page, tier, result);
     }
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Create pipeline (v2)
+// ---------------------------------------------------------------------------
+
+export interface OrchestratorCreateOptions {
+  /** Create-mode tier (budget/standard/premium). */
+  tier?: CreateTier;
+  /** Free-text directions for content focus. */
+  directions?: string;
+  /** Entity type for the page (person, organization, concept, etc.). */
+  entityType?: string;
+  /** Destination path under content/docs/ (e.g., "knowledge-base/people"). */
+  destPath?: string | null;
+  /** Skip duplicate detection. */
+  force?: boolean;
+  /** Model override for orchestrator. */
+  orchestratorModel?: string;
+  /** Model override for section writer. */
+  writerModel?: string;
+}
+
+/**
+ * Run the V2 orchestrator to create a new wiki page.
+ *
+ * This is the create-mode counterpart to runOrchestratorPipeline().
+ * It generates a scaffold, runs the orchestrator agent to fill it in,
+ * and optionally deploys to the content directory.
+ */
+export async function runOrchestratorCreate(
+  topic: string,
+  options: OrchestratorCreateOptions = {},
+): Promise<OrchestratorResult> {
+  const {
+    tier = 'standard',
+    directions = '',
+    entityType = 'concept',
+    destPath = null,
+    force = false,
+  } = options;
+
+  // ── Duplicate check ──────────────────────────────────────────────────────
+
+  if (!force) {
+    try {
+      console.log(`\nChecking for existing pages similar to "${topic}"...`);
+      const { exists, matches } = await checkForExistingPage(topic, ROOT);
+
+      if (matches.length > 0) {
+        console.log('\nFound similar existing pages:');
+        for (const match of matches) {
+          const simPercent = Math.round(match.similarity * 100);
+          console.log(`  [${simPercent}%] ${match.title} — ${match.path}`);
+        }
+        if (exists) {
+          console.log('\nA page with this name likely already exists.');
+          console.log('   Use --force to create anyway.\n');
+          process.exit(1);
+        }
+        console.log('\n   Partial matches only. Proceeding...\n');
+      } else {
+        console.log('   No similar pages found. Proceeding...\n');
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.warn(`Duplicate check failed (continuing): ${error.message}`);
+    }
+  }
+
+  // ── Generate scaffold ──────────────────────────────────────────────────
+
+  const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const scaffold = generateCreateScaffold(topic, entityType);
+
+  // ── Set up temp file ───────────────────────────────────────────────────
+
+  const tempDir = path.join(TEMP_DIR, slug);
+  ensureDir(tempDir);
+  const tempFilePath = path.join(tempDir, 'create.mdx');
+  fs.writeFileSync(tempFilePath, scaffold);
+
+  // ── Map create tier to orchestrator budget ─────────────────────────────
+
+  const budget = CREATE_TIER_BUDGETS[tier] || CREATE_TIER_BUDGETS.standard;
+
+  // ── Build page metadata ────────────────────────────────────────────────
+
+  const pageData = {
+    id: slug,
+    title: topic,
+    path: destPath ? `${destPath}/${slug}` : `knowledge-base/${slug}`,
+    entityType,
+  };
+
+  // ── Print header ───────────────────────────────────────────────────────
+
+  console.log('\n' + '='.repeat(60));
+  console.log(`Creating: "${topic}" (orchestrator v2)`);
+  console.log(`Tier: ${tier} (${budget.name})`);
+  console.log(`Entity type: ${entityType}`);
+  if (directions) console.log(`Directions: ${directions}`);
+  console.log('='.repeat(60) + '\n');
+
+  // ── Run orchestrator in create mode ────────────────────────────────────
+
+  const result = await runOrchestrator(
+    pageData,
+    tempFilePath,
+    scaffold,
+    {
+      tier: 'standard', // Fallback tier (budget override takes precedence)
+      budgetOverride: budget,
+      directions,
+      mode: 'create',
+      topic,
+      orchestratorModel: options.orchestratorModel,
+      writerModel: options.writerModel,
+    },
+  );
+
+  // ── Post-process content ───────────────────────────────────────────────
+
+  let finalContent = result.finalContent;
+  finalContent = repairFrontmatter(finalContent);
+  finalContent = stripRelatedPagesSections(finalContent);
+  finalContent = normalizeDollarEscaping(finalContent);
+
+  // ── Write output ───────────────────────────────────────────────────────
+
+  const finalPath = writeTemp(slug, 'final.mdx', finalContent);
+  result.outputPath = finalPath;
+
+  writeTemp(slug, 'orchestrator-result.json', {
+    ...result,
+    finalContent: undefined,
+  });
+
+  // ── Report ─────────────────────────────────────────────────────────────
+
+  const costStr = result.actualTotalCost != null
+    ? `~$${result.totalCost.toFixed(2)} estimated / $${result.actualTotalCost.toFixed(2)} actual`
+    : `~$${result.totalCost.toFixed(2)}`;
+
+  console.log('\n' + '='.repeat(60));
+  console.log('Orchestrator Create Complete');
+  console.log('='.repeat(60));
+  console.log(`Duration: ${result.duration}s`);
+  console.log(`Tool calls: ${result.toolCallCount}`);
+  console.log(`Refinement cycles: ${result.refinementCycles}`);
+  console.log(`Cost: ${costStr}`);
+  console.log(`Quality gate: ${result.qualityGatePassed ? 'PASSED' : 'FAILED'}`);
+  console.log(`Output: ${finalPath}`);
+
+  if (result.actualCostBreakdown && Object.keys(result.actualCostBreakdown).length > 0) {
+    console.log('\nActual cost breakdown (from API usage):');
+    for (const [label, cost] of Object.entries(result.actualCostBreakdown).sort((a, b) => b[1] - a[1])) {
+      if (cost > 0) console.log(`  ${label}: $${cost.toFixed(4)}`);
+    }
+  }
+
+  // ── Deploy if --dest provided ──────────────────────────────────────────
+
+  if (destPath) {
+    try {
+      console.log(`\nDeploying to content/docs/${destPath}...`);
+
+      // Write final content to a temp draft path the deployer expects
+      const draftDir = path.join(ROOT, '.claude/temp/page-creator', slug);
+      ensureDir(draftDir);
+      const draftPath = path.join(draftDir, 'final.mdx');
+      fs.writeFileSync(draftPath, finalContent);
+
+      // Create a minimal context that deployment needs
+      const deployCtx = { getTopicDir: () => draftDir };
+      const deployResult = deployToDestination(topic, destPath, deployCtx as never);
+
+      if (deployResult.success) {
+        console.log(`Deployed to: ${deployResult.deployedTo}`);
+        const crossLinks = validateCrossLinks(deployResult.deployedTo!);
+        console.log(`EntityLinks: ${crossLinks.outboundCount}`);
+
+        // Edit log
+        appendEditLog(slug, {
+          tool: 'crux-create',
+          agency: 'ai-directed',
+          requestedBy: getDefaultRequestedBy(),
+          note: `Orchestrator v2 create (${tier}): ${topic}`,
+        });
+      } else {
+        console.error(`Deployment failed: ${deployResult.error}`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error(`Deployment failed: ${error.message}`);
+    }
+  } else {
+    console.log(`\nTo deploy, copy the output file to the content directory:`);
+    console.log(`  cp "${finalPath}" content/docs/knowledge-base/<category>/${slug}.mdx`);
   }
 
   return result;

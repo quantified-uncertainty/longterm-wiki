@@ -144,23 +144,47 @@ ${directions ? `\nUser directions: ${directions}` : ''}
 - Max research queries: **${budget.maxResearchQueries}**
 - Estimated cost: ${budget.estimatedCost}
 
+Plan your tool calls carefully. You will see a budget counter after each tool result.
+
 ## Strategy for Page Creation
 
-1. **Research first**: Use \`run_research\` to gather sources about the topic. You'll want 2-3 research calls with different angles.
+1. **Research first**: Use \`run_research\` to gather sources about the topic. You'll want 2-3 research calls with different angles (e.g., "background and history of ${topic}", "criticism and controversies of ${topic}", "${topic} recent developments").
 
-2. **Check structure**: Use \`split_into_sections\` to see what sections exist (the page starts with a template).
+2. **Check structure**: Use \`split_into_sections\` to see what sections the template provides.
 
-3. **Write each section**: Use \`rewrite_section\` on each section, leveraging the source cache from research. Write the most important sections first in case budget runs out.
+3. **Write each section**: Use \`rewrite_section\` on each section, leveraging the source cache from research. Write the most important sections first (Overview, then core sections, then Criticisms) in case budget runs out.
 
-4. **Enrich**: Run \`add_entity_links\` and \`add_fact_refs\` to add structured annotations.
+4. **Enrich**: Run \`add_entity_links\` to insert cross-references to other wiki entities. Run \`add_fact_refs\` to replace hardcoded numbers with KB fact references. Run \`add_references\` to generate a \`<References>\` bibliography block from any \`<R>\` citations.
 
-5. **Validate**: End with \`validate_content\`.
+5. **Update frontmatter**: Use \`edit_frontmatter\` to set the \`summary\` and \`description\` fields based on the content you wrote.
+
+6. **Quality check**: Run \`adversarial_review\` (free, $0) to catch uncited claims, speculation, and weasel words.
+
+7. **Validate**: End with \`validate_content\` as your final tool call.
+
+## Citation Rules — CRITICAL
+
+Every factual claim must have a footnote citation with a real URL. This is the most important quality signal.
+
+- **Format**: Use markdown footnotes \`[^N]\` in text and \`[^N]: Title (URL)\` in the Sources section at the bottom.
+- **Real URLs only**: Every footnote MUST include a real URL from your research sources. NEVER write "(no URL available)" — if you don't have a URL, don't cite it.
+- **Source accuracy**: Only attribute claims to sources that actually support them. Don't cite a source for claims it doesn't contain.
+- **Source diversity**: Use multiple sources per section. Don't rely on a single source for an entire section.
+- **Critical sources**: Include critical perspectives and dissenting views, not just favorable coverage.
 
 ## Important Rules
 
-- **Research before writing.** Every section should cite real sources.
+- **Research before writing.** Every section should cite real sources from the source cache.
 - **Don't fabricate facts.** Only include claims supported by your research sources.
-- **Cover all template sections.** The page template has specific sections — fill each one.
-- **Be balanced and objective.** Present multiple perspectives without favoring one.
-- **Track your budget.** Write the most important sections first.`;
+- **Cover all template sections.** The page template has specific sections — fill each one with substantial content.
+- **Be balanced and objective.** Present multiple perspectives. Include a Criticisms section.
+- **Track your budget.** Write the most important sections first in case budget runs out.
+- **Preserve tables.** If the template has Markdown tables (like Quick Assessment), keep and fill them with real data.
+- **One section at a time.** Each \`rewrite_section\` call handles one ## section.
+- **Escape special characters.** Use \`\\$\` for dollar signs and \`\\<\` for angle brackets in prose.
+- **EntityLinks**: Use \`<EntityLink id="E##">Display Text</EntityLink>\` for cross-references to known wiki entities. The \`add_entity_links\` tool will add these automatically, but you can include them during section writing if you know the entity ID.
+
+## When you're done
+
+After making your improvements, call \`validate_content\` as your final tool call to catch any syntax issues. Then stop — the quality gate will evaluate the result automatically.`;
 }

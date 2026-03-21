@@ -68,32 +68,43 @@ const TIER_THRESHOLDS: Record<OrchestratorTier, QualityThresholds> = {
 export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult {
   const metrics = extractQualityMetrics(ctx.currentContent, ctx.filePath);
   const originalMetrics = extractQualityMetrics(ctx.originalContent, ctx.filePath);
-  const thresholds = TIER_THRESHOLDS[ctx.budget.name.toLowerCase() as OrchestratorTier]
-    || TIER_THRESHOLDS.standard;
+  // Map budget name to threshold tier. Create-mode names contain the base tier
+  // (e.g., "Standard Create" → "standard", "Budget Create" → "standard").
+  const budgetNameLower = ctx.budget.name.toLowerCase();
+  let thresholdTier: OrchestratorTier = 'standard';
+  if (budgetNameLower.includes('deep') || budgetNameLower.includes('premium')) {
+    thresholdTier = 'deep';
+  } else if (budgetNameLower.includes('polish') || budgetNameLower.includes('budget')) {
+    thresholdTier = ctx.mode === 'create' ? 'standard' : 'polish';
+  }
+  const thresholds = TIER_THRESHOLDS[thresholdTier];
 
   const gaps: string[] = [];
+  const isCreateMode = ctx.mode === 'create';
 
-  // Check for regressions (content got worse)
-  if (metrics.wordCount < originalMetrics.wordCount * 0.7) {
-    gaps.push(
-      `Word count dropped significantly: ${originalMetrics.wordCount} → ${metrics.wordCount} ` +
-      `(${Math.round((1 - metrics.wordCount / originalMetrics.wordCount) * 100)}% decrease). ` +
-      `The page should not lose substantial content during improvement.`
-    );
-  }
+  // Check for regressions (content got worse) — only in improve mode
+  if (!isCreateMode) {
+    if (metrics.wordCount < originalMetrics.wordCount * 0.7) {
+      gaps.push(
+        `Word count dropped significantly: ${originalMetrics.wordCount} → ${metrics.wordCount} ` +
+        `(${Math.round((1 - metrics.wordCount / originalMetrics.wordCount) * 100)}% decrease). ` +
+        `The page should not lose substantial content during improvement.`
+      );
+    }
 
-  if (metrics.footnoteCount < originalMetrics.footnoteCount * 0.8) {
-    gaps.push(
-      `Citation count dropped: ${originalMetrics.footnoteCount} → ${metrics.footnoteCount}. ` +
-      `Improvements should not remove existing citations.`
-    );
-  }
+    if (metrics.footnoteCount < originalMetrics.footnoteCount * 0.8) {
+      gaps.push(
+        `Citation count dropped: ${originalMetrics.footnoteCount} → ${metrics.footnoteCount}. ` +
+        `Improvements should not remove existing citations.`
+      );
+    }
 
-  if (originalMetrics.tableCount > 0 && metrics.tableCount < originalMetrics.tableCount) {
-    gaps.push(
-      `Table count dropped: ${originalMetrics.tableCount} → ${metrics.tableCount}. ` +
-      `Tables provide structural value — preserve or improve them, don't remove them.`
-    );
+    if (originalMetrics.tableCount > 0 && metrics.tableCount < originalMetrics.tableCount) {
+      gaps.push(
+        `Table count dropped: ${originalMetrics.tableCount} → ${metrics.tableCount}. ` +
+        `Tables provide structural value — preserve or improve them, don't remove them.`
+      );
+    }
   }
 
   // Check against tier thresholds
@@ -153,9 +164,19 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
   }
 
   // Check for improvement (must have actually changed something)
-  const contentUnchanged = ctx.currentContent === ctx.originalContent;
-  if (contentUnchanged) {
-    gaps.push('No changes were made to the page. The orchestrator should have improved at least some sections.');
+  if (isCreateMode) {
+    // For create mode, the scaffold is minimal — the orchestrator must have written substantial content
+    if (metrics.wordCount < 400) {
+      gaps.push(
+        `Page word count (${metrics.wordCount}) is too low for a new page. ` +
+        `Use rewrite_section to fill in each template section with researched content.`
+      );
+    }
+  } else {
+    const contentUnchanged = ctx.currentContent === ctx.originalContent;
+    if (contentUnchanged) {
+      gaps.push('No changes were made to the page. The orchestrator should have improved at least some sections.');
+    }
   }
 
   const passed = gaps.length === 0;

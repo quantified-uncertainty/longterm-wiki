@@ -26,7 +26,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
-    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect'],
+    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect', 'engine'],
     positional: true,
   },
   regrade: {
@@ -86,7 +86,7 @@ ${commandList}
 
 Options:
   --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
-  --engine=v2       Use agent orchestrator instead of fixed pipeline (improve)
+  --engine=v2       Use agent orchestrator instead of fixed pipeline (improve, create)
   --directions=<d>  Specific improvement directions (improve)
   --output=<path>   Output file path (create)
   --batch=<n>       Batch size (regrade, grade-content)
