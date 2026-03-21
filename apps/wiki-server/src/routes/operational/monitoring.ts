@@ -527,11 +527,9 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_facts,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_summaries,
-      -- Only flag truly orphaned records where BOTH the legacy text page_id and the new integer
-      -- page_id_int are NULL. Records with page_id_old populated but page_id_int NULL are
-      -- pre-migration artifacts (Phase D / Phase 4a), not data corruption.
-      (SELECT count(*) FROM citation_quotes WHERE page_id_old IS NULL AND (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages)))::int AS dangling_citations,
-      (SELECT count(*) FROM edit_logs WHERE page_id_old IS NULL AND (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages)))::int AS dangling_edit_logs
+      -- Phase D2a: page_id_int is now the authoritative column. Flag rows where it's NULL or orphaned.
+      (SELECT count(*) FROM citation_quotes WHERE page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))::int AS dangling_citations,
+      (SELECT count(*) FROM edit_logs WHERE page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))::int AS dangling_edit_logs
   `;
 
   const row = result[0] as IntegritySummaryRow;

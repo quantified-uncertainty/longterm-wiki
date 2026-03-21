@@ -131,28 +131,30 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
-    const COLS = 15; // Phase 4a: +1 for page_id_int
+    // Phase D2a: page_id_old is no longer sent. Params: page_id_int, footnote, url, ...
+    const COLS = 14;
     const numRows = params.length / COLS;
     const rows: QuoteRow[] = [];
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
-      const pageId = params[o] as string;
-      const pageIdInt = params[o + 1] as number | null; // Phase 4a: page_id_int
-      const footnote = params[o + 2] as number;
-      const url = params[o + 3] as string | null;
-      const resourceId = params[o + 4] as string | null;
-      const claimText = params[o + 5] as string;
-      const claimContext = params[o + 6] as string | null;
-      const sourceQuote = params[o + 7] as string | null;
-      const sourceLocation = params[o + 8] as string | null;
-      const quoteVerified = (params[o + 9] ?? false) as boolean;
-      const verificationMethod = params[o + 10] as string | null;
-      const verificationScore = params[o + 11] as number | null;
-      const sourceTitle = params[o + 12] as string | null;
-      const sourceType = params[o + 13] as string | null;
-      const extractionModel = params[o + 14] as string | null;
+      const pageIdInt = params[o] as number;
+      const footnote = params[o + 1] as number;
+      const url = params[o + 2] as string | null;
+      const resourceId = params[o + 3] as string | null;
+      const claimText = params[o + 4] as string;
+      const claimContext = params[o + 5] as string | null;
+      const sourceQuote = params[o + 6] as string | null;
+      const sourceLocation = params[o + 7] as string | null;
+      const quoteVerified = (params[o + 8] ?? false) as boolean;
+      const verificationMethod = params[o + 9] as string | null;
+      const verificationScore = params[o + 10] as number | null;
+      const sourceTitle = params[o + 11] as string | null;
+      const sourceType = params[o + 12] as string | null;
+      const extractionModel = params[o + 13] as string | null;
 
+      // Derive slug from intId for the store key
+      const pageId = slugFromIntId(pageIdInt) ?? `page-${pageIdInt}`;
       const key = quoteKey(pageId, footnote);
       const existing = quotesStore.get(key);
 
@@ -244,7 +246,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .filter((r) => r.quoteVerified === true && r.verificationScore != null && (r.verificationScore as number) < threshold)
       .sort((a, b) => (a.verificationScore as number) - (b.verificationScore as number))
       .map((r) => ({
-        page_id_old: r.pageId, page_id: r.pageId, footnote: r.footnote, url: r.url,
+        // Phase D2a: pageId derived via LEFT JOIN wiki_pages
+        id: r.pageId, footnote: r.footnote, url: r.url,
         claim_text: r.claimText, verification_score: r.verificationScore,
       }));
   }
@@ -300,8 +303,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("citation_quotes") && q.includes("order by") && q.includes("limit") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by")) {
     const limit = (params[0] as number) || 100;
     const offset = (params[1] as number) || 0;
+    // Phase D2a: order by page_id_int instead of page_id_old
     const all = Array.from(quotesStore.values()).sort((a, b) => {
-      const pc = (a.pageId as string).localeCompare(b.pageId as string);
+      const pc = (a.pageIdInt as number) - (b.pageIdInt as number);
       return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
     });
     return all.slice(offset, offset + limit).map(quoteToSqlRow);
@@ -332,7 +336,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const verified = all.filter((r) => r.quoteVerified === true).length;
     const scores = all.filter((r) => r.verificationScore != null).map((r) => r.verificationScore as number);
     const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-    const pages = new Set(all.map((r) => r.pageId));
+    // Phase D2a: count(distinct page_id_int)
+    const pages = new Set(all.map((r) => r.pageIdInt));
     return [{
       count: all.length,
       with_quotes: withQuotes,
@@ -348,25 +353,55 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: quotesStore.size }];
   }
 
-  // --- citation_quotes: Accuracy summary (GROUP BY + HAVING) ---
-  if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having")) {
+  // --- citation_quotes: Accuracy-snapshot aggregation (GROUP BY + HAVING + not_verifiable) ---
+  // Phase D2a: accuracy-snapshot selects pageIdInt + pageId (via LEFT JOIN wiki_pages), plus detailed counts
+  if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having") && q.includes("not_verifiable")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
       if (r.accuracyVerdict != null) {
-        const arr = byPage.get(r.pageId as string) || [];
+        const slug = r.pageId as string;
+        const arr = byPage.get(slug) || [];
         arr.push(r);
-        byPage.set(r.pageId as string, arr);
+        byPage.set(slug, arr);
       }
     }
     return Array.from(byPage.entries())
       .map(([pageId, rows]) => ({
-        page_id_old: pageId,
+        page_id_int: getIntIdForSlug(pageId), // citationQuotes.pageIdInt
+        id: pageId, // wiki_pages.id (slug) via LEFT JOIN
+        count: rows.length,
+        checked_citations: rows.filter((r) => r.accuracyVerdict != null).length,
+        accurate_count: rows.filter((r) => r.accuracyVerdict === "accurate").length,
+        minor_issues_count: rows.filter((r) => r.accuracyVerdict === "minor_issues").length,
+        inaccurate_count: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
+        unsupported_count: rows.filter((r) => r.accuracyVerdict === "unsupported").length,
+        not_verifiable_count: rows.filter((r) => r.accuracyVerdict === "not_verifiable").length,
+        avg: null,
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  // --- citation_quotes: Accuracy summary (GROUP BY + HAVING, no not_verifiable) ---
+  // Phase D2a: groupBy page_id_int with LEFT JOIN wiki_pages; returns wiki_pages.id as slug
+  if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having")) {
+    const byPage = new Map<string, QuoteRow[]>();
+    for (const r of quotesStore.values()) {
+      if (r.accuracyVerdict != null) {
+        const slug = r.pageId as string;
+        const arr = byPage.get(slug) || [];
+        arr.push(r);
+        byPage.set(slug, arr);
+      }
+    }
+    return Array.from(byPage.entries())
+      .map(([pageId, rows]) => ({
+        id: pageId, // wiki_pages.id (slug) via LEFT JOIN
         checked: rows.length,
         accurate: rows.filter((r) => r.accuracyVerdict === "accurate").length,
         inaccurate: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
         unsupported: rows.filter((r) => r.accuracyVerdict === "unsupported").length,
       }))
-      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
+      .sort((a, b) => a.id.localeCompare(b.id));
   }
 
   // --- citation_quotes: Verdict distribution (WHERE accuracy_verdict IS NOT NULL + GROUP BY accuracy_verdict) ---
@@ -396,45 +431,46 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return Array.from(diffCounts.entries()).map(([d, cnt]) => ({ verification_difficulty: d, cnt }));
   }
 
-  // --- citation_quotes: Accuracy-dashboard per-page aggregation (GROUP BY pageId, no HAVING, with minor_issues col) ---
-  // Distinguished from /page-stats by the presence of 'minor_issues' in the query (minor_issues verdict count).
-  if (q.includes("citation_quotes") && q.includes("minor_issues") && q.includes("group by") && !q.includes("having") && !q.includes("where")) {
-    const byPage = new Map<string, QuoteRow[]>();
-    for (const r of quotesStore.values()) {
-      const arr = byPage.get(r.pageId as string) || [];
-      arr.push(r);
-      byPage.set(r.pageId as string, arr);
-    }
-    return Array.from(byPage.entries())
-      .map(([pageId, rows]) => {
-        const checked = rows.filter((r) => r.accuracyVerdict != null);
-        const checkedScores = checked.filter((r) => r.accuracyScore != null).map((r) => r.accuracyScore as number);
-        const avgScore = checkedScores.length > 0 ? checkedScores.reduce((a, b) => a + b, 0) / checkedScores.length : null;
-        return {
-          page_id_old: pageId,
-          count: rows.length,
-          checked: checked.length,
-          accurate: rows.filter((r) => r.accuracyVerdict === "accurate").length,
-          inaccurate: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
-          unsupported: rows.filter((r) => r.accuracyVerdict === "unsupported").length,
-          minor_issues: rows.filter((r) => r.accuracyVerdict === "minor_issues").length,
-          avg_score: avgScore,
-        };
+  // --- citation_quotes: Accuracy-dashboard full select (LEFT JOIN wiki_pages, ORDER BY, no GROUP BY, no WHERE) ---
+  // Phase D2a: accuracy-dashboard does explicit select with pageIdSlug: wikiPages.id via LEFT JOIN
+  if (q.includes("citation_quotes") && q.includes("wiki_pages") && q.includes("order by") && !q.includes("group by") && !q.includes("where") && !q.includes("count")) {
+    return Array.from(quotesStore.values())
+      .sort((a, b) => {
+        const pc = (a.pageId as string).localeCompare(b.pageId as string);
+        return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
       })
-      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
+      .map((r) => ({
+        // wiki_pages.id (slug) via LEFT JOIN — maps to pageIdSlug in the select
+        id: r.pageId,
+        footnote: r.footnote,
+        url: r.url,
+        claim_text: r.claimText,
+        source_quote: r.sourceQuote,
+        quote_verified: r.quoteVerified,
+        verification_score: r.verificationScore,
+        accuracy_verdict: r.accuracyVerdict,
+        accuracy_score: r.accuracyScore,
+        accuracy_issues: r.accuracyIssues,
+        accuracy_supporting_quotes: r.accuracySupportingQuotes,
+        verification_difficulty: r.verificationDifficulty,
+        accuracy_checked_at: r.accuracyCheckedAt,
+        source_title: r.sourceTitle,
+      }));
   }
 
   // --- citation_quotes: Page stats (GROUP BY without HAVING) ---
+  // Phase D2a: groupBy page_id_int with LEFT JOIN wiki_pages; returns wiki_pages.id as slug
   if (q.includes("citation_quotes") && q.includes("group by") && !q.includes("having")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
-      const arr = byPage.get(r.pageId as string) || [];
+      const slug = r.pageId as string;
+      const arr = byPage.get(slug) || [];
       arr.push(r);
-      byPage.set(r.pageId as string, arr);
+      byPage.set(slug, arr);
     }
     return Array.from(byPage.entries())
       .map(([pageId, rows]) => ({
-        page_id_old: pageId,
+        id: pageId, // wiki_pages.id (slug) via LEFT JOIN
         count: rows.length,
         with_quotes: rows.filter((r) => r.sourceQuote != null).length,
         verified: rows.filter((r) => r.quoteVerified === true).length,
@@ -443,7 +479,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         accurate: rows.filter((r) => r.accuracyVerdict === "accurate").length,
         inaccurate: rows.filter((r) => r.accuracyVerdict === "inaccurate").length,
       }))
-      .sort((a, b) => a.page_id_old.localeCompare(b.page_id_old));
+      .sort((a, b) => a.id.localeCompare(b.id));
   }
 
   // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---

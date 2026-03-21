@@ -285,15 +285,14 @@ async function upsertResource(
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    // Phase 4a: use pre-resolved map if provided (batch path), else resolve per-resource (single path)
+    // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
     const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     await db
       .insert(resourceCitations)
       .values(d.citedBy.map((pageId) => ({
         resourceId: d.id,
-        pageId,
-        pageIdInt: citedByIntIdMap.get(pageId) ?? null, // Phase 4a dual-write
-      })))
+        pageIdInt: citedByIntIdMap.get(pageId) ?? 0, // Phase D2a: integer only
+      })).filter(v => v.pageIdInt !== 0)) // Skip unresolved pages
       .onConflictDoNothing();
   }
 
@@ -643,7 +642,7 @@ const resourcesApp = new Hono()
         db.select({ count: count() }).from(resourceCitations),
         db
           .select({
-            count: sql<number>`count(distinct ${resourceCitations.pageId})`,
+            count: sql<number>`count(distinct ${resourceCitations.pageIdInt})`,
           })
           .from(resourceCitations),
         db
@@ -835,12 +834,14 @@ const resourcesApp = new Hono()
   .get("/citations/all", async (c) => {
     const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
+    // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
-        pageId: resourceCitations.pageId,
+        pageId: wikiPages.id,
       })
       .from(resourceCitations)
+      .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
       .limit(HARD_LIMIT + 1);
 
     const truncated = rows.length > HARD_LIMIT;
@@ -850,7 +851,7 @@ const resourcesApp = new Hono()
     const index: Record<string, string[]> = {};
     for (const row of rows) {
       if (!index[row.resourceId]) index[row.resourceId] = [];
-      index[row.resourceId].push(row.pageId);
+      if (row.pageId) index[row.resourceId].push(row.pageId);
     }
 
     return c.json({ citations: index, count: rows.length, truncated });
@@ -954,7 +955,11 @@ const resourcesApp = new Hono()
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
-      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+      // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
+      db.select({ pageId: wikiPages.id })
+        .from(resourceCitations)
+        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
+        .where(eq(resourceCitations.resourceId, id)),
     ]);
 
     return c.json({
@@ -962,7 +967,7 @@ const resourcesApp = new Hono()
       paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
       forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
       policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
-      citedBy: citations.map((row) => row.pageId),
+      citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   })
 
@@ -1298,8 +1303,12 @@ const resourcesApp = new Hono()
     }
 
     // Also fetch citations and sub-table data
+    // Phase D2a: JOIN wiki_pages to recover slug from page_id_int
     const [citations, paperRows, forumRows, policyRows] = await Promise.all([
-      db.select({ pageId: resourceCitations.pageId }).from(resourceCitations).where(eq(resourceCitations.resourceId, id)),
+      db.select({ pageId: wikiPages.id })
+        .from(resourceCitations)
+        .leftJoin(wikiPages, eq(wikiPages.integerIdCol, resourceCitations.pageIdInt))
+        .where(eq(resourceCitations.resourceId, id)),
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
@@ -1310,7 +1319,7 @@ const resourcesApp = new Hono()
       paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
       forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
       policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
-      citedBy: citations.map((row) => row.pageId),
+      citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   });
 
