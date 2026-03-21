@@ -57,7 +57,6 @@ function quoteKey(pageId: string, footnote: number) {
 function quoteToSqlRow(r: QuoteRow): Record<string, unknown> {
   return {
     id: r.id,
-    page_id_old: r.pageId,
     page_id_int: r.pageIdInt,
     footnote: r.footnote,
     url: r.url,
@@ -89,7 +88,6 @@ function quoteToSqlRow(r: QuoteRow): Record<string, unknown> {
 function snapshotToSqlRow(r: SnapshotRow): Record<string, unknown> {
   return {
     id: r.id,
-    page_id_old: r.pageId,
     page_id_int: r.pageIdInt,
     total_citations: r.totalCitations,
     checked_citations: r.checkedCitations,
@@ -161,7 +159,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (existing) {
         const updated: QuoteRow = {
           ...existing,
-          pageId, pageIdInt, footnote, url, resourceId,
+          pageIdInt, footnote, url, resourceId,
           claimText, claimContext,
           sourceQuote, sourceLocation,
           quoteVerified, verificationMethod,
@@ -174,7 +172,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       } else {
         const row: QuoteRow = {
           id: nextQuoteId++,
-          pageId, pageIdInt, footnote, url, resourceId,
+          pageIdInt, footnote, url, resourceId,
           claimText, claimContext,
           sourceQuote, sourceLocation,
           quoteVerified, verificationMethod,
@@ -246,8 +244,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .filter((r) => r.quoteVerified === true && r.verificationScore != null && (r.verificationScore as number) < threshold)
       .sort((a, b) => (a.verificationScore as number) - (b.verificationScore as number))
       .map((r) => ({
-        // Phase D2a: pageId derived via LEFT JOIN wiki_pages
-        id: r.pageId, footnote: r.footnote, url: r.url,
+        // Phase D2b: page slug derived from pageIdInt via LEFT JOIN wiki_pages
+        id: slugFromIntId(r.pageIdInt) ?? null, footnote: r.footnote, url: r.url,
         claim_text: r.claimText, verification_score: r.verificationScore,
       }));
   }
@@ -359,7 +357,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
       if (r.accuracyVerdict != null) {
-        const slug = r.pageId as string;
+        const slug = slugFromIntId(r.pageIdInt) ?? `page-${r.pageIdInt}`;
         const arr = byPage.get(slug) || [];
         arr.push(r);
         byPage.set(slug, arr);
@@ -387,7 +385,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
       if (r.accuracyVerdict != null) {
-        const slug = r.pageId as string;
+        const slug = slugFromIntId(r.pageIdInt) ?? `page-${r.pageIdInt}`;
         const arr = byPage.get(slug) || [];
         arr.push(r);
         byPage.set(slug, arr);
@@ -436,12 +434,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("citation_quotes") && q.includes("wiki_pages") && q.includes("order by") && !q.includes("group by") && !q.includes("where") && !q.includes("count")) {
     return Array.from(quotesStore.values())
       .sort((a, b) => {
-        const pc = (a.pageId as string).localeCompare(b.pageId as string);
+        const slugA = slugFromIntId(a.pageIdInt) ?? "";
+        const slugB = slugFromIntId(b.pageIdInt) ?? "";
+        const pc = slugA.localeCompare(slugB);
         return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
       })
       .map((r) => ({
         // wiki_pages.id (slug) via LEFT JOIN — maps to pageIdSlug in the select
-        id: r.pageId,
+        id: slugFromIntId(r.pageIdInt) ?? null,
         footnote: r.footnote,
         url: r.url,
         claim_text: r.claimText,
@@ -463,7 +463,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("citation_quotes") && q.includes("group by") && !q.includes("having")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
-      const slug = r.pageId as string;
+      const slug = slugFromIntId(r.pageIdInt) ?? `page-${r.pageIdInt}`;
       const arr = byPage.get(slug) || [];
       arr.push(r);
       byPage.set(slug, arr);
@@ -494,7 +494,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const pageIdInt = params[o] as number | null;
       const row: SnapshotRow = {
         id: nextSnapshotId++,
-        pageId: slugFromIntId(pageIdInt), // page_id_old is synthetic here
         pageIdInt: pageIdInt,
         totalCitations: params[o + 1] as number,
         checkedCitations: params[o + 2] as number,
@@ -531,9 +530,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const keep = params[0] as number;
     const byPage = new Map<string, typeof snapshotStore>();
     for (const r of snapshotStore) {
-      const arr = byPage.get(r.pageId as string) || [];
+      const slug = String(r.pageIdInt ?? "unknown");
+      const arr = byPage.get(slug) || [];
       arr.push(r);
-      byPage.set(r.pageId as string, arr);
+      byPage.set(slug, arr);
     }
     let wouldDelete = 0;
     for (const rows of byPage.values()) {
@@ -557,9 +557,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const keep = params[0] as number;
     const byPage = new Map<string, typeof snapshotStore>();
     for (const r of snapshotStore) {
-      const arr = byPage.get(r.pageId as string) || [];
+      const slug = String(r.pageIdInt ?? "unknown");
+      const arr = byPage.get(slug) || [];
       arr.push(r);
-      byPage.set(r.pageId as string, arr);
+      byPage.set(slug, arr);
     }
     const toDelete = new Set<number>();
     for (const rows of byPage.values()) {
@@ -614,7 +615,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- citation_quotes: SELECT * ORDER BY ... (no LIMIT, no WHERE — for accuracy-dashboard) ---
   if (q.includes("citation_quotes") && q.includes("order by") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("limit")) {
     return Array.from(quotesStore.values()).sort((a, b) => {
-      const pc = (a.pageId as string).localeCompare(b.pageId as string);
+      const slugA = slugFromIntId(a.pageIdInt) ?? "";
+      const slugB = slugFromIntId(b.pageIdInt) ?? "";
+      const pc = slugA.localeCompare(slugB);
       return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
     }).map(quoteToSqlRow);
   }
@@ -1188,11 +1191,11 @@ describe("Citation Server API", () => {
   describe("DELETE /api/citations/accuracy-snapshots/cleanup", () => {
     /** Seed the in-memory snapshot store directly for cleanup testing. */
     function seedSnapshotStore(pageId: string, count: number) {
+      const intId = getIntIdForSlug(pageId);
       for (let i = 0; i < count; i++) {
         snapshotStore.push({
           id: nextSnapshotId++,
-          pageId: pageId, // page_id_old column
-          pageIdInt: null,
+          pageIdInt: intId,
           totalCitations: 10,
           checkedCitations: 5,
           accurateCount: 4,

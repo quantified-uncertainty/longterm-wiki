@@ -862,6 +862,13 @@
       "when": 1780214400000,
       "tag": "0122_entities_search_vector",
       "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1780300800000,
+      "tag": "0123_phase_d2b_drop_old_columns",
+      "breakpoints": true
     }
   ]
 }

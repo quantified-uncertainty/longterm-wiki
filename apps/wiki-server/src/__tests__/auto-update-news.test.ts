@@ -121,7 +121,6 @@ function makeNews(runId: number, overrides: Partial<NewsRow> = {}): NewsRow {
     relevanceScore: 50,
     topicsJson: null,
     entitiesJson: null,
-    routedToPageId: null,   // page_id_old column — null in D2a
     routedToPageIdInt: null,
     routedToPageSlug: null, // synthetic convenience field
     routedToPageTitle: null,
@@ -153,7 +152,6 @@ function newsToSqlRow(r: NewsRow): Record<string, unknown> {
     relevance_score: r.relevanceScore,
     topics_json: r.topicsJson,
     entities_json: r.entitiesJson,
-    routed_to_page_id_old: r.routedToPageId,
     routed_to_page_id_int: r.routedToPageIdInt,
     routed_to_page_title: r.routedToPageTitle,
     routed_tier: r.routedTier,
@@ -167,10 +165,11 @@ function newsToSqlRow(r: NewsRow): Record<string, unknown> {
  * clause produces so that `extractColumns` + `values()` in test-utils
  * correctly maps positional arrays back to objects.
  */
-function joinNewsWithRun(news: NewsRow, run: RunRow) {
+function joinNewsWithRun(news: NewsRow, run: RunRow, includeSlug = false) {
   return {
     ...newsToSqlRow(news),
     date: run.date,
+    ...(includeSlug ? { slug: news.routedToPageSlug ?? slugFromIntId(news.routedToPageIdInt) ?? null } : {}),
   };
 }
 
@@ -207,7 +206,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_news_items ----
   if (q.includes("insert into") && q.includes("auto_update_news_items")) {
-    // Phase D2a: removed routed_to_page_id (page_id_old) — 12 columns:
+    // Phase D2b: 11 columns (routed_to_page_id_old dropped):
     //   run_id, title, url, source_id, published_at, summary,
     //   relevance_score, topics_json, entities_json, routed_to_page_id_int,
     //   routed_to_page_title, routed_tier
@@ -229,7 +228,6 @@ const dispatch: SqlDispatcher = (query, params) => {
         relevanceScore: params[o + 6] as number | null,
         topicsJson: params[o + 7] as string[] | null,
         entitiesJson: params[o + 8] as string[] | null,
-        routedToPageId: null, // D2a: not written on insert (page_id_old column)
         routedToPageIdInt: routedIntId,
         routedToPageSlug: routedSlug, // synthetic convenience field for tests
         routedToPageTitle: params[o + 10] as string | null,
@@ -260,7 +258,10 @@ const dispatch: SqlDispatcher = (query, params) => {
     return newsStore
       .filter((r) => ids.includes(r.runId))
       .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
-      .map(newsToSqlRow);
+      .map((r) => ({
+        ...newsToSqlRow(r),
+        slug: r.routedToPageSlug ?? slugFromIntId(r.routedToPageIdInt) ?? null,
+      }));
   }
 
   // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
@@ -281,7 +282,7 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
   }
 
-  // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
+  // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs LEFT JOIN wiki_pages
   //      ORDER BY ... LIMIT ... OFFSET ...  (GET /recent)  ----
   // No standalone WHERE clause — the only ON clause is part of the JOIN.
   if (
@@ -295,7 +296,7 @@ const dispatch: SqlDispatcher = (query, params) => {
     const joined = newsStore
       .map((r) => {
         const run = runStore.find((run) => run.id === r.runId);
-        return run ? joinNewsWithRun(r, run) : null;
+        return run ? joinNewsWithRun(r, run, true) : null;
       })
       .filter(Boolean) as ReturnType<typeof joinNewsWithRun>[];
     return joined.slice(offset, offset + limit);
@@ -319,14 +320,10 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => r.runId === runId)
       .sort((a, b) => (b.relevanceScore ?? -1) - (a.relevanceScore ?? -1))
       .map((r) => {
-        // Append the COALESCE result so it lands at position 15 (after the 15 schema columns).
-        // D2a COALESCE: routed_to_page_id_old ?? wiki_pages.id (via int lookup)
+        // Phase D2b: wiki_pages.slug from LEFT JOIN (extractColumns sees "slug")
         return {
           ...newsToSqlRow(r),
-          _coalesce_result:
-            r.routedToPageId ??
-            slugFromIntId(r.routedToPageIdInt) ??
-            null,
+          slug: slugFromIntId(r.routedToPageIdInt) ?? null,
         };
       });
   }

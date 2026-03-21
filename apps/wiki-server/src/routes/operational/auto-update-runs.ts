@@ -224,7 +224,7 @@ const autoUpdateRunsApp = new Hono()
       const allResults = await db
         .select({
           runId: autoUpdateResults.runId,
-          pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+          pageSlug: wikiPages.id,
           status: autoUpdateResults.status,
           tier: autoUpdateResults.tier,
           durationMs: autoUpdateResults.durationMs,
@@ -319,7 +319,7 @@ const autoUpdateRunsApp = new Hono()
     const results = await db
       .select({
         runId: autoUpdateResults.runId,
-        pageSlug: sql<string | null>`coalesce(${autoUpdateResults.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
         status: autoUpdateResults.status,
         tier: autoUpdateResults.tier,
         durationMs: autoUpdateResults.durationMs,

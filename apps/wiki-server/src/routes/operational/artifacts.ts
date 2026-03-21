@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, and, sql } from "drizzle-orm";
+import { eq, desc, count, and } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { pageImproveRuns, wikiPages } from "../../schema.js";
 import { SaveArtifactsSchema } from "../../api-types.js";
@@ -29,7 +29,7 @@ const ByPageQuery = z.object({
 function formatArtifactEntry(r: typeof pageImproveRuns.$inferSelect, pageSlug?: string | null) {
   return {
     id: r.id,
-    pageId: pageSlug ?? r.pageId ?? "", // Phase D2a: page_id_old nullable; use joined slug or input slug
+    pageId: pageSlug ?? "",
     engine: r.engine,
     tier: r.tier,
     directions: r.directions,
@@ -139,7 +139,7 @@ const artifactsApp = new Hono()
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageImproveRuns)
       .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
@@ -203,7 +203,7 @@ const artifactsApp = new Hono()
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: sql<string | null>`coalesce(${pageImproveRuns.pageId}, ${wikiPages.id})`,
+        pageSlug: wikiPages.id,
       })
       .from(pageImproveRuns)
       .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))

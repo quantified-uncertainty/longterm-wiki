@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
-import { sessions, sessionPages } from "../../schema.js";
+import { sessions, sessionPages, wikiPages } from "../../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery, dbError } from "../shared/utils.js";
 import {
   CreateSessionSchema as SharedCreateSessionSchema,
@@ -193,15 +193,13 @@ const sessionsApp = new Hono()
           .where(eq(sessionPages.sessionId, session.id));
 
         if (d.pages.length > 0) {
-          // Phase 4a: resolve page slugs to integer IDs for dual-write
           const intIdMap = await resolvePageIntIds(tx, d.pages);
-          await tx
-            .insert(sessionPages)
-            .values(d.pages.map((pageId) => ({
-              sessionId: session.id,
-              pageId,
-              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
-            })));
+          const resolvedPages = d.pages
+            .map((pageId) => ({ sessionId: session.id, pageIdInt: intIdMap.get(pageId) }))
+            .filter((r): r is { sessionId: number; pageIdInt: number } => r.pageIdInt != null);
+          if (resolvedPages.length > 0) {
+            await tx.insert(sessionPages).values(resolvedPages);
+          }
         }
 
         return { ...session, pages: d.pages };
@@ -252,21 +250,19 @@ const sessionsApp = new Hono()
             .where(inArray(sessionPages.sessionId, sessionIds));
         }
 
-        // Bulk insert all new page associations
+        // Bulk insert all new page associations (skip unresolvable slugs)
         const allPageAssociations: Array<{
           sessionId: number;
-          pageId: string;
-          pageIdInt: number | null;
+          pageIdInt: number;
         }> = [];
         for (let i = 0; i < items.length; i++) {
           const d = items[i];
           const sessionId = upsertedRows[i].id;
           for (const pageId of d.pages) {
-            allPageAssociations.push({
-              sessionId,
-              pageId,
-              pageIdInt: intIdMap.get(pageId) ?? null, // Phase 4a dual-write
-            });
+            const pageIdInt = intIdMap.get(pageId);
+            if (pageIdInt != null) {
+              allPageAssociations.push({ sessionId, pageIdInt });
+            }
           }
         }
         if (allPageAssociations.length > 0) {
@@ -311,14 +307,20 @@ const sessionsApp = new Hono()
 
     if (sessionIds.length > 0) {
       const pageRows = await db
-        .select()
+        .select({
+          sessionId: sessionPages.sessionId,
+          pageSlug: wikiPages.id,
+        })
         .from(sessionPages)
+        .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(sessionPages.sessionId, sessionIds));
 
       for (const row of pageRows) {
-        const existing = pageMap.get(row.sessionId) || [];
-        existing.push(row.pageId);
-        pageMap.set(row.sessionId, existing);
+        if (row.pageSlug) {
+          const existing = pageMap.get(row.sessionId) || [];
+          existing.push(row.pageSlug);
+          pageMap.set(row.sessionId, existing);
+        }
       }
     }
 
@@ -360,15 +362,21 @@ const sessionsApp = new Hono()
 
     // Also fetch all pages for these sessions
     const allPageRows = await db
-      .select()
+      .select({
+        sessionId: sessionPages.sessionId,
+        pageSlug: wikiPages.id,
+      })
       .from(sessionPages)
+      .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
       .where(inArray(sessionPages.sessionId, sessionIds));
 
     const pageMap = new Map<number, string[]>();
     for (const row of allPageRows) {
-      const existing = pageMap.get(row.sessionId) || [];
-      existing.push(row.pageId);
-      pageMap.set(row.sessionId, existing);
+      if (row.pageSlug) {
+        const existing = pageMap.get(row.sessionId) || [];
+        existing.push(row.pageSlug);
+        pageMap.set(row.sessionId, existing);
+      }
     }
 
     return c.json({
@@ -384,7 +392,7 @@ const sessionsApp = new Hono()
 
     const pagesResult = await db
       .select({
-        count: sql<number>`count(distinct ${sessionPages.pageId})`,
+        count: sql<number>`count(distinct ${sessionPages.pageIdInt})`,
       })
       .from(sessionPages);
     const uniquePages = Number(pagesResult[0].count);
@@ -449,16 +457,22 @@ const sessionsApp = new Hono()
         .where(inArray(sessions.id, sessionIds))
         .orderBy(desc(sessions.date), desc(sessions.id)),
       db
-        .select()
+        .select({
+          sessionId: sessionPages.sessionId,
+          pageSlug: wikiPages.id,
+        })
         .from(sessionPages)
+        .leftJoin(wikiPages, eq(sessionPages.pageIdInt, wikiPages.integerIdCol))
         .where(inArray(sessionPages.sessionId, sessionIds)),
     ]);
 
     const pageMap = new Map<number, string[]>();
     for (const row of pageRows) {
-      const existing = pageMap.get(row.sessionId) || [];
-      existing.push(row.pageId);
-      pageMap.set(row.sessionId, existing);
+      if (row.pageSlug) {
+        const existing = pageMap.get(row.sessionId) || [];
+        existing.push(row.pageSlug);
+        pageMap.set(row.sessionId, existing);
+      }
     }
 
     return c.json({

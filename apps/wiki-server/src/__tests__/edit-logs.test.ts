@@ -106,7 +106,6 @@ function createQueryResult(rows: unknown[], query: string): any {
 function toSqlRow(r: EditLogRow): Record<string, unknown> {
   return {
     id: r.id,
-    page_id_old: r.pageId,
     page_id_int: r.pageIdInt,
     date: r.date,
     tool: r.tool,
@@ -160,7 +159,6 @@ function createMockSql() {
         const pageSlug = slugFromIntId(pageIdInt);
         const row: EditLogRow = {
           id: nextId++,
-          pageId: null, // D2a: not written on insert (maps to page_id_old column)
           pageIdInt: pageIdInt,
           pageSlug: pageSlug,
           date: String(params[o + 1]),

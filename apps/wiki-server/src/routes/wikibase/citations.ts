@@ -884,7 +884,7 @@ const citationsApp = new Hono()
 
     // --- 6. Flagged citations (inaccurate or unsupported, worst score first) ---
     const flaggedRows = await db.select({
-      pageId: citationQuotes.pageId,
+      pageSlug: wikiPages.id,
       footnote: citationQuotes.footnote,
       claimText: citationQuotes.claimText,
       sourceTitle: citationQuotes.sourceTitle,
@@ -896,12 +896,13 @@ const citationsApp = new Hono()
       checkedAt: citationQuotes.accuracyCheckedAt,
     })
       .from(citationQuotes)
+      .leftJoin(wikiPages, eq(citationQuotes.pageIdInt, wikiPages.integerIdCol))
       .where(sql`${citationQuotes.accuracyVerdict} in ('inaccurate', 'unsupported')`)
       .orderBy(asc(citationQuotes.accuracyScore))
       .limit(500);
 
     const flaggedCitations = flaggedRows.map((q) => ({
-      pageId: q.pageId,
+      pageId: q.pageSlug,
       footnote: q.footnote,
       claimText: q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText,
       sourceTitle: q.sourceTitle,
