@@ -52,6 +52,7 @@ import {
   fetchResearchAreas,
   fetchRecordVerdicts,
   fetchPolicyStakeholderIds,
+  syncPolicyStakeholders,
   fetchResourcesFromPG,
   buildPageReferenceIndex,
   getWikiServerWarningCount,
@@ -1019,20 +1020,18 @@ async function main() {
     }
   }
 
-  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments, stakeholder IDs)
+  // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments)
   let assessmentMap = new Map();
   if (!CONTENT_ONLY) {
-    const [benchmarkResults, researchAreasData, recordVerdicts, assessments, policyStakeholderIds] = await Promise.all([
+    const [benchmarkResults, researchAreasData, recordVerdicts, assessments] = await Promise.all([
       fetchBenchmarkResults(),
       fetchResearchAreas(),
       fetchRecordVerdicts(),
       fetchAssessments(),
-      fetchPolicyStakeholderIds(),
     ]);
     database.benchmarkResults = benchmarkResults;
     database.researchAreas = researchAreasData;
     database.recordVerdicts = recordVerdicts;
-    database.policyStakeholderIds = policyStakeholderIds;
     assessmentMap = assessments;
   }
 
@@ -1492,6 +1491,13 @@ async function main() {
   // Update description count to reflect post-enrichment state
   stats.withDescription = typedEntities.filter(e => e.description).length;
   console.log(`  typedEntities: ${typedEntities.length} transformed`);
+
+  // Sync policy stakeholders to wiki-server PG table (populates things table too)
+  if (!CONTENT_ONLY) {
+    await syncPolicyStakeholders(typedEntities);
+    // Now fetch the stakeholder IDs (which were 0 if this is the first sync)
+    database.policyStakeholderIds = await fetchPolicyStakeholderIds();
+  }
 
   // =========================================================================
   // WRITE OUTPUT FILES
