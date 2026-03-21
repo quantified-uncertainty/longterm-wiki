@@ -283,13 +283,14 @@ export function checkResource(resource: Resource): ResourceQualityIssue[] {
     });
   }
 
-  // 4. Title is just a URL
-  if (title && /^https?:\/\//i.test(title.trim())) {
+  // 4. Title is just a URL (not merely starting with http)
+  const trimmedTitle = title.trim();
+  if (trimmedTitle && /^https?:\/\/\S+$/i.test(trimmedTitle)) {
     issues.push({
       resourceId: resource.id,
       url,
       field: "title",
-      message: `Title is a raw URL: "${title.slice(0, 100)}"`,
+      message: `Title is a raw URL: "${trimmedTitle.slice(0, 100)}"`,
       severity: "error",
     });
   }
@@ -384,6 +385,7 @@ export interface ResourceQualityResult {
   warnings: string[];
   issues: ResourceQualityIssue[];
   totalResources: number;
+  skipped: boolean;
 }
 
 export function validateResourceQuality(options?: {
@@ -402,6 +404,7 @@ export function validateResourceQuality(options?: {
         warnings: [],
         issues: [],
         totalResources: 0,
+        skipped: true,
       };
     }
     try {
@@ -414,6 +417,7 @@ export function validateResourceQuality(options?: {
           warnings: [],
           issues: [],
           totalResources: 0,
+          skipped: false,
         };
       }
       resources = parsed as Resource[];
@@ -425,6 +429,7 @@ export function validateResourceQuality(options?: {
         warnings: [],
         issues: [],
         totalResources: 0,
+        skipped: false,
       };
     }
   }
@@ -448,6 +453,7 @@ export function validateResourceQuality(options?: {
     warnings,
     issues: allIssues,
     totalResources: resources.length,
+    skipped: false,
   };
 }
 
@@ -463,7 +469,7 @@ if (process.argv[1]?.includes("validate-resource-quality")) {
 
   const result = validateResourceQuality();
 
-  if (result.totalResources === 0) {
+  if (result.skipped) {
     console.log(
       `${c.dim}No resources snapshot found — skipping resource quality check.${c.reset}`
     );
