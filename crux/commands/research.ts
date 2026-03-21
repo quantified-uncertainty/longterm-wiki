@@ -52,6 +52,9 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   const useExa = options.noExa ? false : undefined;       // undefined = auto (key present)
   const usePerplexity = options.noPerplexity ? false : undefined;
   const useScry = options.noScry ? false : undefined;
+  const useGitHub = options.noGithub ? false : undefined;
+  const useSemanticScholar = options.noSemanticScholar ? false : undefined;
+  const useFederalRegister = options.noFederalRegister ? false : undefined;
 
   // --max-results: URLs per search source (default 8)
   const maxResultsPerSource = options.maxResults !== undefined
@@ -71,6 +74,9 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
       ...(useExa !== undefined && { useExa }),
       ...(usePerplexity !== undefined && { usePerplexity }),
       ...(useScry !== undefined && { useScry }),
+      ...(useGitHub !== undefined && { useGitHub }),
+      ...(useSemanticScholar !== undefined && { useSemanticScholar }),
+      ...(useFederalRegister !== undefined && { useFederalRegister }),
       ...(maxResultsPerSource !== undefined && { maxResultsPerSource }),
       ...(maxUrlsToFetch !== undefined && { maxUrlsToFetch }),
       ...(extractFacts !== undefined && { extractFacts }),
@@ -145,20 +151,29 @@ Usage:
   crux research <topic> --json                   Machine-readable JSON output
 
 Options:
-  --for-page=<id>      Page entity ID to focus the research query
-  --budget=<usd>       Max spend in USD (default: 5.00)
-  --max-results=<n>    Max URLs per search provider (default: 8)
-  --max-urls=<n>       Max URLs to fetch in total (default: 20)
-  --no-exa             Skip Exa web search
-  --no-perplexity      Skip Perplexity (OpenRouter)
-  --no-scry            Skip SCRY (EA Forum / LessWrong)
-  --no-facts           Skip Haiku fact extraction
-  --json               JSON output (machine-readable)
+  --for-page=<id>        Page entity ID to focus the research query
+  --budget=<usd>         Max spend in USD (default: 5.00)
+  --max-results=<n>      Max URLs per search provider (default: 8)
+  --max-urls=<n>         Max URLs to fetch in total (default: 20)
+  --no-exa               Skip Exa web search
+  --no-perplexity        Skip Perplexity (OpenRouter)
+  --no-scry              Skip SCRY (EA Forum / LessWrong)
+  --no-github            Skip GitHub Search (entity-type-routed)
+  --no-semantic-scholar  Skip Semantic Scholar (entity-type-routed)
+  --no-federal-register  Skip Federal Register (entity-type-routed)
+  --no-facts             Skip Haiku fact extraction
+  --json                 JSON output (machine-readable)
+
+Domain-specific providers (activated by entity type via --for-page):
+  GitHub               Repos, orgs for: organization, project, ai-model, benchmark
+  Semantic Scholar     Papers, authors for: person, concept, approach, ai-model, benchmark
+  Federal Register     Regulations, EOs for: policy
 
 Environment:
   EXA_API_KEY          Exa web search (optional)
   OPENROUTER_API_KEY   Perplexity via OpenRouter (optional)
   SCRY_API_KEY         SCRY search (optional; falls back to public key)
+  GITHUB_TOKEN         GitHub API (optional; needed for github provider)
   ANTHROPIC_API_KEY    Optional: if absent, fact extraction is silently skipped
 `,
     exitCode: 0,

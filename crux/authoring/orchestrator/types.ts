@@ -65,6 +65,8 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'deep_citation_check',
       // Quality assurance ($0 — regex-only)
       'adversarial_review',
+      // Domain-specific lookup ($0 — API-only)
+      'github_lookup', 'academic_lookup',
     ],
     estimatedCost: '$4-8',
   },
@@ -86,6 +88,8 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'deep_citation_check',
       // Quality assurance ($0 — regex-only)
       'adversarial_review',
+      // Domain-specific lookup ($0 — API-only)
+      'github_lookup', 'academic_lookup',
     ],
     estimatedCost: '$8-18',
   },
@@ -105,6 +109,7 @@ export const CREATE_TIER_BUDGETS: Record<CreateTier, BudgetConfig> = {
       'run_research', 'rewrite_section', 'add_entity_links',
       'add_fact_refs', 'add_references', 'validate_content',
       'query_wiki_context', 'edit_frontmatter', 'create_visual',
+      'github_lookup', 'academic_lookup',
     ],
     estimatedCost: '$3-6',
   },
@@ -120,6 +125,7 @@ export const CREATE_TIER_BUDGETS: Record<CreateTier, BudgetConfig> = {
       'view_edit_history', 'create_visual',
       'check_cross_references', 'suggest_cross_links',
       'deep_citation_check', 'adversarial_review',
+      'github_lookup', 'academic_lookup',
     ],
     estimatedCost: '$5-12',
   },
@@ -135,6 +141,7 @@ export const CREATE_TIER_BUDGETS: Record<CreateTier, BudgetConfig> = {
       'view_edit_history', 'create_visual',
       'check_cross_references', 'suggest_cross_links',
       'deep_citation_check', 'adversarial_review',
+      'github_lookup', 'academic_lookup',
     ],
     estimatedCost: '$10-20',
   },
