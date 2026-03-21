@@ -33,6 +33,9 @@ import {
 import { cn } from "@lib/utils";
 import { safeHref } from "@/lib/directory-utils";
 
+// Cache for 1 hour — these on-demand pages get heavy bot traffic with 0% cache hits.
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
