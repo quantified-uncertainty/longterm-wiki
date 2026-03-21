@@ -453,43 +453,25 @@ export default async function ResourcePage({ params }: PageProps) {
       {/* Data Status Banner */}
       <section className="mb-6 p-4 rounded-lg border border-border bg-card">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-          Data Status
+          Metadata
         </h2>
         <div className="flex flex-wrap gap-3">
-          {/* Enrichment status */}
-          {resource.enrichment_status && (
-            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-              {resource.enrichment_status}
-            </span>
-          )}
           {/* Importance score */}
           {resource.importance_score != null && (
-            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
               Importance: {Math.round(resource.importance_score * 100)}/100
             </span>
           )}
-          {/* Fetch status */}
-          {resource.local_filename ? (
-            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              <Download className="w-3 h-3" />
-              Full text fetched
-            </span>
-          ) : resource.fetched_at ? (
-            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-              <Database className="w-3 h-3" />
-              Metadata only
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-              <FileQuestion className="w-3 h-3" />
-              Not fetched
+          {/* Resource subtype */}
+          {resource.resource_subtype && (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+              {resource.resource_subtype.replace(/_/g, ' ')}
             </span>
           )}
-          {/* Fetched date */}
-          {resource.fetched_at && (
+          {/* Resource purpose */}
+          {resource.resource_purpose && resource.resource_purpose !== resource.resource_subtype && (
             <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
-              <Clock className="w-3 h-3" />
-              Fetched {formatDate(resource.fetched_at)}
+              {resource.resource_purpose.replace(/_/g, ' ')}
             </span>
           )}
         </div>
