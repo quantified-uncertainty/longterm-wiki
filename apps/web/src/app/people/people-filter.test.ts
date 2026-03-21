@@ -38,9 +38,15 @@ describe("isPersonMeaningful", () => {
     expect(isPersonMeaningful(makeRow({ role: "CEO" }))).toBe(true);
   });
 
-  it("returns true for a person with an employer", () => {
+  it("returns true for a person with an employer name", () => {
     expect(
       isPersonMeaningful(makeRow({ employerName: "Anthropic" })),
+    ).toBe(true);
+  });
+
+  it("returns true for a person with an employer ID but no employer name", () => {
+    expect(
+      isPersonMeaningful(makeRow({ employerId: "org-123" })),
     ).toBe(true);
   });
 

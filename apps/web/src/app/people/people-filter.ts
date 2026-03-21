@@ -17,7 +17,7 @@ import type { PersonRow } from "./people-table";
  */
 export function isPersonMeaningful(row: PersonRow): boolean {
   if (row.role != null) return true;
-  if (row.employerName != null) return true;
+  if (row.employerId != null || row.employerName != null) return true;
   if (row.wikiPageId != null) return true;
   if (row.careerHistoryCount > 0) return true;
   if (row.positionCount > 0) return true;
