@@ -594,7 +594,7 @@ const resourcesApp = new Hono()
         WHERE search_vector @@ to_tsquery('english', $1)
         ORDER BY rank DESC
         LIMIT $2`,
-          [prefixQuery, limit],
+          [prefixQuery, String(limit)],
         )
       : [];
 
