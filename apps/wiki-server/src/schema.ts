@@ -617,6 +617,8 @@ export const resources = pgTable(
     enrichmentDate: timestamp("enrichment_date", { withTimezone: true }),
     /** Computed composite importance score 0-1 */
     importanceScore: real("importance_score"),
+    /** How content behaves over time: immutable | versioned | evergreen | ephemeral */
+    contentLifecycle: text("content_lifecycle"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -636,6 +638,7 @@ export const resources = pgTable(
     index("idx_res_publisher_entity_id").on(table.publisherEntityId),
     index("idx_res_resource_purpose").on(table.resourcePurpose),
     index("idx_res_resource_subtype").on(table.resourceSubtype),
+    index("idx_res_content_lifecycle").on(table.contentLifecycle),
     // GIN indexes on tags, authors, related_entity_ids, and search_vector
     // are created in migration SQL (Drizzle doesn't support GIN index declarations)
   ]
@@ -2662,6 +2665,93 @@ export const wikibasePageAssessments = pgTable(
 // Cross-entity join table tracking organization/person positions on policy entities.
 // Enables queries like "which orgs oppose AI regulation?" and
 // "what policies has Anthropic taken positions on?"
+
+// ── Website Sources ──────────────────────────────────────────────────────
+//
+// Websites tracked as structured data feeds. Each source is a domain
+// linked to an entity (usually an org). A periodic pipeline fetches
+// tracked pages, extracts structured facts via LLM, and upserts them
+// into TableBase/FactBase. See Discussion #2928.
+
+export const websiteSources = pgTable(
+  "website_sources",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** Canonical domain, e.g. "anthropic.com" */
+    domain: text("domain").notNull(),
+    /** FK to entities.stable_id — usually the org this website belongs to */
+    entityId: text("entity_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** Display name resolved from entity, cached for convenience */
+    entityDisplayName: text("entity_display_name"),
+    /** Source reliability: high | medium | low */
+    reliability: text("reliability").notNull().default("medium"),
+    /** Default days between re-fetches for pages under this source */
+    refreshIntervalDays: integer("refresh_interval_days")
+      .notNull()
+      .default(30),
+    enabled: boolean("enabled").notNull().default(true),
+    notes: text("notes"),
+    /** When the extraction pipeline last ran for this source */
+    lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+    /** Error message from last failed run */
+    lastError: text("last_error"),
+    /** Consecutive pipeline failures (reset to 0 on success) */
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_ws_domain").on(table.domain),
+    index("idx_ws_entity").on(table.entityId),
+    index("idx_ws_enabled").on(table.enabled),
+  ]
+);
+
+/** Individual pages within a tracked website source. */
+export const websiteSourcePages = pgTable(
+  "website_source_pages",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to website_sources.id */
+    sourceId: varchar("source_id", { length: 10 })
+      .notNull()
+      .references(() => websiteSources.id, { onDelete: "cascade" }),
+    /** Page path relative to domain, e.g. "/about", "/team" */
+    path: text("path").notNull(),
+    /** Role of this page: about | team | research | pricing | careers | docs | other */
+    pageRole: text("page_role"),
+    /** JSON array of FactBase property IDs to extract, e.g. ["headcount", "headquarters"] */
+    extractTargets: jsonb("extract_targets").$type<string[]>(),
+    /** Override source-level refresh interval for this page */
+    refreshIntervalDays: integer("refresh_interval_days"),
+    enabled: boolean("enabled").notNull().default(true),
+    /** When this page was last fetched */
+    lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    /** Content hash from last fetch (for change detection) */
+    lastContentHash: text("last_content_hash"),
+    /** ID of the most recent page_snapshot record (future FK) */
+    lastSnapshotId: varchar("last_snapshot_id", { length: 10 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_wsp_source_path").on(table.sourceId, table.path),
+    index("idx_wsp_role").on(table.pageRole),
+    index("idx_wsp_enabled").on(table.enabled),
+  ]
+);
+
+// ── Policy Stakeholders ──────────────────────────────────────────────────
 
 export const policyStakeholders = pgTable(
   "policy_stakeholders",

@@ -77,6 +77,7 @@ interface ResourceSearchRow {
   enrichment_status: string | null;
   enrichment_date: string | null;
   importance_score: number | null;
+  content_lifecycle: string | null;
   created_at: string;
   updated_at: string;
   rank: number;
@@ -187,6 +188,7 @@ function resourceValues(d: ResourceInput) {
     relatedEntityIds: d.relatedEntityIds ?? null,
     enrichmentStatus: d.enrichmentStatus ?? null,
     importanceScore: d.importanceScore ?? null,
+    contentLifecycle: d.contentLifecycle ?? null,
   };
 }
 
@@ -256,6 +258,7 @@ async function upsertResource(
           ? sql`now()`
           : sql`COALESCE(null::timestamptz, ${resources.enrichmentDate})`,
         importanceScore: sql`COALESCE(${vals.importanceScore}, ${resources.importanceScore})`,
+        contentLifecycle: sql`COALESCE(${vals.contentLifecycle}, ${resources.contentLifecycle})`,
         updatedAt: sql`now()`,
       },
     })
@@ -339,6 +342,7 @@ function formatResource(r: typeof resources.$inferSelect) {
     enrichmentStatus: r.enrichmentStatus,
     enrichmentDate: r.enrichmentDate,
     importanceScore: r.importanceScore,
+    contentLifecycle: r.contentLifecycle,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
   };
@@ -484,6 +488,7 @@ const resourcesApp = new Hono()
               enrichmentStatus: sql`COALESCE(excluded.enrichment_status, ${resources.enrichmentStatus})`,
               enrichmentDate: sql`CASE WHEN excluded.enrichment_status IS NOT NULL THEN now() ELSE COALESCE(null::timestamptz, ${resources.enrichmentDate}) END`,
               importanceScore: sql`COALESCE(excluded.importance_score, ${resources.importanceScore})`,
+              contentLifecycle: sql`COALESCE(excluded.content_lifecycle, ${resources.contentLifecycle})`,
               updatedAt: sql`now()`,
             },
           })
@@ -587,7 +592,7 @@ const resourcesApp = new Hono()
           fetch_status, last_fetched_at, archive_url, stance,
           context_note, resource_purpose, resource_subtype,
           type_metadata, publisher_entity_id, related_entity_ids,
-          enrichment_status, enrichment_date, importance_score,
+          enrichment_status, enrichment_date, importance_score, content_lifecycle,
           created_at, updated_at,
           ts_rank_cd(search_vector, to_tsquery('english', ${prefixQuery}), 1) AS rank
         FROM resources
@@ -628,6 +633,7 @@ const resourcesApp = new Hono()
         enrichmentStatus: r.enrichment_status,
         enrichmentDate: r.enrichment_date,
         importanceScore: r.importance_score,
+        contentLifecycle: r.content_lifecycle,
         createdAt: r.created_at,
         updatedAt: r.updated_at,
       })),

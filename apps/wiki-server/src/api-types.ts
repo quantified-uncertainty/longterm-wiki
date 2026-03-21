@@ -578,6 +578,8 @@ export const UpsertResourceSchema = z.object({
   relatedEntityIds: z.array(z.string().max(200)).max(50).nullable().optional(),
   enrichmentStatus: z.string().max(50).nullable().optional(),
   importanceScore: z.number().min(0).max(1).nullable().optional(),
+  /** How content behaves over time: immutable | versioned | evergreen | ephemeral */
+  contentLifecycle: z.enum(["immutable", "versioned", "evergreen", "ephemeral"]).nullable().optional(),
 });
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 

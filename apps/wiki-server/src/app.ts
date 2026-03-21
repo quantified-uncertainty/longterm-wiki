@@ -27,6 +27,7 @@ import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.
 import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
 import { entityAssessmentsRoute } from "./routes/tablebase/entity-assessments.js";
 import { publicationsRoute } from "./routes/tablebase/publications.js";
+import { websiteSourcesRoute } from "./routes/tablebase/website-sources.js";
 import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
 
 // FactBase routes — structured triples with temporal data
@@ -197,6 +198,7 @@ export function createApp() {
   app.route("/api/entity-events", entityEventsRoute);
   app.route("/api/entity-assessments", entityAssessmentsRoute);
   app.route("/api/publications", publicationsRoute);
+  app.route("/api/website-sources", websiteSourcesRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);
