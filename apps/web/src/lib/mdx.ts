@@ -285,14 +285,14 @@ export async function renderMdxPage(slug: string): Promise<MdxResult | null> {
 
 /**
  * Extract the "intro section" from raw MDX source — everything from the start
- * up to (but not including) the second level-2 heading (`## `).
+ * up to (but not including) the third level-2 heading (`## `).
  *
  * This captures the Quick Assessment table and the first prose section
  * (typically "Overview") which together give a good summary of the person.
  *
- * If the content has fewer than 2 level-2 headings, returns all the content.
- * Strips footnote definitions at the end since they reference anchors that
- * won't exist in the excerpt.
+ * If the content has fewer than 3 level-2 headings, returns all the content.
+ * Strips footnote references since footnote definitions won't be present
+ * in the excerpt.
  */
 export function extractMdxIntroSection(source: string): string {
   const lines = source.split("\n");
