@@ -14,7 +14,7 @@
 
 import { loadResourcesPGFirst } from '../resource-io.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import { getCitationContentByUrl, listCitationContent } from '../lib/wiki-server/citations.ts';
 import {
   createBatch,
   pollBatch,
@@ -81,27 +81,59 @@ export async function deepEnrichCommand(
 
 /**
  * Load fetched content from citation_content table for a list of resources.
- * Uses concurrent API calls to fetch content by URL.
+ *
+ * Strategy: build a URL→resourceId map from the resources, then fetch content
+ * individually for matching URLs. Uses the bulk listing endpoint to identify
+ * which URLs have content, then fetches full text for matches only.
  */
 async function loadContentForResources(
   resources: Resource[],
   concurrency = 20,
 ): Promise<Map<string, string>> {
   const contentMap = new Map<string, string>();
+
+  // Build URL → resource ID lookup
+  const urlToId = new Map<string, string>();
+  for (const r of resources) {
+    if (r.url) urlToId.set(r.url, r.id);
+  }
+
+  // Step 1: Get all cached URLs from citation_content (bulk, no fullText)
+  console.log(`  Loading content index from citation_content...`);
+  const cachedUrls = new Set<string>();
+  let offset = 0;
+  const pageSize = 500;
+  while (true) {
+    const result = await listCitationContent(pageSize, offset);
+    if (!result.ok || !result.data) break;
+    const entries = (result.data as { entries: Array<{ url: string }> }).entries;
+    if (entries.length === 0) break;
+    for (const e of entries) cachedUrls.add(e.url);
+    offset += entries.length;
+    if (entries.length < pageSize) break;
+  }
+  console.log(`  Found ${cachedUrls.size} cached URLs`);
+
+  // Step 2: Filter to resources that have cached content
+  const toFetch = resources.filter(r => r.url && cachedUrls.has(r.url));
+  console.log(`  ${toFetch.length}/${resources.length} resources have cached content — fetching full text...`);
+
+  if (toFetch.length === 0) return contentMap;
+
+  // Step 3: Fetch full text for matching resources (concurrent)
   let idx = 0;
   let loaded = 0;
   let failed = 0;
 
   async function worker(): Promise<void> {
-    while (idx < resources.length) {
+    while (idx < toFetch.length) {
       const i = idx++;
-      const r = resources[i];
+      const r = toFetch[i];
       try {
         const result = await getCitationContentByUrl(r.url);
         if (result.ok && result.data) {
-          const text = (result.data as Record<string, unknown>).fullText as string
-            || (result.data as Record<string, unknown>).fullTextPreview as string
-            || '';
+          const d = result.data as Record<string, unknown>;
+          const text = (d.fullText as string) || (d.fullTextPreview as string) || '';
           if (text) {
             contentMap.set(r.id, text);
             loaded++;
@@ -111,19 +143,18 @@ async function loadContentForResources(
         failed++;
       }
 
-      if ((loaded + failed) % 200 === 0) {
-        process.stdout.write(`\r  Content loading: ${loaded + failed}/${resources.length} (${loaded} with content)`);
+      if ((loaded + failed) % 100 === 0) {
+        process.stdout.write(`\r  Fetched ${loaded + failed}/${toFetch.length} (${loaded} with content)`);
       }
     }
   }
 
-  console.log(`  Loading fetched content for ${resources.length} resources (concurrency: ${concurrency})...`);
   const workers = Array.from(
-    { length: Math.min(concurrency, resources.length) },
+    { length: Math.min(concurrency, toFetch.length) },
     () => worker(),
   );
   await Promise.all(workers);
-  console.log(`\r  Content loading: ${loaded} with content, ${failed} errors, ${resources.length - loaded - failed} no content cached`);
+  console.log(`\r  Content loaded: ${loaded} with text, ${failed} errors, ${resources.length - loaded} without content`);
 
   return contentMap;
 }
