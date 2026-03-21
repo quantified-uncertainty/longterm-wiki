@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
@@ -269,15 +270,64 @@ const columns: ColumnDef<AgentSessionRow>[] = [
   },
 ];
 
+// ── Outcome Filter Buttons ─────────────────────────────────────────────────
+
+const OUTCOME_FILTERS: ReadonlyArray<{ value: string | null; label: string; style: string }> = [
+  { value: null, label: "All", style: "" },
+  { value: "merged", label: "Merged", style: "text-emerald-600" },
+  { value: "merged_with_revisions", label: "Merged+", style: "text-blue-600" },
+  { value: "reverted", label: "Reverted", style: "text-red-600" },
+  { value: "closed_without_merge", label: "Closed", style: "text-gray-600" },
+  { value: "none", label: "No outcome", style: "text-muted-foreground" },
+];
+
+function OutcomeFilterBar({
+  value,
+  onChange,
+}: {
+  value: string | null;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1.5 text-xs">
+      <span className="text-muted-foreground mr-1">Outcome:</span>
+      {OUTCOME_FILTERS.map((f) => (
+        <button
+          key={f.value ?? "all"}
+          onClick={() => onChange(f.value)}
+          className={`rounded-full px-2.5 py-0.5 font-medium transition-colors ${
+            value === f.value
+              ? "bg-foreground/10 ring-1 ring-foreground/20"
+              : "hover:bg-muted"
+          } ${f.style ?? ""}`}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ── Table Component ────────────────────────────────────────────────────────
 
 export function AgentSessionsTable({ data }: { data: AgentSessionRow[] }) {
+  const [outcomeFilter, setOutcomeFilter] = useState<string | null>(null);
+
+  const filteredData = outcomeFilter
+    ? outcomeFilter === "none"
+      ? data.filter((s) => !s.prOutcome)
+      : data.filter((s) => s.prOutcome === outcomeFilter)
+    : data;
+
   return (
-    <DataTable
-      columns={columns}
-      data={data}
-      defaultSorting={[{ id: "startedAt", desc: true }]}
-      searchPlaceholder="Search tasks..."
-    />
+    <div className="space-y-3">
+      <OutcomeFilterBar value={outcomeFilter} onChange={setOutcomeFilter} />
+      <DataTable
+        columns={columns}
+        data={filteredData}
+        defaultSorting={[{ id: "startedAt", desc: true }]}
+        searchPlaceholder="Search tasks..."
+      />
+    </div>
   );
 }
