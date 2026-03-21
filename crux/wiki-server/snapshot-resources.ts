@@ -50,6 +50,14 @@ interface PGResource {
   fetchedAt: string | null;
   contentHash: string | null;
   stableId: string | null;
+  // Enrichment fields
+  enrichmentStatus: string | null;
+  enrichmentDate: string | null;
+  importanceScore: number | null;
+  contextNote: string | null;
+  resourceSubtype: string | null;
+  resourcePurpose: string | null;
+  fetchStatus: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -133,9 +141,9 @@ export async function generateSnapshot(options?: {
     );
   }
 
-  // Transform to snake_case format, excluding large text fields to keep
-  // the snapshot small. Omitted: summary, review, abstract, key_points
-  // (~45% of full size). These are available from PG at build time.
+  // Transform to snake_case format. Include enrichment metadata so the
+  // website can display summaries, context notes, subtypes, etc.
+  // Large text fields (review, abstract) still excluded to keep size reasonable.
   const snapshot = allResources.map((r) => {
     const entry: Record<string, unknown> = {
       id: r.id,
@@ -143,6 +151,8 @@ export async function generateSnapshot(options?: {
     };
     if (r.title) entry.title = r.title;
     if (r.type) entry.type = r.type;
+    if (r.summary) entry.summary = r.summary;
+    if (r.keyPoints) entry.key_points = r.keyPoints;
     if (r.publicationId) entry.publication_id = r.publicationId;
     if (r.authors) entry.authors = r.authors;
     if (r.publishedDate) entry.published_date = r.publishedDate;
@@ -151,6 +161,13 @@ export async function generateSnapshot(options?: {
     if (r.credibilityOverride != null) entry.credibility_override = r.credibilityOverride;
     if (r.fetchedAt) entry.fetched_at = r.fetchedAt;
     if (r.stableId != null) entry.stable_id = r.stableId;
+    // Enrichment metadata
+    if (r.enrichmentStatus) entry.enrichment_status = r.enrichmentStatus;
+    if (r.importanceScore != null) entry.importance_score = r.importanceScore;
+    if (r.contextNote) entry.context_note = r.contextNote;
+    if (r.resourceSubtype) entry.resource_subtype = r.resourceSubtype;
+    if (r.resourcePurpose) entry.resource_purpose = r.resourcePurpose;
+    if (r.fetchStatus) entry.fetch_status = r.fetchStatus;
     const citedBy = citationsIndex[r.id];
     if (citedBy && citedBy.length > 0) entry.cited_by = citedBy;
     return entry;
