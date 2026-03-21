@@ -378,7 +378,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/kb-verifications/verifications',
+    '/api/verifications/evidence',
     body,
   );
 

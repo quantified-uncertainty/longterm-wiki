@@ -1,7 +1,6 @@
 /**
  * FactBase routes — structured triples with temporal data and provenance.
  *
- * Covers: facts CRUD, factbase verifications (KB verifications).
+ * Covers: facts CRUD. Verifications are now in the unified /api/verifications route.
  */
 export { factsRoute, type FactsRoute } from "./facts.js";
-export { factbaseVerificationsRoute, type FactbaseVerificationsRoute } from "./factbase-verifications.js";

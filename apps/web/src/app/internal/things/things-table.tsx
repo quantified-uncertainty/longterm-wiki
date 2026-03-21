@@ -25,25 +25,6 @@ const PAGE_SIZE = 500;
 // Helpers
 // ---------------------------------------------------------------------------
 
-function verdictBadge(verdict: string | null) {
-  if (!verdict) return null;
-  const colors: Record<string, string> = {
-    confirmed: "bg-green-100 text-green-800",
-    contradicted: "bg-red-100 text-red-800",
-    partial: "bg-yellow-100 text-yellow-800",
-    outdated: "bg-orange-100 text-orange-800",
-    unverifiable: "bg-gray-100 text-gray-600",
-    unchecked: "bg-gray-50 text-gray-500",
-  };
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[verdict] || "bg-gray-100 text-gray-600"}`}
-    >
-      {verdict}
-    </span>
-  );
-}
-
 function thingTypeBadge(type: string, entityType: string | null) {
   const displayType = type === "entity" && entityType ? entityType : type;
 
@@ -181,28 +162,8 @@ const columns: ColumnDef<ThingRow>[] = [
       );
     },
   },
-  {
-    accessorKey: "verdict",
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Verdict">
-        Verdict
-      </SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const thing = row.original;
-      if (!thing.verdict) return null;
-      return (
-        <div className="flex items-center gap-1">
-          {verdictBadge(thing.verdict)}
-          {thing.verdictConfidence != null && (
-            <span className="text-xs text-muted-foreground">
-              {(thing.verdictConfidence * 100).toFixed(0)}%
-            </span>
-          )}
-        </div>
-      );
-    },
-  },
+  // Verdict column removed — verification now lives in the unified
+  // /api/verifications system. See discussion #2950.
 ];
 
 // ---------------------------------------------------------------------------

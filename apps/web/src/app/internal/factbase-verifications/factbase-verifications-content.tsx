@@ -1,27 +1,26 @@
 import {
   fetchDetailed,
   type FetchResult,
-  type RpcKbStatsResult,
-  type RpcKbVerdictsResult,
-  type RpcKbVerdictRow,
-  type RpcKbVerdictDetailResult,
+  type RpcVerificationsStatsResult,
+  type RpcVerificationsVerdictsResult,
+  type RpcVerificationVerdictRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { FactBaseVerificationsTable } from "./factbase-verifications-table";
 
 // Re-export the RPC-inferred types for the table component
-export type VerdictRow = RpcKbVerdictRow;
-export type VerdictDetailResult = RpcKbVerdictDetailResult;
+export type VerdictRow = RpcVerificationVerdictRow;
 
 // ── Data loading ──────────────────────────────────────────────────────────────
 
-async function loadStats(): Promise<FetchResult<RpcKbStatsResult>> {
-  return fetchDetailed<RpcKbStatsResult>("/api/kb-verifications/stats");
+async function loadStats(): Promise<FetchResult<RpcVerificationsStatsResult>> {
+  return fetchDetailed<RpcVerificationsStatsResult>("/api/verifications/stats");
 }
 
-async function loadVerdicts(): Promise<FetchResult<RpcKbVerdictsResult>> {
-  return fetchDetailed<RpcKbVerdictsResult>(
-    "/api/kb-verifications/verdicts?limit=200"
+async function loadVerdicts(): Promise<FetchResult<RpcVerificationsVerdictsResult>> {
+  // Filter to fact record types for the FactBase verifications dashboard
+  return fetchDetailed<RpcVerificationsVerdictsResult>(
+    "/api/verifications/verdicts?record_type=fact&limit=200"
   );
 }
 
@@ -107,7 +106,7 @@ export async function FactBaseVerificationsContent() {
       <p className="text-muted-foreground text-sm leading-relaxed">
         Verification status for FactBase facts checked against external resources.{" "}
         <span className="font-medium text-foreground">
-          {stats.total_facts}
+          {stats.total}
         </span>{" "}
         facts have verdicts.
         {stats.needs_recheck > 0 && (
@@ -120,7 +119,7 @@ export async function FactBaseVerificationsContent() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 not-prose mb-6">
-        <StatCard label="Total Checked" value={stats.total_facts} />
+        <StatCard label="Total Checked" value={stats.total} />
         <StatCard
           label="Avg Confidence"
           value={`${Math.round(stats.avg_confidence * 100)}%`}
@@ -158,7 +157,7 @@ export async function FactBaseVerificationsContent() {
       )}
 
       {/* Distribution bar */}
-      {stats.total_facts > 0 && verdictEntries.length > 0 && (
+      {stats.total > 0 && verdictEntries.length > 0 && (
         <div className="not-prose mb-6">
           <div className="flex rounded-full overflow-hidden h-4">
             {verdictEntries.map(([verdict, verdictCount]) => (
@@ -166,7 +165,7 @@ export async function FactBaseVerificationsContent() {
                 key={verdict}
                 className={BAR_COLORS[verdict] || "bg-gray-300"}
                 style={{
-                  width: `${(verdictCount / stats.total_facts) * 100}%`,
+                  width: `${(verdictCount / stats.total) * 100}%`,
                 }}
                 title={`${verdict}: ${verdictCount}`}
               />
@@ -176,7 +175,7 @@ export async function FactBaseVerificationsContent() {
             {verdictEntries.map(([verdict, verdictCount]) => (
               <span key={verdict}>
                 {verdict}:{" "}
-                {Math.round((verdictCount / stats.total_facts) * 100)}%
+                {Math.round((verdictCount / stats.total) * 100)}%
               </span>
             ))}
           </div>
@@ -188,8 +187,8 @@ export async function FactBaseVerificationsContent() {
 
       <DataSourceBanner source="api" />
       <p className="text-xs text-muted-foreground mt-1">
-        Data from <code className="text-[11px]">kb_fact_verdicts</code> and{" "}
-        <code className="text-[11px]">kb_fact_resource_verifications</code>{" "}
+        Data from <code className="text-[11px]">verification_verdicts</code> and{" "}
+        <code className="text-[11px]">verification_evidence</code>{" "}
         tables in the wiki-server database.
       </p>
     </>

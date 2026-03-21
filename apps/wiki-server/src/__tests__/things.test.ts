@@ -26,9 +26,6 @@ function makeThing(overrides: Record<string, unknown> = {}): Record<string, unkn
     description: null,
     source_url: null,
     wiki_id: null,
-    verdict: null,
-    verdict_confidence: null,
-    verdict_at: null,
     created_at: now,
     updated_at: now,
     synced_at: now,
@@ -79,25 +76,6 @@ function applyThingsFilters(
     if (filterVal) {
       rows = rows.filter((r) => r.parent_thing_id === filterVal);
     }
-  }
-
-  if (whereClause.includes('"verdict" =')) {
-    const filterVal = stringParams[paramIdx++];
-    if (filterVal) {
-      rows = rows.filter((r) => r.verdict === filterVal);
-    }
-  }
-
-  // is not null / is null for verdict
-  if (whereClause.includes("is not null") && whereClause.includes("verdict")) {
-    rows = rows.filter((r) => r.verdict !== null);
-  }
-  if (
-    whereClause.includes("is null") &&
-    whereClause.includes("verdict") &&
-    !whereClause.includes("is not null")
-  ) {
-    rows = rows.filter((r) => r.verdict === null);
   }
 
   return rows;
@@ -198,22 +176,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- things: COUNT with GROUP BY (stats by type / verdict / entity_type) ---
+  // --- things: COUNT with GROUP BY (stats by type / entity_type) ---
   if (q.includes('"things"') && q.includes("group by")) {
-    // Determine which column is being grouped
-    if (q.includes("coalesce") && q.includes("verdict")) {
-      // GROUP BY verdict (with COALESCE for null -> 'unverified')
-      const byVerdict = new Map<string, number>();
-      for (const row of thingsStore.values()) {
-        const v = (row.verdict as string) || "unverified";
-        byVerdict.set(v, (byVerdict.get(v) || 0) + 1);
-      }
-      return [...byVerdict.entries()].map(([verdict, count]) => ({
-        verdict,
-        count,
-      }));
-    }
-
     if (q.includes("entity_type")) {
       // GROUP BY entity_type (with is not null filter)
       const byEntityType = new Map<string, number>();
@@ -289,16 +253,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const limit = numericParams.length >= 2 ? numericParams[numericParams.length - 2] : (numericParams.length === 1 ? numericParams[0] : 50);
     const offset = numericParams.length >= 2 ? numericParams[numericParams.length - 1] : 0;
     return filtered.slice(offset, offset + limit);
-  }
-
-  // --- thing_resource_verifications ---
-  if (q.includes("thing_resource_verifications")) {
-    return [];
-  }
-
-  // --- thing_verdicts ---
-  if (q.includes("thing_verdicts")) {
-    return [];
   }
 
   // --- entity_ids: COUNT (for health check) ---
@@ -580,40 +534,7 @@ describe("Things API", () => {
       }
     });
 
-    it("filters by has_verdict=true/false", async () => {
-      // Seed a thing with verdict
-      await seedThing(app, "thing-verified", "Verified Thing", {
-        sourceId: "v1",
-      });
-      // Manually set verdict in the store
-      const verifiedRow = thingsStore.get("thing-verified");
-      if (verifiedRow) {
-        verifiedRow.verdict = "confirmed";
-        verifiedRow.verdict_confidence = 0.95;
-      }
-
-      await seedThing(app, "thing-unverified", "Unverified Thing", {
-        sourceId: "uv1",
-      });
-
-      // has_verdict=true
-      const res1 = await app.request("/api/things?has_verdict=true");
-      expect(res1.status).toBe(200);
-      const body1 = await res1.json();
-      expect(body1.things.length).toBeGreaterThan(0);
-      for (const t of body1.things) {
-        expect(t.verdict).toBeTruthy();
-      }
-
-      // has_verdict=false
-      const res2 = await app.request("/api/things?has_verdict=false");
-      expect(res2.status).toBe(200);
-      const body2 = await res2.json();
-      expect(body2.things.length).toBeGreaterThan(0);
-      for (const t of body2.things) {
-        expect(t.verdict).toBeNull();
-      }
-    });
+    // has_verdict filter removed — verification now lives in unified system
 
     it("returns empty list when no things", async () => {
       const res = await app.request("/api/things");
@@ -706,7 +627,7 @@ describe("Things API", () => {
   // ---- Stats ----
 
   describe("GET /api/things/stats", () => {
-    it("returns aggregate stats (total, byType, byVerdict, byEntityType)", async () => {
+    it("returns aggregate stats (total, byType, byEntityType)", async () => {
       await seedThing(app, "thing-e1", "Entity 1", {
         thingType: "entity",
         entityType: "organization",
@@ -729,7 +650,6 @@ describe("Things API", () => {
       expect(body.byType).toBeDefined();
       expect(body.byType.entity).toBe(2);
       expect(body.byType.fact).toBe(1);
-      expect(body.byVerdict).toBeDefined();
       expect(body.byEntityType).toBeDefined();
       expect(body.byEntityType.organization).toBe(1);
       expect(body.byEntityType.risk).toBe(1);

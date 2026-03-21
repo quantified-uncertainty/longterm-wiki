@@ -506,7 +506,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/record-verifications/verifications',
+    '/api/verifications/evidence',
     body,
   );
 
@@ -611,7 +611,7 @@ async function storeAggregateVerdict(
 
   const response = await apiRequest<{ ok: boolean }>(
     'POST',
-    '/api/record-verifications/verdicts',
+    '/api/verifications/verdicts',
     body,
   );
 
@@ -635,7 +635,7 @@ async function statsCommand(): Promise<CommandResult> {
     by_type: Record<string, number>;
     needs_recheck: number;
     avg_confidence: number;
-  }>('GET', '/api/record-verifications/stats');
+  }>('GET', '/api/verifications/stats');
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
@@ -706,7 +706,7 @@ async function syncThingsCommand(): Promise<CommandResult> {
         sourcesChecked: number | null;
       }>;
       total: number;
-    }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+    }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
     if (!response.ok) {
       return { exitCode: 1, output: `Failed to fetch verdicts: ${response.message}` };

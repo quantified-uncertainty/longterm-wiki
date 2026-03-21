@@ -849,11 +849,12 @@ function scanVerificationTables(meta: EntityTypeMeta): CellValue {
   if (!meta.dbTable) return naCell("No DB table");
 
   const schema = getWikiServerSchemaContent();
-  // Check for verification-related tables
+  // Check for verification-related tables (unified verification system)
   const hasVerification =
-    schema.includes(`${meta.dbTable}Verification`) ||
-    schema.includes(`record_verifications`) ||
-    schema.includes(`recordVerifications`);
+    schema.includes(`verificationEvidence`) ||
+    schema.includes(`verification_evidence`) ||
+    schema.includes(`verificationVerdicts`) ||
+    schema.includes(`verification_verdicts`);
 
   return cell(
     hasVerification,

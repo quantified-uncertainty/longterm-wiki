@@ -11,7 +11,6 @@ import { ThingsTable } from "./things-table";
 interface ThingsStatsResult {
   total: number;
   byType: Record<string, number>;
-  byVerdict: Record<string, number>;
   byEntityType: Record<string, number>;
 }
 
@@ -22,7 +21,7 @@ async function loadStats(): Promise<FetchResult<ThingsStatsResult>> {
 }
 
 function emptyStats(): ThingsStatsResult {
-  return { total: 0, byType: {}, byVerdict: {}, byEntityType: {} };
+  return { total: 0, byType: {}, byEntityType: {} };
 }
 
 // ── Stats Card ────────────────────────────────────────────────────────────
@@ -50,10 +49,6 @@ function StatCard({
 export async function ThingsContent() {
   const { data: stats, source, apiError } = await withApiFallback(loadStats, emptyStats);
 
-  const withVerdict = Object.entries(stats.byVerdict)
-    .filter(([v]) => v !== "unchecked")
-    .reduce((sum, [, c]) => sum + c, 0);
-
   return (
     <>
       <DataSourceBanner source={source} apiError={apiError} />
@@ -69,15 +64,6 @@ export async function ThingsContent() {
             .slice(0, 3)
             .map(([t, c]) => `${t}: ${c}`)
             .join(", ")}
-        />
-        <StatCard
-          label="With Verdicts"
-          value={withVerdict}
-          sub={
-            stats.total > 0
-              ? `${((withVerdict / stats.total) * 100).toFixed(1)}% of total`
-              : undefined
-          }
         />
         <StatCard
           label="Entity Types"
@@ -111,26 +97,7 @@ export async function ThingsContent() {
       </div>
 
       {/* Verdict breakdown */}
-      {Object.keys(stats.byVerdict).length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3">Verification Status</h2>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(stats.byVerdict)
-              .sort(([, a], [, b]) => b - a)
-              .map(([verdict, count]) => (
-                <div
-                  key={verdict}
-                  className="bg-card border rounded-md px-3 py-2 text-sm"
-                >
-                  <span className="font-medium">{verdict}</span>
-                  <span className="text-muted-foreground ml-2">
-                    {count.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
+      {/* Verification status removed — now in unified /api/verifications system */}
 
       {/* Things table — fetches pages via server actions */}
       <div>
