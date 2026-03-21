@@ -93,6 +93,7 @@ import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-i
 import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
+import * as verifyOrchestrateCommands from './commands/verify-orchestrate.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
@@ -100,6 +101,7 @@ import * as tablebaseCommands from './commands/tablebase.ts';
 import * as pagesCommands from './commands/pages.ts';
 import * as legislationCommands from './commands/legislation.ts';
 import * as extractStructuredDataCommands from './commands/extract-structured-data.ts';
+import * as verifyConsistencyCommands from './commands/verify-consistency.ts';
 
 const domains = {
   validate: validateCommands,
@@ -157,6 +159,7 @@ const domains = {
   'backfill-pr-outcomes': backfillPrOutcomesCommands,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: recordsVerifyCommands,
+  'verify-orchestrate': verifyOrchestrateCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,
@@ -164,6 +167,7 @@ const domains = {
   pages: pagesCommands,
   legislation: legislationCommands,
   'extract-structured-data': extractStructuredDataCommands,
+  'verify-consistency': verifyConsistencyCommands,
 };
 
 const shortcutMap = buildShortcutMap();
