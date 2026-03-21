@@ -1,0 +1,106 @@
+---
+wikiId: E39
+title: Beth Barnes
+description: Founder and CEO of METR, an independent nonprofit conducting capability evaluations of frontier AI models to identify potentially dangerous behaviors.
+sidebar:
+  order: 50
+lastEdited: 2026-03-21
+createdAt: 2026-03-21
+summary: Biographical profile of Beth Barnes, METR's founder, covering her career trajectory, METR's capability evaluation methodology, and her views on AI safety strategy.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Detail |
+|---|---|
+| **Role** | Founder and CEO, <EntityLink id="E201">METR</EntityLink> |
+| **Previous positions** | <EntityLink id="E98">Google DeepMind</EntityLink>; <EntityLink id="E218">OpenAI</EntityLink>; <EntityLink id="E25">Alignment Research Center (ARC)</EntityLink> |
+| **Key contribution** | Research showing AI planning horizons doubling roughly every seven months |
+| **Recognition** | TIME 100 Most Influential People in AI (2024) |
+| **Focus area** | Dangerous capability evaluations; responsible scaling policies |
+
+## Key Links
+
+| Resource | Link |
+|---|---|
+| **Personal site** | barnes.page |
+| **EA Global 2023 talk** | "Safety evaluations and standards for AI" (Bay Area) |
+
+## Overview
+
+Beth Barnes is the founder and CEO of <EntityLink id="E201">METR</EntityLink> (Model Evaluation & Threat Research), an independent nonprofit organization that designs and conducts evaluations of frontier AI models to identify potentially dangerous capabilities. Barnes entered the AI safety field after becoming interested in effective altruism around 2014 and subsequently studying computer science.[^1] Before founding METR, she held positions at <EntityLink id="E98">Google DeepMind</EntityLink>, where she worked on scaling laws for forecasting deep learning progress, and at <EntityLink id="E218">OpenAI</EntityLink>, where she helped develop safety targets and evaluated scalable oversight techniques for alignment.[^1]
+
+Barnes left OpenAI in 2022 to found METR, citing the value of being able to communicate directly with policymakers and other labs without the constraints of institutional affiliation.[^2] METR, which grew out of the evaluations work Barnes led at the <EntityLink id="E25">Alignment Research Center (ARC)</EntityLink> under <EntityLink id="E220">Paul Christiano</EntityLink>, operates as what Barnes has described as a prototype for independent AI evaluation rather than formal oversight.[^3] In 2024, Barnes was named to TIME's 100 Most Influential People in AI.[^2]
+
+## Background and Career
+
+Barnes became involved with effective altruism around 2014, engaging with the movement's focus on evidence-based, high-impact interventions. During her time at the University of Cambridge, she co-wrote a policy paper on AI development and founded a student society called Future of Sentience, which focused on the long-term implications of technologies including AI and synthetic biology.[^4] She also gave a TEDxYouth talk in 2018 titled "Expanding circles," addressing long-term values, effective altruism, and technology steering.[^4]
+
+Her professional AI safety career began with a role at <EntityLink id="E98">Google DeepMind</EntityLink>, where she worked with the Chief Scientist on scaling laws for forecasting deep learning progress.[^1] She then moved to <EntityLink id="E218">OpenAI</EntityLink>, where her work included helping to develop safety targets, evaluating scalable oversight techniques such as debate, and testing code models for signs of misalignment prior to release.[^1]
+
+At OpenAI, Barnes also led the evaluations team at the <EntityLink id="E25">Alignment Research Center (ARC)</EntityLink>, collaborating with <EntityLink id="E220">Paul Christiano</EntityLink> on safety evaluations for cutting-edge models and developing standards for scaling and deployment decisions.[^1] In 2022, she left to establish what would become <EntityLink id="E201">METR</EntityLink> as a fully independent nonprofit, with the organization later spinning off from ARC.[^5]
+
+## METR and Capability Evaluations
+
+<EntityLink id="E201">METR</EntityLink>'s core mission, as Barnes has described it, is to ensure the world is not taken by surprise by dangerous AI developments.[^6] The organization conducts threat modeling and capability evaluations to assess potentially dangerous AI behaviors, including deception, self-replication, and evasion of shutdown. METR collaborates with major AI laboratories as well as U.K. and U.S. AI safety institutes.[^2]
+
+A significant portion of METR's work involves what Barnes calls "long-task planning evaluations." The organization's paper "Measuring AI ability to complete long tasks" found that the planning horizons of AI models were doubling roughly every seven months—a finding Barnes has indicated ranges between three months and one year depending on methodological choices.[^7] According to Barnes, models in the period studied had approximately a 50% chance of successfully completing tasks that would take an expert human around one hour, compared to roughly 30% seven months prior.[^6] This research has been widely regarded as among the most useful AI forecasting work in recent years.[^7]
+
+METR's evaluation methodology involves timing how long skilled humans take to complete multi-step projects, then measuring AI model performance on the same tasks.[^7] Barnes has noted that METR emphasizes prototyping evaluations as a nimble small nonprofit, and that the organization's governance includes provisions for making public recommendations if a laboratory declines to act on evaluation findings—though much of METR's work is conducted under NDA.[^3]
+
+In summer 2023, Barnes collaborated with <EntityLink id="E22">Anthropic</EntityLink> on its Responsible Scaling Policy, a framework that commits the company to pause AI development beyond certain capability thresholds until corresponding evaluations and safety measures are in place.[^2] Similar frameworks have since been adopted by other AI laboratories.
+
+In July 2025, METR conducted a randomized controlled trial examining how early-2025 AI tools affect the productivity of experienced open-source software developers.[^8]
+
+## Views on AI Safety
+
+Barnes has expressed significant concern about the pace of AI capability development relative to the maturity of safety evaluations. Based on METR's research on planning horizon doublings, she has stated that recursively self-improving AI could plausibly emerge within a short timeframe, and has characterized the risk of AI catastrophe as a significant concern for young people over the coming years.[^6] She has called for regulation to address the growing gap between AI capabilities and reliable evaluation methods.[^2]
+
+A consistent theme in Barnes's public statements is skepticism toward what she calls "lab exceptionalism"—the view that AI companies alone should control decisions about AI development. She has expressed doubt about the effectiveness of safety-focused researchers working inside frontier AI companies, suggesting the track record of that approach is not strong, and has articulated a preference for independent research as better positioned to both produce object-level safety progress and provide credible input to policymakers.[^5]
+
+Barnes has also engaged publicly with questions about scalable oversight. She has worked on AI safety via debate—an approach in which AIs are trained to debate answers that are then judged by humans, using reinforcement learning to incentivize honest behavior as a method for preventing misalignment in AI R&D agents.[^9] She has noted the importance of distinguishing between alignment (preventing bad intent in AI systems) and capability-enhancing instruction-following.[^5]
+
+On the question of open-weight AI models, Barnes has described her position as evolving. She has become more favorable toward open-weight models for AI safety research purposes, noting that they enable independent evaluation work, while maintaining concerns about certain threat models and the irreversibility of releasing model weights.[^5]
+
+## Predictions and Track Record
+
+Barnes's most influential predictive claim derives from METR's empirical work: the approximately seven-month doubling time for AI planning horizons. She has noted that this estimate carries significant methodological uncertainty, with plausible ranges spanning three months to a year.[^7]
+
+Barnes has also reflected critically on her own predictions. When METR evaluated GPT-4 prior to its public deployment, she anticipated that post-release public usage would reveal numerous capabilities the evaluation team had not identified during testing—a pattern of capability discovery through external elicitation. In her assessment, this expectation was not borne out: the amount of capability discovery from public elicitation after GPT-4's release was lower than she had forecast.[^10]
+
+More broadly, Barnes has acknowledged structural limitations in AI capability evaluation. She has noted that evaluations can be compromised by weak elicitation strategies, that datasets used to make capability claims are often low quality, and that models frequently surprise researchers by accomplishing tasks previously thought impossible—suggesting a systematic tendency toward underestimation of capabilities.[^10]
+
+Barnes has also stated that she regards the track record of at least one major theory of change in AI safety as poor, though available sources do not specify which theory she was referencing.[^7]
+
+## Community Involvement
+
+Barnes is an active contributor to the <EntityLink id="E538">LessWrong</EntityLink> and EA Forum communities, where she has published posts related to METR's research and engaged with technical AI safety discussions, including topics such as alignment via recursive decomposition and debate-based methods.[^5] She has given talks at EA Global events, including a 2023 Bay Area presentation on safety evaluations and standards for AI.[^4] She has also been associated with the <EntityLink id="E510">80,000 Hours</EntityLink> community, having promoted their career advice for high-impact paths.[^1]
+
+## Criticisms and Concerns
+
+Barnes has herself raised the most prominent concern about METR's work: that much of it is conducted under NDA, with limited formal authorization to alert external parties about worrying findings.[^3] This creates a structural tension between METR's role as an independent evaluator and the practical constraints under which it operates. Barnes has acknowledged this openly, framing METR as a prototype for what independent evaluation could look like rather than a fully realized oversight mechanism.
+
+Critics of AI capability evaluations more broadly have raised questions about whether evaluations like METR's can keep pace with rapid model development, a concern Barnes herself has echoed. She has noted that rapid AI progress risks outstripping the reliability of available evaluation methods, and that high domain-expertise tasks are particularly difficult to evaluate accurately.[^3]
+
+The broader concern that safety researchers leaving frontier AI companies have historically had limited impact on company culture or priorities is one Barnes has engaged with directly, citing it as part of her rationale for establishing an independent organization.[^5]
+
+## Key Uncertainties
+
+- The precise doubling rate of AI planning horizons remains methodologically contested, with Barnes acknowledging a plausible range of three months to one year.[^7]
+- The degree to which METR's NDA-constrained evaluations can function as genuine public oversight, versus internal advisory work, remains an open question.[^3]
+- Barnes's prediction of recursively self-improving AI emerging within approximately two years has not yet been validated or falsified.
+- The broader effectiveness of independent evaluation organizations as a category of AI safety intervention is unproven; METR itself represents an early prototype of the model.
+
+## Sources
+
+[^1]: Beth Barnes speaker bio - METR and career background (EA Global / 80,000 Hours materials)
+[^2]: TIME 100 Most Influential People in AI 2024 - Beth Barnes profile
+[^3]: AXRP podcast, July 2024 - Beth Barnes on AI evaluations and METR's governance
+[^4]: TEDxYouth@Tallinn 2018 and Cambridge University activities - Beth Barnes biographical materials
+[^5]: 80,000 Hours podcast - Beth Barnes on AI safety strategy and lab exceptionalism
+[^6]: METR research overview - "Measuring AI ability to complete long tasks" and organizational mission
+[^7]: METR paper - "Measuring AI ability to complete long tasks" (planning horizon doubling findings)
+[^8]: METR research, July 2025 - Randomized controlled trial on AI tools and open-source developer productivity
+[^9]: Beth Barnes - AI safety via debate: research writeup and progress notes
+[^10]: Beth Barnes - reflections on GPT-4 pre-deployment evaluation and capability elicitation

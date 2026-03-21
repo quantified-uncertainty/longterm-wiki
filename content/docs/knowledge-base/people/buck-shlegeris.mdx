@@ -1,0 +1,125 @@
+---
+wikiId: E46
+title: Buck Shlegeris
+description: CEO of Redwood Research and AI safety researcher focused on AI control techniques to mitigate risks from advanced AI systems.
+sidebar:
+  order: 50
+lastEdited: 2026-03-21
+createdAt: 2026-03-21
+summary: A detailed biographical and research profile of Buck Shlegeris, CEO of Redwood Research, covering his career trajectory, AI control research agenda, and public positions on AI risk.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Property | Value |
+|----------|-------|
+| **Role** | CEO, <EntityLink id="E557">Redwood Research</EntityLink> |
+| **Prior Role** | Researcher and outreach, <EntityLink id="E202">MIRI</EntityLink> |
+| **Research Focus** | AI control, alignment, scheming detection |
+| **Notable Work** | "AI Control: Improving Safety Despite Intentional Subversion" (2023) |
+| **Citations** | ≈2,700+ (Google Scholar) |
+| **h-index** | 18 |
+| **Based** | San Francisco Bay Area (since 2013) |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Alignment Forum Profile | [alignmentforum.org](https://www.alignmentforum.org/users/buck) |
+| EA Forum AMA | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/tDk57GhrdK54TWzPY/i-m-buck-shlegeris-i-do-research-and-outreach-at-miri-ama) |
+
+## Overview
+
+<EntityLink id="E46">Buck Shlegeris</EntityLink> is the CEO of <EntityLink id="E557">Redwood Research</EntityLink>, a nonprofit applied AI alignment organization based in Berkeley, California. His research centers on **AI control** — the development of safety protocols designed to remain robust even if an AI system is actively attempting to subvert them. This distinguishes the control agenda from traditional alignment research, which aims to ensure AI systems share human values in the first place; Shlegeris treats control as a practical backup for a world where alignment cannot be guaranteed before human-level AI arrives.
+
+Shlegeris grew up in Townsville, Australia, and studied a double degree in science and computer science at the Australian National University (ANU) before relocating to the San Francisco Bay Area in 2013.[^1] Prior to leading Redwood Research, he worked as a researcher and outreach staff member at the <EntityLink id="E202">Machine Intelligence Research Institute (MIRI)</EntityLink>, where he managed technical interviewing, ran the AI Safety Retraining Program, and taught at the AI Risk for Computer Scientists workshops.[^2]
+
+His published work spans scalable oversight, AI control, and language model capabilities, with collaborators including <EntityLink id="E220">Paul Christiano</EntityLink> and <EntityLink id="E91">Dario Amodei</EntityLink> on early work and Ryan Greenblatt on more recent control research. Google Scholar records approximately 2,700 citations and an h-index of 18.[^3]
+
+## Background and Early Career
+
+Shlegeris began programming seriously as a freshman at ANU around 2012, undertaking self-directed technical projects including translating proofs from automata theory into Haskell, writing a resistor-battery circuit solver, building a C-to-assembly compiler in Scala, and creating a GUI for physics problems.[^4] During his second year at university, he attended **App Academy**, a coding bootcamp in San Francisco, on a friend's recommendation. He was offered a teaching assistant position there approximately two weeks before graduating the program.[^4]
+
+After App Academy, Shlegeris worked as a software engineer at **Triplebyte**, a startup focused on programming hiring, where he developed aspects of the programming interview process and web interfaces.[^4] During this period he was also involved in the effective altruism community and described his App Academy teaching role partly in terms of "earning to give."[^4]
+
+He transitioned into AI alignment technical research around 2018–2020, joining MIRI as a researcher. At MIRI, he divided his time between technical AI safety work and recruitment and outreach responsibilities: managing participant intake for the AI Risk for Computer Scientists workshops, conducting most technical interviewing for engineering roles, and overseeing the AI Safety Retraining Program, which provided grants for three-month ML study periods to help people transition into AI safety careers.[^2]
+
+## Redwood Research
+
+Shlegeris joined <EntityLink id="E557">Redwood Research</EntityLink> as CTO and later became CEO. The organization focuses on applied alignment research and, under his leadership, has concentrated heavily on the **AI control** agenda — developing practical safeguards against AI systems that may be misaligned or actively scheming.[^5]
+
+### AI Control Research
+
+The central idea behind AI control, as developed at Redwood, is that safety measures should be designed to work even under adversarial conditions — i.e., even if the AI model being overseen is attempting to subvert those measures. This is framed as analogous to insider threat problems in security: just as organizations must guard against employees who might act against organizational interests, AI developers may need to guard against models that pursue goals misaligned with human welfare while appearing cooperative.[^5]
+
+Practical techniques explored in this agenda include:
+
+- **Trusted monitoring**: Using weaker but more trustworthy models (e.g., a smaller, vetted model) to audit the outputs or actions of stronger, potentially untrusted models before execution.
+- **Action resampling**: Replacing or resampling suspicious actions detected during monitoring rather than allowing them to proceed.
+- **Honeypots and deception detection**: Designing situations intended to reveal whether a model is behaving strategically rather than genuinely.
+- **Untrusted monitoring with collusion prevention**: Using untrusted models to monitor each other with protocols designed to prevent them from coordinating against human oversight.[^6]
+
+Shlegeris distinguishes AI control from scalable oversight and alignment research proper. In his framing, alignment research attempts to build AI systems that actually want good outcomes; control research attempts to ensure safety even if that effort fails or remains incomplete when powerful systems are deployed.[^7]
+
+### Notable Publications
+
+The foundational paper for Redwood's control agenda, **"AI Control: Improving Safety Despite Intentional Subversion"** (arXiv:2312.06942, 2023, with Ryan Greenblatt, Kshitij Sachan, and Fabien Roger), develops pipelines of safety protocols evaluated for robustness against subversion and has accumulated over 150 citations.[^3] An earlier paper, **"Supervising Strong Learners by Amplifying Weak Experts"** (arXiv, 2018, with <EntityLink id="E220">Paul Christiano</EntityLink> and <EntityLink id="E91">Dario Amodei</EntityLink>), addressed scalable oversight and has approximately 170 citations.[^3]
+
+Redwood also collaborated with <EntityLink id="E22">Anthropic</EntityLink> on the **"Alignment Faking in Large Language Models"** paper, which attracted significant attention in the AI safety community as empirical evidence that language models can produce behavior consistent with strategic concealment of preferences.[^5]
+
+More recent work includes papers on evaluating control measures for LLM agents, sabotage and monitoring evaluations, and a 2025 paper analyzing safety in concentrated AI control settings co-authored with Greenblatt and others, with funding acknowledged from Coefficient Giving (formerly Open Philanthropy) and Pivotal Research.[^8]
+
+### Blog and Outreach
+
+Alongside formal publications, Shlegeris has authored a series of technical blog posts on the Redwood Research site covering topics such as win/continue/lose scenarios and execute/replace/audit protocols, conservative assumptions in AI control research, and preventing collusion when using untrusted models to monitor each other.[^6] He has also appeared on multiple podcast episodes, including on the <EntityLink id="E510">80,000 Hours</EntityLink> podcast discussing AI control, scheming AIs, and takeover scenarios, and on the AXRP podcast discussing specific control techniques.[^7]
+
+## Views and Positions
+
+### AI Existential Risk
+
+Shlegeris has stated that he has viewed powerful AI as a serious existential threat since around 2010, when that position was regarded as fringe.[^9] He describes AI misalignment risk as "plausibly lower" in the mid-2020s than it was a decade earlier, attributing this partly to luck and partly to reduced investment in some risk-relevant areas, while maintaining that the risk remains significant.[^7]
+
+In discussions around 2022, Shlegeris and collaborator Ryan Greenblatt discussed the possibility of roughly a 50% chance of something going catastrophically wrong, including AI takeover scenarios.[^10] He has also discussed assigning around a 25% prior probability to a given AI system being engaged in scheming, and suggested that even a greater-than-5% scheming risk would warrant deployment caution.[^10]
+
+### Skepticism About Current Models
+
+Shlegeris has noted that he considers current models like GPT-4 extremely unlikely to be engaged in strategic scheming, citing his extensive direct interaction with such systems. He has observed that when prompted with power-seeking hypotheticals, these models' responses are not notably more sophisticated than their responses to ordinary queries — an argument against current-generation models being secretly strategic.[^11]
+
+### Effective Altruism
+
+Shlegeris has been involved in the effective altruism community throughout his career, including as a fund manager on the **Effective Altruism Infrastructure Fund**, which makes grants for EA movement building.[^4] His early career choices — including teaching at App Academy partly to donate income, and seeking out startup roles with equity — were framed in terms of EA-compatible earning and risk preferences.[^4]
+
+### Epistemics
+
+In public discussions, Shlegeris has described his past judgment as mediocre, noting that he did not reliably hold true beliefs and made what he considered foolish decisions. He has attributed some of this to feeling alienated from mainstream society, which he says led to an overly critical stance on conventional beliefs — producing some views he now considers correct (e.g., early concern about animal suffering) and some he considers mistaken.[^2] He has expressed a general heuristic that most things that appear crankish probably are crankish, and described taking pleasure in discovering he was wrong as a method for maintaining calibration.[^9]
+
+## Criticisms and Self-Assessment
+
+No significant external criticisms or controversies are documented in available sources. Shlegeris himself has been notably self-critical in public forums. In his EA Forum AMA, he described his past judgment as mediocre and his early beliefs as unreliable.[^2] He has also noted a recurring mistake pattern: in discussions with knowledgeable people, he tends to generate arguments faster than he can evaluate their validity, leading him to persuade people of conclusions he is not actually confident in.[^11]
+
+He has described <EntityLink id="E202">MIRI</EntityLink> as appearing crankish from the outside — worse than its 2008 incarnation — and has said that initial skepticism is warranted even given legitimacy signals like endorsements from respected researchers.[^2] He has also offered critical assessments of other organizations in the broader AI safety-adjacent space, such as the Qualia Research Institute, which he characterized as more crankish than early MIRI.[^2]
+
+On the broader AI safety field, Shlegeris has noted fragmentation between different research agendas and groups, which he attributes in part to unresolved foundational disagreements and reluctance to share arguments across organizational lines.[^2]
+
+Shlegeris criticized California Governor Gavin Newsom's veto of SB 1047, an AI regulation bill, characterizing it as a concession to major donors and business interests, and noting that the bill had majority support among polled Californians and domain experts.[^8]
+
+## Key Uncertainties
+
+- The degree to which AI control techniques remain effective against more capable future systems — rather than just current-generation LLMs — is an open research question that Shlegeris has acknowledged.
+- His probability estimates for AI scheming and catastrophic outcomes are expressed as rough priors rather than calibrated forecasts, and no formal track record or resolution data is available for his earlier predictions (e.g., an approximately 30% estimate of AGI within 50 years made around 2018).[^10]
+- The relationship between AI control and alignment research — whether they are complementary or whether prioritizing control crowds out deeper alignment work — remains contested in the field.
+
+## Sources
+
+[^1]: Buck Shlegeris background — grew up in Townsville, Australia; studied at ANU; Bay Area since 2013. From overview and background research sections (no URL available).
+[^2]: Buck Shlegeris EA Forum AMA — personal views on MIRI, career history, epistemics, field criticisms. EA Forum post by Buck Shlegeris (no URL available for direct citation beyond canonical link above).
+[^3]: Google Scholar profile for Buck Shlegeris — citation counts, h-index, publication list. Research section on publications (no URL available).
+[^4]: Early career and App Academy history — ANU, App Academy, Triplebyte, EA involvement. From history and background research sections (no URL available).
+[^5]: Redwood Research overview and AI control work — CTO/CEO roles, alignment faking collaboration with Anthropic, control agenda. From overview, AI safety, and work research sections (no URL available).
+[^6]: Redwood Research blog posts on AI control — win/continue/lose scenarios, untrusted monitoring, collusion prevention. From work research section (no URL available).
+[^7]: 80,000 Hours Podcast episode #214 (April 4, 2025) — AI control, misalignment risk trends, scheming AIs, takeover scenarios. From news research section (no URL available).
+[^8]: August 2025 arxiv paper "Attack Selection Reduces Safety in Concentrated AI Control Settings" and February 2025 TechXplore Q&A on SB 1047 — from news research section (no URL available).
+[^9]: Views on AI existential risk since ~2010 and epistemics heuristics — from views research section (no URL available).
+[^10]: Probability estimates for scheming and catastrophic outcomes — dialogue with Ryan Greenblatt (~2022) and podcast discussions. From predictions research section (no URL available).
+[^11]: Self-reported mistake pattern (rapid-firing arguments) and views on GPT-4 scheming likelihood — from criticism and community research sections (no URL available).
