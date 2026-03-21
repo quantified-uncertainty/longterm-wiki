@@ -3413,41 +3413,78 @@
     - name: Governor Gavin Newsom
       entityId: tDwxa07Urw
       position: support
-      reason: Signed into law September 29, 2025 after vetoing more ambitious SB 1047 a year earlier
+      importance: high
+      reason: "Signed SB 53 into law September 29, 2025, framing it as the balanced alternative after vetoing the more ambitious SB 1047 a year earlier"
       source: https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/
+      context:
+        - "His SB 1047 veto directly shaped SB 53's narrower scope — transparency over liability"
+        - "Signed 17 other AI bills alongside SB 53, signaling preference for targeted regulation"
+        - "Appointed expert panel including Fei-Fei Li to draft alternative approach after SB 1047 veto"
     - name: Anthropic
       entityId: mK9pX3rQ7n
       position: support
-      reason: First major AI company to endorse; stated transparency approach balances safety with innovation
+      importance: high
+      reason: "First major AI company to publicly endorse SB 53 (Sep 2025), breaking the united industry opposition front; stated transparency approach balances safety with innovation"
       source: https://www.anthropic.com/news/anthropic-is-endorsing-sb-53
+      context:
+        - "Had shifted from oppose to mixed on SB 1047 — SB 53's lighter approach aligned with their Responsible Scaling Policy"
+        - "Backed by Amazon ($4B), Google ($2B); their endorsement gave political cover for the bill"
+        - "Founded by ex-OpenAI researchers (Dario/Daniela Amodei) — differed from OpenAI's continued opposition"
     - name: OpenAI
       entityId: 1LcLlMGLbw
       position: oppose
-      reason: Lobbied against alongside Meta and Alphabet; preferred federal regulation over state patchwork
+      importance: high
+      reason: "Lobbied against SB 53 alongside Meta and Alphabet through trade groups and direct advocacy; preferred federal regulation over state patchwork"
       source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+      context:
+        - "Opposed both SB 1047 and SB 53 — consistent preference for federal-only regulation"
+        - "Backed by Microsoft ($13B invested); transitioning to for-profit structure"
+        - "Despite company opposition, 113+ employees had signed letter supporting the earlier SB 1047"
     - name: Meta AI (FAIR)
       entityId: tt0f5PYDCw
       position: oppose
-      reason: Lobbied against the bill; argued state-level regulation would stifle innovation
+      importance: high
+      reason: "Lobbied against SB 53 through trade groups; open-weight model strategy (Llama) made transparency requirements particularly burdensome"
       source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+      context:
+        - "Open-source AI strategy uniquely exposed to SB 53's safety framework requirements"
+        - "Co-founded AI Alliance with IBM to coordinate industry opposition to state AI regulation"
+        - "Chief AI Scientist Yann LeCun was vocal opponent of both SB 1047 and SB 53"
     - name: Google DeepMind
       entityId: A4XoubikkQ
       position: oppose
-      reason: Alphabet lobbied against the bill through trade groups; preferred federal approach
+      importance: high
+      reason: "Alphabet lobbied against SB 53 through trade groups and direct advocacy; preferred voluntary commitments and federal approach"
       source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+      context:
+        - "Google invested $2B in Anthropic (which supported the bill) — divergent positions within portfolio"
+        - "Also opposed SB 1047 — consistent opposition to California AI regulation"
+        - "Member of AI Alliance (industry coalition opposing state-level AI bills)"
     - name: TechNet
       entityId: 0PNw6yTH0g
       position: oppose
-      reason: Trade group representing major tech companies; advocated for federal regulation instead
+      importance: medium
+      reason: "Coordinated tech industry opposition as a trade group representing major companies; advocated for federal regulation instead of state patchwork"
       source: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
+      context:
+        - "Members include Google, Meta, OpenAI, Apple, Microsoft — all major frontier model developers"
+        - "Also opposed SB 1047; consistent industry coalition against California AI bills"
     - name: Common Sense Media
       position: support
-      reason: Backed the bill as a necessary consumer and child safety measure
+      importance: medium
+      reason: "Backed SB 53 as a necessary consumer and child safety measure; advocated for transparency requirements"
       source: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
+      context:
+        - "Leading child safety advocacy organization; Jim Steyer (founder) has long-standing relationship with Newsom"
+        - "Focus on AI transparency aligns with their broader digital safety agenda"
     - name: TechEquity Action
       position: support
-      reason: Supported transparency requirements for frontier AI developers
+      importance: medium
+      reason: "Supported SB 53's transparency requirements for frontier AI developers as worker and public safety measure"
       source: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
+      context:
+        - "Bay Area nonprofit focused on tech industry accountability and equitable tech policy"
+        - "Supported SB 1047 as well — consistent advocate for AI regulation"
   keyPoliticians:
     - name: Senator Scott Wiener
       entityId: HLc6VrCh5w
