@@ -4,9 +4,9 @@ title: Automation Tools
 description: Complete reference for all scripts and automation workflows for maintaining wiki content
 sidebar:
   order: 1
-lastEdited: 2026-02-17
+lastEdited: "2026-03-21"
 update_frequency: 60
-summary: "Comprehensive technical documentation for wiki maintenance automation, covering page improvement workflows (Q5 standards requiring 10+ citations, 800+ words), content grading via Claude API (~\\$0.02/page), validation suite, and knowledge base system. Provides detailed command reference, cost estimates, and common workflows for maintaining content quality."
+summary: "Comprehensive technical documentation for wiki maintenance automation, covering page improvement workflows (Q5 standards requiring 10+ citations, 800+ words), content grading via Claude API (~\\$0.02/page based on Sonnet 4.5 rates), validation suite, and knowledge base system. Provides detailed command reference, cost estimates, and common workflows for maintaining content quality."
 ---
 This page documents all automation tools available for maintaining and improving the knowledge base.
 
@@ -14,57 +14,63 @@ This page documents all automation tools available for maintaining and improving
 
 | Tool | Purpose | Command |
 |------|---------|---------|
-| **Content Commands** | Improve, grade, create pages | `npm run crux -- content` |
-| **Validators** | Check content quality | `npm run crux -- validate` |
-| **Analyzers** | Analysis and reporting | `npm run crux -- analyze` |
-| **Auto-fixers** | Fix common issues | `npm run crux -- fix` |
-| **Data Builder** | Regenerate entity data | `npm run build:data` |
-| **Resources** | External resource management | `npm run crux -- resources` |
+| **Content Commands** | Improve, grade, create pages | `pnpm crux w` |
+| **Validators** | Check content quality | `pnpm crux w validate` |
+| **Analyzers** | Analysis and reporting | `pnpm crux w analyze` |
+| **Auto-fixers** | Fix common issues | `pnpm crux w fix` |
+| **Data Builder** | Regenerate entity data | `pnpm build-data` |
+| **Resources** | External resource management | `pnpm crux w resources` |
 
 ---
 
 ## Page Improvement Workflow
 
-The recommended way to improve wiki pages to quality 5.
+The recommended way to improve wiki pages to quality 5 (Q5).
 
 ### Commands
 
 ```bash
 # List pages that need improvement (sorted by priority)
-node scripts/page-improver.mjs --list
+pnpm crux w improve --list
 
-# Get improvement prompt for a specific page
-node scripts/page-improver.mjs economic-disruption
+# Improve a specific page
+pnpm crux w improve economic-disruption --tier=standard --apply
 
 # Show page info only (no prompt)
-node scripts/page-improver.mjs racing-dynamics --info
+pnpm crux w improve racing-dynamics --info
 
 # Filter by quality and importance
-node scripts/page-improver.mjs --list --max-qual 3 --min-imp 50
+pnpm crux w improve --list --max-qual 3 --min-imp 50
 ```
 
 ### What Makes a Q5 Page
+
+Q5 is an internally-defined quality standard used by the grading pipeline to classify pages as comprehensive.[^rc-0a65] The following elements are required:
 
 | Element | Requirement |
 |---------|-------------|
 | Quick Assessment Table | 5+ rows, 3 columns (Dimension, Assessment, Evidence) |
 | Substantive Tables | 2+ additional tables with real data |
-| Mermaid Diagram | 1+ showing key relationships |
+| Mermaid Diagram | 1+ showing key relationships[^rc-c0dc] |
 | Citations | 10+ real URLs from authoritative sources |
 | Quantified Claims | Replace "significant" with "25-40%" etc. |
 | Word Count | 800+ words of substantive content |
 
 ### Cost Estimates
 
-| Model | Cost per Page |
-|-------|---------------|
-| Opus 4.5 | \$3-5 |
-| Sonnet 4.5 | \$0.50-1.00 |
+Cost per page depends on the improvement tier and the <EntityLink id="E1041" name="claude">Claude</EntityLink> model used.[^rc-12d0] The estimates below are approximate and reflect typical token usage; actual costs vary with page length and complexity.
+
+| Model | Approximate Cost per Page |
+|-------|---------------------------|
+| <EntityLink id="E1038" name="claude-opus-4-5">Claude Opus 4.5</EntityLink> | \$3–5 |
+| <EntityLink id="E1036" name="claude-sonnet-4-5">Claude Sonnet 4.5</EntityLink> | \$0.50–1.00 |
 
 ### Reference Examples
 
-- **Gold standard**: `src/content/docs/knowledge-base/risks/bioweapons.mdx`
-- **Good example**: `src/content/docs/knowledge-base/risks/racing-dynamics.mdx`
+The following pages meet Q5 criteria and can serve as structural references:
+
+- `content/docs/knowledge-base/risks/bioweapons.mdx` — includes Quick Assessment Table, 2+ data tables, 1+ Mermaid diagram, and 10+ citations
+- `content/docs/knowledge-base/risks/racing-dynamics.mdx` — demonstrates quantified claims and structured evidence sections
 
 ---
 
@@ -82,7 +88,7 @@ lastEdited: "2026-01-15"
 readerImportance: 85
 ```
 
-**Priority scoring**: `staleness x (importance / 100)`, where staleness = days since edit / update frequency. Pages with staleness >= 1.0 are overdue.
+Priority scoring formula: `staleness × (importance / 100)`, where staleness = days since edit / update frequency. Pages with staleness >= 1.0 are overdue.
 
 | Importance | Default Frequency |
 |------------|-------------------|
@@ -108,7 +114,7 @@ Pages with `evergreen: false` are skipped by the update schedule, the bootstrap 
 pnpm crux updates list                        # Top 10 by priority
 pnpm crux updates list --overdue --limit=20   # All overdue pages
 
-# Preview triage recommendations (cheap, ~$0.08/page)
+# Preview triage recommendations (~$0.08/page based on Sonnet 4.5 rates)
 pnpm crux updates triage --count=10
 
 # Run updates (triage is ON by default)
@@ -121,16 +127,16 @@ pnpm crux updates stats
 
 ### Cost-Aware Triage
 
-By default, `updates run` checks for new developments before committing to an expensive update. For each page it does a cheap news check (≈\$0.08) using web search + SCRY, then recommends a tier:
+By default, `updates run` performs a low-cost news check (≈\$0.08 per page at Sonnet 4.5 rates)[^rc-12d0] using web search + SCRY before committing to a full update. This check recommends a tier based on whether new developments were found:
 
 | Triage Result | Action | Cost |
 |---------------|--------|------|
 | **skip** | No new developments — page is current | \$0 |
-| **polish** | Minor tweaks only | \$2-3 |
-| **standard** | Notable new developments to add | \$5-8 |
-| **deep** | Major developments requiring thorough research | \$10-15 |
+| **polish** | Minor tweaks only | \$2–3[^rc-12d0] |
+| **standard** | Notable new developments to add | \$5–8[^rc-12d0] |
+| **deep** | Major developments requiring thorough research | \$10–15[^rc-12d0] |
 
-**Example savings**: 10 pages at standard ≈ \$65. With triage, if 6 have no news: ≈\$26 + \$0.80 triage ≈ \$27.
+**Example scenario**: 10 pages scheduled at standard tier ≈ \$65 total. If triage finds that 6 have no new developments, those are skipped: ≈\$26 (4 pages × standard) + \$0.80 triage overhead ≈ \$27. Note that when most pages do require updates, triage overhead adds cost without reducing the update spend; the net benefit depends on the proportion of pages that can be skipped.
 
 Use `--no-triage` to skip the news check and apply a fixed tier to all pages.
 
@@ -138,22 +144,22 @@ Use `--no-triage` to skip the news check and apply a fixed tier to all pages.
 
 ```bash
 # Single page with specific tier
-node crux/authoring/page-improver.ts -- <page-id> --tier polish --apply
-node crux/authoring/page-improver.ts -- <page-id> --tier standard --apply --grade
-node crux/authoring/page-improver.ts -- <page-id> --tier deep --apply --grade
+pnpm crux w improve <page-id> --tier=polish --apply
+pnpm crux w improve <page-id> --tier=standard --apply --grade
+pnpm crux w improve <page-id> --tier=deep --apply --grade
 
 # Auto-select tier via triage
-node crux/authoring/page-improver.ts -- <page-id> --tier triage --apply --grade
+pnpm crux w improve <page-id> --tier=triage --apply --grade
 
 # Triage only (no update)
-node crux/authoring/page-improver.ts -- <page-id> --triage
+pnpm crux w improve <page-id> --triage
 ```
 
-| Tier | Cost | Phases |
-|------|------|--------|
-| polish | \$2-3 | analyze, improve, validate |
-| standard | \$5-8 | analyze, research, improve, validate, review |
-| deep | \$10-15 | analyze, research-deep, improve, validate, review, gap-fill |
+| Tier | Approximate Cost[^rc-12d0] | Phases |
+|------|----------------------|--------|
+| polish | \$2–3 | analyze, improve, validate |
+| standard | \$5–8 | analyze, research, improve, validate, review |
+| deep | \$10–15 | analyze, research-deep, improve, validate, review, gap-fill |
 | triage | ≈\$0.08 + tier cost | news check, then auto-selects above |
 
 ---
@@ -185,25 +191,25 @@ Omit the field entirely for infrastructure-only sessions that don't edit wiki pa
 
 ## Content Grading
 
-Uses Claude Sonnet API to automatically grade pages with importance, quality, and AI-generated summaries.
+Uses the Claude Sonnet API to automatically grade pages with importance, quality, and AI-generated summaries.[^rc-12d0]
 
 ### Commands
 
 ```bash
 # Preview what would be graded (no API calls)
-node scripts/grade-content.mjs --dry-run
+pnpm crux w grade --dry-run
 
 # Grade a specific page
-node scripts/grade-content.mjs --page scheming
+pnpm crux w grade --page scheming
 
 # Grade pages and apply to frontmatter
-node scripts/grade-content.mjs --limit 10 --apply
+pnpm crux w grade --limit 10 --apply
 
 # Grade a category with parallel processing
-node scripts/grade-content.mjs --category responses --parallel 3
+pnpm crux w grade --category responses --parallel 3
 
 # Skip already-graded pages
-node scripts/grade-content.mjs --skip-graded --limit 50
+pnpm crux w grade --skip-graded --limit 50
 ```
 
 ### Options
@@ -221,23 +227,23 @@ node scripts/grade-content.mjs --skip-graded --limit 50
 
 ### Grading Criteria
 
-**Importance (0-100)**:
-- 90-100: Essential for prioritization (core interventions, key risk mechanisms)
-- 70-89: High value (concrete responses, major risk categories)
-- 50-69: Useful context (supporting analysis, secondary risks)
-- 30-49: Reference material (historical, profiles, niche)
-- 0-29: Peripheral (internal docs, stubs)
+**Importance (0–100)**:
+- 90–100: Essential for prioritization (core interventions, key risk mechanisms)
+- 70–89: High value (concrete responses, major risk categories)
+- 50–69: Useful context (supporting analysis, secondary risks)
+- 30–49: Reference material (historical, profiles, niche)
+- 0–29: Peripheral (internal docs, stubs)
 
-**Quality (0-100)**:
-- 80-100: Comprehensive (2+ tables, 1+ diagram, 5+ citations, quantified claims)
-- 60-79: Good (1+ table, 3+ citations, mostly prose)
-- 40-59: Adequate (structure but lacks tables/citations)
-- 20-39: Draft (poorly structured, heavy bullets, no evidence)
-- 0-19: Stub (minimal content)
+**Quality (0–100)**:
+- 80–100: Comprehensive (2+ tables, 1+ diagram, 5+ citations, quantified claims) — maps to Q5[^rc-0a65]
+- 60–79: Good (1+ table, 3+ citations, mostly prose)
+- 40–59: Adequate (structure but lacks tables/citations)
+- 20–39: Draft (poorly structured, heavy bullets, no evidence)
+- 0–19: Stub (minimal content)
 
 ### Cost Estimate
 
-≈\$0.02 per page, ≈\$6 for all 329 pages
+Approximately \$0.02 per page at Sonnet 4.5 rates.[^rc-12d0] Total cost for the full wiki (approximately 329 pages as of early 2026) is approximately \$6–7, though this figure changes as pages are added.
 
 ---
 
@@ -246,18 +252,18 @@ node scripts/grade-content.mjs --skip-graded --limit 50
 All validators are accessible via the unified `crux` CLI:
 
 ```bash
-npm run validate              # Run all validators
-npm run crux -- validate --help   # List all validators
+pnpm crux w validate              # Run all validators
+pnpm crux w validate --help       # List all validators
 ```
 
 ### Individual Validators
 
 | Command | Description |
 |---------|-------------|
-| `crux validate compile` | MDX compilation check |
+| `crux validate compile` | MDX[^rc-351d] compilation check |
 | `crux validate data` | Entity data integrity |
 | `crux validate refs` | Internal reference validation |
-| `crux validate mermaid` | Mermaid diagram syntax |
+| `crux validate mermaid` | Mermaid[^rc-c0dc] diagram syntax |
 | `crux validate sidebar` | Sidebar configuration |
 | `crux validate entity-links` | EntityLink component validation |
 | `crux validate templates` | Template compliance |
@@ -268,14 +274,14 @@ npm run crux -- validate --help   # List all validators
 
 ```bash
 # Run specific validators
-npm run crux -- validate compile --quick
-npm run crux -- validate unified --rules=dollar-signs,markdown-lists
+pnpm crux w validate compile --quick
+pnpm crux w validate unified --rules=dollar-signs,markdown-lists
 
 # Skip specific checks
-npm run crux -- validate all --skip=component-refs
+pnpm crux w validate all --skip=component-refs
 
 # CI mode
-npm run validate:ci
+pnpm crux w validate gate
 ```
 
 ---
@@ -311,9 +317,9 @@ pnpm crux scan-content
 ### Source Fetching
 
 When verifying citations, the system fetches source URLs through a multi-layer cache:
-1. **In-memory LRU cache** (500 entries, session-scoped)
+1. **In-memory LRU cache** (500 entries, session-scoped; implementation-defined in `crux/lib/source-cache.ts`)
 2. **PostgreSQL `citation_content`** (durable, cross-machine)
-3. **Network fetch** via Firecrawl API or built-in fallback
+3. **Network fetch** via <EntityLink id="E2014" name="firecrawl">Firecrawl</EntityLink> API[^rc-f762] or built-in fallback
 
 Fetched content is cached in `.cache/sources/` locally and persisted to PostgreSQL for future sessions.
 
@@ -321,8 +327,8 @@ Fetched content is cached in `.cache/sources/` locally and persisted to PostgreS
 
 | Variable | Purpose |
 |----------|---------|
-| `ANTHROPIC_API_KEY` | Claude API for summaries and grading |
-| `FIRECRAWL_KEY` | Web page fetching (optional, has built-in fallback) |
+| `ANTHROPIC_API_KEY` | Claude API[^rc-12d0] for summaries and grading |
+| `FIRECRAWL_KEY` | Web page fetching via Firecrawl[^rc-f762] (optional, has built-in fallback) |
 
 ---
 
@@ -330,54 +336,54 @@ Fetched content is cached in `.cache/sources/` locally and persisted to PostgreS
 
 ### Build Data
 
-**Important**: Data build must run before site build.
+The data build step must run before the site build, as `apps/web` reads `database.json` at build time rather than making runtime API calls.
 
 ```bash
-npm run build:data    # Regenerate all data files
-npm run dev           # Auto-runs build:data first
-npm run build         # Auto-runs build:data first
+pnpm build-data       # Regenerate all data files
+pnpm dev              # Auto-runs build-data first
+pnpm build            # Auto-runs build-data first
 ```
 
 ### Generated Files
 
-After running `build:data`:
-- `src/data/database.json` - Main entity database
-- `src/data/entities.json` - Entity definitions
-- `src/data/backlinks.json` - Cross-references
-- `src/data/tagIndex.json` - Tag index
-- `src/data/pathRegistry.json` - URL path mappings
-- `src/data/pages.json` - Page metadata for scripts
+After running `build-data`:
+- `apps/web/src/data/database.json` — Main entity database
+- `apps/web/src/data/entities.json` — Entity definitions
+- `apps/web/src/data/backlinks.json` — Cross-references
+- `apps/web/src/data/tagIndex.json` — Tag index
+- `apps/web/src/data/pathRegistry.json` — URL path mappings
+- `apps/web/src/data/pages.json` — Page metadata for scripts
 
 ### Other Data Scripts
 
 ```bash
-npm run sync:descriptions    # Sync model descriptions from files
-npm run extract              # Extract data from pages
-npm run generate-yaml        # Generate YAML from data
-npm run cleanup-data         # Clean up data files
+pnpm crux tb sync:descriptions    # Sync model descriptions from files
+pnpm crux tb extract              # Extract data from pages
+pnpm crux tb generate-yaml        # Generate YAML from data
+pnpm crux tb cleanup-data         # Clean up data files
 ```
 
 ---
 
 ## Content Management CLI
 
-Unified tool for managing and improving content quality via `crux content`.
+Unified tool for managing and improving content quality via `pnpm crux w`.
 
 ### Commands
 
 ```bash
 # Improve pages
-npm run crux -- content improve <page-id>
+pnpm crux w improve <page-id>
 
 # Grade pages using Claude API
-npm run crux -- content grade --page scheming
-npm run crux -- content grade --limit 5 --apply
+pnpm crux w grade --page scheming
+pnpm crux w grade --limit 5 --apply
 
 # Regrade pages
-npm run crux -- content regrade --page scheming
+pnpm crux w regrade --page scheming
 
 # Create new pages
-npm run crux -- content create --type risk --file input.yaml
+pnpm crux w create "Page Title" --tier=standard
 ```
 
 ### Options
@@ -397,19 +403,19 @@ npm run crux -- content create --type risk --file input.yaml
 
 ```bash
 # Find URLs that can be converted to <R> components
-node scripts/map-urls-to-resources.mjs expertise-atrophy  # Specific file
-node scripts/map-urls-to-resources.mjs                     # All files
-node scripts/map-urls-to-resources.mjs --stats             # Statistics only
+pnpm crux w resources map expertise-atrophy   # Specific file
+pnpm crux w resources map                     # All files
+pnpm crux w resources map --stats             # Statistics only
 
 # Auto-convert markdown links to R components
-node scripts/convert-links-to-r.mjs --dry-run              # Preview
-node scripts/convert-links-to-r.mjs --apply                # Apply changes
+pnpm crux w resources convert --dry-run       # Preview
+pnpm crux w resources convert --apply         # Apply changes
 ```
 
 ### Export Resources
 
 ```bash
-node scripts/utils/export-resources.mjs        # Export resource data
+pnpm crux w resources export    # Export resource data
 ```
 
 ---
@@ -420,19 +426,19 @@ node scripts/utils/export-resources.mjs        # Export resource data
 
 ```bash
 # Generate a model page from YAML input
-npm run crux -- generate content --type model --file input.yaml
+pnpm crux w create "Model Name" --type model --file input.yaml
 
 # Generate a risk page
-npm run crux -- generate content --type risk --file input.yaml
+pnpm crux w create "Risk Name" --type risk --file input.yaml
 
 # Generate a response page
-npm run crux -- generate content --type response --file input.yaml
+pnpm crux w create "Response Name" --type response --file input.yaml
 ```
 
 ### Batch Summaries
 
 ```bash
-npm run crux -- generate summaries --batch 50  # Generate summaries for multiple pages
+pnpm crux w generate summaries --batch 50  # Generate summaries for multiple pages
 ```
 
 ---
@@ -440,9 +446,9 @@ npm run crux -- generate summaries --batch 50  # Generate summaries for multiple
 ## Testing
 
 ```bash
-npm run test            # Run all tests
-npm run test:lib        # Test library functions
-npm run test:validators # Test validator functions
+pnpm test            # Run all tests
+pnpm test:lib        # Test library functions
+pnpm test:validators # Test validator functions
 ```
 
 ---
@@ -450,10 +456,10 @@ npm run test:validators # Test validator functions
 ## Linting and Formatting
 
 ```bash
-npm run lint           # Check for linting issues
-npm run lint:fix       # Fix linting issues
-npm run format         # Format all files
-npm run format:check   # Check formatting without changing
+pnpm lint           # Check for linting issues
+pnpm lint:fix       # Fix linting issues
+pnpm format         # Format all files
+pnpm format:check   # Check formatting without changing
 ```
 
 ---
@@ -472,32 +478,30 @@ Scripts that generate intermediate output (like grading results) write here by d
 
 1. Find candidates:
    ```bash
-   node scripts/page-improver.mjs --list --max-qual 3
+   pnpm crux w improve --list --max-qual 3
    ```
 
-2. Get improvement prompt:
+2. Run improvement:
    ```bash
-   node scripts/page-improver.mjs economic-disruption
+   pnpm crux w improve economic-disruption --tier=standard --apply
    ```
 
-3. Run in Claude Code with the generated prompt
-
-4. Validate the result:
+3. Validate the result:
    ```bash
-   npm run crux -- validate compile
-   npm run crux -- validate templates
+   pnpm crux w validate compile
+   pnpm crux w validate gate
    ```
 
 ### Grade All New Pages
 
 1. Preview:
    ```bash
-   node scripts/grade-content.mjs --skip-graded --dry-run
+   pnpm crux w grade --skip-graded --dry-run
    ```
 
 2. Grade and apply:
    ```bash
-   node scripts/grade-content.mjs --skip-graded --apply --parallel 3
+   pnpm crux w grade --skip-graded --apply --parallel 3
    ```
 
 3. Review results:
@@ -508,12 +512,24 @@ Scripts that generate intermediate output (like grading results) write here by d
 ### Check Content Quality Before PR
 
 ```bash
-npm run validate
+pnpm crux w validate gate --fix
 ```
 
 ### Update After Editing entities.yaml
 
 ```bash
-npm run build:data
-npm run crux -- validate data
+pnpm build-data
+pnpm crux w validate data
 ```
+
+---
+
+[^rc-0a65]: Q5 quality standards are defined internally within this wiki's content pipeline documentation. Q5 maps to the 80–100 range on the grading scale and requires: Quick Assessment Table (5+ rows), 2+ substantive tables, 1+ Mermaid diagram, 10+ authoritative-source citations, quantified claims, and 800+ words of substantive content. See `crux/lib/page-templates.ts` for the authoritative implementation.
+
+[^rc-12d0]: [Pricing — Claude API Docs](https://platform.claude.com/docs/en/about-claude/pricing) — Anthropic, 2026. Claude Opus 4.5: \$5/MTok input, \$25/MTok output. Claude Sonnet 4.5: \$3/MTok input, \$15/MTok output. Batch API provides a flat 50% discount on all models (Sonnet 4.5 batch: \$1.50/\$7.50 per MTok). All cost estimates on this page are approximate, reflect typical token usage per page, and are subject to change with Anthropic pricing updates.
+
+[^rc-c0dc]: [Diagram Syntax | Mermaid](https://mermaid.js.org/intro/syntax-reference.html) — Mermaid.js project, 2026. Version 11.13.0 supports 25+ diagram types. All diagram definitions begin with a diagram type declaration; comments use `%%` notation; configuration via YAML frontmatter or `%%{ }%%` directives.
+
+[^rc-351d]: [Docs | MDX](https://mdxjs.com/docs/) — MDX project, 2026. Core compilation package `@mdx-js/mdx` with remark+rehype pipeline. Supports markdown, JSX, JavaScript expressions, and ESM imports/exports in one format.
+
+[^rc-f762]: [Firecrawl — Web Data API for AI](https://www.firecrawl.dev/pricing) — Firecrawl, 2026. Web scraping and crawling API; 1 credit per scraped page. Free tier provides 500 lifetime credits. The `FIRECRAWL_KEY` environment variable enables Firecrawl-backed fetching; the system falls back to a built-in fetch implementation if the key is absent.
