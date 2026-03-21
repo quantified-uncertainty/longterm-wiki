@@ -1,0 +1,38 @@
+entity: lG1LEx80wg
+facts:
+  - id: f_Aw3rT8mK5a
+    property: founded-date
+    value: "2016-09-28"
+    source: https://en.wikipedia.org/wiki/Partnership_on_AI
+    notes: "Publicly announced September 28, 2016 with founding members Amazon, Facebook, Google, DeepMind, Microsoft, and IBM"
+
+  - id: f_Cj7vN2xQ4b
+    property: headquarters
+    value: "San Francisco, California"
+    source: https://en.wikipedia.org/wiki/Partnership_on_AI
+    notes: "Headquartered in San Francisco"
+
+  - id: f_Eu9gL1sW6c
+    property: headcount
+    value: 68
+    asOf: 2026-02
+    source: https://www.linkedin.com/company/partnershipai
+    notes: "Approximately 68 employees across 5 continents"
+
+  - id: f_Hy4bP5tR8d
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://partnershiponai.org/funding/
+    notes: "Independent nonprofit funded by philanthropic and corporate contributions"
+
+  - id: f_Kz6dF3wM2e
+    property: website
+    value: "https://partnershiponai.org/"
+    source: https://partnershiponai.org/
+    notes: "Official website"
+
+  - id: f_Nr1hJ8vX5f
+    property: description
+    value: "Multi-stakeholder organization bringing together academics, civil society, industry, and media to advance understanding of AI technologies. Founded by six major tech companies, PAI now has over 100 partner organizations and focuses on responsible AI practices and guidelines."
+    asOf: 2026-03
+    source: https://partnershiponai.org/about/

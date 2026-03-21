@@ -1,0 +1,31 @@
+entity: w7mwNxGtCQ
+facts:
+  - id: f_Rk3mW9xP2a
+    property: founded-date
+    value: "2023-08"
+    source: https://theaipi.org/poll-shows-overwhelming-concern-about-risks-from-ai-as-new-institute-launches-to-understand-public-opinion-and-advocate-for-responsible-ai-policies/
+    notes: "Launched in August 2023 by Daniel Colson"
+
+  - id: f_Jn8vL4qT6b
+    property: headquarters
+    value: "Washington, DC"
+    source: https://theaipi.org/about/
+    notes: "Policy advocacy nonprofit based in Washington, DC"
+
+  - id: f_Xt2yH7wK5c
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://theaipi.org/about/
+    notes: "Research and advocacy non-profit"
+
+  - id: f_Qm6dF1sN9e
+    property: website
+    value: "https://theaipi.org/"
+    source: https://theaipi.org/
+    notes: "Official website"
+
+  - id: f_Bw4gC8rZ3f
+    property: description
+    value: "Research and advocacy nonprofit focused on seeking political solutions to catastrophic risks from emerging AI technology, known for conducting public opinion polling on AI policy issues."
+    asOf: 2026-03
+    source: https://theaipi.org/about/

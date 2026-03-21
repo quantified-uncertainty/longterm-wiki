@@ -1,0 +1,45 @@
+entity: hibH3GwFQA
+facts:
+  - id: f_Pm3nR8xV2g
+    property: founded-date
+    value: "1948"
+    source: https://en.wikipedia.org/wiki/RAND_Corporation
+    notes: "RAND became an independent nonprofit in 1948; originally started as a project in 1946"
+
+  - id: f_Yc7kJ5wT9h
+    property: headquarters
+    value: "Santa Monica, California"
+    source: https://en.wikipedia.org/wiki/RAND_Corporation
+    notes: "Main headquarters; additional offices in Arlington, Pittsburgh, and internationally"
+
+  - id: f_Dn1qL6sM4i
+    property: headcount
+    value: 2396
+    asOf: 2023-09
+    source: https://projects.propublica.org/nonprofits/organizations/951958142
+    notes: "From FY2023 Form 990 filing"
+
+  - id: f_Gz5bH2rK8j
+    property: revenue
+    value: 5.14e+8
+    asOf: 2024-09
+    source: https://www.rand.org/pubs/corporate_pubs/CPA1263.html
+    notes: "Revenues and other support for fiscal year ending September 2024"
+
+  - id: f_Wf9aE3tN7k
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://www.rand.org/about/faq.html
+    notes: "Independent nonprofit research organization"
+
+  - id: f_Sv4cX1mQ6l
+    property: website
+    value: "https://www.rand.org/"
+    source: https://www.rand.org/
+    notes: "Official website"
+
+  - id: f_Hp8dY6nZ5o
+    property: description
+    value: "Global policy think tank conducting research on national security, health, education, and emerging technologies including AI. The Meselson Center and Technology and Security Policy Center lead RAND's AI-related research on frontier AI security, autonomous systems, and cybersecurity."
+    asOf: 2026-03
+    source: https://www.rand.org/about.html
