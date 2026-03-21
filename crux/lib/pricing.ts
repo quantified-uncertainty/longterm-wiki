@@ -6,6 +6,14 @@
  *
  * Prices are in USD per million tokens.
  * Last verified against https://docs.anthropic.com/en/docs/about-claude/pricing
+ *
+ * Prompt caching pricing:
+ * - Cache write: 1.25x input price (25% premium)
+ * - Cache read: 0.1x input price (90% discount)
+ * - Non-cached input: standard input price
+ *
+ * Batch API pricing:
+ * - 50% discount on all token costs (input + output + cache)
  */
 
 export interface ModelPricing {
@@ -67,16 +75,35 @@ export function getModelPricing(model: string): ModelPricing | undefined {
   return undefined;
 }
 
+/** Extended usage that includes prompt caching fields from the Anthropic API. */
+export interface ExtendedUsage {
+  inputTokens: number;
+  outputTokens: number;
+  /** Tokens used to create a new cache entry (1.25x input price). */
+  cacheCreationInputTokens?: number;
+  /** Tokens read from an existing cache (0.1x input price). */
+  cacheReadInputTokens?: number;
+}
+
 /**
  * Calculate the cost of an API call given the model and token usage.
  *
+ * When prompt caching fields are present (cacheCreationInputTokens,
+ * cacheReadInputTokens), the cost is calculated as:
+ *   - Non-cached input: inputTokens * inputPerM
+ *   - Cache writes: cacheCreationInputTokens * inputPerM * 1.25
+ *   - Cache reads: cacheReadInputTokens * inputPerM * 0.1
+ *   - Output: outputTokens * outputPerM
+ *
  * @param model - Model ID or alias (e.g. "claude-sonnet-4-6" or "sonnet")
  * @param usage - Token counts from the API response
+ * @param options - Optional modifiers (e.g., batch discount)
  * @returns Cost in USD, or 0 if model pricing is unknown
  */
 export function calculateCost(
   model: string,
-  usage: { inputTokens: number; outputTokens: number },
+  usage: ExtendedUsage | { inputTokens: number; outputTokens: number },
+  options?: { batchDiscount?: boolean },
 ): number {
   const pricing = getModelPricing(model);
   if (!pricing) {
@@ -84,8 +111,25 @@ export function calculateCost(
     return 0;
   }
 
-  return (
-    (usage.inputTokens / 1_000_000) * pricing.inputPerM +
-    (usage.outputTokens / 1_000_000) * pricing.outputPerM
-  );
+  const ext = usage as ExtendedUsage;
+  const cacheCreation = ext.cacheCreationInputTokens ?? 0;
+  const cacheRead = ext.cacheReadInputTokens ?? 0;
+
+  // Non-cached input tokens (standard price)
+  const inputCost = (usage.inputTokens / 1_000_000) * pricing.inputPerM;
+  // Cache write tokens (25% premium)
+  const cacheWriteCost = (cacheCreation / 1_000_000) * pricing.inputPerM * 1.25;
+  // Cache read tokens (90% discount = 0.1x)
+  const cacheReadCost = (cacheRead / 1_000_000) * pricing.inputPerM * 0.1;
+  // Output tokens (standard price)
+  const outputCost = (usage.outputTokens / 1_000_000) * pricing.outputPerM;
+
+  let total = inputCost + cacheWriteCost + cacheReadCost + outputCost;
+
+  // Batch API: 50% discount on all token costs
+  if (options?.batchDiscount) {
+    total *= 0.5;
+  }
+
+  return total;
 }

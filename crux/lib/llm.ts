@@ -278,7 +278,8 @@ export function extractMdxContent(text: string): string {
 export interface StreamCallOptions {
   model?: string;
   maxTokens?: number;
-  systemPrompt?: string;
+  /** System prompt as a plain string or as TextBlockParam[] (for prompt caching). */
+  systemPrompt?: string | Anthropic.Messages.TextBlockParam[];
   temperature?: number;
   retryLabel?: string;
   heartbeatPhase?: string;
@@ -337,7 +338,8 @@ export async function streamLlmCall(
 export interface CallLlmOptions {
   model?: string;
   maxTokens?: number;
-  systemPrompt?: string;
+  /** System prompt as a plain string or as TextBlockParam[] (for prompt caching). */
+  systemPrompt?: string | Anthropic.Messages.TextBlockParam[];
   temperature?: number;
   retryLabel?: string;
   /** If provided, the call's usage is automatically recorded. */
@@ -376,10 +378,11 @@ export async function callLlm(
     label,
   } = options;
 
-  // Normalize prompt input
-  const system = typeof prompt === 'string'
-    ? (systemPrompt || '')
-    : prompt.system;
+  // Normalize prompt input: accept both string and TextBlockParam[]
+  const system: string | Anthropic.Messages.TextBlockParam[] | undefined =
+    typeof prompt === 'string'
+      ? (systemPrompt || undefined)
+      : prompt.system || undefined;
   const userPrompt = typeof prompt === 'string'
     ? prompt
     : prompt.user;
@@ -415,7 +418,8 @@ export type ToolHandler = (input: Record<string, unknown>) => Promise<string>;
 export interface AgentOptions {
   model?: string;
   maxTokens?: number;
-  systemPrompt?: string;
+  /** System prompt as a plain string or as TextBlockParam[] (for prompt caching). */
+  systemPrompt?: string | Anthropic.Messages.TextBlockParam[];
   tools?: Array<{
     name: string;
     description: string;

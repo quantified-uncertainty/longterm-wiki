@@ -134,6 +134,7 @@ export interface AutoUpdateOptions {
   skipFetch?: boolean;       // Skip RSS fetch (for CI smoke tests — verifies code paths only)
   sources?: string;          // Comma-separated source IDs to check
   check?: boolean;           // Health-check source URLs (used by sources --check)
+  batch?: boolean;           // Use Anthropic Batch API for improve phase (50% cost reduction)
   ci?: boolean;
   json?: boolean;
   verbose?: boolean;

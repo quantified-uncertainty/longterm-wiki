@@ -281,13 +281,13 @@ export async function runAgent(prompt: string, options: RunAgentOptions = {}): P
     model = MODELS.sonnet,
     maxTokens = 16000,
     tools = [],
-    systemPrompt = ''
+    systemPrompt,
   } = options;
 
   return runLlmAgent(getClient(), prompt, {
     model,
     maxTokens,
-    systemPrompt,
+    systemPrompt: systemPrompt || '',
     tools,
     toolHandlers: buildToolHandlers(),
     retryLabel: 'runAgent',
