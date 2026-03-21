@@ -51,6 +51,32 @@ export function writeMainOutputFiles({ database, outputFile }) {
     relatedGraph: _relatedGraph,
     ...databaseForOutput
   } = database;
+
+  // Strip dashboard-only fields from pages to reduce database.json size.
+  // These fields are only consumed by the dev-only PageStatus component
+  // (hidden by CSS default) and internal dashboard pages that fetch from
+  // the wiki-server API. Per-entity bundles retain the full page objects.
+  const DASHBOARD_ONLY_PAGE_FIELDS = [
+    'coverage',           // ~376 KB — structural completeness (PageStatus dev-only, internal dashboards)
+    'metrics',            // ~123 KB — structural metrics (PageStatus dev-only, internal dashboards)
+    'redundancy',         // ~25 KB  — similarity data (PageStatus dev-only)
+    'suggestedQuality',   // ~1.5 KB — auto-graded quality (PageStatus dev-only)
+    'unconvertedLinkCount', // ~0.7 KB — link conversion metric (PageStatus dev-only)
+    'unconvertedLinks',   // ~1.4 KB — not referenced in rendering code
+    'convertedLinkCount', // ~0.8 KB — link conversion metric (internal dashboards only)
+    'changeHistory',      // session change log (PageStatus dev-only)
+    'citationHealth',     // citation stats fallback (PageStatus dev-only; live data used when available)
+  ];
+  if (databaseForOutput.pages) {
+    databaseForOutput.pages = databaseForOutput.pages.map(page => {
+      const slimmed = { ...page };
+      for (const field of DASHBOARD_ONLY_PAGE_FIELDS) {
+        delete slimmed[field];
+      }
+      return slimmed;
+    });
+  }
+
   writeFileSync(outputFile, JSON.stringify(databaseForOutput, null, 2));
   const strippedKeys = [
     'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
@@ -58,6 +84,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
     'redundancyPairs', 'backlinks', 'relatedGraph',
   ];
   console.log(`\n✓ Written: ${outputFile} (stripped: entities, KB, experts, ${strippedKeys.join(', ')})`);
+  console.log(`  Page fields stripped: ${DASHBOARD_ONLY_PAGE_FIELDS.join(', ')}`);
 
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
