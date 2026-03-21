@@ -84,6 +84,8 @@ export interface FetchedSource {
   /** Paragraphs from content most relevant to the query (empty if no query or extractMode=full) */
   relevantExcerpts: string[];
   status: FetchedSourceStatus;
+  /** HTTP status code from the fetch response (0 if no response received, e.g. timeout/network error) */
+  httpStatus: number;
   /** Content type: 'html' (default), 'pdf' (extracted text), or 'transcript' (YouTube) */
   contentType?: FetchedSourceContentType;
   /** Resource metadata, present when the URL matched a known resource */
@@ -585,7 +587,7 @@ async function _fetchSourceCore(
   if (isUnverifiableDomain(url)) {
     const result: FetchedSource = {
       url, title: resource?.title ?? '', fetchedAt: now, content: '',
-      relevantExcerpts: [], status: 'error', resource: resourceMeta,
+      relevantExcerpts: [], status: 'error', httpStatus: 0, resource: resourceMeta,
     };
     sessionCacheSet(url, result);
     return result;
@@ -611,6 +613,7 @@ async function _fetchSourceCore(
         content: memoryCached.fullText,
         relevantExcerpts: excerpts,
         status: paywall ? 'paywall' : 'ok',
+        httpStatus: memoryCached.httpStatus ?? 200,
         contentType: memContentType,
         resource: resourceMeta,
       };
@@ -626,6 +629,7 @@ async function _fetchSourceCore(
       ? extractRelevantExcerpts(pgRow.content, query)
       : [];
     const paywall = detectPaywall(pgRow.content);
+    const pgHttpStatus = pgRow.httpStatus ?? 200;
     const result: FetchedSource = {
       url,
       title: pgRow.title || resource?.title || '',
@@ -633,11 +637,12 @@ async function _fetchSourceCore(
       content: pgRow.content,
       relevantExcerpts: excerpts,
       status: paywall ? 'paywall' : 'ok',
+      httpStatus: pgHttpStatus,
       contentType: pgRow.contentType,
       resource: resourceMeta,
     };
     // Store in memory cache so subsequent calls within this session are fast
-    saveToMemoryCache(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200, pgRow.contentType);
+    saveToMemoryCache(url, pgRow.title, pgRow.content, pgHttpStatus, pgRow.contentType);
     sessionCacheSet(url, result);
     return result;
   }
@@ -658,6 +663,7 @@ async function _fetchSourceCore(
       content,
       relevantExcerpts: excerpts,
       status,
+      httpStatus: content.length > 0 ? 200 : 0,
       contentType: 'transcript',
       resource: resourceMeta,
     };
@@ -750,7 +756,7 @@ async function _fetchSourceCore(
 
   const result: FetchedSource = {
     url, title: finalTitle, fetchedAt: now, content, relevantExcerpts: excerpts,
-    status, contentType: fetchedContentType, resource: resourceMeta,
+    status, httpStatus, contentType: fetchedContentType, resource: resourceMeta,
   };
 
   // ---- 9. Store in session cache ----
@@ -795,7 +801,9 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
   const resourceMeta = resource ? buildResourceMeta(resource) : undefined;
 
   // ---- 1. In-memory session cache ----
-  const cached = sessionCache.get(url);
+  // Skip session cache when maxAgeMs is explicitly 0 (force re-fetch)
+  const skipCache = request.maxAgeMs === 0;
+  const cached = skipCache ? undefined : sessionCache.get(url);
   if (cached) {
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(cached.content, query)

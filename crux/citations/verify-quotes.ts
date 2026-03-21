@@ -11,13 +11,8 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
+import { fetchSource } from '../lib/search/source-fetcher.ts';
 import {
-  getCachedContent,
-  setCachedContent,
-} from '../lib/citation/citation-content-cache.ts';
-import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation/citation-archive.ts';
-import {
-  getCitationContentByUrl,
   getQuotesByPage,
   getPagesWithQuotes,
   markQuoteVerified,
@@ -65,46 +60,15 @@ async function verifyQuotesForPage(
     let sourceText: string | null = null;
 
     if (q.url) {
-      if (refetch) {
-        // Re-fetch the source
-        const fetchResult = await fetchCitationUrl(q.url);
-        if (fetchResult.fullText) {
-          sourceText = fetchResult.fullText;
-          // Update in-memory cache
-          setCachedContent(q.url, {
-            url: q.url,
-            fetchedAt: new Date().toISOString(),
-            httpStatus: fetchResult.httpStatus,
-            contentType: fetchResult.contentType,
-            pageTitle: fetchResult.pageTitle,
-            fullText: fetchResult.fullText,
-            contentLength: fetchResult.contentLength,
-          });
-          // Also push to PostgreSQL for cross-environment access
-          saveFetchResultToPostgres(q.url, fetchResult);
-        }
-      } else {
-        // Use cached content: memory cache first, then PostgreSQL
-        const cached = getCachedContent(q.url);
-        if (cached?.fullText) {
-          sourceText = cached.fullText;
-        } else {
-          // Try PostgreSQL (cross-environment cache)
-          const pgResult = await getCitationContentByUrl(q.url);
-          if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
-            sourceText = pgResult.data.fullText;
-            // Store in memory cache for subsequent calls
-            setCachedContent(q.url, {
-              url: q.url,
-              fetchedAt: pgResult.data.fetchedAt,
-              httpStatus: pgResult.data.httpStatus,
-              contentType: pgResult.data.contentType,
-              pageTitle: pgResult.data.pageTitle,
-              fullText: pgResult.data.fullText,
-              contentLength: pgResult.data.contentLength,
-            });
-          }
-        }
+      // fetchSource handles multi-tier caching (session → PG → network).
+      // When refetch is requested, use maxAgeMs=0 to bypass cache TTL.
+      const source = await fetchSource({
+        url: q.url,
+        extractMode: 'full',
+        ...(refetch ? { maxAgeMs: 0 } : {}),
+      });
+      if (source.content && source.content.length > 0) {
+        sourceText = source.content;
       }
     }
 

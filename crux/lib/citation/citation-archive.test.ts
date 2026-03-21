@@ -1,20 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { extractClaimSentence, extractCitationsFromContent, verifyCitationsForPage } from './citation-archive.ts';
 
 // ---------------------------------------------------------------------------
 // Mocks for verifyCitationsForPage tests
 // ---------------------------------------------------------------------------
 
-// Mock citation-content-cache (in-memory cache)
-vi.mock('./citation-content-cache.ts', () => ({
-  getCachedContent: vi.fn(() => null),
-  setCachedContent: vi.fn(),
-}));
-
-// Mock wiki-server citations client (PostgreSQL)
-const mockUpsertCitationContent = vi.fn().mockResolvedValue({ ok: true, data: { url: 'mock' } });
-vi.mock('../wiki-server/citations.ts', () => ({
-  upsertCitationContent: (...args: unknown[]) => mockUpsertCitationContent(...args),
+// Mock source-fetcher (the unified fetch layer that citation-archive delegates to)
+const mockFetchSource = vi.fn();
+vi.mock('../search/source-fetcher.ts', () => ({
+  fetchSource: (...args: unknown[]) => mockFetchSource(...args),
 }));
 
 // Mock fs to prevent YAML archive writes during tests
@@ -36,6 +30,24 @@ vi.mock('fs', async () => {
     },
   };
 });
+
+// ---------------------------------------------------------------------------
+// Helper to create a FetchedSource mock
+// ---------------------------------------------------------------------------
+
+function makeFetchedSource(overrides: Record<string, unknown> = {}) {
+  return {
+    url: 'https://example.com/test',
+    title: 'Test Page',
+    fetchedAt: new Date().toISOString(),
+    content: 'Hello world content for testing',
+    relevantExcerpts: [],
+    status: 'ok',
+    httpStatus: 200,
+    contentType: 'html',
+    ...overrides,
+  };
+}
 
 describe('extractClaimSentence', () => {
   const sampleBody = `
@@ -244,203 +256,142 @@ Claim A.[^1] Claim B.[^2] Claim C.[^3] Claim D.[^4]
 });
 
 // ---------------------------------------------------------------------------
-// verifyCitationsForPage — PostgreSQL integration tests
+// verifyCitationsForPage — tests via source-fetcher mock
 // ---------------------------------------------------------------------------
 
-const SAMPLE_HTML = `<html><head><title>Test Page</title></head><body><p>Hello world content for testing</p></body></html>`;
-
-describe('verifyCitationsForPage — PostgreSQL writes', () => {
-  let fetchSpy: MockInstance;
-
+describe('verifyCitationsForPage', () => {
   beforeEach(() => {
-    mockUpsertCitationContent.mockClear();
-    fetchSpy = vi.spyOn(globalThis, 'fetch');
+    mockFetchSource.mockReset();
   });
 
-  afterEach(() => {
-    fetchSpy.mockRestore();
-  });
-
-  it('calls upsertCitationContent for verified URLs with content', async () => {
-    fetchSpy.mockResolvedValue(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html' },
+  it('marks verified for successful fetches (HTTP 200 with content)', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource({
+      url: 'https://example.com/test-page',
+      title: 'Test Page',
+      content: 'Hello world content for testing',
     }));
 
     const body = `Some claim.[^1]\n\n[^1]: [Test Source](https://example.com/test-page)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    expect(mockUpsertCitationContent).toHaveBeenCalledTimes(1);
-    const call = mockUpsertCitationContent.mock.calls[0][0];
-    expect(call.url).toBe('https://example.com/test-page');
-    expect(call.httpStatus).toBe(200);
-    expect(call.fullText).toContain('Hello world content');
-    expect(call.pageTitle).toBe('Test Page');
-    expect(call.contentLength).toBeGreaterThan(0);
-    expect(call.fetchedAt).toBeTruthy();
-  });
-
-  it('does NOT call upsertCitationContent for broken URLs (4xx)', async () => {
-    fetchSpy.mockResolvedValue(new Response('Not Found', {
-      status: 404,
-      headers: { 'content-type': 'text/html' },
-    }));
-
-    const body = `Some claim.[^1]\n\n[^1]: [Dead Link](https://example.com/missing)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
-  });
-
-  it('does NOT call upsertCitationContent for unverifiable domains', async () => {
-    const body = `Some claim.[^1]\n\n[^1]: [Tweet](https://twitter.com/user/status/123)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
-    // fetch should not even be called for unverifiable domains
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
-
-  it('calls upsertCitationContent for each URL when page has multiple citations', async () => {
-    // Must return a fresh Response each call (body can only be consumed once)
-    fetchSpy.mockImplementation(() => Promise.resolve(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html' },
-    })));
-
-    const body = `Claim A.[^1] Claim B.[^2]\n\n[^1]: [Source A](https://example.com/a)\n[^2]: [Source B](https://example.com/b)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    expect(mockUpsertCitationContent).toHaveBeenCalledTimes(2);
-    const urls = mockUpsertCitationContent.mock.calls.map((c: unknown[]) => (c[0] as { url: string }).url);
-    expect(urls).toContain('https://example.com/a');
-    expect(urls).toContain('https://example.com/b');
-  });
-
-  it('gracefully handles wiki-server failure (does not throw)', async () => {
-    mockUpsertCitationContent.mockRejectedValue(new Error('Connection refused'));
-
-    fetchSpy.mockResolvedValue(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html' },
-    }));
-
-    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/server-down)`;
-    // Should not throw even though PG write fails
     const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
 
     expect(archive.verified).toBe(1);
     expect(archive.citations[0].status).toBe('verified');
+    expect(archive.citations[0].httpStatus).toBe(200);
+    expect(archive.citations[0].pageTitle).toBe('Test Page');
+    expect(archive.citations[0].contentSnippet).toContain('Hello world');
   });
 
-  it('does NOT call upsertCitationContent for PDFs (no text content)', async () => {
-    fetchSpy.mockResolvedValue(new Response(null, {
-      status: 200,
-      headers: { 'content-type': 'application/pdf', 'content-length': '12345' },
+  it('marks broken for dead URLs (HTTP 404)', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource({
+      url: 'https://example.com/missing',
+      status: 'dead',
+      httpStatus: 404,
+      content: '',
+      title: '',
     }));
 
-    const body = `Some claim.[^1]\n\n[^1]: [Paper](https://example.com/paper.pdf)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
-  });
-
-  it('does NOT call upsertCitationContent for non-HTML content types', async () => {
-    fetchSpy.mockResolvedValue(new Response('plain text data', {
-      status: 200,
-      headers: { 'content-type': 'text/plain' },
-    }));
-
-    const body = `Some claim.[^1]\n\n[^1]: [Data File](https://example.com/data.txt)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    // Non-HTML responses don't have fullHtml/fullText extracted
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
-  });
-
-  it('passes correct field types to upsertCitationContent', async () => {
-    fetchSpy.mockResolvedValue(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html; charset=utf-8' },
-    }));
-
-    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/types-check)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    const call = mockUpsertCitationContent.mock.calls[0][0];
-    // Verify field types match UpsertCitationContentSchema expectations
-    expect(typeof call.url).toBe('string');
-    expect(typeof call.fetchedAt).toBe('string');
-    expect(typeof call.httpStatus).toBe('number');
-    expect(typeof call.fullText).toBe('string');
-    expect(typeof call.contentLength).toBe('number');
-    // contentType and pageTitle can be string or null
-    expect(call.contentType === null || typeof call.contentType === 'string').toBe(true);
-    expect(call.pageTitle === null || typeof call.pageTitle === 'string').toBe(true);
-  });
-
-  it('fetchedAt is a valid ISO 8601 datetime (matches Zod .datetime())', async () => {
-    fetchSpy.mockResolvedValue(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html' },
-    }));
-
-    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/datetime-test)`;
-    await verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    const call = mockUpsertCitationContent.mock.calls[0][0];
-    // Zod .datetime() expects ISO 8601: 2026-02-22T09:16:34.123Z
-    expect(call.fetchedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/);
-  });
-
-  it('does NOT call upsertCitationContent on fetch timeout', async () => {
-    // Use fake timers so retry delays resolve instantly
-    vi.useFakeTimers();
-
-    fetchSpy.mockImplementation(() => {
-      throw new Error('The operation was aborted due to timeout');
-    });
-
-    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/slow-site)`;
-    const promise = verifyCitationsForPage('test-page', body, { delayMs: 0 });
-
-    // Advance past all retry delays (2s + 4s)
-    await vi.advanceTimersByTimeAsync(10_000);
-    const archive = await promise;
-
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
-    // Timeout should mark as unverifiable, not broken
-    expect(archive.citations[0].status).toBe('unverifiable');
-
-    vi.useRealTimers();
-  });
-
-  it('does NOT call upsertCitationContent on network error', async () => {
-    fetchSpy.mockImplementation(() => {
-      throw new Error('ECONNREFUSED');
-    });
-
-    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/down-host)`;
+    const body = `Some claim.[^1]\n\n[^1]: [Dead Link](https://example.com/missing)`;
     const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
 
-    expect(mockUpsertCitationContent).not.toHaveBeenCalled();
+    expect(archive.broken).toBe(1);
     expect(archive.citations[0].status).toBe('broken');
   });
 
-  it('handles page with mix of verifiable and unverifiable citations', async () => {
-    fetchSpy.mockImplementation(() => Promise.resolve(new Response(SAMPLE_HTML, {
-      status: 200,
-      headers: { 'content-type': 'text/html' },
-    })));
+  it('marks unverifiable for unverifiable domains (social media)', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource({
+      url: 'https://twitter.com/user/status/123',
+      status: 'error',
+      httpStatus: 0,
+      content: '',
+      title: '',
+    }));
+
+    const body = `Some claim.[^1]\n\n[^1]: [Tweet](https://twitter.com/user/status/123)`;
+    const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
+
+    // Unverifiable domains return httpStatus 0, which maps to 'unverifiable'
+    expect(archive.citations[0].status).toBe('unverifiable');
+    // fetchSource is called (it handles unverifiable domains internally)
+    expect(mockFetchSource).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles multiple citations on a page', async () => {
+    mockFetchSource.mockImplementation(({ url }: { url: string }) =>
+      Promise.resolve(makeFetchedSource({ url, content: `Content for ${url}` })),
+    );
+
+    const body = `Claim A.[^1] Claim B.[^2]\n\n[^1]: [Source A](https://example.com/a)\n[^2]: [Source B](https://example.com/b)`;
+    const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
+
+    expect(archive.verified).toBe(2);
+    expect(archive.totalCitations).toBe(2);
+    expect(mockFetchSource).toHaveBeenCalledTimes(2);
+  });
+
+  it('gracefully handles fetch errors (does not throw)', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource({
+      status: 'error',
+      httpStatus: 0,
+      content: '',
+      title: '',
+    }));
+
+    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/server-down)`;
+    const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
+
+    // Should not throw — httpStatus 0 maps to 'unverifiable' (covers timeouts and network errors)
+    expect(archive.citations[0].status).toBe('unverifiable');
+  });
+
+  it('marks unverifiable for timeout errors (httpStatus 0)', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource({
+      status: 'error',
+      httpStatus: 0,
+      content: '',
+      title: '',
+    }));
+
+    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/slow-site)`;
+    const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
+
+    // httpStatus 0 (timeout, network error, unverifiable domain) → 'unverifiable'
+    expect(archive.citations[0].status).toBe('unverifiable');
+  });
+
+  it('handles mixed verifiable and unverifiable citations', async () => {
+    mockFetchSource.mockImplementation(({ url }: { url: string }) => {
+      if (url.includes('twitter.com')) {
+        return Promise.resolve(makeFetchedSource({
+          url,
+          status: 'error',
+          httpStatus: 0,
+          content: '',
+          title: '',
+        }));
+      }
+      return Promise.resolve(makeFetchedSource({
+        url,
+        content: 'Real content',
+      }));
+    });
 
     const body = `Claim A.[^1] Claim B.[^2] Claim C.[^3]\n\n[^1]: [Source](https://example.com/good)\n[^2]: [Tweet](https://twitter.com/user/123)\n[^3]: [Source](https://example.com/also-good)`;
+    const archive = await verifyCitationsForPage('test-page', body, { delayMs: 0 });
+
+    expect(archive.verified).toBe(2);
+    expect(archive.unverifiable).toBe(1); // twitter.com → httpStatus 0 → unverifiable
+    expect(mockFetchSource).toHaveBeenCalledTimes(3);
+  });
+
+  it('delegates to fetchSource with extractMode full', async () => {
+    mockFetchSource.mockResolvedValue(makeFetchedSource());
+
+    const body = `Some claim.[^1]\n\n[^1]: [Source](https://example.com/test)`;
     await verifyCitationsForPage('test-page', body, { delayMs: 0 });
 
-    // Only 2 PG writes: example.com/good and example.com/also-good (not twitter)
-    expect(mockUpsertCitationContent).toHaveBeenCalledTimes(2);
-    const urls = mockUpsertCitationContent.mock.calls.map((c: unknown[]) => (c[0] as { url: string }).url);
-    expect(urls).toContain('https://example.com/good');
-    expect(urls).toContain('https://example.com/also-good');
-    expect(urls).not.toContain('https://twitter.com/user/123');
+    expect(mockFetchSource).toHaveBeenCalledWith({
+      url: 'https://example.com/test',
+      extractMode: 'full',
+    });
   });
 });

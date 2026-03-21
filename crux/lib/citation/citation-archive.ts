@@ -9,7 +9,7 @@
  * Data is stored in data/citation-archive/<page-id>.yaml.
  *
  * Usage:
- *   import { readCitationArchive, writeCitationArchive, extractCitationsFromContent, saveFetchResultToPostgres } from './citation-archive.ts';
+ *   import { readCitationArchive, writeCitationArchive, extractCitationsFromContent } from './citation-archive.ts';
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */
@@ -17,8 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { setCachedContent } from './citation-content-cache.ts';
-import { upsertCitationContent } from '../wiki-server/citations.ts';
+import { fetchSource, type FetchedSource } from '../search/source-fetcher.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -375,73 +374,8 @@ export function extractClaimSentence(body: string, footnoteNum: number): string 
 }
 
 // ---------------------------------------------------------------------------
-// Content fetching
+// Content fetching — delegates to source-fetcher.ts (single fetch layer)
 // ---------------------------------------------------------------------------
-
-const FETCH_TIMEOUT_MS = 15000;
-const FETCH_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiCitationVerifier/1.0)';
-
-/** Domains that block automated access — mark as unverifiable */
-const UNVERIFIABLE_DOMAINS = [
-  'twitter.com', 'x.com', 'linkedin.com', 'facebook.com', 't.co',
-  'instagram.com', 'tiktok.com',
-];
-
-/** Domains known to be reliable but that block scraping */
-const SKIP_SCRAPE_DOMAINS = [
-  'academic.oup.com', 'jstor.org', 'dl.acm.org', 'ieee.org',
-  'proceedings.neurips.cc', 'cambridge.org',
-];
-
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return 'unknown';
-  }
-}
-
-function isUnverifiable(url: string): boolean {
-  const domain = getDomain(url);
-  return UNVERIFIABLE_DOMAINS.some(d => domain === d || domain.endsWith('.' + d));
-}
-
-function isSkipScrape(url: string): boolean {
-  const domain = getDomain(url);
-  return SKIP_SCRAPE_DOMAINS.some(d => domain === d || domain.endsWith('.' + d));
-}
-
-/** Extract <title> from HTML */
-function extractTitle(html: string): string | null {
-  const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  if (!match) return null;
-  return match[1]
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-/** Strip HTML tags and extract text content */
-function extractTextContent(html: string): string {
-  return html
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
-    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 export interface FetchResult {
   httpStatus: number;
@@ -449,192 +383,74 @@ export interface FetchResult {
   contentSnippet: string | null;
   contentLength: number;
   contentType: string | null;
-  fullHtml: string | null;
   fullText: string | null;
   error: string | null;
 }
 
-/**
- * Fetch a URL and extract metadata for citation verification.
- * Returns page title, content snippet, and HTTP status.
- */
-export async function fetchCitationUrl(url: string): Promise<FetchResult> {
-  if (isUnverifiable(url)) {
-    return {
-      httpStatus: -1,
-      pageTitle: null,
-      contentSnippet: null,
-      contentLength: 0,
-      contentType: null,
-      fullHtml: null,
-      fullText: null,
-      error: 'unverifiable domain (social media)',
-    };
+/** Map source-fetcher content type to MIME string. */
+function contentTypeToMime(ct: string | undefined): string | null {
+  if (ct === 'pdf') return 'application/pdf';
+  if (ct === 'transcript') return 'text/plain';
+  if (ct === 'html') return 'text/html';
+  return ct ?? null;
+}
+
+/** Convert a FetchedSource to the legacy FetchResult format. */
+function sourceToFetchResult(source: FetchedSource): FetchResult {
+  let errorMsg: string | null = null;
+  if (source.status === 'error') {
+    errorMsg = 'fetch error';
+  } else if (source.status === 'dead') {
+    errorMsg = `HTTP ${source.httpStatus}`;
   }
 
-  const MAX_RETRIES = 2;
-
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': FETCH_USER_AGENT,
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-        redirect: 'follow',
-      });
-
-      const status = response.status;
-      const contentType = response.headers.get('content-type') || '';
-
-      // Retry on 5xx server errors and 429 rate limits
-      if ((status >= 500 || status === 429) && attempt < MAX_RETRIES) {
-        const delay = Math.pow(2, attempt + 1) * 1000;
-        await new Promise((r) => setTimeout(r, delay));
-        continue;
-      }
-
-      if (!response.ok) {
-        return {
-          httpStatus: status,
-          pageTitle: null,
-          contentSnippet: null,
-          contentLength: 0,
-          contentType,
-          fullHtml: null,
-          fullText: null,
-          error: `HTTP ${status}`,
-        };
-      }
-
-      const isHtml = contentType.includes('text/html') || contentType.includes('application/xhtml');
-      const isPdf = contentType.includes('application/pdf');
-
-      if (isPdf) {
-        return {
-          httpStatus: status,
-          pageTitle: '(PDF document)',
-          contentSnippet: null,
-          contentLength: parseInt(response.headers.get('content-length') || '0', 10),
-          contentType,
-          fullHtml: null,
-          fullText: null,
-          error: null,
-        };
-      }
-
-      if (!isHtml) {
-        return {
-          httpStatus: status,
-          pageTitle: null,
-          contentSnippet: `(non-HTML content: ${contentType})`,
-          contentLength: parseInt(response.headers.get('content-length') || '0', 10),
-          contentType,
-          fullHtml: null,
-          fullText: null,
-          error: null,
-        };
-      }
-
-      const html = await response.text();
-      const title = extractTitle(html);
-      const text = extractTextContent(html);
-      const snippet = text.slice(0, 500);
-
-      return {
-        httpStatus: status,
-        pageTitle: title,
-        contentSnippet: snippet || null,
-        contentLength: html.length,
-        contentType,
-        fullHtml: html,
-        fullText: text,
-        error: null,
-      };
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      const isTransient = message.includes('abort') || message.includes('ECONNRESET')
-        || message.includes('socket hang up') || message.includes('timeout');
-
-      // Retry transient network errors
-      if (isTransient && attempt < MAX_RETRIES) {
-        const delay = Math.pow(2, attempt + 1) * 1000;
-        await new Promise((r) => setTimeout(r, delay));
-        continue;
-      }
-
-      return {
-        httpStatus: 0,
-        pageTitle: null,
-        contentSnippet: null,
-        contentLength: 0,
-        contentType: null,
-        fullHtml: null,
-        fullText: null,
-        error: message.includes('abort') ? 'timeout' : message,
-      };
-    }
-  }
-
-  // Unreachable, but TypeScript needs it
   return {
-    httpStatus: 0, pageTitle: null, contentSnippet: null, contentLength: 0,
-    contentType: null, fullHtml: null, fullText: null, error: 'max retries exceeded',
+    httpStatus: source.httpStatus,
+    pageTitle: source.title || null,
+    contentSnippet: source.content ? source.content.slice(0, 500) : null,
+    contentLength: source.content.length,
+    contentType: contentTypeToMime(source.contentType),
+    fullText: source.content || null,
+    error: errorMsg,
   };
 }
 
 /**
- * Store full fetched content in the in-memory session cache.
- * PG is the durable store; this avoids redundant API calls within a session.
- * Best-effort: errors are swallowed so verification isn't blocked.
- */
-function storeCitationContent(
-  url: string,
-  result: FetchResult,
-) {
-  try {
-    setCachedContent(url, {
-      url,
-      fetchedAt: new Date().toISOString(),
-      httpStatus: result.httpStatus,
-      contentType: result.contentType,
-      pageTitle: result.pageTitle,
-      fullText: result.fullText,
-      contentLength: result.contentLength,
-    });
-  } catch {
-    // In-memory cache storage is best-effort — don't fail verification
-  }
-}
-
-/**
- * Fire-and-forget write of fetched content to PostgreSQL (wiki-server).
- * Mirrors source-fetcher.ts::saveToPostgres — errors are silently ignored
- * so the calling operation isn't blocked when the wiki-server is unavailable.
+ * Fetch a URL and extract metadata for citation verification.
  *
- * Exported so extract-quotes and verify-quotes can also push content to PG.
+ * Delegates to source-fetcher.ts which handles:
+ * - Multi-tier caching (session → PG → network)
+ * - Firecrawl, PDF, YouTube transcript support
+ * - arXiv → ar5iv rewriting
+ * - In-flight deduplication
+ * - Retry with exponential backoff
+ *
+ * Returns a FetchResult for backward compatibility with callers that
+ * use the legacy interface.
  */
-export function saveFetchResultToPostgres(url: string, result: FetchResult): void {
-  if (!result.fullText && !result.fullHtml) return;
-  const text = result.fullText || '';
-  if (text.length === 0) return;
-
-  upsertCitationContent({
-    url,
-    fetchedAt: new Date().toISOString(),
-    httpStatus: result.httpStatus,
-    contentType: result.contentType ?? null,
-    pageTitle: result.pageTitle ?? null,
-    fullText: text,
-    contentLength: result.contentLength,
-  }).catch((e) => console.warn('[citation-archive] PG write failed:', e.message));
+export async function fetchCitationUrl(url: string): Promise<FetchResult> {
+  const source = await fetchSource({ url, extractMode: 'full' });
+  return sourceToFetchResult(source);
 }
 
 /**
- * Verify all citations on a page: fetch each URL, store results.
- * Metadata is saved to YAML (in git). Full content is stored in the in-memory
- * session cache and PostgreSQL (wiki-server) for cross-environment access.
+ * Map a FetchResult (from fetchCitationUrl → source-fetcher) to a VerificationStatus.
+ *
+ * source-fetcher returns httpStatus=0 for both unverifiable domains and network errors.
+ * We map httpStatus 0 → 'unverifiable' (matches the old behavior for timeouts and
+ * social media domains). HTTP 200-399 → 'verified'. Everything else → 'broken'.
+ */
+function resultToVerificationStatus(result: FetchResult): VerificationStatus {
+  if (result.httpStatus === 0) return 'unverifiable';
+  if (result.httpStatus >= 200 && result.httpStatus < 400) return 'verified';
+  return 'broken';
+}
+
+/**
+ * Verify all citations on a page: fetch each URL via source-fetcher, store results.
+ *
+ * Metadata is saved to YAML (in git). Full content caching (in-memory + PostgreSQL)
+ * is handled automatically by the source-fetcher layer — no separate cache writes needed.
  */
 export async function verifyCitationsForPage(
   pageId: string,
@@ -658,66 +474,24 @@ export async function verifyCitationsForPage(
           process.stdout.write(`  [^${ext.footnote}] ${ext.url.slice(0, 60)}...`);
         }
 
-        let record: CitationRecord;
+        // fetchCitationUrl delegates to source-fetcher which handles unverifiable
+        // domains, caching, retries, and PG writes internally
+        const result = await fetchCitationUrl(ext.url);
+        const status = resultToVerificationStatus(result);
 
-        if (isUnverifiable(ext.url)) {
-          record = {
-            footnote: ext.footnote,
-            url: ext.url,
-            linkText: ext.linkText,
-            claimContext: ext.claimContext,
-            fetchedAt: new Date().toISOString(),
-            httpStatus: null,
-            pageTitle: null,
-            contentSnippet: null,
-            contentLength: null,
-            status: 'unverifiable',
-            note: 'Social media domain — cannot verify automatically',
-          };
-        } else if (isSkipScrape(ext.url)) {
-          const result = await fetchCitationUrl(ext.url);
-          record = {
-            footnote: ext.footnote,
-            url: ext.url,
-            linkText: ext.linkText,
-            claimContext: ext.claimContext,
-            fetchedAt: new Date().toISOString(),
-            httpStatus: result.httpStatus,
-            pageTitle: result.pageTitle,
-            contentSnippet: null,
-            contentLength: result.contentLength,
-            status: result.httpStatus >= 200 && result.httpStatus < 400 ? 'verified' : 'broken',
-            note: result.error ? `Academic publisher: ${result.error}` : 'Academic publisher — URL accessible',
-          };
-          // Store whatever content we got from academic publishers
-          storeCitationContent(ext.url, result);
-          saveFetchResultToPostgres(ext.url, result);
-        } else {
-          const result = await fetchCitationUrl(ext.url);
-          const status: VerificationStatus =
-            result.httpStatus >= 200 && result.httpStatus < 400 ? 'verified' :
-            result.httpStatus === 0 && result.error === 'timeout' ? 'unverifiable' :
-            'broken';
-
-          record = {
-            footnote: ext.footnote,
-            url: ext.url,
-            linkText: ext.linkText,
-            claimContext: ext.claimContext,
-            fetchedAt: new Date().toISOString(),
-            httpStatus: result.httpStatus,
-            pageTitle: result.pageTitle,
-            contentSnippet: result.contentSnippet,
-            contentLength: result.contentLength,
-            status,
-            note: result.error,
-          };
-          // Store full HTML + text content in memory cache + PostgreSQL
-          if (result.fullHtml || result.fullText) {
-            storeCitationContent(ext.url, result);
-            saveFetchResultToPostgres(ext.url, result);
-          }
-        }
+        const record: CitationRecord = {
+          footnote: ext.footnote,
+          url: ext.url,
+          linkText: ext.linkText,
+          claimContext: ext.claimContext,
+          fetchedAt: new Date().toISOString(),
+          httpStatus: result.httpStatus,
+          pageTitle: result.pageTitle,
+          contentSnippet: result.contentSnippet,
+          contentLength: result.contentLength,
+          status,
+          note: result.error,
+        };
 
         if (verbose) {
           const icon = record.status === 'verified' ? ' ✓' :
