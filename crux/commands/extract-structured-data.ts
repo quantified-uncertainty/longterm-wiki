@@ -35,6 +35,7 @@ import { CostTracker } from '../lib/cost-tracker.ts';
 import { fetchSource } from '../lib/search/source-fetcher.ts';
 import { createLogger } from '../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../lib/cli.ts';
+import { parseFootnotes as parseFootnotesLib, type ParsedFootnote } from '../lib/footnote-parser.ts';
 
 // ---------------------------------------------------------------------------
 // Types — Person (original biographical extraction)
@@ -62,6 +63,7 @@ interface PublicationEntry {
 }
 
 interface PersonExtractedData {
+  kind: 'person';
   education: EducationEntry[];
   roles: RoleEntry[];
   publications: PublicationEntry[];
@@ -90,6 +92,7 @@ interface ProductEntry {
 }
 
 interface OrganizationExtractedData {
+  kind: 'organization';
   foundedYear: number | null;
   headquarters: string | null;
   funding: FundingEntry[];
@@ -113,6 +116,7 @@ interface PricingInfo {
 }
 
 interface AiModelExtractedData {
+  kind: 'ai-model';
   releaseDate: string | null;
   developer: string | null;
   parameterCount: string | null;
@@ -138,6 +142,7 @@ interface StakeholderEntry {
 }
 
 interface PolicyExtractedData {
+  kind: 'policy';
   introducedDate: string | null;
   status: string | null;
   jurisdiction: string | null;
@@ -156,6 +161,7 @@ interface RelatedEntityEntry {
 }
 
 interface DefaultExtractedData {
+  kind: 'default';
   description: string | null;
   keyFacts: string[];
   relatedEntities: RelatedEntityEntry[];
@@ -330,8 +336,8 @@ function loadAllEntityYamls(): { entries: EntityYamlEntry[]; fileByEntityId: Map
           fileByEntityId.set(entry.id, file);
         }
       }
-    } catch {
-      // Skip invalid files
+    } catch (err: unknown) {
+      console.warn(`Warning: Failed to parse YAML file ${file}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -393,8 +399,8 @@ function findMdxFile(entityIdOrWikiId: string, entityType?: string): string | nu
       const files = readdirSync(searchDir);
       const match = files.find((f) => f === `${entityIdOrWikiId}.mdx`);
       if (match) return join(searchDir, match);
-    } catch {
-      // Directory read failed — skip
+    } catch (err: unknown) {
+      console.warn(`Warning: Failed to read directory ${searchDir}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -433,7 +439,7 @@ function resolveEntityType(entity: EntityYamlEntry): string {
 }
 
 // ---------------------------------------------------------------------------
-// Footnote parsing
+// Footnote parsing — delegates to crux/lib/footnote-parser.ts
 // ---------------------------------------------------------------------------
 
 interface Footnote {
@@ -445,22 +451,30 @@ interface Footnote {
 /**
  * Parse footnote definitions from MDX source.
  * Returns a map of footnote ID -> { text, url }.
+ *
+ * Uses the shared footnote-parser library for numeric footnotes ([^1], [^2]) and
+ * supplements with a regex pass for named footnotes ([^ref-id], [^cheapcheck]) which
+ * the library does not handle.
  */
-function parseFootnotes(mdxContent: string): Map<string, Footnote> {
+function parseFootnoteMap(mdxContent: string): Map<string, Footnote> {
   const footnotes = new Map<string, Footnote>();
 
-  // Match footnote definitions like [^ref-id]: Description text. https://url.com
-  const footnotePattern = /^\[(\^[^\]]+)\]:\s*(.+)$/gm;
+  // Use the shared library for numeric footnotes
+  const libFootnotes: ParsedFootnote[] = parseFootnotesLib(mdxContent);
+  for (const fn of libFootnotes) {
+    const id = `^${fn.number}`;
+    footnotes.set(id, { id, text: fn.rawText, url: fn.url });
+  }
+
+  // Supplement: capture named (non-numeric) footnotes the library doesn't handle
+  const namedPattern = /^\[(\^[a-zA-Z][^\]]*)\]:\s*(.+)$/gm;
   let match: RegExpExecArray | null;
-
-  while ((match = footnotePattern.exec(mdxContent)) !== null) {
-    const id = match[1]; // e.g., "^rc-d679"
+  while ((match = namedPattern.exec(mdxContent)) !== null) {
+    const id = match[1];
+    if (footnotes.has(id)) continue; // already captured
     const text = match[2].trim();
-
-    // Extract URL from the footnote text (last URL-like thing in the line)
-    const urlMatch = text.match(/(https?:\/\/[^\s)]+)(?:\s*$)/);
+    const urlMatch = text.match(/(https?:\/\/[^\s)]+)/);
     const url = urlMatch ? urlMatch[1] : null;
-
     footnotes.set(id, { id, text, url });
   }
 
@@ -469,7 +483,7 @@ function parseFootnotes(mdxContent: string): Map<string, Footnote> {
 
 /**
  * Extract footnote references used in a specific section of text.
- * Returns footnote IDs like ["^rc-d679", "^rc-02ec"].
+ * Returns footnote IDs like ["^rc-d679", "^rc-02ec", "^1"].
  */
 function extractFootnoteRefs(text: string): string[] {
   const refs: string[] = [];
@@ -627,6 +641,7 @@ ${commonRules}
 
 function validateOrganizationData(parsed: Record<string, unknown>): OrganizationExtractedData {
   return {
+    kind: 'organization',
     foundedYear: typeof parsed.foundedYear === 'number' ? parsed.foundedYear : null,
     headquarters: typeof parsed.headquarters === 'string' && parsed.headquarters.length > 0 ? parsed.headquarters : null,
     funding: validateFunding(parsed.funding),
@@ -675,6 +690,7 @@ function validateProducts(raw: unknown): ProductEntry[] {
 function validateAiModelData(parsed: Record<string, unknown>): AiModelExtractedData {
   const pricing = parsed.pricing as Record<string, unknown> | undefined;
   return {
+    kind: 'ai-model',
     releaseDate: typeof parsed.releaseDate === 'string' && parsed.releaseDate.length > 0 ? parsed.releaseDate : null,
     developer: typeof parsed.developer === 'string' && parsed.developer.length > 0 ? parsed.developer : null,
     parameterCount: typeof parsed.parameterCount === 'string' && parsed.parameterCount.length > 0 ? parsed.parameterCount : null,
@@ -702,6 +718,7 @@ function validateBenchmarkScores(raw: unknown): BenchmarkScoreEntry[] {
 
 function validatePolicyData(parsed: Record<string, unknown>): PolicyExtractedData {
   return {
+    kind: 'policy',
     introducedDate: typeof parsed.introducedDate === 'string' && parsed.introducedDate.length > 0 ? parsed.introducedDate : null,
     status: typeof parsed.status === 'string' && parsed.status.length > 0 ? parsed.status : null,
     jurisdiction: typeof parsed.jurisdiction === 'string' && parsed.jurisdiction.length > 0 ? parsed.jurisdiction : null,
@@ -739,6 +756,7 @@ function validateStakeholders(raw: unknown): StakeholderEntry[] {
 
 function validateDefaultData(parsed: Record<string, unknown>): DefaultExtractedData {
   return {
+    kind: 'default',
     description: typeof parsed.description === 'string' && parsed.description.length > 0 ? parsed.description : null,
     keyFacts: validateStringArray(parsed.keyFacts),
     relatedEntities: validateRelatedEntities(parsed.relatedEntities),
@@ -801,6 +819,7 @@ function validateExtractedData(parsed: Record<string, unknown>, entityType: stri
   switch (entityType) {
     case 'person':
       return {
+        kind: 'person' as const,
         education: validateEducation(parsed.education),
         roles: validateRoles(parsed.roles),
         publications: validatePublications(parsed.publications),
@@ -944,7 +963,7 @@ RULES:
  */
 function buildClaimsToVerify(
   extracted: ExtractedData,
-  entityType: string,
+  _entityType: string,
   mdxContent: string,
   footnotes: Map<string, Footnote>,
 ): Array<{
@@ -973,74 +992,69 @@ function buildClaimsToVerify(
     });
   };
 
-  switch (entityType) {
+  switch (extracted.kind) {
     case 'person': {
-      const data = extracted as PersonExtractedData;
-      for (const edu of data.education) {
+      for (const edu of extracted.education) {
         const desc = `${edu.degree} from ${edu.institution}${edu.year ? ` (${edu.year})` : ''}`;
         addClaim('education', desc, edu.institution, edu);
       }
-      for (const role of data.roles) {
+      for (const role of extracted.roles) {
         const desc = `${role.title} at ${role.organization}${role.startYear ? ` (${role.startYear}${role.endYear ? `-${role.endYear}` : '+'})` : ''}`;
         addClaim('roles', desc, role.organization, role);
       }
-      if (data.birthYear !== null) {
-        addClaim('birthYear', `Born in ${data.birthYear}`, 'born', data.birthYear);
+      if (extracted.birthYear !== null) {
+        addClaim('birthYear', `Born in ${extracted.birthYear}`, 'born', extracted.birthYear);
       }
       break;
     }
 
     case 'organization': {
-      const data = extracted as OrganizationExtractedData;
-      if (data.foundedYear !== null) {
-        addClaim('foundedYear', `Founded in ${data.foundedYear}`, 'founded', data.foundedYear);
+      if (extracted.foundedYear !== null) {
+        addClaim('foundedYear', `Founded in ${extracted.foundedYear}`, 'founded', extracted.foundedYear);
       }
-      if (data.headquarters) {
-        addClaim('headquarters', `Headquarters: ${data.headquarters}`, 'headquarters', data.headquarters);
+      if (extracted.headquarters) {
+        addClaim('headquarters', `Headquarters: ${extracted.headquarters}`, 'headquarters', extracted.headquarters);
       }
-      for (const fund of data.funding) {
+      for (const fund of extracted.funding) {
         addClaim('funding', `${fund.amount} from ${fund.source}${fund.year ? ` (${fund.year})` : ''}`, fund.source, fund);
       }
-      for (const person of data.keyPersonnel) {
+      for (const person of extracted.keyPersonnel) {
         addClaim('keyPersonnel', `${person.name} as ${person.title}`, person.name, person);
       }
       break;
     }
 
     case 'ai-model': {
-      const data = extracted as AiModelExtractedData;
-      if (data.developer) {
-        addClaim('developer', `Developed by ${data.developer}`, data.developer, data.developer);
+      if (extracted.developer) {
+        addClaim('developer', `Developed by ${extracted.developer}`, extracted.developer, extracted.developer);
       }
-      if (data.releaseDate) {
-        addClaim('releaseDate', `Released ${data.releaseDate}`, 'release', data.releaseDate);
+      if (extracted.releaseDate) {
+        addClaim('releaseDate', `Released ${extracted.releaseDate}`, 'release', extracted.releaseDate);
       }
-      if (data.parameterCount) {
-        addClaim('parameterCount', `${data.parameterCount} parameters`, 'parameter', data.parameterCount);
+      if (extracted.parameterCount) {
+        addClaim('parameterCount', `${extracted.parameterCount} parameters`, 'parameter', extracted.parameterCount);
       }
-      for (const score of data.benchmarkScores) {
+      for (const score of extracted.benchmarkScores) {
         addClaim('benchmarkScores', `${score.benchmark}: ${score.score}`, score.benchmark, score);
       }
       break;
     }
 
     case 'policy': {
-      const data = extracted as PolicyExtractedData;
-      if (data.status) {
-        addClaim('status', `Status: ${data.status}`, 'status', data.status);
+      if (extracted.status) {
+        addClaim('status', `Status: ${extracted.status}`, 'status', extracted.status);
       }
-      if (data.sponsor) {
-        addClaim('sponsor', `Sponsored by ${data.sponsor}`, data.sponsor, data.sponsor);
+      if (extracted.sponsor) {
+        addClaim('sponsor', `Sponsored by ${extracted.sponsor}`, extracted.sponsor, extracted.sponsor);
       }
-      for (const stakeholder of data.stakeholders) {
+      for (const stakeholder of extracted.stakeholders) {
         addClaim('stakeholders', `${stakeholder.name}: ${stakeholder.position}`, stakeholder.name, stakeholder);
       }
       break;
     }
 
-    default: {
-      const data = extracted as DefaultExtractedData;
-      for (const fact of data.keyFacts) {
+    case 'default': {
+      for (const fact of extracted.keyFacts) {
         // Use first 3 words as keyword for footnote search
         const keyword = fact.split(/\s+/).slice(0, 3).join(' ');
         addClaim('keyFacts', fact, keyword, fact);
@@ -1065,7 +1079,7 @@ async function verifyExtractedData(
   log: ReturnType<typeof createLogger>,
 ): Promise<VerifiedClaim[]> {
   const c = log.colors;
-  const footnotes = parseFootnotes(mdxContent);
+  const footnotes = parseFootnoteMap(mdxContent);
   const claims: VerifiedClaim[] = [];
 
   // Build claims to verify based on entity type
@@ -1221,7 +1235,7 @@ function setCustomField(entity: EntityYamlEntry, label: string, value: string): 
 function applyToEntity(
   entity: EntityYamlEntry,
   extracted: ExtractedData,
-  entityType: string,
+  _entityType: string,
   verifiedClaims: VerifiedClaim[],
   requireVerification: boolean,
 ): string[] {
@@ -1244,13 +1258,11 @@ function applyToEntity(
     return fieldClaims.some((c) => c.verified && c.confidence >= 0.7);
   };
 
-  switch (entityType) {
+  switch (extracted.kind) {
     case 'person': {
-      const data = extracted as PersonExtractedData;
-
       // Update education in customFields
-      if (data.education.length > 0 && isUsable('education')) {
-        const educationStr = data.education
+      if (extracted.education.length > 0 && isUsable('education')) {
+        const educationStr = extracted.education
           .map((e) => `${e.degree}, ${e.institution}${e.year ? ` (${e.year})` : ''}`)
           .join('; ');
         setCustomField(entity, 'Education', educationStr);
@@ -1258,15 +1270,14 @@ function applyToEntity(
       }
 
       // Update Known For from research focus
-      if (data.researchFocus.length > 0) {
-        // researchFocus doesn't need individual footnote verification (it's a summary)
-        setCustomField(entity, 'Known For', data.researchFocus.join(', '));
+      if (extracted.researchFocus.length > 0 && isUsable('researchFocus')) {
+        setCustomField(entity, 'Known For', extracted.researchFocus.join(', '));
         applied.push('researchFocus');
       }
 
       // Update tags from research focus areas
-      if (data.researchFocus.length > 0) {
-        const newTags = data.researchFocus.map((focus) =>
+      if (extracted.researchFocus.length > 0 && isUsable('researchFocus')) {
+        const newTags = extracted.researchFocus.map((focus) =>
           focus.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         );
         const existingTags = new Set(entity.tags ?? []);
@@ -1280,91 +1291,83 @@ function applyToEntity(
     }
 
     case 'organization': {
-      const data = extracted as OrganizationExtractedData;
-
-      if (data.foundedYear !== null && isUsable('foundedYear')) {
-        setCustomField(entity, 'Founded', String(data.foundedYear));
+      if (extracted.foundedYear !== null && isUsable('foundedYear')) {
+        setCustomField(entity, 'Founded', String(extracted.foundedYear));
         applied.push('foundedYear');
       }
-      if (data.headquarters && isUsable('headquarters')) {
-        setCustomField(entity, 'Headquarters', data.headquarters);
+      if (extracted.headquarters && isUsable('headquarters')) {
+        setCustomField(entity, 'Headquarters', extracted.headquarters);
         applied.push('headquarters');
       }
-      if (data.keyPersonnel.length > 0 && isUsable('keyPersonnel')) {
-        const personnelStr = data.keyPersonnel.map((p) => `${p.name} (${p.title})`).join('; ');
+      if (extracted.keyPersonnel.length > 0 && isUsable('keyPersonnel')) {
+        const personnelStr = extracted.keyPersonnel.map((p) => `${p.name} (${p.title})`).join('; ');
         setCustomField(entity, 'Key Personnel', personnelStr);
         applied.push('keyPersonnel');
       }
-      if (data.products.length > 0) {
-        const productsStr = data.products.map((p) => p.name).join(', ');
+      if (extracted.products.length > 0 && isUsable('products')) {
+        const productsStr = extracted.products.map((p) => p.name).join(', ');
         setCustomField(entity, 'Products', productsStr);
         applied.push('products');
       }
-      if (data.parentOrg) {
-        setCustomField(entity, 'Parent Organization', data.parentOrg);
+      if (extracted.parentOrg && isUsable('parentOrg')) {
+        setCustomField(entity, 'Parent Organization', extracted.parentOrg);
         applied.push('parentOrg');
       }
       break;
     }
 
     case 'ai-model': {
-      const data = extracted as AiModelExtractedData;
-
-      if (data.developer && isUsable('developer')) {
-        setCustomField(entity, 'Developer', data.developer);
+      if (extracted.developer && isUsable('developer')) {
+        setCustomField(entity, 'Developer', extracted.developer);
         applied.push('developer');
       }
-      if (data.releaseDate && isUsable('releaseDate')) {
-        setCustomField(entity, 'Release Date', data.releaseDate);
+      if (extracted.releaseDate && isUsable('releaseDate')) {
+        setCustomField(entity, 'Release Date', extracted.releaseDate);
         applied.push('releaseDate');
       }
-      if (data.parameterCount) {
-        setCustomField(entity, 'Parameters', data.parameterCount);
+      if (extracted.parameterCount && isUsable('parameterCount')) {
+        setCustomField(entity, 'Parameters', extracted.parameterCount);
         applied.push('parameterCount');
       }
-      if (data.contextWindow) {
-        setCustomField(entity, 'Context Window', data.contextWindow);
+      if (extracted.contextWindow && isUsable('contextWindow')) {
+        setCustomField(entity, 'Context Window', extracted.contextWindow);
         applied.push('contextWindow');
       }
-      if (data.capabilities.length > 0) {
-        setCustomField(entity, 'Capabilities', data.capabilities.join(', '));
+      if (extracted.capabilities.length > 0 && isUsable('capabilities')) {
+        setCustomField(entity, 'Capabilities', extracted.capabilities.join(', '));
         applied.push('capabilities');
       }
       break;
     }
 
     case 'policy': {
-      const data = extracted as PolicyExtractedData;
-
-      if (data.status && isUsable('status')) {
-        setCustomField(entity, 'Status', data.status);
+      if (extracted.status && isUsable('status')) {
+        setCustomField(entity, 'Status', extracted.status);
         applied.push('status');
       }
-      if (data.jurisdiction) {
-        setCustomField(entity, 'Jurisdiction', data.jurisdiction);
+      if (extracted.jurisdiction && isUsable('jurisdiction')) {
+        setCustomField(entity, 'Jurisdiction', extracted.jurisdiction);
         applied.push('jurisdiction');
       }
-      if (data.sponsor && isUsable('sponsor')) {
-        setCustomField(entity, 'Sponsor', data.sponsor);
+      if (extracted.sponsor && isUsable('sponsor')) {
+        setCustomField(entity, 'Sponsor', extracted.sponsor);
         applied.push('sponsor');
       }
-      if (data.introducedDate) {
-        setCustomField(entity, 'Introduced', data.introducedDate);
+      if (extracted.introducedDate && isUsable('introducedDate')) {
+        setCustomField(entity, 'Introduced', extracted.introducedDate);
         applied.push('introducedDate');
       }
       break;
     }
 
-    default: {
-      const data = extracted as DefaultExtractedData;
-
-      if (data.description && !entity.description) {
-        entity.description = data.description;
+    case 'default': {
+      if (extracted.description && !entity.description && isUsable('description')) {
+        entity.description = extracted.description;
         applied.push('description');
       }
-      if (data.keyFacts.length > 0) {
+      if (extracted.keyFacts.length > 0 && isUsable('keyFacts')) {
         // Add key facts as tags
-        const newTags = data.keyFacts
+        const newTags = extracted.keyFacts
           .slice(0, 5)
           .map((f) => f.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 40))
           .filter((t) => t.length > 2);
@@ -1468,17 +1471,21 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
       const resolved = resolveEntityType(e);
       return resolved === filterType || e.type === filterType;
     });
+
+    // Cache findMdxFile results to avoid calling it twice per entity
+    const mdxPathCache = new Map<string, string | null>();
+    for (const e of candidates) {
+      mdxPathCache.set(e.id, findMdxFile(e.id, filterType));
+    }
+
     // Only include entities that have wiki pages
-    candidates = candidates.filter((e) => {
-      const mdxPath = findMdxFile(e.id, filterType);
-      return mdxPath !== null;
-    });
+    candidates = candidates.filter((e) => mdxPathCache.get(e.id) !== null);
 
     // Limit
     candidates = candidates.slice(0, entityLimit);
 
     for (const entity of candidates) {
-      const mdxPath = findMdxFile(entity.id, filterType)!;
+      const mdxPath = mdxPathCache.get(entity.id)!;
       entitiesToProcess.push({ entity, mdxPath, entityType: filterType });
     }
   }
@@ -1574,19 +1581,52 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
 
   // Write YAML if applying
   if (doApply && results.some((r) => r.appliedFields.length > 0)) {
-    // Group results by entity type for saving to the correct YAML files
-    const typeGroups = new Map<string, EntityYamlEntry[]>();
-    for (const { entityType, entity } of entitiesToProcess) {
-      if (!typeGroups.has(entityType)) typeGroups.set(entityType, []);
-    }
+    if (entityIdArg) {
+      // Single-entity mode: load the entity's specific YAML file, update in-place, save back.
+      // This avoids data corruption from filtering allEntries by resolved type (which could
+      // drop entities with aliased types like 'researcher' → 'person').
+      const { fileByEntityId } = loadAllEntityYamls();
+      for (const { entity } of entitiesToProcess) {
+        const yamlFilename = fileByEntityId.get(entity.id);
+        if (!yamlFilename) {
+          console.log(`${c.red}Cannot find YAML file for entity ${entity.id}${c.reset}`);
+          continue;
+        }
+        try {
+          const yamlPath = join(PROJECT_ROOT, 'data/entities', yamlFilename);
+          const raw = readFileSync(yamlPath, 'utf-8');
+          const fileEntries = (parseYaml(raw) ?? []) as EntityYamlEntry[];
+          if (!Array.isArray(fileEntries)) continue;
 
-    // Save each entity type's YAML file
-    for (const [eType] of typeGroups) {
+          // Find and replace the entity in-place
+          const idx = fileEntries.findIndex((e) => e.id === entity.id);
+          if (idx === -1) {
+            console.log(`${c.red}Entity ${entity.id} not found in ${yamlFilename}${c.reset}`);
+            continue;
+          }
+          fileEntries[idx] = entity;
+
+          // Determine header from config or use a generic one
+          const entityType = resolveEntityType(entity);
+          const config = ENTITY_TYPE_CONFIG[entityType];
+          const header = config?.yamlHeader ?? `# Entities\n`;
+          const yamlStr = stringifyYaml(fileEntries, {
+            lineWidth: 120,
+            defaultStringType: 'PLAIN',
+            defaultKeyType: 'PLAIN',
+          });
+          writeFileSync(yamlPath, `${header}\n${yamlStr}`);
+          console.log(`${c.green}Saved changes to ${yamlFilename}${c.reset}`);
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.log(`${c.red}Failed to save YAML for ${entity.id}: ${msg}${c.reset}`);
+        }
+      }
+    } else {
+      // Batch mode: all entities come from the same type-specific YAML file, save all at once
+      const eType = entityTypeFilter ?? 'person';
       try {
-        const entries = entityIdArg
-          ? allEntries.filter((e) => resolveEntityType(e) === eType)
-          : allEntries;
-        saveEntityYaml(eType, entries);
+        saveEntityYaml(eType, allEntries);
         const yamlFile = ENTITY_TYPE_CONFIG[eType]?.yamlFile ?? 'misc.yaml';
         console.log(`${c.green}Saved changes to ${yamlFile}${c.reset}`);
       } catch (err: unknown) {
@@ -1649,28 +1689,18 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
 /**
  * Format a one-line extraction summary for console output.
  */
-function formatExtractionSummary(extracted: ExtractedData, entityType: string): string {
-  switch (entityType) {
-    case 'person': {
-      const data = extracted as PersonExtractedData;
-      return `${data.education.length} education, ${data.roles.length} roles, ${data.publications.length} publications, ${data.researchFocus.length} focus areas`;
-    }
-    case 'organization': {
-      const data = extracted as OrganizationExtractedData;
-      return `${data.funding.length} funding, ${data.keyPersonnel.length} personnel, ${data.products.length} products`;
-    }
-    case 'ai-model': {
-      const data = extracted as AiModelExtractedData;
-      return `${data.capabilities.length} capabilities, ${data.benchmarkScores.length} benchmarks`;
-    }
-    case 'policy': {
-      const data = extracted as PolicyExtractedData;
-      return `${data.provisions.length} provisions, ${data.stakeholders.length} stakeholders`;
-    }
-    default: {
-      const data = extracted as DefaultExtractedData;
-      return `${data.keyFacts.length} key facts, ${data.relatedEntities.length} related entities`;
-    }
+function formatExtractionSummary(extracted: ExtractedData, _entityType: string): string {
+  switch (extracted.kind) {
+    case 'person':
+      return `${extracted.education.length} education, ${extracted.roles.length} roles, ${extracted.publications.length} publications, ${extracted.researchFocus.length} focus areas`;
+    case 'organization':
+      return `${extracted.funding.length} funding, ${extracted.keyPersonnel.length} personnel, ${extracted.products.length} products`;
+    case 'ai-model':
+      return `${extracted.capabilities.length} capabilities, ${extracted.benchmarkScores.length} benchmarks`;
+    case 'policy':
+      return `${extracted.provisions.length} provisions, ${extracted.stakeholders.length} stakeholders`;
+    case 'default':
+      return `${extracted.keyFacts.length} key facts, ${extracted.relatedEntities.length} related entities`;
   }
 }
 
@@ -1679,79 +1709,75 @@ function formatExtractionSummary(extracted: ExtractedData, entityType: string): 
  */
 function formatExtractedDataDisplay(
   extracted: ExtractedData,
-  entityType: string,
+  _entityType: string,
   c: ReturnType<typeof createLogger>['colors'],
 ): string {
   let output = '';
 
-  switch (entityType) {
+  switch (extracted.kind) {
     case 'person': {
-      const data = extracted as PersonExtractedData;
-
-      if (data.education.length > 0) {
+      if (extracted.education.length > 0) {
         output += `  ${c.cyan}Education:${c.reset}\n`;
-        for (const edu of data.education) {
+        for (const edu of extracted.education) {
           output += `    - ${edu.degree}, ${edu.institution}${edu.year ? ` (${edu.year})` : ''}\n`;
         }
       }
 
-      if (data.roles.length > 0) {
+      if (extracted.roles.length > 0) {
         output += `  ${c.cyan}Roles:${c.reset}\n`;
-        for (const role of data.roles) {
+        for (const role of extracted.roles) {
           output += `    - ${role.title} at ${role.organization}${role.startYear ? ` (${role.startYear}${role.endYear ? `-${role.endYear}` : '+'})` : ''} [${role.type}]\n`;
         }
       }
 
-      if (data.publications.length > 0) {
-        output += `  ${c.cyan}Publications:${c.reset} ${data.publications.length} items\n`;
-        for (const pub of data.publications.slice(0, 5)) {
+      if (extracted.publications.length > 0) {
+        output += `  ${c.cyan}Publications:${c.reset} ${extracted.publications.length} items\n`;
+        for (const pub of extracted.publications.slice(0, 5)) {
           output += `    - ${pub.title} (${pub.venue}, ${pub.year ?? '?'}) [${pub.type}]\n`;
         }
-        if (data.publications.length > 5) {
-          output += `    ... and ${data.publications.length - 5} more\n`;
+        if (extracted.publications.length > 5) {
+          output += `    ... and ${extracted.publications.length - 5} more\n`;
         }
       }
 
-      if (data.researchFocus.length > 0) {
-        output += `  ${c.cyan}Research Focus:${c.reset} ${data.researchFocus.join(', ')}\n`;
+      if (extracted.researchFocus.length > 0) {
+        output += `  ${c.cyan}Research Focus:${c.reset} ${extracted.researchFocus.join(', ')}\n`;
       }
 
-      if (data.birthYear !== null) {
-        output += `  ${c.cyan}Birth Year:${c.reset} ${data.birthYear}\n`;
+      if (extracted.birthYear !== null) {
+        output += `  ${c.cyan}Birth Year:${c.reset} ${extracted.birthYear}\n`;
       }
       break;
     }
 
     case 'organization': {
-      const data = extracted as OrganizationExtractedData;
-
-      if (data.foundedYear !== null) {
-        output += `  ${c.cyan}Founded:${c.reset} ${data.foundedYear}\n`;
+      if (extracted.foundedYear !== null) {
+        output += `  ${c.cyan}Founded:${c.reset} ${extracted.foundedYear}\n`;
       }
-      if (data.headquarters) {
-        output += `  ${c.cyan}Headquarters:${c.reset} ${data.headquarters}\n`;
+      if (extracted.headquarters) {
+        output += `  ${c.cyan}Headquarters:${c.reset} ${extracted.headquarters}\n`;
       }
-      if (data.parentOrg) {
-        output += `  ${c.cyan}Parent Org:${c.reset} ${data.parentOrg}\n`;
+      if (extracted.parentOrg) {
+        output += `  ${c.cyan}Parent Org:${c.reset} ${extracted.parentOrg}\n`;
       }
 
-      if (data.keyPersonnel.length > 0) {
+      if (extracted.keyPersonnel.length > 0) {
         output += `  ${c.cyan}Key Personnel:${c.reset}\n`;
-        for (const person of data.keyPersonnel) {
+        for (const person of extracted.keyPersonnel) {
           output += `    - ${person.name} (${person.title})\n`;
         }
       }
 
-      if (data.funding.length > 0) {
+      if (extracted.funding.length > 0) {
         output += `  ${c.cyan}Funding:${c.reset}\n`;
-        for (const fund of data.funding) {
+        for (const fund of extracted.funding) {
           output += `    - ${fund.amount} from ${fund.source}${fund.year ? ` (${fund.year})` : ''}\n`;
         }
       }
 
-      if (data.products.length > 0) {
+      if (extracted.products.length > 0) {
         output += `  ${c.cyan}Products:${c.reset}\n`;
-        for (const product of data.products) {
+        for (const product of extracted.products) {
           output += `    - ${product.name}: ${product.description}\n`;
         }
       }
@@ -1759,74 +1785,68 @@ function formatExtractedDataDisplay(
     }
 
     case 'ai-model': {
-      const data = extracted as AiModelExtractedData;
+      if (extracted.developer) output += `  ${c.cyan}Developer:${c.reset} ${extracted.developer}\n`;
+      if (extracted.releaseDate) output += `  ${c.cyan}Release Date:${c.reset} ${extracted.releaseDate}\n`;
+      if (extracted.parameterCount) output += `  ${c.cyan}Parameters:${c.reset} ${extracted.parameterCount}\n`;
+      if (extracted.contextWindow) output += `  ${c.cyan}Context Window:${c.reset} ${extracted.contextWindow}\n`;
 
-      if (data.developer) output += `  ${c.cyan}Developer:${c.reset} ${data.developer}\n`;
-      if (data.releaseDate) output += `  ${c.cyan}Release Date:${c.reset} ${data.releaseDate}\n`;
-      if (data.parameterCount) output += `  ${c.cyan}Parameters:${c.reset} ${data.parameterCount}\n`;
-      if (data.contextWindow) output += `  ${c.cyan}Context Window:${c.reset} ${data.contextWindow}\n`;
-
-      if (data.capabilities.length > 0) {
-        output += `  ${c.cyan}Capabilities:${c.reset} ${data.capabilities.join(', ')}\n`;
+      if (extracted.capabilities.length > 0) {
+        output += `  ${c.cyan}Capabilities:${c.reset} ${extracted.capabilities.join(', ')}\n`;
       }
 
-      if (data.benchmarkScores.length > 0) {
+      if (extracted.benchmarkScores.length > 0) {
         output += `  ${c.cyan}Benchmarks:${c.reset}\n`;
-        for (const score of data.benchmarkScores.slice(0, 10)) {
+        for (const score of extracted.benchmarkScores.slice(0, 10)) {
           output += `    - ${score.benchmark}: ${score.score}\n`;
         }
-        if (data.benchmarkScores.length > 10) {
-          output += `    ... and ${data.benchmarkScores.length - 10} more\n`;
+        if (extracted.benchmarkScores.length > 10) {
+          output += `    ... and ${extracted.benchmarkScores.length - 10} more\n`;
         }
       }
 
-      if (data.pricing.input || data.pricing.output) {
-        output += `  ${c.cyan}Pricing:${c.reset} Input: ${data.pricing.input ?? 'N/A'} | Output: ${data.pricing.output ?? 'N/A'}\n`;
+      if (extracted.pricing.input || extracted.pricing.output) {
+        output += `  ${c.cyan}Pricing:${c.reset} Input: ${extracted.pricing.input ?? 'N/A'} | Output: ${extracted.pricing.output ?? 'N/A'}\n`;
       }
       break;
     }
 
     case 'policy': {
-      const data = extracted as PolicyExtractedData;
+      if (extracted.status) output += `  ${c.cyan}Status:${c.reset} ${extracted.status}\n`;
+      if (extracted.jurisdiction) output += `  ${c.cyan}Jurisdiction:${c.reset} ${extracted.jurisdiction}\n`;
+      if (extracted.sponsor) output += `  ${c.cyan}Sponsor:${c.reset} ${extracted.sponsor}\n`;
+      if (extracted.introducedDate) output += `  ${c.cyan}Introduced:${c.reset} ${extracted.introducedDate}\n`;
 
-      if (data.status) output += `  ${c.cyan}Status:${c.reset} ${data.status}\n`;
-      if (data.jurisdiction) output += `  ${c.cyan}Jurisdiction:${c.reset} ${data.jurisdiction}\n`;
-      if (data.sponsor) output += `  ${c.cyan}Sponsor:${c.reset} ${data.sponsor}\n`;
-      if (data.introducedDate) output += `  ${c.cyan}Introduced:${c.reset} ${data.introducedDate}\n`;
-
-      if (data.provisions.length > 0) {
+      if (extracted.provisions.length > 0) {
         output += `  ${c.cyan}Provisions:${c.reset}\n`;
-        for (const prov of data.provisions) {
+        for (const prov of extracted.provisions) {
           output += `    - ${prov.title}: ${prov.description}\n`;
         }
       }
 
-      if (data.stakeholders.length > 0) {
+      if (extracted.stakeholders.length > 0) {
         output += `  ${c.cyan}Stakeholders:${c.reset}\n`;
-        for (const sh of data.stakeholders) {
+        for (const sh of extracted.stakeholders) {
           output += `    - ${sh.name} (${sh.position}): ${sh.reason}\n`;
         }
       }
       break;
     }
 
-    default: {
-      const data = extracted as DefaultExtractedData;
-
-      if (data.description) {
-        output += `  ${c.cyan}Description:${c.reset} ${data.description}\n`;
+    case 'default': {
+      if (extracted.description) {
+        output += `  ${c.cyan}Description:${c.reset} ${extracted.description}\n`;
       }
 
-      if (data.keyFacts.length > 0) {
+      if (extracted.keyFacts.length > 0) {
         output += `  ${c.cyan}Key Facts:${c.reset}\n`;
-        for (const fact of data.keyFacts) {
+        for (const fact of extracted.keyFacts) {
           output += `    - ${fact}\n`;
         }
       }
 
-      if (data.relatedEntities.length > 0) {
+      if (extracted.relatedEntities.length > 0) {
         output += `  ${c.cyan}Related Entities:${c.reset}\n`;
-        for (const rel of data.relatedEntities) {
+        for (const rel of extracted.relatedEntities) {
           output += `    - ${rel.name} (${rel.relationship})\n`;
         }
       }
