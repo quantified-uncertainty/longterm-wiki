@@ -690,6 +690,7 @@ Options:
   --budget=N           Max dollars to spend per run (default: 50)
   --count=N            Max pages to update per run (default: 10)
   --sources=a,b,c      Only fetch these source IDs
+  --batch              Use Anthropic Batch API for improve phase (50% cost reduction)
   --dry-run            Run pipeline but skip page improvements
   --skip-fetch         Skip RSS fetch (CI smoke test — verifies code paths only)
   --check              (sources only) Test all RSS/Atom source URLs for reachability
@@ -716,7 +717,9 @@ Pipeline stages:
 Cost model:
   Triage/routing overhead: ~$0.15-0.25 per run
   Per-page improvement: polish ~$2.50, standard ~$6.50, deep ~$12.50
-  Typical daily run (5 pages): ~$15-35
+  With --batch (50% off): polish ~$1.25, standard ~$3.25, deep ~$6.25
+  With prompt caching (auto): ~15-25% input token savings on sequential runs
+  Typical daily run (5 pages): ~$15-35 (sequential), ~$7-18 (batch)
 
 Source configuration:
   Edit data/auto-update/sources.yaml to add/remove/configure news sources.
@@ -731,6 +734,7 @@ Examples:
   crux w auto-update sources --check               Test all source URLs for reachability
   crux w auto-update history                       Show recent runs
   crux w auto-update run --dry-run                 Full pipeline without executing
+  crux w auto-update run --batch --budget=30       Run with Batch API (50% cheaper)
   crux w auto-update audit-gate --diff --apply     Audit changed pages and fix issues
   crux w auto-update audit-gate existential-risk   Audit a specific page
   crux w auto-update submit --budget=30            Submit as parallel background jobs

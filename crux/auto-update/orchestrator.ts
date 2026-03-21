@@ -19,6 +19,7 @@ import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
 import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server/auto-update.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 import { parseIntOpt } from '../lib/cli.ts';
+import { executeBatchImprove } from './batch-improve.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 
@@ -250,13 +251,14 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   const verbose = options.verbose || false;
   const trigger = options.trigger || 'manual';
   const skipFetch = options.skipFetch || false;
+  const useBatch = options.batch || false;
   const sourceIds = options.sources ? options.sources.split(',').map(s => s.trim()) : undefined;
 
   const startedAt = new Date().toISOString();
   const date = startedAt.slice(0, 10);
 
   console.log(`\n=== Auto-Update Pipeline ===`);
-  console.log(`Date: ${date} | Budget: $${budget} | Max pages: ${maxPages} | Dry run: ${dryRun}${skipFetch ? ' | Skip fetch: true' : ''}`);
+  console.log(`Date: ${date} | Budget: $${budget} | Max pages: ${maxPages} | Dry run: ${dryRun}${skipFetch ? ' | Skip fetch: true' : ''}${useBatch ? ' | Batch API: true' : ''}`);
 
   // ── Stage 1: Fetch ──────────────────────────────────────────────────────
 
@@ -411,38 +413,71 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
 
   // ── Stage 4: Execute ────────────────────────────────────────────────────
 
-  console.log(`\n── Stage 4: Executing updates ──`);
+  console.log(`\n── Stage 4: Executing updates${useBatch ? ' (Batch API — 50% cost reduction)' : ''} ──`);
   const results: RunResult[] = [];
   let spent = 0;
-  const costMap: Record<string, number> = { polish: 2.5, standard: 6.5, deep: 12.5 };
+  // Batch API provides 50% discount on all token costs
+  const costMap: Record<string, number> = useBatch
+    ? { polish: 1.25, standard: 3.25, deep: 6.25 }
+    : { polish: 2.5, standard: 6.5, deep: 12.5 };
 
-  for (let i = 0; i < plan.pageUpdates.length; i++) {
-    const update = plan.pageUpdates[i];
-    const cost = costMap[update.suggestedTier] || 6.5;
-
-    if (spent + cost > budget) {
-      console.log(`  [${i + 1}/${plan.pageUpdates.length}] ${update.pageTitle} — SKIPPED (budget exceeded)`);
-      results.push({ pageId: update.pageId, status: 'skipped', tier: update.suggestedTier });
-      continue;
+  if (useBatch) {
+    // ── Batch execution path ──────────────────────────────────────────────
+    // Filter to within-budget updates first
+    const withinBudget: typeof plan.pageUpdates = [];
+    for (const update of plan.pageUpdates) {
+      const cost = costMap[update.suggestedTier] || 3.25;
+      if (spent + cost > budget) {
+        console.log(`  ${update.pageTitle} — SKIPPED (budget exceeded)`);
+        results.push({ pageId: update.pageId, status: 'skipped', tier: update.suggestedTier });
+        continue;
+      }
+      spent += cost;
+      withinBudget.push(update);
     }
 
-    console.log(`  [${i + 1}/${plan.pageUpdates.length}] ${update.pageTitle} (${update.suggestedTier})`);
-    const result = executePageImprove(
-      update.pageId,
-      update.suggestedTier,
-      update.directions,
-      verbose,
-      update.sectionLevel ?? update.suggestedTier === 'polish',
-    );
-    results.push(result);
+    if (withinBudget.length > 0) {
+      const batchResults = await executeBatchImprove(withinBudget, verbose);
+      results.push(...batchResults);
 
-    if (result.status === 'success') {
-      spent += cost;
-      console.log(`    Done (${((result.durationMs || 0) / 1000).toFixed(0)}s)`);
-    } else if (result.status === 'blocked') {
-      console.log(`    BLOCKED: ${result.error?.slice(0, 100)}`);
-    } else {
-      console.log(`    FAILED: ${result.error?.slice(0, 100)}`);
+      // Recalculate spent based on actual successes
+      spent = 0;
+      for (const r of results) {
+        if (r.status === 'success') {
+          spent += costMap[r.tier] || 3.25;
+        }
+      }
+    }
+  } else {
+    // ── Sequential execution path (original) ──────────────────────────────
+    for (let i = 0; i < plan.pageUpdates.length; i++) {
+      const update = plan.pageUpdates[i];
+      const cost = costMap[update.suggestedTier] || 6.5;
+
+      if (spent + cost > budget) {
+        console.log(`  [${i + 1}/${plan.pageUpdates.length}] ${update.pageTitle} — SKIPPED (budget exceeded)`);
+        results.push({ pageId: update.pageId, status: 'skipped', tier: update.suggestedTier });
+        continue;
+      }
+
+      console.log(`  [${i + 1}/${plan.pageUpdates.length}] ${update.pageTitle} (${update.suggestedTier})`);
+      const result = executePageImprove(
+        update.pageId,
+        update.suggestedTier,
+        update.directions,
+        verbose,
+        update.sectionLevel ?? update.suggestedTier === 'polish',
+      );
+      results.push(result);
+
+      if (result.status === 'success') {
+        spent += cost;
+        console.log(`    Done (${((result.durationMs || 0) / 1000).toFixed(0)}s)`);
+      } else if (result.status === 'blocked') {
+        console.log(`    BLOCKED: ${result.error?.slice(0, 100)}`);
+      } else {
+        console.log(`    FAILED: ${result.error?.slice(0, 100)}`);
+      }
     }
   }
 

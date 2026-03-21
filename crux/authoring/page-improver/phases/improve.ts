@@ -13,6 +13,7 @@ import { resolveTemplate, formatTemplateForPrompt } from '../../../lib/content/p
 import { getPageType } from '../../../lib/page-analysis.ts';
 import { convertSlugsToWikiIds } from '../../creator/deployment.ts';
 import { convertNewFootnotes } from '../../../lib/convert-new-footnotes.ts';
+import { buildCachedSystemPrompt, STATIC_IMPROVE_GUIDELINES } from '../../../lib/prompt-cache.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import {
   ROOT, log, getFilePath, getImportPath, writeTemp,
@@ -74,9 +75,15 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     gapAnalysisContext: null, kbContext, tier, templateContext,
   });
 
+  // Use prompt caching: pass static guidelines as a cached system prompt.
+  // The Anthropic API caches the system prompt for 5 minutes, so sequential
+  // page improvements reuse it (90% discount on input tokens for the cached portion).
+  const cachedSystem = buildCachedSystemPrompt(STATIC_IMPROVE_GUIDELINES, '');
+
   const result = await runAgent(prompt, {
     model: options.improveModel || MODELS.sonnet,
-    maxTokens: 16000
+    maxTokens: 16000,
+    systemPrompt: cachedSystem,
   });
 
   let improvedContent: string = result;

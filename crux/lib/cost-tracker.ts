@@ -22,6 +22,10 @@ export interface CostEntry {
   inputTokens: number;
   /** Output tokens from response.usage. */
   outputTokens: number;
+  /** Tokens used to create a prompt cache entry (0 if no caching). */
+  cacheCreationInputTokens: number;
+  /** Tokens read from the prompt cache (0 if no cache hit). */
+  cacheReadInputTokens: number;
   /** Calculated cost in USD. */
   cost: number;
   /** Human-readable label for grouping (e.g. "orchestrator", "rewrite_section"). */
@@ -43,22 +47,37 @@ export class CostTracker {
    * Record a completed API call.
    *
    * @param model - Model ID from the request params
-   * @param usage - Usage object from the Anthropic response (input_tokens, output_tokens)
+   * @param usage - Usage object from the Anthropic response (input_tokens, output_tokens,
+   *   and optionally cache_creation_input_tokens, cache_read_input_tokens)
    * @param label - Grouping label (default: "unknown")
    */
   record(
     model: string,
-    usage: { input_tokens: number; output_tokens: number },
+    usage: {
+      input_tokens: number;
+      output_tokens: number;
+      cache_creation_input_tokens?: number | null;
+      cache_read_input_tokens?: number | null;
+    },
     label?: string,
   ): void {
     const inputTokens = usage.input_tokens;
     const outputTokens = usage.output_tokens;
-    const cost = calculateCost(model, { inputTokens, outputTokens });
+    const cacheCreationInputTokens = usage.cache_creation_input_tokens ?? 0;
+    const cacheReadInputTokens = usage.cache_read_input_tokens ?? 0;
+    const cost = calculateCost(model, {
+      inputTokens,
+      outputTokens,
+      cacheCreationInputTokens,
+      cacheReadInputTokens,
+    });
 
     this.entries.push({
       model,
       inputTokens,
       outputTokens,
+      cacheCreationInputTokens,
+      cacheReadInputTokens,
       cost,
       label: label ?? 'unknown',
       timestamp: Date.now(),
@@ -78,6 +97,8 @@ export class CostTracker {
       model,
       inputTokens: 0,
       outputTokens: 0,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 0,
       cost,
       label,
       timestamp: Date.now(),

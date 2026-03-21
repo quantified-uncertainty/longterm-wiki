@@ -93,7 +93,8 @@ export interface RunAgentOptions {
     description: string;
     input_schema: Record<string, unknown>;
   }>;
-  systemPrompt?: string;
+  /** System prompt as a plain string or as TextBlockParam[] (for prompt caching). */
+  systemPrompt?: string | Array<{ type: 'text'; text: string; cache_control?: { type: 'ephemeral' } | null }>;
 }
 
 export interface PipelineOptions {
