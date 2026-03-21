@@ -298,21 +298,12 @@ export type FactBaseVerdict =
   | "not_verifiable"
   | "verified";
 
-const VALID_VERDICTS: Set<string> = new Set([
-  "accurate",
-  "minor_issues",
-  "inaccurate",
-  "unsupported",
-  "not_verifiable",
-  "verified",
-]);
-
 /**
  * Get the citation verification status for a FactBase fact.
  * kbFactVerification is no longer baked into database.json — returns undefined.
  * TODO: fetch from wiki-server API when available.
  */
-export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
+export function getFactBaseFactVerification(_factId: string): FactBaseVerdict | undefined {
   return undefined;
 }
 
