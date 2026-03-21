@@ -81,6 +81,7 @@ import {
   ensureDirs,
   getTrackedMainFixPr,
   isAbandoned,
+  isCircuitOpen,
   isRecentlyProcessed,
   JSONL_FILE as JSONL_FILE_INTERNAL,
   log,
@@ -310,23 +311,28 @@ async function runCheckCycle(
 
     const ranked = daemonRankPrs(eligible);
     if (ranked.length > 0) {
-      log('');
-      log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
-      for (const pr of ranked) {
-        log(
-          `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}`,
-        );
-      }
-      log('');
+      // Circuit breaker: skip dispatching if too many instant failures
+      if (isCircuitOpen()) {
+        log(`${cl.red}Circuit breaker OPEN — pausing dispatch (3+ consecutive instant failures). Will auto-reset in ≤15 min.${cl.reset}`);
+      } else {
+        log('');
+        log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
+        for (const pr of ranked) {
+          log(
+            `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}`,
+          );
+        }
+        log('');
 
-      const top = ranked[0];
-      const fixResult = await fixPr(top, config);
-      fixedPr = top.number;
+        const top = ranked[0];
+        const fixResult = await fixPr(top, config);
+        fixedPr = top.number;
 
-      // If the PR's CI failure is caused by main being broken, immediately re-check main
-      if (fixResult.mainIsRootCause) {
-        log(`${cl.yellow}⚠ PR #${top.number} blocked by broken main — clearing main cooldown for immediate re-check${cl.reset}`);
-        clearProcessed('main-branch');
+        // If the PR's CI failure is caused by main being broken, immediately re-check main
+        if (fixResult.mainIsRootCause) {
+          log(`${cl.yellow}⚠ PR #${top.number} blocked by broken main — clearing main cooldown for immediate re-check${cl.reset}`);
+          clearProcessed('main-branch');
+        }
       }
     } else {
       log(`${cl.dim}All issues recently processed — nothing to fix${cl.reset}`);

@@ -35,28 +35,6 @@
       author: Summit Participants
   description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
-# DEPRECATED: E8 ai-executive-order is a stub that duplicates E366 us-executive-order (the full page).
-# Kept for backward-compat link resolution; do not create new links to this entity.
-- id: ai-executive-order
-  stableId: Jn7939O5ls
-  wikiId: E8
-  type: policy
-  scope: Federal
-  jurisdiction: United States
-  summaryPage: governance-overview
-  title: AI Executive Order
-  policyStatus: revoked
-  deprecated: true
-  deprecatedInFavorOf: us-executive-order
-  description: >-
-    Deprecated stub. Use the us-executive-order entity (E366) instead.
-    US executive orders establishing AI safety requirements and oversight,
-    including EO 14110 (October 2023) on safe, secure, and trustworthy AI
-    development. Revoked by the Trump administration in January 2025.
-  clusters:
-    - ai-safety
-    - governance
-  lastUpdated: 2026-03
 - id: california-sb1047
   stableId: XcGTez1oFw
   wikiId: E48

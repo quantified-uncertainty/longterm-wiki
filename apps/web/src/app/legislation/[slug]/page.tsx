@@ -41,8 +41,8 @@ import {
   type RawResource,
 } from "@/app/legislation/[slug]/timeline-utils";
 import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
-import { StakeholderReasonCell } from "@/app/legislation/[slug]/stakeholder-detail";
-import { StakeholderVerificationBadge } from "@/components/directory/StakeholderVerificationBadge";
+import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
+import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 
 export function generateStaticParams() {
@@ -64,38 +64,35 @@ export async function generateMetadata({
   };
 }
 
-const POSITION_COLORS: Record<string, string> = {
-  support: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  oppose: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  neutral: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
-  mixed: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-};
+/**
+ * Derive a human-readable source name from a URL.
+ * Tries the publication database first, then falls back to a cleaned domain name.
+ */
+function getSourceDisplayName(url: string): string | undefined {
+  const domain = extractDomain(url);
+  if (!domain) return undefined;
+  const pub = getPublicationByDomain(domain);
+  if (pub) return pub.name;
+  const cleaned = domain
+    .replace(/\.(com|org|net|io|co|gov|edu|us|uk|ca|au)$/i, "")
+    .replace(/\./g, " ");
+  return cleaned
+    .split(/[\s-]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
 
-/** Compact circle indicator for stakeholder importance. */
-function ImportanceIndicator({ importance }: { importance: "high" | "medium" | "low" }) {
-  // high = filled circle, medium = half-filled circle, low = empty circle
-  const size = 10;
-  if (importance === "high") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="High importance">
-        <circle cx="5" cy="5" r="4" className="fill-foreground/70" />
-      </svg>
-    );
-  }
-  if (importance === "medium") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Medium importance">
-        <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/60" strokeWidth="1.2" />
-        <path d="M5,1 A4,4 0 0,0 5,9 Z" className="fill-foreground/60" />
-      </svg>
-    );
-  }
-  // low
-  return (
-    <svg width={size} height={size} viewBox="0 0 10 10" aria-label="Low importance">
-      <circle cx="5" cy="5" r="4" className="fill-none stroke-foreground/40" strokeWidth="1.2" />
-    </svg>
-  );
+/** Resolve verification verdict for a stakeholder (server-side only). */
+function resolveVerdict(
+  policyStableId: string | undefined,
+  stakeholderName: string,
+): { verdict: string; confidence: number | null } | null {
+  if (!policyStableId) return null;
+  const stakeholderId = getPolicyStakeholderId(policyStableId, stakeholderName);
+  if (!stakeholderId) return null;
+  const v = getRecordVerdict("policy-stakeholder", stakeholderId);
+  if (!v) return null;
+  return { verdict: v.verdict, confidence: v.confidence };
 }
 
 /** Status pipeline stages for the visual timeline. */
@@ -158,9 +155,24 @@ export default async function LegislationDetailPage({
   const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
     (importanceOrder[a.importance ?? ""] ?? 3) - (importanceOrder[b.importance ?? ""] ?? 3);
 
-  const supporters = entity.stakeholders.filter((s) => s.position === "support").sort(byImportance);
-  const opponents = entity.stakeholders.filter((s) => s.position === "oppose").sort(byImportance);
-  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral").sort(byImportance);
+  // Convert raw stakeholders to StakeholderRow with resolved hrefs, source names, and verdicts
+  const toRow = (s: (typeof entity.stakeholders)[number]): StakeholderRow => ({
+    name: s.name,
+    entityId: s.entityId,
+    position: s.position,
+    role: s.role,
+    importance: s.importance,
+    reason: s.reason,
+    source: s.source,
+    sourceName: s.source ? getSourceDisplayName(s.source) : undefined,
+    context: s.context,
+    href: resolveEntityHref(s.entityId),
+    verdict: resolveVerdict(entity.stableId, s.name),
+  });
+
+  const supporters = entity.stakeholders.filter((s) => s.position === "support").sort(byImportance).map(toRow);
+  const opponents = entity.stakeholders.filter((s) => s.position === "oppose").sort(byImportance).map(toRow);
+  const mixed = entity.stakeholders.filter((s) => s.position === "mixed" || s.position === "neutral").sort(byImportance).map(toRow);
 
   const provisionsByCategory = new Map<string, typeof entity.provisions>();
   for (const p of entity.provisions) {
@@ -452,87 +464,9 @@ export default async function LegislationDetailPage({
               {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
             </div>
           </div>
-          <div className="rounded-xl border border-border overflow-x-auto">
-            <table className="w-full text-sm min-w-[500px]">
-              <thead>
-                <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
-                  <th className="text-left py-1.5 px-3 font-medium w-[180px]">Name</th>
-                  <th className="text-left py-1.5 px-3 font-medium w-[70px]">Position</th>
-                  <th className="text-left py-1.5 px-3 font-medium">Reason</th>
-                  <th className="text-left py-1.5 px-3 font-medium w-[40px]">Src</th>
-                  <th className="text-left py-1.5 px-3 font-medium w-[60px]">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {[...supporters, ...mixed, ...opponents].map((stakeholder, i) => {
-                  const href = resolveEntityHref(stakeholder.entityId);
-                  return (
-                    <tr key={i} className="hover:bg-muted/20 align-top">
-                      <td className="py-1.5 px-3">
-                        <span className="inline-flex items-center gap-1.5">
-                          {stakeholder.importance && (
-                            <span
-                              className="inline-block flex-shrink-0"
-                              title={`${stakeholder.importance} importance`}
-                            >
-                              <ImportanceIndicator importance={stakeholder.importance} />
-                            </span>
-                          )}
-                          {href ? (
-                            <Link href={href} className="text-primary hover:underline font-medium text-sm">{stakeholder.name}</Link>
-                          ) : (
-                            <span className="font-medium text-sm">{stakeholder.name}</span>
-                          )}
-                          {stakeholder.role && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 whitespace-nowrap">
-                              {stakeholder.role}
-                            </span>
-                          )}
-                        </span>
-                      </td>
-                      <td className="py-1.5 px-3">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${POSITION_COLORS[stakeholder.position] ?? "bg-gray-100 text-gray-600"}`}>
-                          {stakeholder.position}
-                        </span>
-                      </td>
-                      <td className="py-1.5 px-3 text-foreground/70 text-sm">
-                        <StakeholderReasonCell
-                          reason={stakeholder.reason}
-                          context={stakeholder.context}
-                          source={stakeholder.source}
-                        />
-                      </td>
-                      <td className="py-1.5 px-3 text-center">
-                        {stakeholder.source ? (
-                          <a
-                            href={stakeholder.source}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80"
-                            title="View source"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="inline-block">
-                              <path d="M6 3H3v10h10v-3M9 3h4v4M9 7l4-4" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          </a>
-                        ) : (
-                          <span className="text-muted-foreground/30">&mdash;</span>
-                        )}
-                      </td>
-                      <td className="py-1.5 px-3 text-center">
-                        {entity.stableId && (
-                          <StakeholderVerificationBadge
-                            policyEntityStableId={entity.stableId}
-                            stakeholderName={stakeholder.name}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <StakeholderTable
+            stakeholders={[...supporters, ...mixed, ...opponents]}
+          />
         </div>
       ),
     });

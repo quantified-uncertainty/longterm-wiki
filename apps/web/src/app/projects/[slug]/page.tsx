@@ -21,7 +21,7 @@ function safeHostname(url: string): string {
 }
 
 function getProjectSlugs(): string[] {
-  return getTypedEntities().filter(isProject).map((e) => e.id);
+  return getTypedEntities().filter(isProject).filter((e) => !e.deprecated).map((e) => e.id);
 }
 
 function resolveProjectBySlug(slug: string): ProjectEntity | undefined {

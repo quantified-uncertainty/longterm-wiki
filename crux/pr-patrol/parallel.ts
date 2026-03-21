@@ -21,13 +21,19 @@ import {
   cl,
   ensureDirs,
   getFailCount,
+  INSTANT_FAILURE_THRESHOLD_SECONDS,
   isAbandoned,
+  isCircuitOpen,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
   logHeader,
+  markAbandoned,
+  markPendingVerification,
   markProcessed,
   recordFailure,
+  recordInstantFailure,
+  resetCircuit,
   resetFailCount,
   setParallelState,
 } from './state.ts';
@@ -440,6 +446,7 @@ export function classifyFixOutcome(
 ): ClassifiedOutcome {
   if (result.timedOut) {
     const failCount = recordFailure(prNumber);
+    if (failCount >= 2) markAbandoned(prNumber);
     const reason = failCount >= 2
       ? `Abandoned after ${failCount} failures (timeout)`
       : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
@@ -457,6 +464,7 @@ export function classifyFixOutcome(
         };
       }
       const failCount = recordFailure(prNumber);
+      if (failCount >= 2) markAbandoned(prNumber);
       return {
         outcome: 'no-op',
         reason: `No-op: agent determined issue needs human intervention (attempt ${failCount})`,
@@ -464,12 +472,15 @@ export function classifyFixOutcome(
       };
     }
 
-    resetFailCount(prNumber);
+    // Don't reset fail count immediately — mark as pending CI verification.
+    // The fail counter will be reset when CI passes on the next cycle.
+    markPendingVerification(prNumber);
     return { outcome: 'fixed', reason: '', mainIsRootCause: false };
   }
 
   if (result.hitMaxTurns) {
     const failCount = recordFailure(prNumber);
+    if (failCount >= 2) markAbandoned(prNumber);
     const reason = failCount >= 2
       ? `Abandoned after ${failCount} failures`
       : `Hit max turns (${effectiveMaxTurns}) — attempt ${failCount}`;
@@ -478,6 +489,7 @@ export function classifyFixOutcome(
 
   // Error exit
   const failCount = recordFailure(prNumber);
+  if (failCount >= 2) markAbandoned(prNumber);
   const reason = failCount >= 2
     ? `Abandoned after ${failCount} failures (last: exit code ${result.exitCode})`
     : `Exit code: ${result.exitCode}`;
@@ -626,6 +638,16 @@ async function fixPrInSlot(
         await postEventComment(pr.number, config.repo, buildAbandonmentComment(currentFailCount, pr.issues))
           .catch((e: unknown) => log(`${prefix} Warning: could not post abandonment comment: ${e instanceof Error ? e.message : String(e)}`));
       }
+    }
+
+    // Circuit breaker: track instant failures (error + <15s) vs non-instant outcomes
+    if (classified.outcome === 'error' && elapsedS < INSTANT_FAILURE_THRESHOLD_SECONDS) {
+      const tripped = recordInstantFailure();
+      if (tripped) {
+        log(`${prefix} ${cl.red}Circuit breaker TRIPPED — 3+ consecutive instant failures. Pausing dispatch for 15 min.${cl.reset}`);
+      }
+    } else {
+      resetCircuit();
     }
 
     // Log to JSONL
@@ -794,9 +816,9 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
     return { dispatched: 0, results: [] };
   }
 
-  // Filter cooldowns and abandoned (parallel uses higher threshold than serial)
+  // Filter cooldowns and abandoned
   const eligible = detected.filter((pr) => {
-    if (getFailCount(pr.number) >= config.abandonThreshold) {
+    if (isAbandoned(pr.number) || getFailCount(pr.number) >= config.abandonThreshold) {
       log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — ${getFailCount(pr.number)} failures, threshold ${config.abandonThreshold})${cl.reset}`);
       return false;
     }
@@ -842,7 +864,11 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
   const slotsToUse = availableSlots.slice(0, config.maxSlots);
   log(`${cl.green}${slotsToUse.length} slot(s) available${cl.reset} (${idleSlots.length} idle, ${config.reserveSlots} reserved): ${slotsToUse.map((s) => `a${s.slot}`).join(', ')}`);
 
-  // 3. Dispatch fixes
+  // 3. Dispatch fixes (skip if circuit breaker is open)
+  if (isCircuitOpen()) {
+    log(`${cl.red}Circuit breaker OPEN — pausing dispatch (3+ consecutive instant failures). Will auto-reset in ≤15 min.${cl.reset}`);
+    return { dispatched: 0, results: [] };
+  }
   const result = await dispatchFixes(ranked, slotsToUse, config);
 
   // 4. Merge phase — reconcile labels, undraft, enqueue eligible PRs

@@ -176,6 +176,7 @@ import type { FactbaseVerificationsRoute } from "@wiki-server/factbase-verificat
 import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
+import type { PersonnelRoute } from "@wiki-server/personnel-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -289,4 +290,40 @@ export type RpcFundingProgramsAllResult = InferResponseType<FundingProgramsClien
 
 /** A single funding program row from the all-programs list */
 export type RpcFundingProgramRow = RpcFundingProgramsAllResult['fundingPrograms'][number];
+
+// ============================================================================
+// Hono RPC client — Personnel API
+// ============================================================================
+
+/**
+ * Create a typed Hono RPC client for the personnel API.
+ * Returns null if the wiki-server URL is not configured.
+ */
+export function getPersonnelRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 300;
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<PersonnelRoute>(`${config.serverUrl}/api/personnel`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+type PersonnelClient = NonNullable<ReturnType<typeof getPersonnelRpcClient>>;
+
+/** Inferred response type for GET /api/personnel/by-entity/:entityId */
+export type RpcPersonnelByEntityResult = InferResponseType<PersonnelClient['by-entity'][':entityId']['$get'], 200>;
+
+/** A single personnel row from the by-entity endpoint */
+export type RpcPersonnelRow = RpcPersonnelByEntityResult['personnel'][number];
 

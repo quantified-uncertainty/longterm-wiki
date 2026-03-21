@@ -107,6 +107,7 @@ export function extractBotComments(pr: GqlPrNode): BotComment[] {
  */
 export const HUMAN_REQUIRED_CHECKS = new Set([
   'check-protected-paths',
+  'coderabbit-security-gate',
 ]);
 
 // ── Issue detection ──────────────────────────────────────────────────────────

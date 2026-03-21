@@ -153,65 +153,73 @@ vi.mock("../db.js", async () => {
       return [];
     }
 
-    // ---- INSERT INTO sessions (upsert — ON CONFLICT DO UPDATE) ----
+    // ---- INSERT INTO sessions (upsert — ON CONFLICT DO UPDATE, supports multi-row) ----
     if (q.includes("insert into") && q.includes('"sessions"') && !q.includes("session_pages")) {
-      const incoming = {
-        date: String(params[0]),
-        branch: params[1] as string | null,
-        title: params[2] as string,
-        summary: params[3] as string | null,
-        model: params[4] as string | null,
-        duration: params[5] as string | null,
-        cost: params[6] as string | null,
-        cost_cents: params[7] as number | null,
-        duration_minutes: params[8] as number | null,
-        pr_url: params[9] as string | null,
-        checks_yaml: params[10] as string | null,
-        issues_json: params[11] ?? null,
-        learnings_json: params[12] ?? null,
-        recommendations_json: params[13] ?? null,
-        reviewed: params[14] as boolean | null,
-      };
+      const COLS = 15; // Number of columns in sessionValues()
+      const numRows = Math.max(1, Math.floor(params.length / COLS));
+      const results: typeof sessionStore = [];
 
-      // Check for conflict on (date, title)
-      const existing = sessionStore.find(
-        (s) => s.date === incoming.date && s.title === incoming.title
-      );
+      for (let r = 0; r < numRows; r++) {
+        const o = r * COLS;
+        const incoming = {
+          date: String(params[o]),
+          branch: params[o + 1] as string | null,
+          title: params[o + 2] as string,
+          summary: params[o + 3] as string | null,
+          model: params[o + 4] as string | null,
+          duration: params[o + 5] as string | null,
+          cost: params[o + 6] as string | null,
+          cost_cents: params[o + 7] as number | null,
+          duration_minutes: params[o + 8] as number | null,
+          pr_url: params[o + 9] as string | null,
+          checks_yaml: params[o + 10] as string | null,
+          issues_json: params[o + 11] ?? null,
+          learnings_json: params[o + 12] ?? null,
+          recommendations_json: params[o + 13] ?? null,
+          reviewed: params[o + 14] as boolean | null,
+        };
 
-      if (existing && q.includes("on conflict")) {
-        // Update existing row
-        Object.assign(existing, {
-          branch: incoming.branch,
-          summary: incoming.summary,
-          model: incoming.model,
-          duration: incoming.duration,
-          cost: incoming.cost,
-          cost_cents: incoming.cost_cents,
-          duration_minutes: incoming.duration_minutes,
-          pr_url: incoming.pr_url,
-          checks_yaml: incoming.checks_yaml,
-          issues_json: incoming.issues_json,
-          learnings_json: incoming.learnings_json,
-          recommendations_json: incoming.recommendations_json,
-          reviewed: incoming.reviewed,
-        });
-        return [existing];
+        // Check for conflict on (date, title)
+        const existing = sessionStore.find(
+          (s) => s.date === incoming.date && s.title === incoming.title
+        );
+
+        if (existing && q.includes("on conflict")) {
+          Object.assign(existing, {
+            branch: incoming.branch,
+            summary: incoming.summary,
+            model: incoming.model,
+            duration: incoming.duration,
+            cost: incoming.cost,
+            cost_cents: incoming.cost_cents,
+            duration_minutes: incoming.duration_minutes,
+            pr_url: incoming.pr_url,
+            checks_yaml: incoming.checks_yaml,
+            issues_json: incoming.issues_json,
+            learnings_json: incoming.learnings_json,
+            recommendations_json: incoming.recommendations_json,
+            reviewed: incoming.reviewed,
+          });
+          results.push(existing);
+        } else {
+          const row = {
+            ...incoming,
+            id: nextSessionId++,
+            created_at: new Date(),
+          };
+          sessionStore.push(row);
+          results.push(row);
+        }
       }
-
-      const row = {
-        ...incoming,
-        id: nextSessionId++,
-        created_at: new Date(),
-      };
-      sessionStore.push(row);
-      return [row];
+      return results;
     }
 
-    // ---- DELETE FROM session_pages WHERE session_id = $1 ----
+    // ---- DELETE FROM session_pages WHERE session_id ... ----
     if (q.includes("delete") && q.includes("session_pages")) {
-      const sessionId = params[0] as number;
+      // Supports both single-row (= $1) and bulk (IN ($1, $2, ...)) deletes
+      const sessionIds = params.map(Number);
       sessionPageStore = sessionPageStore.filter(
-        (r) => r.session_id !== sessionId
+        (r) => !sessionIds.includes(r.session_id)
       );
       return [];
     }

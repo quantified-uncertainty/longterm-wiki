@@ -28,10 +28,18 @@ import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
   cl,
+  clearAbandoned,
+  clearPendingVerification,
+  getAbandonedSha,
+  isAbandoned,
+  isPendingVerification,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
+  markAbandoned,
   markProcessed,
+  recordFailure,
+  resetFailCount,
 } from './state.ts';
 
 // ── Bot / release PR skip lists ──────────────────────────────────────────────
@@ -78,6 +86,39 @@ export function detectAllPrIssuesFromNodes(
   config: PatrolConfig,
 ): DetectedPr[] {
   const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
+
+  // Check for new pushes on abandoned PRs — clear abandoned state if HEAD SHA changed.
+  // Also update the stored SHA for abandoned PRs that don't have one yet (backward compat).
+  for (const pr of prs) {
+    if (!isAbandoned(pr.number)) continue;
+    const abandonedSha = getAbandonedSha(pr.number);
+    if (abandonedSha && pr.headRefOid && abandonedSha !== pr.headRefOid) {
+      clearAbandoned(pr.number);
+      log(`  PR #${pr.number}: new push detected (${abandonedSha.slice(0, 8)} → ${pr.headRefOid.slice(0, 8)}) — cleared abandoned state`);
+    } else if (!abandonedSha && pr.headRefOid) {
+      // Backfill: write the current SHA so future pushes can be detected
+      markAbandoned(pr.number, pr.headRefOid);
+    }
+  }
+
+  // Check pending CI verifications before filtering.
+  // PRs that were "fixed" in a previous cycle need their CI status verified.
+  for (const pr of prs) {
+    if (!isPendingVerification(pr.number)) continue;
+    const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs);
+    const hasCiFailure = currentIssues.includes('ci-failure');
+    if (!hasCiFailure) {
+      // CI passed — the fix worked, reset the fail counter
+      resetFailCount(pr.number);
+      clearPendingVerification(pr.number);
+      log(`  PR #${pr.number}: CI passed after fix — fail counter reset`);
+    } else {
+      // CI still failing — the fix didn't work, increment fail counter
+      recordFailure(pr.number);
+      clearPendingVerification(pr.number);
+      log(`  PR #${pr.number}: CI still failing after fix — incrementing fail counter`);
+    }
+  }
 
   return prs
     .filter((pr) => {

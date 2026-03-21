@@ -12,7 +12,7 @@ import {
 import { getEntityHref, getWikiHref } from "@/data/entity-nav";
 
 function getEventSlugs(): string[] {
-  return getTypedEntities().filter(isEvent).map((e) => e.id);
+  return getTypedEntities().filter(isEvent).filter((e) => !e.deprecated).map((e) => e.id);
 }
 
 function resolveEventBySlug(slug: string): EventEntity | undefined {

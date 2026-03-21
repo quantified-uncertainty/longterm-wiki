@@ -27,7 +27,8 @@
       "@wiki-server/factbase-verifications-route": ["../wiki-server/src/routes/factbase/factbase-verifications.ts"],
       "@wiki-server/grants-route": ["../wiki-server/src/routes/tablebase/grants.ts"],
       "@wiki-server/divisions-route": ["../wiki-server/src/routes/tablebase/divisions.ts"],
-      "@wiki-server/funding-programs-route": ["../wiki-server/src/routes/tablebase/funding-programs.ts"]
+      "@wiki-server/funding-programs-route": ["../wiki-server/src/routes/tablebase/funding-programs.ts"],
+      "@wiki-server/personnel-route": ["../wiki-server/src/routes/tablebase/personnel.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

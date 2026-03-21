@@ -4,7 +4,7 @@ import { getTypedEntities, isBenchmark, isAiModel, getBenchmarkResults, type Ben
  * Get all benchmark entities.
  */
 export function getBenchmarkEntities(): BenchmarkEntity[] {
-  return getTypedEntities().filter(isBenchmark);
+  return getTypedEntities().filter(isBenchmark).filter((e) => !e.deprecated);
 }
 
 /**
