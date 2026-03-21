@@ -44,6 +44,91 @@ export interface PageTemplate {
   qualityCriteria: QualityCriterion[];
 }
 
+/**
+ * Map from entity type (or page type) to template ID.
+ * Used to auto-resolve templates when `pageTemplate` frontmatter is absent.
+ */
+const ENTITY_TYPE_TO_TEMPLATE: Record<string, string> = {
+  risk: 'knowledge-base-risk',
+  approach: 'knowledge-base-response',
+  response: 'knowledge-base-response',
+  model: 'knowledge-base-model',
+  analysis: 'knowledge-base-model',
+  concept: 'knowledge-base-concept',
+  person: 'knowledge-base-person',
+  organization: 'knowledge-base-organization',
+  overview: 'knowledge-base-overview',
+};
+
+/**
+ * Resolve the best-matching template for a page.
+ * Priority: explicit `pageTemplate` frontmatter > entity type mapping.
+ * Returns null if no template matches.
+ */
+export function resolveTemplate(pageTemplate?: string, entityType?: string): PageTemplate | null {
+  if (pageTemplate && PAGE_TEMPLATES[pageTemplate]) {
+    return PAGE_TEMPLATES[pageTemplate];
+  }
+  if (entityType) {
+    const templateId = ENTITY_TYPE_TO_TEMPLATE[entityType];
+    if (templateId && PAGE_TEMPLATES[templateId]) {
+      return PAGE_TEMPLATES[templateId];
+    }
+  }
+  return null;
+}
+
+/**
+ * Format a template's requirements as a prompt-friendly string.
+ * Used to inject template structure into LLM synthesis/improve prompts.
+ */
+export function formatTemplateForPrompt(template: PageTemplate): string {
+  const lines: string[] = [];
+  lines.push(`Template: ${template.name}`);
+
+  if (template.minWordCount) {
+    lines.push(`Minimum word count: ${template.minWordCount}`);
+  }
+
+  const requiredSections = template.sections.filter(s => s.required);
+  const optionalSections = template.sections.filter(s => !s.required);
+
+  if (requiredSections.length > 0) {
+    lines.push('');
+    lines.push('Required sections (MUST be present as ## headings):');
+    for (const s of requiredSections) {
+      const alts = s.alternateLabels.length > 0
+        ? ` (or: ${s.alternateLabels.join(', ')})`
+        : '';
+      lines.push(`  - ${s.label}${alts}`);
+    }
+  }
+
+  if (optionalSections.length > 0) {
+    lines.push('');
+    lines.push('Optional sections (include if content supports them):');
+    for (const s of optionalSections) {
+      const alts = s.alternateLabels.length > 0
+        ? ` (or: ${s.alternateLabels.join(', ')})`
+        : '';
+      lines.push(`  - ${s.label}${alts}`);
+    }
+  }
+
+  const qualityCriteria = template.qualityCriteria.filter(
+    c => c.id !== 'word-count'
+  );
+  if (qualityCriteria.length > 0) {
+    lines.push('');
+    lines.push('Quality criteria (aim to satisfy these):');
+    for (const c of qualityCriteria) {
+      lines.push(`  - ${c.label}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
   'knowledge-base-risk': {
     id: 'knowledge-base-risk',

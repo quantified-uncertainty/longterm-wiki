@@ -23,10 +23,12 @@ interface ImprovePromptArgs {
   /** Structured KB facts for the page's entity, if one exists in the KB. */
   kbContext: string | null;
   tier: string;
+  /** Formatted template requirements (from resolveTemplate + formatTemplateForPrompt). */
+  templateContext: string | null;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, kbContext, tier } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, kbContext, tier, templateContext } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -57,7 +59,13 @@ ${currentContent}
 \`\`\`
 
 ## Improvement Instructions
+${templateContext ? `
+### Template Requirements
+This page should follow the **${templateContext.split('\n')[0].replace('Template: ', '')}** template structure.
+${templateContext}
 
+Check that all required sections exist. If a required section is missing, add it with substantive content (not stubs). Do not add empty sections just to satisfy the template — only add sections where you have content from the research or existing page to fill them.
+` : ''}
 ### Content Preservation (CRITICAL)
 You are EDITING an existing page, not rewriting it from scratch. Your output must preserve:
 - **ALL existing sections** — do not drop, merge, or summarize away existing sections
