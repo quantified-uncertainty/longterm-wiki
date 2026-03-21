@@ -222,12 +222,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
-  // params: [prefixQuery, limit] for to_tsquery; [q, q, limit] for plainto_tsquery
+  // Tagged template: params = [prefixQuery, prefixQuery, limit] (interpolated values in order)
+  // unsafe(): params = [prefixQuery, limit]
   if ((q.includes("to_tsquery") || q.includes("plainto_tsquery")) && q.includes("resources")) {
     const rawQuery = (params[0] as string);
     // Strip :* suffixes and & operators to get plain search words
     const searchTerm = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim().toLowerCase();
-    const limit = (params[1] as number) || 20;
+    // The limit is always the last param (a number); earlier params are query strings.
+    const lastParam = params[params.length - 1];
+    const limit = (typeof lastParam === "number" ? lastParam : 20);
     const results: Record<string, unknown>[] = [];
     for (const r of resourceStore.values()) {
       const title = ((r.title as string) || "").toLowerCase();
