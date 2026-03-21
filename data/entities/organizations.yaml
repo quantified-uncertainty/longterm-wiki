@@ -53,6 +53,16 @@
       relationship: research
     - id: A4XoubikkQ
       type: organization
+    - id: chris-olah
+      type: person
+    - id: daniela-amodei
+      type: person
+    - id: dario-amodei
+      type: person
+    - id: holden-karnofsky
+      type: person
+    - id: jan-leike
+      type: person
   sources:
     - title: Anthropic Company Website
       url: https://anthropic.com
@@ -134,6 +144,12 @@
     - id: richard-ngo
       type: person
       relationship: research
+    - id: demis-hassabis
+      type: person
+    - id: shane-legg
+      type: person
+    - id: allan-dafoe
+      type: person
   sources:
     - title: Google DeepMind Website
       url: https://deepmind.google
@@ -204,6 +220,8 @@
     - id: vc60Nthkcg
       type: risk
       relationship: addresses
+    - id: sam-altman
+      type: person
   sources:
     - title: OpenAI Website
       url: https://openai.com
@@ -267,6 +285,8 @@
       type: concept
     - id: QVsRgOaeUw
       type: concept
+    - id: elon-musk
+      type: person
   sources:
     - title: xAI Website
       url: https://x.ai
@@ -439,6 +459,10 @@
     - id: vidur-kapur
       type: person
       relationship: research
+    - id: connor-leahy
+      type: person
+    - id: controlai
+      type: organization
   sources:
     - title: Conjecture Website
       url: https://conjecture.dev
@@ -580,6 +604,8 @@
     - id: eli-lifland
       type: person
       relationship: research
+    - id: beth-barnes
+      type: person
   sources:
     - title: METR Website
       url: https://metr.org
@@ -744,6 +770,10 @@
       type: risk
     - id: QsXVXtQ0zE
       type: organization
+    - id: eliezer-yudkowsky
+      type: person
+    - id: nate-soares
+      type: person
   sources:
     - title: MIRI Website
       url: https://intelligence.org
@@ -808,6 +838,8 @@
       type: organization
     - id: A4XoubikkQ
       type: organization
+    - id: ian-hogarth
+      type: person
   sources:
     - title: UK AI Safety Institute Website
       url: https://www.aisi.gov.uk
@@ -862,6 +894,8 @@
     - id: elizabeth-kelly
       type: person
       relationship: leads-to
+    - id: paul-christiano
+      type: person
   sources:
     - title: US AI Safety Institute Website
       url: https://www.nist.gov/aisi
@@ -1046,6 +1080,8 @@
     - id: toby-ord
       type: person
       relationship: research
+    - id: nick-bostrom
+      type: person
   tags:
     - research-org
     - existential-risk
@@ -1216,6 +1252,8 @@
       type: organization
     - id: A4XoubikkQ
       type: organization
+    - id: ilya-sutskever
+      type: person
   sources:
     - title: Safe Superintelligence Inc. Website
       url: https://ssi.inc
@@ -1802,6 +1840,8 @@
       type: person
     - id: 6gjF5d3geg
       type: person
+    - id: max-tegmark
+      type: person
   sources:
     - title: Future of Life Institute Website
       url: https://futureoflife.org/
@@ -2206,6 +2246,8 @@
     - id: cMbVUVK29Q
       type: person
       relationship: research
+    - id: yann-lecun
+      type: person
   sources:
     - title: Meta AI Research
       url: https://ai.meta.com/research/
@@ -2586,7 +2628,7 @@
     - id: jaan-tallinn
       type: person
       relationship: leads-to
-    - id: CgscaZc0lA
+    - id: quri
       type: organization
   clusters:
     - community
@@ -5927,6 +5969,9 @@
   website: https://www.forethought.org
   description: >-
     Research foundation co-founded by Will MacAskill, focused on longtermism and improving long-run outcomes for humanity. Produces research on AI and existential risk.
+  relatedEntries:
+    - id: will-macaskill
+      type: person
   tags:
     - ea-community
     - longtermism
