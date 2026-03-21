@@ -205,7 +205,7 @@ export function createGitHubProvider(): SearchProvider {
           if (orgHit) hits.push(orgHit);
 
           // Also search repos under this org
-          const orgRepos = await searchOrgRepos(orgName, Math.min(maxResults - 1, 5));
+          const orgRepos = await searchOrgRepos(orgName, Math.max(0, Math.min(maxResults - 1, 5)));
           hits.push(...orgRepos);
         }
 

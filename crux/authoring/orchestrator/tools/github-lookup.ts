@@ -56,8 +56,9 @@ export const tool: ToolRegistration = {
       let newCount = 0;
       for (const hit of hits) {
         if (!existingUrls.has(hit.url)) {
+          const nextId = ctx.sourceCache.length + 1;
           ctx.sourceCache.push({
-            id: `GH-${ctx.sourceCache.length + 1}`,
+            id: `GH-${nextId}`,
             url: hit.url,
             title: hit.title,
             content: hit.snippet ?? '',
