@@ -112,20 +112,21 @@ export async function apiRequest<T>(
     return apiErr('unavailable', `${prefix}LONGTERMWIKI_SERVER_URL not set`);
   }
 
-  const fullUrl = `${serverUrl}${path}`;
-
   try {
-    const headers = buildHeaders();
-    const bodyStr = body !== undefined ? JSON.stringify(body) : undefined;
-
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const res = await fetch(fullUrl, {
+
+    const options: RequestInit = {
       method,
-      headers,
-      body: bodyStr,
+      headers: buildHeaders(),
       signal: controller.signal,
-    });
+    };
+
+    if (body !== undefined) {
+      options.body = JSON.stringify(body);
+    }
+
+    const res = await fetch(`${serverUrl}${path}`, options);
     clearTimeout(timer);
 
     if (!res.ok) {
@@ -160,33 +161,6 @@ export async function batchedRequest<T>(
 }
 
 // ---------------------------------------------------------------------------
-// Shared server fetch — exported for health-check.ts and other callers
-// ---------------------------------------------------------------------------
-
-/**
- * Fetch a URL from the wiki-server with timeout support.
- */
-export async function serverFetch(
-  url: string,
-  init?: { method?: string; headers?: Record<string, string>; body?: string; timeoutMs?: number },
-): Promise<{ ok: boolean; status: number; text: () => Promise<string>; json: () => Promise<unknown> }> {
-  const method = init?.method ?? 'GET';
-  const headers = init?.headers ?? {};
-  const timeoutMs = init?.timeoutMs ?? TIMEOUT_MS;
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: init?.body,
-    signal: controller.signal,
-  });
-  clearTimeout(timer);
-  return res;
-}
-
-// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 
@@ -198,10 +172,17 @@ export async function isServerAvailable(): Promise<boolean> {
   if (!serverUrl) return false;
 
   try {
-    const res = await serverFetch(`${serverUrl}/health`, { timeoutMs: TIMEOUT_MS });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    const res = await fetch(`${serverUrl}/health`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
     if (!res.ok) return false;
 
-    const body = (await res.json()) as { status?: string };
+    const body = await res.json();
     return body.status === 'healthy';
   } catch {
     return false;

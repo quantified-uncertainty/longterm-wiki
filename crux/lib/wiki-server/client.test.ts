@@ -210,5 +210,4 @@ describe('wiki-server/client', () => {
       expect(result).toBe(false);
     });
   });
-
 });
