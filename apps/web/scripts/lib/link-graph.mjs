@@ -288,7 +288,7 @@ export function computeRelatedGraph(entities, pages, contentInbound, tagIndex, b
         const entry = {
           id: targetId,
           type: e?.type || 'concept',
-          title: e?.title || targetId,
+          title: e?.title || targetPage?.title || targetId,
           score: Math.round(rawScore * boost * 100) / 100,
         };
         const lbl = labels[entityId]?.[targetId];
@@ -399,8 +399,11 @@ export function collectLinkSignals(entities, pages, contentInbound, tagIndex, by
       const weight = Math.round(specificity * 2 * 100) / 100;
       if (weight > 0) {
         for (const te of tagEntities) {
-          if (te.id !== entity.id) {
+          // Use id-ordering guard (like computeRelatedGraph) + explicit bidirectional addLink
+          // so each pair is processed once but both directions are recorded in the link table.
+          if (te.id !== entity.id && entity.id < te.id) {
             addLink(entity.id, te.id, 'shared_tag', weight, null);
+            addLink(te.id, entity.id, 'shared_tag', weight, null);
           }
         }
       }

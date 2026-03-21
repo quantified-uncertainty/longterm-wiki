@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import { parse as parseYaml } from "yaml";
 import type { EntityMatch, EntityMatcher } from "./types.ts";
+import type { IdRegistryMaps } from "../../../apps/web/src/data/tablebase.ts";
 
 /**
  * Suffixes to strip from grantee names during normalization.
@@ -72,7 +73,7 @@ export function buildEntityMatcher(): EntityMatcher {
 
   // Load database.json for idRegistry (slug↔stableId) and typedEntities
   let db: {
-    idRegistry?: { stableIdBySlug?: Record<string, string>; stableIdToSlug?: Record<string, string> };
+    idRegistry?: IdRegistryMaps;
     typedEntities?: Array<{ id: string; stableId?: string; title?: string; aliases?: string[] }>;
   } = {};
   const dbPath = resolve("apps/web/src/data/database.json");
@@ -89,7 +90,6 @@ export function buildEntityMatcher(): EntityMatcher {
   }
 
   const slugToId: Record<string, string> = db.idRegistry?.stableIdBySlug || {};
-  const idToSlug: Record<string, string> = db.idRegistry?.stableIdToSlug || {};
 
   for (const e of db.typedEntities || []) {
     const slug = e.id;
