@@ -809,11 +809,14 @@ export const entities = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // search_vector tsvector column is managed via raw SQL migration 0120
+    // (Drizzle doesn't have native tsvector support)
   },
   (table) => [
     index("idx_ent_wiki_id").on(table.wikiId),
     index("idx_ent_entity_type").on(table.entityType),
     index("idx_ent_title").on(table.title),
+    // GIN index on search_vector + trigram index on title created in migration SQL
   ]
 );
 
