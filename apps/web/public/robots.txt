@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /factbase/
+Disallow: /organizations/*/grants/
 
 Sitemap: https://www.longtermwiki.com/sitemap.xml
 LLMs-Txt: https://www.longtermwiki.com/llms.txt

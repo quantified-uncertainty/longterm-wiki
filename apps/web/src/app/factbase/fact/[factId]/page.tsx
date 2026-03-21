@@ -19,6 +19,8 @@ import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
 // These are internal KB fact detail pages with low traffic.
+// Cache for 1 hour to avoid expensive re-renders from bot crawlers.
+export const revalidate = 3600;
 
 // ── Metadata ─────────────────────────────────────────────────────────
 
