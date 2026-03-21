@@ -259,8 +259,10 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
         blockJS: false,
         mdxOptions: {
           remarkPlugins: [remarkGfm, remarkMath, remarkDirective, remarkCallouts],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- rehype plugin type incompatibility with next-mdx-remote
-          rehypePlugins: [rehypeSlug as any, rehypeKatex as any],
+          // rehype plugin types are incompatible with next-mdx-remote's expected signature;
+          // runtime behavior is correct, so we suppress the type error.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          rehypePlugins: [rehypeSlug, rehypeKatex] as any,
         },
       },
     });

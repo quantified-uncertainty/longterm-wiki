@@ -1,6 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, isValidElement } from "react";
+
+/** Recursively extract text content from a ReactNode tree. */
+function extractText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractText(node.props.children);
+  }
+  return "";
+}
 
 const defaultEnvironment = {
   seed: "longterm",
@@ -33,6 +44,7 @@ export function SquiggleEstimate({
   showEditor: initialShowEditor = false,
 }: SquiggleEstimateProps) {
   const [showEditor, setShowEditor] = useState(initialShowEditor);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lazy-loaded third-party components with complex props
   const [SquiggleComponents, setSquiggleComponents] = useState<{
     SquiggleChart: React.ComponentType<any>;
     SquiggleEditor: React.ComponentType<any>;
@@ -41,19 +53,8 @@ export function SquiggleEstimate({
 
   const code = useMemo(() => {
     if (codeProp) return codeProp.trim();
-
-    if (children) {
-      if (typeof children === "string") return children.trim();
-
-      const c = children as any;
-      if (c?.props?.children?.props?.children) {
-        return String(c.props.children.props.children).trim();
-      }
-      if (c?.props?.children) {
-        return String(c.props.children).trim();
-      }
-    }
-    return "";
+    // MDX may wrap code blocks in nested React elements; recursively extract text.
+    return extractText(children).trim();
   }, [codeProp, children]);
 
   // Lazy-load Squiggle library and CSS only when component mounts
