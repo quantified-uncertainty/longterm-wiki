@@ -417,9 +417,10 @@ interface TableBaseShape {
   publications: Publication[];
   literature?: LiteratureData;
   organizations: Organization[];
-  prItems: Record<string, unknown>[];
-  backlinks: Record<string, BacklinkEntry[]>;
-  relatedGraph: Record<string, RelatedGraphEntry[]>;
+  /** @deprecated No longer included in database.json. Backlinks are in per-entity bundles. */
+  backlinks?: Record<string, BacklinkEntry[]>;
+  /** @deprecated No longer included in database.json. Related graph is in per-entity bundles. */
+  relatedGraph?: Record<string, RelatedGraphEntry[]>;
   pathRegistry: Record<string, string>;
   idRegistry: IdRegistryMaps;
   pages: Page[];
