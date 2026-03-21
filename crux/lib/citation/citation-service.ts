@@ -1,0 +1,278 @@
+/**
+ * Unified Citation Service — single entry point for all citation verification
+ *
+ * Consolidates the two verification paths:
+ *   1. HTTP-only ("http"): fetch each URL, check HTTP status → verified/broken/unverifiable
+ *   2. LLM-based ("llm"): fetch each URL, then verify claims against source text via LLM
+ *
+ * Both paths share:
+ *   - Citation extraction from MDX (via citation-archive.ts)
+ *   - URL fetching (via source-fetcher.ts)
+ *   - Result types and summary statistics
+ *
+ * Usage:
+ *   import { verifyCitations } from './citation-service.ts';
+ *
+ *   // Quick HTTP check
+ *   const httpResult = await verifyCitations({ content, mode: 'http' });
+ *
+ *   // Full LLM verification
+ *   const llmResult = await verifyCitations({ content, mode: 'llm', fetchMissing: true });
+ *
+ * Part of the citation consolidation initiative (#1479).
+ */
+
+import {
+  extractCitationsFromContent,
+  type ExtractedCitation,
+} from './citation-archive.ts';
+import {
+  auditCitations,
+  type AuditRequest,
+  type AuditResult,
+  type AuditVerdict,
+  type CitationAudit,
+  type SourceCache,
+  type ClaimMap,
+} from './citation-auditor.ts';
+import { fetchSource, type FetchedSource } from '../search/source-fetcher.ts';
+import { stripFrontmatter } from '../patterns.ts';
+
+// ---------------------------------------------------------------------------
+// Public types
+// ---------------------------------------------------------------------------
+
+/** Verification mode. */
+export type VerificationMode = 'http' | 'llm';
+
+/** Status from HTTP-only verification. */
+export type HttpVerificationStatus = 'verified' | 'broken' | 'unverifiable';
+
+/** Result for a single citation (HTTP mode). */
+export interface HttpCitationResult {
+  footnote: number;
+  url: string;
+  linkText: string;
+  claimContext: string;
+  httpStatus: number;
+  pageTitle: string | null;
+  contentSnippet: string | null;
+  contentLength: number;
+  status: HttpVerificationStatus;
+  error: string | null;
+}
+
+/** Aggregate result for HTTP-mode verification. */
+export interface HttpVerificationResult {
+  mode: 'http';
+  citations: HttpCitationResult[];
+  summary: {
+    total: number;
+    verified: number;
+    broken: number;
+    unverifiable: number;
+  };
+}
+
+/** Aggregate result for LLM-mode verification. */
+export interface LlmVerificationResult {
+  mode: 'llm';
+  /** Per-citation LLM verdicts (from citation-auditor). */
+  citations: CitationAudit[];
+  summary: AuditResult['summary'];
+  unsourcedTableCells: AuditResult['unsourcedTableCells'];
+  pass: boolean;
+}
+
+/** Union result type — discriminated on `mode`. */
+export type VerificationResult = HttpVerificationResult | LlmVerificationResult;
+
+/** Options for verifyCitations(). */
+export interface VerifyCitationsRequest {
+  /** Raw MDX content (with or without frontmatter). */
+  content: string;
+
+  /** Verification mode: 'http' for quick status check, 'llm' for claim verification. */
+  mode: VerificationMode;
+
+  // ---- HTTP mode options ----
+
+  /** Concurrency limit for HTTP fetches. Default: 5. */
+  concurrency?: number;
+  /** Delay between batches (ms). Default: 1000 for http, 300 for llm. */
+  delayMs?: number;
+
+  // ---- LLM mode options ----
+
+  /** Pre-fetched sources (avoids redundant fetches). LLM mode only. */
+  sourceCache?: SourceCache;
+  /** Pre-extracted claim texts by footnote ref. LLM mode only. */
+  claimMap?: ClaimMap;
+  /** Whether to fetch URLs not in sourceCache. Default: true. */
+  fetchMissing?: boolean;
+  /** Fraction of citations that must be verified for pass=true. Default: 0.8. */
+  passThreshold?: number;
+  /** LLM model for verification. LLM mode only. */
+  model?: string;
+  /** Max concurrent LLM calls. Default: 3. LLM mode only. */
+  llmConcurrency?: number;
+
+  // ---- Shared ----
+
+  /** Log progress to stdout. Default: false. */
+  verbose?: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// HTTP-only verification (extracted from citation-archive.verifyCitationsForPage)
+// ---------------------------------------------------------------------------
+
+function httpStatusToVerification(httpStatus: number): HttpVerificationStatus {
+  if (httpStatus === 0) return 'unverifiable';
+  if (httpStatus >= 200 && httpStatus < 400) return 'verified';
+  return 'broken';
+}
+
+async function verifyHttp(
+  content: string,
+  opts: VerifyCitationsRequest,
+): Promise<HttpVerificationResult> {
+  const concurrency = opts.concurrency ?? 5;
+  const delayMs = opts.delayMs ?? 1000;
+  const verbose = opts.verbose ?? false;
+
+  const body = stripFrontmatter(content);
+  const extracted = extractCitationsFromContent(body);
+  const citations: HttpCitationResult[] = [];
+
+  for (let i = 0; i < extracted.length; i += concurrency) {
+    const batch = extracted.slice(i, i + concurrency);
+
+    const results = await Promise.all(
+      batch.map(async (ext) => {
+        if (verbose) {
+          process.stdout.write(`  [^${ext.footnote}] ${ext.url.slice(0, 60)}...`);
+        }
+
+        const source = await fetchSource({ url: ext.url, extractMode: 'full' });
+
+        let errorMsg: string | null = null;
+        if (source.status === 'error') errorMsg = 'fetch error';
+        else if (source.status === 'dead') errorMsg = `HTTP ${source.httpStatus}`;
+
+        const status = httpStatusToVerification(source.httpStatus);
+
+        const result: HttpCitationResult = {
+          footnote: ext.footnote,
+          url: ext.url,
+          linkText: ext.linkText,
+          claimContext: ext.claimContext,
+          httpStatus: source.httpStatus,
+          pageTitle: source.title || null,
+          contentSnippet: source.content ? source.content.slice(0, 500) : null,
+          contentLength: source.content.length,
+          status,
+          error: errorMsg,
+        };
+
+        if (verbose) {
+          const icon = status === 'verified' ? ' ✓' :
+                       status === 'broken' ? ' ✗' : ' ?';
+          console.log(icon);
+        }
+
+        return result;
+      }),
+    );
+
+    citations.push(...results);
+
+    if (i + concurrency < extracted.length && delayMs > 0) {
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+
+  return {
+    mode: 'http',
+    citations,
+    summary: {
+      total: citations.length,
+      verified: citations.filter(c => c.status === 'verified').length,
+      broken: citations.filter(c => c.status === 'broken').length,
+      unverifiable: citations.filter(c => c.status === 'unverifiable').length,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// LLM verification (delegates to citation-auditor)
+// ---------------------------------------------------------------------------
+
+async function verifyLlm(
+  content: string,
+  opts: VerifyCitationsRequest,
+): Promise<LlmVerificationResult> {
+  const request: AuditRequest = {
+    content,
+    sourceCache: opts.sourceCache,
+    claimMap: opts.claimMap,
+    fetchMissing: opts.fetchMissing ?? true,
+    passThreshold: opts.passThreshold,
+    model: opts.model,
+    delayMs: opts.delayMs ?? 300,
+    concurrency: opts.llmConcurrency ?? 3,
+  };
+
+  const result = await auditCitations(request);
+
+  return {
+    mode: 'llm',
+    citations: result.citations,
+    summary: result.summary,
+    unsourcedTableCells: result.unsourcedTableCells,
+    pass: result.pass,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Unified entry point
+// ---------------------------------------------------------------------------
+
+/**
+ * Verify citations in MDX content.
+ *
+ * @param request - Verification options including content and mode.
+ * @returns VerificationResult discriminated by mode ('http' or 'llm').
+ *
+ * HTTP mode: Fetches each URL and checks HTTP status. Fast, no LLM cost.
+ * LLM mode: Fetches sources and verifies claims against source text via LLM.
+ */
+export async function verifyCitations(
+  request: VerifyCitationsRequest,
+): Promise<VerificationResult> {
+  if (request.mode === 'http') {
+    return verifyHttp(request.content, request);
+  }
+  return verifyLlm(request.content, request);
+}
+
+// ---------------------------------------------------------------------------
+// Re-exports for convenience
+// ---------------------------------------------------------------------------
+
+export {
+  extractCitationsFromContent,
+  type ExtractedCitation,
+} from './citation-archive.ts';
+
+export {
+  type AuditResult,
+  type AuditVerdict,
+  type CitationAudit,
+  type SourceCache,
+  type ClaimMap,
+  type AuditRequest,
+  type SourceContext,
+  type UnsourcedTableCell,
+  MIN_SOURCE_CONTENT_LENGTH,
+} from './citation-auditor.ts';
