@@ -413,7 +413,6 @@ export interface Page {
 /** TableBase: typed relational records (Postgres/YAML entities). */
 interface TableBaseShape {
   typedEntities?: Array<Record<string, unknown>>;
-  resources: Resource[];
   publications: Publication[];
   literature?: LiteratureData;
   organizations: Organization[];
@@ -657,10 +656,22 @@ export function getTypedEntityByStableId(stableId: string): AnyEntity | undefine
   return entityStableIdIndex().get(stableId);
 }
 
+function loadResources(): Resource[] {
+  // Resources are in a separate file (split from database.json for size)
+  const resourcesPath = path.join(LOCAL_DATA_DIR, "resources.json");
+  try {
+    return JSON.parse(fs.readFileSync(resourcesPath, "utf-8"));
+  } catch {
+    // Fallback to database.json if separate file doesn't exist (backward compat)
+    const db = getTableBase();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- backward compat: resources was removed from TableBaseShape
+    return ((db as any).resources as Resource[]) || [];
+  }
+}
+
 function resourceIndex() {
   if (!_resourceIndex) {
-    const db = getTableBase();
-    const resources = db.resources || [];
+    const resources = loadResources();
     _resourceIndex = new Map();
     _stableIdIndex = new Map();
     for (const r of resources) {
@@ -737,10 +748,13 @@ export function resolveResource(id: string): Resource | undefined {
   return resourceIndex().get(id) ?? stableIdIndex().get(id);
 }
 
-/** Get all resources */
+let _allResources: Resource[] | null = null;
+
+/** Get all resources (loaded from separate resources.json) */
 export function getAllResources(): Resource[] {
-  const db = getTableBase();
-  return db.resources ?? [];
+  if (_allResources) return _allResources;
+  _allResources = loadResources();
+  return _allResources;
 }
 
 /** Get resource IDs for a page (computed at build time from inline <R>, cited_by, URL matching) */

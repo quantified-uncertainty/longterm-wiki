@@ -49,6 +49,8 @@ export function writeMainOutputFiles({ database, outputFile }) {
     // Phase 3: Relational data (already in per-entity bundles)
     backlinks: _backlinks,
     relatedGraph: _relatedGraph,
+    // Phase 4: Large arrays moved to separate lazy-loaded files
+    resources: _resources,
     ...databaseForOutput
   } = database;
 
@@ -81,10 +83,17 @@ export function writeMainOutputFiles({ database, outputFile }) {
   const strippedKeys = [
     'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
     'researchAreas', 'pageReferenceIndex', 'prItems', 'updateSchedule',
-    'redundancyPairs', 'backlinks', 'relatedGraph',
+    'redundancyPairs', 'backlinks', 'relatedGraph', 'resources',
   ];
   console.log(`\n✓ Written: ${outputFile} (stripped: entities, KB, experts, ${strippedKeys.join(', ')})`);
   console.log(`  Page fields stripped: ${DASHBOARD_ONLY_PAGE_FIELDS.join(', ')}`);
+
+  // Write resources to a separate file (lazy-loaded by tablebase.ts)
+  const RESOURCES_OUTPUT_FILE = join(OUTPUT_DIR, 'resources.json');
+  if (_resources) {
+    writeFileSync(RESOURCES_OUTPUT_FILE, JSON.stringify(_resources));
+    console.log(`✓ Written: ${RESOURCES_OUTPUT_FILE} (${_resources.length} resources)`);
+  }
 
   // Write FactBase data to a separate file (loaded independently by factbase.ts)
   const FACTBASE_OUTPUT_FILE = join(OUTPUT_DIR, 'factbase-data.json');
