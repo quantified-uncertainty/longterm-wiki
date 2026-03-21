@@ -377,6 +377,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'kb-entity-slugs',
+    name: 'KB entity slug validation (FactBase refs have entity registry entries)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-kb-entity-slugs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: FactBase !ref values that point to stableIds without entity
+    // registry entries cause broken links and missing entity data in the UI.
+  },
+  {
     id: 'yaml-entity-refs',
     name: 'YAML entity reference integrity (relatedEntries, developer, affiliation)',
     command: 'npx',
