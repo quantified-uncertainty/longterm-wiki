@@ -413,6 +413,55 @@ properties:
       prefix: "$"
       suffix: "B"
 
+  # ── Nonprofit Financial ───────────────────────────────────────
+
+  annual-expenses:
+    name: Annual Expenses
+    description: "Total annual expenses (from 990 filings or annual reports)"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  net-assets:
+    name: Net Assets
+    description: "Net assets / fund balance (total assets minus total liabilities)"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  total-grants-made:
+    name: Total Grants Made
+    description: "Cumulative dollar value of grants awarded by this organization"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  grant-count:
+    name: Grant Count
+    description: "Total number of grants awarded by this organization"
+    dataType: number
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+
   # ── Additional Safety ──────────────────────────────────────────
 
   safety-staffing-ratio:

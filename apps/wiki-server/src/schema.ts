@@ -1607,6 +1607,9 @@ export const personnel = pgTable(
     background: text("background"), // board-seats only
     source: text("source"), // URL confirming the role
     notes: text("notes"),
+    compensation: numeric("compensation"), // annual compensation in USD (from 990s, proxy statements, etc.)
+    compensationYear: text("compensation_year"), // YYYY — fiscal year the compensation applies to
+    compensationSource: text("compensation_source"), // URL to 990, proxy statement, or other source
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2120,6 +2123,168 @@ export const recordVerdicts = pgTable(
   ]
 );
 
+// ── Entity Events (Timeline / Milestones) ────────────────────────────
+//
+// Generic event/milestone table for any entity type. Replaces inline
+// timeline tables in wiki pages and can eventually subsume the YAML-based
+// milestone arrays used by legislation pages.
+//
+// Design: one event per row, linked to an entity. Event types are
+// parameterized (not hardcoded to policy labels), so the same table
+// serves organizations, people, legislation, projects, etc.
+
+/**
+ * Entity events — milestones, announcements, incidents, transitions.
+ *
+ * Each row is a single dated event associated with one entity.
+ * Rendered by timeline components on directory pages.
+ */
+export const entityEvents = pgTable(
+  "entity_events",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the parent entity */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback when entity is unresolved */
+    entityDisplayName: text("entity_display_name"),
+    date: text("date").notNull(), // YYYY, YYYY-MM, or YYYY-MM-DD
+    title: text("title").notNull(),
+    description: text("description"),
+    /** Event type — generic across entity types */
+    eventType: text("event_type").notNull(), // founding | acquisition | pivot | launch | publication | policy | milestone | leadership-change | incident | funding | dissolution | other
+    /** Significance level for filtering/sorting */
+    significance: text("significance"), // major | moderate | minor
+    source: text("source"), // URL to source
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ee_entity").on(table.entityId),
+    index("idx_ee_date").on(table.date),
+    index("idx_ee_type").on(table.eventType),
+    index("idx_ee_significance").on(table.significance),
+  ]
+);
+
+// ── Entity Assessments ──────────────────────────────────────────────
+//
+// Structured quality/capability ratings for entities. Replaces the
+// "Quick Assessment" tables currently embedded in wiki pages.
+// Each row is a single dimension rating for one entity.
+
+/**
+ * Entity assessments — structured ratings along named dimensions.
+ *
+ * Examples: "speed: Fast (<1 week)", "transparency: High",
+ * "research output: Declining", "financial health: Stable".
+ */
+export const entityAssessments = pgTable(
+  "entity_assessments",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Dimension being assessed (e.g., 'speed', 'transparency', 'research-output') */
+    dimension: text("dimension").notNull(),
+    /** Rating value — free text to support varied scales */
+    rating: text("rating").notNull(), // e.g., "Fast (<1 week)", "High", "Declining"
+    /** Supporting evidence or explanation */
+    evidence: text("evidence"),
+    /** Who/what produced this assessment */
+    assessor: text("assessor").notNull().default("editorial"), // editorial | llm | community | external
+    /** When this assessment was made (YYYY-MM-DD) */
+    assessedAt: text("assessed_at"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ea_entity").on(table.entityId),
+    index("idx_ea_dimension").on(table.dimension),
+    // Natural key: one rating per entity per dimension per assessor
+    uniqueIndex("uq_entity_assessment_natural_key")
+      .on(table.entityId, table.dimension, table.assessor),
+  ]
+);
+
+// ── Publications ────────────────────────────────────────────────────
+//
+// Key publications (papers, reports, blog posts) associated with entities.
+// Complements research_area_papers (which links papers to research areas)
+// by linking papers directly to organizations and people.
+
+/**
+ * Publications — papers, reports, and blog posts linked to entities.
+ *
+ * Each row is a publication associated with an organization or person.
+ * Can link to the resources table when the publication is also tracked
+ * as a citation source.
+ */
+export const publications = pgTable(
+  "publications",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the primary author/org */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback */
+    entityDisplayName: text("entity_display_name"),
+    /** Optional FK to resources table for citation tracking */
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    authors: text("authors"), // comma-separated or structured
+    url: text("url"),
+    venue: text("venue"), // journal, conference, arXiv, blog
+    publishedDate: text("published_date"), // YYYY or YYYY-MM
+    publicationType: text("publication_type").notNull().default("paper"), // paper | report | blog-post | book | thesis | preprint | policy-brief
+    citationCount: integer("citation_count"),
+    /** Whether this is a flagship/seminal work for the entity */
+    isFlagship: boolean("is_flagship").notNull().default(false),
+    abstract: text("abstract"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pub_entity").on(table.entityId),
+    index("idx_pub_resource").on(table.resourceId),
+    index("idx_pub_type").on(table.publicationType),
+    index("idx_pub_date").on(table.publishedDate),
+    index("idx_pub_flagship").on(table.isFlagship),
+  ]
+);
+
 // ── Cross-Base: Unified Things Table ──────────────────────────────────
 //
 // Every identifiable item in the system gets a single row here. Enables
@@ -2146,6 +2311,9 @@ export const VALID_THING_TYPES = [
   "division-personnel",
   "research-area",
   "policy-stakeholder",
+  "entity-event",
+  "entity-assessment",
+  "publication",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
