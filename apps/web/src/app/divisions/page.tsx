@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getAllKBRecords } from "@/data/factbase";
-import { ProfileStatCard } from "@/components/directory";
+import {
+  getAllKBRecords,
+  getKBRecords,
+} from "@/data/factbase";
 import {
   parseDivision,
   resolveEntityLink,
   getDivisionHref,
+  getDivisionAltKeys,
   DIVISION_TYPE_LABELS,
-  DIVISION_TYPE_COLORS,
-  STATUS_COLORS,
 } from "./[slug]/division-data";
 import { titleCase } from "@/components/wiki/factbase/format";
+import { DivisionsTable, type DivisionRow, type TypeSummary } from "./divisions-table";
 
 export const metadata: Metadata = {
   title: "Divisions",
@@ -18,24 +19,54 @@ export const metadata: Metadata = {
     "Directory of organizational divisions, teams, departments, and program areas tracked in the knowledge base.",
 };
 
-interface DivisionRow {
-  key: string;
-  name: string;
-  parentName: string;
-  parentHref: string | null;
-  divisionType: string;
-  status: string | null;
-  lead: string | null;
-  leadName: string;
-  leadHref: string | null;
-  href: string | null;
+/**
+ * Check whether a division has meaningful data beyond just its name/type/org.
+ * A division "has data" if it has personnel, grants, funding programs,
+ * a lead, a website, or notes.
+ */
+function divisionHasData(record: import("@/data/factbase").KBRecordEntry): boolean {
+  const division = parseDivision(record);
+
+  // Check basic fields
+  if (division.lead) return true;
+  if (division.website) return true;
+  if (division.notes) return true;
+
+  // Check personnel (via all alternate keys for merged divisions)
+  const allDivKeys = getDivisionAltKeys(record);
+  for (const key of allDivKeys) {
+    const personnel = getKBRecords(`__division__${key}`, "division-personnel");
+    if (personnel.length > 0) return true;
+  }
+
+  // Check funding programs linked to this division
+  const allPrograms = getAllKBRecords("funding-programs");
+  for (const p of allPrograms) {
+    const divId = p.fields.divisionId;
+    if (typeof divId === "string" && allDivKeys.has(divId)) return true;
+  }
+
+  // Check grants (via parent org)
+  const parentGrants = getKBRecords(division.ownerEntityId, "grants");
+  const allDivKeysLower = new Set([...allDivKeys].map((k) => k.toLowerCase()));
+  const divisionNameLower = division.name.toLowerCase();
+  for (const g of parentGrants) {
+    const programId = g.fields.programId as string | undefined;
+    if (programId && allDivKeys.has(programId)) return true;
+    const gDiv = g.fields.divisionName as string | undefined;
+    const gProgram = g.fields.program as string | undefined;
+    if (gDiv && (gDiv.toLowerCase() === divisionNameLower || allDivKeysLower.has(gDiv.toLowerCase()))) return true;
+    if (gProgram && allDivKeysLower.has(gProgram.toLowerCase())) return true;
+  }
+
+  return false;
 }
 
 export default function DivisionsPage() {
   const allRecords = getAllKBRecords("divisions");
 
   // Deduplicate by owner+name (same logic as division-data.ts)
-  const seen = new Map<string, DivisionRow>();
+  const seen = new Map<string, { row: DivisionRow; record: import("@/data/factbase").KBRecordEntry }>();
   for (const record of allRecords) {
     const division = parseDivision(record);
     const mapKey = `${division.ownerEntityId}::${division.name}`;
@@ -44,29 +75,29 @@ export default function DivisionsPage() {
     const parent = resolveEntityLink(division.ownerEntityId);
     const href = getDivisionHref(division);
 
-    let leadName = "";
-    let leadHref: string | null = null;
-    if (division.lead) {
-      const resolved = resolveEntityLink(division.lead);
-      leadName = resolved.name;
-      leadHref = resolved.href;
-    }
-
     seen.set(mapKey, {
-      key: division.key,
-      name: division.name,
-      parentName: parent.name,
-      parentHref: parent.href,
-      divisionType: division.divisionType,
-      status: division.status,
-      lead: division.lead,
-      leadName,
-      leadHref,
-      href,
+      row: {
+        key: division.key,
+        name: division.name,
+        parentName: parent.name,
+        parentHref: parent.href,
+        divisionType: division.divisionType,
+        status: division.status,
+        href,
+        hasData: false, // computed below
+      },
+      record,
     });
   }
 
-  const rows = [...seen.values()].sort(
+  // Compute hasData for each division
+  const rows: DivisionRow[] = [];
+  for (const { row, record } of seen.values()) {
+    row.hasData = divisionHasData(record);
+    rows.push(row);
+  }
+
+  rows.sort(
     (a, b) =>
       a.parentName.localeCompare(b.parentName) ||
       a.name.localeCompare(b.name),
@@ -76,26 +107,20 @@ export default function DivisionsPage() {
   const totalDivisions = rows.length;
   const uniqueOrgs = new Set(rows.map((r) => r.parentName)).size;
   const activeCount = rows.filter((r) => r.status === "active").length;
+  const divisionsWithData = rows.filter((r) => r.hasData).length;
 
-  // Type breakdown
+  // Type breakdown (across all divisions)
   const typeCounts = new Map<string, number>();
   for (const r of rows) {
     typeCounts.set(r.divisionType, (typeCounts.get(r.divisionType) ?? 0) + 1);
   }
-  const typeSummary = [...typeCounts.entries()]
+  const typeSummary: TypeSummary[] = [...typeCounts.entries()]
     .map(([type, count]) => ({
       type,
       label: DIVISION_TYPE_LABELS[type] ?? titleCase(type),
       count,
     }))
     .sort((a, b) => b.count - a.count);
-
-  const stats = [
-    { label: "Divisions", value: totalDivisions.toLocaleString() },
-    { label: "Organizations", value: String(uniqueOrgs) },
-    { label: "Active", value: String(activeCount) },
-    { label: "Types", value: String(typeCounts.size) },
-  ];
 
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
@@ -109,142 +134,14 @@ export default function DivisionsPage() {
         </p>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        {stats.map((stat) => (
-          <ProfileStatCard
-            key={stat.label}
-            label={stat.label}
-            value={stat.value}
-          />
-        ))}
-      </div>
-
-      {/* By type summary */}
-      {typeSummary.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3">By Type</h2>
-          <div className="flex gap-3 flex-wrap">
-            {typeSummary.map((t) => (
-              <div
-                key={t.type}
-                className="rounded-lg border border-border/60 px-4 py-2 flex items-center gap-2"
-              >
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                    DIVISION_TYPE_COLORS[t.type] ??
-                    "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                  }`}
-                >
-                  {t.label}
-                </span>
-                <span className="text-sm tabular-nums text-muted-foreground">
-                  {t.count}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Table */}
-      {totalDivisions > 0 ? (
-        <div className="border border-border/60 rounded-xl overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                <th className="text-left py-2.5 px-3 font-medium">Division</th>
-                <th className="text-left py-2.5 px-3 font-medium">
-                  Organization
-                </th>
-                <th className="text-left py-2.5 px-3 font-medium">Type</th>
-                <th className="text-left py-2.5 px-3 font-medium">Status</th>
-                <th className="text-left py-2.5 px-3 font-medium">Lead</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {rows.map((row) => (
-                <tr
-                  key={row.key}
-                  className="hover:bg-muted/20 transition-colors"
-                >
-                  <td className="py-2 px-3">
-                    {row.href ? (
-                      <Link
-                        href={row.href}
-                        className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                      >
-                        {row.name}
-                      </Link>
-                    ) : (
-                      <span className="font-medium text-foreground text-xs">
-                        {row.name}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.parentHref ? (
-                      <Link
-                        href={row.parentHref}
-                        className="text-primary hover:underline"
-                      >
-                        {row.parentName}
-                      </Link>
-                    ) : (
-                      <span className="text-foreground">{row.parentName}</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        DIVISION_TYPE_COLORS[row.divisionType] ??
-                        "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                      }`}
-                    >
-                      {DIVISION_TYPE_LABELS[row.divisionType] ??
-                        titleCase(row.divisionType)}
-                    </span>
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.status && (
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          STATUS_COLORS[row.status] ??
-                          "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                        }`}
-                      >
-                        {titleCase(row.status)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.leadHref ? (
-                      <Link
-                        href={row.leadHref}
-                        className="text-primary hover:underline"
-                      >
-                        {row.leadName}
-                      </Link>
-                    ) : row.leadName ? (
-                      <span className="text-muted-foreground">
-                        {row.leadName}
-                      </span>
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
-          <p className="text-lg font-medium mb-2">No divisions available</p>
-          <p className="text-sm">
-            Division data is loaded from the knowledge base during the build
-            process.
-          </p>
-        </div>
-      )}
+      <DivisionsTable
+        rows={rows}
+        typeSummary={typeSummary}
+        totalDivisions={totalDivisions}
+        uniqueOrgs={uniqueOrgs}
+        activeCount={activeCount}
+        divisionsWithData={divisionsWithData}
+      />
     </div>
   );
 }
