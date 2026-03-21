@@ -2,10 +2,130 @@
  * Prompt Templates for Page Improvement Phases
  *
  * Extracted from inline strings to make prompts testable and reusable.
+ *
+ * STATIC_IMPROVE_GUIDELINES is the single source of truth for rules that are
+ * identical across all page improvements. It is imported by prompt-cache.ts
+ * for Anthropic prompt caching (cache_control on the system prompt) and
+ * included inline in IMPROVE_PROMPT() for the sequential/batch user message.
  */
 
 import { getPageType } from '../../../lib/page-analysis.ts';
 import type { PageData, AnalysisResult, ResearchResult } from '../types.ts';
+
+/**
+ * Static improvement guidelines that are identical across ALL page improvements.
+ * These are used in two places:
+ * 1. Inline in IMPROVE_PROMPT() (included in the user message for both sequential + batch)
+ * 2. As a cached system prompt via prompt-cache.ts (cache_control wrapping for cost savings)
+ *
+ * Note: page-type-specific rules (person, org, historical), tier-specific rules
+ * (polish constraints), and dynamic data (entity lookup, KB facts, claims) are
+ * NOT included here — they vary per page.
+ */
+export const STATIC_IMPROVE_GUIDELINES = `### Content Preservation (CRITICAL)
+You are EDITING an existing page, not rewriting it from scratch. Your output must preserve:
+- **ALL existing sections** — do not drop, merge, or summarize away existing sections
+- **ALL existing footnotes and citations** — keep every [^N] reference and its definition. If you remove an inline reference [^N], also remove its definition. Do not leave orphaned footnote definitions.
+- **ALL existing EntityLinks** — keep every <EntityLink> tag
+- **ALL existing data tables** — keep every markdown table
+- **Specific details** — dates, numbers, names, quotes must be preserved verbatim
+- **Word count**: Your output should be AT LEAST as long as the input. If the current page is 3000 words, your output must be >=3000 words.
+
+Do NOT summarize, condense, or "streamline" existing content. Add to it. If a section is too long, leave it as-is rather than cutting it.
+
+### Section Deduplication (CRITICAL)
+Do NOT create sections that repeat content already covered elsewhere on the page. Before adding or expanding a section, check if the same information already appears in another section. Common duplication patterns to avoid:
+- Research priorities listed in both a "Key Contributions" section AND a "Current Research Focus" section
+- Technical challenges listed in both a "Views" section AND a "Research" section
+- Career history repeated in both "Background" and a separate "Career" section
+- The same quotes or facts appearing in multiple sections
+- **Quantitative stats scattered across sections**: If a stat like "40+ members" or "\\$30M in funding" is already stated in Overview, do NOT repeat it in Current State, Strategic Position, Community Building, etc. State each quantitative fact ONCE in the most relevant section.
+
+If two existing sections cover the same topic, MERGE them into one section rather than keeping both.
+Do NOT add thin, speculative, or padding sections. A section with only 2-3 bullet points of vague content (like "Recognition and Influence: {/* NEEDS CITATION */} has been cited") adds no value. Only add new sections if you have substantive content to put in them.
+
+### Avoid Redundant Link/Resource Tables
+Do NOT generate "Sources & Resources", "Primary Sources", "Key Research Areas", "Related Organizations", or "Additional Resources" tables at the end of the page. These duplicate the inline footnote citations that already appear throughout the page and in the auto-generated References section. If the page already has 10+ inline citations, omit these tables entirely. A short "## External Links" section with 3-5 key URLs is acceptable as a replacement.
+
+### No Editorial Meta-Comments
+Do NOT add editorial meta-comments in the output like \`{/* Note: Previous version used evaluative language... */}\` or \`{/* Note: This section was restructured... */}\`. The only acceptable MDX comments are \`{/* NEEDS CITATION */}\` markers. The output should be clean wiki content, not a track-changes document.
+
+### Wiki Conventions
+- Use GFM footnotes for prose citations: [^1], [^2], etc. (numbered footnotes will be auto-converted to DB-driven [^rc-XXXX] format by the pipeline)
+- Use inline links in tables: [Source Name](url)
+- EntityLinks use **wiki IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
+- Escape dollar signs: \\\\\\$100M not \\$100M
+
+### Quality Standards
+- Add citations from the research sources
+- Replace vague claims with specific numbers
+- Add EntityLinks for related concepts (using E## IDs from the lookup table)
+- Ensure tables have source links
+- **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
+- Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
+- **New specific claims require sources**: Any NEW date, number, role, or attribution you add that was NOT in the original content MUST have a citation from the research sources. Do not add specific facts from training data alone.
+
+### Objectivity & Neutrality (CRITICAL)
+Write in **encyclopedic/analytical tone**, not advocacy or journalism. This is a wiki, not an opinion piece.
+
+**Language rules:**
+- NEVER use evaluative adjectives: "remarkable", "unprecedented", "formidable", "alarming", "troubling", "devastating"
+- NEVER use "represents a [judgment]" framing (e.g., "represents a complete failure") — state what happened: "none of the 150 bills passed"
+- NEVER use "proved [judgment]" (e.g., "proved decisive") — describe the evidence: "lobbying spending correlated with bill defeat"
+- NEVER use evaluative labels in tables: "Concerning", "Inadequate", "Weak", "Poor" — use data: "25 departures from 3,000 staff (0.8%)"
+- NEVER use dramatic characterizations: "complete failure", "total collapse", "unprecedented crisis"
+- Avoid "watershed", "groundbreaking", "pioneering", "game-changing" — describe the specific innovation
+
+**Framing rules:**
+- Present competing perspectives with equal analytical depth — if you explain criticism, also explain the defense
+- When describing policy outcomes, use neutral language: "did not pass" not "failed"; "modified" not "weakened"
+- Attribute opinions explicitly: "Critics argue..." / "Proponents contend..." — never present one side as obvious truth
+- For uncertain claims, always use hedging: "evidence suggests", "approximately", "estimated at"
+- When citing a source with known ideological positioning, note it: "according to [X], a [conservative/progressive/industry] think tank"
+
+**Assessment tables:**
+- Use quantitative labels: "3 of 8 commitments met (38%)" not "Poor compliance"
+- Use trend descriptions: "Down 15% YoY" not "Declining"
+- If you must use qualitative labels, define the methodology: "Based on [criteria], rated [level]"
+
+### Source Integration
+- When integrating research, note source credibility: think tank positioning, potential conflicts of interest
+- For contested claims, cite sources from multiple perspectives
+- Distinguish between primary sources (government documents, company filings) and secondary analysis (news, blogs)
+- Weight primary sources over secondary; peer-reviewed over journalism
+
+### Biographical Accuracy (CRITICAL for person/org pages)
+People and organizations are VERY sensitive to inaccuracies. Real people read these pages and are embarrassed/upset by errors.
+- **NEVER add biographical facts from your training data** — only from research sources or existing cited content
+- **NEVER guess dates**: If you don't have a source for when someone joined/left/founded something, don't add or change dates
+- **NEVER embellish**: Don't add phrases like "demonstrated exceptional X" or "known for Y" without a specific source
+- **NEVER invent statistics**: Citation counts, visitor numbers, funding amounts must come from cited sources
+- **NEVER attribute views without sources**: Don't say "X believes..." — say "X stated in [source]..."
+- **NEVER mix up who said what**: When paraphrasing debates/forecasts, double-check which claims belong to which person
+- **Remove flattery**: Replace "prominent researcher", "exceptional track record", "competitive excellence" with neutral factual descriptions
+- **Prefer omission over hallucination**: A shorter accurate page is better than a longer one with errors
+- **Every specific claim needs a citation**: dates, roles, numbers, quotes, achievements — if unsourced, flag or remove
+
+### Bare URLs
+Convert any bare URLs in prose (like \`neelnanda.io\` or \`https://example.com\`) to markdown links: \`[neelnanda.io](https://neelnanda.io)\`. URLs inside footnote definitions and existing markdown links should be left as-is.
+
+### Related Pages (DO NOT INCLUDE)
+Do NOT include "## Related Pages", "## See Also", or "## Related Content" sections.
+These are now rendered automatically by the RelatedPages React component at build time.
+Remove any existing such sections from the content. Also remove any <Backlinks> component
+usage and its import if no other usage remains.
+
+### Frontmatter Rules
+- Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
+- Do NOT change \`quality:\`, \`readerImportance:\`, \`researchImportance:\`, \`tacticalValue:\`, \`ratings:\`, \`clusters:\`, or \`balanceFlags:\` fields — these are managed by separate grading/editorial pipelines and will be force-restored to their original values.
+- Do NOT add new frontmatter fields that are not in the original (e.g., \`reviewNote\`).
+- You may update \`description:\` and \`summary:\` to reflect content changes.
+
+### Output Format
+Output the COMPLETE improved MDX file content. Include all frontmatter and content.
+Do not output markdown code blocks - output the raw MDX directly.
+
+Start your response with "---" (the frontmatter delimiter).`;
 
 interface ImprovePromptArgs {
   page: PageData;
@@ -66,33 +186,7 @@ ${templateContext}
 
 Check that all required sections exist. If a required section is missing, add it with substantive content (not stubs). Do not add empty sections just to satisfy the template — only add sections where you have content from the research or existing page to fill them.
 ` : ''}
-### Content Preservation (CRITICAL)
-You are EDITING an existing page, not rewriting it from scratch. Your output must preserve:
-- **ALL existing sections** — do not drop, merge, or summarize away existing sections
-- **ALL existing footnotes and citations** — keep every [^N] reference and its definition. If you remove an inline reference [^N], also remove its definition. Do not leave orphaned footnote definitions.
-- **ALL existing EntityLinks** — keep every <EntityLink> tag
-- **ALL existing data tables** — keep every markdown table
-- **Specific details** — dates, numbers, names, quotes must be preserved verbatim
-- **Word count**: Your output should be AT LEAST as long as the input. If the current page is 3000 words, your output must be ≥3000 words.
-
-Do NOT summarize, condense, or "streamline" existing content. Add to it. If a section is too long, leave it as-is rather than cutting it.
-
-### Section Deduplication (CRITICAL)
-Do NOT create sections that repeat content already covered elsewhere on the page. Before adding or expanding a section, check if the same information already appears in another section. Common duplication patterns to avoid:
-- Research priorities listed in both a "Key Contributions" section AND a "Current Research Focus" section
-- Technical challenges listed in both a "Views" section AND a "Research" section
-- Career history repeated in both "Background" and a separate "Career" section
-- The same quotes or facts appearing in multiple sections
-- **Quantitative stats scattered across sections**: If a stat like "40+ members" or "$30M in funding" is already stated in Overview, do NOT repeat it in Current State, Strategic Position, Community Building, etc. State each quantitative fact ONCE in the most relevant section.
-
-If two existing sections cover the same topic, MERGE them into one section rather than keeping both.
-Do NOT add thin, speculative, or padding sections. A section with only 2-3 bullet points of vague content (like "Recognition and Influence: {/* NEEDS CITATION */} has been cited") adds no value. Only add new sections if you have substantive content to put in them.
-
-### Avoid Redundant Link/Resource Tables
-Do NOT generate "Sources & Resources", "Primary Sources", "Key Research Areas", "Related Organizations", or "Additional Resources" tables at the end of the page. These duplicate the inline footnote citations that already appear throughout the page and in the auto-generated References section. If the page already has 10+ inline citations, omit these tables entirely. A short "## External Links" section with 3-5 key URLs is acceptable as a replacement.
-
-### No Editorial Meta-Comments
-Do NOT add editorial meta-comments in the output like \`{/* Note: Previous version used evaluative language... */}\` or \`{/* Note: This section was restructured... */}\`. The only acceptable MDX comments are \`{/* NEEDS CITATION */}\` markers. The output should be clean wiki content, not a track-changes document.
+${STATIC_IMPROVE_GUIDELINES}
 ${isPolish ? `
 ### Polish Tier Rules (NO RESEARCH AVAILABLE)
 This is a polish-tier improvement — you have NO new research sources. Therefore:
@@ -112,13 +206,9 @@ You have research sources. Therefore:
 - If you cannot support a new claim with a research source, leave the original wording as-is rather than adding unsupported content.
 - **Citation-date matching**: When citing a paper or post for a specific date (e.g., "RLHF was developed in 2019"), verify the cited source's actual publication date matches the claim. A 2017 paper cannot support a "late 2019" date.
 `}
-Make targeted improvements based on the analysis and directions. Follow these guidelines:
+Make targeted improvements based on the analysis and directions. Follow these additional guidelines:
 
-### Wiki Conventions
-- Use GFM footnotes for prose citations: [^1], [^2], etc. (numbered footnotes will be auto-converted to DB-driven [^rc-XXXX] format by the pipeline)
-- Use inline links in tables: [Source Name](url)
-- EntityLinks use **wiki IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
-- Escape dollar signs: \\$100M not $100M
+### Wiki Conventions (Extended)
 - Import from: '${importPath}'
 - Use \`<KBF entity="entity" property="property" />\` for canonical KB fact values (auto-renders with hover tooltip showing source/date)
 - Use \`<Calc expr="{entity.hashId} / {entity.hashId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
@@ -166,57 +256,12 @@ Each missing fact has a source URL -- add it with a footnote citation.
 
 ${gapAnalysisContext}
 ` : ''}
-### Quality Standards
-- Add citations from the research sources
+### Quality Standards (Extended)
 - Replace vague claims with specific numbers; use \`<KBF>\` for canonical KB facts and \`<Calc>\` for derived values
 - When a page has hardcoded ratios/multiples (e.g. "≈27x revenue"), replace with \`<Calc expr="{a.valuation} / {a.revenue}" precision={0} suffix="x" />\`
 - **KB facts — mandatory, not optional**: Review ALL prose numbers against the KB data. If a number matches a canonical KB fact, ALWAYS wrap it with \`<KBF entity="entity" property="property" />\`. Do not selectively apply KBF to some numbers but leave others bare. Consistency is required.
-- Add EntityLinks for related concepts (using E## IDs from the lookup table above)
-- Ensure tables have source links
-- **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
-- Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
-- **New specific claims require sources**: Any NEW date, number, role, or attribution you add that was NOT in the original content MUST have a citation from the research sources. Do not add specific facts from training data alone.
 
-### Objectivity & Neutrality (CRITICAL)
-Write in **encyclopedic/analytical tone**, not advocacy or journalism. This is a wiki, not an opinion piece.
-
-**Language rules:**
-- NEVER use evaluative adjectives: "remarkable", "unprecedented", "formidable", "alarming", "troubling", "devastating"
-- NEVER use "represents a [judgment]" framing (e.g., "represents a complete failure") — state what happened: "none of the 150 bills passed"
-- NEVER use "proved [judgment]" (e.g., "proved decisive") — describe the evidence: "lobbying spending correlated with bill defeat"
-- NEVER use evaluative labels in tables: "Concerning", "Inadequate", "Weak", "Poor" — use data: "25 departures from 3,000 staff (0.8%)"
-- NEVER use dramatic characterizations: "complete failure", "total collapse", "unprecedented crisis"
-- Avoid "watershed", "groundbreaking", "pioneering", "game-changing" — describe the specific innovation
-
-**Framing rules:**
-- Present competing perspectives with equal analytical depth — if you explain criticism, also explain the defense
-- When describing policy outcomes, use neutral language: "did not pass" not "failed"; "modified" not "weakened"
-- Attribute opinions explicitly: "Critics argue..." / "Proponents contend..." — never present one side as obvious truth
-- For uncertain claims, always use hedging: "evidence suggests", "approximately", "estimated at"
-- When citing a source with known ideological positioning, note it: "according to [X], a [conservative/progressive/industry] think tank"
-
-**Assessment tables:**
-- Use quantitative labels: "3 of 8 commitments met (38%)" not "Poor compliance"
-- Use trend descriptions: "Down 15% YoY" not "Declining"
-- If you must use qualitative labels, define the methodology: "Based on [criteria], rated [level]"
-
-### Source Integration
-- When integrating research, note source credibility: think tank positioning, potential conflicts of interest
-- For contested claims, cite sources from multiple perspectives
-- Distinguish between primary sources (government documents, company filings) and secondary analysis (news, blogs)
-- Weight primary sources over secondary; peer-reviewed over journalism
-
-### Biographical Accuracy (CRITICAL for person/org pages)
-People and organizations are VERY sensitive to inaccuracies. Real people read these pages and are embarrassed/upset by errors.
-- **NEVER add biographical facts from your training data** — only from research sources or existing cited content
-- **NEVER guess dates**: If you don't have a source for when someone joined/left/founded something, don't add or change dates
-- **NEVER embellish**: Don't add phrases like "demonstrated exceptional X" or "known for Y" without a specific source
-- **NEVER invent statistics**: Citation counts, visitor numbers, funding amounts must come from cited sources
-- **NEVER attribute views without sources**: Don't say "X believes..." — say "X stated in [source]..."
-- **NEVER mix up who said what**: When paraphrasing debates/forecasts, double-check which claims belong to which person
-- **Remove flattery**: Replace "prominent researcher", "exceptional track record", "competitive excellence" with neutral factual descriptions
-- **Prefer omission over hallucination**: A shorter accurate page is better than a longer one with errors
-- **Every specific claim needs a citation**: dates, roles, numbers, quotes, achievements — if unsourced, flag or remove
+### Biographical Accuracy (Extended)
 - **Link citations directly**: When a footnote is just a URL, consider using an inline link instead of a footnote that redirects
 - **Real-world hallucination examples** (from actual subject feedback on wiki person pages):
   - WRONG: "cited 129 times" (actual: 1,104) — never guess citation/stat numbers
@@ -273,32 +318,12 @@ When you update factual claims — especially funding sources, founding dates, k
 - If you change a funding claim, founding date, or key relationship, check whether the linked org/person page would now have a conflicting statement
 - At the end of your output, if you changed any such facts, add an MDX comment: \`{/* CROSS-PAGE CHECK: Updated [fact] — verify consistency with [related page id] */}\`
 
-` : ''}### Bare URLs
-Convert any bare URLs in prose (like \`neelnanda.io\` or \`https://example.com\`) to markdown links: \`[neelnanda.io](https://neelnanda.io)\`. URLs inside footnote definitions and existing markdown links should be left as-is.
-
-### Related Pages (DO NOT INCLUDE)
-Do NOT include "## Related Pages", "## See Also", or "## Related Content" sections.
-These are now rendered automatically by the RelatedPages React component at build time.
-Remove any existing such sections from the content. Also remove any <Backlinks> component
-usage and its import if no other usage remains.
-
-### Frontmatter Rules
-- Do NOT add a \`metrics:\` block (wordCount, citations, tables, diagrams) — these are computed at build time.
-- Do NOT change \`quality:\`, \`readerImportance:\`, \`researchImportance:\`, \`tacticalValue:\`, \`ratings:\`, \`clusters:\`, or \`balanceFlags:\` fields — these are managed by separate grading/editorial pipelines and will be force-restored to their original values.
-- Do NOT add new frontmatter fields that are not in the original (e.g., \`reviewNote\`).
-- You may update \`description:\` and \`summary:\` to reflect content changes.
-${isPolish ? `
-### Polish Tier Constraints (CRITICAL)
+` : ''}${isPolish ? `### Polish Tier Constraints (CRITICAL)
 This is a POLISH-tier update. Your changes must be MINIMAL:
 - Do NOT add new sections (## headings) that did not exist before
 - Do NOT add substantial new paragraphs (>3 sentences) to existing sections
 - Do NOT restructure, reorder, or merge sections
 - ONLY make: sentence-level edits, factual corrections, citation fixes, wording improvements, EntityLink additions
 - If the news directions don't warrant any changes to this page, return the content unchanged
-` : ''}
-### Output Format
-Output the COMPLETE improved MDX file content. Include all frontmatter and content.
-Do not output markdown code blocks - output the raw MDX directly.
-
-Start your response with "---" (the frontmatter delimiter).`;
+` : ''}`;
 }

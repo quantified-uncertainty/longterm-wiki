@@ -65,7 +65,9 @@ export async function executeBatchImprove(
 ): Promise<RunResult[]> {
   if (updates.length === 0) return [];
 
-  // Force API-direct mode for batch execution (CLI mode doesn't support batches)
+  // Force API-direct mode for batch execution (CLI mode doesn't support batches).
+  // Not restored: executeBatchImprove is always the top-level entry point for batch
+  // runs (called from auto-update orchestrator), so no caller depends on prior mode.
   setApiDirectMode(true);
 
   const client = createLlmClient();
@@ -300,6 +302,40 @@ async function applyBatchResult(
       const largest = codeBlocks.reduce((a, b) => a[1].length >= b[1].length ? a : b);
       improvedContent = largest[1];
     }
+
+    // Detect JSON-wrapped responses: {"content": "...", "claimMap": [...]}
+    // The LLM sometimes returns structured JSON instead of raw MDX.
+    const contentFieldMatch = improvedContent.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+    if (contentFieldMatch) {
+      if (verbose) console.log(`    ${p.update.pageTitle}: detected JSON-wrapped response — extracting "content" field`);
+      try {
+        // Unescape JSON string: \n → newline, \" → ", \\ → \, \t → tab
+        const extracted = JSON.parse(`"${contentFieldMatch[1]}"`);
+        if (typeof extracted === 'string' && extracted.length > 100) {
+          improvedContent = extracted;
+        }
+      } catch {
+        // JSON.parse may fail on truncated strings — try manual unescaping
+        const raw = contentFieldMatch[1];
+        let manual = '';
+        for (let i = 0; i < raw.length; i++) {
+          if (raw[i] === '\\' && i + 1 < raw.length) {
+            const next = raw[i + 1];
+            if (next === 'n') { manual += '\n'; i++; }
+            else if (next === '"') { manual += '"'; i++; }
+            else if (next === '\\') { manual += '\\'; i++; }
+            else if (next === 't') { manual += '\t'; i++; }
+            else { manual += raw[i]; }
+          } else {
+            manual += raw[i];
+          }
+        }
+        if (manual.length > 100) {
+          if (verbose) console.log(`    ${p.update.pageTitle}: used manual unescaping for truncated JSON content string`);
+          improvedContent = manual;
+        }
+      }
+    }
   }
 
   // Validate: looks like MDX?
@@ -359,8 +395,8 @@ async function applyBatchResult(
     if (fnResult.convertedCount > 0) {
       improvedContent = fnResult.content;
     }
-  } catch {
-    // Footnote conversion is non-critical
+  } catch (e: unknown) {
+    console.warn(`Footnote conversion failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // Write the result
