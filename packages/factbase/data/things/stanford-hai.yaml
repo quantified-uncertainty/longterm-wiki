@@ -19,13 +19,6 @@ facts:
     source: https://contactout.com/company/stanford-institute-for-human-centered-artificial-hai-3889
     notes: "Approximately 91 employees including staff, faculty, and fellows"
 
-  - id: f_Hw3cJ6mQ4d
-    property: total-funding
-    value: 1e+9
-    asOf: 2025-01
-    source: https://momentum.stanford.edu/initiatives/human-centered-artificial-intelligence
-    notes: "HAI aims to raise more than $1 billion for research, talent, and computing"
-
   - id: f_Jy7dR9wK2e
     property: website
     value: "https://hai.stanford.edu/"

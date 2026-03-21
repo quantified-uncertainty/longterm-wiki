@@ -17,7 +17,7 @@ facts:
     value: 5e+6
     asOf: 2018-01
     source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
-    notes: "Nuffield Foundation committed GBP 5 million over five years to establish the institute"
+    notes: "Nuffield Foundation committed GBP 5 million (~USD 6.5M at 2018 rates) over five years to establish the institute. Value is in GBP, not USD."
 
   - id: f_Jy4cJ7mQ3d
     property: legal-structure

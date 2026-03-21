@@ -21,10 +21,10 @@ facts:
 
   - id: f_Gw3cJ6mQ2d
     property: revenue
-    value: 4.3e+7
-    asOf: 2025-10
-    source: https://leadiq.com/c/carnegie-endowment-for-international-peace/5a1d8a8224000024006414c1
-    notes: "Estimated annual revenue approximately $43M"
+    value: 5.76e+7
+    asOf: 2025-06
+    source: https://projects.propublica.org/nonprofits/organizations/130552040
+    notes: "Revenue from FY2025 IRS Form 990 filing (~$57.6M). Previous year FY2023 was ~$59.9M."
 
   - id: f_Iy7dR9wK6e
     property: legal-structure

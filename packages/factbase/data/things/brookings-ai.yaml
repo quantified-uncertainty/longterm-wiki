@@ -21,7 +21,7 @@ facts:
 
   - id: f_Xn7aK2wF9d
     property: annual-expenses
-    value: 1.00052e+8
+    value: 1e+8
     asOf: 2024-06
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Annual operating expenses of approximately $100M in FY2024"
