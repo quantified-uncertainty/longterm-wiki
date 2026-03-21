@@ -87,6 +87,13 @@ interface PGResourceRow {
   fetchedAt: string | null;
   contentHash: string | null;
   archiveUrl: string | null;
+  enrichmentStatus: string | null;
+  enrichmentDate: string | null;
+  importanceScore: number | null;
+  contextNote: string | null;
+  resourceSubtype: string | null;
+  resourcePurpose: string | null;
+  fetchStatus: string | null;
 }
 
 interface PGResourcesResponse {
@@ -120,6 +127,12 @@ function pgRowToResource(row: PGResourceRow, citedBy?: string[]): Resource {
     fetched_at: row.fetchedAt ?? undefined,
     content_hash: row.contentHash ?? undefined,
     archive_url: row.archiveUrl ?? undefined,
+    enrichment_status: row.enrichmentStatus ?? undefined,
+    importance_score: row.importanceScore ?? undefined,
+    context_note: row.contextNote ?? undefined,
+    resource_subtype: row.resourceSubtype ?? undefined,
+    resource_purpose: row.resourcePurpose ?? undefined,
+    fetch_status: row.fetchStatus ?? undefined,
   };
 }
 
