@@ -169,7 +169,6 @@ export interface Resource {
   published_date?: string;
   type: string;
   local_filename?: string;
-  importance?: number;
   abstract?: string;
   summary?: string;
   review?: string;
@@ -193,6 +192,7 @@ export interface Resource {
   related_entity_ids?: string[];
   enrichment_status?: string;
   importance_score?: number;
+  content_hash?: string;
   // Sub-table data
   paper?: ResourcePaper;
   forum_post?: ResourceForumPost;
