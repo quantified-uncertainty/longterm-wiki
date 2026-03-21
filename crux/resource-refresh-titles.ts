@@ -58,8 +58,10 @@ function extractTitleFromHtml(html: string): string | null {
 
 // Try og:title as fallback (often cleaner than <title>)
 function extractOgTitle(html: string): string | null {
-  const m = html.match(/<meta\s+(?:property|name)=["']og:title["']\s+content=["']([\s\S]*?)["']/i)
-    || html.match(/content=["']([\s\S]*?)["']\s+(?:property|name)=["']og:title["']/i);
+  // Match og:title with possible extra attributes (e.g., data-rh="true") between <meta and property=
+  // Use [^"']* instead of [\s\S]*? to prevent spanning across HTML tags
+  const m = html.match(/<meta\s+[^>]*?(?:property|name)=["']og:title["']\s+content=["']([^"']*)["']/i)
+    || html.match(/<meta\s+[^>]*?content=["']([^"']*)["']\s+(?:property|name)=["']og:title["']/i);
   if (!m) return null;
   const raw = decodeHtmlEntities(m[1]);
   if (!raw || raw.length < 2) return null;

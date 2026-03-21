@@ -145,9 +145,10 @@ export async function enrichPapersCommand(
         paperData.doi = doi;
       }
 
-      // Categories from fields of study
+      // Categories from fields of study (filter nulls — S2 sometimes returns null categories)
       if (paper.fieldsOfStudy && paper.fieldsOfStudy.length > 0) {
-        paperData.categories = paper.fieldsOfStudy.map((f) => f.category);
+        const cats = paper.fieldsOfStudy.map((f) => f.category).filter((c): c is string => c != null);
+        if (cats.length > 0) paperData.categories = cats;
       }
 
       // Methodology inference
