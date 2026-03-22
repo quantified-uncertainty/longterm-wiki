@@ -234,35 +234,43 @@ erDiagram
 
 ## Domain 3: KB Fact Verification
 
-Independent verification system for structured KB facts against external sources.
+Unified verification system for all record types (facts, grants, personnel, divisions, etc.). See [discussion \#2950](https://github.com/quantified-uncertainty/longterm-wiki/discussions/2950).
 
 <Mermaid chart={`
 erDiagram
-    kb_fact_verdicts {
-        text fact_id PK
+    verification_verdicts {
+        text record_type PK
+        text record_id PK
+        text field_name
+        text entity_id
         text verdict
         real confidence
         text reasoning
         integer sources_checked
         boolean needs_recheck
     }
-    kb_fact_resource_verifications {
+    verification_evidence {
         bigserial id PK
-        text fact_id
+        text record_type
+        text record_id
+        text field_name
+        text entity_id
         text resource_id FK
+        text source_url
         text verdict
         real confidence
         text extracted_value
+        text extracted_quote
         text checker_model
         boolean is_primary_source
     }
-    resources ||--o{ kb_fact_resource_verifications : "checked against"
-    kb_fact_verdicts ||--o{ kb_fact_resource_verifications : "derived from"
+    resources ||--o{ verification_evidence : "checked against"
+    verification_verdicts ||--o{ verification_evidence : "derived from"
 `} />
 
 The verification system has two layers:
-1. **Evidence** (`kb_fact_resource_verifications`): One row per fact-resource check. Records what the LLM found.
-2. **Conclusions** (`kb_fact_verdicts`): One row per fact. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
+1. **Evidence** (`verification_evidence`): One row per source-claim check. Records what the LLM found. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification.
+2. **Verdicts** (`verification_verdicts`): One row per claim. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
 
 ---
 
@@ -602,8 +610,8 @@ flowchart LR
         FP[funding_programs]
     end
     subgraph Verification
-        KBFRV[kb_fact_resource_verifications]
-        KBFV[kb_fact_verdicts]
+        VE[verification_evidence]
+        VV[verification_verdicts]
     end
     subgraph Infra
         JOBS[jobs]
@@ -628,7 +636,7 @@ flowchart LR
     RES --> CQ
     RES --> RC
     RES --> PC
-    RES --> KBFRV
+    RES --> VE
     AUR --> AURES
     AUR --> AUNI
     AA --> ASE

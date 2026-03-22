@@ -448,9 +448,8 @@ export async function VerificationCoverageContent() {
       {/* ── Data source footer ─────────────────────────────────────────── */}
       <p className="text-xs text-muted-foreground mt-4">
         Data from{" "}
-        <code className="text-[11px]">kb_fact_verdicts</code>,{" "}
-        <code className="text-[11px]">record_verdicts</code>, and{" "}
-        <code className="text-[11px]">thing_verdicts</code> tables in the
+        <code className="text-[11px]">verification_verdicts</code> and{" "}
+        <code className="text-[11px]">verification_evidence</code> tables in the
         wiki-server database. Entity counts from local{" "}
         <code className="text-[11px]">database.json</code>.
       </p>
