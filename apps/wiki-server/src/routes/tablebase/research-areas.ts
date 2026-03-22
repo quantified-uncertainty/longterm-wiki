@@ -17,11 +17,18 @@ import {
   researchAreaRisks,
   grantResearchAreas,
   grants,
+  researchAreaEvaluations,
+  researchAreaScores,
+  evaluationDimensions,
 } from "../../schema.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+// Max possible standard deviation for a 1-10 scale (bimodal 50/50 split at extremes).
+// Used to normalize stdDev into a 0-1 "model agreement" metric.
+const MAX_SCORE_STDDEV = 4.5;
 
 const VALID_STATUSES = [
   "active",
@@ -678,6 +685,247 @@ const researchAreasApp = new Hono()
     });
 
     return c.json({ upserted });
+  })
+
+  // ---- GET /evaluations/dimensions — list all evaluation dimensions ----
+  .get("/evaluations/dimensions", async (c) => {
+    const db = getDrizzleDb();
+    const rows = await db
+      .select()
+      .from(evaluationDimensions)
+      .orderBy(evaluationDimensions.sortOrder);
+
+    return c.json({
+      dimensions: rows.map((r) => ({
+        id: r.id,
+        label: r.label,
+        description: r.description,
+        category: r.category,
+        scaleMin: r.scaleMin,
+        scaleMax: r.scaleMax,
+        higherIsBetter: r.higherIsBetter,
+        sortOrder: r.sortOrder,
+      })),
+    });
+  })
+
+  // ---- GET /evaluations/scores — all consensus scores (for directory table) ----
+  .get(
+    "/evaluations/scores",
+    zv(
+      "query",
+      z.object({
+        dimension: z.string().max(100).optional(),
+      })
+    ),
+    async (c) => {
+      const { dimension } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const conditions: SQL[] = [];
+      if (dimension) conditions.push(eq(researchAreaScores.dimension, dimension));
+
+      const rows = await db
+        .select()
+        .from(researchAreaScores)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(researchAreaScores.researchAreaId, researchAreaScores.dimension);
+
+      return c.json({
+        scores: rows.map((r) => ({
+          researchAreaId: r.researchAreaId,
+          dimension: r.dimension,
+          meanScore: r.meanScore,
+          medianScore: r.medianScore,
+          stdDev: r.stdDev,
+          minScore: r.minScore,
+          maxScore: r.maxScore,
+          numEvaluators: r.numEvaluators,
+          modelAgreement: r.modelAgreement,
+          lastComputed: r.lastComputed,
+        })),
+      });
+    }
+  )
+
+  // ---- GET /evaluations/by-area/:id — all evaluations for a specific area ----
+  .get("/evaluations/by-area/:id", async (c) => {
+    const areaId = c.req.param("id");
+    const db = getDrizzleDb();
+
+    const [evalRows, scoreRows] = await Promise.all([
+      db
+        .select()
+        .from(researchAreaEvaluations)
+        .where(eq(researchAreaEvaluations.researchAreaId, areaId))
+        .orderBy(researchAreaEvaluations.dimension, researchAreaEvaluations.evaluatedAt),
+      db
+        .select()
+        .from(researchAreaScores)
+        .where(eq(researchAreaScores.researchAreaId, areaId))
+        .orderBy(researchAreaScores.dimension),
+    ]);
+
+    return c.json({
+      researchAreaId: areaId,
+      evaluations: evalRows.map((r) => ({
+        id: r.id,
+        dimension: r.dimension,
+        score: r.score,
+        confidence: r.confidence,
+        reasoning: r.reasoning,
+        evaluatorType: r.evaluatorType,
+        evaluatorId: r.evaluatorId,
+        promptVersion: r.promptVersion,
+        evaluatedAt: r.evaluatedAt,
+      })),
+      scores: scoreRows.map((r) => ({
+        dimension: r.dimension,
+        meanScore: r.meanScore,
+        medianScore: r.medianScore,
+        stdDev: r.stdDev,
+        minScore: r.minScore,
+        maxScore: r.maxScore,
+        numEvaluators: r.numEvaluators,
+        modelAgreement: r.modelAgreement,
+        lastComputed: r.lastComputed,
+      })),
+    });
+  })
+
+  // ---- POST /evaluations/sync — upsert evaluations ----
+  .post("/evaluations/sync", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const SyncEvaluationSchema = z.object({
+      items: z.array(
+        z.object({
+          researchAreaId: z.string().min(1).max(200),
+          dimension: z.string().min(1).max(100),
+          score: z.number().min(1).max(10),
+          confidence: z.number().min(0).max(1).optional(),
+          reasoning: z.string().max(5000).optional(),
+          evaluatorType: z.enum(["llm", "human"]).default("llm"),
+          evaluatorId: z.string().min(1).max(200),
+          promptVersion: z.string().max(100).optional(),
+        })
+      ).min(1).max(1000),
+    });
+
+    const parsed = SyncEvaluationSchema.safeParse(body);
+    if (!parsed.success) {
+      return validationError(
+        c,
+        parsed.error.issues.map((i) => i.message).join(", ")
+      );
+    }
+
+    const db = getDrizzleDb();
+    const now = new Date();
+    let upserted = 0;
+
+    await db.transaction(async (tx) => {
+      for (const item of parsed.data.items) {
+        await tx
+          .insert(researchAreaEvaluations)
+          .values({
+            researchAreaId: item.researchAreaId,
+            dimension: item.dimension,
+            score: item.score,
+            confidence: item.confidence ?? null,
+            reasoning: item.reasoning ?? null,
+            evaluatorType: item.evaluatorType,
+            evaluatorId: item.evaluatorId,
+            promptVersion: item.promptVersion ?? "",
+            evaluatedAt: now,
+          })
+          .onConflictDoUpdate({
+            target: [
+              researchAreaEvaluations.researchAreaId,
+              researchAreaEvaluations.dimension,
+              researchAreaEvaluations.evaluatorId,
+              researchAreaEvaluations.promptVersion,
+            ],
+            set: {
+              score: item.score,
+              confidence: item.confidence ?? null,
+              reasoning: item.reasoning ?? null,
+              evaluatedAt: now,
+            },
+          });
+        upserted++;
+      }
+    });
+
+    return c.json({ upserted });
+  })
+
+  // ---- POST /evaluations/recompute-scores — recompute consensus from evaluations ----
+  .post("/evaluations/recompute-scores", async (c) => {
+    const db = getDrizzleDb();
+
+    // Compute aggregate scores per (area, dimension) from all evaluations
+    const aggregated = await db
+      .select({
+        researchAreaId: researchAreaEvaluations.researchAreaId,
+        dimension: researchAreaEvaluations.dimension,
+        meanScore: sql<number>`AVG(${researchAreaEvaluations.score})`,
+        medianScore: sql<number>`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${researchAreaEvaluations.score})`,
+        stdDev: sql<number>`STDDEV(${researchAreaEvaluations.score})`,
+        minScore: sql<number>`MIN(${researchAreaEvaluations.score})`,
+        maxScore: sql<number>`MAX(${researchAreaEvaluations.score})`,
+        numEvaluators: count(),
+      })
+      .from(researchAreaEvaluations)
+      .groupBy(
+        researchAreaEvaluations.researchAreaId,
+        researchAreaEvaluations.dimension
+      );
+
+    const now = new Date();
+    let upserted = 0;
+
+    await db.transaction(async (tx) => {
+      for (const row of aggregated) {
+        const stdDev = row.stdDev ?? 0;
+        const modelAgreement = Math.max(0, 1 - stdDev / MAX_SCORE_STDDEV);
+
+        await tx
+          .insert(researchAreaScores)
+          .values({
+            researchAreaId: row.researchAreaId,
+            dimension: row.dimension,
+            meanScore: row.meanScore,
+            medianScore: row.medianScore,
+            stdDev: row.stdDev,
+            minScore: row.minScore,
+            maxScore: row.maxScore,
+            numEvaluators: row.numEvaluators,
+            modelAgreement,
+            lastComputed: now,
+          })
+          .onConflictDoUpdate({
+            target: [
+              researchAreaScores.researchAreaId,
+              researchAreaScores.dimension,
+            ],
+            set: {
+              meanScore: row.meanScore,
+              medianScore: row.medianScore,
+              stdDev: row.stdDev,
+              minScore: row.minScore,
+              maxScore: row.maxScore,
+              numEvaluators: row.numEvaluators,
+              modelAgreement,
+              lastComputed: now,
+            },
+          });
+        upserted++;
+      }
+    });
+
+    return c.json({ recomputed: upserted });
   });
 
 export const researchAreasRoute = researchAreasApp;
