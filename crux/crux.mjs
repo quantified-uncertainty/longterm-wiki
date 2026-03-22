@@ -94,7 +94,7 @@ import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
-import * as verifyOrchestrateCommands from './commands/verify-orchestrate.ts';
+import * as verifyOrchestrateCommands from './commands/source-check-orchestrate.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
