@@ -431,3 +431,18 @@ overrides:
   "Squiggle": "squiggle"
   "Topos Institute": "topos-institute"
   Topos: "topos-institute"
+
+  # --- ARIA Safeguarded AI compound grantees ---
+  "UCL / Cornell": "university-college-london"
+  "UCL / Hellas AI": "university-college-london"
+  "Topos Research UK / University of Florida": "topos-institute"
+  "Ink & Switch / Cambridge University": "university-of-cambridge"
+  "University of Birmingham / University of Oxford": "university-of-oxford"
+  "Hashberg Ltd / University of Birmingham": "university-of-birmingham"
+  "University of Birmingham / CISPA Helmholtz Center": "university-of-birmingham"
+  "University of Birmingham / AstraZeneca": "university-of-birmingham"
+  "University of Warwick / HPI Potsdam / Oxford / Groningen / PIK / UC Berkeley": "university-of-warwick"
+  "AI & Democracy Foundation / UW / MIT": "mit"
+  "Lindus Health / University of Oxford": "university-of-oxford"
+  "Heriot-Watt University / University of Strathclyde": "heriot-watt-university"
+  "Zeroth Research / Fondazione Bruno Kessler": "zeroth-research"

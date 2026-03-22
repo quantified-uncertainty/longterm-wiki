@@ -6,7 +6,7 @@ sidebar:
   label: Provable Safe
   order: 10
 subcategory: architectures
-lastEdited: 2026-01-28
+lastEdited: 2026-03-22
 update_frequency: 45
 summary: Provable Safe AI uses formal verification to provide mathematical safety guarantees, with UK's ARIA investing £59M through 2028. Current verification handles ~10^6 parameters while frontier models exceed 10^12 (6 orders of magnitude gap), yielding 1-5% probability of dominance at TAI, with critical unsolved challenge of verifying world models match reality.
 clusters:
@@ -156,7 +156,7 @@ flowchart TB
 
 ## ARIA's Safeguarded AI Programme
 
-The UK's Advanced Research + Invention Agency (ARIA) has committed [£59 million over 3-5 years](https://www.aria.org.uk/) to the Safeguarded AI programme, led by Programme Director David "davidad" Dalrymple. This represents the largest government investment specifically targeting provably safe AI.
+The UK's Advanced Research + Invention Agency (ARIA) has committed [£59 million over 3-5 years](https://www.aria.org.uk/) to the Safeguarded AI programme, led by Programme Director David "davidad" Dalrymple with Scientific Director Yoshua Bengio (joined August 2024). This represents the largest government investment specifically targeting provably safe AI. In November 2025, ARIA [announced a significant pivot](https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/): TA1's scope was expanded to broader "mathematical assurance and auditability"; TA2 Phase 2 (the £18M "AI Production Facility") was abandoned as frontier AI advances made dedicated ML capability development less valuable; and TA3 Phase 2 (£8.4M) was cancelled and replaced by a cybersecurity focus on formally-verified firewalls for critical infrastructure. Kathleen Fisher (former DARPA HACMS programme lead) is incoming as ARIA CEO.
 
 ### The Guaranteed Safe AI Framework
 
@@ -176,9 +176,8 @@ The foundational paper ["Towards Guaranteed Safe AI"](https://arxiv.org/abs/2405
 | Technical Area | Focus | Funding | Timeline |
 |----------------|-------|---------|----------|
 | **TA 1.1** | Formal proof language development | £3.5M (10-16 grants) | April-May 2024 round completed |
-| **TA 1.2** | AI Production Facility | £18M | Winner announced October 2025; operational January 2026 |
-| **TA 2** | World model development | Not yet announced | 2025-2027 |
-| **TA 3** | Integration and demonstration | Not yet announced | 2027-2028 |
+| **TA 2** | AI Production Facility | £18M (abandoned) | [Abandoned in Nov 2025 pivot](https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/) — frontier AI advances made dedicated ML capability development less valuable |
+| **TA 3** | Real-world applications | £5.4M Phase 1 (continuing); Phase 2 cancelled | Phase 2 (£8.4M) replaced by cybersecurity pivot targeting formally-verified firewalls for critical infrastructure |
 
 **Key quote from davidad:** "The frontier model needs to submit a proof certificate, which is something that is written in a formal language that we're defining in another part of the program... This new language for proofs will hopefully be easy for frontier models to generate and then also easy for a deterministic, human-audited algorithm to check."
 
@@ -234,7 +233,8 @@ According to the [Stanford Center for AI Safety whitepaper](https://aisafety.sta
 | Person | Affiliation | Contribution |
 |--------|-------------|--------------|
 | **David "davidad" Dalrymple** | ARIA | Safeguarded AI programme lead; GS AI framework author |
-| **Yoshua Bengio** | Mila/ARIA | GS AI paper co-author; Scientific Director for ARIA |
+| **Yoshua Bengio** | Mila/ARIA | GS AI paper co-author; joined as ARIA Scientific Director in August 2024 |
+| **Kathleen Fisher** | ARIA (incoming CEO) | Former DARPA HACMS programme lead; incoming ARIA CEO |
 | **Stuart Russell** | UC Berkeley | GS AI co-author; provably beneficial AI advocate |
 | **Sanjit Seshia** | UC Berkeley | Verified AI, scenic language for testing |
 | **Clark Barrett** | Stanford | SMT solver development (CVC5) |
@@ -317,8 +317,8 @@ According to the [Stanford Center for AI Safety whitepaper](https://aisafety.sta
 
 | Milestone | Estimated Timeline | Confidence | Key Dependencies |
 |-----------|-------------------|------------|------------------|
-| ARIA TA 1.1 proof language | 2025-2026 | HIGH | Funding secured; teams selected |
-| AI Production Facility operational | January 2026 | HIGH | £18M grant awarded October 2025 |
+| ARIA TA1 proof language + expanded assurance | 2025-2026 | HIGH | Funding secured; teams selected; scope expanded Nov 2025 |
+| ~~AI Production Facility~~ | Abandoned (Nov 2025) | N/A | TA2 Phase 2 cancelled; frontier AI advances made dedicated capability development unnecessary |
 | Proof-of-concept (constrained domain) | 2026-2027 | MEDIUM | World model quality for target domain |
 | ARIA Stage 3 (integrated demo) | 2028 | MEDIUM | Per ARIA roadmap; dependent on prior stages |
 | Competitive narrow AI (e.g., grid control) | 2028-2032 | LOW | Requires capability parity in domain |
