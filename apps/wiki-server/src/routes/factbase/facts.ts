@@ -51,6 +51,8 @@ function formatFact(f: typeof facts.$inferSelect) {
     low: f.low,
     high: f.high,
     asOf: f.asOf,
+    validEnd: f.validEnd,
+    currency: f.currency,
     measure: f.measure,
     subject: f.subject,
     note: f.note,
@@ -331,8 +333,23 @@ const factsApp = new Hono()
   .get("/export", async (c) => {
     const db = getDrizzleDb();
 
+    // Select only columns used in the response (skip syncedAt, createdAt, updatedAt, id, label, formatDivisor)
     const allFacts = await db
-      .select()
+      .select({
+        entityId: facts.entityId,
+        factId: facts.factId,
+        value: facts.value,
+        numeric: facts.numeric,
+        low: facts.low,
+        high: facts.high,
+        asOf: facts.asOf,
+        validEnd: facts.validEnd,
+        currency: facts.currency,
+        measure: facts.measure,
+        source: facts.source,
+        note: facts.note,
+        format: facts.format,
+      })
       .from(facts)
       .orderBy(asc(facts.entityId), asc(facts.asOf));
 
