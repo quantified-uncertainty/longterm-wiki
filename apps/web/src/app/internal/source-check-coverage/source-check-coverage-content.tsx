@@ -49,7 +49,7 @@ function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
 }
 
 async function loadSourceCheckStats() {
-  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/source-checks/stats", {
+  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/verifications/stats", {
     revalidate: 60,
   });
 }
