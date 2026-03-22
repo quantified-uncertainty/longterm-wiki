@@ -1,8 +1,8 @@
 /**
- * Tests for llm-verifier.ts
+ * Tests for llm-checker.ts
  */
 import { describe, it, expect } from 'vitest';
-import { validateVerdict } from './llm-verifier.ts';
+import { validateVerdict } from './llm-checker.ts';
 
 describe('validateVerdict', () => {
   it('returns valid verdicts unchanged', () => {

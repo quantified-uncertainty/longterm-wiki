@@ -80,8 +80,8 @@ YAML files in `packages/factbase/data/things/` are currently the primary source.
 |----------|---------------|---------|
 | `facts` | `facts` | PG mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. Export via `/api/facts/export`. |
 | `properties` | `properties` | Controlled vocabulary for fact property types (valuation, headcount, ceo, etc.). |
-| ~~`factbase_resource_verifications`~~ | — | Replaced by unified `verification_evidence` table (migration 0127). |
-| ~~`factbase_verdicts`~~ | — | Replaced by unified `verification_verdicts` table (migration 0127). |
+| ~~`factbase_resource_verifications`~~ | — | Replaced by unified `source_check_evidence` table (migration 0127). |
+| ~~`factbase_verdicts`~~ | — | Replaced by unified `source_check_verdicts` table (migration 0127). |
 
 ### WikiBase tables (prose content)
 
@@ -110,8 +110,8 @@ All verification data lives in two tables (replacing the previous six). See [dis
 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
-| `verification_evidence` | `verificationEvidence` | Per-source checks for any record type. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification. |
-| `verification_verdicts` | `verificationVerdicts` | Aggregate verdicts per claim. Keyed by `(record_type, record_id, COALESCE(field_name, ''))`. |
+| `source_check_evidence` | `sourceCheckEvidence` | Per-source checks for any record type. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) source-checking. |
+| `source_check_verdicts` | `sourceCheckVerdicts` | Aggregate verdicts per claim. Keyed by `(record_type, record_id, COALESCE(field_name, ''))`. |
 
 ### Operational tables
 
@@ -146,8 +146,8 @@ These tables are not part of any Base. They track system operations, CI/CD, and 
 | `funding_programs` | `fundingPrograms` | Open funding opportunities. |
 | `benchmarks` | `benchmarks` | Evaluation benchmark definitions. |
 | `benchmark_results` | `benchmarkResults` | Model scores on benchmarks. |
-| ~~`record_verifications`~~ | — | Replaced by unified `verification_evidence` table (migration 0127). |
-| ~~`record_verdicts`~~ | — | Replaced by unified `verification_verdicts` table (migration 0127). |
+| ~~`record_verifications`~~ | — | Replaced by unified `source_check_evidence` table (migration 0127). |
+| ~~`record_verdicts`~~ | — | Replaced by unified `source_check_verdicts` table (migration 0127). |
 | `research_areas` | `researchAreas` | Research area taxonomy. |
 
 ---

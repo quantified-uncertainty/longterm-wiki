@@ -84,7 +84,7 @@ import { ThingsContent } from "@/app/internal/things/things-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
 import { EntityMatrixContent } from "@/app/internal/entity-matrix/entity-matrix-content";
 import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
-import { EntityVerificationsContent } from "@/app/internal/entity-verifications/entity-verifications-content";
+import { EntitySourceChecksContent } from "@/app/internal/entity-source-checks/entity-source-checks-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -249,7 +249,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   AgentActivityContent,
   EntityMatrixContent,
   EntityProfileContent,
-  EntityVerificationsContent,
+  EntitySourceChecksContent,
 
   // Table view components
   SafetyApproachesTableView,

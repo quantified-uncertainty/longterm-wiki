@@ -1,16 +1,18 @@
 /**
- * Tests for the KB verify CLI command.
+ * Tests for the FactBase source-check CLI command.
  *
  * Tests the dry-run mode with real KB data (no LLM calls needed).
- * The verify logic itself is tested via integration with the command handler.
+ * The source-check logic itself is tested via integration with the command handler.
  */
 
 import { describe, it, expect } from 'vitest';
 import { commands } from './factbase.ts';
 
-describe('crux kb verify --dry-run', () => {
+const sourceCheck = commands['source-check'];
+
+describe('crux fb source-check --dry-run', () => {
   it('lists facts to verify for a specific entity', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'anthropic',
       'dry-run': true,
       limit: '3',
@@ -22,7 +24,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('returns JSON in CI mode', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'anthropic',
       'dry-run': true,
       limit: '2',
@@ -39,7 +41,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('finds a specific fact by ID', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       fact: 'f_dW5cR9mJ8q',
       'dry-run': true,
     });
@@ -50,7 +52,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('reports no facts when entity has none with sources', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'nonexistent-entity',
       'dry-run': true,
     });
@@ -59,7 +61,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('reports no facts when fact ID does not exist', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       fact: 'f_nonexistent',
       'dry-run': true,
     });
@@ -68,7 +70,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('respects --limit option', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'anthropic',
       'dry-run': true,
       limit: '2',
@@ -81,7 +83,7 @@ describe('crux kb verify --dry-run', () => {
 
   it('skips inverse facts (inv_ prefix)', async () => {
     // All facts in the dry-run output should be non-inverse
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'anthropic',
       'dry-run': true,
       ci: true,
@@ -94,7 +96,7 @@ describe('crux kb verify --dry-run', () => {
   });
 
   it('all listed facts have source URLs', async () => {
-    const result = await commands.verify([], {
+    const result = await sourceCheck([], {
       entity: 'anthropic',
       'dry-run': true,
       ci: true,

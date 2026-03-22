@@ -46,7 +46,7 @@ export const VALID_RECORD_TYPES = [
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
 
-export const VALID_VERIFICATION_VERDICTS = [
+export const VALID_SOURCE_CHECK_VERDICTS = [
   "confirmed",
   "contradicted",
   "unverifiable",
@@ -54,7 +54,12 @@ export const VALID_VERIFICATION_VERDICTS = [
   "partial",
 ] as const;
 
-export type VerificationVerdict = (typeof VALID_VERIFICATION_VERDICTS)[number];
+export type SourceCheckVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
+
+/** @deprecated Use VALID_SOURCE_CHECK_VERDICTS */
+export const VALID_VERIFICATION_VERDICTS = VALID_SOURCE_CHECK_VERDICTS;
+/** @deprecated Use SourceCheckVerdict */
+export type VerificationVerdict = SourceCheckVerdict;
 
 // ---------------------------------------------------------------------------
 // Edit Logs

@@ -1,7 +1,7 @@
 /**
- * Source Fetcher — fetch and cache source documents for verification.
+ * Source Fetcher — fetch and cache source documents for source-checking.
  *
- * Shared by records-verify and verify-orchestrate. Handles:
+ * Shared by factbase-source-check and source-check-orchestrate. Handles:
  * - SSRF protection (block private/internal hosts)
  * - Unverifiable domain detection
  * - Wiki-server citation content cache lookup
@@ -16,9 +16,9 @@ import {
 } from '../search/paywall-detection.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import type { FetchSourceResult } from './types.ts';
-import { VERIFICATION_CONSTANTS } from './types.ts';
+import { SOURCE_CHECK_CONSTANTS } from './types.ts';
 
-const { MAX_CONTENT_LENGTH, FETCH_TIMEOUT_MS } = VERIFICATION_CONSTANTS;
+const { MAX_CONTENT_LENGTH, FETCH_TIMEOUT_MS } = SOURCE_CHECK_CONSTANTS;
 
 /**
  * Check if a hostname is a private/internal address that should be blocked (SSRF protection).
@@ -57,7 +57,7 @@ export function htmlToText(html: string): string {
 }
 
 /**
- * Fetch source content from a URL for verification purposes.
+ * Fetch source content from a URL for source-checking.
  *
  * Attempts in order:
  * 1. Wiki-server citation content cache
@@ -66,13 +66,13 @@ export function htmlToText(html: string): string {
  * Applies SSRF protection, unverifiable domain detection, and paywall detection.
  *
  * @param url - The source URL to fetch
- * @param userAgent - User-Agent string for direct HTTP fetches (default: LongtermWiki-Verifier/1.0)
- * @param logPrefix - Prefix for log messages (default: '[verify]')
+ * @param userAgent - User-Agent string for direct HTTP fetches
+ * @param logPrefix - Prefix for log messages (default: '[source-check]')
  */
 export async function fetchSourceContent(
   url: string,
-  userAgent = 'LongtermWiki-Verifier/1.0',
-  logPrefix = '[verify]',
+  userAgent = 'LongtermWiki-SourceChecker/1.0',
+  logPrefix = '[source-check]',
 ): Promise<FetchSourceResult> {
   if (!url.startsWith('https://')) {
     return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };

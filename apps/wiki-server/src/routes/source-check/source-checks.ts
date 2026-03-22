@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { verificationEvidence, verificationVerdicts } from "../../schema.js";
+import { sourceCheckEvidence, sourceCheckVerdicts } from "../../schema.js";
 import {
   zv,
   parseJsonBody,
@@ -76,7 +76,7 @@ const EvidenceQuery = z.object({
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const verificationsApp = new Hono()
+const sourceChecksApp = new Hono()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -85,18 +85,18 @@ const verificationsApp = new Hono()
     const [statsRow] = await db
       .select({
         total: count(),
-        needsRecheck: sql<number>`count(*) filter (where ${verificationVerdicts.needsRecheck} = true)`,
-        avgConfidence: sql<number>`coalesce(avg(${verificationVerdicts.confidence}), 0)`,
+        needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
+        avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
       })
-      .from(verificationVerdicts);
+      .from(sourceCheckVerdicts);
 
     const byVerdictRows = await db
       .select({
-        verdict: verificationVerdicts.verdict,
+        verdict: sourceCheckVerdicts.verdict,
         count: count(),
       })
-      .from(verificationVerdicts)
-      .groupBy(verificationVerdicts.verdict);
+      .from(sourceCheckVerdicts)
+      .groupBy(sourceCheckVerdicts.verdict);
 
     const byVerdict: Record<string, number> = {};
     for (const row of byVerdictRows) {
@@ -105,11 +105,11 @@ const verificationsApp = new Hono()
 
     const byTypeRows = await db
       .select({
-        recordType: verificationVerdicts.recordType,
+        recordType: sourceCheckVerdicts.recordType,
         count: count(),
       })
-      .from(verificationVerdicts)
-      .groupBy(verificationVerdicts.recordType);
+      .from(sourceCheckVerdicts)
+      .groupBy(sourceCheckVerdicts.recordType);
 
     const byType: Record<string, number> = {};
     for (const row of byTypeRows) {
@@ -133,16 +133,16 @@ const verificationsApp = new Hono()
 
     const conditions = [];
     if (record_type) {
-      conditions.push(eq(verificationVerdicts.recordType, record_type));
+      conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
     }
     if (verdict) {
-      conditions.push(eq(verificationVerdicts.verdict, verdict));
+      conditions.push(eq(sourceCheckVerdicts.verdict, verdict));
     }
     if (needs_recheck !== undefined) {
-      conditions.push(eq(verificationVerdicts.needsRecheck, needs_recheck));
+      conditions.push(eq(sourceCheckVerdicts.needsRecheck, needs_recheck));
     }
     if (entity_id) {
-      conditions.push(eq(verificationVerdicts.entityId, entity_id));
+      conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
     }
 
     const whereClause =
@@ -150,15 +150,15 @@ const verificationsApp = new Hono()
 
     const rows = await db
       .select()
-      .from(verificationVerdicts)
+      .from(sourceCheckVerdicts)
       .where(whereClause)
-      .orderBy(desc(verificationVerdicts.lastComputedAt))
+      .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
     const countResult = await db
       .select({ count: count() })
-      .from(verificationVerdicts)
+      .from(sourceCheckVerdicts)
       .where(whereClause);
     const total = countResult[0].count;
 
@@ -195,11 +195,11 @@ const verificationsApp = new Hono()
 
     const verdictRows = await db
       .select()
-      .from(verificationVerdicts)
+      .from(sourceCheckVerdicts)
       .where(
         and(
-          eq(verificationVerdicts.recordType, recordType),
-          eq(verificationVerdicts.recordId, recordId),
+          eq(sourceCheckVerdicts.recordType, recordType),
+          eq(sourceCheckVerdicts.recordId, recordId),
         )
       );
 
@@ -210,14 +210,14 @@ const verificationsApp = new Hono()
     // Return all verdicts for this record (row-level + any cell-level)
     const evidenceRows = await db
       .select()
-      .from(verificationEvidence)
+      .from(sourceCheckEvidence)
       .where(
         and(
-          eq(verificationEvidence.recordType, recordType),
-          eq(verificationEvidence.recordId, recordId),
+          eq(sourceCheckEvidence.recordType, recordType),
+          eq(sourceCheckEvidence.recordId, recordId),
         )
       )
-      .orderBy(desc(verificationEvidence.checkedAt));
+      .orderBy(desc(sourceCheckEvidence.checkedAt));
 
     return c.json({
       verdicts: verdictRows.map((v) => ({
@@ -271,14 +271,14 @@ const verificationsApp = new Hono()
 
       const rows = await db
         .select()
-        .from(verificationEvidence)
+        .from(sourceCheckEvidence)
         .where(
           and(
-            eq(verificationEvidence.recordType, recordType),
-            eq(verificationEvidence.recordId, recordId),
+            eq(sourceCheckEvidence.recordType, recordType),
+            eq(sourceCheckEvidence.recordId, recordId),
           )
         )
-        .orderBy(desc(verificationEvidence.checkedAt))
+        .orderBy(desc(sourceCheckEvidence.checkedAt))
         .limit(limit)
         .offset(offset);
 
@@ -318,7 +318,7 @@ const verificationsApp = new Hono()
     const now = new Date();
 
     const [inserted] = await db
-      .insert(verificationEvidence)
+      .insert(sourceCheckEvidence)
       .values({
         recordType: body.recordType,
         recordId: body.recordId,
@@ -338,19 +338,19 @@ const verificationsApp = new Hono()
         createdAt: now,
         updatedAt: now,
       })
-      .returning({ id: verificationEvidence.id });
+      .returning({ id: sourceCheckEvidence.id });
 
     // Auto-flag corresponding verdicts for recheck
     const updated = await db
-      .update(verificationVerdicts)
+      .update(sourceCheckVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
       .where(
         and(
-          eq(verificationVerdicts.recordType, body.recordType),
-          eq(verificationVerdicts.recordId, body.recordId),
+          eq(sourceCheckVerdicts.recordType, body.recordType),
+          eq(sourceCheckVerdicts.recordId, body.recordId),
         )
       )
-      .returning({ recordId: verificationVerdicts.recordId });
+      .returning({ recordId: sourceCheckVerdicts.recordId });
 
     return c.json(
       {
@@ -380,7 +380,7 @@ const verificationsApp = new Hono()
     const entityIdVal = body.entityId ?? null;
 
     const doUpdate = () => db.execute(sql`
-      UPDATE verification_verdicts SET
+      UPDATE source_check_verdicts SET
         entity_id = COALESCE(${entityIdVal}, entity_id),
         verdict = ${body.verdict},
         confidence = ${body.confidence ?? null},
@@ -401,7 +401,7 @@ const verificationsApp = new Hono()
     if (rowsUpdated === 0) {
       try {
         await db.execute(sql`
-          INSERT INTO verification_verdicts (
+          INSERT INTO source_check_verdicts (
             record_type, record_id, field_name, entity_id,
             verdict, confidence, reasoning, sources_checked,
             needs_recheck, next_check_due, last_computed_at,
@@ -430,5 +430,5 @@ const verificationsApp = new Hono()
 
 // ---- Exports ----
 
-export const verificationsRoute = verificationsApp;
-export type VerificationsRoute = typeof verificationsApp;
+export const sourceChecksRoute = sourceChecksApp;
+export type SourceChecksRoute = typeof sourceChecksApp;

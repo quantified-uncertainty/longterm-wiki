@@ -1,33 +1,33 @@
 /**
- * LLM Verifier — call LLM for fact-checking and parse verdicts.
+ * LLM Source-Checker — call LLM for source-checking claims and parse verdicts.
  *
- * Shared by records-verify and verify-orchestrate. Provides:
- * - LLM verification call with structured JSON parsing
+ * Shared by factbase-source-check and source-check-orchestrate. Provides:
+ * - LLM source-check call with structured JSON parsing
  * - Verdict validation against allowed values
  */
 
 import { callLlm, MODELS, type createLlmClient } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import {
-  VALID_VERIFICATION_VERDICTS,
-  type VerificationVerdict,
+  VALID_SOURCE_CHECK_VERDICTS,
+  type SourceCheckVerdict,
 } from '../../../apps/wiki-server/src/api-types.ts';
-import type { LlmVerificationResult } from './types.ts';
+import type { LlmSourceCheckResult } from './types.ts';
 
 /**
- * Call the LLM to verify a claim/record against source text.
+ * Call the LLM to source-check a claim/record against source text.
  *
  * @param client - LLM client instance
- * @param prompt - The full verification prompt
+ * @param prompt - The full source-check prompt
  * @param retryLabel - Label for retry tracking
- * @returns Parsed and validated verification result
+ * @returns Parsed and validated source-check result
  * @throws Error if the LLM call fails
  */
-export async function callLlmForVerification(
+export async function callLlmForSourceCheck(
   client: ReturnType<typeof createLlmClient>,
   prompt: string,
   retryLabel: string,
-): Promise<LlmVerificationResult> {
+): Promise<LlmSourceCheckResult> {
   const result = await callLlm(client, prompt, {
     model: MODELS.haiku,
     maxTokens: 500,
@@ -42,7 +42,7 @@ export async function callLlmForVerification(
     reasoning: string;
   };
 
-  const verdict = (VALID_VERIFICATION_VERDICTS as readonly string[]).includes(parsed.verdict)
+  const verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.verdict)
     ? parsed.verdict
     : 'unverifiable';
 
@@ -58,9 +58,9 @@ export async function callLlmForVerification(
  * Validate a verdict string against the canonical list.
  * Returns the validated verdict or 'unverifiable' if invalid.
  */
-export function validateVerdict(verdict: string): VerificationVerdict {
-  return (VALID_VERIFICATION_VERDICTS as readonly string[]).includes(verdict)
-    ? (verdict as VerificationVerdict)
+export function validateVerdict(verdict: string): SourceCheckVerdict {
+  return (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(verdict)
+    ? (verdict as SourceCheckVerdict)
     : 'unverifiable';
 }
 

@@ -6,7 +6,7 @@
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -164,7 +164,7 @@ export function EquityPositionsSection({
                           source
                         </a>
                       )}
-                      <VerificationBadge verdict={verdict} />
+                      <SourceCheckBadge verdict={verdict} />
                     </div>
                     {pos.notes && (
                       <div className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">

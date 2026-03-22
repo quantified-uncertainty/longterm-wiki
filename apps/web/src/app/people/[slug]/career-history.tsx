@@ -3,7 +3,7 @@ import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -35,7 +35,7 @@ export function CareerHistory({
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
-                <VerificationBadge verdict={verdict} />
+                <SourceCheckBadge verdict={verdict} />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">
                 {orgSlug ? (

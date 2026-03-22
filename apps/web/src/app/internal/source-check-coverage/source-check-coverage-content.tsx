@@ -15,8 +15,8 @@ interface ThingsStatsResult {
   byEntityType: Record<string, number>;
 }
 
-/** Stats shape returned by GET /api/verifications/stats (unified) */
-interface UnifiedVerificationStatsResult {
+/** Stats shape returned by GET /api/source-checks/stats (unified) */
+interface UnifiedSourceCheckStatsResult {
   total: number;
   avg_confidence: number;
   needs_recheck: number;
@@ -52,8 +52,8 @@ async function loadThingsStats(): Promise<FetchResult<ThingsStatsResult>> {
   });
 }
 
-async function loadVerificationStats(): Promise<FetchResult<UnifiedVerificationStatsResult>> {
-  return fetchDetailed<UnifiedVerificationStatsResult>("/api/verifications/stats", {
+async function loadSourceCheckStats(): Promise<FetchResult<UnifiedSourceCheckStatsResult>> {
+  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/source-checks/stats", {
     revalidate: 60,
   });
 }
@@ -62,7 +62,7 @@ function emptyThingsStats(): ThingsStatsResult {
   return { total: 0, byType: {}, byEntityType: {} };
 }
 
-function emptyVerificationStats(): UnifiedVerificationStatsResult {
+function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
   return {
     total: 0,
     avg_confidence: 0,
@@ -144,16 +144,16 @@ function VerdictBreakdownCard({
 
 // ── Main Component ────────────────────────────────────────────────────────
 
-export async function VerificationCoverageContent() {
+export async function SourceCheckCoverageContent() {
   // Load data sources in parallel
   const [thingsResult, verificationResult] = await Promise.all([
     withApiFallback(loadThingsStats, emptyThingsStats),
-    withApiFallback(loadVerificationStats, emptyVerificationStats),
+    withApiFallback(loadSourceCheckStats, emptySourceCheckStats),
   ]);
 
   // Merge with defaults to guard against undefined fields from unavailable API
   const thingsStats = { ...emptyThingsStats(), ...thingsResult.data };
-  const vStats = { ...emptyVerificationStats(), ...verificationResult.data };
+  const vStats = { ...emptySourceCheckStats(), ...verificationResult.data };
 
   // Determine overall source and error
   const source = thingsResult.source === "api" ? "api" as const : "local" as const;
@@ -169,7 +169,7 @@ export async function VerificationCoverageContent() {
   }
   const totalEntities = entities.length;
 
-  // Verdict distribution from unified verification system
+  // Verdict distribution from unified source-check system
   const verdictEntries = Object.entries(vStats.by_verdict ?? {}).sort(
     ([, a], [, b]) => b - a
   );
@@ -205,9 +205,9 @@ export async function VerificationCoverageContent() {
       <DataSourceBanner source={source} apiError={apiError} />
 
       <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-        Verification coverage across all record types. Data from the unified{" "}
-        <code className="text-[11px]">verification_verdicts</code> and{" "}
-        <code className="text-[11px]">verification_evidence</code> tables.
+        Source-check coverage across all record types. Data from the unified{" "}
+        <code className="text-[11px]">source_check_verdicts</code> and{" "}
+        <code className="text-[11px]">source_check_evidence</code> tables.
       </p>
 
       {/* ── (a) Summary cards ──────────────────────────────────────────── */}
@@ -319,7 +319,7 @@ export async function VerificationCoverageContent() {
             Verdict Distribution
           </h2>
           <p className="text-sm text-muted-foreground mb-3">
-            All verdicts from the unified verification system.
+            All verdicts from the unified source-check system.
           </p>
 
           {/* Badges */}
@@ -395,7 +395,7 @@ export async function VerificationCoverageContent() {
           </h2>
           <p className="text-sm text-muted-foreground mb-3">
             Entity types ranked by the number of entities not yet indexed in
-            the Things table. Focus verification efforts here first.
+            the Things table. Focus source-check efforts here first.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
@@ -448,8 +448,8 @@ export async function VerificationCoverageContent() {
       {/* ── Data source footer ─────────────────────────────────────────── */}
       <p className="text-xs text-muted-foreground mt-4">
         Data from{" "}
-        <code className="text-[11px]">verification_verdicts</code> and{" "}
-        <code className="text-[11px]">verification_evidence</code> tables in the
+        <code className="text-[11px]">source_check_verdicts</code> and{" "}
+        <code className="text-[11px]">source_check_evidence</code> tables in the
         wiki-server database. Entity counts from local{" "}
         <code className="text-[11px]">database.json</code>.
       </p>

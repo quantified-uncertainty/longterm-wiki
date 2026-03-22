@@ -1,26 +1,26 @@
 import {
   fetchDetailed,
   type FetchResult,
-  type RpcVerificationsStatsResult,
-  type RpcVerificationsVerdictsResult,
-  type RpcVerificationVerdictRow,
+  type RpcSourceChecksStatsResult,
+  type RpcSourceChecksVerdictsResult,
+  type RpcSourceCheckVerdictRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { FactBaseVerificationsTable } from "./factbase-verifications-table";
+import { FactBaseSourceChecksTable } from "./factbase-source-checks-table";
 
 // Re-export the RPC-inferred types for the table component
-export type VerdictRow = RpcVerificationVerdictRow;
+export type VerdictRow = RpcSourceCheckVerdictRow;
 
 // ── Data loading ──────────────────────────────────────────────────────────────
 
-async function loadStats(): Promise<FetchResult<RpcVerificationsStatsResult>> {
-  return fetchDetailed<RpcVerificationsStatsResult>("/api/verifications/stats");
+async function loadStats(): Promise<FetchResult<RpcSourceChecksStatsResult>> {
+  return fetchDetailed<RpcSourceChecksStatsResult>("/api/source-checks/stats");
 }
 
-async function loadVerdicts(): Promise<FetchResult<RpcVerificationsVerdictsResult>> {
-  // Filter to fact record types for the FactBase verifications dashboard
-  return fetchDetailed<RpcVerificationsVerdictsResult>(
-    "/api/verifications/verdicts?record_type=fact&limit=200"
+async function loadVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsResult>> {
+  // Filter to fact record types for the FactBase source-checks dashboard
+  return fetchDetailed<RpcSourceChecksVerdictsResult>(
+    "/api/source-checks/verdicts?record_type=fact&limit=200"
   );
 }
 
@@ -69,7 +69,7 @@ const BAR_COLORS: Record<string, string> = {
 
 // ── Main content component ────────────────────────────────────────────────────
 
-export async function FactBaseVerificationsContent() {
+export async function FactBaseSourceChecksContent() {
   const [statsResult, verdictsResult] = await Promise.all([
     loadStats(),
     loadVerdicts(),
@@ -86,7 +86,7 @@ export async function FactBaseVerificationsContent() {
     return (
       <>
         <p className="text-muted-foreground">
-          FactBase Verification dashboard requires a connection to the
+          FactBase Source-Check dashboard requires a connection to the
           wiki-server. No local fallback is available for this data.
         </p>
         <DataSourceBanner source="local" apiError={apiError} />
@@ -104,7 +104,7 @@ export async function FactBaseVerificationsContent() {
   return (
     <>
       <p className="text-muted-foreground text-sm leading-relaxed">
-        Verification status for FactBase facts checked against external resources.{" "}
+        Source-check status for FactBase facts checked against external resources.{" "}
         <span className="font-medium text-foreground">
           {stats.total}
         </span>{" "}
@@ -183,12 +183,12 @@ export async function FactBaseVerificationsContent() {
       )}
 
       {/* Interactive table */}
-      <FactBaseVerificationsTable data={verdicts} />
+      <FactBaseSourceChecksTable data={verdicts} />
 
       <DataSourceBanner source="api" />
       <p className="text-xs text-muted-foreground mt-1">
-        Data from <code className="text-[11px]">verification_verdicts</code> and{" "}
-        <code className="text-[11px]">verification_evidence</code>{" "}
+        Data from <code className="text-[11px]">source_check_verdicts</code> and{" "}
+        <code className="text-[11px]">source_check_evidence</code>{" "}
         tables in the wiki-server database.
       </p>
     </>

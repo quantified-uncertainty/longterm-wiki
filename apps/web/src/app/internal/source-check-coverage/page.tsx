@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function EntityVerificationsRedirect() {
+export default function SourceCheckCoveragePage() {
   redirect("/wiki/E2200");
 }

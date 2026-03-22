@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const verdict = request.nextUrl.searchParams.get("verdict");
     if (verdict && verdict.length <= 50) params.set("verdict", verdict);
 
-    const url = `${config.serverUrl}/api/verifications/verdicts?${params.toString()}`;
+    const url = `${config.serverUrl}/api/source-checks/verdicts?${params.toString()}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(15_000),

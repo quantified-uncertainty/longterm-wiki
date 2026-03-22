@@ -1,8 +1,8 @@
 /**
- * Verification status badge for structured data records (grants, personnel, etc.).
+ * Source-check status badge for structured data records (grants, personnel, etc.).
  *
  * Shows a small colored indicator next to record data points on detail pages.
- * The verdict comes from the record verification system (wiki-server + LLM checks).
+ * The verdict comes from the source-check system (wiki-server + LLM checks).
  *
  * Only renders when a verdict exists — unchecked records show nothing.
  */
@@ -52,7 +52,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
 
 // ── Component ────────────────────────────────────────────────────────
 
-export function VerificationBadge({
+export function SourceCheckBadge({
   verdict,
 }: {
   verdict: RecordVerdict | null | undefined;
