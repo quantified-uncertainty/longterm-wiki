@@ -328,19 +328,19 @@ describe('checkIssueSections', () => {
   });
 
   it('detects missing acceptance criteria', () => {
-    const body = '## Problem\n\nDescription of the problem that needs to be addressed urgently.';
+    const body = '## Problem\n\nDescription of the problem that needs to be addressed urgently. This is a longer description to pass the minimum body length check.';
     const missing = checkIssueSections('Title [sonnet]', body);
     expect(missing).toContain('Acceptance Criteria (## section or - [ ] checkboxes)');
   });
 
   it('accepts checkboxes as acceptance criteria', () => {
-    const body = '## Problem\n\nDescription of the problem.\n\n- [ ] Do thing\n- [ ] Done';
+    const body = '## Problem\n\nDescription of the problem that is long enough to pass the body length check.\n\n- [ ] Do thing\n- [ ] Done';
     const missing = checkIssueSections('Title [sonnet]', body);
     expect(missing).not.toContain('Acceptance Criteria (## section or - [ ] checkboxes)');
   });
 
   it('detects missing model recommendation', () => {
-    const body = '## Problem\n\nDescription.\n\n## Acceptance Criteria\n\n- [ ] Fix';
+    const body = '## Problem\n\nDescription that is long enough to pass the minimum body length check for validation.\n\n## Acceptance Criteria\n\n- [ ] Fix';
     const missing = checkIssueSections('Title', body);
     expect(missing).toContain('Recommended Model (model:haiku/sonnet/opus label, ## section, or [model] in title)');
   });
