@@ -46,7 +46,7 @@ const app = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) {
       return c.json({ references: [], totalClaim: 0, totalCitation: 0 });
@@ -64,7 +64,7 @@ const app = new Hono()
       type: "citation" as const,
       id: Number(r.id),
       referenceId: r.referenceId,
-      pageId, // use URL parameter — page_id_old no longer written for new rows (Phase D2a)
+      pageId, // use URL parameter
       title: r.title,
       url: r.url,
       note: r.note,
@@ -117,7 +117,7 @@ const app = new Hono()
       }
     }
 
-    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
+    // Resolve slug to integer ID
     const citPageIdInt = await resolvePageIntId(db, parsed.data.pageId);
 
     const rows = await db
@@ -136,7 +136,7 @@ const app = new Hono()
     const result: PageCitationRow = {
       id: Number(row.id),
       referenceId: row.referenceId,
-      pageId: parsed.data.pageId, // derived from input — page_id_old no longer written (Phase D2a)
+      pageId: parsed.data.pageId, // derived from input
       title: row.title,
       url: row.url,
       note: row.note,
@@ -179,7 +179,7 @@ const app = new Hono()
       }
     }
 
-    // Phase D2a: resolve page slugs to integer IDs (no longer dual-writing page_id_old)
+    // Resolve page slugs to integer IDs
     const batchIntIdMap = await resolvePageIntIds(db, pageIds);
 
     const values = parsed.data.items.map((item) => ({

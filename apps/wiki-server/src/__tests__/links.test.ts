@@ -7,9 +7,9 @@ import { mockDbModule, postJson } from "./test-utils.js";
 interface LinkRow {
   id: number;
   source_slug: string;  // synthetic — slug for convenience
-  source_id: number | null;  // Phase D3+E: integer FK (was source_id_int)
+  source_id: number | null;
   target_slug: string;  // synthetic — slug for convenience
-  target_id: number | null;  // Phase D3+E: integer FK (was target_id_int)
+  target_id: number | null;
   link_type: string;
   relationship: string | null;
   weight: number;
@@ -174,7 +174,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- page_links: DISTINCT ON backlinks query (Phase D3+E: filter by target_id) ---
+  // --- page_links: DISTINCT ON backlinks query (filter by target_id) ---
   if (
     q.includes("page_links") &&
     q.includes("distinct on") &&
@@ -349,7 +349,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("distinct on") &&
     !q.includes("bidirectional")
   ) {
-    // Phase D3+E: params are [graphEntityIntId, graphEntityIntId, MAX_GRAPH_EDGES]
     const entityIntId = params[0] as number;
     const maxEdges = (params[2] as number) || 500;
     const results: Record<string, unknown>[] = [];
@@ -419,7 +418,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT (for seeding) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 27; // Phase D3+E: id (integer PK), wiki_id, slug, title, ...
+    const COLS = 27; // id (integer PK), wiki_id, slug, title, ...
     const numRows = params.length / COLS;
     const rows: PageRow[] = [];
     for (let i = 0; i < numRows; i++) {
@@ -427,10 +426,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const slug = params[o + 2] as string; // slug column
       const row: PageRow = {
         id: slug, // use slug as display ID for pagesStore key
-        title: params[o + 3] as string, // Phase D3+E: shifted by 1 vs Phase 4a
-        entity_type: (params[o + 8] as string) || null, // Phase D3+E: entity_type at offset 8
-        quality: (params[o + 10] as number) || null, // Phase D3+E: quality at offset 10
-        reader_importance: (params[o + 11] as number) || null, // Phase D3+E: reader_importance at offset 11
+        title: params[o + 3] as string,
+        entity_type: (params[o + 8] as string) || null,
+        quality: (params[o + 10] as number) || null,
+        reader_importance: (params[o + 11] as number) || null,
       };
       pagesStore.set(slug, row);
       rows.push(row);

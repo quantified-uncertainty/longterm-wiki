@@ -130,9 +130,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- INSERT INTO resource_citations (supports multi-row) ----
-  // Phase D3+E: Params: resource_id, page_id (integer)
+  // Params: resource_id, page_id (integer)
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const COLS = 2; // Phase D3+E: resource_id, page_id
+    const COLS = 2; // resource_id, page_id
     const numRows = params.length / COLS;
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
@@ -189,7 +189,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: resourceStore.size }];
   }
 
-  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page, Phase D3+E) ----
+  // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page) ----
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
     const intId = params[0] as number;
     const results: Record<string, unknown>[] = [];
@@ -213,7 +213,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- SELECT wiki_pages.slug FROM resource_citations LEFT JOIN wiki_pages WHERE resource_id = $1 ----
-  // Phase D3+E: returns slug via LEFT JOIN wiki_pages
+  // Returns slug via LEFT JOIN wiki_pages
   if (q.includes("resource_citations") && q.includes("where") && !q.includes("delete") && !q.includes("count")) {
     const resourceId = params[0] as string;
     return citationStore

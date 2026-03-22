@@ -40,6 +40,6 @@ Follow existing patterns in `apps/web/src/app/internal/entities/` (Pattern A ref
 
 All dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect).
 
-**Dashboards:** Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Auto-Update Runs (E914), Auto-Update News (E915), Active Agents (E925), Groundskeeper Runs (E926), System Health (E927), Entity Profile (E1929). *(E899 deprecated — merged into E908.)*
+**Dashboards:** System Health (E927), PR Dashboard (E1011), Entities & Pages (E908), Page Changes (E909), Page Coverage (E899), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Sessions (E912), Session Insights (E913), Agent Activity (E1281), Active Agents (E925), Auto-Update Runs (E914), Auto-Update News (E915), Groundskeeper Runs (E926), Grants (E1055), Divisions (E1058), Funding Programs (E1059), People Coverage (E1099), Things (E1300), Entity Matrix (E1309), Entity Profile (E1929), Verification Coverage (E2100), Entity Verifications (E2200).
 
-**Citations:** Fact Dashboard (E898), Resources, Citation Accuracy (E917), Citation Content (E918), Hallucination Risk (E919), Hallucination Evals (E920).
+**Citations:** Fact Dashboard (E898), FactBase Verifications (E1045), Citation Accuracy (E917), Citation Content (E918), Hallucination Risk (E919), Hallucination Evals (E920).

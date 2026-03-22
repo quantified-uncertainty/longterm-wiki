@@ -1,0 +1,1114 @@
+[
+  {
+    "id": "363f7d0d1b1ddbfd",
+    "url": "https://en.wikipedia.org/wiki/Deep_Utopia",
+    "oldTitle": "en.wikipedia.org",
+    "newTitle": "Deep Utopia",
+    "type": "reference",
+    "stableId": "ReRFWAEEjw"
+  },
+  {
+    "id": "3d41b495e14408c2",
+    "url": "https://en.wikipedia.org/wiki/Human_Compatible",
+    "oldTitle": "en.wikipedia.org",
+    "newTitle": "Human Compatible",
+    "type": "reference",
+    "stableId": "Nm9ElcWUcg"
+  },
+  {
+    "id": "kb-0173fcc200d0e40c",
+    "url": "https://en.wikipedia.org/wiki/Geoffrey_Hinton",
+    "oldTitle": null,
+    "newTitle": "Geoffrey Hinton",
+    "type": "reference",
+    "stableId": "Mzg4MTc5OT"
+  },
+  {
+    "id": "kb-03c3135b58e803db",
+    "url": "https://x.com/HoldenKarnofsky",
+    "oldTitle": null,
+    "newTitle": "@HoldenKarnofsky on X",
+    "type": "web",
+    "stableId": "ODI5NDFhNT"
+  },
+  {
+    "id": "kb-06ab79e382d92fc3",
+    "url": "https://x.com/paulfchristiano",
+    "oldTitle": null,
+    "newTitle": "@paulfchristiano on X",
+    "type": "web",
+    "stableId": "YmI0Zjc5Nz"
+  },
+  {
+    "id": "kb-09097735e518f0b4",
+    "url": "https://x.com/janleike",
+    "oldTitle": null,
+    "newTitle": "@janleike on X",
+    "type": "web",
+    "stableId": "YmNlNzI1OW"
+  },
+  {
+    "id": "kb-19918a51d2e21373",
+    "url": "https://x.com/geoffreyhinton",
+    "oldTitle": null,
+    "newTitle": "@geoffreyhinton on X",
+    "type": "web",
+    "stableId": "M2MzYTkyMm"
+  },
+  {
+    "id": "kb-1d8d9b51a1ab57c7",
+    "url": "https://en.wikipedia.org/wiki/Dario_Amodei",
+    "oldTitle": null,
+    "newTitle": "Dario Amodei",
+    "type": "reference",
+    "stableId": "NDdiMjVkYW"
+  },
+  {
+    "id": "kb-255b21ab621baed0",
+    "url": "https://x.com/ylecun",
+    "oldTitle": null,
+    "newTitle": "@ylecun on X",
+    "type": "web",
+    "stableId": "NzcxODE3ZG"
+  },
+  {
+    "id": "kb-28723136804c944b",
+    "url": "https://x.com/ESYudkowsky",
+    "oldTitle": null,
+    "newTitle": "@ESYudkowsky on X",
+    "type": "web",
+    "stableId": "MjQ4ZTkyZD"
+  },
+  {
+    "id": "kb-35438d5c0351ff1f",
+    "url": "https://en.wikipedia.org/wiki/Holden_Karnofsky",
+    "oldTitle": null,
+    "newTitle": "Holden Karnofsky",
+    "type": "reference",
+    "stableId": "ZDJiMDYyM2"
+  },
+  {
+    "id": "kb-446d0b12cf093255",
+    "url": "https://x.com/NPCollapse",
+    "oldTitle": null,
+    "newTitle": "@NPCollapse on X",
+    "type": "web",
+    "stableId": "MTA4YzQ5NW"
+  },
+  {
+    "id": "kb-4e0562c4ba761246",
+    "url": "https://en.wikipedia.org/wiki/Yoshua_Bengio",
+    "oldTitle": null,
+    "newTitle": "Yoshua Bengio",
+    "type": "reference",
+    "stableId": "ZWYyYzU4Yj"
+  },
+  {
+    "id": "kb-522fe818e7459bda",
+    "url": "https://en.wikipedia.org/wiki/Google_DeepMind",
+    "oldTitle": null,
+    "newTitle": "Google DeepMind",
+    "type": "reference",
+    "stableId": "ZjdkNTU5MW"
+  },
+  {
+    "id": "kb-5ba040d85b465516",
+    "url": "https://x.com/iabornamore",
+    "oldTitle": null,
+    "newTitle": "@iabornamore on X",
+    "type": "web",
+    "stableId": "NzBiMjkxMj"
+  },
+  {
+    "id": "kb-679f309525e56c49",
+    "url": "https://x.com/ch402",
+    "oldTitle": null,
+    "newTitle": "@ch402 on X",
+    "type": "web",
+    "stableId": "NjY4NmRmNz"
+  },
+  {
+    "id": "kb-68fb56627384188a",
+    "url": "https://x.com/elonmusk",
+    "oldTitle": null,
+    "newTitle": "@elonmusk on X",
+    "type": "web",
+    "stableId": "MTcwMDNiOT"
+  },
+  {
+    "id": "kb-6c02b94b4c2222a9",
+    "url": "https://en.wikipedia.org/wiki/Jaan_Tallinn",
+    "oldTitle": null,
+    "newTitle": "Jaan Tallinn",
+    "type": "reference",
+    "stableId": "M2Q3NDVkYT"
+  },
+  {
+    "id": "kb-74085d6827c291f5",
+    "url": "https://en.wikipedia.org/wiki/Jan_Leike",
+    "oldTitle": null,
+    "newTitle": "Jan Leike",
+    "type": "reference",
+    "stableId": "ZjUwYTA0MG"
+  },
+  {
+    "id": "kb-88c03c9b0d868b42",
+    "url": "https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.",
+    "oldTitle": null,
+    "newTitle": "Safe Superintelligence Inc.",
+    "type": "reference",
+    "stableId": "MWQxMTUzNz"
+  },
+  {
+    "id": "kb-940ec5d542c30ebd",
+    "url": "https://x.com/sama",
+    "oldTitle": null,
+    "newTitle": "@sama on X",
+    "type": "web",
+    "stableId": "OGQ5NzFmMj"
+  },
+  {
+    "id": "kb-a11e5ecbac34ee4c",
+    "url": "https://en.wikipedia.org/wiki/Paul_Christiano",
+    "oldTitle": null,
+    "newTitle": "Paul Christiano",
+    "type": "reference",
+    "stableId": "ZTM0OGQ4Nz"
+  },
+  {
+    "id": "kb-b418963be8935b02",
+    "url": "https://x.com/DarioAmodei",
+    "oldTitle": null,
+    "newTitle": "@DarioAmodei on X",
+    "type": "web",
+    "stableId": "MzZmMjc2Mj"
+  },
+  {
+    "id": "kb-bab966a212f1bc8b",
+    "url": "https://en.wikipedia.org/wiki/Nick_Bostrom",
+    "oldTitle": null,
+    "newTitle": "Nick Bostrom",
+    "type": "reference",
+    "stableId": "NTdjMzkyMT"
+  },
+  {
+    "id": "kb-bdf7458184e1e789",
+    "url": "https://en.wikipedia.org/wiki/Connor_Leahy",
+    "oldTitle": null,
+    "newTitle": "Connor Leahy",
+    "type": "reference",
+    "stableId": "ZjE2MDRlNW"
+  },
+  {
+    "id": "kb-d3d698d4982d1d15",
+    "url": "https://x.com/demishassabis",
+    "oldTitle": null,
+    "newTitle": "@demishassabis on X",
+    "type": "web",
+    "stableId": "MmI5YTgyNW"
+  },
+  {
+    "id": "kb-d79b1ece2e627a2e",
+    "url": "https://x.com/StuartJRussell",
+    "oldTitle": null,
+    "newTitle": "@StuartJRussell on X",
+    "type": "web",
+    "stableId": "YTc0ZmY0OW"
+  },
+  {
+    "id": "kb-decdd70f29170a63",
+    "url": "https://en.wikipedia.org/wiki/Loopt",
+    "oldTitle": null,
+    "newTitle": "Loopt",
+    "type": "reference",
+    "stableId": "MWUxZDRlYT"
+  },
+  {
+    "id": "kb-e26bb2fe535e10c4",
+    "url": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "oldTitle": null,
+    "newTitle": "Elon Musk",
+    "type": "reference",
+    "stableId": "N2YyYWQ5Mz"
+  },
+  {
+    "id": "kb-f68985d139b4a2ac",
+    "url": "https://en.wikipedia.org/wiki/Sam_Altman",
+    "oldTitle": null,
+    "newTitle": "Sam Altman",
+    "type": "reference",
+    "stableId": "MmFmNTg2Nj"
+  },
+  {
+    "id": "kb-f97a806d7bd3cd7b",
+    "url": "https://x.com/NickBostrom",
+    "oldTitle": null,
+    "newTitle": "@NickBostrom on X",
+    "type": "web",
+    "stableId": "OWVmMjQxNW"
+  },
+  {
+    "id": "0562f8c207d8b63f",
+    "url": "https://www.alignment.org/",
+    "oldTitle": "alignment.org",
+    "newTitle": "Alignment Research Center",
+    "type": "web",
+    "stableId": "ZjljOTM4Nm"
+  },
+  {
+    "id": "0ca8b8d0e4d99748",
+    "url": "https://www.levels.fyi/t/data-scientist",
+    "oldTitle": "Levels.fyi",
+    "newTitle": "Data Scientist Salary",
+    "type": "web",
+    "stableId": "MjJiYzU1ND"
+  },
+  {
+    "id": "0df4be45b473dda2",
+    "url": "https://www.nature.com/articles/nature16961",
+    "oldTitle": "www.nature.com",
+    "newTitle": "Mastering the game of Go with deep neural networks and tree search",
+    "type": "paper",
+    "stableId": "baAC1axS0A"
+  },
+  {
+    "id": "0e2f99c628b14d9c",
+    "url": "https://comprop.oii.ox.ac.uk/research/publications/",
+    "oldTitle": "Book",
+    "newTitle": "Programme on Democracy and Technology (Oxford Internet Institute)",
+    "type": "web",
+    "stableId": "ZWE1NzdiND"
+  },
+  {
+    "id": "1060f486990f5014",
+    "url": "https://evaluations.metr.org/gpt-5-1-codex-max-report/",
+    "oldTitle": "evaluations.metr.org",
+    "newTitle": "Details about METR\u2019s evaluation of OpenAI GPT-5.1-Codex-Max",
+    "type": "web",
+    "stableId": "ZWE0ZTIxYj"
+  },
+  {
+    "id": "18ed7d3a559cd77e",
+    "url": "https://www.cold-takes.com/ai-could-defeat-all-of-us-combined/",
+    "oldTitle": "www.cold-takes.com",
+    "newTitle": "AI Could Defeat All Of Us Combined",
+    "type": "web",
+    "stableId": "YmjUrjYcgw"
+  },
+  {
+    "id": "19dfec2f79bfade6",
+    "url": "https://www.brookings.edu/topic/technology/",
+    "oldTitle": "brookings.edu",
+    "newTitle": "The 4th Annual Breyer Lecture: Technology, Accountability, and International Law (Brookings)",
+    "type": "web",
+    "stableId": "OTQ4YmUyZG"
+  },
+  {
+    "id": "1f30f7fced4344e6",
+    "url": "https://hpmor.com/",
+    "oldTitle": "hpmor.com",
+    "newTitle": "Harry Potter and the Methods of Rationality",
+    "type": "web",
+    "stableId": "totiI8Dqjg"
+  },
+  {
+    "id": "254bcdc7bfcdcd73",
+    "url": "https://www.gov.uk/government/topical-events/ai-safety-summit-2023",
+    "oldTitle": "gov.uk",
+    "newTitle": "AI Safety Summit 2023",
+    "type": "government",
+    "stableId": "NDRlMWNlOG"
+  },
+  {
+    "id": "346b1574c0c3ce67",
+    "url": "https://distill.pub/2020/circuits/zoom-in/",
+    "oldTitle": "distill.pub",
+    "newTitle": "Zoom In: An Introduction to Circuits",
+    "type": "web",
+    "stableId": "gTBAjr695Q"
+  },
+  {
+    "id": "34c865128d362d08",
+    "url": "https://techcrunch.com/2025/05/28/netflix-co-founder-reed-hastings-joins-anthropics-board/",
+    "oldTitle": null,
+    "newTitle": "Netflix co-founder Reed Hastings joins Anthropic's board",
+    "type": "web",
+    "stableId": "MTUwMGIyMj"
+  },
+  {
+    "id": "357cf00ad44eea37",
+    "url": "https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/",
+    "oldTitle": null,
+    "newTitle": "Anthropic Long-Term Benefit Trust",
+    "type": "web",
+    "stableId": "NzM2MmE2Mm"
+  },
+  {
+    "id": "3a07423e8bf204c2",
+    "url": "https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/",
+    "oldTitle": null,
+    "newTitle": "Enterprises prefer Anthropic's AI models over anyone else's, including OpenAI's",
+    "type": "web",
+    "stableId": "ZDhjY2FkYT"
+  },
+  {
+    "id": "3b144f02aca0e4d0",
+    "url": "https://globalhealth.harvard.edu",
+    "oldTitle": "globalhealth.harvard.edu",
+    "newTitle": "Harvard Global Health Institute",
+    "type": "web",
+    "stableId": "NzQ0YTUyOT"
+  },
+  {
+    "id": "3ca76bd7dcbb0a13",
+    "url": "https://lighthaven.space",
+    "oldTitle": "Lighthaven.space",
+    "newTitle": "Lighthaven",
+    "type": "web",
+    "stableId": "NmQ2YTE0OT"
+  },
+  {
+    "id": "3e3555c010d375ba",
+    "url": "https://perma.cc/",
+    "oldTitle": "Perma.cc",
+    "newTitle": "Perma.cc - Permanent web archiving",
+    "type": "web",
+    "stableId": "NWZmZjIzY2"
+  },
+  {
+    "id": "3ee11b82b7e1fd68",
+    "url": "https://metr.org/blog/2025-10-14-malt-dataset-of-natural-and-prompted-behaviors/",
+    "oldTitle": "metr.org",
+    "newTitle": "MALT: A Dataset of Natural and Prompted Behaviors That Threaten Eval Integrity",
+    "type": "web",
+    "stableId": "ZGI2MjViND"
+  },
+  {
+    "id": "41ce725530adfaa5",
+    "url": "https://www.anthropic.com/research/next-generation-constitutional-classifiers",
+    "oldTitle": null,
+    "newTitle": "Next-generation Constitutional Classifiers: More efficient protection against universal jailbreaks",
+    "type": "paper",
+    "stableId": "OTAxYTAyMm"
+  },
+  {
+    "id": "41e1a2551ca48b7c",
+    "url": "https://www.anthropic.com/news/chris-liddell-appointed-anthropic-board",
+    "oldTitle": null,
+    "newTitle": "Chris Liddell appointed to Anthropic\u2019s board of directors",
+    "type": "blog",
+    "stableId": "ODliNWIyOD"
+  },
+  {
+    "id": "423364c2f6bc5f49",
+    "url": "https://seo.ai/blog/how-many-people-work-at-anthropic",
+    "oldTitle": null,
+    "newTitle": "How Many People Work at Anthropic (Claude)? Statistics & Facts (2025)",
+    "type": "web",
+    "stableId": "MTg2MWNhNz"
+  },
+  {
+    "id": "47f4c94acf618045",
+    "url": "https://www.nature.com/articles/nature24270",
+    "oldTitle": "www.nature.com",
+    "newTitle": "Mastering the game of Go without human knowledge",
+    "type": "paper",
+    "stableId": "YTGEQDtfPA"
+  },
+  {
+    "id": "4df4910b23f17440",
+    "url": "https://arxiv.org/abs/2205.06175",
+    "oldTitle": "arxiv.org",
+    "newTitle": "A Generalist Agent",
+    "type": "paper",
+    "stableId": "N8Cy6wHxFw"
+  },
+  {
+    "id": "5083d746c2728ff2",
+    "url": "https://transformer-circuits.pub/",
+    "oldTitle": null,
+    "newTitle": "Transformer Circuits Thread",
+    "type": "paper",
+    "stableId": "MGJhYTk1MW"
+  },
+  {
+    "id": "541ff0c6f8a5aa2d",
+    "url": "https://techcrunch.com/2025/04/09/anthropic-rolls-out-a-200-per-month-claude-subscription/",
+    "oldTitle": null,
+    "newTitle": "Anthropic rolls out a $200-per-month Claude subscription",
+    "type": "web",
+    "stableId": "OTFkZTBkOW"
+  },
+  {
+    "id": "5c44e34893cf58f5",
+    "url": "https://alphafold.ebi.ac.uk/",
+    "oldTitle": "alphafold.ebi.ac.uk",
+    "newTitle": "AlphaFold Protein Structure Database",
+    "type": "web",
+    "stableId": "Nzg5ZjI1Mj"
+  },
+  {
+    "id": "5e1bfad61e9bc59b",
+    "url": "https://www.cnbc.com/2024/11/22/amazon-to-invest-another-4-billion-in-anthropic-openais-biggest-rival.html",
+    "oldTitle": null,
+    "newTitle": "Amazon to invest another $4 billion in Anthropic, OpenAI's biggest rival",
+    "type": "web",
+    "stableId": "NTUwODY1Nz"
+  },
+  {
+    "id": "605e0f8923379ff4",
+    "url": "https://www.anthropic.com/news/claude-for-enterprise",
+    "oldTitle": null,
+    "newTitle": "Claude for Enterprise",
+    "type": "blog",
+    "stableId": "ZTI4NzZjYm"
+  },
+  {
+    "id": "60ee1ecaeb050bff",
+    "url": "https://americanbazaaronline.com/2026/02/10/anthropic-ai-safety-researcher-mrinank-sharma-resigns-474827/",
+    "oldTitle": null,
+    "newTitle": "Anthropic AI safety researcher Mrinank Sharma resigns, warns of \u2018world in peril\u2019",
+    "type": "web",
+    "stableId": "YmE3NGM2OT"
+  },
+  {
+    "id": "683aef834ac1612a",
+    "url": "https://arxiv.org/abs/2212.08073",
+    "oldTitle": null,
+    "newTitle": "Constitutional AI: Harmlessness from AI Feedback",
+    "type": "paper",
+    "stableId": "MWI0YWIwNz"
+  },
+  {
+    "id": "6a63d67067867cc8",
+    "url": "https://www.levels.fyi/t/software-engineer/title/machine-learning-engineer",
+    "oldTitle": "Levels.fyi",
+    "newTitle": "Machine Learning Engineer Salary",
+    "type": "web",
+    "stableId": "ZjZkZjc3MG"
+  },
+  {
+    "id": "6b9e7fcf6e29c869",
+    "url": "https://www.cnbc.com/2025/10/23/anthropic-google-cloud-deal-tpu.html",
+    "oldTitle": null,
+    "newTitle": "Google and Anthropic announce cloud deal worth tens of billions of dollars",
+    "type": "web",
+    "stableId": "YjEyYTU3N2"
+  },
+  {
+    "id": "70bd86a20fe4d4e4",
+    "url": "https://colah.github.io/posts/2015-08-Understanding-LSTMs/",
+    "oldTitle": "colah.github.io",
+    "newTitle": "Understanding LSTM Networks -- colah's blog",
+    "type": "web",
+    "stableId": "eGds0XlloQ"
+  },
+  {
+    "id": "7457262d461e2206",
+    "url": "https://evaluations.metr.org/gpt-5-report/",
+    "oldTitle": "evaluations.metr.org",
+    "newTitle": "Details about METR\u2019s evaluation of OpenAI GPT-5",
+    "type": "web",
+    "stableId": "ZjU3MDFiZm"
+  },
+  {
+    "id": "7512ddb574f82249",
+    "url": "https://www.anthropic.com/news/activating-asl3-protections",
+    "oldTitle": null,
+    "newTitle": "Activating AI Safety Level 3 protections",
+    "type": "blog",
+    "stableId": "YmFkZjUwMz"
+  },
+  {
+    "id": "7b7aaa503e910705",
+    "url": "https://www.iproov.com/",
+    "oldTitle": "iproov.com",
+    "newTitle": "iProov - Biometric Identity Verification",
+    "type": "web",
+    "stableId": "OWMwNjE1ND"
+  },
+  {
+    "id": "862e2d851c171321",
+    "url": "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/",
+    "oldTitle": null,
+    "newTitle": "Microsoft and OpenAI extend partnership",
+    "type": "web",
+    "stableId": "NTBlNjdmMG"
+  },
+  {
+    "id": "86df45a5f8a9bf6d",
+    "url": "https://intelligence.org/",
+    "oldTitle": "miri.org",
+    "newTitle": "Machine Intelligence Research Institute",
+    "type": "web",
+    "stableId": "YmZjYzBhMW"
+  },
+  {
+    "id": "8be2d4e337697647",
+    "url": "https://www.niemanlab.org",
+    "oldTitle": "niemanlab.org",
+    "newTitle": "Nieman Journalism Lab",
+    "type": "web",
+    "stableId": "ZGI5ZTQyND"
+  },
+  {
+    "id": "8dfaa29db42b2ec9",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/eu-ai-act-implementation-timeline",
+    "oldTitle": "ec.europa.eu",
+    "newTitle": "AI Act Service Desk - Timeline for the Implementation of the EU AI Act",
+    "type": "web",
+    "stableId": "MzE5NmRkYz"
+  },
+  {
+    "id": "8f7f1a6ed1b856a8",
+    "url": "https://originality.ai/",
+    "oldTitle": "Originality.ai",
+    "newTitle": "Originality AI",
+    "type": "web",
+    "stableId": "OGFkMjQ2Mz"
+  },
+  {
+    "id": "8f9203cd503c4950",
+    "url": "https://www.cylab.cmu.edu/",
+    "oldTitle": "cylab.cmu.edu",
+    "newTitle": "CyLab Security & Privacy Institute",
+    "type": "web",
+    "stableId": "MTQ5M2RlOT"
+  },
+  {
+    "id": "902b8d8f101ce30d",
+    "url": "https://ieeexplore.ieee.org/document/6795724",
+    "oldTitle": "ieeexplore.ieee.org",
+    "newTitle": "Backpropagation Applied to Handwritten Zip Code Recognition",
+    "type": "web",
+    "stableId": "EmOPSeJHJQ"
+  },
+  {
+    "id": "926e4c583994b48d",
+    "url": "https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai",
+    "oldTitle": null,
+    "newTitle": "Anthropic Approaches $7B Run Rate in 2025, Outpaces OpenAI",
+    "type": "web",
+    "stableId": "ZGM1ZTNhYj"
+  },
+  {
+    "id": "93109952a74302d8",
+    "url": "https://docs.anthropic.com/en/docs/claude-code",
+    "oldTitle": null,
+    "newTitle": "Claude Code overview",
+    "type": "web",
+    "stableId": "NDZkNDdmMz"
+  },
+  {
+    "id": "97b62b9535782db4",
+    "url": "https://techcrunch.com/2025/10/02/anthropic-hires-new-cto-with-focus-on-ai-infrastructure/",
+    "oldTitle": null,
+    "newTitle": "Anthropic hires new CTO with focus on AI infrastructure",
+    "type": "web",
+    "stableId": "OGQ3NzhjZT"
+  },
+  {
+    "id": "9989af3aebafc142",
+    "url": "https://webliteracy.pressbooks.com/",
+    "oldTitle": "Book",
+    "newTitle": "Web Literacy for Student Fact-Checkers",
+    "type": "web",
+    "stableId": "NWZjZTZmNj"
+  },
+  {
+    "id": "9e4ef9c155b6d9f3",
+    "url": "https://www.anthropic.com/news/3-5-models-and-computer-use",
+    "oldTitle": null,
+    "newTitle": "Introducing computer use, a new Claude 3.5 Sonnet, and Claude 3.5 Haiku",
+    "type": "blog",
+    "stableId": "ZWY4YWNlOT"
+  },
+  {
+    "id": "a0a069731e7d18ee",
+    "url": "https://colah.github.io/posts/2015-09-NN-Types-FP/",
+    "oldTitle": "colah.github.io",
+    "newTitle": "Neural Networks, Types, and Functional Programming -- colah's blog",
+    "type": "web",
+    "stableId": "py1T6rW4jw"
+  },
+  {
+    "id": "a5915ff048168702",
+    "url": "https://console.anthropic.com",
+    "oldTitle": null,
+    "newTitle": "Claude Console",
+    "type": "web",
+    "stableId": "MmUzZTI1ND"
+  },
+  {
+    "id": "a79282823a854917",
+    "url": "https://blogs.microsoft.com/blog/2025/11/18/microsoft-nvidia-and-anthropic-announce-strategic-partnerships/",
+    "oldTitle": null,
+    "newTitle": "Microsoft, NVIDIA and Anthropic announce strategic partnerships",
+    "type": "web",
+    "stableId": "YmRkYWM5Nm"
+  },
+  {
+    "id": "a86b4f04559de6da",
+    "url": "https://metr.org/blog/2025-02-27-gpt-4-5-evals/",
+    "oldTitle": "metr.org",
+    "newTitle": "METR\u2019s GPT-4.5 pre-deployment evaluations",
+    "type": "web",
+    "stableId": "NDc0NDczYj"
+  },
+  {
+    "id": "ac4705e95f3c2341",
+    "url": "https://www.cnbc.com/2026/02/17/anthropic-ai-claude-sonnet-4-6-default-free-pro.html",
+    "oldTitle": null,
+    "newTitle": "Anthropic releases Claude Sonnet 4.6, continuing breakneck pace of AI model releases",
+    "type": "web",
+    "stableId": "YTI2NTIzMm"
+  },
+  {
+    "id": "ac6cbd8d06bd1b94",
+    "url": "https://www.cnbc.com/2025/01/22/google-agrees-to-new-1-billion-investment-in-anthropic.html",
+    "oldTitle": null,
+    "newTitle": "Google agrees to new $1 billion investment in Anthropic",
+    "type": "web",
+    "stableId": "NDM0ZGQ0MT"
+  },
+  {
+    "id": "adca842031a9c15e",
+    "url": "https://www.nber.org/books-and-chapters/economics-artificial-intelligence-agenda",
+    "oldTitle": "Book",
+    "newTitle": "The Economics of Artificial Intelligence: An Agenda",
+    "type": "web",
+    "stableId": "NDU1ZTJiND"
+  },
+  {
+    "id": "b0da081d86bf805d",
+    "url": "https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors",
+    "oldTitle": null,
+    "newTitle": "Jay Kreps appointed to Anthropic's Board of Directors",
+    "type": "blog",
+    "stableId": "OTA5NWYzY2"
+  },
+  {
+    "id": "b769d6d601ec5ed5",
+    "url": "https://eur-lex.europa.eu/",
+    "oldTitle": "eur-lex.europa.eu",
+    "newTitle": "EUR-Lex",
+    "type": "web",
+    "stableId": "YjBhNTRjYW"
+  },
+  {
+    "id": "b7cacded533c524c",
+    "url": "https://bun.com/blog/bun-joins-anthropic",
+    "oldTitle": null,
+    "newTitle": "Bun is joining Anthropic",
+    "type": "web",
+    "stableId": "MDE2MGI4M2"
+  },
+  {
+    "id": "b93f7282dcf3a639",
+    "url": "https://shoshanazuboff.com/book/about/",
+    "oldTitle": "Book",
+    "newTitle": "The Age of Surveillance Capitalism",
+    "type": "web",
+    "stableId": "MmYwMTU3Mz"
+  },
+  {
+    "id": "c22c010f61c21b96",
+    "url": "https://darioamodei.com/machines-of-loving-grace",
+    "oldTitle": "darioamodei.com",
+    "newTitle": "Machines of Loving Grace",
+    "type": "web",
+    "stableId": "DMWUTByTQw"
+  },
+  {
+    "id": "c31cb77e5fcfeb11",
+    "url": "https://arxiv.org/abs/1503.02531",
+    "oldTitle": "arxiv.org",
+    "newTitle": "Distilling the Knowledge in a Neural Network",
+    "type": "paper",
+    "stableId": "wDzP3RTg1g"
+  },
+  {
+    "id": "c3bdc0f40f1d2be9",
+    "url": "https://sacra.com/c/anthropic/",
+    "oldTitle": null,
+    "newTitle": "Anthropic revenue, valuation & funding",
+    "type": "web",
+    "stableId": "YmYxOGE4Nj"
+  },
+  {
+    "id": "c504c05209810e67",
+    "url": "https://www.simulation-argument.com/simulation.html",
+    "oldTitle": "www.simulation-argument.com",
+    "newTitle": "Are You Living in a Simulation?",
+    "type": "web",
+    "stableId": "XkcsA0OUXw"
+  },
+  {
+    "id": "c637506d2cd4d849",
+    "url": "https://www.anthropic.com/index/anthropics-responsible-scaling-policy",
+    "oldTitle": null,
+    "newTitle": "Anthropic's Responsible Scaling Policy",
+    "type": "blog",
+    "stableId": "ZTAwYzI4Mm"
+  },
+  {
+    "id": "ce455a08271b2d7e",
+    "url": "https://www.nicholascarr.com/?page_id=16",
+    "oldTitle": "Book",
+    "newTitle": "The Shallows",
+    "type": "web",
+    "stableId": "MjUxNjAwND"
+  },
+  {
+    "id": "d27a3547bb4ddded",
+    "url": "https://anthropic.com/company",
+    "oldTitle": null,
+    "newTitle": "Anthropic",
+    "type": "web",
+    "stableId": "MjlmNzVhOG"
+  },
+  {
+    "id": "d2c42b4a0556d402",
+    "url": "https://moores.samaltman.com/",
+    "oldTitle": "moores.samaltman.com",
+    "newTitle": "Moore's Law for Everything",
+    "type": "web",
+    "stableId": "Mrt3gN7QUw"
+  },
+  {
+    "id": "da5922a303706ca0",
+    "url": "https://dataconomy.com/2025/08/04/anthropic-leads-enterprise-llms-with-32-market-share/",
+    "oldTitle": null,
+    "newTitle": "Anthropic leads enterprise LLMs with 32% market share",
+    "type": "web",
+    "stableId": "YmI1ZTkwYz"
+  },
+  {
+    "id": "e283b9c34207eff8",
+    "url": "https://www.anthropic.com/news/model-context-protocol",
+    "oldTitle": null,
+    "newTitle": "Introducing the Model Context Protocol",
+    "type": "blog",
+    "stableId": "ZDNlMDIwZm"
+  },
+  {
+    "id": "e51a9f82540a1841",
+    "url": "https://www.anthropic.com/news/anthropic-expands-global-leadership-in-enterprise-ai-naming-chris-ciauri-as-managing-director-of",
+    "oldTitle": null,
+    "newTitle": "Anthropic names Chris Ciauri as Managing Director of International",
+    "type": "blog",
+    "stableId": "ZDU1NTc3Zj"
+  },
+  {
+    "id": "e5c0904211c7d0cc",
+    "url": "https://arxiv.org/abs/2401.05566",
+    "oldTitle": null,
+    "newTitle": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+    "type": "paper",
+    "stableId": "MzM4OWZlM2"
+  },
+  {
+    "id": "e724db341d6e0065",
+    "url": "https://transformer-circuits.pub/2024/scaling-monosemanticity/",
+    "oldTitle": null,
+    "newTitle": "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet",
+    "type": "paper",
+    "stableId": "ZWFmNWM5Mz"
+  },
+  {
+    "id": "e91e6f80eaaceb58",
+    "url": "https://www.anthropic.com/news/claude-3-5-sonnet",
+    "oldTitle": null,
+    "newTitle": "Introducing Claude 3.5 Sonnet",
+    "type": "blog",
+    "stableId": "ODE0NzgyY2"
+  },
+  {
+    "id": "f097d8804219db19",
+    "url": "https://www.readthesequences.com/",
+    "oldTitle": "www.readthesequences.com",
+    "newTitle": "Rationality: From AI to Zombies",
+    "type": "web",
+    "stableId": "jPGXEMnk5Q"
+  },
+  {
+    "id": "f1fdd91d386911e6",
+    "url": "https://backlinko.com/claude-users",
+    "oldTitle": null,
+    "newTitle": "Claude Statistics 2026: How Many People Use Claude?",
+    "type": "web",
+    "stableId": "NmEzYTk1YT"
+  },
+  {
+    "id": "f4d17448edb15f0a",
+    "url": "https://ia.samaltman.com/",
+    "oldTitle": "ia.samaltman.com",
+    "newTitle": "The Intelligence Age",
+    "type": "web",
+    "stableId": "QczsxKSUdQ"
+  },
+  {
+    "id": "f705f8874ee136ea",
+    "url": "https://www.businessofapps.com/data/claude-statistics/",
+    "oldTitle": null,
+    "newTitle": "Claude Revenue and Usage Statistics (2026)",
+    "type": "web",
+    "stableId": "YjljN2FmMj"
+  },
+  {
+    "id": "f8394e1ee2bafc7f",
+    "url": "https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html",
+    "oldTitle": null,
+    "newTitle": "Anthropic ARR surges to $19 billion on Claude Code strength",
+    "type": "web",
+    "stableId": "MWM0YjczM2"
+  },
+  {
+    "id": "f8d125865398a92f",
+    "url": "https://aima.cs.berkeley.edu/",
+    "oldTitle": "aima.cs.berkeley.edu",
+    "newTitle": "Artificial Intelligence: A Modern Approach",
+    "type": "web",
+    "stableId": "5Y3gTZIj7w"
+  },
+  {
+    "id": "fe6c042996d3aa1b",
+    "url": "https://www.techpolicy.press/most-researchers-do-not-believe-agi-is-imminent-why-do-policymakers-act-otherwise/",
+    "oldTitle": "TechPolicy.Press",
+    "newTitle": "Most Researchers Do Not Believe AGI Is Imminent. Why Do Policymakers Act Otherwise?",
+    "type": "web",
+    "stableId": "ZWFhNGIyOT"
+  },
+  {
+    "id": "ffbffc746de4f899",
+    "url": "https://arxiv.org/abs/2204.06745",
+    "oldTitle": "arxiv.org",
+    "newTitle": "GPT-NeoX-20B: An Open-Source Autoregressive Language Model",
+    "type": "paper",
+    "stableId": "v7jCdXS8JQ"
+  },
+  {
+    "id": "kb-0aac71d5b6ac8081",
+    "url": "https://projects.propublica.org/nonprofits/organizations/582565917",
+    "oldTitle": null,
+    "newTitle": "Machine Intelligence Research Institute (ProPublica Nonprofit Explorer)",
+    "type": "web",
+    "stableId": "YmY3MDZmYm"
+  },
+  {
+    "id": "kb-12f80e3d3bbdea9b",
+    "url": "https://ai.meta.com/people/yann-lecun/",
+    "oldTitle": null,
+    "newTitle": "Yann LeCun - AI at Meta",
+    "type": "web",
+    "stableId": "MTk1ZjI5Yj"
+  },
+  {
+    "id": "kb-1f4cf7d038af017e",
+    "url": "https://www.metacareers.com/blog/how-pytorch-unlocks-ai-research-and-productization-at-scale",
+    "oldTitle": null,
+    "newTitle": "How PyTorch unlocks AI research and productization at scale",
+    "type": "web",
+    "stableId": "ZWZiYTE5Y2"
+  },
+  {
+    "id": "kb-244ccf9e43e90961",
+    "url": "https://survivalandflourishing.fund/2024/recommendations",
+    "oldTitle": null,
+    "newTitle": "SFF-2024 S-Process Recommendations",
+    "type": "web",
+    "stableId": "OTYyMmQ3Y2"
+  },
+  {
+    "id": "kb-2c16d126b367df5d",
+    "url": "https://intelligence.org/about/",
+    "oldTitle": null,
+    "newTitle": "Machine Intelligence Research Institute",
+    "type": "web",
+    "stableId": "NTM4MWFkZW"
+  },
+  {
+    "id": "kb-2f2b92acdccd739a",
+    "url": "https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603",
+    "oldTitle": null,
+    "newTitle": "Tensions between the Pentagon and AI giant Anthropic reach a boiling point",
+    "type": "web",
+    "stableId": "Mzk3ODBiZT"
+  },
+  {
+    "id": "kb-317a2f6beaa03a8b",
+    "url": "https://paulfchristiano.com/",
+    "oldTitle": null,
+    "newTitle": "Paul Christiano",
+    "type": "web",
+    "stableId": "YmJkNjU2NG"
+  },
+  {
+    "id": "kb-33245f18e250fd3d",
+    "url": "https://asana.com/company",
+    "oldTitle": null,
+    "newTitle": "Asana",
+    "type": "web",
+    "stableId": "YWMyMTliZj"
+  },
+  {
+    "id": "kb-37bc73d0870ec93a",
+    "url": "https://colah.github.io/",
+    "oldTitle": null,
+    "newTitle": "colah's blog",
+    "type": "web",
+    "stableId": "MzEzZGViMT"
+  },
+  {
+    "id": "kb-38e2cec7773343fd",
+    "url": "https://fortune.com/2026/02/27/trump-us-government-anthropic-claude-pentagon-6-months-phaseout-ai-standoff/",
+    "oldTitle": null,
+    "newTitle": "Trump orders U.S. government to stop using Anthropic but gives Pentagon six months to phase it out while Hegseth adds supply-chain risk designation",
+    "type": "web",
+    "stableId": "OGMwMjczZG"
+  },
+  {
+    "id": "kb-42561f4ac8f9b761",
+    "url": "https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/",
+    "oldTitle": null,
+    "newTitle": "Anthropic CEO Dario Amodei calls White House actions 'retaliatory and punitive'",
+    "type": "web",
+    "stableId": "NzU1ZTkwYW"
+  },
+  {
+    "id": "kb-4ef5196df45ade12",
+    "url": "https://www.givewell.org/about/people",
+    "oldTitle": null,
+    "newTitle": "GiveWell Team",
+    "type": "web",
+    "stableId": "NmYzOTg1MD"
+  },
+  {
+    "id": "kb-56d677872445cc8b",
+    "url": "https://www.openphilanthropy.org/about/team/",
+    "oldTitle": null,
+    "newTitle": "Open Philanthropy Team",
+    "type": "web",
+    "stableId": "NDk0MDAwOT"
+  },
+  {
+    "id": "kb-5c9bae39f84b0a4e",
+    "url": "https://sacra.com/c/xai/",
+    "oldTitle": null,
+    "newTitle": "xAI revenue, valuation & funding",
+    "type": "web",
+    "stableId": "MmIxNmQ0NG"
+  },
+  {
+    "id": "kb-60329bc2e58f1772",
+    "url": "https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/",
+    "oldTitle": null,
+    "newTitle": "Meta\u2019s $27 billion bet turns AI compute into Wall Street\u2019s hottest new investment",
+    "type": "web",
+    "stableId": "Y2U3MTY5Mz"
+  },
+  {
+    "id": "kb-657d1f1f55b92cdb",
+    "url": "https://deepmind.google/about",
+    "oldTitle": null,
+    "newTitle": "Google DeepMind",
+    "type": "web",
+    "stableId": "NGQzOWFhMj"
+  },
+  {
+    "id": "kb-6f91129a8881d8b8",
+    "url": "https://www.nist.gov/people/paul-christiano",
+    "oldTitle": null,
+    "newTitle": "Paul Christiano",
+    "type": "government",
+    "stableId": "MzllMjE5MT"
+  },
+  {
+    "id": "kb-a966760bfd9288fb",
+    "url": "https://mila.quebec/en/person/bengio-yoshua",
+    "oldTitle": null,
+    "newTitle": "Yoshua Bengio (Mila)",
+    "type": "web",
+    "stableId": "MWQ1MDllZj"
+  },
+  {
+    "id": "kb-b0add46c4f869fe8",
+    "url": "https://www.nbcnews.com/tech/internet/x-paywall-ai-image-grok-app-bikini-allows-sexual-deepfakes-rcna252647",
+    "oldTitle": null,
+    "newTitle": "Elon Musk's X limits some sexual deepfakes after backlash, but xAI's Grok still makes them",
+    "type": "web",
+    "stableId": "NGYxYmM1YT"
+  },
+  {
+    "id": "kb-b5be9ced97749de8",
+    "url": "https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation",
+    "oldTitle": null,
+    "newTitle": "Anthropic raises Series E at $61.5B post-money valuation",
+    "type": "web",
+    "stableId": "ZmMyNGUzOW"
+  },
+  {
+    "id": "kb-c255d8c9c9668fd1",
+    "url": "https://survivalandflourishing.fund/2025/recommendations",
+    "oldTitle": null,
+    "newTitle": "SFF-2025 S-Process Recommendations",
+    "type": "web",
+    "stableId": "NDM4NmJkN2"
+  },
+  {
+    "id": "kb-c3b39552b31a2c7e",
+    "url": "https://www.businessofapps.com/data/grok-statistics/",
+    "oldTitle": null,
+    "newTitle": "Grok Revenue and Usage Statistics (2026)",
+    "type": "web",
+    "stableId": "YzJlMWMyNG"
+  },
+  {
+    "id": "kb-c5f8f5c5670c539f",
+    "url": "https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7",
+    "oldTitle": null,
+    "newTitle": "SFF 2025 Funding by Cause Area (EA Forum)",
+    "type": "blog",
+    "stableId": "MzJlNDRlN2"
+  },
+  {
+    "id": "kb-ccc48f8fcab1714b",
+    "url": "https://survivalandflourishing.fund/speculation-grants",
+    "oldTitle": null,
+    "newTitle": "Speculation Grants (Survival and Flourishing Fund)",
+    "type": "web",
+    "stableId": "YzMyYzk2ND"
+  },
+  {
+    "id": "kb-d4ec2326ac2bb897",
+    "url": "https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html",
+    "oldTitle": null,
+    "newTitle": "Anthropic gives $20 million to group pushing for AI regulations ahead of 2026 elections",
+    "type": "web",
+    "stableId": "MDU3NTk1ZW"
+  },
+  {
+    "id": "kb-d810022b134c68a9",
+    "url": "https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/",
+    "oldTitle": null,
+    "newTitle": "xAI strikes GSA deal for Grok after weeks of speculation",
+    "type": "web",
+    "stableId": "ZGQ1NGFlNj"
+  },
+  {
+    "id": "kb-fb48a11860d8df22",
+    "url": "https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415",
+    "oldTitle": null,
+    "newTitle": "Safe Superintelligence Raises $2B at $32B Valuation",
+    "type": "web",
+    "stableId": "NDhjNmQxNz"
+  },
+  {
+    "id": "kb-fd5a7d6cfe6e7e1d",
+    "url": "https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/",
+    "oldTitle": null,
+    "newTitle": "Request for Proposals: Technical AI Safety Research",
+    "type": "web",
+    "stableId": "MzFlMTMzZj"
+  }
+]

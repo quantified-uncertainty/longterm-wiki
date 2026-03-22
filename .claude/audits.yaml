@@ -35,7 +35,7 @@ audits:
       "heartbeat OK" messages.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-03-14"
+    last_checked: "2026-03-22"
     last_result: pass
 
   - id: agent-sessions-logged
@@ -91,7 +91,7 @@ audits:
     frequency: weekly
     added: "2026-03-04"
     added_by_pr: 1630
-    last_checked: "2026-03-13"
+    last_checked: "2026-03-22"
     last_result: pass
 
   - id: active-agents-dashboard-adoption

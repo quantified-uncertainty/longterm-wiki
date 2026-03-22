@@ -77,7 +77,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- entities: tsvector search (search_vector @@ to_tsquery) ---
-  // Phase D3+E: search now uses buildTsvectorSearchCondition first.
+  // Search uses buildTsvectorSearchCondition first.
   // The SQL contains "search_vector", "to_tsquery", and "@@".
   // MUST come before ILIKE since ILIKE is the fallback when tsquery can't be built.
   if (q.includes('"entities"') && q.includes("search_vector") && q.includes("to_tsquery")) {
@@ -653,7 +653,7 @@ describe("Entities API", () => {
   // ---- Referential integrity ----
 
   describe("Referential integrity", () => {
-    it("rejects sync with dangling relatedEntries", async () => {
+    it("strips dangling relatedEntries instead of rejecting", async () => {
       const res = await postJson(app, "/api/entities/sync", {
         entities: [
           {
@@ -668,9 +668,10 @@ describe("Entities API", () => {
         ],
       });
 
-      expect(res.status).toBe(400);
+      // Entity should be upserted — dangling refs are stripped, not rejected
+      expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.message).toContain("nonexistent-org");
+      expect(body.upserted).toBe(1);
     });
 
     it("accepts relatedEntries pointing to entities in the same batch", async () => {

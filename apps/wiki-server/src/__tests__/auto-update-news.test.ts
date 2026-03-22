@@ -207,7 +207,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_news_items ----
   if (q.includes("insert into") && q.includes("auto_update_news_items")) {
-    // Phase D3+E: 12 columns:
+    // 12 columns:
     //   run_id, title, url, source_id, published_at, summary,
     //   relevance_score, topics_json, entities_json, routed_to_page_id,
     //   routed_to_page_title, routed_tier
@@ -263,7 +263,7 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT FROM auto_update_news_items INNER JOIN auto_update_runs
-  //      WHERE routed_to_page_id = $1  (GET /by-page, Phase D3+E)  ----
+  //      WHERE routed_to_page_id = $1  (GET /by-page)  ----
   // The WHERE clause distinguishes this from /recent, which has no WHERE.
   if (
     q.includes("auto_update_news_items") &&
@@ -301,7 +301,7 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT FROM auto_update_news_items WHERE run_id = $1  (GET /by-run) ----
-  // Phase D3+E: query uses LEFT JOIN wiki_pages; Drizzle selects wikiPages.slug
+  // Query uses LEFT JOIN wiki_pages; Drizzle selects wikiPages.slug
   // as the routedToPageSlug column. extractColumns finds "slug" in the SELECT list.
   if (
     q.includes("auto_update_news_items") &&

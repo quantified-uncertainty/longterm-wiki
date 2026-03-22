@@ -51,7 +51,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 /** Result row shape after JOIN with wiki_pages to recover slug. */
 type ResultWithSlug = {
   runId: number | bigint;
-  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
+  pageSlug: string | null;
   status: string;
   tier: string | null;
   durationMs: number | null;
@@ -171,7 +171,7 @@ const autoUpdateRunsApp = new Hono()
       let resultsInserted = 0;
 
       if (d.results && d.results.length > 0) {
-        // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
+        // Resolve slugs to integer IDs
         const resultPageIds = [...new Set(d.results.map((r) => r.pageId))];
         const intIdMap = await resolvePageIntIds(tx, resultPageIds);
 
@@ -215,8 +215,7 @@ const autoUpdateRunsApp = new Hono()
     const total = countResult[0].count;
 
     // Fetch all results for the page of runs in a single query.
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    // (page_id_old no longer written; fall back to wiki_pages.id via page_id).
+    // LEFT JOIN wiki_pages to recover slug from integer page ID
     const runIds = rows.map((r) => r.id);
     const resultsByRun = new Map<number, ResultWithSlug[]>();
 
@@ -315,7 +314,7 @@ const autoUpdateRunsApp = new Hono()
     }
 
     const r = rows[0];
-    // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
+    // LEFT JOIN wiki_pages to recover slug from integer page ID
     const results = await db
       .select({
         runId: autoUpdateResults.runId,

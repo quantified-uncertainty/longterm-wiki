@@ -288,7 +288,7 @@ const pagesApp = new Hono()
 
     try {
      await db.transaction(async (tx) => {
-      // Phase 4a: auto-allocate entity_ids for all page slugs and resolve to integer IDs
+      // Auto-allocate entity_ids for all page slugs and resolve to integer IDs
       const intIdMap = await allocateAndResolvePageIntIds(tx, pageIds);
 
       const allVals = pages.map((page) => ({
