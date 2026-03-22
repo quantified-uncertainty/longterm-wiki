@@ -379,46 +379,79 @@ const sourceChecksApp = new Hono()
     const fieldNameVal = body.fieldName ?? null;
     const entityIdVal = body.entityId ?? null;
 
-    const doUpdate = () => db.execute(sql`
-      UPDATE source_check_verdicts SET
-        entity_id = COALESCE(${entityIdVal}, entity_id),
-        verdict = ${body.verdict},
-        confidence = ${body.confidence ?? null},
-        reasoning = ${body.reasoning ?? null},
-        sources_checked = ${body.sourcesChecked ?? 0},
-        needs_recheck = false,
-        next_check_due = ${body.nextCheckDue ? new Date(body.nextCheckDue) : null},
-        last_computed_at = ${now},
-        updated_at = ${now}
-      WHERE record_type = ${body.recordType}
-        AND record_id = ${body.recordId}
-        AND COALESCE(field_name, '') = COALESCE(${fieldNameVal}, '')
-    `);
+    // Use Drizzle ORM insert/update instead of raw SQL to avoid driver issues
+    // with bare literals and COALESCE expressions.
+    const fieldNameForLookup = fieldNameVal ?? "";
+    const confidenceVal = body.confidence ?? null;
+    const reasoningVal = body.reasoning ?? null;
+    const sourcesCheckedVal = body.sourcesChecked ?? 0;
+    const nextCheckDueVal = body.nextCheckDue ? new Date(body.nextCheckDue) : null;
 
-    const updateResult = await doUpdate();
-    const rowsUpdated = (updateResult as unknown as { count?: number })?.count ?? 0;
+    // Try update first
+    const updated = await db
+      .update(verificationVerdicts)
+      .set({
+        entityId: entityIdVal,
+        verdict: body.verdict,
+        confidence: confidenceVal,
+        reasoning: reasoningVal,
+        sourcesChecked: sourcesCheckedVal,
+        needsRecheck: false,
+        nextCheckDue: nextCheckDueVal,
+        lastComputedAt: now,
+        updatedAt: now,
+      })
+      .where(
+        and(
+          eq(verificationVerdicts.recordType, body.recordType),
+          eq(verificationVerdicts.recordId, body.recordId),
+          sql`COALESCE(${verificationVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+        )
+      )
+      .returning({ recordId: verificationVerdicts.recordId });
 
-    if (rowsUpdated === 0) {
+    if (updated.length === 0) {
       try {
-        await db.execute(sql`
-          INSERT INTO source_check_verdicts (
-            record_type, record_id, field_name, entity_id,
-            verdict, confidence, reasoning, sources_checked,
-            needs_recheck, next_check_due, last_computed_at,
-            created_at, updated_at
-          ) VALUES (
-            ${body.recordType}, ${body.recordId}, ${fieldNameVal}, ${entityIdVal},
-            ${body.verdict}, ${body.confidence ?? null}, ${body.reasoning ?? null}, ${body.sourcesChecked ?? 0},
-            false, ${body.nextCheckDue ? new Date(body.nextCheckDue) : null}, ${now},
-            ${now}, ${now}
-          )
-        `);
+        await db
+          .insert(verificationVerdicts)
+          .values({
+            recordType: body.recordType,
+            recordId: body.recordId,
+            fieldName: fieldNameVal,
+            entityId: entityIdVal,
+            verdict: body.verdict,
+            confidence: confidenceVal,
+            reasoning: reasoningVal,
+            sourcesChecked: sourcesCheckedVal,
+            needsRecheck: false,
+            nextCheckDue: nextCheckDueVal,
+            lastComputedAt: now,
+            createdAt: now,
+            updatedAt: now,
+          });
       } catch (insertErr: unknown) {
         // Race condition: another request inserted between our UPDATE and INSERT.
         // Retry the UPDATE which should now find the row.
         const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
         if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
-          await doUpdate();
+          await db
+            .update(verificationVerdicts)
+            .set({
+              verdict: body.verdict,
+              confidence: confidenceVal,
+              reasoning: reasoningVal,
+              sourcesChecked: sourcesCheckedVal,
+              needsRecheck: false,
+              lastComputedAt: now,
+              updatedAt: now,
+            })
+            .where(
+              and(
+                eq(verificationVerdicts.recordType, body.recordType),
+                eq(verificationVerdicts.recordId, body.recordId),
+                sql`COALESCE(${verificationVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+              )
+            );
         } else {
           throw insertErr;
         }
