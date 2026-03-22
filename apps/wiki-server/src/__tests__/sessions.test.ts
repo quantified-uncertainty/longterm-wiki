@@ -28,7 +28,8 @@ let sessionStore: Array<{
 
 let sessionPageStore: Array<{
   session_id: number;
-  page_id_int: number | null;
+  page_slug: string;  // synthetic — slug for convenience
+  page_id: number | null;  // Phase D3+E: integer FK (was page_id_int)
 }> = [];
 
 let nextSlugIntId = 1000;
@@ -46,7 +47,7 @@ function lookupIntIdForSlug(slug: string): number | undefined {
   return slugIntIdMap.get(slug);
 }
 
-/** Reverse lookup: integer ID → slug. Returns null if not found. */
+/** Reverse-lookup: recover slug from integer ID. */
 function slugFromIntId(intId: number | null): string | null {
   if (intId === null) return null;
   for (const [slug, id] of slugIntIdMap.entries()) {
@@ -135,7 +136,7 @@ vi.mock("../db.js", async () => {
   function dispatch(query: string, params: unknown[]): unknown[] {
     const q = query.toLowerCase();
     // Debug: uncomment to see generated queries
-    // console.log('DISPATCH:', q.substring(0, 200), '| params:', JSON.stringify(params).substring(0, 100));
+    // console.log('DISPATCH:', q.substring(0, 300), '| params:', JSON.stringify(params).substring(0, 100));
 
     // ---- health check / entity_ids ----
     if (q.includes("count(*)") && q.includes("entity_ids")) {
@@ -233,14 +234,16 @@ vi.mock("../db.js", async () => {
 
     // ---- INSERT INTO session_pages (supports multi-row) ----
     if (q.includes("insert into") && q.includes("session_pages")) {
-      const COLS = 2; // Phase D2b: session_id, page_id_int
+      const COLS = 2; // Phase D3+E: session_id, page_id (integer only — page_slug removed)
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
         const o = i * COLS;
+        const pageId = params[o + 1] as number;
         const row = {
           session_id: params[o] as number,
-          page_id_int: params[o + 1] as number | null,
+          page_slug: slugFromIntId(pageId) ?? `page-${pageId}`, // synthetic — derived from intId map
+          page_id: pageId,
         };
         sessionPageStore.push(row);
         rows.push(row);
@@ -258,10 +261,10 @@ vi.mock("../db.js", async () => {
       return [{ count: sessionPageStore.length }];
     }
 
-    // ---- SELECT count(distinct page_id_int) FROM session_pages ----
+    // ---- SELECT count(distinct page_id) FROM session_pages ----
     if (q.includes("count(distinct") && q.includes("session_pages")) {
-      const unique = new Set(sessionPageStore.map((r) => r.page_id_int).filter((id) => id != null));
-      return [{ page_id_int: unique.size }];
+      const unique = new Set(sessionPageStore.map((r) => r.page_slug));
+      return [{ page_id: unique.size }];
     }
 
     // ---- SELECT sessions.id, sessions.date FROM sessions INNER JOIN session_pages ... GROUP BY ... LIMIT (page-changes step 1) ----
@@ -280,11 +283,7 @@ vi.mock("../db.js", async () => {
 
     // ---- SELECT all FROM session_pages (no WHERE — legacy fallback) ----
     if (q.includes("session_pages") && q.includes("select") && !q.includes("where") && !q.includes("count") && !q.includes("insert")) {
-      return sessionPageStore.map((r) => ({
-        session_id: r.session_id,
-        page_id_int: r.page_id_int,
-        id: slugFromIntId(r.page_id_int) ?? null,
-      }));
+      return [...sessionPageStore];
     }
 
     // ---- SELECT model, count FROM sessions GROUP BY model ----
@@ -299,30 +298,30 @@ vi.mock("../db.js", async () => {
         .sort((a, b) => b.count - a.count);
     }
 
-    // ---- SELECT FROM session_pages (LEFT JOIN wiki_pages) WHERE session_id IN ($1, $2, ...) ----
-    if (q.includes("session_pages") && (q.includes("any(") || q.includes(" in ("))) {
-      // Drizzle inArray spreads array elements as $1, $2, ... — all params are individual IDs
+    // ---- SELECT FROM session_pages LEFT JOIN wiki_pages WHERE session_id IN ($1, $2, ...) ----
+    // Phase D3+E: by-page and page-changes routes LEFT JOIN wiki_pages to recover slug.
+    // extractColumns finds "session_id" and "slug" — mock must return { session_id, slug }.
+    if (q.includes("session_pages") && q.includes("wiki_pages") && (q.includes("any(") || q.includes(" in ("))) {
       const ids = params.map(Number);
       return sessionPageStore
         .filter((r) => ids.includes(r.session_id))
         .map((r) => ({
           session_id: r.session_id,
-          page_id_int: r.page_id_int,
-          // Phase D2b: wiki_pages.id slug from LEFT JOIN
-          id: slugFromIntId(r.page_id_int) ?? null,
+          slug: r.page_slug, // wikiPages.slug via LEFT JOIN
         }));
     }
 
-    // ---- SELECT FROM session_pages WHERE page_id_int = $1 (Phase 4b) ----
-    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id_int") && !q.includes("any(") && !q.includes(" in (")) {
+    // ---- SELECT FROM session_pages WHERE session_id IN ($1, $2, ...) (no JOIN) ----
+    if (q.includes("session_pages") && (q.includes("any(") || q.includes(" in ("))) {
+      // Drizzle inArray spreads array elements as $1, $2, ... — all params are individual IDs
+      const ids = params.map(Number);
+      return sessionPageStore.filter((r) => ids.includes(r.session_id));
+    }
+
+    // ---- SELECT FROM session_pages WHERE page_id = $1 (Phase D3+E) ----
+    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id") && !q.includes("any(") && !q.includes(" in (")) {
       const intId = params[0] as number;
-      return sessionPageStore
-        .filter((r) => r.page_id_int === intId)
-        .map((r) => ({
-          session_id: r.session_id,
-          page_id_int: r.page_id_int,
-          id: slugFromIntId(r.page_id_int) ?? null,
-        }));
+      return sessionPageStore.filter((r) => r.page_id === intId);
     }
 
     // ---- SELECT FROM sessions WHERE id IN ($1, $2, ...) ORDER BY ... ----

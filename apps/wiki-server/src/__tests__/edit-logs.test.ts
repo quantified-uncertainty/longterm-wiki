@@ -106,7 +106,7 @@ function createQueryResult(rows: unknown[], query: string): any {
 function toSqlRow(r: EditLogRow): Record<string, unknown> {
   return {
     id: r.id,
-    page_id_int: r.pageIdInt,
+    page_id: r.pageId,
     date: r.date,
     tool: r.tool,
     agency: r.agency,
@@ -149,17 +149,17 @@ function createMockSql() {
 
     // ---- INSERT INTO edit_logs (supports multi-row) ----
     if (q.includes("insert into") && q.includes("edit_logs")) {
-      // Phase D2a: Drizzle sends positional params: page_id_int, date, tool, agency, requested_by, note per row
+      // Phase D3+E: Drizzle sends positional params: page_id, date, tool, agency, requested_by, note per row
       const COLS = 6;
       const numRows = params.length / COLS;
       const rows: EditLogRow[] = [];
       for (let i = 0; i < numRows; i++) {
         const o = i * COLS;
-        const pageIdInt = params[o] as number | null;
-        const pageSlug = slugFromIntId(pageIdInt);
+        const pageId = params[o] as number | null;
+        const pageSlug = slugFromIntId(pageId);
         const row: EditLogRow = {
           id: nextId++,
-          pageIdInt: pageIdInt,
+          pageId: pageId,
           pageSlug: pageSlug,
           date: String(params[o + 1]),
           tool: params[o + 2] as string,
@@ -179,9 +179,9 @@ function createMockSql() {
     // Key is "page_id" because extractColumns finds the last quoted identifier
     // inside `count(distinct "edit_logs"."page_id")` as "page_id".
     if (q.includes("count(distinct") && q.includes("page_id") && q.includes("edit_logs")) {
-      const uniquePages = new Set(editStore.map((e) => e.pageIdInt).filter((v) => v !== null));
-      // Phase D2a: count(distinct page_id_int) — extractColumns finds "page_id_int"
-      return [{ page_id_int: uniquePages.size }];
+      const uniquePages = new Set(editStore.map((e) => e.pageId).filter((v) => v !== null));
+      // Phase D3+E: count(distinct page_id) — extractColumns finds "page_id"
+      return [{ page_id: uniquePages.size }];
     }
 
     // ---- SELECT count(*) FROM edit_logs (not GROUP BY) ----
@@ -213,7 +213,7 @@ function createMockSql() {
           grouped[e.pageSlug] = e.date;
         }
       }
-      // Phase D2a: route returns { page_id, latest_date } via JOIN wiki_pages
+      // Phase D3+E: route returns { page_id, latest_date } via JOIN wiki_pages
       return Object.entries(grouped).map(([page_id, date]) => ({ page_id, latest_date: date }));
     }
 
@@ -226,7 +226,7 @@ function createMockSql() {
           grouped[e.pageSlug] = e.date;
         }
       }
-      // Phase D2a: route returns { page_id, earliest_date } via JOIN wiki_pages
+      // Phase D3+E: route returns { page_id, earliest_date } via JOIN wiki_pages
       return Object.entries(grouped).map(([page_id, date]) => ({ page_id, earliest_date: date }));
     }
 
@@ -241,13 +241,13 @@ function createMockSql() {
         .sort((a, b) => b.count - a.count);
     }
 
-    // ---- SELECT ... WHERE page_id_int = $1 ORDER BY date, id ----
-    // Phase 4b: reads use page_id_int integer column
+    // ---- SELECT ... WHERE page_id = $1 ORDER BY date, id ----
+    // Phase D3+E: reads use page_id integer column
     // Exclude queries with LIMIT (those are the paginated /all endpoint)
-    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id_int") && !q.includes("limit")) {
+    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id") && !q.includes("limit")) {
       const intId = params[0] as number;
       return editStore
-        .filter((e) => e.pageIdInt === intId)
+        .filter((e) => e.pageId === intId)
         .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
         .map(toSqlRow);
     }

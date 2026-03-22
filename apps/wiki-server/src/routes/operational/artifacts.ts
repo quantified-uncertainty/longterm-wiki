@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, and } from "drizzle-orm";
+import { eq, desc, count, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { pageImproveRuns, wikiPages } from "../../schema.js";
 import { SaveArtifactsSchema } from "../../api-types.js";
@@ -71,7 +71,7 @@ const artifactsApp = new Hono()
     const rows = await db
       .insert(pageImproveRuns)
       .values({
-        pageIdInt,
+        pageId: pageIdInt,
         engine: d.engine,
         tier: d.tier,
         directions: d.directions ?? null,
@@ -112,14 +112,14 @@ const artifactsApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id_int
+    // Phase 4b: resolve slug to integer and query by page_id
     const intId = await resolvePageIntId(db, page_id);
     if (intId === null) return c.json({ entries: [] });
 
     const rows = await db
       .select()
       .from(pageImproveRuns)
-      .where(eq(pageImproveRuns.pageIdInt, intId))
+      .where(eq(pageImproveRuns.pageId, intId))
       .orderBy(desc(pageImproveRuns.startedAt))
       .limit(limit);
 
@@ -139,10 +139,10 @@ const artifactsApp = new Hono()
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: wikiPages.id,
+        pageSlug: wikiPages.slug,
       })
       .from(pageImproveRuns)
-      .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(pageImproveRuns.pageId, wikiPages.id))
       .orderBy(desc(pageImproveRuns.startedAt))
       .limit(limit)
       .offset(offset);
@@ -203,10 +203,10 @@ const artifactsApp = new Hono()
     const rows = await db
       .select({
         run: pageImproveRuns,
-        pageSlug: wikiPages.id,
+        pageSlug: wikiPages.slug,
       })
       .from(pageImproveRuns)
-      .leftJoin(wikiPages, eq(pageImproveRuns.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(pageImproveRuns.pageId, wikiPages.id))
       .where(eq(pageImproveRuns.id, id));
 
     if (rows.length === 0) {

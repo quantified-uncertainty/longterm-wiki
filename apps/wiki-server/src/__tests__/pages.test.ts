@@ -72,49 +72,49 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 28; // Phase 4a: +2 for slug and integer_id
+    const COLS = 27; // Phase D3+E: id (integer PK), wiki_id, slug, title, ... (old text id + integer_id merged into id)
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
-      const id = params[o] as string;
-      const existing = pagesStore.get(id);
+      const id = params[o] as number; // integer PK
+      const slug = params[o + 2] as string;
+      const existing = pagesStore.get(slug);
 
       const row: Record<string, unknown> = {
         id,
         wiki_id: params[o + 1],
-        slug: params[o + 2],
-        integer_id: params[o + 3],
-        title: params[o + 4],
-        description: params[o + 5],
-        summary: params[o + 6],
-        category: params[o + 7],
-        subcategory: params[o + 8],
-        entity_type: params[o + 9],
-        tags: params[o + 10],
-        quality: params[o + 11],
-        reader_importance: params[o + 12],
-        research_importance: params[o + 13],
-        tactical_value: params[o + 14],
-        backlink_count: params[o + 15],
-        risk_category: params[o + 16],
-        date_created: params[o + 17],
-        recommended_score: params[o + 18],
-        clusters: params[o + 19],
-        hallucination_risk_level: params[o + 20],
-        hallucination_risk_score: params[o + 21],
-        content_plaintext: params[o + 22],
-        word_count: params[o + 23],
-        last_updated: params[o + 24],
-        content_format: params[o + 25],
-        synced_from_branch: params[o + 26],
-        synced_from_commit: params[o + 27],
+        slug,
+        title: params[o + 3],
+        description: params[o + 4],
+        summary: params[o + 5],
+        category: params[o + 6],
+        subcategory: params[o + 7],
+        entity_type: params[o + 8],
+        tags: params[o + 9],
+        quality: params[o + 10],
+        reader_importance: params[o + 11],
+        research_importance: params[o + 12],
+        tactical_value: params[o + 13],
+        backlink_count: params[o + 14],
+        risk_category: params[o + 15],
+        date_created: params[o + 16],
+        recommended_score: params[o + 17],
+        clusters: params[o + 18],
+        hallucination_risk_level: params[o + 19],
+        hallucination_risk_score: params[o + 20],
+        content_plaintext: params[o + 21],
+        word_count: params[o + 22],
+        last_updated: params[o + 23],
+        content_format: params[o + 24],
+        synced_from_branch: params[o + 25],
+        synced_from_commit: params[o + 26],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
       };
-      pagesStore.set(id, row);
+      pagesStore.set(slug, row);
       rows.push(row);
     }
     return rows;
@@ -126,6 +126,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- wiki_pages: Full-text search via search_vector (prefix tsquery or plain) ---
+  // Phase D3+E: route uses `slug AS id` in the raw SQL SELECT, so `id` = the slug string.
   if (q.includes("search_vector") && (q.includes("to_tsquery") || q.includes("plainto_tsquery")) && !q.includes("update")) {
     // First param is the tsquery string (e.g. "anthropic:*" for prefix search)
     const rawQuery = params[0] as string;
@@ -136,7 +137,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     for (const row of pagesStore.values()) {
       if (simpleTextMatch(row, searchWords)) {
         results.push({
-          id: row.id,
+          id: row.slug, // `slug AS id` in the raw SQL — id is the slug string, not the integer PK
           wiki_id: row.wiki_id,
           title: row.title,
           description: row.description,
@@ -153,16 +154,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- wiki_pages: Trigram similarity fallback search ---
+  // Phase D3+E: route uses `slug AS id` in the raw SQL SELECT.
   if (q.includes("similarity") && q.includes("wiki_pages") && !q.includes("update")) {
     const searchQuery = params[0] as string;
     const limit = (params[1] as number) || 20;
     const excludeIds = (params[2] as string[]) || [];
     const results: Record<string, unknown>[] = [];
     for (const row of pagesStore.values()) {
-      if (excludeIds.includes(row.id as string)) continue;
+      if (excludeIds.includes(row.slug as string)) continue;
       if (simpleTextMatch(row, searchQuery)) {
         results.push({
-          id: row.id,
+          id: row.slug, // `slug AS id` in the raw SQL — id is the slug string
           wiki_id: row.wiki_id,
           title: row.title,
           description: row.description,
@@ -178,13 +180,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- wiki_pages: SELECT with WHERE + OR (get by id or wiki_id) ---
+  // --- wiki_pages: SELECT with WHERE + OR (get by slug or wiki_id) ---
   if (q.includes("wiki_pages") && q.includes("where") && q.includes(" or ") && !q.includes("count(*)")) {
-    const id = params[0] as string;
+    const slug = params[0] as string;
     const wikiId = params[1] as string;
     const results: Record<string, unknown>[] = [];
     for (const row of pagesStore.values()) {
-      if (row.id === id || row.wiki_id === wikiId) {
+      if (row.slug === slug || row.wiki_id === wikiId) {
         results.push(row);
       }
     }
@@ -210,7 +212,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- wiki_pages: SELECT ORDER BY LIMIT (paginated listing) ---
   if (q.includes("wiki_pages") && q.includes("order by") && q.includes("limit") && !q.includes("count(*)")) {
     const allRows = Array.from(pagesStore.values()).sort((a, b) =>
-      String(a.id ?? "").localeCompare(String(b.id ?? ""))
+      String(a.slug ?? "").localeCompare(String(b.slug ?? ""))
     );
 
     let filtered = allRows;
@@ -229,19 +231,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
-  // --- wiki_pages: SELECT WHERE id = ? (no OR — pre-delete fetch) ---
+  // --- wiki_pages: SELECT WHERE slug = ? (no OR — pre-delete fetch) ---
   if (q.includes("wiki_pages") && q.includes("where") && !q.includes(" or ") && !q.includes("count(*)") && !q.includes("order by") && !q.includes("search_vector") && !q.includes("similarity") && !q.includes("delete from") && !q.includes("entity_ids")) {
-    const id = params[0] as string;
-    const row = pagesStore.get(id);
+    const slug = params[0] as string;
+    const row = pagesStore.get(slug);
     return row ? [row] : [];
   }
 
-  // --- wiki_pages: DELETE WHERE id = ? (with or without RETURNING) ---
+  // --- wiki_pages: DELETE WHERE slug = ? (with or without RETURNING) ---
   if (q.includes("delete from") && q.includes("wiki_pages")) {
-    const id = params[0] as string;
-    if (pagesStore.has(id)) {
-      pagesStore.delete(id);
-      return [{ id }];
+    const slug = params[0] as string;
+    if (pagesStore.has(slug)) {
+      const row = pagesStore.get(slug)!;
+      pagesStore.delete(slug);
+      return [{ id: row.id, slug }];
     }
     return [];
   }

@@ -56,13 +56,13 @@ const integrityApp = new Hono()
         "entity_id",
         "entities"
       ),
-      // 4. citation_quotes.page_id_int → wiki_pages
+      // 4. citation_quotes.page_id → wiki_pages
       // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM citation_quotes WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
+        sql`SELECT DISTINCT page_id::text AS ref FROM citation_quotes WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
         "citation_quotes",
-        "page_id_int",
+        "page_id",
         "wiki_pages"
       ),
       // 5. citation_quotes.resource_id → resources
@@ -73,13 +73,13 @@ const integrityApp = new Hono()
         "resource_id",
         "resources"
       ),
-      // 6. edit_logs.page_id_int → wiki_pages
+      // 6. edit_logs.page_id → wiki_pages
       // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM edit_logs WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
+        sql`SELECT DISTINCT page_id::text AS ref FROM edit_logs WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
         "edit_logs",
-        "page_id_int",
+        "page_id",
         "wiki_pages"
       ),
       // 7. entities.relatedEntries JSONB → entities
@@ -90,13 +90,13 @@ const integrityApp = new Hono()
         "related_entries[].id",
         "entities"
       ),
-      // 8. resource_citations.page_id_int → wiki_pages
+      // 8. resource_citations.page_id → wiki_pages
       // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id_int::text AS ref FROM resource_citations WHERE (page_id_int IS NULL OR page_id_int NOT IN (SELECT integer_id FROM wiki_pages))`,
+        sql`SELECT DISTINCT page_id::text AS ref FROM resource_citations WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
         "resource_citations",
-        "page_id_int",
+        "page_id",
         "wiki_pages"
       ),
     ];
