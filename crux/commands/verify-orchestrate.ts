@@ -350,7 +350,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/kb-verifications/verdicts?limit=5000');
+    }>('GET', '/api/verifications/verdicts?limit=5000');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -390,7 +390,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
           needsRecheck?: boolean;
         }>;
         total: number;
-      }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+      }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
       if (!response.ok || !response.data) break;
 
@@ -1010,9 +1010,10 @@ async function verifySingleItem(
 
 async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void> {
   if (item.data.kind === 'fact') {
-    // Store as KB verification
+    // Store as unified verification evidence
     const body = {
-      factId: (item.data as FactItemData).fact.id,
+      recordType: 'fact',
+      recordId: (item.data as FactItemData).fact.id,
       verdict: result.verdict,
       confidence: result.confidence,
       extractedValue: result.extractedValue,
@@ -1024,7 +1025,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
 
     const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
       'POST',
-      '/api/kb-verifications/verifications',
+      '/api/verifications/evidence',
       body,
     );
 
@@ -1048,7 +1049,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
 
     const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
       'POST',
-      '/api/record-verifications/verifications',
+      '/api/verifications/evidence',
       body,
     );
 
@@ -1068,7 +1069,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
 
     await apiRequest<{ ok: boolean }>(
       'POST',
-      '/api/record-verifications/verdicts',
+      '/api/verifications/verdicts',
       verdictBody,
     ).catch((e: unknown) => {
       console.warn(`[verify-orchestrate] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);

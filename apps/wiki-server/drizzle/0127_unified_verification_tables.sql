@@ -7,6 +7,17 @@
 --   thing_resource_verifications   + thing_verdicts          (Things)
 -- Also removes denormalized verdict columns from the things table.
 
+-- ── Step 0: Backup old tables ─────────────────────────────────────────────
+-- Safety backup: 248 record verdicts + evidence in production.
+-- These backup tables can be dropped manually after verifying the migration.
+
+CREATE TABLE IF NOT EXISTS _backup_record_verdicts AS SELECT * FROM record_verdicts;
+CREATE TABLE IF NOT EXISTS _backup_record_verifications AS SELECT * FROM record_verifications;
+CREATE TABLE IF NOT EXISTS _backup_kb_fact_verdicts AS SELECT * FROM kb_fact_verdicts;
+CREATE TABLE IF NOT EXISTS _backup_kb_fact_resource_verifications AS SELECT * FROM kb_fact_resource_verifications;
+CREATE TABLE IF NOT EXISTS _backup_thing_verdicts AS SELECT * FROM thing_verdicts;
+CREATE TABLE IF NOT EXISTS _backup_thing_resource_verifications AS SELECT * FROM thing_resource_verifications;
+
 -- ── Step 1: Create new unified tables ────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS verification_evidence (

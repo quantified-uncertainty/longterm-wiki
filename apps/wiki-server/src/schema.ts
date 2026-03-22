@@ -2036,7 +2036,7 @@ export const fundingPrograms = pgTable(
 
 // record_verifications and record_verdicts tables removed — replaced by
 // unified verification_evidence and verification_verdicts tables above.
-// See migration 0123 and discussion #2950.
+// See migration 0127 and discussion #2950.
 
 // ── Entity Events (Timeline / Milestones) ────────────────────────────
 //
@@ -2250,7 +2250,7 @@ export const things = pgTable(
     wikiId: text("wiki_id"),
     parentTitle: text("parent_title"),
     // verdict, verdict_confidence, verdict_at columns removed — verification
-    // now lives in the unified verification_verdicts table. See migration 0123.
+    // now lives in the unified verification_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2274,7 +2274,7 @@ export const things = pgTable(
 
 // thing_resource_verifications and thing_verdicts tables removed — replaced by
 // unified verification_evidence and verification_verdicts tables.
-// See migration 0123 and discussion #2950.
+// See migration 0127 and discussion #2950.
 
 // ── QA Page Checks ─────────────────────────────────────────────────────
 //
