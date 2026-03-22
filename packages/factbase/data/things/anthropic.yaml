@@ -116,6 +116,27 @@ facts:
     notes: "Series G post-money valuation; second-largest venture deal ever behind
       OpenAI's $40B"
 
+  - id: f_kR8wT3vN6m
+    property: valuation
+    value: 5.95e+11
+    asOf: 2026-03
+    source: https://app.ventuals.com/trade/anthropic
+    notes: "Secondary/derivatives market implied valuation (Ventuals platform, March
+      2026). Not a primary funding round. Mark price ~$596/share, up from $259-306
+      in Feb 2026 secondary markets. Represents ~57% premium over $380B Series G.
+      Oracle price ~$520, suggesting actual OTC trades at lower levels (~$580B
+      implied)."
+
+  # ── Employee Tender Offer ───────────────────────────────────────
+  - id: f_nQ4xW7mK9p
+    property: employee-tender-offer
+    value: 5.5e+9
+    asOf: 2026-02
+    source: https://www.bloomberg.com/news/articles/2026-02-23/anthropic-kicks-off-share-sale-for-staffers-of-up-to-6-billion
+    notes: "Employee share sale program, $5-6B at $350B pre-money valuation (below
+      the $380B post-money Series G). Provides employee liquidity while company
+      remains private. Launched Feb 2026 per Bloomberg."
+
   # ── Total Funding ───────────────────────────────────────────────
   - id: f_V3qsrDVY3A
     property: total-funding

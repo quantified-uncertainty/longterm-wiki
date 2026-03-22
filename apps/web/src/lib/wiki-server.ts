@@ -172,7 +172,7 @@ export function dataSourceLabel(source: DataSource): string {
 
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
-import type { VerificationsRoute } from "@wiki-server/verifications-route";
+import type { SourceChecksRoute } from "@wiki-server/source-checks-route";
 import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
@@ -217,19 +217,19 @@ export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][
 export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
 
 // ============================================================================
-// Hono RPC client — Unified Verifications API
+// Hono RPC client — Unified Source-Checks API
 // ============================================================================
 
-type VerificationsClient = ReturnType<typeof hc<VerificationsRoute>>;
+type SourceChecksClient = ReturnType<typeof hc<SourceChecksRoute>>;
 
-/** Inferred response type for GET /api/verifications/stats */
-export type RpcVerificationsStatsResult = InferResponseType<VerificationsClient['stats']['$get'], 200>;
+/** Inferred response type for GET /api/source-checks/stats */
+export type RpcSourceChecksStatsResult = InferResponseType<SourceChecksClient['stats']['$get'], 200>;
 
-/** Inferred response type for GET /api/verifications/verdicts */
-export type RpcVerificationsVerdictsResult = InferResponseType<VerificationsClient['verdicts']['$get'], 200>;
+/** Inferred response type for GET /api/source-checks/verdicts */
+export type RpcSourceChecksVerdictsResult = InferResponseType<SourceChecksClient['verdicts']['$get'], 200>;
 
 /** A single verdict row from the verdicts list */
-export type RpcVerificationVerdictRow = RpcVerificationsVerdictsResult['verdicts'][number];
+export type RpcSourceCheckVerdictRow = RpcSourceChecksVerdictsResult['verdicts'][number];
 
 // ============================================================================
 // Hono RPC client — Grants API

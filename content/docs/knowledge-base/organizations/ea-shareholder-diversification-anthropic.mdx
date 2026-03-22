@@ -3,9 +3,9 @@ wikiId: E858
 title: EA Shareholder Diversification from Anthropic
 description: Analysis of strategies for EA-aligned Anthropic shareholders to reduce portfolio concentration risk.
 subcategory: funders
-lastEdited: 2026-02-16
+lastEdited: 2026-03-22
 update_frequency: 30
-summary: "The EA ecosystem faces extreme portfolio concentration risk with \\$27-76B in risk-adjusted capital tied to Anthropic stock. This page analyzes diversification strategies across three time horizons: immediate (secondary market sales, expanded buybacks), pre-IPO (DAF transfers, structured share sales), and post-IPO (10b5-1 plans, charitable transfers). Dustin Moskovitz's \\$500M nonprofit transfer provides the key precedent. An 80% valuation drop would destroy \\$20-60B in expected EA capital. Priority actions: Moskovitz and Tallinn should expand secondary sales, Anthropic should raise buyback caps, and EA-aligned employees should maximize DAF transfers under current matching terms."
+summary: "The EA ecosystem faces extreme portfolio concentration risk with \\$27-76B in risk-adjusted capital at the \\$380B Series G — scaling to \\$42-119B at March 2026 secondary market pricing (~\\$595B implied). This page analyzes diversification strategies across three time horizons: immediate (secondary market sales, expanded buybacks), pre-IPO (DAF transfers, structured share sales), and post-IPO (10b5-1 plans, charitable transfers). Dustin Moskovitz's \\$500M nonprofit transfer provides the key precedent. The dramatic shift from secondary market discounts (Feb 2026) to 57% premiums (Mar 2026) creates a favorable selling window. Priority actions: Moskovitz and Tallinn should expand secondary sales, Anthropic should raise buyback caps, and EA-aligned employees should maximize DAF transfers under current matching terms."
 clusters:
   - community
   - ai-safety
@@ -22,35 +22,37 @@ import {EntityLink, SquiggleEstimate} from '@components/wiki';
 :::note[Page Scope]
 This page analyzes diversification strategies for EA-aligned Anthropic shareholders. For the underlying capital estimates, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>. For IPO timeline, see <EntityLink id="E409" name="anthropic-ipo">Anthropic IPO</EntityLink>. For pre-IPO DAF transfer mechanics, see <EntityLink id="E412" name="anthropic-pre-ipo-daf-transfers">Anthropic Pre-IPO DAF Transfers</EntityLink>. For interventions targeting founder pledge fulfillment, see <EntityLink id="E411" name="anthropic-pledge-enforcement">Anthropic Founder Pledge Interventions</EntityLink>.
 
-**Data as of**: February 2026. Current valuation: \$380B (Series G). IPO expected: mid-2027 (prediction market median).
+**Data as of**: March 2026. Last primary round: \$380B (Series G, Feb 2026). Secondary market implied valuation: ≈\$595B (Ventuals, March 2026). IPO expected: mid-2027 (prediction market median).
 :::
 
 ## Quick Assessment
 
 | Dimension | Assessment |
 |-----------|------------|
-| **EA capital at risk** | \$27-76B risk-adjusted, tied to single asset |
-| **Current AI safety funding** | \$120-150M/year (180-630x smaller) |
-| **Diversification urgency** | High — capital illiquid until IPO (est. mid-2027) |
+| **EA capital at risk** | \$27-76B risk-adjusted at \$380B (Series G); \$42-119B at ≈\$595B (secondary market, Mar 2026) |
+| **Current AI safety funding** | \$120-150M/year (280-990x smaller at secondary market pricing) |
+| **Diversification urgency** | Very high — capital illiquid until IPO (est. mid-2027); secondary market premium creates favorable selling window |
 | **Pre-IPO options** | Secondary sales, buybacks, DAF transfers |
 | **Key precedent** | Moskovitz moved \$500M to nonprofit vehicle (Nov 2025) |
 | **Recommended target** | Diversify at least 20% of EA holdings pre-IPO |
 | **Post-IPO options** | 10b5-1 plans, charitable stock transfers, CRTs |
-| **Worst-case scenario** | 80% valuation drop destroys \$20-60B in expected EA capital |
+| **Worst-case scenario** | 80% valuation drop destroys \$20-60B in expected EA capital (at Series G pricing) |
 
 ## Overview
 
-The effective altruism ecosystem faces an extraordinary concentration risk: an estimated \$27-76B in risk-adjusted EA-aligned capital is tied to a single private company, while total annual EA funding is approximately \$120-150M/year. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) This may represent the largest concentration of *expected future philanthropic capital* in a single illiquid asset in history, and it is almost entirely inaccessible today.
+The effective altruism ecosystem faces an extraordinary concentration risk: an estimated \$27-76B in risk-adjusted EA-aligned capital is tied to a single private company at the \$380B Series G valuation — scaling to \$42-119B at secondary market pricing (≈\$595B, March 2026) — while total annual EA funding is approximately \$120-150M/year. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) This may represent the largest concentration of *expected future philanthropic capital* in a single illiquid asset in history, and it is almost entirely inaccessible today.
 
 At <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>'s \$380B valuation (Series G, February 2026), the EA-aligned capital breaks down as follows: [Anthropic](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
 
-| Source | Estimated Value | Reliability |
-|--------|-----------------|-------------|
-| Founder pledges (80% of equity, 7 founders) | \$43-64B gross | Low — only 2/7 have documented EA connections |
-| Employee pledges + matching (in DAFs) | \$20-40B | Moderate — legally bound once transferred, but participation rates estimated |
-| <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> stake | \$2-6B (conservative) | High — strong AI safety track record |
-| <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> stake | \$3-9B | Very high — \$500M already transferred |
-| **Total risk-adjusted** | **\$27-76B** | Discounted from \$68-119B gross for cause allocation probability (only 2/7 founders EA-aligned) and pledge fulfillment risk. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for methodology. |
+| Source | Value at \$380B (Series G) | Value at ≈\$595B (secondary, Mar 2026) | Reliability |
+|--------|--------------------------|---------------------------------------|-------------|
+| Founder pledges (80% of equity, 7 founders) | \$43-64B gross | \$67-100B gross | Low — only 2/7 have documented EA connections |
+| Employee pledges + matching (in DAFs) | \$20-40B | \$31-63B | Moderate — legally bound once transferred, but participation rates estimated |
+| <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> stake | \$2-6B | \$3-9B | High — strong AI safety track record |
+| <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> stake | \$3-9B | \$5-14B | Very high — \$500M already transferred |
+| **Total risk-adjusted** | **\$27-76B** | **\$42-119B** | Discounted from gross for cause allocation probability (only 2/7 founders EA-aligned) and pledge fulfillment risk. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for methodology. |
+
+The secondary market column uses a 1.57x multiplier (= \$595B / \$380B). Secondary market prices are volatile and reflect derivatives/prediction market sentiment rather than institutional primary round pricing. Nevertheless, if these prices approximate the eventual IPO valuation, the total EA-aligned capital could significantly exceed the Series G-based estimates.
 
 No prudent financial strategy would hold 95%+ of *expected future capital* in a single illiquid position. Yet this is effectively the EA ecosystem's situation with respect to its largest pending funding source.
 
@@ -97,24 +99,28 @@ capitalLost
 
 EA-aligned shareholders can sell Anthropic shares to buyers on private secondary markets. This is the most direct path to diversification before IPO.
 
-**Current market data** (February 2026): [Premier Alternatives](https://www.premieralts.com/companies/anthropic/secondary-market-price)
+**Secondary market data** (February–March 2026):
 
-| Platform | Share Price | Implied Valuation |
-|----------|-------------|-------------------|
-| Forge Global | \$259 | ≈\$290B |
-| Premier Alternatives | \$273 | ≈\$305B |
-| Hiive | \$302 | ≈\$340B |
-| Notice | \$306 | ≈\$345B |
+| Platform | Share Price | Implied Valuation | Date | Notes |
+|----------|-------------|-------------------|------|-------|
+| Premier Alternatives | \$186 | ≈\$273B | Mar 2026 | [Premier Alternatives](https://www.premieralts.com/companies/anthropic/secondary-market-price) |
+| Notice | \$252 | ≈\$370B | Mar 2026 | [Notice](https://notice.co/c/anthropic) |
+| Forge Global | \$259 | ≈\$380B | Mar 2026 | [Forge Global](https://forgeglobal.com/anthropic_stock/) |
+| UpMarket | ≈\$370 | ≈\$542B | Mar 2026 | [UpMarket](https://www.upmarket.co/private-markets/pre-ipo/anthropic/) |
+| Hiive | \$474 | ≈\$695B | Mar 2026 | Indicative; 0 live orders. [Hiive](https://www.hiive.com/securities/anthropic-stock) |
+| **Ventuals** | **≈\$596** | **≈\$595B** | Mar 2026 | Derivatives/prediction market; [Ventuals](https://app.ventuals.com/trade/anthropic) |
+
+Secondary market pricing in March 2026 shows extreme dispersion — from \$186/share (Premier Alternatives, 28% discount to Series G) to \$596/share (Ventuals, 57% premium). The wide range reflects differences between traditional OTC brokers (often showing stale or discounted pricing) and derivatives/prediction markets (which can reflect forward-looking sentiment). The Hiive indicative price of \$474 has zero live orders, suggesting it may be an algorithmic estimate rather than a transaction price. Nevertheless, the overall trend is upward: the highest-liquidity platforms (Ventuals, UpMarket) show substantial premiums over the Series G, implying that the market consensus may already be pricing in continued revenue growth toward the \$20-26B 2026 guidance.
 
 **Key precedent:** <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> moved a \$500 million Anthropic stake into a nonprofit vehicle to reinvest returns. [Fortune](https://fortune.com/2025/11/10/meet-the-millennial-meta-cofounder-and-his-wife-who-are-giving-away-20-billion/) This demonstrates that large EA-aligned holders can and do execute private transactions at scale.
 
 **Constraints:**
 - **Right of First Refusal (ROFR)**: Most private company shares require company approval for transfers
 - **Volume limitations**: Secondary markets have limited depth; blocks above \$1B are difficult to place without material price impact
-- **Discount**: Buyers typically demand 10-25% discounts below last round price for illiquid positions
+- **Price dispersion**: March 2026 secondary prices range from 28% discount (Premier Alternatives) to 57% premium (Ventuals). Actual transaction prices likely fall in the middle. The employee tender offer at \$350B pre-money suggests Anthropic itself prices internal liquidity below the Series G.
 - **Tax**: Capital gains triggered on sale
 
-**Realistic capacity**: \$500M-\$3B could move through secondary markets pre-IPO without massive discounts.
+**Realistic capacity**: \$500M-\$3B could move through traditional secondary markets pre-IPO. Additionally, the new \$5-6B employee tender offer provides a direct, company-sanctioned liquidity channel — the combined capacity is significantly higher than previously estimated.
 
 ### 2. Expanded Company Buyback Programs
 
@@ -125,11 +131,12 @@ Anthropic has already conducted one employee buyback. Advocating for expanded pr
 - Eligible: Employees with 2+ years tenure
 - Limit: Up to 20% of equity, capped at \$2M per person
 
-**Recommendations for expanded program:**
-- Raise the per-person cap from \$2M to \$10M+ for long-tenured employees
-- Increase the eligible percentage from 20% to 30-40%
-- Offer quarterly buyback windows rather than ad hoc
+**February 2026 employee tender offer**: Anthropic launched a much larger employee share sale program of up to \$5-6 billion at a \$350B pre-money valuation — notably below the \$380B post-money Series G. [Bloomberg](https://www.bloomberg.com/news/articles/2026-02-23/anthropic-kicks-off-share-sale-for-staffers-of-up-to-6-billion) This is a significant expansion of employee liquidity and represents a major step toward the recommendations below. At \$5-6B, this is 2,500-3,000x larger than the March 2025 buyback cap.
+
+**Recommendations for further expansion:**
 - Allow transfers to 501(c)(3) organizations as an alternative to cash buyback
+- Offer quarterly tender windows rather than ad hoc
+- Consider pricing at or above Series G (\$380B) rather than below, given secondary market premiums
 
 ### 3. Pre-IPO DAF Transfers
 
@@ -190,7 +197,101 @@ Transfer appreciated shares to a CRT that sells tax-free, invests proceeds, pays
 
 20% of \$27-76B is approximately \$5-15B. Even achieving the lower end would represent a transformative injection into the EA ecosystem—roughly 33-125x current annual AI safety funding.
 
-### Recommended Actions by Stakeholder
+### Decision Framework: Should You Sell?
+
+The right recommendation depends on who you are — exposure size, role type, and liquidity constraints. The following decision tree applies specifically to EA-aligned holders evaluating whether to sell or hold Anthropic equity.
+
+<Mermaid chart={`
+flowchart TD
+    START["Do you hold Anthropic equity?"] -->|Yes| SIZE{"Exposure size?"}
+    SIZE -->|">$10M + grantmaking role"| SENIOR["Senior Grantmaker / Major Funder"]
+    SIZE -->|"$1-10M, active in EA"| ANGEL["EA-Adjacent Investor / Early Employee"]
+    SIZE -->|"Employee equity"| EMP{"Role type?"}
+    SIZE -->|"&lt;$500K"| JUNIOR["Junior Community Member"]
+    SIZE -->|"Institutional"| INST["Foundation / Institutional Investor"]
+
+    EMP -->|"Safety-critical research"| SAFETY["Safety Researcher Employee"]
+    EMP -->|"Other roles"| TYPICAL["Typical Employee"]
+
+    SENIOR --> SELL_FAST["SELL QUICKLY via DAF\\nBias risk outweighs upside"]
+    ANGEL --> SELL_MOST["SELL 70-80%\\nKeep small residual position"]
+    SAFETY --> SELL_EARLY["SELL EARLY\\nConflict of interest on safety judgments"]
+    TYPICAL --> HOLD_THEN_SELL["HOLD → DIVERSIFY POST-IPO\\n18-24 month schedule after lockup"]
+    JUNIOR --> DIVERSIFY["STANDARD DIVERSIFICATION\\nPersonal finance, not EA strategy"]
+    INST --> HEDGE["HEDGE CORRELATION\\nComplex; fiduciary + signal concerns"]
+
+    style SELL_FAST fill:#ff9999
+    style SELL_MOST fill:#ffcc99
+    style SELL_EARLY fill:#ff9999
+    style HOLD_THEN_SELL fill:#ccffcc
+    style DIVERSIFY fill:#ccccff
+    style HEDGE fill:#ffffcc
+`} />
+
+### Stakeholder-Specific Analysis
+
+#### 1. Senior Grantmakers / Major Funders (\>\$10M exposure)
+
+**Recommendation: Sell quickly** — confidence 80%.
+
+This is where the bias argument is most acute. Someone at a major foundation making grants *about* AI safety while holding \$20M+ in Anthropic equity has a structural conflict that's hard to manage through willpower alone. The expected reputational and epistemic damage to the field from compromised grant decisions likely exceeds the expected financial upside from holding.
+
+**Optimal execution**: Donate to DAF immediately, liquidate from within the DAF over 12-24 months to avoid both capital gains and secondary market price depression from bulk selling.
+
+**Counterweight**: These actors may have informal governance influence worth preserving through shareholding. Probably not sufficient to outweigh the bias concern at this scale.
+
+#### 2. EA-Adjacent Investors / Early Employees (\$1-10M exposure)
+
+**Recommendation: Sell 70-80%, keep a small position** — confidence 70%.
+
+This cohort has the most interesting tradeoffs. They're liquid enough to act, the financial upside from holding is real, but the conflict of interest is meaningful if they're active in community discourse.
+
+- Liquidate enough to remove financial anxiety about the position (probably 70-80%)
+- Retain a small residual position — the psychological and informational value of being a shareholder (following the company closely, having skin in the game on AI outcomes) has some positive value
+- The retained position should be small enough that it doesn't influence grant or research decisions
+
+#### 3. Typical Anthropic Employees
+
+**Recommendation: Hold until IPO lockup expiry, then diversify aggressively over 18-24 months** — confidence 65%.
+
+The situation is different for employees:
+- Liquidity is constrained — secondary sales require company approval (though the \$5-6B tender offer helps)
+- Their *labor* income is already maximally concentrated in Anthropic's success, so the marginal bias from equity on top of employment is smaller than it sounds
+- Financial diversification is the dominant argument, not the bias argument — they're already epistemically compromised by employment
+- Post-IPO, a disciplined 18-24 month diversification schedule is appropriate
+
+#### 4. Safety-Critical Research Employees
+
+**Recommendation: Sell early, even at financial cost** — confidence 75%.
+
+The exception to the general employee guidance. Employees in safety-critical research roles making judgments about Anthropic's own safety practices face a direct conflict: equity appreciation depends on capability progress, but their role requires honest assessment of whether safety is keeping pace. Faster liquidation via the tender offer or DAF transfers makes sense even at the \$350B pre-money discount.
+
+#### 5. Junior Community Members (\<\$500K exposure)
+
+**Recommendation: Standard financial diversification** — confidence 75%.
+
+At this scale the bias argument is largely noise — a researcher with \$200K in Anthropic options isn't going to swing major community decisions. The relevant analysis is standard personal finance: concentrated single-stock exposure in a high-variance private company is bad portfolio construction regardless of the EA framing. Exercise options when financially feasible, diversify, and don't let ideological framing overcomplicate a personal finance decision.
+
+#### 6. EA-Aligned Institutional Investors
+
+**Recommendation: Hedge the portfolio correlation** — confidence 55%.
+
+The most complicated case. Institutions face fiduciary constraints, signal risks (a large institutional sale affects Anthropic's secondary price), and potential information rights creating additional complexity.
+
+The strongest argument for selling is the **portfolio correlation problem**: if the EA funding ecosystem is heavily correlated with Anthropic's success, a bad outcome for Anthropic (regulatory action, capability plateau, safety incident) simultaneously destroys the funding base *and* represents a bad AI outcome. That's a catastrophic correlation worth hedging against.
+
+### Cross-Cutting Considerations
+
+**Timing urgency varies enormously.** "Sell ASAP" means different things for different positions:
+- For a \$50M position: 18 months of careful execution via secondary markets
+- For a \$2M employee position: participate in the tender offer now, or wait for IPO lockup expiry in early-mid 2027
+- For a \$200K junior position: exercise options when feasible, no rush
+
+**Near-term capital has outsized leverage.** If there's a 2-3 year critical window for AI governance and safety infrastructure spending, capital available in 2026-2027 may genuinely have 3-5x the leverage of capital available in 2029 when AI outcomes are clearer. This is the most empirically contestable but potentially most important variable in the entire analysis.
+
+**Devil's advocate**: The entire sell-now framing assumes EA/longtermist capital is well-deployed and faces diminishing returns. If the field is still severely talent- and opportunity-constrained rather than capital-constrained, the urgency of converting equity to cash drops substantially. See <EntityLink id="E695" name="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink>.
+
+### Recommended Actions by Timeline
 
 **Tier 1 — Immediate (0-6 months):**
 
@@ -198,7 +299,7 @@ Transfer appreciated shares to a CRT that sells tax-free, invests proceeds, pays
 |-------------|--------|-------------------|
 | <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> | Expand secondary market sales and nonprofit transfers | \$1-5B additional |
 | <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> | Explore secondary market sales for portion of stake | \$500M-2B |
-| Large employee stakeholders | Maximize DAF transfers under current matching terms | \$1-3B |
+| Large employee stakeholders | Maximize DAF transfers under current matching terms; participate in tender offer | \$1-3B |
 | EA community | Advocate for expanded Anthropic buyback program | Enables above |
 
 **Tier 2 — Pre-IPO (6-18 months):**

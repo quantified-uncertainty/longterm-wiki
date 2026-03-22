@@ -22,8 +22,8 @@ import { benchmarksRoute } from "./routes/tablebase/benchmarks.js";
 import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
 
-// Unified verification system (replaces factbase-verifications + record-verifications)
-import { verificationsRoute } from "./routes/verification/verifications.js";
+// Unified source-check system (replaces factbase-verifications + record-verifications)
+import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
 import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
@@ -164,10 +164,12 @@ export function createApp() {
   app.route("/api/links", linksRoute);
   app.route("/api/explore", exploreRoute);
 
-  // FactBase routes — structured facts and verification
+  // FactBase routes — structured facts
   app.route("/api/facts", factsRoute);
-  // Unified verification system (replaces /api/kb-verifications and /api/record-verifications)
-  app.route("/api/verifications", verificationsRoute);
+  // Unified source-check system
+  app.route("/api/source-checks", sourceChecksRoute);
+  // Deprecated alias for /api/source-checks
+  app.route("/api/verifications", sourceChecksRoute);
 
   // WikiBase routes — prose content and page metadata
   app.route("/api/pages", pagesRoute);

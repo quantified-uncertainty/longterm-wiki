@@ -83,7 +83,15 @@ export async function enrichPapersCommand(
 
   console.log(`  Found ${paperResources.length} paper-like resources`);
 
-  const toProcess = paperResources.slice(0, limit);
+  // Skip already-enriched/reviewed resources so we progress through the backlog
+  // instead of re-processing the same first N resources every run.
+  const unenriched = paperResources.filter((r) => {
+    const s = r.enrichment_status;
+    return !s || s === 'pending' || s === 'fetched' || s === 'classified';
+  });
+  console.log(`  ${unenriched.length} need enrichment (${paperResources.length - unenriched.length} already enriched/reviewed)`);
+
+  const toProcess = unenriched.slice(0, limit);
   let enriched = 0;
   let skipped = 0;
   let failed = 0;

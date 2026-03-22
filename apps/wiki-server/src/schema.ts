@@ -1492,7 +1492,7 @@ export const pageCitations = pgTable(
   ]
 );
 
-// ── Unified Verification System ─────────────────────────────────────────
+// ── Unified Source-Check System ──────────────────────────────────────────
 //
 // Two tables replace the previous six (kb_fact_resource_verifications,
 // kb_fact_verdicts, record_verifications, record_verdicts,
@@ -1500,13 +1500,13 @@ export const pageCitations = pgTable(
 // See discussion #2950 for architecture decisions.
 
 /**
- * Per-source verification evidence — one row per source×claim check.
+ * Per-source check evidence — one row per source×claim check.
  *
  * Supports both row-level (fieldName=NULL) and cell-level (fieldName='amount')
- * verification for any record type (facts, grants, personnel, etc.).
+ * source-checking for any record type (facts, grants, personnel, etc.).
  */
-export const verificationEvidence = pgTable(
-  "verification_evidence",
+export const sourceCheckEvidence = pgTable(
+  "source_check_evidence",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     recordType: text("record_type").notNull(), // 'fact', 'grant', 'personnel', 'investment', etc.
@@ -1536,21 +1536,21 @@ export const verificationEvidence = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_ve_record").on(table.recordType, table.recordId),
-    index("idx_ve_entity").on(table.entityId),
-    index("idx_ve_verdict").on(table.verdict),
-    index("idx_ve_checked").on(table.checkedAt),
+    index("idx_sce_record").on(table.recordType, table.recordId),
+    index("idx_sce_entity").on(table.entityId),
+    index("idx_sce_verdict").on(table.verdict),
+    index("idx_sce_checked").on(table.checkedAt),
   ]
 );
 
 /**
  * Aggregate verdict per claim — one row per (recordType, recordId, fieldName).
  *
- * Derived from verification_evidence. Separates evidence (per-source checks)
+ * Derived from source_check_evidence. Separates evidence (per-source checks)
  * from conclusions (all-things-considered verdict).
  */
-export const verificationVerdicts = pgTable(
-  "verification_verdicts",
+export const sourceCheckVerdicts = pgTable(
+  "source_check_verdicts",
   {
     recordType: text("record_type").notNull(),
     recordId: text("record_id").notNull(),
@@ -1574,12 +1574,17 @@ export const verificationVerdicts = pgTable(
   },
   (table) => [
     // PK is (record_type, record_id, COALESCE(field_name, '')) defined in migration SQL
-    index("idx_vv_verdict").on(table.verdict),
-    index("idx_vv_recheck").on(table.needsRecheck),
-    index("idx_vv_entity").on(table.entityId),
-    index("idx_vv_type").on(table.recordType),
+    index("idx_scv_verdict").on(table.verdict),
+    index("idx_scv_recheck").on(table.needsRecheck),
+    index("idx_scv_entity").on(table.entityId),
+    index("idx_scv_type").on(table.recordType),
   ]
 );
+
+/** @deprecated Use sourceCheckEvidence */
+export const verificationEvidence = sourceCheckEvidence;
+/** @deprecated Use sourceCheckVerdicts */
+export const verificationVerdicts = sourceCheckVerdicts;
 
 /**
  * Personnel — unified table covering key-persons, board-seats, and career-history.
@@ -2056,14 +2061,14 @@ export const fundingPrograms = pgTable(
   ]
 );
 
-// ── Record Verification ────────────────────────────────────────────────
+// ── Record Source-Checking ─────────────────────────────────────────────
 //
-// Unified verification for structured data records (grants, personnel,
-// divisions, funding programs, etc.). Mirrors the two-tier KB fact
-// verification model: evidence (per-source checks) → verdicts (aggregate).
+// Unified source-checking for structured data records (grants, personnel,
+// divisions, funding programs, etc.). Mirrors the two-tier fact
+// source-check model: evidence (per-source checks) → verdicts (aggregate).
 
 // record_verifications and record_verdicts tables removed — replaced by
-// unified verification_evidence and verification_verdicts tables above.
+// unified source_check_evidence and source_check_verdicts tables above.
 // See migration 0127 and discussion #2950.
 
 // ── Entity Events (Timeline / Milestones) ────────────────────────────
@@ -2277,8 +2282,8 @@ export const things = pgTable(
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
     parentTitle: text("parent_title"),
-    // verdict, verdict_confidence, verdict_at columns removed — verification
-    // now lives in the unified verification_verdicts table. See migration 0127.
+    // verdict, verdict_confidence, verdict_at columns removed — source-check
+    // verdicts now live in the unified source_check_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2301,7 +2306,7 @@ export const things = pgTable(
 );
 
 // thing_resource_verifications and thing_verdicts tables removed — replaced by
-// unified verification_evidence and verification_verdicts tables.
+// unified source_check_evidence and source_check_verdicts tables.
 // See migration 0127 and discussion #2950.
 
 // ── QA Page Checks ─────────────────────────────────────────────────────

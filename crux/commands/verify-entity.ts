@@ -571,7 +571,7 @@ ${c.bold}Examples:${c.reset}
 
     if (subcommand === 'all') {
       // Delegate to the orchestrator for cross-entity verification
-      const { orchestrateCommand } = await import('./verify-orchestrate.ts');
+      const { orchestrateCommand } = await import('./source-check-orchestrate.ts');
       return orchestrateCommand(args.slice(1), options);
     }
 

@@ -1009,6 +1009,7 @@
   lastUpdated: 2026-03
 - id: aria-uk
   stableId: XqjV4mbMXQ
+  wikiId: E1997
   type: organization
   orgType: government
   title: Advanced Research and Invention Agency (ARIA)
@@ -6328,4 +6329,70 @@
   tags:
     - ai
     - academic
+  lastUpdated: 2026-03
+
+# --- ARIA Safeguarded AI grantee universities ---
+- id: university-college-london
+  stableId: ln8-CgTqI8
+  type: organization
+  orgType: academic
+  title: University College London
+  website: https://www.ucl.ac.uk
+  description: >-
+    Public research university in London, one of the UK's leading institutions
+    for computer science and AI research.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-birmingham
+  stableId: bEVAImWDe3
+  type: organization
+  orgType: academic
+  title: University of Birmingham
+  website: https://www.birmingham.ac.uk
+  description: >-
+    Public research university in Birmingham, UK, with research programs in
+    computer science, formal methods, and AI safety.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: university-of-warwick
+  stableId: OpZ5XbfHDo
+  type: organization
+  orgType: academic
+  title: University of Warwick
+  website: https://warwick.ac.uk
+  description: >-
+    Public research university in Coventry, UK, with strength in mathematics,
+    computer science, and statistics.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: heriot-watt-university
+  stableId: DbW4BTw7jq
+  type: organization
+  orgType: academic
+  title: Heriot-Watt University
+  website: https://www.hw.ac.uk
+  description: >-
+    Public research university in Edinburgh, Scotland, with research programs in
+    computer science and robotics.
+  tags:
+    - academic
+  lastUpdated: 2026-03
+
+- id: zeroth-research
+  stableId: 2oZvXRbu46
+  type: organization
+  orgType: generic
+  title: Zeroth Research
+  website: https://www.zeroth.team
+  description: >-
+    Research organization focused on AI safety and formal verification methods.
+  tags:
+    - ai-safety
+    - research
   lastUpdated: 2026-03

@@ -10,7 +10,7 @@ import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -195,7 +195,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
               {titleCase(round.instrument)}
             </span>
           )}
-          <VerificationBadge verdict={roundVerdict} />
+          <SourceCheckBadge verdict={roundVerdict} />
         </div>
 
         {/* Amount hero */}
