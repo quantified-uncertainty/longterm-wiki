@@ -18,9 +18,9 @@ async function loadStats(): Promise<FetchResult<RpcSourceChecksStatsResult>> {
 }
 
 async function loadVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsResult>> {
-  // Filter to fact record types for the FactBase source-checks dashboard
+  // Load all verdicts — the stats are also unfiltered, so table and stats must match
   return fetchDetailed<RpcSourceChecksVerdictsResult>(
-    "/api/source-checks/verdicts?record_type=fact&limit=200"
+    "/api/source-checks/verdicts?limit=200"
   );
 }
 

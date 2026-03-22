@@ -1,19 +1,11 @@
 import {
   fetchDetailed,
   withApiFallback,
-  type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { getTypedEntities } from "@data/tablebase";
 
 // ── Types ─────────────────────────────────────────────────────────────────
-
-/** Stats shape returned by GET /api/things/stats */
-interface ThingsStatsResult {
-  total: number;
-  byType: Record<string, number>;
-  byEntityType: Record<string, number>;
-}
 
 /** Stats shape returned by GET /api/source-checks/stats (unified) */
 interface UnifiedSourceCheckStatsResult {
@@ -46,22 +38,6 @@ const BAR_COLORS: Record<string, string> = {
 
 // ── Data loading ──────────────────────────────────────────────────────────
 
-async function loadThingsStats(): Promise<FetchResult<ThingsStatsResult>> {
-  return fetchDetailed<ThingsStatsResult>("/api/things/stats", {
-    revalidate: 60,
-  });
-}
-
-async function loadSourceCheckStats(): Promise<FetchResult<UnifiedSourceCheckStatsResult>> {
-  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/source-checks/stats", {
-    revalidate: 60,
-  });
-}
-
-function emptyThingsStats(): ThingsStatsResult {
-  return { total: 0, byType: {}, byEntityType: {} };
-}
-
 function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
   return {
     total: 0,
@@ -70,6 +46,12 @@ function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
     by_verdict: {},
     by_type: {},
   };
+}
+
+async function loadSourceCheckStats() {
+  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/source-checks/stats", {
+    revalidate: 60,
+  });
 }
 
 // ── Stat Card ─────────────────────────────────────────────────────────────
@@ -100,67 +82,23 @@ function StatCard({
   );
 }
 
-// ── Coverage percentage color ─────────────────────────────────────────────
-
-function coverageColor(pct: number): string {
-  if (pct < 25) return "text-red-600";
-  if (pct < 75) return "text-amber-600";
-  return "text-emerald-600";
-}
-
-// ── Verdict Breakdown Card ────────────────────────────────────────────────
-
-function VerdictBreakdownCard({
-  title,
-  subtitle,
-  verdicts,
-}: {
-  title: string;
-  subtitle: string;
-  verdicts: Record<string, number>;
-}) {
-  const entries = Object.entries(verdicts).sort(([, a], [, b]) => b - a);
-  return (
-    <div className="rounded-lg border border-border/60 p-4">
-      <h3 className="text-sm font-semibold mb-2">{title}</h3>
-      <p className="text-xs text-muted-foreground mb-2">{subtitle}</p>
-      {entries.length > 0 ? (
-        <div className="space-y-1">
-          {entries.map(([verdict, count]) => (
-            <div key={verdict} className="flex justify-between text-xs">
-              <span className={VERDICT_COLORS[verdict] || "text-muted-foreground"}>
-                {verdict}
-              </span>
-              <span className="tabular-nums">{count}</span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">No verdicts recorded</p>
-      )}
-    </div>
-  );
-}
-
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function SourceCheckCoverageContent() {
-  // Load data sources in parallel
-  const [thingsResult, verificationResult] = await Promise.all([
-    withApiFallback(loadThingsStats, emptyThingsStats),
-    withApiFallback(loadSourceCheckStats, emptySourceCheckStats),
-  ]);
+  const verificationResult = await withApiFallback(
+    loadSourceCheckStats,
+    emptySourceCheckStats
+  );
 
-  // Merge with defaults to guard against undefined fields from unavailable API
-  const thingsStats = { ...emptyThingsStats(), ...thingsResult.data };
-  const vStats = { ...emptySourceCheckStats(), ...verificationResult.data };
+  const vStats: UnifiedSourceCheckStatsResult = {
+    ...emptySourceCheckStats(),
+    ...verificationResult.data,
+  };
 
-  // Determine overall source and error
-  const source = thingsResult.source === "api" ? "api" as const : "local" as const;
-  const apiError =
-    thingsResult.apiError || verificationResult.apiError;
+  const source = verificationResult.source === "api" ? "api" as const : "local" as const;
+  const apiError = verificationResult.apiError;
 
-  // Local entity data for coverage by type
+  // Local entity data for entity type counts
   const entities = getTypedEntities();
   const entityCountByType = new Map<string, number>();
   for (const e of entities) {
@@ -168,37 +106,13 @@ export async function SourceCheckCoverageContent() {
     entityCountByType.set(t, (entityCountByType.get(t) ?? 0) + 1);
   }
   const totalEntities = entities.length;
+  const entityTypes = [...entityCountByType.keys()].sort();
 
   // Verdict distribution from unified source-check system
   const verdictEntries = Object.entries(vStats.by_verdict ?? {}).sort(
     ([, a], [, b]) => b - a
   );
   const totalVerdicts = verdictEntries.reduce((s, [, c]) => s + c, 0);
-
-  // Coverage by entity type — combine local entity counts with things byEntityType
-  const entityTypes = [...entityCountByType.keys()].sort();
-  const coverageByType = entityTypes.map((type) => {
-    const total = entityCountByType.get(type) ?? 0;
-    const thingsOfType = thingsStats.byEntityType[type] ?? 0;
-    const pct = total > 0 ? Math.round((thingsOfType / total) * 100) : 0;
-    return {
-      type,
-      total,
-      indexed: thingsOfType,
-      pct,
-    };
-  });
-
-  // Priority entities — sorted by most entities without coverage
-  const priorityTypes = coverageByType
-    .filter((c) => c.pct < 100 && c.total > 0)
-    .sort((a, b) => b.total - b.indexed - (a.total - a.indexed))
-    .slice(0, 10);
-
-  // Pre-compute totals used in footer (avoid repeating reduce in JSX)
-  const totalIndexed = coverageByType.reduce((s, r) => s + r.indexed, 0);
-  const totalNotIndexed = totalEntities - totalIndexed;
-  const totalPct = totalEntities > 0 ? Math.round((totalIndexed / totalEntities) * 100) : 0;
 
   return (
     <>
@@ -239,11 +153,15 @@ export async function SourceCheckCoverageContent() {
         />
       </div>
 
-      {/* ── (b) Coverage by Entity Type ────────────────────────────────── */}
+      {/* ── (b) Entities by Type ────────────────────────────────── */}
       <div className="not-prose mb-8">
         <h2 className="text-lg font-semibold mb-3">
-          Coverage by Entity Type
+          Entities by Type
         </h2>
+        <p className="text-sm text-muted-foreground mb-3">
+          Entity counts from local <code className="text-[11px]">database.json</code>.
+          Verification verdicts are tracked by record type (personnel, division, etc.), not entity type.
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -251,40 +169,20 @@ export async function SourceCheckCoverageContent() {
                 <th className="text-left py-2 px-3 font-medium">
                   Entity Type
                 </th>
-                <th className="text-right py-2 px-3 font-medium">Total</th>
-                <th className="text-right py-2 px-3 font-medium">
-                  In Things Index
-                </th>
-                <th className="text-right py-2 px-3 font-medium">
-                  Not Indexed
-                </th>
-                <th className="text-right py-2 px-3 font-medium">
-                  % Coverage
-                </th>
+                <th className="text-right py-2 px-3 font-medium">Count</th>
               </tr>
             </thead>
             <tbody>
-              {coverageByType
-                .sort((a, b) => b.total - a.total)
-                .map((row) => (
+              {[...entityCountByType.entries()]
+                .sort(([, a], [, b]) => b - a)
+                .map(([type, count]) => (
                   <tr
-                    key={row.type}
+                    key={type}
                     className="border-b border-border/30 hover:bg-muted/30"
                   >
-                    <td className="py-2 px-3 font-medium">{row.type}</td>
+                    <td className="py-2 px-3 font-medium">{type}</td>
                     <td className="text-right py-2 px-3 tabular-nums">
-                      {row.total}
-                    </td>
-                    <td className="text-right py-2 px-3 tabular-nums">
-                      {row.indexed}
-                    </td>
-                    <td className="text-right py-2 px-3 tabular-nums text-muted-foreground">
-                      {row.total - row.indexed}
-                    </td>
-                    <td
-                      className={`text-right py-2 px-3 tabular-nums font-medium ${coverageColor(row.pct)}`}
-                    >
-                      {row.pct}%
+                      {count}
                     </td>
                   </tr>
                 ))}
@@ -294,17 +192,6 @@ export async function SourceCheckCoverageContent() {
                 <td className="py-2 px-3">Total</td>
                 <td className="text-right py-2 px-3 tabular-nums">
                   {totalEntities}
-                </td>
-                <td className="text-right py-2 px-3 tabular-nums">
-                  {totalIndexed}
-                </td>
-                <td className="text-right py-2 px-3 tabular-nums text-muted-foreground">
-                  {totalNotIndexed}
-                </td>
-                <td
-                  className={`text-right py-2 px-3 tabular-nums font-medium ${coverageColor(totalPct)}`}
-                >
-                  {totalPct}%
                 </td>
               </tr>
             </tfoot>
@@ -368,80 +255,18 @@ export async function SourceCheckCoverageContent() {
             </div>
           )}
 
-          {/* Per-type breakdown */}
+          {/* Per-type summary */}
           {Object.keys(vStats.by_type ?? {}).length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               {Object.entries(vStats.by_type).sort(([,a],[,b]) => b - a).map(([type, count]) => (
-                <VerdictBreakdownCard
-                  key={type}
-                  title={`${type} verdicts`}
-                  subtitle={`${count} verdicts`}
-                  verdicts={{}}
-                />
+                <div key={type} className="rounded-lg border border-border/60 p-4">
+                  <h3 className="text-sm font-semibold mb-1 capitalize">{type}</h3>
+                  <p className="text-2xl font-bold tabular-nums">{count}</p>
+                  <p className="text-xs text-muted-foreground mt-1">verdicts</p>
+                </div>
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Staleness and per-record-type coverage sections removed — the unified
-          verification system will add these back with richer breakdowns. */}
-
-      {/* ── (f) Priority Queue — Types needing coverage ────────────────── */}
-      {priorityTypes.length > 0 && (
-        <div className="not-prose mb-8">
-          <h2 className="text-lg font-semibold mb-3">
-            Priority: Entity Types Needing Coverage
-          </h2>
-          <p className="text-sm text-muted-foreground mb-3">
-            Entity types ranked by the number of entities not yet indexed in
-            the Things table. Focus source-check efforts here first.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-border/60">
-                  <th className="text-left py-2 px-3 font-medium">
-                    Entity Type
-                  </th>
-                  <th className="text-right py-2 px-3 font-medium">
-                    Total
-                  </th>
-                  <th className="text-right py-2 px-3 font-medium">
-                    Indexed
-                  </th>
-                  <th className="text-right py-2 px-3 font-medium">Gap</th>
-                  <th className="text-right py-2 px-3 font-medium">
-                    Coverage
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {priorityTypes.map((row) => (
-                  <tr
-                    key={row.type}
-                    className="border-b border-border/30 hover:bg-muted/30"
-                  >
-                    <td className="py-2 px-3 font-medium">{row.type}</td>
-                    <td className="text-right py-2 px-3 tabular-nums">
-                      {row.total}
-                    </td>
-                    <td className="text-right py-2 px-3 tabular-nums">
-                      {row.indexed}
-                    </td>
-                    <td className="text-right py-2 px-3 tabular-nums text-red-600 font-medium">
-                      {row.total - row.indexed}
-                    </td>
-                    <td
-                      className={`text-right py-2 px-3 tabular-nums font-medium ${coverageColor(row.pct)}`}
-                    >
-                      {row.pct}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       )}
 
