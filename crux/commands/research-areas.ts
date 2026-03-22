@@ -502,13 +502,6 @@ async function showStats(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 async function seed(dryRun: boolean): Promise<void> {
-  const serverUrl = getServerUrl();
-  if (!serverUrl) {
-    throw new Error(
-      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
-    );
-  }
-
   // Show summary by cluster
   const byCluster = new Map<string, number>();
   for (const area of RESEARCH_AREAS) {
@@ -539,6 +532,13 @@ async function seed(dryRun: boolean): Promise<void> {
       `\nDry run complete. Use without --dry-run to sync ${RESEARCH_AREAS.length} areas to wiki-server.`
     );
     return;
+  }
+
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    throw new Error(
+      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+    );
   }
 
   // Sync in batches (API allows max 200)

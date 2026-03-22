@@ -16,8 +16,8 @@ const VALID_CLUSTERS = [
 const VALID_STATUSES = ["active", "emerging", "mature", "declining", "archived"];
 
 describe("research-areas-seed", () => {
-  it("has at least 40 research areas", () => {
-    expect(RESEARCH_AREAS.length).toBeGreaterThanOrEqual(40);
+  it("has at least 54 research areas", () => {
+    expect(RESEARCH_AREAS.length).toBeGreaterThanOrEqual(54);
   });
 
   it("has no duplicate IDs", () => {
@@ -73,7 +73,8 @@ describe("research-areas-seed", () => {
     for (const area of RESEARCH_AREAS) {
       clusterCounts.set(area.cluster, (clusterCounts.get(area.cluster) ?? 0) + 1);
     }
-    for (const [cluster, count] of clusterCounts) {
+    for (const cluster of VALID_CLUSTERS) {
+      const count = clusterCounts.get(cluster) ?? 0;
       expect(count).toBeGreaterThanOrEqual(2);
     }
   });
