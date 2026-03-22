@@ -330,82 +330,45 @@ export async function runNumericConsistency(options: {
   json?: boolean;
   limit?: number;
 }): Promise<ValidatorResult> {
-  const files = findMdxFiles(CONTENT_DIR);
-
-  // Collect entity → claims
-  const entityClaims: Map<string, NumericClaim[]> = new Map();
-
-  for (const filePath of files) {
-    // Skip internal docs
-    const rel = filePath.replace(/^.*content\/docs\//, '');
-    if (rel.startsWith('internal/')) continue;
-
-    let raw: string;
-    try {
-      raw = readFileSync(filePath, 'utf-8');
-    } catch {
-      continue;
-    }
-
-    const body = getContentBody(raw);
-
-    // Find entity IDs in this file via EntityLink references
-    const entityLinkPattern = /EntityLink[^>]*id=["']([^"']+)["']/g;
-    const entitiesInFile = new Set<string>();
-
-    let m: RegExpExecArray | null;
-    while ((m = entityLinkPattern.exec(body)) !== null) {
-      entitiesInFile.add(m[1]);
-    }
-
-    // Filter to specific entity if --entity specified
-    if (options.entityId) {
-      if (!entitiesInFile.has(options.entityId)) continue;
-      entitiesInFile.clear();
-      entitiesInFile.add(options.entityId);
-    }
-
-    for (const entityId of entitiesInFile) {
-      const claims = extractEntityContextClaims(body, entityId, filePath);
-      if (claims.length === 0) continue;
-
-      const existing = entityClaims.get(entityId) ?? [];
-      existing.push(...claims);
-      entityClaims.set(entityId, existing);
-    }
-  }
-
-  // Find contradictions
-  const allContradictions: ContradictionReport[] = [];
-
-  for (const [entityId, claims] of entityClaims.entries()) {
-    if (claims.length < 2) continue;
-
-    const contradictions = findHeuristicContradictions(claims);
-    for (const c of contradictions) {
-      c.entityId = entityId;
-      allContradictions.push(c);
-    }
-  }
-
-  // Deduplicate (same claim pair can match multiple numbers)
-  const seen = new Set<string>();
-  const deduped = allContradictions.filter(c => {
-    const key = `${c.entityId}|${c.claim1.pageId}|${c.claim2.pageId}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
   const limit = options.limit ?? 20;
+  const result = await runNumericConsistencyDetailed({
+    entityId: options.entityId,
+    limit,
+  });
+  const deduped = result.contradictions;
   const top = deduped.slice(0, limit);
+
+  // Re-collect entity claims for review mode (needed for --entity output)
+  // This is only used when entityId is specified, so the cost is acceptable
+  let entityClaims: Map<string, NumericClaim[]> | undefined;
+  if (options.entityId) {
+    entityClaims = new Map<string, NumericClaim[]>();
+    const files = findMdxFiles(CONTENT_DIR);
+    for (const filePath of files) {
+      const rel = filePath.replace(/^.*content\/docs\//, '');
+      if (rel.startsWith('internal/')) continue;
+      let raw: string;
+      try { raw = readFileSync(filePath, 'utf-8'); } catch { continue; }
+      const body = getContentBody(raw);
+      const entityLinkPattern = /EntityLink[^>]*id=["']([^"']+)["']/g;
+      let m: RegExpExecArray | null;
+      const entitiesInFile = new Set<string>();
+      while ((m = entityLinkPattern.exec(body)) !== null) entitiesInFile.add(m[1]);
+      if (!entitiesInFile.has(options.entityId)) continue;
+      const claims = extractEntityContextClaims(body, options.entityId, filePath);
+      if (claims.length === 0) continue;
+      const existing = entityClaims.get(options.entityId) ?? [];
+      existing.push(...claims);
+      entityClaims.set(options.entityId, existing);
+    }
+  }
 
   // Output mode:
   // Without --entity: show high-confidence candidates only (deduped list)
   // With --entity: show all numeric claims grouped by page (review mode)
   if (options.entityId) {
     // Review mode: show all numeric claims for this entity
-    const entityClaimsForId = entityClaims.get(options.entityId) ?? [];
+    const entityClaimsForId = entityClaims?.get(options.entityId) ?? [];
     if (options.json) {
       console.log(JSON.stringify({
         entity: options.entityId,

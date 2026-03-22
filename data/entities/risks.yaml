@@ -234,6 +234,10 @@
       type: risk
     - id: mK9pX3rQ7n
       type: organization
+    - id: cyberweapons
+      type: risk
+    - id: proliferation
+      type: risk
   sources:
     - title: The Precipice
       author: Toby Ord
@@ -2440,6 +2444,12 @@
       type: organization
     - id: MBGtb3Qlkw
       type: safety-agenda
+    - id: automation-bias
+      type: risk
+    - id: erosion-of-agency
+      type: risk
+    - id: reward-hacking
+      type: risk
   sources:
     - title: Discovering Language Model Behaviors with Model-Written Evaluations
       url: https://arxiv.org/abs/2212.09251

@@ -725,6 +725,8 @@
       type: person
     - id: tDwxa07Urw
       type: person
+    - id: us-executive-order
+      type: policy
   sources:
     - title: SB 1047 Bill Text (Final Amended Version)
       url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1047
@@ -1542,6 +1544,8 @@
       type: organization
     - id: XLLyzaEaCA
       type: organization
+    - id: us-executive-order
+      type: policy
   sources:
     - title: EU AI Act Full Text (Annotated)
       url: https://artificialintelligenceact.eu/
@@ -2208,6 +2212,8 @@
       type: organization
     - id: 1LcLlMGLbw
       type: organization
+    - id: us-executive-order
+      type: policy
   sources:
     - title: 'White House Fact Sheet: Voluntary AI Commitments'
       url: >-
@@ -3796,6 +3802,8 @@
       type: policy
     - id: 57vCq45URQ
       type: policy
+    - id: hardware-enabled-governance
+      type: approach
   lastUpdated: 2026-02
 
 - id: thresholds
@@ -3829,6 +3837,8 @@
       type: approach
     - id: uvwmYLYstg
       type: policy
+    - id: international-regimes
+      type: concept
   lastUpdated: 2026-02
 
 - id: lab-culture
@@ -4769,6 +4779,10 @@
       type: organization
     - id: mK9pX3rQ7n
       type: organization
+    - id: structured-access
+      type: approach
+    - id: tool-restrictions
+      type: approach
   lastUpdated: 2026-02
 
 - id: structured-access

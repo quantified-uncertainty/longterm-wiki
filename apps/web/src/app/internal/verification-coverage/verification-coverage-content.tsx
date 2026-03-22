@@ -146,6 +146,40 @@ function coverageColor(pct: number): string {
   return "text-emerald-600";
 }
 
+// ── Verdict Breakdown Card ────────────────────────────────────────────────
+
+function VerdictBreakdownCard({
+  title,
+  subtitle,
+  verdicts,
+}: {
+  title: string;
+  subtitle: string;
+  verdicts: Record<string, number>;
+}) {
+  const entries = Object.entries(verdicts).sort(([, a], [, b]) => b - a);
+  return (
+    <div className="rounded-lg border border-border/60 p-4">
+      <h3 className="text-sm font-semibold mb-2">{title}</h3>
+      <p className="text-xs text-muted-foreground mb-2">{subtitle}</p>
+      {entries.length > 0 ? (
+        <div className="space-y-1">
+          {entries.map(([verdict, count]) => (
+            <div key={verdict} className="flex justify-between text-xs">
+              <span className={VERDICT_COLORS[verdict] || "text-muted-foreground"}>
+                {verdict}
+              </span>
+              <span className="tabular-nums">{count}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">No verdicts recorded</p>
+      )}
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function VerificationCoverageContent() {
@@ -247,6 +281,11 @@ export async function VerificationCoverageContent() {
     .filter((c) => c.pct < 100 && c.total > 0)
     .sort((a, b) => b.total - b.indexed - (a.total - a.indexed))
     .slice(0, 10);
+
+  // Pre-compute totals used in footer (avoid repeating reduce in JSX)
+  const totalIndexed = coverageByType.reduce((s, r) => s + r.indexed, 0);
+  const totalNotIndexed = totalEntities - totalIndexed;
+  const totalPct = totalEntities > 0 ? Math.round((totalIndexed / totalEntities) * 100) : 0;
 
   return (
     <>
@@ -357,37 +396,15 @@ export async function VerificationCoverageContent() {
                   {totalEntities}
                 </td>
                 <td className="text-right py-2 px-3 tabular-nums">
-                  {coverageByType.reduce((s, r) => s + r.indexed, 0)}
+                  {totalIndexed}
                 </td>
                 <td className="text-right py-2 px-3 tabular-nums text-muted-foreground">
-                  {totalEntities -
-                    coverageByType.reduce((s, r) => s + r.indexed, 0)}
+                  {totalNotIndexed}
                 </td>
                 <td
-                  className={`text-right py-2 px-3 tabular-nums font-medium ${coverageColor(
-                    totalEntities > 0
-                      ? Math.round(
-                          (coverageByType.reduce(
-                            (s, r) => s + r.indexed,
-                            0
-                          ) /
-                            totalEntities) *
-                            100
-                        )
-                      : 0
-                  )}`}
+                  className={`text-right py-2 px-3 tabular-nums font-medium ${coverageColor(totalPct)}`}
                 >
-                  {totalEntities > 0
-                    ? Math.round(
-                        (coverageByType.reduce(
-                          (s, r) => s + r.indexed,
-                          0
-                        ) /
-                          totalEntities) *
-                          100
-                      )
-                    : 0}
-                  %
+                  {totalPct}%
                 </td>
               </tr>
             </tfoot>
@@ -457,114 +474,21 @@ export async function VerificationCoverageContent() {
 
           {/* Per-system breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            {/* FactBase */}
-            <div className="rounded-lg border border-border/60 p-4">
-              <h3 className="text-sm font-semibold mb-2">
-                FactBase Verdicts
-              </h3>
-              <p className="text-xs text-muted-foreground mb-2">
-                {kbStats.total_facts} facts checked
-              </p>
-              {Object.entries(kbStats.by_verdict ?? {}).length > 0 ? (
-                <div className="space-y-1">
-                  {Object.entries(kbStats.by_verdict ?? {})
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([verdict, count]) => (
-                      <div
-                        key={verdict}
-                        className="flex justify-between text-xs"
-                      >
-                        <span
-                          className={
-                            VERDICT_COLORS[verdict] ||
-                            "text-muted-foreground"
-                          }
-                        >
-                          {verdict}
-                        </span>
-                        <span className="tabular-nums">{count}</span>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  No verdicts recorded
-                </p>
-              )}
-            </div>
-
-            {/* Record verifications */}
-            <div className="rounded-lg border border-border/60 p-4">
-              <h3 className="text-sm font-semibold mb-2">
-                Record Verdicts
-              </h3>
-              <p className="text-xs text-muted-foreground mb-2">
-                {recordStats.total_verdicts} verdicts across{" "}
-                {recordStats.total_records} records
-              </p>
-              {Object.entries(recordStats.by_verdict ?? {}).length > 0 ? (
-                <div className="space-y-1">
-                  {Object.entries(recordStats.by_verdict ?? {})
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([verdict, count]) => (
-                      <div
-                        key={verdict}
-                        className="flex justify-between text-xs"
-                      >
-                        <span
-                          className={
-                            VERDICT_COLORS[verdict] ||
-                            "text-muted-foreground"
-                          }
-                        >
-                          {verdict}
-                        </span>
-                        <span className="tabular-nums">{count}</span>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  No verdicts recorded
-                </p>
-              )}
-            </div>
-
-            {/* Things verdicts */}
-            <div className="rounded-lg border border-border/60 p-4">
-              <h3 className="text-sm font-semibold mb-2">
-                Things Verdicts
-              </h3>
-              <p className="text-xs text-muted-foreground mb-2">
-                {thingsStats.total} total things
-              </p>
-              {Object.entries(thingsStats.byVerdict ?? {}).length > 0 ? (
-                <div className="space-y-1">
-                  {Object.entries(thingsStats.byVerdict ?? {})
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([verdict, count]) => (
-                      <div
-                        key={verdict}
-                        className="flex justify-between text-xs"
-                      >
-                        <span
-                          className={
-                            VERDICT_COLORS[verdict] ||
-                            "text-muted-foreground"
-                          }
-                        >
-                          {verdict}
-                        </span>
-                        <span className="tabular-nums">{count}</span>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  No verdicts recorded
-                </p>
-              )}
-            </div>
+            <VerdictBreakdownCard
+              title="FactBase Verdicts"
+              subtitle={`${kbStats.total_facts} facts checked`}
+              verdicts={kbStats.by_verdict}
+            />
+            <VerdictBreakdownCard
+              title="Record Verdicts"
+              subtitle={`${recordStats.total_verdicts} verdicts across ${recordStats.total_records} records`}
+              verdicts={recordStats.by_verdict}
+            />
+            <VerdictBreakdownCard
+              title="Things Verdicts"
+              subtitle={`${thingsStats.total} total things`}
+              verdicts={thingsStats.byVerdict}
+            />
           </div>
         </div>
       )}
@@ -577,36 +501,18 @@ export async function VerificationCoverageContent() {
           reflect current data.
         </p>
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-border/60 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">
-              &gt; 30 days old
-            </p>
-            <p
-              className={`text-2xl font-bold tabular-nums ${staleness.over_30_days > 0 ? "text-amber-500" : "text-emerald-600"}`}
-            >
-              {staleness.over_30_days}
-            </p>
-          </div>
-          <div className="rounded-lg border border-border/60 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">
-              &gt; 90 days old
-            </p>
-            <p
-              className={`text-2xl font-bold tabular-nums ${staleness.over_90_days > 0 ? "text-amber-600" : "text-emerald-600"}`}
-            >
-              {staleness.over_90_days}
-            </p>
-          </div>
-          <div className="rounded-lg border border-border/60 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">
-              &gt; 180 days old
-            </p>
-            <p
-              className={`text-2xl font-bold tabular-nums ${staleness.over_180_days > 0 ? "text-red-600" : "text-emerald-600"}`}
-            >
-              {staleness.over_180_days}
-            </p>
-          </div>
+          {[
+            { label: "> 30 days old", value: staleness.over_30_days, warnColor: "text-amber-500" },
+            { label: "> 90 days old", value: staleness.over_90_days, warnColor: "text-amber-600" },
+            { label: "> 180 days old", value: staleness.over_180_days, warnColor: "text-red-600" },
+          ].map(({ label, value, warnColor }) => (
+            <div key={label} className="rounded-lg border border-border/60 p-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">{label}</p>
+              <p className={`text-2xl font-bold tabular-nums ${value > 0 ? warnColor : "text-emerald-600"}`}>
+                {value}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
