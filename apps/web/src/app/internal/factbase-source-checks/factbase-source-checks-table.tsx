@@ -489,6 +489,7 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
         renderExpandedRow={(row) => {
           if (!row.getIsExpanded()) return null;
           return (
+<<<<<<< HEAD:apps/web/src/app/internal/factbase-source-checks/factbase-source-checks-table.tsx
             <ExpandedSourceCheckDetail
               recordType={row.original.recordType}
               recordId={row.original.recordId}
