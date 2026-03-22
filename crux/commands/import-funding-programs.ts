@@ -702,6 +702,78 @@ const PROGRAMS: FundingProgramDef[] = [
     status: "awarded",
     source: "https://www.astralcodexten.com/",
   },
+
+  // ---- ARIA (Advanced Research and Invention Agency) ----
+  {
+    idSeed: "prog|aria|ta1-1-theory",
+    orgId: ORG_IDS.ARIA,
+    divisionIdSeed: "div|aria|ta1-1-theory",
+    name: "Safeguarded AI TA1.1 — Theory",
+    description:
+      "22 projects on mathematical representations and formal semantics for world-models, specifications, and proofs. Covers category theory, probabilistic logic, string diagrams, and verification foundations.",
+    programType: "solicitation",
+    totalBudget: 3_500_000,
+    currency: "GBP",
+    status: "awarded",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes: "GBP 3.5M Phase 1 across 22 projects. Call opened April 2024.",
+  },
+  {
+    idSeed: "prog|aria|ta1-2-3-platform",
+    orgId: ORG_IDS.ARIA,
+    divisionIdSeed: "div|aria|ta1-2-platform",
+    name: "Safeguarded AI TA1.2 + TA1.3 — Platform",
+    description:
+      "Backend infrastructure (TA1.2) and human-computer interface (TA1.3) for the Safeguarded AI programme. Proof checking, automated reasoning, collaborative modeling, and UX.",
+    programType: "solicitation",
+    totalBudget: 14_200_000,
+    currency: "GBP",
+    status: "awarded",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes: "GBP 14.2M across 8 projects.",
+  },
+  {
+    idSeed: "prog|aria|ta1-4-sociotechnical",
+    orgId: ORG_IDS.ARIA,
+    divisionIdSeed: "div|aria|ta1-4-sociotechnical",
+    name: "Safeguarded AI TA1.4 — Sociotechnical Integration",
+    description:
+      "Law-following AI, formal models of society, governance models, privacy-preserving verification, preference aggregation, and deliberative AI specifications.",
+    programType: "solicitation",
+    totalBudget: 3_400_000,
+    currency: "GBP",
+    status: "awarded",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes: "GBP 3.4M across 6 teams, Phase 1 (up to 18 months).",
+  },
+  {
+    idSeed: "prog|aria|ta2-ml",
+    orgId: ORG_IDS.ARIA,
+    divisionIdSeed: "div|aria|ta2-ml",
+    name: "Safeguarded AI TA2 — Machine Learning",
+    description:
+      "Phase 1: development teams for ML approaches to safeguarded AI. Phase 2 (GBP 18M single award) abandoned in Nov 2025 pivot — frontier AI advances made dedicated ML capability development less valuable.",
+    programType: "solicitation",
+    totalBudget: 1_000_000,
+    currency: "GBP",
+    status: "closed",
+    source: "https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/",
+    notes: "Phase 1: GBP 1M across 3 teams (completed). Phase 2 (GBP 18M) abandoned Nov 2025.",
+  },
+  {
+    idSeed: "prog|aria|ta3-applications",
+    orgId: ORG_IDS.ARIA,
+    divisionIdSeed: "div|aria|ta3-applications",
+    name: "Safeguarded AI TA3 — Real-World Applications",
+    description:
+      "Real-world demonstrations of safeguarded AI in energy grid, automated driving, clinical trials, logistics, biopharmaceuticals, and telecom. Phase 2 (GBP 8.4M) cancelled in Nov 2025 pivot; replaced by cybersecurity focus on formally-verified firewalls for critical infrastructure.",
+    programType: "solicitation",
+    totalBudget: 5_400_000,
+    currency: "GBP",
+    status: "awarded",
+    source: "https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/",
+    notes: "GBP 5.4M Phase 1 across 9 teams (continuing). Phase 2 (GBP 8.4M) cancelled Nov 2025.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
