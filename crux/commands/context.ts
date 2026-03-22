@@ -40,6 +40,7 @@ import type {
   BacklinksResult,
   CitationQuote,
 } from '../lib/wiki-server/pages.ts';
+import { getSessionsByEntity } from '../lib/wiki-server/agent-sessions.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
@@ -442,11 +443,12 @@ async function forEntity(
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
 
-  // Fetch entity, facts, and pages mentioning this entity in parallel
-  const [entityResult, factsResult, pageSearchResult] = await Promise.all([
+  // Fetch entity, facts, pages, and session history in parallel
+  const [entityResult, factsResult, pageSearchResult, sessionsResult] = await Promise.all([
     getEntity(entityId),
     getFactsByEntity(entityId, 20),
     searchPages(entityId, 10),
+    getSessionsByEntity(entityId).catch(() => null),
   ]);
 
   if (!entityResult.ok) {
@@ -530,6 +532,19 @@ async function forEntity(
     bundle += '\n';
   }
 
+  // Past agent sessions that touched this entity
+  if (sessionsResult?.ok && sessionsResult.data.sessions.length > 0) {
+    bundle += `## Past Agent Sessions\n\n`;
+    bundle += `| Date | Task | PR |\n|------|------|----|\n`;
+    for (const s of sessionsResult.data.sessions.slice(0, 10)) {
+      const date = s.date ?? '—';
+      const task = (s.title ?? s.task).slice(0, 80);
+      const pr = s.prUrl ? `[PR](${s.prUrl})` : '—';
+      bundle += `| ${date} | ${task} | ${pr} |\n`;
+    }
+    bundle += '\n';
+  }
+
   const print = options.print as boolean;
   if (print) {
     return { output: bundle, exitCode: 0 };
@@ -537,12 +552,14 @@ async function forEntity(
 
   writeBundle(outputPath, bundle);
 
+  const sessionCount = sessionsResult?.ok ? sessionsResult.data.sessions.length : 0;
   const summary = [
     `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
     `  Entity: ${e.title} (${entityId}) [${e.entityType}]`,
     factsResult.ok ? `  Facts: ${factsResult.data.facts.length}` : '',
     kbContext ? `  KB structured facts: included` : '',
     pageSearchResult.ok ? `  Pages mentioning entity: ${pageSearchResult.data.results.length}` : '',
+    sessionCount > 0 ? `  Past sessions: ${sessionCount}` : '',
   ]
     .filter(Boolean)
     .join('\n');

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { eq, desc, and, lt, count, sql, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { agentSessions, agentSessionPages, wikiPages } from "../../schema.js";
+import { agentSessions, agentSessionPages, agentSessionEntities, wikiPages } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -170,7 +170,7 @@ const agentSessionsApp = new Hono()
     const {
       checklistMd, status, prUrl, prOutcome, fixesPrUrl,
       date, title, summary, model, duration, cost, durationMinutes, checksYaml,
-      issuesJson, learningsJson, recommendationsJson, reviewed, pages,
+      issuesJson, learningsJson, recommendationsJson, reviewed, pages, entities,
     } = parsed.data;
     const resolvedCostCents = parsed.data.costCents !== undefined
       ? parsed.data.costCents
@@ -181,7 +181,7 @@ const agentSessionsApp = new Hono()
     const hasAnyField = [
       checklistMd, status, prUrl, prOutcome, fixesPrUrl,
       date, title, summary, model, duration, cost, checksYaml,
-      issuesJson, learningsJson, recommendationsJson, reviewed, pages,
+      issuesJson, learningsJson, recommendationsJson, reviewed, pages, entities,
       parsed.data.costCents, parsed.data.durationMinutes,
     ].some((v) => v !== undefined);
     if (!hasAnyField) return validationError(c, "At least one field must be provided");
@@ -220,6 +220,15 @@ const agentSessionsApp = new Hono()
           if (resolved.length > 0) {
             await tx.insert(agentSessionPages).values(resolved);
           }
+        }
+      }
+      if (entities !== undefined) {
+        await tx.delete(agentSessionEntities).where(eq(agentSessionEntities.agentSessionId, id));
+        if (entities.length > 0) {
+          const uniqueEntities = [...new Set(entities)];
+          await tx.insert(agentSessionEntities).values(
+            uniqueEntities.map((stableId) => ({ agentSessionId: id, entityStableId: stableId })),
+          );
         }
       }
       return rows[0];
@@ -293,6 +302,31 @@ const agentSessionsApp = new Hono()
       pageMap.set(row.agentSessionId, existing);
     }
     return c.json({ sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])) });
+  })
+  .get("/by-entity", async (c) => {
+    const entityId = c.req.query("entity_id");
+    if (!entityId) return validationError(c, "entity_id query parameter is required");
+    const db = getDrizzleDb();
+    const aseRows = await db.select({ agentSessionId: agentSessionEntities.agentSessionId })
+      .from(agentSessionEntities).where(eq(agentSessionEntities.entityStableId, entityId));
+    if (aseRows.length === 0) return c.json({ sessions: [] });
+    const sessionIds = aseRows.map((r) => r.agentSessionId);
+    const rows = await db.select().from(agentSessions)
+      .where(inArray(agentSessions.id, sessionIds))
+      .orderBy(desc(agentSessions.date), desc(agentSessions.id));
+    return c.json({
+      sessions: rows.map((r) => ({
+        id: r.id,
+        branch: r.branch,
+        task: r.task,
+        sessionType: r.sessionType,
+        date: r.date,
+        title: r.title,
+        summary: r.summary,
+        prUrl: r.prUrl,
+        status: r.status,
+      })),
+    });
   })
   .get("/insights", async (c) => {
     const parsed = InsightsQuery.safeParse(c.req.query());
