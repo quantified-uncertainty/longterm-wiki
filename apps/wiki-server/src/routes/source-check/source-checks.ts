@@ -18,6 +18,7 @@ import {
   entities,
   divisions,
   things,
+  facts,
 } from "../../schema.js";
 import {
   zv,
