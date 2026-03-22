@@ -41,7 +41,7 @@ async function main() {
     broken: number;
     unverifiable: number;
     verifiedAt: string;
-    brokenUrls: Array<{ footnote: number; url: string; linkText: string; note: string | null }>;
+    brokenUrls: Array<{ footnote: string; url: string; linkText: string; note: string | null }>;
   }
 
   const summaries: PageSummary[] = [];
