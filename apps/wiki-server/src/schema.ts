@@ -977,7 +977,7 @@ export const agentSessionEntities = pgTable(
   (table) => [
     primaryKey({ columns: [table.agentSessionId, table.entityStableId] }),
     index("idx_ase_entity_stable_id").on(table.entityStableId),
-    index("idx_ase_agent_session_id").on(table.agentSessionId),
+    // PK (agent_session_id, entity_stable_id) covers single-column lookups on agent_session_id
   ]
 );
 

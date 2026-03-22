@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS agent_session_entities (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ase_entity_stable_id ON agent_session_entities(entity_stable_id);
-CREATE INDEX IF NOT EXISTS idx_ase_agent_session_id ON agent_session_entities(agent_session_id);
+-- idx_ase_agent_session_id not needed: PK (agent_session_id, entity_stable_id) covers single-column lookups

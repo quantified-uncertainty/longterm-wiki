@@ -538,7 +538,7 @@ async function forEntity(
     bundle += `| Date | Task | PR |\n|------|------|----|\n`;
     for (const s of sessionsResult.data.sessions.slice(0, 10)) {
       const date = s.date ?? '—';
-      const task = (s.title ?? s.task).slice(0, 80);
+      const task = (s.title ?? s.task ?? '(untitled)').slice(0, 80);
       const pr = s.prUrl ? `[PR](${s.prUrl})` : '—';
       bundle += `| ${date} | ${task} | ${pr} |\n`;
     }
