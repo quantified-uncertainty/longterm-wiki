@@ -11,9 +11,10 @@ on:
 
 # Cancel superseded runs for the same PR/branch (saves ~3 min per cancelled run).
 # Runs on main and merge queue are never cancelled (each SHA produces a unique group).
+# Label events get their own group so they don't cancel in-progress CI builds.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.pull_request.number || github.sha }}-${{ (github.event.action == 'labeled' || github.event.action == 'unlabeled') && 'label' || 'main' }}
+  cancel-in-progress: ${{ github.event.action != 'labeled' && github.event.action != 'unlabeled' }}
 
 jobs:
   ci:
