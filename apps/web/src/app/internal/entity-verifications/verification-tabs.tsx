@@ -1,0 +1,53 @@
+"use client";
+
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+interface VerificationTabsProps {
+  verdictsContent: React.ReactNode;
+  factbaseContent: React.ReactNode;
+  coverageContent: React.ReactNode;
+}
+
+/**
+ * Client-side tab switcher for the consolidated verification dashboard.
+ * Server-rendered content is passed in as ReactNode props.
+ */
+export function VerificationTabs({
+  verdictsContent,
+  factbaseContent,
+  coverageContent,
+}: VerificationTabsProps) {
+  return (
+    <Tabs defaultValue="verdicts">
+      <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0">
+        <TabsTrigger
+          value="verdicts"
+          className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          Verdicts
+        </TabsTrigger>
+        <TabsTrigger
+          value="factbase"
+          className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          FactBase
+        </TabsTrigger>
+        <TabsTrigger
+          value="coverage"
+          className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          Coverage
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="verdicts" className="mt-6">
+        {verdictsContent}
+      </TabsContent>
+      <TabsContent value="factbase" className="mt-6">
+        {factbaseContent}
+      </TabsContent>
+      <TabsContent value="coverage" className="mt-6">
+        {coverageContent}
+      </TabsContent>
+    </Tabs>
+  );
+}

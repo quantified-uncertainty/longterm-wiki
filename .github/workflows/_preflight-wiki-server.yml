@@ -1,0 +1,42 @@
+name: Preflight — Wiki Server Health
+on:
+  workflow_call:
+    outputs:
+      wiki_server_healthy:
+        description: "Whether the wiki-server is reachable and healthy"
+        value: ${{ jobs.check.outputs.healthy }}
+
+# Reusable workflow that checks wiki-server health before running dependent jobs.
+# Replaces the duplicated preflight pattern across 8+ workflows.
+#
+# Usage:
+#   preflight:
+#     if: vars.AUTOMATION_PAUSED != 'true'
+#     uses: ./.github/workflows/_preflight-wiki-server.yml
+#     secrets: inherit
+#
+#   my-job:
+#     needs: [preflight]
+#     ...
+#
+# The calling workflow should handle the AUTOMATION_PAUSED check in its own
+# `if` condition on the preflight job, since reusable workflows cannot access
+# `vars.*` context directly (it must be passed from the caller).
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      healthy: ${{ steps.health.outputs.healthy }}
+    steps:
+      - name: Check wiki-server health
+        id: health
+        run: |
+          if curl -sf --max-time 10 "${{ secrets.LONGTERMWIKI_SERVER_URL }}/health"; then
+            echo "Wiki-server is healthy"
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Wiki-server unreachable — skipping workflow"
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
