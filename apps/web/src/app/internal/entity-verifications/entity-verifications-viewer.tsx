@@ -211,9 +211,13 @@ function VerdictCard({ verdict }: { verdict: VerdictRow }) {
       if (res.ok) {
         const data = await res.json();
         setEvidence(data.evidence ?? []);
+      } else {
+        console.warn(`[entity-verifications] Failed to load evidence for ${verdict.recordType}/${verdict.recordId}: HTTP ${res.status}`);
+        setEvidence([]);
       }
-    } catch {
-      // Silently fail — evidence section just won't show
+    } catch (e) {
+      console.warn(`[entity-verifications] Failed to load evidence: ${e instanceof Error ? e.message : String(e)}`);
+      setEvidence([]);
     } finally {
       setLoadingEvidence(false);
     }
@@ -444,16 +448,17 @@ export function EntityVerificationsViewer() {
     }
   }, []);
 
-  // Auto-load from URL param
+  // Auto-load from URL param on initial mount only
   useEffect(() => {
-    if (entityParam && !loaded) {
+    if (entityParam && !loaded && !isLoading) {
       fetchVerdicts(entityParam);
     }
-  }, [entityParam, loaded, fetchVerdicts]);
+    // Only run on mount — entityParam changes are handled by handleSearch
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = (q: string) => {
     router.push(`?entity=${encodeURIComponent(q)}`, { scroll: false });
-    setLoaded(false);
     setActiveType("all");
     setActiveVerdict("all");
     fetchVerdicts(q);

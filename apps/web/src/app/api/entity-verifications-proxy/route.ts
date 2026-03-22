@@ -31,14 +31,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Forward all query params to the unified verifications endpoint
+    // Forward validated query params to the unified verifications endpoint
     const params = new URLSearchParams();
     params.set("entity_id", entityId.trim());
-    params.set("limit", request.nextUrl.searchParams.get("limit") ?? "200");
+    const rawLimit = parseInt(request.nextUrl.searchParams.get("limit") ?? "200", 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 200;
+    params.set("limit", String(limit));
     const recordType = request.nextUrl.searchParams.get("record_type");
-    if (recordType) params.set("record_type", recordType);
+    if (recordType && recordType.length <= 50) params.set("record_type", recordType);
     const verdict = request.nextUrl.searchParams.get("verdict");
-    if (verdict) params.set("verdict", verdict);
+    if (verdict && verdict.length <= 50) params.set("verdict", verdict);
 
     const url = `${config.serverUrl}/api/verifications/verdicts?${params.toString()}`;
     const res = await fetch(url, {
