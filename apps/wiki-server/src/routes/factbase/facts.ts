@@ -261,6 +261,8 @@ const factsApp = new Hono()
           low: f.low ?? null,
           high: f.high ?? null,
           asOf: f.asOf ?? null,
+          validEnd: f.validEnd ?? null,
+          currency: f.currency ?? null,
           measure: f.measure ?? null,
           subject: f.subject ?? null,
           note: f.note ?? null,
@@ -281,6 +283,8 @@ const factsApp = new Hono()
               low: sql`excluded.low`,
               high: sql`excluded.high`,
               asOf: sql`excluded.as_of`,
+              validEnd: sql`excluded.valid_end`,
+              currency: sql`excluded.currency`,
               measure: sql`excluded.measure`,
               subject: sql`excluded.subject`,
               note: sql`excluded.note`,
@@ -338,7 +342,8 @@ const factsApp = new Hono()
       propertyId: string;
       value: { type: string; value: unknown; low?: number; high?: number };
       asOf: string | null;
-      validEnd?: string;
+      validEnd?: string | null;
+      currency?: string | null;
       source: string | null;
       notes: string | null;
       measure?: string;
@@ -361,6 +366,8 @@ const factsApp = new Hono()
         propertyId: f.measure ?? f.factId,
         value,
         asOf: f.asOf,
+        ...(f.validEnd && { validEnd: f.validEnd }),
+        ...(f.currency && { currency: f.currency }),
         source: f.source,
         notes: f.note,
         ...(f.measure && { measure: f.measure }),
