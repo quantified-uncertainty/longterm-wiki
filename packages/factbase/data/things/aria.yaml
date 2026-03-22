@@ -37,8 +37,9 @@ facts:
 
   # ── Safeguarded AI Programme Budget ────────────────────────────
   - id: f_d7uLELQ2tA
-    property: total-grants-made
+    property: total-funding
     value: 59000000
+    currency: GBP
     asOf: 2025-11
     source: https://www.aria.org.uk/programme-safeguarded-ai/
     notes: >-
