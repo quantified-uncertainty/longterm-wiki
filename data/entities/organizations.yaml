@@ -1007,6 +1007,48 @@
     - ai-safety
     - international
   lastUpdated: 2026-03
+- id: aria-uk
+  stableId: XqjV4mbMXQ
+  type: organization
+  orgType: government
+  title: Advanced Research and Invention Agency (ARIA)
+  website: https://www.aria.org.uk
+  relatedEntries:
+    - id: SQlb1r5EzN
+      type: person
+      relationship: leads-to
+    - id: MEt9F7f50w
+      type: approach
+      relationship: research
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: ARIA Website
+      url: https://www.aria.org.uk
+    - title: ARIA Safeguarded AI Programme
+      url: https://www.aria.org.uk/programme-safeguarded-ai/
+    - title: ARIA Safeguarded AI Funding
+      url: https://www.aria.org.uk/opportunity-spaces/mathematics-for-safe-ai/safeguarded-ai/funding/
+  description: >-
+    The UK's Advanced Research + Invention Agency (ARIA) is a government research funding
+    body modeled on DARPA. Its Safeguarded AI programme, led by Programme Director David
+    "davidad" Dalrymple, has committed GBP 59 million over 3-5 years to develop AI systems
+    with mathematical safety guarantees through formal verification. The programme funds
+    research across multiple technical areas: TA1 (core theory, GBP 18M), TA3 (cyber-physical
+    applications, GBP 5.4M), and TA1.4 (sociotechnical integration, GBP 3.4M). ARIA aims to
+    create quantitative safety guarantees for AI "in the way we have come to expect for
+    nuclear power and passenger aviation."
+  tags:
+    - formal-methods
+    - provably-safe-ai
+    - ai-safety
+    - formal-verification
+    - uk-government
+    - research-funding
+  clusters:
+    - ai-safety
+    - governance
+  lastUpdated: 2026-03
 - id: eu-ai-office
   stableId: aobKGolfow
   wikiId: E1016
