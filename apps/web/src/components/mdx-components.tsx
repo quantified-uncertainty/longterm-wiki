@@ -40,6 +40,9 @@ import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGen
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 
+// Verification status — entity-level verification verdict summary
+import { VerificationStatus } from "@/components/wiki/VerificationStatus";
+
 // Epic tracking — use on multi-issue coordination pages (see content/docs/internal/epic-page-conventions.mdx)
 // Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
 import { EpicTracker } from "@/components/wiki/EpicTracker";
@@ -205,6 +208,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBEntitySidebar: FBEntitySidebar,
   KBRefLink: FBRefLink,
   KBCompareTable: FBCompareTable,
+
+  // Verification status
+  VerificationStatus,
 
   // Epic tracking
   EpicTracker,
