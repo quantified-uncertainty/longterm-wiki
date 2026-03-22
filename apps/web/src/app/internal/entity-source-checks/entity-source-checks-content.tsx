@@ -10,7 +10,7 @@ import { SourceCheckTabs } from "./source-check-tabs";
  * Combines three previously separate dashboards into tabbed sections:
  * - Verdicts (E2200): all source-check verdicts with expandable evidence
  * - FactBase (E1045): FactBase-specific source-check stats and table
- * - Coverage (E2100): entity type coverage analysis and priority queue
+ * - Coverage (E2500): entity type coverage analysis and priority queue
  *
  * Each tab renders the original content component — no logic was duplicated.
  */
