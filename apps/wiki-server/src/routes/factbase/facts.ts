@@ -214,17 +214,24 @@ const factsApp = new Hono()
     const parsed = SyncFactsBatchSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { facts: items } = parsed.data;
+    let items = parsed.data.facts;
     const db = getDrizzleDb();
 
-    // Validate entity references (facts now use stable IDs, not slugs)
+    // Validate entity references — skip facts whose entities don't exist in PG
+    // rather than rejecting the entire batch. This allows syncing facts for
+    // entities that ARE in PG while skipping those that haven't been synced yet.
     const entityIds = [...new Set(items.map((f) => f.entityId))];
     const missingEntities = await checkRefsExist(db, entities, entities.stableId, entityIds);
     if (missingEntities.length > 0) {
-      return validationError(
-        c,
-        `Referenced entities not found: ${missingEntities.join(", ")}`
+      const missingSet = new Set(missingEntities);
+      const skipped = items.filter((f) => missingSet.has(f.entityId));
+      items = items.filter((f) => !missingSet.has(f.entityId));
+      console.warn(
+        `[facts/sync] Skipping ${skipped.length} facts for ${missingEntities.length} missing entities: ${missingEntities.slice(0, 10).join(", ")}${missingEntities.length > 10 ? ` ... (+${missingEntities.length - 10} more)` : ""}`
       );
+      if (items.length === 0) {
+        return c.json({ upserted: 0, skipped: skipped.length });
+      }
     }
 
     // Validate subject references (optional field, also points to entities).

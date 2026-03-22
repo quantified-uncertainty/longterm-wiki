@@ -1,7 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getExpandedRowModel,
+  type SortingState,
+  type ExpandedState,
+  type ColumnDef,
+} from "@tanstack/react-table";
 import {
   Search,
   Loader2,
@@ -10,8 +20,11 @@ import {
   ShieldQuestion,
   Clock,
   ChevronRight,
+  ChevronLeft,
   ExternalLink,
+  RotateCcw,
 } from "lucide-react";
+import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -51,304 +64,259 @@ interface EvidenceRow {
   checkedAt: string | null;
 }
 
-interface VerdictsResponse {
-  verdicts: VerdictRow[];
-  total: number;
-}
-
 // ── Verdict styling ─────────────────────────────────────────────────────
 
-const VERDICT_STYLES: Record<string, { bg: string; text: string; icon: typeof ShieldCheck }> = {
-  confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600", icon: ShieldCheck },
-  contradicted: { bg: "bg-red-500/15", text: "text-red-600", icon: ShieldAlert },
-  outdated: { bg: "bg-amber-500/15", text: "text-amber-600", icon: Clock },
-  partial: { bg: "bg-amber-400/15", text: "text-amber-500", icon: ShieldQuestion },
-  unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500", icon: ShieldQuestion },
-  unchecked: { bg: "bg-gray-400/15", text: "text-gray-400", icon: ShieldQuestion },
+const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
+  confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600" },
+  contradicted: { bg: "bg-red-500/15", text: "text-red-600" },
+  outdated: { bg: "bg-amber-500/15", text: "text-amber-600" },
+  partial: { bg: "bg-amber-400/15", text: "text-amber-500" },
+  unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500" },
+  unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
 };
 
-function VerdictBadge({ verdict, confidence }: { verdict: string; confidence: number | null }) {
+function VerdictBadge({ verdict }: { verdict: string }) {
   const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
-  const Icon = style.icon;
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${style.bg} ${style.text}`}>
-      <Icon className="h-3.5 w-3.5" />
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.bg} ${style.text}`}>
       {verdict}
-      {confidence != null && (
-        <span className="text-[10px] opacity-70">
-          {Math.round(confidence * 100)}%
-        </span>
-      )}
     </span>
   );
 }
 
-// ── Claim display ───────────────────────────────────────────────────────
+// ── Columns ────────────────────────────────────────────────────────────────
 
-function formatClaim(v: VerdictRow): string {
-  const type = v.recordType.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  if (v.fieldName) {
-    return `${type} [${v.recordId}] . ${v.fieldName}`;
-  }
-  return `${type} [${v.recordId}]`;
-}
-
-// ── Entity search bar ───────────────────────────────────────────────────
-
-function EntitySearchBar({
-  initialQuery,
-  onSearch,
-  isLoading,
-}: {
-  initialQuery: string;
-  onSearch: (q: string) => void;
-  isLoading: boolean;
-}) {
-  const [query, setQuery] = useState(initialQuery);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) onSearch(query.trim());
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-center mb-6">
-      <div className="relative flex-1">
-        {isLoading ? (
-          <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
-        ) : (
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        )}
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Entity slug, stableId, or wikiId (e.g. anthropic, E42)"
-          className="w-full h-10 pl-10 pr-4 border rounded-lg bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={isLoading || !query.trim()}
-        className="h-10 px-4 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-foreground/90 disabled:opacity-50 transition-colors"
-      >
-        Load
-      </button>
-    </form>
-  );
-}
-
-// ── Stats summary ───────────────────────────────────────────────────────
-
-function StatsSummary({ verdicts }: { verdicts: VerdictRow[] }) {
-  const counts = new Map<string, number>();
-  for (const v of verdicts) {
-    counts.set(v.verdict, (counts.get(v.verdict) ?? 0) + 1);
-  }
-  const entries = [...counts.entries()].sort(([, a], [, b]) => b - a);
-
-  const avgConfidence = verdicts.length > 0
-    ? verdicts.reduce((sum, v) => sum + (v.confidence ?? 0), 0) / verdicts.length
-    : 0;
-
-  const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
-  const recordTypes = new Set(verdicts.map((v) => v.recordType));
-
-  return (
-    <div className="not-prose mb-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
-          <p className="text-2xl font-bold tabular-nums">{verdicts.length}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {recordTypes.size} record type{recordTypes.size !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>
-          <p className="text-2xl font-bold tabular-nums">
-            {avgConfidence > 0 ? `${Math.round(avgConfidence * 100)}%` : "N/A"}
-          </p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
-          <p className={cn("text-2xl font-bold tabular-nums", needsRecheck > 0 ? "text-amber-600" : "")}>
-            {needsRecheck}
-          </p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Verdict Distribution</p>
-          <div className="flex gap-1 flex-wrap mt-1">
-            {entries.map(([verdict, count]) => {
-              const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
-              return (
-                <span key={verdict} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text}`}>
-                  {verdict} {count}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Verdict card with expandable evidence ───────────────────────────────
-
-function VerdictCard({ verdict }: { verdict: VerdictRow }) {
-  const [expanded, setExpanded] = useState(false);
-  const [evidence, setEvidence] = useState<EvidenceRow[] | null>(null);
-  const [loadingEvidence, setLoadingEvidence] = useState(false);
-
-  const loadEvidence = useCallback(async () => {
-    if (evidence) return;
-    setLoadingEvidence(true);
-    try {
-      const res = await fetch(
-        `/api/verification-detail?recordType=${encodeURIComponent(verdict.recordType)}&recordId=${encodeURIComponent(verdict.recordId)}`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setEvidence(data.evidence ?? []);
-      } else {
-        console.warn(`[entity-verifications] Failed to load evidence for ${verdict.recordType}/${verdict.recordId}: HTTP ${res.status}`);
-        setEvidence([]);
-      }
-    } catch (e) {
-      console.warn(`[entity-verifications] Failed to load evidence: ${e instanceof Error ? e.message : String(e)}`);
-      setEvidence([]);
-    } finally {
-      setLoadingEvidence(false);
-    }
-  }, [verdict.recordType, verdict.recordId, evidence]);
-
-  const handleToggle = () => {
-    if (!expanded) loadEvidence();
-    setExpanded(!expanded);
-  };
-
-  return (
-    <div className="rounded-lg border border-border/60 overflow-hidden">
-      {/* Header row */}
+function expandToggleColumn(): ColumnDef<VerdictRow> {
+  return {
+    id: "expand",
+    size: 32,
+    header: () => null,
+    cell: ({ row }) => (
       <button
         type="button"
-        onClick={handleToggle}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
+        onClick={(e) => { e.stopPropagation(); row.toggleExpanded(); }}
+        className="p-1 rounded hover:bg-muted transition-colors"
+        aria-label={row.getIsExpanded() ? "Collapse" : "Expand"}
       >
-        <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0", expanded && "rotate-90")} />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{formatClaim(verdict)}</p>
-          {verdict.reasoning && (
-            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{verdict.reasoning}</p>
-          )}
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <VerdictBadge verdict={verdict.verdict} confidence={verdict.confidence} />
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {verdict.sourcesChecked} source{verdict.sourcesChecked !== 1 ? "s" : ""}
-          </span>
-        </div>
+        <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", row.getIsExpanded() && "rotate-90")} />
       </button>
+    ),
+  };
+}
 
-      {/* Expanded evidence */}
-      {expanded && (
-        <div className="border-t border-border/40 bg-muted/20 p-4">
-          {loadingEvidence && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading evidence...
-            </div>
-          )}
-          {evidence && evidence.length === 0 && (
-            <p className="text-sm text-muted-foreground">No evidence records found.</p>
-          )}
-          {evidence && evidence.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground">
-                Evidence ({evidence.length} source{evidence.length !== 1 ? "s" : ""})
-              </p>
-              {evidence.map((e) => (
-                <div key={e.id} className="rounded-md border border-border/40 bg-background p-3 text-sm">
-                  <div className="flex items-start gap-2 mb-2">
-                    <VerdictBadge verdict={e.verdict} confidence={e.confidence} />
-                    {e.isPrimarySource && (
-                      <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 rounded-full px-2 py-0.5">
-                        primary
-                      </span>
-                    )}
-                    {e.checkerModel && (
-                      <span className="text-[10px] text-muted-foreground bg-muted rounded-full px-2 py-0.5">
-                        {e.checkerModel}
-                      </span>
-                    )}
-                    {e.checkedAt && (
-                      <span className="text-[10px] text-muted-foreground ml-auto tabular-nums">
-                        {new Date(e.checkedAt).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                  {e.sourceUrl && (
-                    <a
-                      href={e.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1 mb-1"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      {e.sourceUrl.length > 80 ? e.sourceUrl.slice(0, 77) + "..." : e.sourceUrl}
+const columns: ColumnDef<VerdictRow>[] = [
+  expandToggleColumn(),
+  {
+    accessorKey: "recordType",
+    header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+    cell: ({ row }) => (
+      <span className="text-xs font-medium capitalize">{row.original.recordType}</span>
+    ),
+  },
+  {
+    accessorKey: "entityId",
+    header: ({ column }) => <SortableHeader column={column}>Entity</SortableHeader>,
+    cell: ({ row }) => {
+      const id = row.original.entityId;
+      if (!id) return <span className="text-xs text-muted-foreground">-</span>;
+      return (
+        <span className="text-xs font-mono text-muted-foreground" title={id}>
+          {id.length > 12 ? id.slice(0, 10) + "..." : id}
+        </span>
+      );
+    },
+    filterFn: "includesString",
+  },
+  {
+    accessorKey: "recordId",
+    header: ({ column }) => <SortableHeader column={column}>Record</SortableHeader>,
+    cell: ({ row }) => (
+      <span className="text-xs font-mono text-muted-foreground" title={row.original.recordId}>
+        {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
+      </span>
+    ),
+    filterFn: "includesString",
+  },
+  {
+    accessorKey: "verdict",
+    header: ({ column }) => <SortableHeader column={column}>Verdict</SortableHeader>,
+    cell: ({ row }) => <VerdictBadge verdict={row.original.verdict} />,
+  },
+  {
+    accessorKey: "confidence",
+    header: ({ column }) => <SortableHeader column={column}>Confidence</SortableHeader>,
+    cell: ({ row }) => {
+      const c = row.original.confidence;
+      if (c == null) return <span className="text-xs text-muted-foreground">-</span>;
+      return <span className="text-sm tabular-nums font-medium">{Math.round(c * 100)}%</span>;
+    },
+  },
+  {
+    accessorKey: "reasoning",
+    header: "Reasoning",
+    cell: ({ row }) => {
+      const r = row.original.reasoning;
+      if (!r) return <span className="text-xs text-muted-foreground">-</span>;
+      return (
+        <span className="text-xs text-muted-foreground line-clamp-2 max-w-[300px]" title={r}>
+          {r}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "sourcesChecked",
+    header: ({ column }) => <SortableHeader column={column}>Sources</SortableHeader>,
+    cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.sourcesChecked}</span>,
+  },
+  {
+    accessorKey: "needsRecheck",
+    header: ({ column }) => <SortableHeader column={column}>Recheck</SortableHeader>,
+    cell: ({ row }) =>
+      row.original.needsRecheck ? (
+        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">yes</span>
+      ) : (
+        <span className="text-xs text-muted-foreground">no</span>
+      ),
+  },
+  {
+    accessorKey: "lastComputedAt",
+    header: ({ column }) => <SortableHeader column={column}>Last Checked</SortableHeader>,
+    cell: ({ row }) => {
+      const d = row.original.lastComputedAt;
+      if (!d) return <span className="text-xs text-muted-foreground">-</span>;
+      return <span className="text-xs text-muted-foreground tabular-nums">{new Date(d).toLocaleDateString()}</span>;
+    },
+  },
+];
+
+// ── Expanded evidence detail ───────────────────────────────────────────────
+
+type DetailCache = Record<string, { status: "loading" | "error" | "loaded"; data?: { evidence: EvidenceRow[] }; error?: string }>;
+
+function ExpandedDetail({
+  recordType,
+  recordId,
+  cache,
+  onLoad,
+}: {
+  recordType: string;
+  recordId: string;
+  cache: DetailCache;
+  onLoad: (recordType: string, recordId: string) => void;
+}) {
+  const key = `${recordType}:${recordId}`;
+  const entry = cache[key];
+
+  useEffect(() => {
+    if (!entry) onLoad(recordType, recordId);
+  }, [recordType, recordId, entry, onLoad]);
+
+  if (!entry || entry.status === "loading") {
+    return (
+      <div className="flex items-center gap-2 px-6 py-4 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading evidence...
+      </div>
+    );
+  }
+
+  if (entry.status === "error") {
+    return (
+      <div className="flex items-center gap-3 px-6 py-4 text-sm text-red-500">
+        <span>Failed: {entry.error}</span>
+        <button type="button" onClick={() => onLoad(recordType, recordId)}
+          className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2 py-1 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
+          <RotateCcw className="h-3 w-3" /> Retry
+        </button>
+      </div>
+    );
+  }
+
+  const evidence = entry.data?.evidence ?? [];
+  if (evidence.length === 0) {
+    return <div className="px-6 py-4 text-sm text-muted-foreground">No evidence records found.</div>;
+  }
+
+  return (
+    <div className="px-6 py-4 bg-muted/30">
+      <div className="text-xs font-semibold text-muted-foreground mb-2">
+        Evidence ({evidence.length} source{evidence.length !== 1 ? "s" : ""})
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-border/40 text-left text-muted-foreground">
+              <th className="py-1.5 pr-3 font-medium">Source</th>
+              <th className="py-1.5 pr-3 font-medium">Verdict</th>
+              <th className="py-1.5 pr-3 font-medium">Confidence</th>
+              <th className="py-1.5 pr-3 font-medium">Expected</th>
+              <th className="py-1.5 pr-3 font-medium">Found</th>
+              <th className="py-1.5 pr-3 font-medium">Model</th>
+              <th className="py-1.5 font-medium">Checked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {evidence.map((e) => (
+              <tr key={e.id} className="border-b border-border/20 last:border-0">
+                <td className="py-1.5 pr-3 max-w-[200px]">
+                  {e.sourceUrl ? (
+                    <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline flex items-center gap-1">
+                      <ExternalLink className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{new URL(e.sourceUrl).hostname}</span>
                     </a>
-                  )}
-                  {e.expectedValue && (
-                    <div className="text-xs mt-1">
-                      <span className="text-muted-foreground">Expected: </span>
-                      <span className="font-medium">{e.expectedValue}</span>
-                    </div>
-                  )}
-                  {e.extractedValue && (
-                    <div className="text-xs mt-0.5">
-                      <span className="text-muted-foreground">Found: </span>
-                      <span className="font-medium">{e.extractedValue}</span>
-                    </div>
-                  )}
-                  {e.extractedQuote && (
-                    <blockquote className="text-xs text-muted-foreground mt-1 pl-3 border-l-2 border-border italic line-clamp-3">
-                      {e.extractedQuote}
-                    </blockquote>
-                  )}
-                  {e.notes && (
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{e.notes}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          {verdict.reasoning && (
-            <div className="mt-3 pt-3 border-t border-border/40">
-              <p className="text-xs font-semibold text-muted-foreground mb-1">Aggregate Reasoning</p>
-              <p className="text-xs text-muted-foreground">{verdict.reasoning}</p>
-            </div>
-          )}
-        </div>
-      )}
+                  ) : <span className="text-muted-foreground">-</span>}
+                </td>
+                <td className="py-1.5 pr-3"><VerdictBadge verdict={e.verdict} /></td>
+                <td className="py-1.5 pr-3 tabular-nums">{e.confidence != null ? `${Math.round(e.confidence * 100)}%` : "-"}</td>
+                <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.expectedValue ?? undefined}>
+                  {e.expectedValue || "-"}
+                </td>
+                <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.extractedValue ?? undefined}>
+                  {e.extractedValue || "-"}
+                </td>
+                <td className="py-1.5 pr-3 text-muted-foreground">{e.checkerModel || "-"}</td>
+                <td className="py-1.5 tabular-nums text-muted-foreground">
+                  {e.checkedAt ? new Date(e.checkedAt).toLocaleDateString() : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
-// ── Filter tabs ─────────────────────────────────────────────────────────
+// ── Main viewer ────────────────────────────────────────────────────────────
 
-function FilterTabs({
-  verdicts,
-  activeType,
-  onChangeType,
-  activeVerdict,
-  onChangeVerdict,
-}: {
-  verdicts: VerdictRow[];
-  activeType: string;
-  onChangeType: (t: string) => void;
-  activeVerdict: string;
-  onChangeVerdict: (v: string) => void;
-}) {
+export function EntityVerificationsViewer() {
+  const [verdicts, setVerdicts] = useState<VerdictRow[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [detailCache, setDetailCache] = useState<DetailCache>({});
+
+  // Filter state
+  const [filterType, setFilterType] = useState("all");
+  const [filterVerdict, setFilterVerdict] = useState("all");
+
+  // Load all verdicts on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/entity-verifications-proxy?limit=200");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setVerdicts(data.verdicts ?? []);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
+
+  // Compute filter options from data
   const typeCounts = new Map<string, number>();
   const verdictCounts = new Map<string, number>();
   for (const v of verdicts) {
@@ -356,174 +324,197 @@ function FilterTabs({
     verdictCounts.set(v.verdict, (verdictCounts.get(v.verdict) ?? 0) + 1);
   }
 
-  return (
-    <div className="not-prose space-y-3 mb-4">
-      {/* Record type filter */}
-      <div className="flex gap-1.5 flex-wrap">
-        <button
-          onClick={() => onChangeType("all")}
-          className={cn(
-            "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-            activeType === "all" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"
-          )}
-        >
-          All types ({verdicts.length})
-        </button>
-        {[...typeCounts.entries()].sort(([, a], [, b]) => b - a).map(([type, count]) => (
-          <button
-            key={type}
-            onClick={() => onChangeType(type)}
-            className={cn(
-              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-              activeType === type ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"
-            )}
-          >
-            {type} ({count})
-          </button>
-        ))}
-      </div>
-      {/* Verdict filter */}
-      <div className="flex gap-1.5 flex-wrap">
-        <button
-          onClick={() => onChangeVerdict("all")}
-          className={cn(
-            "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-            activeVerdict === "all" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"
-          )}
-        >
-          All verdicts
-        </button>
-        {[...verdictCounts.entries()].sort(([, a], [, b]) => b - a).map(([v, count]) => {
-          const style = VERDICT_STYLES[v] || VERDICT_STYLES.unchecked;
-          return (
-            <button
-              key={v}
-              onClick={() => onChangeVerdict(v)}
-              className={cn(
-                "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                activeVerdict === v ? `${style.bg} ${style.text}` : "bg-muted text-muted-foreground hover:bg-muted/80"
-              )}
-            >
-              {v} ({count})
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── Main viewer ─────────────────────────────────────────────────────────
-
-export function EntityVerificationsViewer() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const entityParam = searchParams.get("entity") ?? "";
-  const [verdicts, setVerdicts] = useState<VerdictRow[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(false);
-  const [activeType, setActiveType] = useState("all");
-  const [activeVerdict, setActiveVerdict] = useState("all");
-
-  const fetchVerdicts = useCallback(async (entityId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `/api/entity-verifications-proxy?entity_id=${encodeURIComponent(entityId)}`
-      );
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.message ?? `HTTP ${res.status}`);
-      }
-      const data: VerdictsResponse = await res.json();
-      setVerdicts(data.verdicts);
-      setLoaded(true);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Auto-load from URL param on initial mount only
-  useEffect(() => {
-    if (entityParam && !loaded && !isLoading) {
-      fetchVerdicts(entityParam);
-    }
-    // Only run on mount — entityParam changes are handled by handleSearch
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleSearch = (q: string) => {
-    router.push(`?entity=${encodeURIComponent(q)}`, { scroll: false });
-    setActiveType("all");
-    setActiveVerdict("all");
-    fetchVerdicts(q);
-  };
-
   const filtered = verdicts.filter((v) => {
-    if (activeType !== "all" && v.recordType !== activeType) return false;
-    if (activeVerdict !== "all" && v.verdict !== activeVerdict) return false;
+    if (filterType !== "all" && v.recordType !== filterType) return false;
+    if (filterVerdict !== "all" && v.verdict !== filterVerdict) return false;
     return true;
   });
 
+  // Table state
+  const [sorting, setSorting] = useState<SortingState>([{ id: "lastComputedAt", desc: true }]);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 100 });
+
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [globalFilter, filterType, filterVerdict]);
+
+  const table = useReactTable({
+    data: filtered,
+    columns,
+    getRowId: (row) => `${row.recordType}:${row.recordId}:${row.fieldName ?? ""}`,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    onExpandedChange: setExpanded,
+    onPaginationChange: setPagination,
+    globalFilterFn: "includesString",
+    state: { sorting, globalFilter, expanded, pagination },
+  });
+
+  const fetchDetail = useCallback(async (recordType: string, recordId: string) => {
+    const key = `${recordType}:${recordId}`;
+    setDetailCache((prev) => ({ ...prev, [key]: { status: "loading" } }));
+    try {
+      const res = await fetch(`/api/verification-detail?recordType=${encodeURIComponent(recordType)}&recordId=${encodeURIComponent(recordId)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setDetailCache((prev) => ({ ...prev, [key]: { status: "loaded", data: json } }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[entity-verifications] Failed to load evidence for ${key}: ${msg}`);
+      setDetailCache((prev) => ({ ...prev, [key]: { status: "error", error: msg } }));
+    }
+  }, []);
+
+  const filteredCount = table.getFilteredRowModel().rows.length;
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const { pageIndex, pageSize: ps } = table.getState().pagination;
+  const rangeStart = pageIndex * ps + 1;
+  const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
+
+  // Stats
+  const avgConfidence = verdicts.length > 0
+    ? verdicts.reduce((s, v) => s + (v.confidence ?? 0), 0) / verdicts.length : 0;
+  const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading verifications...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-600">
+        Failed to load verifications: {error}
+      </div>
+    );
+  }
+
   return (
     <div className="not-prose">
-      <EntitySearchBar
-        initialQuery={entityParam}
-        onSearch={handleSearch}
-        isLoading={isLoading}
+      {/* Stats cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
+          <p className="text-2xl font-bold tabular-nums">{verdicts.length}</p>
+        </div>
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>
+          <p className="text-2xl font-bold tabular-nums">{avgConfidence > 0 ? `${Math.round(avgConfidence * 100)}%` : "N/A"}</p>
+        </div>
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
+          <p className={cn("text-2xl font-bold tabular-nums", needsRecheck > 0 ? "text-amber-600" : "")}>{needsRecheck}</p>
+        </div>
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Record Types</p>
+          <p className="text-2xl font-bold tabular-nums">{typeCounts.size}</p>
+        </div>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="space-y-3 mb-4">
+        <div className="flex gap-1.5 flex-wrap">
+          <button onClick={() => setFilterType("all")}
+            className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+              filterType === "all" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+            All types ({verdicts.length})
+          </button>
+          {[...typeCounts.entries()].sort(([, a], [, b]) => b - a).map(([type, count]) => (
+            <button key={type} onClick={() => setFilterType(type)}
+              className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                filterType === type ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+              {type} ({count})
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          <button onClick={() => setFilterVerdict("all")}
+            className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+              filterVerdict === "all" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+            All verdicts
+          </button>
+          {[...verdictCounts.entries()].sort(([, a], [, b]) => b - a).map(([v, count]) => {
+            const style = VERDICT_STYLES[v] || VERDICT_STYLES.unchecked;
+            return (
+              <button key={v} onClick={() => setFilterVerdict(v)}
+                className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  filterVerdict === v ? `${style.bg} ${style.text}` : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+                {v} ({count})
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Search + count */}
+      <div className="flex items-center gap-4 mb-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            placeholder="Search verifications..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+          />
+        </div>
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {filteredCount === filtered.length
+            ? `${filtered.length} results`
+            : `${filteredCount} of ${filtered.length} results`}
+        </span>
+      </div>
+
+      {/* Table */}
+      <DataTable
+        table={table}
+        renderExpandedRow={(row) => {
+          if (!row.getIsExpanded()) return null;
+          return (
+            <ExpandedDetail
+              recordType={row.original.recordType}
+              recordId={row.original.recordId}
+              cache={detailCache}
+              onLoad={fetchDetail}
+            />
+          );
+        }}
       />
 
-      {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 mb-6 text-sm text-red-600">
-          {error}
-        </div>
-      )}
-
-      {!loaded && !isLoading && !error && (
-        <div className="text-center py-12 text-muted-foreground">
-          <ShieldCheck className="h-12 w-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Enter an entity identifier above to view its verification status.</p>
-          <p className="text-xs mt-1">Supports entity slugs (anthropic), stableIds, or wikiIds (E42)</p>
-        </div>
-      )}
-
-      {loaded && verdicts.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          <ShieldQuestion className="h-12 w-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">No verification verdicts found for this entity.</p>
-        </div>
-      )}
-
-      {loaded && verdicts.length > 0 && (
-        <>
-          <StatsSummary verdicts={verdicts} />
-          <FilterTabs
-            verdicts={verdicts}
-            activeType={activeType}
-            onChangeType={setActiveType}
-            activeVerdict={activeVerdict}
-            onChangeVerdict={setActiveVerdict}
-          />
-          <div className="space-y-2">
-            {filtered.map((v) => (
-              <VerdictCard
-                key={`${v.recordType}:${v.recordId}:${v.fieldName ?? ""}`}
-                verdict={v}
-              />
-            ))}
+      {/* Pagination */}
+      {pageCount > 1 && (
+        <div className="flex items-center justify-between px-1 mt-4">
+          <span className="text-sm text-muted-foreground">
+            Showing {rangeStart}–{rangeEnd} of {filteredCount}
+          </span>
+          <div className="flex items-center gap-1">
+            <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              <ChevronLeft className="h-3.5 w-3.5" /> Prev
+            </button>
+            <span className="px-2 text-xs text-muted-foreground tabular-nums">{currentPage} / {pageCount}</span>
+            <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}
+              className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              Next <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
-          {filtered.length === 0 && (
-            <p className="text-center text-sm text-muted-foreground py-8">
-              No verdicts match the current filters.
-            </p>
-          )}
-        </>
+        </div>
       )}
+
+      <p className="text-xs text-muted-foreground mt-4">
+        Data from <code className="text-[11px]">verification_verdicts</code> table.
+        Click a row to expand and see per-source evidence.
+      </p>
     </div>
   );
 }

@@ -653,7 +653,7 @@ describe("Entities API", () => {
   // ---- Referential integrity ----
 
   describe("Referential integrity", () => {
-    it("rejects sync with dangling relatedEntries", async () => {
+    it("strips dangling relatedEntries instead of rejecting", async () => {
       const res = await postJson(app, "/api/entities/sync", {
         entities: [
           {
@@ -668,9 +668,10 @@ describe("Entities API", () => {
         ],
       });
 
-      expect(res.status).toBe(400);
+      // Entity should be upserted — dangling refs are stripped, not rejected
+      expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.message).toContain("nonexistent-org");
+      expect(body.upserted).toBe(1);
     });
 
     it("accepts relatedEntries pointing to entities in the same batch", async () => {
