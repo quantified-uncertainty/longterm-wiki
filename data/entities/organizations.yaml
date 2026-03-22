@@ -6396,3 +6396,252 @@
     - ai-safety
     - research
   lastUpdated: 2026-03
+
+# --- AI for Legislation & Regulatory Intelligence ---
+
+- id: fiscalnote
+  stableId: hrCbRXB4rg
+  wikiId: E2006
+  type: organization
+  orgType: startup
+  title: FiscalNote
+  website: https://fiscalnote.com
+  description: >-
+    Publicly traded (NYSE: NOTE) AI-driven policy and regulatory intelligence platform founded
+    by Tim Hwang. Offers AI-powered bill tracking, legislative forecasting (predicting passage
+    likelihood), bill comparison, similar-bill detection, and AI-powered legislative drafting
+    via its PolicyNote product. Covers federal legislation, all 50 US states, and 100+ countries.
+    In 2025, expanded PolicyNote with AI-powered legislative drafting for government affairs
+    professionals.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+    - regulatory-compliance
+  lastUpdated: 2026-03
+
+- id: norm-ai
+  stableId: 92Op4ymvxQ
+  wikiId: E2007
+  type: organization
+  orgType: startup
+  title: Norm AI
+  website: https://norm.ai
+  description: >-
+    AI company founded by John J. Nay (Stanford CodeX affiliate) that converts government
+    regulations and corporate policies into executable computer code via proprietary "Regulatory
+    AI Agents." Regulations are represented as decision trees that become executable programs.
+    Raised over \$140M total from Blackstone, Bain Capital, Coatue, and Craft Ventures. Launched
+    "Norm Law," an AI-native law firm. Clients collectively manage over \$30 trillion in assets.
+  tags:
+    - ai-for-legislation
+    - regulatory-compliance
+    - computational-law
+    - law-as-code
+  lastUpdated: 2026-03
+
+- id: popvox-foundation
+  stableId: RIqV81buCg
+  wikiId: E2008
+  type: organization
+  orgType: generic
+  title: POPVOX Foundation
+  website: https://popvox.org
+  description: >-
+    Leading nonprofit working on AI adoption in the US Congress. Provides free AI training for
+    Congressional offices, published the "AI Field Guide" for Congressional staff, and created
+    starter kits for introducing AI into congressional workflows. Partners with the Foundation
+    for American Innovation. Developed ParlLink, an open-source AI-enabled platform for
+    legislative digitization (Digital Parliaments Project). Led by CEO Marci Harris, a former
+    Congressional staffer. Expanding to state legislatures and African parliaments in 2026.
+  tags:
+    - ai-for-legislation
+    - govtech
+    - congressional-ai
+    - nonprofit
+  lastUpdated: 2026-03
+
+- id: quorum
+  stableId: HMEZGsaP3A
+  wikiId: E2009
+  type: organization
+  orgType: startup
+  title: Quorum
+  website: https://quorum.us
+  description: >-
+    AI-powered public affairs platform offering the "Quorum Copilot" suite for legislative
+    analysis: Copilot Analyze (bill summarization and key insight extraction), Copilot Search
+    (semantic search across bills and hearings), and Copilot Message (generates grassroots
+    outreach variants). AI assistant "Quincy" answers natural-language questions about specific
+    bills. Covers all 50 US states and Congress.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+    - public-affairs
+  lastUpdated: 2026-03
+
+- id: xcential
+  stableId: TCbaQbZwDA
+  wikiId: E2010
+  type: organization
+  orgType: startup
+  title: Xcential
+  website: https://xcential.com
+  description: >-
+    Established leader in legislative drafting software, founded in 2002. Its LegisPro platform
+    is used by the US House of Representatives, the US Government Publishing Office, the
+    California Office of Legislative Counsel, and the UK and Scottish Parliaments. XML-based
+    structured authoring platform supporting USLM, Akoma Ntoso, and LegalDocML standards.
+    Over 25 years of experience in legislative technology. Expanding AI capabilities for
+    legislature clients.
+  tags:
+    - ai-for-legislation
+    - legislative-drafting
+    - govtech
+    - xml-standards
+  lastUpdated: 2026-03
+
+- id: stanford-codex
+  stableId: YqPeeaLCgQ
+  wikiId: E2011
+  type: organization
+  orgType: academic
+  title: Stanford CodeX - Center for Legal Informatics
+  website: https://law.stanford.edu/codex-the-stanford-center-for-legal-informatics/
+  description: >-
+    Joint center between Stanford Law School and the Computer Science department focused on
+    computational law. Key projects include Corpus Legis (library of regulations encoded in
+    computable form), Project CALC (computer-assisted legal compliance for building codes),
+    Computational Antitrust, and Legal Analytics (analysis of 760,000+ federal cases from
+    1790-2024). Published influential research on "Large Language Models as Lobbyists" (by
+    John Nay, who later founded Norm AI). Led by Executive Director Roland Vogl.
+  tags:
+    - ai-for-legislation
+    - computational-law
+    - academic
+    - legal-informatics
+  lastUpdated: 2026-03
+
+- id: legislaide
+  stableId: dy97FfG3Mw
+  wikiId: E2012
+  type: organization
+  orgType: startup
+  title: Legislaide
+  website: https://legislaide.com
+  description: >-
+    AI-powered research and drafting tool specifically for local governments, founded in 2023
+    by Roger Lin. Drafts staff reports, ordinances, and resolutions, claiming to reduce drafting
+    time by 80%+. Maintains a database of 100,000+ municipal ordinances. Focused on the
+    municipal/county level rather than state or federal legislation.
+  tags:
+    - ai-for-legislation
+    - legislative-drafting
+    - govtech
+    - local-government
+  lastUpdated: 2026-03
+
+- id: fastdemocracy
+  stableId: P33feJM86w
+  wikiId: E2013
+  type: organization
+  orgType: startup
+  title: FastDemocracy
+  website: https://fastdemocracy.com
+  description: >-
+    St. Louis-based govtech startup offering AI-powered bill summarization, change detection,
+    and a "chat with bills" feature. Uses patent-pending bill similarity detection algorithms.
+    Covers all 50 US states, Congress, DC, Puerto Rico, and some municipalities. Offers both
+    free and paid tiers, making legislative intelligence accessible to smaller organizations
+    and individual advocates.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+    - civic-tech
+  lastUpdated: 2026-03
+
+- id: plural-policy
+  stableId: 4maty6zh42
+  type: organization
+  orgType: startup
+  title: Plural Policy
+  website: https://pluralpolicy.com
+  description: >-
+    AI-powered bill-tracking and policy intelligence platform founded in 2018 by Damola Ogundipe
+    and Yemi Adewunmi. Provided real-time updates, predictive analytics, and strategic insights
+    on legislation. Clients included Google and NextGen America. Acquired by SAI360 in December
+    2025 to expand AI regulatory intelligence capabilities. Was a Google for Startups Black
+    Founders Fund recipient (2020). Also maintained Open States, an open-source project providing
+    bulk legislative data for all 50 states.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+  lastUpdated: 2026-03
+
+- id: fed10
+  stableId: nZ78007nkv
+  type: organization
+  orgType: startup
+  title: Fed10
+  website: https://fed10.ai
+  description: >-
+    YC-backed (2025) startup describing itself as a "legislative consulting firm staffed by
+    AI agents." Monitors every bill across the US, flags threats to businesses, and delivers
+    actionable insights. Founded by three ex-lobbyists. Very early stage, based in San Francisco.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+  lastUpdated: 2026-03
+
+- id: multistate-ai
+  stableId: 28h0ziLBdl
+  type: organization
+  orgType: startup
+  title: MultiState.ai
+  website: https://multistate.ai
+  description: >-
+    Tracks AI-related and other legislation across all 50 US states in real time using a
+    custom-trained LLM informed by domain experts with decades of experience. As of March
+    2026, tracking 1,561 AI-related bills across 45 states.
+  tags:
+    - ai-for-legislation
+    - legislative-intelligence
+    - govtech
+  lastUpdated: 2026-03
+
+- id: regology
+  stableId: yNOv3B8Ba3
+  type: organization
+  orgType: startup
+  title: Regology
+  website: https://regology.com
+  description: >-
+    AI agents for regulatory research, change management, and compliance workflows. Covers
+    94 million regulatory requirements across millions of sections of law, spanning 25 countries
+    and 1,000+ agencies. Raised \$8M Series A in 2021 led by ACME Capital.
+  tags:
+    - ai-for-legislation
+    - regulatory-compliance
+    - govtech
+  lastUpdated: 2026-03
+
+- id: smu-cclaw
+  stableId: OgEMJXP2sZ
+  type: organization
+  orgType: academic
+  title: SMU Centre for Computational Law
+  website: https://cclaw.smu.edu.sg
+  description: >-
+    Research centre at Singapore Management University funded by a S\$15M grant from the
+    Singapore National Research Foundation. Develops open-source technologies for "smart"
+    contracts and "smart" statutes, including a domain-specific programming language (DSL)
+    for expressing laws in code. Led by Lim How Khang.
+  tags:
+    - computational-law
+    - law-as-code
+    - academic
+  lastUpdated: 2026-03

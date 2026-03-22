@@ -1273,3 +1273,35 @@
     - ai-safety
     - epistemics
   lastUpdated: 2026-02
+
+- id: ai-assisted-legislation
+  stableId: UcJzT3w0Sw
+  wikiId: E2014
+  type: analysis
+  title: AI-Assisted Legislation
+  description: >-
+    Overview of organizations and tools using AI to analyze, draft, and improve
+    legislative processes. Covers commercial legislative intelligence platforms,
+    drafting tools, regulatory AI, congressional adoption, and academic research
+    in computational law.
+  relatedEntries:
+    - id: hrCbRXB4rg
+      type: organization
+    - id: 92Op4ymvxQ
+      type: organization
+    - id: RIqV81buCg
+      type: organization
+    - id: HMEZGsaP3A
+      type: organization
+    - id: TCbaQbZwDA
+      type: organization
+    - id: YqPeeaLCgQ
+      type: organization
+    - id: dy97FfG3Mw
+      type: organization
+    - id: P33feJM86w
+      type: organization
+  clusters:
+    - governance
+    - ai-safety
+  lastUpdated: 2026-03

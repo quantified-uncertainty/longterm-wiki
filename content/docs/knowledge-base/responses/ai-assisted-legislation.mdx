@@ -1,0 +1,96 @@
+---
+wikiId: E2014
+title: AI-Assisted Legislation
+description: Overview of organizations and tools using AI to analyze, draft, and improve legislative processes in the US and internationally.
+subcategory: governance
+lastEdited: 2026-03-22
+update_frequency: 60
+summary: "Emerging field of using AI to improve legislative processes, including bill analysis, legislative drafting, regulatory compliance, and computational law. Most commercial activity focuses on legislative intelligence for lobbyists and compliance teams rather than improving legislation quality directly. Key players include FiscalNote (NYSE: NOTE), Quorum, Norm AI (\\$140M+ raised), and Stanford CodeX. Congress remains cautious, with the House Office of Legislative Counsel warning that LLM-generated bill text often creates unintended legal consequences."
+clusters:
+  - governance
+  - ai-safety
+---
+import {R, EntityLink} from '@components/wiki';
+
+## Overview
+
+AI-assisted legislation refers to the use of artificial intelligence to analyze, draft, review, and improve laws and regulations. While there is significant commercial activity in this space, most of it focuses on **legislative intelligence** (helping lobbyists and compliance teams track and influence bills) rather than **improving legislation quality** directly (helping legislators write better laws).
+
+This is a meaningful distinction. The dominant commercial incentive is to help private interests monitor and influence legislation, not to help governments produce better policy. The organizations and tools that do focus on improving the legislative process itself tend to be nonprofits, academic projects, or government initiatives rather than venture-backed startups.
+
+## Landscape
+
+### Commercial Legislative Intelligence Platforms
+
+The largest category of AI-for-legislation companies provides bill tracking, analysis, and prediction tools primarily for corporate government affairs teams and lobbyists.
+
+**<EntityLink id="E2006" name="fiscalnote">FiscalNote</EntityLink>** (NYSE: NOTE) is the market leader, offering AI-powered bill tracking, legislative passage forecasting, bill comparison, and similar-bill detection across federal, all 50 US states, and 100+ countries. In 2025, it expanded its PolicyNote product with AI-powered legislative drafting capabilities for government affairs professionals.
+
+**<EntityLink id="E2009" name="quorum">Quorum</EntityLink>** offers its "Copilot" suite for public affairs: bill summarization, semantic search across bills and hearings, and automated grassroots outreach generation. Its AI assistant "Quincy" answers natural-language questions about specific bills.
+
+Other notable platforms include **<EntityLink id="E2013" name="fastdemocracy">FastDemocracy</EntityLink>** (AI bill summarization, "chat with bills," patent-pending similarity detection), **<EntityLink id="plural-policy">Plural Policy</EntityLink>** (acquired by SAI360 in December 2025), **<EntityLink id="fed10">Fed10</EntityLink>** (YC 2025, "legislative consulting firm staffed by AI agents"), and **<EntityLink id="multistate-ai">MultiState.ai</EntityLink>** (custom LLM tracking 1,500+ AI bills across 45 states as of March 2026).
+
+### Legislative Drafting Tools
+
+A smaller but potentially more impactful category focuses on the actual drafting of legislation.
+
+**<EntityLink id="E2010" name="xcential">Xcential</EntityLink>** is the established leader in legislative drafting software, founded in 2002. Its LegisPro platform is used by the US House of Representatives, the US Government Publishing Office, the California Office of Legislative Counsel, and the UK and Scottish Parliaments. It uses XML-based structured authoring supporting USLM, Akoma Ntoso, and LegalDocML standards and is now expanding AI capabilities.
+
+**<EntityLink id="E2012" name="legislaide">Legislaide</EntityLink>** targets local governments specifically, offering AI-powered drafting of ordinances, resolutions, and staff reports. It maintains a database of 100,000+ municipal ordinances and claims to reduce drafting time by over 80%.
+
+### Regulatory AI and "Law as Code"
+
+A growing subfield seeks to represent laws and regulations as machine-executable code, enabling automated compliance checking and impact analysis.
+
+**<EntityLink id="E2007" name="norm-ai">Norm AI</EntityLink>**, founded by John J. Nay (a <EntityLink id="E2011" name="stanford-codex">Stanford CodeX</EntityLink> affiliate), converts government regulations into executable programs via "Regulatory AI Agents." The company has raised over \$140M from Blackstone, Bain Capital, and others, and launched "Norm Law," an AI-native law firm.
+
+**<EntityLink id="regology">Regology</EntityLink>** provides AI agents for regulatory research and compliance across 94 million requirements spanning 25 countries.
+
+The **<EntityLink id="smu-cclaw">SMU Centre for Computational Law</EntityLink>** in Singapore, funded by a S\$15M government grant, is developing open-source domain-specific programming languages for expressing laws as executable code.
+
+### Congressional and Government Adoption
+
+Government adoption of AI for legislation is proceeding cautiously, particularly at the federal level.
+
+**<EntityLink id="E2008" name="popvox-foundation">POPVOX Foundation</EntityLink>** is the leading nonprofit promoting AI adoption in Congress, providing free AI training for Congressional offices, an "AI Field Guide" for staff, and ParlLink, an open-source legislative digitization platform. It is expanding to state legislatures in 2026.
+
+The **US House Office of the Clerk** deployed NLP tools in 2022 to compare bill texts and show how proposed legislation would modify existing US Code. The **Congressional Budget Office** has experimented with Microsoft Copilot for legislative analysis.
+
+However, the **House Office of Legislative Counsel** has noted that LLM-produced bill text often fails to achieve the intended policy impact and can create unintended interactions with US Code — a significant warning about naive AI drafting approaches.
+
+**Ohio** has used an AI tool since 2020 for wholesale revision of state administrative law, identifying outdated, conflicting, or redundant content. The state estimates savings of \$44M and 58,000 person-hours over a decade, inspiring Senator Husted's federal "Leveraging Artificial Intelligence to Streamline the Code of Federal Regulations Act of 2025."
+
+### Academic Research
+
+**<EntityLink id="E2011" name="stanford-codex">Stanford CodeX</EntityLink>** (Center for Legal Informatics) is the leading academic center, jointly run by Stanford Law School and Computer Science. Key projects include Corpus Legis (regulations in computable form), Project CALC (computer-assisted legal compliance), and influential research on "Large Language Models as Lobbyists."
+
+Harvard's **Ash Center Allen Lab for Democracy Renovation** develops democracy-supportive technology policies, while the **Berkman Klein Center** conducts AI-and-law research.
+
+### International Comparisons
+
+Some countries have moved faster than the US:
+
+- **United Arab Emirates**: First country to officially use AI as a "co-legislator," combining federal/local laws, court rulings, and government data into one platform, with an estimated 70% acceleration of lawmaking.
+- **Brazil**: The Ulysses System at the Chamber of Deputies provides AI-powered bill classification, similar-bill detection, speech recognition, and citizen opinion analysis (processing 30,000+ public comments per bill). The system is open source.
+- **Albania**: Using AI to align national legislation with EU standards as part of EU accession.
+
+## Key Observations
+
+**Most investment targets monitoring, not improvement.** The commercial incentive is to help companies track legislation that affects them, not to help legislators write better laws. This creates a gap between where the technology is and where it could have the most impact.
+
+**Legislative drafting is harder than it looks.** The US Code is a complex, interconnected system. As the House Office of Legislative Counsel has noted, LLM-generated text can create unintended legal consequences — the same word can have different legal meanings in different sections, and an amendment to one section can have cascading effects across others. Structured approaches (like Xcential's XML-based system) may be more reliable than free-form LLM generation.
+
+**The "law as code" approach is promising but early.** Converting regulations into executable programs (Norm AI, SMU CCLAW) could enable automated impact analysis and consistency checking. This is a more tractable problem than fully automated drafting because it works with existing law rather than generating new text.
+
+**State and local governments are more experimental.** Ohio's admin code review and Legislaide's municipal ordinance drafting show that AI can add value at levels of government with less complex legal frameworks and lower stakes for errors.
+
+**Congressional adoption is constrained by institutional culture.** POPVOX Foundation's work suggests that AI adoption in Congress faces barriers beyond technology: staff turnover, security concerns, and institutional resistance to change.
+
+## Potential AI Safety Relevance
+
+The intersection of AI and legislation matters for AI safety in several ways:
+
+1. **AI regulation quality**: If AI safety legislation (like <EntityLink id="E367" name="us-state-legislation">the 1,000+ state-level AI bills</EntityLink>) is being drafted or analyzed with AI tools, the quality of those tools affects the quality of AI governance.
+2. **Institutional capture risk**: As noted in the wiki's <EntityLink id="E166" name="institutional-capture">institutional capture</EntityLink> analysis, AI policy analysis tools could systematically bias government decisions if they embed particular assumptions about regulatory costs and benefits.
+3. **Legislative capacity**: Congressional staff capacity is a bottleneck for AI safety legislation. AI tools that improve staff productivity could accelerate (or degrade) the quality of AI governance.
+4. **Regulatory compliance verification**: "Law as code" approaches could eventually enable automated verification that AI systems comply with safety regulations, reducing the enforcement gap.
