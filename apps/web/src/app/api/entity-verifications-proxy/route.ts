@@ -4,18 +4,13 @@ import { getWikiServerConfig } from "@lib/wiki-server";
 /**
  * GET /api/entity-verifications-proxy?entity_id=...&record_type=...&limit=...
  *
- * Proxies verification verdict + evidence requests to the wiki-server.
+ * Proxies verification verdict requests to the wiki-server.
+ * entity_id is optional — omit it to fetch all verdicts.
  */
 export async function GET(request: NextRequest) {
   const entityId = request.nextUrl.searchParams.get("entity_id");
-  if (!entityId || !entityId.trim()) {
-    return NextResponse.json(
-      { error: "validation_error", message: "entity_id parameter is required" },
-      { status: 400 }
-    );
-  }
 
-  if (entityId.length > 200 || !/^[\w.\-:]+$/.test(entityId)) {
+  if (entityId && (entityId.length > 200 || !/^[\w.\-:*]+$/.test(entityId))) {
     return NextResponse.json(
       { error: "validation_error", message: "Invalid entity_id" },
       { status: 400 }
@@ -33,7 +28,9 @@ export async function GET(request: NextRequest) {
   try {
     // Forward validated query params to the unified verifications endpoint
     const params = new URLSearchParams();
-    params.set("entity_id", entityId.trim());
+    if (entityId && entityId.trim() && entityId !== "*") {
+      params.set("entity_id", entityId.trim());
+    }
     const rawLimit = parseInt(request.nextUrl.searchParams.get("limit") ?? "200", 10);
     const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 200;
     params.set("limit", String(limit));
