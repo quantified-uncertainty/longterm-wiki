@@ -157,17 +157,17 @@ async function fetchStakeholderThings(): Promise<Map<string, ThingItem>> {
  * Returns true if a matching verification record exists.
  */
 async function hasExistingVerification(
-  thingId: string,
+  recordId: string,
   sourceUrl: string | null,
   fieldName: string
 ): Promise<boolean> {
-  const result = await apiRequest<VerificationsListResponse>(
+  const result = await apiRequest<{ evidence: Array<{ sourceUrl: string | null; fieldName: string | null }> }>(
     "GET",
-    `/api/things/verifications/${encodeURIComponent(thingId)}?limit=50`
+    `/api/verifications/evidence/policy-stakeholder/${encodeURIComponent(recordId)}?limit=50`
   );
   if (!result.ok) return false;
 
-  return result.data.verifications.some(
+  return result.data.evidence.some(
     (v) => v.sourceUrl === sourceUrl && v.fieldName === fieldName
   );
 }
@@ -176,7 +176,7 @@ async function hasExistingVerification(
  * Create a verification record for a stakeholder position.
  */
 async function createVerification(
-  thingId: string,
+  recordId: string,
   sourceUrl: string,
   position: string,
   stakeholderName: string,
@@ -184,9 +184,10 @@ async function createVerification(
 ): Promise<VerificationResponse | null> {
   const result = await apiRequest<VerificationResponse>(
     "POST",
-    "/api/things/verifications",
+    "/api/verifications/evidence",
     {
-      thingId,
+      recordType: "policy-stakeholder",
+      recordId,
       sourceUrl,
       fieldName: "position",
       expectedValue: position,
@@ -198,7 +199,7 @@ async function createVerification(
   );
   if (!result.ok) {
     console.warn(
-      `  Warning: Failed to create verification for ${thingId}: ${result.message}`
+      `  Warning: Failed to create verification for ${recordId}: ${result.message}`
     );
     return null;
   }
@@ -209,7 +210,7 @@ async function createVerification(
  * Create or update the aggregate verdict for a stakeholder.
  */
 async function upsertVerdict(
-  thingId: string,
+  recordId: string,
   verdict: "confirmed" | "unchecked",
   opts: {
     confidence?: number;
@@ -220,9 +221,10 @@ async function upsertVerdict(
 ): Promise<VerdictResponse | null> {
   const result = await apiRequest<VerdictResponse>(
     "POST",
-    "/api/things/verdicts",
+    "/api/verifications/verdicts",
     {
-      thingId,
+      recordType: "policy-stakeholder",
+      recordId,
       verdict,
       confidence: opts.confidence ?? null,
       reasoning: opts.reasoning ?? null,

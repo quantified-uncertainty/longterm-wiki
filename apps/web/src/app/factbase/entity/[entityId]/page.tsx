@@ -36,7 +36,8 @@ import { formatAmount } from "@/lib/directory-utils";
 type VerdictType = "confirmed" | "contradicted" | "unverifiable" | "outdated" | "partial" | "unchecked";
 
 interface VerdictRow {
-  factId: string;
+  recordType: string;
+  recordId: string;
   verdict: string;
   confidence: number | null;
   reasoning: string | null;
@@ -52,13 +53,13 @@ interface VerdictsResponse {
 
 async function fetchEntityVerdicts(entityId: string): Promise<Map<string, VerdictRow>> {
   const data = await fetchFromWikiServer<VerdictsResponse>(
-    `/api/kb-verifications/verdicts?entity_id=${encodeURIComponent(entityId)}&limit=200`,
+    `/api/verifications/verdicts?record_type=fact&entity_id=${encodeURIComponent(entityId)}&limit=200`,
     { revalidate: 300 }
   );
   const map = new Map<string, VerdictRow>();
   if (data) {
     for (const v of data.verdicts) {
-      map.set(v.factId, v);
+      map.set(v.recordId, v);
     }
   }
   return map;

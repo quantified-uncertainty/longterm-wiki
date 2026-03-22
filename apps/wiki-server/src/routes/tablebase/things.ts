@@ -9,11 +9,10 @@ import {
   sql,
   ilike,
   or,
-  isNull,
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, thingResourceVerifications, thingVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import { things, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -40,11 +39,6 @@ const ListQuery = z.object({
   thing_type: z.string().max(50).optional(),
   entity_type: z.string().max(100).optional(),
   parent_id: z.string().max(100).optional(),
-  verdict: z.string().max(50).optional(),
-  has_verdict: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
   sort: z.enum(["title", "updated_at", "created_at", "thing_type"]).default("title"),
   order: z.enum(["asc", "desc"]).default("asc"),
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
@@ -61,35 +55,8 @@ const StatsQuery = z.object({
   parent_id: z.string().max(100).optional(),
 });
 
-// ---- Verification schemas ----
-
-const VerificationQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
-const PostVerificationSchema = z.object({
-  thingId: z.string().min(1).max(200),
-  resourceId: z.string().max(200).optional(),
-  sourceUrl: z.string().max(2048).optional(),
-  fieldName: z.string().max(200).optional(),
-  expectedValue: z.string().max(5000).optional(),
-  verdict: z.enum(["confirmed", "contradicted", "unverifiable", "outdated", "partial"]),
-  confidence: z.number().min(0).max(1).optional(),
-  extractedValue: z.string().max(5000).optional(),
-  checkerModel: z.string().max(100).optional(),
-  isPrimarySource: z.boolean().optional(),
-  notes: z.string().max(10000).optional(),
-});
-
-const PostVerdictSchema = z.object({
-  thingId: z.string().min(1).max(200),
-  verdict: z.enum(["confirmed", "contradicted", "unverifiable", "outdated", "partial", "unchecked"]),
-  confidence: z.number().min(0).max(1).optional(),
-  reasoning: z.string().max(10000).optional(),
-  sourcesChecked: z.number().int().min(0).optional(),
-  needsRecheck: z.boolean().optional(),
-});
+// Verification schemas removed — verification now lives in the unified
+// /api/verifications route. See discussion #2950.
 
 // ---- Raw SQL row types ----
 
@@ -106,9 +73,6 @@ interface ThingSearchRow {
   source_url: string | null;
   wiki_id: string | null;
   parent_title: string | null;
-  verdict: string | null;
-  verdict_confidence: number | null;
-  verdict_at: string | null;
   created_at: string;
   updated_at: string;
   synced_at: string | null;
@@ -131,48 +95,14 @@ function formatThing(t: typeof things.$inferSelect) {
     wikiId: t.wikiId,
     href: thingHref(t),
     parentTitle: t.parentTitle,
-    verdict: t.verdict,
-    verdictConfidence: t.verdictConfidence,
-    verdictAt: t.verdictAt,
     createdAt: t.createdAt,
     updatedAt: t.updatedAt,
     syncedAt: t.syncedAt,
   };
 }
 
-function formatVerification(v: typeof thingResourceVerifications.$inferSelect) {
-  return {
-    id: v.id,
-    thingId: v.thingId,
-    resourceId: v.resourceId,
-    sourceUrl: v.sourceUrl,
-    fieldName: v.fieldName,
-    expectedValue: v.expectedValue,
-    verdict: v.verdict,
-    confidence: v.confidence,
-    extractedValue: v.extractedValue,
-    checkerModel: v.checkerModel,
-    isPrimarySource: v.isPrimarySource,
-    notes: v.notes,
-    checkedAt: v.checkedAt,
-    createdAt: v.createdAt,
-    updatedAt: v.updatedAt,
-  };
-}
-
-function formatVerdict(v: typeof thingVerdicts.$inferSelect) {
-  return {
-    thingId: v.thingId,
-    verdict: v.verdict,
-    confidence: v.confidence,
-    reasoning: v.reasoning,
-    sourcesChecked: v.sourcesChecked,
-    needsRecheck: v.needsRecheck,
-    lastComputedAt: v.lastComputedAt,
-    createdAt: v.createdAt,
-    updatedAt: v.updatedAt,
-  };
-}
+// formatVerification and formatVerdict removed — verification now lives in
+// the unified /api/verifications route. See discussion #2950.
 
 const sortColumns = {
   title: things.title,
@@ -285,7 +215,6 @@ const thingsApp = new Hono()
         `SELECT
           id, thing_type, title, parent_thing_id, source_table, source_id,
           entity_type, description, source_url, wiki_id, parent_title,
-          verdict, verdict_confidence, verdict_at,
           created_at, updated_at, synced_at,
           similarity(title, $1) AS similarity
         FROM things
@@ -318,9 +247,6 @@ const thingsApp = new Hono()
             entityType: r.entity_type,
           }),
           parentTitle: r.parent_title,
-          verdict: r.verdict,
-          verdictConfidence: r.verdict_confidence,
-          verdictAt: r.verdict_at,
           createdAt: r.created_at,
           updatedAt: r.updated_at,
           syncedAt: r.synced_at,
@@ -392,20 +318,6 @@ const thingsApp = new Hono()
       byType[row.thingType] = row.count;
     }
 
-    const byVerdictRows = await db
-      .select({
-        verdict: sql<string>`COALESCE(${things.verdict}, 'unverified')`,
-        count: count(),
-      })
-      .from(things)
-      .where(baseCondition)
-      .groupBy(sql`COALESCE(${things.verdict}, 'unverified')`);
-
-    const byVerdict: Record<string, number> = {};
-    for (const row of byVerdictRows) {
-      byVerdict[row.verdict] = row.count;
-    }
-
     // Count things with entity_type breakdown (entities only)
     const byEntityTypeRows = await db
       .select({
@@ -429,7 +341,6 @@ const thingsApp = new Hono()
     return c.json({
       total,
       byType,
-      byVerdict,
       byEntityType,
     });
   })
@@ -468,176 +379,9 @@ const thingsApp = new Hono()
     });
   })
 
-  // ---- GET /verifications/:thingId ----
-  .get("/verifications/:thingId", zv("query", VerificationQuery), async (c) => {
-    const thingId = c.req.param("thingId");
-    const { limit, offset } = c.req.valid("query");
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select()
-      .from(thingResourceVerifications)
-      .where(eq(thingResourceVerifications.thingId, thingId))
-      .orderBy(desc(thingResourceVerifications.checkedAt))
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(thingResourceVerifications)
-      .where(eq(thingResourceVerifications.thingId, thingId));
-
-    return c.json({
-      verifications: rows.map(formatVerification),
-      total: countResult[0].count,
-      thingId,
-    });
-  })
-
-  // ---- POST /verifications ----
-  .post("/verifications", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = PostVerificationSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const data = parsed.data;
-    const db = getDrizzleDb();
-
-    // Verify the thing exists
-    const thingRows = await db
-      .select({ id: things.id })
-      .from(things)
-      .where(eq(things.id, data.thingId))
-      .limit(1);
-    if (thingRows.length === 0) {
-      return c.json(
-        { error: "not_found", message: `Thing not found: ${data.thingId}` },
-        404
-      );
-    }
-
-    const inserted = await db.transaction(async (tx) => {
-      const [row] = await tx
-        .insert(thingResourceVerifications)
-        .values({
-          thingId: data.thingId,
-          resourceId: data.resourceId ?? null,
-          sourceUrl: data.sourceUrl ?? null,
-          fieldName: data.fieldName ?? null,
-          expectedValue: data.expectedValue ?? null,
-          verdict: data.verdict,
-          confidence: data.confidence ?? null,
-          extractedValue: data.extractedValue ?? null,
-          checkerModel: data.checkerModel ?? null,
-          isPrimarySource: data.isPrimarySource ?? false,
-          notes: data.notes ?? null,
-        })
-        .returning();
-
-      // Auto-flag the aggregate verdict for recheck
-      await tx
-        .update(thingVerdicts)
-        .set({ needsRecheck: true, updatedAt: new Date() })
-        .where(eq(thingVerdicts.thingId, data.thingId));
-
-      return row;
-    });
-
-    return c.json(formatVerification(inserted), 201);
-  })
-
-  // ---- GET /verdicts/:thingId ----
-  .get("/verdicts/:thingId", async (c) => {
-    const thingId = c.req.param("thingId");
-    const db = getDrizzleDb();
-
-    const rows = await db
-      .select()
-      .from(thingVerdicts)
-      .where(eq(thingVerdicts.thingId, thingId))
-      .limit(1);
-
-    if (rows.length === 0) {
-      return c.json(
-        { error: "not_found", message: `No verdict for thing: ${thingId}` },
-        404
-      );
-    }
-
-    return c.json(formatVerdict(rows[0]));
-  })
-
-  // ---- POST /verdicts ----
-  .post("/verdicts", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = PostVerdictSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const data = parsed.data;
-    const db = getDrizzleDb();
-
-    // Verify the thing exists
-    const thingRows = await db
-      .select({ id: things.id })
-      .from(things)
-      .where(eq(things.id, data.thingId))
-      .limit(1);
-    if (thingRows.length === 0) {
-      return c.json(
-        { error: "not_found", message: `Thing not found: ${data.thingId}` },
-        404
-      );
-    }
-
-    const now = new Date();
-
-    const upserted = await db.transaction(async (tx) => {
-      // Upsert the aggregate verdict
-      const [row] = await tx
-        .insert(thingVerdicts)
-        .values({
-          thingId: data.thingId,
-          verdict: data.verdict,
-          confidence: data.confidence ?? null,
-          reasoning: data.reasoning ?? null,
-          sourcesChecked: data.sourcesChecked ?? 0,
-          needsRecheck: data.needsRecheck ?? false,
-          lastComputedAt: now,
-        })
-        .onConflictDoUpdate({
-          target: thingVerdicts.thingId,
-          set: {
-            verdict: sql`excluded.verdict`,
-            confidence: sql`excluded.confidence`,
-            reasoning: sql`excluded.reasoning`,
-            sourcesChecked: sql`excluded.sources_checked`,
-            needsRecheck: sql`excluded.needs_recheck`,
-            lastComputedAt: sql`excluded.last_computed_at`,
-            updatedAt: sql`now()`,
-          },
-        })
-        .returning();
-
-      // Also update the denormalized verdict on the things row
-      await tx
-        .update(things)
-        .set({
-          verdict: data.verdict,
-          verdictConfidence: data.confidence ?? null,
-          verdictAt: now,
-          updatedAt: now,
-        })
-        .where(eq(things.id, data.thingId));
-
-      return row;
-    });
-
-    return c.json(formatVerdict(upserted));
-  })
+  // Verification endpoints (GET/POST /verifications, GET/POST /verdicts) removed.
+  // Verification now lives in the unified /api/verifications route.
+  // See discussion #2950.
 
   // ---- GET /:id ----
   .get("/:id", async (c) => {
@@ -696,8 +440,6 @@ const thingsApp = new Hono()
       thing_type,
       entity_type,
       parent_id,
-      verdict,
-      has_verdict,
       sort,
       order,
       limit,
@@ -709,9 +451,6 @@ const thingsApp = new Hono()
     if (thing_type) conditions.push(eq(things.thingType, thing_type));
     if (entity_type) conditions.push(eq(things.entityType, entity_type));
     if (parent_id) conditions.push(eq(things.parentThingId, parent_id));
-    if (verdict) conditions.push(eq(things.verdict, verdict));
-    if (has_verdict === true) conditions.push(isNotNull(things.verdict));
-    if (has_verdict === false) conditions.push(isNull(things.verdict));
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
@@ -805,9 +544,8 @@ const thingsApp = new Hono()
         .onConflictDoUpdate({
           target: [things.sourceTable, things.sourceId],
           set: {
-            // Do NOT update `id` — it's the PK referenced by thing_verdicts
-            // and thing_resource_verifications FKs. Changing it would cause
-            // constraint violations or cascade-delete verification data.
+            // Do NOT update `id` — it's the PK and may be referenced
+            // by external systems. Changing it would break links.
             thingType: sql`excluded.thing_type`,
             title: sql`excluded.title`,
             parentThingId: sql`excluded.parent_thing_id`,

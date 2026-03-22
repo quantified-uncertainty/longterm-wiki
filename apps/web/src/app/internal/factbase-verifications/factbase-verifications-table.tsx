@@ -15,7 +15,28 @@ import {
 import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import type { VerdictRow, VerdictDetailResult } from "./factbase-verifications-content";
+import type { VerdictRow } from "./factbase-verifications-content";
+
+interface VerdictDetailResult {
+  evidence: Array<{
+    id: number;
+    recordType: string;
+    recordId: string;
+    fieldName: string | null;
+    entityId: string | null;
+    expectedValue: string | null;
+    resourceId: string | null;
+    sourceUrl: string | null;
+    extractedValue: string | null;
+    extractedQuote: string | null;
+    verdict: string;
+    confidence: number | null;
+    isPrimarySource: boolean;
+    checkerModel: string | null;
+    notes: string | null;
+    checkedAt: string | null;
+  }>;
+}
 
 // ── Verdict badge ─────────────────────────────────────────────────────────────
 
@@ -91,20 +112,18 @@ const columns: ColumnDef<VerdictRow>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "factId",
+    accessorKey: "recordId",
     header: ({ column }) => (
-      <SortableHeader column={column}>Fact</SortableHeader>
+      <SortableHeader column={column}>Record</SortableHeader>
     ),
     cell: ({ row }) => {
-      const label = row.original.factLabel;
-      const factId = row.original.factId;
+      const recordId = row.original.recordId;
+      const recordType = row.original.recordType;
       return (
         <div className="flex flex-col gap-0.5">
-          {label && (
-            <span className="text-xs font-medium text-foreground">{label}</span>
-          )}
+          <span className="text-[11px] text-muted-foreground capitalize">{recordType}</span>
           <span className="text-[11px] font-mono text-muted-foreground">
-            {factId}
+            {recordId}
           </span>
         </div>
       );
@@ -237,12 +256,12 @@ function ExpandedVerificationDetail({
     );
   }
 
-  const verifications = entry.data?.verifications ?? [];
+  const evidence = entry.data?.evidence ?? [];
 
-  if (verifications.length === 0) {
+  if (evidence.length === 0) {
     return (
       <div className="px-6 py-4 text-sm text-muted-foreground">
-        No per-resource verifications found for this fact.
+        No verification evidence found for this record.
       </div>
     );
   }
@@ -250,7 +269,7 @@ function ExpandedVerificationDetail({
   return (
     <div className="px-6 py-4 bg-muted/30">
       <div className="text-xs font-semibold text-muted-foreground mb-2">
-        Per-Resource Verifications ({verifications.length})
+        Verification Evidence ({evidence.length})
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
@@ -267,7 +286,7 @@ function ExpandedVerificationDetail({
             </tr>
           </thead>
           <tbody>
-            {verifications.map((v) => (
+            {evidence.map((v) => (
               <tr key={v.id} className="border-b border-border/20 last:border-0">
                 <td className="py-1.5 pr-3 font-mono text-muted-foreground">
                   {v.resourceId}
@@ -351,7 +370,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
   const table = useReactTable({
     data: filtered,
     columns,
-    getRowId: (row) => row.factId,
+    getRowId: (row) => `${row.recordType}:${row.recordId}`,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -381,7 +400,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
 
       try {
         const res = await fetch(
-          `/api/factbase-verdict-detail?factId=${encodeURIComponent(factId)}`
+          `/api/verification-detail?recordType=fact&recordId=${encodeURIComponent(factId)}`
         );
         if (!res.ok) {
           throw new Error(`Server returned ${res.status} ${res.statusText}`);
@@ -467,7 +486,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
           if (!row.getIsExpanded()) return null;
           return (
             <ExpandedVerificationDetail
-              factId={row.original.factId}
+              factId={row.original.recordId}
               cache={detailCache}
               onLoad={fetchDetail}
             />
