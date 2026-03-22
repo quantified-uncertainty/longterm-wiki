@@ -1,0 +1,32 @@
+entity: YPE80Sx2VA
+facts:
+  - id: f_Bm4nT7xR3a
+    property: founded-date
+    value: "2019-03"
+    source: https://news.stanford.edu/stories/2019/03/stanford_university_launches_human-centered_ai
+    notes: "Stanford launched HAI in March 2019"
+
+  - id: f_Dp8gK2sW6b
+    property: headquarters
+    value: "Stanford, California"
+    source: https://hai.stanford.edu/about
+    notes: "Located on the Stanford University campus"
+
+  - id: f_Fq1vL5tN9c
+    property: headcount
+    value: 91
+    asOf: 2025-06
+    source: https://contactout.com/company/stanford-institute-for-human-centered-artificial-hai-3889
+    notes: "Approximately 91 employees including staff, faculty, and fellows"
+
+  - id: f_Jy7dR9wK2e
+    property: website
+    value: "https://hai.stanford.edu/"
+    source: https://hai.stanford.edu/
+    notes: "Official website"
+
+  - id: f_Lz5aH1vB8f
+    property: description
+    value: "Stanford's interdisciplinary institute for human-centered AI research, education, and policy. Co-directed by John Etchemendy and Fei-Fei Li, HAI publishes the annual AI Index Report tracking global AI trends and conducts research across 200+ faculty affiliates from all seven Stanford schools."
+    asOf: 2026-03
+    source: https://hai.stanford.edu/about

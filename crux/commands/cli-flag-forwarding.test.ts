@@ -336,7 +336,7 @@ const CONTENT_SCRIPTS: Record<string, Pick<ScriptConfig, 'passthrough' | 'positi
     passthrough: [
       'ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade',
       'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine',
-      'citation-gate', 'skip-citation-audit', 'citation-audit-model',
+      'citation-gate', 'skip-citation-gate', 'skip-citation-audit', 'citation-audit-model',
       'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume',
       'report-file', 'no-save-artifacts', 'output', 'limit',
     ],
@@ -433,8 +433,8 @@ describe('structural guard — test configs stay in sync with source', () => {
     expect(VALIDATE_SCRIPTS.gate.passthrough).toHaveLength(7);
   });
 
-  it('content improve passthrough has exactly 25 entries', () => {
-    expect(CONTENT_SCRIPTS.improve.passthrough).toHaveLength(25);
+  it('content improve passthrough has exactly 26 entries', () => {
+    expect(CONTENT_SCRIPTS.improve.passthrough).toHaveLength(26);
   });
 
   it('citations verify passthrough has exactly 6 entries', () => {

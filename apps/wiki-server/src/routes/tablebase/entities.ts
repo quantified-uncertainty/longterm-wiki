@@ -19,7 +19,15 @@ import {
   SyncEntitiesBatchSchema,
 } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
-import { buildSearchCondition, parseSort } from "../shared/query-helpers.js";
+import {
+  buildSearchCondition,
+  buildTsvectorSearchCondition,
+  buildTsvectorRankExpr,
+  buildTrigramFallbackCondition,
+  buildTrigramRankExpr,
+  parseSort,
+  TRIGRAM_FALLBACK_THRESHOLD,
+} from "../shared/query-helpers.js";
 
 // ---- Constants ----
 
@@ -204,20 +212,59 @@ const entitiesApp = new Hono()
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q, limit } = c.req.valid("query");
     const db = getDrizzleDb();
-    const pattern = `%${escapeIlike(q)}%`;
 
-    const rows = await db
-      .select()
-      .from(entities)
-      .where(
-        or(
-          ilike(entities.title, pattern),
-          ilike(entities.id, pattern),
-          ilike(entities.description, pattern)
+    const searchVectorExpr = sql.raw("search_vector");
+    const ftsCondition = buildTsvectorSearchCondition(
+      searchVectorExpr,
+      q,
+      [entities.title, entities.id, entities.description],
+    );
+
+    const rankExpr = buildTsvectorRankExpr(
+      searchVectorExpr,
+      entities.title,
+      q,
+    );
+
+    let rows;
+    if (ftsCondition && rankExpr) {
+      // Tsvector search with relevance ranking
+      rows = await db
+        .select()
+        .from(entities)
+        .where(ftsCondition)
+        .orderBy(sql`${rankExpr} DESC`, entities.id)
+        .limit(limit);
+
+      // Trigram fallback if too few results
+      if (rows.length < TRIGRAM_FALLBACK_THRESHOLD) {
+        const trigramCondition = buildTrigramFallbackCondition(entities.title, q);
+        const trigramRows = await db
+          .select()
+          .from(entities)
+          .where(trigramCondition)
+          .orderBy(sql`${buildTrigramRankExpr(entities.title, q)} DESC`, entities.id)
+          .limit(limit);
+        if (trigramRows.length > rows.length) {
+          rows = trigramRows;
+        }
+      }
+    } else {
+      // ILIKE fallback when tsquery cannot be built
+      const pattern = `%${escapeIlike(q)}%`;
+      rows = await db
+        .select()
+        .from(entities)
+        .where(
+          or(
+            ilike(entities.title, pattern),
+            ilike(entities.id, pattern),
+            ilike(entities.description, pattern)
+          )
         )
-      )
-      .orderBy(entities.id)
-      .limit(limit);
+        .orderBy(entities.id)
+        .limit(limit);
+    }
 
     return c.json({
       results: rows.map(formatEntity),
@@ -261,12 +308,26 @@ const entitiesApp = new Hono()
     // Build WHERE — always filter to organization entity type
     const conditions: SQL[] = [eq(entities.entityType, "organization")];
 
+    // Search: prefer tsvector full-text search, fall back to ILIKE + trigram
+    const searchVectorExpr = sql.raw("search_vector");
+    let searchRankExpr: SQL | undefined;
+    let searchMode: "fts" | "trigram" | null = null;
+
     if (q) {
-      const searchCond = buildSearchCondition(
-        [entities.title, entities.id, entities.description],
+      const ftsCondition = buildTsvectorSearchCondition(
+        searchVectorExpr,
         q,
+        [entities.title, entities.id, entities.description],
       );
-      if (searchCond) conditions.push(searchCond);
+      if (ftsCondition) {
+        conditions.push(ftsCondition);
+        searchRankExpr = buildTsvectorRankExpr(
+          searchVectorExpr,
+          entities.title,
+          q,
+        );
+        searchMode = "fts";
+      }
     }
 
     const where = conditions.length === 1 ? conditions[0] : and(...conditions)!;
@@ -319,11 +380,18 @@ const entitiesApp = new Hono()
         ? sql`${sortCol} DESC NULLS LAST`
         : sql`${sortCol} ASC NULLS LAST`;
 
+    // When searching with relevance, override sort with search rank
+    const effectiveOrder = (q && searchRankExpr && (sort === undefined || sort === ""))
+      ? sql`${searchRankExpr} DESC, ${entities.title} ASC`
+      : orderClause;
+
     // Filtered count
-    const [{ total }] = await db
+    const [{ total: ftsTotal }] = await db
       .select({ total: count() })
       .from(entities)
       .where(where);
+
+    let total = ftsTotal;
 
     // Data query with lateral fact subqueries
     interface OrgRow {
@@ -343,7 +411,7 @@ const entitiesApp = new Hono()
       foundedDate: string | null;
     }
 
-    const rows: OrgRow[] = await db
+    let rows: OrgRow[] = await db
       .select({
         id: entities.id,
         wikiId: entities.wikiId,
@@ -362,9 +430,52 @@ const entitiesApp = new Hono()
       })
       .from(entities)
       .where(where)
-      .orderBy(orderClause, entities.id)
+      .orderBy(effectiveOrder, entities.id)
       .limit(limit)
       .offset(offset);
+
+    // Trigram fallback: if FTS returned too few results and we have a search term,
+    // retry with trigram similarity on title for typo tolerance.
+    if (q && total < TRIGRAM_FALLBACK_THRESHOLD && searchMode === "fts") {
+      searchMode = "trigram";
+      const trigramConditions: SQL[] = [
+        eq(entities.entityType, "organization"),
+        buildTrigramFallbackCondition(entities.title, q),
+      ];
+      const trigramWhere = and(...trigramConditions)!;
+      const trigramRank = buildTrigramRankExpr(entities.title, q);
+
+      const [{ total: trigramTotal }] = await db
+        .select({ total: count() })
+        .from(entities)
+        .where(trigramWhere);
+
+      if (trigramTotal > total) {
+        total = trigramTotal;
+        rows = await db
+          .select({
+            id: entities.id,
+            wikiId: entities.wikiId,
+            stableId: entities.stableId,
+            title: entities.title,
+            description: entities.description,
+            website: entities.website,
+            revenueNum: sql<number | null>`${latestFact("revenue")}`,
+            revenueDate: sql<string | null>`${latestFactAsOf("revenue")}`,
+            valuationNum: sql<number | null>`${latestFact("valuation")}`,
+            valuationDate: sql<string | null>`${latestFactAsOf("valuation")}`,
+            headcount: sql<number | null>`${latestFact("headcount")}`,
+            headcountDate: sql<string | null>`${latestFactAsOf("headcount")}`,
+            totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
+            foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
+          })
+          .from(entities)
+          .where(trigramWhere)
+          .orderBy(sql`${trigramRank} DESC`, entities.id)
+          .limit(limit)
+          .offset(offset);
+      }
+    }
 
     return c.json({
       organizations: rows.map((r) => ({
@@ -386,6 +497,7 @@ const entitiesApp = new Hono()
       total,
       limit,
       offset,
+      searchMode,
     });
   })
 

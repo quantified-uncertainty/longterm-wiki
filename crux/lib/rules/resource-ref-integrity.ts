@@ -6,6 +6,7 @@
  */
 
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
+import { RESOURCE_REF_RE } from '../patterns.ts';
 import { loadResourceIdsPGFirst } from '../../resource-io.ts';
 
 // Cache to avoid re-fetching on every file check
@@ -22,9 +23,6 @@ async function getResourceIds(): Promise<Set<string> | null> {
   }
   return resourceIdCache;
 }
-
-/** Regex matching <R id="HEXID"> or <R id='HEXID'> */
-const RESOURCE_REF_RE = /<R\s+id=["']([^"']+)["'][^>]*>/g;
 
 export const resourceRefIntegrityRule = createRule({
   id: 'resource-ref-integrity',

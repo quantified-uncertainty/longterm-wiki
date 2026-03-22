@@ -1,13 +1,14 @@
 /**
  * Citation Audit Phase
  *
- * Post-improve advisory check that verifies each citation in the improved
- * content against its source URL using the citation-auditor module.
+ * Post-improve citation verification gate.
  *
- * Runs after the enrich phase. In advisory mode (default), warnings are
- * logged but --apply is never blocked. In gate mode (--citation-gate), the
- * pipeline aborts --apply when the verified fraction falls below the
- * passThreshold.
+ * Verifies each citation in the improved content against its source URL
+ * using the citation-auditor module.
+ *
+ * Runs after the enrich phase. In gate mode (default), --apply is blocked
+ * when the verified fraction falls below the passThreshold. Use
+ * --skip-citation-gate to run in advisory mode (warnings only).
  *
  * Source cache integration:
  *   When the research phase built a SourceCacheEntry[], it is converted into
@@ -142,7 +143,7 @@ export async function citationAuditPhase(
   } else if (result.pass) {
     log('citation-audit', `\u2713 Citation audit passed`);
   } else {
-    const mode = options.citationGate ? 'GATE' : 'WARNING';
+    const mode = options.citationGate !== false ? 'GATE' : 'WARNING';
     log(
       'citation-audit',
       `\u26A0 [${mode}] Citation audit failed: pass rate below threshold (${verified}/${verified + failed} verified)`,

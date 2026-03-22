@@ -167,7 +167,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Historical grantmaking for criminal justice reform. Program wound down in 2022.",
     programType: "grant-round",
     status: "closed",
-    source: "https://coefficientgiving.org/grants/?q=&focus-area=criminal-justice-reform",
+    source: "https://coefficientgiving.org/grant-publishing-process/",
     notes: "~$200M total grants. 398 grants. Focused on reducing incarceration.",
   },
   {

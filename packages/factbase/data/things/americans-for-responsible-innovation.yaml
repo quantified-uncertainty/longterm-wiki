@@ -1,0 +1,31 @@
+entity: IFjdCevnFg
+facts:
+  - id: f_Jn4rT6xR2a
+    property: founded-date
+    value: "2023"
+    source: https://www.axios.com/2024/03/06/ai-regulation-ari-biden-silicon-valley
+    notes: "Founded in late 2023 by former Congressman Brad Carson and tech entrepreneur Eric Gastfriend"
+
+  - id: f_Lp8gK4sW7b
+    property: headquarters
+    value: "Washington, DC"
+    source: https://www.idealist.org/en/nonprofit/a502e6b55b704230a46f029d6c4fd704-americans-for-responsible-innovation-washington
+    notes: "Headquartered in Washington, DC"
+
+  - id: f_Nq3vL9tN1c
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://ari.us/about-us/
+    notes: "Nonprofit policy advocacy organization"
+
+  - id: f_Pw7cJ2mQ5d
+    property: website
+    value: "https://ari.us/"
+    source: https://ari.us/
+    notes: "Official website"
+
+  - id: f_Ry1dR5wK8e
+    property: description
+    value: "Nonprofit policy advocacy organization focused on helping U.S. policymakers develop governance frameworks for AI and emerging technologies. Founded by former Congressman Brad Carson (President) and tech entrepreneur Eric Gastfriend (Executive Director). Advisory board includes Stanford's Erik Brynjolfsson and former NTIA administrator Diane Rinaldo."
+    asOf: 2026-03
+    source: https://ari.us/about-us/

@@ -84,6 +84,8 @@ import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts'
 import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
 import * as importFundingProgramsCommands from './commands/import-funding-programs.ts';
+import * as importQuriPersonnelCommands from './commands/import-quri-personnel.ts';
+import * as importQuriResourcesCommands from './commands/import-quri-resources.ts';
 import * as peopleCommands from './commands/people.ts';
 import * as orgsCommands from './commands/orgs.ts';
 import * as researchAreasCommands from './commands/research-areas.ts';
@@ -93,12 +95,15 @@ import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-i
 import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as recordsVerifyCommands from './commands/records-verify.ts';
+import * as verifyOrchestrateCommands from './commands/verify-orchestrate.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
 import * as pagesCommands from './commands/pages.ts';
 import * as legislationCommands from './commands/legislation.ts';
+import * as extractStructuredDataCommands from './commands/extract-structured-data.ts';
+import * as verifyConsistencyCommands from './commands/verify-consistency.ts';
 
 const domains = {
   validate: validateCommands,
@@ -147,6 +152,8 @@ const domains = {
   'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,
   'import-funding-programs': importFundingProgramsCommands,
+  'import-quri-personnel': importQuriPersonnelCommands,
+  'import-quri-resources': importQuriResourcesCommands,
   people: peopleCommands,
   orgs: orgsCommands,
   'research-areas': researchAreasCommands,
@@ -156,12 +163,15 @@ const domains = {
   'backfill-pr-outcomes': backfillPrOutcomesCommands,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: recordsVerifyCommands,
+  'verify-orchestrate': verifyOrchestrateCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
   pages: pagesCommands,
   legislation: legislationCommands,
+  'extract-structured-data': extractStructuredDataCommands,
+  'verify-consistency': verifyConsistencyCommands,
 };
 
 const shortcutMap = buildShortcutMap();

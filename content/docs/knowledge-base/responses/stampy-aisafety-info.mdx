@@ -1,13 +1,13 @@
 ---
 wikiId: E382
 title: Stampy / AISafety.info
-description: A collaborative AI safety Q&A wiki and chatbot maintained by a global volunteer team.
+description: A collaborative AI safety Q&A wiki and chatbot maintained by a global volunteer team, premised on concerns about existential risk from advanced AI.
 sidebar:
   order: 6
 subcategory: epistemic-platforms
-lastEdited: 2026-02-02
+lastEdited: 2026-03-21
 update_frequency: 45
-summary: AISafety.info is a volunteer-maintained wiki with 280+ answers on AI existential risk, complemented by Stampy, an LLM chatbot searching 10K-100K alignment documents via RAG. Features include a Discord bot bridging YouTube comments, PageRank-style karma voting for answer quality control, and the Distillation Fellowship program for content creation. Founded by Rob Miles as a 501(c)(3) nonprofit.
+summary: "Detailed reference page for AISafety.info/Stampy, covering technical architecture, team structure, funding status (2024 emergency campaign seeking \\$40K), and community programs like the paused Distillation Fellowship (\\$2,500/month/fellow). Well-structured compilation but adds no original analysis and has limited relevance to prioritization decisions."
 clusters:
   - epistemics
   - community
@@ -17,20 +17,20 @@ import { EntityLink } from '@components/wiki';
 
 ## Quick Assessment
 
-| Dimension | Assessment | Evidence |
-|-----------|------------|----------|
-| **Content Coverage** | Substantial | 280+ live answers, hundreds of drafts |
-| **Data Sources** | Comprehensive | 10K-100K documents from alignment literature |
-| **Accessibility** | High | Free web interface, Discord bot, chatbot |
-| **Community Integration** | Strong | YouTube bridging, karma voting, write-a-thons |
-| **Open Source** | Yes | 10 public GitHub repositories |
-| **Maintenance** | Active | Global volunteer team + paid editor fellowships |
+| Dimension | Value | Notes |
+|-----------|-------|-------|
+| **Content Coverage** | 280+ live answers, hundreds of drafts | As of October 2023 soft launch[^rc-1e20] |
+| **Data Sources** | ≈10,000–100,000 documents | Alignment literature across forums, blogs, and academic sources |
+| **Accessibility** | Free web interface, Discord bot, chatbot | No account required |
+| **Community Integration** | YouTube bridge, karma voting, write-a-thons | Active Discord community |
+| **Open Source** | Yes (MIT license) | 10 public GitHub repositories |
+| **Maintenance** | Volunteer team; Distillation Fellowship paused | Emergency funding sought in 2024[^rc-abcd] |
 
 ## Project Details
 
 | Attribute | Details |
 |-----------|---------|
-| **Name** | AISafety.info (also known as Stampy) |
+| **Name** | <EntityLink id="E382" name="stampy-aisafety-info">Stampy / AISafety.info</EntityLink> |
 | **Organization** | Ashgro Inc (501(c)(3) nonprofit) |
 | **Founder** | Rob Miles |
 | **Website** | [aisafety.info](https://aisafety.info/) |
@@ -43,16 +43,24 @@ import { EntityLink } from '@components/wiki';
 
 [AISafety.info](https://aisafety.info/) is a collaborative Q&A wiki focused on existential risk from artificial intelligence, founded by AI safety educator Rob Miles. The project combines human-written educational content with an LLM-powered chatbot, a Discord bot bridging YouTube and Discord communities, and structured programs for content creation.
 
-The site's core thesis is that "smarter-than-human AI may come soon" and "it could lead to human extinction." Rather than simply asserting these claims, the wiki provides structured explanations, addresses common objections, and offers pathways for further engagement.
+The site is premised on the view that smarter-than-human AI may arrive in the near future and could pose existential risks to humanity. Its content covers these concerns through structured Q&A, addresses common objections, and provides pathways to deeper engagement with AI safety literature and careers. The site's framing reflects the EA/rationalist community's perspective on AI risk, which is one position within broader AI safety discourse.
 
 ### Key Components
 
 | Component | Purpose | Technology |
 |-----------|---------|------------|
 | **Q&A Wiki** | Human-written answers to AI safety questions | Web frontend (Remix/Cloudflare) |
-| **Stampy Chatbot** | LLM-powered answers with citations | RAG pipeline + GPT models |
+| **Stampy Chatbot** | LLM-powered answers with citations | RAG pipeline; supports 24 models across OpenAI, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, Google, and OpenRouter[^rc-e906] |
 | **Discord Bot** | YouTube integration, community moderation | Python, modular architecture |
-| **Alignment Research Dataset** | Curated corpus for chatbot | HuggingFace, 10K-100K documents |
+| **Alignment Research Dataset** | Curated corpus for chatbot | HuggingFace, approximately 10,000–100,000 documents |
+
+## History
+
+The Stampy project originated in September 2020 as a Discord bot for Rob Miles's AI safety community server.[^rc-2527] The bot watched YouTube comments and facilitated community Q&A; its name derives from a "stamp collector" scenario referenced in an early Computerphile video.
+
+The project evolved into a structured content effort with the launch of the Distillation Fellowship, a paid three-month editorial program. Two fellowship cohorts were completed before the website's public debut.[^rc-1e20] The full AISafety.info website soft-launched in October 2023 with 280 live answers and hundreds of additional answers in draft.[^rc-1e20] The soft launch was accompanied by announcements on <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink> and the EA Forum, with a full public launch planned to leverage Rob Miles's YouTube channel audience.
+
+By 2024, the organization disclosed a funding shortfall, describing itself as operating on a "skeleton crew" with monthly burn rate reduced from approximately \$12,000 to \$6,000, and launched an emergency fundraising campaign seeking \$40,000 to sustain operations for three to four months.[^rc-abcd]
 
 ## Content & Statistics
 
@@ -60,7 +68,7 @@ The site's core thesis is that "smarter-than-human AI may come soon" and "it cou
 
 | Metric | Value |
 |--------|-------|
-| **Live Answers** | 280+ |
+| **Live Answers** | 280+ (as of October 2023 soft launch)[^rc-1e20] |
 | **Draft Answers** | Hundreds in development |
 | **Content Updates** | Ongoing community contributions |
 | **Feedback System** | Google Docs integration for comments |
@@ -71,7 +79,7 @@ The chatbot draws from a curated corpus hosted on HuggingFace:
 
 | Metric | Value |
 |--------|-------|
-| **Document Count** | 10,000 - 100,000 |
+| **Document Count** | Approximately 10,000–100,000 (range reflects varied corpus sources) |
 | **Monthly Downloads** | ≈1,600 |
 | **License** | MIT |
 | **Language** | English |
@@ -79,7 +87,7 @@ The chatbot draws from a curated corpus hosted on HuggingFace:
 **Sources include:**
 - Academic: arXiv papers, Arbital
 - Forums: Alignment Forum, <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink>, EA Forum
-- Organizational blogs: <EntityLink id="E202" name="miri">MIRI</EntityLink>, DeepMind, <EntityLink id="E218" name="openai">OpenAI</EntityLink>
+- Organizational blogs: <EntityLink id="E202" name="miri">MIRI</EntityLink>, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>
 - Individual blogs: <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, <EntityLink id="E574" name="gwern">Gwern Branwen</EntityLink>
 - Educational: AGI Safety Fundamentals course
 - Video: YouTube playlists on AI safety
@@ -93,6 +101,8 @@ The chatbot uses Retrieval-Augmented Generation (RAG) with a three-step process:
 1. **Retrieval**: Search the alignment-research-dataset for semantically similar chunks using vector embeddings
 2. **Context Assembly**: Feed relevant text snippets into an LLM's context window
 3. **Generation**: Produce a summary with citations to source documents
+
+**Multi-Model Support**: The stampy-chat codebase supports 24 models across four providers: OpenAI (including <EntityLink id="E1068" name="gpt-4o">GPT-4o</EntityLink>, o1, and o3), Anthropic (including <EntityLink id="E1032" name="claude-3-7-sonnet">Claude 3.7 Sonnet</EntityLink> and <EntityLink id="E1041" name="claude">Claude</EntityLink> Sonnet 4), Google (<EntityLink id="E1084" name="gemini-2-5-flash">Gemini 2.5 Flash</EntityLink> and <EntityLink id="E1083" name="gemini-2-5-pro">Gemini 2.5 Pro</EntityLink>), and OpenRouter.[^rc-e906] The live default model is configured via environment variable and is not publicly documented.
 
 **Dual Response Strategy**: Stampy prioritizes human-written answers from the wiki when available, falling back to AI-generated responses for novel questions. This reduces hallucination risk for common questions while maintaining coverage for the "long tail."
 
@@ -108,7 +118,7 @@ The Discord bot ([StampyAI/stampy](https://github.com/StampyAI/stampy)) has evol
 - Question management (Questions, QuestionSetter)
 - Factoid database
 - Wolfram Alpha integration
-- LLM response generation (GPT-4 whitelist available)
+- LLM response generation (<EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> whitelist available)
 - Alignment Forum search
 
 ### YouTube-Discord Bridge
@@ -129,20 +139,22 @@ A distinctive feature is bidirectional integration with Rob Miles' YouTube chann
 
 ## Repository Ecosystem
 
-Stampy maintains 10 public repositories:
+Stampy maintains 10 public repositories. Star counts are as of March 2025.[^rc-542a]
 
 | Repository | Stars | Purpose |
 |------------|-------|---------|
 | **stampy-ui** | 41 | Web frontend (TypeScript) |
 | **stampy** | 40 | Discord bot (Python) |
+| **alignment-research-dataset** | 23 | Data scraping pipeline (Python) |
 | **stampy-chat** | 15 | Conversational chatbot (TypeScript) |
-| **alignment-research-dataset** | 13 | Data scraping pipeline (Python) |
-| **stampede** | - | Elixir chatbot framework (alpha) |
-| **stampy-nlp** | - | NLP microservices (Python) |
-| **stampy-extension** | - | Browser extension |
-| **GDocsRelatedThings** | - | Google Docs integration |
-| **AISafety.com** | 1 | Issue tracker (54 open issues) |
-| **StampyAIAssets** | - | Logos and branding |
+| **stampede** | 2 | Elixir chatbot framework (alpha; last commit September 2024) |
+| **StampyAIAssets** | 4 | Logos and branding |
+| **stampy-nlp** | — | NLP microservices (Python) |
+| **stampy-extension** | — | Browser extension |
+| **GDocsRelatedThings** | — | Google Docs integration |
+| **AISafety.com** | 2 | Issue tracker (54 open issues) |
+
+The `stampede` Elixir framework, originally designed as a multi-service chatbot backend, had its last commit in September 2024 and remains at alpha status with no releases and no documented stable API.[^rc-542a]
 
 ## Team & Community Programs
 
@@ -159,24 +171,25 @@ Stampy maintains 10 public repositories:
 
 A structured 3-month paid program for content creation:
 
-- **Completed**: Two fellowship cohorts
+- **Completed**: Two fellowship cohorts[^rc-1e20]
+- **Compensation**: \$2,500 per month per fellow[^rc-497f]
 - **Purpose**: Train editors to distill complex AI safety content into accessible answers
 - **Output**: Significant portion of the 280+ live answers
-- **Future**: Additional cohorts planned pending funding
+- **Current Status**: Paused pending funding; the organization disclosed operating at reduced capacity in 2024 with the fellowship identified as a target for resumed funding contingent on a successful fundraising campaign[^rc-abcd]
 
 ### Write-a-thons
 
 Community events for collaborative content creation:
 
 - **Format**: Multi-day focused writing sprints
-- **Example**: October 6-9 write-a-thon (third event)
+- **History**: At least three write-a-thon events have been held
 - **Output**: Batch content creation and answer improvement
 
 ## Use Cases
 
 ### For Newcomers
 
-AISafety.info serves as an accessible entry point for people encountering AI risk arguments for the first time:
+AISafety.info provides structured entry points for people encountering AI risk arguments for the first time. The site's content reflects a particular perspective on AI risk prominent in EA/rationalist communities, and should be understood as one school of thought within broader AI safety discourse.
 
 - Start with basic questions and progress to advanced topics
 - Find responses to specific objections
@@ -210,7 +223,7 @@ While primarily aimed at broader audiences:
 | **Quality control** | PageRank-style voting prevents low-quality YouTube responses |
 | **Community integration** | YouTube bridging creates feedback loop |
 | **Structured programs** | Distillation Fellowship produces consistent content |
-| **Comprehensive dataset** | 10K-100K documents from major alignment sources |
+| **Comprehensive dataset** | ≈10,000–100,000 documents from major alignment sources |
 | **Open source** | All code publicly available, MIT licensed |
 
 ### Limitations
@@ -219,9 +232,10 @@ While primarily aimed at broader audiences:
 |------------|--------|
 | **Chatbot accuracy** | LLM hallucination risk; users must verify sources |
 | **Volunteer capacity** | Development and content dependent on contributor availability |
-| **Opinionated framing** | Presents AI risk case rather than neutral overview |
+| **Opinionated framing** | Content is premised on AI x-risk concerns prominent in EA/rationalist communities; the site presents this framing as well-supported rather than as one position among several in ongoing AI safety debates; observers outside this community may characterize the site as an advocacy and outreach platform rather than a neutral educational resource |
 | **Dataset maintenance** | Ongoing work to clean and update sources |
-| **Single community perspective** | Primarily reflects EA/rationalist community views |
+| **Single community perspective** | Content and editorial choices primarily reflect EA/rationalist community epistemics and philosophical commitments, including longtermism; this shapes which questions are asked and how answers are framed, extending beyond mere community affiliation to substantive editorial stances |
+| **Funding uncertainty** | As of 2024, the organization was operating on reduced capacity and ran an emergency fundraising campaign; Distillation Fellowship paused[^rc-abcd] |
 
 ## Funding & Sustainability
 
@@ -233,6 +247,10 @@ While primarily aimed at broader audiences:
 | **EA Community** | Grants and donations |
 | **<EntityLink id="E547" name="manifund">Manifund</EntityLink>** | Project funding platform |
 | **Volunteer Labor** | Primary development resource |
+
+### Funding Status
+
+As of 2024, the organization disclosed a significant funding shortfall. In public fundraising materials, it described operating on a "skeleton crew" with monthly burn rate reduced from approximately \$12,000 to approximately \$6,000, and sought \$40,000 in emergency funding to sustain operations for three to four months.[^rc-abcd] The fundraising materials identified delivering an improved chatbot and a collaboration video with Rob Miles as immediate commitments, and described the Distillation Fellowship as a target for renewal if the campaign succeeded.
 
 ### Resource Needs
 
@@ -251,3 +269,9 @@ While primarily aimed at broader audiences:
 - [Every.org Donation Page](https://www.every.org/aisafetyinfo)
 - [How Stampy Chatbot Works](https://aisafety.info/questions/NM1R/How-does-the-Stampy-chatbot-work)
 
+[^rc-2527]: [GitHub - StampyAI/stampy](https://github.com/StampyAI/stampy), repository created September 28, 2020.
+[^rc-1e20]: [Stampy's AI Safety Info soft launch](https://www.lesswrong.com/posts/obMiQv9K76nRZj9tE/stampy-s-ai-safety-info-soft-launch), LessWrong / EA Forum, October 2023.
+[^rc-abcd]: [Keep Stampy Alive](https://www.every.org/aisafetyinfo/f/keep-stampy-alive), Every.org, 2024.
+[^rc-e906]: [GitHub - StampyAI/stampy-chat: settings.py](https://github.com/StampyAI/stampy-chat), accessed March 2025.
+[^rc-542a]: [StampyAI GitHub Organization](https://github.com/StampyAI), accessed March 2025.
+[^rc-497f]: [AI Safety Info Distillation Fellowship](https://forum.effectivealtruism.org/posts/4cCRCoYvcLEr7prC2/ai-safety-info-distillation-fellowship), EA Forum, 2023.

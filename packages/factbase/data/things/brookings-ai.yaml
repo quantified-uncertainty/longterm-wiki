@@ -1,0 +1,45 @@
+entity: GrI1ZpreMg
+facts:
+  - id: f_Tc2pW7xR4a
+    property: founded-date
+    value: "1916"
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "Founded in 1916 as the Institute for Government Research; reorganized as Brookings Institution in 1927"
+
+  - id: f_Mk9nH3sL6b
+    property: headquarters
+    value: "Washington, DC"
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "1775 Massachusetts Ave NW, Washington, DC 20036"
+
+  - id: f_Vr5gJ8tQ1c
+    property: headcount
+    value: 350
+    asOf: 2024-06
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "Over 300 experts; total staff approximately 350"
+
+  - id: f_Xn7aK2wF9d
+    property: annual-expenses
+    value: 1e+8
+    asOf: 2024-06
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "Annual operating expenses of approximately $100M in FY2024"
+
+  - id: f_Lq4cN6mY3e
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "Independent nonprofit think tank"
+
+  - id: f_Zw1dR5vB8f
+    property: website
+    value: "https://www.brookings.edu/"
+    source: https://www.brookings.edu/
+    notes: "Official website"
+
+  - id: f_Gj3hS9pE2g
+    property: description
+    value: "One of the oldest and most influential American think tanks. Its Artificial Intelligence and Emerging Technology Initiative conducts interdisciplinary research on AI governance, convenes diverse stakeholders, and publishes policy recommendations on responsible AI development."
+    asOf: 2026-03
+    source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/

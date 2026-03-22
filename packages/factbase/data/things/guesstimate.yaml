@@ -1,0 +1,23 @@
+entity: MlKFIMTdRg
+facts:
+  - id: f_GE1descr01
+    property: description
+    value: >-
+      Web-based spreadsheet for making estimates with probability distributions.
+      Precursor to Squiggle. Features a library of 17,000+ community models.
+    asOf: !date 2026-03
+
+  - id: f_GE2found01
+    property: founded-date
+    value: !date 2016
+    source: https://quantifieduncertainty.org
+
+  - id: f_GE3webst01
+    property: website
+    value: https://www.getguesstimate.com
+
+  - id: f_GE4fndby01
+    property: founded-by
+    value:
+      - !ref 24aX2Ru7Dg
+    notes: Created by Ozzie Gooen in 2016

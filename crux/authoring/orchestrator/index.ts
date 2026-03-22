@@ -28,6 +28,7 @@ import { deployToDestination, validateCrossLinks } from '../creator/deployment.t
 
 import { runOrchestrator, normalizeDollarEscaping } from './orchestrator.ts';
 import { generateCreateScaffold } from './scaffold.ts';
+import { validatePipelineResources } from '../../lib/validation/validate-resource-refs.ts';
 import { CREATE_TIER_BUDGETS, type OrchestratorOptions, type OrchestratorResult, type OrchestratorTier, type CreateTier } from './types.ts';
 
 export type { OrchestratorOptions, OrchestratorResult, OrchestratorTier };
@@ -203,6 +204,17 @@ export async function runOrchestratorPipeline(
   finalContent = repairFrontmatter(finalContent);
   finalContent = stripRelatedPagesSections(finalContent);
   finalContent = normalizeDollarEscaping(finalContent);
+
+  // ── Resource ref validation ─────────────────────────────────────────────
+  try {
+    const resourceValidation = await validatePipelineResources(finalContent, { log });
+    if (resourceValidation.refs.changed) {
+      finalContent = resourceValidation.refs.fixedContent;
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('resource-validation', `Warning: resource ref validation failed (non-blocking): ${error.message}`);
+  }
 
   // ── Write output ───────────────────────────────────────────────────────
 
@@ -415,6 +427,17 @@ export async function runOrchestratorCreate(
   let finalContent = result.finalContent;
   finalContent = repairFrontmatter(finalContent);
   finalContent = stripRelatedPagesSections(finalContent);
+
+  // ── Resource ref validation ─────────────────────────────────────────────
+  try {
+    const resourceValidation = await validatePipelineResources(finalContent, { log });
+    if (resourceValidation.refs.changed) {
+      finalContent = resourceValidation.refs.fixedContent;
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('resource-validation', `Warning: resource ref validation failed (non-blocking): ${error.message}`);
+  }
 
   // ── Write output ───────────────────────────────────────────────────────
 

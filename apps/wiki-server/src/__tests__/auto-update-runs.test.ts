@@ -76,7 +76,6 @@ function resultToSqlRow(r: ResultRow): Record<string, unknown> {
   return {
     id: r.id,
     run_id: r.runId,
-    page_id_old: r.pageId,
     page_id_int: r.pageIdInt,
     status: r.status,
     tier: r.tier,
@@ -158,7 +157,6 @@ const dispatch: SqlDispatcher = (query, params) => {
       const row: ResultRow = {
         id: nextResultId++,
         runId: params[o] as number,
-        pageId: null, // D2a: not written on insert (maps to page_id_old column)
         pageIdInt: pageIdInt,
         pageSlug: pageSlug,
         status: params[o + 2] as string,
@@ -173,8 +171,8 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
-  // Phase D2a: query uses COALESCE + LEFT JOIN wiki_pages. extractColumns finds
-  // "id" for the COALESCE expression, so we remap "id" to the page slug.
+  // Phase D2b: query LEFT JOINs wiki_pages and selects wiki_pages.id for the slug.
+  // extractColumns finds "id" for "wiki_pages"."id".
   if (
     q.includes("auto_update_results") &&
     q.includes("where") &&
@@ -185,9 +183,8 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => runIds.includes(r.runId))
       .map((r) => ({
         run_id: r.runId,
-        // "id" is what extractColumns finds for coalesce(..., "wiki_pages"."id")
-        // D2a COALESCE: page_id_old ?? wiki_pages.id (via int lookup)
-        id: r.pageId ?? slugFromIntId(r.pageIdInt) ?? null,
+        // "id" is what extractColumns finds for "wiki_pages"."id"
+        id: slugFromIntId(r.pageIdInt) ?? null,
         status: r.status,
         tier: r.tier,
         duration_ms: r.durationMs,

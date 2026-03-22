@@ -191,12 +191,30 @@ Output ONLY a JSON object with this structure:
 
 // ── Cost Estimation ─────────────────────────────────────────────────────────
 
-const COST_MAP: Record<string, number> = {
+/**
+ * Estimated per-page cost by tier (sequential execution).
+ *
+ * With prompt caching (automatic): ~15-25% savings on input tokens when running
+ * multiple pages within 5 minutes — the static improvement guidelines are cached.
+ *
+ * With Batch API (--batch flag): 50% discount on all token costs.
+ * Batch costs: polish ~$1.25, standard ~$3.25, deep ~$6.25, budget ~$1.50
+ */
+export const COST_MAP: Record<string, number> = {
   polish: 2.5,
   standard: 6.5,
   deep: 12.5,
   budget: 3,
   premium: 10,
+};
+
+/** Batch API costs: 50% discount on all token costs. */
+export const BATCH_COST_MAP: Record<string, number> = {
+  polish: 1.25,
+  standard: 3.25,
+  deep: 6.25,
+  budget: 1.5,
+  premium: 5,
 };
 
 // ── Routing Helpers (exported for testing) ───────────────────────────────────

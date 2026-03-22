@@ -24,6 +24,11 @@ import { recordVerificationsRoute } from "./routes/tablebase/record-verification
 import { thingsRoute } from "./routes/tablebase/things.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
+import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
+import { entityAssessmentsRoute } from "./routes/tablebase/entity-assessments.js";
+import { publicationsRoute } from "./routes/tablebase/publications.js";
+import { websiteSourcesRoute } from "./routes/tablebase/website-sources.js";
+import { entityRecommendedResourcesRoute } from "./routes/tablebase/entity-recommended-resources.js";
 import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
 
 // FactBase routes — structured triples with temporal data
@@ -191,6 +196,11 @@ export function createApp() {
   app.route("/api/things", thingsRoute);
   app.route("/api/research-areas", researchAreasRoute);
   app.route("/api/policy-stakeholders", policyStakeholdersRoute);
+  app.route("/api/entity-events", entityEventsRoute);
+  app.route("/api/entity-assessments", entityAssessmentsRoute);
+  app.route("/api/publications", publicationsRoute);
+  app.route("/api/website-sources", websiteSourcesRoute);
+  app.route("/api/entity-recommended-resources", entityRecommendedResourcesRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);

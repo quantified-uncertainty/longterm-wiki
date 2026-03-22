@@ -1,0 +1,34 @@
+entity: 24aX2Ru7Dg
+facts:
+  - id: f_OG1descr01
+    property: description
+    value: >-
+      Founder and Executive Director of QURI (Quantified Uncertainty Research
+      Institute). Created Guesstimate (2016) and leads development of Squiggle,
+      a probabilistic programming language for estimation. Previously worked at
+      the Future of Humanity Institute at Oxford.
+    asOf: !date 2026-03
+
+  - id: f_OG2emplyd1
+    property: employed-by
+    value: !ref Khej79OA8g
+    asOf: !date 2026-03
+    notes: Founder and Executive Director of QURI since 2019
+
+  - id: f_OG3role001
+    property: role
+    value: "Founder & Executive Director"
+    asOf: !date 2026-03
+
+  - id: f_OG4educa01
+    property: education
+    value: "Harvey Mudd College"
+
+  - id: f_OG5notab01
+    property: notable-for
+    value: "Founded QURI; created Guesstimate (2016); leads Squiggle development; FHI background"
+    asOf: !date 2026-03
+
+  - id: f_OG6githb01
+    property: github-profile
+    value: "https://github.com/OAGr"

@@ -76,6 +76,50 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
+  // --- entities: tsvector full-text search (has to_tsquery + @@) ---
+  // MUST come before ILIKE and OR checks since tsvector queries may also contain those
+  if (q.includes('"entities"') && q.includes("to_tsquery")) {
+    // The tsquery param is like "anthropic:*" or "AI:* & align:*"
+    const tsqueryParam = params.find((p) => typeof p === "string" && (p as string).includes(":*")) as string | undefined;
+    const limitParam = params.find((p) => typeof p === "number") as number | undefined;
+    const limit = limitParam ?? 20;
+    if (tsqueryParam) {
+      // Parse tsquery words: "word1:* & word2:*" → ["word1", "word2"]
+      const words = tsqueryParam
+        .split("&")
+        .map((w) => w.replace(/:.*$/, "").trim().toLowerCase())
+        .filter(Boolean);
+      const results: Record<string, unknown>[] = [];
+      for (const row of entitiesStore.values()) {
+        const title = (row.title as string || "").toLowerCase();
+        const id = (row.id as string || "").toLowerCase();
+        const desc = (row.description as string || "").toLowerCase();
+        const text = `${title} ${id} ${desc}`;
+        // All words must match (AND semantics, like tsquery)
+        if (words.every((w) => text.includes(w))) {
+          results.push(row);
+        }
+      }
+      return results.slice(0, limit);
+    }
+    return [];
+  }
+
+  // --- entities: trigram similarity search (has similarity()) ---
+  if (q.includes('"entities"') && q.includes("similarity")) {
+    const searchTerm = (params.find((p) => typeof p === "string") as string || "").toLowerCase();
+    const limitParam = params.find((p) => typeof p === "number") as number | undefined;
+    const limit = limitParam ?? 20;
+    const results: Record<string, unknown>[] = [];
+    for (const row of entitiesStore.values()) {
+      const title = (row.title as string || "").toLowerCase();
+      if (title.includes(searchTerm) || searchTerm.includes(title)) {
+        results.push(row);
+      }
+    }
+    return results.slice(0, limit);
+  }
+
   // --- entities: ILIKE search (has ilike + order by + limit) ---
   // MUST come before the OR check since ILIKE queries also contain 'or'
   if (q.includes('"entities"') && q.includes("ilike")) {
@@ -490,7 +534,11 @@ describe("Entities API", () => {
       expect(body.results).toHaveLength(0);
     });
 
-    // ---- SQL metacharacter escaping ----
+    // ---- Special character handling in search ----
+    // Search now uses tsvector FTS first (buildPrefixTsquery strips special chars),
+    // falling back to ILIKE only when tsquery cannot be built. These tests verify
+    // that special characters in user input do not cause errors and that the
+    // tsquery parameter is properly sanitized.
 
     it("escapes % in search query so it is treated as a literal character", async () => {
       await seedEntity(app, "test-percent", "100% Safe AI");
@@ -501,13 +549,16 @@ describe("Entities API", () => {
       );
       expect(res.status).toBe(200);
 
-      // Verify the ILIKE parameter escapes % as \%
-      const ilikeCall = dispatchCalls.find((c) =>
-        c.query.toLowerCase().includes("ilike")
+      // buildPrefixTsquery("100 %") strips % → "100:*", so tsvector is used
+      const tsqueryCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("to_tsquery")
       );
-      expect(ilikeCall).toBeDefined();
-      // The pattern should be %100\%% — wrapping wildcards around the escaped literal
-      expect(ilikeCall!.params[0]).toBe("%100\\%%");
+      expect(tsqueryCall).toBeDefined();
+      // The tsquery param should contain "100:*" with % stripped
+      const tsqParam = tsqueryCall!.params.find(
+        (p) => typeof p === "string" && (p as string).includes(":*")
+      ) as string;
+      expect(tsqParam).toBe("100:*");
     });
 
     it("escapes _ in search query so it is treated as a literal character", async () => {
@@ -519,13 +570,15 @@ describe("Entities API", () => {
       );
       expect(res.status).toBe(200);
 
-      // Verify the ILIKE parameter escapes _ as \_
-      const ilikeCall = dispatchCalls.find((c) =>
-        c.query.toLowerCase().includes("ilike")
+      // buildPrefixTsquery("my_var") strips _ → "my:* & var:*"
+      const tsqueryCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("to_tsquery")
       );
-      expect(ilikeCall).toBeDefined();
-      // The pattern should be %my\_var% — wrapping wildcards around the escaped literal
-      expect(ilikeCall!.params[0]).toBe("%my\\_var%");
+      expect(tsqueryCall).toBeDefined();
+      const tsqParam = tsqueryCall!.params.find(
+        (p) => typeof p === "string" && (p as string).includes(":*")
+      ) as string;
+      expect(tsqParam).toBe("my:* & var:*");
     });
 
     it("escapes \\ in search query so it does not act as an escape character", async () => {
@@ -537,13 +590,15 @@ describe("Entities API", () => {
       );
       expect(res.status).toBe(200);
 
-      // Verify the ILIKE parameter escapes \ as \\
-      const ilikeCall = dispatchCalls.find((c) =>
-        c.query.toLowerCase().includes("ilike")
+      // buildPrefixTsquery("C:\\Users") strips \\ → "C:* & Users:*"
+      const tsqueryCall = dispatchCalls.find((c) =>
+        c.query.toLowerCase().includes("to_tsquery")
       );
-      expect(ilikeCall).toBeDefined();
-      // The pattern should be %C:\\Users% — wrapping wildcards around the escaped literal
-      expect(ilikeCall!.params[0]).toBe("%C:\\\\Users%");
+      expect(tsqueryCall).toBeDefined();
+      const tsqParam = tsqueryCall!.params.find(
+        (p) => typeof p === "string" && (p as string).includes(":*")
+      ) as string;
+      expect(tsqParam).toBe("C:* & Users:*");
     });
   });
 

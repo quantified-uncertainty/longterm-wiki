@@ -45,8 +45,6 @@ export const citationQuotes = pgTable(
   "citation_quotes",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int")
       .notNull()
       .references(() => wikiPages.integerIdCol),
@@ -84,13 +82,10 @@ export const citationQuotes = pgTable(
       .defaultNow(),
   },
   (table) => [
-    // Legacy unique index on (page_id_old, footnote) still exists in DB for old rows.
-    // New unique index on (page_id_int, footnote) used for ON CONFLICT (created by phase-d2a-citations-predeploy.sql).
     uniqueIndex("citation_quotes_page_id_int_footnote_unique").on(
       table.pageIdInt,
       table.footnote
     ),
-    index("idx_cq_page_id").on(table.pageId),
     index("idx_cq_page_id_int").on(table.pageIdInt),
     index("idx_cq_url").on(table.url),
     index("idx_cq_verified").on(table.quoteVerified),
@@ -215,9 +210,7 @@ export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     totalCitations: integer("total_citations").notNull(),
     checkedCitations: integer("checked_citations").notNull(),
     accurateCount: integer("accurate_count").notNull().default(0),
@@ -231,7 +224,6 @@ export const citationAccuracySnapshots = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_cas_page_id").on(table.pageId),
     index("idx_cas_page_id_int").on(table.pageIdInt),
     index("idx_cas_snapshot_at").on(table.snapshotAt),
   ]
@@ -241,9 +233,7 @@ export const editLogs = pgTable(
   "edit_logs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     date: date("date").notNull(),
     tool: text("tool").notNull(),
     agency: text("agency").notNull(),
@@ -254,7 +244,6 @@ export const editLogs = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_el_page_id").on(table.pageId),
     index("idx_el_page_id_int").on(table.pageIdInt),
     index("idx_el_date").on(table.date),
     index("idx_el_tool").on(table.tool),
@@ -265,9 +254,7 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     score: integer("score").notNull(),
     level: text("level").notNull(), // 'low' | 'medium' | 'high'
     factors: jsonb("factors").$type<string[]>(),
@@ -277,7 +264,6 @@ export const hallucinationRiskSnapshots = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_hrs_page_id").on(table.pageId),
     index("idx_hrs_page_id_int").on(table.pageIdInt),
     index("idx_hrs_computed_at").on(table.computedAt),
     index("idx_hrs_level").on(table.level),
@@ -320,14 +306,12 @@ export const sessionPages = pgTable(
     sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old")
+    pageIdInt: integer("page_id_int")
       .notNull()
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+      .references(() => wikiPages.integerIdCol),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.pageId] }),
-    index("idx_sp_page_id").on(table.pageId),
+    primaryKey({ columns: [table.sessionId, table.pageIdInt] }),
     index("idx_sp_page_id_int").on(table.pageIdInt),
   ]
 );
@@ -370,9 +354,7 @@ export const autoUpdateResults = pgTable(
     runId: bigint("run_id", { mode: "number" })
       .notNull()
       .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     status: text("status").notNull(),
     tier: text("tier"),
     durationMs: integer("duration_ms"),
@@ -380,7 +362,7 @@ export const autoUpdateResults = pgTable(
   },
   (table) => [
     index("idx_aures_run_id").on(table.runId),
-    index("idx_aures_page_id").on(table.pageId),
+    index("idx_aures_page_id_int").on(table.pageIdInt),
     index("idx_aures_status").on(table.status),
   ]
 );
@@ -573,9 +555,7 @@ export const claimPageReferences = pgTable(
     claimId: bigint("claim_id", { mode: "number" })
       .notNull()
       .references(() => claims.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     footnote: integer("footnote"),
     section: text("section"),
     // --- Phase 3 fields (migration 0033) ---
@@ -587,17 +567,7 @@ export const claimPageReferences = pgTable(
   },
   (table) => [
     index("idx_cpr_claim_id").on(table.claimId),
-    index("idx_cpr_page_id").on(table.pageId),
-    // The real unique constraint is a COALESCE-based expression index in
-    // migration 0031_unify_claims_citations.sql:
-    //   CREATE UNIQUE INDEX idx_cpr_claim_page_footnote
-    //     ON claim_page_references (claim_id, page_id, COALESCE(footnote, -1));
-    // Drizzle doesn't support expression indexes, so we declare a plain
-    // index here for query-planning awareness only.
-    index("idx_cpr_claim_page_footnote").on(
-      table.claimId,
-      table.pageId,
-    ),
+    index("idx_cpr_page_id_int").on(table.pageIdInt),
   ]
 );
 
@@ -647,6 +617,8 @@ export const resources = pgTable(
     enrichmentDate: timestamp("enrichment_date", { withTimezone: true }),
     /** Computed composite importance score 0-1 */
     importanceScore: real("importance_score"),
+    /** How content behaves over time: immutable | versioned | evergreen | ephemeral */
+    contentLifecycle: text("content_lifecycle"),
     // search_vector tsvector column is managed via raw SQL migration
     // (Drizzle doesn't have native tsvector support)
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -666,6 +638,7 @@ export const resources = pgTable(
     index("idx_res_publisher_entity_id").on(table.publisherEntityId),
     index("idx_res_resource_purpose").on(table.resourcePurpose),
     index("idx_res_resource_subtype").on(table.resourceSubtype),
+    index("idx_res_content_lifecycle").on(table.contentLifecycle),
     // GIN indexes on tags, authors, related_entity_ids, and search_vector
     // are created in migration SQL (Drizzle doesn't support GIN index declarations)
   ]
@@ -677,8 +650,6 @@ export const resourceCitations = pgTable(
     resourceId: text("resource_id")
       .notNull()
       .references(() => resources.id, { onDelete: "cascade" }),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
     pageIdInt: integer("page_id_int")
       .notNull()
       .references(() => wikiPages.integerIdCol),
@@ -688,7 +659,6 @@ export const resourceCitations = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.resourceId, table.pageIdInt] }),
-    index("idx_rc_page_id").on(table.pageId),
     index("idx_rc_page_id_int").on(table.pageIdInt),
   ]
 );
@@ -809,11 +779,14 @@ export const entities = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // search_vector tsvector column is managed via raw SQL migration 0120
+    // (Drizzle doesn't have native tsvector support)
   },
   (table) => [
     index("idx_ent_wiki_id").on(table.wikiId),
     index("idx_ent_entity_type").on(table.entityType),
     index("idx_ent_title").on(table.title),
+    // GIN index on search_vector + trigram index on title created in migration SQL
   ]
 );
 
@@ -885,10 +858,8 @@ export const pageLinks = pgTable(
   "page_links",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    sourceId: text("source_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
-    targetId: text("target_id_old"), // Phase D2a: no longer written; nullable pending D2b DROP
-    sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
-    targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    sourceIdInt: integer("source_id_int").references(() => wikiPages.integerIdCol),
+    targetIdInt: integer("target_id_int").references(() => wikiPages.integerIdCol),
     linkType: text("link_type").notNull(), // 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag'
     relationship: text("relationship"), // e.g. 'causes', 'mitigates' — only for yaml_related
     weight: real("weight").notNull().default(1.0),
@@ -897,13 +868,13 @@ export const pageLinks = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("idx_pl_source_target_type").on(
-      table.sourceId,
-      table.targetId,
+    uniqueIndex("idx_pl_source_target_type_int").on(
+      table.sourceIdInt,
+      table.targetIdInt,
       table.linkType
     ),
-    index("idx_pl_source_id").on(table.sourceId),
-    index("idx_pl_target_id").on(table.targetId),
+    index("idx_pl_source_id_int").on(table.sourceIdInt),
+    index("idx_pl_target_id_int").on(table.targetIdInt),
     index("idx_pl_link_type").on(table.linkType),
   ]
 );
@@ -1005,10 +976,7 @@ export const autoUpdateNewsItems = pgTable(
     relevanceScore: integer("relevance_score"),
     topicsJson: jsonb("topics_json").$type<string[]>(),
     entitiesJson: jsonb("entities_json").$type<string[]>(),
-    routedToPageId: text("routed_to_page_id_old").references(() => wikiPages.id, {
-      onDelete: "set null",
-    }),
-    routedToPageIdInt: integer("routed_to_page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    routedToPageIdInt: integer("routed_to_page_id_int").references(() => wikiPages.integerIdCol),
     routedToPageTitle: text("routed_to_page_title"),
     routedTier: text("routed_tier"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -1019,7 +987,6 @@ export const autoUpdateNewsItems = pgTable(
     index("idx_auni_run_id").on(table.runId),
     index("idx_auni_source_id").on(table.sourceId),
     index("idx_auni_relevance").on(table.relevanceScore),
-    index("idx_auni_routed_page").on(table.routedToPageId),
     index("idx_auni_routed_page_id_int").on(table.routedToPageIdInt),
     index("idx_auni_published_at").on(table.publishedAt),
   ]
@@ -1043,9 +1010,7 @@ export const pageImproveRuns = pgTable(
   "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id, { onDelete: "cascade" }),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     engine: text("engine").notNull(), // 'v1' | 'v2'
     tier: text("tier").notNull(), // 'polish' | 'standard' | 'deep'
     directions: text("directions"),
@@ -1083,10 +1048,10 @@ export const pageImproveRuns = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_pir_page_id").on(table.pageId),
+    index("idx_pir_page_id_int").on(table.pageIdInt),
     index("idx_pir_engine").on(table.engine),
     index("idx_pir_started_at").on(table.startedAt),
-    index("idx_pir_page_started").on(table.pageId, table.startedAt),
+    index("idx_pir_page_started_int").on(table.pageIdInt, table.startedAt),
   ]
 );
 
@@ -1484,9 +1449,7 @@ export const pageCitations = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     referenceId: varchar("reference_id").notNull().unique(),
-    pageId: text("page_id_old") // Phase D2a: no longer written; nullable pending D2b DROP
-      .references(() => wikiPages.id),
-    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol), // Phase 4a: integer PK migration (#1498)
+    pageIdInt: integer("page_id_int").references(() => wikiPages.integerIdCol),
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
@@ -1496,7 +1459,7 @@ export const pageCitations = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
-    index("idx_pc_page_id").on(table.pageId),
+    index("idx_pc_page_id_int").on(table.pageIdInt),
     index("idx_pc_reference_id").on(table.referenceId),
   ]
 );
@@ -2120,6 +2083,168 @@ export const recordVerdicts = pgTable(
   ]
 );
 
+// ── Entity Events (Timeline / Milestones) ────────────────────────────
+//
+// Generic event/milestone table for any entity type. Replaces inline
+// timeline tables in wiki pages and can eventually subsume the YAML-based
+// milestone arrays used by legislation pages.
+//
+// Design: one event per row, linked to an entity. Event types are
+// parameterized (not hardcoded to policy labels), so the same table
+// serves organizations, people, legislation, projects, etc.
+
+/**
+ * Entity events — milestones, announcements, incidents, transitions.
+ *
+ * Each row is a single dated event associated with one entity.
+ * Rendered by timeline components on directory pages.
+ */
+export const entityEvents = pgTable(
+  "entity_events",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the parent entity */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback when entity is unresolved */
+    entityDisplayName: text("entity_display_name"),
+    date: text("date").notNull(), // YYYY, YYYY-MM, or YYYY-MM-DD
+    title: text("title").notNull(),
+    description: text("description"),
+    /** Event type — generic across entity types */
+    eventType: text("event_type").notNull(), // founding | acquisition | pivot | launch | publication | policy | milestone | leadership-change | incident | funding | dissolution | other
+    /** Significance level for filtering/sorting */
+    significance: text("significance"), // major | moderate | minor
+    source: text("source"), // URL to source
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ee_entity").on(table.entityId),
+    index("idx_ee_date").on(table.date),
+    index("idx_ee_type").on(table.eventType),
+    index("idx_ee_significance").on(table.significance),
+  ]
+);
+
+// ── Entity Assessments ──────────────────────────────────────────────
+//
+// Structured quality/capability ratings for entities. Replaces the
+// "Quick Assessment" tables currently embedded in wiki pages.
+// Each row is a single dimension rating for one entity.
+
+/**
+ * Entity assessments — structured ratings along named dimensions.
+ *
+ * Examples: "speed: Fast (<1 week)", "transparency: High",
+ * "research output: Declining", "financial health: Stable".
+ */
+export const entityAssessments = pgTable(
+  "entity_assessments",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Dimension being assessed (e.g., 'speed', 'transparency', 'research-output') */
+    dimension: text("dimension").notNull(),
+    /** Rating value — free text to support varied scales */
+    rating: text("rating").notNull(), // e.g., "Fast (<1 week)", "High", "Declining"
+    /** Supporting evidence or explanation */
+    evidence: text("evidence"),
+    /** Who/what produced this assessment */
+    assessor: text("assessor").notNull().default("editorial"), // editorial | llm | community | external
+    /** When this assessment was made (YYYY-MM-DD) */
+    assessedAt: text("assessed_at"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ea_entity").on(table.entityId),
+    index("idx_ea_dimension").on(table.dimension),
+    // Natural key: one rating per entity per dimension per assessor
+    uniqueIndex("uq_entity_assessment_natural_key")
+      .on(table.entityId, table.dimension, table.assessor),
+  ]
+);
+
+// ── Publications ────────────────────────────────────────────────────
+//
+// Key publications (papers, reports, blog posts) associated with entities.
+// Complements research_area_papers (which links papers to research areas)
+// by linking papers directly to organizations and people.
+
+/**
+ * Publications — papers, reports, and blog posts linked to entities.
+ *
+ * Each row is a publication associated with an organization or person.
+ * Can link to the resources table when the publication is also tracked
+ * as a citation source.
+ */
+export const publications = pgTable(
+  "publications",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the primary author/org */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback */
+    entityDisplayName: text("entity_display_name"),
+    /** Optional FK to resources table for citation tracking */
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    authors: text("authors"), // comma-separated or structured
+    url: text("url"),
+    venue: text("venue"), // journal, conference, arXiv, blog
+    publishedDate: text("published_date"), // YYYY or YYYY-MM
+    publicationType: text("publication_type").notNull().default("paper"), // paper | report | blog-post | book | thesis | preprint | policy-brief
+    citationCount: integer("citation_count"),
+    /** Whether this is a flagship/seminal work for the entity */
+    isFlagship: boolean("is_flagship").notNull().default(false),
+    abstract: text("abstract"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pub_entity").on(table.entityId),
+    index("idx_pub_resource").on(table.resourceId),
+    index("idx_pub_type").on(table.publicationType),
+    index("idx_pub_date").on(table.publishedDate),
+    index("idx_pub_flagship").on(table.isFlagship),
+  ]
+);
+
 // ── Cross-Base: Unified Things Table ──────────────────────────────────
 //
 // Every identifiable item in the system gets a single row here. Enables
@@ -2146,6 +2271,9 @@ export const VALID_THING_TYPES = [
   "division-personnel",
   "research-area",
   "policy-stakeholder",
+  "entity-event",
+  "entity-assessment",
+  "publication",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -2434,6 +2562,43 @@ export const researchAreaRisks = pgTable(
 );
 
 /**
+ * Recommended resources for any entity (books, papers, videos, blog posts).
+ * General-purpose — any entity can have a reading list.
+ */
+export const entityRecommendedResources = pgTable(
+  "entity_recommended_resources",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    url: text("url"),
+    authors: text("authors"),
+    publishedDate: text("published_date"), // YYYY or YYYY-MM
+    category: text("category"), // book, textbook, paper, video, blog_post
+    topics: jsonb("topics").$type<string[]>(),
+    importance: integer("importance"), // 1-5
+    isSeminal: boolean("is_seminal").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_err_entity_url")
+      .on(table.entityId, table.url)
+      .where(sql`url IS NOT NULL`),
+    index("idx_err_entity").on(table.entityId),
+    index("idx_err_resource").on(table.resourceId),
+  ]
+);
+
+/**
  * Many-to-many link between grants and research areas.
  */
 export const grantResearchAreas = pgTable(
@@ -2537,6 +2702,93 @@ export const wikibasePageAssessments = pgTable(
 // Cross-entity join table tracking organization/person positions on policy entities.
 // Enables queries like "which orgs oppose AI regulation?" and
 // "what policies has Anthropic taken positions on?"
+
+// ── Website Sources ──────────────────────────────────────────────────────
+//
+// Websites tracked as structured data feeds. Each source is a domain
+// linked to an entity (usually an org). A periodic pipeline fetches
+// tracked pages, extracts structured facts via LLM, and upserts them
+// into TableBase/FactBase. See Discussion #2928.
+
+export const websiteSources = pgTable(
+  "website_sources",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** Canonical domain, e.g. "anthropic.com" */
+    domain: text("domain").notNull(),
+    /** FK to entities.stable_id — usually the org this website belongs to */
+    entityId: text("entity_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** Display name resolved from entity, cached for convenience */
+    entityDisplayName: text("entity_display_name"),
+    /** Source reliability: high | medium | low */
+    reliability: text("reliability").notNull().default("medium"),
+    /** Default days between re-fetches for pages under this source */
+    refreshIntervalDays: integer("refresh_interval_days")
+      .notNull()
+      .default(30),
+    enabled: boolean("enabled").notNull().default(true),
+    notes: text("notes"),
+    /** When the extraction pipeline last ran for this source */
+    lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+    /** Error message from last failed run */
+    lastError: text("last_error"),
+    /** Consecutive pipeline failures (reset to 0 on success) */
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_ws_domain").on(table.domain),
+    index("idx_ws_entity").on(table.entityId),
+    index("idx_ws_enabled").on(table.enabled),
+  ]
+);
+
+/** Individual pages within a tracked website source. */
+export const websiteSourcePages = pgTable(
+  "website_source_pages",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to website_sources.id */
+    sourceId: varchar("source_id", { length: 10 })
+      .notNull()
+      .references(() => websiteSources.id, { onDelete: "cascade" }),
+    /** Page path relative to domain, e.g. "/about", "/team" */
+    path: text("path").notNull(),
+    /** Role of this page: about | team | research | pricing | careers | docs | other */
+    pageRole: text("page_role"),
+    /** JSON array of FactBase property IDs to extract, e.g. ["headcount", "headquarters"] */
+    extractTargets: jsonb("extract_targets").$type<string[]>(),
+    /** Override source-level refresh interval for this page */
+    refreshIntervalDays: integer("refresh_interval_days"),
+    enabled: boolean("enabled").notNull().default(true),
+    /** When this page was last fetched */
+    lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    /** Content hash from last fetch (for change detection) */
+    lastContentHash: text("last_content_hash"),
+    /** ID of the most recent page_snapshot record (future FK) */
+    lastSnapshotId: varchar("last_snapshot_id", { length: 10 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_wsp_source_path").on(table.sourceId, table.path),
+    index("idx_wsp_role").on(table.pageRole),
+    index("idx_wsp_enabled").on(table.enabled),
+  ]
+);
+
+// ── Policy Stakeholders ──────────────────────────────────────────────────
 
 export const policyStakeholders = pgTable(
   "policy_stakeholders",

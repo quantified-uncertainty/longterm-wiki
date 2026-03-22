@@ -40,6 +40,11 @@ import { saveResources } from '../../resource-io.ts';
 import { hashId, guessResourceType } from '../../resource-utils.ts';
 import { apiRequest } from '../wiki-server/client.ts';
 import type { Resource } from '../../resource-types.ts';
+import { getActiveProviders } from './providers/entity-type-routing.ts';
+import { createGitHubProvider } from './providers/github-search.ts';
+import { createSemanticScholarProvider } from './providers/semantic-scholar.ts';
+import { createFederalRegisterProvider } from './providers/regulatory-search.ts';
+import type { SearchProvider } from './providers/types.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -63,6 +68,12 @@ export interface ResearchConfig {
   usePerplexity?: boolean;
   /** Use SCRY EA Forum / LessWrong search (default: true if SCRY_API_KEY is set, or public key). */
   useScry?: boolean;
+  /** Use GitHub Search API for entity-type-routed searches (default: true if GITHUB_TOKEN is set). */
+  useGitHub?: boolean;
+  /** Use Semantic Scholar API for entity-type-routed searches (default: true). */
+  useSemanticScholar?: boolean;
+  /** Use Federal Register API for policy entity-type-routed searches (default: true). */
+  useFederalRegister?: boolean;
   /** Max URLs to collect from each search provider (default: 8). */
   maxResultsPerSource?: number;
   /** Max URLs to actually fetch (after dedup, default: 20). */
@@ -129,7 +140,7 @@ export interface ResearchResult {
 // Internal types
 // ---------------------------------------------------------------------------
 
-interface SearchHit {
+export interface SearchHit {
   url: string;
   title: string;
   snippet?: string;
@@ -542,6 +553,9 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     useExa = !!getApiKey('EXA_API_KEY'),
     usePerplexity = !!getApiKey('OPENROUTER_API_KEY'),
     useScry = true,
+    useGitHub = true,
+    useSemanticScholar = true,
+    useFederalRegister = true,
     maxResultsPerSource = DEFAULT_MAX_RESULTS_PER_SOURCE,
     maxUrlsToFetch = DEFAULT_MAX_URLS_TO_FETCH,
     extractFacts: shouldExtractFacts = true,
@@ -650,6 +664,54 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   for (let i = 0; i < providerNames.length; i++) {
     if (allHitArrays[i].length > 0) {
       sourcesSearched.push(providerNames[i]);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Phase 1b: Domain-specific providers (entity-type-routed)
+  // -------------------------------------------------------------------------
+
+  const entityType = pageContext?.type;
+  const activeProviderNames = getActiveProviders(entityType);
+
+  // Map provider names to config flags and factory functions
+  const providerRegistry: Record<string, { enabled: boolean; create: () => SearchProvider }> = {
+    'github': { enabled: useGitHub, create: createGitHubProvider },
+    'semantic-scholar': { enabled: useSemanticScholar, create: createSemanticScholarProvider },
+    'federal-register': { enabled: useFederalRegister, create: createFederalRegisterProvider },
+  };
+
+  const domainPromises: Array<Promise<SearchHit[]>> = [];
+  const domainProviderNames: string[] = [];
+
+  for (const name of activeProviderNames) {
+    const entry = providerRegistry[name];
+    if (!entry || !entry.enabled) continue;
+
+    const provider = entry.create();
+    if (!provider.isAvailable()) {
+      console.warn(`[research-agent] ${name} provider not available, skipping`);
+      continue;
+    }
+
+    domainProviderNames.push(name);
+    domainPromises.push(
+      provider.search(focusedQuery, maxResultsPerSource, entityType).catch(err => {
+        console.warn(
+          `[research-agent] ${name} search failed: ${err instanceof Error ? err.message : err}`,
+        );
+        return [];
+      }),
+    );
+  }
+
+  if (domainPromises.length > 0) {
+    const domainHitArrays = await Promise.all(domainPromises);
+    for (let i = 0; i < domainProviderNames.length; i++) {
+      if (domainHitArrays[i].length > 0) {
+        sourcesSearched.push(domainProviderNames[i]);
+        allHitArrays.push(domainHitArrays[i]);
+      }
     }
   }
 

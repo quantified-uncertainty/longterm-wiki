@@ -1,0 +1,29 @@
+pageId: cooperate-bot
+verifiedAt: 2026-03-21
+totalCitations: 1
+verified: 1
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/Fit37Gs7pwNau7di9/contribution-adjusted-utility-maximization-funds-an-early
+    linkText: Gooen, O. (2023). — "Contribution-Adjusted Utility Maximization Funds." — Effective Altruism Forum.
+    claimContext: "The Contribution-Adjusted Utility Maximization Fund (CAUMF) proposal[^2] addresses a related problem: pooling donor resources to maximize each donor's individual preferences, capturing coordination gains. A cooperate-bot can be understood as a single-person CAUMF — one principal, one autonomous allo"
+    fetchedAt: 2026-03-21T19:34:53.323Z
+    httpStatus: 200
+    pageTitle: "Contribution-Adjusted Utility Maximization Funds: An Early Proposal — EA Forum"
+    contentSnippet: |-
+      Hide table of contents
+
+      # [Contribution-Adjusted Utility Maximization Funds: An EarlyProposal](https://forum.effectivealtruism.org/posts/Fit37Gs7pwNau7di9/contribution-adjusted-utility-maximization-funds-an-early)
+
+      by [Ozzie Gooen](https://forum.effectivealtruism.org/users/oagr?from=post_header)
+
+      Aug 3 202114 min read4
+
+      # 13
+
+      [Building effective altruism](https://forum.effectivealtruism.org/topics/building-effective-altruism)[Forecasting](https://forum.effectivealtruism.org/topics/forecasting)[E
+    contentLength: 44451
+    status: verified
+    note: null

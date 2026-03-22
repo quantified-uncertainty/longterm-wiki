@@ -89,4 +89,13 @@ export const COLUMN_DESCRIPTIONS: Record<string, Record<string, string>> = {
     organization_id: "Entity stableId or slug",
     role: "pioneer | active | major | funder | emerging",
   },
+  entity_recommended_resources: {
+    entity_id: "FK to entities.stable_id for the recommending entity",
+    resource_id: "Optional FK to resources.id (when resource exists in catalog)",
+    category: "book | textbook | paper | video | blog_post",
+    topics: "JSONB string[] of topic tags",
+    importance: "1-5 rating (5 = most important)",
+    is_seminal: "Whether this is a foundational/top recommendation",
+    sort_order: "Display ordering within the entity's list",
+  },
 };

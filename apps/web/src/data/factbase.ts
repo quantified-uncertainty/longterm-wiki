@@ -298,13 +298,40 @@ export type FactBaseVerdict =
   | "not_verifiable"
   | "verified";
 
+const VALID_VERDICTS: Set<string> = new Set([
+  "accurate",
+  "minor_issues",
+  "inaccurate",
+  "unsupported",
+  "not_verifiable",
+  "verified",
+]);
+
+let _kbFactVerification: Record<string, string> | null = null;
+
+function loadKbFactVerification(): Record<string, string> {
+  if (_kbFactVerification) return _kbFactVerification;
+  const filePath = path.join(LOCAL_DATA_DIR, "kb-fact-verification.json");
+  try {
+    _kbFactVerification = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _kbFactVerification!;
+  } catch {
+    _kbFactVerification = {};
+    return _kbFactVerification;
+  }
+}
+
 /**
  * Get the citation verification status for a FactBase fact.
- * kbFactVerification is no longer baked into database.json — returns undefined.
- * TODO: fetch from wiki-server API when available.
+ * Returns the best verdict found by cross-referencing the fact's source URL
+ * against citation quotes at build time, or undefined if no match.
+ * Loaded from a separate kb-fact-verification.json (split from database.json).
  */
-export function getFactBaseFactVerification(_factId: string): FactBaseVerdict | undefined {
-  return undefined;
+export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
+  const verifications = loadKbFactVerification();
+  const verdict = verifications[factId];
+  if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
+  return verdict as FactBaseVerdict;
 }
 
 /**

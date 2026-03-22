@@ -93,7 +93,8 @@ export interface RunAgentOptions {
     description: string;
     input_schema: Record<string, unknown>;
   }>;
-  systemPrompt?: string;
+  /** System prompt as a plain string or as TextBlockParam[] (for prompt caching). */
+  systemPrompt?: string | Array<{ type: 'text'; text: string; cache_control?: { type: 'ephemeral' } | null }>;
 }
 
 export interface PipelineOptions {
@@ -127,7 +128,8 @@ export interface PipelineOptions {
   /**
    * When true, the citation audit phase blocks --apply when the verified
    * fraction falls below the passThreshold (gate mode).
-   * Default: false (advisory mode — warnings logged, apply not blocked).
+   * Default: true (gate mode — apply blocked on audit failure).
+   * Use --skip-citation-gate to disable.
    */
   citationGate?: boolean;
   /**

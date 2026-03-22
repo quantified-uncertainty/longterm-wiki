@@ -848,6 +848,48 @@
       "when": 1780041600000,
       "tag": "0120_benchmark_results_model_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1780128000000,
+      "tag": "0121_data_first_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1780214400000,
+      "tag": "0122_entities_search_vector",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1780300800000,
+      "tag": "0123_phase_d2b_drop_old_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1780387200000,
+      "tag": "0124_website_sources_and_content_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1780473600000,
+      "tag": "0125_create_entity_recommended_resources",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1780560000000,
+      "tag": "0126_fix_coefficient_giving_source_urls",
+      "breakpoints": true
     }
   ]
 }

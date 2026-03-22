@@ -1,0 +1,461 @@
+pageId: anthropic-government-standoff
+verifiedAt: 2026-03-21
+totalCitations: 20
+verified: 20
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
+    linkText: Dario Amodei says he 'cannot in good conscience' bow to Pentagon demands
+    claimContext: "1. **No fully autonomous weapons**: Claude would not be used to control weapons systems that select and engage targets without human intervention. Amodei argued frontier AI systems \"are simply not reliable enough to power fully autonomous weapons\" and that deploying them \"would endanger America's wa"
+    fetchedAt: 2026-03-21T19:34:47.214Z
+    httpStatus: 200
+    pageTitle: Dario Amodei says he 'cannot in good conscience' bow to Pentagon's demands over AI use in military | Fortune
+    contentSnippet: |-
+      - [Home](https://fortune.com/)
+
+      - [Latest](https://fortune.com/section/latest/)
+
+      - [Fortune 500](https://fortune.com/section/fortune-500/)
+
+      - [Finance](https://fortune.com/section/finance/)
+
+      - [Tech](https://fortune.com/section/tech/)
+
+      - [Leadership](https://fortune.com/section/leadership/)
+
+      - [Lifestyle](https://fortune.com/section/lifestyle/)
+
+      - [Rankings](https://fortune.com/ranking/)
+
+      - [Multimedia](https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagon
+    contentLength: 12958
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.cnbc.com/2026/02/27/anthropic-pentagon-ai-policy-war-spying.html
+    linkText: Anthropic faces lose-lose scenario in Pentagon conflict
+    claimContext: "2. **No mass domestic surveillance**: Claude would not be used for the systematic collection or analysis of data on Americans — including geolocation, web browsing data, and personal financial information purchased from data brokers.[^2]"
+    fetchedAt: 2026-03-21T19:34:47.289Z
+    httpStatus: 200
+    pageTitle: Anthropic lose-lose situation in Pentagon demand for AI policy change
+    contentSnippet: |-
+      [Skip Navigation](https://www.cnbc.com/2026/02/27/anthropic-pentagon-ai-policy-war-spying.html#MainContent)
+
+      Anthropic faces lose-lose scenario in Pentagon conflict as deadline for policy change looms
+
+      ShareShare Article via FacebookShare Article via TwitterShare Article via LinkedInShare Article via Email
+
+      [Markets](https://www.cnbc.com/markets/)
+
+      [Business](https://www.cnbc.com/business/)
+
+      [Investing](https://www.cnbc.com/investing/)
+
+      [Tech](https://www.cnbc.com/technology/)
+
+      [Politics](https:
+    contentLength: 16865
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.pbs.org/newshour/nation/anthropic-cannot-in-good-conscience-accede-to-pentagons-demands-ceo-says
+    linkText: Anthropic 'cannot in good conscience accede' to Pentagon demands, CEO says
+    claimContext: Anthropic stated it supported "all lawful uses of AI for national security aside from the two narrow exceptions."[^3]
+    fetchedAt: 2026-03-21T19:34:47.210Z
+    httpStatus: 200
+    pageTitle: Anthropic 'cannot in good conscience accede' to Pentagon's demands, CEO says | PBS News
+    contentSnippet: |-
+      [PBS](https://www.pbs.org/ "PBS")
+
+      Donate
+
+      Change your local station
+
+      [Explore More from My Station](https://www.pbs.org/my-station/ "")
+
+      ## MORE FROM
+
+      - [Live TV](https://www.pbs.org/livestream/ "")
+      - [PBS Shows](https://www.pbs.org/shows/ "")
+      - [My Station](https://www.pbs.org/my-station/ "")
+      - [My List](https://www.pbs.org/my-list/shows/ "")
+      - [Donate](https://www.pbs.org/donate/ "")
+
+      Choose station
+
+      ## PBS IS BROUGHT TO YOU BY
+
+      helps your community explore new
+      worlds and ideas through progra
+    contentLength: 12003
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.aljazeera.com/news/2026/2/25/anthropic-vs-the-pentagon-why-ai-firm-is-taking-on-trump-administration
+    linkText: "Anthropic vs the Pentagon: Why AI firm is taking on Trump administration"
+    claimContext: "|------|-------|-------------| | **Jul 2025** | Pentagon awards \\$200M AI contracts to Anthropic, OpenAI, Google, xAI | Anthropic first AI company on classified networks (via Palantir)[^4] | | **Jan 3, 2026** | US operation captures Venezuelan President Maduro; Claude AI used during raid | 83 killed"
+    fetchedAt: 2026-03-21T19:34:47.215Z
+    httpStatus: 200
+    pageTitle: "Anthropic vs the Pentagon: Why AI firm is taking on Trump administration | Government News | Al Jazeera"
+    contentSnippet: |-
+      **BREAKING**
+
+      [Missiles targeted Israel's Dimona, town that is home to its nuclear facility](https://www.aljazeera.com/news/liveblog/2026/3/21/iran-war-live-trump-says-other-nations-have-to-protect-hormuz-from-iran) [Explosions and intercepted reported east of Tehran](https://www.aljazeera.com/news/liveblog/2026/3/21/iran-war-live-trump-says-other-nations-have-to-protect-hormuz-from-iran) [Iran says it has targeted bases in Kuwait and the UAE](https://www.aljazeera.com/news/liveblog/2026/3/21/ir
+    contentLength: 11461
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.axios.com/2026/02/27/anthropic-pentagon-supply-chain-risk-claude
+    linkText: Trump moves to blacklist Anthropic's Claude from government work
+    claimContext: Defense Undersecretary Emil Michael was reportedly offering Anthropic a deal that would have required allowing "the collection or analysis of data on Americans, from geolocation to web browsing data to personal financial information purchased from data brokers."[^5]
+    fetchedAt: 2026-03-21T19:34:47.262Z
+    httpStatus: 200
+    pageTitle: Trump moves to blacklist Anthropic's Claude from government work
+    contentSnippet: |-
+      Manage your tracker preferences
+
+      We use cookies and similar tracking technologies to remember preferences, analyze traffic, and deliver ads. Using some kinds of trackers (like cross-site or behavioral advertising cookies) may be considered a “sale” or “sharing” of personal data under certain state laws. You can opt in or out of these trackers below.
+
+      Targeted advertising cookies and similar trackers
+      On
+
+      Setting this to “off” disables targeted advertising and related trackers in your current brow
+    contentLength: 8435
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.bloomberg.com/news/articles/2026-02-28/anthropic-to-challenge-any-supply-chain-risk-designation
+    linkText: Anthropic to Challenge Any Supply Chain Risk Designation
+    claimContext: The "supply chain risk" designation under 10 U.S.C. §4401 is a category typically reserved for companies from adversarial nations — most prominently Chinese telecom giant Huawei. It has never before been publicly applied to an American company.[^6]
+    fetchedAt: 2026-03-21T19:34:48.459Z
+    httpStatus: 200
+    pageTitle: Bloomberg - Are you a robot?
+    contentSnippet: |-
+      ## We've detected unusual activity from your computer network
+
+      To continue, please click the box below to let us know you're not a robot.
+
+      ### Why did this happen?
+
+      Please make sure your browser supports JavaScript and cookies and that you are not
+      blocking them from loading.
+      For more information you can review our [Terms of Service](https://www.bloomberg.com/notices/tos)
+      and [Cookie Policy](https://www.bloomberg.com/notices/tos).
+
+      ### Need Help?
+
+      For inquiries related to this message please [con
+    contentLength: 835
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban
+    linkText: OpenAI announces Pentagon deal after Trump bans Anthropic
+    claimContext: 'Hours after Trump banned Anthropic, <EntityLink id="E218" name="openai">OpenAI</EntityLink> announced it had struck a deal with the Pentagon to deploy its models on classified networks. CEO <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> wrote on X: "Two of our most important safety '
+    fetchedAt: 2026-03-21T19:34:48.498Z
+    httpStatus: 200
+    pageTitle: "OpenAI announces Pentagon deal after Trump bans Anthropic : NPR"
+    contentSnippet: |-
+      Accessibility links
+
+      - [Skip to main content](https://www.npr.org/2026/02/27/nx-s1-5729118/trump-anthropic-pentagon-openai-ai-weapons-ban#mainContent)
+      - [Keyboard shortcuts for audio player](https://help.npr.org/contact/s/article?name=what-are-the-keyboard-shortcuts-for-using-the-npr-org-audio-player)
+
+      **WAMU 88.5On Air Now**
+
+      - **Hourly News**
+      - **Listen Live**
+      - **My Playlist**
+
+      **OpenAI announces Pentagon deal after Trump bans Anthropic** **Shortly after the president's ban of artificial inte
+    contentLength: 22715
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.americanprogress.org/article/the-trump-administration-is-trying-to-make-an-example-of-the-ai-giant-anthropic/
+    linkText: The Trump Administration Is Trying to Make an Example of the AI Giant Anthropic
+    claimContext: The Center for American Progress argued that the administration was "trying to make an example" of Anthropic to deter other companies from asserting ethical restrictions.[^8]
+    fetchedAt: 2026-03-21T19:34:48.540Z
+    httpStatus: 200
+    pageTitle: The Trump Administration Is Trying To Make an Example of the AI Giant Anthropic - Center for American Progress
+    contentSnippet: |-
+      [_Center for American Progress_](https://www.americanprogress.org/)
+
+      ##### The Trump Administration Is Trying To Make an Example of the AI Giant Anthropic
+
+      - [Share](https://www.americanprogress.org/article/the-trump-administration-is-trying-to-make-an-example-of-the-ai-giant-anthropic/#)
+
+
+      ###### Share
+
+
+
+
+
+        - [Twitter](https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.americanprogress.org%2Farticle%2Fthe-trump-administration-is-trying-to-make-an-example-of-the-ai-giant-anthropic%2F&text=
+    contentLength: 31237
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
+    linkText: Tensions between the Pentagon and AI giant Anthropic reach a boiling point
+    claimContext: "- **OpenAI**: Altman told employees in an internal memo that OpenAI \"would largely follow Anthropic's approach\" if in the same position[^7] - **Google**: 100+ workers sent a letter to Chief Scientist Jeff Dean requesting similar limits on military AI use[^9] - **Microsoft and Amazon**: Employees dem"
+    fetchedAt: 2026-03-21T19:34:48.497Z
+    httpStatus: 200
+    pageTitle: Tensions between Pentagon and Anthropic reach a boiling point
+    contentSnippet: |-
+      IE 11 is not supported. For an optimal experience visit our site on another browser.
+
+      Skip to Content
+
+      [Hegseth to meet with Anthropic CEO as rift grows over military use of AI](https://www.nbcnews.com/video/hegseth-to-meet-with-anthropic-ceo-as-rift-grows-over-military-use-of-ai-258169925838)
+
+      04:00
+
+      [Get more newsLiveon](https://www.nbcnews.com/watch)
+
+      Share
+
+      [Add NBC News to Google](https://www.google.com/preferences/source?q=nbcnews.com)
+
+      Feb. 20, 2026, 12:43 PM EST
+
+      By [Jared Perlo](https:/
+    contentLength: 12659
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.eff.org/deeplinks/2026/02/tech-companies-shouldnt-be-bullied-doing-surveillance
+    linkText: Tech Companies Shouldn't Be Bullied Into Doing Surveillance
+    claimContext: "- **Microsoft and Amazon**: Employees demanded management prevent unrestricted Pentagon use of AI products[^9] - **Cross-industry petition**: Hundreds signed an EFF-organized petition opposing government coercion of AI companies[^10]"
+    fetchedAt: 2026-03-21T19:34:48.461Z
+    httpStatus: 200
+    pageTitle: Tech Companies Shouldn’t Be Bullied Into Doing Surveillance | Electronic Frontier Foundation
+    contentSnippet: |-
+      [Skip to main content](https://www.eff.org/deeplinks/2026/02/tech-companies-shouldnt-be-bullied-doing-surveillance#main-content)
+
+      [Electronic Frontier Foundation](https://www.eff.org/)
+
+      [Donate](https://supporters.eff.org/donate/site-m--m)
+
+      [![](https://www.eff.org/files/privacy_s-defender-site-banner-desktop.png)Privacy’s Defender: My Thirty-Year Fight Against Digital Surveillance](https://www.eff.org/Privacys-Defender "Privacy’s Defender: My Thirty-Year Fight Against Digital Surveillance") [![
+    contentLength: 13651
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.axios.com/2025/10/16/anthropic-david-sacks-ai-white-house
+    linkText: "New AI battle: White House vs Anthropic"
+    claimContext: The standoff did not emerge in a vacuum. In October 2025, White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> publicly accused Anthropic co-founder Jack Clark of running "a sophisticated regulatory capture strategy based on fear-mongering" and trying to "backdoor Wo
+    fetchedAt: 2026-03-21T19:34:49.711Z
+    httpStatus: 200
+    pageTitle: "New AI battle: White House vs. Anthropic"
+    contentSnippet: |-
+      Manage your tracker preferences
+
+      We use cookies and similar tracking technologies to remember preferences, analyze traffic, and deliver ads. Using some kinds of trackers (like cross-site or behavioral advertising cookies) may be considered a “sale” or “sharing” of personal data under certain state laws. You can opt in or out of these trackers below.
+
+      Targeted advertising cookies and similar trackers
+      On
+
+      Setting this to “off” disables targeted advertising and related trackers in your current brow
+    contentLength: 5409
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://techcrunch.com/2025/10/21/anthropic-ceo-claps-back-after-trump-officials-accuse-firm-of-ai-fear-mongering/
+    linkText: Anthropic CEO claps back after Trump officials accuse firm of AI fear-mongering
+    claimContext: The standoff did not emerge in a vacuum. In October 2025, White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> publicly accused Anthropic co-founder Jack Clark of running "a sophisticated regulatory capture strategy based on fear-mongering" and trying to "backdoor Wo
+    fetchedAt: 2026-03-21T19:34:49.738Z
+    httpStatus: 200
+    pageTitle: Anthropic CEO claps back after Trump officials accuse firm of AI fear-mongering   | TechCrunch
+    contentSnippet: |-
+      Checking your Browser…
+
+      Verifying...
+
+      Stuck? [Troubleshoot](https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/ov2/av0/rch/jgj9v/0x4AAAAAAB5UiAgmkGtdUBSR/auto/fbE/new/normal?lang=auto#refresh)
+
+      Success!
+
+      Verification failed
+
+      [Troubleshoot](https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/ov2/av0/rch/jgj9v/0x4AAAAAAB5UiAgmkGtdUBSR/auto/fbE/new/normal?lang=auto#refresh)
+
+      Verification expired
+
+      [Refresh](https://challenges.cloudflare.com/cdn-cgi/
+    contentLength: 32196
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.washingtonexaminer.com/policy/technology/3795645/anthropic-backers-donated-democrats-federal-ai-vendor-list/
+    linkText: Anthropic backers donated to Democrats
+    claimContext: 'Several factors made Anthropic a politically convenient target: - CEO <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> endorsed Kamala Harris in 2024 and donated over \$214,000 to Democratic candidates[^13] - Key backers include Netflix co-founder Reed Hastings (\$20M+ to Democrats'
+    fetchedAt: 2026-03-21T19:34:49.761Z
+    httpStatus: 200
+    pageTitle: Trump AI vendor pick Anthropic faces scrutiny over Democratic ties
+    contentSnippet: |-
+      - [Sign In](https://www.washingtonexaminer.com/sign-in/)
+      - [Home](https://www.washingtonexaminer.com/)
+      - [News](https://www.washingtonexaminer.com/section/news/)
+        - [Politics](https://www.washingtonexaminer.com/section/politics/)
+          - [White House](https://www.washingtonexaminer.com/section/news/white-house/)
+          - [Senate](https://www.washingtonexaminer.com/section/news/senate/)
+          - [House](https://www.washingtonexaminer.com/section/news/house/)
+          - [Campaigns](https://www.washingtonexami
+    contentLength: 19993
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html
+    linkText: Anthropic gives \$20 million to group pushing for AI regulations
+    claimContext: '- Key backers include Netflix co-founder Reed Hastings (\$20M+ to Democrats) and <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> (\$38M to Harris super PAC)[^13] - Anthropic donated \$20M to Public First Action, supporting pro-regulation candidates[^14] - A deleted Amodei'
+    fetchedAt: 2026-03-21T19:34:51.787Z
+    httpStatus: 200
+    pageTitle: "Anthropic gives $20 million to group pushing for AI regulations "
+    contentSnippet: |-
+      [Skip Navigation](https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html#MainContent)
+
+      Anthropic gives $20 million to group pushing for AI regulations ahead of 2026 elections
+
+      ShareShare Article via FacebookShare Article via TwitterShare Article via LinkedInShare Article via Email
+
+      [Markets](https://www.cnbc.com/markets/)
+
+      [Business](https://www.cnbc.com/business/)
+
+      [Investing](https://www.cnbc.com/investing/)
+
+      [Tech](https://www.cnbc.com/technology/
+    contentLength: 11388
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://time.com/7380854/exclusive-anthropic-drops-flagship-safety-pledge/
+    linkText: "Exclusive: Anthropic Drops Flagship Safety Pledge"
+    claimContext: In a striking coincidence of timing, Anthropic published Responsible Scaling Policy v3.0 the same week it was defying the Pentagon. The updated RSP dropped the hard commitment to pause model training if safety measures were insufficient — a pause would now only be considered if Anthropic has a "sign
+    fetchedAt: 2026-03-21T19:34:49.699Z
+    httpStatus: 200
+    pageTitle: Anthropic Drops Flagship Safety Pledge | TIME
+    contentSnippet: |-
+      - [Tech](https://time.com/section/tech)
+      - [AI](https://time.com/tag/ai)
+
+      # Exclusive: Anthropic Drops Flagship Safety Pledge
+
+      [ADD TIME ON GOOGLE](https://www.google.com/preferences/source?q=https://time.com)
+
+      Show me more content from TIME on Google Search
+
+      ![Billy Perrigo](https://time.com/redesign/_next/image/?url=https%3A%2F%2Fapi.time.com%2Fwp-content%2Fuploads%2F2017%2F10%2FTIME_Staff-Portraits_Billy-Perrigo_141_F1.jpg%3Fquality%3D85%26w%3D1024&w=256&q=75)
+
+      by
+
+      [Billy Perrigo](https://time
+    contentLength: 11350
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://darioamodei.com/machines-of-loving-grace
+    linkText: Machines of Loving Grace
+    claimContext: "- Builds the most commercially successful coding AI tool (<FBF entity=\"mK9pX3rQ7n\" property=\"product-revenue\">\\$2.5B</FBF> Claude Code run-rate) - Warns about catastrophic AI risk (Amodei's 10-25% probability estimate)[^16]"
+    fetchedAt: 2026-03-21T19:34:53.066Z
+    httpStatus: 200
+    pageTitle: Dario Amodei — Machines of Loving Grace
+    contentSnippet: |-
+      # Machines of Loving Grace
+
+      # Machines of Loving Grace[1](https://darioamodei.com/essay/machines-of-loving-grace\#fn:1)  1 [https://allpoetry.com/All-Watched-Over-By-Machines-Of-Loving-Grace](https://allpoetry.com/All-Watched-Over-By-Machines-Of-Loving-Grace)
+
+      How AI Could Transform the World for the Better
+
+      October 2024
+
+      I think and talk a lot about the risks of powerful AI. The company I’m the CEO of, Anthropic, does a lot of research on how to reduce these risks. Because of this, people somet
+    contentLength: 100000
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.washingtonpost.com/technology/2026/02/27/anthropic-pentagon-lethal-military-ai/
+    linkText: The hypothetical nuclear attack that escalated the Pentagon's showdown with Anthropic
+    claimContext: "| **Feb 23** | xAI approved for classified networks; agrees to all terms without reservation | Pentagon secures alternative AI provider | | **Feb 24** | Hegseth meets Amodei at Pentagon; demands signed document for full access | References Defense Production Act, contract termination, supply chain r"
+    fetchedAt: 2026-03-21T19:34:53.016Z
+    httpStatus: 200
+    pageTitle: How Anthropic and the Pentagon got into a fight over AI weapons - The Washington Post
+    contentSnippet: |-
+      Democracy Dies in Darkness
+
+      By [Ian Duncan](https://www.washingtonpost.com/people/ian-duncan/)
+      ,
+
+      [Elizabeth Dwoskin](https://www.washingtonpost.com/people/elizabeth-dwoskin/)
+      and
+
+      [Tara Copp](https://www.washingtonpost.com/people/tara-copp/)
+
+      As a standoff between artificial intelligence firm Anthropic and the Pentagon deepened this week, the two sides offered starkly different accounts of a key discussion about a hypothetical nuclear strike against the United States, revealing the intensity of
+    contentLength: 7448
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.axios.com/2026/02/26/anthropic-pentagon-ultamatim-congress-deadline
+    linkText: Congress rips Pentagon over "sophomoric" Anthropic fight
+    claimContext: "| **Feb 26** | Amodei publishes statement: \"cannot in good conscience accede\" | Calls Pentagon threats \"inherently contradictory\" | | **Feb 26** | Congressional leaders call Pentagon's approach \"sophomoric\" | Bipartisan criticism of escalation tactics[^18] | | **Feb 27** | Emil Michael calls Amodei "
+    fetchedAt: 2026-03-21T19:34:52.942Z
+    httpStatus: 200
+    pageTitle: Congress rips Pentagon over "sophomoric" Anthropic fight
+    contentSnippet: |-
+      Manage your tracker preferences
+
+      We use cookies and similar tracking technologies to remember preferences, analyze traffic, and deliver ads. Using some kinds of trackers (like cross-site or behavioral advertising cookies) may be considered a “sale” or “sharing” of personal data under certain state laws. You can opt in or out of these trackers below.
+
+      Targeted advertising cookies and similar trackers
+      On
+
+      Setting this to “off” disables targeted advertising and related trackers in your current brow
+    contentLength: 6409
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.axios.com/2026/02/27/senate-defense-anthropic-pentagon-ai
+    linkText: "Scoop: Top Senate defense leaders intervene in Pentagon-Anthropic AI dispute"
+    claimContext: '| **Feb 27** | Emil Michael calls Amodei a "liar" with a "God complex" | Pentagon undersecretary escalates personal attacks [Fortune](https://fortune.com/2026/02/27/pentagon-brands-anthropic-ceo-dario-amodei-a-liar-with-a-god-complex-as-deadline-looms-over-ai-use-in-weapons-and-surveillance/) | | **'
+    fetchedAt: 2026-03-21T19:34:52.996Z
+    httpStatus: 200
+    pageTitle: "Scoop: Top Senate defense leaders intervene in Pentagon-Anthropic AI dispute"
+    contentSnippet: |-
+      Manage your tracker preferences
+
+      We use cookies and similar tracking technologies to remember preferences, analyze traffic, and deliver ads. Using some kinds of trackers (like cross-site or behavioral advertising cookies) may be considered a “sale” or “sharing” of personal data under certain state laws. You can opt in or out of these trackers below.
+
+      Targeted advertising cookies and similar trackers
+      On
+
+      Setting this to “off” disables targeted advertising and related trackers in your current brow
+    contentLength: 6641
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://abcnews.com/Politics/anthropic-latest-pentagon-contract-bar-ai-autonomous-weapons/story?id=130558898
+    linkText: Trump directs government to cease using Anthropic's technology after Pentagon standoff
+    claimContext: '| **Feb 27** | Hegseth designates Anthropic a "Supply-Chain Risk to National Security" | Bars Pentagon contractors from any commercial activity with Anthropic | | **Feb 27** | GSA removes Anthropic from USAi.gov and Multiple Award Schedule | Federal procurement access severed[^20] | | **Feb 27** | O'
+    fetchedAt: 2026-03-21T19:34:52.967Z
+    httpStatus: 200
+    pageTitle: Trump orders US government to cut ties with Anthropic; Hegseth declares supply chain 'risk' - ABC News
+    contentSnippet: |-
+      [breakingRobert Mueller, former FBI director and special counsel, dies at 81](https://abcnews.com/US/robert-mueller-former-fbi-director-special-counsel-dies/story?id=112685092)
+
+      # Trump orders US government to cut ties with Anthropic; Hegseth declares supply chain 'risk'
+
+      The AI company said being designated a supply chain risk is "legally unsound."
+
+      By[Selina Wang](https://abcnews.com/author/selina_wang)
+
+      February 27, 2026, 10:30 PM
+
+      President Donald Trump ordered U.S. government agencies to st
+    contentLength: 11282
+    status: verified
+    note: null

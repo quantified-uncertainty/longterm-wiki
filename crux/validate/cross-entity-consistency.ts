@@ -30,16 +30,17 @@
 
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 import { PROJECT_ROOT, ensureDataLayer } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
 
 // ---------------------------------------------------------------------------
-// Types
+// Types (exported for use by verify-consistency unified runner)
 // ---------------------------------------------------------------------------
 
-type Severity = "error" | "warning" | "info";
+export type Severity = "error" | "warning" | "info";
 
-interface Mismatch {
+export interface Mismatch {
   /** Category of the check */
   checkType:
     | "person-org"
@@ -352,33 +353,40 @@ function checkProjectOrg(
 }
 
 // ---------------------------------------------------------------------------
-// Main
+// Exported runner (for use by the unified consistency command)
 // ---------------------------------------------------------------------------
 
-async function main(): Promise<void> {
-  const verbose = process.argv.includes("--verbose");
-  const ci = process.argv.includes("--ci");
-  const c = getColors(ci);
+export interface CrossEntityCheckResult {
+  mismatches: Mismatch[];
+  stats: {
+    totalEntities: number;
+    people: number;
+    models: number;
+    projects: number;
+  };
+}
 
-  const typeArg = process.argv.find((a) => a.startsWith("--type="));
-  const filterType = typeArg ? typeArg.split("=")[1] : null;
+/**
+ * Run cross-entity consistency checks and return structured results.
+ * Can be called in-process by the unified consistency runner.
+ */
+export function runCrossEntityCheck(options: {
+  filterType?: string | null;
+} = {}): CrossEntityCheckResult {
+  const filterType = options.filterType ?? null;
 
   ensureDataLayer();
 
   const dbPath = join(PROJECT_ROOT, "apps/web/src/data/database.json");
   if (!existsSync(dbPath)) {
-    console.error(
-      c.red + "database.json not found. Run: pnpm build-data" + c.reset,
-    );
-    process.exit(1);
+    throw new Error("database.json not found. Run: pnpm build-data");
   }
 
   const db = JSON.parse(readFileSync(dbPath, "utf-8"));
   const typedEntities: TypedEntity[] = db.typedEntities || [];
 
   if (typedEntities.length === 0) {
-    console.error(c.red + "No typedEntities in database.json." + c.reset);
-    process.exit(1);
+    throw new Error("No typedEntities in database.json.");
   }
 
   const entityById = new Map<string, TypedEntity>();
@@ -390,7 +398,6 @@ async function main(): Promise<void> {
   const models = typedEntities.filter((e) => e.entityType === "ai-model");
   const projects = typedEntities.filter((e) => e.entityType === "project");
 
-  // Run all checks (filter by type if requested)
   const allMismatches: Mismatch[] = [];
 
   if (!filterType || filterType === "person" || filterType === "person-org") {
@@ -399,25 +406,48 @@ async function main(): Promise<void> {
   if (!filterType || filterType === "ai-model" || filterType === "model-org") {
     allMismatches.push(...checkModelOrg(models, entityById));
   }
-  if (
-    !filterType ||
-    filterType === "bidirectional" ||
-    filterType === "related"
-  ) {
+  if (!filterType || filterType === "bidirectional" || filterType === "related") {
     allMismatches.push(...checkBidirectionalRelated(typedEntities, entityById));
   }
   if (!filterType || filterType === "person" || filterType === "coherence") {
-    allMismatches.push(
-      ...checkPersonAffiliationCoherence(people, entityById),
-    );
+    allMismatches.push(...checkPersonAffiliationCoherence(people, entityById));
   }
-  if (
-    !filterType ||
-    filterType === "project" ||
-    filterType === "project-org"
-  ) {
+  if (!filterType || filterType === "project" || filterType === "project-org") {
     allMismatches.push(...checkProjectOrg(projects, entityById));
   }
+
+  return {
+    mismatches: allMismatches,
+    stats: {
+      totalEntities: typedEntities.length,
+      people: people.length,
+      models: models.length,
+      projects: projects.length,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Main (standalone CLI entry point)
+// ---------------------------------------------------------------------------
+
+async function main(): Promise<void> {
+  const verbose = process.argv.includes("--verbose");
+  const ci = process.argv.includes("--ci");
+  const c = getColors(ci);
+
+  const typeArg = process.argv.find((a) => a.startsWith("--type="));
+  const filterType = typeArg ? typeArg.split("=")[1] : null;
+
+  let result: CrossEntityCheckResult;
+  try {
+    result = runCrossEntityCheck({ filterType });
+  } catch (err) {
+    console.error(c.red + (err instanceof Error ? err.message : String(err)) + c.reset);
+    process.exit(1);
+  }
+
+  const { mismatches: allMismatches, stats } = result;
 
   // Compute stats
   const byCheckType = new Map<string, Mismatch[]>();
@@ -436,10 +466,10 @@ async function main(): Promise<void> {
   if (ci) {
     const summary = {
       passed: warningCount === 0 && errorCount === 0,
-      totalEntities: typedEntities.length,
-      people: people.length,
-      models: models.length,
-      projects: projects.length,
+      totalEntities: stats.totalEntities,
+      people: stats.people,
+      models: stats.models,
+      projects: stats.projects,
       totalMismatches: allMismatches.length,
       errors: errorCount,
       warnings: warningCount,
@@ -473,7 +503,7 @@ async function main(): Promise<void> {
   );
   console.log(
     c.dim +
-      `Scanning ${typedEntities.length} entities (${people.length} people, ${models.length} models, ${projects.length} projects)` +
+      `Scanning ${stats.totalEntities} entities (${stats.people} people, ${stats.models} models, ${stats.projects} projects)` +
       c.reset +
       "\n",
   );
@@ -606,7 +636,10 @@ async function main(): Promise<void> {
   process.exit(errorCount > 0 || warningCount > 0 ? 1 : 0);
 }
 
-main().catch((err) => {
-  console.error("Cross-entity consistency check crashed:", err);
-  process.exit(1);
-});
+// Only run main() when executed directly (not when imported by crux CLI)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("Cross-entity consistency check crashed:", err);
+    process.exit(1);
+  });
+}

@@ -37,6 +37,17 @@ export const COMPONENT_USAGE_RE = /<([A-Z][a-zA-Z0-9]*)/g;
 export const WIKI_IMPORT_RE = /import\s*\{([^}]+)\}\s*from\s*['"]@components\/wiki['"]/;
 
 // ---------------------------------------------------------------------------
+// Resource reference patterns
+// ---------------------------------------------------------------------------
+
+/** Match `<R id="...">` — captures the ID in group 1. Use with `g` flag. */
+export const RESOURCE_REF_RE = /<R\s+id=["']([^"']+)["'][^>]*>/g;
+
+/** Match full `<R id="...">text</R>` or self-closing `<R id="..." />`.
+ *  Groups: 1=id, 2=remaining attrs, 3=children text (if not self-closing). */
+export const RESOURCE_REF_FULL_RE = /<R\s+id=["']([^"']+)["']([^>]*?)(?:\/>|>([\s\S]*?)<\/R>)/g;
+
+// ---------------------------------------------------------------------------
 // Markdown patterns
 // ---------------------------------------------------------------------------
 

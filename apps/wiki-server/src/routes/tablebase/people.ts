@@ -3,7 +3,12 @@ import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { zv, escapeIlike } from "../shared/utils.js";
-import { parseSort } from "../shared/query-helpers.js";
+import { parseSort, TRIGRAM_FALLBACK_THRESHOLD } from "../shared/query-helpers.js";
+import {
+  buildPrefixTsquery,
+  normalizeSearchQuery,
+  TRIGRAM_SIMILARITY_THRESHOLD,
+} from "../../search-utils.js";
 
 // ---- Constants ----
 
@@ -80,32 +85,68 @@ const peopleApp = new Hono()
 
     // Build dynamic WHERE fragments
     const extraConditions: ReturnType<typeof sql>[] = [];
+    let searchMode: "fts" | "trigram" | "ilike" | null = null;
 
     if (q) {
-      const pattern = `%${escapeIlike(q.trim())}%`;
-      extraConditions.push(sql`(
-        t.title ILIKE ${pattern}
-        OR t.description ILIKE ${pattern}
-        OR EXISTS (
-          SELECT 1 FROM facts f_s
-          WHERE f_s.entity_id = t.id
-          AND f_s.measure = 'role'
-          AND f_s.value ILIKE ${pattern}
-        )
-        OR EXISTS (
-          SELECT 1 FROM facts f_s2
-          WHERE f_s2.entity_id = t.id
-          AND f_s2.measure = 'employed-by'
-          AND (
-            f_s2.value ILIKE ${pattern}
-            OR EXISTS (
-              SELECT 1 FROM entities e_s
-              WHERE e_s.stable_id = f_s2.value
-              AND e_s.title ILIKE ${pattern}
+      const trimmedQ = q.trim();
+      const normalized = normalizeSearchQuery(trimmedQ);
+      const tsquery = buildPrefixTsquery(normalized);
+
+      if (tsquery) {
+        // Primary: tsvector full-text search on things.search_vector
+        // Also search role and employer facts via ILIKE for completeness
+        const pattern = `%${escapeIlike(trimmedQ)}%`;
+        extraConditions.push(sql`(
+          t.search_vector @@ to_tsquery('english', ${tsquery})
+          OR EXISTS (
+            SELECT 1 FROM facts f_s
+            WHERE f_s.entity_id = t.id
+            AND f_s.measure = 'role'
+            AND f_s.value ILIKE ${pattern}
+          )
+          OR EXISTS (
+            SELECT 1 FROM facts f_s2
+            WHERE f_s2.entity_id = t.id
+            AND f_s2.measure = 'employed-by'
+            AND (
+              f_s2.value ILIKE ${pattern}
+              OR EXISTS (
+                SELECT 1 FROM entities e_s
+                WHERE e_s.stable_id = f_s2.value
+                AND e_s.title ILIKE ${pattern}
+              )
             )
           )
-        )
-      )`);
+        )`);
+        searchMode = "fts";
+      } else {
+        // Fallback to ILIKE when tsquery cannot be built (all-punctuation input)
+        const pattern = `%${escapeIlike(trimmedQ)}%`;
+        extraConditions.push(sql`(
+          t.title ILIKE ${pattern}
+          OR t.description ILIKE ${pattern}
+          OR EXISTS (
+            SELECT 1 FROM facts f_s
+            WHERE f_s.entity_id = t.id
+            AND f_s.measure = 'role'
+            AND f_s.value ILIKE ${pattern}
+          )
+          OR EXISTS (
+            SELECT 1 FROM facts f_s2
+            WHERE f_s2.entity_id = t.id
+            AND f_s2.measure = 'employed-by'
+            AND (
+              f_s2.value ILIKE ${pattern}
+              OR EXISTS (
+                SELECT 1 FROM entities e_s
+                WHERE e_s.stable_id = f_s2.value
+                AND e_s.title ILIKE ${pattern}
+              )
+            )
+          )
+        )`);
+        searchMode = "ilike";
+      }
     }
 
     if (affiliation) {
@@ -147,10 +188,31 @@ const peopleApp = new Hono()
       netWorth: netWorthSubquery,
     };
     const sortExpr = sortExprMap[field] ?? sql`t.title`;
-    const orderClause =
+    const defaultOrderClause =
       dir === "desc"
         ? sql`${sortExpr} DESC NULLS LAST`
         : sql`${sortExpr} ASC NULLS LAST`;
+
+    // When searching via FTS with no explicit sort, order by search relevance
+    let orderClause = defaultOrderClause;
+    if (q && searchMode === "fts" && (sort === undefined || sort === "")) {
+      const trimmedQ = q.trim();
+      const normalized = normalizeSearchQuery(trimmedQ);
+      const tsquery = buildPrefixTsquery(normalized);
+      if (tsquery) {
+        // Title-match boost: exact (+1000), acronym-in-parens (+500), starts-with (+100), word-boundary (+10)
+        orderClause = sql`(
+          ts_rank_cd(t.search_vector, to_tsquery('english', ${tsquery}), 1)
+          + CASE
+              WHEN lower(t.title) = lower(${trimmedQ}) THEN 1000
+              WHEN position('(' || upper(${trimmedQ}) || ')' in t.title) > 0 THEN 500
+              WHEN starts_with(lower(t.title), lower(${trimmedQ}) || ' ') THEN 100
+              WHEN position(' ' || lower(${trimmedQ}) in lower(t.title)) > 0 THEN 10
+              ELSE 0
+            END
+        ) DESC`;
+      }
+    }
 
     // Count query
     const countResult = (await db.execute(sql`
@@ -160,10 +222,10 @@ const peopleApp = new Hono()
         AND t.entity_type = 'person'
         ${extraWhere}
     `)) as CountRow[];
-    const total = countResult[0]?.total ?? 0;
+    let total = countResult[0]?.total ?? 0;
 
     // Data query with fact subqueries for person attributes
-    const rows = (await db.execute(sql`
+    let rows = (await db.execute(sql`
       SELECT
         t.id,
         t.source_id AS slug,
@@ -184,11 +246,78 @@ const peopleApp = new Hono()
       OFFSET ${offset}
     `)) as PersonRawRow[];
 
+    // Trigram fallback: if FTS returned too few results, retry with trigram similarity
+    if (q && total < TRIGRAM_FALLBACK_THRESHOLD && searchMode === "fts") {
+      searchMode = "trigram";
+      const trimmedQ = q.trim();
+
+      // Build trigram conditions: keep affiliation filter if present, replace search with trigram
+      const trigramConditions: ReturnType<typeof sql>[] = [];
+      trigramConditions.push(
+        sql`similarity(t.title, ${trimmedQ}) > ${TRIGRAM_SIMILARITY_THRESHOLD}`,
+      );
+
+      if (affiliation) {
+        trigramConditions.push(sql`EXISTS (
+          SELECT 1 FROM facts f_aff
+          WHERE f_aff.entity_id = t.id
+          AND f_aff.measure = 'employed-by'
+          AND (
+            f_aff.value = ${affiliation}
+            OR EXISTS (
+              SELECT 1 FROM entities e_aff
+              WHERE e_aff.stable_id = f_aff.value
+              AND (e_aff.id = ${affiliation} OR e_aff.title = ${affiliation})
+            )
+          )
+        )`);
+      }
+
+      const trigramExtraWhere =
+        trigramConditions.length > 0
+          ? sql`AND ${trigramConditions.reduce((acc, cond, i) => (i === 0 ? cond : sql`${acc} AND ${cond}`))}`
+          : sql``;
+
+      const trigramCountResult = (await db.execute(sql`
+        SELECT COUNT(*)::int AS total
+        FROM things t
+        WHERE t.thing_type = 'entity'
+          AND t.entity_type = 'person'
+          ${trigramExtraWhere}
+      `)) as CountRow[];
+      const trigramTotal = trigramCountResult[0]?.total ?? 0;
+
+      if (trigramTotal > total) {
+        total = trigramTotal;
+        rows = (await db.execute(sql`
+          SELECT
+            t.id,
+            t.source_id AS slug,
+            t.title AS name,
+            t.wiki_id AS "wikiId",
+            t.description,
+            ${roleSubquery} AS role,
+            (SELECT f_e.value FROM facts f_e WHERE f_e.entity_id = t.id AND f_e.measure = 'employed-by' LIMIT 1) AS "employerId",
+            ${employerSubquery} AS "employerName",
+            ${bornYearSubquery} AS "bornYear",
+            ${netWorthSubquery} AS "netWorth"
+          FROM things t
+          WHERE t.thing_type = 'entity'
+            AND t.entity_type = 'person'
+            ${trigramExtraWhere}
+          ORDER BY similarity(t.title, ${trimmedQ}) DESC, t.id
+          LIMIT ${limit}
+          OFFSET ${offset}
+        `)) as PersonRawRow[];
+      }
+    }
+
     return c.json({
       items: rows.map(formatPersonRow),
       total,
       limit,
       offset,
+      searchMode,
     });
   })
 

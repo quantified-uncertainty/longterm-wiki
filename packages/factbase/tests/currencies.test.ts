@@ -137,3 +137,71 @@ describe("formatValue with currency override", () => {
     expect(result).toBe("40%");
   });
 });
+
+describe("formatValue adaptive divisor ($0B bug fix)", () => {
+  const revenueProperty: Property = {
+    id: "revenue",
+    name: "Revenue",
+    dataType: "number",
+    unit: "USD",
+    display: { divisor: 1e9, prefix: "$", suffix: "B" },
+  };
+
+  it("falls back to M for values under $50M (would round to $0B)", () => {
+    expect(formatValue(50_000_000, revenueProperty)).toBe("$50M");
+    expect(formatValue(10_000_000, revenueProperty)).toBe("$10M");
+    expect(formatValue(1_000_000, revenueProperty)).toBe("$1M");
+  });
+
+  it("falls back to K for very small values", () => {
+    // 500K / 1e6 = 0.5 → "$0.5M" (M is sufficient)
+    expect(formatValue(500_000, revenueProperty)).toBe("$0.5M");
+    // 50K / 1e6 = 0.05 < 0.1 → falls through to K: 50K / 1e3 = 50 → "$50K"
+    expect(formatValue(50_000, revenueProperty)).toBe("$50K");
+  });
+
+  it("falls back to raw value when all scales too large", () => {
+    // 5 / 1e3 = 0.005 < 0.1 → all scales exhausted → raw value
+    expect(formatValue(5, revenueProperty)).toBe("$5");
+  });
+
+  it("still uses B for values that display correctly", () => {
+    expect(formatValue(1_000_000_000, revenueProperty)).toBe("$1B");
+    expect(formatValue(10_000_000_000, revenueProperty)).toBe("$10B");
+    expect(formatValue(500_000_000, revenueProperty)).toBe("$0.5B");
+  });
+
+  it("handles the boundary correctly (values < 0.1 after division fall back)", () => {
+    // 49M / 1e9 = 0.049 < 0.1 → falls back to M
+    expect(formatValue(49_000_000, revenueProperty)).toBe("$49M");
+    // 50M / 1e9 = 0.05 < 0.1 → falls back to M
+    expect(formatValue(50_000_000, revenueProperty)).toBe("$50M");
+    // 99M / 1e9 = 0.099 < 0.1 → falls back to M
+    expect(formatValue(99_000_000, revenueProperty)).toBe("$99M");
+    // 100M / 1e9 = 0.1 → displays as $0.1B (at the threshold)
+    expect(formatValue(100_000_000, revenueProperty)).toBe("$0.1B");
+  });
+
+  it("handles negative values with adaptive fallback", () => {
+    expect(formatValue(-10_000_000, revenueProperty)).toBe("$-10M");
+  });
+
+  it("handles zero correctly (no fallback needed)", () => {
+    expect(formatValue(0, revenueProperty)).toBe("$0B");
+  });
+
+  it("preserves currency override with adaptive fallback", () => {
+    expect(formatValue(50_000_000, revenueProperty, "GBP")).toBe("£50M");
+  });
+
+  it("does not adapt non-scale suffixes", () => {
+    const customProperty: Property = {
+      id: "custom",
+      name: "Custom",
+      dataType: "number",
+      display: { divisor: 1e9, prefix: "", suffix: " widgets" },
+    };
+    // Non-scale suffix: should NOT adapt, just display the divided value
+    expect(formatValue(10_000_000, customProperty)).toBe("0 widgets");
+  });
+});

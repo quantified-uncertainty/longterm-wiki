@@ -22,6 +22,7 @@ import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
+import { validatePipelineResources } from '../../lib/validation/validate-resource-refs.ts';
 import { ValidationEngine } from '../../lib/validation/validation-engine.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
@@ -274,10 +275,10 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
             r.auditResult = await citationAuditPhase(page, r.improvedContent!, r.research, options);
           } catch (err: unknown) {
             const error = err instanceof Error ? err : new Error(String(err));
-            if (options.citationGate) {
-              throw new Error(`Citation audit failed with --citation-gate: ${error.message}`);
+            if (options.citationGate !== false) {
+              throw new Error(`Citation audit error (use --skip-citation-gate to bypass): ${error.message}`);
             }
-            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing without audit`);
+            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing (--skip-citation-gate)`);
           }
         }
         break;
@@ -363,25 +364,40 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       console.log(`Unsourced table cells: ${unsourcedTableCells} (numeric claims without citations)`);
     }
     if (!r.auditResult.pass) {
-      if (options.citationGate && dryRun) {
-        console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
-      } else if (options.citationGate && !dryRun) {
-        console.log(`⚠ Citation audit FAILED — blocking apply (--citation-gate)`);
+      const gateActive = options.citationGate !== false;
+      if (gateActive && dryRun) {
+        console.log(`⚠ Citation audit FAILED (would block --apply; use --skip-citation-gate to bypass)`);
+      } else if (gateActive && !dryRun) {
+        console.log(`⚠ Citation audit FAILED — blocking apply`);
       } else {
-        console.log(`⚠ Citation audit FAILED (advisory)`);
+        console.log(`⚠ Citation audit FAILED (gate disabled via --skip-citation-gate)`);
       }
     }
   }
 
-  // Gate mode: abort --apply when citation audit fails
-  if (options.citationGate && !dryRun && r.auditResult && !r.auditResult.pass) {
+  // Gate mode (default): abort --apply when citation audit fails
+  if (options.citationGate !== false && !dryRun && r.auditResult && !r.auditResult.pass) {
     const auditPath = path.join(TEMP_DIR, page.id, 'citation-audit.json');
-    console.error('\nApply blocked: citation audit failed and --citation-gate is set.');
-    console.error(`Review ${auditPath} for per-citation details.`);
+    console.error('\nApply blocked: citation audit failed.');
+    console.error(`Use --skip-citation-gate to apply anyway, or review ${auditPath} for per-citation details.`);
     process.exit(1);
   }
 
   if (dryRun) {
+    // Resource ref validation in dry-run mode: report but don't modify temp file
+    try {
+      const resourceValidation = await validatePipelineResources(
+        fs.readFileSync(finalPath, 'utf-8'),
+        { log },
+      );
+      if (resourceValidation.refs.brokenRefs > 0) {
+        console.log(`Resource refs: ${resourceValidation.refs.brokenRefs} broken (would be auto-fixed on --apply)`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('resource-validation', `Warning: resource ref check failed: ${error.message}`);
+    }
+
     console.log('\nTo apply changes:');
     console.log(`  cp "${finalPath}" "${filePath}"`);
     console.log('\nOr review the diff:');
@@ -405,6 +421,18 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // final write. The improve phase already calls ensureFrontmatterFields, but
     // later phases (enrich, validate auto-fixes, gap-fill) can re-modify content.
     contentToApply = ensureFrontmatterFields(originalContent, contentToApply);
+
+    // Resource reference validation: check <R id="..."> tags resolve to real resources.
+    // Runs BEFORE semantic diff so that broken-ref fixes are included in the diff analysis.
+    try {
+      const resourceValidation = await validatePipelineResources(contentToApply, { log });
+      if (resourceValidation.refs.changed) {
+        contentToApply = resourceValidation.refs.fixedContent;
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('resource-validation', `Warning: resource ref validation failed (non-blocking): ${error.message}`);
+    }
 
     // Semantic diff: analyze factual claim changes for safety audit.
     // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
