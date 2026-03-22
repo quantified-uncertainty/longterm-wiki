@@ -437,11 +437,13 @@ const sourceChecksApp = new Hono()
           await db
             .update(verificationVerdicts)
             .set({
+              entityId: entityIdVal,
               verdict: body.verdict,
               confidence: confidenceVal,
               reasoning: reasoningVal,
               sourcesChecked: sourcesCheckedVal,
               needsRecheck: false,
+              nextCheckDue: nextCheckDueVal,
               lastComputedAt: now,
               updatedAt: now,
             })
