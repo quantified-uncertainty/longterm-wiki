@@ -250,7 +250,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   EntityMatrixContent,
   EntityProfileContent,
   EntitySourceChecksContent,
-  EntityVerificationsContent: EntitySourceChecksContent, // deprecated alias
 
   // Table view components
   SafetyApproachesTableView,

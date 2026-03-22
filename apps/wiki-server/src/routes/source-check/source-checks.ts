@@ -432,8 +432,3 @@ const sourceChecksApp = new Hono()
 
 export const sourceChecksRoute = sourceChecksApp;
 export type SourceChecksRoute = typeof sourceChecksApp;
-
-/** @deprecated Use sourceChecksRoute */
-export const verificationsRoute = sourceChecksRoute;
-/** @deprecated Use SourceChecksRoute */
-export type VerificationsRoute = SourceChecksRoute;

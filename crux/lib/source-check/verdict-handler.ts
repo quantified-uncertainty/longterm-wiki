@@ -49,9 +49,6 @@ export async function storeSourceCheckEvidence(params: {
   }
 }
 
-/** @deprecated Use storeSourceCheckEvidence */
-export const storeVerificationEvidence = storeSourceCheckEvidence;
-
 /**
  * Store an aggregate verdict for a record.
  *

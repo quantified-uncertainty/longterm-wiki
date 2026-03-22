@@ -1,5 +1,5 @@
 /**
- * Verification status badge for structured data records (grants, personnel, etc.).
+ * Source-check status badge for structured data records (grants, personnel, etc.).
  *
  * Shows a small colored indicator next to record data points on detail pages.
  * The verdict comes from the source-check system (wiki-server + LLM checks).

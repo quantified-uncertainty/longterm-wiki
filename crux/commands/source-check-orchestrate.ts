@@ -203,14 +203,14 @@ async function searchForEntity(entity: Entity): Promise<string[]> {
     });
 
     if (!response.ok) {
-      console.warn(`[verify-orchestrate] Exa search failed: HTTP ${response.status}`);
+      console.warn(`[source-check] Exa search failed: HTTP ${response.status}`);
       return [];
     }
 
     const data = await response.json() as { results?: Array<{ url: string }> };
     return (data.results ?? []).map(r => r.url).filter(Boolean);
   } catch (e: unknown) {
-    console.warn(`[verify-orchestrate] Web search failed: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[source-check] Web search failed: ${e instanceof Error ? e.message : String(e)}`);
     return [];
   }
 }
@@ -249,7 +249,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=5000');
+    }>('GET', '/api/source-checks/verdicts?record_type=fact&limit=5000');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -262,7 +262,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
       }
     }
   } catch (e: unknown) {
-    console.warn(`[verify-orchestrate] Could not fetch KB verdicts: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[source-check] Could not fetch KB verdicts: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return map;
@@ -289,7 +289,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
           needsRecheck?: boolean;
         }>;
         total: number;
-      }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+      }>('GET', `/api/source-checks/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
       if (!response.ok || !response.data) break;
 
@@ -307,7 +307,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
       offset += PAGE_SIZE;
     }
   } catch (e: unknown) {
-    console.warn(`[verify-orchestrate] Could not fetch record verdicts: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[source-check] Could not fetch record verdicts: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return map;
@@ -398,7 +398,7 @@ async function collectRecordItems(
     try {
       const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
       if (!response.ok) {
-        console.warn(`[verify-orchestrate] Failed to fetch ${recordType}: ${response.message}`);
+        console.warn(`[source-check] Failed to fetch ${recordType}: ${response.message}`);
         continue;
       }
 
@@ -442,7 +442,7 @@ async function collectRecordItems(
         });
       }
     } catch (e: unknown) {
-      console.warn(`[verify-orchestrate] Error collecting ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
+      console.warn(`[source-check] Error collecting ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
@@ -880,7 +880,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       extractedValue: result.extractedValue,
       reasoning: result.reasoning,
       isPrimarySource: true,
-    }, '[verify-orchestrate]');
+    }, '[source-check]');
   } else if (item.data.kind === 'record') {
     const recordData = item.data as RecordItemData;
 
@@ -893,7 +893,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       confidence: result.confidence,
       extractedValue: result.extractedValue,
       reasoning: result.reasoning,
-    }, '[verify-orchestrate]');
+    }, '[source-check]');
 
     // Store aggregate verdict
     await storeAggregateVerdict({
@@ -903,8 +903,8 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       confidence: result.confidence,
       reasoning: result.reasoning,
       sourcesChecked: 1,
-    }, '[verify-orchestrate]').catch((e: unknown) => {
-      console.warn(`[verify-orchestrate] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
+    }, '[source-check]').catch((e: unknown) => {
+      console.warn(`[source-check] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
     });
   }
   // Entity-type verifications are logged but not stored in a specific endpoint
@@ -1276,7 +1276,7 @@ async function statsCommand(): Promise<CommandResult> {
     by_type: Record<string, number>;
     needs_recheck: number;
     avg_confidence: number;
-  }>('GET', '/api/verifications/stats');
+  }>('GET', '/api/source-checks/stats');
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };

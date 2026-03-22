@@ -19,9 +19,6 @@ export interface LlmSourceCheckResult {
   reasoning: string;
 }
 
-/** @deprecated Use LlmSourceCheckResult */
-export type LlmVerificationResult = LlmSourceCheckResult;
-
 /** Constants shared across source-check modules */
 export const SOURCE_CHECK_CONSTANTS = {
   MAX_CONTENT_LENGTH: 8000,
@@ -29,6 +26,3 @@ export const SOURCE_CHECK_CONSTANTS = {
   /** Estimated cost per LLM source-check call in USD */
   ESTIMATED_COST_PER_VERIFICATION: 0.01,
 } as const;
-
-/** @deprecated Use SOURCE_CHECK_CONSTANTS */
-export const VERIFICATION_CONSTANTS = SOURCE_CHECK_CONSTANTS;

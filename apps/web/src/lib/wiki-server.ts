@@ -231,14 +231,6 @@ export type RpcSourceChecksVerdictsResult = InferResponseType<SourceChecksClient
 /** A single verdict row from the verdicts list */
 export type RpcSourceCheckVerdictRow = RpcSourceChecksVerdictsResult['verdicts'][number];
 
-// Deprecated aliases
-/** @deprecated Use RpcSourceChecksStatsResult */
-export type RpcVerificationsStatsResult = RpcSourceChecksStatsResult;
-/** @deprecated Use RpcSourceChecksVerdictsResult */
-export type RpcVerificationsVerdictsResult = RpcSourceChecksVerdictsResult;
-/** @deprecated Use RpcSourceCheckVerdictRow */
-export type RpcVerificationVerdictRow = RpcSourceCheckVerdictRow;
-
 // ============================================================================
 // Hono RPC client — Grants API
 // ============================================================================

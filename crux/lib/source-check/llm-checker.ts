@@ -54,9 +54,6 @@ export async function callLlmForSourceCheck(
   };
 }
 
-/** @deprecated Use callLlmForSourceCheck */
-export const callLlmForVerification = callLlmForSourceCheck;
-
 /**
  * Validate a verdict string against the canonical list.
  * Returns the validated verdict or 'unverifiable' if invalid.
