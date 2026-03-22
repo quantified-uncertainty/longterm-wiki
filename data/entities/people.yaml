@@ -1133,7 +1133,9 @@
       type: organization
     - id: BEKEqQDmkQ
       type: organization
-  lastUpdated: 2026-02
+    - id: quri
+      type: organization
+  lastUpdated: 2026-03
 
 - id: dustin-moskovitz
   stableId: Jtj6jHbuQ7
@@ -1280,12 +1282,16 @@
   description: >-
     Nuño Sempere is a Spanish superforecaster who co-founded the highly
     successful Samotsvety forecasting group and now runs Sentinel for global
-    catastrophe early warning, while being known for skeptical views on high AI
-    existential risk estimates and critical perspectives on EA institutions. The
-    article provides detailed coverage of his forecasting methodology and organizational contributions.
+    catastrophe early warning. Worked as a Research Fellow at QURI (2020-2023),
+    where he built Metaforecast and contributed extensively to forecasting
+    research. Known for skeptical views on high AI existential risk estimates
+    and critical perspectives on EA institutions.
   clusters:
     - epistemics
-  lastUpdated: 2026-02
+  relatedEntries:
+    - id: quri
+      type: organization
+  lastUpdated: 2026-03
 - id: vidur-kapur
   stableId: XqvdX3YisQ
   wikiId: E580
@@ -2609,4 +2615,201 @@
       value: Co-founder, Elicit
   tags:
     - ai
+
+- id: ozzie-gooen
+  stableId: 24aX2Ru7Dg
+  type: person
+  title: Ozzie Gooen
+  description: >-
+    Founder and Executive Director of QURI (Quantified Uncertainty Research
+    Institute). Created Guesstimate (2016) and leads development of Squiggle,
+    a probabilistic programming language for estimation. Previously worked at
+    the Future of Humanity Institute at Oxford. Background in programming and
+    research focused on epistemic tools, forecasting infrastructure, and
+    uncertainty quantification.
+  website: https://quantifieduncertainty.org
+  tags:
+    - epistemic-tools
+    - forecasting
+    - probabilistic-reasoning
+    - open-source
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+    - id: squiggle-hub
+      type: project
+    - id: guesstimate
+      type: project
+  customFields:
+    - label: Role
+      value: Founder & Executive Director, QURI
+    - label: Known For
+      value: Guesstimate, Squiggle, QURI
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/oagr
+    - title: LessWrong Profile
+      url: https://www.lesswrong.com/users/ozziegooen
+  lastUpdated: 2026-03
+
+- id: sam-nolan
+  stableId: 2Ui200bHUQ
+  type: person
+  title: Sam Nolan
+  description: >-
+    Software developer who worked at QURI (2021-2023) on the Squiggle
+    programming language and cost-effectiveness analyses. Led the GiveWell CEA
+    quantification project using Squiggle, finding a mean cost to double
+    consumption of $169 (95% CI: $131-$1,185).
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+  lastUpdated: 2026-03
+
+- id: quinn-dougherty
+  stableId: YtooTZ0ORg
+  type: person
+  title: Quinn Dougherty
+  description: >-
+    Software Engineer who worked at QURI (2021-2022). Focused on epistemic
+    public goods with involvement in AGI alignment and community-building
+    projects.
+  website: https://quinnd.net
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/quinn
+  lastUpdated: 2026-03
+
+- id: elizabeth-van-nostrand
+  stableId: rF8popeiHw
+  type: person
+  title: Elizabeth Van Nostrand
+  description: >-
+    Consultant who worked with QURI (2019-2020) on evaluation-related posts
+    and the Amplifying Generalist Research experiment. Writes the Aceso Under
+    Glass blog.
+  website: https://acesounderglass.com
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/elizabeth
+    - title: LessWrong Profile
+      url: https://www.lesswrong.com/users/elizabeth-1
+  lastUpdated: 2026-03
+
+- id: umur-ozkul
+  stableId: y9XSIBClAw
+  type: person
+  title: Umur Ozkul
+  description: >-
+    Software Engineer who worked at QURI on the Squiggle interpreter.
+    Background in computer science, evolutionary programming, and functional
+    language design.
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: squiggle
+      type: project
+  lastUpdated: 2026-03
+
+- id: jacob-lagerros
+  stableId: JUWVFemrYQ
+  type: person
+  title: Jacob Lagerros
+  description: >-
+    Board Member of QURI. Has worked on forecasting initiatives and at the
+    Future of Humanity Institute. Subsequently worked at LessWrong.
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/jacobjacob
+    - title: LessWrong Profile
+      url: https://www.lesswrong.com/users/jacobjacob
+  lastUpdated: 2026-03
+
+- id: andrew-critch
+  stableId: ckKaHtKC5g
+  type: person
+  title: Andrew Critch
+  description: >-
+    CEO and Cofounder of Encultured AI. Board Member of QURI. Previously a
+    research fellow at MIRI, algorithmic trader at Jane Street, and cofounder
+    of CFAR and BERI. Founded the Berkeley Existential Risk Initiative and
+    cofounded SPARC.
+  website: https://acritch.com
+  tags:
+    - ai-safety
+    - rationality
+  clusters:
+    - ai-safety
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/critch
+    - title: LessWrong Profile
+      url: https://www.lesswrong.com/users/andrew_critch
+  lastUpdated: 2026-03
+
+- id: peter-wildeford
+  stableId: mIbKwQ4ZwQ
+  type: person
+  title: Peter Wildeford
+  description: >-
+    Co-founder and former co-Executive Director of Rethink Priorities.
+    Advisor to QURI.
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+    - id: rethink-priorities
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/peter_wildeford
+  lastUpdated: 2026-03
+
+- id: misha-yagudin
+  stableId: 1oXRs4wqTA
+  type: person
+  title: Misha Yagudin
+  description: >-
+    Founding partner at Arb, a research consultancy that has worked for Open
+    Philanthropy and others. Collaborator with QURI and Nuño Sempere. Met
+    Nuño at an FHI Summer Fellowship.
+  clusters:
+    - epistemics
+  relatedEntries:
+    - id: quri
+      type: organization
+  sources:
+    - title: EA Forum Profile
+      url: https://forum.effectivealtruism.org/users/misha_yagudin
+  lastUpdated: 2026-03
 

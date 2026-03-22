@@ -60,6 +60,17 @@
     - id: ltff
       type: organization
       relationship: supports
+    - id: ozzie-gooen
+      type: person
+    - id: foretold
+      type: project
+      relationship: related
+    - id: utility-function-extractor
+      type: project
+      relationship: related
+    - id: ai-safety-papers
+      type: project
+      relationship: related
   sources:
     - title: QURI Website
       url: https://quantifieduncertainty.org
@@ -126,7 +137,7 @@
   wikiId: E200
   type: project
   title: Metaforecast
-  projectStatus: maintained
+  projectStatus: unmaintained
   projectUrl: https://metaforecast.org
   organization: quri
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
@@ -253,3 +264,40 @@
   path: /knowledge-base/responses/wikipedia-and-ai/
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
+
+- id: foretold
+  stableId: pF3vNTBCmg
+  type: project
+  title: Foretold.io
+  projectStatus: deprecated
+  projectUrl: https://www.foretold.io
+  organization: quri
+  description: >-
+    A prediction platform meant for large sets of judgmental predictions.
+    Ozzie Gooen worked on this for much of 2018-2020. Later work halted
+    to favor smaller applications and research. Currently not functioning.
+  lastUpdated: 2026-03
+
+- id: utility-function-extractor
+  stableId: t9w0BEC2zQ
+  type: project
+  title: Utility Function Extractor
+  projectStatus: archived
+  projectUrl: https://utility-function-extractor.quantifieduncertainty.org
+  organization: quri
+  description: >-
+    A tool to elicit comparisons from people and convert those into a simple
+    utility function. Used privately for occasional experiments.
+  lastUpdated: 2026-03
+
+- id: ai-safety-papers
+  stableId: T6AGNzTdKw
+  type: project
+  title: AI Safety Papers
+  projectStatus: archived
+  projectUrl: https://ai-safety-papers.quantifieduncertainty.org
+  organization: quri
+  description: >-
+    A UI on top of an existing database about AI Safety Papers. The underlying
+    database is not being updated, so the data is fairly old (2020).
+  lastUpdated: 2026-03

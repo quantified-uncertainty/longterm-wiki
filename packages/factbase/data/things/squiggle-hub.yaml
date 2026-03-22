@@ -1,0 +1,24 @@
+entity: esASr3BOVQ
+facts:
+  - id: f_SH1descr01
+    property: description
+    value: >-
+      Web platform for creating, sharing, and discovering Squiggle models.
+      Features model groups, version history, AI-assisted editing via
+      SquiggleAI, and a growing library of community-contributed models.
+    asOf: !date 2026-03
+
+  - id: f_SH2found01
+    property: founded-date
+    value: !date 2023
+
+  - id: f_SH3webst01
+    property: website
+    value: https://squigglehub.org
+
+  - id: f_SH4fndby01
+    property: founded-by
+    value:
+      - !ref 24aX2Ru7Dg
+      - !ref 9TS0Cj5u5Q
+    notes: Built by Ozzie Gooen and Slava Matyukhin

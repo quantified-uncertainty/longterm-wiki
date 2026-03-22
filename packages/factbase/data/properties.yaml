@@ -52,6 +52,17 @@ properties:
       prefix: "$"
       suffix: "B"
 
+  funding-received:
+    name: Funding Received
+    description: "A specific grant or funding amount received from a grantor"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      prefix: "$"
+
   # ── People & Relationships ────────────────────────────────────
 
   employed-by:

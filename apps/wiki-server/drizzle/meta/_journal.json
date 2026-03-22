@@ -876,6 +876,13 @@
       "when": 1780387200000,
       "tag": "0124_website_sources_and_content_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1780473600000,
+      "tag": "0125_create_entity_recommended_resources",
+      "breakpoints": true
     }
   ]
 }
