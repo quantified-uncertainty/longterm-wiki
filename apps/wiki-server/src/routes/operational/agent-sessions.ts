@@ -307,26 +307,24 @@ const agentSessionsApp = new Hono()
     const entityId = c.req.query("entity_id");
     if (!entityId) return validationError(c, "entity_id query parameter is required");
     const db = getDrizzleDb();
-    const aseRows = await db.select({ agentSessionId: agentSessionEntities.agentSessionId })
-      .from(agentSessionEntities).where(eq(agentSessionEntities.entityStableId, entityId));
-    if (aseRows.length === 0) return c.json({ sessions: [] });
-    const sessionIds = aseRows.map((r) => r.agentSessionId);
-    const rows = await db.select().from(agentSessions)
-      .where(inArray(agentSessions.id, sessionIds))
-      .orderBy(desc(agentSessions.date), desc(agentSessions.id));
-    return c.json({
-      sessions: rows.map((r) => ({
-        id: r.id,
-        branch: r.branch,
-        task: r.task,
-        sessionType: r.sessionType,
-        date: r.date,
-        title: r.title,
-        summary: r.summary,
-        prUrl: r.prUrl,
-        status: r.status,
-      })),
-    });
+    const rows = await db
+      .select({
+        id: agentSessions.id,
+        branch: agentSessions.branch,
+        task: agentSessions.task,
+        sessionType: agentSessions.sessionType,
+        date: agentSessions.date,
+        title: agentSessions.title,
+        summary: agentSessions.summary,
+        prUrl: agentSessions.prUrl,
+        status: agentSessions.status,
+      })
+      .from(agentSessions)
+      .innerJoin(agentSessionEntities, eq(agentSessionEntities.agentSessionId, agentSessions.id))
+      .where(eq(agentSessionEntities.entityStableId, entityId))
+      .orderBy(desc(agentSessions.date), desc(agentSessions.id))
+      .limit(20);
+    return c.json({ sessions: rows });
   })
   .get("/insights", async (c) => {
     const parsed = InsightsQuery.safeParse(c.req.query());

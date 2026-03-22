@@ -535,12 +535,13 @@ async function forEntity(
   // Past agent sessions that touched this entity
   if (sessionsResult?.ok && sessionsResult.data.sessions.length > 0) {
     bundle += `## Past Agent Sessions\n\n`;
-    bundle += `| Date | Task | PR |\n|------|------|----|\n`;
+    bundle += tableRow('Date', 'Task', 'PR') + '\n';
+    bundle += tableRow('------', '------', '----') + '\n';
     for (const s of sessionsResult.data.sessions.slice(0, 10)) {
       const date = s.date ?? '—';
       const task = (s.title ?? s.task ?? '(untitled)').slice(0, 80);
       const pr = s.prUrl ? `[PR](${s.prUrl})` : '—';
-      bundle += `| ${date} | ${task} | ${pr} |\n`;
+      bundle += tableRow(date, task, pr) + '\n';
     }
     bundle += '\n';
   }
