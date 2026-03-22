@@ -154,6 +154,33 @@ Many experts believe that transformative AI could arrive within decades.[^3] How
     expect(claim1).toContain('First step');
     expect(claim1).not.toContain('Second step');
   });
+
+  it('extracts claim sentence for [^rc-XXXX] references', () => {
+    const body = `
+AI capex-revenue gap is 6-14x.[^rc-fec0] Revenue estimates vary widely.
+
+[^rc-fec0]: [Goldman Sachs AI Report](https://example.com/report)
+`;
+    const claim = extractClaimSentence(body, 'rc-fec0');
+    expect(claim).toContain('capex-revenue gap');
+    expect(claim).not.toContain('[^rc-fec0]');
+  });
+
+  it('accepts both string and number footnote IDs', () => {
+    const body = `
+Some fact here.[^1] Another fact.[^rc-abc1]
+
+[^1]: [Source](https://example.com/1)
+[^rc-abc1]: [Resource](https://example.com/resource)
+`;
+    // Number still works
+    const claim1 = extractClaimSentence(body, 1);
+    expect(claim1).toContain('Some fact here');
+
+    // String works too
+    const claim2 = extractClaimSentence(body, 'rc-abc1');
+    expect(claim2).toContain('Another fact');
+  });
 });
 
 describe('extractCitationsFromContent', () => {
@@ -165,7 +192,7 @@ Some claim here.[^1]
 `;
     const citations = extractCitationsFromContent(body);
     expect(citations.length).toBe(1);
-    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].footnote).toBe('1');
     expect(citations[0].url).toBe('https://example.com/report');
     expect(citations[0].linkText).toBe('Report Title');
   });
@@ -178,7 +205,7 @@ AI timelines are uncertain.[^1]
 `;
     const citations = extractCitationsFromContent(body);
     expect(citations.length).toBe(1);
-    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].footnote).toBe('1');
     expect(citations[0].url).toBe('https://example.com/karnofsky');
     expect(citations[0].linkText).toContain('Some Background on Our Views');
     expect(citations[0].linkText).toContain('Holden Karnofsky');
@@ -216,11 +243,11 @@ TransformerLens is a key tool.[^1] It was built for mechanistic interpretability
     const citations = extractCitationsFromContent(body);
     expect(citations.length).toBe(2);
 
-    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].footnote).toBe('1');
     expect(citations[0].url).toBe('https://github.com/neelnanda-io/TransformerLens');
     expect(citations[0].linkText).toBe('TransformerLens GitHub repository');
 
-    expect(citations[1].footnote).toBe(2);
+    expect(citations[1].footnote).toBe('2');
     expect(citations[1].url).toBe('https://transformer-circuits.pub/2021/framework/index.html');
     expect(citations[1].linkText).toContain('Mathematical Framework');
   });
@@ -234,7 +261,7 @@ Some claim.[^1] Another claim.[^2]
 `;
     const citations = extractCitationsFromContent(body);
     expect(citations.length).toBe(1);
-    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].footnote).toBe('1');
   });
 
   it('handles mixed footnote formats in the same page', () => {
@@ -252,6 +279,78 @@ Claim A.[^1] Claim B.[^2] Claim C.[^3] Claim D.[^4]
     expect(citations[1].url).toBe('https://example.com/embedded');
     expect(citations[2].url).toBe('https://example.com/text-url');
     expect(citations[3].url).toBe('https://example.com/bare');
+  });
+
+  it('extracts [^rc-XXXX] resource citations', () => {
+    const body = `
+AI capex-revenue gap is 6-14x.[^rc-fec0] Revenue estimates vary widely.[^rc-4bd8]
+
+[^rc-fec0]: [Goldman Sachs AI Report](https://example.com/goldman-ai)
+[^rc-4bd8]: [McKinsey AI Revenue Analysis](https://example.com/mckinsey)
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(2);
+    expect(citations[0].footnote).toBe('rc-4bd8');
+    expect(citations[0].url).toBe('https://example.com/mckinsey');
+    expect(citations[1].footnote).toBe('rc-fec0');
+    expect(citations[1].url).toBe('https://example.com/goldman-ai');
+    expect(citations[1].claimContext).toContain('capex-revenue gap');
+  });
+
+  it('extracts [^kb-...] knowledge base citations', () => {
+    const body = `
+Anthropic revenue reached \\$1B.[^kb-mK9pX3rQ7n]
+
+[^kb-mK9pX3rQ7n]: [Anthropic Financial Data](https://example.com/anthropic-finances)
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(1);
+    expect(citations[0].footnote).toBe('kb-mK9pX3rQ7n');
+    expect(citations[0].url).toBe('https://example.com/anthropic-finances');
+  });
+
+  it('handles mixed numeric and rc/kb citations', () => {
+    const body = `
+Fact one.[^1] Fact two.[^rc-abc1] Fact three.[^2] Fact four.[^kb-xyz]
+
+[^1]: [Source One](https://example.com/one)
+[^rc-abc1]: [Resource Citation](https://example.com/resource)
+[^2]: [Source Two](https://example.com/two)
+[^kb-xyz]: [KB Citation](https://example.com/kb)
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(4);
+    // Numeric first, then alphabetical
+    expect(citations[0].footnote).toBe('1');
+    expect(citations[1].footnote).toBe('2');
+    expect(citations[2].footnote).toBe('kb-xyz');
+    expect(citations[3].footnote).toBe('rc-abc1');
+  });
+
+  it('extracts [^rc-XXXX] with bare URL format', () => {
+    const body = `
+Some claim.[^rc-dead]
+
+[^rc-dead]: https://example.com/bare-resource
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(1);
+    expect(citations[0].footnote).toBe('rc-dead');
+    expect(citations[0].url).toBe('https://example.com/bare-resource');
+    expect(citations[0].linkText).toBe('');
+  });
+
+  it('extracts [^rc-XXXX] with text-then-URL format', () => {
+    const body = `
+Some claim.[^rc-beef]
+
+[^rc-beef]: Goldman Sachs AI Infrastructure Report: https://example.com/gs-report
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(1);
+    expect(citations[0].footnote).toBe('rc-beef');
+    expect(citations[0].url).toBe('https://example.com/gs-report');
+    expect(citations[0].linkText).toBe('Goldman Sachs AI Infrastructure Report');
   });
 });
 

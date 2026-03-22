@@ -221,11 +221,11 @@ export async function getUnverifiedQuotes(limit = 100): Promise<ApiResult<Unveri
 
 export async function getQuote(
   pageId: string,
-  footnote: number,
+  footnote: number | string,
 ): Promise<ApiResult<SingleQuoteResult>> {
   return apiRequest<SingleQuoteResult>(
     'GET',
-    `/api/citations/quotes/${encodeURIComponent(pageId)}/${footnote}`,
+    `/api/citations/quotes/${encodeURIComponent(pageId)}/${encodeURIComponent(String(footnote))}`,
   );
 }
 
