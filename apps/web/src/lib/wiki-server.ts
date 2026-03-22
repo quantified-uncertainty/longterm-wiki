@@ -172,7 +172,7 @@ export function dataSourceLabel(source: DataSource): string {
 
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
-import type { FactbaseVerificationsRoute } from "@wiki-server/factbase-verifications-route";
+import type { VerificationsRoute } from "@wiki-server/verifications-route";
 import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
@@ -217,22 +217,19 @@ export type RpcFactsByEntityResult = InferResponseType<FactsClient['by-entity'][
 export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':entityId']['$get'], 200>;
 
 // ============================================================================
-// Hono RPC client — KB Verifications API
+// Hono RPC client — Unified Verifications API
 // ============================================================================
 
-type KbVerificationsClient = ReturnType<typeof hc<FactbaseVerificationsRoute>>;
+type VerificationsClient = ReturnType<typeof hc<VerificationsRoute>>;
 
-/** Inferred response type for GET /api/kb-verifications/stats */
-export type RpcKbStatsResult = InferResponseType<KbVerificationsClient['stats']['$get'], 200>;
+/** Inferred response type for GET /api/verifications/stats */
+export type RpcVerificationsStatsResult = InferResponseType<VerificationsClient['stats']['$get'], 200>;
 
-/** Inferred response type for GET /api/kb-verifications/verdicts */
-export type RpcKbVerdictsResult = InferResponseType<KbVerificationsClient['verdicts']['$get'], 200>;
+/** Inferred response type for GET /api/verifications/verdicts */
+export type RpcVerificationsVerdictsResult = InferResponseType<VerificationsClient['verdicts']['$get'], 200>;
 
 /** A single verdict row from the verdicts list */
-export type RpcKbVerdictRow = RpcKbVerdictsResult['verdicts'][number];
-
-/** Inferred response type for GET /api/kb-verifications/verdicts/:factId */
-export type RpcKbVerdictDetailResult = InferResponseType<KbVerificationsClient['verdicts'][':factId']['$get'], 200>;
+export type RpcVerificationVerdictRow = RpcVerificationsVerdictsResult['verdicts'][number];
 
 // ============================================================================
 // Hono RPC client — Grants API

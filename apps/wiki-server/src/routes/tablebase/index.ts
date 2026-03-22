@@ -3,7 +3,7 @@
  *
  * Covers: entities, entity IDs, personnel, people, grants, divisions,
  * investments, funding rounds, equity positions, funding programs,
- * benchmarks, benchmark results, record verifications, things, research areas.
+ * benchmarks, benchmark results, things, research areas.
  */
 export { entitiesRoute, type EntitiesRoute } from "./entities.js";
 export { idsRoute, type IdsRoute } from "./ids.js";
@@ -18,7 +18,6 @@ export { equityPositionsRoute, type EquityPositionsRoute } from "./equity-positi
 export { fundingProgramsRoute, type FundingProgramsRoute } from "./funding-programs.js";
 export { benchmarksRoute, type BenchmarksRoute } from "./benchmarks.js";
 export { benchmarkResultsRoute, type BenchmarkResultsRoute } from "./benchmark-results.js";
-export { recordVerificationsRoute, type RecordVerificationsRoute } from "./record-verifications.js";
 export { thingsRoute, type ThingsRoute } from "./things.js";
 export { researchAreasRoute, type ResearchAreasRoute } from "./research-areas.js";
 export { policyStakeholdersRoute, type PolicyStakeholdersRoute } from "./policy-stakeholders.js";

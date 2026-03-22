@@ -16,8 +16,6 @@ export interface ThingSearchRow {
   description: string | null;
   sourceUrl: string | null;
   wikiId: string | null;
-  verdict: string | null;
-  verdictConfidence: number | null;
   href?: string;
 }
 
@@ -32,8 +30,6 @@ interface ApiThing {
   description: string | null;
   sourceUrl: string | null;
   wikiId: string | null;
-  verdict: string | null;
-  verdictConfidence: number | null;
 }
 
 interface SearchResponse {

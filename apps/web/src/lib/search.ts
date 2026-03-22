@@ -117,8 +117,6 @@ export interface ThingSearchResult {
   sourceUrl: string | null;
   wikiId: string | null;
   href: string | null;
-  verdict: string | null;
-  verdictConfidence: number | null;
   createdAt: string | null;
   updatedAt: string | null;
 }

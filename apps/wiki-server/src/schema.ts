@@ -1464,30 +1464,42 @@ export const pageCitations = pgTable(
   ]
 );
 
+// ── Unified Verification System ─────────────────────────────────────────
+//
+// Two tables replace the previous six (kb_fact_resource_verifications,
+// kb_fact_verdicts, record_verifications, record_verdicts,
+// thing_resource_verifications, thing_verdicts).
+// See discussion #2950 for architecture decisions.
+
 /**
- * Per-resource verification evidence for KB facts.
+ * Per-source verification evidence — one row per source×claim check.
  *
- * Each row records one LLM check of a KB fact against a specific resource.
- * A fact can have multiple rows (one per resource checked).
+ * Supports both row-level (fieldName=NULL) and cell-level (fieldName='amount')
+ * verification for any record type (facts, grants, personnel, etc.).
  */
-export const factbaseResourceVerifications = pgTable(
-  "kb_fact_resource_verifications",
+export const verificationEvidence = pgTable(
+  "verification_evidence",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    factId: text("fact_id").notNull(),
+    recordType: text("record_type").notNull(), // 'fact', 'grant', 'personnel', 'investment', etc.
+    recordId: text("record_id").notNull(), // PK in the source table
+    fieldName: text("field_name"), // NULL = whole row, or specific column name
+    entityId: text("entity_id"), // which entity this is about (for grouping/display)
+    expectedValue: text("expected_value"), // what the record says
     resourceId: text("resource_id").references(() => resources.id, {
       onDelete: "set null",
     }),
+    sourceUrl: text("source_url"), // direct URL
+    extractedValue: text("extracted_value"), // what the source says
+    extractedQuote: text("extracted_quote"), // relevant passage from source
     verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
     confidence: real("confidence"), // 0.0 to 1.0
-    extractedValue: text("extracted_value"),
-    checkerModel: text("checker_model"),
     isPrimarySource: boolean("is_primary_source").notNull().default(false),
+    checkerModel: text("checker_model"),
+    notes: text("notes"),
     checkedAt: timestamp("checked_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    notes: text("notes"),
-    sourceUrl: text("source_url"), // URL that was actually verified (fact source can change over time)
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1496,26 +1508,32 @@ export const factbaseResourceVerifications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_kbfrv_fact_id").on(table.factId),
-    index("idx_kbfrv_verdict").on(table.verdict),
+    index("idx_ve_record").on(table.recordType, table.recordId),
+    index("idx_ve_entity").on(table.entityId),
+    index("idx_ve_verdict").on(table.verdict),
+    index("idx_ve_checked").on(table.checkedAt),
   ]
 );
 
 /**
- * Aggregate per-fact verdicts — one row per fact, derived from resource verifications.
+ * Aggregate verdict per claim — one row per (recordType, recordId, fieldName).
  *
- * Recomputed periodically from kb_fact_resource_verifications. Separates evidence
- * (per-resource checks) from conclusions (all-things-considered verdict).
+ * Derived from verification_evidence. Separates evidence (per-source checks)
+ * from conclusions (all-things-considered verdict).
  */
-export const factbaseVerdicts = pgTable(
-  "kb_fact_verdicts",
+export const verificationVerdicts = pgTable(
+  "verification_verdicts",
   {
-    factId: text("fact_id").primaryKey(),
-    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | unchecked
+    recordType: text("record_type").notNull(),
+    recordId: text("record_id").notNull(),
+    fieldName: text("field_name"), // NULL = whole row verdict
+    entityId: text("entity_id"), // for grouping/display
+    verdict: text("verdict").notNull(), // confirmed | contradicted | outdated | partial | unverifiable | unchecked
     confidence: real("confidence"),
     reasoning: text("reasoning"),
     sourcesChecked: integer("sources_checked").notNull().default(0),
     needsRecheck: boolean("needs_recheck").notNull().default(false),
+    nextCheckDue: timestamp("next_check_due", { withTimezone: true }),
     lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1527,8 +1545,11 @@ export const factbaseVerdicts = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_kbfv_verdicts_verdict").on(table.verdict),
-    index("idx_kbfv_verdicts_recheck").on(table.needsRecheck),
+    // PK is (record_type, record_id, COALESCE(field_name, '')) defined in migration SQL
+    index("idx_vv_verdict").on(table.verdict),
+    index("idx_vv_recheck").on(table.needsRecheck),
+    index("idx_vv_entity").on(table.entityId),
+    index("idx_vv_type").on(table.recordType),
   ]
 );
 
@@ -2013,75 +2034,9 @@ export const fundingPrograms = pgTable(
 // divisions, funding programs, etc.). Mirrors the two-tier KB fact
 // verification model: evidence (per-source checks) → verdicts (aggregate).
 
-/**
- * Per-source verification checks for structured data records.
- *
- * Each row records a single check of one record against one source URL.
- * Multiple checks can exist per record (different sources, rechecks over time).
- */
-export const recordVerifications = pgTable(
-  "record_verifications",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    recordType: text("record_type").notNull(), // 'grant' | 'personnel' | 'division' | 'funding-program' | 'funding-round' | 'investment' | 'equity-position'
-    recordId: varchar("record_id", { length: 10 }).notNull(), // ID from the source table
-    fieldName: text("field_name"), // optional: specific field checked (e.g., 'amount', 'startDate')
-    expectedValue: text("expected_value"), // what the record says
-    sourceUrl: text("source_url"), // URL that was checked
-    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
-    confidence: real("confidence"), // 0.0 to 1.0
-    extractedValue: text("extracted_value"), // what the source actually says
-    checkerModel: text("checker_model"), // e.g., "claude-3-haiku"
-    notes: text("notes"),
-    checkedAt: timestamp("checked_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("idx_rv_record").on(table.recordType, table.recordId),
-    index("idx_rv_verdict").on(table.verdict),
-    index("idx_rv_type").on(table.recordType),
-  ]
-);
-
-/**
- * Aggregate per-record verdicts — one row per record, derived from
- * record_verifications. Separates evidence (per-source checks) from
- * conclusions (all-things-considered verdict).
- */
-export const recordVerdicts = pgTable(
-  "record_verdicts",
-  {
-    recordType: text("record_type").notNull(),
-    recordId: varchar("record_id", { length: 10 }).notNull(),
-    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | unchecked
-    confidence: real("confidence"),
-    reasoning: text("reasoning"),
-    sourcesChecked: integer("sources_checked").notNull().default(0),
-    needsRecheck: boolean("needs_recheck").notNull().default(false),
-    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.recordType, table.recordId] }),
-    index("idx_rvd_verdict").on(table.verdict),
-    index("idx_rvd_recheck").on(table.needsRecheck),
-    index("idx_rvd_type").on(table.recordType),
-  ]
-);
+// record_verifications and record_verdicts tables removed — replaced by
+// unified verification_evidence and verification_verdicts tables above.
+// See migration 0127 and discussion #2950.
 
 // ── Entity Events (Timeline / Milestones) ────────────────────────────
 //
@@ -2294,9 +2249,8 @@ export const things = pgTable(
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
     parentTitle: text("parent_title"),
-    verdict: text("verdict"),
-    verdictConfidence: real("verdict_confidence"),
-    verdictAt: timestamp("verdict_at", { withTimezone: true }),
+    // verdict, verdict_confidence, verdict_at columns removed — verification
+    // now lives in the unified verification_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2312,87 +2266,15 @@ export const things = pgTable(
     index("idx_things_type").on(table.thingType),
     index("idx_things_parent").on(table.parentThingId),
     index("idx_things_entity_type").on(table.entityType),
-    index("idx_things_verdict").on(table.verdict),
     index("idx_things_updated").on(table.updatedAt),
     uniqueIndex("idx_things_source_unique").on(table.sourceTable, table.sourceId),
     // GIN index on search_vector is created in migration SQL
   ]
 );
 
-// ── Thing Verification ───────────────────────────────────────────────
-//
-// Evidence + aggregate pattern for thing-level verification.
-// Mirrors record_verifications / record_verdicts but keyed by things.id.
-
-/**
- * Per-source verification checks for things.
- * Each row records a single check of one thing against one source.
- */
-export const thingResourceVerifications = pgTable(
-  "thing_resource_verifications",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    thingId: text("thing_id")
-      .notNull()
-      .references(() => things.id, { onDelete: "cascade" }),
-    resourceId: text("resource_id").references(() => resources.id, {
-      onDelete: "set null",
-    }),
-    sourceUrl: text("source_url"),
-    fieldName: text("field_name"),
-    expectedValue: text("expected_value"),
-    verdict: text("verdict").notNull(),
-    confidence: real("confidence"),
-    extractedValue: text("extracted_value"),
-    checkerModel: text("checker_model"),
-    isPrimarySource: boolean("is_primary_source").default(false),
-    notes: text("notes"),
-    checkedAt: timestamp("checked_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("idx_trv_thing").on(table.thingId),
-    index("idx_trv_verdict").on(table.verdict),
-  ]
-);
-
-/**
- * Aggregate per-thing verdicts — one row per thing, derived from
- * thing_resource_verifications.
- */
-export const thingVerdicts = pgTable(
-  "thing_verdicts",
-  {
-    thingId: text("thing_id")
-      .primaryKey()
-      .references(() => things.id, { onDelete: "cascade" }),
-    verdict: text("verdict").notNull(),
-    confidence: real("confidence"),
-    reasoning: text("reasoning"),
-    sourcesChecked: integer("sources_checked").default(0),
-    needsRecheck: boolean("needs_recheck").notNull().default(false),
-    lastComputedAt: timestamp("last_computed_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("idx_tvd_verdict").on(table.verdict),
-    index("idx_tvd_recheck").on(table.needsRecheck),
-  ]
-);
+// thing_resource_verifications and thing_verdicts tables removed — replaced by
+// unified verification_evidence and verification_verdicts tables.
+// See migration 0127 and discussion #2950.
 
 // ── QA Page Checks ─────────────────────────────────────────────────────
 //

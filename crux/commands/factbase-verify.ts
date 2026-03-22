@@ -366,7 +366,8 @@ async function verifySingleFact(
  */
 async function storeVerificationResult(result: VerificationResult): Promise<void> {
   const body = {
-    factId: result.factId,
+    recordType: 'fact',
+    recordId: result.factId,
     verdict: result.verdict,
     confidence: result.confidence,
     extractedValue: result.extractedValue,
@@ -378,7 +379,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/kb-verifications/verifications',
+    '/api/verifications/evidence',
     body,
   );
 

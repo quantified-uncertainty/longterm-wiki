@@ -67,7 +67,8 @@ interface VerificationResult {
 }
 
 interface ExistingVerdict {
-  thingId: string;
+  recordType: string;
+  recordId: string;
   verdict: string;
   confidence: number | null;
   needsRecheck: boolean;
@@ -88,24 +89,27 @@ function loadPolicyEntities(): PolicyEntity[] {
 }
 
 /**
- * Build a thing ID for a stakeholder position.
- * Uses the format: policy-stakeholder:<policyId>:<stakeholderName>
- * This must match the thing ID convention used by the things sync system.
+ * Build a record ID for a stakeholder position verification.
  */
-function buildStakeholderThingId(policyId: string, stakeholderName: string): string {
+function buildStakeholderRecordId(policyId: string, stakeholderName: string): string {
   const slug = stakeholderName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  return `policy-stakeholder:${policyId}:${slug}`;
+  return `${policyId}:${slug}`;
 }
+
+const STAKEHOLDER_RECORD_TYPE = 'policy-stakeholder';
 
 // ---------------------------------------------------------------------------
 // Existing verdict check
 // ---------------------------------------------------------------------------
 
-async function getExistingVerdict(thingId: string): Promise<ExistingVerdict | null> {
-  const result = await apiRequest<ExistingVerdict>('GET', `/api/things/verdicts/${encodeURIComponent(thingId)}`);
+async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | null> {
+  const result = await apiRequest<{ verdicts: ExistingVerdict[] }>(
+    'GET',
+    `/api/verifications/verdicts/${STAKEHOLDER_RECORD_TYPE}/${encodeURIComponent(recordId)}`
+  );
 
-  if (result.ok) {
-    return result.data;
+  if (result.ok && result.data.verdicts.length > 0) {
+    return result.data.verdicts[0];
   }
 
   // 404 = no verdict yet, which is fine
@@ -115,7 +119,7 @@ async function getExistingVerdict(thingId: string): Promise<ExistingVerdict | nu
 
   // For other errors (unavailable, timeout), log and return null
   if (!result.ok) {
-    console.warn(`[auto-verify] Could not check existing verdict for ${thingId}: ${result.message}`);
+    console.warn(`[auto-verify] Could not check existing verdict for ${recordId}: ${result.message}`);
     return null;
   }
 
@@ -226,7 +230,8 @@ If the position matches but the reason is different, use "partial".`;
 // ---------------------------------------------------------------------------
 
 interface PostVerificationBody {
-  thingId: string;
+  recordType: string;
+  recordId: string;
   sourceUrl: string;
   fieldName: string;
   expectedValue: string;
@@ -239,16 +244,16 @@ interface PostVerificationBody {
 }
 
 interface PostVerdictBody {
-  thingId: string;
+  recordType: string;
+  recordId: string;
   verdict: VerificationVerdict | 'unchecked';
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
-  needsRecheck: boolean;
 }
 
 async function recordVerification(verification: PostVerificationBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/things/verifications', verification);
+  const result = await apiRequest<unknown>('POST', '/api/verifications/evidence', verification);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verification: ${result.message}`);
     return false;
@@ -257,7 +262,7 @@ async function recordVerification(verification: PostVerificationBody): Promise<b
 }
 
 async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/things/verdicts', verdict);
+  const result = await apiRequest<unknown>('POST', '/api/verifications/verdicts', verdict);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verdict: ${result.message}`);
     return false;
@@ -309,7 +314,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   for (const policy of filtered) {
     for (const stakeholder of policy.stakeholders || []) {
       if (!stakeholder.source) continue;
-      const thingId = buildStakeholderThingId(policy.id, stakeholder.name);
+      const thingId = buildStakeholderRecordId(policy.id, stakeholder.name);
       allStakeholders.push({ policy, stakeholder, thingId });
     }
   }
@@ -521,7 +526,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
     // 7c. Record verification to wiki-server
     const recordedVerification = await recordVerification({
-      thingId,
+      recordType: STAKEHOLDER_RECORD_TYPE,
+      recordId: thingId,
       sourceUrl,
       fieldName: 'position',
       expectedValue: `${stakeholder.position}: ${stakeholder.reason || ''}`.slice(0, 5000),
@@ -539,12 +545,12 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
     // 7d. Update aggregate verdict
     const recordedVerdict = await recordVerdict({
-      thingId,
+      recordType: STAKEHOLDER_RECORD_TYPE,
+      recordId: thingId,
       verdict: llmResult.verdict,
       confidence: llmResult.confidence,
       reasoning: llmResult.notes,
       sourcesChecked: 1,
-      needsRecheck: false,
     });
 
     if (!recordedVerdict) {

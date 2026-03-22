@@ -80,8 +80,8 @@ These tables mirror data from the FactBase YAML package. The YAML in `packages/f
 |----------|---------------|---------|
 | `facts` | `facts` | Read mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. |
 | `properties` | `properties` | Controlled vocabulary for fact property types (valuation, headcount, ceo, etc.). |
-| `factbase_resource_verifications` | `factbaseResourceVerifications` | Per-source verification checks for FactBase facts. |
-| `factbase_verdicts` | `factbaseVerdicts` | Aggregate fact-level verdicts derived from verification evidence. |
+| ~~`factbase_resource_verifications`~~ | — | Replaced by unified `verification_evidence` table (migration 0127). |
+| ~~`factbase_verdicts`~~ | — | Replaced by unified `verification_verdicts` table (migration 0127). |
 
 ### WikiBase tables (prose content)
 
@@ -95,17 +95,23 @@ These tables mirror the MDX wiki pages.
 
 ### Cross-Base index (the `things` table)
 
-The `things` table is a **cross-base universal index**, not a FactBase concept. Every identifiable item in the system (entity, fact, grant, resource, personnel record, division, etc.) gets a single row. This enables:
+The `things` table is a **cross-base universal index** used for search. Every identifiable item in the system (entity, fact, grant, resource, personnel record, division, etc.) gets a single row. This enables:
 
 - Cross-domain search (search everything in one query)
-- Unified verification status across all record types
 - A single browse UI for all data
 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
-| `things` | `things` | Universal index. `thing_type` indicates domain (entity, fact, grant, etc.). `source_table` + `source_id` point back to the originating record. |
-| `thing_resource_verifications` | `thingResourceVerifications` | Per-source verification checks keyed by `things.id`. |
-| `thing_verdicts` | `thingVerdicts` | Aggregate verdicts for things. |
+| `things` | `things` | Universal search index. `thing_type` indicates domain (entity, fact, grant, etc.). `source_table` + `source_id` point back to the originating record. |
+
+### Unified Verification tables
+
+All verification data lives in two tables (replacing the previous six). See [discussion \#2950](https://github.com/quantified-uncertainty/longterm-wiki/discussions/2950).
+
+| PG table | Drizzle export | Purpose |
+|----------|---------------|---------|
+| `verification_evidence` | `verificationEvidence` | Per-source checks for any record type. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification. |
+| `verification_verdicts` | `verificationVerdicts` | Aggregate verdicts per claim. Keyed by `(record_type, record_id, COALESCE(field_name, ''))`. |
 
 ### Operational tables
 
@@ -140,8 +146,8 @@ These tables are not part of any Base. They track system operations, CI/CD, and 
 | `funding_programs` | `fundingPrograms` | Open funding opportunities. |
 | `benchmarks` | `benchmarks` | Evaluation benchmark definitions. |
 | `benchmark_results` | `benchmarkResults` | Model scores on benchmarks. |
-| `record_verifications` | `recordVerifications` | Per-source checks for financial records. |
-| `record_verdicts` | `recordVerdicts` | Aggregate verdicts for financial records. |
+| ~~`record_verifications`~~ | — | Replaced by unified `verification_evidence` table (migration 0127). |
+| ~~`record_verdicts`~~ | — | Replaced by unified `verification_verdicts` table (migration 0127). |
 | `research_areas` | `researchAreas` | Research area taxonomy. |
 
 ---

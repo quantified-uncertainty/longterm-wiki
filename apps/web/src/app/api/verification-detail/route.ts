@@ -2,34 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
- * GET /api/factbase-verdict-detail?factId=...
+ * GET /api/verification-detail?recordType=...&recordId=...
  *
- * Proxies KB verdict detail requests to the wiki-server's
- * /api/kb-verifications/verdicts/:factId endpoint.
+ * Proxies verification evidence requests to the wiki-server's
+ * /api/verifications/evidence/:recordType/:recordId endpoint.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const factId = searchParams.get("factId");
+  const recordType = searchParams.get("recordType");
+  const recordId = searchParams.get("recordId");
 
-  if (!factId) {
+  if (!recordType || !recordId) {
     return NextResponse.json(
-      { error: "factId is required" },
+      { error: "recordType and recordId are required" },
       { status: 400 },
     );
   }
 
-  // Validate factId length to prevent abuse
-  if (factId.length > 100) {
+  if (recordId.length > 500 || recordType.length > 50) {
     return NextResponse.json(
-      { error: "factId too long" },
+      { error: "Parameter too long" },
       { status: 400 },
     );
   }
 
-  // Validate factId contains only safe characters (alphanumeric, hyphens, underscores, dots, colons)
-  if (!/^[\w.\-:]+$/.test(factId)) {
+  // Validate IDs contain only safe characters
+  if (!/^[\w.\-:]+$/.test(recordId) || !/^[\w.\-]+$/.test(recordType)) {
     return NextResponse.json(
-      { error: "factId contains invalid characters" },
+      { error: "Parameters contain invalid characters" },
       { status: 400 },
     );
   }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${config.serverUrl}/api/kb-verifications/verdicts/${encodeURIComponent(factId)}`;
+    const url = `${config.serverUrl}/api/verifications/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(10000),
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     if (!res.ok) {
       if (res.status === 404) {
         return NextResponse.json(
-          { error: "Verdict not found" },
+          { error: "Evidence not found" },
           { status: 404 },
         );
       }
