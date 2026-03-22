@@ -50,7 +50,7 @@ export type HttpVerificationStatus = 'verified' | 'broken' | 'unverifiable';
 
 /** Result for a single citation (HTTP mode). */
 export interface HttpCitationResult {
-  footnote: number;
+  footnote: string;
   url: string;
   linkText: string;
   claimContext: string;

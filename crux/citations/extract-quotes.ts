@@ -96,10 +96,21 @@ export async function extractQuotesForPage(
 
   for (let i = 0; i < extracted.length; i++) {
     const cit = extracted[i];
+    const numericFootnote = /^\d+$/.test(cit.footnote) ? parseInt(cit.footnote, 10) : null;
+
+    // Skip non-numeric footnotes (rc-XXXX, kb-...) for DB operations
+    // These reference resources directly and don't use the citation_quotes table
+    if (numericFootnote === null) {
+      result.skipped++;
+      if (verbose) {
+        console.log(`  [^${cit.footnote}] (resource ref, skipping DB quote extraction)`);
+      }
+      continue;
+    }
 
     // Check if already processed
     if (!recheck) {
-      const existingResult = await getQuote(pageId, cit.footnote);
+      const existingResult = await getQuote(pageId, numericFootnote);
       const existing = existingResult.ok ? existingResult.data.quote : null;
       if (existing?.sourceQuote) {
         result.skipped++;
@@ -199,7 +210,7 @@ export async function extractQuotesForPage(
       // Store in wiki-server DB
       await upsertCitationQuote({
         pageId,
-        footnote: cit.footnote,
+        footnote: numericFootnote,
         url: cit.url || null,
         resourceId,
         claimText,
@@ -245,7 +256,7 @@ export async function extractQuotesForPage(
       const errResource = cit.url ? getResourceByUrl(cit.url) : null;
       await upsertCitationQuote({
         pageId,
-        footnote: cit.footnote,
+        footnote: numericFootnote,
         url: cit.url || null,
         resourceId: errResource?.id ?? null,
         claimText,
