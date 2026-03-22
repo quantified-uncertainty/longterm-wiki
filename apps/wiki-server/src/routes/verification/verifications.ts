@@ -379,8 +379,9 @@ const verificationsApp = new Hono()
     const fieldNameVal = body.fieldName ?? null;
     const entityIdVal = body.entityId ?? null;
 
-    const updateResult = await db.execute(sql`
+    const doUpdate = () => db.execute(sql`
       UPDATE verification_verdicts SET
+        entity_id = COALESCE(${entityIdVal}, entity_id),
         verdict = ${body.verdict},
         confidence = ${body.confidence ?? null},
         reasoning = ${body.reasoning ?? null},
@@ -394,22 +395,34 @@ const verificationsApp = new Hono()
         AND COALESCE(field_name, '') = COALESCE(${fieldNameVal}, '')
     `);
 
+    const updateResult = await doUpdate();
     const rowsUpdated = (updateResult as unknown as { count?: number })?.count ?? 0;
 
     if (rowsUpdated === 0) {
-      await db.execute(sql`
-        INSERT INTO verification_verdicts (
-          record_type, record_id, field_name, entity_id,
-          verdict, confidence, reasoning, sources_checked,
-          needs_recheck, next_check_due, last_computed_at,
-          created_at, updated_at
-        ) VALUES (
-          ${body.recordType}, ${body.recordId}, ${fieldNameVal}, ${entityIdVal},
-          ${body.verdict}, ${body.confidence ?? null}, ${body.reasoning ?? null}, ${body.sourcesChecked ?? 0},
-          false, ${body.nextCheckDue ? new Date(body.nextCheckDue) : null}, ${now},
-          ${now}, ${now}
-        )
-      `);
+      try {
+        await db.execute(sql`
+          INSERT INTO verification_verdicts (
+            record_type, record_id, field_name, entity_id,
+            verdict, confidence, reasoning, sources_checked,
+            needs_recheck, next_check_due, last_computed_at,
+            created_at, updated_at
+          ) VALUES (
+            ${body.recordType}, ${body.recordId}, ${fieldNameVal}, ${entityIdVal},
+            ${body.verdict}, ${body.confidence ?? null}, ${body.reasoning ?? null}, ${body.sourcesChecked ?? 0},
+            false, ${body.nextCheckDue ? new Date(body.nextCheckDue) : null}, ${now},
+            ${now}, ${now}
+          )
+        `);
+      } catch (insertErr: unknown) {
+        // Race condition: another request inserted between our UPDATE and INSERT.
+        // Retry the UPDATE which should now find the row.
+        const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
+        if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
+          await doUpdate();
+        } else {
+          throw insertErr;
+        }
+      }
     }
 
     return c.json({ ok: true }, 200);
