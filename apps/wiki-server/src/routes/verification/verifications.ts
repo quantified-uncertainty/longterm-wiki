@@ -373,30 +373,44 @@ const verificationsApp = new Hono()
     const db = getDrizzleDb();
     const now = new Date();
 
-    // The PK uses COALESCE(field_name, '') so we need raw SQL for the conflict target
-    await db.execute(sql`
-      INSERT INTO verification_verdicts (
-        record_type, record_id, field_name, entity_id,
-        verdict, confidence, reasoning, sources_checked,
-        needs_recheck, next_check_due, last_computed_at,
-        created_at, updated_at
-      ) VALUES (
-        ${body.recordType}, ${body.recordId}, ${body.fieldName ?? null}, ${body.entityId ?? null},
-        ${body.verdict}, ${body.confidence ?? null}, ${body.reasoning ?? null}, ${body.sourcesChecked ?? 0},
-        false, ${body.nextCheckDue ? new Date(body.nextCheckDue) : null}, ${now},
-        ${now}, ${now}
-      )
-      ON CONFLICT (record_type, record_id, COALESCE(field_name, ''))
-      DO UPDATE SET
-        verdict = EXCLUDED.verdict,
-        confidence = EXCLUDED.confidence,
-        reasoning = EXCLUDED.reasoning,
-        sources_checked = EXCLUDED.sources_checked,
+    // Two-step upsert: try UPDATE first, INSERT if no rows affected.
+    // This avoids ON CONFLICT with COALESCE expression which has compatibility
+    // issues across PG versions with the postgres.js driver.
+    const fieldNameVal = body.fieldName ?? null;
+    const entityIdVal = body.entityId ?? null;
+
+    const updateResult = await db.execute(sql`
+      UPDATE verification_verdicts SET
+        verdict = ${body.verdict},
+        confidence = ${body.confidence ?? null},
+        reasoning = ${body.reasoning ?? null},
+        sources_checked = ${body.sourcesChecked ?? 0},
         needs_recheck = false,
-        next_check_due = EXCLUDED.next_check_due,
-        last_computed_at = EXCLUDED.last_computed_at,
+        next_check_due = ${body.nextCheckDue ? new Date(body.nextCheckDue) : null},
+        last_computed_at = ${now},
         updated_at = ${now}
+      WHERE record_type = ${body.recordType}
+        AND record_id = ${body.recordId}
+        AND COALESCE(field_name, '') = COALESCE(${fieldNameVal}, '')
     `);
+
+    const rowsUpdated = (updateResult as unknown as { count?: number })?.count ?? 0;
+
+    if (rowsUpdated === 0) {
+      await db.execute(sql`
+        INSERT INTO verification_verdicts (
+          record_type, record_id, field_name, entity_id,
+          verdict, confidence, reasoning, sources_checked,
+          needs_recheck, next_check_due, last_computed_at,
+          created_at, updated_at
+        ) VALUES (
+          ${body.recordType}, ${body.recordId}, ${fieldNameVal}, ${entityIdVal},
+          ${body.verdict}, ${body.confidence ?? null}, ${body.reasoning ?? null}, ${body.sourcesChecked ?? 0},
+          false, ${body.nextCheckDue ? new Date(body.nextCheckDue) : null}, ${now},
+          ${now}, ${now}
+        )
+      `);
+    }
 
     return c.json({ ok: true }, 200);
   });
