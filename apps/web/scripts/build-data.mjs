@@ -51,7 +51,7 @@ import {
   fetchBenchmarkResults,
   fetchResearchAreas,
   fetchRecordVerdicts,
-  fetchFactBaseFromServer,
+  // fetchFactBaseFromServer — available but not yet wired as default (PG-primary prep)
   fetchPolicyStakeholderIds,
   syncPolicyStakeholders,
   fetchResourcesFromPG,

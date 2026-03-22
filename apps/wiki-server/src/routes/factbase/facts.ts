@@ -325,8 +325,9 @@ const factsApp = new Hono()
   })
 
   // ---- GET /export ----
-  // Returns all facts grouped by entity ID, matching the SerializedKB.facts format.
-  // Used by build-data.mjs to export PG facts → factbase-data.json.
+  // Returns all facts grouped by entity ID in a format approximating SerializedKB.facts.
+  // Note: some Fact fields (derivedFrom, sourceQuote, usdEquivalent, etc.) are not
+  // stored in PG and will be absent. See discussion #2950 for the PG-primary roadmap.
   .get("/export", async (c) => {
     const db = getDrizzleDb();
 
@@ -353,8 +354,9 @@ const factsApp = new Hono()
       if (!grouped[f.entityId]) grouped[f.entityId] = [];
 
       // Reconstruct the Fact value shape from PG columns
+      const inferredType = f.format ?? (f.numeric != null ? "number" : "text");
       const value: { type: string; value: unknown; low?: number; high?: number } = {
-        type: f.format ?? "text",
+        type: inferredType,
         value: f.numeric != null ? f.numeric : f.value,
       };
       if (f.low != null) value.low = f.low;
@@ -366,8 +368,8 @@ const factsApp = new Hono()
         propertyId: f.measure ?? f.factId,
         value,
         asOf: f.asOf,
-        ...(f.validEnd && { validEnd: f.validEnd }),
-        ...(f.currency && { currency: f.currency }),
+        ...(f.validEnd != null && { validEnd: f.validEnd }),
+        ...(f.currency != null && { currency: f.currency }),
         source: f.source,
         notes: f.note,
         ...(f.measure && { measure: f.measure }),
