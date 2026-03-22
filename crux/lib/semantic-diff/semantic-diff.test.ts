@@ -579,3 +579,55 @@ describe('adversarial cases — scope checker', () => {
     expect(result.violations[0].file).toBe('content/docs/secret.mdx');
   });
 });
+
+// ---------------------------------------------------------------------------
+// LLM gating
+// ---------------------------------------------------------------------------
+
+import { shouldUseLlmContradictions } from './index.ts';
+
+describe('shouldUseLlmContradictions', () => {
+  it('returns true when claims include numeric type', () => {
+    const claims = [
+      makeClaim('Company has 150 employees', 'numeric', '$150M'),
+    ];
+    expect(shouldUseLlmContradictions(claims)).toBe(true);
+  });
+
+  it('returns true when claims include temporal type', () => {
+    const claims = [
+      makeClaim('Founded in 2015', 'temporal'),
+    ];
+    expect(shouldUseLlmContradictions(claims)).toBe(true);
+  });
+
+  it('returns true when claims have keyValue even if type is other', () => {
+    const claims = [
+      makeClaim('Revenue is $50M', 'other', '$50M'),
+    ];
+    expect(shouldUseLlmContradictions(claims)).toBe(true);
+  });
+
+  it('returns false for prose-only claims without numeric/temporal data', () => {
+    const claims = [
+      makeClaim('The organization focuses on AI safety research', 'existence'),
+      makeClaim('They collaborate with academic institutions', 'attribution'),
+      makeClaim('Their approach differs from competitors', 'comparison'),
+    ];
+    expect(shouldUseLlmContradictions(claims)).toBe(false);
+  });
+
+  it('returns false for empty claims array', () => {
+    expect(shouldUseLlmContradictions([])).toBe(false);
+  });
+
+  it('returns true if even one claim is numeric among many prose claims', () => {
+    const claims = [
+      makeClaim('The org works on alignment', 'existence'),
+      makeClaim('They publish research papers', 'existence'),
+      makeClaim('Staff count is 42', 'numeric', '42'),
+      makeClaim('They focus on interpretability', 'definition'),
+    ];
+    expect(shouldUseLlmContradictions(claims)).toBe(true);
+  });
+});
