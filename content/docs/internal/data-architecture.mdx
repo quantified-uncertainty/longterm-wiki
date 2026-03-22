@@ -74,11 +74,11 @@ These tables mirror the YAML entity/resource catalog. YAML files remain authorit
 
 ### FactBase tables (structured facts)
 
-These tables mirror data from the FactBase YAML package. The YAML in `packages/factbase/data/things/` is the source of truth.
+YAML files in `packages/factbase/data/things/` are currently the primary source. They sync to PG via `crux wiki-server sync-facts`. The PG `facts` table provides an export endpoint (`GET /api/facts/export`) for consumers that need PG-backed access. Once the PG schema includes all Fact fields (`validEnd`, `currency`, etc.), PG will become the primary source.
 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
-| `facts` | `facts` | Read mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. |
+| `facts` | `facts` | PG mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. Export via `/api/facts/export`. |
 | `properties` | `properties` | Controlled vocabulary for fact property types (valuation, headcount, ceo, etc.). |
 | ~~`factbase_resource_verifications`~~ | — | Replaced by unified `verification_evidence` table (migration 0127). |
 | ~~`factbase_verdicts`~~ | — | Replaced by unified `verification_verdicts` table (migration 0127). |

@@ -51,6 +51,7 @@ import {
   fetchBenchmarkResults,
   fetchResearchAreas,
   fetchRecordVerdicts,
+  // fetchFactBaseFromServer — available but not yet wired as default (PG-primary prep)
   fetchPolicyStakeholderIds,
   syncPolicyStakeholders,
   fetchResourcesFromPG,
@@ -567,15 +568,16 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Load FactBase (structured facts graph) from packages/factbase
-  // Build entity map from TableBase entities for injection into FactBase loader
+  // Load FactBase (structured facts) from YAML.
+  // YAML remains the primary source for now — the PG facts table mirrors it
+  // via `crux wiki-server sync-facts`. Once PG schema has all Fact fields
+  // (validEnd, currency, etc.), PG can become the primary source.
+  // The /api/facts/export endpoint is available for PG-based consumers.
   const factbaseDataDir = join(REPO_ROOT, 'packages', 'factbase', 'data');
   if (existsSync(factbaseDataDir)) {
     const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
 
     // Build TableBase entity map keyed by stableId for FactBase entity injection
-    // Canonicalize entity types (e.g. "lab" -> "organization", "researcher" -> "person")
-    // since transformEntities() runs later and raw YAML types may still be present here.
     const tableBaseEntityMap = new Map();
     for (const entity of entities) {
       if (entity.stableId) {

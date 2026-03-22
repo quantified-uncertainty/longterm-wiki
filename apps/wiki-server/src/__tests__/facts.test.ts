@@ -34,7 +34,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- facts: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"facts"')) {
-    const COLS = 14;
+    const COLS = 16;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -55,12 +55,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         low: params[o + 5],
         high: params[o + 6],
         as_of: params[o + 7],
-        measure: params[o + 8],
-        subject: params[o + 9],
-        note: params[o + 10],
-        source: params[o + 11],
-        format: params[o + 12],
-        format_divisor: params[o + 13],
+        valid_end: params[o + 8],
+        currency: params[o + 9],
+        measure: params[o + 10],
+        subject: params[o + 11],
+        note: params[o + 12],
+        source: params[o + 13],
+        format: params[o + 14],
+        format_divisor: params[o + 15],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
