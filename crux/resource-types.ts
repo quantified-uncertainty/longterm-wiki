@@ -41,6 +41,7 @@ export interface Resource {
   enrichment_status?: string;
   enrichment_date?: string;
   importance_score?: number;
+  fetch_status?: string;
   // Sub-table data (populated when fetched with details)
   paper?: ResourcePaper;
   forum_post?: ResourceForumPost;

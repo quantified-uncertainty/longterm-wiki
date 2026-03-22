@@ -22,7 +22,7 @@ facts:
     property: founded-by
     value:
       - !ref eYrBgMLJDw
-      - !ref "-kU8m3AFTq"
+      - !ref 0x0hqwKo4I
       - !ref vIgoE1BeAk
     source: https://ssi.inc
 
