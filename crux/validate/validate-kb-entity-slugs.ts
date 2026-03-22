@@ -135,23 +135,38 @@ export function loadEntityRegistry(
 // ---------------------------------------------------------------------------
 
 /**
+ * Strip surrounding YAML quotes (single or double) from a value extracted
+ * via regex. YAML quotes IDs that start with special characters (e.g. `-`),
+ * but the logical value excludes the quotes.
+ */
+function stripYamlQuotes(value: string): string {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
+/**
  * Extract the entity stableId from a FactBase YAML file.
  * Handles both entity: <stableId> and thing: { id: <stableId> } formats.
  */
 function extractEntityId(content: string): string | null {
   const entityMatch = content.match(/^entity:\s*(\S+)/m);
   if (entityMatch && !content.match(/^thing:/m)) {
-    return entityMatch[1];
+    return stripYamlQuotes(entityMatch[1]);
   }
 
   if (content.match(/^thing:/m)) {
     const stableIdMatch = content.match(/^\s+stableId:\s*(\S+)/m);
-    if (stableIdMatch) return stableIdMatch[1];
+    if (stableIdMatch) return stripYamlQuotes(stableIdMatch[1]);
 
     const slugMatch = content.match(/^\s+slug:\s*\S+/m);
     if (slugMatch) {
       const idMatch = content.match(/^\s+id:\s*(\S+)/m);
-      if (idMatch) return idMatch[1];
+      if (idMatch) return stripYamlQuotes(idMatch[1]);
     }
   }
 

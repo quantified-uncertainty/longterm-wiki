@@ -70,11 +70,10 @@ describe("validate-entity-refs", () => {
   it(
     "fails when threshold is set impossibly high",
     () => {
-      // With threshold=100 and known orphans, it should fail
+      // With threshold=101 (above any possible percentage), it should always fail
       const result = run(
-        "npx tsx crux/validate/validate-entity-refs.ts --threshold=100"
+        "npx tsx crux/validate/validate-entity-refs.ts --threshold=101"
       );
-      // Will fail because current link rate is ~43%
       expect(result.exitCode).toBe(1);
       expect(result.stdout).toContain("below threshold");
     },

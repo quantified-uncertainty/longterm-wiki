@@ -2,7 +2,7 @@ entity: eQh3ZhWv8D
 facts:
   - id: f_FxnbY9edJA
     property: employed-by
-    value: "GiveWell"
+    value: !ref OwXl35e7bg
     asOf: 2007-01
     validEnd: "2014"
     source: https://www.givewell.org/about/people
@@ -10,7 +10,7 @@ facts:
 
   - id: f_S7CquLh2pg
     property: employed-by
-    value: "Open Philanthropy"
+    value: !ref NifCYhN75w
     asOf: 2014-01
     validEnd: "2024"
     source: https://www.openphilanthropy.org/about/team/

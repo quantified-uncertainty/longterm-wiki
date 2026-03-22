@@ -20,8 +20,8 @@ facts:
   - id: f_YndqOVXiTA
     property: founded-by
     value:
-      - nikolai-eroshenko
-      - hannu-rajaniemi
+      - !ref CBNE3Hszkr
+      - !ref 9VlZhCkPBE
     source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
 
   - id: f_iNzsKTtpRQ

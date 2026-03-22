@@ -6239,3 +6239,44 @@
     - national-security
     - think-tank
   lastUpdated: 2026-03
+
+- id: asana
+  stableId: xakL6BzSla
+  type: organization
+  orgType: generic
+  title: Asana
+  website: https://asana.com
+  description: >-
+    Work management platform co-founded by Dustin Moskovitz and Justin Rosenstein in 2008.
+    Provides project management and team collaboration tools.
+  tags:
+    - tech
+  lastUpdated: 2026-03
+
+- id: google-brain
+  stableId: AZmSQxCAlk
+  type: organization
+  orgType: other
+  title: Google Brain
+  description: >-
+    Deep learning research team at Google, founded in 2011. Merged with DeepMind in April 2023
+    to form Google DeepMind. Produced foundational AI research including TensorFlow, the
+    Transformer architecture, and neural scaling laws.
+  tags:
+    - ai
+    - google
+  lastUpdated: 2026-03
+
+- id: mila
+  stableId: alE9l9RI99
+  type: organization
+  orgType: academic
+  title: Mila - Quebec AI Institute
+  website: https://mila.quebec
+  description: >-
+    Quebec Artificial Intelligence Institute, founded by Yoshua Bengio. One of the world's
+    largest academic research centers for deep learning, based in Montreal.
+  tags:
+    - ai
+    - academic
+  lastUpdated: 2026-03

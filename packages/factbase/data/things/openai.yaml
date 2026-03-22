@@ -42,8 +42,8 @@ facts:
       - !ref eYrBgMLJDw
       - !ref Yq4s2cI7ng
       - !ref 69vftmr1jg
-      - wojciech-zaremba
-      - john-schulman
+      - !ref bkQV-vwEmE
+      - !ref ZocUS6ej6S
     source: https://openai.com/blog/introducing-openai
 
   - id: f_HfB3WmNDFQ

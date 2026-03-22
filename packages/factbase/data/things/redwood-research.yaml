@@ -19,6 +19,6 @@ facts:
   - id: f_yii7fct7Gw
     property: founded-by
     value:
-      - nate-thomas
-      - buck-shlegeris
+      - !ref R8tDuupBTt
+      - !ref Z62bQynY4g
     source: https://www.redwoodresearch.org/
