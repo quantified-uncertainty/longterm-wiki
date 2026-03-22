@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,10 +15,6 @@ import {
 import {
   Search,
   Loader2,
-  ShieldCheck,
-  ShieldAlert,
-  ShieldQuestion,
-  Clock,
   ChevronRight,
   ChevronLeft,
   ExternalLink,
@@ -104,91 +100,108 @@ function expandToggleColumn(): ColumnDef<VerdictRow> {
   };
 }
 
-const columns: ColumnDef<VerdictRow>[] = [
-  expandToggleColumn(),
-  {
-    accessorKey: "recordType",
-    header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-    cell: ({ row }) => (
-      <span className="text-xs font-medium capitalize">{row.original.recordType}</span>
-    ),
-  },
-  {
-    accessorKey: "entityId",
-    header: ({ column }) => <SortableHeader column={column}>Entity</SortableHeader>,
-    cell: ({ row }) => {
-      const id = row.original.entityId;
-      if (!id) return <span className="text-xs text-muted-foreground">-</span>;
-      return (
-        <span className="text-xs font-mono text-muted-foreground" title={id}>
-          {id.length > 12 ? id.slice(0, 10) + "..." : id}
-        </span>
-      );
-    },
-    filterFn: "includesString",
-  },
-  {
-    accessorKey: "recordId",
-    header: ({ column }) => <SortableHeader column={column}>Record</SortableHeader>,
-    cell: ({ row }) => (
-      <span className="text-xs font-mono text-muted-foreground" title={row.original.recordId}>
-        {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
-      </span>
-    ),
-    filterFn: "includesString",
-  },
-  {
-    accessorKey: "verdict",
-    header: ({ column }) => <SortableHeader column={column}>Verdict</SortableHeader>,
-    cell: ({ row }) => <VerdictBadge verdict={row.original.verdict} />,
-  },
-  {
-    accessorKey: "confidence",
-    header: ({ column }) => <SortableHeader column={column}>Confidence</SortableHeader>,
-    cell: ({ row }) => {
-      const c = row.original.confidence;
-      if (c == null) return <span className="text-xs text-muted-foreground">-</span>;
-      return <span className="text-sm tabular-nums font-medium">{Math.round(c * 100)}%</span>;
-    },
-  },
-  {
-    accessorKey: "reasoning",
-    header: "Reasoning",
-    cell: ({ row }) => {
-      const r = row.original.reasoning;
-      if (!r) return <span className="text-xs text-muted-foreground">-</span>;
-      return (
-        <span className="text-xs text-muted-foreground line-clamp-2 max-w-[300px]" title={r}>
-          {r}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "sourcesChecked",
-    header: ({ column }) => <SortableHeader column={column}>Sources</SortableHeader>,
-    cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.sourcesChecked}</span>,
-  },
-  {
-    accessorKey: "needsRecheck",
-    header: ({ column }) => <SortableHeader column={column}>Recheck</SortableHeader>,
-    cell: ({ row }) =>
-      row.original.needsRecheck ? (
-        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">yes</span>
-      ) : (
-        <span className="text-xs text-muted-foreground">no</span>
+function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
+  return [
+    expandToggleColumn(),
+    {
+      accessorKey: "recordType",
+      header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+      cell: ({ row }) => (
+        <span className="text-xs font-medium capitalize">{row.original.recordType}</span>
       ),
-  },
-  {
-    accessorKey: "lastComputedAt",
-    header: ({ column }) => <SortableHeader column={column}>Last Checked</SortableHeader>,
-    cell: ({ row }) => {
-      const d = row.original.lastComputedAt;
-      if (!d) return <span className="text-xs text-muted-foreground">-</span>;
-      return <span className="text-xs text-muted-foreground tabular-nums">{new Date(d).toLocaleDateString()}</span>;
     },
-  },
-];
+    {
+      accessorKey: "entityId",
+      header: ({ column }) => <SortableHeader column={column}>Entity</SortableHeader>,
+      cell: ({ row }) => {
+        const id = row.original.entityId;
+        if (!id) return <span className="text-xs text-muted-foreground">-</span>;
+        return (
+          <span className="text-xs font-mono text-muted-foreground" title={id}>
+            {id.length > 12 ? id.slice(0, 10) + "..." : id}
+          </span>
+        );
+      },
+      filterFn: "includesString",
+    },
+    {
+      accessorKey: "recordId",
+      header: ({ column }) => <SortableHeader column={column}>Record</SortableHeader>,
+      cell: ({ row }) => {
+        const resolvedName = names[row.original.recordId];
+        if (resolvedName) {
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-medium" title={resolvedName}>
+                {resolvedName.length > 30 ? resolvedName.slice(0, 28) + "..." : resolvedName}
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground" title={row.original.recordId}>
+                {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
+              </span>
+            </div>
+          );
+        }
+        return (
+          <span className="text-xs font-mono text-muted-foreground" title={row.original.recordId}>
+            {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
+          </span>
+        );
+      },
+      filterFn: "includesString",
+    },
+    {
+      accessorKey: "verdict",
+      header: ({ column }) => <SortableHeader column={column}>Verdict</SortableHeader>,
+      cell: ({ row }) => <VerdictBadge verdict={row.original.verdict} />,
+    },
+    {
+      accessorKey: "confidence",
+      header: ({ column }) => <SortableHeader column={column}>Confidence</SortableHeader>,
+      cell: ({ row }) => {
+        const c = row.original.confidence;
+        if (c == null) return <span className="text-xs text-muted-foreground">-</span>;
+        return <span className="text-sm tabular-nums font-medium">{Math.round(c * 100)}%</span>;
+      },
+    },
+    {
+      accessorKey: "reasoning",
+      header: "Reasoning",
+      cell: ({ row }) => {
+        const r = row.original.reasoning;
+        if (!r) return <span className="text-xs text-muted-foreground">-</span>;
+        return (
+          <span className="text-xs text-muted-foreground line-clamp-2 max-w-[300px]" title={r}>
+            {r}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "sourcesChecked",
+      header: ({ column }) => <SortableHeader column={column}>Sources</SortableHeader>,
+      cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.sourcesChecked}</span>,
+    },
+    {
+      accessorKey: "needsRecheck",
+      header: ({ column }) => <SortableHeader column={column}>Recheck</SortableHeader>,
+      cell: ({ row }) =>
+        row.original.needsRecheck ? (
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">yes</span>
+        ) : (
+          <span className="text-xs text-muted-foreground">no</span>
+        ),
+    },
+    {
+      accessorKey: "lastComputedAt",
+      header: ({ column }) => <SortableHeader column={column}>Last Checked</SortableHeader>,
+      cell: ({ row }) => {
+        const d = row.original.lastComputedAt;
+        if (!d) return <span className="text-xs text-muted-foreground">-</span>;
+        return <span className="text-xs text-muted-foreground tabular-nums">{new Date(d).toLocaleDateString()}</span>;
+      },
+    },
+  ];
+}
 
 // ── Expanded evidence detail ───────────────────────────────────────────────
 
@@ -261,9 +274,9 @@ function ExpandedDetail({
                 <td className="py-1.5 pr-3 max-w-[200px]">
                   {e.sourceUrl ? (
                     <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center gap-1">
+                      className="text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400">
                       <ExternalLink className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{new URL(e.sourceUrl).hostname}</span>
+                      <span className="truncate">{(() => { try { return new URL(e.sourceUrl).hostname; } catch { return e.sourceUrl; } })()}</span>
                     </a>
                   ) : <span className="text-muted-foreground">-</span>}
                 </td>
@@ -288,6 +301,56 @@ function ExpandedDetail({
   );
 }
 
+// ── Name resolution ──────────────────────────────────────────────────────
+
+type NameMap = Record<string, string>;
+
+/**
+ * Batch-resolve record IDs to human-readable names via the proxy API.
+ * Groups IDs by record type and makes one request per type.
+ * Returns a flat map of recordId -> name.
+ */
+async function resolveRecordNames(
+  verdicts: VerdictRow[]
+): Promise<NameMap> {
+  // Group unique IDs by record type
+  const byType = new Map<string, Set<string>>();
+  for (const v of verdicts) {
+    const existing = byType.get(v.recordType);
+    if (existing) {
+      existing.add(v.recordId);
+    } else {
+      byType.set(v.recordType, new Set([v.recordId]));
+    }
+  }
+
+  const result: NameMap = {};
+
+  // Fetch names for each record type in parallel
+  const fetches = [...byType.entries()].map(async ([recordType, ids]) => {
+    const idList = [...ids].join(",");
+    try {
+      const res = await fetch(
+        `/api/verification-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      const names = data.names as Record<string, string> | undefined;
+      if (names) {
+        for (const [id, name] of Object.entries(names)) {
+          result[id] = name;
+        }
+      }
+    } catch (e) {
+      // Non-critical: display falls back to raw ID
+      console.warn(`[entity-verifications] Failed to resolve names for ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  });
+
+  await Promise.all(fetches);
+  return result;
+}
+
 // ── Main viewer ────────────────────────────────────────────────────────────
 
 export function EntitySourceChecksViewer() {
@@ -295,19 +358,29 @@ export function EntitySourceChecksViewer() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [detailCache, setDetailCache] = useState<DetailCache>({});
+  const [recordNames, setRecordNames] = useState<NameMap>({});
 
   // Filter state
   const [filterType, setFilterType] = useState("all");
   const [filterVerdict, setFilterVerdict] = useState("all");
 
-  // Load all verdicts on mount
+  // Load all verdicts on mount, then resolve names
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch("/api/entity-verifications-proxy?limit=200");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        setVerdicts(data.verdicts ?? []);
+        const rows = data.verdicts ?? [];
+        setVerdicts(rows);
+
+        // Resolve names in background (non-blocking)
+        if (rows.length > 0) {
+          resolveRecordNames(rows).then(
+            (names) => setRecordNames(names),
+            (e) => console.warn(`[entity-verifications] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
+          );
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       } finally {
@@ -329,6 +402,9 @@ export function EntitySourceChecksViewer() {
     if (filterVerdict !== "all" && v.verdict !== filterVerdict) return false;
     return true;
   });
+
+  // Memoize columns so they update when record names are resolved
+  const columns = useMemo(() => buildColumns(recordNames), [recordNames]);
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([{ id: "lastComputedAt", desc: true }]);

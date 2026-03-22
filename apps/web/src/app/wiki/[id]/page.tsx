@@ -39,6 +39,7 @@ import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
+import { VerificationStatus } from "@/components/wiki/VerificationStatus";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
@@ -413,6 +414,8 @@ async function ContentView({
       </CitationQuotesProvider>
       {/* KB facts section: auto-rendered for entities with substantive KB data */}
       {isArticle && !isInternal && entity && <FBAutoFacts entityId={slug} />}
+      {/* Verification status: shows entity-level verification verdicts when available */}
+      {isArticle && !isInternal && entity && <VerificationStatus entityId={slug} />}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>

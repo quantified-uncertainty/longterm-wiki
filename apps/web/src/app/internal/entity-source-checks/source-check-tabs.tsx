@@ -4,17 +4,18 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface SourceCheckTabsProps {
   verdictsContent: React.ReactNode;
-  factbaseContent: React.ReactNode;
   coverageContent: React.ReactNode;
 }
 
 /**
  * Client-side tab switcher for the consolidated source-check dashboard.
  * Server-rendered content is passed in as ReactNode props.
+ *
+ * Previously had a FactBase tab, but it showed the same data as Verdicts
+ * (which already has record type filter buttons). Removed to deduplicate.
  */
 export function SourceCheckTabs({
   verdictsContent,
-  factbaseContent,
   coverageContent,
 }: SourceCheckTabsProps) {
   return (
@@ -27,12 +28,6 @@ export function SourceCheckTabs({
           Verdicts
         </TabsTrigger>
         <TabsTrigger
-          value="factbase"
-          className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
-        >
-          FactBase
-        </TabsTrigger>
-        <TabsTrigger
           value="coverage"
           className="rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
         >
@@ -41,9 +36,6 @@ export function SourceCheckTabs({
       </TabsList>
       <TabsContent value="verdicts" className="mt-6">
         {verdictsContent}
-      </TabsContent>
-      <TabsContent value="factbase" className="mt-6">
-        {factbaseContent}
       </TabsContent>
       <TabsContent value="coverage" className="mt-6">
         {coverageContent}
