@@ -1,33 +1,37 @@
 /**
  * Shared helpers for resolving page slugs to integer IDs
  * and auto-allocating entity IDs for new pages during sync.
+ *
+ * Read lookups (resolvePageIntId/resolvePageIntIds) query wiki_pages directly
+ * since wiki_pages.id is the integer PK and wiki_pages.slug is unique.
+ * Allocation (allocateAndResolvePageIntIds) still uses entity_ids for sequence-based ID generation.
  */
 
 import { eq, inArray, sql } from "drizzle-orm";
-import { entityIds } from "../../schema.js";
+import { entityIds, wikiPages } from "../../schema.js";
 import type { getDrizzleDb } from "../../db.js";
 
 type DrizzleDb = ReturnType<typeof getDrizzleDb>;
 
 /**
- * Resolve a single page slug to its integer ID via entity_ids table.
- * Returns null if the slug has no entity_id allocation.
+ * Resolve a single page slug to its integer ID via wiki_pages.
+ * Returns null if no page exists for the slug.
  */
 export async function resolvePageIntId(
   db: DrizzleDb,
   slug: string
 ): Promise<number | null> {
   const rows = await db
-    .select({ wikiId: entityIds.wikiId })
-    .from(entityIds)
-    .where(eq(entityIds.slug, slug))
+    .select({ id: wikiPages.id })
+    .from(wikiPages)
+    .where(eq(wikiPages.slug, slug))
     .limit(1);
-  return rows[0]?.wikiId ?? null;
+  return rows[0]?.id ?? null;
 }
 
 /**
  * Resolve multiple page slugs to their integer IDs in one query.
- * Returns a Map<slug, intId>. Slugs without an entity_id allocation are omitted.
+ * Returns a Map<slug, intId>. Slugs without a wiki_pages row are omitted.
  */
 export async function resolvePageIntIds(
   db: DrizzleDb,
@@ -37,13 +41,13 @@ export async function resolvePageIntIds(
 
   const uniqueSlugs = [...new Set(slugs)];
   const rows = await db
-    .select({ slug: entityIds.slug, wikiId: entityIds.wikiId })
-    .from(entityIds)
-    .where(inArray(entityIds.slug, uniqueSlugs));
+    .select({ slug: wikiPages.slug, id: wikiPages.id })
+    .from(wikiPages)
+    .where(inArray(wikiPages.slug, uniqueSlugs));
 
   const map = new Map<string, number>();
   for (const row of rows) {
-    map.set(row.slug, row.wikiId);
+    map.set(row.slug, row.id);
   }
   return map;
 }

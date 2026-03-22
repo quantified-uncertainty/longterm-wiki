@@ -650,14 +650,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return row ? [contentToSqlRow(row)] : [];
   }
 
-  // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
-  // Allocating on first use mirrors production where all page slugs have entity_ids.
-  // Exception: "no-entity-id" slug returns no row, simulating a page absent from entity_ids
+  // --- wiki_pages: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
+  // Allocating on first use mirrors production where all page slugs have wiki_pages rows.
+  // Exception: "no-entity-id" slug returns no row, simulating a page absent from wiki_pages
   // (used to test the null-intId early-return path in routes).
-  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)")) {
+  if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("as id")) {
     return params
       .filter((p) => String(p) !== "no-entity-id")
-      .map((p) => ({ wiki_id: getIntIdForSlug(String(p)), slug: p }));
+      .map((p) => ({ id: getIntIdForSlug(String(p)), slug: p }));
   }
 
   // --- entity_ids fallbacks (for health check count) ---

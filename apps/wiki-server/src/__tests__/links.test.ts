@@ -82,16 +82,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ wiki_id: getIntIdForSlug(slug), slug }];
   }
 
-  // --- entity_ids: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
-  // Must not match the page_links INSERT which contains entity_ids in a JOIN
-  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("page_links")) {
+  // --- wiki_pages: SELECT WHERE slug (for resolvePageIntId/resolvePageIntIds) ---
+  if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("page_links")) {
     return params
       .map((p) => {
         const slug = String(p);
-        const wiki_id = lookupIntIdForSlug(slug);
-        return wiki_id === undefined ? null : { wiki_id, slug };
+        const id = lookupIntIdForSlug(slug);
+        return id === undefined ? null : { id, slug };
       })
-      .filter((r): r is { wiki_id: number; slug: string } => r !== null);
+      .filter((r): r is { id: number; slug: string } => r !== null);
   }
 
   // --- page_links: DELETE all ---
