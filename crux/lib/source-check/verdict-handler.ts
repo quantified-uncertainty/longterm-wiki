@@ -1,31 +1,31 @@
 /**
- * Verdict Handler — store verification evidence and aggregate verdicts.
+ * Verdict Handler — store source-check evidence and aggregate verdicts.
  *
- * Shared by records-verify and verify-orchestrate. Handles:
- * - Storing individual verification evidence via wiki-server API
+ * Shared by factbase-source-check and source-check-orchestrate. Handles:
+ * - Storing individual source-check evidence via wiki-server API
  * - Storing aggregate verdicts via wiki-server API
  */
 
 import { apiRequest } from '../wiki-server/client.ts';
 import { MODELS } from '../llm.ts';
-import type { VerificationVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
+import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 
 /**
- * Store individual verification evidence in the wiki-server.
+ * Store individual source-check evidence in the wiki-server.
  *
  * @param params - Evidence parameters
- * @param logPrefix - Prefix for warning messages (default: '[verify]')
+ * @param logPrefix - Prefix for warning messages (default: '[source-check]')
  */
-export async function storeVerificationEvidence(params: {
+export async function storeSourceCheckEvidence(params: {
   recordType: RecordType | 'fact';
   recordId: string;
   sourceUrl: string;
-  verdict: VerificationVerdict | string;
+  verdict: SourceCheckVerdict | string;
   confidence: number;
   extractedValue: string;
   reasoning: string;
   isPrimarySource?: boolean;
-}, logPrefix = '[verify]'): Promise<void> {
+}, logPrefix = '[source-check]'): Promise<void> {
   const body = {
     recordType: params.recordType,
     recordId: params.recordId,
@@ -40,29 +40,32 @@ export async function storeVerificationEvidence(params: {
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/verifications/evidence',
+    '/api/source-checks/evidence',
     body,
   );
 
   if (!response.ok) {
-    console.warn(`${logPrefix} Failed to store verification for ${params.recordType}/${params.recordId}: ${response.error}`);
+    console.warn(`${logPrefix} Failed to store evidence for ${params.recordType}/${params.recordId}: ${response.error}`);
   }
 }
+
+/** @deprecated Use storeSourceCheckEvidence */
+export const storeVerificationEvidence = storeSourceCheckEvidence;
 
 /**
  * Store an aggregate verdict for a record.
  *
  * @param params - Verdict parameters
- * @param logPrefix - Prefix for warning messages (default: '[verify]')
+ * @param logPrefix - Prefix for warning messages (default: '[source-check]')
  */
 export async function storeAggregateVerdict(params: {
   recordType: RecordType;
   recordId: string;
-  verdict: VerificationVerdict | string;
+  verdict: SourceCheckVerdict | string;
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
-}, logPrefix = '[verify]'): Promise<void> {
+}, logPrefix = '[source-check]'): Promise<void> {
   const body = {
     recordType: params.recordType,
     recordId: params.recordId,
@@ -74,7 +77,7 @@ export async function storeAggregateVerdict(params: {
 
   const response = await apiRequest<{ ok: boolean }>(
     'POST',
-    '/api/verifications/verdicts',
+    '/api/source-checks/verdicts',
     body,
   );
 

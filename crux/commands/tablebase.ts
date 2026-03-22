@@ -867,15 +867,15 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
 const PERSONNEL_SYNC_BATCH_SIZE = 200;
 
 // ---------------------------------------------------------------------------
-// verify-records: Batch verification of enriched records
+// source-check-records: Batch source-checking of enriched records
 // ---------------------------------------------------------------------------
 
-async function verifyRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { verifyRecords, formatVerificationReport } = await import('../tablebase/verify.ts');
+async function sourceCheckRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { verifyRecords, formatVerificationReport } = await import('../tablebase/source-check.ts');
 
   const table = options.table as string | undefined;
   if (!table) {
-    return { exitCode: 1, output: 'Usage: crux tb verify-records --table=<personnel|funding-rounds|investments|benchmark-results> [--source=deterministic|batch|all] [--limit=N] [--model=haiku]' };
+    return { exitCode: 1, output: 'Usage: crux tb source-check-records --table=<personnel|funding-rounds|investments|benchmark-results> [--source=deterministic|batch|all] [--limit=N] [--model=haiku]' };
   }
 
   const limit = options.limit ? parseInt(options.limit as string, 10) : undefined;
@@ -992,8 +992,9 @@ export const commands = {
   'create-entity': createEntityCommand,
   'ensure-entities': ensureEntitiesCommand,
   'fetch-page': fetchPageCommand,
-  verify: verifyCommand,
-  'verify-records': verifyRecordsCommand,
+  verify: verifyCommand, // personnel ID integrity check (not source-checking)
+  'source-check-records': sourceCheckRecordsCommand,
+  'verify-records': sourceCheckRecordsCommand, // deprecated alias
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
   default: scanCommand,
@@ -1028,7 +1029,7 @@ Commands:
   create-entity  Create a new entity (person, org, etc.) with allocated ID
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
-  verify-records Batch-verify records using deterministic checks + Batch API
+  source-check-records Batch source-check records using deterministic checks + Batch API
   sync-careers   Sync FactBase career data to the personnel table
 
   Backfill (consolidated from backfill-* domains):
@@ -1080,9 +1081,9 @@ Examples:
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
-  crux tb tablebase verify-records --table=personnel --source=deterministic  # Fast structural checks
-  crux tb tablebase verify-records --table=personnel --source=batch --limit=100  # LLM verify 100 records
-  crux tb tablebase verify-records --table=personnel --source=all   # Full verification
+  crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
+  crux tb tablebase source-check-records --table=personnel --source=batch --limit=100  # LLM check 100 records
+  crux tb tablebase source-check-records --table=personnel --source=all   # Full source-check
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records

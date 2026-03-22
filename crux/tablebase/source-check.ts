@@ -1,16 +1,16 @@
 /**
- * TableBase Batch Verification
+ * TableBase Batch Source-Check
  *
- * Verifies enriched records using the Batch API (50% cost discount).
+ * Source-checks enriched records using the Batch API (50% cost discount).
  * Two-phase approach:
  *   1. Deterministic checks: source URL reachability, entity resolution, field presence
- *   2. LLM verification via Batch API: cross-reference record claims against source content
+ *   2. LLM source-check via Batch API: cross-reference record claims against source content
  *
  * Usage:
- *   crux tb verify-records --table=personnel           # Verify all personnel records
- *   crux tb verify-records --table=personnel --limit=50 # Verify first 50
- *   crux tb verify-records --source=batch               # LLM verification via Batch API
- *   crux tb verify-records --source=deterministic       # Structural checks only (no LLM)
+ *   crux tb source-check-records --table=personnel           # Check all personnel records
+ *   crux tb source-check-records --table=personnel --limit=50 # Check first 50
+ *   crux tb source-check-records --source=batch               # LLM source-check via Batch API
+ *   crux tb source-check-records --source=deterministic       # Structural checks only (no LLM)
  */
 
 import { readFileSync, existsSync } from 'fs';

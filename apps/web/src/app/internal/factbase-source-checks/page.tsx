@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function FactBaseVerificationsPage() {
+export default function FactBaseSourceChecksPage() {
   redirect("/wiki/E2200");
 }

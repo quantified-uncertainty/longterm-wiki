@@ -2,21 +2,21 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-interface VerificationTabsProps {
+interface SourceCheckTabsProps {
   verdictsContent: React.ReactNode;
   factbaseContent: React.ReactNode;
   coverageContent: React.ReactNode;
 }
 
 /**
- * Client-side tab switcher for the consolidated verification dashboard.
+ * Client-side tab switcher for the consolidated source-check dashboard.
  * Server-rendered content is passed in as ReactNode props.
  */
-export function VerificationTabs({
+export function SourceCheckTabs({
   verdictsContent,
   factbaseContent,
   coverageContent,
-}: VerificationTabsProps) {
+}: SourceCheckTabsProps) {
   return (
     <Tabs defaultValue="verdicts">
       <TabsList className="w-full justify-start gap-1 bg-transparent p-0 border-b border-border rounded-none h-auto pb-0">

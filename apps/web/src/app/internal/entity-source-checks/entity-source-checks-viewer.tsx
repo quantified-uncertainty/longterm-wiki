@@ -290,7 +290,7 @@ function ExpandedDetail({
 
 // ── Main viewer ────────────────────────────────────────────────────────────
 
-export function EntityVerificationsViewer() {
+export function EntitySourceChecksViewer() {
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -387,7 +387,7 @@ export function EntityVerificationsViewer() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading verifications...
+        <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading source checks...
       </div>
     );
   }
@@ -395,7 +395,7 @@ export function EntityVerificationsViewer() {
   if (error) {
     return (
       <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-600">
-        Failed to load verifications: {error}
+        Failed to load source checks: {error}
       </div>
     );
   }
@@ -462,7 +462,7 @@ export function EntityVerificationsViewer() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            placeholder="Search verifications..."
+            placeholder="Search source checks..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
@@ -512,7 +512,7 @@ export function EntityVerificationsViewer() {
       )}
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data from <code className="text-[11px]">verification_verdicts</code> table.
+        Data from <code className="text-[11px]">source_check_verdicts</code> table.
         Click a row to expand and see per-source evidence.
       </p>
     </div>

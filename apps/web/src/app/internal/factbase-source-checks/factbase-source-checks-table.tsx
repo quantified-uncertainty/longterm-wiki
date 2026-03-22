@@ -15,7 +15,7 @@ import {
 import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import type { VerdictRow } from "./factbase-verifications-content";
+import type { VerdictRow } from "./factbase-source-checks-content";
 
 interface VerdictDetailResult {
   evidence: Array<{
@@ -214,7 +214,7 @@ type DetailCache = Record<string, {
   error?: string;
 }>;
 
-function ExpandedVerificationDetail({
+function ExpandedSourceCheckDetail({
   factId,
   cache,
   onLoad,
@@ -235,7 +235,7 @@ function ExpandedVerificationDetail({
     return (
       <div className="flex items-center gap-2 px-6 py-4 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Loading verification details...
+        Loading source-check details...
       </div>
     );
   }
@@ -261,7 +261,7 @@ function ExpandedVerificationDetail({
   if (evidence.length === 0) {
     return (
       <div className="px-6 py-4 text-sm text-muted-foreground">
-        No verification evidence found for this record.
+        No source-check evidence found for this record.
       </div>
     );
   }
@@ -269,7 +269,7 @@ function ExpandedVerificationDetail({
   return (
     <div className="px-6 py-4 bg-muted/30">
       <div className="text-xs font-semibold text-muted-foreground mb-2">
-        Verification Evidence ({evidence.length})
+        Source-Check Evidence ({evidence.length})
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
@@ -333,7 +333,7 @@ function ExpandedVerificationDetail({
 
 // ── Table component ───────────────────────────────────────────────────────────
 
-export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
+export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
   const [filterVerdict, setFilterVerdict] = useState<string>("all");
   const [detailCache, setDetailCache] = useState<DetailCache>({});
 
@@ -467,7 +467,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            placeholder="Search verifications..."
+            placeholder="Search source checks..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
@@ -485,7 +485,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
         renderExpandedRow={(row) => {
           if (!row.getIsExpanded()) return null;
           return (
-            <ExpandedVerificationDetail
+            <ExpandedSourceCheckDetail
               factId={row.original.recordId}
               cache={detailCache}
               onLoad={fetchDetail}

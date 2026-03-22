@@ -1,7 +1,7 @@
 /**
  * Record field access utilities — safe accessors for untyped API response objects.
  *
- * Used by records-verify and verify-orchestrate to extract typed values
+ * Used by factbase-source-check and source-check-orchestrate to extract typed values
  * from raw API response rows without runtime type assertions.
  */
 

@@ -8,7 +8,7 @@ import {
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
-import { VerificationBadge } from "@/components/directory/VerificationBadge";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
 import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
@@ -129,7 +129,7 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
               {titleCase(grant.status)}
             </span>
           )}
-          <VerificationBadge verdict={grantVerdict} />
+          <SourceCheckBadge verdict={grantVerdict} />
         </div>
 
         {/* Amount hero */}
