@@ -828,8 +828,9 @@ const entitiesApp = new Hono()
     const { entities: items } = c.req.valid("json");
     const db = getDrizzleDb();
 
-    // Validate relatedEntries references: check that referenced entity IDs exist
-    // (excluding IDs being created in this same batch, which are valid self-refs)
+    // Validate relatedEntries references: strip out references to entities
+    // that don't exist (either in this batch or in PG). This allows the sync
+    // to proceed even when entities reference each other across batches.
     const batchIds = new Set(items.map((e) => e.id));
     const relatedIds = [
       ...new Set(
@@ -842,9 +843,17 @@ const entitiesApp = new Hono()
     if (relatedIds.length > 0) {
       const missing = await checkRefsExist(db, entities, entities.id, relatedIds);
       if (missing.length > 0) {
-        return validationError(
-          c,
-          `Referenced entities not found in relatedEntries: ${missing.join(", ")}`
+        const missingSet = new Set(missing);
+        // Strip invalid references instead of rejecting the batch
+        for (const item of items) {
+          if (item.relatedEntries) {
+            item.relatedEntries = item.relatedEntries.filter(
+              (r) => batchIds.has(r.id) || !missingSet.has(r.id)
+            );
+          }
+        }
+        console.warn(
+          `[entities/sync] Stripped ${missing.length} unresolved relatedEntries refs: ${missing.slice(0, 10).join(", ")}${missing.length > 10 ? ` ... (+${missing.length - 10} more)` : ""}`
         );
       }
     }
