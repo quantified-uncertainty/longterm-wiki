@@ -127,6 +127,16 @@ facts:
       Oracle price ~$520, suggesting actual OTC trades at lower levels (~$580B
       implied)."
 
+  # ── Employee Tender Offer ───────────────────────────────────────
+  - id: f_nQ4xW7mK9p
+    property: employee-tender-offer
+    value: 5.5e+9
+    asOf: 2026-02
+    source: https://www.bloomberg.com/news/articles/2026-02-23/anthropic-kicks-off-share-sale-for-staffers-of-up-to-6-billion
+    notes: "Employee share sale program, $5-6B at $350B pre-money valuation (below
+      the $380B post-money Series G). Provides employee liquidity while company
+      remains private. Launched Feb 2026 per Bloomberg."
+
   # ── Total Funding ───────────────────────────────────────────────
   - id: f_V3qsrDVY3A
     property: total-funding
