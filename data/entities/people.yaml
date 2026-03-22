@@ -902,9 +902,12 @@
       type: person
     - id: 73qTEkYyWA
       type: safety-agenda
+    - id: XqjV4mbMXQ
+      type: organization
+      relationship: research
   customFields:
     - label: Role
-      value: Scientific Director of Mila, Professor
+      value: Scientific Director of Mila, Professor; Scientific Director of ARIA Safeguarded AI (since Aug 2024)
     - label: Known For
       value: Deep learning pioneer, now AI safety advocate
   sources:

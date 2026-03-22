@@ -1017,6 +1017,9 @@
     - id: SQlb1r5EzN
       type: person
       relationship: leads-to
+    - id: nGFBXZeM3d
+      type: person
+      relationship: research
     - id: MEt9F7f50w
       type: approach
       relationship: research
@@ -1029,15 +1032,19 @@
       url: https://www.aria.org.uk/programme-safeguarded-ai/
     - title: ARIA Safeguarded AI Funding
       url: https://www.aria.org.uk/opportunity-spaces/mathematics-for-safe-ai/safeguarded-ai/funding/
+    - title: "Nov 2025 Pivot Announcement"
+      url: https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/
   description: >-
     The UK's Advanced Research + Invention Agency (ARIA) is a government research funding
     body modeled on DARPA. Its Safeguarded AI programme, led by Programme Director David
-    "davidad" Dalrymple, has committed GBP 59 million over 3-5 years to develop AI systems
-    with mathematical safety guarantees through formal verification. The programme funds
-    research across multiple technical areas: TA1 (core theory, GBP 18M), TA3 (cyber-physical
-    applications, GBP 5.4M), and TA1.4 (sociotechnical integration, GBP 3.4M). ARIA aims to
-    create quantitative safety guarantees for AI "in the way we have come to expect for
-    nuclear power and passenger aviation."
+    "davidad" Dalrymple with Scientific Director Yoshua Bengio (joined Aug 2024), has
+    committed GBP 59 million over 3-5 years to develop AI systems with mathematical safety
+    guarantees through formal verification. The programme funds 48 projects across multiple
+    technical areas: TA1.1 (theory, GBP 3.5M, 22 projects), TA1.2+1.3 (platform, GBP 14.2M),
+    TA1.4 (sociotechnical, GBP 3.4M), TA2 (ML, GBP 1M Phase 1), and TA3 (applications,
+    GBP 5.4M, 9 projects). A Nov 2025 pivot abandoned TA2 Phase 2 (GBP 18M) and cancelled
+    TA3 Phase 2 (GBP 8.4M), expanding TA1 scope to broader mathematical assurance and
+    adding a cybersecurity focus on formally-verified firewalls for critical infrastructure.
   tags:
     - formal-methods
     - provably-safe-ai

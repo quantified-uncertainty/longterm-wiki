@@ -116,6 +116,18 @@ function programForTA(ta: AriaGrant["ta"]): string {
   }
 }
 
+/** Approximate award dates per TA based on solicitation timelines. */
+function dateForTA(ta: AriaGrant["ta"]): string {
+  switch (ta) {
+    case "TA1.1": return "2024-06"; // Call opened Apr 2024, awards ~mid-2024
+    case "TA1.2": return "2024-09"; // Platform teams selected after TA1.1
+    case "TA1.3": return "2024-09";
+    case "TA1.4": return "2025-02"; // Solicitation closed Jan 2025
+    case "TA2": return "2025-04";   // Solicitation finalized Apr 2025
+    case "TA3": return "2024-09";   // Phase 1 teams selected 2024
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Grant source
 // ---------------------------------------------------------------------------
@@ -146,7 +158,7 @@ export const source: GrantSource = {
         name: name.substring(0, 500),
         amount: g.amount ?? null,
         currency: "GBP",
-        date: "2024-01", // Programme grants started in 2024
+        date: dateForTA(g.ta),
         focusArea: `Safeguarded AI ${g.ta}`,
         description: `${g.title}. Lead(s): ${g.leads}. Institutions: ${g.institutions}. Status: ${g.status}.`,
         sourceUrl: g.sourceUrl ?? null,

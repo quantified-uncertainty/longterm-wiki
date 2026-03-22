@@ -712,9 +712,11 @@ const PROGRAMS: FundingProgramDef[] = [
     description:
       "22 projects on mathematical representations and formal semantics for world-models, specifications, and proofs. Covers category theory, probabilistic logic, string diagrams, and verification foundations.",
     programType: "solicitation",
+    totalBudget: 3_500_000,
+    currency: "GBP",
     status: "awarded",
     source: "https://www.aria.org.uk/programme-safeguarded-ai/",
-    notes: "Round completed April-May 2024. 22 projects selected.",
+    notes: "GBP 3.5M Phase 1 across 22 projects. Call opened April 2024.",
   },
   {
     idSeed: "prog|aria|ta1-2-3-platform",
@@ -750,13 +752,13 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|aria|ta2-ml",
     name: "Safeguarded AI TA2 — Machine Learning",
     description:
-      "Phase 1: development teams for ML approaches to safeguarded AI. Phase 2 (GBP 18M single award) redirected as ARIA pivots to expand TA1.",
+      "Phase 1: development teams for ML approaches to safeguarded AI. Phase 2 (GBP 18M single award) abandoned in Nov 2025 pivot — frontier AI advances made dedicated ML capability development less valuable.",
     programType: "solicitation",
     totalBudget: 1_000_000,
     currency: "GBP",
-    status: "awarded",
-    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
-    notes: "Phase 1: GBP 1M across 3 teams. Phase 2 redirected.",
+    status: "closed",
+    source: "https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/",
+    notes: "Phase 1: GBP 1M across 3 teams (completed). Phase 2 (GBP 18M) abandoned Nov 2025.",
   },
   {
     idSeed: "prog|aria|ta3-applications",
@@ -764,13 +766,13 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|aria|ta3-applications",
     name: "Safeguarded AI TA3 — Real-World Applications",
     description:
-      "Real-world demonstrations of safeguarded AI in energy grid, automated driving, clinical trials, logistics, biopharmaceuticals, and telecom. Phase 2 cancelled.",
+      "Real-world demonstrations of safeguarded AI in energy grid, automated driving, clinical trials, logistics, biopharmaceuticals, and telecom. Phase 2 (GBP 8.4M) cancelled in Nov 2025 pivot; replaced by cybersecurity focus on formally-verified firewalls for critical infrastructure.",
     programType: "solicitation",
-    totalBudget: 4_900_000,
+    totalBudget: 5_400_000,
     currency: "GBP",
     status: "awarded",
-    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
-    notes: "GBP 4.9M across 9 teams. Phase 2 cancelled; Phase 1 projects continue.",
+    source: "https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/",
+    notes: "GBP 5.4M Phase 1 across 9 teams (continuing). Phase 2 (GBP 8.4M) cancelled Nov 2025.",
   },
 ];
 
