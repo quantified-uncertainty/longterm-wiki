@@ -31,25 +31,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- entity_ids: SELECT single slug (for resolvePageIntId with LIMIT) ---
+  // --- wiki_pages: SELECT single slug (for resolvePageIntId with LIMIT) ---
   // Must come before the batch matcher below, since LIMIT queries also contain "where" and "slug".
-  if (q.includes('"entity_ids"') && q.includes("limit")) {
+  if (q.includes('from "wiki_pages"') && q.includes("limit")) {
     const slug = params[0] as string;
     const wikiId = entityIdsStore.get(slug);
     if (wikiId !== undefined) {
-      return [{ wiki_id: wikiId }];
+      return [{ id: wikiId }];
     }
     return [];
   }
 
-  // --- entity_ids: SELECT WHERE slug IN (...) ---
-  if (q.includes('"entity_ids"') && q.includes("where") && q.includes('"slug"')) {
-    const results: Array<{ slug: string; wiki_id: number }> = [];
+  // --- wiki_pages: SELECT WHERE slug IN (...) ---
+  if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes('"slug"')) {
+    const results: Array<{ slug: string; id: number }> = [];
     for (const p of params) {
       const slug = p as string;
       const wikiId = entityIdsStore.get(slug);
       if (wikiId !== undefined) {
-        results.push({ slug, wiki_id: wikiId });
+        results.push({ slug, id: wikiId });
       }
     }
     return results;

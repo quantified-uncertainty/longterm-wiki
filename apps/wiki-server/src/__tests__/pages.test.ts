@@ -59,12 +59,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- entity_ids: SELECT WHERE slug IN (...) (batch resolve from page-id-helpers) ---
-  if (q.includes("entity_ids") && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("insert into")) {
+  // --- wiki_pages: SELECT WHERE slug IN (...) (batch resolve from page-id-helpers) ---
+  // Must exclude OR queries (get-by-slug-or-wikiId), search queries, and other wiki_pages handlers.
+  if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && q.includes(" in ") && !q.includes("count(*)") && !q.includes("insert into") && !q.includes(" or ") && !q.includes("as id")) {
     const results: Record<string, unknown>[] = [];
     for (const [numId, entry] of entityIdsStore.entries()) {
       if (params.includes(entry.slug)) {
-        results.push({ wiki_id: numId, slug: entry.slug });
+        results.push({ id: numId, slug: entry.slug });
       }
     }
     return results;
