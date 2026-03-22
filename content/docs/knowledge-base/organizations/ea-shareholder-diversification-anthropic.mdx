@@ -197,7 +197,101 @@ Transfer appreciated shares to a CRT that sells tax-free, invests proceeds, pays
 
 20% of \$27-76B is approximately \$5-15B. Even achieving the lower end would represent a transformative injection into the EA ecosystem—roughly 33-125x current annual AI safety funding.
 
-### Recommended Actions by Stakeholder
+### Decision Framework: Should You Sell?
+
+The right recommendation depends on who you are — exposure size, role type, and liquidity constraints. The following decision tree applies specifically to EA-aligned holders evaluating whether to sell or hold Anthropic equity.
+
+<Mermaid chart={`
+flowchart TD
+    START["Do you hold Anthropic equity?"] -->|Yes| SIZE{"Exposure size?"}
+    SIZE -->|">$10M + grantmaking role"| SENIOR["Senior Grantmaker / Major Funder"]
+    SIZE -->|"$1-10M, active in EA"| ANGEL["EA-Adjacent Investor / Early Employee"]
+    SIZE -->|"Employee equity"| EMP{"Role type?"}
+    SIZE -->|"<$500K"| JUNIOR["Junior Community Member"]
+    SIZE -->|"Institutional"| INST["Foundation / Institutional Investor"]
+
+    EMP -->|"Safety-critical research"| SAFETY["Safety Researcher Employee"]
+    EMP -->|"Other roles"| TYPICAL["Typical Employee"]
+
+    SENIOR --> SELL_FAST["SELL QUICKLY via DAF\\nBias risk outweighs upside"]
+    ANGEL --> SELL_MOST["SELL 70-80%\\nKeep small residual position"]
+    SAFETY --> SELL_EARLY["SELL EARLY\\nConflict of interest on safety judgments"]
+    TYPICAL --> HOLD_THEN_SELL["HOLD → DIVERSIFY POST-IPO\\n18-24 month schedule after lockup"]
+    JUNIOR --> DIVERSIFY["STANDARD DIVERSIFICATION\\nPersonal finance, not EA strategy"]
+    INST --> HEDGE["HEDGE CORRELATION\\nComplex; fiduciary + signal concerns"]
+
+    style SELL_FAST fill:#ff9999
+    style SELL_MOST fill:#ffcc99
+    style SELL_EARLY fill:#ff9999
+    style HOLD_THEN_SELL fill:#ccffcc
+    style DIVERSIFY fill:#ccccff
+    style HEDGE fill:#ffffcc
+`} />
+
+### Stakeholder-Specific Analysis
+
+#### 1. Senior Grantmakers / Major Funders (\>\$10M exposure)
+
+**Recommendation: Sell quickly** — confidence 80%.
+
+This is where the bias argument is most acute. Someone at a major foundation making grants *about* AI safety while holding \$20M+ in Anthropic equity has a structural conflict that's hard to manage through willpower alone. The expected reputational and epistemic damage to the field from compromised grant decisions likely exceeds the expected financial upside from holding.
+
+**Optimal execution**: Donate to DAF immediately, liquidate from within the DAF over 12-24 months to avoid both capital gains and secondary market price depression from bulk selling.
+
+**Counterweight**: These actors may have informal governance influence worth preserving through shareholding. Probably not sufficient to outweigh the bias concern at this scale.
+
+#### 2. EA-Adjacent Investors / Early Employees (\$1-10M exposure)
+
+**Recommendation: Sell 70-80%, keep a small position** — confidence 70%.
+
+This cohort has the most interesting tradeoffs. They're liquid enough to act, the financial upside from holding is real, but the conflict of interest is meaningful if they're active in community discourse.
+
+- Liquidate enough to remove financial anxiety about the position (probably 70-80%)
+- Retain a small residual position — the psychological and informational value of being a shareholder (following the company closely, having skin in the game on AI outcomes) has some positive value
+- The retained position should be small enough that it doesn't influence grant or research decisions
+
+#### 3. Typical Anthropic Employees
+
+**Recommendation: Hold until IPO lockup expiry, then diversify aggressively over 18-24 months** — confidence 65%.
+
+The situation is different for employees:
+- Liquidity is constrained — secondary sales require company approval (though the \$5-6B tender offer helps)
+- Their *labor* income is already maximally concentrated in Anthropic's success, so the marginal bias from equity on top of employment is smaller than it sounds
+- Financial diversification is the dominant argument, not the bias argument — they're already epistemically compromised by employment
+- Post-IPO, a disciplined 18-24 month diversification schedule is appropriate
+
+#### 4. Safety-Critical Research Employees
+
+**Recommendation: Sell early, even at financial cost** — confidence 75%.
+
+The exception to the general employee guidance. Employees in safety-critical research roles making judgments about Anthropic's own safety practices face a direct conflict: equity appreciation depends on capability progress, but their role requires honest assessment of whether safety is keeping pace. Faster liquidation via the tender offer or DAF transfers makes sense even at the \$350B pre-money discount.
+
+#### 5. Junior Community Members (\<\$500K exposure)
+
+**Recommendation: Standard financial diversification** — confidence 75%.
+
+At this scale the bias argument is largely noise — a researcher with \$200K in Anthropic options isn't going to swing major community decisions. The relevant analysis is standard personal finance: concentrated single-stock exposure in a high-variance private company is bad portfolio construction regardless of the EA framing. Exercise options when financially feasible, diversify, and don't let ideological framing overcomplicate a personal finance decision.
+
+#### 6. EA-Aligned Institutional Investors
+
+**Recommendation: Hedge the portfolio correlation** — confidence 55%.
+
+The most complicated case. Institutions face fiduciary constraints, signal risks (a large institutional sale affects Anthropic's secondary price), and potential information rights creating additional complexity.
+
+The strongest argument for selling is the **portfolio correlation problem**: if the EA funding ecosystem is heavily correlated with Anthropic's success, a bad outcome for Anthropic (regulatory action, capability plateau, safety incident) simultaneously destroys the funding base *and* represents a bad AI outcome. That's a catastrophic correlation worth hedging against.
+
+### Cross-Cutting Considerations
+
+**Timing urgency varies enormously.** "Sell ASAP" means different things for different positions:
+- For a \$50M position: 18 months of careful execution via secondary markets
+- For a \$2M employee position: participate in the tender offer now, or wait for IPO lockup expiry in early-mid 2027
+- For a \$200K junior position: exercise options when feasible, no rush
+
+**Near-term capital has outsized leverage.** If there's a 2-3 year critical window for AI governance and safety infrastructure spending, capital available in 2026-2027 may genuinely have 3-5x the leverage of capital available in 2029 when AI outcomes are clearer. This is the most empirically contestable but potentially most important variable in the entire analysis.
+
+**Devil's advocate**: The entire sell-now framing assumes EA/longtermist capital is well-deployed and faces diminishing returns. If the field is still severely talent- and opportunity-constrained rather than capital-constrained, the urgency of converting equity to cash drops substantially. See <EntityLink id="E695" name="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink>.
+
+### Recommended Actions by Timeline
 
 **Tier 1 — Immediate (0-6 months):**
 
@@ -205,7 +299,7 @@ Transfer appreciated shares to a CRT that sells tax-free, invests proceeds, pays
 |-------------|--------|-------------------|
 | <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> | Expand secondary market sales and nonprofit transfers | \$1-5B additional |
 | <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> | Explore secondary market sales for portion of stake | \$500M-2B |
-| Large employee stakeholders | Maximize DAF transfers under current matching terms | \$1-3B |
+| Large employee stakeholders | Maximize DAF transfers under current matching terms; participate in tender offer | \$1-3B |
 | EA community | Advocate for expanded Anthropic buyback program | Enables above |
 
 **Tier 2 — Pre-IPO (6-18 months):**
