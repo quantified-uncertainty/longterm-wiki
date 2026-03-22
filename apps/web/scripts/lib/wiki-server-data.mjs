@@ -515,6 +515,41 @@ export async function fetchRecordVerdicts() {
 }
 
 /**
+ * Fetch all FactBase facts from the wiki-server PG database.
+ * Returns facts grouped by entity ID in the SerializedKB.facts format,
+ * or null if the server is unavailable.
+ *
+ * When available, this replaces the YAML-based loading in build-data.mjs,
+ * making PG the source of truth for facts.
+ */
+export async function fetchFactBaseFromServer() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  factbase-export: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return null;
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const url = `${serverUrl}/api/facts/export`;
+    const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+    if (!resp.ok) {
+      logWikiServerWarning('factbase-export', `HTTP ${resp.status}`);
+      return null;
+    }
+    const data = await resp.json();
+    const entityCount = data.entities ?? Object.keys(data.facts ?? {}).length;
+    const factCount = data.total ?? 0;
+    console.log(`  factbase-export: ${factCount} facts across ${entityCount} entities (from PG)`);
+    return data.facts ?? {};
+  } catch (err) {
+    logWikiServerWarning('factbase-export', err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}
+
+/**
  * Fetch policy stakeholder IDs from wiki-server.
  * Returns a map keyed by "policyEntityId:stakeholderDisplayName" -> stakeholder PG ID.
  * Used by the legislation page to look up verification verdicts for each stakeholder row.

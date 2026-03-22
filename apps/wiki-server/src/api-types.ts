@@ -819,6 +819,8 @@ export const SyncFactSchema = z.object({
   low: z.number().nullable().optional(),
   high: z.number().nullable().optional(),
   asOf: z.string().max(20).nullable().optional(),
+  validEnd: z.string().max(20).nullable().optional(),
+  currency: z.string().max(10).nullable().optional(),
   measure: z.string().max(100).nullable().optional(),
   subject: z.string().max(300).nullable().optional(),
   note: z.string().max(5000).nullable().optional(),

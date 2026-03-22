@@ -904,6 +904,13 @@
       "when": 1780732800000,
       "tag": "0128_phase_d3e_pk_swap",
       "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1780819200000,
+      "tag": "0129_add_facts_validend_currency",
+      "breakpoints": true
     }
   ]
 }

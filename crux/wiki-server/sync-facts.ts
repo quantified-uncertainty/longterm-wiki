@@ -100,6 +100,8 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
     low,
     high,
     asOf: fact.asOf ?? null,
+    validEnd: fact.validEnd ?? null,
+    currency: fact.currency ?? null,
     measure: fact.propertyId,
     subject: fact.subjectId,
     note: fact.notes ?? null,

@@ -826,6 +826,8 @@ export const facts = pgTable(
     low: real("low"), // Lower bound for range values
     high: real("high"), // Upper bound for range values
     asOf: text("as_of"), // Point-in-time (YYYY-MM, YYYY, or ISO date)
+    validEnd: text("valid_end"), // Expiry date — fact was true until this date
+    currency: text("currency"), // Currency code for monetary values (default: USD)
     measure: text("measure"), // Measure ID for timeseries grouping
     subject: text("subject").references(() => entities.stableId, {
       onDelete: "set null",
