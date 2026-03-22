@@ -234,7 +234,7 @@ async function upsertVerdict(
   );
   if (!result.ok) {
     console.warn(
-      `  Warning: Failed to upsert verdict for ${thingId}: ${result.message}`
+      `  Warning: Failed to upsert verdict for ${recordId}: ${result.message}`
     );
     return null;
   }
