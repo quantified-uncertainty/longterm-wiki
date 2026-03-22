@@ -200,12 +200,21 @@ Output ONLY a JSON object with this structure:
  * With Batch API (--batch flag): 50% discount on all token costs.
  * Batch costs: polish ~$1.25, standard ~$3.25, deep ~$6.25, budget ~$1.50
  */
-const COST_MAP: Record<string, number> = {
+export const COST_MAP: Record<string, number> = {
   polish: 2.5,
   standard: 6.5,
   deep: 12.5,
   budget: 3,
   premium: 10,
+};
+
+/** Batch API costs: 50% discount on all token costs. */
+export const BATCH_COST_MAP: Record<string, number> = {
+  polish: 1.25,
+  standard: 3.25,
+  deep: 6.25,
+  budget: 1.5,
+  premium: 5,
 };
 
 // ── Routing Helpers (exported for testing) ───────────────────────────────────
