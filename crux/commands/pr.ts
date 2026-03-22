@@ -557,10 +557,12 @@ async function rebaseAll(_args: string[], options: CommandOptions): Promise<Comm
   output += `\n${c.bold}Summary:${c.reset} ${rebased} rebased, ${upToDate} up-to-date, ${skipped} skipped, ${conflicts} conflicts, ${pushFailed} push-failed\n`;
 
   if (failed > 0) {
-    output += `${c.red}${failed} PR(s) failed to push — they may need manual attention or will be retried on next run.${c.reset}\n`;
+    output += `${c.yellow}${failed} PR(s) failed to push — they may need manual attention or will be retried on next run.${c.reset}\n`;
   }
 
-  return { output, exitCode: failed > 0 ? 1 : 0 };
+  // Push failures and conflicts are expected/self-healing states, not errors.
+  // Only exit non-zero if there are actual unexpected errors (currently none tracked).
+  return { output, exitCode: 0 };
 }
 
 /**

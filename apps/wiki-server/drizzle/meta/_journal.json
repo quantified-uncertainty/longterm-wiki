@@ -911,6 +911,13 @@
       "when": 1780819200000,
       "tag": "0129_add_facts_validend_currency",
       "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1780905600000,
+      "tag": "0130_agent_session_entities",
+      "breakpoints": true
     }
   ]
 }

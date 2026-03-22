@@ -355,20 +355,21 @@ describe('context for-entity — successful bundle', () => {
     mockApiRequest
       .mockResolvedValueOnce({ ok: true, data: ENTITY_DETAIL })
       .mockResolvedValueOnce({ ok: true, data: FACTS_RESULT })
-      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT });
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: { sessions: [] } }); // sessions by entity
 
     await commands['for-entity'](['anthropic'], { print: true, ci: true });
 
-    // Verify that one of the apiRequest calls used the correct /by-entity/ path,
+    // Verify that one of the apiRequest calls used the correct /api/facts/by-entity/ path,
     // not the former broken /api/facts?entity_id= path.
     const factsCalls = mockApiRequest.mock.calls.filter((call) =>
-      String(call[1]).includes('by-entity'),
+      String(call[1]).includes('/api/facts/by-entity/'),
     );
     expect(factsCalls).toHaveLength(1);
     expect(factsCalls[0][1]).toContain('/api/facts/by-entity/anthropic');
-    // Verify no call used the old broken path
+    // Verify no call used the old broken facts path (/api/facts?entity_id=)
     const brokenCalls = mockApiRequest.mock.calls.filter((call) =>
-      String(call[1]).includes('entity_id='),
+      String(call[1]).includes('/api/facts') && String(call[1]).includes('entity_id='),
     );
     expect(brokenCalls).toHaveLength(0);
   });

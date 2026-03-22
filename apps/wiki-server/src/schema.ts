@@ -963,6 +963,25 @@ export const agentSessionPages = pgTable(
 );
 
 /**
+ * Tracks which entities (by stableId) each agent session touched.
+ * Mirrors agentSessionPages but for entities instead of wiki pages.
+ */
+export const agentSessionEntities = pgTable(
+  "agent_session_entities",
+  {
+    agentSessionId: bigint("agent_session_id", { mode: "number" })
+      .notNull()
+      .references(() => agentSessions.id, { onDelete: "cascade" }),
+    entityStableId: text("entity_stable_id").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.agentSessionId, table.entityStableId] }),
+    index("idx_ase_entity_stable_id").on(table.entityStableId),
+    // PK (agent_session_id, entity_stable_id) covers single-column lookups on agent_session_id
+  ]
+);
+
+/**
  * Auto-update news items — individual news items discovered during auto-update runs.
  *
  * Each item represents a news article/post found by the feed fetcher, enriched with

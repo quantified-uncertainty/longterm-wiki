@@ -36,6 +36,12 @@ export type AgentSessionListResponse = InferResponseType<
   200
 >;
 
+/** Shape returned by GET /by-entity (200 success). */
+export type AgentSessionsByEntityResponse = InferResponseType<
+  RpcClient['by-entity']['$get'],
+  200
+>;
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -82,6 +88,18 @@ export async function listAgentSessions(
   return apiRequest<AgentSessionListResponse>(
     'GET',
     `/api/agent-sessions?limit=${limit}`,
+  );
+}
+
+/**
+ * Get sessions that touched a specific entity (by stableId).
+ */
+export async function getSessionsByEntity(
+  entityStableId: string,
+): Promise<ApiResult<AgentSessionsByEntityResponse>> {
+  return apiRequest<AgentSessionsByEntityResponse>(
+    'GET',
+    `/api/agent-sessions/by-entity?entity_id=${encodeURIComponent(entityStableId)}`,
   );
 }
 
