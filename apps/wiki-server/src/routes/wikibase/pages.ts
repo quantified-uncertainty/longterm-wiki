@@ -328,7 +328,6 @@ const pagesApp = new Hono()
           target: wikiPages.slug,
           set: {
             wikiId: sql`excluded.wiki_id`,
-            id: sql`excluded.id`,
             title: sql`excluded.title`,
             description: sql`excluded.description`,
             summary: sql`excluded.summary`,

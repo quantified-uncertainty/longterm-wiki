@@ -157,6 +157,11 @@ SELECT DISTINCT ON (page_id) id,
 FROM hallucination_risk_snapshots
 ORDER BY page_id, computed_at DESC;
 
+-- Recreate indexes that were on the old view
+CREATE UNIQUE INDEX idx_hrl_page_id ON hallucination_risk_latest (page_id);
+CREATE INDEX idx_hrl_score ON hallucination_risk_latest (score DESC);
+CREATE INDEX idx_hrl_level ON hallucination_risk_latest (level);
+
 -- ============================================================
 -- 7. Verification
 -- ============================================================

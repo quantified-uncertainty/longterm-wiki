@@ -2523,8 +2523,8 @@ export const wikibasePageSimilarity = pgTable(
   "wikibase_page_similarity",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: integer("page_id"),
-    similarPageId: integer("similar_page_id"),
+    pageId: integer("page_id").references(() => wikiPages.id),
+    similarPageId: integer("similar_page_id").references(() => wikiPages.id),
     similarity: integer("similarity").notNull(), // 0-100 percentage
     rank: integer("rank").notNull(), // 1-5
     syncedAt: timestamp("synced_at", { withTimezone: true })
@@ -2550,7 +2550,7 @@ export const wikibasePageAssessments = pgTable(
   "wikibase_page_assessments",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: integer("page_id"),
+    pageId: integer("page_id").references(() => wikiPages.id),
     assessor: text("assessor").notNull(), // 'structural' | 'llm-grading' | 'editorial' | 'frontmatter-sync'
     method: text("method"), // 'metrics-extractor-v1' | 'crux-grade-sonnet' | 'frontmatter-manual'
     model: text("model"), // LLM model used (NULL for structural/editorial)
