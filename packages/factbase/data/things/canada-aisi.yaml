@@ -1,0 +1,47 @@
+entity: 22LBI06kLw
+facts:
+  - id: f_alOmirt98N
+    property: founded-date
+    value: "2024-11"
+    source: https://www.canada.ca/en/innovation-science-economic-development/news/2024/11/canada-launches-canadian-artificial-intelligence-safety-institute.html
+    notes: "Announced November 12, 2024 in Montreal; first convened later that month in San Francisco as part of the International Network of AI Safety Institutes"
+
+  - id: f_Gj4WwvIR8P
+    property: total-funding
+    value: 5e+7
+    asOf: 2024-11
+    source: https://www.canada.ca/en/innovation-science-economic-development/news/2024/11/canada-launches-canadian-artificial-intelligence-safety-institute.html
+    notes: "C$50M over five years pledged by Canadian government as part of Budget 2024's $2.4B AI investment (~US$37M)"
+    currency: CAD
+    usdEquivalent: 37000000
+
+  - id: f_wwmTADNlSB
+    property: headquarters
+    value: "Ottawa, Canada"
+    source: https://ised-isde.canada.ca/site/ised/en/canadian-artificial-intelligence-safety-institute
+    notes: "Under Innovation, Science and Economic Development Canada (ISED)"
+
+  - id: f_eP1BaNorkt
+    property: description
+    value: >-
+      Canada's national AI safety institute, established under ISED with C$50M in funding.
+      Focuses on AI safety research through CIFAR partnership, with programs on interpretability,
+      robustness testing, and cybersecurity misuse. Part of the international AISI network.
+    asOf: 2025-06
+    source: https://www.canada.ca/en/innovation-science-economic-development/news/2024/11/canada-launches-canadian-artificial-intelligence-safety-institute.html
+
+  - id: f_PZ8jVTpaSB
+    property: funding-received
+    value: 2.7e+7
+    asOf: 2025-03
+    source: https://cifar.ca/cifarnews/2024/11/12/government-of-canada-announces-canadian-ai-safety-institute/
+    notes: "C$27M contribution to CIFAR for the CAISI Research Program specifically"
+    currency: CAD
+
+  - id: f_Vrb7oRQj8U
+    property: headcount
+    value:
+      - 5
+      - 15
+    asOf: 2025-06
+    notes: "Estimate; no published source. Early-stage institute with appointed Executive Director (Dr. Elissa Strome, Feb 2025)"

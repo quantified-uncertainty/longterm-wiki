@@ -1,0 +1,44 @@
+entity: VJacG0VE2w
+facts:
+  - id: f_bZ2ZkRMSLJ
+    property: founded-date
+    value: "2017"
+    source: https://en.wikipedia.org/wiki/AI_Now_Institute
+    notes: "Founded at New York University by Kate Crawford and Meredith Whittaker"
+
+  - id: f_e1ELWXLFHS
+    property: headquarters
+    value: "New York, NY"
+    source: https://ainowinstitute.org/about
+    notes: "Based at New York University; became independent research institute in mid-2022"
+
+  - id: f_H3jscXNPlN
+    property: founded-by
+    value:
+      - kate-crawford
+      - meredith-whittaker
+    source: https://en.wikipedia.org/wiki/AI_Now_Institute
+    notes: "Co-founded by Kate Crawford (researcher) and Meredith Whittaker (now Signal president)"
+
+  - id: f_bYj3YUbF9D
+    property: description
+    value: >-
+      Independent policy research institute studying the social implications of AI, focusing on
+      corporate power concentration, algorithmic accountability, and surveillance. Known for annual
+      AI Now Reports and advocacy against unregulated facial recognition.
+    asOf: 2025-12
+    source: https://ainowinstitute.org/about
+
+  - id: f_eO1ZrfJ6aj
+    property: headcount
+    value:
+      - 15
+      - 30
+    asOf: 2025-06
+    notes: "Estimate; no published source. LinkedIn lists 11-50 employees; research staff plus policy team"
+
+  - id: f_ehgUgv6LHC
+    property: legal-structure
+    value: "Independent nonprofit research institute"
+    source: https://en.wikipedia.org/wiki/AI_Now_Institute
+    notes: "Originally housed at NYU; became independent in mid-2022"

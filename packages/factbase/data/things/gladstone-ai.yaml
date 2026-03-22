@@ -1,0 +1,47 @@
+entity: HkfUxsbBLQ
+facts:
+  - id: f_lOHec6F31n
+    property: founded-date
+    value: "2022"
+    source: https://www.gladstone.ai/about
+    notes: "Founded by Jeremie Harris (CEO) and Edouard Harris (CTO)"
+
+  - id: f_jAh3sxgAw5
+    property: founded-by
+    value:
+      - jeremie-harris
+      - edouard-harris
+    source: https://www.gladstone.ai/about
+    notes: "Brothers with backgrounds in physics and AI startups; Y Combinator alumni"
+
+  - id: f_2a2wV4u2y5
+    property: description
+    value: >-
+      AI safety advisory firm that provides briefings, training, and risk assessments to
+      government officials. Authored the first-ever AI action plan commissioned by the U.S.
+      State Department ('Defense in Depth'), released March 2024. Has trained hundreds of
+      Department of Defense staff including senior executives, generals, and admirals.
+    asOf: 2025-12
+    source: https://www.gladstone.ai/about
+
+  - id: f_rrTE7WhInG
+    property: headcount
+    value:
+      - 4
+      - 10
+    asOf: 2024-03
+    source: https://time.com/6898967/ai-extinction-national-security-risks-report/
+    notes: "Described as a four-person firm in early 2024; may have grown since"
+
+  - id: f_RO2UEc6GRY
+    property: funding-received
+    value: 250000
+    asOf: 2024-03
+    source: https://time.com/6898967/ai-extinction-national-security-risks-report/
+    notes: "Federal contract worth $250,000 from U.S. State Department for the 'Defense in Depth' report, commissioned November 2022"
+
+  - id: f_9Wvj44C569
+    property: legal-structure
+    value: "Private company"
+    source: https://www.gladstone.ai/about
+    notes: "Independent firm; no outside funding taken as of 2024"

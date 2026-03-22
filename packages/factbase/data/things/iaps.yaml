@@ -1,0 +1,37 @@
+entity: NI4hqOL33A
+facts:
+  - id: f_iKXIKTtIqQ
+    property: founded-date
+    value: "2024"
+    source: https://www.iaps.ai
+    notes: "Nonpartisan think tank focused on AI policy"
+
+  - id: f_5oWjk3601I
+    property: headquarters
+    value: "Washington, DC"
+    source: https://www.iaps.ai/contact
+    notes: "Washington, DC metro area; remote-first organization"
+
+  - id: f_6a13OgG0xh
+    property: headcount
+    value:
+      - 11
+      - 20
+    asOf: 2025-12
+    source: https://www.linkedin.com/company/institute-for-ai-policy-and-strategy
+    notes: "LinkedIn company size listing"
+
+  - id: f_iHjUY97NNp
+    property: description
+    value: >-
+      Nonpartisan think tank producing policy research on implications of frontier AI, from
+      today's most advanced models to potential AGI and superintelligence. Focus areas include
+      frontier security, compute policy, and international strategy. Remote-first organization
+      with DC-area presence.
+    asOf: 2025-12
+    source: https://www.iaps.ai
+
+  - id: f_I10Ftofsv1
+    property: legal-structure
+    value: "Nonprofit think tank"
+    source: https://www.idealist.org/en/nonprofit/a25d86f3f3904984bdc5f745721222d1-institute-for-ai-policy-and-strategy-washington
