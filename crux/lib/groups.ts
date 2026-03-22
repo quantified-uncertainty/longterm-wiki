@@ -77,7 +77,6 @@ export const GROUPS: Record<string, GroupDef> = {
       'orgs',
       'research-areas',
       'verify',
-      'verify-records',
       'verify-orchestrate',
       'legislation',
     ],
