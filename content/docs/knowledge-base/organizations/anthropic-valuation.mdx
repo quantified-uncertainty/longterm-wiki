@@ -1,13 +1,13 @@
 ---
 wikiId: E405
 title: Anthropic Valuation Analysis
-description: "Analysis of Anthropic's \\\\$380B valuation (Series G, Feb 2026). With \\\\$14B run-rate revenue at the time of the round, Anthropic traded at ~27x—closer to OpenAI's 25x."
+description: "Analysis of Anthropic's valuation: \\\\$380B Series G (Feb 2026), ~\\\\$595B secondary market implied (Mar 2026). Revenue grew from \\\\$14B to \\\\$19B run-rate, maintaining ~27-31x multiples."
 sidebar:
   order: 51
 subcategory: finance
-lastEdited: 2026-02-17
+lastEdited: 2026-03-22
 update_frequency: 21
-summary: "Valuation analysis updated for Series G (Feb 2026). Anthropic raised \\$30B at \\$380B post-money with \\$14B run-rate revenue at the time of the round (growing to \\$19B by March 2026), yielding ~27x multiple—now closer to OpenAI's 25x at \\$500B/\\$20B. Bull case rests on 88% enterprise retention (vs 76% industry), coding benchmark leadership (80.9% SWE-bench vs GPT-5.2's 74.9%), 500+ million-dollar customers, and dual AWS/Google Cloud partnerships worth tens of billions. Bear case includes severe customer concentration (≈\\$1.2B or 25%+ from Cursor and GitHub Copilot alone), margin compression (forecast cut from 50% to 40%), and bubble warnings—Sam Altman admits 'AI bubble is ongoing.' Extended scenarios model 1.5-5x growth (\\$500B-\\$1.75T) with revised probabilities."
+summary: "Valuation analysis updated March 2026. Series G closed at \\$380B (Feb 2026) with \\$14B run-rate; by March 2026, secondary/derivatives markets price Anthropic at ~\\$595B implied (Ventuals), a 57% premium over the primary round. Revenue grew to \\$19B run-rate, maintaining ≈31x multiple at secondary pricing — the 'Moderate Bull' scenario (\\$500-700B) is already materializing in derivatives markets. Bull case: 88% enterprise retention, coding benchmark leadership, dual AWS/Google Cloud partnerships. Bear case: 25%+ customer concentration (Cursor + GitHub Copilot), margin compression (50%→40%), AI bubble warnings."
 clusters:
   - ai-safety
   - governance
@@ -22,7 +22,7 @@ import {F, Calc} from '@components/facts';
 :::note[Page Scope]
 This page covers Anthropic valuation analysis. For company overview, see <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>. For IPO timeline, see <EntityLink id="E409" name="anthropic-ipo">Anthropic IPO</EntityLink>. For EA capital analysis, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
 
-**Data as of**: February 2026. Key figures: Anthropic <FBF entity="mK9pX3rQ7n" property="valuation">\$380B</FBF> valuation (Series G), <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-02">\$14B</FBF> run-rate revenue; OpenAI <FBF entity="1LcLlMGLbw" property="valuation">\$500B</FBF> valuation, <FBF entity="1LcLlMGLbw" property="revenue">\$20B</FBF> ARR.
+**Data as of**: March 2026. Key figures: Anthropic <FBF entity="mK9pX3rQ7n" property="valuation">\$380B</FBF> valuation (Series G, Feb 2026), ~\$595B implied on secondary/derivatives markets (Ventuals, Mar 2026), <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-03">\$19B</FBF> run-rate revenue; OpenAI <FBF entity="1LcLlMGLbw" property="valuation">\$500B</FBF> valuation, <FBF entity="1LcLlMGLbw" property="revenue">\$20B</FBF> ARR.
 :::
 
 ## Quick Assessment
@@ -78,6 +78,22 @@ Both companies are growing rapidly. OpenAI projects reaching \$100B revenue by 2
 | Feb 2026 | Series G | <FBF entity="mK9pX3rQ7n" property="valuation">\$380B</FBF> | <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-02">≈\$14B</FBF> | ≈27x |
 
 Multiple compression from 400x to ≈27x reflects a business with rapidly growing revenue scaling toward profitability.
+
+### Secondary Market Pricing (March 2026)
+
+By mid-March 2026, secondary/derivatives markets showed a dramatic divergence from the Series G price:
+
+| Platform | Share Price | Implied Valuation | vs. Series G |
+|----------|-------------|-------------------|-------------|
+| OTC secondary (Feb 2026) | \$259-306 | \$290-345B | 10-25% discount |
+| Ventuals oracle (Mar 2026) | ≈\$520 | ≈\$580B | +53% premium |
+| Ventuals mark (Mar 2026) | ≈\$596 | ≈\$595B | +57% premium |
+
+[Ventuals](https://app.ventuals.com/trade/anthropic)
+
+The shift from discounts to a 57% premium in one month is notable. At \$595B implied valuation with \$19B run-rate revenue (March 2026), the secondary market multiple is ≈31x — still in the range of recent AI company multiples. This pricing, if sustained, would push the "Moderate Bull" scenario (\$500-700B) from forward-looking to current reality in secondary markets.
+
+**Important caveats**: Ventuals is a derivatives/prediction market platform, not a traditional OTC secondary market. Implied valuations from derivatives can diverge from actual transaction prices. The oracle price (~\$520, implying ~\$580B) may better reflect actual OTC trade levels. Derivatives markets for private companies have limited liquidity and can exhibit outsized price moves.
 
 ## Bull Case: Data Supporting Higher Valuation
 
@@ -246,7 +262,7 @@ flowchart LR
     style STRONG fill:#ccccff
 `} />
 
-**Key change from previous analysis**: With the Series G at <FBF entity="mK9pX3rQ7n" property="valuation">\$380B</FBF> and <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-02">\$14B</FBF> revenue (≈27x multiple), Anthropic's valuation multiple relative to OpenAI has converged. The revenue growth trajectory is now the primary valuation driver rather than a premium multiple.
+**Key changes since previous analysis**: (1) The Series G at <FBF entity="mK9pX3rQ7n" property="valuation">\$380B</FBF> and <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-02">\$14B</FBF> revenue (≈27x multiple) compressed the revenue multiple toward OpenAI's level. (2) As of March 2026, secondary/derivatives markets are pricing Anthropic at ~\$595B — already in the "Moderate Bull" range. Revenue has also grown to <FBF entity="mK9pX3rQ7n" property="revenue" asOf="2026-03">\$19B</FBF> run-rate, maintaining a ≈31x multiple at secondary pricing. The question is whether the next primary round will validate or trail secondary market levels.
 
 ## Unit Economics Analysis
 
