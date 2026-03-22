@@ -19,23 +19,11 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import {
-  detectPaywall,
-  isUnverifiableDomain,
-  classifyFetchError,
-  type SourceFetchErrorType,
-} from '../lib/search/paywall-detection.ts';
+import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
-
-// ── Constants ─────────────────────────────────────────────────────────
-
-/** Max characters of source content to send to the LLM */
-const MAX_CONTENT_LENGTH = 8000;
-/** HTTP fetch timeout in milliseconds */
-const FETCH_TIMEOUT_MS = 15_000;
+import { fetchSourceContent } from '../lib/source-check/fetch-source.ts';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -92,148 +80,6 @@ interface SourceCheckSummary {
 // ── Helpers ────────────────────────────────────────────────────────────
 
 // LoadedKB, loadGraphFull, resolveEntity imported from ../lib/kb-loader.ts
-
-/** Result of fetching source content, with structured error info */
-interface FetchSourceResult {
-  content: string | null;
-  errorType?: SourceFetchErrorType;
-  errorMessage?: string;
-}
-
-/**
- * Fetch source content for a URL.
- *
- * Resolution order:
- *   1. Check for unverifiable domains (social media etc.)
- *   2. Try wiki-server citation_content cache (fullText field)
- *   3. Direct HTTP fetch with HTML tag stripping
- *   4. Detect paywall signals in fetched content
- *
- * Returns structured error types for machine-readable classification.
- */
-async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
-  // SSRF protection: only allow https:// URLs (no http://, file://, ftp://, etc.)
-  if (!url.startsWith('https://')) {
-    console.warn(`[kb-source-check] Skipping non-HTTPS URL: ${url}`);
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
-  }
-
-  // SSRF protection: block private/internal hosts
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host === '[::1]' ||
-      host === '::1' ||
-      host === '0.0.0.0' ||
-      host === '[::]' ||
-      host === '::' ||
-      host.endsWith('.local') ||
-      host.endsWith('.internal') ||
-      // IPv4 private ranges
-      /^10\./.test(host) ||
-      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
-      /^192\.168\./.test(host) ||
-      /^169\.254\./.test(host) ||
-      // IPv6 private/reserved ranges
-      /^fe80:/i.test(host) ||          // link-local
-      /^f[cd][0-9a-f]{2}:/i.test(host) || // unique local (fc00::/7)
-      /^::ffff:127\./i.test(host) ||   // IPv4-mapped loopback
-      /^::ffff:10\./i.test(host) ||    // IPv4-mapped private
-      /^::ffff:192\.168\./i.test(host) || // IPv4-mapped private
-      /^::ffff:172\.(1[6-9]|2\d|3[01])\./i.test(host) || // IPv4-mapped private
-      /^::ffff:169\.254\./i.test(host) // IPv4-mapped link-local
-    ) {
-      console.warn(`[kb-source-check] Blocking private/internal URL: ${url}`);
-      return { content: null, errorType: 'access_denied', errorMessage: 'Private/internal host blocked' };
-    }
-  } catch {
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid URL' };
-  }
-
-  // Check for unverifiable domains (social media, etc.)
-  if (isUnverifiableDomain(url)) {
-    console.warn(`[kb-source-check] Unverifiable domain: ${url}`);
-    return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
-  }
-
-  // Try wiki-server citation_content cache first
-  try {
-    const result = await getCitationContentByUrl(url);
-    if (result.ok && result.data) {
-      // RPC type inference resolves to `never` because the route can return 400/404.
-      // The actual shape includes fullText from the citation_content table row.
-      const cached = result.data as Record<string, unknown>;
-      const content = cached.fullText as string | null;
-      if (content && content.length > 0) {
-        // Check for paywall signals even in cached content
-        if (detectPaywall(content)) {
-          console.warn(`[kb-source-check] Cached content for ${url} appears paywalled`);
-          return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
-        }
-        return { content: content.slice(0, MAX_CONTENT_LENGTH) };
-      }
-    }
-  } catch (e: unknown) {
-    // Wiki-server unavailable — fall back to direct fetch
-    console.warn(`[kb-source-check] Wiki-server cache miss for ${url}: ${e instanceof Error ? e.message : String(e)}`);
-  }
-
-  // Direct fetch with timeout
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'LongtermWiki-FactChecker/1.0',
-        'Accept': 'text/html,application/xhtml+xml,text/plain',
-      },
-    });
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      const errorType = classifyFetchError(response.status, null, null, url);
-      console.warn(`[kb-source-check] HTTP ${response.status} for ${url}`);
-      return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
-    }
-
-    const html = await response.text();
-    // Strip HTML tags for a basic text extraction
-    const text = html
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    const content = text.slice(0, MAX_CONTENT_LENGTH);
-
-    // Detect paywall in fetched content
-    if (detectPaywall(content)) {
-      console.warn(`[kb-source-check] Paywall detected for ${url}`);
-      return { content, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
-    }
-
-    return { content };
-  } catch (e: unknown) {
-    if (e instanceof DOMException && e.name === 'AbortError') {
-      console.warn(`[kb-source-check] Timeout fetching ${url}`);
-      return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
-    }
-    const msg = e instanceof Error ? e.message : String(e);
-    console.warn(`[kb-source-check] Failed to fetch ${url}: ${msg}`);
-    return { content: null, errorType: 'fetch_error', errorMessage: msg };
-  }
-}
 
 /**
  * Build the LLM verification prompt for a single fact.
@@ -293,7 +139,10 @@ async function verifySingleFact(
   const sourceUrl = fact.source!;
 
   // Fetch source content
-  const fetchResult = await fetchSourceContent(sourceUrl);
+  const fetchResult = await fetchSourceContent(sourceUrl, {
+    userAgent: 'LongtermWiki-FactChecker/1.0',
+    logPrefix: '[kb-source-check]',
+  });
   if (!fetchResult.content) {
     return {
       factId: fact.id,
