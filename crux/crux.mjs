@@ -12,7 +12,7 @@
  *
  * Groups:
  *   w   / wiki       Wiki content (validate, fix, content, citations, ...)
- *   fb  / factbase   FactBase (show, list, verify, migrate, ...)
+ *   fb  / factbase   FactBase (show, list, source-check, migrate, ...)
  *   tb  / tablebase  TableBase (scan, gaps, people, orgs, ids, imports, ...)
  *   gh              GitHub (issues, pr, ci, epic, release, ...)
  *   sys / system     System (agents, jobs, sessions, health, audits, ...)
@@ -90,7 +90,7 @@ import * as researchAreasCommands from './commands/research-areas.ts';
 import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
-import * as recordsVerifyCommands from './commands/records-verify.ts';
+import * as recordsSourceCheckCommands from './commands/records-source-check.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
@@ -150,7 +150,7 @@ const domains = {
   'backfill-stable-ids': backfillStableIdsCommand,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommand,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
-  verify: recordsVerifyCommands,
+  'source-check': recordsSourceCheckCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,

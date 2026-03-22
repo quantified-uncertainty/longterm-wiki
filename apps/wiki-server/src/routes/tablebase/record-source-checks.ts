@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { recordVerifications, recordVerdicts, things } from "../../schema.js";
+import { recordSourceChecks, recordVerdicts, things } from "../../schema.js";
 import {
   zv,
   parseJsonBody,
@@ -11,7 +11,7 @@ import {
 } from "../shared/utils.js";
 import {
   VALID_RECORD_TYPES,
-  VALID_VERIFICATION_VERDICTS,
+  VALID_SOURCE_CHECK_VERDICTS,
 } from "../../api-types.js";
 
 // ---- Constants ----
@@ -39,7 +39,7 @@ const VerificationBody = z.object({
   fieldName: z.string().max(100).optional(),
   expectedValue: z.string().max(2000).optional(),
   sourceUrl: z.string().url().max(MAX_URL_LENGTH).optional(),
-  verdict: z.enum(VALID_VERIFICATION_VERDICTS),
+  verdict: z.enum(VALID_SOURCE_CHECK_VERDICTS),
   confidence: z.number().min(0).max(1).optional(),
   extractedValue: z.string().max(2000).optional(),
   checkerModel: z.string().max(100).optional(),
@@ -49,7 +49,7 @@ const VerificationBody = z.object({
 const VerdictUpsertBody = z.object({
   recordType: z.enum(VALID_RECORD_TYPES),
   recordId: z.string().min(1).max(MAX_ID_LENGTH),
-  verdict: z.enum([...VALID_VERIFICATION_VERDICTS, "unchecked"]),
+  verdict: z.enum([...VALID_SOURCE_CHECK_VERDICTS, "unchecked"]),
   confidence: z.number().min(0).max(1).optional(),
   reasoning: z.string().max(5000).optional(),
   sourcesChecked: z.number().int().min(0).optional(),
@@ -73,7 +73,7 @@ const ByRecordQuery = z.object({
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
-const recordVerificationsApp = new Hono()
+const recordSourceChecksApp = new Hono()
 
   // ---- GET /stats ----
   .get("/stats", async (c) => {
@@ -213,14 +213,14 @@ const recordVerificationsApp = new Hono()
 
     const verifications = await db
       .select()
-      .from(recordVerifications)
+      .from(recordSourceChecks)
       .where(
         and(
-          eq(recordVerifications.recordType, recordType),
-          eq(recordVerifications.recordId, recordId)
+          eq(recordSourceChecks.recordType, recordType),
+          eq(recordSourceChecks.recordId, recordId)
         )
       )
-      .orderBy(desc(recordVerifications.checkedAt));
+      .orderBy(desc(recordSourceChecks.checkedAt));
 
     return c.json({
       verdict: {
@@ -275,14 +275,14 @@ const recordVerificationsApp = new Hono()
 
       const rows = await db
         .select()
-        .from(recordVerifications)
+        .from(recordSourceChecks)
         .where(
           and(
-            eq(recordVerifications.recordType, recordType),
-            eq(recordVerifications.recordId, recordId)
+            eq(recordSourceChecks.recordType, recordType),
+            eq(recordSourceChecks.recordId, recordId)
           )
         )
-        .orderBy(desc(recordVerifications.checkedAt))
+        .orderBy(desc(recordSourceChecks.checkedAt))
         .limit(limit)
         .offset(offset);
 
@@ -320,7 +320,7 @@ const recordVerificationsApp = new Hono()
     const now = new Date();
 
     const [inserted] = await db
-      .insert(recordVerifications)
+      .insert(recordSourceChecks)
       .values({
         recordType: body.recordType,
         recordId: body.recordId,
@@ -336,7 +336,7 @@ const recordVerificationsApp = new Hono()
         createdAt: now,
         updatedAt: now,
       })
-      .returning({ id: recordVerifications.id });
+      .returning({ id: recordSourceChecks.id });
 
     // Auto-flag the corresponding verdict for recheck
     const updated = await db
@@ -419,7 +419,7 @@ const recordVerificationsApp = new Hono()
         .catch((e: unknown) => {
           // Best-effort sync — don't fail the verdict write if things sync fails
           console.warn(
-            `[record-verifications] Failed to sync verdict to things table: ${
+            `[record-source-checks] Failed to sync verdict to things table: ${
               e instanceof Error ? e.message : String(e)
             }`,
           );
@@ -436,5 +436,10 @@ const recordVerificationsApp = new Hono()
 
 // ---- Exports ----
 
-export const recordVerificationsRoute = recordVerificationsApp;
-export type RecordVerificationsRoute = typeof recordVerificationsApp;
+export const recordSourceChecksRoute = recordSourceChecksApp;
+export type RecordSourceChecksRoute = typeof recordSourceChecksApp;
+
+/** @deprecated Use recordSourceChecksRoute */
+export const recordVerificationsRoute = recordSourceChecksRoute;
+/** @deprecated Use RecordSourceChecksRoute */
+export type RecordVerificationsRoute = RecordSourceChecksRoute;

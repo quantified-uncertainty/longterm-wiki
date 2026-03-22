@@ -270,8 +270,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
-  // --- thing_resource_verifications ---
-  if (q.includes("thing_resource_verifications")) {
+  // --- thing_source_checks ---
+  if (q.includes("thing_source_checks")) {
     return [];
   }
 

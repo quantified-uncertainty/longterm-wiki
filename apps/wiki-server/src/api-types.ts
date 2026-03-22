@@ -30,7 +30,7 @@ export const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 export const PageIdSchema = z.string().min(1).max(200);
 
 // ---------------------------------------------------------------------------
-// Record Verifications
+// Source Checks — LLM-based checking of structured data against source URLs
 // ---------------------------------------------------------------------------
 
 export const VALID_RECORD_TYPES = [
@@ -45,7 +45,7 @@ export const VALID_RECORD_TYPES = [
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
 
-export const VALID_VERIFICATION_VERDICTS = [
+export const VALID_SOURCE_CHECK_VERDICTS = [
   "confirmed",
   "contradicted",
   "unverifiable",
@@ -53,7 +53,12 @@ export const VALID_VERIFICATION_VERDICTS = [
   "partial",
 ] as const;
 
-export type VerificationVerdict = (typeof VALID_VERIFICATION_VERDICTS)[number];
+export type SourceCheckVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
+
+/** @deprecated Use VALID_SOURCE_CHECK_VERDICTS */
+export const VALID_VERIFICATION_VERDICTS = VALID_SOURCE_CHECK_VERDICTS;
+/** @deprecated Use SourceCheckVerdict */
+export type VerificationVerdict = SourceCheckVerdict;
 
 // ---------------------------------------------------------------------------
 // Edit Logs

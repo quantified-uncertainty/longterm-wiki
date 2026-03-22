@@ -180,8 +180,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered;
   }
 
-  // INSERT into record_verifications
-  if (q.includes("insert") && q.includes("record_verifications")) {
+  // INSERT into record_source_checks
+  if (q.includes("insert") && q.includes("record_source_checks")) {
     const nextId =
       verifications.length > 0
         ? Math.max(...verifications.map((v) => v.id)) + 1
@@ -231,8 +231,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // SELECT from record_verifications (by-record lookup)
-  if (q.includes("record_verifications")) {
+  // SELECT from record_source_checks (by-record lookup)
+  if (q.includes("record_source_checks")) {
     let filtered = verifications;
     for (const p of params) {
       if (typeof p === "string") {
@@ -262,20 +262,20 @@ let app: Hono;
 
 beforeEach(async () => {
   resetStores();
-  const { recordVerificationsRoute } = await import(
-    "../routes/tablebase/record-verifications.js"
+  const { recordSourceChecksRoute } = await import(
+    "../routes/tablebase/record-source-checks.js"
   );
   app = new Hono().route(
-    "/api/record-verifications",
-    recordVerificationsRoute
+    "/api/record-source-checks",
+    recordSourceChecksRoute
   );
 });
 
 // ---- Tests ----
 
-describe("GET /api/record-verifications/stats", () => {
+describe("GET /api/record-source-checks/stats", () => {
   it("returns aggregate stats", async () => {
-    const res = await app.request("/api/record-verifications/stats");
+    const res = await app.request("/api/record-source-checks/stats");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.total_records).toBe(3);
@@ -286,10 +286,10 @@ describe("GET /api/record-verifications/stats", () => {
   });
 });
 
-describe("GET /api/record-verifications/verdicts", () => {
+describe("GET /api/record-source-checks/verdicts", () => {
   it("returns verdicts list with pagination", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts?limit=10"
+      "/api/record-source-checks/verdicts?limit=10"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -299,7 +299,7 @@ describe("GET /api/record-verifications/verdicts", () => {
 
   it("filters by record_type", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts?record_type=grant&limit=10"
+      "/api/record-source-checks/verdicts?record_type=grant&limit=10"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -310,16 +310,16 @@ describe("GET /api/record-verifications/verdicts", () => {
 
   it("validates limit parameter", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts?limit=999"
+      "/api/record-source-checks/verdicts?limit=999"
     );
     expect(res.status).toBe(400);
   });
 });
 
-describe("GET /api/record-verifications/verdicts/:recordType/:recordId", () => {
+describe("GET /api/record-source-checks/verdicts/:recordType/:recordId", () => {
   it("returns verdict with verifications", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts/grant/GR_abc123"
+      "/api/record-source-checks/verdicts/grant/GR_abc123"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -331,16 +331,16 @@ describe("GET /api/record-verifications/verdicts/:recordType/:recordId", () => {
 
   it("returns 404 for nonexistent record", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts/grant/ZZZZZZZZZZ"
+      "/api/record-source-checks/verdicts/grant/ZZZZZZZZZZ"
     );
     expect(res.status).toBe(404);
   });
 });
 
-describe("GET /api/record-verifications/by-record/:recordType/:recordId", () => {
+describe("GET /api/record-source-checks/by-record/:recordType/:recordId", () => {
   it("returns verifications for a record", async () => {
     const res = await app.request(
-      "/api/record-verifications/by-record/grant/GR_abc123"
+      "/api/record-source-checks/by-record/grant/GR_abc123"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -349,7 +349,7 @@ describe("GET /api/record-verifications/by-record/:recordType/:recordId", () => 
 
   it("returns empty for invalid record type", async () => {
     const res = await app.request(
-      "/api/record-verifications/by-record/invalid-type/GR_abc123"
+      "/api/record-source-checks/by-record/invalid-type/GR_abc123"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -357,10 +357,10 @@ describe("GET /api/record-verifications/by-record/:recordType/:recordId", () => 
   });
 });
 
-describe("POST /api/record-verifications/verifications", () => {
+describe("POST /api/record-source-checks/verifications", () => {
   it("creates a verification", async () => {
     const res = await app.request(
-      "/api/record-verifications/verifications",
+      "/api/record-source-checks/verifications",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -383,7 +383,7 @@ describe("POST /api/record-verifications/verifications", () => {
 
   it("rejects invalid record type", async () => {
     const res = await app.request(
-      "/api/record-verifications/verifications",
+      "/api/record-source-checks/verifications",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -399,7 +399,7 @@ describe("POST /api/record-verifications/verifications", () => {
 
   it("rejects invalid verdict", async () => {
     const res = await app.request(
-      "/api/record-verifications/verifications",
+      "/api/record-source-checks/verifications",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -414,10 +414,10 @@ describe("POST /api/record-verifications/verifications", () => {
   });
 });
 
-describe("POST /api/record-verifications/verdicts", () => {
+describe("POST /api/record-source-checks/verdicts", () => {
   it("upserts a verdict", async () => {
     const res = await app.request(
-      "/api/record-verifications/verdicts",
+      "/api/record-source-checks/verdicts",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

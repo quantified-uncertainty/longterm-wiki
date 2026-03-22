@@ -455,7 +455,7 @@ interface TableBaseShape {
     totalFunding: string;
     riskCount: number;
   }>;
-  /** Record verification verdicts, keyed by "recordType:recordId" */
+  /** Record source check verdicts, keyed by "recordType:recordId" */
   recordVerdicts?: Record<string, RecordVerdict>;
 }
 
@@ -973,7 +973,7 @@ export function getResearchAreasFromPG(
 
 // ============================================================================
 // RECORD VERDICTS
-// Used by VerificationBadge on organization, grant, and funding-round detail pages.
+// Used by SourceCheckBadge on organization, grant, and funding-round detail pages.
 // ============================================================================
 
 export interface RecordVerdict {

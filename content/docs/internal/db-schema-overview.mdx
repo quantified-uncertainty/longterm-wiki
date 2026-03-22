@@ -246,7 +246,7 @@ erDiagram
         integer sources_checked
         boolean needs_recheck
     }
-    kb_fact_resource_verifications {
+    kb_source_checks {
         bigserial id PK
         text fact_id
         text resource_id FK
@@ -256,12 +256,12 @@ erDiagram
         text checker_model
         boolean is_primary_source
     }
-    resources ||--o{ kb_fact_resource_verifications : "checked against"
-    kb_fact_verdicts ||--o{ kb_fact_resource_verifications : "derived from"
+    resources ||--o{ kb_source_checks : "checked against"
+    kb_fact_verdicts ||--o{ kb_source_checks : "derived from"
 `} />
 
 The verification system has two layers:
-1. **Evidence** (`kb_fact_resource_verifications`): One row per fact-resource check. Records what the LLM found.
+1. **Evidence** (`kb_source_checks`): One row per fact-resource check. Records what the LLM found.
 2. **Conclusions** (`kb_fact_verdicts`): One row per fact. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
 
 ---
@@ -602,7 +602,7 @@ flowchart LR
         FP[funding_programs]
     end
     subgraph Verification
-        KBFRV[kb_fact_resource_verifications]
+        KBSC[kb_source_checks]
         KBFV[kb_fact_verdicts]
     end
     subgraph Infra
@@ -628,7 +628,7 @@ flowchart LR
     RES --> CQ
     RES --> RC
     RES --> PC
-    RES --> KBFRV
+    RES --> KBSC
     AUR --> AURES
     AUR --> AUNI
     AA --> ASE

@@ -5,7 +5,7 @@ import { getWikiServerConfig } from "@lib/wiki-server";
  * GET /api/factbase-verdict-detail?factId=...
  *
  * Proxies KB verdict detail requests to the wiki-server's
- * /api/kb-verifications/verdicts/:factId endpoint.
+ * /api/factbase-source-checks/verdicts/:factId endpoint.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${config.serverUrl}/api/kb-verifications/verdicts/${encodeURIComponent(factId)}`;
+    const url = `${config.serverUrl}/api/factbase-source-checks/verdicts/${encodeURIComponent(factId)}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(10000),

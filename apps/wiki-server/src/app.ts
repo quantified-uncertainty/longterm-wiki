@@ -20,7 +20,7 @@ import { equityPositionsRoute } from "./routes/tablebase/equity-positions.js";
 import { fundingProgramsRoute } from "./routes/tablebase/funding-programs.js";
 import { benchmarksRoute } from "./routes/tablebase/benchmarks.js";
 import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
-import { recordVerificationsRoute } from "./routes/tablebase/record-verifications.js";
+import { recordSourceChecksRoute } from "./routes/tablebase/record-source-checks.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
@@ -28,7 +28,7 @@ import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
 
 // FactBase routes — structured triples with temporal data
 import { factsRoute } from "./routes/factbase/facts.js";
-import { factbaseVerificationsRoute } from "./routes/factbase/factbase-verifications.js";
+import { factbaseSourceChecksRoute } from "./routes/factbase/factbase-source-checks.js";
 
 // WikiBase routes — long-form prose, citations, references
 import { pagesRoute } from "./routes/wikibase/pages.js";
@@ -158,9 +158,10 @@ export function createApp() {
   app.route("/api/links", linksRoute);
   app.route("/api/explore", exploreRoute);
 
-  // FactBase routes — structured facts and verification
+  // FactBase routes — structured facts and source checks
   app.route("/api/facts", factsRoute);
-  app.route("/api/kb-verifications", factbaseVerificationsRoute); // API path kept for backwards compat
+  app.route("/api/factbase-source-checks", factbaseSourceChecksRoute);
+  app.route("/api/kb-verifications", factbaseSourceChecksRoute); // deprecated path, kept for backwards compat
 
   // WikiBase routes — prose content and page metadata
   app.route("/api/pages", pagesRoute);
@@ -184,7 +185,8 @@ export function createApp() {
   app.route("/api/funding-programs", fundingProgramsRoute);
   app.route("/api/benchmarks", benchmarksRoute);
   app.route("/api/benchmark-results", benchmarkResultsRoute);
-  app.route("/api/record-verifications", recordVerificationsRoute);
+  app.route("/api/record-source-checks", recordSourceChecksRoute);
+  app.route("/api/record-verifications", recordSourceChecksRoute); // deprecated path, kept for backwards compat
   app.route("/api/assessments", assessmentsRoute);
 
   // Cross-Base: unified things index

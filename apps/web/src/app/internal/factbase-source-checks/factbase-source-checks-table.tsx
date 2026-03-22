@@ -15,7 +15,7 @@ import {
 import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import type { VerdictRow, VerdictDetailResult } from "./factbase-verifications-content";
+import type { VerdictRow, VerdictDetailResult } from "./factbase-source-checks-content";
 
 // ── Verdict badge ─────────────────────────────────────────────────────────────
 
@@ -314,7 +314,7 @@ function ExpandedVerificationDetail({
 
 // ── Table component ───────────────────────────────────────────────────────────
 
-export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
+export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
   const [filterVerdict, setFilterVerdict] = useState<string>("all");
   const [detailCache, setDetailCache] = useState<DetailCache>({});
 
@@ -448,7 +448,7 @@ export function FactBaseVerificationsTable({ data }: { data: VerdictRow[] }) {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            placeholder="Search verifications..."
+            placeholder="Search source checks..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"

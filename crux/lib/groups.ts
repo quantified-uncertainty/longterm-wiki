@@ -73,7 +73,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'people',
       'orgs',
       'research-areas',
-      'verify',
+      'source-check',
     ],
     flattened: ['tablebase'],
   },

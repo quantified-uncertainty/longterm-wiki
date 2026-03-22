@@ -1,5 +1,5 @@
 /**
- * KB Fact Verification Command
+ * KB Fact Source-Check Command
  *
  * Checks KB facts against their source URLs using an LLM.
  * For each fact with a source URL, fetches the source content (from DB cache
@@ -7,10 +7,10 @@
  * whether the source confirms, contradicts, or doesn't address the claim.
  *
  * Usage:
- *   crux fb verify --entity=anthropic         Verify all facts for Anthropic
- *   crux fb verify --fact=f_dW5cR9mJ8q        Verify a single fact
- *   crux fb verify --dry-run                   Show what would be checked
- *   crux fb verify --limit=10                  Check at most 10 facts
+ *   crux fb source-check --entity=anthropic         Check all facts for Anthropic
+ *   crux fb source-check --fact=f_dW5cR9mJ8q        Check a single fact
+ *   crux fb source-check --dry-run                   Show what would be checked
+ *   crux fb source-check --limit=10                  Check at most 10 facts
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -48,9 +48,9 @@ interface VerifyCommandOptions extends BaseOptions {
   ci?: boolean;
 }
 
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial';
+type SourceCheckVerdict = 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial';
 
-interface VerificationResult {
+interface SourceCheckResult {
   factId: string;
   entityId: string;
   entityName: string;
@@ -59,7 +59,7 @@ interface VerificationResult {
   formattedValue: string;
   sourceUrl: string;
   asOf?: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
@@ -67,7 +67,7 @@ interface VerificationResult {
   errorType?: SourceFetchErrorType;
 }
 
-interface VerificationError {
+interface SourceCheckError {
   factId: string;
   entityId: string;
   propertyId: string;
@@ -77,7 +77,7 @@ interface VerificationError {
   errorType?: SourceFetchErrorType;
 }
 
-interface VerificationSummary {
+interface SourceCheckSummary {
   total: number;
   confirmed: number;
   contradicted: number;
@@ -85,8 +85,8 @@ interface VerificationSummary {
   outdated: number;
   partial: number;
   errors: number;
-  results: VerificationResult[];
-  failures: VerificationError[];
+  results: SourceCheckResult[];
+  failures: SourceCheckError[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -114,7 +114,7 @@ interface FetchSourceResult {
 async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
   // SSRF protection: only allow https:// URLs (no http://, file://, ftp://, etc.)
   if (!url.startsWith('https://')) {
-    console.warn(`[kb-verify] Skipping non-HTTPS URL: ${url}`);
+    console.warn(`[kb-source-check] Skipping non-HTTPS URL: ${url}`);
     return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
   }
 
@@ -146,7 +146,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
       /^::ffff:172\.(1[6-9]|2\d|3[01])\./i.test(host) || // IPv4-mapped private
       /^::ffff:169\.254\./i.test(host) // IPv4-mapped link-local
     ) {
-      console.warn(`[kb-verify] Blocking private/internal URL: ${url}`);
+      console.warn(`[kb-source-check] Blocking private/internal URL: ${url}`);
       return { content: null, errorType: 'access_denied', errorMessage: 'Private/internal host blocked' };
     }
   } catch {
@@ -155,7 +155,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
 
   // Check for unverifiable domains (social media, etc.)
   if (isUnverifiableDomain(url)) {
-    console.warn(`[kb-verify] Unverifiable domain: ${url}`);
+    console.warn(`[kb-source-check] Unverifiable domain: ${url}`);
     return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
@@ -170,7 +170,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
       if (content && content.length > 0) {
         // Check for paywall signals even in cached content
         if (detectPaywall(content)) {
-          console.warn(`[kb-verify] Cached content for ${url} appears paywalled`);
+          console.warn(`[kb-source-check] Cached content for ${url} appears paywalled`);
           return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
         }
         return { content: content.slice(0, MAX_CONTENT_LENGTH) };
@@ -178,7 +178,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
     }
   } catch (e: unknown) {
     // Wiki-server unavailable — fall back to direct fetch
-    console.warn(`[kb-verify] Wiki-server cache miss for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[kb-source-check] Wiki-server cache miss for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // Direct fetch with timeout
@@ -196,7 +196,7 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
 
     if (!response.ok) {
       const errorType = classifyFetchError(response.status, null, null, url);
-      console.warn(`[kb-verify] HTTP ${response.status} for ${url}`);
+      console.warn(`[kb-source-check] HTTP ${response.status} for ${url}`);
       return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
     }
 
@@ -219,18 +219,18 @@ async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
 
     // Detect paywall in fetched content
     if (detectPaywall(content)) {
-      console.warn(`[kb-verify] Paywall detected for ${url}`);
+      console.warn(`[kb-source-check] Paywall detected for ${url}`);
       return { content, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
     }
 
     return { content };
   } catch (e: unknown) {
     if (e instanceof DOMException && e.name === 'AbortError') {
-      console.warn(`[kb-verify] Timeout fetching ${url}`);
+      console.warn(`[kb-source-check] Timeout fetching ${url}`);
       return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
     }
     const msg = e instanceof Error ? e.message : String(e);
-    console.warn(`[kb-verify] Failed to fetch ${url}: ${msg}`);
+    console.warn(`[kb-source-check] Failed to fetch ${url}: ${msg}`);
     return { content: null, errorType: 'fetch_error', errorMessage: msg };
   }
 }
@@ -287,7 +287,7 @@ async function verifySingleFact(
   fact: Fact,
   graph: Graph,
   client: ReturnType<typeof createLlmClient>,
-): Promise<VerificationResult | VerificationError> {
+): Promise<SourceCheckResult | SourceCheckError> {
   const property = graph.getProperty(fact.propertyId);
   const formattedValue = formatFactValue(fact, property, graph);
   const sourceUrl = fact.source!;
@@ -329,9 +329,9 @@ async function verifySingleFact(
       reasoning: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
 
     return {
@@ -364,7 +364,7 @@ async function verifySingleFact(
  * Store a verification result in the wiki-server database.
  * Best-effort: logs a warning on failure but does not block the pipeline.
  */
-async function storeVerificationResult(result: VerificationResult): Promise<void> {
+async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> {
   const body = {
     factId: result.factId,
     verdict: result.verdict,
@@ -378,12 +378,12 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/kb-verifications/verifications',
+    '/api/factbase-source-checks/verifications',
     body,
   );
 
   if (!response.ok) {
-    console.warn(`[kb-verify] Failed to store verification for ${result.factId}: ${response.error}`);
+    console.warn(`[kb-source-check] Failed to store verification for ${result.factId}: ${response.error}`);
   }
 }
 
@@ -505,7 +505,7 @@ export async function verifyCommand(
 
   // Live run: verify facts with LLM
   const client = createLlmClient();
-  const summary: VerificationSummary = {
+  const summary: SourceCheckSummary = {
     total: factsToVerify.length,
     confirmed: 0,
     contradicted: 0,
@@ -546,8 +546,8 @@ export async function verifyCommand(
       }
 
       // Store result in wiki-server (best-effort, does not block pipeline)
-      storeVerificationResult(result).catch((e: unknown) => {
-        console.warn(`[kb-verify] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
+      storeSourceCheckResult(result).catch((e: unknown) => {
+        console.warn(`[kb-source-check] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
       });
     }
   }

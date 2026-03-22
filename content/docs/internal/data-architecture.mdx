@@ -80,7 +80,7 @@ These tables mirror data from the FactBase YAML package. The YAML in `packages/f
 |----------|---------------|---------|
 | `facts` | `facts` | Read mirror of FactBase YAML. Numeric/string facts with timeseries support via `measure` + `as_of`. |
 | `properties` | `properties` | Controlled vocabulary for fact property types (valuation, headcount, ceo, etc.). |
-| `factbase_resource_verifications` | `factbaseResourceVerifications` | Per-source verification checks for FactBase facts. |
+| `kb_source_checks` | `factbaseSourceChecks` | Per-source checks for FactBase facts. |
 | `factbase_verdicts` | `factbaseVerdicts` | Aggregate fact-level verdicts derived from verification evidence. |
 
 ### WikiBase tables (prose content)
@@ -104,7 +104,7 @@ The `things` table is a **cross-base universal index**, not a FactBase concept. 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
 | `things` | `things` | Universal index. `thing_type` indicates domain (entity, fact, grant, etc.). `source_table` + `source_id` point back to the originating record. |
-| `thing_resource_verifications` | `thingResourceVerifications` | Per-source verification checks keyed by `things.id`. |
+| `thing_source_checks` | `thingSourceChecks` | Per-source checks keyed by `things.id`. |
 | `thing_verdicts` | `thingVerdicts` | Aggregate verdicts for things. |
 
 ### Operational tables
@@ -140,7 +140,7 @@ These tables are not part of any Base. They track system operations, CI/CD, and 
 | `funding_programs` | `fundingPrograms` | Open funding opportunities. |
 | `benchmarks` | `benchmarks` | Evaluation benchmark definitions. |
 | `benchmark_results` | `benchmarkResults` | Model scores on benchmarks. |
-| `record_verifications` | `recordVerifications` | Per-source checks for financial records. |
+| `record_source_checks` | `recordSourceChecks` | Per-source checks for financial records. |
 | `record_verdicts` | `recordVerdicts` | Aggregate verdicts for financial records. |
 | `research_areas` | `researchAreas` | Research area taxonomy. |
 

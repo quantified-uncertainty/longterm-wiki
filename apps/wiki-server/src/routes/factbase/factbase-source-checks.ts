@@ -4,7 +4,7 @@ import { eq, and, count, sql, desc, or } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import {
   factbaseVerdicts,
-  factbaseResourceVerifications,
+  factbaseSourceChecks,
   facts,
   entities,
 } from "../../schema.js";
@@ -216,9 +216,9 @@ const kbVerificationsApp = new Hono()
 
     const verifications = await db
       .select()
-      .from(factbaseResourceVerifications)
-      .where(eq(factbaseResourceVerifications.factId, factId))
-      .orderBy(desc(factbaseResourceVerifications.checkedAt));
+      .from(factbaseSourceChecks)
+      .where(eq(factbaseSourceChecks.factId, factId))
+      .orderBy(desc(factbaseSourceChecks.checkedAt));
 
     return c.json({
       verdict: {
@@ -265,7 +265,7 @@ const kbVerificationsApp = new Hono()
 
     // Insert the resource verification
     const [inserted] = await db
-      .insert(factbaseResourceVerifications)
+      .insert(factbaseSourceChecks)
       .values({
         factId: body.factId,
         resourceId: body.resourceId ?? null,
@@ -280,7 +280,7 @@ const kbVerificationsApp = new Hono()
         createdAt: now,
         updatedAt: now,
       })
-      .returning({ id: factbaseResourceVerifications.id });
+      .returning({ id: factbaseSourceChecks.id });
 
     // Auto-set needs_recheck on the corresponding verdict if one exists.
     // When new evidence is inserted, the aggregate verdict may be stale.
@@ -299,9 +299,14 @@ const kbVerificationsApp = new Hono()
 // ---- Exports ----
 
 /**
- * KB Verifications route handler -- mount at `/api/kb-verifications` in the main app.
+ * FactBase source checks route handler — mount at `/api/factbase-source-checks`.
  *
- * Also exports `KbVerificationsRoute` type for Hono RPC client type inference.
+ * Also exports `FactbaseSourceChecksRoute` type for Hono RPC client type inference.
  */
-export const factbaseVerificationsRoute = kbVerificationsApp;
-export type FactbaseVerificationsRoute = typeof kbVerificationsApp;
+export const factbaseSourceChecksRoute = kbVerificationsApp;
+export type FactbaseSourceChecksRoute = typeof kbVerificationsApp;
+
+/** @deprecated Use factbaseSourceChecksRoute */
+export const factbaseVerificationsRoute = factbaseSourceChecksRoute;
+/** @deprecated Use FactbaseSourceChecksRoute */
+export type FactbaseVerificationsRoute = FactbaseSourceChecksRoute;

@@ -17,7 +17,7 @@ import { validate } from '../../packages/factbase/src/validate.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
-import { verifyCommand } from './factbase-verify.ts';
+import { verifyCommand } from './factbase-source-check.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
@@ -1109,7 +1109,7 @@ export const commands = {
   'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
   'sync-sources': syncSourcesCommand,
-  verify: verifyCommand,
+  'source-check': verifyCommand,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
@@ -1134,7 +1134,7 @@ Commands:
   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
-  verify                Verify KB facts against source URLs using LLM
+  source-check          Check KB facts against source URLs using LLM
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
 
@@ -1144,9 +1144,9 @@ Options:
   --ci                  JSON output (sync-sources: dry-run, lists URLs only)
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
-  --entity=X            (verify) Verify all facts for one entity
-  --fact=X              (verify) Verify a single fact by ID
-  --dry-run             (verify) Show what would be checked without calling LLM
+  --entity=X            (source-check) Check all facts for one entity
+  --fact=X              (source-check) Check a single fact by ID
+  --dry-run             (source-check) Show what would be checked without calling LLM
   --asOf=YYYY-MM        (add-fact) Temporal anchor date
   --source=URL          (add-fact) Source URL
   --notes=TEXT           (add-fact) Free-text annotation
@@ -1162,7 +1162,7 @@ Examples:
   crux fb coverage --type=organization Organizations property coverage
   crux fb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
   crux fb sync-sources                Sync source URLs to wiki-server resources
-  crux fb verify --entity=anthropic   Verify Anthropic facts against sources
-  crux fb verify --dry-run --limit=5  Preview 5 facts that would be checked
+  crux fb source-check --entity=anthropic   Check Anthropic facts against sources
+  crux fb source-check --dry-run --limit=5  Preview 5 facts that would be checked
 `;
 }

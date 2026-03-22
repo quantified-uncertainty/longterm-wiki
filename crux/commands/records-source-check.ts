@@ -1,17 +1,17 @@
 /**
- * Record Verification Command
+ * Record Source-Check Command
  *
- * Verifies structured data records (grants, personnel, divisions, etc.)
+ * Checks structured data records (grants, personnel, divisions, etc.)
  * against their source URLs using an LLM. For each record with a source
  * URL, fetches the source content and checks whether the source confirms
  * the record's data.
  *
  * Usage:
- *   crux tb verify grants                       Verify all grants with source URLs
- *   crux tb verify personnel --entity=anthropic  Verify personnel for one org
- *   crux tb verify stats                        Show verification coverage report
- *   crux tb verify --type=grant --limit=10       Verify 10 grants
- *   crux tb verify --dry-run                     Show what would be checked
+ *   crux tb source-check grants                       Check all grants with source URLs
+ *   crux tb source-check personnel --entity=anthropic  Check personnel for one org
+ *   crux tb source-check stats                        Show source-check coverage report
+ *   crux tb source-check --type=grant --limit=10       Check 10 grants
+ *   crux tb source-check --dry-run                     Show what would be checked
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -27,9 +27,9 @@ import {
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import {
   VALID_RECORD_TYPES,
-  VALID_VERIFICATION_VERDICTS,
+  VALID_SOURCE_CHECK_VERDICTS,
   type RecordType,
-  type VerificationVerdict,
+  type SourceCheckVerdict,
 } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -56,19 +56,19 @@ interface RecordToVerify {
   fields: Record<string, string | number | null>; // key fields to verify
 }
 
-interface VerificationResult {
+interface SourceCheckResult {
   recordType: RecordType;
   recordId: string;
   description: string;
   sourceUrl: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
   errorType?: SourceFetchErrorType;
 }
 
-interface VerificationError {
+interface SourceCheckError {
   recordType: RecordType;
   recordId: string;
   sourceUrl: string;
@@ -394,7 +394,7 @@ Respond with ONLY a JSON object (no markdown code fences):
 async function verifySingleRecord(
   record: RecordToVerify,
   client: ReturnType<typeof createLlmClient>,
-): Promise<VerificationResult | VerificationError> {
+): Promise<SourceCheckResult | SourceCheckError> {
   const fetchResult = await fetchSourceContent(record.sourceUrl);
   if (!fetchResult.content) {
     return {
@@ -423,8 +423,8 @@ async function verifySingleRecord(
       reasoning: string;
     };
 
-    const verdict = (VALID_VERIFICATION_VERDICTS as readonly string[]).includes(parsed.verdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.verdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
 
     return {
@@ -450,7 +450,7 @@ async function verifySingleRecord(
 
 // ── Store results ────────────────────────────────────────────────────
 
-async function storeVerificationResult(result: VerificationResult): Promise<void> {
+async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> {
   const body = {
     recordType: result.recordType,
     recordId: result.recordId,
@@ -464,7 +464,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/record-verifications/verifications',
+    '/api/record-source-checks/verifications',
     body,
   );
 
@@ -525,7 +525,7 @@ async function lookupThingId(recordType: RecordType, recordId: string): Promise<
 async function syncVerdictToThings(
   recordType: RecordType,
   recordId: string,
-  verdict: VerificationVerdict,
+  verdict: SourceCheckVerdict,
   confidence: number,
   reasoning: string,
   sourcesChecked: number,
@@ -553,7 +553,7 @@ async function syncVerdictToThings(
 async function storeAggregateVerdict(
   recordType: RecordType,
   recordId: string,
-  verdict: VerificationVerdict,
+  verdict: SourceCheckVerdict,
   confidence: number,
   reasoning: string,
   sourcesChecked: number,
@@ -569,7 +569,7 @@ async function storeAggregateVerdict(
 
   const response = await apiRequest<{ ok: boolean }>(
     'POST',
-    '/api/record-verifications/verdicts',
+    '/api/record-source-checks/verdicts',
     body,
   );
 
@@ -593,7 +593,7 @@ async function statsCommand(): Promise<CommandResult> {
     by_type: Record<string, number>;
     needs_recheck: number;
     avg_confidence: number;
-  }>('GET', '/api/record-verifications/stats');
+  }>('GET', '/api/record-source-checks/stats');
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
@@ -664,7 +664,7 @@ async function syncThingsCommand(): Promise<CommandResult> {
         sourcesChecked: number | null;
       }>;
       total: number;
-    }>('GET', `/api/record-verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+    }>('GET', `/api/record-source-checks/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
     if (!response.ok) {
       return { exitCode: 1, output: `Failed to fetch verdicts: ${response.message}` };
@@ -728,7 +728,7 @@ async function syncThingsCommand(): Promise<CommandResult> {
 
 // ── Main command ─────────────────────────────────────────────────────
 
-export async function recordsVerifyCommand(
+export async function recordsSourceCheckCommand(
   args: string[],
   options: VerifyCommandOptions,
 ): Promise<CommandResult> {
@@ -777,7 +777,7 @@ export async function recordsVerifyCommand(
     if (!mapped) {
       return {
         exitCode: 1,
-        output: `Unknown subcommand: ${subcommand}\nUsage: crux tb verify <type|stats|sync-things> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
+        output: `Unknown subcommand: ${subcommand}\nUsage: crux tb source-check <type|stats|sync-things> [options]\nTypes: ${VALID_RECORD_TYPES.join(', ')}`,
       };
     }
     typesToVerify = [mapped];
@@ -848,8 +848,8 @@ export async function recordsVerifyCommand(
     outdated: 0,
     partial: 0,
     errors: 0,
-    results: [] as VerificationResult[],
-    failures: [] as VerificationError[],
+    results: [] as SourceCheckResult[],
+    failures: [] as SourceCheckError[],
   };
 
   console.log(`\x1b[1mVerifying ${recordsToVerify.length} record(s)...\x1b[0m`);
@@ -879,7 +879,7 @@ export async function recordsVerifyCommand(
       }
 
       // Store result — await to avoid data loss on process exit
-      await storeVerificationResult(result).catch((e: unknown) => {
+      await storeSourceCheckResult(result).catch((e: unknown) => {
         console.warn(`[verify] Failed to store: ${e instanceof Error ? e.message : String(e)}`);
       });
 
@@ -974,39 +974,39 @@ export async function recordsVerifyCommand(
 // ── Exports ──────────────────────────────────────────────────────────
 
 export const commands = {
-  default: recordsVerifyCommand,
+  default: recordsSourceCheckCommand,
   stats: statsCommand,
 };
 
 export function getHelp(): string {
   return `
-Record Verification — verify structured data against source URLs
+Record Source-Check — check structured data against source URLs
 
 Usage:
-  crux tb verify <type>              Verify all records of a type with source URLs
-  crux tb verify stats               Show verification coverage report
-  crux tb verify sync-things         Sync existing verdicts to the Things dashboard
-  crux tb verify grants              Verify all grants
-  crux tb verify personnel           Verify all personnel records
-  crux tb verify divisions           Verify all divisions
-  crux tb verify funding-programs    Verify funding programs
-  crux tb verify funding-rounds      Verify funding rounds
-  crux tb verify investments         Verify investments
-  crux tb verify equity-positions    Verify equity positions
+  crux tb source-check <type>              Check all records of a type with source URLs
+  crux tb source-check stats               Show source-check coverage report
+  crux tb source-check sync-things         Sync existing verdicts to the Things dashboard
+  crux tb source-check grants              Check all grants
+  crux tb source-check personnel           Check all personnel records
+  crux tb source-check divisions           Check all divisions
+  crux tb source-check funding-programs    Check funding programs
+  crux tb source-check funding-rounds      Check funding rounds
+  crux tb source-check investments         Check investments
+  crux tb source-check equity-positions    Check equity positions
 
 Options:
   --type=X            Filter by record type
   --entity=X          Filter by entity (org or person stableId)
-  --limit=N           Limit number of records to verify
+  --limit=N           Limit number of records to check
   --dry-run           Show what would be checked without calling LLM
   --ci                JSON output
 
 Examples:
-  crux tb verify grants --dry-run             Preview which grants would be checked
-  crux tb verify personnel --entity=anthropic Verify Anthropic personnel records
-  crux tb verify stats                        Show verification coverage
-  crux tb verify grants --limit=5             Verify 5 grants
-  crux tb verify --dry-run                    Preview all record types
-  crux tb verify sync-things                  Push all verdicts to Things dashboard
+  crux tb source-check grants --dry-run             Preview which grants would be checked
+  crux tb source-check personnel --entity=anthropic Check Anthropic personnel records
+  crux tb source-check stats                        Show source-check coverage
+  crux tb source-check grants --limit=5             Check 5 grants
+  crux tb source-check --dry-run                    Preview all record types
+  crux tb source-check sync-things                  Push all verdicts to Things dashboard
 `;
 }

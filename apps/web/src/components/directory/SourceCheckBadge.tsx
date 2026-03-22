@@ -1,8 +1,8 @@
 /**
- * Verification status badge for structured data records (grants, personnel, etc.).
+ * Source check status badge for structured data records (grants, personnel, etc.).
  *
  * Shows a small colored indicator next to record data points on detail pages.
- * The verdict comes from the record verification system (wiki-server + LLM checks).
+ * The verdict comes from the record source check system (wiki-server + LLM checks).
  *
  * Only renders when a verdict exists — unchecked records show nothing.
  */
@@ -52,7 +52,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
 
 // ── Component ────────────────────────────────────────────────────────
 
-export function VerificationBadge({
+export function SourceCheckBadge({
   verdict,
 }: {
   verdict: RecordVerdict | null | undefined;
@@ -85,8 +85,8 @@ export function VerificationBadge({
 // ── Mapping helper ───────────────────────────────────────────────────
 
 /**
- * Map a KB record collection name to the verification record type.
- * Returns null for collections that don't have verification support.
+ * Map a KB record collection name to the source check record type.
+ * Returns null for collections that don't have source check support.
  */
 export function collectionToRecordType(
   collection: string,
@@ -104,7 +104,7 @@ export function collectionToRecordType(
 }
 
 /**
- * Map a KB record schema to the verification record type.
+ * Map a KB record schema to the source check record type.
  * Handles personnel subtypes (key-person, board-seat, career-history all map to "personnel").
  */
 export function schemaToRecordType(schema: string): string | null {

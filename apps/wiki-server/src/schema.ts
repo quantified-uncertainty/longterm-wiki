@@ -1405,13 +1405,13 @@ export const pageCitations = pgTable(
 );
 
 /**
- * Per-resource verification evidence for KB facts.
+ * Per-resource source checks for KB facts.
  *
  * Each row records one LLM check of a KB fact against a specific resource.
  * A fact can have multiple rows (one per resource checked).
  */
-export const factbaseResourceVerifications = pgTable(
-  "kb_fact_resource_verifications",
+export const factbaseSourceChecks = pgTable(
+  "kb_source_checks",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     factId: text("fact_id").notNull(),
@@ -1436,15 +1436,15 @@ export const factbaseResourceVerifications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_kbfrv_fact_id").on(table.factId),
-    index("idx_kbfrv_verdict").on(table.verdict),
+    index("idx_kbsc_fact_id").on(table.factId),
+    index("idx_kbsc_verdict").on(table.verdict),
   ]
 );
 
 /**
- * Aggregate per-fact verdicts — one row per fact, derived from resource verifications.
+ * Aggregate per-fact verdicts — one row per fact, derived from source checks.
  *
- * Recomputed periodically from kb_fact_resource_verifications. Separates evidence
+ * Recomputed periodically from kb_source_checks. Separates evidence
  * (per-resource checks) from conclusions (all-things-considered verdict).
  */
 export const factbaseVerdicts = pgTable(
@@ -1952,13 +1952,13 @@ export const fundingPrograms = pgTable(
 // verification model: evidence (per-source checks) → verdicts (aggregate).
 
 /**
- * Per-source verification checks for structured data records.
+ * Per-source checks for structured data records.
  *
  * Each row records a single check of one record against one source URL.
  * Multiple checks can exist per record (different sources, rechecks over time).
  */
-export const recordVerifications = pgTable(
-  "record_verifications",
+export const recordSourceChecks = pgTable(
+  "record_source_checks",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     recordType: text("record_type").notNull(), // 'grant' | 'personnel' | 'division' | 'funding-program' | 'funding-round' | 'investment' | 'equity-position'
@@ -1982,15 +1982,15 @@ export const recordVerifications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_rv_record").on(table.recordType, table.recordId),
-    index("idx_rv_verdict").on(table.verdict),
-    index("idx_rv_type").on(table.recordType),
+    index("idx_rsc_record").on(table.recordType, table.recordId),
+    index("idx_rsc_verdict").on(table.verdict),
+    index("idx_rsc_type").on(table.recordType),
   ]
 );
 
 /**
  * Aggregate per-record verdicts — one row per record, derived from
- * record_verifications. Separates evidence (per-source checks) from
+ * record_source_checks. Separates evidence (per-source checks) from
  * conclusions (all-things-considered verdict).
  */
 export const recordVerdicts = pgTable(
@@ -2091,17 +2091,17 @@ export const things = pgTable(
   ]
 );
 
-// ── Thing Verification ───────────────────────────────────────────────
+// ── Thing Source Checks ──────────────────────────────────────────────
 //
-// Evidence + aggregate pattern for thing-level verification.
-// Mirrors record_verifications / record_verdicts but keyed by things.id.
+// Evidence + aggregate pattern for thing-level source checking.
+// Mirrors record_source_checks / record_verdicts but keyed by things.id.
 
 /**
- * Per-source verification checks for things.
+ * Per-source checks for things.
  * Each row records a single check of one thing against one source.
  */
-export const thingResourceVerifications = pgTable(
-  "thing_resource_verifications",
+export const thingSourceChecks = pgTable(
+  "thing_source_checks",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     thingId: text("thing_id")
@@ -2130,14 +2130,14 @@ export const thingResourceVerifications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_trv_thing").on(table.thingId),
-    index("idx_trv_verdict").on(table.verdict),
+    index("idx_tsc_thing").on(table.thingId),
+    index("idx_tsc_verdict").on(table.verdict),
   ]
 );
 
 /**
  * Aggregate per-thing verdicts — one row per thing, derived from
- * thing_resource_verifications.
+ * thing_source_checks.
  */
 export const thingVerdicts = pgTable(
   "thing_verdicts",

@@ -42,7 +42,7 @@ pnpm crux w fix markdown                     # After any page edit
 
 # FactBase (fb = factbase)
 pnpm crux fb show <entity>                   # Show FactBase entity
-pnpm crux fb verify                          # Verify FactBase data
+pnpm crux fb source-check                    # Source-check FactBase facts against URLs
 
 # TableBase (tb = tablebase)
 pnpm crux tb ids allocate <slug>             # Wiki entity: allocate numericId + stableId

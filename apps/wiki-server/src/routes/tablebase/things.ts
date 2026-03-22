@@ -13,7 +13,7 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, thingResourceVerifications, thingVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import { things, thingSourceChecks, thingVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -138,7 +138,7 @@ function formatThing(t: typeof things.$inferSelect) {
   };
 }
 
-function formatVerification(v: typeof thingResourceVerifications.$inferSelect) {
+function formatVerification(v: typeof thingSourceChecks.$inferSelect) {
   return {
     id: v.id,
     thingId: v.thingId,
@@ -438,16 +438,16 @@ const thingsApp = new Hono()
 
     const rows = await db
       .select()
-      .from(thingResourceVerifications)
-      .where(eq(thingResourceVerifications.thingId, thingId))
-      .orderBy(desc(thingResourceVerifications.checkedAt))
+      .from(thingSourceChecks)
+      .where(eq(thingSourceChecks.thingId, thingId))
+      .orderBy(desc(thingSourceChecks.checkedAt))
       .limit(limit)
       .offset(offset);
 
     const countResult = await db
       .select({ count: count() })
-      .from(thingResourceVerifications)
-      .where(eq(thingResourceVerifications.thingId, thingId));
+      .from(thingSourceChecks)
+      .where(eq(thingSourceChecks.thingId, thingId));
 
     return c.json({
       verifications: rows.map(formatVerification),
@@ -482,7 +482,7 @@ const thingsApp = new Hono()
 
     const inserted = await db.transaction(async (tx) => {
       const [row] = await tx
-        .insert(thingResourceVerifications)
+        .insert(thingSourceChecks)
         .values({
           thingId: data.thingId,
           resourceId: data.resourceId ?? null,

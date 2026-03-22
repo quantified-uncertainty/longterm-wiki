@@ -181,8 +181,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return verdicts;
   }
 
-  // INSERT into kb_fact_resource_verifications (POST /verifications)
-  if (q.includes("insert") && q.includes("kb_fact_resource_verifications")) {
+  // INSERT into kb_source_checks (POST /verifications)
+  if (q.includes("insert") && q.includes("kb_source_checks")) {
     const nextId = verifications.length > 0 ? Math.max(...verifications.map((v) => v.id)) + 1 : 1;
     const now = new Date().toISOString();
     // Extract fact_id from params (first string starting with f_)
@@ -224,8 +224,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // SELECT from kb_fact_resource_verifications
-  if (q.includes("kb_fact_resource_verifications")) {
+  // SELECT from kb_source_checks
+  if (q.includes("kb_source_checks")) {
     const factId = params.find(
       (p) => typeof p === "string" && (p as string).startsWith("f_")
     );
@@ -246,17 +246,17 @@ let app: Hono;
 
 beforeEach(async () => {
   resetStores();
-  const { factbaseVerificationsRoute } = await import(
-    "../routes/factbase/factbase-verifications.js"
+  const { factbaseSourceChecksRoute } = await import(
+    "../routes/factbase/factbase-source-checks.js"
   );
-  app = new Hono().route("/api/kb-verifications", factbaseVerificationsRoute);
+  app = new Hono().route("/api/factbase-source-checks", factbaseSourceChecksRoute);
 });
 
 // ---- Tests ----
 
-describe("GET /api/kb-verifications/stats", () => {
+describe("GET /api/factbase-source-checks/stats", () => {
   it("returns aggregate stats", async () => {
-    const res = await app.request("/api/kb-verifications/stats");
+    const res = await app.request("/api/factbase-source-checks/stats");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.total_facts).toBe(3);
@@ -266,9 +266,9 @@ describe("GET /api/kb-verifications/stats", () => {
   });
 });
 
-describe("GET /api/kb-verifications/verdicts", () => {
+describe("GET /api/factbase-source-checks/verdicts", () => {
   it("returns verdicts list with pagination", async () => {
-    const res = await app.request("/api/kb-verifications/verdicts?limit=10");
+    const res = await app.request("/api/factbase-source-checks/verdicts?limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.verdicts).toBeInstanceOf(Array);
@@ -276,17 +276,17 @@ describe("GET /api/kb-verifications/verdicts", () => {
   });
 
   it("validates limit parameter", async () => {
-    const res = await app.request("/api/kb-verifications/verdicts?limit=999");
+    const res = await app.request("/api/factbase-source-checks/verdicts?limit=999");
     expect(res.status).toBe(400);
   });
 
   it("validates offset parameter", async () => {
-    const res = await app.request("/api/kb-verifications/verdicts?offset=-1");
+    const res = await app.request("/api/factbase-source-checks/verdicts?offset=-1");
     expect(res.status).toBe(400);
   });
 
   it("includes entityId and factLabel in verdict rows", async () => {
-    const res = await app.request("/api/kb-verifications/verdicts?limit=10");
+    const res = await app.request("/api/factbase-source-checks/verdicts?limit=10");
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.verdicts.length).toBe(3);
@@ -302,7 +302,7 @@ describe("GET /api/kb-verifications/verdicts", () => {
 
   it("filters by entity_id", async () => {
     const res = await app.request(
-      "/api/kb-verifications/verdicts?entity_id=openai&limit=10"
+      "/api/factbase-source-checks/verdicts?entity_id=openai&limit=10"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -312,10 +312,10 @@ describe("GET /api/kb-verifications/verdicts", () => {
   });
 });
 
-describe("GET /api/kb-verifications/verdicts/:factId", () => {
+describe("GET /api/factbase-source-checks/verdicts/:factId", () => {
   it("returns verdict and verifications for existing fact", async () => {
     const res = await app.request(
-      "/api/kb-verifications/verdicts/f_abc123"
+      "/api/factbase-source-checks/verdicts/f_abc123"
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -326,7 +326,7 @@ describe("GET /api/kb-verifications/verdicts/:factId", () => {
 
   it("returns 404 for non-existent fact", async () => {
     const res = await app.request(
-      "/api/kb-verifications/verdicts/f_nonexistent"
+      "/api/factbase-source-checks/verdicts/f_nonexistent"
     );
     expect(res.status).toBe(404);
   });
@@ -334,15 +334,15 @@ describe("GET /api/kb-verifications/verdicts/:factId", () => {
   it("returns 404 for overly long factId", async () => {
     const longId = "f_" + "x".repeat(200);
     const res = await app.request(
-      `/api/kb-verifications/verdicts/${longId}`
+      `/api/factbase-source-checks/verdicts/${longId}`
     );
     expect(res.status).toBe(404);
   });
 });
 
-describe("POST /api/kb-verifications/verifications", () => {
+describe("POST /api/factbase-source-checks/verifications", () => {
   it("inserts a resource verification and returns 201", async () => {
-    const res = await app.request("/api/kb-verifications/verifications", {
+    const res = await app.request("/api/factbase-source-checks/verifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -367,7 +367,7 @@ describe("POST /api/kb-verifications/verifications", () => {
     const preVerdict = verdicts.find((v) => v.fact_id === "f_abc123");
     expect(preVerdict?.needs_recheck).toBe(false);
 
-    await app.request("/api/kb-verifications/verifications", {
+    await app.request("/api/factbase-source-checks/verifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -383,7 +383,7 @@ describe("POST /api/kb-verifications/verifications", () => {
   });
 
   it("returns verdictFlagged: false when no existing verdict exists", async () => {
-    const res = await app.request("/api/kb-verifications/verifications", {
+    const res = await app.request("/api/factbase-source-checks/verifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -397,7 +397,7 @@ describe("POST /api/kb-verifications/verifications", () => {
   });
 
   it("rejects invalid verdict values", async () => {
-    const res = await app.request("/api/kb-verifications/verifications", {
+    const res = await app.request("/api/factbase-source-checks/verifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -409,7 +409,7 @@ describe("POST /api/kb-verifications/verifications", () => {
   });
 
   it("rejects missing factId", async () => {
-    const res = await app.request("/api/kb-verifications/verifications", {
+    const res = await app.request("/api/factbase-source-checks/verifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

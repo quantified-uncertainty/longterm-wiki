@@ -273,7 +273,7 @@ export function getInternalNav(): NavSection[] {
       title: "Citations",
       items: [
         { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
-        { label: "FactBase Verifications", href: internalHref("kb-fact-verifications-dashboard") },
+        { label: "FactBase Source Checks", href: internalHref("factbase-source-checks-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },

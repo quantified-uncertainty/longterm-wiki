@@ -52,7 +52,7 @@ interface VerdictsResponse {
 
 async function fetchEntityVerdicts(entityId: string): Promise<Map<string, VerdictRow>> {
   const data = await fetchFromWikiServer<VerdictsResponse>(
-    `/api/kb-verifications/verdicts?entity_id=${encodeURIComponent(entityId)}&limit=200`,
+    `/api/factbase-source-checks/verdicts?entity_id=${encodeURIComponent(entityId)}&limit=200`,
     { revalidate: 300 }
   );
   const map = new Map<string, VerdictRow>();
