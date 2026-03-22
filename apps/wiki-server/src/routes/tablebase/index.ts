@@ -25,3 +25,4 @@ export { entityEventsRoute, type EntityEventsRoute } from "./entity-events.js";
 export { entityAssessmentsRoute, type EntityAssessmentsRoute } from "./entity-assessments.js";
 export { publicationsRoute, type PublicationsRoute } from "./publications.js";
 export { websiteSourcesRoute, type WebsiteSourcesRoute } from "./website-sources.js";
+export { secondaryMarketPricesRoute, type SecondaryMarketPricesRoute } from "./secondary-market-prices.js";
