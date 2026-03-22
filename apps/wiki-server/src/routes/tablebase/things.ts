@@ -215,7 +215,6 @@ const thingsApp = new Hono()
         `SELECT
           id, thing_type, title, parent_thing_id, source_table, source_id,
           entity_type, description, source_url, wiki_id, parent_title,
-          verdict, verdict_confidence, verdict_at,
           created_at, updated_at, synced_at,
           similarity(title, $1) AS similarity
         FROM things
@@ -545,9 +544,8 @@ const thingsApp = new Hono()
         .onConflictDoUpdate({
           target: [things.sourceTable, things.sourceId],
           set: {
-            // Do NOT update `id` — it's the PK referenced by thing_verdicts
-            // and thing_resource_verifications FKs. Changing it would cause
-            // constraint violations or cascade-delete verification data.
+            // Do NOT update `id` — it's the PK and may be referenced
+            // by external systems. Changing it would break links.
             thingType: sql`excluded.thing_type`,
             title: sql`excluded.title`,
             parentThingId: sql`excluded.parent_thing_id`,

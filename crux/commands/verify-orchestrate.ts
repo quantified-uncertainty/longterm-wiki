@@ -344,20 +344,21 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
   try {
     const response = await apiRequest<{
       verdicts: Array<{
-        factId: string;
+        recordType: string;
+        recordId: string;
         verdict: string;
-        checkedAt?: string;
+        lastComputedAt?: string;
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/verifications/verdicts?limit=5000');
+    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=5000');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
-        map.set(v.factId, {
-          factId: v.factId,
+        map.set(v.recordId, {
+          factId: v.recordId,
           verdict: v.verdict,
-          checkedAt: v.checkedAt,
+          checkedAt: v.lastComputedAt,
           needsRecheck: v.needsRecheck,
         });
       }
@@ -386,7 +387,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
           recordType: string;
           recordId: string;
           verdict: string;
-          checkedAt?: string;
+          lastComputedAt?: string;
           needsRecheck?: boolean;
         }>;
         total: number;
@@ -399,7 +400,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
           recordType: v.recordType,
           recordId: v.recordId,
           verdict: v.verdict,
-          checkedAt: v.checkedAt,
+          checkedAt: v.lastComputedAt,
           needsRecheck: v.needsRecheck,
         });
       }
