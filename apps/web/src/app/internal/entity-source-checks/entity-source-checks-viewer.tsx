@@ -367,7 +367,7 @@ export function EntitySourceChecksViewer() {
       setDetailCache((prev) => ({ ...prev, [key]: { status: "loaded", data: json } }));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[entity-verifications] Failed to load evidence for ${key}: ${msg}`);
+      console.warn(`[entity-source-checks] Failed to load evidence for ${key}: ${msg}`);
       setDetailCache((prev) => ({ ...prev, [key]: { status: "error", error: msg } }));
     }
   }, []);

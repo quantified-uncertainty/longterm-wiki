@@ -238,7 +238,7 @@ Unified verification system for all record types (facts, grants, personnel, divi
 
 <Mermaid chart={`
 erDiagram
-    verification_verdicts {
+    source_check_verdicts {
         text record_type PK
         text record_id PK
         text field_name
@@ -249,7 +249,7 @@ erDiagram
         integer sources_checked
         boolean needs_recheck
     }
-    verification_evidence {
+    source_check_evidence {
         bigserial id PK
         text record_type
         text record_id
@@ -264,13 +264,13 @@ erDiagram
         text checker_model
         boolean is_primary_source
     }
-    resources ||--o{ verification_evidence : "checked against"
-    verification_verdicts ||--o{ verification_evidence : "derived from"
+    resources ||--o{ source_check_evidence : "checked against"
+    source_check_verdicts ||--o{ source_check_evidence : "derived from"
 `} />
 
-The verification system has two layers:
-1. **Evidence** (`verification_evidence`): One row per source-claim check. Records what the LLM found. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification.
-2. **Verdicts** (`verification_verdicts`): One row per claim. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
+The source-check system has two layers:
+1. **Evidence** (`source_check_evidence`): One row per source-claim check. Records what the LLM found. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification.
+2. **Verdicts** (`source_check_verdicts`): One row per claim. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
 
 ---
 
@@ -609,9 +609,9 @@ flowchart LR
         DP[division_personnel]
         FP[funding_programs]
     end
-    subgraph Verification
-        VE[verification_evidence]
-        VV[verification_verdicts]
+    subgraph Source-Check
+        VE[source_check_evidence]
+        VV[source_check_verdicts]
     end
     subgraph Infra
         JOBS[jobs]

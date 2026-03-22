@@ -16,3 +16,4 @@ ALTER INDEX idx_vv_verdict RENAME TO idx_scv_verdict;
 ALTER INDEX idx_vv_recheck RENAME TO idx_scv_recheck;
 ALTER INDEX idx_vv_entity RENAME TO idx_scv_entity;
 ALTER INDEX idx_vv_type RENAME TO idx_scv_type;
+ALTER INDEX idx_vv_pk RENAME TO idx_scv_pk;
