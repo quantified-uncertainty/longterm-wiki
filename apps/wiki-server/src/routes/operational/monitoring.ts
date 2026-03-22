@@ -706,13 +706,16 @@ async function fetchDeployHistory() {
 // ---- Agent activity summary ----
 
 async function fetchAgentActivity(rawDb: ReturnType<typeof getDb>) {
+  // active_agents is a transient state table for currently-running agents.
+  // agent_sessions is the permanent session history — use it for weekly metrics.
   const result = await rawDb`
     SELECT
-      count(*) FILTER (WHERE status = 'active' AND heartbeat_at >= now() - interval '15 minutes')::int AS active_now,
+      (SELECT count(*)::int FROM active_agents
+        WHERE status = 'active' AND heartbeat_at >= now() - interval '15 minutes') AS active_now,
       count(*) FILTER (WHERE started_at >= now() - interval '7 days')::int AS sessions_this_week,
-      count(*) FILTER (WHERE started_at >= now() - interval '7 days' AND pr_number IS NOT NULL)::int AS prs_this_week,
+      count(*) FILTER (WHERE started_at >= now() - interval '7 days' AND pr_url IS NOT NULL)::int AS prs_this_week,
       count(*) FILTER (WHERE started_at >= now() - interval '7 days' AND status = 'completed')::int AS completed_this_week
-    FROM active_agents
+    FROM agent_sessions
   `;
 
   const row = result[0] as AgentActivityRow;
