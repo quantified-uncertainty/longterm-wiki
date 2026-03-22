@@ -22,29 +22,27 @@ import { loadGraphFull } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
 import type { Fact, Entity as FBEntity } from '../../packages/factbase/src/types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
-import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
-import { parseJsonResponse } from '../lib/anthropic.ts';
+import { createLlmClient } from '../lib/llm.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
-import {
-  detectPaywall,
-  isUnverifiableDomain,
-  classifyFetchError,
-  type SourceFetchErrorType,
-} from '../lib/search/paywall-detection.ts';
+import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import {
   VALID_RECORD_TYPES,
-  VALID_VERIFICATION_VERDICTS,
   type RecordType,
   type VerificationVerdict,
 } from '../../apps/wiki-server/src/api-types.ts';
+import {
+  fetchSourceContent,
+  callLlmForVerification,
+  storeVerificationEvidence,
+  storeAggregateVerdict,
+  VERIFICATION_CONSTANTS,
+  MODELS,
+} from '../lib/verification/index.ts';
+import { str, strOrNull, numOrNull, resolveName } from '../lib/verification/record-fields.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const MAX_CONTENT_LENGTH = 8000;
-const FETCH_TIMEOUT_MS = 15_000;
-/** Estimated cost per LLM verification call in USD */
-const ESTIMATED_COST_PER_VERIFICATION = 0.01;
+const { ESTIMATED_COST_PER_VERIFICATION } = VERIFICATION_CONSTANTS;
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -163,107 +161,7 @@ interface OrchestrationSummary {
   failures: VerifyError[];
 }
 
-// ── Source fetching (shared with factbase-verify and records-verify) ──
-
-interface FetchSourceResult {
-  content: string | null;
-  errorType?: SourceFetchErrorType;
-  errorMessage?: string;
-}
-
-async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
-  if (!url.startsWith('https://')) {
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
-  }
-
-  // SSRF protection
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === 'localhost' || host === '127.0.0.1' || host === '[::1]' ||
-      host === '::1' || host === '0.0.0.0' || host === '[::]' || host === '::' ||
-      host.endsWith('.local') || host.endsWith('.internal') ||
-      /^10\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
-      /^192\.168\./.test(host) || /^169\.254\./.test(host) ||
-      /^fe80:/i.test(host) || /^f[cd][0-9a-f]{2}:/i.test(host) ||
-      /^::ffff:127\./i.test(host) || /^::ffff:10\./i.test(host) ||
-      /^::ffff:192\.168\./i.test(host) ||
-      /^::ffff:172\.(1[6-9]|2\d|3[01])\./i.test(host) ||
-      /^::ffff:169\.254\./i.test(host)
-    ) {
-      return { content: null, errorType: 'access_denied', errorMessage: 'Private host blocked' };
-    }
-  } catch {
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid URL' };
-  }
-
-  if (isUnverifiableDomain(url)) {
-    return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
-  }
-
-  // Try wiki-server citation_content cache
-  try {
-    const result = await getCitationContentByUrl(url);
-    if (result.ok && result.data) {
-      const cached = result.data as Record<string, unknown>;
-      const content = cached.fullText as string | null;
-      if (content && content.length > 0) {
-        if (detectPaywall(content)) {
-          return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
-        }
-        return { content: content.slice(0, MAX_CONTENT_LENGTH) };
-      }
-    }
-  } catch (e: unknown) {
-    console.warn(`[verify-orchestrate] Cache miss: ${e instanceof Error ? e.message : String(e)}`);
-  }
-
-  // Direct fetch
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'LongtermWiki-VerifyOrchestrator/1.0',
-        'Accept': 'text/html,application/xhtml+xml,text/plain',
-      },
-    });
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      const errorType = classifyFetchError(response.status, null, null, url);
-      return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
-    }
-
-    const html = await response.text();
-    const text = html
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, MAX_CONTENT_LENGTH);
-
-    if (detectPaywall(text)) {
-      return { content: text, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
-    }
-
-    return { content: text };
-  } catch (e: unknown) {
-    if (e instanceof DOMException && e.name === 'AbortError') {
-      return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
-    }
-    return { content: null, errorType: 'fetch_error', errorMessage: e instanceof Error ? e.message : String(e) };
-  }
-}
+// fetchSourceContent is now imported from ../lib/verification/source-fetcher.ts
 
 // ── Web search for entities without sources ──────────────────────────
 
@@ -676,29 +574,7 @@ function computeRecordPriority(
 
 // ── Record description/field extraction ──────────────────────────────
 
-/** Safe field access from untyped API response objects */
-function str(item: Record<string, unknown>, key: string): string {
-  const v = item[key];
-  return typeof v === 'string' ? v : String(v ?? '');
-}
-
-function strOrNull(item: Record<string, unknown>, key: string): string | null {
-  const v = item[key];
-  return v == null ? null : String(v);
-}
-
-function numOrNull(item: Record<string, unknown>, key: string): number | null {
-  const v = item[key];
-  return typeof v === 'number' ? v : null;
-}
-
-function resolveName(item: Record<string, unknown>, ...keys: string[]): string {
-  for (const key of keys) {
-    const v = item[key];
-    if (typeof v === 'string' && v.length > 0) return v;
-  }
-  return '(unknown)';
-}
+// str, strOrNull, numOrNull, resolveName imported from ../lib/verification/record-fields.ts
 
 function buildRecordDescription(recordType: RecordType, item: Record<string, unknown>): string {
   switch (recordType) {
@@ -969,32 +845,16 @@ async function verifySingleItem(
   }
 
   try {
-    const result = await callLlm(client, prompt, {
-      model: MODELS.haiku,
-      maxTokens: 500,
-      temperature: 0,
-      retryLabel: `verify-${item.id}`,
-    });
-
-    const parsed = parseJsonResponse(result.text) as {
-      verdict: string;
-      confidence: number;
-      extracted_value: string;
-      reasoning: string;
-    };
-
-    const verdict = (VALID_VERIFICATION_VERDICTS as readonly string[]).includes(parsed.verdict)
-      ? (parsed.verdict as VerificationVerdict)
-      : 'unverifiable';
+    const llmResult = await callLlmForVerification(client, prompt, `verify-${item.id}`);
 
     return {
       itemId: item.id,
       kind: item.kind,
       description: item.description,
-      verdict,
-      confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
-      extractedValue: parsed.extracted_value ?? '',
-      reasoning: parsed.reasoning ?? '',
+      verdict: llmResult.verdict as VerificationVerdict,
+      confidence: llmResult.confidence,
+      extractedValue: llmResult.extractedValue,
+      reasoning: llmResult.reasoning,
       sourceUrl: verifiedSourceUrl,
     };
   } catch (e: unknown) {
@@ -1011,68 +871,39 @@ async function verifySingleItem(
 
 async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void> {
   if (item.data.kind === 'fact') {
-    // Store as unified verification evidence
-    const body = {
+    await storeVerificationEvidence({
       recordType: 'fact',
       recordId: (item.data as FactItemData).fact.id,
+      sourceUrl: result.sourceUrl,
       verdict: result.verdict,
       confidence: result.confidence,
       extractedValue: result.extractedValue,
-      checkerModel: MODELS.haiku,
+      reasoning: result.reasoning,
       isPrimarySource: true,
-      notes: result.reasoning,
-      sourceUrl: result.sourceUrl,
-    };
-
-    const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-      'POST',
-      '/api/verifications/evidence',
-      body,
-    );
-
-    if (!response.ok) {
-      console.warn(`[verify-orchestrate] Failed to store KB verification: ${response.error}`);
-    }
+    }, '[verify-orchestrate]');
   } else if (item.data.kind === 'record') {
     const recordData = item.data as RecordItemData;
 
-    // Store individual verification
-    const body = {
+    // Store individual verification evidence
+    await storeVerificationEvidence({
       recordType: recordData.recordType,
       recordId: recordData.recordId,
       sourceUrl: result.sourceUrl,
       verdict: result.verdict,
       confidence: result.confidence,
       extractedValue: result.extractedValue,
-      checkerModel: MODELS.haiku,
-      notes: result.reasoning,
-    };
-
-    const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-      'POST',
-      '/api/verifications/evidence',
-      body,
-    );
-
-    if (!response.ok) {
-      console.warn(`[verify-orchestrate] Failed to store record verification: ${response.error}`);
-    }
+      reasoning: result.reasoning,
+    }, '[verify-orchestrate]');
 
     // Store aggregate verdict
-    const verdictBody = {
+    await storeAggregateVerdict({
       recordType: recordData.recordType,
       recordId: recordData.recordId,
       verdict: result.verdict,
       confidence: result.confidence,
       reasoning: result.reasoning,
       sourcesChecked: 1,
-    };
-
-    await apiRequest<{ ok: boolean }>(
-      'POST',
-      '/api/verifications/verdicts',
-      verdictBody,
-    ).catch((e: unknown) => {
+    }, '[verify-orchestrate]').catch((e: unknown) => {
       console.warn(`[verify-orchestrate] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
     });
   }
@@ -1436,29 +1267,133 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
   return lines.join('\n');
 }
 
+// ── Stats command (merged from records-verify) ───────────────────────
+
+async function statsCommand(): Promise<CommandResult> {
+  const response = await apiRequest<{
+    total: number;
+    by_verdict: Record<string, number>;
+    by_type: Record<string, number>;
+    needs_recheck: number;
+    avg_confidence: number;
+  }>('GET', '/api/verifications/stats');
+
+  if (!response.ok) {
+    return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
+  }
+
+  const stats = response.data;
+  const lines: string[] = [];
+  lines.push('\x1b[1m=== Verification Stats ===\x1b[0m');
+  lines.push(`Total verdicts: ${stats.total}`);
+  lines.push(`Average confidence: ${(stats.avg_confidence * 100).toFixed(0)}%`);
+  lines.push(`Needs recheck: ${stats.needs_recheck}`);
+  lines.push('');
+
+  lines.push('\x1b[1mBy verdict:\x1b[0m');
+  for (const [verdict, cnt] of Object.entries(stats.by_verdict)) {
+    const color = verdict === 'confirmed' ? '\x1b[32m' : verdict === 'contradicted' ? '\x1b[31m' : '\x1b[33m';
+    lines.push(`  ${color}${verdict.padEnd(15)}\x1b[0m ${cnt}`);
+  }
+  lines.push('');
+
+  lines.push('\x1b[1mBy record type:\x1b[0m');
+  for (const [type, cnt] of Object.entries(stats.by_type)) {
+    lines.push(`  ${type.padEnd(20)} ${cnt}`);
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+// ── Record-type subcommand routing (merged from records-verify) ──────
+
+/** Map plural/singular CLI subcommand names to RecordType */
+const RECORD_TYPE_MAP: Record<string, RecordType> = {
+  grant: 'grant',
+  grants: 'grant',
+  personnel: 'personnel',
+  division: 'division',
+  divisions: 'division',
+  'funding-program': 'funding-program',
+  'funding-programs': 'funding-program',
+  'funding-round': 'funding-round',
+  'funding-rounds': 'funding-round',
+  investment: 'investment',
+  investments: 'investment',
+  'equity-position': 'equity-position',
+  'equity-positions': 'equity-position',
+};
+
+/**
+ * Unified verify command entry point.
+ * Routes to orchestrate, stats, or record-type-specific verification.
+ */
+async function verifyCommand(
+  args: string[],
+  options: OrchestrateOptions,
+): Promise<CommandResult> {
+  const subcommand = args[0];
+
+  // Stats subcommand
+  if (subcommand === 'stats') {
+    return statsCommand();
+  }
+
+  // sync-things subcommand (deprecated)
+  if (subcommand === 'sync-things') {
+    return { exitCode: 0, output: 'sync-things is no longer needed -- Things table no longer stores verdicts.' };
+  }
+
+  // orchestrate subcommand (explicit)
+  if (subcommand === 'orchestrate') {
+    return orchestrateCommand(args.slice(1), options);
+  }
+
+  // Record type subcommands (grants, personnel, etc.)
+  const mapped = subcommand ? RECORD_TYPE_MAP[subcommand] : undefined;
+  if (mapped) {
+    // Route to orchestrate with --type=record and entity-type filter
+    const recordOptions: OrchestrateOptions = {
+      ...options,
+      type: 'record',
+    };
+    return orchestrateCommand(args.slice(1), recordOptions);
+  }
+
+  // Default: run orchestrate
+  return orchestrateCommand(args, options);
+}
+
 // ── Exports ──────────────────────────────────────────────────────────
 
 export const commands = {
-  default: orchestrateCommand,
+  default: verifyCommand,
   orchestrate: orchestrateCommand,
+  stats: statsCommand,
 };
 
 export function getHelp(): string {
   return `
-Verification Orchestrator -- systematic verification across all data layers
+Verification — verify structured data against source URLs
 
 Usage:
-  crux verify orchestrate [options]      Run verification across facts, records, and entities
-  crux verify orchestrate --dry-run      Preview what would be verified
-  crux verify orchestrate --type=fact    Verify only FactBase facts
-  crux verify orchestrate --type=record  Verify only structured records
-  crux verify orchestrate --type=entity  Verify entities via web search
+  crux tb verify [options]                 Run verification across all data layers
+  crux tb verify orchestrate [options]     Full orchestrated verification with prioritization
+  crux tb verify stats                     Show verification coverage report
+  crux tb verify grants                    Verify all grants (shorthand for --type=record)
+  crux tb verify personnel                 Verify all personnel records
+  crux tb verify divisions                 Verify all divisions
+  crux tb verify funding-programs          Verify funding programs
+  crux tb verify funding-rounds            Verify funding rounds
+  crux tb verify investments               Verify investments
+  crux tb verify equity-positions          Verify equity positions
 
 Options:
   --budget=N             Max dollars to spend on LLM calls (est. ~$0.01/item)
   --limit=N              Max number of items to verify
   --type=X               What to verify: fact | record | entity | all (default: all)
   --entity-type=X        Filter by entity type (organization, person, ai-model, ...)
+  --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
@@ -1471,10 +1406,12 @@ Priority order:
   5. Staleness (oldest verification first)
 
 Examples:
-  crux verify orchestrate --dry-run                         Preview verification plan
-  crux verify orchestrate --budget=5 --limit=100            Verify up to 100 items, $5 cap
-  crux verify orchestrate --type=fact --entity-type=org     Verify organization facts
-  crux verify orchestrate --type=record --limit=20          Verify 20 records
-  crux verify orchestrate --source=web-search --type=entity Find and verify sourceless entities
+  crux tb verify --dry-run                              Preview verification plan
+  crux tb verify orchestrate --budget=5 --limit=100     Verify up to 100 items, $5 cap
+  crux tb verify grants --dry-run                       Preview which grants would be checked
+  crux tb verify personnel --entity=anthropic           Verify Anthropic personnel records
+  crux tb verify stats                                  Show verification coverage
+  crux tb verify --type=fact --entity-type=organization  Verify organization facts
+  crux tb verify --type=record --limit=20               Verify 20 records
 `;
 }
