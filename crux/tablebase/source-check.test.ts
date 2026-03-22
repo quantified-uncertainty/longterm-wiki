@@ -5,8 +5,8 @@ vi.mock('../lib/content-types.ts', () => ({
   PROJECT_ROOT: '/nonexistent-test-root',
 }));
 
-import { runDeterministicChecks } from './verify.ts';
-import type { VerificationIssue } from './verify.ts';
+import { runDeterministicChecks } from './source-check.ts';
+import type { VerificationIssue } from './source-check.ts';
 
 describe('runDeterministicChecks', () => {
   it('flags records missing source URL', () => {
