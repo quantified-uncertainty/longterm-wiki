@@ -77,11 +77,12 @@ async function fetchSourceContent(url: string): Promise<{ text: string } | { err
   // Try wiki-server citation content cache first
   try {
     const cached = await getCitationContentByUrl(url);
-    if (cached?.fullText && cached.fullText.length > 50) {
-      return { text: cached.fullText.slice(0, MAX_CONTENT_LENGTH) };
+    if (cached.ok && cached.data?.fullText && cached.data.fullText.length > 50) {
+      return { text: cached.data.fullText.slice(0, MAX_CONTENT_LENGTH) };
     }
-  } catch {
-    // Cache miss — fall through to direct fetch
+  } catch (e) {
+    // Cache miss or wiki-server unavailable — fall through to direct fetch
+    console.warn(`[verify] Citation cache miss for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // Direct fetch
@@ -93,7 +94,8 @@ async function fetchSourceContent(url: string): Promise<{ text: string } | { err
     });
 
     if (!res.ok) {
-      return { error: `HTTP ${res.status}`, errorType: classifyFetchError(res.status) };
+      const errorType = classifyFetchError(res.status, null, null, url);
+      return { error: `HTTP ${res.status}`, errorType: errorType ?? 'http_error' };
     }
 
     const contentType = res.headers.get('content-type') ?? '';
@@ -104,9 +106,8 @@ async function fetchSourceContent(url: string): Promise<{ text: string } | { err
     const text = await res.text();
 
     // Paywall detection
-    const paywallResult = detectPaywall(url, text);
-    if (paywallResult.isPaywalled) {
-      return { error: `Paywalled: ${paywallResult.reason}`, errorType: 'paywall' };
+    if (detectPaywall(text)) {
+      return { error: 'Content appears paywalled', errorType: 'paywall' };
     }
 
     // Strip HTML tags for a rough text extraction
