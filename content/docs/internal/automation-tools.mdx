@@ -319,7 +319,7 @@ pnpm crux scan-content
 When verifying citations, the system fetches source URLs through a multi-layer cache:
 1. **In-memory LRU cache** (500 entries, session-scoped; implementation-defined in `crux/lib/source-cache.ts`)
 2. **PostgreSQL `citation_content`** (durable, cross-machine)
-3. **Network fetch** via <EntityLink id="E2014" name="firecrawl">Firecrawl</EntityLink> API[^rc-f762] or built-in fallback
+3. **Network fetch** via [Firecrawl](https://www.firecrawl.dev) API[^rc-f762] or built-in fallback
 
 Fetched content is cached in `.cache/sources/` locally and persisted to PostgreSQL for future sessions.
 
